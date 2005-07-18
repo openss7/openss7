@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: poll.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/07/13 12:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: poll.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/07/13 12:01:18 $"
 
 /************************************************************************
 *                      poll() System Call				*
@@ -84,7 +84,7 @@ char *lis_poll_file =
 #else
     "<unknown/poll.h>"
 #endif
-    ;
+;
 
 /* typedef struct semaphore	semaphore_t ; */
 typedef struct file file_t;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -103,6 +103,7 @@ MODULE_ALIAS("streams-echo");
 #endif
 
 modID_t modid = CONFIG_STREAMS_ECHO_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -116,6 +117,7 @@ MODULE_ALIAS("streams-driver-echo");
 #endif
 
 major_t major = CONFIG_STREAMS_ECHO_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -140,9 +142,11 @@ static struct module_info echo_minfo = {
 	mi_lowat:STRLOW,
 };
 
-static int echo_put(queue_t *q, mblk_t *mp)
+static int
+echo_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
+
 	trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -155,6 +159,7 @@ static int echo_put(queue_t *q, mblk_t *mp)
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
+
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(rq, mp->b_rptr[1], FLUSHALL);
 			else
@@ -185,6 +190,7 @@ static int echo_put(queue_t *q, mblk_t *mp)
       nak:
 	{
 		union ioctypes *ioc;
+
 		mp->b_datap->db_type = M_IOCNAK;
 		ioc = (typeof(ioc)) mp->b_rptr;
 		ioc->iocblk.ioc_rval = -1;
@@ -203,12 +209,15 @@ typedef struct echo {
 static spinlock_t echo_lock = SPIN_LOCK_UNLOCKED;
 static struct echo *echo_list = NULL;
 
-static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct echo *p, **pp = &echo_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
-	ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor, sflag));
+
+	ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
+		sflag));
 	if (q->q_ptr != NULL) {
 		printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
@@ -217,7 +226,7 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
 	}
-	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	{ /* we could sleep */
+	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
 		printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
 	}
@@ -230,6 +239,7 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
+
 		printd(("%s: driver open\n", __FUNCTION__));
 		if (cminor < 1) {
 			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
@@ -240,6 +250,7 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(0, cminor)) != 0; pp = &(*pp)->next, cminor++) {
 			minor_t dminor = getminor((*pp)->dev);
+
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor && sflag != CLONEOPEN) {
@@ -269,9 +280,11 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
-static int echo_close(queue_t *q, int oflag, cred_t *crp)
+static int
+echo_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct echo *p;
+
 	trace();
 	if ((p = q->q_ptr) == NULL) {
 		pswerr(("%s: already closed\n", __FUNCTION__));
@@ -316,9 +329,11 @@ static struct cdevsw echo_cdev = {
 #ifdef CONFIG_STREAMS_ECHO_MODULE
 static
 #endif
-int __init echo_init(void)
+int __init
+echo_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_ECHO_MODULE
 	printk(KERN_INFO ECHO_BANNER);
 #else
@@ -331,10 +346,12 @@ int __init echo_init(void)
 		major = err;
 	return (0);
 };
+
 #ifdef CONFIG_STREAMS_ECHO_MODULE
 static
 #endif
-void __exit echo_exit(void)
+void __exit
+echo_exit(void)
 {
 	unregister_strdev(&echo_cdev, major);
 };

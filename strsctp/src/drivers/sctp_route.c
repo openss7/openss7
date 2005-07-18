@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
 
-static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $";
+static char const ident[] =
+    "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
 
 #define __NO_VERSION__
 
@@ -97,7 +98,6 @@ static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9
 #   define sctp_protolist __sctp_protolist
 #endif
 
-
 #if defined HAVE_LKSCTP_SCTP
 #   if !defined CONFIG_IP_SCTP && !defined CONFIG_IP_SCTP_MODULE
 #	undef HAVE_LKSCTP_SCTP
@@ -134,8 +134,8 @@ static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -216,74 +216,64 @@ sctp_choose_best(sp, not)
 
 	if ((best = sp->daddr))
 		for (sd = best->next; sd; sd = sd->next) {
-			/*
-			   choose usable over unusable 
-			 */
+			/* 
+			   choose usable over unusable */
 			if (!best->dst_cache && sd->dst_cache) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose active routes 
-			 */
+			/* 
+			   choose active routes */
 			if (best->retransmits > best->max_retrans
 			    && sd->retransmits <= sd->max_retrans) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes without timeouts 
-			 */
+			/* 
+			   choose routes without timeouts */
 			if (best->retransmits && !(sd->retransmits)) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes without dups 
-			 */
+			/* 
+			   choose routes without dups */
 			if (best->dups && !(sd->dups)) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose usable alternate if possible 
-			 */
+			/* 
+			   choose usable alternate if possible */
 			if (best == not && sd != not) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes with least excessive timeouts 
-			 */
+			/* 
+			   choose routes with least excessive timeouts */
 			if (best->retransmits + sd->max_retrans >
 			    sd->retransmits + best->max_retrans) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose routes with the least duplicates 
-			 */
+			/* 
+			   choose routes with the least duplicates */
 			if (best->dups > sd->dups) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose lowest rto 
-			 */
+			/* 
+			   choose lowest rto */
 			if (best->rto > sd->rto) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose not to slow start 
-			 */
+			/* 
+			   choose not to slow start */
 			if (best->cwnd <= best->ssthresh && sd->cwnd > sd->ssthresh) {
 				best = sd;
 				continue;
 			}
-			/*
-			   choose largest available window 
-			 */
+			/* 
+			   choose largest available window */
 			if (best->cwnd + best->mtu - 1 - best->in_flight <
 			    sd->cwnd + sd->mtu - 1 - sd->in_flight) {
 				best = sd;
@@ -321,9 +311,11 @@ dst_pmtu(struct dst_entry *dst)
 #ifndef ip_route_output_flow
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
 int
-ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags) {
+ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
+{
 	int (*func) (struct rtable **, struct flowi *, struct sock *, int)
-		= (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
+	= (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
+
 	return func(rp, flp, sk, flags);
 }
 #endif
@@ -331,9 +323,11 @@ ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int
 #ifndef __ip_route_output_key
 #ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
 int
-__ip_route_output_key(struct rtable **rp, const struct flowi *flp) {
+__ip_route_output_key(struct rtable **rp, const struct flowi *flp)
+{
 	int (*func) (struct rtable **, const struct flowi *)
-		= (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
+	= (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
+
 	return func(rp, flp);
 }
 #endif
@@ -365,7 +359,7 @@ sctp_update_routes(sp, force_reselect)
 	old_pmtu = xchg(&sp->pmtu, INT_MAX);	/* big enough? */
 	taddr = sp->taddr;
 	raddr = sp->raddr;
-	/*
+	/* 
 	 *  First we check our cached routes..
 	 */
 	for (sd = sp->daddr; sd; sd = sd->next) {
@@ -420,9 +414,8 @@ sctp_update_routes(sp, force_reselect)
 				}
 				sd->saddr = sp->saddr->saddr;
 			}
-			/*
-			   always revert to initial settings when rerouting 
-			 */
+			/* 
+			   always revert to initial settings when rerouting */
 			sd->rto = sp->rto_ini;
 			sd->rttvar = 0;
 			sd->srtt = 0;
@@ -433,14 +426,13 @@ sctp_update_routes(sp, force_reselect)
 
 			route_changed = 1;
 		}
-		/*
-		   You're welcome diald! 
-		 */
+		/* 
+		   You're welcome diald! */
 		if (sysctl_ip_dynaddr && sp->s_state == SCTP_COOKIE_WAIT && sd == sp->daddr) {
-			/*
-			   see if route changed on primary as result of INIT that was discarded 
-			 */
+			/* 
+			   see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
+
 #if defined HAVE_OLD_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif))
@@ -471,9 +463,8 @@ sctp_update_routes(sp, force_reselect)
 		}
 		viable_route = 1;
 
-		/*
-		   always update MTU if we have a viable route 
-		 */
+		/* 
+		   always update MTU if we have a viable route */
 
 		if (sd->mtu != dst_pmtu(&rt->u.dst)) {
 			sd->mtu = dst_pmtu(&rt->u.dst);
@@ -486,9 +477,8 @@ sctp_update_routes(sp, force_reselect)
 	if (!viable_route) {
 		rare();
 
-		/*
-		   set defaults 
-		 */
+		/* 
+		   set defaults */
 		sp->taddr = sp->daddr;
 		sp->raddr = sp->daddr->next ? sp->daddr->next : sp->daddr;
 
@@ -496,9 +486,8 @@ sctp_update_routes(sp, force_reselect)
 
 		return (err);
 	}
-	/*
-	   if we have made or need changes then we want to reanalyze routes 
-	 */
+	/* 
+	   if we have made or need changes then we want to reanalyze routes */
 	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr
 	    || !sp->raddr) {
 #ifdef _DEBUG

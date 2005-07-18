@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:49 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:49 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:49 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:49 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:49 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -110,6 +110,7 @@ MODULE_ALIAS("streams-pipemod");
 #endif
 
 modID_t modid = CONFIG_STREAMS_PIPEMOD_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -138,7 +139,8 @@ static struct module_info pipemod_minfo = {
  *
  *  -------------------------------------------------------------------------
  */
-static int pipemod_put(queue_t *q, mblk_t *mp)
+static int
+pipemod_put(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_datap->db_type == M_FLUSH) {
 		switch (mp->b_rptr[0] & (FLUSHR | FLUSHW)) {
@@ -163,9 +165,11 @@ static int pipemod_put(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
+
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
 	}
@@ -179,7 +183,8 @@ static int pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *c
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-static int pipemod_close(queue_t *q, int oflag, cred_t *crp)
+static int
+pipemod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
@@ -218,9 +223,11 @@ static struct fmodsw pipemod_fmod = {
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 static
 #endif
-int __init pipemod_init(void)
+int __init
+pipemod_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 	printk(KERN_INFO PIPEMOD_BANNER);
 #else
@@ -233,12 +240,15 @@ int __init pipemod_init(void)
 		modid = err;
 	return (0);
 };
+
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 static
 #endif
-void __exit pipemod_exit(void)
+void __exit
+pipemod_exit(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&pipemod_fmod)) < 0)
 		return (void) (err);
 	return (void) (0);

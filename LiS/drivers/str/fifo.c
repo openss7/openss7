@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/13 12:01:14 $"
 
 /*
  *  fifo.c - FIFO pseudo-driver
@@ -159,39 +159,39 @@ static int fifo_close(queue_t *, int, cred_t *);
  *  module structure
  */
 static struct module_info fifo_minfo = {
-	MOD_ID,			/* id */
-	MOD_NAME,		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* highwater mark */
-	512L			/* lowwater mark */
+	MOD_ID,				/* id */
+	MOD_NAME,			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* highwater mark */
+	512L				/* lowwater mark */
 };
 
 static struct qinit fifo_rinit = {
-	lis_strrput,		/* put */
-	lis_strrsrv,		/* service */
-	fifo_open,		/* open */
-	fifo_close,		/* close */
-	NULL,			/* admin */
-	&fifo_minfo,		/* info */
-	NULL			/* stat */
+	lis_strrput,			/* put */
+	lis_strrsrv,			/* service */
+	fifo_open,			/* open */
+	fifo_close,			/* close */
+	NULL,				/* admin */
+	&fifo_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit fifo_winit = {
-	NULL,			/* put */
-	lis_strwsrv,		/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&fifo_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	lis_strwsrv,			/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&fifo_minfo,			/* info */
+	NULL				/* stat */
 };
 
 struct streamtab fifo_info = {
-	&fifo_rinit,		/* read queue init */
-	&fifo_winit,		/* write queue init */
-	NULL,			/* lower mux read queue init */
-	NULL			/* lower mux write queue init */
+	&fifo_rinit,			/* read queue init */
+	&fifo_winit,			/* write queue init */
+	NULL,				/* lower mux read queue init */
+	NULL				/* lower mux write queue init */
 };
 
 static inline int

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $
+ @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $"
+#ident "@(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $"
 
-static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $";
+static char const ident[] =
+    "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -124,6 +125,7 @@ adler32(uint32_t adler, void *buf, size_t len)
 	register uint32_t s2 = (adler >> 16) & 0xffff;
 	register uint8_t *ptr = buf;
 	register int k;
+
 	if (!ptr)
 		return 1L;
 	while (len > 0) {

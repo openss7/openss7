@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.11 $) $Date: 2005/07/13 12:01:18 $
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.12 $) $Date: 2005/07/18 00:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 00:55:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.11 $) $Date: 2005/07/13 12:01:18 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.12 $) $Date: 2005/07/18 00:55:40 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -161,8 +161,8 @@ EXPORT_SYMBOL(lis_esbbcall);
 EXPORT_SYMBOL(lis_flushband);
 EXPORT_SYMBOL(lis_findmod);
 EXPORT_SYMBOL(lis_flushq);
-EXPORT_SYMBOL(lis_fmod_sw); /* for sad */
-EXPORT_SYMBOL(lis_fstr_sw); /* for sad */
+EXPORT_SYMBOL(lis_fmod_sw);	/* for sad */
+EXPORT_SYMBOL(lis_fstr_sw);	/* for sad */
 EXPORT_SYMBOL(lis_free);
 EXPORT_SYMBOL(lis_freeb);
 EXPORT_SYMBOL(lis_free_dma);

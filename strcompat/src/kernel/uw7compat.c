@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:25:42 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:25:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:25:42 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -96,7 +96,6 @@ MODULE_ALIAS("streams-uw7compat");
 #endif
 #endif
 
-
 /* don't use these - these are fakes */
 #undef allocb_physreq
 /**
@@ -105,7 +104,8 @@ MODULE_ALIAS("streams-uw7compat");
  *  @priority:		priority of the allocation
  *  @physreq_ptr:	physical requirements of the message block
  */
-mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
+mblk_t *
+allocb_physreq(size_t size, uint priority, physreq_t * prp)
 {
 #if LIS
 	return lis_allocb_physreq(size, priority, prp, __FILE__, __LINE__);
@@ -124,7 +124,8 @@ mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(allocb_physreq);	/* uw7/ddi.h */
-mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
+mblk_t *
+msgphysreq(mblk_t *mp, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
 		return (NULL);
@@ -138,7 +139,8 @@ mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(msgphysreq);	/* uw7/ddi.h */
-mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
+mblk_t *
+msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
 		return (NULL);
@@ -152,7 +154,8 @@ mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(msgpullup_physreq);	/* uw7/ddi.h */
-mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
+mblk_t *
+msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
 {
 	return (NULL);
 }
@@ -160,11 +163,13 @@ mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
 EXPORT_SYMBOL(msgscgth);	/* uw7/ddi.h */
 
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-int printf_UW7(char *fmt, ...)
+int
+printf_UW7(char *fmt, ...)
 {
 	va_list args;
 	int n;
 	char printf_buf[1024];
+
 	va_start(args, fmt);
 	n = vsnprintf(printf_buf, sizeof(printf_buf), fmt, args);
 	va_end(args);
@@ -172,31 +177,41 @@ int printf_UW7(char *fmt, ...)
 	return (n);
 }
 
-EXPORT_SYMBOL(printf_UW7);                        /* uw7/ddi.h */
+EXPORT_SYMBOL(printf_UW7);	/* uw7/ddi.h */
 
 __UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t * counter, int value);
+
 EXPORT_SYMBOL(ATOMIC_INT_ADD);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag);
+
 EXPORT_SYMBOL(ATOMIC_INT_ALLOC);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter);
+
 EXPORT_SYMBOL(ATOMIC_INT_DEALLOC);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE int ATOMIC_INT_DECR(atomic_int_t * counter);
+
 EXPORT_SYMBOL(ATOMIC_INT_DECR);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_INCR(atomic_int_t * counter);
+
 EXPORT_SYMBOL(ATOMIC_INT_INCR);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_INIT(atomic_int_t * counter, int value);
+
 EXPORT_SYMBOL(ATOMIC_INT_INIT);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE int ATOMIC_INT_READ(atomic_int_t * counter);
+
 EXPORT_SYMBOL(ATOMIC_INT_READ);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t * counter, int value);
+
 EXPORT_SYMBOL(ATOMIC_INT_SUB);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value);
+
 EXPORT_SYMBOL(ATOMIC_INT_WRITE);	/* uw7/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 static
 #endif
-int __init uw7comp_init(void)
+int __init
+uw7comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 	printk(KERN_INFO UW7COMP_BANNER);
@@ -205,10 +220,12 @@ int __init uw7comp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 static
 #endif
-void __exit uw7comp_exit(void)
+void __exit
+uw7comp_exit(void)
 {
 	return;
 }

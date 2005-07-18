@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:03:58 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/18 12:25:40  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/07/14 22:03:58  brian
  - updates for check pass and header splitting
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_OSF_STREAM_H__
 #define __SYS_OSF_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/osf/stream.h directly, include sys/stream.h instead."
@@ -91,7 +94,8 @@ extern int streams_close_comm(queue_t *, int, cred_t *);
 extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);
 extern int streams_open_ocomm(dev_t, unsigned int, queue_t *, dev_t *, int, int, cred_t *);
 
-__OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp)
+__OSF_EXTERN_INLINE void
+puthere(queue_t *q, mblk_t *mp)
 {
 	put(q, mp);
 }

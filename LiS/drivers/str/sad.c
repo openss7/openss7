@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/07/13 12:01:14 $"
 
 /*
  *  sad: STREAMS Administrative Driver
@@ -101,42 +101,42 @@ STATIC int sad_close(queue_t *, int, cred_t *);
 STATIC int sad_wput(queue_t *, mblk_t *);
 
 STATIC struct module_info sad_minfo = {
-	0,			/* Module ID number */
-	"sad",			/* Module name */
-	0,			/* Min packet size accepted */
-	INFPSZ,			/* Max packet size accepted */
-	0,			/* Hi water mark ignored */
-	0			/* Low water mark ignored */
+	0,				/* Module ID number */
+	"sad",				/* Module name */
+	0,				/* Min packet size accepted */
+	INFPSZ,				/* Max packet size accepted */
+	0,				/* Hi water mark ignored */
+	0				/* Low water mark ignored */
 };
 
 STATIC struct qinit sad_rinit = {
-	NULL,			/* No read put */
-	NULL,			/* No read service */
-	sad_open,		/* Each open */
-	sad_close,		/* Last close */
-	NULL,			/* Reserved */
-	&sad_minfo,		/* Information */
-	NULL			/* No statistics */
+	NULL,				/* No read put */
+	NULL,				/* No read service */
+	sad_open,			/* Each open */
+	sad_close,			/* Last close */
+	NULL,				/* Reserved */
+	&sad_minfo,			/* Information */
+	NULL				/* No statistics */
 };
 
 STATIC struct qinit sad_winit = {
-	sad_wput,		/* Write put */
-	NULL,			/* No write service */
-	NULL,			/* Ignored */
-	NULL,			/* Ignored */
-	NULL,			/* Reserved */
-	&sad_minfo,		/* Information */
-	NULL			/* No statistics */
+	sad_wput,			/* Write put */
+	NULL,				/* No write service */
+	NULL,				/* Ignored */
+	NULL,				/* Ignored */
+	NULL,				/* Reserved */
+	&sad_minfo,			/* Information */
+	NULL				/* No statistics */
 };
 
 #if !defined __NO_VERSION__
 STATIC
 #endif
 struct streamtab sad_info = {
-	&sad_rinit,		/* Read queue */
-	&sad_winit,		/* Write queue */
-	NULL,			/* Unused */
-	NULL			/* Unused */
+	&sad_rinit,			/* Read queue */
+	&sad_winit,			/* Write queue */
+	NULL,				/* Unused */
+	NULL				/* Unused */
 };
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sock.h,v 0.9.2.2 2005/05/14 08:29:33 brian Exp $
+ @(#) $Id: sock.h,v 0.9.2.3 2005/07/18 11:56:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_NET_NET_SOCK_H__
 #define __OS7_NET_NET_SOCK_H__
 
-#ident "@(#) $RCSfile: sock.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sock.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <linux/config.h>
 #include <linux/timer.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:04:05 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/18 12:25:41  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/07/14 22:04:05  brian
  - updates for check pass and header splitting
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_SVR4_STREAM_H__
 #define __SYS_SVR4_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/svr4/stream.h directly, include sys/stream.h instead."
@@ -85,18 +88,22 @@
 
 /* don't use these functions, they are way too dangerous */
 extern long MPSTR_QLOCK(queue_t *q);
+
 #ifndef MPSTR_QLOCK
 #define MPSTR_QLOCK(__q) MPSTR_QLOCK(__q)
 #endif
 extern void MPSTR_QRELE(queue_t *q, long s);
+
 #ifndef MPSTR_QRELE
 #define MPSTR_QRELE(__q,__f) MPSTR_QRELE(__q,__f)
 #endif
 extern long MPSTR_STPLOCK(struct stdata *stp);
+
 #ifndef MPSTR_STPLOCK
 #define MPSTR_STPLOCK(__s) MPSTR_STPLOCK(__s)
 #endif
 extern void MPSTR_STPRELE(struct stdata *stp, long s);
+
 #ifndef MPSTR_STPRELE
 #define MPSTR_STPRELE(__s,__f) MPSTR_STPRELE(__s,__f)
 #endif

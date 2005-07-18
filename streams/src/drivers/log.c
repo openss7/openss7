@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -105,6 +105,7 @@ MODULE_ALIAS("streams-log");
 #endif
 
 modID_t modid = CONFIG_STREAMS_LOG_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -118,6 +119,7 @@ MODULE_ALIAS("streams-driver-log");
 #endif
 
 major_t major = CONFIG_STREAMS_LOG_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -157,12 +159,14 @@ struct log {
 	mblk_t *traceblk;		/* a message block containing trace ids */
 };
 
-static int log_put(queue_t *q, mblk_t *mp)
+static int
+log_put(queue_t *q, mblk_t *mp)
 {
 	struct log *log = q->q_ptr;
 	union ioctypes *ioc;
 	int err = 0, rval = 0;
 	mblk_t *dp = mp->b_cont;
+
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -173,6 +177,7 @@ static int log_put(queue_t *q, mblk_t *mp)
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
+
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(rq, mp->b_rptr[1], FLUSHALL);
 			else
@@ -252,11 +257,13 @@ static int log_put(queue_t *q, mblk_t *mp)
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
 static struct log *log_list = NULL;
 
-static int log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct log *p, **pp = &log_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
@@ -272,6 +279,7 @@ static int log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	{
 		major_t dmajor = 0;
 		minor_t dminor = 0;
+
 		if (cminor < 1)
 			return (ENXIO);
 		spin_lock(&log_lock);
@@ -305,9 +313,11 @@ static int log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int log_close(queue_t *q, int oflag, cred_t *crp)
+static int
+log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;
+
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	spin_lock(&log_lock);
@@ -348,9 +358,11 @@ static struct cdevsw log_cdev = {
 #ifdef CONFIG_STREAMS_LOG_MODULE
 static
 #endif
-int __init log_init(void)
+int __init
+log_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_LOG_MODULE
 	printk(KERN_INFO LOG_BANNER);
 #else
@@ -363,10 +375,12 @@ int __init log_init(void)
 		major = err;
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_LOG_MODULE
 static
 #endif
-void __exit log_exit(void)
+void __exit
+log_exit(void)
 {
 	unregister_strdev(&log_cdev, major);
 }

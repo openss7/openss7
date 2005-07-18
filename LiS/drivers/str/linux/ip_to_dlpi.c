@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/07/13 12:01:14 $"
 
 /*************************************************************************
  *
@@ -203,19 +203,19 @@ struct module_info ip2xinetminfo = {
 	IP2XINETM_ID, "ip2xinet", 0, 8192, 8192, 1024
 };
 
-struct qinit ip2xineturinit = {	/* upper read */
+struct qinit ip2xineturinit = {		/* upper read */
 	NULL, ip2xinetursrv, ip2xinetopen, ip2xinetclose, NULL, &ip2xinetminfo, NULL
 };
 
-struct qinit ip2xinetuwinit = {	/* upper write */
+struct qinit ip2xinetuwinit = {		/* upper write */
 	ip2xinetuwput, NULL, ip2xinetopen, ip2xinetclose, NULL, &ip2xinetminfo, NULL
 };
 
-struct qinit ip2xinetlrinit = {	/* lower read */
+struct qinit ip2xinetlrinit = {		/* lower read */
 	ip2xinetlrput, NULL, NULL, NULL, NULL, &ip2xinetminfo, NULL
 };
 
-struct qinit ip2xinetlwinit = {	/* lower write */
+struct qinit ip2xinetlwinit = {		/* lower write */
 	NULL, ip2xinetlwsrv, NULL, NULL, NULL, &ip2xinetminfo, NULL
 };
 

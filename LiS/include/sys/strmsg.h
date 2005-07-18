@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: strmsg.h,v 1.1.1.2.4.2 2005/07/13 12:01:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -53,7 +53,7 @@
  * <strmsg.h> --- Linux STREAMS message types
  * Author          : gram & nemo
  * Created On      : Mon Oct 17 11:37:12 1994
- * RCS Id          ; $Id: strmsg.h,v 1.2 1996/01/27 00:40:02 dave Exp $
+ * RCS Id          ; $Id: strmsg.h,v 1.1.1.2.4.2 2005/07/13 12:01:19 brian Exp $
  * Last Modified By: David Grothe
  * Purpose         : Provide Streams message types
  *                 :
@@ -69,7 +69,7 @@
 #ifndef _STR_MSG_H
 #define _STR_MSG_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strmsg.h,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/07/13 12:01:19 $"
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -122,49 +122,49 @@
  */
 typedef enum msg_type {
 	QNORM = 0x00,			/* - S U O A H M L */
-	M_DATA = 0x00,		/* | S U O A H M L */
-	M_PROTO = 0x01,		/* | S U O A H M L */
-	M_BREAK = 0x08,		/* v S U O(0x10) A H M L(0x02) */
-	M_PASSFP = 0x09,	/* | S U O(0x11) A H M L(0x06) */
-	M_EVENT = 0x0a,		/* ? S */
-	M_SIG = 0x0b,		/* ^ S U O(0x13) A H M L(0x09) */
-	M_DELAY = 0x0c,		/* v S U O(0x14) A H M L(0x04) */
-	M_CTL = 0x0d,		/* | S U O(0x15) A H M L(0x03) */
-	M_IOCTL = 0x0e,		/* v S U O(0x16) A H M L(0x05) */
-	M_SETOPTS = 0x10,	/* ^ S U O(0x20) A H M L(0x08) */
-	M_RSE = 0x11,		/* | S U O(0x21) A H M L(0x07) */
-	M_TRAIL = 0x12,		/* ? U */
-	M_BACKWASH = 0x13,	/* v A */
-	QPCTL = 0x80,		/* - S U O A H M L(0x0a) */
-	M_IOCACK = 0x81,	/* ^ S U O A H M L(0x0f) */
-	M_IOCNAK = 0x82,	/* ^ S U O A H M L(0x10) */
-	M_PCPROTO = 0x83,	/* | S U O A H M L(0x12) */
-	M_PCSIG = 0x84,		/* ^ S U O A H M L(0x14) */
-	M_READ = 0x85,		/* v S U O(0x8b) A H(0x8b) M(0x8b) L(0x15) */
-	M_FLUSH = 0x86,		/* | S U O A H M L(0x0d) */
-	M_STOP = 0x87,		/* v S U O A H M L(0x16) */
-	M_START = 0x88,		/* v S U O A H M L(0x17) */
-	M_HANGUP = 0x89,	/* ^ S U O A H M L(0x0e) */
-	M_ERROR = 0x8a,		/* ^ S U O A H M L(0x0c) */
-	M_COPYIN = 0x8b,	/* ^ S U O(0x8d) A H(0x8d) M(0x8c) L(0x0a) */
-	M_COPYOUT = 0x8c,	/* ^ S U O(0x8e) A H(0x8e) M(0x8d) L(0x0b) */
-	M_IOCDATA = 0x8d,	/* v S U O(0x8f) A H(0x8f) M(0x8e) L(0x11) */
-	M_PCRSE = 0x8e,		/* | S U O(0x90) A H(0x90) M(0x90) L(0x13) */
-	M_STOPI = 0x8f,		/* v S U O(0x91) A H(0x91) M(0x91) L(0x19) */
-	M_STARTI = 0x90,	/* v S U O(0x92) A H(0x92) M(0x92) L(0x18) */
+	M_DATA = 0x00,			/* | S U O A H M L */
+	M_PROTO = 0x01,			/* | S U O A H M L */
+	M_BREAK = 0x08,			/* v S U O(0x10) A H M L(0x02) */
+	M_PASSFP = 0x09,		/* | S U O(0x11) A H M L(0x06) */
+	M_EVENT = 0x0a,			/* ? S */
+	M_SIG = 0x0b,			/* ^ S U O(0x13) A H M L(0x09) */
+	M_DELAY = 0x0c,			/* v S U O(0x14) A H M L(0x04) */
+	M_CTL = 0x0d,			/* | S U O(0x15) A H M L(0x03) */
+	M_IOCTL = 0x0e,			/* v S U O(0x16) A H M L(0x05) */
+	M_SETOPTS = 0x10,		/* ^ S U O(0x20) A H M L(0x08) */
+	M_RSE = 0x11,			/* | S U O(0x21) A H M L(0x07) */
+	M_TRAIL = 0x12,			/* ? U */
+	M_BACKWASH = 0x13,		/* v A */
+	QPCTL = 0x80,			/* - S U O A H M L(0x0a) */
+	M_IOCACK = 0x81,		/* ^ S U O A H M L(0x0f) */
+	M_IOCNAK = 0x82,		/* ^ S U O A H M L(0x10) */
+	M_PCPROTO = 0x83,		/* | S U O A H M L(0x12) */
+	M_PCSIG = 0x84,			/* ^ S U O A H M L(0x14) */
+	M_READ = 0x85,			/* v S U O(0x8b) A H(0x8b) M(0x8b) L(0x15) */
+	M_FLUSH = 0x86,			/* | S U O A H M L(0x0d) */
+	M_STOP = 0x87,			/* v S U O A H M L(0x16) */
+	M_START = 0x88,			/* v S U O A H M L(0x17) */
+	M_HANGUP = 0x89,		/* ^ S U O A H M L(0x0e) */
+	M_ERROR = 0x8a,			/* ^ S U O A H M L(0x0c) */
+	M_COPYIN = 0x8b,		/* ^ S U O(0x8d) A H(0x8d) M(0x8c) L(0x0a) */
+	M_COPYOUT = 0x8c,		/* ^ S U O(0x8e) A H(0x8e) M(0x8d) L(0x0b) */
+	M_IOCDATA = 0x8d,		/* v S U O(0x8f) A H(0x8f) M(0x8e) L(0x11) */
+	M_PCRSE = 0x8e,			/* | S U O(0x90) A H(0x90) M(0x90) L(0x13) */
+	M_STOPI = 0x8f,			/* v S U O(0x91) A H(0x91) M(0x91) L(0x19) */
+	M_STARTI = 0x90,		/* v S U O(0x92) A H(0x92) M(0x92) L(0x18) */
 
 	/* the rest of these are all over the board, only M_UNHANGUP is common, they have been
 	   renumbered so that at least they don't overlap */
 
-	M_PCCTL = 0x91,		/* | U */
-	M_PCSETOPTS = 0x92,	/* ^ U */
-	M_PCEVENT = 0x93,	/* ? S(0x91) */
-	M_UNHANGUP = 0x94,	/* ^ S(0x92) O */
-	M_NOTIFY = 0x95,	/* ^ O(0x93) H(0x93) */
-	M_HPDATA = 0x96,	/* ^ H(0x8c) M(0x93) */
-	M_LETSPLAY = 0x97,	/* ^ A */
-	M_DONTPLAY = 0x98,	/* v A */
-	M_BACKDONE = 0x99,	/* v A */
+	M_PCCTL = 0x91,			/* | U */
+	M_PCSETOPTS = 0x92,		/* ^ U */
+	M_PCEVENT = 0x93,		/* ? S(0x91) */
+	M_UNHANGUP = 0x94,		/* ^ S(0x92) O */
+	M_NOTIFY = 0x95,		/* ^ O(0x93) H(0x93) */
+	M_HPDATA = 0x96,		/* ^ H(0x8c) M(0x93) */
+	M_LETSPLAY = 0x97,		/* ^ A */
+	M_DONTPLAY = 0x98,		/* v A */
+	M_BACKDONE = 0x99,		/* v A */
 
 } msg_type_t;
 

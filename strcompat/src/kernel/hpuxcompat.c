@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -97,6 +97,7 @@ MODULE_ALIAS("streams-hpuxcompat");
 #endif
 
 static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
+
 /**
  *  streams_get_sleep_lock: - acquire the global sleep lock
  *  @event:	the event which will be later passed to sleep
@@ -107,14 +108,17 @@ static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
  *
  *  Return Value:streams_get_sleep_lock() returns a pointer to the global sleep lock.
  */
-lock_t *streams_get_sleep_lock(caddr_t event)
+lock_t *
+streams_get_sleep_lock(caddr_t event)
 {
 	(void) event;
 	return &sleep_lock;
 }
+
 EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
 
-lock_t *get_sleep_lock(caddr_t event) __attribute__((alias("streams_get_sleep_lock")));
+lock_t *get_sleep_lock(caddr_t event) __attribute__ ((alias("streams_get_sleep_lock")));
+
 EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
 #if LFS
@@ -138,7 +142,8 @@ EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
  *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
  *  guaranteed to be executed within the STREAMS scheduler.
  */
-void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
+void
+streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 {
 	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
 			      int perim, int type);
@@ -146,16 +151,19 @@ void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 		return;
 	// never();
 }
+
 EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
 #endif
 
-int str_install_HPUX(struct stream_inst *inst)
+int
+str_install_HPUX(struct stream_inst *inst)
 {
 #if LIS
 	switch (inst->inst_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
 		int err;
+
 		if (inst->inst_major == -1)
 			inst->inst_major = 0;
 		if ((err = lis_register_strdev(inst->inst_major, &inst->inst_str_tab, 255,
@@ -166,6 +174,7 @@ int str_install_HPUX(struct stream_inst *inst)
 	case STR_IS_MODULE:
 	{
 		int err;
+
 		if ((err = lis_register_strmod(&inst->inst_str_tab, inst->name)) > 0)
 			inst->inst_major = err;
 		return (err < 0 ? -err : 0);
@@ -180,6 +189,7 @@ int str_install_HPUX(struct stream_inst *inst)
 	{
 		struct cdevsw *cdev;
 		int err;
+
 		if (!(cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)))
 			return (ENOMEM);
 		cdev->d_name = inst->name;
@@ -224,6 +234,7 @@ int str_install_HPUX(struct stream_inst *inst)
 	{
 		struct fmodsw *fmod;
 		int err;
+
 		if (!(fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)))
 			return (ENOMEM);
 		fmod->f_name = inst->name;
@@ -272,7 +283,8 @@ int str_install_HPUX(struct stream_inst *inst)
 
 EXPORT_SYMBOL(str_install_HPUX);
 
-int str_uninstall(struct stream_inst *inst)
+int
+str_uninstall(struct stream_inst *inst)
 {
 #if LIS
 	switch (inst->inst_flags & STR_TYPE_MASK) {
@@ -290,6 +302,7 @@ int str_uninstall(struct stream_inst *inst)
 	{
 		struct cdevsw *cdev;
 		int err;
+
 		if ((cdev = cdev_str(&inst->inst_str_tab)) == NULL)
 			return (ENOENT);
 		if ((err = unregister_strdev(cdev, inst->inst_major)) == 0)
@@ -300,6 +313,7 @@ int str_uninstall(struct stream_inst *inst)
 	{
 		struct fmodsw *fmod;
 		int err;
+
 		if ((fmod = fmod_str(&inst->inst_str_tab)) == NULL)
 			return (ENOENT);
 		if ((err = unregister_strmod(fmod)) == 0)
@@ -317,7 +331,8 @@ EXPORT_SYMBOL(str_uninstall);
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 static
 #endif
-int __init hpuxcomp_init(void)
+int __init
+hpuxcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 	printk(KERN_INFO HPUXCOMP_BANNER);
@@ -326,10 +341,12 @@ int __init hpuxcomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 static
 #endif
-void __exit hpuxcomp_exit(void)
+void __exit
+hpuxcomp_exit(void)
 {
 	return;
 }

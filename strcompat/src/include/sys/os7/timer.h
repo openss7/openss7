@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -74,6 +74,7 @@ ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 	       int (*to_fnc) (struct head *), void (*exp_func) (caddr_t))
 {
 	struct head *h = (struct head *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&h->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", mod, h, timer, jiffies));
@@ -103,6 +104,7 @@ __OS7_EXTERN_INLINE void
 ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", mod, h, timer, jiffies));

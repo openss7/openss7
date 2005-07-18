@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $
+ @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/16 21:07:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $"
+#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $";
+static char const ident[] =
+    "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:53:08 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
@@ -78,8 +79,10 @@ hmac_md5(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
 	uint8_t k_opad[65];
 	uint8_t tk[16];
 	int i;
+
 	if (klen > 64) {
 		MD5_CTX ctx;
+
 		MD5Init(&ctx);
 		MD5Update(&ctx, key, klen);
 		MD5Final(tk, &ctx);

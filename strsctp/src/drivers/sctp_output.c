@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
 
-static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $";
+static char const ident[] =
+    "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
 
 #define __NO_VERSION__
 
@@ -134,8 +135,8 @@ static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -204,6 +205,7 @@ sctp_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
+
 	if (skb->len > rt->u.dst.pmtu) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
@@ -238,6 +240,7 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 		.proto = IPPROTO_SCTP,
 		.uli_u = {.ports = {.sport = 0,.dport = 0}}
 	};
+
 	return ip_route_output_key(rp, &fl);
 }
 #endif
@@ -248,6 +251,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 	mblk_t *mp;
 {
 	struct rtable *rt = NULL;
+
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, 0, 0)) {
 		struct sk_buff *skb;
@@ -287,6 +291,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
+
 				if (blen > 0) {
 					bcopy(bp->b_rptr, data, blen);
 					data += blen;
@@ -301,10 +306,9 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			rare();
 	} else
 		rare();
-	/*
+	/* 
 	   sending OOTB reponses are one time events, if we can't send the message we just drop it, 
-	   the peer will probably come back again later 
-	 */
+	   the peer will probably come back again later */
 	freemsg(mp);
 	return;
 }
@@ -327,6 +331,7 @@ sctp_xmit_msg(daddr, mp, sp)
 	sctp_t *sp;
 {
 	struct rtable *rt = NULL;
+
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, 0)) {
 		struct sk_buff *skb;
@@ -367,6 +372,7 @@ sctp_xmit_msg(daddr, mp, sp)
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
+
 				if (blen > 0) {
 					bcopy(bp->b_rptr, data, blen);
 					data += blen;
@@ -382,10 +388,9 @@ sctp_xmit_msg(daddr, mp, sp)
 			rare();
 	} else
 		rare();
-	/*
+	/* 
 	   sending INIT ACKs are one time events, if we can't get the response off, we just drop
-	   the INIT ACK: the peer should send us another INIT * in a short while... 
-	 */
+	   the INIT ACK: the peer should send us another INIT * in a short while... */
 	freemsg(mp);
 	return;
 }
@@ -427,7 +432,8 @@ sctp_send_msg(sp, sd, mp)
 
 #ifdef SCTP_CONFIG_ERROR_GENERATOR
 			if ((sp->options & SCTP_OPTION_DBREAK)
-			    && sd->daddr == 0x010000ff && ++break_packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
+			    && sd->daddr == 0x010000ff
+			    && ++break_packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 				if (break_packets > SCTP_CONFIG_BREAK_GENERATOR_LIMIT)
 					break_packets = 0;
 				return;
@@ -496,6 +502,7 @@ sctp_send_msg(sp, sd, mp)
 
 					for (db = bp; db; db = db->b_cont) {
 						int blen = db->b_wptr - db->b_rptr;
+
 						normal(db->b_datap->db_type == M_DATA);
 						if (db->b_datap->db_type == M_DATA) {
 							normal(blen > 0);
@@ -509,10 +516,10 @@ sctp_send_msg(sp, sd, mp)
 						}
 					}
 					{
-						/*
-						   pad each chunk if not padded already 
-						 */
+						/* 
+						   pad each chunk if not padded already */
 						size_t pad = PADC(clen) - clen;
+
 						ensure(head + plen >= data + pad, kfree_skb(skb);
 						       return);
 						bzero(data, pad);
@@ -531,7 +538,7 @@ sctp_send_msg(sp, sd, mp)
 				sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
 				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-				/*
+				/* 
 				 *  Whenever we transmit something, we expect a reply to our v_tag, so
 				 *  we put ourselves in the 1st level vtag caches expecting a quick
 				 *  reply.

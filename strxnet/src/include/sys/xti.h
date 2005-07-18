@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.5 2005/07/14 22:04:25 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.6 2005/07/18 12:45:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:25 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_H
 #define _SYS_XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifndef t_scalar_t
 /**
@@ -64,6 +64,7 @@
  * systems, however, t_scalar_t is only defined here.
  */
 typedef int32_t t_scalar_t;
+
 #define t_scalar_t t_scalar_t
 #endif				/* !defined t_scalar_t */
 
@@ -77,6 +78,7 @@ typedef int32_t t_scalar_t;
  * in stropts.h according to SUSv2 and SUSv3.
  */
 typedef u_int32_t t_uscalar_t;
+
 #define t_uscalar_t t_uscalar_t
 #endif				/* !defined t_uscalar_t */
 #endif				/* !defined _STROPTS_H || defined NEED_T_USCALAR_T */
@@ -182,6 +184,7 @@ typedef u_int32_t t_uscalar_t;
  * multi-threading environment a typical definition of t_errno is:
  */
 extern int *_t_errno(void);
+
 #define t_errno (*(_t_errno()))
 
 /* 
@@ -289,6 +292,7 @@ struct t_leaf_status {
 	int status;			/* status: T_CONNECT or T_DISCONNECT */
 	int reason;			/* disconnect reason */
 };
+
 #define t_leaf_status t_leaf_status
 
 #define T_LEAF_NOCHANGE		0
@@ -301,90 +305,130 @@ struct t_leaf_status {
  */
 /* XTI Library Function: t_accept - accept a connection request */
 extern int t_accept __P((int, int, const struct t_call *));
+
 /* XTI Library Function: t_addleaf - add a leaf to point to multipoint connection */
 extern int t_addleaf __P((int, int, struct netbuf *));
+
 /* XTI Library Function: t_alloc - allocate a library structure */
 extern char *t_alloc __P((int, int, int));
+
 /* XTI Library Function: t_bind - bind an address to a transport endpoint */
 extern int t_bind __P((int, const struct t_bind *, struct t_bind *));
+
 /* XTI Library Function: t_close - close a transport endpoint */
 extern int t_close __P((int));
+
 /* XTI Library Function: t_connect - establish a connection */
 extern int t_connect __P((int, const struct t_call *, struct t_call *));
+
 /* XTI Library Function: t_error - produce error message */
 extern int t_error __P((const char *));
+
 /* XTI Library Function: t_free - free a library structure */
 extern int t_free __P((void *, int));
+
 /* XTI Library Function: t_getinfo - get protocol-specific service information */
 extern int t_getinfo __P((int, struct t_info *));
+
 /* XTI Library Function: t_getprotaddr - get protocol addresses */
 extern int t_getprotaddr __P((int, struct t_bind *, struct t_bind *));
+
 /* XTI Library Function: t_getstate - get the current state */
 extern int t_getstate __P((int));
+
 /* XTI Library Function: t_listen - listen for a connection indication */
 extern int t_listen __P((int, struct t_call *));
+
 /* XTI Library Function: t_look - look at current event on a transport endpoint */
 extern int t_look __P((int));
+
 /* XTI Library Function: t_open - establish a transport endpoint */
 extern int t_open __P((const char *, int, struct t_info *));
+
 /* XTI Library Function: t_optmgmt - manage options for a transport endpoint */
 extern int t_optmgmt __P((int, const struct t_optmgmt *, struct t_optmgmt *));
+
 /* XTI Library Function: t_rcv - receive data or expedited data on a connection */
 extern int t_rcv __P((int, char *, unsigned int, int *));
+
 /* XTI Library Function: t_rcvconnect - receive the confirmation from a connection request */
 extern int t_rcvconnect __P((int, struct t_call *));
+
 /* XTI Library Function: t_rcvdis - retrieve information from disconnect */
 extern int t_rcvdis __P((int, struct t_discon *));
+
 /* XTI Library Function: t_rcvleafchange - acknowledge receipt of a leaf change indication */
 extern int t_rcvleafchange __P((int, struct t_leaf_status *));
+
 /* XTI Library Function: t_rcvopt - receive data with options */
-extern int t_rcvopt __P((int fd, struct t_unitdata *optdata, int *flags));
+extern int t_rcvopt __P((int fd, struct t_unitdata * optdata, int *flags));
+
 /* XTI Library Function: t_rcvrel - acknowledge receipt of an orderly release indication */
 extern int t_rcvrel __P((int));
+
 /* XTI Library Function: t_rcvreldata - receive an orderly release indication or confirmation
    containing user data */
 extern int t_rcvreldata __P((int, struct t_discon *));
+
 /* XTI Library Function: t_rcvudata - receive a data unit */
 extern int t_rcvudata __P((int, struct t_unitdata *, int *));
+
 /* XTI Library Function: t_rcvuderr - receive a unit data error indication */
 extern int t_rcvuderr __P((int, struct t_uderr *));
+
 /* XTI Library Function: t_rcvv - receive data or expedited data sent over a connection and put the 
    data into one or more noncontiguous buffers */
 extern int t_rcvv __P((int, struct t_iovec *, unsigned int, int *));
+
 /* XTI Library Function: t_rcvvudata - receive data with options into one or more noncontiguous buffers */
 //extern int t_rcvvopt __P((int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags));
 /* XTI Library Function: t_rcvvudata - receive a data unit into one or more noncontiguous buffers */
 extern int t_rcvvudata __P((int, struct t_unitdata *, struct t_iovec *, unsigned int, int *));
+
 /* XTI Library Function: t_removeleaf - remove a leaf from a point to multipoint connection */
 extern int t_removeleaf __P((int, int, int));
+
 /* XTI Library Function: t_snd - send data or expedited data over a connection */
 extern int t_snd __P((int, char *, unsigned int, int));
+
 /* XTI Library Function: t_snddis - send user-initiated disconnect request */
 extern int t_snddis __P((int, const struct t_call *));
+
 /* XTI Library Function: t_sndopt - send data with options */
-extern int t_sndopt __P((int fd, const struct t_unitdata *optdata, int flags));
+extern int t_sndopt __P((int fd, const struct t_unitdata * optdata, int flags));
+
 /* XTI Library Function: t_sndrel - initiate an orderly release */
 extern int t_sndrel __P((int));
+
 /* XTI Library Function: t_sndreldata - initiate or respond to an orderly release with user data */
 extern int t_sndreldata __P((int, struct t_discon *));
+
 /* XTI Library Function: t_sndudata - send a data unit */
 extern int t_sndudata __P((int, const struct t_unitdata *));
+
 /* XTI Library Function: t_sndv - send data or expedited data, from one or more noncontiguous
    buffers, on a connection */
 extern int t_sndv __P((int, const struct t_iovec *, unsigned int, int));
+
 /* XTI Library Function: t_sndvopt - send data with options from one or more non-contiguous buffers */
-extern int t_sndvopt __P((int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags));
+extern int t_sndvopt
+__P((int fd, const struct t_unitdata * optdata, const struct t_iovec * iov, unsigned int iovcount,
+     int flags));
 /* XTI Library Function: t_sndvudata - send a data unit from one or more non-contiguous buffers */
 extern int t_sndvudata __P((int, struct t_unitdata *, struct t_iovec *, unsigned int));
+
 /* XTI Library Function: t_strerror - generate error message string */
 extern const char *t_strerror __P((int));
+
 /* XTI Library Function: t_sync - synchronise transport library */
 extern int t_sync __P((int));
+
 /* XTI Library Function: t_sysconf - get configurable XTI variables */
 extern int t_sysconf __P((int));
+
 /* XTI Library Function: t_unbind - disable a transport endpoint */
 extern int t_unbind __P((int));
-#endif	/* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /* 
  * The following are the events returned from t_look().

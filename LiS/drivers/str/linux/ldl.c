@@ -1,69 +1,69 @@
-_RP				/* 
-				 *  ldl: Yet another unfinished DLPI driver
-				 *
-				 *  Version: 0.4.1
-				 *
-				 *  Copyright (C) 1998, 1999 Ole Husgaard (sparre@login.dknet.dk)
-				 *
-				 *  Token ring support by Dave Grothe Copyright (C) 1999
-				 *
-				 *  This program is free software; you can redistribute it and/or modify
-				 *  it under the terms of the GNU General Public License as published by
-				 *  the Free Software Foundation; either version 2 of the License, or
-				 *  (at your option) any later version.
-				 *
-				 *  This program is distributed in the hope that it will be useful,
-				 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-				 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-				 *  GNU General Public License for more details.
-				 *
-				 *  You should have received a copy of the GNU General Public License
-				 *  along with this program; if not, write to the Free Software
-				 *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-				 *
-				 * 
-				 * 
-				 * This driver does not attempt to do any hardware programming. Instead
-				 * this driver is an interface between the existing Linux network device
-				 * driver interface and the DLPI interface.
-				 * 
-				 * It will also work in cooperation with Linux protocol drivers. You can
-				 * BIND the IP protocol to a Linux netdevice that is also used by the
-				 * Linux IP socket interface:
-				 * Incoming packets are delivered to this DLPI driver *and* to the Linux
-				 * IP socket interface. But packets sent out by this DLPI driver are *not*
-				 * seen by the Linux IP socket interface, and packets send out by the Linux
-				 * IP socket interface are *not* seen by this driver. This means that the
-				 * Linux IP code will see a response to an IP protocol packet sent out from
-				 * this DLPI driver.
-				 * To avoid this sort of confusion, you should do one of:
-				 *   1) Use this driver for listening only.
-				 *   2) Use protocols *not* used by the Linux socket code.
-				 *   3) Tell Linux that the interface is down (does this work?)
-				 *
-				 * The PPA (device number) used for ATTACH is determined by looking at
-				 * the Linux netdevice list. The first netdevice has PPA 0. You can see
-				 * the device list in /proc/net/dev, or you can do a LDL_FINDPPA IOCTL if
-				 * you know the netdevice name.
-				 * You can OR the PPA with one of the LDL_FRAME_xxx constants defined in
-				 * ldl.h if you want to use other framing types that the default ethernet II.
-				 * 
-				 * Currently only ethernet devices and the loopback device are supported.
-				 * 
-				 * 
-				 * TODO: Sending IP packets from ldl to the native Linux IP layer across
-				 * the loopback interface no longer works. The native IP receive code now
-				 * checks a field skb->dst to see if the packet is bogus. This field is set
-				 * on receive from a network card, but due to some optimizations this is
-				 * set before transmit when using the loopback interface. The skb->dst field
-				 * should point to an entry in the ipv4 FIB, and I do not think that there is
-				 * any way to get at this without changing the native Linux ipv4 code.
-				 * And it looks like doing this would either slow down the native ipv4 code,
-				 * open up a security hole, or make the kernel significantly bigger.
-				 * Another option could be to change this driver to check for ipv4 on the
-				 * loopback interface. When this is detected, we could set skb->dst.
-				 * 
-				 */
+/* 
+ *  ldl: Yet another unfinished DLPI driver
+ *
+ *  Version: 0.4.1
+ *
+ *  Copyright (C) 1998, 1999 Ole Husgaard (sparre@login.dknet.dk)
+ *
+ *  Token ring support by Dave Grothe Copyright (C) 1999
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * 
+ * 
+ * This driver does not attempt to do any hardware programming. Instead
+ * this driver is an interface between the existing Linux network device
+ * driver interface and the DLPI interface.
+ * 
+ * It will also work in cooperation with Linux protocol drivers. You can
+ * BIND the IP protocol to a Linux netdevice that is also used by the
+ * Linux IP socket interface:
+ * Incoming packets are delivered to this DLPI driver *and* to the Linux
+ * IP socket interface. But packets sent out by this DLPI driver are *not*
+ * seen by the Linux IP socket interface, and packets send out by the Linux
+ * IP socket interface are *not* seen by this driver. This means that the
+ * Linux IP code will see a response to an IP protocol packet sent out from
+ * this DLPI driver.
+ * To avoid this sort of confusion, you should do one of:
+ *   1) Use this driver for listening only.
+ *   2) Use protocols *not* used by the Linux socket code.
+ *   3) Tell Linux that the interface is down (does this work?)
+ *
+ * The PPA (device number) used for ATTACH is determined by looking at
+ * the Linux netdevice list. The first netdevice has PPA 0. You can see
+ * the device list in /proc/net/dev, or you can do a LDL_FINDPPA IOCTL if
+ * you know the netdevice name.
+ * You can OR the PPA with one of the LDL_FRAME_xxx constants defined in
+ * ldl.h if you want to use other framing types that the default ethernet II.
+ * 
+ * Currently only ethernet devices and the loopback device are supported.
+ * 
+ * 
+ * TODO: Sending IP packets from ldl to the native Linux IP layer across
+ * the loopback interface no longer works. The native IP receive code now
+ * checks a field skb->dst to see if the packet is bogus. This field is set
+ * on receive from a network card, but due to some optimizations this is
+ * set before transmit when using the loopback interface. The skb->dst field
+ * should point to an entry in the ipv4 FIB, and I do not think that there is
+ * any way to get at this without changing the native Linux ipv4 code.
+ * And it looks like doing this would either slow down the native ipv4 code,
+ * open up a security hole, or make the kernel significantly bigger.
+ * Another option could be to change this driver to check for ipv4 on the
+ * loopback interface. When this is detected, we could set skb->dst.
+ * 
+ */
 #undef DEBUG			/* unused symbol that causes a warning */
 #include <sys/LiS/module.h>	/* must be VERY first include */
 #include <linux/version.h>
@@ -360,42 +360,42 @@ STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type 
 STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp);
 
 STATIC struct module_info dl_minfo = {
-	0x7253,			/* Module ID number */
-	"ldl",			/* Module name: Linux DataLink */
-	4,			/* Min packet size accepted */
-	INFPSZ,			/* Max packet size accepted */
-	0x10000,		/* Hi water mark: 64 Kb */
-	0x04000			/* Low water mark: 16 Kb */
+	0x7253,				/* Module ID number */
+	"ldl",				/* Module name: Linux DataLink */
+	4,				/* Min packet size accepted */
+	INFPSZ,				/* Max packet size accepted */
+	0x10000,			/* Hi water mark: 64 Kb */
+	0x04000				/* Low water mark: 16 Kb */
 };
 
 STATIC struct qinit dl_rinit = {
-	NULL,			/* No read put */
-	dl_rsrv,		/* Read service */
-	dl_open,		/* Each open */
-	dl_close,		/* Last close */
-	NULL,			/* Reserved */
-	&dl_minfo,		/* Information */
-	NULL			/* No statistics */
+	NULL,				/* No read put */
+	dl_rsrv,			/* Read service */
+	dl_open,			/* Each open */
+	dl_close,			/* Last close */
+	NULL,				/* Reserved */
+	&dl_minfo,			/* Information */
+	NULL				/* No statistics */
 };
 
 STATIC struct qinit dl_winit = {
-	dl_wput,		/* Write put */
-	dl_wsrv,		/* Write service */
-	NULL,			/* Ignored */
-	NULL,			/* Ignored */
-	NULL,			/* Reserved */
-	&dl_minfo,		/* Information */
-	NULL			/* No statistics */
+	dl_wput,			/* Write put */
+	dl_wsrv,			/* Write service */
+	NULL,				/* Ignored */
+	NULL,				/* Ignored */
+	NULL,				/* Reserved */
+	&dl_minfo,			/* Information */
+	NULL				/* No statistics */
 };
 
 #ifdef MODULE
 STATIC
 #endif
 struct streamtab ldl_info = {
-	&dl_rinit,		/* Read queue */
-	&dl_winit,		/* Write queue */
-	NULL,			/* Unused */
-	NULL			/* Unused */
+	&dl_rinit,			/* Read queue */
+	&dl_winit,			/* Write queue */
+	NULL,				/* Unused */
+	NULL				/* Unused */
 };
 
 STATIC void

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $
+ @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $"
+#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $";
+static char const ident[] =
+    "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -115,15 +116,17 @@ static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 
  *  Code adapted directly from RFC 2401.
  */
 void
-hmac_md5(uint8_t * text, int tlen, uint8_t * key, int klen, uint8_t * digest)
+hmac_md5(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
 {
 	MD5_CTX context;
 	uint8_t k_ipad[65];
 	uint8_t k_opad[65];
 	uint8_t tk[16];
 	int i;
+
 	if (klen > 64) {
 		MD5_CTX ctx;
+
 		MD5Init(&ctx);
 		MD5Update(&ctx, key, klen);
 		MD5Final(tk, &ctx);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -173,7 +173,8 @@ typedef struct tirdwr {
 
 static kmem_cache_t *tirdwr_priv_cachep = NULL;
 
-static int tirdwr_init_caches(void)
+static int
+tirdwr_init_caches(void)
 {
 	if (!tirdwr_priv_cachep
 	    && !(tirdwr_priv_cachep =
@@ -186,7 +187,8 @@ static int tirdwr_init_caches(void)
 	return (0);
 }
 
-static int tirdwr_term_caches(void)
+static int
+tirdwr_term_caches(void)
 {
 	if (tirdwr_priv_cachep) {
 		if (kmem_cache_destroy(tirdwr_priv_cachep)) {
@@ -198,9 +200,11 @@ static int tirdwr_term_caches(void)
 	return (0);
 }
 
-static tirdwr_t *tirdwr_alloc_priv(queue_t *q)
+static tirdwr_t *
+tirdwr_alloc_priv(queue_t *q)
 {
 	tirdwr_t *priv;
+
 	if ((priv = kmem_cache_alloc(tirdwr_priv_cachep, SLAB_ATOMIC))) {
 		priv->rq = q;
 		priv->wq = WR(q);
@@ -222,9 +226,11 @@ static tirdwr_t *tirdwr_alloc_priv(queue_t *q)
 	return (priv);
 }
 
-static void tirdwr_free_priv(queue_t *q)
+static void
+tirdwr_free_priv(queue_t *q)
 {
 	tirdwr_t *priv;
+
 	if ((priv = (typeof(priv)) q->q_ptr)) {
 		if (priv->rdzero_bcid)
 			unbufcall(xchg(&priv->rdzero_bcid, 0));
@@ -257,7 +263,8 @@ static void tirdwr_eproto_bc(long arg);
 #define TIRDWR_HANGUP	01
 #define TIRDWR_EPROTO	02
 
-static void tirdwr_rdzero(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
+static void
+tirdwr_rdzero(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 {
 	if (bp)
 		freemsg(bp);
@@ -275,7 +282,8 @@ static void tirdwr_rdzero(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call", MOD_NAME);
 	}
 }
-static void tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
+static void
+tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 {
 	if (bp)
 		freemsg(bp);
@@ -296,7 +304,8 @@ static void tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call", MOD_NAME);
 	}
 }
-static void tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
+static void
+tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 {
 	if (bp)
 		freemsg(bp);
@@ -318,21 +327,27 @@ static void tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 	}
 }
 
-static void tirdwr_rdzero_bc(long arg)
+static void
+tirdwr_rdzero_bc(long arg)
 {
 	tirdwr_t *priv = (typeof(priv)) arg;
+
 	if (xchg(&priv->rdzero_bcid, 0) != 0)
 		tirdwr_hangup((tirdwr_t *) arg, NULL, NULL);
 }
-static void tirdwr_hangup_bc(long arg)
+static void
+tirdwr_hangup_bc(long arg)
 {
 	tirdwr_t *priv = (typeof(priv)) arg;
+
 	if (xchg(&priv->hangup_bcid, 0) != 0)
 		tirdwr_hangup((tirdwr_t *) arg, NULL, NULL);
 }
-static void tirdwr_eproto_bc(long arg)
+static void
+tirdwr_eproto_bc(long arg)
 {
 	tirdwr_t *priv = (typeof(priv)) arg;
+
 	if (xchg(&priv->eproto_bcid, 0) != 0)
 		tirdwr_eproto((tirdwr_t *) arg, NULL, NULL);
 }
@@ -345,7 +360,8 @@ static void tirdwr_eproto_bc(long arg)
  *  =========================================================================
  */
 
-static inline void tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
+static inline void
+tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 {
 #if !defined TIRDWR_PEDANTIC
 	/* Although SVR 4 documentation says that we ignore message delimitors, we restore message
@@ -359,10 +375,12 @@ static inline void tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 	return;
 }
 
-static int tirdwr_rput(queue_t *q, mblk_t *mp)
+static int
+tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *bp = NULL;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
@@ -401,6 +419,7 @@ static int tirdwr_rput(queue_t *q, mblk_t *mp)
 	case M_PROTO:
 	{
 		union T_primitives *p = (typeof(p)) mp->b_rptr;
+
 		if (mp->b_wptr < mp->b_rptr + sizeof(p->type)) {
 			tirdwr_eproto(priv, mp, bp);
 			break;
@@ -509,10 +528,12 @@ static int tirdwr_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int tirdwr_wput(queue_t *q, mblk_t *mp)
+static int
+tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
@@ -603,10 +624,12 @@ static int tirdwr_wput(queue_t *q, mblk_t *mp)
  *  Note that LiS does not do module counting, therefore we have to do it.
  */
 
-static int tirdwr_push(queue_t *q)
+static int
+tirdwr_push(queue_t *q)
 {
 	queue_t *hq;
 	int err = 0;
+
 	/* Need to check for bad messages on stream head read queue. LiS does not have a freezestr
 	   or much of a qprocsoff, but the stream should be effectively frozen, so we can
 	   dereference the q->q_next pointer.  If anything, the q->q_next pointer should remain
@@ -615,8 +638,10 @@ static int tirdwr_push(queue_t *q)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
+
 #ifdef LIS
 		lis_flags_t psw;
+
 		/* Under LiS we can't freeze the stream but we can lock the queue.  This is not a
 		   completely satisfactory solution for SMP because another processor could be in
 		   the middle of performing putq to the queue from before the push while we lock
@@ -656,15 +681,18 @@ static int tirdwr_push(queue_t *q)
 #   endif
 #endif
 
-static void tirdwr_pop(queue_t *q)
+static void
+tirdwr_pop(queue_t *q)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *mp;
+
 	switch (priv->state) {
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIRDWR_EPROTO)) {
 			if ((mp = allocb(sizeof(struct T_ordrel_req), BPRI_WAITOK))) {
 				struct T_ordrel_req *prim = (typeof(prim)) mp->b_wptr;
+
 				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;
 				prim->PRIM_type = T_ORDREL_REQ;
@@ -676,6 +704,7 @@ static void tirdwr_pop(queue_t *q)
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 			struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+
 			mp->b_wptr = (unsigned char *) (prim + 1);
 			mp->b_datap->db_type = M_PROTO;
 			prim->PRIM_type = T_DISCON_REQ;
@@ -711,9 +740,11 @@ static void tirdwr_pop(queue_t *q)
 #   endif			/* defined M_UNHANGUP */
 }
 
-static int tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+static int
+tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err = 0;
+
 	if (q->q_ptr != NULL)
 		goto quit;	/* already open */
 	err = ENXIO;
@@ -730,7 +761,8 @@ static int tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp
 	return (err);
 }
 
-static int tirdwr_close(queue_t *q, int oflag, cred_t *crp)
+static int
+tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
@@ -770,6 +802,7 @@ static int tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -790,17 +823,21 @@ STATIC struct fmodsw tirdwr_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC int tirdwr_register_strmod(void)
+STATIC int
+tirdwr_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	return (0);
 }
 
-STATIC int tirdwr_unregister_strmod(void)
+STATIC int
+tirdwr_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	return (0);
@@ -814,17 +851,21 @@ STATIC int tirdwr_unregister_strmod(void)
  */
 #ifdef LIS
 
-STATIC int tirdwr_register_strmod(void)
+STATIC int
+tirdwr_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&tirdwrinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	return (0);
 }
 
-STATIC int tirdwr_unregister_strmod(void)
+STATIC int
+tirdwr_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&tirdwrinfo)) < 0)
 		return (err);
 	return (0);
@@ -832,9 +873,11 @@ STATIC int tirdwr_unregister_strmod(void)
 
 #endif				/* LIS */
 
-MODULE_STATIC int __init tirdwrinit(void)
+MODULE_STATIC int __init
+tirdwrinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = tirdwr_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -850,9 +893,11 @@ MODULE_STATIC int __init tirdwrinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit tirdwrterminate(void)
+MODULE_STATIC void __exit
+tirdwrterminate(void)
 {
 	int err;
+
 	if ((err = tirdwr_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = tirdwr_term_caches()))

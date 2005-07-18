@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/07/14 03:40:05 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/07/18 12:25:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_IRIX_DDI_H__
 #define __SYS_IRIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/14 03:40:05 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:25:39 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -73,13 +73,15 @@
 #endif
 #include <sys/svr4/ddi.h>	/* for lock_t */
 
-__IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args)
+__IRIX_EXTERN_INLINE void
+icmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	return vcmn_err(err_lvl, fmt, args);
 }
 
 /* gcc 3.4.3 can't handle inlining with variable argument list */
-extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 3, 4)));
+extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
+    __attribute__ ((format(printf, 3, 4)));
 
 #elif defined(_IRIX_SOURCE)
 #warning "_IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX"

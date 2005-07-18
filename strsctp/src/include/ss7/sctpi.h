@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctpi.h,v 0.9.2.2 2005/05/14 08:29:19 brian Exp $
+ @(#) $Id: sctpi.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTPI_H__
 #define __SCTPI_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  This is a STREAMS-based definition of the SCTP (Stream Control
@@ -136,6 +136,7 @@ typedef struct {
 	sctp_ushort sctp_num_addr;	/* number of local addresses in list */
 	sctp_ulong sctp_addrs[0];	/* list of local addresses */
 } sctp_initialize_req_t;
+
 /*
    followed by list of addresses 
  */
@@ -161,6 +162,7 @@ typedef struct {
 	sctp_ulong sctp_num_dtas;	/* number of destination transport addrs */
 	sctp_dta_t sctp_dtas[0];	/* list of destination transport addresses */
 } sctp_associate_con_t;
+
 /*
    followed by list of destination transport addresses 
  */

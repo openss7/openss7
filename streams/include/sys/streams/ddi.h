@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.26 2005/07/15 23:09:43 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.27 2005/07/18 12:06:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/15 23:09:43 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:06:58 $"
 
 #ifndef __SYS_DDI_H__
 #warn "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -79,29 +79,36 @@
 #include <sys/map.h>		/* for rm map definitions */
 #endif
 
-__EXTERN_INLINE major_t getmajor(dev_t dev)
+__EXTERN_INLINE major_t
+getmajor(dev_t dev)
 {
 	ulong major = ((dev >> 16) & 0x0000ffff);
+
 #if 0
 	if (!major)
 		major = MAJOR(dev);
 #endif
 	return (major);
 }
-__EXTERN_INLINE minor_t getminor(dev_t dev)
+__EXTERN_INLINE minor_t
+getminor(dev_t dev)
 {
 	ulong minor = (dev & 0x0000ffff);
+
 #if 0
 	ulong major = ((dev >> 16) & 0x0000ffff);
+
 	if (!major)
 		minor = MINOR(dev);
 #endif
 	return (minor);
 }
-__EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor)
+__EXTERN_INLINE dev_t
+makedevice(major_t major, minor_t minor)
 {
 	ulong maj = major & 0x0000ffff;
 	ulong min = minor & 0x0000ffff;
+
 	return ((maj << 16) | min);
 }
 
@@ -112,13 +119,15 @@ int umount2(char *pathname, int flags);
 int unlink(char *pathname);
 #endif
 
-__EXTERN_INLINE int copyin(const void *from, void *to, size_t len)
+__EXTERN_INLINE int
+copyin(const void *from, void *to, size_t len)
 {
 	if (copy_from_user(to, from, len))
 		return (-EFAULT);
 	return (0);
 }
-__EXTERN_INLINE int copyout(const void *from, void *to, size_t len)
+__EXTERN_INLINE int
+copyout(const void *from, void *to, size_t len)
 {
 	if (copy_to_user(to, from, len))
 		return (-EFAULT);
@@ -126,32 +135,38 @@ __EXTERN_INLINE int copyout(const void *from, void *to, size_t len)
 }
 
 /* FIXME: There are faster ways to do these... */
-__EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz)
+__EXTERN_INLINE unsigned long
+drv_hztousec(unsigned long hz)
 {
 	return ((hz * 1000000) / HZ);
 }
-__EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec)
+__EXTERN_INLINE unsigned long
+drv_usectohz(unsigned long usec)
 {
 	return (((usec + 999999) * HZ) / 1000000);
 }
 
-__EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz)
+__EXTERN_INLINE unsigned long
+drv_hztomsec(unsigned long hz)
 {
 	return ((hz * 1000) / HZ);
 }
-__EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec)
+__EXTERN_INLINE unsigned long
+drv_msectohz(unsigned long msec)
 {
 	return (((msec + 999) * HZ) / 1000);
 }
 
 #undef min
-__EXTERN_INLINE int min(int a, int b)
+__EXTERN_INLINE int
+min(int a, int b)
 {
 	return ((a < b) ? a : b);
 }
 
 #undef max
-__EXTERN_INLINE int max(int a, int b)
+__EXTERN_INLINE int
+max(int a, int b)
 {
 	return ((a < b) ? b : a);
 }
@@ -173,7 +188,8 @@ __EXTERN_INLINE int max(int a, int b)
 
 extern int sysctl_str_strmsgsz;
 
-__EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
+__EXTERN_INLINE int
+drv_getparm(const unsigned int parm, void *value_p)
 {
 	switch (parm) {
 	case LBOLT:
@@ -206,6 +222,7 @@ __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
 	case TIME:
 	{
 		struct timeval tv;
+
 		do_gettimeofday(&tv);
 		*(time_t *) value_p = tv.tv_sec;
 		return (0);
@@ -225,35 +242,41 @@ __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
 	}
 	return (-1);
 }
-__EXTERN_INLINE int drv_priv(cred_t *crp)
+__EXTERN_INLINE int
+drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
 	if (crp->cr_uid == 0 || crp->cr_ruid == 0)
 		return (0);
 	return (EPERM);
 }
-__EXTERN_INLINE void drv_usecwait(unsigned long usec)
+__EXTERN_INLINE void
+drv_usecwait(unsigned long usec)
 {
 	return (udelay(usec));
 }
-__EXTERN_INLINE void delay(unsigned long ticks)
+__EXTERN_INLINE void
+delay(unsigned long ticks)
 {
 	set_current_state(TASK_INTERRUPTIBLE);
 	while ((ticks = schedule_timeout(ticks))) ;
 	set_current_state(TASK_RUNNING);
 }
 
-static __inline__ void bcopy(const void *from, void *to, size_t len)
+static __inline__ void
+bcopy(const void *from, void *to, size_t len)
 {
 	memcpy(to, from, len);
 }
-__EXTERN_INLINE void bzero(void *data, size_t len)
+__EXTERN_INLINE void
+bzero(void *data, size_t len)
 {
 	memset(data, 0, len);
 }
-static __inline__ int bcmp(const void *s1, const void *s2, size_t len)
+static __inline__ int
+bcmp(const void *s1, const void *s2, size_t len)
 {
-	return memcmp(s1,s2,len);
+	return memcmp(s1, s2, len);
 }
 
 /* these are SVR 4 D3DK functions that need to be implemented yet */

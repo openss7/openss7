@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: snmp.h,v 0.9.2.2 2005/05/14 08:29:33 brian Exp $
+ @(#) $Id: snmp.h,v 0.9.2.3 2005/07/18 11:56:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_NET_NET_SNMP_H__
 #define __OS7_NET_NET_SNMP_H__
 
-#ident "@(#) $RCSfile: snmp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: snmp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /*
  *  In accordance with draft-ietf-sigtran-sctp-mib-07

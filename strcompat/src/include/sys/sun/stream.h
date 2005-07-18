@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/07/15 23:09:30 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.4 2005/07/18 12:25:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.4  2005/07/18 12:25:41  brian
+ - standard indentation
+
  Revision 0.9.2.3  2005/07/15 23:09:30  brian
  - checking in for sync
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -86,7 +89,8 @@
 
 #if defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 
-__SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
+__SUN_EXTERN_INLINE void
+freezestr_SUN(queue_t *q)
 {
 	freezestr(q);
 }
@@ -94,7 +98,8 @@ __SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
 #undef freezestr
 #define freezestr freezestr_SUN
 
-__SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q)
+__SUN_EXTERN_INLINE void
+unfreezestr_SUN(queue_t *q)
 {
 #if LFS
 	unfreezestr(q, -1UL);
@@ -113,7 +118,8 @@ extern int qwait_sig(queue_t *rq);
 #endif
 
 #if LFS
-extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg);
+extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *),
+			     void *arg);
 extern timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
 #endif
 
@@ -122,7 +128,8 @@ extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
 
 #if LFS
 /* LiS already defines this */
-__SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp)
+__SUN_EXTERN_INLINE unsigned char
+queclass(mblk_t *mp)
 {
 	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
 }
@@ -134,11 +141,13 @@ extern void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
-__SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
+__SUN_EXTERN_INLINE mblk_t *
+mkiocb(unsigned int command)
 {
 	mblk_t *mp;
 	union ioctypes *iocp;
 	static atomic_t ioc_id = ATOMIC_INIT(0);
+
 	if ((mp = allocb(sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		mp->b_wptr += sizeof(*iocp);

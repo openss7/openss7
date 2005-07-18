@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $
+ @(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $"
+#ident "@(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:34 $";
+static char const ident[] =
+    "$RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 11:56:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -115,15 +116,17 @@ static char const ident[] = "$RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision:
  *  Code adapted directly from RFC 2401.
  */
 void
-hmac_sha1(uint8_t * text, int tlen, uint8_t * key, int klen, uint8_t * digest)
+hmac_sha1(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
 {
 	SHA_CTX context;
 	uint8_t k_ipad[64];
 	uint8_t k_opad[64];
 	uint8_t tk[16];
 	int i;
+
 	if (klen > 64) {
 		SHA_CTX ctx;
+
 		SHAInit(&ctx);
 		SHAUpdate(&ctx, key, klen);
 		SHAFinal(tk, &ctx);

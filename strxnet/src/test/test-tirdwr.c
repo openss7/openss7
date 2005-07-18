@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/06/30 07:10:16 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:05 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/30 07:10:16 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.20  2005/07/18 12:45:05  brian
+ - standard indentation
+
  Revision 0.9.2.19  2005/06/30 07:10:16  brian
  - corrected some more timing
 
@@ -108,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/06/30 07:10:16 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:05 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/06/30 07:10:16 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:05 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -216,6 +219,7 @@ static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.
  */
 
 static const char *lpkgname = "OpenSS7 XTI/TLI Library";
+
 /* static const char *spkgname = "XNET"; */
 static const char *lstdname = "XNS 5.2";
 static const char *sstdname = "XNS";
@@ -253,13 +257,12 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT	  20	// 100		// 10
-#define NORMAL_WAIT	 100	// 500		// 100
-#define LONG_WAIT	 500	// 5000		// 500
-#define LONGER_WAIT	1000	// 10000	// 5000
+#define SHORT_WAIT	  20	// 100 // 10
+#define NORMAL_WAIT	 100	// 500 // 100
+#define LONG_WAIT	 500	// 5000 // 500
+#define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1UL
 #define TEST_DURATION	20000
-
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -384,10 +387,12 @@ static int state;
 /*
  *  Return the current time in milliseconds.
  */
-static long now(void)
+static long
+now(void)
 {
 	long ret;
 	struct timeval now;
+
 	if (gettimeofday(&now, NULL)) {
 		last_errno = errno;
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -403,7 +408,8 @@ static long now(void)
 	ret += (now.tv_usec + 999L) / 1000L;
 	return ret;
 }
-static long milliseconds(char *t)
+static long
+milliseconds(char *t)
 {
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -415,7 +421,8 @@ static long milliseconds(char *t)
 	}
 	return now();
 }
-static long milliseconds_2nd(char *t)
+static long
+milliseconds_2nd(char *t)
 {
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -434,9 +441,11 @@ static long milliseconds_2nd(char *t)
  *  timer as specified by arguments.  Return SUCCESS if the interval is within
  *  the allowable range and FAILURE otherwise.
  */
-static int check_time(const char *t, long i, long lo, long hi)
+static int
+check_time(const char *t, long i, long lo, long hi)
 {
 	float tol, dlo, dhi, itv;
+
 	itv = i * timer_scale;
 	dlo = lo;
 	dhi = hi;
@@ -458,11 +467,13 @@ static int check_time(const char *t, long i, long lo, long hi)
 }
 #endif
 
-static int time_event(int child, int event)
+static int
+time_event(int child, int event)
 {
 	if (verbose > 4) {
 		float t, m;
 		struct timeval now;
+
 		gettimeofday(&now, NULL);
 		if (!test_start)
 			test_start = now.tv_sec;
@@ -480,17 +491,20 @@ static int time_event(int child, int event)
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	sigemptyset(&act.sa_mask);
@@ -506,12 +520,14 @@ static int timer_sethandler(void)
 /*
  *  Start an interval timer as the overall test timer.
  */
-static int start_tt(long duration)
+static int
+start_tt(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
+
 	if (timer_sethandler())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -521,18 +537,22 @@ static int start_tt(long duration)
 }
 
 #if 0
-static int start_st(long duration)
+static int
+start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
+
 	return start_tt(sdur);
 }
 #endif
 
-static int stop_tt(void)
+static int
+stop_tt(void)
 {
 	struct itimerval setting = { {0, 0}, {0, 0} };
 	sigset_t mask;
 	struct sigaction act;
+
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return __RESULT_FAILURE;
 	act.sa_handler = SIG_DFL;
@@ -562,8 +582,9 @@ struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_data = {
-	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
-};
+	{
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}
+, 32767};
 
 /*
  * connect options
@@ -572,8 +593,9 @@ struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_conn = {
-	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
-};
+	{
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}
+, 32767};
 
 /*
  * management options
@@ -582,15 +604,19 @@ struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_optm = {
-	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
-};
+	{
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}
+, 32767};
 
-struct t_opthdr *find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
+struct t_opthdr *
+find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 {
 	const char *opt_ptr = cmd_buf + opt_ofs;
 	struct t_opthdr *oh = NULL;
+
 	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
 		int len = oh->len - sizeof(*oh);
+
 		if (len < 0) {
 			oh = NULL;
 			break;
@@ -612,7 +638,8 @@ struct t_opthdr *find_option(int level, int name, const char *cmd_buf, size_t op
  *  -------------------------------------------------------------------------
  */
 
-char *errno_string(long err)
+char *
+errno_string(long err)
 {
 	switch (err) {
 	case 0:
@@ -864,13 +891,15 @@ char *errno_string(long err)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "[%ld]", err);
 		return buf;
 	}
 	}
 }
 
-char *terrno_string(ulong terr, long uerr)
+char *
+terrno_string(ulong terr, long uerr)
 {
 	switch (terr) {
 	case TBADADDR:
@@ -934,13 +963,15 @@ char *terrno_string(ulong terr, long uerr)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "[%lu]", terr);
 		return buf;
 	}
 	}
 }
 
-const char *event_string(int event)
+const char *
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1028,7 +1059,8 @@ const char *event_string(int event)
 	}
 }
 
-const char *ioctl_string(int cmd, intptr_t arg)
+const char *
+ioctl_string(int cmd, intptr_t arg)
 {
 	switch (cmd) {
 	case I_NREAD:
@@ -1048,6 +1080,7 @@ const char *ioctl_string(int cmd, intptr_t arg)
 	case I_STR:
 		if (arg) {
 			struct strioctl *icp = (struct strioctl *) arg;
+
 			switch (icp->ic_cmd) {
 			case _O_TI_BIND:
 				return ("_O_TI_BIND");
@@ -1191,7 +1224,8 @@ const char *ioctl_string(int cmd, intptr_t arg)
 	}
 }
 
-const char *service_type(ulong type)
+const char *
+service_type(ulong type)
 {
 	switch (type) {
 	case T_CLTS:
@@ -1205,7 +1239,8 @@ const char *service_type(ulong type)
 	}
 }
 
-const char *state_string(ulong state)
+const char *
+state_string(ulong state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -1248,13 +1283,16 @@ const char *state_string(ulong state)
 }
 
 #if 0
-void print_addr(char *add_ptr, size_t add_len)
+void
+print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		int i;
+
 		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
 			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
 		fprintf(stdout, "[%d]", ntohs(a->port));
@@ -1267,14 +1305,18 @@ void print_addr(char *add_ptr, size_t add_len)
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
-char *addr_string(char *add_ptr, size_t add_len)
+
+char *
+addr_string(char *add_ptr, size_t add_len)
 {
 	static char buf[128];
 	size_t len = 0;
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+
 	if (add_len) {
 		int i;
+
 		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
 		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
@@ -1286,14 +1328,18 @@ char *addr_string(char *add_ptr, size_t add_len)
 	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
-void print_addrs(int fd, char *add_ptr, size_t add_len)
+
+void
+print_addrs(int fd, char *add_ptr, size_t add_len)
 {
 	fprintf(stdout, "Stupid!\n");
 }
 #else
-void print_addr(char *add_ptr, size_t add_len)
+void
+print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		if (add_len != sizeof(*a))
@@ -1306,11 +1352,13 @@ void print_addr(char *add_ptr, size_t add_len)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-char *addr_string(char *add_ptr, size_t add_len)
+char *
+addr_string(char *add_ptr, size_t add_len)
 {
 	static char buf[128];
 	size_t len = 0;
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+
 	if (add_len) {
 		if (add_len != sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
@@ -1320,13 +1368,17 @@ char *addr_string(char *add_ptr, size_t add_len)
 	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
-void print_addrs(int fd, char *add_ptr, size_t add_len)
+
+void
+print_addrs(int fd, char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *sin;
+
 	if (verbose < 3)
 		return;
 	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
 		char buf[128];
+
 		snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", (sin->sin_addr.s_addr >> 0) & 0xff, (sin->sin_addr.s_addr >> 8) & 0xff, (sin->sin_addr.s_addr >> 16) & 0xff, (sin->sin_addr.s_addr >> 24) & 0xff, ntohs(sin->sin_port));
 		if (fd == test_fd[0]) {
 			fprintf(stdout, "%-20s|  |                               |                    \n", buf);
@@ -1341,7 +1393,8 @@ void print_addrs(int fd, char *add_ptr, size_t add_len)
 }
 #endif
 
-char *status_string(struct t_opthdr *oh)
+char *
+status_string(struct t_opthdr *oh)
 {
 	switch (oh->status) {
 	case 0:
@@ -1359,6 +1412,7 @@ char *status_string(struct t_opthdr *oh)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "(unknown status %ld)", (long) oh->status);
 		return buf;
 	}
@@ -1369,7 +1423,8 @@ char *status_string(struct t_opthdr *oh)
 #define T_ALLLEVELS -1UL
 #endif
 
-char *level_string(struct t_opthdr *oh)
+char *
+level_string(struct t_opthdr *oh)
 {
 	switch (oh->level) {
 	case T_ALLLEVELS:
@@ -1389,13 +1444,15 @@ char *level_string(struct t_opthdr *oh)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "(unknown level %ld)", (long) oh->level);
 		return buf;
 	}
 	}
 }
 
-char *name_string(struct t_opthdr *oh)
+char *
+name_string(struct t_opthdr *oh)
 {
 	if (oh->name == T_ALLOPT)
 		return ("T_ALLOPT");
@@ -1555,12 +1612,14 @@ char *name_string(struct t_opthdr *oh)
 	}
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "(unknown name %ld)", (long) oh->name);
 		return buf;
 	}
 }
 
-char *yesno_string(struct t_opthdr *oh)
+char *
+yesno_string(struct t_opthdr *oh)
 {
 	switch (*((t_uscalar_t *) T_OPT_DATA(oh))) {
 	case T_YES:
@@ -1572,14 +1631,17 @@ char *yesno_string(struct t_opthdr *oh)
 	}
 }
 
-char *number_string(struct t_opthdr *oh)
+char *
+number_string(struct t_opthdr *oh)
 {
 	static char buf[32];
+
 	snprintf(buf, 32, "%d", *((t_scalar_t *) T_OPT_DATA(oh)));
 	return (buf);
 }
 
-char *value_string(int child, struct t_opthdr *oh)
+char *
+value_string(int child, struct t_opthdr *oh)
 {
 #if 0
 	static char buf[64] = "(invalid)";
@@ -1625,6 +1687,7 @@ char *value_string(int child, struct t_opthdr *oh)
 		case T_IP_ADDR:
 			if (oh->len == sizeof(*oh) + sizeof(uint32_t)) {
 				uint32_t addr = *((uint32_t *) T_OPT_DATA(oh));
+
 				snprintf(buf, sizeof(buf), "%d.%d.%d.%d", (addr >> 0) & 0x00ff, (addr >> 8) & 0x00ff, (addr >> 16) & 0x00ff, (addr >> 24) & 0x00ff);
 			}
 			return buf;
@@ -1737,9 +1800,11 @@ char *value_string(int child, struct t_opthdr *oh)
 }
 
 #if 0
-void parse_options(int fd, char *opt_ptr, size_t opt_len)
+void
+parse_options(int fd, char *opt_ptr, size_t opt_len)
 {
 	struct t_opthdr *oh;
+
 	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
 		if (oh->len == sizeof(*oh))
 			continue;
@@ -1764,7 +1829,8 @@ void parse_options(int fd, char *opt_ptr, size_t opt_len)
 }
 #endif
 
-char *mgmtflag_string(t_uscalar_t flag)
+char *
+mgmtflag_string(t_uscalar_t flag)
 {
 	switch (flag) {
 	case T_NEGOTIATE:
@@ -1789,9 +1855,11 @@ char *mgmtflag_string(t_uscalar_t flag)
 	return "(unknown flag)";
 }
 
-char *size_string(ulong size)
+char *
+size_string(ulong size)
 {
 	static char buf[128];
+
 	switch (size) {
 	case T_INFINITE:
 		return ("T_INFINITE");
@@ -1804,7 +1872,8 @@ char *size_string(ulong size)
 	return buf;
 }
 
-const char *prim_string(ulong prim)
+const char *
+prim_string(ulong prim)
 {
 	switch (prim) {
 	case T_CONN_REQ:
@@ -1872,7 +1941,8 @@ const char *prim_string(ulong prim)
 	}
 }
 
-char *t_errno_string(long err, long syserr)
+char *
+t_errno_string(long err, long syserr)
 {
 	switch (err) {
 	case 0:
@@ -1938,13 +2008,15 @@ char *t_errno_string(long err, long syserr)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "[%ld]", err);
 		return buf;
 	}
 	}
 }
 
-char *t_look_string(int look)
+char *
+t_look_string(int look)
 {
 	switch (look) {
 	case 0:
@@ -1970,13 +2042,15 @@ char *t_look_string(int look)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "(%d)", look);
 		return buf;
 	}
 	}
 }
 
-void print_less(int child)
+void
+print_less(int child)
 {
 	if (verbose < 1 || !show)
 		return;
@@ -2004,12 +2078,14 @@ void print_less(int child)
 	return;
 }
 
-void print_more(void)
+void
+print_more(void)
 {
 	show = 1;
 }
 
-void print_simple(int child, const char *msgs[])
+void
+print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child]);
@@ -2017,7 +2093,8 @@ void print_simple(int child, const char *msgs[])
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_simple_int(int child, const char *msgs[], int val)
+void
+print_simple_int(int child, const char *msgs[], int val)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val);
@@ -2025,7 +2102,8 @@ void print_simple_int(int child, const char *msgs[], int val)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_double_int(int child, const char *msgs[], int val, int val2)
+void
+print_double_int(int child, const char *msgs[], int val, int val2)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val, val2);
@@ -2033,7 +2111,8 @@ void print_double_int(int child, const char *msgs[], int val, int val2)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_triple_int(int child, const char *msgs[], int val, int val2, int val3)
+void
+print_triple_int(int child, const char *msgs[], int val, int val2, int val3)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val, val2, val3);
@@ -2041,7 +2120,8 @@ void print_triple_int(int child, const char *msgs[], int val, int val2, int val3
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_simple_string(int child, const char *msgs[], const char *string)
+void
+print_simple_string(int child, const char *msgs[], const char *string)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string);
@@ -2049,18 +2129,21 @@ void print_simple_string(int child, const char *msgs[], const char *string)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_pipe(int child)
+void
+print_pipe(int child)
 {
 	static const char *msgs[] = {
 		"  pipe()      ----->v  v<------------------------------>v                   \n",
 		"                    v  v<------------------------------>v<-----     pipe()  \n",
 		"                    .  .                                .                   \n",
 	};
+
 	if (verbose > 3)
 		print_simple(child, msgs);
 }
 
-void print_open(int child)
+void
+print_open(int child)
 {
 	static const char *msgs[] = {
 		"  open()      ----->v  .                                .                   \n",
@@ -2068,11 +2151,13 @@ void print_open(int child)
 		"                    |  v<-------------------------------.------     open()  \n",
 		"                    .  .                                .                   \n",
 	};
+
 	if (verbose > 3)
 		print_simple(child, msgs);
 }
 
-void print_close(int child)
+void
+print_close(int child)
 {
 	static const char *msgs[] = {
 		"  close()     ----->X  |                                |                   \n",
@@ -2080,11 +2165,13 @@ void print_close(int child)
 		"                    .  X<-------------------------------.------    close()  \n",
 		"                    .  .                                .                   \n",
 	};
+
 	if (verbose > 3)
 		print_simple(child, msgs);
 }
 
-void print_preamble(int child)
+void
+print_preamble(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+  +----------Preamble--------------+                   \n",
@@ -2092,11 +2179,13 @@ void print_preamble(int child)
 		"                    +--+----------Preamble--------------+                   \n",
 		"--------------------+--+----------Preamble--------------+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_notapplicable(int child)
+void
+print_notapplicable(int child)
 {
 	static const char *msgs[] = {
 		"X-X-X-X-X-X-X-X-X-X-|  |-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
@@ -2104,11 +2193,13 @@ void print_notapplicable(int child)
 		"                    |X-|-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
 		"X-X-X-X-X-X-X-X-X-X-|X-|-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_skipped(int child)
+void
+print_skipped(int child)
 {
 	static const char *msgs[] = {
 		"::::::::::::::::::::|  |::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
@@ -2116,11 +2207,13 @@ void print_skipped(int child)
 		"                    |::|::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
 		"::::::::::::::::::::|::|::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_inconclusive(int child)
+void
+print_inconclusive(int child)
 {
 	static const char *msgs[] = {
 		"????????????????????|  |??????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
@@ -2128,11 +2221,13 @@ void print_inconclusive(int child)
 		"                    |??|??????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
 		"????????????????????|??|??????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_test(int child)
+void
+print_test(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+  +------------Test----------------+                   \n",
@@ -2140,11 +2235,13 @@ void print_test(int child)
 		"                    +--+------------Test----------------+                   \n",
 		"--------------------+--+------------Test----------------+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_failed(int child)
+void
+print_failed(int child)
 {
 	static const char *msgs[] = {
 		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
@@ -2152,11 +2249,13 @@ void print_failed(int child)
 		"                    |XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
 		"XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_script_error(int child)
+void
+print_script_error(int child)
 {
 	static const char *msgs[] = {
 		"####################|  |######## SCRIPT ERROR ##########|                    [%d:%03d]\n",
@@ -2164,11 +2263,13 @@ void print_script_error(int child)
 		"                    |##|######## SCRIPT ERROR ##########|                    [%d:%03d]\n",
 		"####################|##|######## SCRIPT ERROR ##########|################### [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_passed(int child)
+void
+print_passed(int child)
 {
 	static const char *msgs[] = {
 		"********************|  |********** PASSED **************|                    [%d:%03d]\n",
@@ -2176,11 +2277,13 @@ void print_passed(int child)
 		"                    |**|********** PASSED **************|                    [%d:%03d]\n",
 		"********************|**|********** PASSED **************|******************* [%d:%03d]\n",
 	};
+
 	if (verbose > 2)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_postamble(int child)
+void
+print_postamble(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+  +----------Postamble-------------+                   \n",
@@ -2188,11 +2291,13 @@ void print_postamble(int child)
 		"                    +--+----------Postamble-------------+                   \n",
 		"--------------------+--+----------Postamble-------------+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_test_end(int child)
+void
+print_test_end(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+  +--------------------------------+                   \n",
@@ -2200,11 +2305,13 @@ void print_test_end(int child)
 		"                    +--+--------------------------------+                   \n",
 		"--------------------+--+--------------------------------+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_terminated(int child, int signal)
+void
+print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
 		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
@@ -2212,11 +2319,13 @@ void print_terminated(int child, int signal)
 		"                    |@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
 		"@@@@@@@@@@@@@@@@@@@@|@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, signal);
 }
 
-void print_stopped(int child, int signal)
+void
+print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
 		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
@@ -2224,11 +2333,13 @@ void print_stopped(int child, int signal)
 		"                    |&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
 		"&&&&&&&&&&&&&&&&&&&&|&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 	};
+
 	if (verbose > 0)
 		print_double_int(child, msgs, child, signal);
 }
 
-void print_timeout(int child)
+void
+print_timeout(int child)
 {
 	static const char *msgs[] = {
 		"++++++++++++++++++++|  |+++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
@@ -2236,13 +2347,15 @@ void print_timeout(int child)
 		"                    |++|+++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
 		"++++++++++++++++++++|++|+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
+
 	if (show_timeout || verbose > 0) {
 		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
 }
 
-void print_nothing(int child)
+void
+print_nothing(int child)
 {
 	static const char *msgs[] = {
 		"- - - - - - - - - - |  |- - - - - nothing! - - - - - - -|                    [%d:%03d]\n",
@@ -2250,11 +2363,13 @@ void print_nothing(int child)
 		"                    |- |- - - - - nothing! - - - - - - -|                    [%d:%03d]\n",
 		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 	};
+
 	if (verbose > 1)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_string_state(int child, const char *msgs[], const char *string)
+void
+print_string_state(int child, const char *msgs[], const char *string)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string, child, state);
@@ -2262,7 +2377,8 @@ void print_string_state(int child, const char *msgs[], const char *string)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_syscall(int child, const char *command)
+void
+print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"  %-14s--->|  |                                |                    [%d:%03d]\n",
@@ -2270,11 +2386,13 @@ void print_syscall(int child, const char *command)
 		"                    |  |                                |<---%14s  [%d:%03d]\n",
 		"                    |  |                                |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-void print_tx_prim(int child, const char *command)
+void
+print_tx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"--%16s->|  |                                |                    [%d:%03d]\n",
@@ -2282,11 +2400,13 @@ void print_tx_prim(int child, const char *command)
 		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
 		"                    |  |                                |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-void print_rx_prim(int child, const char *command)
+void
+print_rx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"<-%16s--|  |                                |                    [%d:%03d]\n",
@@ -2294,11 +2414,13 @@ void print_rx_prim(int child, const char *command)
 		"                    |  |- - - - - - - - - - - - - - - ->|-%16s-> [%d:%03d]\n",
 		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-void print_ack_prim(int child, const char *command)
+void
+print_ack_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"<-%16s-/|  |                                |                    [%d:%03d]\n",
@@ -2306,11 +2428,13 @@ void print_ack_prim(int child, const char *command)
 		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s-> [%d:%03d]\n",
 		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-void print_long_state(int child, const char *msgs[], long value)
+void
+print_long_state(int child, const char *msgs[], long value)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], value, child, state);
@@ -2318,7 +2442,8 @@ void print_long_state(int child, const char *msgs[], long value)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_no_prim(int child, long prim)
+void
+print_no_prim(int child, long prim)
 {
 	static const char *msgs[] = {
 		"????%4ld????  ?----?|  | ?- - - - - - - - - - - - - -? |                     [%d:%03d]\n",
@@ -2326,11 +2451,13 @@ void print_no_prim(int child, long prim)
 		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
 		"                    |  | ?- - - - - %4ld  - - - - - -? |                     [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_long_state(child, msgs, prim);
 }
 
-void print_string_int_state(int child, const char *msgs[], const char *string, int val)
+void
+print_string_int_state(int child, const char *msgs[], const char *string, int val)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string, val, child, state);
@@ -2338,7 +2465,8 @@ void print_string_int_state(int child, const char *msgs[], const char *string, i
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_rx_data(int child, const char *command, size_t bytes)
+void
+print_rx_data(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
 		"<-%1$16s--|  |  %2$4d bytes                    |                    [%3$d:%4$03d]\n",
@@ -2346,11 +2474,13 @@ void print_rx_data(int child, const char *command, size_t bytes)
 		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
 		"                    |  |  %2$4d bytes  %1$16s  |                    [%3$d:%4$03d]\n",
 	};
+
 	if ((verbose && show_data) || verbose > 1)
 		print_string_int_state(child, msgs, command, bytes);
 }
 
-void print_errno(int child, long error)
+void
+print_errno(int child, long error)
 {
 	static const char *msgs[] = {
 		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
@@ -2358,11 +2488,13 @@ void print_errno(int child, long error)
 		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
 		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 3)
 		print_string_state(child, msgs, errno_string(error));
 }
 
-void print_success(int child)
+void
+print_success(int child)
 {
 	static const char *msgs[] = {
 		"  ok          <----/|  |                                |                    [%d:%03d]\n",
@@ -2370,11 +2502,13 @@ void print_success(int child)
 		"                    |  |                                |\\---->         ok   [%d:%03d]\n",
 		"                    |  |              ok                |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 4)
 		print_double_int(child, msgs, child, state);
 }
 
-void print_success_value(int child, int value)
+void
+print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
 		"  %10d  <----/|  |                                |                    [%d:%03d]\n",
@@ -2382,11 +2516,13 @@ void print_success_value(int child, int value)
 		"                    |  |                                |\\---->  %10d  [%d:%03d]\n",
 		"                    |  |         [%10d]           |                    [%d:%03d]\n",
 	};
+
 	if (verbose)
 		print_triple_int(child, msgs, value, child, state);
 }
 
-void print_ti_ioctl(int child, int cmd, intptr_t arg)
+void
+print_ti_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
 		"--ioctl(2)--------->|  |    %16s            |                    [%d:%03d]\n",
@@ -2394,17 +2530,20 @@ void print_ti_ioctl(int child, int cmd, intptr_t arg)
 		"                    |  |    %16s            |<---ioctl(2)------  [%d:%03d]\n",
 		"                    |  |    %16s ioctl(2)   |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
-void print_ioctl(int child, int cmd, intptr_t arg)
+void
+print_ioctl(int child, int cmd, intptr_t arg)
 {
 	if (verbose > 3)
 		print_ti_ioctl(child, cmd, arg);
 }
 
-void print_datcall(int child, const char *command, size_t bytes)
+void
+print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
 		"  %1$16s->|- | %2$4d bytes- - - - - - - - - - >|                    [%3$d:%4$03d]\n",
@@ -2412,11 +2551,13 @@ void print_datcall(int child, const char *command, size_t bytes)
 		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s  [%3$d:%4$03d]\n",
 		"                    |< + %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
+
 	if ((verbose && show_data) || verbose > 1)
 		print_string_int_state(child, msgs, command, bytes);
 }
 
-void print_libcall(int child, const char *command)
+void
+print_libcall(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"  %-16s->|  |                                |                    [%d:%03d]\n",
@@ -2424,11 +2565,13 @@ void print_libcall(int child, const char *command)
 		"                    |  |                                |<-%16s  [%d:%03d]\n",
 		"                    |  |     [%16s]         |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-void print_terror(int child, long error, long terror)
+void
+print_terror(int child, long error, long terror)
 {
 	static const char *msgs[] = {
 		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
@@ -2436,11 +2579,13 @@ void print_terror(int child, long error, long terror)
 		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
 		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, t_errno_string(terror, error));
 }
 
-void print_tlook(int child, int tlook)
+void
+print_tlook(int child, int tlook)
 {
 	static const char *msgs[] = {
 		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
@@ -2448,11 +2593,13 @@ void print_tlook(int child, int tlook)
 		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
 		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, t_look_string(tlook));
 }
 
-void print_expect(int child, int want)
+void
+print_expect(int child, int want)
 {
 	static const char *msgs[] = {
 		" (%-16s) |  | - - - -[Expected]- - - - - - - |                     [%d:%03d]\n",
@@ -2460,11 +2607,13 @@ void print_expect(int child, int want)
 		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
 		"                    |- |- [Expected %-16s ] -|                     [%d:%03d]\n",
 	};
+
 	if (verbose > 1 && show)
 		print_string_state(child, msgs, event_string(want));
 }
 
-void print_string(int child, const char *string)
+void
+print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
 		"%-20s|  |                                |                    \n",
@@ -2472,11 +2621,13 @@ void print_string(int child, const char *string)
 		"                    |  |                                |%-20s\n",
 		"                    |  |    %-20s        |                    \n",
 	};
+
 	if (verbose > 1 && show)
 		print_simple_string(child, msgs, string);
 }
 
-void print_time_state(int child, const char *msgs[], ulong time)
+void
+print_time_state(int child, const char *msgs[], ulong time)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], time, child, state);
@@ -2484,7 +2635,8 @@ void print_time_state(int child, const char *msgs[], ulong time)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_waiting(int child, ulong time)
+void
+print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
 		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
@@ -2492,11 +2644,13 @@ void print_waiting(int child, ulong time)
 		"                    | /|/ / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
 		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
+
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
 }
 
-void print_float_state(int child, const char *msgs[], float time)
+void
+print_float_state(int child, const char *msgs[], float time)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], time, child, state);
@@ -2504,7 +2658,8 @@ void print_float_state(int child, const char *msgs[], float time)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_mwaiting(int child, struct timespec *time)
+void
+print_mwaiting(int child, struct timespec *time)
 {
 	static const char *msgs[] = {
 		"/ / / / / / / / / / |  |/ Waiting %8.4f seconds / / /|                    [%d:%03d]\n",
@@ -2512,8 +2667,10 @@ void print_mwaiting(int child, struct timespec *time)
 		"                    | /|/ Waiting %8.4f seconds / / /|                    [%d:%03d]\n",
 		"/ / / / / / / / / / | /|/ Waiting %8.4f seconds / / /| / / / / / / / / /  [%d:%03d]\n",
 	};
+
 	if (verbose > 0 && show) {
 		float delay;
+
 		delay = time->tv_nsec;
 		delay = delay / 1000000000;
 		delay = delay + time->tv_sec;
@@ -2521,49 +2678,67 @@ void print_mwaiting(int child, struct timespec *time)
 	}
 }
 
-void print_mgmtflag(int child, t_uscalar_t flag)
+void
+print_mgmtflag(int child, t_uscalar_t flag)
 {
 	print_string(child, mgmtflag_string(flag));
 }
 
-void print_opt_level(int child, struct t_opthdr *oh)
+void
+print_opt_level(int child, struct t_opthdr *oh)
 {
 	char *level = level_string(oh);
+
 	if (level)
 		print_string(child, level);
 }
-void print_opt_name(int child, struct t_opthdr *oh)
+
+void
+print_opt_name(int child, struct t_opthdr *oh)
 {
 	char *name = name_string(oh);
+
 	if (name)
 		print_string(child, name);
 }
-void print_opt_status(int child, struct t_opthdr *oh)
+
+void
+print_opt_status(int child, struct t_opthdr *oh)
 {
 	char *status = status_string(oh);
+
 	if (status)
 		print_string(child, status);
 }
-void print_opt_length(int child, struct t_opthdr *oh)
+
+void
+print_opt_length(int child, struct t_opthdr *oh)
 {
 	int len = oh->len - sizeof(*oh);
+
 	if (len) {
 		char buf[32];
+
 		snprintf(buf, sizeof(buf), "(len=%d)", len);
 		print_string(child, buf);
 	}
 }
-void print_opt_value(int child, struct t_opthdr *oh)
+void
+print_opt_value(int child, struct t_opthdr *oh)
 {
 	char *value = value_string(child, oh);
+
 	if (value)
 		print_string(child, value);
 }
-void print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
+
+void
+print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 {
 	struct t_opthdr *oh;
 	const char *opt_ptr = cmd_buf + opt_ofs;
 	char buf[64];
+
 	if (verbose < 4)
 		return;
 	snprintf(buf, sizeof(buf), "opt len = %d", opt_len);
@@ -2574,6 +2749,7 @@ void print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_le
 	if (oh) {
 		for (; oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
 			int len = oh->len - sizeof(*oh);
+
 			print_opt_level(child, oh);
 			print_opt_name(child, oh);
 			print_opt_status(child, oh);
@@ -2591,8 +2767,11 @@ void print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_le
 	}
 }
 
-void print_info(int child, struct T_info_ack *info) {
+void
+print_info(int child, struct T_info_ack *info)
+{
 	char buf[64];
+
 	if (verbose < 4)
 		return;
 	snprintf(buf, sizeof(buf), "TSDU  = %ld", (long) info->TSDU_size);
@@ -2624,7 +2803,8 @@ void print_info(int child, struct T_info_ack *info) {
  *
  *  -------------------------------------------------------------------------
  */
-int test_ioctl(int child, int cmd, intptr_t arg)
+int
+test_ioctl(int child, int cmd, intptr_t arg)
 {
 	print_ioctl(child, cmd, arg);
 	for (;;) {
@@ -2640,9 +2820,11 @@ int test_ioctl(int child, int cmd, intptr_t arg)
 	}
 }
 
-int test_insertfd(int child, int resfd,  int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
+int
+test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
 	struct strfdinsert fdi;
+
 	if (ctrl) {
 		fdi.ctlbuf.maxlen = ctrl->maxlen;
 		fdi.ctlbuf.len = ctrl->len;
@@ -2664,12 +2846,13 @@ int test_insertfd(int child, int resfd,  int offset, struct strbuf *ctrl, struct
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
 
-int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
+int
+test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
@@ -2714,7 +2897,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 	}
 }
 
-int test_write(int child, const void *buf, size_t len)
+int
+test_write(int child, const void *buf, size_t len)
 {
 	print_syscall(child, "write(2)------");
 	for (;;) {
@@ -2730,7 +2914,8 @@ int test_write(int child, const void *buf, size_t len)
 	return (__RESULT_SUCCESS);
 }
 
-int test_writev(int child, const struct iovec *iov, int num)
+int
+test_writev(int child, const struct iovec *iov, int num)
 {
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
@@ -2746,7 +2931,8 @@ int test_writev(int child, const struct iovec *iov, int num)
 	return (__RESULT_SUCCESS);
 }
 
-int test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
+int
+test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 {
 	print_syscall(child, "getmsg(2)-----");
 	for (;;) {
@@ -2760,7 +2946,8 @@ int test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	return (__RESULT_SUCCESS);
 }
 
-int test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
+int
+test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
 {
 	print_syscall(child, "getpmsg(2)----");
 	for (;;) {
@@ -2774,7 +2961,8 @@ int test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp
 	return (__RESULT_SUCCESS);
 }
 
-int test_read(int child, void *buf, size_t count)
+int
+test_read(int child, void *buf, size_t count)
 {
 	print_syscall(child, "read(2)-------");
 	for (;;) {
@@ -2788,7 +2976,8 @@ int test_read(int child, void *buf, size_t count)
 	return (__RESULT_SUCCESS);
 }
 
-int test_readv(int child, const struct iovec *iov, int count)
+int
+test_readv(int child, const struct iovec *iov, int count)
 {
 	print_syscall(child, "readv(2)------");
 	for (;;) {
@@ -2802,11 +2991,14 @@ int test_readv(int child, const struct iovec *iov, int count)
 	return (__RESULT_SUCCESS);
 }
 
-int test_ti_ioctl(int child, int cmd, intptr_t arg)
+int
+test_ti_ioctl(int child, int cmd, intptr_t arg)
 {
 	int tpi_error;
+
 	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
 		fflush(stdout);
@@ -2826,6 +3018,7 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 	}
 	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
 		fflush(stdout);
@@ -2852,9 +3045,11 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 	return (__RESULT_FAILURE);
 }
 
-int test_nonblock(int child)
+int
+test_nonblock(int child)
 {
 	long flags;
+
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
@@ -2880,9 +3075,11 @@ int test_nonblock(int child)
 	return (__RESULT_SUCCESS);
 }
 
-int test_block(int child)
+int
+test_block(int child)
 {
 	long flags;
+
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
@@ -2908,9 +3105,11 @@ int test_block(int child)
 	return (__RESULT_SUCCESS);
 }
 
-int test_pipe(int child)
+int
+test_pipe(int child)
 {
 	int fds[2];
+
 	for (;;) {
 		print_pipe(child);
 		if (pipe(fds) >= 0) {
@@ -2926,9 +3125,11 @@ int test_pipe(int child)
 	}
 }
 
-int test_open(int child, const char *name)
+int
+test_open(int child, const char *name)
 {
 	int fd;
+
 	for (;;) {
 		print_open(child);
 		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
@@ -2943,9 +3144,11 @@ int test_open(int child, const char *name)
 	}
 }
 
-int test_close(int child)
+int
+test_close(int child)
 {
 	int fd = test_fd[child];
+
 	test_fd[child] = 0;
 	for (;;) {
 		print_close(child);
@@ -2968,7 +3171,8 @@ int test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int stream_start(int child, int index)
+static int
+stream_start(int child, int index)
 {
 	switch (child) {
 	case 1:
@@ -2994,7 +3198,8 @@ static int stream_start(int child, int index)
 	}
 }
 
-static int stream_stop(int child)
+static int
+stream_stop(int child)
 {
 	switch (child) {
 	case 1:
@@ -3026,7 +3231,8 @@ static int stream_stop(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int begin_tests(int index)
+static int
+begin_tests(int index)
 {
 	state = 0;
 	if (stream_start(0, index) != __RESULT_SUCCESS)
@@ -3044,7 +3250,8 @@ static int begin_tests(int index)
 	return __RESULT_FAILURE;
 }
 
-static int end_tests(int index)
+static int
+end_tests(int index)
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
@@ -3069,12 +3276,14 @@ static int end_tests(int index)
  *  -------------------------------------------------------------------------
  */
 
-static int do_signal(int child, int action)
+static int
+do_signal(int child, int action)
 {
 	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
 	union T_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
+
 	ic.ic_cmd = 0;
 	ic.ic_timout = test_timout;
 	ic.ic_len = sizeof(cbuf);
@@ -3092,6 +3301,7 @@ static int do_signal(int child, int action)
 	case __TEST_WRITEV:
 	{
 		struct iovec vector[4];
+
 		vector[0].iov_base = dbuf;
 		vector[0].iov_len = sprintf(vector[0].iov_base, "Writev test datum for vector 0.");
 		vector[1].iov_base = dbuf + vector[0].iov_len;
@@ -3162,7 +3372,7 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_RES:
 		ctrl->len = sizeof(p->conn_res)
-			+ (test_opts ? test_olen : 0);
+		    + (test_opts ? test_olen : 0);
 		p->conn_res.PRIM_type = T_CONN_RES;
 		p->conn_res.ACCEPTOR_id = 0;
 		p->conn_res.OPT_length = test_opts ? test_olen : 0;
@@ -3762,6 +3972,7 @@ static int do_signal(int child, int action)
 			struct ti_sync_req req;
 			struct ti_sync_ack ack;
 		} *s = (typeof(s)) p;
+
 		ic.ic_cmd = TI_SYNC;
 		ic.ic_len = sizeof(*s);
 		s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
@@ -3792,9 +4003,11 @@ static int do_signal(int child, int action)
  *  -------------------------------------------------------------------------
  */
 
-static int do_decode_data(int child, struct strbuf *data)
+static int
+do_decode_data(int child, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
+
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_prim(child, "DATA------------");
@@ -3802,10 +4015,12 @@ static int do_decode_data(int child, struct strbuf *data)
 	return ((last_event = event));
 }
 
-static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
+static int
+do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
+
 	if (ctrl->len >= sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
 		case T_CONN_REQ:
@@ -3991,7 +4206,8 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	return ((last_event = event));
 }
 
-static int do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
+static int
+do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	if (ctrl->len > 0) {
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
@@ -4010,13 +4226,15 @@ static int do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 #define PT  0x00000002UL
 #define ANY 0x00000003UL
 
-int any_wait_event(int source, int wait)
+int
+any_wait_event(int source, int wait)
 {
 	while (1) {
 		struct pollfd pfd[] = {
 			{test_fd[0], POLLIN | POLLPRI, 0},
 			{test_fd[1], POLLIN | POLLPRI, 0}
 		};
+
 		if (timer_timeout) {
 			timer_timeout = 0;
 			print_timeout(3);
@@ -4053,6 +4271,7 @@ int any_wait_event(int source, int wait)
 				char dbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, dbuf };
+
 				if (verbose > 3) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "getmsg from top:\n");
@@ -4076,6 +4295,7 @@ int any_wait_event(int source, int wait)
 				char dbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, dbuf };
+
 				if (verbose > 3) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "getmsg from bot:\n");
@@ -4100,10 +4320,12 @@ int any_wait_event(int source, int wait)
 }
 #endif
 
-int wait_event(int child, int wait)
+int
+wait_event(int child, int wait)
 {
 	while (1) {
 		struct pollfd pfd[] = { {test_fd[child], POLLIN | POLLPRI, 0} };
+
 		if (timer_timeout) {
 			timer_timeout = 0;
 			print_timeout(child);
@@ -4132,6 +4354,7 @@ int wait_event(int child, int wait)
 				print_success(child);
 			if (pfd[0].revents) {
 				int ret;
+
 				ctrl.maxlen = BUFSIZE;
 				ctrl.len = -1;
 				ctrl.buf = cbuf;
@@ -4174,18 +4397,22 @@ int wait_event(int child, int wait)
 	return __EVENT_UNKNOWN;
 }
 
-int get_event(int child)
+int
+get_event(int child)
 {
 	return wait_event(child, -1);
 }
 
-int get_data(int child, int action)
+int
+get_data(int child, int action)
 {
 	int ret = 0;
+
 	switch (action) {
 	case __TEST_READ:
 	{
 		char buf[BUFSIZE];
+
 		test_read(child, buf, BUFSIZE);
 		ret = last_retval;
 		break;
@@ -4200,6 +4427,7 @@ int get_data(int child, int action)
 			{buf + (BUFSIZE >> 2) + (BUFSIZE >> 2), (BUFSIZE >> 2)},
 			{buf + (BUFSIZE >> 2) + (BUFSIZE >> 2) + (BUFSIZE >> 2), (BUFSIZE >> 2)}
 		};
+
 		test_readv(child, vector, count);
 		ret = last_retval;
 		break;
@@ -4208,6 +4436,7 @@ int get_data(int child, int action)
 	{
 		char buf[BUFSIZE];
 		struct strbuf data = { BUFSIZE, 0, buf };
+
 		if (test_getmsg(child, NULL, &data, &test_gflags) == __RESULT_FAILURE) {
 			ret = last_retval;
 			break;
@@ -4219,6 +4448,7 @@ int get_data(int child, int action)
 	{
 		char buf[BUFSIZE];
 		struct strbuf data = { BUFSIZE, 0, buf };
+
 		if (test_getpmsg(child, NULL, &data, &test_gband, &test_gflags) == __RESULT_FAILURE) {
 			ret = last_retval;
 			break;
@@ -4230,7 +4460,8 @@ int get_data(int child, int action)
 	return (ret);
 }
 
-int expect(int child, int wait, int want)
+int
+expect(int child, int wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -4238,15 +4469,18 @@ int expect(int child, int wait, int want)
 	return (__RESULT_FAILURE);
 }
 
-void test_sleep(int child, unsigned long t)
+void
+test_sleep(int child, unsigned long t)
 {
 	print_waiting(child, t);
 	sleep(t);
 }
 
-void test_msleep(int child, unsigned long m)
+void
+test_msleep(int child, unsigned long m)
 {
 	struct timespec time;
+
 	time.tv_sec = m / 1000;
 	time.tv_nsec = (m % 1000) * 1000000;
 	print_mwaiting(child, &time);
@@ -4260,7 +4494,8 @@ void test_msleep(int child, unsigned long m)
  *
  *  -------------------------------------------------------------------------
  */
-static int preamble_0(int child)
+static int
+preamble_0(int child)
 {
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
@@ -4269,9 +4504,11 @@ static int preamble_0(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_0(int child)
+static int
+postamble_0(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4301,9 +4538,11 @@ static int postamble_0(int child)
 }
 
 #if 0
-static int preamble_1(int child)
+static int
+preamble_1(int child)
 {
 	union T_primitives *p = (typeof(p)) cbuf;
+
 	test_mgmtflags = T_NEGOTIATE;
 	test_opts = &opt_optm;
 	test_olen = sizeof(opt_optm);
@@ -4330,7 +4569,8 @@ static int preamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int preamble_1s(int child)
+static int
+preamble_1s(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4342,9 +4582,11 @@ static int preamble_1s(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_1(int child)
+static int
+postamble_1(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4378,9 +4620,11 @@ static int postamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_1e(int child)
+static int
+postamble_1e(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4412,7 +4656,8 @@ static int postamble_1e(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int preamble_2_conn(int child)
+static int
+preamble_2_conn(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4446,7 +4691,8 @@ static int preamble_2_conn(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int preamble_2_resp(int child)
+static int
+preamble_2_resp(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4458,7 +4704,8 @@ static int preamble_2_resp(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int preamble_2_list(int child)
+static int
+preamble_2_list(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4483,9 +4730,11 @@ static int preamble_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_2_conn(int child)
+static int
+postamble_2_conn(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4524,9 +4773,11 @@ static int postamble_2_conn(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_2_resp(int child)
+static int
+postamble_2_resp(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4563,9 +4814,11 @@ static int postamble_2_resp(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_2_list(int child)
+static int
+postamble_2_list(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4597,7 +4850,8 @@ static int postamble_2_list(int child)
 }
 
 #if 0
-static int preamble_2b_conn(int child)
+static int
+preamble_2b_conn(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4632,7 +4886,8 @@ static int preamble_2b_conn(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int preamble_2b_resp(int child)
+static int
+preamble_2b_resp(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4645,7 +4900,8 @@ static int preamble_2b_resp(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int preamble_2b_list(int child)
+static int
+preamble_2b_list(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -4669,9 +4925,11 @@ static int preamble_2b_list(int child)
 }
 #endif
 
-static int postamble_3_conn(int child)
+static int
+postamble_3_conn(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4715,9 +4973,11 @@ static int postamble_3_conn(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_3_resp(int child)
+static int
+postamble_3_resp(int child)
 {
 	int failed = -1;
+
 	while (1) {
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
@@ -4767,14 +5027,16 @@ static int postamble_3_resp(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int postamble_3_list(int child)
+static int
+postamble_3_list(int child)
 {
 	return postamble_2_list(child);
 }
 #endif
 
 #if 0
-static int preamble_3b_conn(int child)
+static int
+preamble_3b_conn(int child)
 {
 	opt_optm.rcv_val = T_YES;
 	opt_optm.ist_val = 32;
@@ -4783,7 +5045,8 @@ static int preamble_3b_conn(int child)
 	opt_conn.ost_val = 32;
 	return preamble_2_conn(child);
 }
-static int preamble_3b_resp(int child)
+static int
+preamble_3b_resp(int child)
 {
 	opt_optm.rcv_val = T_YES;
 	opt_optm.ist_val = 32;
@@ -4792,7 +5055,8 @@ static int preamble_3b_resp(int child)
 	opt_conn.ost_val = 32;
 	return preamble_2_resp(child);
 }
-static int preamble_3b_list(int child)
+static int
+preamble_3b_list(int child)
 {
 	opt_optm.rcv_val = T_YES;
 	opt_optm.ist_val = 32;
@@ -4802,100 +5066,118 @@ static int preamble_3b_list(int child)
 	return preamble_2_list(child);
 }
 
-static int preamble_4_conn(int child)
+static int
+preamble_4_conn(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
 	return preamble_2_conn(child);
 }
-static int preamble_4_list(int child)
+static int
+preamble_4_list(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
 	return preamble_2_list(child);
 }
-static int preamble_4_resp(int child)
+static int
+preamble_4_resp(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
 	return preamble_2_resp(child);
 }
 
-static int preamble_4b_conn(int child)
+static int
+preamble_4b_conn(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_2_conn(child);
 }
-static int preamble_4b_list(int child)
+static int
+preamble_4b_list(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_2_list(child);
 }
-static int preamble_4b_resp(int child)
+static int
+preamble_4b_resp(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_2_resp(child);
 }
 
-static int preamble_5_conn(int child)
+static int
+preamble_5_conn(int child)
 {
 	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
 	opt_optm.dbg_val = SCTP_OPTION_BREAK;
 	return preamble_2_conn(child);
 }
-static int preamble_5_list(int child)
+static int
+preamble_5_list(int child)
 {
 	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
 	opt_optm.dbg_val = SCTP_OPTION_BREAK;
 	return preamble_2_list(child);
 }
-static int preamble_5_resp(int child)
+static int
+preamble_5_resp(int child)
 {
 	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
 	opt_optm.dbg_val = SCTP_OPTION_BREAK;
 	return preamble_2_resp(child);
 }
 
-static int preamble_6_conn(int child)
+static int
+preamble_6_conn(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_3b_conn(child);
 }
-static int preamble_6_list(int child)
+static int
+preamble_6_list(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_3b_list(child);
 }
-static int preamble_6_resp(int child)
+static int
+preamble_6_resp(int child)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_3b_resp(child);
 }
 
-static int preamble_7_conn(int child)
+static int
+preamble_7_conn(int child)
 {
 	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
 	return preamble_1(child);
 }
-static int preamble_7_list(int child)
+static int
+preamble_7_list(int child)
 {
 	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
 	return preamble_1(child);
 }
-static int preamble_7_resp(int child)
+static int
+preamble_7_resp(int child)
 {
 	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
 	return preamble_1(child);
 }
 
-static int preamble_8_conn(int child)
+static int
+preamble_8_conn(int child)
 {
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
 }
-static int preamble_8_list(int child)
+static int
+preamble_8_list(int child)
 {
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
 }
-static int preamble_8_resp(int child)
+static int
+preamble_8_resp(int child)
 {
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
@@ -4927,7 +5209,8 @@ struct test_stream {
 #define desc_case_0_1 "\
 Checks that the test case guard timer will fire and bring down the children."
 
-int test_case_0_1(int child)
+int
+test_case_0_1(int child)
 {
 	test_sleep(child, 40);
 	return (__RESULT_SUCCESS);
@@ -4940,7 +5223,6 @@ struct test_stream test_0_1_conn = { &preamble_0_1, &test_case_0_1, &postamble_0
 struct test_stream test_0_1_resp = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
 struct test_stream test_0_1_list = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
 
-
 #define test_group_1 "Pushing and popping the tirdwr module"
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
@@ -4952,7 +5234,8 @@ ensures that pushing the module on an empty stream has no effect, while\n\
 popping the module from the stream results in a T_DISCON_REQ being sent to the\n\
 transport peer."
 
-int test_case_1_1_top(int child)
+int
+test_case_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -4965,7 +5248,8 @@ int test_case_1_1_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_1_1_bot(int child)
+int
+test_case_1_1_bot(int child)
 {
 	switch (wait_event(child, NORMAL_WAIT)) {
 	case __TEST_DISCON_REQ:
@@ -4999,11 +5283,12 @@ that the pushing the module on an empty stream has no effect, while popping\n\
 the module from the stream after receiving an orderly release indication\n\
 results in a T_ORDREL_REQ being sent to the transport peer."
 
-int test_case_1_2_top(int child)
+int
+test_case_1_2_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
-  again:
+      again:
 	state++;
 	switch (wait_event(child, LONG_WAIT)) {
 	case __EVENT_EOF:
@@ -5023,7 +5308,8 @@ int test_case_1_2_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_1_2_bot(int child)
+int
+test_case_1_2_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5056,7 +5342,8 @@ struct test_stream test_1_2_bot = { &preamble_1_2_bot, &test_case_1_2_bot, &post
 This test case tests that the module can be successfully pushed after a number\n\
 of M_DATA have been received on the stream."
 
-int test_case_1_3_top(int child)
+int
+test_case_1_3_top(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
@@ -5080,7 +5367,8 @@ int test_case_1_3_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_1_3_bot(int child)
+int
+test_case_1_3_bot(int child)
 {
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
@@ -5116,7 +5404,8 @@ struct test_stream test_1_3_bot = { &preamble_1_3_bot, &test_case_1_3_bot, &post
 This test case tests that the module cannot be pushed on a stream that has\n\
 already received T_DATA_IND primitives."
 
-int test_case_1_4_top(int child)
+int
+test_case_1_4_top(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
@@ -5137,7 +5426,8 @@ int test_case_1_4_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_1_4_bot(int child)
+int
+test_case_1_4_bot(int child)
 {
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
@@ -5175,7 +5465,8 @@ struct test_stream test_1_4_bot = { &preamble_1_4_bot, &test_case_1_4_bot, &post
 This test case ensures that the application can receive data formatted as\n\
 M_DATA messages after pushing the module."
 
-int test_case_2_1_top(int child)
+int
+test_case_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5204,7 +5495,8 @@ int test_case_2_1_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_2_1_bot(int child)
+int
+test_case_2_1_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5245,7 +5537,8 @@ struct test_stream test_2_1_bot = { &preamble_2_1_bot, &test_case_2_1_bot, &post
 This test case ensures that the application can receive data formatted as\n\
 T_DATA_IND messages after pushing the module."
 
-int test_case_2_2_top(int child)
+int
+test_case_2_2_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5274,7 +5567,8 @@ int test_case_2_2_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_2_2_bot(int child)
+int
+test_case_2_2_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5319,7 +5613,8 @@ struct test_stream test_2_2_bot = { &preamble_2_2_bot, &test_case_2_2_bot, &post
 This test case ensures that the application can receive data formatted as\n\
 T_OPTDATA_IND messages after pushing the module."
 
-int test_case_2_3_top(int child)
+int
+test_case_2_3_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5348,7 +5643,8 @@ int test_case_2_3_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_2_3_bot(int child)
+int
+test_case_2_3_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5395,9 +5691,11 @@ T_DATA_IND messages after pushing the module.  It also ensures that the\n\
 application will receive zero returns to reads after an orderly release\n\
 indication has been received."
 
-int test_case_2_4_top(int child)
+int
+test_case_2_4_top(int child)
 {
 	int count = 0;
+
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5429,7 +5727,8 @@ int test_case_2_4_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_2_4_bot(int child)
+int
+test_case_2_4_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5475,7 +5774,8 @@ T_DATA_IND messages after pushing the module.  It also ensures that the\n\
 application will receive zero returns to reads after disconnect indication has\n\
 been received."
 
-int test_case_2_5_top(int child)
+int
+test_case_2_5_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5509,7 +5809,8 @@ int test_case_2_5_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_2_5_bot(int child)
+int
+test_case_2_5_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5554,7 +5855,8 @@ struct test_stream test_2_5_bot = { &preamble_2_5_bot, &test_case_2_5_bot, &post
 #define desc_case_3_1 "\
 Tests that data can be sent with write(2) after pushing the module."
 
-int test_case_3_1_top(int child)
+int
+test_case_3_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5576,7 +5878,8 @@ int test_case_3_1_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_1_bot(int child)
+int
+test_case_3_1_bot(int child)
 {
 	for (;;) {
 		state++;
@@ -5613,7 +5916,8 @@ struct test_stream test_3_1_bot = { &preamble_3_1_bot, &test_case_3_1_bot, &post
 #define desc_case_3_2 "\
 Tests that data can be sent with writev(2) after pushing the module."
 
-int test_case_3_2_top(int child)
+int
+test_case_3_2_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5635,7 +5939,8 @@ int test_case_3_2_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_2_bot(int child)
+int
+test_case_3_2_bot(int child)
 {
 	for (;;) {
 		state++;
@@ -5672,7 +5977,8 @@ struct test_stream test_3_2_bot = { &preamble_3_2_bot, &test_case_3_2_bot, &post
 #define desc_case_3_3 "\
 Tests that data can be sent with putmsg(2) after pushing the module."
 
-int test_case_3_3_top(int child)
+int
+test_case_3_3_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5694,7 +6000,8 @@ int test_case_3_3_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_3_bot(int child)
+int
+test_case_3_3_bot(int child)
 {
 	for (;;) {
 		state++;
@@ -5731,7 +6038,8 @@ struct test_stream test_3_3_bot = { &preamble_3_3_bot, &test_case_3_3_bot, &post
 #define desc_case_3_4 "\
 Tests that expedited data cannot be sent with putpmsg(2) after pushing the module."
 
-int test_case_3_4_top(int child)
+int
+test_case_3_4_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5753,7 +6061,8 @@ int test_case_3_4_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_4_bot(int child)
+int
+test_case_3_4_bot(int child)
 {
 	for (;;) {
 		state++;
@@ -5790,7 +6099,8 @@ struct test_stream test_3_4_bot = { &preamble_3_4_bot, &test_case_3_4_bot, &post
 #define desc_case_3_5 "\
 Tests that data can be sent with write(2) after orderly release."
 
-int test_case_3_5_top(int child)
+int
+test_case_3_5_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5814,7 +6124,8 @@ int test_case_3_5_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_5_bot(int child)
+int
+test_case_3_5_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5857,7 +6168,8 @@ struct test_stream test_3_5_bot = { &preamble_3_5_bot, &test_case_3_5_bot, &post
 #define desc_case_3_6 "\
 Tests that data cannot be sent with write(2) after disconnect."
 
-int test_case_3_6_top(int child)
+int
+test_case_3_6_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5881,7 +6193,8 @@ int test_case_3_6_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_6_bot(int child)
+int
+test_case_3_6_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5920,7 +6233,8 @@ struct test_stream test_3_6_bot = { &preamble_3_6_bot, &test_case_3_6_bot, &post
 #define desc_case_3_7 "\
 Tests that data can be sent with putmsg(2) after orderly release."
 
-int test_case_3_7_top(int child)
+int
+test_case_3_7_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5944,7 +6258,8 @@ int test_case_3_7_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_7_bot(int child)
+int
+test_case_3_7_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -5987,7 +6302,8 @@ struct test_stream test_3_7_bot = { &preamble_3_7_bot, &test_case_3_7_bot, &post
 #define desc_case_3_8 "\
 Tests that data cannot be sent with putmsg(2) after disconnect."
 
-int test_case_3_8_top(int child)
+int
+test_case_3_8_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -6011,7 +6327,8 @@ int test_case_3_8_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_8_bot(int child)
+int
+test_case_3_8_bot(int child)
 {
 	test_msleep(child, NORMAL_WAIT);
 	state++;
@@ -6046,7 +6363,8 @@ struct test_stream test_3_8_bot = { &preamble_3_8_bot, &test_case_3_8_bot, &post
 Tests that receipt of a T_CONN_IND after the module has been pushed results in\n\
 an error on the stream."
 
-int test_case_4_1_top(int child)
+int
+test_case_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -6085,7 +6403,8 @@ int test_case_4_1_top(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_4_1_bot(int child, int signal)
+int
+test_case_4_1_bot(int child, int signal)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
@@ -6106,7 +6425,8 @@ int test_case_4_1_bot(int child, int signal)
 }
 
 #define test_case_4_1_1_top test_case_4_1_top
-int test_case_4_1_1_bot(int child)
+int
+test_case_4_1_1_bot(int child)
 {
 	test_data = "Connection indication test data.";
 	return test_case_4_1_bot(child, __TEST_CONN_IND);
@@ -6130,7 +6450,8 @@ Tests that receipt of a T_CONN_CON after the module has been pushed results in\n
 an error on the stream."
 
 #define test_case_4_1_2_top test_case_4_1_top
-int test_case_4_1_2_bot(int child)
+int
+test_case_4_1_2_bot(int child)
 {
 	test_data = "Connection confirmation test data.";
 	return test_case_4_1_bot(child, __TEST_CONN_CON);
@@ -6154,7 +6475,8 @@ Tests that receipt of a T_EXDATA_IND after the module has been pushed results in
 an error on the stream."
 
 #define test_case_4_1_3_top test_case_4_1_top
-int test_case_4_1_3_bot(int child)
+int
+test_case_4_1_3_bot(int child)
 {
 	test_data = "Expedited test data.";
 	return test_case_4_1_bot(child, __TEST_EXDATA_IND);
@@ -6178,7 +6500,8 @@ Tests that receipt of a T_INFO_ACK after the module has been pushed results in\n
 an error on the stream."
 
 #define test_case_4_1_4_top test_case_4_1_top
-int test_case_4_1_4_bot(int child)
+int
+test_case_4_1_4_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_INFO_ACK);
 }
@@ -6201,7 +6524,8 @@ Tests that receipt of a T_BIND_ACK after the module has been pushed results in\n
 an error on the stream."
 
 #define test_case_4_1_5_top test_case_4_1_top
-int test_case_4_1_5_bot(int child)
+int
+test_case_4_1_5_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_BIND_ACK);
 }
@@ -6224,7 +6548,8 @@ Tests that receipt of a T_ERROR_ACK after the module has been pushed results in\
 an error on the stream."
 
 #define test_case_4_1_6_top test_case_4_1_top
-int test_case_4_1_6_bot(int child)
+int
+test_case_4_1_6_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_ERROR_ACK);
 }
@@ -6247,7 +6572,8 @@ Tests that receipt of a T_OK_ACK after the module has been pushed results in\n\
 an error on the stream."
 
 #define test_case_4_1_7_top test_case_4_1_top
-int test_case_4_1_7_bot(int child)
+int
+test_case_4_1_7_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_OK_ACK);
 }
@@ -6270,7 +6596,8 @@ Tests that receipt of a T_UNITDATA_IND after the module has been pushed results 
 an error on the stream."
 
 #define test_case_4_1_8_top test_case_4_1_top
-int test_case_4_1_8_bot(int child)
+int
+test_case_4_1_8_bot(int child)
 {
 	test_data = "Unit test data.";
 	return test_case_4_1_bot(child, __TEST_UNITDATA_IND);
@@ -6294,7 +6621,8 @@ Tests that receipt of a T_UDERROR_IND after the module has been pushed results i
 an error on the stream."
 
 #define test_case_4_1_9_top test_case_4_1_top
-int test_case_4_1_9_bot(int child)
+int
+test_case_4_1_9_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_UDERROR_IND);
 }
@@ -6317,7 +6645,8 @@ Tests that receipt of a T_OPTMGMT_ACK after the module has been pushed results i
 an error on the stream."
 
 #define test_case_4_1_10_top test_case_4_1_top
-int test_case_4_1_10_bot(int child)
+int
+test_case_4_1_10_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_OPTMGMT_ACK);
 }
@@ -6340,7 +6669,8 @@ Tests that receipt of a T_ADDR_ACK after the module has been pushed results in\n
 an error on the stream."
 
 #define test_case_4_1_11_top test_case_4_1_top
-int test_case_4_1_11_bot(int child)
+int
+test_case_4_1_11_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_ADDR_ACK);
 }
@@ -6363,7 +6693,8 @@ Tests that receipt of a T_CAPABILITY_ACK after the module has been pushed result
 an error on the stream."
 
 #define test_case_4_1_12_top test_case_4_1_top
-int test_case_4_1_12_bot(int child)
+int
+test_case_4_1_12_bot(int child)
 {
 	return test_case_4_1_bot(child, __TEST_CAPABILITY_ACK);
 }
@@ -6387,7 +6718,8 @@ struct test_stream test_4_1_12_bot = { &preamble_4_1_12_bot, &test_case_4_1_12_b
 Tests that sending a T_CONN_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_top(int child, int signal)
+int
+test_case_4_2_top(int child, int signal)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -6427,7 +6759,8 @@ int test_case_4_2_top(int child, int signal)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_4_2_bot(int child)
+int
+test_case_4_2_bot(int child)
 {
 	switch (wait_event(child, LONGER_WAIT)) {
 	case __EVENT_NO_MSG:
@@ -6442,10 +6775,12 @@ int test_case_4_2_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_4_2_1_top(int child)
+int
+test_case_4_2_1_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_CONN_REQ);
 }
+
 #define test_case_4_2_1_bot test_case_4_2_bot
 
 #define preamble_4_2_1_top	preamble_0
@@ -6465,10 +6800,12 @@ struct test_stream test_4_2_1_bot = { &preamble_4_2_1_bot, &test_case_4_2_1_bot,
 Tests that sending a T_CONN_RES after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_2_top(int child)
+int
+test_case_4_2_2_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_CONN_RES);
 }
+
 #define test_case_4_2_2_bot test_case_4_2_bot
 
 #define preamble_4_2_2_top	preamble_0
@@ -6488,10 +6825,12 @@ struct test_stream test_4_2_2_bot = { &preamble_4_2_2_bot, &test_case_4_2_2_bot,
 Tests that sending a T_DISCON_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_3_top(int child)
+int
+test_case_4_2_3_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_DISCON_REQ);
 }
+
 #define test_case_4_2_3_bot test_case_4_2_bot
 
 #define preamble_4_2_3_top	preamble_0
@@ -6511,11 +6850,13 @@ struct test_stream test_4_2_3_bot = { &preamble_4_2_3_bot, &test_case_4_2_3_bot,
 Tests that sending a T_DATA_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_4_top(int child)
+int
+test_case_4_2_4_top(int child)
 {
 	test_data = "Normal test message.";
 	return test_case_4_2_top(child, __TEST_DATA_REQ);
 }
+
 #define test_case_4_2_4_bot test_case_4_2_bot
 
 #define preamble_4_2_4_top	preamble_0
@@ -6535,11 +6876,13 @@ struct test_stream test_4_2_4_bot = { &preamble_4_2_4_bot, &test_case_4_2_4_bot,
 Tests that sending a T_EXDATA_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_5_top(int child)
+int
+test_case_4_2_5_top(int child)
 {
 	test_data = "Expedited test message.";
 	return test_case_4_2_top(child, __TEST_EXDATA_REQ);
 }
+
 #define test_case_4_2_5_bot test_case_4_2_bot
 
 #define preamble_4_2_5_top	preamble_0
@@ -6559,10 +6902,12 @@ struct test_stream test_4_2_5_bot = { &preamble_4_2_5_bot, &test_case_4_2_5_bot,
 Tests that sending a T_INFO_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_6_top(int child)
+int
+test_case_4_2_6_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_INFO_REQ);
 }
+
 #define test_case_4_2_6_bot test_case_4_2_bot
 
 #define preamble_4_2_6_top	preamble_0
@@ -6582,10 +6927,12 @@ struct test_stream test_4_2_6_bot = { &preamble_4_2_6_bot, &test_case_4_2_6_bot,
 Tests that sending a T_BIND_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_7_top(int child)
+int
+test_case_4_2_7_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_BIND_REQ);
 }
+
 #define test_case_4_2_7_bot test_case_4_2_bot
 
 #define preamble_4_2_7_top	preamble_0
@@ -6605,10 +6952,12 @@ struct test_stream test_4_2_7_bot = { &preamble_4_2_7_bot, &test_case_4_2_7_bot,
 Tests that sending a T_UNBIND_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_8_top(int child)
+int
+test_case_4_2_8_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_UNBIND_REQ);
 }
+
 #define test_case_4_2_8_bot test_case_4_2_bot
 
 #define preamble_4_2_8_top	preamble_0
@@ -6628,11 +6977,13 @@ struct test_stream test_4_2_8_bot = { &preamble_4_2_8_bot, &test_case_4_2_8_bot,
 Tests that sending a T_UNITDATA_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_9_top(int child)
+int
+test_case_4_2_9_top(int child)
 {
 	test_data = "Unit test message.";
 	return test_case_4_2_top(child, __TEST_UNITDATA_REQ);
 }
+
 #define test_case_4_2_9_bot test_case_4_2_bot
 
 #define preamble_4_2_9_top	preamble_0
@@ -6652,10 +7003,12 @@ struct test_stream test_4_2_9_bot = { &preamble_4_2_9_bot, &test_case_4_2_9_bot,
 Tests that sending a T_OPTMGMT_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_10_top(int child)
+int
+test_case_4_2_10_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_OPTMGMT_REQ);
 }
+
 #define test_case_4_2_10_bot test_case_4_2_bot
 
 #define preamble_4_2_10_top	preamble_0
@@ -6675,11 +7028,13 @@ struct test_stream test_4_2_10_bot = { &preamble_4_2_10_bot, &test_case_4_2_10_b
 Tests that sending a T_ORDREL_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_11_top(int child)
+int
+test_case_4_2_11_top(int child)
 {
 	test_data = "Orderly release data.";
 	return test_case_4_2_top(child, __TEST_ORDREL_REQ);
 }
+
 #define test_case_4_2_11_bot test_case_4_2_bot
 
 #define preamble_4_2_11_top	preamble_0
@@ -6699,11 +7054,13 @@ struct test_stream test_4_2_11_bot = { &preamble_4_2_11_bot, &test_case_4_2_11_b
 Tests that sending a T_OPTDATA_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_12_top(int child)
+int
+test_case_4_2_12_top(int child)
 {
 	test_data = "Option data.";
 	return test_case_4_2_top(child, __TEST_OPTDATA_REQ);
 }
+
 #define test_case_4_2_12_bot test_case_4_2_bot
 
 #define preamble_4_2_12_top	preamble_0
@@ -6723,10 +7080,12 @@ struct test_stream test_4_2_12_bot = { &preamble_4_2_12_bot, &test_case_4_2_12_b
 Tests that sending a T_ADDR_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_13_top(int child)
+int
+test_case_4_2_13_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_ADDR_REQ);
 }
+
 #define test_case_4_2_13_bot test_case_4_2_bot
 
 #define preamble_4_2_13_top	preamble_0
@@ -6746,10 +7105,12 @@ struct test_stream test_4_2_13_bot = { &preamble_4_2_13_bot, &test_case_4_2_13_b
 Tests that sending a T_CAPABILITY_REQ after the module has been pushed results in an\n\
 error on the stream."
 
-int test_case_4_2_14_top(int child)
+int
+test_case_4_2_14_top(int child)
 {
 	return test_case_4_2_top(child, __TEST_CAPABILITY_REQ);
 }
+
 #define test_case_4_2_14_bot test_case_4_2_bot
 
 #define preamble_4_2_14_top	preamble_0
@@ -6771,7 +7132,8 @@ struct test_stream test_4_2_14_bot = { &preamble_4_2_14_bot, &test_case_4_2_14_b
 Tests that performing a TI_GETINFO IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_top(int child, int signal)
+int
+test_case_4_3_top(int child, int signal)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -6811,7 +7173,8 @@ int test_case_4_3_top(int child, int signal)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_4_3_bot(int child)
+int
+test_case_4_3_bot(int child)
 {
 	switch (wait_event(child, LONGER_WAIT)) {
 	case __EVENT_NO_MSG:
@@ -6826,10 +7189,12 @@ int test_case_4_3_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-int test_case_4_3_1_top(int child)
+int
+test_case_4_3_1_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_GETINFO);
 }
+
 #define test_case_4_3_1_bot test_case_4_3_bot
 
 #define preamble_4_3_1_top	preamble_0
@@ -6849,10 +7214,12 @@ struct test_stream test_4_3_1_bot = { &preamble_4_3_1_bot, &test_case_4_3_1_bot,
 Tests that performing a TI_OPTMGMT IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_2_top(int child)
+int
+test_case_4_3_2_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_OPTMGMT);
 }
+
 #define test_case_4_3_2_bot test_case_4_3_bot
 
 #define preamble_4_3_2_top	preamble_0
@@ -6872,10 +7239,12 @@ struct test_stream test_4_3_2_bot = { &preamble_4_3_2_bot, &test_case_4_3_2_bot,
 Tests that performing a TI_BIND IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_3_top(int child)
+int
+test_case_4_3_3_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_BIND);
 }
+
 #define test_case_4_3_3_bot test_case_4_3_bot
 
 #define preamble_4_3_3_top	preamble_0
@@ -6895,10 +7264,12 @@ struct test_stream test_4_3_3_bot = { &preamble_4_3_3_bot, &test_case_4_3_3_bot,
 Tests that performing a TI_UNBIND IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_4_top(int child)
+int
+test_case_4_3_4_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_UNBIND);
 }
+
 #define test_case_4_3_4_bot test_case_4_3_bot
 
 #define preamble_4_3_4_top	preamble_0
@@ -6918,10 +7289,12 @@ struct test_stream test_4_3_4_bot = { &preamble_4_3_4_bot, &test_case_4_3_4_bot,
 Tests that performing a TI_GETMYNAME IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_5_top(int child)
+int
+test_case_4_3_5_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_GETMYNAME);
 }
+
 #define test_case_4_3_5_bot test_case_4_3_bot
 
 #define preamble_4_3_5_top	preamble_0
@@ -6941,10 +7314,12 @@ struct test_stream test_4_3_5_bot = { &preamble_4_3_5_bot, &test_case_4_3_5_bot,
 Tests that performing a TI_GETPEERNAME IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_6_top(int child)
+int
+test_case_4_3_6_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_GETPEERNAME);
 }
+
 #define test_case_4_3_6_bot test_case_4_3_bot
 
 #define preamble_4_3_6_top	preamble_0
@@ -6964,10 +7339,12 @@ struct test_stream test_4_3_6_bot = { &preamble_4_3_6_bot, &test_case_4_3_6_bot,
 Tests that performing a TI_SETMYNAME IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_7_top(int child)
+int
+test_case_4_3_7_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_SETMYNAME);
 }
+
 #define test_case_4_3_7_bot test_case_4_3_bot
 
 #define preamble_4_3_7_top	preamble_0
@@ -6987,10 +7364,12 @@ struct test_stream test_4_3_7_bot = { &preamble_4_3_7_bot, &test_case_4_3_7_bot,
 Tests that performing a TI_SETPEERNAME IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_8_top(int child)
+int
+test_case_4_3_8_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_SETPEERNAME);
 }
+
 #define test_case_4_3_8_bot test_case_4_3_bot
 
 #define preamble_4_3_8_top	preamble_0
@@ -7010,10 +7389,12 @@ struct test_stream test_4_3_8_bot = { &preamble_4_3_8_bot, &test_case_4_3_8_bot,
 Tests that performing a TI_SYNC IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_9_top(int child)
+int
+test_case_4_3_9_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_SYNC);
 }
+
 #define test_case_4_3_9_bot test_case_4_3_bot
 
 #define preamble_4_3_9_top	preamble_0
@@ -7033,10 +7414,12 @@ struct test_stream test_4_3_9_bot = { &preamble_4_3_9_bot, &test_case_4_3_9_bot,
 Tests that performing a TI_GETADDRS IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_10_top(int child)
+int
+test_case_4_3_10_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_GETADDRS);
 }
+
 #define test_case_4_3_10_bot test_case_4_3_bot
 
 #define preamble_4_3_10_top	preamble_0
@@ -7056,10 +7439,12 @@ struct test_stream test_4_3_10_bot = { &preamble_4_3_10_bot, &test_case_4_3_10_b
 Tests that performing a TI_CAPABILITY IO control after the module has been pushed\n\
 results in an error on the stream."
 
-int test_case_4_3_11_top(int child)
+int
+test_case_4_3_11_top(int child)
 {
 	return test_case_4_3_top(child, __TEST_TI_CAPABILITY);
 }
+
 #define test_case_4_3_11_bot test_case_4_3_bot
 
 #define preamble_4_3_11_top	preamble_0
@@ -7078,11 +7463,13 @@ struct test_stream test_4_3_11_bot = { &preamble_4_3_11_bot, &test_case_4_3_11_b
  *
  *  -------------------------------------------------------------------------
  */
-int run_stream(int child, struct test_stream *stream)
+int
+run_stream(int child, struct test_stream *stream)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	int pre_result = __RESULT_SCRIPT_ERROR;
 	int post_result = __RESULT_SCRIPT_ERROR;
+
 	print_preamble(child);
 	state = 100;
 	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
@@ -7161,11 +7548,13 @@ int run_stream(int child, struct test_stream *stream)
  *  tested module.
  */
 
-int test_run(struct test_stream *stream[])
+int
+test_run(struct test_stream *stream[])
 {
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
+
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
@@ -7243,6 +7632,7 @@ int test_run(struct test_stream *stream[])
 				}
 			} else if (WIFSIGNALED(this_status)) {
 				int signal = WTERMSIG(this_status);
+
 				if (this_child == child[0]) {
 					print_terminated(0, signal);
 					if (child[1])
@@ -7272,6 +7662,7 @@ int test_run(struct test_stream *stream[])
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
+
 				if (this_child == child[0]) {
 					print_stopped(0, signal);
 					if (child[0])
@@ -7349,73 +7740,129 @@ struct test_case {
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
-	int (*start)(int);		/* start function */
-	int (*stop)(int);		/* stop function */
+	int (*start) (int);		/* start function */
+	int (*stop) (int);		/* stop function */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
 } tests[] = {
 	{
-		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, { &test_0_1_conn, &test_0_1_resp, &test_0_1_list }, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, { &test_1_1_top, &test_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, { &test_1_2_top, &test_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, { &test_1_3_top, &test_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, { &test_1_4_top, &test_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, { &test_2_1_top, &test_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, { &test_2_2_top, &test_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, { &test_2_3_top, &test_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_4, tgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, { &test_2_4_top, &test_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_5, tgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, { &test_2_5_top, &test_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, { &test_3_1_top, &test_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, { &test_3_2_top, &test_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, { &test_3_3_top, &test_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, { &test_3_4_top, &test_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, { &test_3_5_top, &test_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, { &test_3_6_top, &test_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_7, tgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, { &test_3_7_top, &test_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_8, tgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, { &test_3_8_top, &test_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, { &test_4_1_1_top, &test_4_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, { &test_4_1_2_top, &test_4_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_3, tgrp_case_4_1_3, name_case_4_1_3, desc_case_4_1_3, sref_case_4_1_3, { &test_4_1_3_top, &test_4_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_4, tgrp_case_4_1_4, name_case_4_1_4, desc_case_4_1_4, sref_case_4_1_4, { &test_4_1_4_top, &test_4_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_5, tgrp_case_4_1_5, name_case_4_1_5, desc_case_4_1_5, sref_case_4_1_5, { &test_4_1_5_top, &test_4_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_6, tgrp_case_4_1_6, name_case_4_1_6, desc_case_4_1_6, sref_case_4_1_6, { &test_4_1_6_top, &test_4_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_7, tgrp_case_4_1_7, name_case_4_1_7, desc_case_4_1_7, sref_case_4_1_7, { &test_4_1_7_top, &test_4_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_8, tgrp_case_4_1_8, name_case_4_1_8, desc_case_4_1_8, sref_case_4_1_8, { &test_4_1_8_top, &test_4_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_9, tgrp_case_4_1_9, name_case_4_1_9, desc_case_4_1_9, sref_case_4_1_9, { &test_4_1_9_top, &test_4_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_10, tgrp_case_4_1_10, name_case_4_1_10, desc_case_4_1_10, sref_case_4_1_10, { &test_4_1_10_top, &test_4_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_11, tgrp_case_4_1_11, name_case_4_1_11, desc_case_4_1_11, sref_case_4_1_11, { &test_4_1_11_top, &test_4_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_12, tgrp_case_4_1_12, name_case_4_1_12, desc_case_4_1_12, sref_case_4_1_12, { &test_4_1_12_top, &test_4_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, { &test_4_2_1_top, &test_4_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, { &test_4_2_2_top, &test_4_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_3, tgrp_case_4_2_3, name_case_4_2_3, desc_case_4_2_3, sref_case_4_2_3, { &test_4_2_3_top, &test_4_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_4, tgrp_case_4_2_4, name_case_4_2_4, desc_case_4_2_4, sref_case_4_2_4, { &test_4_2_4_top, &test_4_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_5, tgrp_case_4_2_5, name_case_4_2_5, desc_case_4_2_5, sref_case_4_2_5, { &test_4_2_5_top, &test_4_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_6, tgrp_case_4_2_6, name_case_4_2_6, desc_case_4_2_6, sref_case_4_2_6, { &test_4_2_6_top, &test_4_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_7, tgrp_case_4_2_7, name_case_4_2_7, desc_case_4_2_7, sref_case_4_2_7, { &test_4_2_7_top, &test_4_2_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_8, tgrp_case_4_2_8, name_case_4_2_8, desc_case_4_2_8, sref_case_4_2_8, { &test_4_2_8_top, &test_4_2_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_9, tgrp_case_4_2_9, name_case_4_2_9, desc_case_4_2_9, sref_case_4_2_9, { &test_4_2_9_top, &test_4_2_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_10, tgrp_case_4_2_10, name_case_4_2_10, desc_case_4_2_10, sref_case_4_2_10, { &test_4_2_10_top, &test_4_2_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_11, tgrp_case_4_2_11, name_case_4_2_11, desc_case_4_2_11, sref_case_4_2_11, { &test_4_2_11_top, &test_4_2_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_12, tgrp_case_4_2_12, name_case_4_2_12, desc_case_4_2_12, sref_case_4_2_12, { &test_4_2_12_top, &test_4_2_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_13, tgrp_case_4_2_13, name_case_4_2_13, desc_case_4_2_13, sref_case_4_2_13, { &test_4_2_13_top, &test_4_2_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_14, tgrp_case_4_2_14, name_case_4_2_14, desc_case_4_2_14, sref_case_4_2_14, { &test_4_2_14_top, &test_4_2_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_1, tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, sref_case_4_3_1, { &test_4_3_1_top, &test_4_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_2, tgrp_case_4_3_2, name_case_4_3_2, desc_case_4_3_2, sref_case_4_3_2, { &test_4_3_2_top, &test_4_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_3, tgrp_case_4_3_3, name_case_4_3_3, desc_case_4_3_3, sref_case_4_3_3, { &test_4_3_3_top, &test_4_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_4, tgrp_case_4_3_4, name_case_4_3_4, desc_case_4_3_4, sref_case_4_3_4, { &test_4_3_4_top, &test_4_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_5, tgrp_case_4_3_5, name_case_4_3_5, desc_case_4_3_5, sref_case_4_3_5, { &test_4_3_5_top, &test_4_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_6, tgrp_case_4_3_6, name_case_4_3_6, desc_case_4_3_6, sref_case_4_3_6, { &test_4_3_6_top, &test_4_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_7, tgrp_case_4_3_7, name_case_4_3_7, desc_case_4_3_7, sref_case_4_3_7, { &test_4_3_7_top, &test_4_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_8, tgrp_case_4_3_8, name_case_4_3_8, desc_case_4_3_8, sref_case_4_3_8, { &test_4_3_8_top, &test_4_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_9, tgrp_case_4_3_9, name_case_4_3_9, desc_case_4_3_9, sref_case_4_3_9, { &test_4_3_9_top, &test_4_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_10, tgrp_case_4_3_10, name_case_4_3_10, desc_case_4_3_10, sref_case_4_3_10, { &test_4_3_10_top, &test_4_3_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_11, tgrp_case_4_3_11, name_case_4_3_11, desc_case_4_3_11, sref_case_4_3_11, { &test_4_3_11_top, &test_4_3_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, {
+	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
+	&test_1_1_top, &test_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
+	&test_1_2_top, &test_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, {
+	&test_1_3_top, &test_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, {
+	&test_1_4_top, &test_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, {
+	&test_2_1_top, &test_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, {
+	&test_2_2_top, &test_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, {
+	&test_2_3_top, &test_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_4, tgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, {
+	&test_2_4_top, &test_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_5, tgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, {
+	&test_2_5_top, &test_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, {
+	&test_3_1_top, &test_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, {
+	&test_3_2_top, &test_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, {
+	&test_3_3_top, &test_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, {
+	&test_3_4_top, &test_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, {
+	&test_3_5_top, &test_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, {
+	&test_3_6_top, &test_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7, tgrp_case_3_7, name_case_3_7, desc_case_3_7, sref_case_3_7, {
+	&test_3_7_top, &test_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8, tgrp_case_3_8, name_case_3_8, desc_case_3_8, sref_case_3_8, {
+	&test_3_8_top, &test_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, {
+	&test_4_1_1_top, &test_4_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, {
+	&test_4_1_2_top, &test_4_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_3, tgrp_case_4_1_3, name_case_4_1_3, desc_case_4_1_3, sref_case_4_1_3, {
+	&test_4_1_3_top, &test_4_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_4, tgrp_case_4_1_4, name_case_4_1_4, desc_case_4_1_4, sref_case_4_1_4, {
+	&test_4_1_4_top, &test_4_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_5, tgrp_case_4_1_5, name_case_4_1_5, desc_case_4_1_5, sref_case_4_1_5, {
+	&test_4_1_5_top, &test_4_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_6, tgrp_case_4_1_6, name_case_4_1_6, desc_case_4_1_6, sref_case_4_1_6, {
+	&test_4_1_6_top, &test_4_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_7, tgrp_case_4_1_7, name_case_4_1_7, desc_case_4_1_7, sref_case_4_1_7, {
+	&test_4_1_7_top, &test_4_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_8, tgrp_case_4_1_8, name_case_4_1_8, desc_case_4_1_8, sref_case_4_1_8, {
+	&test_4_1_8_top, &test_4_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_9, tgrp_case_4_1_9, name_case_4_1_9, desc_case_4_1_9, sref_case_4_1_9, {
+	&test_4_1_9_top, &test_4_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_10, tgrp_case_4_1_10, name_case_4_1_10, desc_case_4_1_10, sref_case_4_1_10, {
+	&test_4_1_10_top, &test_4_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_11, tgrp_case_4_1_11, name_case_4_1_11, desc_case_4_1_11, sref_case_4_1_11, {
+	&test_4_1_11_top, &test_4_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_12, tgrp_case_4_1_12, name_case_4_1_12, desc_case_4_1_12, sref_case_4_1_12, {
+	&test_4_1_12_top, &test_4_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, {
+	&test_4_2_1_top, &test_4_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, {
+	&test_4_2_2_top, &test_4_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_3, tgrp_case_4_2_3, name_case_4_2_3, desc_case_4_2_3, sref_case_4_2_3, {
+	&test_4_2_3_top, &test_4_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_4, tgrp_case_4_2_4, name_case_4_2_4, desc_case_4_2_4, sref_case_4_2_4, {
+	&test_4_2_4_top, &test_4_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_5, tgrp_case_4_2_5, name_case_4_2_5, desc_case_4_2_5, sref_case_4_2_5, {
+	&test_4_2_5_top, &test_4_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_6, tgrp_case_4_2_6, name_case_4_2_6, desc_case_4_2_6, sref_case_4_2_6, {
+	&test_4_2_6_top, &test_4_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_7, tgrp_case_4_2_7, name_case_4_2_7, desc_case_4_2_7, sref_case_4_2_7, {
+	&test_4_2_7_top, &test_4_2_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_8, tgrp_case_4_2_8, name_case_4_2_8, desc_case_4_2_8, sref_case_4_2_8, {
+	&test_4_2_8_top, &test_4_2_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_9, tgrp_case_4_2_9, name_case_4_2_9, desc_case_4_2_9, sref_case_4_2_9, {
+	&test_4_2_9_top, &test_4_2_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_10, tgrp_case_4_2_10, name_case_4_2_10, desc_case_4_2_10, sref_case_4_2_10, {
+	&test_4_2_10_top, &test_4_2_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_11, tgrp_case_4_2_11, name_case_4_2_11, desc_case_4_2_11, sref_case_4_2_11, {
+	&test_4_2_11_top, &test_4_2_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_12, tgrp_case_4_2_12, name_case_4_2_12, desc_case_4_2_12, sref_case_4_2_12, {
+	&test_4_2_12_top, &test_4_2_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_13, tgrp_case_4_2_13, name_case_4_2_13, desc_case_4_2_13, sref_case_4_2_13, {
+	&test_4_2_13_top, &test_4_2_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_14, tgrp_case_4_2_14, name_case_4_2_14, desc_case_4_2_14, sref_case_4_2_14, {
+	&test_4_2_14_top, &test_4_2_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_1, tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, sref_case_4_3_1, {
+	&test_4_3_1_top, &test_4_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_2, tgrp_case_4_3_2, name_case_4_3_2, desc_case_4_3_2, sref_case_4_3_2, {
+	&test_4_3_2_top, &test_4_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_3, tgrp_case_4_3_3, name_case_4_3_3, desc_case_4_3_3, sref_case_4_3_3, {
+	&test_4_3_3_top, &test_4_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_4, tgrp_case_4_3_4, name_case_4_3_4, desc_case_4_3_4, sref_case_4_3_4, {
+	&test_4_3_4_top, &test_4_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_5, tgrp_case_4_3_5, name_case_4_3_5, desc_case_4_3_5, sref_case_4_3_5, {
+	&test_4_3_5_top, &test_4_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_6, tgrp_case_4_3_6, name_case_4_3_6, desc_case_4_3_6, sref_case_4_3_6, {
+	&test_4_3_6_top, &test_4_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_7, tgrp_case_4_3_7, name_case_4_3_7, desc_case_4_3_7, sref_case_4_3_7, {
+	&test_4_3_7_top, &test_4_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_8, tgrp_case_4_3_8, name_case_4_3_8, desc_case_4_3_8, sref_case_4_3_8, {
+	&test_4_3_8_top, &test_4_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_9, tgrp_case_4_3_9, name_case_4_3_9, desc_case_4_3_9, sref_case_4_3_9, {
+	&test_4_3_9_top, &test_4_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_10, tgrp_case_4_3_10, name_case_4_3_10, desc_case_4_3_10, sref_case_4_3_10, {
+	&test_4_3_10_top, &test_4_3_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_11, tgrp_case_4_3_11, name_case_4_3_11, desc_case_4_3_11, sref_case_4_3_11, {
+	&test_4_3_11_top, &test_4_3_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
 static int summary = 0;
 
-void print_header(void)
+void
+print_header(void)
 {
 	if (verbose <= 0)
 		return;
@@ -7425,7 +7872,8 @@ void print_header(void)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-int do_tests(int num_tests)
+int
+do_tests(int num_tests)
 {
 	int i;
 	int result = __RESULT_INCONCLUSIVE;
@@ -7436,6 +7884,7 @@ int do_tests(int num_tests)
 	int skipped = 0;
 	int notselected = 0;
 	int aborted = 0;
+
 	print_header();
 	show = 0;
 	if (verbose > 0) {
@@ -7473,10 +7922,10 @@ int do_tests(int num_tests)
 				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if ((result = tests[i].result) == 0) {
-				if ((result = (*tests[i].start)(i)) != __RESULT_SUCCESS)
+				if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
 					goto inconclusive;
 				result = test_run(tests[i].stream);
-				(*tests[i].stop)(i);
+				(*tests[i].stop) (i);
 			} else {
 				switch (result) {
 				case __RESULT_SUCCESS:
@@ -7671,7 +8120,8 @@ int do_tests(int num_tests)
 	}
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -7725,7 +8175,8 @@ regulations).\n\
 ");
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -7743,7 +8194,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -7756,7 +8208,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -7801,12 +8254,14 @@ Options:\n\
 ", argv[0], devname);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	size_t l, n;
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
 			t->run = 1;
@@ -7815,6 +8270,7 @@ int main(int argc, char *argv[])
 	}
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -7836,6 +8292,7 @@ int main(int argc, char *argv[])
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
@@ -7916,9 +8373,9 @@ int main(int argc, char *argv[])
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, 16)) {
 						// if (!t->result) {
-							t->run = 1;
-							n++;
-							tests_to_run++;
+						t->run = 1;
+						n++;
+						tests_to_run++;
 						// }
 					}
 				if (!n) {
@@ -7952,9 +8409,9 @@ int main(int argc, char *argv[])
 			for (n = 0, t = tests; t->numb; t++)
 				if (!strncmp(t->numb, optarg, l)) {
 					// if (!t->result) {
-						t->run = 1;
-						n++;
-						tests_to_run++;
+					t->run = 1;
+					n++;
+					tests_to_run++;
 					// }
 				}
 			if (!n) {
@@ -7994,7 +8451,7 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/*
+	/* 
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)

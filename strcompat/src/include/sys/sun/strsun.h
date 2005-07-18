@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.4 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.5 2005/07/18 12:25:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/12 13:54:44 $"
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/18 12:25:41 $"
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -68,49 +68,60 @@
 
 #include <linux/types.h>
 
-__SUN_EXTERN_INLINE unsigned char *DB_BASE(mblk_t *mp)
+__SUN_EXTERN_INLINE unsigned char *
+DB_BASE(mblk_t *mp)
 {
 	return (unsigned char *) (mp->b_datap->db_base);
 }
-__SUN_EXTERN_INLINE unsigned char *DB_LIM(mblk_t *mp)
+__SUN_EXTERN_INLINE unsigned char *
+DB_LIM(mblk_t *mp)
 {
 	return (unsigned char *) (mp->b_datap->db_lim);
 }
-__SUN_EXTERN_INLINE size_t DB_REF(mblk_t *mp)
+__SUN_EXTERN_INLINE size_t
+DB_REF(mblk_t *mp)
 {
 	return (size_t) (mp->b_datap->db_ref);
 }
-__SUN_EXTERN_INLINE int DB_TYPE(mblk_t *mp)
+__SUN_EXTERN_INLINE int
+DB_TYPE(mblk_t *mp)
 {
 	return (int) (mp->b_datap->db_type);
 }
 
-__SUN_EXTERN_INLINE long MBLKL(mblk_t *mp)
+__SUN_EXTERN_INLINE long
+MBLKL(mblk_t *mp)
 {
 	return (long) (mp->b_wptr - mp->b_rptr);
 }
-__SUN_EXTERN_INLINE long MBLKSIZE(mblk_t *mp)
+__SUN_EXTERN_INLINE long
+MBLKSIZE(mblk_t *mp)
 {
 	return (long) (mp->b_datap->db_lim - mp->b_datap->db_base);
 }
-__SUN_EXTERN_INLINE long MBLKHEAD(mblk_t *mp)
+__SUN_EXTERN_INLINE long
+MBLKHEAD(mblk_t *mp)
 {
 	return (long) (mp->b_rptr - mp->b_datap->db_base);
 }
-__SUN_EXTERN_INLINE long MBLKTAIL(mblk_t *mp)
+__SUN_EXTERN_INLINE long
+MBLKTAIL(mblk_t *mp)
 {
 	return (long) (mp->b_datap->db_lim - mp->b_wptr);
 }
-__SUN_EXTERN_INLINE long MBLKIN(mblk_t *mp, ssize_t off, size_t len)
+__SUN_EXTERN_INLINE long
+MBLKIN(mblk_t *mp, ssize_t off, size_t len)
 {
 	return ((off >= 0) && (mp->b_rptr + off + len < mp->b_wptr));
 }
-__SUN_EXTERN_INLINE long OFFSET(void *p, void *base)
+__SUN_EXTERN_INLINE long
+OFFSET(void *p, void *base)
 {
 	return (long) ((caddr_t) p - (caddr_t) base);
 }
 
-__SUN_EXTERN_INLINE void merror(queue_t *q, mblk_t *mp, int error)
+__SUN_EXTERN_INLINE void
+merror(queue_t *q, mblk_t *mp, int error)
 {
 	mp->b_datap->db_type = M_ERROR;
 	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
@@ -118,9 +129,11 @@ __SUN_EXTERN_INLINE void merror(queue_t *q, mblk_t *mp, int error)
 	mp->b_rptr[0] = mp->b_rptr[1] = error;
 	qreply(q, mp);
 }
-__SUN_EXTERN_INLINE void mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval)
+__SUN_EXTERN_INLINE void
+mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval)
 {
 	union ioctypes *iocp;
+
 	mp->b_datap->db_type = M_IOCACK;
 	iocp = (typeof(iocp)) mp->b_rptr;
 	iocp->iocblk.ioc_count = count;
@@ -133,9 +146,11 @@ __SUN_EXTERN_INLINE void mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval
 	if (mp->b_cont)
 		mp->b_cont->b_wptr = mp->b_cont->b_rptr + count;
 }
-__SUN_EXTERN_INLINE void miocack(queue_t *q, mblk_t *mp, int count, int rval)
+__SUN_EXTERN_INLINE void
+miocack(queue_t *q, mblk_t *mp, int count, int rval)
 {
 	union ioctypes *iocp;
+
 	mp->b_datap->db_type = M_IOCACK;
 	iocp = (typeof(iocp)) mp->b_rptr;
 	iocp->iocblk.ioc_count = count;
@@ -143,9 +158,11 @@ __SUN_EXTERN_INLINE void miocack(queue_t *q, mblk_t *mp, int count, int rval)
 	iocp->iocblk.ioc_error = 0;
 	qreply(q, mp);
 }
-__SUN_EXTERN_INLINE void miocnak(queue_t *q, mblk_t *mp, int count, int error)
+__SUN_EXTERN_INLINE void
+miocnak(queue_t *q, mblk_t *mp, int count, int error)
 {
 	union ioctypes *iocp;
+
 	mp->b_datap->db_type = M_IOCNAK;
 	iocp = (typeof(iocp)) mp->b_rptr;
 	iocp->iocblk.ioc_count = count;
@@ -153,8 +170,8 @@ __SUN_EXTERN_INLINE void miocnak(queue_t *q, mblk_t *mp, int count, int error)
 	iocp->iocblk.ioc_error = error;
 	qreply(q, mp);
 }
-__SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int type,
-				      uint32_t primtype)
+__SUN_EXTERN_INLINE mblk_t *
+mexchange(queue_t *q, mblk_t *mp, size_t size, int type, uint32_t primtype)
 {
 	if (unlikely(mp == NULL ||
 		     (size > FASTBUF && mp->b_datap->db_lim - mp->b_datap->db_base < size) ||
@@ -183,12 +200,14 @@ __SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int t
 		*(uint32_t *) mp->b_rptr = primtype;
 	return (mp);
 }
-__SUN_EXTERN_INLINE mblk_t *mexpandb(mblk_t *mp, int i1, int i2)
+__SUN_EXTERN_INLINE mblk_t *
+mexpandb(mblk_t *mp, int i1, int i2)
 {
 	/* I don't really know what this does... */
 	return (NULL);
 }
-__SUN_EXTERN_INLINE int miocpullup(mblk_t *mp, size_t len)
+__SUN_EXTERN_INLINE int
+miocpullup(mblk_t *mp, size_t len)
 {
 	if (unlikely(!mp || !mp->b_cont ||
 		     ((struct iocblk *) mp->b_rptr)->ioc_count == TRANSPARENT))
@@ -201,12 +220,15 @@ __SUN_EXTERN_INLINE int miocpullup(mblk_t *mp, size_t len)
       einval:
 	return (EINVAL);
 }
+
 #if 0
 /* contained in the base package */
-__SUN_EXTERN_INLINE size_t msgsize(mblk_t *mp)
+__SUN_EXTERN_INLINE size_t
+msgsize(mblk_t *mp)
 {
 	mblk_t *bp;
 	size_t s;
+
 	for (bp = mp, s = 0; bp; bp = bp->b_cont) {
 		if (bp->b_wptr > bp->b_rptr) {
 			s += bp->b_wptr - bp->b_rptr;
@@ -215,13 +237,16 @@ __SUN_EXTERN_INLINE size_t msgsize(mblk_t *mp)
 	return s;
 }
 #endif
-__SUN_EXTERN_INLINE void mcopymsg(mblk_t *mp, unsigned char *buf)
+__SUN_EXTERN_INLINE void
+mcopymsg(mblk_t *mp, unsigned char *buf)
 {
 	mblk_t *bp;
 	unsigned char *ptr;
+
 	for (bp = mp, ptr = buf; bp; bp = bp->b_cont) {
 		if (bp->b_wptr > bp->b_rptr) {
 			long len = bp->b_wptr - bp->b_rptr;
+
 			bcopy(bp->b_rptr, ptr, len);
 			ptr += len;
 		}
@@ -229,9 +254,11 @@ __SUN_EXTERN_INLINE void mcopymsg(mblk_t *mp, unsigned char *buf)
 	freemsg(mp);
 	return;
 }
-__SUN_EXTERN_INLINE void mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
+__SUN_EXTERN_INLINE void
+mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
 {
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;
+
 	if (mp->b_datap->db_type == M_IOCTL && iocp->iocblk.ioc_count == TRANSPARENT)
 		iocp->copyreq.cq_addr = (caddr_t) *(uintptr_t *) mp->b_cont->b_rptr;
 	else
@@ -244,9 +271,11 @@ __SUN_EXTERN_INLINE void mcopyin(mblk_t *mp, void *priv, size_t size, void *uadd
 	iocp->copyreq.cq_flag = 0;
 	mp->b_wptr = mp->b_rptr + sizeof(iocp->copyreq);
 }
-__SUN_EXTERN_INLINE void mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp)
+__SUN_EXTERN_INLINE void
+mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp)
 {
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;
+
 	if (mp->b_datap->db_type == M_IOCTL && iocp->iocblk.ioc_count == TRANSPARENT) {
 		iocp->copyreq.cq_addr = (caddr_t) *(uintptr_t *) mp->b_cont->b_rptr;
 		freemsg(xchg(&mp->b_cont, dp));

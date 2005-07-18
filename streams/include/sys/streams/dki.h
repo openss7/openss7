@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.10 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.11 2005/07/18 12:06:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DKI_H__
 #define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:06:58 $"
 
 #ifndef __SYS_DKI_H__
 #warn "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
@@ -102,6 +102,5 @@ typedef struct lis_cred {
 	(((__f)->f_flags & ~O_ACCMODE) | \
 	 ((__f)->f_mode & O_ACCMODE) | \
 	 ((__f)->f_flags & FNDELAY ? (O_NONBLOCK | O_NDELAY) : 0))
-
 
 #endif				/* __SYS_STREAMS_DKI_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:41 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.9 2005/07/18 12:25:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:41 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:25:38 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -78,12 +78,12 @@
 
 typedef enum {
 	SQLVL_DEFAULT = 0,		/* default level */
-	SQLVL_GLOBAL = 1,	/* STREAMS scheduler level */
-	SQLVL_ELSEWHERE = 2,	/* module group level */
-	SQLVL_MODULE = 3,	/* module level (default) */
-	SQLVL_QUEUEPAIR = 4,	/* queue pair level */
-	SQLVL_QUEUE = 5,	/* queue level */
-	SQLVL_NOP = 6,		/* no synchronization */
+	SQLVL_GLOBAL = 1,		/* STREAMS scheduler level */
+	SQLVL_ELSEWHERE = 2,		/* module group level */
+	SQLVL_MODULE = 3,		/* module level (default) */
+	SQLVL_QUEUEPAIR = 4,		/* queue pair level */
+	SQLVL_QUEUE = 5,		/* queue level */
+	SQLVL_NOP = 6,			/* no synchronization */
 } sqlvl_t;
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:07:40 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:06:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:07:40 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:06:59 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:07:40 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:06:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,12 +70,12 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/kernel/strreg.h"	    /* for spec_open() */
+#include "src/kernel/strreg.h"	/* for spec_open() */
 #include "src/modules/sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:07:40 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:06:59 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -111,6 +111,7 @@ MODULE_ALIAS("streams-nsdev");
 #endif
 
 modID_t modid = CONFIG_STREAMS_NSDEV_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -124,6 +125,7 @@ MODULE_ALIAS("streams-driver-nsdev");
 #endif
 
 major_t major = CONFIG_STREAMS_NSDEV_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -149,12 +151,12 @@ static struct module_info nsdev_minfo = {
 };
 
 static struct qinit nsdev_rinit = {
-	//qi_putp:putq,
+	// qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
 };
 
 static struct qinit nsdev_winit = {
-	//qi_putp:putq,
+	// qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
 };
 
@@ -178,10 +180,12 @@ static struct streamtab nsdev_info = {
  *  'streams-' prefixed to the name and run through the list again.  We could also generate the
  *  request from the path to the original dentry.
  */
-static int nsdevopen(struct inode *inode, struct file *file)
+static int
+nsdevopen(struct inode *inode, struct file *file)
 {
 	struct cdevsw *cdev;
 	int err;
+
 	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
 		return (-ENOENT);
 	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
@@ -238,13 +242,15 @@ static struct cdevsw nsdev_cdev = {
  *  inode->i_rdev.
  */
 
-STATIC int nsdev_open(struct inode *inode, struct file *file)
+STATIC int
+nsdev_open(struct inode *inode, struct file *file)
 {
 	int err;
 	struct cdevsw *cdev;
 	major_t major;
 	minor_t minor;
 	modID_t modid, instance;
+
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
 #if HAVE_KFUNC_TO_KDEV_T
@@ -291,9 +297,11 @@ STATIC struct file_operations nsdev_f_ops ____cacheline_aligned = {
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
 static
 #endif
-int __init nsdev_init(void)
+int __init
+nsdev_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
 	printk(KERN_INFO NSDEV_BANNER);
 #else
@@ -306,10 +314,12 @@ int __init nsdev_init(void)
 		major = err;
 	return (0);
 };
+
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
 static
 #endif
-void __exit nsdev_exit(void)
+void __exit
+nsdev_exit(void)
 {
 	unregister_cmajor(&nsdev_cdev, major);
 };

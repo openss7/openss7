@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.2 2005/05/14 08:29:20 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:20 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.3  2005/07/18 12:53:09  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/05/14 08:29:20  brian
  - copyright header correction
 
@@ -71,7 +74,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 
@@ -177,4 +180,3 @@ typedef struct t_sctp_status {
 #endif
 
 #endif				/* _SYS_XTI_SCTP_H */
-

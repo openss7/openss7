@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_tcp.h,v 0.9.2.3 2005/05/14 08:28:53 brian Exp $
+ @(#) $Id: xti_tcp.h,v 0.9.2.4 2005/07/18 12:47:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:53 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:47:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_TCP_H
 #define _SYS_XTI_TCP_H
 
-#ident "@(#) $RCSfile: xti_tcp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_tcp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /*
  * TCP level
@@ -117,16 +117,12 @@ struct t_tcp_info {
 	t_uscalar_t tcpi_lost;
 	t_uscalar_t tcpi_retrans;
 	t_uscalar_t tcpi_fackets;
-	/*
-	   Times. 
-	 */
+	/* Times. */
 	t_uscalar_t tcpi_last_data_sent;
 	t_uscalar_t tcpi_last_ack_sent;	/* Not remembered, sorry. */
 	t_uscalar_t tcpi_last_data_recv;
 	t_uscalar_t tcpi_last_ack_recv;
-	/*
-	   Metrics. 
-	 */
+	/* Metrics. */
 	t_uscalar_t tcpi_pmtu;
 	t_uscalar_t tcpi_rcv_ssthresh;
 	t_uscalar_t tcpi_rtt;
@@ -138,4 +134,3 @@ struct t_tcp_info {
 };
 
 #endif				/* _SYS_XTI_TCP_H */
-

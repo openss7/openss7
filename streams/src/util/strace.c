@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:07:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:07:06 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:07:06 $";
 
 /* 
  *  AIX Utility: strace - Prints STREAMS trace messages.
@@ -82,7 +82,8 @@ static char const ident[] =
 static int debug = 0;
 static int output = 1;
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -94,7 +95,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -107,7 +109,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -141,7 +144,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -187,13 +191,16 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	int i, fd, count;
 	struct trace_ids *tids;
 	struct strioctl ic;
+
 	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -208,6 +215,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "qdvhVC?", long_options, &option_index);
 #else
 		c = getopt(argc, argv, "qdvhVC?");
@@ -344,6 +352,7 @@ int main(int argc, char *argv[])
 		struct strbuf ctl = { 1024, 1024, cbuf };
 		struct strbuf dat = { 1024, 1024, dbuf };
 		struct log_ctl *lc;
+
 		if ((ret = getmsg(fd, &ctl, &dat, &flags)) < 0) {
 			perror(argv[0]);
 			exit(1);

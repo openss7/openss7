@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 10:38:56 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/18 12:07:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 10:38:56 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 10:38:56 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/18 12:07:01 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 10:38:56 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/18 12:07:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -105,9 +105,11 @@ EXPORT_SYMBOL(strthreads);
 #endif
 
 #if HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! HAVE_RAISE_SOFTIRQ_EXPORT
-void fastcall raise_softirq(unsigned int nr)
+void fastcall
+raise_softirq(unsigned int nr)
 {
 	unsigned long flags;
+
 	local_irq_save(flags);
 	raise_softirq_irqoff(nr);
 	local_irq_restore(flags);
@@ -122,10 +124,12 @@ void fastcall raise_softirq(unsigned int nr)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-static void mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct mdbblock *md = obj;
+
 		bzero(md, sizeof(*md));
 		atomic_set(&md->datablk.d_dblock.db_users, 0);
 #if defined CONFIG_STREAMS_DEBUG
@@ -138,9 +142,11 @@ static void mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 /* use the current queue being processed by the thread as a guess as to which queue the thing
    (message block, bufcall callback, timout callback) belongs to, but, if we are at irq, then we
    will only used the supplied value, even if null. */
-static queue_t *queue_guess(queue_t *q)
+static queue_t *
+queue_guess(queue_t *q)
 {
 	queue_t *guess;
+
 	if ((guess = q) == NULL && current_context() == CTX_STREAMS)
 		guess = this_thread->currentq;
 	return (guess);
@@ -170,13 +176,15 @@ static queue_t *queue_guess(queue_t *q)
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
  */
-mblk_t *mdbblock_alloc(uint priority, void *func)
+mblk_t *
+mdbblock_alloc(uint priority, void *func)
 {
 	struct strthread *t = this_thread;
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 	mblk_t *mp = NULL;
 	int slab_flags;
 	unsigned long flags;
+
 	if (atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs)
 		goto fail;
 	switch (priority) {
@@ -202,6 +210,7 @@ mblk_t *mdbblock_alloc(uint priority, void *func)
 #if defined CONFIG_STREAMS_DEBUG
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
+
 		md->msgblk.m_func = func;
 		md->msgblk.m_queue = qget(queue_guess(NULL));
 		write_lock_irqsave(&smi->si_rwlock, flags);
@@ -238,10 +247,12 @@ mblk_t *mdbblock_alloc(uint priority, void *func)
  *  To reduce latency on allocation to a minimum, we null the state of the blocks when they are
  *  placed to the free list rather than when they are allocated.
  */
-void mdbblock_free(mblk_t *mp)
+void
+mdbblock_free(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
 	struct mdbblock *md = (typeof(md)) mp;
+
 	/* don't zero hidden list structures */
 	bzero(&md->datablk.d_dblock, sizeof(md->datablk.d_dblock));
 	bzero(&md->msgblk.m_mblock, sizeof(md->msgblk.m_mblock));
@@ -265,10 +276,12 @@ void mdbblock_free(mblk_t *mp)
  *  set on the thread).  It frees all blocks from the free list.  We first steal the entire list and
  *  then work on them one by one.
  */
-static void freeblocks(struct strthread *t)
+static void
+freeblocks(struct strthread *t)
 {
 	register mblk_t *mp, *mp_next;
 	unsigned long flags;
+
 	clear_bit(freeblks, &t->flags);
 	local_irq_save(flags);
 	if ((mp_next = xchg(&t->freemblk_head, NULL))) {
@@ -276,10 +289,12 @@ static void freeblocks(struct strthread *t)
 		local_irq_restore(flags);
 		while ((mp = mp_next)) {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
+
 #if defined CONFIG_STREAMS_DEBUG
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 			unsigned long flags;
 			struct mdbblock *md = (struct mdbblock *) mp;
+
 			write_lock_irqsave(&smi->si_rwlock, flags);
 			list_del_init(&md->msgblk.m_list);
 			list_del_init(&md->datablk.db_list);
@@ -303,26 +318,32 @@ static void freeblocks(struct strthread *t)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-static void qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct qbinfo *qbi = obj;
+
 		bzero(qbi, sizeof(*qbi));
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&qbi->qbi_list);
 #endif
 	}
 }
-struct qband *allocqb(void)
+struct qband *
+allocqb(void)
 {
 	struct qband *qb;
 	struct strinfo *si = &Strinfo[DYN_QBAND];
+
 	if ((qb = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 		struct qbinfo *qbi = (struct qbinfo *) qb;
+
 		atomic_set(&qbi->qbi_refs, 1);
 #if defined CONFIG_STREAMS_DEBUG
 		{
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_add_tail(&qbi->qbi_list, &si->si_head);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -334,12 +355,16 @@ struct qband *allocqb(void)
 	}
 	return (qb);
 }
-void freeqb(struct qband *qb)
+
+void
+freeqb(struct qband *qb)
 {
 	struct strinfo *si = &Strinfo[DYN_QBAND];
+
 #if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct qbinfo *qbi = (struct qbinfo *) qb;
+
 	write_lock_irqsave(&si->si_rwlock, flags);
 	list_del_init(&qbi->qbi_list);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -349,9 +374,11 @@ void freeqb(struct qband *qb)
 	bzero(qb, sizeof(*qb));
 	kmem_cache_free(si->si_cache, qb);
 }
-static void __freebands(queue_t *q)
+static void
+__freebands(queue_t *q)
 {
 	struct qband *qb, *qb_next;
+
 	if ((qb_next = xchg(&q->q_bandp, NULL))) {
 		while ((qb = qb_next)) {
 			qb_next = qb->qb_next;
@@ -368,10 +395,12 @@ static void __freebands(queue_t *q)
  *  -------------------------------------------------------------------------
  *  keep the cache ctors and the object ctors and dtors close to each other.
  */
-static void apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct apinfo *api = obj;
+
 		bzero(api, sizeof(*api));
 		INIT_LIST_HEAD(&api->api_more);
 #if defined CONFIG_STREAMS_DEBUG
@@ -379,13 +408,16 @@ static void apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-struct apinfo *ap_alloc(struct strapush *sap)
+struct apinfo *
+ap_alloc(struct strapush *sap)
 {
 	struct apinfo *api;
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
+
 	if ((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 #if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail(&api->api_list, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -398,7 +430,8 @@ struct apinfo *ap_alloc(struct strapush *sap)
 	}
 	return (api);
 }
-struct apinfo *ap_get(struct apinfo *api)
+struct apinfo *
+ap_get(struct apinfo *api)
 {
 	if (api) {
 		if (atomic_read(&api->api_refs) < 1)
@@ -407,13 +440,17 @@ struct apinfo *ap_get(struct apinfo *api)
 	}
 	return (api);
 }
-void ap_put(struct apinfo *api)
+
+void
+ap_put(struct apinfo *api)
 {
 	if (api) {
 		if (atomic_dec_and_test(&api->api_refs)) {
 			struct strinfo *si = &Strinfo[DYN_STRAPUSH];
+
 #if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init(&api->api_list);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -440,10 +477,12 @@ void ap_put(struct apinfo *api)
  *
  *  -------------------------------------------------------------------------
  */
-static void devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct devinfo *di = obj;
+
 		bzero(di, sizeof(*di));
 		INIT_LIST_HEAD(&di->di_list);
 		INIT_LIST_HEAD(&di->di_hash);
@@ -452,13 +491,16 @@ static void devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-struct devinfo *di_alloc(struct cdevsw *cdev)
+struct devinfo *
+di_alloc(struct cdevsw *cdev)
 {
 	struct devinfo *di;
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
+
 	if ((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 #if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -477,7 +519,8 @@ struct devinfo *di_alloc(struct cdevsw *cdev)
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(di_alloc);
 #endif
-struct devinfo *di_get(struct devinfo *di)
+struct devinfo *
+di_get(struct devinfo *di)
 {
 	if (di) {
 		if (atomic_read(&di->di_refs) < 1)
@@ -486,13 +529,17 @@ struct devinfo *di_get(struct devinfo *di)
 	}
 	return (di);
 }
-void di_put(struct devinfo *di)
+
+void
+di_put(struct devinfo *di)
 {
 	if (di) {
 		if (atomic_dec_and_test(&di->di_refs)) {
 			struct strinfo *si = &Strinfo[DYN_DEVINFO];
+
 #if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &di->di_next);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -525,10 +572,12 @@ EXPORT_SYMBOL(di_put);
  *
  *  -------------------------------------------------------------------------
  */
-static void mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct mdlinfo *mi = obj;
+
 		bzero(mi, sizeof(*mi));
 		INIT_LIST_HEAD(&mi->mi_list);
 		INIT_LIST_HEAD(&mi->mi_hash);
@@ -537,13 +586,16 @@ static void mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-struct mdlinfo *modi_alloc(struct fmodsw *fmod)
+struct mdlinfo *
+modi_alloc(struct fmodsw *fmod)
 {
 	struct mdlinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
+
 	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 #if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -558,7 +610,8 @@ struct mdlinfo *modi_alloc(struct fmodsw *fmod)
 	}
 	return (mi);
 }
-struct mdlinfo *modi_get(struct mdlinfo *mi)
+struct mdlinfo *
+modi_get(struct mdlinfo *mi)
 {
 	if (mi) {
 		if (atomic_read(&mi->mi_refs) < 1)
@@ -567,13 +620,17 @@ struct mdlinfo *modi_get(struct mdlinfo *mi)
 	}
 	return (mi);
 }
-void modi_put(struct mdlinfo *mi)
+
+void
+modi_put(struct mdlinfo *mi)
 {
 	if (mi) {
 		if (atomic_dec_and_test(&mi->mi_refs)) {
 			struct strinfo *si = &Strinfo[DYN_MODINFO];
+
 #if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &mi->mi_next);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -608,10 +665,12 @@ void modi_put(struct mdlinfo *mi)
  *  @q:		queue from which to remove the message
  *  @mp:	message to remove
  */
-static int __rmvq(queue_t *q, mblk_t *mp)
+static int
+__rmvq(queue_t *q, mblk_t *mp)
 {
 	int backenable = 0;
 	struct qband *qb;
+
 	if (mp->b_prev)
 		mp->b_prev->b_next = mp->b_next;
 	if (mp->b_next)
@@ -653,11 +712,13 @@ static int __rmvq(queue_t *q, mblk_t *mp)
  *  @flag:	how, %FLUSHDATA or %FLUSHALL
  *  @mppp:	pointer to a pointer to the end of a message chain
  */
-static int __flushq(queue_t *q, int flag, mblk_t ***mppp)
+static int
+__flushq(queue_t *q, int flag, mblk_t ***mppp)
 {
 	mblk_t *mp, *mp_next;
 	struct qband *qb;
 	int backenable = 0;
+
 	switch (flag) {
 	case FLUSHDATA:
 		mp_next = q->q_first;
@@ -705,11 +766,13 @@ void freechain(mblk_t *mp, mblk_t **mpp);
  *  @q:		the queue to flush
  *  @flag:	how to flush: %FLUSHDATA or %FLUSHALL
  */
-void flushq(queue_t *q, int flag)
+void
+flushq(queue_t *q, int flag)
 {
 	int backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long flags;
+
 	ensure(q, return);
 	qwlock(q, &flags);
 	backenable = __flushq(q, flag, &mpp);
@@ -731,10 +794,12 @@ EXPORT_SYMBOL(flushq);
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-static void queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct queinfo *qu = obj;
+
 		bzero(qu, sizeof(*qu));
 		/* initialize queue locks */
 		qplockinit((queue_t *) qu);
@@ -753,19 +818,23 @@ static void queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *
  *  Can be called by the module writer to get a private queue pair.
  */
-queue_t *allocq(void)
+queue_t *
+allocq(void)
 {
 	queue_t *rq;
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
+
 	if ((rq = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 		queue_t *wq = rq + 1;
 		struct queinfo *qu = (struct queinfo *) rq;
+
 		atomic_set(&qu->qu_refs, 1);
 		rq->q_other = wq;
 		wq->q_other = rq;
 #if defined CONFIG_STREAMS_DEBUG
 		{
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_add_tail(&qu->qu_list, &si->si_head);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -788,13 +857,16 @@ EXPORT_SYMBOL(allocq);
  *
  *  Frees a queue pair allocated with allocq().  Does not flush messages or clear use bits.
  */
-static void __freeq(queue_t *rq)
+static void
+__freeq(queue_t *rq)
 {
 	queue_t *wq = rq + 1;
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
+
 #if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	write_lock_irqsave(&si->si_rwlock, flags);
 	list_del_init(&qu->qu_list);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -811,6 +883,7 @@ static void __freeq(queue_t *rq)
 }
 
 void freechain(mblk_t *mp, mblk_t **mpp);
+
 /**
  *  freeq:	- free a queue pair
  *  @rq:	read queue of queue pair
@@ -818,10 +891,12 @@ void freechain(mblk_t *mp, mblk_t **mpp);
  *  Can be called by the module writer on private queue pairs allocated with allocq().  All message
  *  blocks will be flushed.
  */
-void freeq(queue_t *rq)
+void
+freeq(queue_t *rq)
 {
 	queue_t *wq = rq + 1;
 	mblk_t *mp = NULL, **mpp = &mp;
+
 	clear_bit(QUSE_BIT, &rq->q_flag);
 	clear_bit(QUSE_BIT, &wq->q_flag);
 	__flushq(rq, FLUSHALL, &mpp);
@@ -842,7 +917,8 @@ EXPORT_SYMBOL(freeq);
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-static void linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		static spinlock_t link_index_lock = SPIN_LOCK_UNLOCKED;
@@ -850,6 +926,7 @@ static void linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		unsigned long flags;
 		struct linkinfo *li = obj;
 		struct linkblk *l = &li->li_linkblk;
+
 		bzero(li, sizeof(*li));
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&li->li_list);
@@ -861,14 +938,17 @@ static void linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		spin_unlock_irqrestore(&link_index_lock, flags);
 	}
 }
-struct linkblk *alloclk(void)
+struct linkblk *
+alloclk(void)
 {
 	struct linkblk *l;
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
+
 	if ((l = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 #if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		struct linkinfo *li = (struct linkinfo *) l;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail(&li->li_list, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -883,13 +963,16 @@ struct linkblk *alloclk(void)
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(alloclk);
 #endif
-void freelk(struct linkblk *l)
+void
+freelk(struct linkblk *l)
 {
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 	struct linkinfo *li = (struct linkinfo *) l;
+
 #if defined CONFIG_STREAMS_DEBUG
 	{
 		unsigned long flags;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_del_init(&li->li_list);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -912,10 +995,12 @@ EXPORT_SYMBOL(freelk);
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 
-static void syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct syncq *sq = obj;
+
 		bzero(sq, sizeof(*sq));
 		spin_lock_init(&sq->sq_lock);
 #if 0
@@ -927,12 +1012,15 @@ static void syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		INIT_LIST_HEAD((struct list_head *) &sq->sq_next);
 	}
 }
-struct syncq *sq_alloc(void)
+struct syncq *
+sq_alloc(void)
 {
 	struct syncq *sq;
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
+
 	if ((sq = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 		unsigned long flags;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -943,7 +1031,8 @@ struct syncq *sq_alloc(void)
 	}
 	return (sq);
 }
-struct syncq *sq_get(struct syncq *sq)
+struct syncq *
+sq_get(struct syncq *sq)
 {
 	if (sq) {
 		if (atomic_read(&sq->sq_refs) < 1)
@@ -952,13 +1041,17 @@ struct syncq *sq_get(struct syncq *sq)
 	}
 	return (sq);
 }
-void sq_put(struct syncq **sqp)
+
+void
+sq_put(struct syncq **sqp)
 {
 	struct syncq *sq;
+
 	if ((sq = xchg(sqp, NULL))) {
 		if (atomic_dec_and_test(&sq->sq_refs)) {
 			struct strinfo *si = &Strinfo[DYN_SYNCQ];
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &sq->sq_next);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -1000,12 +1093,14 @@ void sq_put(struct syncq **sqp)
 static rwlock_t event_hash_lock = RW_LOCK_UNLOCKED;
 static struct strevent *event_hash[EVENT_HASH_SIZE] __cacheline_aligned;
 static int event_id = 0;
-static void seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct seinfo *s = obj;
 		struct strevent *se = obj;
 		unsigned long flags;
+
 		bzero(s, sizeof(*s));
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&s->s_list);
@@ -1017,17 +1112,21 @@ static void seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		write_unlock_irqrestore(&event_hash_lock, flags);
 	}
 }
-static inline struct strevent *event_alloc(int type, queue_t *q)
+static inline struct strevent *
+event_alloc(int type, queue_t *q)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
 	struct strevent *se = NULL;
+
 	if (atomic_read(&si->si_cnt) < EVENT_LIMIT) {
 		if ((se = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 			struct seinfo *s = (struct seinfo *) se;
+
 			s->s_type = type;
 #if defined CONFIG_STREAMS_DEBUG
 			{
 				unsigned long flags;
+
 				s->s_queue = qget(queue_guess(q));
 				write_lock_irqsave(&si->si_rwlock, flags);
 				list_add_tail(&s->s_list, &si->si_head);
@@ -1041,12 +1140,15 @@ static inline struct strevent *event_alloc(int type, queue_t *q)
 	}
 	return (se);
 }
-static inline void event_free(struct strevent *se)
+static inline void
+event_free(struct strevent *se)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
+
 #if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct seinfo *s = (struct seinfo *) se;
+
 	qput(&s->s_queue);
 	write_lock_irqsave(&si->si_rwlock, flags);
 	list_del_init(&s->s_list);
@@ -1056,12 +1158,14 @@ static inline void event_free(struct strevent *se)
 	se->se_seq++;
 	kmem_cache_free(si->si_cache, se);
 }
-static struct strevent *find_event(int event_id)
+static struct strevent *
+find_event(int event_id)
 {
 	struct strevent **sep;
 	int id = (event_id >> EVENT_ID_SHIFT) & EVENT_ID_MASK;
 	int seq = event_id & EVENT_SEQ_MASK;
 	unsigned long flags;
+
 	sep = &event_hash[id & EVENT_HASH_MASK];
 	read_lock_irqsave(&event_hash_lock, flags);
 	for (; *sep; sep = &(*sep)->se_prev)
@@ -1074,7 +1178,8 @@ static struct strevent *find_event(int event_id)
 /**
  *  sealloc:	- allocate a stream event structure
  */
-struct strevent *sealloc(void)
+struct strevent *
+sealloc(void)
 {
 	return event_alloc(SE_STREAM, NULL);
 }
@@ -1085,7 +1190,8 @@ EXPORT_SYMBOL(sealloc);
  *  sefree:	- deallocate a stream event structure
  *  @se:	the stream event structure to deallocate
  */
-int sefree(struct strevent *se)
+int
+sefree(struct strevent *se)
 {
 	event_free(se);
 	return (0);
@@ -1105,12 +1211,15 @@ EXPORT_SYMBOL(sefree);
  *  invoked the buffer call.  This means that the callback function will not execute until after the
  *  caller exits or hits a pre-emption point.
  */
-bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg)
+bcid_t
+__bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg)
 {
 	bcid_t bcid = 0;
 	struct strevent *se;
+
 	if ((se = event_alloc(SE_BUFCALL, q))) {
 		struct strthread *t = this_thread;
+
 		se->x.b.queue = qget(q);	/* hold a reference */
 		se->x.b.func = function;
 		se->x.b.arg = arg;
@@ -1130,7 +1239,8 @@ EXPORT_SYMBOL(__bufcall);
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
+bcid_t
+bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
 	return __bufcall(queue_guess(NULL), size, priority, function, arg);
 }
@@ -1144,6 +1254,7 @@ EXPORT_SYMBOL(bufcall);
  *  @arg:	a client argument to pass to the callback function
  */
 __EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
+
 EXPORT_SYMBOL(esbbcall);
 
 /**
@@ -1151,19 +1262,23 @@ EXPORT_SYMBOL(esbbcall);
  *  @bcid:	buffer call id returned by bufcall() or esbbcall()
  *  Notices:	Don't ever call this function with an expired bufcall id.
  */
-void unbufcall(bcid_t bcid)
+void
+unbufcall(bcid_t bcid)
 {
 	struct strevent *se;
+
 	if ((se = find_event(bcid)))
 		xchg(&se->x.b.func, NULL);
 }
 
 EXPORT_SYMBOL(unbufcall);
 
-static void timeout_function(unsigned long arg)
+static void
+timeout_function(unsigned long arg)
 {
 	struct strevent *se = (struct strevent *) arg;
 	struct strthread *t = &strthreads[se->x.t.cpu];
+
 	/* FIXME: this is dangerous - need a per-cpu list spin */
 	*xchg(&t->strtimout_tail, &se->se_next) = se;
 	/* bind timeout back to the CPU that called for it */
@@ -1175,11 +1290,12 @@ static void timeout_function(unsigned long arg)
 #endif
 }
 
-toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
-		 int cpu)
+toid_t
+__timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu)
 {
 	toid_t toid = 0;
 	struct strevent *se;
+
 	if ((se = event_alloc(SE_TIMEOUT, q))) {
 		init_timer(&se->x.t.timer);
 		se->x.t.queue = qget(q);	/* hold a reference */
@@ -1206,7 +1322,8 @@ EXPORT_SYMBOL(__timeout);
  *  invoked the timeout.  This means that the callback function will not execute until after the
  *  caller hits a pre-emption point.
  */
-toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
+toid_t
+timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 {
 	return __timeout(queue_guess(NULL), timo_fcn, arg, ticks, 0, smp_processor_id());
 }
@@ -1217,10 +1334,12 @@ EXPORT_SYMBOL(timeout);
  *  untimeout:	- cancel a timeout callback
  *  @toid:	timeout identifier
  */
-clock_t untimeout(toid_t toid)
+clock_t
+untimeout(toid_t toid)
 {
 	struct strevent *se;
 	clock_t rem = 0;
+
 	if ((se = find_event(toid))) {
 		xchg(&se->x.t.func, NULL);
 		qput(&se->x.t.queue);
@@ -1248,12 +1367,15 @@ EXPORT_SYMBOL(untimeout);
  *
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
-static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
-		   weld_arg_t arg, queue_t *protq, int type)
+static int
+__weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
+	weld_arg_t arg, queue_t *protq, int type)
 {
 	struct strevent *se;
+
 	if ((se = event_alloc(type, protq))) {
 		struct strthread *t = this_thread;
+
 		se->x.w.queue = qget(protq);
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -1285,8 +1407,9 @@ static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_
  *
  *  Notices: The @func callback function will be called by the same CPU upon which weldq() was issued.
  */
-int weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
-	  queue_t *protq)
+int
+weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
+      queue_t *protq)
 {
 	if (!q1)
 		return (EINVAL);
@@ -1323,8 +1446,9 @@ EXPORT_SYMBOL(weldq);
  *  Notices: The @func callback function will be called by the same CPU upon which unweldq() was issued.
  *
  */
-int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
-	    queue_t *protq)
+int
+unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
+	queue_t *protq)
 {
 	if (!q1)
 		return (EINVAL);
@@ -1355,12 +1479,14 @@ EXPORT_SYMBOL(unweldq);
  *
  *  Deferrable functions that use defer_func() are streams_put() and qwriter().
  */
-int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
-	       int perim, int type)
+int
+defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg, int perim, int type)
 {
 	struct strevent *se;
+
 	if ((se = event_alloc(type, q))) {
 		struct strthread *t = this_thread;
+
 		se->x.p.queue = qget(q);
 		se->x.p.func = func;
 		se->x.p.arg = arg;
@@ -1380,10 +1506,12 @@ EXPORT_SYMBOL(defer_func);
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
  *  -------------------------------------------------------------------------
  */
-void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
+void
+__defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
 {
 	/* must be called with sq locked */
 	struct strevent *se;
+
 	if ((se = event_alloc(SE_STRPUT, q))) {
 		se->x.p.queue = qget(q);
 		se->x.p.func = (void *) put;
@@ -1397,7 +1525,8 @@ void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
 }
 
 /* Execution of deferred events */
-static void defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
+static void
+defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
 {
 	*xchg(&sq->sq_tail, &se->se_next) = se;
 	unlock_syncq(sq, flagsp);
@@ -1407,7 +1536,8 @@ static void defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
  *  sq_stream:	- execute deferred %SE_STREAM event
  *  @se:	deferred event
  */
-static void sq_stream(struct strevent *se)
+static void
+sq_stream(struct strevent *se)
 {
 }
 
@@ -1415,11 +1545,13 @@ static void sq_stream(struct strevent *se)
  *  sq_bufcall:	- execute deferred %SE_BUFCALL event
  *  @se:	deferred event
  */
-static void sq_bufcall(struct strevent *se)
+static void
+sq_bufcall(struct strevent *se)
 {
 	queue_t *q = se->x.b.queue;
 	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;	/* XXX */
 	unsigned long flags;
+
 	if (enter_shared(osq, &flags)) {
 		if (enter_exclus(isq, &flags)) {
 			/* we are inside the perimeters */
@@ -1438,11 +1570,13 @@ static void sq_bufcall(struct strevent *se)
  *  sq_timeout:	- execute deferred %SE_TIMEOUT event
  *  @se:	deferred event
  */
-static void sq_timeout(struct strevent *se)
+static void
+sq_timeout(struct strevent *se)
 {
 	queue_t *q = se->x.t.queue;
 	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
 	unsigned long flags;
+
 	if (enter_shared(osq, &flags)) {
 		if (enter_exclus(isq, &flags)) {
 			/* we are inside the perimeters */
@@ -1466,14 +1600,17 @@ static void sq_timeout(struct strevent *se)
  *  sq_weldq:	- execute deferred %SE_WELDQ event
  *  @se:	deferred event
  */
-static void sq_weldq(struct strevent *se)
+static void
+sq_weldq(struct strevent *se)
 {
 	queue_t *q = se->x.w.queue;
 	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
 	unsigned long flags;
+
 	if (enter_shared(osq, &flags)) {
 		if (enter_exclus(isq, &flags)) {
 			queue_t *qn1 = NULL, *qn3 = NULL;
+
 			local_irq_save(flags);
 			if (se->x.w.q1)
 				__hwlock(se->x.w.q1);
@@ -1511,14 +1648,17 @@ static void sq_weldq(struct strevent *se)
  *  sq_unweldq:	- execute deferred %SE_UNWELDQ event
  *  @se:	deferred event
  */
-static void sq_unweldq(struct strevent *se)
+static void
+sq_unweldq(struct strevent *se)
 {
 	queue_t *q = se->x.w.queue;
 	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
 	unsigned long flags;
+
 	if (enter_shared(osq, &flags)) {
 		if (enter_exclus(isq, &flags)) {
 			queue_t *qn1 = NULL, *qn3 = NULL;
+
 			local_irq_save(flags);
 			if (se->x.w.q1)
 				__hwlock(se->x.w.q1);
@@ -1556,11 +1696,13 @@ static void sq_unweldq(struct strevent *se)
  *  sq_strput:	- execute deferred %SE_STRPUT event
  *  @se:	deferred event
  */
-static void sq_strput(struct strevent *se)
+static void
+sq_strput(struct strevent *se)
 {
 	queue_t *q = se->x.p.queue;
 	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
 	unsigned long flags;
+
 	hrlock(q);
 	if (enter_shared(osq, &flags)) {
 		if (isq->sq_flag & D_MTPUTSHARED) {
@@ -1588,11 +1730,13 @@ static void sq_strput(struct strevent *se)
  *  sq_writer:	- execute deferred %SE_WRITER event
  *  @se:	deferred event
  */
-static void sq_writer(struct strevent *se)
+static void
+sq_writer(struct strevent *se)
 {
 	queue_t *q = se->x.p.queue;
 	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
 	unsigned long flags;
+
 	hrlock(q);
 	switch (se->x.p.perim) {
 	case PERIM_INNER:
@@ -1626,7 +1770,8 @@ static void sq_writer(struct strevent *se)
  *  sq_putp:	- execute deferred %SE_PUTP event
  *  @se:	deferred event
  */
-static void sq_putp(struct strevent *se)
+static void
+sq_putp(struct strevent *se)
 {
 	/* this will defer itself if necessary */
 	se->x.p.func(se->x.p.arg, se->x.p.mp);
@@ -1639,6 +1784,7 @@ static void sq_putp(struct strevent *se)
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
+
 EXPORT_SYMBOL(kmem_alloc);
 
 /**
@@ -1647,6 +1793,7 @@ EXPORT_SYMBOL(kmem_alloc);
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
+
 EXPORT_SYMBOL(kmem_zalloc);
 
 /**
@@ -1656,11 +1803,13 @@ EXPORT_SYMBOL(kmem_zalloc);
  *
  *  Frees memory allocated with kmem_alloc() or kmem_zalloc().
  */
-void kmem_free(void *addr, size_t size)
+void
+kmem_free(void *addr, size_t size)
 {
 	kfree(addr);
 	if (size) {
 		struct strthread *t = this_thread;
+
 		if (test_bit(strbcwait, &t->flags) && !test_and_set_bit(strbcflag, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
 	}
@@ -1675,6 +1824,7 @@ EXPORT_SYMBOL(kmem_free);
  *  @node:
  */
 __EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
+
 EXPORT_SYMBOL(kmem_alloc_node);
 
 /**
@@ -1684,6 +1834,7 @@ EXPORT_SYMBOL(kmem_alloc_node);
  *  @node:
  */
 __EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
+
 EXPORT_SYMBOL(kmem_zalloc_node);
 
 /* 
@@ -1698,10 +1849,12 @@ EXPORT_SYMBOL(kmem_zalloc_node);
  *  timeouts:	- process timeouts
  *  @t:		STREAMS execution thread
  */
-static inline void timeouts(struct strthread *t)
+static inline void
+timeouts(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
 	unsigned long flags;
+
 	clear_bit(strtimout, &t->flags);
 	local_irq_save(flags);
 	if ((se_next = xchg(&t->strtimout_head, NULL))) {
@@ -1709,9 +1862,11 @@ static inline void timeouts(struct strthread *t)
 		local_irq_restore(flags);
 		while ((se = se_next)) {
 			void (*func) (caddr_t);
+
 			se_next = xchg(&se->se_next, NULL);
 			if ((func = se->x.t.func)) {
 				queue_t *q;
+
 				if ((q = se->x.t.queue)) {
 					if (test_bit(QUSE_BIT, &q->q_flag)) {
 						hrlock(q);
@@ -1737,10 +1892,12 @@ static inline void timeouts(struct strthread *t)
  *  doevents:	- process STREAMS events
  *  @t:		STREAMS execution thread
  */
-static inline void doevents(struct strthread *t)
+static inline void
+doevents(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
 	unsigned long flags;
+
 	clear_bit(strevents, &t->flags);
 	local_irq_save(flags);
 	if ((se_next = xchg(&t->strevents_head, NULL))) {
@@ -1748,6 +1905,7 @@ static inline void doevents(struct strthread *t)
 		local_irq_restore(flags);
 		while ((se = se_next)) {
 			struct seinfo *s = (typeof(s)) se;
+
 			se_next = xchg(&se->se_next, NULL);
 			switch (s->s_type) {
 			case SE_STREAM:
@@ -1759,10 +1917,12 @@ static inline void doevents(struct strthread *t)
 			case SE_UNWELDQ:
 			{
 				queue_t *q = xchg(&se->x.w.queue, NULL);
+
 				if (q)
 					hwlock(q, &flags);
 				if (se->x.w.q1) {
 					unsigned long flags = 0;
+
 					hwlock(se->x.w.q1, &flags);
 					se->x.w.q1->q_next = se->x.w.q2;
 					hwunlock(se->x.w.q1, &flags);
@@ -1771,6 +1931,7 @@ static inline void doevents(struct strthread *t)
 				}
 				if (se->x.w.q3) {
 					unsigned long flags = 0;
+
 					hwlock(se->x.w.q3, &flags);
 					se->x.w.q3->q_next = se->x.w.q4;
 					hwunlock(se->x.w.q3, &flags);
@@ -1812,10 +1973,12 @@ static inline void doevents(struct strthread *t)
  *  backlog:	- process message backlog
  *  @t:		STREAMS execution thread
  */
-static inline void backlog(struct strthread *t)
+static inline void
+backlog(struct strthread *t)
 {
 	register syncq_t *sq, *sq_link;
 	unsigned long flags;
+
 	clear_bit(qsyncflag, &t->flags);
 	local_irq_save(flags);
 	if ((sq_link = xchg(&t->sqhead, NULL))) {
@@ -1823,6 +1986,7 @@ static inline void backlog(struct strthread *t)
 		local_irq_restore(flags);
 		while ((sq = sq_link)) {
 			register struct strevent *se, *se_next;
+
 			sq_link = xchg(&sq->sq_link, NULL);
 			spin_lock_irqsave(&sq->sq_lock, flags);
 			if ((se_next = xchg(&sq->sq_head, NULL))) {
@@ -1830,6 +1994,7 @@ static inline void backlog(struct strthread *t)
 				spin_unlock_irqrestore(&sq->sq_lock, flags);
 				while ((se = se_next)) {
 					struct seinfo *s = (typeof(s)) se;
+
 					se_next = xchg(&se->se_next, NULL);
 					switch (s->s_type) {
 					case SE_STREAM:
@@ -1877,10 +2042,12 @@ static inline void backlog(struct strthread *t)
  *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
  *  an allocation is successful.
  */
-static inline void bufcalls(struct strthread *t)
+static inline void
+bufcalls(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
 	unsigned long flags;
+
 	clear_bit(strbcwait, &t->flags);
 	local_irq_save(flags);
 	if ((se_next = xchg(&t->strbcalls_head, NULL))) {
@@ -1888,9 +2055,11 @@ static inline void bufcalls(struct strthread *t)
 		local_irq_restore(flags);
 		while ((se = se_next)) {
 			void (*func) (long);
+
 			se_next = xchg(&se->se_next, NULL);
 			if ((func = se->x.b.func)) {
 				queue_t *q;
+
 				if ((q = xchg(&se->x.b.queue, NULL))) {
 					if (test_bit(QUSE_BIT, &q->q_flag)) {
 						hrlock(q);
@@ -1916,10 +2085,12 @@ static inline void bufcalls(struct strthread *t)
  *  queuerun:	- process service procedures
  *  @t:		STREAMS execution thread
  */
-static inline void queuerun(struct strthread *t)
+static inline void
+queuerun(struct strthread *t)
 {
 	register queue_t *q, *q_link;
 	unsigned long flags;
+
 	clear_bit(qrunflag, &t->flags);
 	local_irq_save(flags);
 	if ((q_link = xchg(&t->qhead, NULL))) {
@@ -1928,9 +2099,11 @@ static inline void queuerun(struct strthread *t)
 		while ((q = q_link)) {
 			queue_t *rq = RD(q);
 			struct queinfo *qu = (typeof(qu)) rq;
+
 			q_link = xchg(&q->q_link, NULL);
 			if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag))) {
 				int (*srvp) (queue_t *);
+
 				if ((srvp = q->q_qinfo->qi_srvp)) {
 					hrlock(rq);
 					qprlock(rq);
@@ -1955,9 +2128,11 @@ static inline void queuerun(struct strthread *t)
 /**
  *  setqsched:	- schedule execution of queue procedures
  */
-void inline setqsched(void)
+void inline
+setqsched(void)
 {
 	struct strthread *t = this_thread;
+
 	if (!test_and_set_bit(qrunflag, &t->flags))
 		raise_softirq(STREAMS_SOFTIRQ);
 }
@@ -1967,9 +2142,11 @@ EXPORT_SYMBOL(setqsched);
 /**
  *  qready:	- test if queue procedures are scheduled
  */
-int inline qready(void)
+int inline
+qready(void)
 {
 	struct strthread *t = this_thread;
+
 	return (test_bit(qrunflag, &t->flags) != 0);
 }
 
@@ -1983,10 +2160,12 @@ EXPORT_SYMBOL(qready);
  *  the queue.  This means that the service procedure will not run until after the caller exits or
  *  hits a pre-emption point.
  */
-static void qschedule(queue_t *q)
+static void
+qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		struct strthread *t = this_thread;
+
 		/* put ourselves on the run list */
 		*xchg(&t->qtail, &q->q_link) = qget(q);
 		setqsched();
@@ -2000,11 +2179,13 @@ static void qschedule(queue_t *q)
  *  sqsched() schedules the synchronization queue @sq to have its backlog of events serviced, if
  *  necessary.  sqsched() is called when the last thread leaves a sychronization queue (barrier).
  */
-void sqsched(syncq_t *sq)
+void
+sqsched(syncq_t *sq)
 {
 	/* called with sq locked */
 	if (!sq->sq_link) {
 		struct strthread *t = this_thread;
+
 		/* put ourselves on the run list */
 		*xchg(&t->sqtail, &sq->sq_link) = sq_get(sq);
 		if (!test_and_set_bit(qsyncflag, &t->flags))
@@ -2016,7 +2197,8 @@ void sqsched(syncq_t *sq)
  *  enableq:	- enable a queue service procedure
  *  @q:		queue for which service procedure is to be enabled
  */
-int enableq(queue_t *q)
+int
+enableq(queue_t *q)
 {
 	if (q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag)) {
 		qschedule(q);
@@ -2033,7 +2215,8 @@ EXPORT_SYMBOL(enableq);
  *
  *  Another name for qschedule().
  */
-void qenable(queue_t *q)
+void
+qenable(queue_t *q)
 {
 	(void) qschedule(q);
 }
@@ -2045,6 +2228,7 @@ EXPORT_SYMBOL(qenable);
  *  @q:		queue to permit service procedure scheduling
  */
 __EXTERN_INLINE void enableok(queue_t *q);
+
 EXPORT_SYMBOL(enableok);
 
 /**
@@ -2052,6 +2236,7 @@ EXPORT_SYMBOL(enableok);
  *  @q:		queue to defer service procedure scheduling
  */
 __EXTERN_INLINE void noenable(queue_t *q);
+
 EXPORT_SYMBOL(noenable);
 
 /*
@@ -2061,10 +2246,12 @@ EXPORT_SYMBOL(noenable);
  *  Free chains of message blocks outstanding from flush operations that were left over at the end
  *  of the CPU run.
  */
-static inline void freechains(struct strthread *t)
+static inline void
+freechains(struct strthread *t)
 {
 	register mblk_t *mp, *mp_next;
 	unsigned long flags;
+
 	clear_bit(flushwork, &t->flags);
 	local_irq_save(flags);
 	if ((mp_next = xchg(&t->freemsg_head, NULL))) {
@@ -2091,9 +2278,11 @@ static inline void freechains(struct strthread *t)
  *  chain of message blocks formed by concatenating these freed chains.  They will be dealt with at
  *  the end of the STREAMS scheduler SOFTIRQ run.
  */
-void freechain(mblk_t *mp, mblk_t **mpp)
+void
+freechain(mblk_t *mp, mblk_t **mpp)
 {
 	struct strthread *t = this_thread;
+
 	*xchg(&t->freemsg_tail, mpp) = mp;
 	if (!test_and_set_bit(flushwork, &t->flags))
 		raise_softirq(STREAMS_SOFTIRQ);
@@ -2103,9 +2292,11 @@ void freechain(mblk_t *mp, mblk_t **mpp)
  *  runqueues:	- run scheduled STRAMS events on the current processor
  *  @unused:	unused
  */
-static void runqueues(struct softirq_action *unused)
+static void
+runqueues(struct softirq_action *unused)
 {
 	struct strthread *t = this_thread;
+
 	set_bit(queueflag, &t->flags);
 	/* catch up on backlog first */
 	if (t->flags & QSYNCFLAG)
@@ -2139,9 +2330,11 @@ static void runqueues(struct softirq_action *unused)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-static void clear_shinfo(struct shinfo *sh)
+static void
+clear_shinfo(struct shinfo *sh)
 {
 	struct stdata *sd = &sh->sh_stdata;
+
 	bzero(sh, sizeof(*sh));
 	atomic_set(&sh->sh_refs, 0);
 #if defined CONFIG_STREAMS_DEBUG
@@ -2156,21 +2349,26 @@ static void clear_shinfo(struct shinfo *sh)
 	slockinit(sd);
 //      init_MUTEX(&sd->sd_mutex);
 }
-static void shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void
+shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 		clear_shinfo(obj);
 }
-struct stdata *allocstr(void)
+struct stdata *
+allocstr(void)
 {
 	struct strinfo *si = &Strinfo[DYN_STREAM];
 	struct stdata *sd;
+
 	if ((sd = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 		struct shinfo *sh = (struct shinfo *) sd;
+
 		atomic_set(&sh->sh_refs, 1);
 #if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 		{
 			unsigned long flags;
+
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_add_tail(&sh->sh_list, &si->si_head);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -2185,13 +2383,16 @@ struct stdata *allocstr(void)
 
 EXPORT_SYMBOL(allocstr);
 
-static void __freestr(struct stdata *sd)
+static void
+__freestr(struct stdata *sd)
 {
 	struct strinfo *si = &Strinfo[DYN_STREAM];
 	struct shinfo *sh = (struct shinfo *) sd;
+
 #if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 	{
 		unsigned long flags;
+
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_del_init(&sh->sh_list);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -2202,7 +2403,9 @@ static void __freestr(struct stdata *sd)
 	atomic_dec(&si->si_cnt);
 	kmem_cache_free(si->si_cache, sh);
 }
-void freestr(struct stdata *sd)
+
+void
+freestr(struct stdata *sd)
 {
 	/* FIXME: need to deallocate anything attached to the stream head */
 	sd_put(sd);
@@ -2210,10 +2413,12 @@ void freestr(struct stdata *sd)
 
 EXPORT_SYMBOL(freestr);
 
-struct stdata *sd_get(struct stdata *sd)
+struct stdata *
+sd_get(struct stdata *sd)
 {
 	if (sd) {
 		struct shinfo *sh = (struct shinfo *) sd;
+
 		if (atomic_read(&sh->sh_refs) <= 0)
 			swerr();
 		atomic_inc(&sh->sh_refs);
@@ -2225,10 +2430,12 @@ struct stdata *sd_get(struct stdata *sd)
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(sd_get);
 #endif
-void sd_put(struct stdata *sd)
+void
+sd_put(struct stdata *sd)
 {
 	if (sd) {
 		struct shinfo *sh = (struct shinfo *) sd;
+
 		if (atomic_dec_and_test(&sh->sh_refs)) {
 			/* the last reference is gone, there should be nothing left */
 			if (sd->sd_rq)
@@ -2282,11 +2489,13 @@ static struct cacheinfo {
 /*
  *  str_term_caches:	- terminate caches
  */
-static void str_term_caches(void)
+static void
+str_term_caches(void)
 {
 	int j;
 	struct strinfo *si = Strinfo;
 	struct cacheinfo *ci = Cacheinfo;
+
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
 		if (!si->si_cache)
 			continue;
@@ -2304,11 +2513,13 @@ static void str_term_caches(void)
 /*
  *  str_init_caches:	- initialize caches
  */
-static int str_init_caches(void)
+static int
+str_init_caches(void)
 {
 	int j;
 	struct strinfo *si = Strinfo;
 	struct cacheinfo *ci = Cacheinfo;
+
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&si->si_head);
@@ -2334,7 +2545,8 @@ static int str_init_caches(void)
 
 #ifndef open_softirq
 #ifdef HAVE_OPEN_SOFTIRQ_ADDR
-void open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
+void
+open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
 	static void (*func) (int, void (*)(struct softirq_action *), void *) =
 	    (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
@@ -2346,13 +2558,16 @@ void open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 /**
  *  strsched_init:  - initialize the STREAMS scheduler
  */
-int strsched_init(void)
+int
+strsched_init(void)
 {
 	int result, i;
+
 	if ((result = str_init_caches()) < 0)
 		return (result);
 	for (i = 0; i < NR_CPUS; i++) {
 		struct strthread *t = &strthreads[i];
+
 		/* initialize all the lists */
 		t->qhead = NULL;
 		t->qtail = &t->qhead;
@@ -2375,7 +2590,8 @@ int strsched_init(void)
 	return (0);
 }
 
-void strsched_exit(void)
+void
+strsched_exit(void)
 {
 	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
 	str_term_caches();

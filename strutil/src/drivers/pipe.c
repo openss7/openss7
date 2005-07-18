@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $";
 
 #define _LFS_SOURCE
 
@@ -72,7 +72,7 @@ extern struct file_operations strm_f_ops;
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -108,6 +108,7 @@ MODULE_ALIAS("streams-pipe");
 #endif
 
 modID_t modid = CONFIG_STREAMS_PIPE_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -121,6 +122,7 @@ MODULE_ALIAS("streams-driver-pipe");
 #endif
 
 major_t major = CONFIG_STREAMS_PIPE_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -180,18 +182,22 @@ static struct streamtab pipe_info = {
  *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
  *  @crp:	pointer to user's credentials structure
  */
-static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 #if LIS
 	return (ENXIO);
 #else
 	int err;
+
 	if (q->q_ptr != NULL) {
 		/* we walk down the queue chain calling open on each of the modules and the driver */
 		queue_t *wq = WR(q), *wq_next;
+
 		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 		while ((wq = wq_next)) {
 			int new_sflag;
+
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			new_sflag = wq_next ? MODOPEN : sflag;
 			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
@@ -202,6 +208,7 @@ static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
 		dev_t dev = *devp;
 		struct stdata *sd;
+
 		if ((sd = ((struct queinfo *) q)->qu_str)) {
 			/* 1st step: attach the driver and call its open routine */
 			/* we are the driver and this *is* the open routine */
@@ -223,7 +230,8 @@ static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (-EIO);		/* can't be opened as module or clone */
 #endif
 }
-static int pipe_close(queue_t *q, int oflag, cred_t *crp)
+static int
+pipe_close(queue_t *q, int oflag, cred_t *crp)
 {
 #if LFS
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
@@ -245,9 +253,11 @@ static struct cdevsw pipe_cdev = {
 #ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 static
 #endif
-int __init pipe_init(void)
+int __init
+pipe_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 	printk(KERN_INFO PIPE_BANNER);
 #else
@@ -260,10 +270,12 @@ int __init pipe_init(void)
 		major = err;
 	return (0);
 };
+
 #ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 static
 #endif
-void __exit pipe_exit(void)
+void __exit
+pipe_exit(void)
 {
 	unregister_strdev(&pipe_cdev, major);
 };

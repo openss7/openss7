@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sysctl.h,v 0.9.2.7 2005/05/14 08:29:33 brian Exp $
+ @(#) $Id: sysctl.h,v 0.9.2.8 2005/07/18 11:56:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_LINUX_LINUX_SYSCTL_H__
 #define __OS7_LINUX_LINUX_SYSCTL_H__
 
-#ident "@(#) $RCSfile: sysctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sysctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 enum {
 	__OS7_NET_SCTP_RTO_INITIAL = 200,

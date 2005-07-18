@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:46 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:07:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:46 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:07:00 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:46 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:07:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -68,7 +68,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:46 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:07:00 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -96,7 +96,7 @@ MODULE_ALIAS("streams");
 #include <sys/ddi.h>
 
 #include "strprocfs.h"
-#include "src/modules/sth.h"		/* for str_minfo */
+#include "src/modules/sth.h"	/* for str_minfo */
 #include "src/kernel/strsysctl.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strreg.h"
@@ -186,7 +186,8 @@ extern int sc_init(void);
 extern void sc_exit(void);
 #endif
 
-static int modules_init(void)
+static int
+modules_init(void)
 {
 #ifdef CONFIG_STREAMS_CLONE
 	clone_init();
@@ -251,7 +252,8 @@ static int modules_init(void)
 	return (0);
 }
 
-static void modules_exit(void)
+static void
+modules_exit(void)
 {
 #ifdef CONFIG_STREAMS_SC
 	sc_exit();
@@ -318,9 +320,11 @@ static void modules_exit(void)
 #ifdef CONFIG_STREAMS_MODULE
 static
 #endif
-int __init streams_init(void)
+int __init
+streams_init(void)
 {
 	int result = -EINVAL;
+
 #ifdef CONFIG_STREAMS_MODULE
 	printk(KERN_INFO STREAMS_BANNER);	/* log message */
 #else
@@ -349,7 +353,8 @@ int __init streams_init(void)
 #ifdef CONFIG_STREAMS_MODULE
 static
 #endif
-void __exit streams_exit(void)
+void __exit
+streams_exit(void)
 {
 	modules_exit();
 	strsched_exit();

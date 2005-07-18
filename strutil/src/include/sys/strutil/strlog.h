@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.9 2005/07/12 14:06:22 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.10 2005/07/18 12:38:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 14:06:22 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:38:48 $"
 
 #ifndef __SYS_STRLOG_H__
 #warn "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."

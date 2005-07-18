@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/09 21:55:19 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:55:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/09 21:55:19 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:59 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/09 21:55:19 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -97,7 +97,8 @@ static struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * roo
 static int (*check_mnt) (struct vfsmount * mnt)
 = (typeof(check_mnt)) HAVE_CHECK_MNT_ADDR;
 #else
-static inline int check_mnt(struct vfsmount *mnt)
+static inline int
+check_mnt(struct vfsmount *mnt)
 {
 	return mnt->mnt_namespace == current->namespace;
 }
@@ -113,16 +114,19 @@ static int (*do_umount) (struct vfsmount * mnt, int flags)
 
 #if HAVE_PATH_LOOKUP_EXPORT
 #else
-int path_lookup(const char *path, unsigned flags, struct nameidata *nd)
+int
+path_lookup(const char *path, unsigned flags, struct nameidata *nd)
 {
 	int error = 0;
+
 	if (path_init(path, flags, nd))
 		error = path_walk(path, nd);
 	return error;
 }
 #endif
 
-long do_fattach(const struct file *file, const char *file_name)
+long
+do_fattach(const struct file *file, const char *file_name)
 {
 	/* very much like do_add_mount() but with different permissions and clone_mnt() of the file 
 	   instead of do_kern_mount() of the filesystem root */
@@ -187,9 +191,11 @@ long do_fattach(const struct file *file, const char *file_name)
       out:
 	return err;
 }
+
 EXPORT_SYMBOL(do_fattach);
 
-long do_fdetach(const char *file_name)
+long
+do_fdetach(const char *file_name)
 {
 	/* pretty much the same as sys_umount() with different permissions */
 	struct nameidata nd;
@@ -227,7 +233,7 @@ long do_fdetach(const char *file_name)
       out:
 	return err;
 }
+
 EXPORT_SYMBOL(do_fdetach);
 
 #endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */
-

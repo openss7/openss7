@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $"
 
 /************************************************************************
 *                          Clone Driver                                 *
@@ -80,12 +80,12 @@
 #include <sys/osif.h>
 
 static struct module_info clone_minfo = {
-	0,			/* id */
-	"clone",		/* name */
-	0,			/* min packet size accepted */
-	0,			/* max packet size accepted */
-	0,			/* high water mark */
-	0			/* low water mark */
+	0,				/* id */
+	"clone",			/* name */
+	0,				/* min packet size accepted */
+	0,				/* max packet size accepted */
+	0,				/* high water mark */
+	0				/* low water mark */
 };
 
 static int clone_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -94,32 +94,32 @@ static int clone_close(queue_t *, int, cred_t *);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit clone_rinit = {
-	NULL,			/* put */
-	NULL,			/* service */
-	clone_open,		/* open */
-	clone_close,		/* close */
-	NULL,			/* admin */
-	&clone_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	NULL,				/* service */
+	clone_open,			/* open */
+	clone_close,			/* close */
+	NULL,				/* admin */
+	&clone_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit clone_winit = {
-	NULL,			/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&clone_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&clone_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the clone driver.
  */
 struct streamtab clone_info = {
-	&clone_rinit,		/* read queue */
-	&clone_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&clone_rinit,			/* read queue */
+	&clone_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 static int

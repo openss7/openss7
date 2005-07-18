@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.11 $) $Date: 2005/06/24 09:01:11 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.13 $) $Date: 2005/07/13 12:01:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/24 09:01:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.11 $) $Date: 2005/06/24 09:01:11 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.13 $) $Date: 2005/07/13 12:01:16 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.11 2005/06/24 09:01:11 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.13 2005/07/13 12:01:16 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -164,7 +164,7 @@ char *lis_stropts_file =
 #else
     "<unknown/stropts.h>"
 #endif
-    ;
+;
 
 /*
  * Load STREAMS module with panic_when_killed=1 (default) to call panic()
@@ -213,7 +213,7 @@ static int lis_errnos[LIS_NR_CPUS];
 
 #ifdef HAVE_SYS_MKNOD_ADDR
 static asmlinkage long (*syscall_mknod) (const char *filename, int mode, dev_t dev)
-    = (typeof(syscall_mknod)) HAVE_SYS_MKNOD_ADDR;
+= (typeof(syscall_mknod)) HAVE_SYS_MKNOD_ADDR;
 #elif defined _HPPA_LIS_
 #define syscall_mknod(name,mode,dev) (-ENOSYS)
 #else
@@ -222,7 +222,7 @@ static _NI _syscall3(long, syscall_mknod, const char *, file, int, mode, int, de
 #endif
 #ifdef HAVE_SYS_UNLINK_ADDR
 static asmlinkage long (*syscall_unlink) (const char *pathname)
-    = (typeof(syscall_unlink)) HAVE_SYS_UNLINK_ADDR;
+= (typeof(syscall_unlink)) HAVE_SYS_UNLINK_ADDR;
 #elif defined _HPPA_LIS_
 #define syscall_unlink(name) (-ENOSYS)
 #else
@@ -232,7 +232,7 @@ static _NI _syscall1(long, syscall_unlink, const char *, file);
 #ifdef HAVE_SYS_MOUNT_ADDR
 static asmlinkage long (*syscall_mount) (char *dev_name, char *dir_name, char *type,
 					 unsigned long flags, void *data)
-    = (typeof(syscall_mount)) HAVE_SYS_MOUNT_ADDR;
+= (typeof(syscall_mount)) HAVE_SYS_MOUNT_ADDR;
 #elif defined _HPPA_LIS_
 #define syscall_mount(dev_name,dir_name,type,flags,data) (-ENOSYS)
 #else
@@ -242,7 +242,7 @@ static _NI _syscall5(long, syscall_mount, char *, dev, char *, dir, char *, type
 #endif
 #ifdef HAVE_SYS_UMOUNT_ADDR
 asmlinkage long (*syscall_umount2) (char *name, int flags)
-    = (typeof(syscall_umount2)) HAVE_SYS_UMOUNT_ADDR;
+= (typeof(syscall_umount2)) HAVE_SYS_UMOUNT_ADDR;
 #elif defined _HPPA_LIS_
 #define syscall_umount2(name,flags) (-ENOSYS)
 #else
@@ -437,16 +437,16 @@ int lis_strflush(struct file *f);
  * File operations
  */
 struct file_operations lis_streams_fops = {
-      owner:THIS_MODULE,
-      read:lis_strread,	/* read */
-      write:lis_strwrite,	/* write */
-      poll:lis_poll_2_1,	/* poll */
-      ioctl:lis_strioctl,	/* ioctl */
-      open:lis_stropen,	/* open */
+	owner:THIS_MODULE,
+	read:lis_strread,		/* read */
+	write:lis_strwrite,		/* write */
+	poll:lis_poll_2_1,		/* poll */
+	ioctl:lis_strioctl,		/* ioctl */
+	open:lis_stropen,		/* open */
 #if defined(KERNEL_2_5)
-      flush:lis_strflush,	/* flush */
+	flush:lis_strflush,		/* flush */
 #endif
-      release:lis_strclose,	/* release */
+	release:lis_strclose,		/* release */
 };
 
 /*
@@ -456,8 +456,8 @@ extern int lis_dentry_delete(struct dentry *dentry);
 extern void lis_dentry_iput(struct dentry *dentry, struct inode *inode);
 
 struct dentry_operations lis_dentry_ops = {
-      d_delete:lis_dentry_delete,
-      d_iput:lis_dentry_iput
+	d_delete:lis_dentry_delete,
+	d_iput:lis_dentry_iput
 };
 
 /*
@@ -476,7 +476,7 @@ struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry);
 # endif
 
 struct inode_operations lis_streams_iops = {
-      lookup:&lis_inode_lookup,
+	lookup:&lis_inode_lookup,
 };
 
 /*
@@ -516,19 +516,19 @@ struct super_block *lis_fs_read_super(struct super_block *sb, void *ptr, int sil
 #define LIS_FS_NAME	"LiS"
 
 struct file_system_type lis_file_system_ops = {
-      name:LIS_FS_NAME,
+	name:LIS_FS_NAME,
 #if defined(KERNEL_2_5)
-      get_sb:lis_fs_get_sb,
-      kill_sb:lis_fs_kill_sb,
-      owner:NULL,
+	get_sb:lis_fs_get_sb,
+	kill_sb:lis_fs_kill_sb,
+	owner:NULL,
 #else
-      read_super:lis_fs_read_super,
-      owner:NULL,
+	read_super:lis_fs_read_super,
+	owner:NULL,
 #endif
 #if defined(FATTACH_VIA_MOUNT)
-      fs_flags:0,
+	fs_flags:0,
 #else
-      fs_flags:(FS_NOMOUNT | FS_SINGLE),
+	fs_flags:(FS_NOMOUNT | FS_SINGLE),
 #endif
 };
 
@@ -609,14 +609,14 @@ void lis_super_put_super(struct super_block *);
 #endif
 
 struct super_operations lis_super_ops = {
-      put_inode:lis_super_put_inode,
-      statfs:lis_super_statfs,
+	put_inode:lis_super_put_inode,
+	statfs:lis_super_statfs,
 #if defined(KERNEL_2_5)
-      drop_inode:lis_drop_inode,
+	drop_inode:lis_drop_inode,
 #endif
 #if defined(FATTACH_VIA_MOUNT)
-      umount_begin:lis_super_umount_begin,
-      put_super:lis_super_put_super,
+	umount_begin:lis_super_umount_begin,
+	put_super:lis_super_put_super,
 #endif
 };
 

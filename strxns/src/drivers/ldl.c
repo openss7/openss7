@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/13 12:01:52 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/13 12:01:52 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/13 12:01:52 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2005/07/13 12:01:52 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -444,12 +444,14 @@ struct dl {
 #define DEV_WR_MAX 0x10000	/* High water: 64 Kb */
 
 ldl_gstats_ioctl_t ldl_gstats;
+
 #define	ginc(field)	atomic_inc(&ldl_gstats.field)
 STATIC unsigned long ldl_debug_mask;
 
 #undef SPLSTR
 #undef SPLX
 STATIC spinlock_t ldl_spin_lock = SPIN_LOCK_UNLOCKED;
+
 #define SPLSTR(__psw) while(0){ (void)(__psw); spin_lock(&ldl_spin_lock);   }
 #define SPLX(__psw)   while(0){ (void)(__psw); spin_unlock(&ldl_spin_lock); }
 
@@ -1748,6 +1750,7 @@ eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 		return 1;
 	if (*(fr + 14) != dl->sap->sap.sap[0]) {
 		struct sap *sap = dl->subs;
+
 		while (sap != NULL) {
 			if (*(fr + 14) == sap->sap.sap[0])
 				break;
@@ -1759,6 +1762,7 @@ eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 #if 0
 	{
 		int i;
+
 		printk("eth_8022_want: SAP checked, MAC@ not yet ...");
 		for (i = 0; i < 16; i++)
 			printk("%02x ", fr[i]);
@@ -1777,6 +1781,7 @@ eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 	 */
 	{
 		struct dev_mc_list *dmi = dl->ndev->dev->mc_list;
+
 		while (dmi != NULL)
 			if (!memcmp(fr, dmi->dmi_addr, 6))
 				return 1;
@@ -1870,6 +1875,7 @@ eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
 		return 1;
 	if (*(fr + 14) != dl->sap->sap.sap[0]) {
 		struct sap *sap = dl->subs;
+
 		while (sap != NULL) {
 			if (*(fr + 14) == sap->sap.sap[0])
 				break;
@@ -2178,6 +2184,7 @@ tr_8022_want(struct dl *dl, unsigned char *fr, int len)
 #if 0
 	{
 		int i;
+
 		printk("tr_8022_want:\n");
 		for (i = 0; i < 16; i++)
 			printk("%02x ", fr[i]);
@@ -2238,6 +2245,7 @@ tr_8022_want(struct dl *dl, unsigned char *fr, int len)
 
 	if (llcp->llc_dsap != dl->sap->sap.sap[0]) {
 		struct sap *sap = dl->subs;
+
 		while (sap != NULL) {
 			if (llcp->llc_dsap == sap->sap.sap[0])
 				break;
@@ -2537,6 +2545,7 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 	mblk_t *dp;
 	struct dl *dl, *last = NULL;
 	struct sap *sap;
+
 #if 0
 	struct ethhdr *hdr = (struct ethhdr *) skb->mac.raw;
 #endif
@@ -2551,6 +2560,7 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 
 	if (skb_is_nonlinear(skb)) {
 		struct sk_buff *b;
+
 		/* FIXME untested code */
 		printk("ldl: non linear skb");
 		b = skb_clone(skb, GFP_ATOMIC);
@@ -2838,6 +2848,7 @@ tx_func_proto(struct dl *dl, mblk_t *mp)
 
 	if ((dl->flags & LDLFLAG_RAW) != 0) {	/* raw means don't chk addrs */
 		int rslt;
+
 		dmp = mp->b_cont;
 		ASSERT(dmp != NULL);	/* needs data buffer */
 		if (dmp == NULL)
@@ -4550,6 +4561,7 @@ STATIC int
 ldl_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while (canputnext(q)) {
 		if ((mp = getq(q)) == NULL)
 			break;
@@ -4565,6 +4577,7 @@ ldl_rsrv(queue_t *q)
 
 #ifdef LINUX
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -4573,6 +4586,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID number for LDL driver (0 for allocation).");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -4594,6 +4608,7 @@ int __init
 ldl_init(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, DRV_BANNER);
 	if ((err = register_strdev(&ldl_cdev, major)) < 0)
 		return (err);
@@ -4620,6 +4635,7 @@ STATIC void
 ldl_init(void)
 {
 	int err;
+
 	if (ldl_initialized != 0)
 		return;
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
@@ -4639,6 +4655,7 @@ STATIC void
 ldl_terminate(void)
 {
 	int err;
+
 	if (ldl_initialized <= 0)
 		return;
 	if (major) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 15:52:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:09 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 15:52:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.15  2005/07/18 15:52:13  brian
+ - implemented mps mpprintf functions
+
+ Revision 0.9.2.14  2005/07/18 12:25:42  brian
+ - standard indentation
+
  Revision 0.9.2.13  2005/07/14 22:04:09  brian
  - updates for check pass and header splitting
 
@@ -92,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 15:52:13 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 15:52:13 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -117,9 +123,13 @@ static char const ident[] =
 
 #include "sys/os7/compat.h"
 
+#include <linux/types.h>	/* for ptrdiff_t */
+#include <linux/ctype.h>	/* for isdigit */
+#include <asm/div64.h>		/* for do_div */
+
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 15:52:13 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -146,6 +156,7 @@ MODULE_ALIAS("streams-mpscompat");
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len);
+
 EXPORT_SYMBOL(mi_bcmp);
 
 /*
@@ -153,6 +164,7 @@ EXPORT_SYMBOL(mi_bcmp);
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
+
 EXPORT_SYMBOL(mi_alloc);	/* mps/ddi.h */
 
 /*
@@ -160,6 +172,7 @@ EXPORT_SYMBOL(mi_alloc);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
+
 EXPORT_SYMBOL(mi_alloc_sleep);	/* mps/ddi.h */
 
 /*
@@ -167,6 +180,7 @@ EXPORT_SYMBOL(mi_alloc_sleep);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
+
 EXPORT_SYMBOL(mi_zalloc);	/* mps/ddi.h */
 
 /*
@@ -174,6 +188,7 @@ EXPORT_SYMBOL(mi_zalloc);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
+
 EXPORT_SYMBOL(mi_zalloc_sleep);	/* mps/ddi.h */
 
 /*
@@ -181,6 +196,7 @@ EXPORT_SYMBOL(mi_zalloc_sleep);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_free(void *ptr);
+
 EXPORT_SYMBOL(mi_free);		/* mps/ddi.h */
 
 /*
@@ -201,6 +217,7 @@ struct mi_comm {
 	size_t mi_size;			/* size of this structure plus private data */
 	char mi_priv[0];		/* followed by private data */
 };
+
 #define mi_dev mi_u.dev
 #define mi_index mi_u.index
 
@@ -246,6 +263,7 @@ EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mps/ddi.h */
 caddr_t mi_first_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
+
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
@@ -261,6 +279,7 @@ EXPORT_SYMBOL(mi_first_ptr);	/* mps/ddi.h */
 caddr_t mi_first_dev_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
+
 	for (; mi && getmajor(mi->mi_dev) != 0; mi = mi->mi_next) ;
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
@@ -274,6 +293,7 @@ EXPORT_SYMBOL(mi_first_dev_ptr);	/* mps/ddi.h */
 caddr_t mi_next_ptr(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1)->mi_next : NULL;
+
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
@@ -289,6 +309,7 @@ EXPORT_SYMBOL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
 caddr_t mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
+
 	for (mi = mi ? mi->mi_next : NULL; mi && getmajor(mi->mi_dev) != 0; mi = mi->mi_next) ;
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
@@ -303,6 +324,7 @@ EXPORT_SYMBOL(mi_next_dev_ptr);	/* mps/ddi.h */
 caddr_t mi_prev_ptr(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
+
 	if (mi && mi->mi_prev != &mi->mi_next && mi->mi_prev != mi->mi_head)
 		return ((caddr_t) (((struct mi_comm *) mi->mi_prev) + 1));
 	return (NULL);
@@ -321,6 +343,7 @@ int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag
 	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1, **mip = (struct mi_comm **) mi_head;
 	major_t cmajor = devp ? getmajor(*devp) : 0;
 	minor_t cminor = devp ? getminor(*devp) : 0;
+
 	spin_lock(&mi_list_lock);
 	switch (sflag) {
 	case CLONEOPEN:
@@ -334,11 +357,13 @@ int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
+
 		for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor;
 		     mip = &(*mip)->mi_next) ;
 		for (; *mip && dmajor == getmajor((*mip)->mi_dev)
 		     && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
 			minor_t dminor = getminor((*mip)->mi_dev);
+
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor)
@@ -381,6 +406,7 @@ EXPORT_SYMBOL(mi_open_link);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
+
 EXPORT_SYMBOL(mi_open_detached);	/* mps/ddi.h */
 
 /*
@@ -388,6 +414,7 @@ EXPORT_SYMBOL(mi_open_detached);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_attach(queue_t *q, caddr_t ptr);
+
 EXPORT_SYMBOL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
 
 /* 
@@ -406,6 +433,7 @@ void mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 {
 	if (ptr) {
 		struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+
 		spin_lock(&mi_list_lock);
 		if (mi_head == NULL || mi->mi_head == (struct mi_comm **) mi_head) {
 			if ((*mi->mi_prev = mi->mi_next))
@@ -427,6 +455,7 @@ EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
 void mi_close_free(caddr_t ptr)
 {
 	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+
 	if (ptr && mi->mi_head == NULL && mi->mi_next == NULL)
 		kmem_free(mi, mi->mi_size);
 }
@@ -438,6 +467,7 @@ EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_detach(queue_t *q, caddr_t ptr);
+
 EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
 
 /*
@@ -445,6 +475,7 @@ EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_close_detached(caddr_t *mi_head, caddr_t ptr);
+
 EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
 
 /* 
@@ -452,6 +483,7 @@ EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  */
 int mi_close_comm(caddr_t *mi_head, queue_t *q);
+
 EXPORT_SYMBOL(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
 
 struct mi_iocblk {
@@ -467,7 +499,6 @@ struct mi_iocblk {
  *
  *  =========================================================================
  */
-
 
 mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 {
@@ -538,6 +569,7 @@ EXPORT_SYMBOL(mi_reallocb);
 void mi_copy_done(queue_t *q, mblk_t *mp, int err)
 {
 	union ioctypes *ioc;
+
 	ensure(mp, return);
 	ensure(q && mp->b_wptr >= mp->b_rptr + sizeof(*ioc), goto error);
 	ioc = (typeof(ioc)) mp->b_rptr;
@@ -571,6 +603,7 @@ void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 	struct mi_iocblk *mip;
 	mblk_t *bp;
 	int err = EPROTO;
+
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 		if (ioc->iocblk.ioc_count == TRANSPARENT) {
@@ -639,6 +672,7 @@ void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 	struct mi_iocblk *mip;
 	mblk_t *bp;
 	int err = EPROTO;
+
 	if (mp->b_datap->db_type == M_IOCDATA) {
 		if ((bp = ioc->copyresp.cp_private)) {
 			mip = (typeof(mip)) mp->b_rptr;
@@ -671,6 +705,7 @@ mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int 
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
 	mblk_t *db, *bp;
+
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 		if (ioc->iocblk.ioc_count == TRANSPARENT) {
@@ -720,6 +755,7 @@ void mi_copyout(queue_t *q, mblk_t *mp)
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
 	mblk_t *bp, *db;
+
 	if (mp->b_datap->db_type != M_IOCDATA || !mp->b_cont || !(bp = ioc->copyresp.cp_private))
 		return mi_copy_done(q, mp, EPROTO);
 	if (ioc->copyresp.cp_rval || !(db = bp->b_cont))
@@ -751,6 +787,7 @@ int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	struct mi_iocblk *mip;
 	mblk_t *bp, *db = NULL;
 	int err = EPROTO;
+
 	if (mp->b_datap->db_type != M_IOCDATA || !(db = mp->b_cont)
 	    || !(bp = ioc->copyresp.cp_private))
 		goto error;
@@ -783,6 +820,7 @@ EXPORT_SYMBOL(mi_copy_state);	/* mps/ddi.h */
 void mi_copy_set_rval(mblk_t *mp, int rval)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+
 	ioc->iocblk.ioc_rval = rval;
 }
 
@@ -818,6 +856,7 @@ static void mi_timer_expiry(caddr_t data)
 {
 	tblk_t *tb = (typeof(tb)) data;
 	toid_t tid;
+
 	if ((tid = xchg(&tb->tb_tid, 0))) {
 		if (tb->tb_q && tb->tb_mp)
 			put(tb->tb_q, tb->tb_mp);
@@ -837,6 +876,7 @@ mblk_t *mi_timer_alloc_MAC(queue_t *q, size_t size)
 {
 	mblk_t *mp;
 	tblk_t *tb;
+
 	if ((mp = allocb(sizeof(*tb) + size, BPRI_HI))) {
 		mp->b_datap->db_type = M_PCSIG;
 		tb = (typeof(tb)) mp->b_rptr;
@@ -861,6 +901,7 @@ void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
 void mi_timer_MAC(mblk_t *mp, clock_t msec)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+
 	return mi_timer_SUN(tb->tb_q, mp, msec);
 }
 
@@ -874,10 +915,12 @@ int mi_timer_cancel(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
+
 	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
 	case TB_ACTIVE:
 	{
 		toid_t tid;
+
 		if (!(tid = xchg(&tb->tb_tid, 0))) {
 			tb->tb_state = TB_CANCELLED;
 			return (-1);
@@ -910,9 +953,10 @@ mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	tblk_t *t2 = (typeof(t2)) new_mp->b_datap->db_base;
+
 	if (!mi_timer_cancel(mp)) {
 		mi_timer_SUN(q, new_mp, drv_hztomsec(tb->tb_time - jiffies));
-	      return (new_mp);
+		return (new_mp);
 	}
 	tb->tb_state = TB_IDLE;
 	mi_timer_SUN(q, mp, drv_hztomsec(tb->tb_time - jiffies));
@@ -942,14 +986,17 @@ EXPORT_SYMBOL(mi_timer_alloc_SUN);
 void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+
 	if (msec >= 0) {
 		long state;
+
 		tb->tb_q = q;
 		switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
 		case TB_ACTIVE:
 			/* tb has timer actively running */
 		{
 			toid_t tid;
+
 			if (!(tid = xchg(&tb->tb_tid, 0)))
 				goto reschedule;
 			untimeout(tid);
@@ -1026,10 +1073,12 @@ void mi_timer_move(queue_t *q, mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
+
 	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
 	case TB_ACTIVE:
 	{
 		toid_t tid;
+
 		if (!(tid = xchg(&tb->tb_tid, 0)))
 			goto dequeue;
 		untimeout(tid);
@@ -1050,6 +1099,7 @@ void mi_timer_move(queue_t *q, mblk_t *mp)
 	default:
 	{
 		queue_t *oldq;
+
 	      dequeue:
 		/* double race breaker */
 		if ((oldq = xchg(&tb->tb_q, NULL))) {
@@ -1088,6 +1138,7 @@ int mi_timer_valid(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
+
 	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
 	case TB_ACTIVE:
 	default:
@@ -1127,10 +1178,12 @@ void mi_timer_free(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
+
 	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
 	case TB_ACTIVE:
 	{
 		toid_t tid;
+
 		if (!(tid = xchg(&tb->tb_tid, 0)))
 			goto zombie;
 		untimeout(tid);
@@ -1154,6 +1207,7 @@ queue_t *mi_allocq(struct streamtab *st)
 #endif
 #if LFS
 	queue_t *q;
+
 	if ((q = allocq()))
 		setq(q, st->st_rdinit, st->st_wrinit);
 	return (q);
@@ -1177,10 +1231,12 @@ EXPORT_SYMBOL(mi_freeq);
 int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
 	int result = 0;
+
 	if (vstrlog != NULL) {
 		va_list args;
 		modID_t mid = q->q_qinfo->qi_minfo->mi_idnum;
 		minor_t sid = 0;	/* FIXME - should be minor devce number */
+
 		va_start(args, fmt);
 		result = vstrlog(mid, sid, level, flags, fmt, args);
 		va_end(args);
@@ -1190,7 +1246,418 @@ int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 
 EXPORT_SYMBOL(mi_strlog);
 
+#define _MI_FLAG_ZEROPAD	(1<<0)
+#define _MI_FLAG_SIGN		(1<<1)
+#define _MI_FLAG_PLUS		(1<<2)
+#define _MI_FLAG_SPACE		(1<<3)
+#define _MI_FLAG_LEFT		(1<<4)
+#define _MI_FLAG_SPECIAL	(1<<5)
+#define _MI_FLAG_LARGE		(1<<6)
 
+static int mi_putc(char c, mblk_t **mpp)
+{
+	if (unlikely((*mpp)->b_wptr >= (*mpp)->b_datap->db_lim)) {
+		mblk_t *mp;
+
+		mp = allocb(256, BPRI_MED);
+		(*mpp)->b_cont = mp;
+		mpp = &(*mpp)->b_cont;
+	}
+	if (likely(*mpp != NULL)) {
+		(*mpp)->b_wptr[0] = (unsigned char) c;
+		(*mpp)->b_wptr++;
+		return (1);
+	}
+	return (0);
+}
+
+static int mi_number(mblk_t **mpp, long long num, int base, int width, int decimal, int flags)
+{
+	char sign;
+	int i, count = 0, rval = 0;
+	char tmp[66];
+
+	if (flags & _MI_FLAG_LEFT)
+		flags &= ~_MI_FLAG_ZEROPAD;
+	if (base < 2 || base > 16)
+		return (count);
+	sign = '\0';
+	if (flags & _MI_FLAG_SIGN) {
+		if (num < 0) {
+			sign = '-';
+			num = -num;
+			width--;
+		} else if (flags & _MI_FLAG_PLUS) {
+			sign = '+';
+			width--;
+		} else if (flags & _MI_FLAG_SPACE) {
+			sign = ' ';
+			width--;
+		}
+	}
+	if (flags & _MI_FLAG_SPECIAL) {
+		switch (base) {
+		case 16:
+			width -= 2;	/* for 0x */
+			break;
+		case 8:
+			width--;	/* for 0 */
+			break;
+		}
+	}
+	i = 0;
+	if (num == 0)
+		tmp[i++] = '0';
+	else {
+		const char *hexdig =
+		    (flags & _MI_FLAG_LARGE) ? "0123456789ABCDEF" : "0123456789abcdef";
+		for (; num != 0; tmp[i++] = hexdig[do_div(num, base)]) ;
+	}
+	if (i > decimal)
+		decimal = i;
+	width -= decimal;
+	if (!(flags & (_MI_FLAG_ZEROPAD | _MI_FLAG_LEFT)))
+		while (width-- > 0) {
+			if (!mi_putc(' ', mpp))
+				goto abort;
+			count++;
+		}
+	if (sign != '\0') {
+		if (!mi_putc(sign, mpp))
+			goto abort;
+		count++;
+	}
+	if (flags & _MI_FLAG_SPECIAL) {
+		switch (base) {
+		case 8:
+			if (!mi_putc('0', mpp))
+				goto abort;
+			count++;
+			break;
+		case 16:
+		{
+			char xchar = (flags & _MI_FLAG_LARGE) ? 'X' : 'x';
+
+			if (!mi_putc('0', mpp))
+				goto abort;
+			count++;
+			if (!mi_putc(xchar, mpp))
+				goto abort;
+			count++;
+			break;
+		}
+		}
+	}
+	if (!(flags & _MI_FLAG_LEFT)) {
+		char pad = (flags & _MI_FLAG_ZEROPAD) ? '0' : ' ';
+
+		while (width-- > 0) {
+			if (!mi_putc(pad, mpp))
+				goto abort;
+			count++;
+		}
+	}
+	while (i < decimal--) {
+		if (!mi_putc('0', mpp))
+			goto abort;
+		count++;
+	}
+	while (i-- > 0) {
+		if (!mi_putc(tmp[i], mpp))
+			goto abort;
+		count++;
+	}
+	while (width-- > 0) {
+		if (!mi_putc(' ', mpp))
+			goto abort;
+		count++;
+	}
+	rval = count;
+      abort:
+	return (rval);
+}
+
+static int mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
+{
+	char type;
+	int count = 0, rval = -1, flags = 0, width = -1, decimal = -1, base = 10;
+	mblk_t **mpp = &mp;
+
+	for (; *fmt; ++fmt) {
+		const char *pos;
+		unsigned long long num = 0;
+
+		if (*fmt != '%') {
+			if (!mi_putc(*fmt, mpp))
+				goto abort;
+			count++;
+			continue;
+		}
+		pos = fmt;	/* remember position of % */
+		/* process flags */
+		for (++fmt;; ++fmt) {
+			switch (*fmt) {
+			case '-':
+				flags |= _MI_FLAG_LEFT;
+				continue;
+			case '+':
+				flags |= _MI_FLAG_PLUS;
+				continue;
+			case ' ':
+				flags |= _MI_FLAG_SPACE;
+				continue;
+			case '#':
+				flags |= _MI_FLAG_SPECIAL;
+				continue;
+			case '0':
+				flags |= _MI_FLAG_ZEROPAD;
+				continue;
+			default:
+				break;
+			}
+		}
+		/* get field width */
+		if (isdigit(*fmt))
+			for (width = 0; isdigit(*fmt); width *= 10, width += (*fmt - '0')) ;
+		else if (*fmt == '*') {
+			++fmt;
+			if ((width = va_arg(args, int)) < 0) {
+				width = -width;
+				flags |= _MI_FLAG_LEFT;
+			}
+		}
+		/* get the decimal precision */
+		if (*fmt == '.') {
+			++fmt;
+			if (isdigit(*fmt))
+				for (decimal = 0; isdigit(*fmt);
+				     decimal += 10, decimal += (*fmt - '0')) ;
+			else if (*fmt == '*') {
+				if ((decimal = va_arg(args, int)) < 0)
+					 decimal = 0;
+			}
+		}
+		/* get conversion type */
+		type = 'i';
+		switch (*fmt) {
+		case 'h':
+			type = *fmt;
+			++fmt;
+			if (*fmt == 'h') {
+				type = 'c';
+				++fmt;
+			}
+			break;
+		case 'l':
+			type = *fmt;
+			++fmt;
+			if (*fmt == 'l') {
+				type = 'L';
+				++fmt;
+			}
+			break;
+		case 'q':
+		case 'L':
+		case 'Z':
+		case 'z':
+		case 't':
+			type = *fmt;
+			++fmt;
+			break;
+		}
+		switch (*fmt) {
+		case 'c':
+		{
+			char c;
+
+			if (!(flags & _MI_FLAG_LEFT))
+				while (--width > 0) {
+					if (!mi_putc(' ', mpp))
+						goto abort;
+					count++;
+				}
+			c = va_arg(args, int);
+
+			if (!mi_putc(c, mpp))
+				goto abort;
+			count++;
+			while (--width > 0) {
+				if (!mi_putc(' ', mpp))
+					goto abort;
+				count++;
+			}
+			continue;
+		}
+		case 's':
+		{
+			const char *s;
+			int i;
+			size_t len = 0;
+			s = va_arg(args, char *);
+
+			len = strnlen(s, 1024);
+			if (!(flags & _MI_FLAG_LEFT))
+				while (len < width--) {
+					if (!mi_putc(' ', mpp))
+						goto abort;
+					count++;
+				}
+			for (i = 0; i < len; ++i, ++s) {
+				if (!mi_putc(*s, mpp))
+					goto abort;
+				count++;
+			}
+			while (len < width--) {
+				if (!mi_putc(' ', mpp))
+					goto abort;
+				count++;
+			}
+			continue;
+		}
+		case '%':
+			if (!mi_putc('%', mpp))
+				goto abort;
+			count++;
+			continue;
+		case 'p':
+		case 'o':
+		case 'X':
+		case 'x':
+		case 'd':
+		case 'i':
+		case 'u':
+			switch (*fmt) {
+			case 'p':
+				type = 'p';
+				if (width == -1) {
+					width = 2 * sizeof(void *);
+					flags |= _MI_FLAG_ZEROPAD;
+				}
+				base = 16;
+				break;
+			case 'o':
+				base = 8;
+				break;
+			case 'X':
+				flags |= _MI_FLAG_LARGE;
+			case 'x':
+				base = 16;
+				break;
+			case 'd':
+			case 'i':
+				flags |= _MI_FLAG_SIGN;
+			case 'u':
+				base = 10;
+				break;
+			}
+			switch (type) {
+			case 'c':
+				num = va_arg(args, int);
+
+				if (flags & _MI_FLAG_SIGN)
+					num = (signed char) num;
+				break;
+			case 'h':
+				num = va_arg(args, int);
+
+				if (flags & _MI_FLAG_SIGN)
+					num = (signed short) num;
+				break;
+			case 'p':
+				num = va_arg(args, uintptr_t);
+				flags &= ~_MI_FLAG_SIGN;
+				break;
+			case 'l':
+				num = va_arg(args, unsigned long);
+
+				if (flags & _MI_FLAG_SIGN)
+					num = (signed long) num;
+				break;
+			case 'q':
+			case 'L':
+				num = va_arg(args, unsigned long long);
+
+				if (flags & _MI_FLAG_SIGN)
+					num = (signed long long) num;
+				break;
+			case 'Z':
+			case 'z':
+				num = va_arg(args, size_t);
+
+				if (flags & _MI_FLAG_SIGN)
+					num = (ssize_t) num;
+				break;
+			case 't':
+				num = va_arg(args, ptrdiff_t);
+				break;
+			case 'i':
+			default:
+				num = va_arg(args, unsigned int);
+
+				if (flags & _MI_FLAG_SIGN)
+					num = (signed int) num;
+				break;
+			}
+			{
+				int result;
+
+				if (!(result = mi_number(mpp, num, base, width, decimal, flags)))
+					goto abort;
+				count += result;
+			}
+			continue;
+		case '\0':
+		default:
+			/* put origianl '%' */
+			if (!mi_putc('%', mpp))
+				goto abort;
+			count++;
+			/* put the bad format characters */
+			for (; fmt > pos; pos++, count++)
+				if (!mi_putc(*pos, mpp))
+					goto abort;
+			if (*fmt == '\0')
+				break;
+			continue;
+		}
+		break;
+	}
+	if (!mi_putc('\0', mpp))
+		goto abort;
+	rval = count;
+      abort:
+	return (rval);
+}
+
+int mi_mpprintf(mblk_t *mp, char *fmt, ...)
+{
+	va_list args;
+	int count = -1;
+
+	va_start(args, fmt);
+	if (mp)
+		count = mi_vmpprintf(mp, fmt, args);
+	va_end(args);
+	return (count);
+}
+
+EXPORT_SYMBOL(mi_mpprintf);
+
+int mi_mpprintf_nr(mblk_t *mp, char *fmt, ...)
+{
+	va_list args;
+	int count = -1;
+
+	va_start(args, fmt);
+	if (mp) {
+		adjmsg(mp, -1);
+		count = mi_vmpprintf(mp, fmt, args);
+	}
+	va_end(args);
+	return (count);
+}
+
+EXPORT_SYMBOL(mi_mpprintf_nr);
 
 /*
  *  =========================================================================
@@ -1207,11 +1674,12 @@ int mi_set_sth_hiwat(queue_t *q, size_t size)
 {
 	struct stroptions *so;
 	mblk_t *mp;
+
 	assert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
-		so = (typeof(so))mp->b_rptr;
+		so = (typeof(so)) mp->b_rptr;
 		so->so_flags = SO_HIWAT;
 		so->so_band = 0;
 		so->so_hiwat = size;
@@ -1231,11 +1699,12 @@ int mi_set_sth_lowat(queue_t *q, size_t size)
 {
 	struct stroptions *so;
 	mblk_t *mp;
+
 	assert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
-		so = (typeof(so))mp->b_rptr;
+		so = (typeof(so)) mp->b_rptr;
 		so->so_flags = SO_LOWAT;
 		so->so_band = 0;
 		so->so_lowat = size;
@@ -1256,11 +1725,12 @@ int mi_set_sth_maxblk(queue_t *q, ssize_t size)
 #ifdef SO_MAXBLK
 	struct stroptions *so;
 	mblk_t *mp;
+
 	assert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
-		so = (typeof(so))mp->b_rptr;
+		so = (typeof(so)) mp->b_rptr;
 		so->so_flags = SO_MAXBLK;
 		so->so_maxblk = size;
 		putnext(q, mp);
@@ -1281,11 +1751,12 @@ int mi_set_sth_copyopt(queue_t *q, int copyopt)
 #ifdef SO_COPYOPT
 	struct stroptions *so;
 	mblk_t *mp;
+
 	assert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
-		so = (typeof(so))mp->b_rptr;
+		so = (typeof(so)) mp->b_rptr;
 		so->so_flags = SO_COPYOPT;
 		so->so_copyopt = copyopt;
 		putnext(q, mp);
@@ -1305,11 +1776,12 @@ int mi_set_sth_wroff(queue_t *q, size_t size)
 {
 	struct stroptions *so;
 	mblk_t *mp;
+
 	assert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
-		so = (typeof(so))mp->b_rptr;
+		so = (typeof(so)) mp->b_rptr;
 		so->so_flags = SO_WROFF;
 		so->so_wroff = size;
 		putnext(q, mp);
@@ -1331,6 +1803,7 @@ int mi_sprintf(char *buf, char *fmt, ...)
 {
 	int result;
 	va_list args;
+
 	va_start(args, fmt);
 	result = vsprintf(buf, fmt, args);
 	va_end(args);
@@ -1375,6 +1848,7 @@ uint8_t *mi_offset_param(mblk_t *mp, size_t offset, size_t len)
 {
 	if (mp || len == 0) {
 		size_t blen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
+
 		if (blen >= offset + len)
 			return (mp->b_rptr + offset);
 	}
@@ -1390,12 +1864,14 @@ EXPORT_SYMBOL(mi_offset_param);
 uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len)
 {
 	uint8_t *result = NULL;
+
 	for (; mp; mp = mp->b_cont) {
 		if (isdatamsg(mp)) {
 			if ((result = mi_offset_param(mp, offset, len)))
 				break;
 			else {
 				size_t blen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
+
 				if (offset < blen)
 					/* spans blocks - should do a pullup */
 					break;
@@ -1423,6 +1899,7 @@ void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 {
 #if LIS
 	lis_flags_t flags;
+
 	LIS_QISRLOCK(q, &flags);
 	(*proc) (q, mp);
 	LIS_QISRUNLOCK(q, &flags);
@@ -1438,9 +1915,10 @@ EXPORT_SYMBOL(mps_become_writer);
  *  MPS_INTR_DISABLE
  *  -------------------------------------------------------------------------
  */
-void mps_intr_disable(pl_t *plp)
+void mps_intr_disable(pl_t * plp)
 {
 	unsigned long flags = *plp;
+
 	local_irq_save(flags);
 	*plp = flags;
 }
@@ -1454,6 +1932,7 @@ EXPORT_SYMBOL(mps_intr_disable);
 void mps_intr_enable(pl_t pl)
 {
 	unsigned long flags = pl;
+
 	local_irq_restore(flags);
 }
 
@@ -1471,6 +1950,7 @@ int __init mpscomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 static
 #endif

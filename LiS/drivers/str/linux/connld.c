@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:14 $"
 
 /*
  *  connld.c - unique pipe generator
@@ -110,39 +110,39 @@ static int connld_rput(queue_t *q, mblk_t *mp);
  *  module structure
  */
 static struct module_info connld_minfo = {
-	MOD_ID,			/* id */
-	MOD_NAME,		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* highwater mark */
-	512L			/* lowwater mark */
+	MOD_ID,				/* id */
+	MOD_NAME,			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* highwater mark */
+	512L				/* lowwater mark */
 };
 
 static struct qinit connld_rinit = {
-	connld_rput,		/* put */
-	NULL,			/* service */
-	connld_open,		/* open */
-	connld_close,		/* close */
-	NULL,			/* admin */
-	&connld_minfo,		/* info */
-	NULL			/* stat */
+	connld_rput,			/* put */
+	NULL,				/* service */
+	connld_open,			/* open */
+	connld_close,			/* close */
+	NULL,				/* admin */
+	&connld_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit connld_winit = {
-	connld_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&connld_minfo,		/* info */
-	NULL			/* stat */
+	connld_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&connld_minfo,			/* info */
+	NULL				/* stat */
 };
 
 struct streamtab connld_info = {
-	&connld_rinit,		/* read queue init */
-	&connld_winit,		/* write queue init */
-	NULL,			/* lower mux read queue init */
-	NULL			/* lower mux write queue init */
+	&connld_rinit,			/* read queue init */
+	&connld_winit,			/* write queue init */
+	NULL,				/* lower mux read queue init */
+	NULL				/* lower mux write queue init */
 };
 
 /*

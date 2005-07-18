@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $
+ @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $"
+#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $";
+    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -159,11 +159,11 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 		int *flagsp;
 	};
 	struct __lis_getpmsg_args args = {
-	      fd:fd,
-	      ctlptr:ctlptr,
-	      datptr:datptr,
-	      bandp:bandp,
-	      flagsp:flagsp,
+		fd:fd,
+		ctlptr:ctlptr,
+		datptr:datptr,
+		bandp:bandp,
+		flagsp:flagsp,
 	};
 
 	return (read(fd, &args, LIS_GETMSG_PUTMSG_ULEN));

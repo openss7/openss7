@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:07:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:07:06 $"
 
 static char const ident[] =
-    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:07:06 $";
 
 /* 
  * SVR 4.2 utility: strchg - Changes stream configuration.
@@ -80,7 +80,8 @@ static char const ident[] =
 
 int verbose = 1;
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -92,7 +93,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -107,7 +109,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -148,7 +151,8 @@ Options:\n\
 ", argv[0]);
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -205,12 +209,15 @@ enum { CMN_NONE, CMN_PUSH, CMN_POP, CMN_POPUPTO, CMN_POPALL, CMN_FILE };
 char fbuf[PATH_MAX] = { '\0', };
 char mbuf[OPTS_MAX] = { '\0', };
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	char *mptr;
 	int i, fd, flen = 0, mlen = 0, mnum = 1, command = CMN_NONE;
+
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -229,6 +236,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "h:pu:af:qvHVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "h:pu:af:qvHVC?");
@@ -348,6 +356,7 @@ int main(int argc, char *argv[])
 		{
 			struct str_mlist mlist = { l_name:{0,}, };
 			struct str_list list = { sl_nmods:1, sl_modlist:&mlist, };
+
 			while (ioctl(fd, I_LIST, NULL) > 1) {
 				list.sl_nmods = 1;
 				if (ioctl(fd, I_LIST, &list) < 0) {

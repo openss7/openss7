@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/13 12:01:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/13 12:01:15 $"
 
 /************************************************************************
 *                     Multi-Threaded Test Driver                        *
@@ -77,12 +77,12 @@
 ************************************************************************/
 
 static struct module_info mtdrv_minfo = {
-	0,			/* id */
-	"mtdrv",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"mtdrv",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 /* These are the entry points to the driver: open, close, write side put and
@@ -97,32 +97,32 @@ static int mtdrv_rsrv(queue_t *);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit mtdrv_rinit = {
-	NULL,			/* put */
-	mtdrv_rsrv,		/* service */
-	mtdrv_open,		/* open */
-	mtdrv_close,		/* close */
-	NULL,			/* admin */
-	&mtdrv_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	mtdrv_rsrv,			/* service */
+	mtdrv_open,			/* open */
+	mtdrv_close,			/* close */
+	NULL,				/* admin */
+	&mtdrv_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit mtdrv_winit = {
-	mtdrv_wput,		/* put */
-	mtdrv_wsrv,		/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&mtdrv_minfo,		/* info */
-	NULL			/* stat */
+	mtdrv_wput,			/* put */
+	mtdrv_wsrv,			/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&mtdrv_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the driver.
  */
 struct streamtab mtdrv_info = {
-	&mtdrv_rinit,		/* read queue */
-	&mtdrv_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&mtdrv_rinit,			/* read queue */
+	&mtdrv_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 /************************************************************************

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.16 2005/07/15 23:09:27 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.17 2005/07/18 12:25:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/15 23:09:27 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -76,29 +76,37 @@
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
 #if LFS
-__SUN_EXTERN_INLINE cred_t *ddi_get_cred(void)
+__SUN_EXTERN_INLINE cred_t *
+ddi_get_cred(void)
 {
 	return (current_creds);
 }
 #endif
-__SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void)
+__SUN_EXTERN_INLINE clock_t
+ddi_get_lbolt(void)
 {
 	return (jiffies);
 }
-__SUN_EXTERN_INLINE pid_t ddi_get_pid(void)
+__SUN_EXTERN_INLINE pid_t
+ddi_get_pid(void)
 {
 	return (current->pid);
 }
-__SUN_EXTERN_INLINE time_t ddi_get_time(void)
+
+__SUN_EXTERN_INLINE time_t
+ddi_get_time(void)
 {
 	struct timeval tv;
+
 	do_gettimeofday(&tv);
 	return (tv.tv_sec);
 }
-__SUN_EXTERN_INLINE unsigned short ddi_getiminor(dev_t dev)
+__SUN_EXTERN_INLINE unsigned short
+ddi_getiminor(dev_t dev)
 {
 #if HAVE_KFUNC_TO_KDEV_T
 	kdev_t kdev;
+
 	kdev = to_kdev_t(dev);
 	return MINOR(kdev);
 #else
@@ -119,10 +127,12 @@ typedef struct ddi_umem_cookie {
 	void *umem;
 } ddi_umem_cookie_t;
 
-__SUN_EXTERN_INLINE void *ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
+__SUN_EXTERN_INLINE void *
+ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
 {
 	void *umem;
 	unsigned int order = 1, gfp_mask;
+
 	if (!cookiep)
 		return (NULL);
 	while ((size >>= 1) != 0)
@@ -135,7 +145,8 @@ __SUN_EXTERN_INLINE void *ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_
 	}
 	return (umem);
 }
-__SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep)
+__SUN_EXTERN_INLINE void *
+ddi_umem_free(ddi_umem_cookie_t * cookiep)
 {
 	if (cookiep)
 		free_pages((unsigned long) cookiep->umem, cookiep->order);
@@ -143,11 +154,12 @@ __SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep)
 }
 
 #if 0
-int ddi_create_minor_node(dev_info_t *dip, char *name, int type, minor_t minor, char *node, int flag);
-void ddi_remove_minor_node(dev_info_t *dip, char *name);
-major_t ddi_driver_major(dev_info_t *dip);
-const char *ddi_driver_name(dev_info_t *dip);
-int ddi_get_instance(dev_info_t *dip);
+int ddi_create_minor_node(dev_info_t * dip, char *name, int type, minor_t minor, char *node,
+			  int flag);
+void ddi_remove_minor_node(dev_info_t * dip, char *name);
+major_t ddi_driver_major(dev_info_t * dip);
+const char *ddi_driver_name(dev_info_t * dip);
+int ddi_get_instance(dev_info_t * dip);
 int ddi_get_soft_state(int yyy);
 int ddi_removing_power(int yyy);
 int ddi_soft_state(int yyy);

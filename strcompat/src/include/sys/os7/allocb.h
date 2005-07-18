@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: allocb.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: allocb.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -67,8 +67,10 @@ __OS7_EXTERN_INLINE void
 ss7_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
+
 	if (q) {
 		str_t *s = STR_PRIV(q);
+
 		if (q == s->iq) {
 			if (s->ibid) {
 				s->ibid = 0;
@@ -118,6 +120,7 @@ ss7_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
 		str_t *s = STR_PRIV(q);
+
 		if (q == s->iq) {
 			if (!s->ibid) {
 				s->ibid = bufcall(size, prior, &ss7_bufsrv, (long) q);
@@ -146,6 +149,7 @@ ss7_esbbcall(queue_t *q, int prior)
 {
 	if (q) {
 		str_t *s = STR_PRIV(q);
+
 		if (q == s->iq) {
 			if (!s->ibid) {
 				s->ibid = esbbcall(prior, &ss7_bufsrv, (long) q);
@@ -173,6 +177,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(size, prior)))
 		return (mp);
 	rare();
@@ -188,6 +193,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
+
 	if ((mp = esballoc(base, size, prior, frtn)))
 		return (mp);
 	rare();
@@ -216,6 +222,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_dupb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
+
 	if (!(mp = dupb(bp)))
 		ss7_bufcall(q, bp->b_wptr - bp->b_rptr, BPRI_MED);
 	return (mp);
@@ -229,6 +236,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_dupmsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
+
 	if (!(mp = dupmsg(bp)))
 		ss7_bufcall(q, msgsize(bp), BPRI_MED);
 	return (mp);
@@ -242,6 +250,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_copyb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
+
 	if (!(mp = copyb(bp)))
 		ss7_bufcall(q, bp->b_wptr - bp->b_rptr, BPRI_MED);
 	return (mp);
@@ -255,6 +264,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_copymsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
+
 	if (!(mp = copymsg(bp)))
 		ss7_bufcall(q, msgsize(bp), BPRI_MED);
 	return (mp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.18 2005/07/15 23:08:45 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.19 2005/07/18 12:25:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/15 23:08:45 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/18 12:25:39 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -153,6 +153,7 @@ typedef struct lis_pci_dev {
 
 extern void *lis__kfree(void *ptr) __depr;
 extern void *lis__kmalloc(int nbytes, int class, int use_cache) __depr;
+
 #if 0
 extern void lis_add_timer(struct timer_list *timer) __depr;
 #endif
@@ -168,29 +169,35 @@ extern void lis_atomic_inc(lis_atomic_t *atomic_addr) __depr;
 extern int lis_atomic_read(lis_atomic_t *atomic_addr) __depr;
 extern void lis_atomic_set(lis_atomic_t *atomic_addr, int valu) __depr;
 extern void lis_atomic_sub(lis_atomic_t *atomic_addr, int amt) __depr;
+
 #if 0
 extern void lis_bprintf(char *fmt, ...) __depr;
 extern int lis_can_unload(void) __depr;
 extern int lis_check_guard(void *ptr, char *msg) __depr;
 extern int lis_check_mem(void) __depr;
 extern int lis_check_region(unsigned int from, unsigned int extent) __depr;
-extern int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth) __depr;
+extern int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr,
+			  int lgth) __depr;
 #endif
 extern void lis_cmn_err(int err_lvl, char *fmt, ...) __depr;
 extern char lis_date[] __depr;
 extern unsigned long lis_debug_mask __depr;
 extern unsigned long lis_debug_mask2 __depr;
+
 #if 0
 extern void lis_dec_mod_cnt_fcn(const char *file, int line) __depr;
 extern int lis_del_timer(struct timer_list *timer) __depr;
 #endif
 extern void lis_disable_irq(unsigned int irq) __depr;
+
 #if 0
 extern void lis_dobufcall(int cpu_id) __depr;
-extern int lis_doclose(struct inode *i, struct file *f, struct stdata *head, cred_t *creds) __depr;
+extern int lis_doclose(struct inode *i, struct file *f, struct stdata *head,
+		       cred_t *creds) __depr;
 #endif
 extern int lis_down_fcn(lis_semaphore_t *lsem, char *file, int line) __depr;
 extern unsigned long lis_dsecs(void) __depr;
+
 #if 0
 extern void lis_enable_intr(struct streamtab *strtab, int major, const char *name) __depr;
 #endif
@@ -206,6 +213,7 @@ extern void *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line) __d
 extern int lis_getint(unsigned char **p) __depr;
 extern void lis_gettimeofday(struct timeval *tv) __depr;
 extern unsigned long lis_hitime(void) __depr;
+
 #if 0
 extern lis_atomic_t lis_in_syscall __depr;
 extern void lis_inc_mod_cnt_fcn(const char *file, int line) __depr;
@@ -219,6 +227,7 @@ extern unsigned long lis_jiffies(void) __depr;
 extern int lis_kernel_down(struct semaphore *sem) __depr;
 extern void lis_kernel_up(struct semaphore *sem) __depr;
 extern char lis_kernel_version[] __depr;
+
 #if 0
 extern void lis_kfree(const void *ptr) __depr;
 extern int lis_kill_pg(int pgrp, int sig, int priv) __depr;
@@ -228,7 +237,8 @@ extern int lis_loadable_load(const char *name) __depr;
 extern const char *lis_maj_min_name(struct stdata *head) __depr;
 #endif
 extern int lis_major __depr;
-extern void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr) __depr;
+extern void *lis_malloc(int nbytes, int class, int use_cache, char *file_name,
+			int line_nr) __depr;
 #if 0
 extern void lis_mark_mem(void *ptr, const char *file_name, int line_nr) __depr;
 extern long lis_max_mem __depr;
@@ -242,6 +252,7 @@ extern const char *lis_msg_type_name(mblk_t *mp) __depr;
 extern int lis_num_cpus __depr;
 extern void lis_osif_cli(void) __depr;
 extern void lis_osif_do_gettimeofday(struct timeval *tp) __depr;
+
 #ifdef HAVE_TIMESPEC_DO_SETTIMEOFDAY
 extern int lis_osif_do_settimeofday(struct timespec *tp) __depr;
 #else
@@ -255,6 +266,7 @@ extern void lis_print_data(mblk_t *mp, int opt, int cont) __depr;
 extern void lis_print_mem(void) __depr;
 extern void lis_print_msg(mblk_t *mp, const char *prefix, int opt) __depr;
 extern void lis_print_queue(queue_t *q) __depr;
+
 #if 0
 extern void lis_print_spl_track(void) __depr;
 #endif
@@ -263,28 +275,35 @@ extern void lis_putbyte(unsigned char **p, unsigned char byte) __depr;
 extern const char *lis_queue_name(queue_t *q) __depr;
 extern void lis_release_region(unsigned int from, unsigned int extent) __depr;
 extern int lis_request_dma(unsigned int dma_nr, const char *device_id) __depr;
+
 #if HAVE_KTYPE_IRQRETURN_T
-extern int lis_request_irq(unsigned int irq, irqreturn_t (*handler) (int, void *, struct pt_regs *),
+extern int lis_request_irq(unsigned int irq,
+			   irqreturn_t(*handler) (int, void *, struct pt_regs *),
 			   unsigned long flags, const char *device, void *dev_id) __depr;
 #else
-extern int lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *),
+extern int lis_request_irq(unsigned int irq,
+			   void (*handler) (int, void *, struct pt_regs *),
 			   unsigned long flags, const char *device, void *dev_id) __depr;
 #endif
-extern void lis_request_region(unsigned int from, unsigned int extent, const char *name) __depr;
+extern void lis_request_region(unsigned int from, unsigned int extent,
+			       const char *name) __depr;
 extern lis_rw_lock_t *lis_rw_lock_alloc_fcn(const char *name, char *file, int line) __depr;
-extern lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char *file,
-					   int line) __depr;
-extern void lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, char *file, int line) __depr;
+extern lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name,
+					   char *file, int line) __depr;
+extern void lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, char *file,
+				 int line) __depr;
 extern void lis_rw_read_lock_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
 extern void lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
-extern void lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line) __depr;
+extern void lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file,
+					 int line) __depr;
 extern void lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
 extern void lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
 extern void lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file,
 					      int line) __depr;
 extern void lis_rw_write_lock_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
 extern void lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
-extern void lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line) __depr;
+extern void lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file,
+					  int line) __depr;
 extern void lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
 extern void lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line) __depr;
 extern void lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file,
@@ -295,16 +314,21 @@ extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem) __depr;
 extern void lis_sem_init(lis_semaphore_t *lsem, int count) __depr;
 extern void lis_sleep_on(wait_queue_head_t *wq) __depr;
 extern int lis_spin_is_locked_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
-extern lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, char *file, int line) __depr;
+extern lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, char *file,
+						int line) __depr;
 extern void lis_spin_lock_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
-extern lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
-extern void lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, char *file, int line) __depr;
+extern lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t *lock, char *file,
+					       int line) __depr;
+extern void lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, char *file,
+				   int line) __depr;
 extern void lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
-extern void lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line) __depr;
+extern void lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flagp, char *file,
+				      int line) __depr;
 extern int lis_spin_trylock_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
 extern void lis_spin_unlock_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
 extern void lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
-extern void lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line) __depr;
+extern void lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flagp, char *file,
+					   int line) __depr;
 extern void lis_spl0_fcn(char *file, int line) __depr;
 extern int lis_splstr_fcn(char *file, int line) __depr;
 extern void lis_splx_fcn(int x, char *file, int line) __depr;
@@ -315,6 +339,7 @@ extern char *lis_stropts_file __depr;
 extern pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name) __depr;
 extern int lis_thread_stop(pid_t pid) __depr;
 extern void lis_udelay(long micro_secs) __depr;
+
 #if 0
 extern int lis_umount2(char *path, int flags) __depr;
 #endif
@@ -338,34 +363,42 @@ extern void *lis_zmalloc(int nbytes, int class, char *file_name, int line_nr) __
 extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 					   dma_addr_t *dma_handle) __depr;
 extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask) __depr;
+
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction) __depr;
 #endif
-extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
-					     size_t len, int direction) __depr;
-extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
-					     size_t len, int direction) __depr;
-extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr) __depr;
-extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr) __depr;
+extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev,
+						     dma64_addr_t dma_addr, size_t len,
+						     int direction) __depr;
+extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev,
+							dma64_addr_t dma_addr, size_t len,
+							int direction) __depr;
+extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
+						    dma64_addr_t dma_addr) __depr;
+extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev,
+						 dma64_addr_t dma_addr) __depr;
 extern dma64_addr_t lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page,
-						 unsigned long offset, int direction) __depr;
+						 unsigned long offset,
+						 int direction) __depr;
 extern int lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask) __depr;
 extern void lis_osif_pci_disable_device(struct pci_dev *dev) __depr;
 extern int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask) __depr;
-extern void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems,
-				     int direction) __depr;
-extern void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
-					 int direction) __depr;
+extern void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+				     int nelems, int direction) __depr;
+extern void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle,
+					 size_t size, int direction) __depr;
 extern int lis_osif_pci_enable_device(struct pci_dev *dev) __depr;
-extern struct pci_dev *lis_osif_pci_find_class(unsigned int class, struct pci_dev *from) __depr;
+extern struct pci_dev *lis_osif_pci_find_class(unsigned int class,
+					       struct pci_dev *from) __depr;
 extern struct pci_dev *lis_osif_pci_find_device(unsigned int vendor, unsigned int device,
 						struct pci_dev *from) __depr;
 extern struct pci_dev *lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn) __depr;
 extern void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size, void *vaddr,
 					 dma_addr_t dma_handle) __depr;
 extern dma_addr_t lis_osif_pci_map_page(struct pci_dev *hwdev, struct page *page,
-					unsigned long offset, size_t size, int direction) __depr;
+					unsigned long offset, size_t size,
+					int direction) __depr;
 extern int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents,
 			       int direction) __depr;
 extern dma_addr_t lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr, size_t size,
@@ -376,38 +409,47 @@ extern int lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 * v
 extern int lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 * val) __depr;
 extern int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask) __depr;
 extern void lis_osif_pci_set_master(struct pci_dev *dev) __depr;
-extern void lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address, size_t size,
-				    int direction) __depr;
+extern void lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address,
+				    size_t size, int direction) __depr;
 extern void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents,
 				  int direction) __depr;
-extern void lis_osif_pci_unmap_single(struct pci_dev *hwdev, dma_addr_t dma_addr, size_t size,
-				      int direction) __depr;
+extern void lis_osif_pci_unmap_single(struct pci_dev *hwdev, dma_addr_t dma_addr,
+				      size_t size, int direction) __depr;
 extern void lis_osif_pci_unregister_driver(struct pci_driver *p) __depr;
 extern int lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val) __depr;
 extern int lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val) __depr;
 extern int lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val) __depr;
 extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg) __depr;
 extern size_t lis_osif_sg_dma_len(struct scatterlist *sg) __depr;
+
 #if 0
 extern void lis_pci_cleanup(void) __depr;
 #endif
 extern void lis_pci_disable_device(lis_pci_dev_t *dev) __depr;
 extern int lis_pci_enable_device(lis_pci_dev_t *dev) __depr;
-extern lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct) __depr;
+extern lis_pci_dev_t *lis_pci_find_class(unsigned class,
+					 lis_pci_dev_t *previous_struct) __depr;
 extern lis_pci_dev_t *lis_pci_find_device(unsigned vendor, unsigned device,
 					  lis_pci_dev_t *previous_struct) __depr;
 extern lis_pci_dev_t *lis_pci_find_slot(unsigned bus, unsigned dev_fcn) __depr;
-extern int lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val) __depr;
-extern int lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val) __depr;
-extern int lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val) __depr;
+extern int lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index,
+				    unsigned char *rtn_val) __depr;
+extern int lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index,
+				     unsigned long *rtn_val) __depr;
+extern int lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index,
+				    unsigned short *rtn_val) __depr;
 extern void lis_pci_set_master(lis_pci_dev_t *dev) __depr;
-extern int lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val) __depr;
-extern int lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val) __depr;
-extern int lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val) __depr;
-extern int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
-				  unsigned char *dev_fn) __depr;
+extern int lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index,
+				     unsigned char val) __depr;
+extern int lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index,
+				      unsigned long val) __depr;
+extern int lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index,
+				     unsigned short val) __depr;
+extern int lis_pcibios_find_class(unsigned int class_code, unsigned short index,
+				  unsigned char *bus, unsigned char *dev_fn) __depr;
 extern int lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id,
-				   unsigned short index, unsigned char *bus, unsigned char *dev_fn) __depr;
+				   unsigned short index, unsigned char *bus,
+				   unsigned char *dev_fn) __depr;
 extern void lis_pcibios_init(void) __depr;
 extern int lis_pcibios_present(void) __depr;
 extern int lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn,

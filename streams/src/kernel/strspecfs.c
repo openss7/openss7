@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -277,11 +277,13 @@ MODULE_ALIAS("/dev/streams/*");
  *  shadow special filesystem has been performed on the mounted filesystem.  We need to establish
  *  our streams arguments and nest into the devices open procedure.
  */
-STATIC int spec_dev_open(struct inode *inode, struct file *file)
+STATIC int
+spec_dev_open(struct inode *inode, struct file *file)
 {
 	int err;
 	struct str_args args;
 	struct cdevsw *cdev;
+
 	err = -ENOENT;
 	/* XXX: can the module unload in our face this way? */
 	if (!(cdev = file->f_dentry->d_parent->d_inode->u.generic_ip))
@@ -303,8 +305,8 @@ STATIC int spec_dev_open(struct inode *inode, struct file *file)
 }
 
 struct file_operations spec_dev_f_ops = {
-      owner:THIS_MODULE,
-      open:&spec_dev_open,
+	owner:THIS_MODULE,
+	open:&spec_dev_open,
 };
 #endif
 
@@ -337,20 +339,24 @@ struct file_operations spec_dev_f_ops = {
  *  appeared (or didn't).
  */
 #if HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
-STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new,
-					struct nameidata *dummy)
+STATIC struct dentry *
+spec_dir_i_lookup(struct inode *dir, struct dentry *new, struct nameidata *dummy)
 #else
-STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
+STATIC struct dentry *
+spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 #endif
 {
 	struct cdevsw *cdev;
+
 	ptrace(("%s: lookup dentry %p, %s in directory %p\n", __FUNCTION__, new, new->d_name.name,
 		dir));
 	if ((cdev = dir->u.generic_ip)) {
 		struct devnode *cmin;
+
 		/* check if the name is registered as a minor device node name */
 		if ((cmin = cmin_find(cdev, new->d_name.name))) {
 			struct inode *inode;
+
 			printd(("%s: name is a device cmin\n", __FUNCTION__));
 			if ((inode = cmin->n_inode)) {
 				igrab(inode);
@@ -365,10 +371,12 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 			/* check if the name is a valid number */
 			char *tail = (char *) new->d_name.name;
 			minor_t minor = simple_strtoul(tail, &tail, 0);
+
 			if (*tail == '\0') {
 				if ((minor & ~MINORMASK) == 0) {
 					struct inode *inode;
 					dev_t dev = makedevice(cdev->d_modid, minor);
+
 					printd(("%s: name is a valid number\n", __FUNCTION__));
 #if HAVE_KFUNC_IGET_LOCKED
 					if ((inode = iget_locked(dir->i_sb, dev)))
@@ -402,7 +410,7 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
     number.  That would be quite simple. */
 
 STATIC struct inode_operations spec_dir_i_ops = {
-      lookup:spec_dir_i_lookup,
+	lookup:spec_dir_i_lookup,
 };
 
 /* 
@@ -421,14 +429,17 @@ STATIC struct inode_operations spec_dir_i_ops = {
  *  active (open) devices.  spec_dir_readdir() walks the allocated device node list and then the
  *  active stream head list associated with the driver.
  */
-STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
+STATIC int
+spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 {
 	struct dentry *dentry = file->f_dentry;
 	int nr = file->f_pos;
+
 	ptrace(("%s: listing device directory, dentry %p, inode %p\n", __FUNCTION__,
 		dentry, dentry->d_inode));
 	switch (nr) {
 		struct cdevsw *cdev;
+
 	case 0:
 		if (filldir(dirent, ".", 1, nr, dentry->d_inode->i_ino, DT_DIR) < 0)
 			break;
@@ -446,6 +457,7 @@ STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		if ((cdev = dentry->d_inode->u.generic_ip) && cdev->d_minors.next) {
 			struct list_head *pos;
 			int i = nr - 2, err = 0;
+
 			/* skip to position */
 			for (pos = cdev->d_minors.next; pos != &cdev->d_minors && i;
 			     pos = pos->next, i--) ;
@@ -453,6 +465,7 @@ STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 			for (; err >= 0 && pos != &cdev->d_minors;
 			     pos = pos->next, nr++, file->f_pos++) {
 				struct devnode *cmin = list_entry(pos, struct devnode, n_list);
+
 				if (cmin->n_inode) {
 					read_unlock(&cdevsw_lock);
 					err = filldir(dirent, cmin->n_name,
@@ -471,6 +484,7 @@ STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		list_for_each_safe(pos, tmp, &cdev->d_stlist) {
 			struct stdata *sd = list_entry(pos, struct stdata, sd_list);
 			struct file *file;
+
 			if (!(file = sd->sd_file) || !(dentry = file->f_dentry)
 			    || !(inode = dentry->d_inode))
 				continue;
@@ -490,9 +504,9 @@ STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 #endif
 
 STATIC struct file_operations spec_dir_f_ops = {
-      owner:THIS_MODULE,
-      read:generic_read_dir,
-      readdir:spec_dir_readdir,
+	owner:THIS_MODULE,
+	read:generic_read_dir,
+	readdir:spec_dir_readdir,
 };
 
 /*
@@ -500,9 +514,11 @@ STATIC struct file_operations spec_dir_f_ops = {
  *  -------------------------------------------------------------------------
  */
 #if 0
-STATIC int spec_dir_d_revalidate(struct dentry *dentry, int flags)
+STATIC int
+spec_dir_d_revalidate(struct dentry *dentry, int flags)
 {
 	struct inode *inode;
+
 	ptrace(("%s: revalidating dentry %p (%s), inode %p (%ld)\n", __FUNCTION__, dentry,
 		dentry->d_name.name, dentry->d_inode,
 		dentry->d_inode ? dentry->d_inode->i_ino : 0));
@@ -513,6 +529,7 @@ STATIC int spec_dir_d_revalidate(struct dentry *dentry, int flags)
 	switch (inode->i_mode & S_IFMT) {
 		struct cdevsw *cdev;
 		struct devnode *cmin;
+
 	case S_IFDIR:
 		/* If the inode is a directory, then the inode corresponds to a module directory
 		   inode.  In this case, the driver may have unloaded while the dentry was still
@@ -546,7 +563,8 @@ STATIC int spec_dir_d_revalidate(struct dentry *dentry, int flags)
 #endif
 
 #if 0
-STATIC int spec_dir_d_hash(struct dentry *dentry, struct qstr *dname)
+STATIC int
+spec_dir_d_hash(struct dentry *dentry, struct qstr *dname)
 {
 	ptrace(("%s: hashing dentry %p (%s)\n", __FUNCTION__, dentry, dname->name));
 	if (dname->len)
@@ -554,7 +572,8 @@ STATIC int spec_dir_d_hash(struct dentry *dentry, struct qstr *dname)
 	return (0);		/* success */
 }
 
-STATIC int spec_dir_d_compare(struct dentry *parent, struct qstr *child, struct qstr *name)
+STATIC int
+spec_dir_d_compare(struct dentry *parent, struct qstr *child, struct qstr *name)
 {
 	ptrace(("%s: comparing dentry %p (%s), %s to %s\n", __FUNCTION__, parent,
 		parent->d_name.name, name->name, child->name));
@@ -570,7 +589,8 @@ STATIC int spec_dir_d_compare(struct dentry *parent, struct qstr *child, struct 
 	return (0);		/* success */
 }
 
-STATIC int spec_dir_d_delete(struct dentry *dentry)
+STATIC int
+spec_dir_d_delete(struct dentry *dentry)
 {
 	ptrace(("%s: deleting dentry %p (%s), inode %p (%ld)\n", __FUNCTION__, dentry,
 		dentry->d_name.name, dentry->d_inode,
@@ -580,14 +600,16 @@ STATIC int spec_dir_d_delete(struct dentry *dentry)
 }
 
 #if 0
-STATIC void spec_dir_d_iput(struct dentry *dentry, struct inode *inode)
+STATIC void
+spec_dir_d_iput(struct dentry *dentry, struct inode *inode)
 {
 	ptrace(("%s: putting inode %p (%ld), for dentry %p (%s)\n", __FUNCTION__, inode,
 		inode->i_ino, dentry, dentry->d_name.name));
 	iput(inode);		/* this is what the system does otherwise */
 }
 
-STATIC void spec_dir_d_release(struct dentry *dentry)
+STATIC void
+spec_dir_d_release(struct dentry *dentry)
 {
 	ptrace(("%s: releasing dentry %p, inode %p\n", __FUNCTION__, dentry, dentry->d_inode));
 	return;
@@ -596,14 +618,14 @@ STATIC void spec_dir_d_release(struct dentry *dentry)
 
 STATIC struct dentry_operations spec_dir_d_ops ____cacheline_aligned = {
 #if 0
-      d_revalidate:spec_dir_d_revalidate,
+	d_revalidate:spec_dir_d_revalidate,
 #endif
-      d_hash:spec_dir_d_hash,
-      d_compare:spec_dir_d_compare,
-      d_delete:spec_dir_d_delete,
+	d_hash:spec_dir_d_hash,
+	d_compare:spec_dir_d_compare,
+	d_delete:spec_dir_d_delete,
 #if 0
-      d_release:spec_dir_d_release,
-      d_iput:spec_dir_d_iput,
+	d_release:spec_dir_d_release,
+	d_iput:spec_dir_d_iput,
 #endif
 };
 #endif
@@ -641,18 +663,21 @@ STATIC struct dentry_operations spec_dir_d_ops ____cacheline_aligned = {
  *  we request a module of the name streams-%s, where %s is the name requested.
  */
 #if HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
-STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new,
-					 struct nameidata *dummy)
+STATIC struct dentry *
+spec_root_i_lookup(struct inode *dir, struct dentry *new, struct nameidata *dummy)
 #else
-STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
+STATIC struct dentry *
+spec_root_i_lookup(struct inode *dir, struct dentry *new)
 #endif
 {
 	struct cdevsw *cdev;
+
 	ptrace(("%s: lookup dentry %p, %s in root dir inode %p\n", __FUNCTION__, new,
 		new->d_name.name, dir));
 	/* this will also attempt to demand load the "streams-%s" module if required */
 	if ((cdev = cdev_find(new->d_name.name))) {
 		struct inode *inode;
+
 		printd(("%s: %s: found device\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: name is a device or module\n", __FUNCTION__));
 		if ((inode = cdev->d_inode)) {
@@ -671,7 +696,7 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 }
 
 STATIC struct inode_operations spec_root_i_ops = {
-      lookup:spec_root_i_lookup,
+	lookup:spec_root_i_lookup,
 };
 
 /* 
@@ -690,10 +715,12 @@ STATIC struct inode_operations spec_root_i_ops = {
  *  cdevsw hash.  It walks the cdevsw_list and fills a dirent structure for each item on the list.
  *  Each cdevsw entry that has an associated directory inode is listed.
  */
-STATIC int spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
+STATIC int
+spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 {
 	struct dentry *dentry = file->f_dentry;
 	int nr = file->f_pos;
+
 	ptrace(("%s: listing root directory, dentry %p, inode %p\n", __FUNCTION__, dentry,
 		dentry->d_inode));
 	switch (nr) {
@@ -714,6 +741,7 @@ STATIC int spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 		if (cdevsw_list.next) {
 			struct list_head *pos;
 			int i = nr - 2, err = 0;
+
 			/* skip to position */
 			for (pos = cdevsw_list.next; pos != &cdevsw_list && i;
 			     pos = pos->next, i--) ;
@@ -721,6 +749,7 @@ STATIC int spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 			for (; err >= 0 && pos != &cdevsw_list;
 			     pos = pos->next, nr++, file->f_pos++) {
 				struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_list);
+
 				if (cdev->d_inode) {
 					read_unlock(&cdevsw_lock);
 					err = filldir(dirent, cdev->d_name,
@@ -739,12 +768,12 @@ STATIC int spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 #endif
 
 STATIC struct file_operations spec_root_f_ops = {
-      owner:THIS_MODULE,
-      read:generic_read_dir,
+	owner:THIS_MODULE,
+	read:generic_read_dir,
 #if 1
-      readdir:spec_root_readdir,
+	readdir:spec_root_readdir,
 #else
-      readdir:dcache_readdir,
+	readdir:dcache_readdir,
 #endif
 };
 
@@ -760,9 +789,11 @@ STATIC struct file_operations spec_root_f_ops = {
  *
  *  Revalidate the directory entry.  Always occurs on a hashed lookup if we have this method.
  */
-STATIC int spec_root_d_revalidate(struct dentry *dentry, int flags)
+STATIC int
+spec_root_d_revalidate(struct dentry *dentry, int flags)
 {
 	struct inode *inode;
+
 	ptrace(("%s: revalidating dentry %p (%s), inode %p (%ld)\n", __FUNCTION__, dentry,
 		dentry->d_name.name, dentry->d_inode,
 		dentry->d_inode ? dentry->d_inode->i_ino : 0));
@@ -773,6 +804,7 @@ STATIC int spec_root_d_revalidate(struct dentry *dentry, int flags)
 	switch (inode->i_mode & S_IFMT) {
 		struct cdevsw *cdev;
 		struct devnode *cmin;
+
 	case S_IFDIR:
 		/* If the inode is a directory, then the inode corresponds to a module directory
 		   inode.  In this case, the driver may have unloaded while the dentry was still
@@ -820,7 +852,8 @@ STATIC int spec_root_d_revalidate(struct dentry *dentry, int flags)
  *  need to look through the instantiated minor device list to find the name and map back to the
  *  device number. We can return an error number (-ENOENT) here if we don't like the name.
  */
-STATIC int spec_root_d_hash(struct dentry *dentry, struct qstr *dname)
+STATIC int
+spec_root_d_hash(struct dentry *dentry, struct qstr *dname)
 {
 	ptrace(("%s: hashing dentry %p (%s)\n", __FUNCTION__, dentry, dname->name));
 	/* Note that this is also called directly from lookup_hash() with a zero length name and
@@ -842,7 +875,8 @@ STATIC int spec_root_d_hash(struct dentry *dentry, struct qstr *dname)
  *  as the hash values match. The hash is formulated from the inode device number and is the inode
  *  number anyway.  Therefore the hash itself uniquely identifies the inode
  */
-STATIC int spec_root_d_compare(struct dentry *parent, struct qstr *child, struct qstr *name)
+STATIC int
+spec_root_d_compare(struct dentry *parent, struct qstr *child, struct qstr *name)
 {
 	ptrace(("%s: comparing dentry %p (%s), %s to %s\n", __FUNCTION__, parent,
 		parent->d_name.name, name->name, child->name));
@@ -868,7 +902,8 @@ STATIC int spec_root_d_compare(struct dentry *parent, struct qstr *child, struct
  *  deallocate it altogether, so we return (1) here. That's what sockfs, pipefs and other hidden
  *  filesystems do.
  */
-STATIC int spec_root_d_delete(struct dentry *dentry)
+STATIC int
+spec_root_d_delete(struct dentry *dentry)
 {
 	ptrace(("%s: deleting dentry %p (%s), inode %p (%ld)\n", __FUNCTION__, dentry,
 		dentry->d_name.name, dentry->d_inode,
@@ -888,7 +923,8 @@ STATIC int spec_root_d_delete(struct dentry *dentry)
  *  get another kick at the can with the superblock put_inode() and delete_inode() operations that
  *  are called by iput(), see spec_delete_inode().
  */
-STATIC void spec_root_d_iput(struct dentry *dentry, struct inode *inode)
+STATIC void
+spec_root_d_iput(struct dentry *dentry, struct inode *inode)
 {
 	ptrace(("%s: putting inode %p (%ld), for dentry %p (%s)\n", __FUNCTION__, inode,
 		inode->i_ino, dentry, dentry->d_name.name));
@@ -904,7 +940,8 @@ STATIC void spec_root_d_iput(struct dentry *dentry, struct inode *inode)
  *  actually point directory entries at stream head data structures, so we need to dereference that
  *  now.
  */
-STATIC void spec_root_d_release(struct dentry *dentry)
+STATIC void
+spec_root_d_release(struct dentry *dentry)
 {
 	ptrace(("%s: releasing dentry %p, inode %p\n", __FUNCTION__, dentry, dentry->d_inode));
 	return;
@@ -914,16 +951,16 @@ STATIC void spec_root_d_release(struct dentry *dentry)
 #if 0
 STATIC struct dentry_operations spec_root_d_ops ____cacheline_aligned = {
 #if 0
-      d_revalidate:spec_root_d_revalidate,
+	d_revalidate:spec_root_d_revalidate,
 #endif
 #if 0
-      d_hash:spec_root_d_hash,
-      d_compare:spec_root_d_compare,
-      d_delete:spec_root_d_delete,
+	d_hash:spec_root_d_hash,
+	d_compare:spec_root_d_compare,
+	d_delete:spec_root_d_delete,
 #endif
 #if 0
-      d_release:spec_root_d_release,
-      d_iput:spec_root_d_iput,
+	d_release:spec_root_d_release,
+	d_iput:spec_root_d_iput,
 #endif
 };
 #endif
@@ -939,9 +976,11 @@ STATIC struct dentry_operations spec_root_d_ops ____cacheline_aligned = {
  *  Shadow Special Filesystem super block.
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE struct spec_sb_info *spec_sbi_alloc(void)
+STATIC INLINE struct spec_sb_info *
+spec_sbi_alloc(void)
 {
 	struct spec_sb_info *sbi;
+
 	if ((sbi = kmalloc(sizeof(*sbi), GFP_ATOMIC))) {
 		memset(sbi, 0, sizeof(*sbi));
 		sbi->sbi_magic = SPEC_SBI_MAGIC;
@@ -950,7 +989,8 @@ STATIC INLINE struct spec_sb_info *spec_sbi_alloc(void)
 	return (sbi);
 }
 
-STATIC INLINE void spec_sbi_free(struct spec_sb_info *sbi)
+STATIC INLINE void
+spec_sbi_free(struct spec_sb_info *sbi)
 {
 	if (sbi) {
 		printd(("%s: freeing options %p\n", __FUNCTION__, sbi));
@@ -968,7 +1008,8 @@ STATIC INLINE void spec_sbi_free(struct spec_sb_info *sbi)
  *  special filesystem superblock information structure.  If option processing fails, reasonable
  *  values will be assigned to all super block options.
  */
-STATIC INLINE int spec_parse_options(char *options, struct spec_sb_info *sbi)
+STATIC INLINE int
+spec_parse_options(char *options, struct spec_sb_info *sbi)
 {
 	int err = 0;
 	int setuid = 0;
@@ -978,6 +1019,7 @@ STATIC INLINE int spec_parse_options(char *options, struct spec_sb_info *sbi)
 	uid_t gid = 0;
 	umode_t mode = 0777;
 	char *this_char, *value, *token = options;
+
 	ptrace(("%s: paring options %p\n", __FUNCTION__, sbi));
 	if (!sbi || sbi->sbi_magic != SPEC_SBI_MAGIC)
 		goto einval;
@@ -1040,9 +1082,11 @@ STATIC INLINE int spec_parse_options(char *options, struct spec_sb_info *sbi)
  *  all the operations with our own.  Finally we hash the inode.  The inode is returned to iget() in
  *  the inode lookup() method on the specfs root directory or module directory.
  */
-STATIC void spec_read_inode(struct inode *inode)
+STATIC void
+spec_read_inode(struct inode *inode)
 {
 	struct cdevsw *cdev = inode->u.generic_ip;
+
 	ptrace(("%s: reading inode %p (%ld)\n", __FUNCTION__, inode, inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
@@ -1068,10 +1112,12 @@ STATIC void spec_read_inode(struct inode *inode)
 	}
 	if (getmajor(inode->i_ino)) {
 		dev_t dev = MKDEV(cdev->d_major, getminor(inode->i_ino) & MINORMASK);
+
 		/* for device nodes, the major component of the i_ino is the module id */
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
 		inode->i_mode &= ~S_IXUGO;
-		printd(("%s: reading device node %p (%ld) %o\n", __FUNCTION__, inode, inode->i_ino, (inode->i_mode & ~S_IFMT)));
+		printd(("%s: reading device node %p (%ld) %o\n", __FUNCTION__, inode, inode->i_ino,
+			(inode->i_mode & ~S_IFMT)));
 		inode->i_op = NULL;
 		inode->i_fop = cdev->d_fop;
 #if HAVE_KFUNC_TO_KDEV_T
@@ -1085,7 +1131,8 @@ STATIC void spec_read_inode(struct inode *inode)
 		/* for module nodes, the minor component of the i_ino is the module id */
 		inode->i_mode |= S_IFDIR;
 		inode->i_mode |= ((inode->i_mode & S_IRUGO) >> 2);
-		printd(("%s: reading driver node %p (%ld) %o\n", __FUNCTION__, inode, inode->i_ino, (inode->i_mode & ~S_IFMT)));
+		printd(("%s: reading driver node %p (%ld) %o\n", __FUNCTION__, inode, inode->i_ino,
+			(inode->i_mode & ~S_IFMT)));
 		inode->i_op = &spec_dir_i_ops;
 		inode->i_fop = &spec_dir_f_ops;
 	}
@@ -1117,7 +1164,8 @@ STATIC void spec_read_inode(struct inode *inode)
  *  all the operations with our own.  Finally we hash the inode.  The inode is returned to iget() in
  *  the inode lookup() method on the specfs root directory or module directory.
  */
-STATIC void spec_read_inode2(struct inode *inode, void *opaque)
+STATIC void
+spec_read_inode2(struct inode *inode, void *opaque)
 {
 	inode->u.generic_ip = opaque;
 	return spec_read_inode(inode);
@@ -1134,11 +1182,11 @@ STATIC void spec_read_inode2(struct inode *inode, void *opaque)
  *  below will be called as well).  A force delete here will just set i_nlink to zero if the
  *  i_count is at 1.
  */
-STATIC void spec_put_inode(struct inode *inode)
+STATIC void
+spec_put_inode(struct inode *inode)
 {
 	ptrace(("%s: putting inode %p (%ld), i_count %d, i_nlink %d\n", __FUNCTION__,
-		inode, inode->i_ino, atomic_read(&inode->i_count),
-		inode->i_nlink));
+		inode, inode->i_ino, atomic_read(&inode->i_count), inode->i_nlink));
 	if (inode->i_nlink != 0) {
 		pswerr(("%s: number of links non-zero: i_nlink = %d, force deleting\n",
 			__FUNCTION__, inode->i_nlink));
@@ -1167,7 +1215,8 @@ STATIC void spec_put_inode(struct inode *inode)
  *  Because the inode numbers are controls and the mode of the inode is controlled by us, we can
  *  know what type of underlying structure may be hanging off of the u.generic_ip pointer.
  */
-STATIC void spec_delete_inode(struct inode *inode)
+STATIC void
+spec_delete_inode(struct inode *inode)
 {
 	ptrace(("%s: deleting inode %p (%ld)\n", __FUNCTION__, inode, inode->i_ino));
 	switch (inode->i_mode & S_IFMT) {
@@ -1233,7 +1282,8 @@ STATIC void spec_delete_inode(struct inode *inode)
  *  When we put a super block away, we must detach the options structure from the superblock and
  *  free it.
  */
-STATIC void spec_put_super(struct super_block *sb)
+STATIC void
+spec_put_super(struct super_block *sb)
 {
 	ptrace(("%s: putting superblock %p\n", __FUNCTION__, sb));
 	/* just free our optional mount information */
@@ -1252,9 +1302,11 @@ STATIC void spec_put_super(struct super_block *sb)
  *  @buf:	buffer for statfs data
  */
 #if HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE
-STATIC int spec_statfs(struct super_block *sb, struct kstatfs *buf)
+STATIC int
+spec_statfs(struct super_block *sb, struct kstatfs *buf)
 #else
-STATIC int spec_statfs(struct super_block *sb, struct statfs *buf)
+STATIC int
+spec_statfs(struct super_block *sb, struct statfs *buf)
 #endif
 {
 	(void) sb;
@@ -1273,7 +1325,8 @@ STATIC int spec_statfs(struct super_block *sb, struct statfs *buf)
  *
  *  Notices: When we are remounted, we must check for new options.
  */
-STATIC int spec_remount_fs(struct super_block *sb, int *flags, char *data)
+STATIC int
+spec_remount_fs(struct super_block *sb, int *flags, char *data)
 {
 #if HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
 	struct spec_sb_info *sbi = sb->s_fs_info;
@@ -1294,7 +1347,8 @@ STATIC int spec_remount_fs(struct super_block *sb, int *flags, char *data)
  *  mistakes those pointers as block or character device pointers.  We use i_pipe, but let's clear
  *  it here too.
  */
-STATIC void spec_clear_inode(struct inode *inode)
+STATIC void
+spec_clear_inode(struct inode *inode)
 {
 	ptrace(("%s: cleaning inode %p (%ld)\n", __FUNCTION__, inode, inode->i_ino));
 	if (inode->i_pipe) {
@@ -1306,7 +1360,8 @@ STATIC void spec_clear_inode(struct inode *inode)
 	}
 }
 
-STATIC void spec_umount_begin(struct super_block *sb)
+STATIC void
+spec_umount_begin(struct super_block *sb)
 {
 	ptrace(("%s: unmounting with force, superblock %p\n", __FUNCTION__, sb));
 	(void) sb;
@@ -1326,7 +1381,7 @@ STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 //      .write_super = NULL,
 //      .write_super_lockfs = NULL,
 //      .unlockfs = NULL,
-	.statfs = spec_statfs,	/* like simple_statfs */
+	.statfs = spec_statfs,		/* like simple_statfs */
 	.remount_fs = spec_remount_fs,
 	.clear_inode = spec_clear_inode,
 	.umount_begin = spec_umount_begin,
@@ -1341,11 +1396,13 @@ STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
  *
  *  Create the super block inode.
  */
-STATIC int specfs_fill_super(struct super_block *sb, void *data, int silent)
+STATIC int
+specfs_fill_super(struct super_block *sb, void *data, int silent)
 {
 	struct inode *inode;
 	struct spec_sb_info *sbi;
 	int err;
+
 	ptrace(("%s: filling superblock\n", __FUNCTION__));
 	sb->s_blocksize = 1024;
 	sb->s_blocksize_bits = 10;
@@ -1390,12 +1447,13 @@ STATIC int specfs_fill_super(struct super_block *sb, void *data, int silent)
 }
 
 #if HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
-STATIC struct super_block *specfs_get_sb(struct file_system_type *fs_type, int flags,
-					 const char *dev_name, void *data)
+STATIC struct super_block *
+specfs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
 {
 	return get_sb_single(fs_type, flags, data, specfs_fill_super);
 }
-STATIC void specfs_kill_sb(struct super_block *sb)
+STATIC void
+specfs_kill_sb(struct super_block *sb)
 {
 	return kill_anon_super(sb);
 }
@@ -1415,7 +1473,8 @@ struct file_system_type spec_fs_type = {
  *
  *  Create the super block inode.
  */
-STATIC struct super_block *specfs_read_super(struct super_block *sb, void *data, int silent)
+STATIC struct super_block *
+specfs_read_super(struct super_block *sb, void *data, int silent)
 {
 	ptrace(("%s: reading superblock\n", __FUNCTION__));
 	return (specfs_fill_super(sb, data, silent) ? NULL : sb);
@@ -1429,7 +1488,8 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE | FS_
 STATIC struct vfsmount *specfs_mnt = NULL;
 STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
 
-struct vfsmount *specfs_get(void)
+struct vfsmount *
+specfs_get(void)
 {
 	spin_lock(&specfs_lock);
 	if (!specfs_mnt) {
@@ -1440,9 +1500,11 @@ struct vfsmount *specfs_get(void)
 	}
 	spin_unlock(&specfs_lock);
 	if (specfs_mnt)
-		ptrace(("%s: mount count is now %d\n", __FUNCTION__, atomic_read(&specfs_mnt->mnt_count)));
+		ptrace(("%s: mount count is now %d\n", __FUNCTION__,
+			atomic_read(&specfs_mnt->mnt_count)));
 	return (mntget(specfs_mnt));
 }
+
 EXPORT_SYMBOL(specfs_get);
 
 #if ! HAVE_KFUNC_KERN_UMOUNT
@@ -1450,10 +1512,12 @@ EXPORT_SYMBOL(specfs_get);
 #define kern_umount mntput
 #endif
 
-void specfs_put(void)
+void
+specfs_put(void)
 {
 	if (specfs_mnt) {
-		ptrace(("%s: mount count is now %d\n", __FUNCTION__, atomic_read(&specfs_mnt->mnt_count)));
+		ptrace(("%s: mount count is now %d\n", __FUNCTION__,
+			atomic_read(&specfs_mnt->mnt_count)));
 		mntput(specfs_mnt);
 		spin_lock(&specfs_lock);
 		if (atomic_read(&specfs_mnt->mnt_count) == 1) {
@@ -1463,6 +1527,7 @@ void specfs_put(void)
 		spin_unlock(&specfs_lock);
 	}
 }
+
 EXPORT_SYMBOL(specfs_put);
 
 /**
@@ -1471,9 +1536,11 @@ EXPORT_SYMBOL(specfs_put);
 #ifdef CONFIG_STREAMS_MODULE
 static
 #endif
-int __init specfs_init(void)
+int __init
+specfs_init(void)
 {
 	int result;
+
 #ifdef CONFIG_STREAMS_MODULE
 	printk(KERN_INFO SPECFS_BANNER);	/* log message */
 #else
@@ -1497,7 +1564,8 @@ int __init specfs_init(void)
 #ifdef CONFIG_STREAMS_MODULE
 static
 #endif
-void __exit specfs_exit(void)
+void __exit
+specfs_exit(void)
 {
 	strlookup_exit();
 	ptrace(("%s: unregistering filesystem\n", __FUNCTION__));

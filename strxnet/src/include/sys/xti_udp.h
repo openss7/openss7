@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_udp.h,v 0.9.2.2 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: xti_udp.h,v 0.9.2.3 2005/07/18 12:45:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_UDP_H
 #define _SYS_XTI_UDP_H
 
-#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /* 
  * UDP level
@@ -66,4 +66,3 @@
 #define T_UDP_CHECKSUM		1	/* checksum computation (???) */
 
 #endif				/* _SYS_XTI_UDP_H */
-

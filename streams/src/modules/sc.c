@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -110,6 +110,7 @@ MODULE_ALIAS("streams-sc");
 #endif
 
 modID_t modid = CONFIG_STREAMS_SC_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -151,12 +152,14 @@ struct sc {
  *  
  *  -------------------------------------------------------------------------
  */
-static int sc_wput(queue_t *q, mblk_t *mp)
+static int
+sc_wput(queue_t *q, mblk_t *mp)
 {
 	struct sc *sc = q->q_ptr;
 	union ioctypes *ioc;
 	int err = 0, rval = 0;
 	mblk_t *dp = mp->b_cont;
+
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		/* canonical flushing */
@@ -169,6 +172,7 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
+
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(rq, mp->b_rptr[1], FLUSHALL);
 			else
@@ -186,6 +190,7 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 				goto nak;
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				void *addr = *(void **) dp->b_rptr;
+
 				if (addr == NULL) {
 					rval = /* how name drivers and modules? */ 0;
 					goto ack;
@@ -214,6 +219,7 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 				struct sc_list *list;
 				struct sc_mlist *mlist;
 				struct list_head *pos;
+
 				switch (sc->iocstate) {
 				case 1:
 				      sc_list_state_1:
@@ -309,7 +315,8 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
-static int sc_rput(queue_t *q, mblk_t *mp)
+static int
+sc_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
 	return (0);
@@ -322,12 +329,14 @@ static int sc_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	if (q->q_ptr)
 		return (0);	/* already open */
 	if (sflag == MODOPEN && WR(q)->q_next != NULL) {
 		struct sc *sc;
+
 		if (crp->cr_uid != 0 && crp->cr_ruid != 0)
 			return (-EACCES);
 		if (!(sc = kmem_alloc(sizeof(*sc), KM_NOSLEEP)))
@@ -339,9 +348,11 @@ static int sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (-EIO);		/* can't be opened as driver */
 }
-static int sc_close(queue_t *q, int oflag, cred_t *crp)
+static int
+sc_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct sc *sc = q->q_ptr;
+
 	(void) oflag;
 	(void) crp;
 	if (!sc)
@@ -388,9 +399,11 @@ static struct fmodsw sc_fmod = {
 #ifdef CONFIG_STREAMS_SC_MODULE
 static
 #endif
-int __init sc_init(void)
+int __init
+sc_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_SC_MODULE
 	printk(KERN_INFO SC_BANNER);
 #else
@@ -407,9 +420,11 @@ int __init sc_init(void)
 #ifdef CONFIG_STREAMS_SC_MODULE
 static
 #endif
-void __exit sc_exit(void)
+void __exit
+sc_exit(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sc_fmod)))
 		return (void) (err);
 	return (void) (0);

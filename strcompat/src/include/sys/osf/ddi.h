@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.7 2005/07/15 23:09:24 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.8 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_DDI_H__
 #define __SYS_OSF_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/15 23:09:24 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:25:40 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -68,13 +68,17 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
 
-__OSF_EXTERN_INLINE time_t lbolt(void)
+__OSF_EXTERN_INLINE time_t
+lbolt(void)
 {
 	return jiffies;
 }
-__OSF_EXTERN_INLINE time_t time(void)
+
+__OSF_EXTERN_INLINE time_t
+time(void)
 {
 	struct timeval tv;
+
 	do_gettimeofday(&tv);
 	return tv.tv_sec;
 }

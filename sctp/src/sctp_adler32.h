@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_adler32.h,v 0.9.2.2 2005/05/14 08:29:34 brian Exp $
+ @(#) $Id: sctp_adler32.h,v 0.9.2.3 2005/07/18 11:56:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_ADLER32_H__
 #define __SCTP_ADLER32_H__
 
-#ident "@(#) $RCSfile: sctp_adler32.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_adler32.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #define BASE 65521L		/* largest prime smaller than 65536 */
 #define NMAX 5552		/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <=

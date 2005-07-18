@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:14 $"
 
 /*                               -*- Mode: C -*- 
  * loop.c --- Streams loopback driver, as of Sun manual 
  * Author          : Graham Wheeler
  * Created On      : Sat Oct  7 05:01:31 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: loop.c,v 1.1.1.2 2003/10/23 21:23:58 brian Exp $
+ * RCS Id          : $Id: loop.c,v 1.1.1.3.4.4 2005/07/13 12:01:14 brian Exp $
  * Purpose         : provide loopback streams driver
  * ----------------______________________________________________
  *
@@ -86,12 +86,12 @@
 /* Module info for the loopback driver
  */
 static struct module_info loop_minfo = {
-	0,			/* id */
-	"loop",			/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	4096L			/* low water mark */
+	0,				/* id */
+	"loop",				/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	4096L				/* low water mark */
 };
 
 /* These are the entry points to the driver: open, close, write side put and
@@ -106,32 +106,32 @@ static int loop_rsrv(queue_t *);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit loop_rinit = {
-	NULL,			/* put */
-	loop_rsrv,		/* service */
-	loop_open,		/* open */
-	loop_close,		/* close */
-	NULL,			/* admin */
-	&loop_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	loop_rsrv,			/* service */
+	loop_open,			/* open */
+	loop_close,			/* close */
+	NULL,				/* admin */
+	&loop_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit loop_winit = {
-	loop_wput,		/* put */
-	loop_wsrv,		/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&loop_minfo,		/* info */
-	NULL			/* stat */
+	loop_wput,			/* put */
+	loop_wsrv,			/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&loop_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the loopback driver.
  */
 struct streamtab sloop_info = {
-	&loop_rinit,		/* read queue */
-	&loop_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&loop_rinit,			/* read queue */
+	&loop_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 /*  -------------------------------------------------------------------  */

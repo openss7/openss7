@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tpi_sctp.h,v 0.9.2.2 2005/05/14 08:29:20 brian Exp $
+ @(#) $Id: tpi_sctp.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:20 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_SCTP_H
 #define _SYS_TPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifndef T_CURRENT_VERSION
 
@@ -70,8 +70,8 @@
 #define T_ODF_EX	T_EXPEDITED
 #endif
 #ifndef XPG4_1
-#define XPG4_1		2	/* This indicates that the transport provider conforms to XTI in XPG4 and
-				   supports the new primitives T_ADDR_REQ and T_ADDR_ACK */
+#define XPG4_1		2	/* This indicates that the transport provider conforms to XTI in
+				   XPG4 and supports the new primitives T_ADDR_REQ and T_ADDR_ACK */
 #endif
 
 /*

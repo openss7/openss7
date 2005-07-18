@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/07/15 23:09:13 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2005/07/18 15:52:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:13 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 15:52:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.5  2005/07/18 15:52:10  brian
+ - implemented mps mpprintf functions
+
+ Revision 0.9.2.4  2005/07/18 12:25:40  brian
+ - standard indentation
+
  Revision 0.9.2.3  2005/07/15 23:09:13  brian
  - checking in for sync
 
@@ -64,7 +70,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -100,13 +106,16 @@ extern caddr_t mi_first_dev_ptr(caddr_t *mi_head);
 extern caddr_t mi_next_ptr(caddr_t ptr);
 extern caddr_t mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr);
 extern caddr_t mi_prev_ptr(caddr_t ptr);
-extern int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp);
+extern int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag,
+			cred_t *credp);
 extern void mi_close_free(caddr_t ptr);
 
-__MPS_EXTERN_INLINE caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
+__MPS_EXTERN_INLINE caddr_t
+mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
 {
 	caddr_t ptr;
 	int err;
+
 	if (!(ptr = mi_open_alloc_sleep(size)))
 		return (NULL);
 	if (!(err = mi_open_link(mi_head, ptr, devp, 0, DRVOPEN, NULL)))
@@ -115,15 +124,19 @@ __MPS_EXTERN_INLINE caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_
 	return (NULL);
 }
 
-__MPS_EXTERN_INLINE void mi_attach(queue_t *q, caddr_t ptr)
+__MPS_EXTERN_INLINE void
+mi_attach(queue_t *q, caddr_t ptr)
 {
 	q->q_ptr = WR(q)->q_ptr = ptr;
 }
 
-__MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+__MPS_EXTERN_INLINE int
+mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, int sflag,
+	     cred_t *credp)
 {
 	caddr_t ptr;
 	int err;
+
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN) {
@@ -145,20 +158,24 @@ __MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, 
 
 extern void mi_close_unlink(caddr_t *mi_head, caddr_t ptr);
 
-__MPS_EXTERN_INLINE void mi_detach(queue_t *q, caddr_t ptr)
+__MPS_EXTERN_INLINE void
+mi_detach(queue_t *q, caddr_t ptr)
 {
 	mi_close_unlink(NULL, ptr);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
-__MPS_EXTERN_INLINE void mi_close_detached(caddr_t *mi_head, caddr_t ptr)
+__MPS_EXTERN_INLINE void
+mi_close_detached(caddr_t *mi_head, caddr_t ptr)
 {
 	mi_close_free(ptr);
 }
 
-__MPS_EXTERN_INLINE int mi_close_comm(caddr_t *mi_head, queue_t *q)
+__MPS_EXTERN_INLINE int
+mi_close_comm(caddr_t *mi_head, queue_t *q)
 {
 	caddr_t ptr = q->q_ptr;
+
 	mi_detach(q, ptr);
 	mi_close_detached(mi_head, ptr);
 	return (0);
@@ -188,9 +205,11 @@ extern void mi_timer_free(mblk_t *mp);
 /*
  *  Buffer call helper function.
  */
-__MPS_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
+__MPS_EXTERN_INLINE void
+mi_bufcall(queue_t *q, int size, int priority)
 {
-	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
+	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
+				long arg);
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
@@ -210,7 +229,8 @@ extern mblk_t *mi_reallocb(mblk_t *mp, size_t size);
 extern void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
 extern void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len);
 extern void mi_copyout(queue_t *q, mblk_t *mp);
-extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error);
+extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len,
+				int free_on_error);
 extern void mi_copy_done(queue_t *q, mblk_t *mp, int err);
 extern int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp);
 extern void mi_copy_set_rval(mblk_t *mp, int rval);
@@ -229,13 +249,10 @@ extern int mi_set_sth_wroff(queue_t *q, size_t size);
  */
 extern queue_t *mi_allocq(struct streamtab *st);
 extern void mi_freeq(queue_t *q);
-extern int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...) __attribute__((format(printf, 4, 5)));
-
-#if 0
-/* not implemented yet */
+extern int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
+    __attribute__ ((format(printf, 4, 5)));
 extern int mi_mpprintf(mblk_t *mp, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 extern int mi_mpprintf_nr(mblk_t *mp, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
-#endif
 
 /*
  *  Message block functions
@@ -246,7 +263,7 @@ extern uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len);
 /*
  *  Some internals showing.
  */
-typedef void (*proc_ptr_t)(queue_t *, mblk_t *);
+typedef void (*proc_ptr_t) (queue_t *, mblk_t *);
 extern void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc);
 
 #elif defined _MPS_SOURCE

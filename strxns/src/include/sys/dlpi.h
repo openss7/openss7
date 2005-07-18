@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.3 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.4 2005/07/18 12:40:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:26:12 $"
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:40:29 $"
 
 #ifdef __LP64__
 typedef int32_t dl_long;
@@ -484,6 +484,7 @@ typedef struct {
 	dl_long dl_protection;
 	dl_long dl_residual_error;
 } dl_qos_cl_sel1_t;
+
 /*
    DLPI interface primitive definitions.
 
@@ -583,6 +584,7 @@ typedef struct {
 	dl_ulong dl_subs_sap_length;	/* length of subs_sap */
 	dl_ulong dl_subs_bind_class;	/* peer or hierarchical */
 } dl_subs_bind_req_t;
+
 #define	dl_subs_sap_len	dl_subs_sap_length	/* SCO compatibility */
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/22 12:07:10 $
+ @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 12:07:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/22 12:07:10 $"
+#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:53:09 $"
 
-static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/22 12:07:10 $";
+static char const ident[] =
+    "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:53:09 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
@@ -86,6 +87,7 @@ static void
 MD5Transform(uint32_t dig[4], uint32_t const dat[16])
 {
 	register uint32_t a, b, c, d;
+
 	a = dig[0];
 	b = dig[1];
 	c = dig[2];
@@ -165,8 +167,10 @@ static void
 byteSwap(uint32_t *buf, unsigned cnt)
 {
 	uint8_t *p = (uint8_t *) buf;
+
 	do {
-		*buf++ = (uint32_t) ((unsigned) p[3] << 8 | p[2]) << 16 | ((unsigned) p[1] << 8 | p[0]);
+		*buf++ =
+		    (uint32_t) ((unsigned) p[3] << 8 | p[2]) << 16 | ((unsigned) p[1] << 8 | p[0]);
 		p += 4;
 	} while (--cnt);
 }
@@ -196,6 +200,7 @@ void
 MD5Update(MD5_CTX * md5, uint8_t const *buf, unsigned len)
 {
 	uint32_t t;
+
 	/* Update byte count */
 	t = md5->lo;
 	if ((md5->lo = t + len) < t)
@@ -232,6 +237,7 @@ MD5Final(uint8_t dig[16], MD5_CTX * md5)
 {
 	int count = md5->lo & 0x3f;	/* Number of bytes in md5->dat */
 	uint8_t *p = (uint8_t *) md5->dat + count;
+
 	/* Set the first char of padding to 0x80.  There is always room. */
 	*p++ = 0x80;
 	/* Bytes of padding needed to make 56 bytes (-8..55) */

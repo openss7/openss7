@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $
+ @(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/16 21:07:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $"
+#ident "@(#) $RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $";
+static char const ident[] =
+    "$RCSfile: sctp_crc32c.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:53:08 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
@@ -153,6 +154,7 @@ uint32_t crc_table[] = {
 	0x79B737BAL, 0x8BDCB4B9L, 0x988C474DL, 0x6AE7C44EL,
 	0xBE2DA0A5L, 0x4C4623A6L, 0x5F16D052L, 0xAD7D5351L
 };
+
 #define DOCRC1(buf,i)	{crc=(crc>>8)^crc_table[(crc^(buf[i]))&0xff];}
 #define DOCRC2(buf,i)	DOCRC1(buf,i); DOCRC1(buf,i+1);
 #define DOCRC4(buf,i)	DOCRC2(buf,i); DOCRC2(buf,i+2);
@@ -163,6 +165,7 @@ uint32_t
 crc32c(register uint32_t crc, void *buf, register int len)
 {
 	register uint8_t *ptr = buf;
+
 	if (ptr) {
 		while (len >= 16) {
 			DOCRC16(ptr);

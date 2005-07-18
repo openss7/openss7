@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:14 $"
 
 /*
  *  pipemod.c - "pipemod" module
@@ -105,39 +105,39 @@ static void flush_module(queue_t *, mblk_t *);
  *  module structure
  */
 static struct module_info pipemod_minfo = {
-	MOD_ID,			/* id */
-	MOD_NAME,		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* highwater mark */
-	512L			/* lowwater mark */
+	MOD_ID,				/* id */
+	MOD_NAME,			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* highwater mark */
+	512L				/* lowwater mark */
 };
 
 static struct qinit pipemod_rinit = {
-	pipemod_put,		/* put */
-	NULL,			/* service */
-	pipemod_open,		/* open */
-	pipemod_close,		/* close */
-	NULL,			/* admin */
-	&pipemod_minfo,		/* info */
-	NULL			/* stat */
+	pipemod_put,			/* put */
+	NULL,				/* service */
+	pipemod_open,			/* open */
+	pipemod_close,			/* close */
+	NULL,				/* admin */
+	&pipemod_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit pipemod_winit = {
-	pipemod_put,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&pipemod_minfo,		/* info */
-	NULL			/* stat */
+	pipemod_put,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&pipemod_minfo,			/* info */
+	NULL				/* stat */
 };
 
 struct streamtab pipemod_info = {
-	&pipemod_rinit,		/* read queue init */
-	&pipemod_winit,		/* write queue init */
-	NULL,			/* lower mux read queue init */
-	NULL			/* lower mux write queue init */
+	&pipemod_rinit,			/* read queue init */
+	&pipemod_winit,			/* write queue init */
+	NULL,				/* lower mux read queue init */
+	NULL				/* lower mux write queue init */
 };
 
 /*

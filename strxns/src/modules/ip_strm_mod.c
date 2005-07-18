@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:53 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:53 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:53 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:53 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:53 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -337,6 +337,7 @@ STATIC int
 ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 {
 	ip_to_streams_minor_t *minor_ptr;
+
 	(void) oflag;
 	(void) credp;
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
@@ -1518,6 +1519,7 @@ ip_strm_init(struct ism_dev *dev)
 
 #ifdef LINUX
 modID_t modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -1538,6 +1540,7 @@ STATIC int
 ip_to_streams_register_module(void)
 {
 	int err;
+
 	if ((err = register_strmod(&ip_to_streams_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
@@ -1554,6 +1557,7 @@ STATIC int
 ip_to_streams_register_module(void)
 {
 	int ret;
+
 	if ((ret = lis_register_strmod(&ip_to_streams_info, MOD_NAME)) != LIS_NULL_MID) {
 		if (modid == 0)
 			modid = ret;
@@ -1574,6 +1578,7 @@ STATIC int __init
 ip_to_streams_init(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = ip_to_streams_register_module())) {
 		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, -err);

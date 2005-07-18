@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.4 2005/07/18 01:00:30 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2005/07/18 12:25:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 01:00:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.5  2005/07/18 12:25:39  brian
+ - standard indentation
+
  Revision 0.9.2.4  2005/07/18 01:00:30  brian
  - added missing STRHIGH, STRLOW, STRMAXPSZ and STRMINPSZ definitions
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -94,7 +97,8 @@
 #endif
 
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
-__LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+__LFS_EXTERN_INLINE int
+appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	return lis_appq(q, emp, nmp);
 }
@@ -104,9 +108,11 @@ __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 extern int bcanget(queue_t *q, int band);
 extern int canget(queue_t *q);
 
-__LFS_EXTERN_INLINE int enableq(queue_t *q)
+__LFS_EXTERN_INLINE int
+enableq(queue_t *q)
 {
 	lis_flags_t flags;
+
 	LIS_RDQISRLOCK(q, &flags);
 	if (q->q_qinfo && q->q_qinfo->qi_srvp && !F_ISSET(q->q_flag, QNOENB)) {
 		LIS_RDQISRUNLOCK(q, &flags);
@@ -123,20 +129,24 @@ typedef int (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
 typedef int (*qi_qclose_t) (queue_t *, int, cred_t *);
 typedef int (*qi_qadmin_t) (void);
 
-__LFS_EXTERN_INLINE qi_qadmin_t getadmin(modID_t modid)
+__LFS_EXTERN_INLINE qi_qadmin_t
+getadmin(modID_t modid)
 {
 	struct streamtab *st;
 	struct qinit *qi;
+
 	if ((st = lis_modstr(modid)))
 		if ((qi = st->st_rdinit))
 			return (qi->qi_qadmin);
 	return (NULL);
 }
-__LFS_EXTERN_INLINE modID_t getmid(const char *name)
+__LFS_EXTERN_INLINE modID_t
+getmid(const char *name)
 {
 	return lis_findmod(name);
 }
-__LFS_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2)
+__LFS_EXTERN_INLINE mblk_t *
+linkmsg(mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1) {
 		linkb(mp1, mp2);
@@ -144,15 +154,18 @@ __LFS_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2)
 	}
 	return (mp2);
 }
-__LFS_EXTERN_INLINE int pcmsg(unsigned char type)
+__LFS_EXTERN_INLINE int
+pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
 
 #undef datamsg
-__LFS_EXTERN_INLINE int datamsg(unsigned char type)
+__LFS_EXTERN_INLINE int
+datamsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
+
 	/* just so happens there is a gap in the QNORM mesages right at M_PCPROTO */
 	return (((1 << mod) &
 		 ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) !=
@@ -161,32 +174,38 @@ __LFS_EXTERN_INLINE int datamsg(unsigned char type)
 
 #define datamsg(_type) datamsg(_type)
 #undef ctlmsg
-__LFS_EXTERN_INLINE int ctlmsg(unsigned char type)
+__LFS_EXTERN_INLINE int
+ctlmsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
+
 	/* just so happens there is a gap in the QNORM mesages right at M_PCPROTO */
 	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
 }
 
 #define ctlmsg(_type) ctlmsg(_type)
 #undef isdatablk
-__LFS_EXTERN_INLINE int isdatablk(dblk_t * db)
+__LFS_EXTERN_INLINE int
+isdatablk(dblk_t * db)
 {
 	return datamsg(db->db_type);
 }
 
 #define isdatablk(_db) isdatablk(_db)
 #undef isdatamsg
-__LFS_EXTERN_INLINE int isdatamsg(mblk_t *mp)
+__LFS_EXTERN_INLINE int
+isdatamsg(mblk_t *mp)
 {
 	return isdatablk(mp->b_datap);
 }
 
 #define isdatamsg(_mp) isdatamsg(_mp)
 #undef putctl
-__LFS_EXTERN_INLINE int putctl(queue_t *q, int type)
+__LFS_EXTERN_INLINE int
+putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		put(q, mp);
@@ -197,9 +216,11 @@ __LFS_EXTERN_INLINE int putctl(queue_t *q, int type)
 
 #define putctl(_q,_type) putctl(_q,_type)
 #undef putctl1
-__LFS_EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
+__LFS_EXTERN_INLINE int
+putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
@@ -211,9 +232,11 @@ __LFS_EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
 
 #define putctl1(_q,_type,_param) putctl1(_q,_type,_param)
 #undef putctl2
-__LFS_EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
+__LFS_EXTERN_INLINE int
+putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
@@ -226,9 +249,11 @@ __LFS_EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
 
 #define putctl2(_q,_type,_param1,_param2) putctl2(_q,_type,_param1,_param2)
 #undef putnextctl
-__LFS_EXTERN_INLINE int putnextctl(queue_t *q, int type)
+__LFS_EXTERN_INLINE int
+putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
@@ -239,9 +264,11 @@ __LFS_EXTERN_INLINE int putnextctl(queue_t *q, int type)
 
 #define putnextctl(_q,_type) putnextctl(_q,_type)
 #undef putnextctl1
-__LFS_EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
+__LFS_EXTERN_INLINE int
+putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
@@ -253,9 +280,11 @@ __LFS_EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
 
 #define putnextctl1(_q,_type,_param) putnextctl1(_q,_type,_param)
 #undef putnextctl2
-__LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2)
+__LFS_EXTERN_INLINE int
+putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 06:18:54 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 06:18:54 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 16:34:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 06:18:54 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 06:18:54 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 06:18:54 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -149,12 +149,12 @@ MODULE_ALIAS("/dev/streams/log/*");
 #endif
 
 static struct module_info log_minfo = {
-      mi_idnum:CONFIG_STREAMS_LOG_MODID,
-      mi_idname:CONFIG_STREAMS_LOG_NAME,
-      mi_minpsz:0,
-      mi_maxpsz:INFPSZ,
-      mi_hiwat:STRHIGH,
-      mi_lowat:STRLOW,
+	mi_idnum:CONFIG_STREAMS_LOG_MODID,
+	mi_idname:CONFIG_STREAMS_LOG_NAME,
+	mi_minpsz:0,
+	mi_maxpsz:INFPSZ,
+	mi_hiwat:STRHIGH,
+	mi_lowat:STRLOW,
 };
 
 queue_t *log_errq = NULL;
@@ -172,10 +172,12 @@ struct log {
 	mblk_t *traceblk;		/* a message block containing trace ids */
 };
 
-#define __WSIZE		(sizeof(short))
-#define WORD_ALIGN(__x) (((__x) + __WSIZE - 1) & ~(__WSIZE - 1))
+#define PROMOTE_SIZE		(sizeof(int))
+#define PROMOTE_ALIGN(__x)	(((__x) + PROMOTE_SIZE - 1) & ~(PROMOTE_SIZE - 1))
+#define PROMOTE_SIZEOF(__x)	((sizeof(__x) < PROMOTE_SIZE) ? PROMOTE_SIZE : sizeof(__x))
 
-static int log_put(queue_t *q, mblk_t *mp)
+static int
+log_put(queue_t *q, mblk_t *mp)
 {
 	struct log *log = q->q_ptr;
 	union ioctypes *ioc;
@@ -272,7 +274,8 @@ static int log_put(queue_t *q, mblk_t *mp)
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
 static struct log *log_list = NULL;
 
-static int log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct log *p, **pp = &log_list;
 	major_t cmajor = getmajor(*devp);
@@ -327,7 +330,8 @@ static int log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int log_close(queue_t *q, int oflag, cred_t *crp)
+static int
+log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;
 
@@ -344,28 +348,28 @@ static int log_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit log_rqinit = {
-      qi_qopen:log_open,
-      qi_qclose:log_close,
-      qi_minfo:&log_minfo,
+	qi_qopen:log_open,
+	qi_qclose:log_close,
+	qi_minfo:&log_minfo,
 };
 
 static struct qinit log_wqinit = {
-      qi_putp:log_put,
-      qi_minfo:&log_minfo,
+	qi_putp:log_put,
+	qi_minfo:&log_minfo,
 };
 
 static struct streamtab log_info = {
-      st_rdinit:&log_rqinit,
-      st_wrinit:&log_wqinit,
+	st_rdinit:&log_rqinit,
+	st_wrinit:&log_wqinit,
 };
 
 static struct cdevsw log_cdev = {
-      d_name:CONFIG_STREAMS_LOG_NAME,
-      d_str:&log_info,
-      d_flag:0,
-      d_fop:NULL,
-      d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-      d_kmod:THIS_MODULE,
+	d_name:CONFIG_STREAMS_LOG_NAME,
+	d_str:&log_info,
+	d_flag:0,
+	d_fop:NULL,
+	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
+	d_kmod:THIS_MODULE,
 };
 
 /*
@@ -374,8 +378,8 @@ static struct cdevsw log_cdev = {
 
 static vstrlog_t oldlog = NULL;
 
-static inline mblk_t *log_alloc_ctl(queue_t *q, short mid, short sid, char level,
-				    unsigned short flags, int seq_no)
+static inline mblk_t *
+log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags, int seq_no)
 {
 	struct log_ctl *cp;
 	mblk_t *mp = NULL;
@@ -410,7 +414,8 @@ static inline mblk_t *log_alloc_ctl(queue_t *q, short mid, short sid, char level
 	return (mp);
 }
 
-static inline int isdigit(char c)
+static inline int
+isdigit(char c)
 {
 	switch (c) {
 	case '0':
@@ -428,20 +433,23 @@ static inline int isdigit(char c)
 	return (0);
 }
 
-static inline mblk_t *log_alloc_data(char *fmt, va_list args)
+static mblk_t *
+log_alloc_data(char *fmt, va_list args)
 {
 	mblk_t *bp;
-	size_t len = strnlen(fmt, 256);
-	size_t plen = WORD_ALIGN(len + 1);
+	size_t len = strlen(fmt);
+	size_t plen = PROMOTE_ALIGN(len + 1);
 
 	fmt[len] = '\0';	/* force null termination */
 	if ((bp = allocb(plen, BPRI_MED))) {
+		va_list args2;
 		size_t nargs = 0, alen = 0;
 		char type;
 		mblk_t *dp;
 
 		bp->b_datap->db_type = M_DATA;
 		bp->b_wptr = bp->b_rptr;
+		va_copy(args2, args);
 		for (; *fmt; ++fmt, bp->b_wptr++) {
 			if ((*bp->b_wptr = *fmt) != '%')
 				continue;
@@ -474,7 +482,9 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 			} else if ((*bp->b_wptr = *fmt) == '*') {
 				++fmt;
 				bp->b_wptr++;
-				alen += sizeof(int);
+				alen += PROMOTE_SIZEOF(int);
+				(void)va_arg(args2, int);
+
 				if (++nargs == NLOGARGS)
 					break;
 			}
@@ -492,7 +502,10 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 				} else if ((*bp->b_wptr = *fmt) == '*') {
 					++fmt;
 					bp->b_wptr++;
-					alen += sizeof(int);
+					alen += PROMOTE_SIZEOF(int);
+
+					(void)va_arg(args2, int);
+
 					if (++nargs == NLOGARGS)
 						break;
 				}
@@ -520,6 +533,7 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 					type = 'L';
 				}
 				break;
+			case 'q':
 			case 'L':
 			case 'Z':
 			case 'z':
@@ -548,46 +562,70 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 				}
 				switch (type) {
 				case 'c':
-					alen += sizeof(short);
+					alen += PROMOTE_SIZEOF(char);
+					(void)va_arg(args2, int);
+
 					break;
 				case 'p':
-					alen += sizeof(void *);
+					alen += PROMOTE_SIZEOF(void *);
+					(void)va_arg(args2, void *);
+
 					break;
 				case 't':
-					alen += sizeof(ptrdiff_t);
+					alen += PROMOTE_SIZEOF(ptrdiff_t);
+					(void)va_arg(args2, ptrdiff_t);
 					break;
 				case 'l':
-					alen += sizeof(long);
+					alen += PROMOTE_SIZEOF(long);
+					(void)va_arg(args2, long);
+
 					break;
+				case 'q':
 				case 'L':
-					alen += sizeof(long long);
+					alen += PROMOTE_SIZEOF(long long);
+					(void)va_arg(args2, long long);
+
 					break;
 				case 'Z':
 				case 'z':
-					alen += sizeof(size_t);
+					alen += PROMOTE_SIZEOF(size_t);
+					(void)va_arg(args2, size_t);
+
 					break;
 				case 'h':
-					alen += sizeof(short);
+					alen += PROMOTE_SIZEOF(short);
+					(void)va_arg(args2, int);
+
 					break;
+				case 'i':
 				default:
-					alen += sizeof(int);
+					alen += PROMOTE_SIZEOF(int);
+					(void)va_arg(args2, int);
+
 					break;
 				}
 				if (++nargs == NLOGARGS)
 					break;
 				continue;
 			case 's':
-				alen += 64;	/* don't allow greater than 64 byte string
-						   arguments */
+			{
+				char *s = va_arg(args, char *);
+				size_t len = strlen(s);
+				size_t plen = PROMOTE_ALIGN(len + 1);
+
+				/* don't allow greater than 1024 byte string arguments */
+				alen += plen;
 				if (++nargs == NLOGARGS)
 					break;
 				continue;
+			}
 			case '%':
 			default:
 				continue;
 			}
 			break;
 		}
+		va_end(args2);
 		/* pass through once more with arguments */
 		if ((dp = allocb(alen, BPRI_MED))) {
 			fmt = bp->b_rptr;
@@ -621,7 +659,8 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 				} else if (*fmt == '*') {
 					++fmt;
 					*(int *) dp->b_wptr = va_arg(args, int);
-					dp->b_wptr += sizeof(int);
+					dp->b_wptr += PROMOTE_SIZEOF(int);
+
 					if (!--nargs)
 						break;
 				}
@@ -636,7 +675,8 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 					} else if (*fmt == '*') {
 						++fmt;
 						*(int *) dp->b_wptr = va_arg(args, int);
-						dp->b_wptr += sizeof(int);
+						dp->b_wptr += PROMOTE_SIZEOF(int);
+
 						if (!--nargs)
 							break;
 					}
@@ -687,36 +727,43 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 					switch (type) {
 					case 'p':
 						*(void **) dp->b_wptr = va_arg(args, void *);
-						dp->b_wptr += sizeof(void *);
+						dp->b_wptr += PROMOTE_SIZEOF(void *);
+
 						break;
 					case 'l':
 						*(long *) dp->b_wptr = va_arg(args, long);
-						dp->b_wptr += sizeof(long);
+						dp->b_wptr += PROMOTE_SIZEOF(long);
+
 						break;
 					case 'L':
 						*(long long *) dp->b_wptr = va_arg(args, long long);
-						dp->b_wptr += sizeof(long long);
+						dp->b_wptr += PROMOTE_SIZEOF(long long);
+
 						break;
 					case 'Z':
 					case 'z':
 						*(size_t *) dp->b_wptr = va_arg(args, size_t);
-						dp->b_wptr += sizeof(size_t);
+						dp->b_wptr += PROMOTE_SIZEOF(size_t);
+
 						break;
 					case 't':
 						*(ptrdiff_t *) dp->b_wptr = va_arg(args, ptrdiff_t);
-						dp->b_wptr += sizeof(ptrdiff_t);
+						dp->b_wptr += PROMOTE_SIZEOF(ptrdiff_t);
 						break;
 					case 'h':
 						*(short *) dp->b_wptr = va_arg(args, int);
-						dp->b_wptr += sizeof(short);
+						dp->b_wptr += PROMOTE_SIZEOF(short);
+
 						break;
 					case 'c':
 						*(short *) dp->b_wptr = va_arg(args, int);
-						dp->b_wptr += sizeof(short);
+						dp->b_wptr += PROMOTE_SIZEOF(short);
+
 						break;
 					default:
 						*(int *) dp->b_wptr = va_arg(args, int);
-						dp->b_wptr += sizeof(int);
+						dp->b_wptr += PROMOTE_SIZEOF(int);
+
 						break;
 					}
 					if (!--nargs)
@@ -724,12 +771,11 @@ static inline mblk_t *log_alloc_data(char *fmt, va_list args)
 					continue;
 				case 's':
 				{
-					char *string = va_arg(args, char *);
-					size_t len = strnlen(string, 64);
-					size_t plen = WORD_ALIGN(len + 1);
+					char *s = va_arg(args, char *);
+					size_t len = strlen(s);
+					size_t plen = PROMOTE_ALIGN(len + 1);
 
-					/* don't allow greater than 64 byte string arguments */
-					strncpy(dp->b_wptr, string, 64);
+					strcpy(dp->b_wptr, s);
 					dp->b_wptr += plen;
 					if (!--nargs)
 						break;
@@ -754,7 +800,7 @@ static int
 log_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, va_list args)
 {
 	/* check if the log is for the error or trace logger */
-	int rval = 0, seq_no;
+	int rval = 0, seq_no = 0;
 	queue_t *logq = NULL;
 	mblk_t *mp;
 
@@ -794,7 +840,8 @@ log_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, v
 #ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 static
 #endif
-int __init log_init(void)
+int __init
+log_init(void)
 {
 	int err;
 
@@ -816,7 +863,8 @@ int __init log_init(void)
 #ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 static
 #endif
-void __exit log_exit(void)
+void __exit
+log_exit(void)
 {
 	/* unhook from vstrlog */
 	vstrlog = oldlog;

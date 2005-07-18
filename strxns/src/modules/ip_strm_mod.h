@@ -17,7 +17,6 @@
  * 
  */
 
-
 #if defined(__KERNEL__)
 
 #include <linux/skbuff.h>
@@ -42,28 +41,27 @@
 #define netif_queue_stopped(dev) ((dev)->tbusy)
 #endif
 
-typedef struct ip_to_streams
-{
+typedef struct ip_to_streams {
 	unsigned long dl_magic;
-	unsigned long dl_sap ;
-	queue_t	*dl_q ;
-	queue_t	*dl_rdq ;
-        queue_t *dl_wrq ;
-        int	 dl_err_prim ;
-	int	 dlstate;
-	int	 dl_m_error;
-	int	 dl_tli_err;
-	int	 dl_unix_err;
-	int	 dl_reason;
-	int	 dl_retry_proto;
-	int	 dl_lower_ptr;
-	int	 dl_bufcall_id;
-	int	 contype;
-	int	 ip_open ;
-	int	 dev_registered ;
-	struct enet_statistics  stats ;
-	char	 myname[16] ;	/* something for mydev.name to point to */
-	struct ism_dev	mydev;	/* a device struct, not a pointer */
+	unsigned long dl_sap;
+	queue_t *dl_q;
+	queue_t *dl_rdq;
+	queue_t *dl_wrq;
+	int dl_err_prim;
+	int dlstate;
+	int dl_m_error;
+	int dl_tli_err;
+	int dl_unix_err;
+	int dl_reason;
+	int dl_retry_proto;
+	int dl_lower_ptr;
+	int dl_bufcall_id;
+	int contype;
+	int ip_open;
+	int dev_registered;
+	struct enet_statistics stats;
+	char myname[16];		/* something for mydev.name to point to */
+	struct ism_dev mydev;		/* a device struct, not a pointer */
 } ip_to_streams_minor_t, *ip_to_streams_minor_p;
 
 #endif
@@ -89,7 +87,7 @@ typedef struct ip_to_streams
  * value that sockios.h would use.
  */
 #ifndef SIOCSIFNAME
-#define SIOCSIFNAME     0x8923		/* ioctl code */
+#define SIOCSIFNAME     0x8923	/* ioctl code */
 #endif
 
 #define IP	0x1

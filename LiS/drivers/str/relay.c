@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $"
 
 /*                               -*- Mode: C -*- 
  * relay.c --- A simple relay pushable module
  * Author          : Dave Grothe
  * Created On      : Dec 30, 1995
  * Last Modified By: Dave Grothe
- * RCS Id          : $Id: relay.c,v 1.1 1996/01/07 20:49:08 dave Exp $
+ * RCS Id          : $Id: relay.c,v 1.1.1.3.4.3 2005/07/13 12:01:14 brian Exp $
  * Purpose         : relay messages just to test pushable modules
  * ----------------______________________________________________
  *
@@ -80,30 +80,30 @@
 /* Module info for the relay module
  */
 static struct module_info relay_minfo = {
-	0,			/* id */
-	"relay",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"relay",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 static struct module_info relay2_minfo = {
-	0,			/* id */
-	"relay2",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"relay2",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 static struct module_info relay3_minfo = {
-	0,			/* id */
-	"relay3",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"relay3",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 /* These are the entry points to the driver: open, close, write side put and
@@ -122,90 +122,90 @@ static int relay_rsrv(queue_t *);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit relay_rinit = {
-	relay_rput,		/* put */
-	NULL,			/* service */
-	relay_open,		/* open */
-	relay_close,		/* close */
-	NULL,			/* admin */
-	&relay_minfo,		/* info */
-	NULL			/* stat */
+	relay_rput,			/* put */
+	NULL,				/* service */
+	relay_open,			/* open */
+	relay_close,			/* close */
+	NULL,				/* admin */
+	&relay_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit relay_winit = {
-	relay_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&relay_minfo,		/* info */
-	NULL			/* stat */
+	relay_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&relay_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the relay modules
  */
 struct streamtab relay_info = {
-	&relay_rinit,		/* read queue */
-	&relay_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&relay_rinit,			/* read queue */
+	&relay_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 static struct qinit relay2_rinit = {
-	relay_rput,		/* put */
-	NULL,			/* service */
-	relay_open,		/* open */
-	relay_close,		/* close */
-	NULL,			/* admin */
-	&relay2_minfo,		/* info */
-	NULL			/* stat */
+	relay_rput,			/* put */
+	NULL,				/* service */
+	relay_open,			/* open */
+	relay_close,			/* close */
+	NULL,				/* admin */
+	&relay2_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit relay2_winit = {
-	relay_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&relay2_minfo,		/* info */
-	NULL			/* stat */
+	relay_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&relay2_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the relay modules
  */
 struct streamtab relay2_info = {
-	&relay2_rinit,		/* read queue */
-	&relay2_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&relay2_rinit,			/* read queue */
+	&relay2_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 static struct qinit relay3_rinit = {
-	relay_rput,		/* put */
-	NULL,			/* service */
-	relay_open,		/* open */
-	relay_close,		/* close */
-	NULL,			/* admin */
-	&relay3_minfo,		/* info */
-	NULL			/* stat */
+	relay_rput,			/* put */
+	NULL,				/* service */
+	relay_open,			/* open */
+	relay_close,			/* close */
+	NULL,				/* admin */
+	&relay3_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit relay3_winit = {
-	relay_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&relay3_minfo,		/* info */
-	NULL			/* stat */
+	relay_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&relay3_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the relay modules
  */
 struct streamtab relay3_info = {
-	&relay3_rinit,		/* read queue */
-	&relay3_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&relay3_rinit,			/* read queue */
+	&relay3_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 /*  -------------------------------------------------------------------  */

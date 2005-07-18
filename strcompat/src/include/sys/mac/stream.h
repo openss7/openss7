@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/15 23:09:07 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/18 12:25:40  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/07/15 23:09:07  brian
  - checking in for sync
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_MAC_STREAM_H__
 #define __SYS_MAC_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mac/stream.h directly, include sys/stream.h instead."
@@ -106,14 +109,15 @@ extern uint8_t *mi_offset_paramc(mblk_t *mp, long offset, long len);
 
 extern int mi_set_sth_hiwat(queue_t *q, size_t size);
 extern int mi_set_sth_lowat(queue_t *q, size_t size);
-extern int mi_set_sth_maxblk(queue_t *q , size_t size);
+extern int mi_set_sth_maxblk(queue_t *q, size_t size);
 extern int mi_set_sth_wroff(queue_t *q, size_t size);
 
 extern caddr_t mi_next_ptr(caddr_t ptr);
 extern caddr_t mi_prev_ptr(caddr_t ptr);
 extern caddr_t mi_open_detached(caddr_t *mi_list, size_t size, dev_t *devp);
 extern void mi_attach(queue_t *q, caddr_t ptr);
-extern int mi_open_comm(caddr_t *mi_list, size_t size, queue_t *q, dev_t *dev, int flag, int sflag, cred_t *credp);
+extern int mi_open_comm(caddr_t *mi_list, size_t size, queue_t *q, dev_t *dev, int flag, int sflag,
+			cred_t *credp);
 extern void mi_detach(queue_t *q, caddr_t ptr);
 extern void mi_close_detached(caddr_t *mi_list, caddr_t strptr);
 extern int mi_close_comm(caddr_t *mi_list, queue_t *q);

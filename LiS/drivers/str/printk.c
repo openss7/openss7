@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $"
 
 /************************************************************************
 *                          Printk Driver                                *
@@ -72,12 +72,12 @@
 #include <sys/osif.h>
 
 static struct module_info printk_minfo = {
-	0,			/* id */
-	"printk",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	50000,			/* high water mark */
-	40000			/* low water mark */
+	0,				/* id */
+	"printk",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	50000,				/* high water mark */
+	40000				/* low water mark */
 };
 
 static int printk_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -87,32 +87,32 @@ static int printk_wput(queue_t *, mblk_t *);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit printk_rinit = {
-	NULL,			/* put */
-	NULL,			/* service */
-	printk_open,		/* open */
-	printk_close,		/* close */
-	NULL,			/* admin */
-	&printk_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	NULL,				/* service */
+	printk_open,			/* open */
+	printk_close,			/* close */
+	NULL,				/* admin */
+	&printk_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit printk_winit = {
-	printk_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&printk_minfo,		/* info */
-	NULL			/* stat */
+	printk_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&printk_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the printk driver.
  */
 struct streamtab printk_info = {
-	&printk_rinit,		/* read queue */
-	&printk_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&printk_rinit,			/* read queue */
+	&printk_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 /*

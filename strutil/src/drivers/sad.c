@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:38:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:38:48 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:38:48 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:38:48 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -99,6 +99,7 @@ MODULE_ALIAS("streams-sad");
 #endif
 
 modID_t modid = CONFIG_STREAMS_SAD_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -112,6 +113,7 @@ MODULE_ALIAS("streams-driver-sad");
 #endif
 
 major_t major = CONFIG_STREAMS_SAD_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -146,12 +148,14 @@ struct sad {
 	int nmods;
 } sads[2];
 
-static int sad_put(queue_t *q, mblk_t *mp)
+static int
+sad_put(queue_t *q, mblk_t *mp)
 {
 	struct sad *sad = q->q_ptr;
 	union ioctypes *ioc;
 	int err = 0, rval = 0;
 	mblk_t *dp = mp->b_cont;
+
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -163,6 +167,7 @@ static int sad_put(queue_t *q, mblk_t *mp)
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
+
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(rq, mp->b_rptr[1], FLUSHALL);
 			else
@@ -232,6 +237,7 @@ static int sad_put(queue_t *q, mblk_t *mp)
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
 				struct strapush *sap;
+
 				switch (sad->iocstate) {
 				case 1:
 				      sad_sap_state1:
@@ -283,6 +289,7 @@ static int sad_put(queue_t *q, mblk_t *mp)
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
 				struct strapush *sap;
+
 				switch (sad->iocstate) {
 				case 1:
 				      sad_gap_state1:
@@ -309,6 +316,7 @@ static int sad_put(queue_t *q, mblk_t *mp)
 			if (err == 0) {
 				struct str_list *slp;
 				struct str_mlist *slm;
+
 				switch (sad->iocstate) {
 				case 1:
 				      sad_vml_state1:
@@ -357,10 +365,12 @@ static int sad_put(queue_t *q, mblk_t *mp)
  /* There are two minors 0 is the /dev/sad/admin driver and 1 is the /dev/sad/user driver.
     Permission for access to the /dev/sad/admin minor is performed by filesystem permission on the
     character device and a check on open. */
-static int sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	major_t major = getmajor(*devp);
 	minor_t minor = getminor(*devp);
+
 	if (q->q_ptr)
 		return (0);	/* already open */
 	switch (sflag) {
@@ -380,9 +390,11 @@ static int sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (-ENXIO);
 }
-static int sad_close(queue_t *q, int oflag, cred_t *crp)
+static int
+sad_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct sad *sad = q->q_ptr;
+
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	sad->assigned = 0;
 	sad->iocstate = 0;
@@ -425,9 +437,11 @@ static struct devnode sad_node_user = {
 #ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 static
 #endif
-int __init sad_init(void)
+int __init
+sad_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 	printk(KERN_INFO SAD_BANNER);
 #else
@@ -443,10 +457,12 @@ int __init sad_init(void)
 	register_strnod(&sad_cdev, &sad_node_user, 1);
 	return (0);
 };
+
 #ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 static
 #endif
-void __exit sad_exit(void)
+void __exit
+sad_exit(void)
 {
 	unregister_strnod(&sad_cdev, 1);
 	unregister_strnod(&sad_cdev, 0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -99,6 +99,7 @@ MODULE_ALIAS("streams-spx");
 #endif
 
 modID_t modid = CONFIG_STREAMS_SPX_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -112,6 +113,7 @@ MODULE_ALIAS("streams-driver-spx");
 #endif
 
 major_t major = CONFIG_STREAMS_SPX_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -138,7 +140,8 @@ typedef struct spx {
 static spinlock_t spx_lock = SPIN_LOCK_UNLOCKED;
 static struct spx *spx_list = NULL;
 
-static int spx_rput(queue_t *q, mblk_t *mp)
+static int
+spx_rput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -154,9 +157,11 @@ static int spx_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int spx_wput(queue_t *q, mblk_t *mp)
+static int
+spx_wput(queue_t *q, mblk_t *mp)
 {
 	struct spx *p = q->q_ptr;
+
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -192,6 +197,7 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 		if (p->init == 0 && mp->b_wptr >= mp->b_rptr + sizeof(long)) {
 			queue_t *oq = NULL;
 			struct spx *x;
+
 			/* not necessarily aligned */
 			bcopy(mp->b_rptr, oq, sizeof(*oq));
 			/* validate against list */
@@ -224,6 +230,7 @@ static int spx_wput(queue_t *q, mblk_t *mp)
       nak:
 	{
 		union ioctypes *ioc;
+
 		mp->b_datap->db_type = M_IOCNAK;
 		ioc = (typeof(ioc)) mp->b_rptr;
 		ioc->iocblk.ioc_rval = -1;
@@ -234,11 +241,13 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 #endif
 }
 
-static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct spx *p, **pp = &spx_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
@@ -253,6 +262,7 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
+
 		if (cminor < 1)
 			return (ENXIO);
 		spin_lock(&spx_lock);
@@ -260,6 +270,7 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
 			minor_t dminor = getminor((*pp)->dev);
+
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor && sflag != CLONEOPEN) {
@@ -288,9 +299,11 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int spx_close(queue_t *q, int oflag, cred_t *crp)
+static int
+spx_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct spx *p;
+
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	spin_lock(&spx_lock);
@@ -345,9 +358,11 @@ static struct cdevsw spx_cdev = {
 #ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 static
 #endif
-int __init spx_init(void)
+int __init
+spx_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 	printk(KERN_INFO SPX_BANNER);
 #else
@@ -364,7 +379,8 @@ int __init spx_init(void)
 #ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 static
 #endif
-void __exit spx_exit(void)
+void __exit
+spx_exit(void)
 {
 	unregister_strdev(&spx_cdev, major);
 };

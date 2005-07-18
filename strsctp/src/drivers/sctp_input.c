@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $
+ @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $"
+#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $";
+static char const ident[] =
+    "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $";
 
 #define __NO_VERSION__
 
@@ -134,8 +135,8 @@ static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -207,12 +208,12 @@ sctp_rcv_ootb(mblk_t *mp)
 	struct sctphdr *sh = (struct sctphdr *) (mp->b_datap->db_base + (iph->ihl << 2));
 	struct sctpchdr *ch = (struct sctpchdr *) mp->b_rptr;
 	int sat = inet_addr_type(iph->saddr);
+
 	seldom();
 	ensure(mp, return (-EFAULT));
 	if (sat != RTN_UNICAST && sat != RTN_LOCAL) {
-		/*
-		   RFC 2960 8.4(1). 
-		 */
+		/* 
+		   RFC 2960 8.4(1). */
 		freemsg(mp);
 		return (0);
 	}
@@ -264,6 +265,7 @@ sctp_err(struct sk_buff *skb, u32 info)
 	struct sctphdr *sh;
 	struct iphdr *iph = (struct iphdr *) skb->data;
 	size_t ihl;
+
 	ensure(skb, return);
 #define ICMP_MIN_LENGTH 8
 	if (skb->len < (ihl = iph->ihl << 2) + ICMP_MIN_LENGTH) {
@@ -330,20 +332,19 @@ sctp_rcv(struct sk_buff *skb)
 	struct sctphdr *sh;
 	unsigned short len;
 	frtn_t fr = { &sctp_free, (char *) skb };
+
 	if (skb->pkt_type == PACKET_HOST) {
-		/*
+		/* 
 		   For now...  We should actually place non-linear fragments into seperate mblks
-		   and pass them up as a chain. 
-		 */
+		   and pass them up as a chain. */
 		if (!skb_is_nonlinear(skb)
 		    || skb_linearize(skb, GFP_ATOMIC) == 0) {
-			/*
-			   pull up the ip header 
-			 */
+			/* 
+			   pull up the ip header */
 			__skb_pull(skb, skb->h.raw - skb->data);
 			sh = (struct sctphdr *) skb->h.raw;
 			len = skb->len;
-			/*
+			/* 
 			 *  perform the crc-32c checksum per RFC 2960 Appendix B.
 			 */
 			csum0 = sh->check;
@@ -352,17 +353,15 @@ sctp_rcv(struct sk_buff *skb)
 			csum2 = crc32c(~0UL, sh, len);
 			sh->check = csum0;
 			if (csum1 == csum2) {
-				/*
-				   pull to the ip header 
-				 */
+				/* 
+				   pull to the ip header */
 				__skb_push(skb, skb->data - skb->nh.raw);
 				if ((mp = esballoc(skb->data, skb->len, BPRI_MED, &fr))) {
 					ptrace(("Allocated mblk %p\n", mp));
 					mp->b_datap->db_type = M_DATA;
 					mp->b_wptr = mp->b_rptr + skb->len;
-					/*
-					   trim the ip header 
-					 */
+					/* 
+					   trim the ip header */
 					mp->b_rptr += skb->h.raw - skb->nh.raw;
 					mp->b_rptr += sizeof(struct sctphdr);
 					SCTPHASH_BH_RLOCK();

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/07 20:29:46 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:07:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/07 20:29:46 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:07:00 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/07 20:29:46 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:07:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,14 +98,17 @@ static char const ident[] =
 /*
  *  This is a variation on the theme of spec_open.
  */
-STATIC struct file *pipe_file_open(void)
+STATIC struct file *
+pipe_file_open(void)
 {
 	struct file *file;
 	struct dentry *dentry;
 	struct vfsmount *mnt;
+
 	ptrace(("%s: performing pipe open\n", __FUNCTION__));
 	{
 		struct qstr name = {.name = "pipe",.len = 4, };
+
 		name.hash = full_name_hash(name.name, name.len);
 		{
 			file = ERR_PTR(-ENXIO);
@@ -130,6 +133,7 @@ STATIC struct file *pipe_file_open(void)
 	{
 		struct dentry *parent = dentry;
 		struct qstr name = {.name = "0",.len = 1, };
+
 		name.hash = full_name_hash(name.name, name.len);
 		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__, 0,
 			name.name, name.len));
@@ -139,7 +143,8 @@ STATIC struct file *pipe_file_open(void)
 		dput(parent);
 	}
 	if (IS_ERR((file = (void *) dentry))) {
-		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -(int)PTR_ERR(file)));
+		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__,
+			-(int) PTR_ERR(file)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
@@ -151,7 +156,7 @@ STATIC struct file *pipe_file_open(void)
 	file = dentry_open(dentry, mntget(mnt), O_CLONE | 0x3);
 	if (IS_ERR(file)) {
 		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__,
-			-(int)PTR_ERR(file)));
+			-(int) PTR_ERR(file)));
 		goto done;
 	}
       done:
@@ -162,11 +167,13 @@ STATIC struct file *pipe_file_open(void)
 	goto done;
 }
 
-long do_spipe(int *fds)
+long
+do_spipe(int *fds)
 {
 	struct file *file1, *file2;
 	int fd1, fd2;
 	int err;
+
 #if HAVE_PUT_FILP_ADDR
 	static void (*put_filp) (struct file * file) = (typeof(put_filp)) HAVE_PUT_FILP_ADDR;
 #endif

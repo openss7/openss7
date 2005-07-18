@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: qnx-mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: qnx-mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:18 $"
 
 /************************************************************************
 *                        QNX Driver Routines 			 	*
@@ -73,20 +73,20 @@
 #include <sys/LiS/head.h>	/* for strread, strwrite, etc */
 
 struct file_operations lis_streams_fops = {
-	NULL,			/* lseek -- no lseek */
-	lis_strread,		/* read */
-	lis_strwrite,		/* write to stream */
-	NULL,			/* readdir -- no readdir */
-	NULL,			/* select */
-	lis_strioctl,		/* ioctl */
-	NULL,			/* mmap -- no mmap */
-	lis_stropen,		/* open the stream */
-	lis_strclose,		/* close the stream */
-	NULL,			/* fsync -- no fsync */
-	NULL,			/* fasync -- no fasync */
-	NULL,			/* check_media_change */
-	NULL,			/* revalidate */
-	lis_strputpmsg,		/* putpmsg & putmsg */
-	lis_strgetpmsg,		/* getpmsg & getmsg */
-	lis_strpoll		/* poll */
+	NULL,				/* lseek -- no lseek */
+	lis_strread,			/* read */
+	lis_strwrite,			/* write to stream */
+	NULL,				/* readdir -- no readdir */
+	NULL,				/* select */
+	lis_strioctl,			/* ioctl */
+	NULL,				/* mmap -- no mmap */
+	lis_stropen,			/* open the stream */
+	lis_strclose,			/* close the stream */
+	NULL,				/* fsync -- no fsync */
+	NULL,				/* fasync -- no fasync */
+	NULL,				/* check_media_change */
+	NULL,				/* revalidate */
+	lis_strputpmsg,			/* putpmsg & putmsg */
+	lis_strgetpmsg,			/* getpmsg & getmsg */
+	lis_strpoll			/* poll */
 };

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:40:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:40:29 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:40:29 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2005/07/13 12:01:52 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:40:29 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -785,6 +785,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 				int len, tmplen;
 				struct ethhdr *eth;
 				struct sk_buff *skb;
+
 				newmp = unlinkb(mp);
 
 				freemsg(mp);
@@ -1254,6 +1255,7 @@ int
 ip2xinet_rebuild_header(struct sk_buff *skb)
 {
 	struct ethhdr *eth = (struct ethhdr *) (skb->data);
+
 	// return arp_find(&(eth->h_dest),skb);
 	return arp_find(eth->h_dest, skb);
 }
@@ -1412,6 +1414,7 @@ cleanup_linuxip(void)
 
 #ifdef LINUX
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -1420,6 +1423,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID number for IP2XINET driver (0 for allocation).");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -1441,6 +1445,7 @@ int __init
 ip2xinet_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_IP2XINET_MODULE
 	cmn_err(CE_NOTE, IP2XINET_BANNER);
 #else
@@ -1471,6 +1476,7 @@ STATIC void
 ip2xinet_init(void)
 {
 	int err;
+
 	if (ip2xinet_initialized != 0)
 		return;
 	cmn_err(CE_NOTE, IP2XINET_BANNER);	/* console splash */
@@ -1495,6 +1501,7 @@ ip2xinet_init(void)
 	ip2xinet_initialized = 1;
 	if (major == 0 && err > 0) {
 		int clonemajor = lis_clone_major();
+
 		major = err;
 		/* Remove the old /dev/ip2xinet node.  We are about to create a new one, and that
 		   call may fail if the old one is still there. We don't actually care if the
@@ -1516,6 +1523,7 @@ STATIC void
 ip2xinet_terminate(void)
 {
 	int err;
+
 	if (ip2xinet_initialized <= 0)
 		return;
 	if (major) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.9 2005/05/14 08:29:33 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.10 2005/07/18 11:56:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #include <features.h>
@@ -62,9 +62,10 @@
 #endif				/* __KERNEL__ */
 
 #ifndef __KERNEL__
+/* *INDENT-OFF* */
 __BEGIN_DECLS
+/* *INDENT-ON* */
 #endif
-
 enum {
 	__OS7_SCTP_ESTABLISHED = 1,
 	__OS7_SCTP_COOKIE_WAIT,
@@ -88,6 +89,7 @@ struct __os7_sctp_hbitvl {
 	uint hb_act;			/* activation flag */
 	uint hb_itvl;			/* interval in milliseconds */
 };
+
 /*
  *  User __OS7_SCTP_RTO socket option structure
  */
@@ -98,6 +100,7 @@ struct __os7_sctp_rtoval {
 	uint rto_max;			/* RTO.Max (milliseconds) */
 	uint max_retrans;		/* Path.Max.Retrans (retires) */
 };
+
 /*
  *  User __OS7_SCTP_STATUS socket option structure
  */
@@ -362,7 +365,8 @@ struct __os7_sctp_astat {
 #define SCTP_UNREACHABLE		__OS7_SCTP_UNREACHABLE
 
 #ifndef __KERNEL__
+/* *INDENT-OFF* */
 __END_DECLS
+/* *INDENT-ON* */
 #endif
-
 #endif				/* _NETINET_SCTP_H */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -80,7 +80,8 @@ static char const ident[] =
 static int debug = 0;
 static int output = 1;
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -92,7 +93,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -105,7 +107,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -135,7 +138,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -183,7 +187,8 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 
 enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, } command = CMN_NONE;
 
-void printit(struct sc_mlist *l, int cmd)
+void
+printit(struct sc_mlist *l, int cmd)
 {
 	if (output <= 0 || l->major == -1)
 		return;
@@ -213,13 +218,16 @@ void printit(struct sc_mlist *l, int cmd)
 	fprintf(stdout, "\n");
 };
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	int i, fd, count;
 	struct sc_list *list;
 	struct strioctl ic;
+
 	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -236,6 +244,7 @@ int main(int argc, char **argv)
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "lcdqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "lcdqvhVC?");
@@ -360,6 +369,7 @@ int main(int argc, char **argv)
 	}
 	if (optind < argc) {
 		int ret = 0;
+
 		/* have module name arguments - iterate through them */
 		for (; optind < argc; optind++) {
 			for (i = 0; i < count; i++)

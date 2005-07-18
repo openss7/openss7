@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:46:11 $
+ @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:46:11 $"
+#ident "@(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:46:11 $";
+static char const ident[] =
+    "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $";
 
 #define __NO_VERSION__
 
@@ -134,8 +135,8 @@ static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -173,6 +174,7 @@ STATIC void
 sctp_bhash_insert(sctp_t * sp)
 {
 	sctp_t **spp = &sctp_bhash[sctp_sp_bhashfn(sp)];
+
 	if ((sp->bnext = *spp))
 		sp->bnext->bprev = &sp->bnext;
 	sp->bprev = spp;
@@ -182,6 +184,7 @@ STATIC void
 sctp_lhash_insert(sctp_t * sp)
 {
 	sctp_t **spp = &sctp_lhash[sctp_sp_lhashfn(sp)];
+
 	if ((sp->lnext = *spp))
 		sp->lnext->lprev = &sp->lnext;
 	sp->lprev = spp;
@@ -191,6 +194,7 @@ STATIC void
 sctp_phash_insert(sctp_t * sp)
 {
 	sctp_t **spp = &sctp_phash[sctp_sp_phashfn(sp)];
+
 	if ((sp->pnext = *spp))
 		sp->pnext->pprev = &sp->pnext;
 	sp->pprev = spp;
@@ -201,6 +205,7 @@ sctp_vhash_insert(sctp_t * sp)
 {
 	sctp_t **spp = &sctp_vhash[sctp_sp_vhashfn(sp)];
 	sctp_t **scp = &sctp_cache[sctp_sp_cachefn(sp)];
+
 	if ((sp->vnext = *spp))
 		sp->vnext->vprev = &sp->vnext;
 	sp->vprev = spp;
@@ -211,6 +216,7 @@ STATIC void
 sctp_thash_insert(sctp_t * sp)
 {
 	sctp_t **spp = &sctp_thash[sctp_sp_thashfn(sp)];
+
 	if ((sp->tnext = *spp))
 		sp->tnext->tprev = &sp->tnext;
 	sp->tprev = spp;
@@ -314,13 +320,14 @@ sctp_bind_hash(sp, cons)
 		sctp_lhash_unhash(sp);	/* start clean */
 		if (cons) {
 			sctp_t *sp2, **spp = &sctp_lhash[sctp_sp_lhashfn(sp)];
-			/*
-			   check for conflicts 
-			 */
+
+			/* 
+			   check for conflicts */
 			for (sp2 = *spp; sp2; sp2 = sp2->lnext) {
 				if (!sp2->sport || !sp->sport || sp2->sport == sp->sport) {
 					if (sp2->sanum && sp->sanum) {
 						sctp_saddr_t *ss, *ss2;
+
 						for (ss = sp->saddr; ss; ss = ss->next)
 							for (ss2 = sp2->saddr; ss2; ss2 = ss2->next) {
 								if (ss->saddr != ss2->saddr)
@@ -374,15 +381,17 @@ sctp_conn_hash(sp)
 		sctp_phash_unhash(sp);	/* start clean */
 		{
 			sctp_t *sp2, **spp = &sctp_thash[sctp_sp_thashfn(sp)];
-			/*
-			   check for conflicts 
-			 */
+
+			/* 
+			   check for conflicts */
 			for (sp2 = *spp; sp2; sp2 = sp2->tnext) {
 				if (sp2->sport == sp->sport && sp2->dport == sp->dport) {
 					sctp_saddr_t *ss, *ss2;
+
 					for (ss = sp->saddr; ss; ss = ss->next)
 						for (ss2 = sp2->saddr; ss2; ss2 = ss2->next) {
 							sctp_daddr_t *sd, *sd2;
+
 							if (ss->saddr != ss2->saddr)
 								continue;
 							for (sd = sp->daddr; sd; sd = sd->next)
@@ -451,9 +460,8 @@ sctp_get_port(void)
 		snum = low;
 	}
 
-	/*
-	   find a fresh, completely unused port number 
-	 */
+	/* 
+	   find a fresh, completely unused port number */
 	for (; rem > 0; snum++, rem--) {
 		if (snum > high || snum < low) {
 			rare();
@@ -683,25 +691,21 @@ sctp_lookup_cookie_echo(ck, v_tag, sport, dport, saddr, daddr)
 {
 	sctp_t *sp = NULL;
 
-	/*
-	   quick sanity checks on cookie 
-	 */
+	/* 
+	   quick sanity checks on cookie */
 	if (ck->v_tag == v_tag && ck->sport == sport && ck->dport == dport) {
 		if (		/* RFC 2960 5.2.4 (A) */
 			   (ck->l_ttag && ck->p_ttag
 			    && (sp = sctp_lookup_vtag(ck->l_ttag, sport, dport, saddr, daddr)))
-			   /*
-			      RFC 2960 5.2.4 (B) 
-			    */
+			   /* 
+			      RFC 2960 5.2.4 (B) */
 			   || ((sp = sctp_lookup_vtag(v_tag, sport, dport, saddr, daddr)))
-			   /*
-			      RFC 2960 5.2.4 (C) 
-			    */
+			   /* 
+			      RFC 2960 5.2.4 (C) */
 			   || (!ck->l_ttag && !ck->p_ttag
 			       && (sp = sctp_lookup_ptag(ck->p_tag, sport, dport, saddr, daddr)))
-			   /*
-			      RFC 2960 5.2.4 (D) 
-			    */
+			   /* 
+			      RFC 2960 5.2.4 (D) */
 			   || ((sp = sctp_lookup_listen(sport, saddr))))
 			return (sp);
 	} else
@@ -735,16 +739,14 @@ sctp_lookup(struct sctphdr * sh, uint32_t daddr, uint32_t saddr)
 	uint16_t sport = sh->srce;
 
 	if (v_tag) {
-		/*
-		   fast path 
-		 */
+		/* 
+		   fast path */
 		if (ctype == SCTP_CTYPE_SACK || ctype == SCTP_CTYPE_DATA)
 			return sctp_lookup_vtag(v_tag, dport, sport, daddr, saddr);
 
 		switch (ctype) {
-			/*
-			   See RFC 2960 Section 8.5.1 
-			 */
+			/* 
+			   See RFC 2960 Section 8.5.1 */
 		case SCTP_CTYPE_ABORT:
 		case SCTP_CTYPE_SHUTDOWN_COMPLETE:
 			if (ch->flags & 0x1)	/* T bit set */
@@ -753,9 +755,8 @@ sctp_lookup(struct sctphdr * sh, uint32_t daddr, uint32_t saddr)
 			if ((sp = sctp_lookup_vtag(v_tag, dport, sport, daddr, saddr)))
 				return (sp);
 			if (ctype == SCTP_CTYPE_ABORT)
-				/*
-				   check abort for conn ind 
-				 */
+				/* 
+				   check abort for conn ind */
 				if ((sp = sctp_lookup_listen(dport, daddr)))
 					return (sp);
 		case SCTP_CTYPE_INIT:

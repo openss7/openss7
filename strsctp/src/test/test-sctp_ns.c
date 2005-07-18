@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:57:38 $
+ @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:53:10 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 16:57:38 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/07/18 12:53:10 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:57:38 $"
+#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:53:10 $"
 
-static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:57:38 $";
+static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:53:10 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -154,6 +154,7 @@ timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -170,6 +171,7 @@ static int
 start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {1, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -183,6 +185,7 @@ sctp_get(int fd, int wait)
 {
 	int ret;
 	int flags = 0;
+
 	while ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {
 		switch (errno) {
 		default:
@@ -207,6 +210,7 @@ sctp_get(int fd, int wait)
 	}
 	do {
 		struct pollfd pfd[] = { {fd, POLLIN | POLLPRI, 0} };
+
 		if (!(ret = poll(pfd, 1, wait))) {
 			perror("sctp_get: poll");
 			return -1;
@@ -233,6 +237,7 @@ int
 sctp_options(int fd, ulong flags, N_qos_sel_info_sctp_t * qos)
 {
 	int ret;
+
 	ctrl.len = sizeof(cmd.npi.optmgmt_req) + sizeof(*qos);
 	cmd.prim = N_OPTMGMT_REQ;
 	cmd.npi.optmgmt_req.OPTMGMT_flags = flags;
@@ -259,6 +264,7 @@ int
 sctp_bind(int fd, addr_t * addr, int coninds)
 {
 	int ret;
+
 	ctrl.len = sizeof(cmd.npi.bind_req) + sizeof(*addr);
 	cmd.prim = N_BIND_REQ;
 	cmd.npi.bind_req.ADDR_length = sizeof(*addr);
@@ -288,6 +294,7 @@ int
 sctp_connect(int fd, addr_t * addr, N_qos_sel_conn_sctp_t * qos)
 {
 	int ret;
+
 	ctrl.len = sizeof(cmd.npi.conn_req) + sizeof(*addr) + sizeof(*qos);
 	cmd.prim = N_CONN_REQ;
 	cmd.npi.conn_req.DEST_length = sizeof(*addr);
@@ -317,6 +324,7 @@ int
 sctp_accept(int fd, int fd2, int tok)
 {
 	int ret, seq;
+
 	if ((ret = sctp_get(fd, -1)) < 0) {
 		fprintf(stderr, "sctp_accept: couldn't get message on listener\n");
 		return -1;
@@ -373,6 +381,7 @@ int
 sctp_read(int fd, void *msg, size_t len)
 {
 	int ret;
+
 	data.buf = msg;
 	data.len = 0;
 	data.maxlen = len;
@@ -455,9 +464,7 @@ test_sctps(void)
 		pfd[0].events = POLLIN | POLLOUT;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-			       inp_count, out_count, inp_count + out_count, out_count - inp_count,
-			       8 * (42 + len) * (inp_count + out_count));
+			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n", inp_count, out_count, inp_count + out_count, out_count - inp_count, 8 * (42 + len) * (inp_count + out_count));
 			inp_count = 0;
 			out_count = 0;
 			if (start_timer()) {
@@ -639,8 +646,10 @@ main(int argc, char **argv)
 	short portr = 10000;
 	int time;
 	struct hostent *haddr;
+
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -659,6 +668,7 @@ main(int argc, char **argv)
 			{NULL, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "l:r:t:p:w:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "l:r:t:p:w:qvhVC?");

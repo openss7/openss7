@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_crc32c.h,v 0.9.2.2 2005/05/14 08:29:34 brian Exp $
+ @(#) $Id: sctp_crc32c.h,v 0.9.2.3 2005/07/18 11:56:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_CRC32C_H__
 #define __SCTP_CRC32C_H__
 
-#ident "@(#) $RCSfile: sctp_crc32c.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_crc32c.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 extern uint32_t crc_table[];
 extern uint32_t crc32c(register uint32_t crc, void *buf, register int len);

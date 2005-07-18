@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: hooks.h.in,v 0.9.2.12 2005/05/14 08:29:33 brian Exp $
+ @(#) $Id: hooks.h.in,v 0.9.2.13 2005/07/18 11:56:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_LINUX_HOOKS_H__
 #define __LOCAL_LINUX_HOOKS_H__
 
-#ident "@(#) $RCSfile: hooks.h.in,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: hooks.h.in,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
@@ -72,8 +72,10 @@
 #undef HAVE_ICMP_ERR_CONVERT_ADDR
 #endif
 extern struct icmp_err icmp_err_convert[];
+
 #ifdef HAVE_ICMP_ERR_CONVERT_ADDR
 struct icmp_err *icmp_err_convert___ = (void *) HAVE_ICMP_ERR_CONVERT_ADDR;
+
 #define icmp_err_convert icmp_err_convert___
 #endif
 
@@ -81,8 +83,10 @@ struct icmp_err *icmp_err_convert___ = (void *) HAVE_ICMP_ERR_CONVERT_ADDR;
 #undef HAVE_ICMP_STATISTICS_ADDR
 #endif
 extern struct icmp_mib icmp_statistic[];
+
 #ifdef HAVE_ICMP_STATISTICS_ADDR
 struct icmp_mib *icmp_statistic___ = (void *) HAVE_ICMP_STATISTICS_ADDR;
+
 #define icmp_statistics icmp_statistic___
 #endif
 
@@ -91,6 +95,7 @@ struct icmp_mib *icmp_statistic___ = (void *) HAVE_ICMP_STATISTICS_ADDR;
 #endif
 #ifdef HAVE_IP_CMSG_RECV_ADDR
 void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
+
 #define ip_cmsg_recv (*((typeof(ip_cmsg_recv) *) HAVE_IP_CMSG_RECV_ADDR))
 #endif
 
@@ -99,6 +104,7 @@ void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
 #endif
 #ifdef HAVE_IP_CMSG_SEND_ADDR
 int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
+
 #define ip_cmsg_send (*((typeof(ip_cmsg_send) *) HAVE_IP_CMSG_SEND_ADDR))
 #endif
 
@@ -107,6 +113,7 @@ int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
 #endif
 #ifdef HAVE_IP_GETSOCKOPT_ADDR
 int ip_getsockopt(struct sock *sk, int level, int optname, char *optval, int *optlen);
+
 #define ip_getsockopt (*((typeof(ip_getsockopt) *) HAVE_IP_GETSOCKOPT_ADDR))
 #endif
 
@@ -115,6 +122,7 @@ int ip_getsockopt(struct sock *sk, int level, int optname, char *optval, int *op
 #endif
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
 int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+
 #define ip_route_output_flow (*((typeof(ip_route_output_flow) *)HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR))
 #endif
 
@@ -122,6 +130,7 @@ int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk,
 #undef HAVE_IP_RT_MIN_PMTU_ADDR
 #endif
 extern int ip_rt_min_pmtu;
+
 #ifdef HAVE_IP_RT_MIN_PMTU_ADDR
 #define ip_rt_min_pmtu (*((typeof(ip_rt_min_pmtu) *)HAVE_IP_RT_MIN_PMTU_ADDR))
 #endif
@@ -130,6 +139,7 @@ extern int ip_rt_min_pmtu;
 #undef HAVE_IP_RT_MTU_EXPIRES_ADDR
 #endif
 extern int ip_rt_mtu_expires;
+
 #ifdef HAVE_IP_RT_MTU_EXPIRES_ADDR
 #define ip_rt_mtu_expires (*((typeof(ip_rt_mtu_expires) *)HAVE_IP_RT_MTU_EXPIRES_ADDR))
 #endif
@@ -139,6 +149,7 @@ extern int ip_rt_mtu_expires;
 #endif
 #ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
 void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+
 #define ip_rt_update_pmtu (*((typeof(ip_rt_update_pmtu) *) HAVE_IP_RT_UPDATE_PMTU_ADDR))
 #endif
 
@@ -147,6 +158,7 @@ void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #endif
 #ifdef HAVE_IP_SETSOCKOPT_ADDR
 int ip_setsockopt_func(struct sock *sk, int level, int optname, char *optval, int optlen);
+
 #define ip_setsockopt (*((typeof(ip_setsockopt_func) *) HAVE_IP_SETSOCKOPT_ADDR))
 #endif
 
@@ -154,6 +166,7 @@ int ip_setsockopt_func(struct sock *sk, int level, int optname, char *optval, in
 #undef HAVE_SYSCTL_IP_DYNADDR_ADDR
 #endif
 extern int sysctl_ip_dynaddr;
+
 #ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
 #define sysctl_ip_dynaddr (*((typeof(sysctl_ip_dynaddr) *)HAVE_SYSCTL_IP_DYNADDR_ADDR))
 #endif
@@ -162,6 +175,7 @@ extern int sysctl_ip_dynaddr;
 #undef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 #endif
 extern int sysctl_ip_nonlocal_bind;
+
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 #define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
 #endif
@@ -171,6 +185,7 @@ extern int sysctl_ip_nonlocal_bind;
 #endif
 #ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
 int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+
 #define __ip_route_output_key (*((typeof(__ip_route_output_key) *) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR))
 #endif
 
@@ -179,6 +194,7 @@ int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #endif
 #ifdef HAVE_INET_BIND_ADDR
 int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
+
 #define inet_bind (*((typeof(inet_bind) *)HAVE_INET_BIND_ADDR))
 #endif
 
@@ -187,6 +203,7 @@ int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
 #endif
 #ifdef HAVE_INET_IOCTL_ADDR
 int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+
 #define inet_ioctl (*((typeof(inet_ioctl) *) HAVE_INET_IOCTL_ADDR))
 #endif
 
@@ -195,6 +212,7 @@ int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
 #endif
 #ifdef HAVE_INET_GETNAME_ADDR
 int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+
 #define inet_getname (*((typeof(inet_getname) *) HAVE_INET_GETNAME_ADDR))
 #endif
 
@@ -203,6 +221,7 @@ int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, in
 #endif
 #ifdef HAVE_INET_MULTI_GETNAME_ADDR
 int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+
 #define inet_multi_getname (*((typeof(inet_mutli_getname) *) HAVE_INET_MULTI_GETNAME_ADDR))
 #endif
 
@@ -246,6 +265,7 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 		.proto = IPPROTO_SCTP,
 		.uli_u = {.ports = {.sport = 0,.dport = 0}}
 	};
+
 	return ip_route_output_key(rp, &fl);
 }
 #endif
@@ -255,6 +275,7 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 #endif
 #ifdef HAVE___XFRM_POLICY_CHECK_ADDR
 int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
+
 #define __xfrm_policy_check (*((typeof(__xfrm_policy_check) *) HAVE___XFRM_POLICY_CHECK_ADDR))
 #endif
 
@@ -263,6 +284,7 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned 
 #endif
 #ifdef HAVE___XFRM_SK_CLONE_POLICY_ADDR
 int __xfrm_sk_clone_policy(struct sock *sk);
+
 #define __xfrm_sk_clone_policy (*((typeof(__xfrm_sk_clone_policy) *) HAVE___XFRM_SK_CLONE_POLICY_ADDR))
 #endif
 
@@ -271,6 +293,7 @@ int __xfrm_sk_clone_policy(struct sock *sk);
 #endif
 #ifdef HAVE_XFRM_POLICY_DELETE_ADDR
 void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+
 #define xfrm_policy_delete (*((typeof(xfrm_policy_delete) *) HAVE_XFRM_POLICY_DELETE_ADDR))
 #endif
 
@@ -279,6 +302,7 @@ void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #ifdef HAVE_SNMP_GET_INFO_ADDR
 int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+
 #define snmp_get_info (*((typeof(snmp_get_info) *) HAVE_SNMP_GET_INFO_ADDR))
 #endif
 
@@ -287,6 +311,7 @@ int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 #ifdef HAVE_SOCKET_GET_INFO_ADDR
 int socket_get_info(char *buffer, char **start, off_t offset, int length);
+
 #define socket_get_info (*((typeof(socket_get_info) *) HAVE_SOCKET_GET_INFO_ADDR))
 #endif
 
@@ -295,6 +320,7 @@ int socket_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 #ifdef HAVE_AFINET_GET_INFO_ADDR
 int afinet_get_info(char *buffer, char **start, off_t offset, int length);
+
 #define afinet_get_info (*((typeof(afinet_get_info) *) HAVE_AFINET_GET_INFO_ADDR))
 #endif
 
@@ -302,6 +328,7 @@ int afinet_get_info(char *buffer, char **start, off_t offset, int length);
 #undef HAVE_TCP_PROT_ADDR
 #endif
 extern struct proto tcp_prot;
+
 #ifdef HAVE_TCP_PROT_ADDR
 #define tcp_prot (*((typeof(tcp_prot) *)HAVE_TCP_PROT_ADDR))
 #endif
@@ -310,6 +337,7 @@ extern struct proto tcp_prot;
 #undef HAVE_UDP_PROT_ADDR
 #endif
 extern struct proto udp_prot;
+
 #ifdef HAVE_UDP_PROT_ADDR
 #define udp_prot (*((typeof(udp_prot) *)HAVE_UDP_PROT_ADDR))
 #endif
@@ -318,6 +346,7 @@ extern struct proto udp_prot;
 #undef HAVE_RAW_PROT_ADDR
 #endif
 extern struct proto raw_prot;
+
 #ifdef HAVE_RAW_PROT_ADDR
 #define raw_prot (*((typeof(raw_prot) *)HAVE_RAW_PROT_ADDR))
 #endif
@@ -326,6 +355,7 @@ extern struct proto raw_prot;
 #undef HAVE_TCP_MEMORY_ALLOCATED_ADDR
 #endif
 extern atomic_t tcp_memory_allocated;
+
 #ifdef HAVE_TCP_MEMORY_ALLOCATED_ADDR
 #define tcp_memory_allocated (*((typeof(tcp_memory_allocated) *)HAVE_TCP_MEMORY_ALLOCATED_ADDR))
 #endif
@@ -334,6 +364,7 @@ extern atomic_t tcp_memory_allocated;
 #undef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
 #endif
 extern atomic_t tcp_sockets_allocated;
+
 #ifdef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
 #define tcp_sockets_allocated (*((typeof(tcp_sockets_allocated) *)HAVE_TCP_SOCKETS_ALLOCATED_ADDR))
 #endif
@@ -342,6 +373,7 @@ extern atomic_t tcp_sockets_allocated;
 #undef HAVE_TCP_ORPHAN_COUNT_ADDR
 #endif
 extern atomic_t tcp_orphan_count;
+
 #ifdef HAVE_TCP_ORPHAN_COUNT_ADDR
 #define tcp_orphan_count (*((typeof(tcp_orphan_count) *)HAVE_TCP_ORPHAN_COUNT_ADDR))
 #endif
@@ -350,6 +382,7 @@ extern atomic_t tcp_orphan_count;
 #undef HAVE_TCP_TW_COUNT_ADDR
 #endif
 extern int tcp_tw_count;
+
 #ifdef HAVE_TCP_TW_COUNT_ADDR
 #define tcp_tw_count (*((typeof(tcp_tw_count) *)HAVE_TCP_TW_COUNT_ADDR))
 #endif
@@ -358,6 +391,7 @@ extern int tcp_tw_count;
 #undef HAVE_IP_FRAG_NQUEUES_ADDR
 #endif
 extern int ip_frag_nqueues;
+
 #ifdef HAVE_IP_FRAG_NQUEUES_ADDR
 #define ip_frag_nqueues (*((typeof(ip_frag_nqueues) *)HAVE_IP_FRAG_NQUEUES_ADDR))
 #endif
@@ -366,6 +400,7 @@ extern int ip_frag_nqueues;
 #undef HAVE_IP_FRAG_MEM_ADDR
 #endif
 extern atomic_t ip_frag_mem;
+
 #ifdef HAVE_IP_FRAG_MEM_ADDR
 #define ip_frag_mem (*((typeof(ip_frag_mem) *)HAVE_IP_FRAG_MEM_ADDR))
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_cache.h,v 0.9.2.3 2005/05/14 08:29:17 brian Exp $
+ @(#) $Id: sctp_cache.h,v 0.9.2.4 2005/07/18 12:53:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_CACHE_H__
 #define __SCTP_CACHE_H__
 
-#ident "@(#) $RCSfile: sctp_cache.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:29:17 $"
+#ident "@(#) $RCSfile: sctp_cache.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:53:08 $"
 
 /*
  *  Cache pointers
@@ -76,11 +76,12 @@ sctp_find_daddr(sp, daddr)
 	uint32_t daddr;
 {
 	sctp_daddr_t *sd;
+
 	for (sd = sp->daddr; sd && sd->daddr != daddr; sd = sd->next) ;
 	return (sd);
 }
 extern sctp_daddr_t *sctp_daddr_include(sctp_t * sp, uint32_t daddr, int *errp);
-extern int sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t * daddrs, size_t dnum);
+extern int sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t *daddrs, size_t dnum);
 
 /*
  *  Find a Source Address
@@ -92,13 +93,15 @@ sctp_find_saddr(sp, saddr)
 	uint32_t saddr;
 {
 	sctp_saddr_t *ss;
+
 	for (ss = sp->saddr; ss && ss->saddr != saddr; ss = ss->next) ;
 	return (ss);
 }
 extern sctp_saddr_t *sctp_saddr_include(sctp_t * sp, uint32_t saddr, int *errp);
-extern int sctp_alloc_saddrs(sctp_t * sp, uint16_t sport, uint32_t * saddrs, size_t snum);
+extern int sctp_alloc_saddrs(sctp_t * sp, uint16_t sport, uint32_t *saddrs, size_t snum);
 
 extern sctp_strm_t *sctp_strm_alloc(sctp_strm_t ** stp, uint16_t sid, int *erp);
+
 /*
  *  Find or Add an Inbound or Outbound Stream
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,6 +113,7 @@ sctp_istrm_find(sp, sid, errp)
 	int *errp;
 {
 	sctp_strm_t *st;
+
 	if (!(st = sp->istr) || st->sid != sid)
 		for (st = sp->istrm; st && st->sid != sid; st = st->next) ;
 	if (st)
@@ -125,6 +129,7 @@ sctp_ostrm_find(sp, sid, errp)
 	int *errp;
 {
 	sctp_strm_t *st;
+
 	if (!(st = sp->ostr) || st->sid != sid)
 		for (st = sp->ostrm; st && st->sid != sid; st = st->next) ;
 	if (st)
@@ -142,6 +147,7 @@ sctp_trylockq(queue_t *q)
 {
 	int res;
 	sctp_t *sp = (sctp_t *) q->q_ptr;
+
 	spin_lock_bh(&sp->qlock);
 	if (!(res = !sp->users++)) {
 		if (q == sp->rq)
@@ -160,6 +166,7 @@ static inline void
 sctp_unlockq(queue_t *q)
 {
 	sctp_t *sp = (sctp_t *) q->q_ptr;
+
 	sctp_cleanup_read(sp);	/* deliver to userq what is possible */
 	sctp_transmit_wakeup(sp);	/* reply to peer what is necessary */
 	spin_lock_bh(&sp->qlock);

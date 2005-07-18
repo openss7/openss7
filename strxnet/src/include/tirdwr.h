@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.2 2005/05/14 08:28:28 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.3 2005/07/18 12:45:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:28 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:03 $ by $Author: brian $
 
  $Log: tirdwr.h,v $
+ Revision 0.9.2.3  2005/07/18 12:45:03  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/05/14 08:28:28  brian
  - copyright header correction
 
@@ -65,7 +68,7 @@
 #ifndef _TIRDWR_H
 #define _TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:28:28 $"
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/18 12:45:03 $"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -81,5 +84,4 @@ __END_DECLS
 /* *INDENT-ON* */
 #endif
 
-#endif  _TIRDWR_H
-
+#endif				/* _TIRDWR_H */

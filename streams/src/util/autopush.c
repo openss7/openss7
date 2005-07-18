@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/01 20:17:37 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/01 20:17:37 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $"
 
 static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/01 20:17:37 $";
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $";
 
 /* 
  *  autopush(8)
@@ -90,7 +90,8 @@ static char const ident[] =
 static int output = 1;
 static int debug = 0;
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -180,7 +181,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -235,6 +237,7 @@ sad_cmd(int fd, int cmd, struct strapush *sap)
 		ic_len:sizeof(*sap),
 		ic_dp:(char *) sap,
 	};
+
 	return ioctl(fd, I_STR, &ioc);
 }
 static int
@@ -246,6 +249,7 @@ sad_vml(int fd, struct str_list *sml)
 		ic_len:sizeof(*sml) + MAXAPUSH * sizeof(struct str_mlist),
 		ic_dp:(char *) sml,
 	};
+
 	return ioctl(fd, I_STR, &ioc);
 }
 
@@ -253,6 +257,7 @@ static int
 autopush_set(char *devname, int major, int minor, int lastminor, int nmods, char **modlist)
 {
 	int i;
+
 	if (debug) {
 		fprintf(stderr,
 			"%s: devname=%s, major=%d, minor=%d, lastminor=%d, nmods=%d, modlist=",
@@ -281,6 +286,7 @@ autopush_ver(int nmods, char **modlist)
 		struct str_list list;
 		struct str_mlist mlist[MAXAPUSH];
 	} sml;
+
 	if (debug) {
 		fprintf(stderr, "%s: nmods = %d, modlist=", __FUNCTION__, nmods);
 		for (i = 0; i < nmods; i++)
@@ -312,6 +318,7 @@ autopush_get(char *devname, int major, int minor)
 	struct strapush sap;
 	int header = 0;
 	int fd;
+
 	if (debug)
 		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
 			major, minor);
@@ -384,6 +391,7 @@ autopush_res(char *devname, int major, int minor)
 	struct strapush sap;
 	int header = 0;
 	int fd;
+
 	if (debug)
 		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
 			major, minor);
@@ -455,6 +463,7 @@ autopush_fil(char *filename)
 	char *line;
 	int lineno, fd;
 	FILE *file;
+
 	if ((file = fopen(filename, "r")) == NULL) {
 		if (output || debug)
 			perror(__FUNCTION__);
@@ -467,12 +476,14 @@ autopush_fil(char *filename)
 		int tokenind;
 		int major = -1, minor = -1, lastminor = -1;
 		char devname[FMNAMESZ + 1] = "";
+
 		for (str = line, tokenind = 0, sap.sap_npush = 0;
 		     tokenind < MAXAPUSH + 3
 		     && (token = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL;
 		     str = NULL, tokenind++) {
 			switch (tokenind) {
 				char *end;
+
 			case 0:	/* major | name */
 				if (token[0] == '#')
 					goto skip_line;
@@ -580,6 +591,7 @@ main(int argc, char **argv)
 		OPTION_VERIFY,
 		OPTION_CLONE,
 	} option = OPTION_NONE;
+
 	while (1) {
 #ifdef _GNU_SOURCE
 		int option_index = 0;
@@ -605,6 +617,7 @@ main(int argc, char **argv)
 			{ 0, }
 			/* *INDENT-ON* */
 		};
+
 		c = getopt_long_only(argc, argv, "f:sgrcM:m:N:l:vqd::x::VCh?", long_options,
 				     &option_index);
 #else				/* _GNU_SOURCE */

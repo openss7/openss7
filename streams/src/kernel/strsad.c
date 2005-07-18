@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/09 21:55:19 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:07:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:55:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/09 21:55:19 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:07:01 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/09 21:55:19 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:07:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,14 +72,17 @@ static char const ident[] =
 
 static spinlock_t apush_lock = SPIN_LOCK_UNLOCKED;
 
-static struct apinfo *__autopush_find(struct cdevsw *cdev, unsigned char minor)
+static struct apinfo *
+__autopush_find(struct cdevsw *cdev, unsigned char minor)
 {
 	struct list_head *pos;
 	struct apinfo *api = NULL;
+
 	if (!cdev->d_apush.next)
 		INIT_LIST_HEAD(&cdev->d_apush);
 	list_for_each(pos, &cdev->d_apush) {
 		api = list_entry(pos, struct apinfo, api_more);
+
 		if (minor >= api->api_sap.sap_minor && minor <= api->api_sap.sap_lastminor)
 			break;
 		api = NULL;
@@ -87,10 +90,12 @@ static struct apinfo *__autopush_find(struct cdevsw *cdev, unsigned char minor)
 	return (api);
 }
 
-static int __autopush_add(struct cdevsw *cdev, struct strapush *sap)
+static int
+__autopush_add(struct cdevsw *cdev, struct strapush *sap)
 {
 	struct apinfo *api;
 	int err;
+
 	err = -EEXIST;
 	if ((api = __autopush_find(cdev, sap->sap_minor)) != NULL)
 		goto error;
@@ -105,10 +110,12 @@ static int __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 	return (err);
 }
 
-static int __autopush_del(struct cdevsw *cdev, struct strapush *sap)
+static int
+__autopush_del(struct cdevsw *cdev, struct strapush *sap)
 {
 	struct apinfo *api;
 	int err;
+
 	err = -ENODEV;
 	if ((api = __autopush_find(cdev, sap->sap_minor)) == NULL)
 		goto error;
@@ -121,11 +128,13 @@ static int __autopush_del(struct cdevsw *cdev, struct strapush *sap)
 	return (err);
 }
 
-struct strapush *autopush_find(dev_t dev)
+struct strapush *
+autopush_find(dev_t dev)
 {
 	unsigned long flags;
 	struct cdevsw *cdev;
 	struct apinfo *api = NULL;
+
 	if ((cdev = cdrv_get(getmajor(dev))) == NULL)
 		goto notfound;
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
@@ -138,15 +147,18 @@ struct strapush *autopush_find(dev_t dev)
       notfound:
 	return ((struct strapush *) api);
 }
+
 #if defined CONFIG_STREAMS_SAD_MODULE
 EXPORT_SYMBOL(autopush_find);
 #endif
 
-int autopush_add(struct strapush *sap)
+int
+autopush_add(struct strapush *sap)
 {
 	unsigned long flags;
 	struct cdevsw *cdev;
 	int err, k;
+
 	err = -EINVAL;
 	switch (sap->sap_cmd) {
 	case SAP_ONE:
@@ -172,6 +184,7 @@ int autopush_add(struct strapush *sap)
 		goto error;
 	for (k = 0; k < sap->sap_npush; k++) {
 		int len = strnlen(sap->sap_list[k], FMNAMESZ + 1);
+
 		if (len == 0 || len == FMNAMESZ + 1)
 			goto error;
 	}
@@ -187,15 +200,18 @@ int autopush_add(struct strapush *sap)
       error:
 	return (err);
 }
+
 #if defined CONFIG_STREAMS_SAD_MODULE
 EXPORT_SYMBOL(autopush_add);
 #endif
 
-int autopush_del(struct strapush *sap)
+int
+autopush_del(struct strapush *sap)
 {
 	unsigned long flags;
 	struct cdevsw *cdev;
 	int err;
+
 	err = -EINVAL;
 #ifndef MAX_CHRDEV
 	if (sap->sap_major != MAJOR(MKDEV(sap->sap_major, 0)))
@@ -215,16 +231,20 @@ int autopush_del(struct strapush *sap)
       error:
 	return (err);
 }
+
 #if defined CONFIG_STREAMS_SAD_MODULE
 EXPORT_SYMBOL(autopush_del);
 #endif
 
-int autopush_vml(struct str_mlist *smp, int nmods)
+int
+autopush_vml(struct str_mlist *smp, int nmods)
 {
 	int rtn = 0, k;
+
 	for (k = 0; k < nmods; k++, smp++) {
 		int len;
 		struct fmodsw *fmod;
+
 		len = strnlen(smp->l_name, FMNAMESZ + 1);
 		if (len == 0 || len == FMNAMESZ + 1)
 			goto einval;
@@ -239,11 +259,13 @@ int autopush_vml(struct str_mlist *smp, int nmods)
       einval:
 	return (-EINVAL);
 }
+
 #if defined CONFIG_STREAMS_SAD_MODULE
 EXPORT_SYMBOL(autopush_vml);
 #endif
 
-int apush_set(struct strapush *sap)
+int
+apush_set(struct strapush *sap)
 {
 	if (sap != NULL) {
 		switch (sap->sap_cmd) {
@@ -260,11 +282,14 @@ int apush_set(struct strapush *sap)
 
 EXPORT_SYMBOL(apush_set);
 
-int apush_get(struct strapush *sap)
+int
+apush_get(struct strapush *sap)
 {
 	struct strapush *ap;
+
 	if (sap != NULL) {
 		dev_t dev;
+
 #ifndef MAX_CHRDEV
 		if (sap->sap_major != MAJOR(MKDEV(sap->sap_major, 0)))
 #else
@@ -287,9 +312,10 @@ int apush_get(struct strapush *sap)
 	return (-ENODEV);
 }
 
-EXPORT_SYMBOL(apush_get);	/* strconf.h  LiS specific */
+EXPORT_SYMBOL(apush_get);	/* strconf.h LiS specific */
 
-int apush_vml(struct str_list *slp)
+int
+apush_vml(struct str_list *slp)
 {
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
 }
@@ -304,15 +330,19 @@ EXPORT_SYMBOL(apush_vml);
  *  @sflag: stream flag (%MODOPEN or %CLONEOPEN or %DRVOPEN)
  *  @crp: pointer to user credentials structure
  */
-int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
+int
+autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct apinfo *api;
 	int err;
+
 	if ((api = (typeof(api)) autopush_find(*devp)) != NULL) {
 		int k;
+
 		for (k = 0; k < MAX_APUSH; k++) {
 			struct fmodsw *fmod;
 			dev_t dev;
+
 			if (api->api_sap.sap_list[k][0] == 0)
 				break;
 			if (!(fmod = fmod_find(api->api_sap.sap_list[k]))) {
@@ -340,12 +370,14 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
 	{
 		/* detach everything, including the driver */
 		queue_t *wq = sd->sd_wq;
+
 		if (wq)
 			while (wq->q_next && SAMESTR(wq))
 				qdetach(wq->q_next - 1, oflag, crp);
 		return (err);
 	}
 }
+
 #if defined CONFIG_STREAMS_STH_MODULE || \
     defined CONFIG_STREAMS_FIFO_MODULE || \
     defined CONFIG_STREAMS_PIPE_MODULE || \

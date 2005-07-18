@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 12:08:18 $
+ @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 12:08:18 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 12:08:18 $"
+#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:33 $"
 
-static char const ident[] = "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 12:08:18 $";
+static char const ident[] =
+    "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -192,10 +193,11 @@ SHAInit(SHA_CTX * sha1)
  *  Note that this corrupts the sha1->data area
  */
 STATIC void
-SHSTransform(uint32_t * dig, uint32_t * dat)
+SHSTransform(uint32_t *dig, uint32_t *dat)
 {
 	uint32_t A, B, C, D, E;		/* Local vars */
 	uint32_t xd[16];		/* Expanded data */
+
 	/* Set up first buffer and local data buffer */
 	A = dig[0];
 	B = dig[1];
@@ -298,7 +300,7 @@ SHSTransform(uint32_t * dig, uint32_t * dat)
  */
 #ifdef __LITTLE_ENDIAN
 STATIC void
-longReverse(uint32_t * buf, int cnt)
+longReverse(uint32_t *buf, int cnt)
 {
 	uint32_t val;
 	cnt /= sizeof(uint32_t);
@@ -315,10 +317,11 @@ longReverse(uint32_t * buf, int cnt)
  *  Update SHS for a block of data
  */
 void
-SHAUpdate(SHA_CTX * sha1, uint8_t * buf, int len)
+SHAUpdate(SHA_CTX * sha1, uint8_t *buf, int len)
 {
 	uint32_t tmp;
 	int cnt;
+
 	/* Update bitcount */
 	tmp = sha1->lo;
 	if ((sha1->lo = tmp + ((uint32_t) len << 3)) < tmp)
@@ -329,6 +332,7 @@ SHAUpdate(SHA_CTX * sha1, uint8_t * buf, int len)
 	/* Handle any leading odd-sized chunks */
 	if (cnt) {
 		uint8_t *p = (uint8_t *) sha1->dat + cnt;
+
 		cnt = 64 - cnt;
 		if (len < cnt) {
 			memcpy(p, buf, len);
@@ -357,11 +361,12 @@ SHAUpdate(SHA_CTX * sha1, uint8_t * buf, int len)
  *  (64-bit count of bits processed, MSB-first)
  */
 void
-SHAFinal(uint8_t * out, SHA_CTX * sha1)
+SHAFinal(uint8_t *out, SHA_CTX * sha1)
 {
 	int len;
 	unsigned int i, j;
 	uint8_t *dat;
+
 	/* Compute number of bytes mod 64 */
 	len = (int) sha1->lo;
 	len = (len >> 3) & 0x3F;

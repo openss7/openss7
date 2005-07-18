@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:52 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:52 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:52 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:52 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -212,6 +212,7 @@ static struct timod *
 timod_alloc_priv(queue_t *q)
 {
 	struct timod *priv;
+
 	if ((priv = kmem_cache_alloc(timod_priv_cachep, SLAB_ATOMIC))) {
 		bzero(priv, sizeof(*priv));
 		priv->rq = q;
@@ -238,6 +239,7 @@ static void
 timod_free_priv(queue_t *q)
 {
 	struct timod *priv;
+
 	if ((priv = (typeof(priv)) q->q_ptr)) {
 		q->q_ptr = WR(q)->q_ptr = NULL;
 		priv->rq = NULL;
@@ -259,10 +261,12 @@ static int
 split_buffer(mblk_t *mp, int offset)
 {
 	unsigned char *ptr = mp->b_rptr + offset;
+
 	if (ptr > mp->b_wptr)
 		return (-EINVAL);
 	if (ptr < mp->b_wptr) {
 		mblk_t *dp;
+
 		if ((dp = copyb(mp))) {
 			dp->b_datap->db_type = M_DATA;
 			dp->b_rptr += offset;
@@ -288,6 +292,7 @@ static int
 timod_rput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
@@ -300,6 +305,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 		union T_primitives *p;
 		struct iocblk *ioc;
 		mblk_t *dp;
+
 	case M_PCPROTO:
 	case M_PROTO:
 		p = (typeof(p)) mp->b_rptr;
@@ -533,6 +539,7 @@ static int
 timod_wput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
+
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
@@ -546,6 +553,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		struct iocblk *ioc;
 		mblk_t *dp;
 		int err;
+
 	case M_IOCTL:
 		/* Most of the ioctls provided here are to acheive atomic and thread-safe
 		   operations on the stream for use by the XTI/TLI library.  Each ioctl takes a TPI 
@@ -614,6 +622,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		case TI_SETMYNAME:
 			if (p->type == T_CONN_RES && ioc->ioc_count >= sizeof(p->conn_res)) {
 				int doff = sizeof(p->conn_res);
+
 				if (p->conn_res.OPT_length
 				    && doff < p->conn_res.OPT_offset + p->conn_res.OPT_length)
 					doff = p->conn_res.OPT_offset + p->conn_res.OPT_length;
@@ -639,6 +648,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		case TI_SETPEERNAME:
 			if (p->type == T_CONN_REQ && ioc->ioc_count >= sizeof(p->conn_req)) {
 				int doff = sizeof(p->conn_req);
+
 				if (p->conn_req.OPT_length
 				    && doff < p->conn_req.OPT_offset + p->conn_req.OPT_length)
 					doff = p->conn_req.OPT_offset + p->conn_req.OPT_length;
@@ -700,6 +710,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		case TI_SYNC:
 			if (ioc->ioc_count >= sizeof(struct ti_sync_ack)) {
 				int flags = ((struct ti_sync_req *) p)->tsr_flags;
+
 				if (flags & TSRF_INFO_REQ) {
 					dp->b_datap->db_type = M_PCPROTO;
 					p->type = T_INFO_REQ;
@@ -892,11 +903,13 @@ timod_pop(queue_t *q)
 {
 	struct timod *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *mp;
+
 	switch (priv->state) {
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIMOD_EPROTO)) {
 			if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 				struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+
 				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;
 				prim->PRIM_type = T_ORDREL_REQ;
@@ -907,6 +920,7 @@ timod_pop(queue_t *q)
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 			struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+
 			mp->b_wptr = (unsigned char *) (prim + 1);
 			mp->b_datap->db_type = M_PROTO;
 			prim->PRIM_type = T_DISCON_REQ;
@@ -947,6 +961,7 @@ static int
 timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err = 0;
+
 	if (q->q_ptr != NULL)
 		goto quit;	/* already open */
 	err = ENXIO;
@@ -1002,6 +1017,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -1026,6 +1042,7 @@ STATIC int
 timod_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&timod_fmod)) < 0)
 		return (err);
 	return (0);
@@ -1035,6 +1052,7 @@ STATIC int
 timod_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&timod_fmod)) < 0)
 		return (err);
 	return (0);
@@ -1052,6 +1070,7 @@ STATIC int
 timod_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&timodinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	return (0);
@@ -1061,6 +1080,7 @@ STATIC int
 timod_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&timodinfo)) < 0)
 		return (err);
 	return (0);
@@ -1072,6 +1092,7 @@ MODULE_STATIC int __init
 timodinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = timod_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -1091,6 +1112,7 @@ MODULE_STATIC void __exit
 timodterminate(void)
 {
 	int err;
+
 	if ((err = timod_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = timod_term_caches()))

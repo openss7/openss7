@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/01 20:17:30 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:07:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/01 20:17:30 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:07:00 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/01 20:17:30 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:07:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,11 +85,14 @@ extern struct proc_dir_entry *proc_str;
 
 static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
     __attribute__ ((format(printf, 3, 4)));
-static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
+static int
+snprintf(char *buf, ssize_t size, const char *fmt, ...)
 {
 	int count = 0;
+
 	if (size > 0) {
 		va_list args;
+
 		va_start(args, fmt);
 		count = vsnprintf(buf, size, fmt, args);
 		va_end(args);
@@ -98,9 +101,11 @@ static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
 }
 
 #if 0
-static int get_streams_driver(char *page, ssize_t maxlen, struct cdevsw *d)
+static int
+get_streams_driver(char *page, ssize_t maxlen, struct cdevsw *d)
 {
 	int len = 0;
+
 	if (!d)
 		goto done;
       done:
@@ -108,7 +113,8 @@ static int get_streams_driver(char *page, ssize_t maxlen, struct cdevsw *d)
 }
 
 /* called by proc file system to list the registered STREAMS devices */
-static int get_streams_drivers_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_drivers_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 1024;
@@ -116,6 +122,7 @@ static int get_streams_drivers_list(char *page, char **start, off_t offset, int 
 	off_t begin, pos;
 	char buffer[maxlen + 1];
 	struct list_head *cur;
+
 	if (offset < maxlen) {
 		get_streams_driver_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -124,6 +131,7 @@ static int get_streams_drivers_list(char *page, char **start, off_t offset, int 
 	read_lock(&cdevsw_lock);
 	list_for_each(cur, &cdevsw_list) {
 		struct cdevsw *d = list_entry(cur, struct cdevsw, d_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_driver(buffer, maxlen - 1, d);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -143,9 +151,11 @@ static int get_streams_drivers_list(char *page, char **start, off_t offset, int 
 	return (len);
 }
 
-static int get_streams_module(char *page, ssize_t maxlen, struct cdevsw *d)
+static int
+get_streams_module(char *page, ssize_t maxlen, struct cdevsw *d)
 {
 	int len = 0;
+
 	if (!d)
 		goto done;
       done:
@@ -153,7 +163,8 @@ static int get_streams_module(char *page, ssize_t maxlen, struct cdevsw *d)
 }
 
 /* called by proc file system to list the registered STREAMS modules */
-static int get_streams_modules_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_modules_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 1024;
@@ -161,6 +172,7 @@ static int get_streams_modules_list(char *page, char **start, off_t offset, int 
 	off_t begin, pos;
 	char buffer[maxlen + 1];
 	struct list_head *cur;
+
 	if (offset < maxlen) {
 		get_streams_module_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -169,6 +181,7 @@ static int get_streams_modules_list(char *page, char **start, off_t offset, int 
 	read_lock(&fmodsw_lock);
 	list_for_each(cur, &fmodsw_list) {
 		struct fmodsw *f = list_entry(cur, struct fmodsw, f_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_module(buffer, maxlen - 1, f);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -189,9 +202,11 @@ static int get_streams_modules_list(char *page, char **start, off_t offset, int 
 }
 #endif
 
-static int get_streams_module_info_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_module_info_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "mi");
 	len += snprintf(page + len, maxlen - len, ", mi_idnum");
 	len += snprintf(page + len, maxlen - len, ", mi_idname");
@@ -201,9 +216,11 @@ static int get_streams_module_info_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", mi_lowat");
 	return (len);
 }
-static int get_streams_module_info(char *page, ssize_t maxlen, struct module_info *mi)
+static int
+get_streams_module_info(char *page, ssize_t maxlen, struct module_info *mi)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", mi);
 	if (!mi)
 		goto done;
@@ -216,9 +233,11 @@ static int get_streams_module_info(char *page, ssize_t maxlen, struct module_inf
       done:
 	return (len);
 }
-static int get_streams_module_stat_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_module_stat_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "ms");
 	len += snprintf(page + len, maxlen - len, ", ms_pcnt");
 	len += snprintf(page + len, maxlen - len, ", ms_scnt");
@@ -230,9 +249,11 @@ static int get_streams_module_stat_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", ms_flags");
 	return (len);
 }
-static int get_streams_module_stat(char *page, ssize_t maxlen, struct module_stat *ms)
+static int
+get_streams_module_stat(char *page, ssize_t maxlen, struct module_stat *ms)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", ms);
 	if (!ms)
 		goto done;
@@ -247,9 +268,11 @@ static int get_streams_module_stat(char *page, ssize_t maxlen, struct module_sta
       done:
 	return (len);
 }
-static int get_streams_qinit_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_qinit_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "qi");
 	len += snprintf(page + len, maxlen - len, ", qi_putp");
 	len += snprintf(page + len, maxlen - len, ", qi_srvp");
@@ -263,9 +286,11 @@ static int get_streams_qinit_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_qinit(char *page, ssize_t maxlen, struct qinit *qi)
+static int
+get_streams_qinit(char *page, ssize_t maxlen, struct qinit *qi)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", qi);
 	if (!qi)
 		goto done;
@@ -282,9 +307,11 @@ static int get_streams_qinit(char *page, ssize_t maxlen, struct qinit *qi)
       done:
 	return (len);
 }
-static int get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "st");
 	len += snprintf(page + len, maxlen - len, ", st_rdinit { ");
 	len += get_streams_qinit_hdr(page + len, maxlen - len);
@@ -297,9 +324,11 @@ static int get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamtab *st)
+static int
+get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamtab *st)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", st);
 	if (!st)
 		goto done;
@@ -315,27 +344,34 @@ static int get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamta
       done:
 	return (len);
 }
-static int get_streams_strapush_list_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_strapush_list_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, ", sap [, sap]");
 	return (len);
 }
-static int get_streams_strapush_list(char *page, ssize_t maxlen, struct list_head *list)
+static int
+get_streams_strapush_list(char *page, ssize_t maxlen, struct list_head *list)
 {
 	int len = 0;
 	struct list_head *cur, *tmp;
+
 	if (!list->next)
 		INIT_LIST_HEAD(list);
 	list_for_each_safe(cur, tmp, list) {
 		struct strapush *sap = (struct strapush *) list_entry(cur, struct apinfo, api_more);
+
 		len += snprintf(page + len, maxlen - len, ", %p", sap);
 	}
 	return (len);
 }
-static int get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "dp");
 	len += snprintf(page + len, maxlen - len, ", d_name");
 	len += snprintf(page + len, maxlen - len, ", d_str { ");
@@ -355,9 +391,11 @@ static int get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
+static int
+get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", d);
 	if (!d)
 		goto done;
@@ -382,7 +420,8 @@ static int get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 }
 
 /* called by proc file system to list the registered STREAMS devices */
-static int get_streams_cdevsw_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_cdevsw_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 1024;
@@ -390,6 +429,7 @@ static int get_streams_cdevsw_list(char *page, char **start, off_t offset, int l
 	off_t begin, pos;
 	char buffer[maxlen + 1];
 	struct list_head *cur;
+
 	if (offset < maxlen) {
 		get_streams_cdevsw_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -398,6 +438,7 @@ static int get_streams_cdevsw_list(char *page, char **start, off_t offset, int l
 	read_lock(&cdevsw_lock);
 	list_for_each(cur, &cdevsw_list) {
 		struct cdevsw *d = list_entry(cur, struct cdevsw, d_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_cdevsw(buffer, maxlen - 1, d);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -417,9 +458,11 @@ static int get_streams_cdevsw_list(char *page, char **start, off_t offset, int l
 	return (len);
 }
 
-static int get_streams_streamtab_mod_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_streamtab_mod_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "st");
 	len += snprintf(page + len, maxlen - len, ", st_rdinit { ");
 	len += get_streams_qinit_hdr(page + len, maxlen - len);
@@ -428,9 +471,11 @@ static int get_streams_streamtab_mod_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_streamtab_mod(char *page, ssize_t maxlen, struct streamtab *st)
+static int
+get_streams_streamtab_mod(char *page, ssize_t maxlen, struct streamtab *st)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", st);
 	if (!st)
 		goto done;
@@ -442,9 +487,11 @@ static int get_streams_streamtab_mod(char *page, ssize_t maxlen, struct streamta
       done:
 	return (len);
 }
-static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "f");
 	len += snprintf(page + len, maxlen - len, ", f_name");
 	len += snprintf(page + len, maxlen - len, ", f_str { ");
@@ -457,9 +504,11 @@ static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", f_kmod");
 	return (len);
 }
-static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
+static int
+get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", f);
 	if (!f)
 		goto done;
@@ -477,7 +526,8 @@ static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 }
 
 /* called by proc file system to list the registered STREAMS modules */
-static int get_streams_fmodsw_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_fmodsw_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 1024;
@@ -485,6 +535,7 @@ static int get_streams_fmodsw_list(char *page, char **start, off_t offset, int l
 	off_t begin, pos;
 	char buffer[maxlen + 1];
 	struct list_head *cur;
+
 	if (offset < maxlen) {
 		get_streams_fmodsw_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -493,6 +544,7 @@ static int get_streams_fmodsw_list(char *page, char **start, off_t offset, int l
 	read_lock(&fmodsw_lock);
 	list_for_each(cur, &fmodsw_list) {
 		struct fmodsw *f = list_entry(cur, struct fmodsw, f_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_fmodsw(buffer, maxlen - 1, f);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -525,10 +577,13 @@ static char *dyn_name[DYN_SIZE] = {
 	"DYN_MODINFO:",
 	"DYN_SYNQ:",
 };
+
 /* list the strinfo structure counts */
-static int get_streams_strinfo_data(char *page, ssize_t maxlen)
+static int
+get_streams_strinfo_data(char *page, ssize_t maxlen)
 {
 	int j, len = 0;
+
 	/* we don't need to lock anything here, the counts are allowed to change as we are listing
 	   them */
 	for (j = 0; j < DYN_SIZE; j++)
@@ -536,9 +591,11 @@ static int get_streams_strinfo_data(char *page, ssize_t maxlen)
 				atomic_read(&Strinfo[j].si_cnt), Strinfo[j].si_hwl);
 	return len;
 }
-static int get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len;
+
 	len = get_streams_strinfo_data(page, length + 1);
 	if (offset >= len) {
 		*start = page;
@@ -555,9 +612,11 @@ static int get_streams_strinfo_list(char *page, char **start, off_t offset, int 
 }
 
 #if defined CONFIG_STREAMS_DEBUG
-static int get_streams_stdata_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_stdata_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "sd");
 	len += snprintf(page + len, maxlen - len, ", sd_rq");
 	len += snprintf(page + len, maxlen - len, ", sd_wq");
@@ -570,7 +629,7 @@ static int get_streams_stdata_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_wropt");
 	len += snprintf(page + len, maxlen - len, ", sd_eropt");
 	len += snprintf(page + len, maxlen - len, ", sd_iocid");
-//	len += snprintf(page + len, maxlen - len, ", sd_iocwait");
+//      len += snprintf(page + len, maxlen - len, ", sd_iocwait");
 //      len += snprintf(page + len, maxlen - len, ", sd_sidp");
 //      len += snprintf(page + len, maxlen - len, ", sd_pgidp");
 	len += snprintf(page + len, maxlen - len, ", sd_wroff");
@@ -585,22 +644,24 @@ static int get_streams_stdata_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_nanchor");
 	len += snprintf(page + len, maxlen - len, ", sd_sigflags");
 	len += snprintf(page + len, maxlen - len, ", sd_siglist");
-//	len += snprintf(page + len, maxlen - len, ", sd_waitq");
+//      len += snprintf(page + len, maxlen - len, ", sd_waitq");
 //      len += snprintf(page + len, maxlen - len, ", sd_mark");
 	len += snprintf(page + len, maxlen - len, ", sd_closetime");
-//	len += snprintf(page + len, maxlen - len, ", sd_rtime");
-//	len += snprintf(page + len, maxlen - len, ", sd_qlock");
+//      len += snprintf(page + len, maxlen - len, ", sd_rtime");
+//      len += snprintf(page + len, maxlen - len, ", sd_qlock");
 	len += snprintf(page + len, maxlen - len, ", sd_owner");
 	len += snprintf(page + len, maxlen - len, ", sd_nest");
-//	len += snprintf(page + len, maxlen - len, ", sd_mutex");
+//      len += snprintf(page + len, maxlen - len, ", sd_mutex");
 	len += snprintf(page + len, maxlen - len, ", sd_links");
 	len += snprintf(page + len, maxlen - len, ", sd_link_next");
 	len += snprintf(page + len, maxlen - len, ", sd_linkblk");
 	return (len);
 }
-static int get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
+static int
+get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", sd);
 	if (!sd)
 		goto done;
@@ -630,32 +691,36 @@ static int get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_nanchor);
 	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_sigflags);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_siglist);
-//	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_waitq);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_waitq);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mark);
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_closetime);
-//	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_rtime);
-//	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_qlock);
+//      len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_rtime);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_qlock);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_owner);
 	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_nest);
-//	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mutex);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mutex);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_links);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_link_next);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_linkblk);
       done:
 	return (len);
 }
-static int get_streams_shinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_shinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "sh");
 	len += snprintf(page + len, maxlen - len, ", sh_stdata { ");
 	len += get_streams_stdata_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_shinfo_data(char *page, ssize_t maxlen, struct shinfo *sh)
+static int
+get_streams_shinfo_data(char *page, ssize_t maxlen, struct shinfo *sh)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "sh: %p", sh);
 	if (!sh)
 		goto done;
@@ -667,7 +732,8 @@ static int get_streams_shinfo_data(char *page, ssize_t maxlen, struct shinfo *sh
 }
 
 /* list stream head information for allocated streams */
-static int get_streams_shinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_shinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 512;
@@ -676,6 +742,7 @@ static int get_streams_shinfo_list(char *page, char **start, off_t offset, int l
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_STREAM];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_shinfo_data_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -683,6 +750,7 @@ static int get_streams_shinfo_list(char *page, char **start, off_t offset, int l
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct shinfo *sh = list_entry(cur, struct shinfo, sh_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_shinfo_data(buffer, maxlen - 1, sh);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -701,9 +769,11 @@ static int get_streams_shinfo_list(char *page, char **start, off_t offset, int l
 	return len;
 }
 
-static int get_streams_queue_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_queue_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "q");
 	len += snprintf(page + len, maxlen - len, ", q_qinfo");
 	len += snprintf(page + len, maxlen - len, ", q_first");
@@ -725,9 +795,11 @@ static int get_streams_queue_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", q_iflags");
 	return (len);
 }
-static int get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
+static int
+get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", q);
 	if (!q)
 		goto done;
@@ -752,9 +824,11 @@ static int get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
       done:
 	return (len);
 }
-static int get_streams_queinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_queinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "qu");
 	len += snprintf(page + len, maxlen - len, ", rq { ");
 	len += get_streams_queue_hdr(page + len, maxlen - len);
@@ -767,9 +841,11 @@ static int get_streams_queinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", qu_nest");
 	return (len);
 }
-static int get_streams_queinfo_data(char *page, ssize_t maxlen, struct queinfo *qu)
+static int
+get_streams_queinfo_data(char *page, ssize_t maxlen, struct queinfo *qu)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", qu);
 	if (!qu)
 		goto done;
@@ -787,7 +863,8 @@ static int get_streams_queinfo_data(char *page, ssize_t maxlen, struct queinfo *
 }
 
 /* list stream head information for allocated queues */
-static int get_streams_queinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_queinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 512;
@@ -796,6 +873,7 @@ static int get_streams_queinfo_list(char *page, char **start, off_t offset, int 
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_queinfo_data_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -803,6 +881,7 @@ static int get_streams_queinfo_list(char *page, char **start, off_t offset, int 
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct queinfo *qu = list_entry(cur, struct queinfo, qu_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_queinfo_data(buffer, maxlen - 1, qu);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -821,9 +900,11 @@ static int get_streams_queinfo_list(char *page, char **start, off_t offset, int 
 	return len;
 }
 
-static int get_streams_msgb_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_msgb_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "b");
 	len += snprintf(page + len, maxlen - len, ", b_next");
 	len += snprintf(page + len, maxlen - len, ", b_prev");
@@ -838,9 +919,11 @@ static int get_streams_msgb_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", b_size");
 	return (len);
 }
-static int get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
+static int
+get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", b);
 	if (!b)
 		goto done;
@@ -858,9 +941,11 @@ static int get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
       done:
 	return (len);
 }
-static int get_streams_mbinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_mbinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "m");
 	len += snprintf(page + len, maxlen - len, ", m_mblock { ");
 	len += get_streams_msgb_hdr(page + len, maxlen - len);
@@ -868,9 +953,11 @@ static int get_streams_mbinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", m_queue");
 	return (len);
 }
-static int get_streams_mbinfo_data(char *page, ssize_t maxlen, struct mbinfo *m)
+static int
+get_streams_mbinfo_data(char *page, ssize_t maxlen, struct mbinfo *m)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "m: %p", m);
 	if (!m)
 		goto done;
@@ -883,7 +970,8 @@ static int get_streams_mbinfo_data(char *page, ssize_t maxlen, struct mbinfo *m)
 }
 
 /* list stream head information for allocated message blocks */
-static int get_streams_mbinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_mbinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 256;
@@ -892,6 +980,7 @@ static int get_streams_mbinfo_list(char *page, char **start, off_t offset, int l
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_MSGBLOCK];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_mbinfo_data_hdr(buffer, maxlen - 1);
 		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -899,6 +988,7 @@ static int get_streams_mbinfo_list(char *page, char **start, off_t offset, int l
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct mbinfo *m = list_entry(cur, struct mbinfo, m_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_mbinfo_data(buffer, maxlen - 1, m);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -917,9 +1007,11 @@ static int get_streams_mbinfo_list(char *page, char **start, off_t offset, int l
 	return len;
 }
 
-static int get_streams_datab_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_datab_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "db");
 	len += snprintf(page + len, maxlen - len, ", db_frtnp");
 	len += snprintf(page + len, maxlen - len, ", db_base");
@@ -929,9 +1021,11 @@ static int get_streams_datab_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", db_users");
 	return (len);
 }
-static int get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
+static int
+get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "db: %p", db);
 	if (!db)
 		goto done;
@@ -944,18 +1038,22 @@ static int get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
       done:
 	return (len);
 }
-static int get_streams_dbinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_dbinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "db");
 	len += snprintf(page + len, maxlen - len, ", d_dblock { ");
 	len += get_streams_datab_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_dbinfo_data(char *page, ssize_t maxlen, struct dbinfo *db)
+static int
+get_streams_dbinfo_data(char *page, ssize_t maxlen, struct dbinfo *db)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", db);
 	if (!db)
 		goto done;
@@ -967,7 +1065,8 @@ static int get_streams_dbinfo_data(char *page, ssize_t maxlen, struct dbinfo *db
 }
 
 /* list stream head information for allocated data blocks */
-static int get_streams_dbinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_dbinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 256;
@@ -976,6 +1075,7 @@ static int get_streams_dbinfo_list(char *page, char **start, off_t offset, int l
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_MDBBLOCK];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_dbinfo_data_hdr(buffer, maxlen - 1);
 		len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -983,6 +1083,7 @@ static int get_streams_dbinfo_list(char *page, char **start, off_t offset, int l
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct dbinfo *db = list_entry(cur, struct dbinfo, db_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_dbinfo_data(buffer, maxlen - 1, db);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1001,18 +1102,22 @@ static int get_streams_dbinfo_list(char *page, char **start, off_t offset, int l
 	return len;
 }
 
-static int get_streams_linkblk_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_linkblk_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "l");
 	len += snprintf(page + len, maxlen - len, ", l_qtop");
 	len += snprintf(page + len, maxlen - len, ", l_qbot");
 	len += snprintf(page + len, maxlen - len, ", l_index");
 	return (len);
 }
-static int get_streams_linkblk(char *page, ssize_t maxlen, struct linkblk *l)
+static int
+get_streams_linkblk(char *page, ssize_t maxlen, struct linkblk *l)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", l);
 	if (!l)
 		goto done;
@@ -1022,18 +1127,22 @@ static int get_streams_linkblk(char *page, ssize_t maxlen, struct linkblk *l)
       done:
 	return (len);
 }
-static int get_streams_linkinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_linkinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "li");
 	len += snprintf(page + len, maxlen - len, ", li_linkblk { ");
 	len += get_streams_linkblk_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_linkinfo_data(char *page, ssize_t maxlen, struct linkinfo *li)
+static int
+get_streams_linkinfo_data(char *page, ssize_t maxlen, struct linkinfo *li)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", li);
 	if (!li)
 		goto done;
@@ -1045,7 +1154,8 @@ static int get_streams_linkinfo_data(char *page, ssize_t maxlen, struct linkinfo
 }
 
 /* list stream head information for allocated link blocks */
-static int get_streams_linkinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_linkinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 256;
@@ -1054,6 +1164,7 @@ static int get_streams_linkinfo_list(char *page, char **start, off_t offset, int
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_linkinfo_data_hdr(buffer, maxlen - 1);
 		len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1061,6 +1172,7 @@ static int get_streams_linkinfo_list(char *page, char **start, off_t offset, int
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct linkinfo *li = list_entry(cur, struct linkinfo, li_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_linkinfo_data(buffer, maxlen - 1, li);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1079,9 +1191,11 @@ static int get_streams_linkinfo_list(char *page, char **start, off_t offset, int
 	return len;
 }
 
-static int get_streams_strevent_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_strevent_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "se");
 	len += snprintf(page + len, maxlen - len, ", { SE_STREAM x.e.procp");
 	len += snprintf(page + len, maxlen - len, ", x.e.events ");
@@ -1098,9 +1212,11 @@ static int get_streams_strevent_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", se_seq");
 	return (len);
 }
-static int get_streams_strevent(char *page, ssize_t maxlen, int type, struct strevent *se)
+static int
+get_streams_strevent(char *page, ssize_t maxlen, int type, struct strevent *se)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", se);
 	if (!se)
 		goto done;
@@ -1125,9 +1241,11 @@ static int get_streams_strevent(char *page, ssize_t maxlen, int type, struct str
       done:
 	return (len);
 }
-static int get_streams_seinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_seinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "s");
 	len += snprintf(page + len, maxlen - len, ", s_strevent { ");
 	len += get_streams_strevent_hdr(page + len, maxlen - len);
@@ -1135,9 +1253,11 @@ static int get_streams_seinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", s_queue");
 	return (len);
 }
-static int get_streams_seinfo_data(char *page, ssize_t maxlen, struct seinfo *s)
+static int
+get_streams_seinfo_data(char *page, ssize_t maxlen, struct seinfo *s)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", s);
 	if (!s)
 		goto done;
@@ -1150,7 +1270,8 @@ static int get_streams_seinfo_data(char *page, ssize_t maxlen, struct seinfo *s)
 }
 
 /* list stream head information for allocated strevents */
-static int get_streams_seinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_seinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 256;
@@ -1159,6 +1280,7 @@ static int get_streams_seinfo_list(char *page, char **start, off_t offset, int l
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_seinfo_data_hdr(buffer, maxlen - 1);
 		len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1166,6 +1288,7 @@ static int get_streams_seinfo_list(char *page, char **start, off_t offset, int l
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct seinfo *s = list_entry(cur, struct seinfo, s_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_seinfo_data(buffer, maxlen - 1, s);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1184,9 +1307,11 @@ static int get_streams_seinfo_list(char *page, char **start, off_t offset, int l
 	return len;
 }
 
-static int get_streams_qband_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_qband_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "qb");
 	len += snprintf(page + len, maxlen - len, ", qb_next");
 	len += snprintf(page + len, maxlen - len, ", qb_count");
@@ -1199,9 +1324,11 @@ static int get_streams_qband_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", qb_band");
 	return (len);
 }
-static int get_streams_qband(char *page, ssize_t maxlen, struct qband *qb)
+static int
+get_streams_qband(char *page, ssize_t maxlen, struct qband *qb)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", qb);
 	if (!qb)
 		goto done;
@@ -1217,18 +1344,22 @@ static int get_streams_qband(char *page, ssize_t maxlen, struct qband *qb)
       done:
 	return (len);
 }
-static int get_streams_qbinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_qbinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "qbi");
 	len += snprintf(page + len, maxlen - len, ", qbi_qband { ");
 	len += get_streams_qband_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, qbi_refs");
 	return (len);
 }
-static int get_streams_qbinfo_data(char *page, ssize_t maxlen, struct qbinfo *qbi)
+static int
+get_streams_qbinfo_data(char *page, ssize_t maxlen, struct qbinfo *qbi)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", qbi);
 	if (!qbi)
 		goto done;
@@ -1240,7 +1371,8 @@ static int get_streams_qbinfo_data(char *page, ssize_t maxlen, struct qbinfo *qb
 }
 
 /* list stream head information for allocated qbands */
-static int get_streams_qbinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_qbinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 256;
@@ -1249,6 +1381,7 @@ static int get_streams_qbinfo_list(char *page, char **start, off_t offset, int l
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_QBAND];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_qbinfo_data_hdr(buffer, maxlen - 1);
 		len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1256,6 +1389,7 @@ static int get_streams_qbinfo_list(char *page, char **start, off_t offset, int l
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct qbinfo *qbi = list_entry(cur, struct qbinfo, qbi_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_qbinfo_data(buffer, maxlen - 1, qbi);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1274,9 +1408,11 @@ static int get_streams_qbinfo_list(char *page, char **start, off_t offset, int l
 	return len;
 }
 
-static int get_streams_strapush_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_strapush_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "sap");
 	len += snprintf(page + len, maxlen - len, ", sap_cmd");
 	len += snprintf(page + len, maxlen - len, ", sap_major");
@@ -1287,9 +1423,11 @@ static int get_streams_strapush_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_strapush(char *page, ssize_t maxlen, struct strapush *sap)
+static int
+get_streams_strapush(char *page, ssize_t maxlen, struct strapush *sap)
 {
 	int i, len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", sap);
 	if (!sap)
 		goto done;
@@ -1305,18 +1443,22 @@ static int get_streams_strapush(char *page, ssize_t maxlen, struct strapush *sap
       done:
 	return (len);
 }
-static int get_streams_apinfo_data_hdr(char *page, ssize_t maxlen)
+static int
+get_streams_apinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "api");
 	len += snprintf(page + len, maxlen - len, ", api_sap { ");
 	len += get_streams_strapush_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int get_streams_apinfo_data(char *page, ssize_t maxlen, struct apinfo *api)
+static int
+get_streams_apinfo_data(char *page, ssize_t maxlen, struct apinfo *api)
 {
 	int len = 0;
+
 	len += snprintf(page + len, maxlen - len, "%p", api);
 	if (!api)
 		goto done;
@@ -1328,7 +1470,8 @@ static int get_streams_apinfo_data(char *page, ssize_t maxlen, struct apinfo *ap
 }
 
 /* list stream head information for allocate strapush structures */
-static int get_streams_apinfo_list(char *page, char **start, off_t offset, int length)
+static int
+get_streams_apinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
 	static const ssize_t maxlen = 256;
@@ -1337,6 +1480,7 @@ static int get_streams_apinfo_list(char *page, char **start, off_t offset, int l
 	char buffer[maxlen + 1];
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
 	struct list_head *cur, *tmp;
+
 	if (offset < maxlen) {
 		get_streams_apinfo_data_hdr(buffer, maxlen - 1);
 		len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1344,6 +1488,7 @@ static int get_streams_apinfo_list(char *page, char **start, off_t offset, int l
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
 		struct apinfo *api = list_entry(cur, struct apinfo, api_list);
+
 		if ((pos += maxlen) > offset) {
 			get_streams_apinfo_data(buffer, maxlen - 1, api);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1367,7 +1512,8 @@ struct proc_dir_entry *proc_str = NULL;
 
 #endif				/* CONFIG_PROC_FS */
 
-int strprocfs_init(void)
+int
+strprocfs_init(void)
 {
 #ifdef CONFIG_PROC_FS
 	proc_str = proc_mkdir("streams", NULL);
@@ -1399,7 +1545,8 @@ int strprocfs_init(void)
 	return (0);
 }
 
-void strprocfs_exit(void)
+void
+strprocfs_exit(void)
 {
 #ifdef CONFIG_PROC_FS
 #if 0

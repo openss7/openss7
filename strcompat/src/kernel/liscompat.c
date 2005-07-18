@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -110,7 +110,8 @@ MODULE_ALIAS("streams-liscompat");
  *  symbols.  It is only linked into the kernel when compiled with
  *  CONFIG_STREAMS_COMPAT_LIS set.
  */
-static char *dont_use_this_function(void)
+static char *
+dont_use_this_function(void)
 {
 	swerr();
 	return "(DON'T USE THIS FUNCTION!)";
@@ -118,16 +119,19 @@ static char *dont_use_this_function(void)
 
 #ifdef CONFIG_STREAMS_DEBUG
 #if LIS_DEPRECARTED_FUNCTIONS
-static void warn_kern_violation(char *func, char *file, int line)
+static void
+warn_kern_violation(char *func, char *file, int line)
 {
 	printk(KERN_WARNING "%s: export violation: %s +%d\n", func, file, line);
 }
 #endif
-static void warn_kern_wrapper(const char *func, const char *repl)
+static void
+warn_kern_wrapper(const char *func, const char *repl)
 {
 	printk(KERN_DEBUG "%s: don't call this function: use %s instead\n", func, repl);
 }
-static void warnf_kern_wrapper(const char *func, const char *repl, const char *f, const int l)
+static void
+warnf_kern_wrapper(const char *func, const char *repl, const char *f, const int l)
 {
 	printk(KERN_DEBUG "%s [%s +%d]: don't call this function: use %s instead\n", func, f, l,
 	       repl);
@@ -153,6 +157,7 @@ static void warnf_kern_wrapper(const char *func, const char *repl, const char *f
  *  Here are the lis definitions...
  */
 __LIS_EXTERN_INLINE int lis_adjmsg(mblk_t *mp, int length);
+
 EXPORT_SYMBOL(lis_adjmsg);
 __LIS_EXTERN_INLINE struct msgb *lis_allocb(int size, unsigned int priority, char *file_name,
 					    int line_nr);
@@ -163,204 +168,279 @@ __LIS_EXTERN_INLINE struct msgb *lis_allocb_physreq(int size, unsigned int prior
 EXPORT_SYMBOL(lis_allocb_physreq);
 #if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE queue_t *lis_allocq(const char *name);
+
 EXPORT_SYMBOL(lis_allocq);
 #endif
 __LIS_EXTERN_INLINE int lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2);
+
 EXPORT_SYMBOL(lis_appq);
 __LIS_EXTERN_INLINE queue_t *lis_backq(queue_t *q);
+
 EXPORT_SYMBOL(lis_backq);
 __LIS_EXTERN_INLINE queue_t *lis_backq_fcn(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_backq_fcn);
 __LIS_EXTERN_INLINE int lis_bcanput(queue_t *q, unsigned char band);
+
 EXPORT_SYMBOL(lis_bcanput);
 __LIS_EXTERN_INLINE int lis_bcanputnext(queue_t *q, unsigned char band);
+
 EXPORT_SYMBOL(lis_bcanputnext);
 __LIS_EXTERN_INLINE int lis_bcanputnext_anyband(queue_t *q);
+
 EXPORT_SYMBOL(lis_bcanputnext_anyband);
 __LIS_EXTERN_INLINE int lis_bufcall(unsigned size, int priority, void (*function) (long), long arg);
+
 EXPORT_SYMBOL(lis_bufcall);
 __LIS_EXTERN_INLINE mblk_t *lis_copyb(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_copyb);
 __LIS_EXTERN_INLINE mblk_t *lis_copymsg(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_copymsg);
 #if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE int lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len);
+
 EXPORT_SYMBOL(lis_copyin);
 __LIS_EXTERN_INLINE int lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len);
+
 EXPORT_SYMBOL(lis_copyout);
 #endif
 __LIS_EXTERN_INLINE mblk_t *lis_dupb(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_dupb);
 __LIS_EXTERN_INLINE mblk_t *lis_dupmsg(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_dupmsg);
 __LIS_EXTERN_INLINE mblk_t *lis_esballoc(unsigned char *base, int size, int priority,
 					 frtn_t *freeinfo, char *file_name, int line_nr);
 EXPORT_SYMBOL(lis_esballoc);
 __LIS_EXTERN_INLINE int lis_esbbcall(int priority, void (*function) (long), long arg);
+
 EXPORT_SYMBOL(lis_esbbcall);
 __LIS_EXTERN_INLINE void lis_flushband(queue_t *q, unsigned char band, int flag);
+
 EXPORT_SYMBOL(lis_flushband);
 __LIS_EXTERN_INLINE void lis_flushq(queue_t *q, int flag);
+
 EXPORT_SYMBOL(lis_flushq);
 __LIS_EXTERN_INLINE void lis_freeb(mblk_t *bp);
+
 EXPORT_SYMBOL(lis_freeb);
 __LIS_EXTERN_INLINE void lis_freemsg(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_freemsg);
 __LIS_EXTERN_INLINE void lis_freezestr(queue_t *q);
+
 EXPORT_SYMBOL(lis_freezestr);
 __LIS_EXTERN_INLINE mblk_t *lis_getq(queue_t *q);
+
 EXPORT_SYMBOL(lis_getq);
 #if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_freeq(queue_t *q);
+
 EXPORT_SYMBOL(lis_freeq);
 #endif
 __LIS_EXTERN_INLINE int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp);
+
 EXPORT_SYMBOL(lis_insq);
 __LIS_EXTERN_INLINE void lis_linkb(mblk_t *mp1, mblk_t *mp2);
+
 EXPORT_SYMBOL(lis_linkb);
 __LIS_EXTERN_INLINE int lis_max(int a, int b);
+
 EXPORT_SYMBOL(lis_max);
 __LIS_EXTERN_INLINE int lis_min(int a, int b);
+
 EXPORT_SYMBOL(lis_min);
 __LIS_EXTERN_INLINE int lis_msgdsize(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_msgdsize);
 __LIS_EXTERN_INLINE mblk_t *lis_msgpullup(mblk_t *mp, int len);
+
 EXPORT_SYMBOL(lis_msgpullup);
 __LIS_EXTERN_INLINE int lis_msgsize(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_msgsize);
 __LIS_EXTERN_INLINE int lis_pullupmsg(mblk_t *mp, int length);
+
 EXPORT_SYMBOL(lis_pullupmsg);
 __LIS_EXTERN_INLINE int lis_putbq(queue_t *q, mblk_t *mp);
+
 EXPORT_SYMBOL(lis_putbq);
 __LIS_EXTERN_INLINE int lis_putctl(queue_t *q, int type, char *file_name, int line_nr);
+
 EXPORT_SYMBOL(lis_putctl);
 __LIS_EXTERN_INLINE int lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr);
+
 EXPORT_SYMBOL(lis_putctl1);
 __LIS_EXTERN_INLINE int lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr);
+
 EXPORT_SYMBOL(lis_putnextctl);
 __LIS_EXTERN_INLINE int lis_putnextctl1(queue_t *q, int type, int param, char *file_name,
 					int line_nr);
 EXPORT_SYMBOL(lis_putnextctl1);
 __LIS_EXTERN_INLINE int lis_putq(queue_t *q, mblk_t *mp);
+
 EXPORT_SYMBOL(lis_putq);
 __LIS_EXTERN_INLINE int lis_qcountstrm(queue_t *q);
+
 EXPORT_SYMBOL(lis_qcountstrm);
 #if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds);
+
 EXPORT_SYMBOL(lis_qdetach);
 #endif
 __LIS_EXTERN_INLINE void lis_qenable(queue_t *q);
+
 EXPORT_SYMBOL(lis_qenable);
 __LIS_EXTERN_INLINE void lis_qprocsoff(queue_t *rdq);
+
 EXPORT_SYMBOL(lis_qprocsoff);
 __LIS_EXTERN_INLINE void lis_qprocson(queue_t *rdq);
+
 EXPORT_SYMBOL(lis_qprocson);
 __LIS_EXTERN_INLINE int lis_qsize(queue_t *q);
+
 EXPORT_SYMBOL(lis_qsize);
 __LIS_EXTERN_INLINE mblk_t *lis_rmvb(mblk_t *mp, mblk_t *bp);
+
 EXPORT_SYMBOL(lis_rmvb);
 __LIS_EXTERN_INLINE void lis_rmvq(queue_t *q, mblk_t *mp);
+
 EXPORT_SYMBOL(lis_rmvq);
 __LIS_EXTERN_INLINE queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_OTHERQ);
 __LIS_EXTERN_INLINE queue_t *lis_safe_RD(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_RD);
 __LIS_EXTERN_INLINE int lis_safe_SAMESTR(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_SAMESTR);
 __LIS_EXTERN_INLINE queue_t *lis_safe_WR(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_WR);
 __LIS_EXTERN_INLINE int lis_safe_canenable(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_canenable);
 __LIS_EXTERN_INLINE void lis_safe_enableok(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_enableok);
 __LIS_EXTERN_INLINE void lis_safe_noenable(queue_t *q, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_noenable);
 __LIS_EXTERN_INLINE void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_putmsg);
 __LIS_EXTERN_INLINE void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_putnext);
 __LIS_EXTERN_INLINE void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l);
+
 EXPORT_SYMBOL(lis_safe_qreply);
 #if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
+
 EXPORT_SYMBOL(lis_setq);
 #endif
 __LIS_EXTERN_INLINE int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val);
+
 EXPORT_SYMBOL(lis_strqget);
 __LIS_EXTERN_INLINE int lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val);
+
 EXPORT_SYMBOL(lis_strqset);
 __LIS_EXTERN_INLINE int lis_testb(int size, unsigned int priority);
+
 EXPORT_SYMBOL(lis_testb);
 __LIS_EXTERN_INLINE toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 					   char *file_name, int line_nr);
 EXPORT_SYMBOL(lis_timeout_fcn);
 __LIS_EXTERN_INLINE void lis_unbufcall(int bcid);
+
 EXPORT_SYMBOL(lis_unbufcall);
 __LIS_EXTERN_INLINE void lis_unfreezestr(queue_t *q);
+
 EXPORT_SYMBOL(lis_unfreezestr);
 __LIS_EXTERN_INLINE mblk_t *lis_unlinkb(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_unlinkb);
 __LIS_EXTERN_INLINE toid_t lis_untimeout(toid_t id);
+
 EXPORT_SYMBOL(lis_untimeout);
 __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp);
+
 EXPORT_SYMBOL(lis_xmsgsize);
 
 #if LIS_DEPRECARTED_FUNCTIONS
 char *lis_poll_file = "<linux/poll.h>";
+
 EXPORT_SYMBOL(lis_poll_file);
 #endif
 char *lis_stropts_file = "<linux/stropts.h>";
+
 EXPORT_SYMBOL(lis_stropts_file);
 char lis_date[] = "2003/10/28 08:00:04";
+
 EXPORT_SYMBOL(lis_date);
 char lis_kernel_version[] = UTS_RELEASE;
+
 EXPORT_SYMBOL(lis_kernel_version);
 char lis_version[] = "1.1.2.17";
+
 EXPORT_SYMBOL(lis_version);
 #if LIS_DEPRECARTED_FUNCTIONS
-char *lis_poll_events(short events)
+char *
+lis_poll_events(short events)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_poll_events);
-const char *lis_maj_min_name(stdata_t *head)
+const char *
+lis_maj_min_name(stdata_t *head)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_maj_min_name);
 #endif
-const char *lis_msg_type_name(mblk_t *mp)
+const char *
+lis_msg_type_name(mblk_t *mp)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_msg_type_name);
-const char *lis_queue_name(queue_t *q)
+const char *
+lis_queue_name(queue_t *q)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_queue_name);
-const char *lis_strm_name(stdata_t *head)
+const char *
+lis_strm_name(stdata_t *head)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_strm_name);
-const char *lis_strm_name_from_queue(queue_t *q)
+const char *
+lis_strm_name_from_queue(queue_t *q)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_strm_name_from_queue);
-int lis_apush_get(struct lis_strapush *ap)
+int
+lis_apush_get(struct lis_strapush *ap)
 {
 	struct strapush sap;
 	int k, err;
 	int maxapush = MAXAPUSH > LIS_MAXAPUSH ? LIS_MAXAPUSH : MAXAPUSH;
 	int fmnamesz = FMNAMESZ > LIS_FMNAMESZ ? LIS_FMNAMESZ : FMNAMESZ;
+
 	sap.sap_cmd = ap->sap_cmd;
 	sap.sap_major = ap->sap_major;
 	sap.sap_minor = ap->sap_minor;
@@ -379,12 +459,14 @@ int lis_apush_get(struct lis_strapush *ap)
 }
 
 EXPORT_SYMBOL(lis_apush_get);
-int lis_apush_set(struct lis_strapush *ap)
+int
+lis_apush_set(struct lis_strapush *ap)
 {
 	struct strapush sap;
 	int k;
 	int maxapush = MAXAPUSH > LIS_MAXAPUSH ? LIS_MAXAPUSH : MAXAPUSH;
 	int fmnamesz = FMNAMESZ > LIS_FMNAMESZ ? LIS_FMNAMESZ : FMNAMESZ;
+
 	sap.sap_cmd = ap->sap_cmd;
 	sap.sap_major = ap->sap_major;
 	sap.sap_minor = ap->sap_minor;
@@ -398,16 +480,20 @@ int lis_apush_set(struct lis_strapush *ap)
 }
 
 EXPORT_SYMBOL(lis_apush_set);
-int lis_apush_vml(struct str_list *slp)
+int
+lis_apush_vml(struct str_list *slp)
 {
 	return apush_vml(slp);
 }
+
 EXPORT_SYMBOL(lis_apush_vml);
 #if LIS_DEPRECARTED_FUNCTIONS
-int lis_apushm(dev_t dev, const char *mods[])
+int
+lis_apushm(dev_t dev, const char *mods[])
 {
 	struct strapush sap;
 	int err;
+
 	sap.sap_major = getmajor(dev);
 	sap.sap_minor = getminor(dev);
 	if ((err = apush_get(&sap)) == 0)
@@ -417,67 +503,77 @@ int lis_apushm(dev_t dev, const char *mods[])
 }
 
 EXPORT_SYMBOL(lis_apushm);
-int lis_check_guard(void *ptr, char *msg)
+int
+lis_check_guard(void *ptr, char *msg)
 {
 	return 1;
 }
 
 EXPORT_SYMBOL(lis_check_guard);
-int lis_check_mem(void)
+int
+lis_check_mem(void)
 {
 	return 1;
 }
 
 EXPORT_SYMBOL(lis_check_mem);
-int lis_check_q_magic(queue_t *q, char *file, int line)
+int
+lis_check_q_magic(queue_t *q, char *file, int line)
 {
 	return 1;
 }
 
 EXPORT_SYMBOL(lis_check_q_magic);
 #endif
-int lis_clone_major(void)
+int
+lis_clone_major(void)
 {
 	return CONFIG_STREAMS_CLONE_MAJOR;
 }
 
 EXPORT_SYMBOL(lis_clone_major);
 #if LIS_DEPRECARTED_FUNCTIONS
-int lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds)
+int
+lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds)
 {
 	return strm_f_ops.release(i, f);
 }
 
 EXPORT_SYMBOL(lis_doclose);
-int lis_fifo_open_sync(struct inode *i, struct file *f)
+int
+lis_fifo_open_sync(struct inode *i, struct file *f)
 {
 	swerr();
 	return -ENOSYS;
 }
 
 EXPORT_SYMBOL(lis_fifo_open_sync);
-int lis_fifo_write_sync(struct inode *i, int written)
+int
+lis_fifo_write_sync(struct inode *i, int written)
 {
 	swerr();
 	return -ENOSYS;
 }
 
 EXPORT_SYMBOL(lis_fifo_write_sync);
-int lis_get_fifo(struct file **f)
+int
+lis_get_fifo(struct file **f)
 {
 	swerr();
 	return -ENOSYS;
 }
 
 EXPORT_SYMBOL(lis_get_fifo);
-int lis_get_pipe(struct file **f0, struct file **f1)
+int
+lis_get_pipe(struct file **f0, struct file **f1)
 {
 	swerr();
 	return -ENOSYS;
 }
 
 EXPORT_SYMBOL(lis_get_pipe);
-int lis_ioc_fattach(struct file *f, char *path)
+int
+lis_ioc_fattach(struct file *f, char *path)
 {
 #if HAVE_KERNEL_FATTACH_SUPPORT
 	return lis_fattach(f, path);
@@ -487,7 +583,8 @@ int lis_ioc_fattach(struct file *f, char *path)
 }
 
 EXPORT_SYMBOL(lis_ioc_fattach);
-int lis_ioc_fdetach(char *path)
+int
+lis_ioc_fdetach(char *path)
 {
 #if HAVE_KERNEL_FATTACH_SUPPORT
 	return lis_fdetach(path);
@@ -497,7 +594,8 @@ int lis_ioc_fdetach(char *path)
 }
 
 EXPORT_SYMBOL(lis_ioc_fdetach);
-int lis_ioc_pipe(unsigned int *fildes)
+int
+lis_ioc_pipe(unsigned int *fildes)
 {
 #if HAVE_KERNEL_PIPE_SUPPORT
 	return lis_pipe(fildes);
@@ -510,20 +608,24 @@ EXPORT_SYMBOL(lis_ioc_pipe);
 #endif
 
 int lis_major = 0;
+
 EXPORT_SYMBOL(lis_major);
-int lis_own_spl(void)
+int
+lis_own_spl(void)
 {
 	return 1;
 }
 
 EXPORT_SYMBOL(lis_own_spl);
-int lis_printk(const char *fmt, ...)
+int
+lis_printk(const char *fmt, ...)
 {
 	static spinlock_t printk_lock = SPIN_LOCK_UNLOCKED;
 	static char printk_buf[1024];
 	unsigned long flags;
 	va_list args;
 	int ret;
+
 	spin_lock_irqsave(&printk_lock, flags);
 	va_start(args, fmt);
 	vsnprintf(printk_buf, sizeof(printk_buf), fmt, args);
@@ -535,38 +637,44 @@ int lis_printk(const char *fmt, ...)
 
 EXPORT_SYMBOL(lis_printk);
 #if LIS_DEPRECARTED_FUNCTIONS
-int lis_strclose(struct inode *i, struct file *f)
+int
+lis_strclose(struct inode *i, struct file *f)
 {
 	return strm_f_ops.release(i, f);
 }
 
 EXPORT_SYMBOL(lis_strclose);
-int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp,
-		   int *flagsp, int doit)
+int
+lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp,
+	       int *flagsp, int doit)
 {
 	return strgetpmsg(fp, ctlp, datp, bandp, flagsp);
 }
 
 EXPORT_SYMBOL(lis_strgetpmsg);
-int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg)
+int
+lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg)
 {
 	return strm_f_ops.ioctl(i, f, cmd, arg);
 }
 
 EXPORT_SYMBOL(lis_strioctl);
-int lis_stropen(struct inode *i, struct file *f)
+int
+lis_stropen(struct inode *i, struct file *f)
 {
 	return strm_f_ops.open(i, f);
 }
 
 EXPORT_SYMBOL(lis_stropen);
-int lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band, int flags)
+int
+lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band, int flags)
 {
 	return strputpmsg(fp, ctlp, datp, band, flags);
 }
 
 EXPORT_SYMBOL(lis_strputpmsg);
-int lis_valid_mod_list(struct str_list ml)
+int
+lis_valid_mod_list(struct str_list ml)
 {
 	return apush_vml(&ml);
 }
@@ -574,36 +682,43 @@ int lis_valid_mod_list(struct str_list ml)
 EXPORT_SYMBOL(lis_valid_mod_list);
 
 long lis_max_mem = 0;
+
 EXPORT_SYMBOL(lis_max_mem);
 #endif
-long lis_milli_to_ticks(long milli_sec)
+long
+lis_milli_to_ticks(long milli_sec)
 {
 	return WARN(milli_sec / (1000 / HZ));
 }
 
 EXPORT_SYMBOL(lis_milli_to_ticks);
-pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name)
+pid_t
+lis_thread_start(int (*fcn) (void *), void *arg, const char *name)
 {
 	return 0;
 }
 
 EXPORT_SYMBOL(lis_thread_start);
 #if LIS_DEPRECARTED_FUNCTIONS
-ssize_t lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
+ssize_t
+lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 {
 	return strm_f_ops.read(fp, ubuff, ulen, op);
 }
 
 EXPORT_SYMBOL(lis_strread);
-ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
+ssize_t
+lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
 {
 	return strm_f_ops.write(fp, ubuff, ulen, op);
 }
 
 EXPORT_SYMBOL(lis_strwrite);
-streamtab_t *lis_find_strdev(major_t major)
+streamtab_t *
+lis_find_strdev(major_t major)
 {
 	struct streamtab *st = NULL;
+
 #ifdef MAX_CHRDEV
 	if (major < MAX_CHRDEV)
 #else
@@ -611,6 +726,7 @@ streamtab_t *lis_find_strdev(major_t major)
 #endif
 	{
 		struct cdevsw *cdev;
+
 		if ((cdev = sdev_get(major)) != NULL) {
 			printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 			st = cdev->d_str;
@@ -623,26 +739,32 @@ streamtab_t *lis_find_strdev(major_t major)
 
 EXPORT_SYMBOL(lis_find_strdev);
 struct fmodsw *lis_fmod_sw = NULL;
+
 EXPORT_SYMBOL(lis_fmod_sw);
 struct fmodsw *lis_fstr_sw = NULL;
+
 EXPORT_SYMBOL(lis_fstr_sw);
-struct inode *lis_old_inode(struct file *f, struct inode *i)
+struct inode *
+lis_old_inode(struct file *f, struct inode *i)
 {
 	swerr();
 	return NULL;
 }
 
 EXPORT_SYMBOL(lis_old_inode);
-unsigned lis_poll_2_1(struct file *fp, poll_table * wait)
+unsigned
+lis_poll_2_1(struct file *fp, poll_table * wait)
 {
 	return strm_f_ops.poll(fp, wait);
 }
 
 EXPORT_SYMBOL(lis_poll_2_1);
-unsigned lis_poll_bits(stdata_t *hd)
+unsigned
+lis_poll_bits(stdata_t *hd)
 {
 	unsigned int mask = 0;
 	struct stdata *sd = (typeof(sd)) hd;
+
 	if (test_bit(STRDERR_BIT, &sd->sd_flag) || test_bit(STWRERR_BIT, &sd->sd_flag))
 		mask |= POLLERR;
 	if (test_bit(STRHUP_BIT, &sd->sd_flag))
@@ -665,17 +787,21 @@ unsigned lis_poll_bits(stdata_t *hd)
 EXPORT_SYMBOL(lis_poll_bits);
 #endif
 unsigned long lis_debug_mask2 = 0;
+
 EXPORT_SYMBOL(lis_debug_mask2);
 unsigned long lis_debug_mask = 0;
+
 EXPORT_SYMBOL(lis_debug_mask);
-void *lis_vmalloc(unsigned long size)
+void *
+lis_vmalloc(unsigned long size)
 {
 	return WARN(vmalloc(size));
 }
 
 EXPORT_SYMBOL(lis_vmalloc);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_bprintf(char *fmt, ...)
+void
+lis_bprintf(char *fmt, ...)
 {
 	swerr();
 	return;
@@ -683,10 +809,12 @@ void lis_bprintf(char *fmt, ...)
 
 EXPORT_SYMBOL(lis_bprintf);
 #endif
-void lis_cmn_err(int err_lvl, char *fmt, ...)
+void
+lis_cmn_err(int err_lvl, char *fmt, ...)
 {
 	extern void vcmn_err(int err_lvl, const char *fmt, va_list args);
 	va_list args;
+
 	va_start(args, fmt);
 	vcmn_err(err_lvl, fmt, args);
 	va_end(args);
@@ -694,14 +822,16 @@ void lis_cmn_err(int err_lvl, char *fmt, ...)
 
 EXPORT_SYMBOL(lis_cmn_err);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_dobufcall(int cpu_id)
+void
+lis_dobufcall(int cpu_id)
 {
 	/* bufcalls will be processed by the LfS executive when necessary. */
 	return;
 }
 
 EXPORT_SYMBOL(lis_dobufcall);
-void lis_enable_intr(struct streamtab *strtab, int major, const char *name)
+void
+lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 {
 	/* don't do this */
 	swerr();
@@ -709,7 +839,8 @@ void lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 }
 
 EXPORT_SYMBOL(lis_enable_intr);
-void lis_fifo_close_sync(struct inode *i, struct file *f)
+void
+lis_fifo_close_sync(struct inode *i, struct file *f)
 {
 	/* don't do this */
 	swerr();
@@ -717,7 +848,8 @@ void lis_fifo_close_sync(struct inode *i, struct file *f)
 }
 
 EXPORT_SYMBOL(lis_fifo_close_sync);
-void lis_flush_print_buffer(void)
+void
+lis_flush_print_buffer(void)
 {
 	/* print buffers will be processed by kernel. */
 	return;
@@ -725,62 +857,71 @@ void lis_flush_print_buffer(void)
 
 EXPORT_SYMBOL(lis_flush_print_buffer);
 #endif
-void lis_free(void *ptr, char *file_name, int line_nr)
+void
+lis_free(void *ptr, char *file_name, int line_nr)
 {
 	kfree(ptr);
 }
 
 EXPORT_SYMBOL(lis_free);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_freedb(mblk_t *bp, int free_hdr)
+void
+lis_freedb(mblk_t *bp, int free_hdr)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_freedb);
-void lis_init_bufcall(void)
+void
+lis_init_bufcall(void)
 {
 	return;
 }
 
 EXPORT_SYMBOL(lis_init_bufcall);
-void lis_mark_mem(void *ptr, const char *file_name, int line_nr)
+void
+lis_mark_mem(void *ptr, const char *file_name, int line_nr)
 {
 	return;
 }
 
 EXPORT_SYMBOL(lis_mark_mem);
 #endif
-void lis_print_block(void *ptr)
+void
+lis_print_block(void *ptr)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_block);
-void lis_print_data(mblk_t *mp, int opt, int cont)
+void
+lis_print_data(mblk_t *mp, int opt, int cont)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_data);
-void lis_print_mem(void)
+void
+lis_print_mem(void)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_mem);
-void lis_print_msg(mblk_t *mp, const char *prefix, int opt)
+void
+lis_print_msg(mblk_t *mp, const char *prefix, int opt)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_msg);
-void lis_print_queue(queue_t *q)
+void
+lis_print_queue(queue_t *q)
 {
 	swerr();
 	return;
@@ -788,42 +929,48 @@ void lis_print_queue(queue_t *q)
 
 EXPORT_SYMBOL(lis_print_queue);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_print_queues(void)
+void
+lis_print_queues(void)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_queues);
-void lis_print_spl_track(void)
+void
+lis_print_spl_track(void)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_spl_track);
-void lis_print_stream(stdata_t *hd)
+void
+lis_print_stream(stdata_t *hd)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_print_stream);
-void lis_set_file_str(struct file *f, struct stdata *s)
+void
+lis_set_file_str(struct file *f, struct stdata *s)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_set_file_str);
-void lis_setqsched(int can_call)
+void
+lis_setqsched(int can_call)
 {
 	WARN(setqsched());
 }
 
 EXPORT_SYMBOL(lis_setqsched);
 #endif
-void lis_spl0_fcn(char *file, int line)
+void
+lis_spl0_fcn(char *file, int line)
 {
 	WARNF(local_irq_enable(), file, line);
 }
@@ -845,25 +992,29 @@ EXPORT_SYMBOL(lis_setqsched_isr_cnts);
 #endif
 
 #if LIS_DEPRECARTED_FUNCTIONS
-mblk_t *lis_get_passfp(void)
+mblk_t *
+lis_get_passfp(void)
 {
 	return allocb(sizeof(struct strrecvfd), BPRI_HI);
 }
 
 EXPORT_SYMBOL(lis_get_passfp);
-void lis_free_passfp(mblk_t *mp)
+void
+lis_free_passfp(mblk_t *mp)
 {
 	freemsg(mp);
 }
 
 EXPORT_SYMBOL(lis_free_passfp);
-int lis_recvfd(stdata_t *recvhd, strrecvfd_t * recv, struct file *fp)
+int
+lis_recvfd(stdata_t *recvhd, strrecvfd_t * recv, struct file *fp)
 {
 	return (-EOPNOTSUPP);
 }
 
 EXPORT_SYMBOL(lis_recvfd);
-int lis_sendfd(stdata_t *sendhd, unsigned int fd, struct file *fp)
+int
+lis_sendfd(stdata_t *sendhd, unsigned int fd, struct file *fp)
 {
 	return (-EOPNOTSUPP);
 }
@@ -877,27 +1028,31 @@ EXPORT_SYMBOL(lis_sendfd);
  *  know when a module is using one and can change it.
  */
 #ifdef CONFIG_PCI
-dma64_addr_t lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page,
-					  unsigned long offset, int direction)
+dma64_addr_t
+lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page,
+			     unsigned long offset, int direction)
 {
 	return WARN(pci_dac_page_to_dma(pdev, page, offset, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dac_page_to_dma);
-dma_addr_t lis_osif_pci_map_page(struct pci_dev *hwdev, struct page *page, unsigned long offset,
-				 size_t size, int direction)
+dma_addr_t
+lis_osif_pci_map_page(struct pci_dev *hwdev, struct page *page, unsigned long offset,
+		      size_t size, int direction)
 {
 	return WARN(pci_map_page(hwdev, page, offset, size, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_map_page);
-dma_addr_t lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr, size_t size, int direction)
+dma_addr_t
+lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr, size_t size, int direction)
 {
 	return WARN(pci_map_single(hwdev, ptr, size, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_map_single);
-dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg)
+dma_addr_t
+lis_osif_sg_dma_address(struct scatterlist *sg)
 {
 	return WARN(sg_dma_address(sg));
 }
@@ -905,27 +1060,31 @@ dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg)
 EXPORT_SYMBOL(lis_osif_sg_dma_address);
 #endif
 #if LIS_DEPRECARTED_FUNCTIONS
-int lis_can_unload(void)
+int
+lis_can_unload(void)
 {
 	return 1;
 }
 
 EXPORT_SYMBOL(lis_can_unload);
 #if HAVE_KFUNC_CHECK_REGION
-int lis_check_region(unsigned int from, unsigned int extent)
+int
+lis_check_region(unsigned int from, unsigned int extent)
 {
 	return WARN(check_region(from, extent));
 }
 
 EXPORT_SYMBOL(lis_check_region);
 #endif
-int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth)
+int
+lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth)
 {
 	return WARN(verify_area(rd_wr_fcn, usr_addr, lgth));
 }
 
 EXPORT_SYMBOL(lis_check_umem);
-int lis_del_timer(struct timer_list *timer)
+int
+lis_del_timer(struct timer_list *timer)
 {
 	return WARN(del_timer(timer));
 }
@@ -934,7 +1093,8 @@ EXPORT_SYMBOL(lis_del_timer);
 #endif
 
 /* This one is just plain silly. */
-int lis_getint(unsigned char **p)
+int
+lis_getint(unsigned char **p)
 {
 	int retval = *((int *) (*p));
 	p += sizeof(int);
@@ -942,26 +1102,30 @@ int lis_getint(unsigned char **p)
 }
 
 EXPORT_SYMBOL(lis_getint);
-int lis_kernel_down(struct semaphore *sem)
+int
+lis_kernel_down(struct semaphore *sem)
 {
 	return WARN(down_interruptible(sem));
 }
 
 EXPORT_SYMBOL(lis_kernel_down);
 #if LIS_DEPRECARTED_FUNCTIONS
-int lis_kill_pg(int pgrp, int sig, int priv)
+int
+lis_kill_pg(int pgrp, int sig, int priv)
 {
 	return WARN(kill_pg(pgrp, sig, priv));
 }
 
 EXPORT_SYMBOL(lis_kill_pg);
-int lis_kill_proc(int pid, int sig, int priv)
+int
+lis_kill_proc(int pid, int sig, int priv)
 {
 	return WARN(kill_proc(pid, sig, priv));
 }
 
 EXPORT_SYMBOL(lis_kill_proc);
-int lis_loadable_load(const char *name)
+int
+lis_loadable_load(const char *name)
 {
 	return WARN(request_module(name));
 }
@@ -970,83 +1134,97 @@ EXPORT_SYMBOL(lis_loadable_load);
 #endif
 
 int lis_num_cpus = NR_CPUS;
+
 EXPORT_SYMBOL(lis_num_cpus);
 #ifdef CONFIG_PCI
-int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
+int
+lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
 	return WARN(pci_dac_dma_supported(hwdev, mask));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_supported);
 #if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
-int lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
+int
+lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
 	return WARN(pci_dac_set_dma_mask(hwdev, mask));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dac_set_dma_mask);
 #endif
-int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
+int
+lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
 	return WARN(pci_dma_supported(hwdev, mask));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dma_supported);
-int lis_osif_pci_enable_device(struct pci_dev *dev)
+int
+lis_osif_pci_enable_device(struct pci_dev *dev)
 {
 	return WARN(pci_enable_device(dev));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_enable_device);
-int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, int direction)
+int
+lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, int direction)
 {
 	return WARN(pci_map_sg(hwdev, sg, nents, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_map_sg);
-int lis_osif_pci_module_init(void *p)
+int
+lis_osif_pci_module_init(void *p)
 {
 	return WARN(pci_module_init(p));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_module_init);
-int lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 * val)
+int
+lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 * val)
 {
 	return WARN(pci_read_config_byte(dev, where, val));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_read_config_byte);
-int lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 * val)
+int
+lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 * val)
 {
 	return WARN(pci_read_config_dword(dev, where, val));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_read_config_dword);
-int lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 * val)
+int
+lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 * val)
 {
 	return WARN(pci_read_config_word(dev, where, val));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_read_config_word);
-int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)
+int
+lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
 	return WARN(pci_set_dma_mask(hwdev, mask));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_set_dma_mask);
-int lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val)
+int
+lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val)
 {
 	return WARN(pci_write_config_byte(dev, where, val));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_write_config_byte);
-int lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val)
+int
+lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val)
 {
 	return WARN(pci_write_config_dword(dev, where, val));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_write_config_dword);
-int lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val)
+int
+lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val)
 {
 	return WARN(pci_write_config_word(dev, where, val));
 }
@@ -1055,14 +1233,16 @@ EXPORT_SYMBOL(lis_osif_pci_write_config_word);
 #endif
 
 #ifdef CONFIG_PCI
-const char *lis_pcibios_strerror(int error)
+const char *
+lis_pcibios_strerror(int error)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_pcibios_strerror);
 #if HAVE_KFUNC_PCIBIOS_INIT
-void lis_pcibios_init(void)
+void
+lis_pcibios_init(void)
 {
 #ifdef HAVE_PCIBIOS_INIT_ADDR
 	typeof(&pcibios_init) _pcibios_init = (typeof(_pcibios_init)) HAVE_PCIBIOS_INIT_ADDR;
@@ -1075,8 +1255,9 @@ void lis_pcibios_init(void)
 EXPORT_SYMBOL(lis_pcibios_init);
 #endif
 #if HAVE_KFUNC_PCIBIOS_FIND_CLASS
-int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
-			   unsigned char *dev_fn)
+int
+lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
+		       unsigned char *dev_fn)
 {
 	return WARN(pcibios_find_class(class_code, index, bus, dev_fn));
 }
@@ -1084,8 +1265,9 @@ int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsign
 EXPORT_SYMBOL(lis_pcibios_find_class);
 #endif
 #if HAVE_KFUNC_PCIBIOS_FIND_DEVICE
-int lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned short index,
-			    unsigned char *bus, unsigned char *dev_fn)
+int
+lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned short index,
+			unsigned char *bus, unsigned char *dev_fn)
 {
 	return WARN(pcibios_find_device(vendor, dev_id, index, bus, dev_fn));
 }
@@ -1093,7 +1275,8 @@ int lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsign
 EXPORT_SYMBOL(lis_pcibios_find_device);
 #endif
 #if HAVE_KFUNC_PCIBIOS_PRESENT
-int lis_pcibios_present(void)
+int
+lis_pcibios_present(void)
 {
 	return WARN(pcibios_present());
 }
@@ -1101,8 +1284,9 @@ int lis_pcibios_present(void)
 EXPORT_SYMBOL(lis_pcibios_present);
 #endif
 #if HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
-int lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
-				 unsigned char *val)
+int
+lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
+			     unsigned char *val)
 {
 	return WARN(pcibios_read_config_byte(bus, dev_fn, where, val));
 }
@@ -1110,8 +1294,9 @@ int lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsign
 EXPORT_SYMBOL(lis_pcibios_read_config_byte);
 #endif
 #if HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
-int lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
-				  unsigned int *val)
+int
+lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
+			      unsigned int *val)
 {
 	return WARN(pcibios_read_config_dword(bus, dev_fn, where, val));
 }
@@ -1119,8 +1304,9 @@ int lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsig
 EXPORT_SYMBOL(lis_pcibios_read_config_dword);
 #endif
 #if HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
-int lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
-				 unsigned short *val)
+int
+lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
+			     unsigned short *val)
 {
 	return WARN(pcibios_read_config_word(bus, dev_fn, where, val));
 }
@@ -1128,8 +1314,9 @@ int lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsign
 EXPORT_SYMBOL(lis_pcibios_read_config_word);
 #endif
 #if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_BYTE
-int lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
-				  unsigned char val)
+int
+lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
+			      unsigned char val)
 {
 	return WARN(pcibios_write_config_byte(bus, dev_fn, where, val));
 }
@@ -1137,8 +1324,9 @@ int lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsig
 EXPORT_SYMBOL(lis_pcibios_write_config_byte);
 #endif
 #if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_DWORD
-int lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
-				   unsigned int val)
+int
+lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
+			       unsigned int val)
 {
 	return WARN(pcibios_write_config_dword(bus, dev_fn, where, val));
 }
@@ -1146,8 +1334,9 @@ int lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsi
 EXPORT_SYMBOL(lis_pcibios_write_config_dword);
 #endif
 #if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_WORD
-int lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
-				  unsigned short val)
+int
+lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
+			      unsigned short val)
 {
 	return WARN(pcibios_write_config_word(bus, dev_fn, where, val));
 }
@@ -1156,31 +1345,36 @@ EXPORT_SYMBOL(lis_pcibios_write_config_word);
 #endif
 #endif
 
-int lis_request_dma(unsigned int dma_nr, const char *device_id)
+int
+lis_request_dma(unsigned int dma_nr, const char *device_id)
 {
 	return WARN(request_dma(dma_nr, device_id));
 }
 
 EXPORT_SYMBOL(lis_request_dma);
 #if HAVE_KTYPE_IRQRETURN_T
-int lis_request_irq(unsigned int irq, irqreturn_t(*handler) (int, void *, struct pt_regs *),
-		    unsigned long flags, const char *device, void *dev_id)
+int
+lis_request_irq(unsigned int irq, irqreturn_t(*handler) (int, void *, struct pt_regs *),
+		unsigned long flags, const char *device, void *dev_id)
 {
 	return WARN(request_irq(irq, handler, flags, device, dev_id));
 }
 #else
-int lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *),
-		    unsigned long flags, const char *device, void *dev_id)
+int
+lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *),
+		unsigned long flags, const char *device, void *dev_id)
 {
 	return WARN(request_irq(irq, handler, flags, device, dev_id));
 }
 #endif
 
 EXPORT_SYMBOL(lis_request_irq);
-int lis_sprintf(char *bfr, const char *fmt, ...)
+int
+lis_sprintf(char *bfr, const char *fmt, ...)
 {
 	va_list args;
 	int ret;
+
 	va_start(args, fmt);
 	ret = WARN(vsprintf(bfr, fmt, args));
 	va_end(args);
@@ -1188,13 +1382,15 @@ int lis_sprintf(char *bfr, const char *fmt, ...)
 }
 
 EXPORT_SYMBOL(lis_sprintf);
-int lis_thread_stop(pid_t pid)
+int
+lis_thread_stop(pid_t pid)
 {
 	return WARN(kill_proc(pid, SIGTERM, 1));
 }
 
 EXPORT_SYMBOL(lis_thread_stop);
-int lis_vsprintf(char *bfr, const char *fmt, va_list args)
+int
+lis_vsprintf(char *bfr, const char *fmt, va_list args)
 {
 	return WARN(vsprintf(bfr, fmt, args));
 }
@@ -1202,7 +1398,8 @@ int lis_vsprintf(char *bfr, const char *fmt, va_list args)
 EXPORT_SYMBOL(lis_vsprintf);
 
 #ifdef CONFIG_PCI
-size_t lis_osif_sg_dma_len(struct scatterlist *sg)
+size_t
+lis_osif_sg_dma_len(struct scatterlist *sg)
 {
 	return WARN(sg_dma_len(sg));
 }
@@ -1210,7 +1407,8 @@ size_t lis_osif_sg_dma_len(struct scatterlist *sg)
 EXPORT_SYMBOL(lis_osif_sg_dma_len);
 #endif
 #if LIS_DEPRECARTED_FUNCTIONS
-struct inode *lis_file_inode(struct file *f)
+struct inode *
+lis_file_inode(struct file *f)
 {
 	return f->f_dentry->d_inode;
 }
@@ -1219,28 +1417,31 @@ EXPORT_SYMBOL(lis_file_inode);
 #endif
 
 #ifdef CONFIG_PCI
-struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
+struct page *
+lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
 	return WARN(pci_dac_dma_to_page(pdev, dma_addr));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_to_page);
 #if HAVE_KFUNC_PCI_FIND_CLASS
-struct pci_dev *lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
+struct pci_dev *
+lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
 {
 	return WARN(pci_find_class(class, from));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_find_class);
 #endif
-struct pci_dev *lis_osif_pci_find_device(unsigned int vendor, unsigned int device,
-					 struct pci_dev *from)
+struct pci_dev *
+lis_osif_pci_find_device(unsigned int vendor, unsigned int device, struct pci_dev *from)
 {
 	return WARN(pci_find_device(vendor, device, from));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_find_device);
-struct pci_dev *lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
+struct pci_dev *
+lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 {
 	return WARN(pci_find_slot(bus, devfn));
 }
@@ -1248,44 +1449,53 @@ struct pci_dev *lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 EXPORT_SYMBOL(lis_osif_pci_find_slot);
 #endif
 #if LIS_DEPRECARTED_FUNCTIONS
-struct stdata *lis_file_str(struct file *f)
+struct stdata *
+lis_file_str(struct file *f)
 {
 	return WARN((struct stdata *) f->f_dentry->d_inode->i_pipe);
 }
 
 EXPORT_SYMBOL(lis_file_str);
 #endif
-unsigned lis_usectohz(unsigned usec)
+unsigned
+lis_usectohz(unsigned usec)
 {
 	return WARN(usec / (1000000 / HZ));
 }
 
 EXPORT_SYMBOL(lis_usectohz);
-unsigned long lis_dsecs(void)
+unsigned long
+lis_dsecs(void)
 {
 	struct timeval tv;
+
 	WARN(do_gettimeofday(&tv));
 	return (tv.tv_sec * 10L) + (tv.tv_usec / 100000L);
 }
 
 EXPORT_SYMBOL(lis_dsecs);
-unsigned long lis_hitime(void)
+unsigned long
+lis_hitime(void)
 {
 	struct timeval tv;
+
 	WARN(do_gettimeofday(&tv));
 	return (tv.tv_sec & 0x3f) * 1000000 + tv.tv_usec;
 }
 
 EXPORT_SYMBOL(lis_hitime);
-unsigned long lis_jiffies(void)
+unsigned long
+lis_jiffies(void)
 {
 	return WARN(jiffies);
 }
 
 EXPORT_SYMBOL(lis_jiffies);
-unsigned long lis_msecs(void)
+unsigned long
+lis_msecs(void)
 {
 	struct timeval tv;
+
 	WARN(do_gettimeofday(&tv));
 	return (tv.tv_sec * 1000L) + (tv.tv_usec / 1000L);
 }
@@ -1293,94 +1503,110 @@ unsigned long lis_msecs(void)
 EXPORT_SYMBOL(lis_msecs);
 
 #ifdef CONFIG_PCI
-unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
+unsigned long
+lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
 	return pci_dac_dma_to_offset(pdev, dma_addr);
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_to_offset);
 #endif
-unsigned long lis_secs(void)
+unsigned long
+lis_secs(void)
 {
 	struct timeval tv;
+
 	WARN(do_gettimeofday(&tv));
 	return tv.tv_sec;
 }
 
 EXPORT_SYMBOL(lis_secs);
-unsigned long lis_usecs(void)
+unsigned long
+lis_usecs(void)
 {
 	struct timeval tv;
+
 	WARN(do_gettimeofday(&tv));
 	return (tv.tv_sec * 1000000L) + tv.tv_usec;
 }
 
 EXPORT_SYMBOL(lis_usecs);
-unsigned long lis_virt_to_phys(volatile void *addr)
+unsigned long
+lis_virt_to_phys(volatile void *addr)
 {
 	return WARN(virt_to_phys(addr));
 }
 
 EXPORT_SYMBOL(lis_virt_to_phys);
-void *lis__kfree(void *ptr)
+void *
+lis__kfree(void *ptr)
 {
 	WARN(kfree(ptr));
 	return NULL;
 }
 
 EXPORT_SYMBOL(lis__kfree);
-void *lis__kmalloc(int nbytes, int class, int use_cache)
+void *
+lis__kmalloc(int nbytes, int class, int use_cache)
 {
 	return WARN(kmalloc(nbytes, class));
 }
 
 EXPORT_SYMBOL(lis__kmalloc);
-void *lis_alloc_atomic_fcn(int nbytes, char *file, int line)
+void *
+lis_alloc_atomic_fcn(int nbytes, char *file, int line)
 {
 	return WARNF(kmalloc(nbytes, GFP_ATOMIC), file, line);
 }
 
 EXPORT_SYMBOL(lis_alloc_atomic_fcn);
-void *lis_alloc_dma_fcn(int nbytes, char *file, int line)
+void *
+lis_alloc_dma_fcn(int nbytes, char *file, int line)
 {
 	return WARNF(kmalloc(nbytes, GFP_DMA), file, line);
 }
 
 EXPORT_SYMBOL(lis_alloc_dma_fcn);
-void *lis_alloc_kernel_fcn(int nbytes, char *file, int line)
+void *
+lis_alloc_kernel_fcn(int nbytes, char *file, int line)
 {
 	return WARNF(kmalloc(nbytes, GFP_KERNEL), file, line);
 }
 
 EXPORT_SYMBOL(lis_alloc_kernel_fcn);
-void *lis_free_mem_fcn(void *mem_area, char *file, int line)
+void *
+lis_free_mem_fcn(void *mem_area, char *file, int line)
 {
 	WARNF(kfree(mem_area), file, line);
 	return NULL;
 }
 
 EXPORT_SYMBOL(lis_free_mem_fcn);
-void *lis_ioremap(unsigned long offset, unsigned long size)
+void *
+lis_ioremap(unsigned long offset, unsigned long size)
 {
 	return WARN(ioremap(offset, size));
 }
 
 EXPORT_SYMBOL(lis_ioremap);
-void *lis_ioremap_nocache(unsigned long offset, unsigned long size)
+void *
+lis_ioremap_nocache(unsigned long offset, unsigned long size)
 {
 	return WARN(ioremap_nocache(offset, size));
 }
 
 EXPORT_SYMBOL(lis_ioremap_nocache);
 #if LIS_DEPRECARTED_FUNCTIONS
-void *lis_kmalloc(size_t nbytes, int type)
+void *
+lis_kmalloc(size_t nbytes, int type)
 {
 	return WARN(kmalloc(nbytes, type));
 }
 
 EXPORT_SYMBOL(lis_kmalloc);
 #endif
-void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr)
+void *
+lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr)
 {
 	return WARN(kmalloc(nbytes, class));
 }
@@ -1388,40 +1614,46 @@ void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line
 EXPORT_SYMBOL(lis_malloc);
 
 #ifdef CONFIG_PCI
-void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size, dma_addr_t *dma_handle)
+void *
+lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size, dma_addr_t *dma_handle)
 {
 	return WARN(pci_alloc_consistent(hwdev, size, dma_handle));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_alloc_consistent);
 #endif
-void *lis_phys_to_virt(unsigned long addr)
+void *
+lis_phys_to_virt(unsigned long addr)
 {
 	return WARN(phys_to_virt(addr));
 }
 
 EXPORT_SYMBOL(lis_phys_to_virt);
-void *lis_vremap(unsigned long offset, unsigned long size)
+void *
+lis_vremap(unsigned long offset, unsigned long size)
 {
 	return WARN(ioremap_nocache(offset, size));
 }
 
 EXPORT_SYMBOL(lis_vremap);
-void *lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
+void *
+lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 {
 	return WARN(kmem_zalloc(nbytes, (class & __GFP_WAIT) ? KM_SLEEP : KM_NOSLEEP));
 }
 
 EXPORT_SYMBOL(lis_zmalloc);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_add_timer(struct timer_list *timer)
+void
+lis_add_timer(struct timer_list *timer)
 {
 	return WARN(add_timer(timer));
 }
 
 EXPORT_SYMBOL(lis_add_timer);
 #endif
-void lis_assert_fail(const char *expr, const char *objname, const char *file, unsigned int line)
+void
+lis_assert_fail(const char *expr, const char *objname, const char *file, unsigned int line)
 {
 	return (void) printk(KERN_CRIT "%s: assert(%s) failed in file %s, line %u\n", objname, expr,
 			     file, line);
@@ -1430,7 +1662,8 @@ void lis_assert_fail(const char *expr, const char *objname, const char *file, un
 EXPORT_SYMBOL(lis_assert_fail);
 #if LIS_DEPRECARTED_FUNCTIONS
 #if HAVE_KFUNC_MOD_DEC_USE_COUNT
-void lis_dec_mod_cnt_fcn(const char *file, int line)
+void
+lis_dec_mod_cnt_fcn(const char *file, int line)
 {
 	WARNF(MOD_DEC_USE_COUNT, file, line);
 	return;
@@ -1439,31 +1672,36 @@ void lis_dec_mod_cnt_fcn(const char *file, int line)
 EXPORT_SYMBOL(lis_dec_mod_cnt_fcn);
 #endif
 #endif
-void lis_disable_irq(unsigned int irq)
+void
+lis_disable_irq(unsigned int irq)
 {
 	return WARN(disable_irq(irq));
 }
 
 EXPORT_SYMBOL(lis_disable_irq);
-void lis_enable_irq(unsigned int irq)
+void
+lis_enable_irq(unsigned int irq)
 {
 	return WARN(enable_irq(irq));
 }
 
 EXPORT_SYMBOL(lis_enable_irq);
-void lis_free_dma(unsigned int dma_nr)
+void
+lis_free_dma(unsigned int dma_nr)
 {
 	return WARN(free_dma(dma_nr));
 }
 
 EXPORT_SYMBOL(lis_free_dma);
-void lis_free_irq(unsigned int irq, void *dev_id)
+void
+lis_free_irq(unsigned int irq, void *dev_id)
 {
 	return WARN(free_irq(irq, dev_id));
 }
 
 EXPORT_SYMBOL(lis_free_irq);
-void lis_gettimeofday(struct timeval *tv)
+void
+lis_gettimeofday(struct timeval *tv)
 {
 	return WARN(do_gettimeofday(tv));
 }
@@ -1471,7 +1709,8 @@ void lis_gettimeofday(struct timeval *tv)
 EXPORT_SYMBOL(lis_gettimeofday);
 #if LIS_DEPRECARTED_FUNCTIONS
 #if HAVE_KFUNC_MOD_INC_USE_COUNT
-void lis_inc_mod_cnt_fcn(const char *file, int line)
+void
+lis_inc_mod_cnt_fcn(const char *file, int line)
 {
 	WARNF(MOD_INC_USE_COUNT, file, line);
 	return;
@@ -1481,34 +1720,39 @@ EXPORT_SYMBOL(lis_inc_mod_cnt_fcn);
 #endif
 #endif
 #if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
-void lis_interruptible_sleep_on(wait_queue_head_t *wq)
+void
+lis_interruptible_sleep_on(wait_queue_head_t *wq)
 {
 	return WARN(interruptible_sleep_on(wq));
 }
 
 EXPORT_SYMBOL(lis_interruptible_sleep_on);
 #endif
-void lis_kernel_up(struct semaphore *sem)
+void
+lis_kernel_up(struct semaphore *sem)
 {
 	return WARN(up(sem));
 }
 
 EXPORT_SYMBOL(lis_kernel_up);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_kfree(const void *ptr)
+void
+lis_kfree(const void *ptr)
 {
 	return WARN(kfree(ptr));
 }
 
 EXPORT_SYMBOL(lis_kfree);
 #endif
-void lis_iounmap(void *ptr)
+void
+lis_iounmap(void *ptr)
 {
 	return WARN(iounmap(ptr));
 }
 
 EXPORT_SYMBOL(lis_iounmap);
-void lis_osif_cli(void)
+void
+lis_osif_cli(void)
 {
 #ifdef HAVE_KFUNC_CLI
 	WARN(cli());
@@ -1519,19 +1763,22 @@ void lis_osif_cli(void)
 }
 
 EXPORT_SYMBOL(lis_osif_cli);
-void lis_osif_do_gettimeofday(struct timeval *tp)
+void
+lis_osif_do_gettimeofday(struct timeval *tp)
 {
 	return WARN(do_gettimeofday(tp));
 }
 
 EXPORT_SYMBOL(lis_osif_do_gettimeofday);
 #ifdef HAVE_TIMESPEC_DO_SETTIMEOFDAY
-int lis_osif_do_settimeofday(struct timespec *tp)
+int
+lis_osif_do_settimeofday(struct timespec *tp)
 {
 	return WARN(do_settimeofday(tp));
 }
 #else
-void lis_osif_do_settimeofday(struct timeval *tp)
+void
+lis_osif_do_settimeofday(struct timeval *tp)
 {
 	return WARN(do_settimeofday(tp));
 }
@@ -1541,41 +1788,48 @@ EXPORT_SYMBOL(lis_osif_do_settimeofday);
 
 #ifdef CONFIG_PCI
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
-void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
-				      int direction)
+void
+lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
+				 int direction)
 {
 	return WARN(pci_dac_dma_sync_single(pdev, dma_addr, len, direction));
 }
+
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_sync_single);
 #endif
 
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
-void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
-					      size_t len, int direction)
+void
+lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					 size_t len, int direction)
 {
 	return WARN(pci_dac_dma_sync_single_for_cpu(pdev, dma_addr, len, direction));
 }
+
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_sync_single_for_cpu);
 #endif
 
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
-void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
-						 size_t len, int direction)
+void
+lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					    size_t len, int direction)
 {
 	return WARN(pci_dac_dma_sync_single_for_device(pdev, dma_addr, len, direction));
 }
+
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_sync_single_for_device);
 #endif
 
-void lis_osif_pci_disable_device(struct pci_dev *dev)
+void
+lis_osif_pci_disable_device(struct pci_dev *dev)
 {
 	return WARN(pci_disable_device(dev));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_disable_device);
 #if HAVE_KFUNC_PCI_DMA_SYNC_SG
-void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems,
-			      int direction)
+void
+lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems, int direction)
 {
 	return WARN(pci_dma_sync_sg(hwdev, sg, nelems, direction));
 }
@@ -1583,55 +1837,60 @@ void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int
 EXPORT_SYMBOL(lis_osif_pci_dma_sync_sg);
 #endif
 #if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
-void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
-				  int direction)
+void
+lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
+			     int direction)
 {
 	return WARN(pci_dma_sync_single(hwdev, dma_handle, size, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_dma_sync_single);
 #endif
-void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size, void *vaddr,
-				  dma_addr_t dma_handle)
+void
+lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size, void *vaddr, dma_addr_t dma_handle)
 {
 	return WARN(pci_free_consistent(hwdev, size, vaddr, dma_handle));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_free_consistent);
-void lis_osif_pci_set_master(struct pci_dev *dev)
+void
+lis_osif_pci_set_master(struct pci_dev *dev)
 {
 	return WARN(pci_set_master(dev));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_set_master);
-void lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address, size_t size,
-			     int direction)
+void
+lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address, size_t size, int direction)
 {
 	return WARN(pci_unmap_page(hwdev, dma_address, size, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_unmap_page);
-void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, int direction)
+void
+lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, int direction)
 {
 	return WARN(pci_unmap_sg(hwdev, sg, nents, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_unmap_sg);
-void lis_osif_pci_unmap_single(struct pci_dev *hwdev, dma_addr_t dma_addr, size_t size,
-			       int direction)
+void
+lis_osif_pci_unmap_single(struct pci_dev *hwdev, dma_addr_t dma_addr, size_t size, int direction)
 {
 	return WARN(pci_unmap_single(hwdev, dma_addr, size, direction));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_unmap_single);
-void lis_osif_pci_unregister_driver(struct pci_driver *p)
+void
+lis_osif_pci_unregister_driver(struct pci_driver *p)
 {
 	return WARN(pci_unregister_driver(p));
 }
 
 EXPORT_SYMBOL(lis_osif_pci_unregister_driver);
 #endif
-void lis_osif_sti(void)
+void
+lis_osif_sti(void)
 {
 #if HAVE_KFUNC_STI
 	WARN(sti());
@@ -1642,68 +1901,80 @@ void lis_osif_sti(void)
 }
 
 EXPORT_SYMBOL(lis_osif_sti);
-void lis_putbyte(unsigned char **p, unsigned char byte)
+void
+lis_putbyte(unsigned char **p, unsigned char byte)
 {
 	*(*p)++ = byte;
 	return;
 }
 
 EXPORT_SYMBOL(lis_putbyte);
-void lis_release_region(unsigned int from, unsigned int extent)
+void
+lis_release_region(unsigned int from, unsigned int extent)
 {
 	return WARN(release_region(from, extent));
 }
 
 EXPORT_SYMBOL(lis_release_region);
-void lis_request_region(unsigned int from, unsigned int extent, const char *name)
+void
+lis_request_region(unsigned int from, unsigned int extent, const char *name)
 {
 	return (void) WARN(request_region(from, extent, name));
 }
 
 EXPORT_SYMBOL(lis_request_region);
 #if HAVE_KFUNC_SLEEP_ON
-void lis_sleep_on(wait_queue_head_t *wq)
+void
+lis_sleep_on(wait_queue_head_t *wq)
 {
 	return WARN(sleep_on(wq));
 }
 
 EXPORT_SYMBOL(lis_sleep_on);
 #endif
-void lis_udelay(long micro_secs)
+void
+lis_udelay(long micro_secs)
 {
 	return WARN(udelay(micro_secs));
 }
 
 EXPORT_SYMBOL(lis_udelay);
-void lis_vfree(void *ptr)
+void
+lis_vfree(void *ptr)
 {
 	return WARN(vfree(ptr));
 }
 
 EXPORT_SYMBOL(lis_vfree);
-void lis_wake_up(wait_queue_head_t *wq)
+void
+lis_wake_up(wait_queue_head_t *wq)
 {
 	return WARN(wake_up(wq));
 }
 
 EXPORT_SYMBOL(lis_wake_up);
-void lis_wake_up_interruptible(wait_queue_head_t *wq)
+void
+lis_wake_up_interruptible(wait_queue_head_t *wq)
 {
 	return WARN(wake_up_interruptible(wq));
 }
 
 EXPORT_SYMBOL(lis_wake_up_interruptible);
-int lis_splstr_fcn(char *file, int line)
+int
+lis_splstr_fcn(char *file, int line)
 {
 	unsigned long flags;
+
 	WARNF(local_irq_save(flags), file, line);
 	return flags;
 }
 
 EXPORT_SYMBOL(lis_splstr_fcn);
-void lis_splx_fcn(int x, char *file, int line)
+void
+lis_splx_fcn(int x, char *file, int line)
 {
 	unsigned long flags = x;
+
 	WARNF(local_irq_restore(flags), file, line);
 	return;
 }
@@ -1715,21 +1986,24 @@ EXPORT_SYMBOL(lis_splx_fcn);
  *  devices.  Use the Linux kernel facilities directly please.
  */
 #ifdef CONFIG_PCI
-lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct)
+lis_pci_dev_t *
+lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct)
 {
 	swerr();
 	return NULL;
 }
 
 EXPORT_SYMBOL(lis_pci_find_class);
-lis_pci_dev_t *lis_pci_find_device(unsigned vendor, unsigned device, lis_pci_dev_t *previous_struct)
+lis_pci_dev_t *
+lis_pci_find_device(unsigned vendor, unsigned device, lis_pci_dev_t *previous_struct)
 {
 	swerr();
 	return NULL;
 }
 
 EXPORT_SYMBOL(lis_pci_find_device);
-lis_pci_dev_t *lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
+lis_pci_dev_t *
+lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 {
 	swerr();
 	return NULL;
@@ -1737,7 +2011,8 @@ lis_pci_dev_t *lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 
 EXPORT_SYMBOL(lis_pci_find_slot);
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_pci_cleanup(void)
+void
+lis_pci_cleanup(void)
 {
 	swerr();
 	return;
@@ -1745,57 +2020,66 @@ void lis_pci_cleanup(void)
 
 EXPORT_SYMBOL(lis_pci_cleanup);
 #endif
-void lis_pci_disable_device(lis_pci_dev_t *dev)
+void
+lis_pci_disable_device(lis_pci_dev_t *dev)
 {
 	WARN(pci_disable_device(dev->kern_ptr));
 	return;
 }
 
 EXPORT_SYMBOL(lis_pci_disable_device);
-void lis_pci_set_master(lis_pci_dev_t *dev)
+void
+lis_pci_set_master(lis_pci_dev_t *dev)
 {
 	WARN(pci_set_master(dev->kern_ptr));
 	return;
 }
 
 EXPORT_SYMBOL(lis_pci_set_master);
-int lis_pci_enable_device(lis_pci_dev_t *dev)
+int
+lis_pci_enable_device(lis_pci_dev_t *dev)
 {
 	return WARN(pci_enable_device(dev->kern_ptr));
 }
 
 EXPORT_SYMBOL(lis_pci_enable_device);
-int lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val)
+int
+lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val)
 {
 	return WARN(pci_read_config_byte(dev->kern_ptr, index, rtn_val));
 }
 
 EXPORT_SYMBOL(lis_pci_read_config_byte);
-int lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val)
+int
+lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val)
 {
 	return WARN(pci_read_config_dword(dev->kern_ptr, index, (u32 *) rtn_val));
 }
 
 EXPORT_SYMBOL(lis_pci_read_config_dword);
-int lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val)
+int
+lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val)
 {
 	return WARN(pci_read_config_word(dev->kern_ptr, index, rtn_val));
 }
 
 EXPORT_SYMBOL(lis_pci_read_config_word);
-int lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val)
+int
+lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val)
 {
 	return WARN(pci_write_config_byte(dev->kern_ptr, index, val));
 }
 
 EXPORT_SYMBOL(lis_pci_write_config_byte);
-int lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val)
+int
+lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val)
 {
 	return WARN(pci_write_config_dword(dev->kern_ptr, index, val));
 }
 
 EXPORT_SYMBOL(lis_pci_write_config_dword);
-int lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val)
+int
+lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val)
 {
 	return WARN(pci_write_config_word(dev->kern_ptr, index, val));
 }
@@ -1807,30 +2091,36 @@ EXPORT_SYMBOL(lis_pci_write_config_word);
  *  LiS weighty spin locks.  We just use a normal kernel spin lock
  *  embedded in the oversized LiS structure.
  */
-int lis_spin_is_locked_fcn(lis_spin_lock_t *lock, char *file, int line)
+int
+lis_spin_is_locked_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	return WARNF(spin_is_locked((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_is_locked_fcn);
-int lis_spin_trylock_fcn(lis_spin_lock_t *lock, char *file, int line)
+int
+lis_spin_trylock_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	return WARNF(spin_trylock((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_trylock_fcn);
-lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, char *file, int line)
+lis_spin_lock_t *
+lis_spin_lock_alloc_fcn(const char *name, char *file, int line)
 {
 	lis_spin_lock_t *lock;
+
 	if ((lock = WARNF(kmem_zalloc(sizeof(*lock), KM_NOSLEEP), file, line)))
 		spin_lock_init((spinlock_t *) lock->spin_lock_mem);
 	return lock;
 }
 
 EXPORT_SYMBOL(lis_spin_lock_alloc_fcn);
-lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t *lock, char *file, int line)
+lis_spin_lock_t *
+lis_spin_lock_free_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	unsigned long flags;
+
 	spin_lock_irqsave((spinlock_t *) lock->spin_lock_mem, flags);
 	WARNF(kmem_free((void *) lock, sizeof(*lock)), file, line);
 	local_irq_restore(flags);
@@ -1838,47 +2128,56 @@ lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t *lock, char *file, int l
 }
 
 EXPORT_SYMBOL(lis_spin_lock_free_fcn);
-void lis_spin_lock_fcn(lis_spin_lock_t *lock, char *file, int line)
+void
+lis_spin_lock_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	WARNF(spin_lock((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_lock_fcn);
-void lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, char *file, int line)
+void
+lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, char *file, int line)
 {
 	WARNF(spin_lock_init((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_lock_init_fcn);
-void lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, char *file, int line)
+void
+lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	WARNF(spin_lock_irq((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_lock_irq_fcn);
-void lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line)
+void
+lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line)
 {
 	unsigned long flags;
+
 	WARNF(spin_lock_irqsave((spinlock_t *) lock->spin_lock_mem, flags), file, line);
 	*flagp = flags;
 }
 
 EXPORT_SYMBOL(lis_spin_lock_irqsave_fcn);
-void lis_spin_unlock_fcn(lis_spin_lock_t *lock, char *file, int line)
+void
+lis_spin_unlock_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	WARNF(spin_unlock((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_unlock_fcn);
-void lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, char *file, int line)
+void
+lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, char *file, int line)
 {
 	WARNF(spin_unlock_irq((spinlock_t *) lock->spin_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_spin_unlock_irq_fcn);
-void lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line)
+void
+lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flagp, char *file, int line)
 {
 	unsigned long flags = *flagp;
+
 	WARNF(spin_unlock_irqrestore((spinlock_t *) lock->spin_lock_mem, flags), file, line);
 }
 
@@ -1888,18 +2187,22 @@ EXPORT_SYMBOL(lis_spin_unlock_irqrestore_fcn);
  *  LiS weighty read write locks.  We just use a normal kernel read write lock
  *  embedded in the oversized LiS structure.
  */
-lis_rw_lock_t *lis_rw_lock_alloc_fcn(const char *name, char *file, int line)
+lis_rw_lock_t *
+lis_rw_lock_alloc_fcn(const char *name, char *file, int line)
 {
 	lis_rw_lock_t *lock;
+
 	if ((lock = WARNF(kmem_zalloc(sizeof(*lock), KM_NOSLEEP), file, line)))
 		rwlock_init((rwlock_t *) lock->rw_lock_mem);
 	return lock;
 }
 
 EXPORT_SYMBOL(lis_rw_lock_alloc_fcn);
-lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char *file, int line)
+lis_rw_lock_t *
+lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char *file, int line)
 {
 	unsigned long flags;
+
 	write_lock_irqsave((rwlock_t *) lock->rw_lock_mem, flags);
 	WARNF(kmem_free((void *) lock, sizeof(*lock)), file, line);
 	local_irq_restore(flags);
@@ -1907,86 +2210,103 @@ lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char 
 }
 
 EXPORT_SYMBOL(lis_rw_lock_free_fcn);
-void lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, char *file, int line)
+void
+lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, char *file, int line)
 {
 	WARNF(rwlock_init((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_lock_init_fcn);
-void lis_rw_read_lock_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_read_lock_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(read_lock((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_read_lock_fcn);
-void lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(read_lock_irq((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_read_lock_irq_fcn);
-void lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
+void
+lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
 {
 	unsigned long flags;
+
 	WARNF(read_lock_irqsave((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 	*flagp = flags;
 }
 
 EXPORT_SYMBOL(lis_rw_read_lock_irqsave_fcn);
-void lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(read_unlock((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_read_unlock_fcn);
-void lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(read_unlock_irq((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_read_unlock_irq_fcn);
-void lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
+void
+lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
 {
 	unsigned long flags = *flagp;
+
 	WARNF(read_unlock_irqrestore((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_read_unlock_irqrestore_fcn);
-void lis_rw_write_lock_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_write_lock_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(write_lock((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_write_lock_fcn);
-void lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(write_lock_irq((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_write_lock_irq_fcn);
-void lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
+void
+lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
 {
 	unsigned long flags;
+
 	WARNF(write_lock_irqsave((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 	*flagp = flags;
 }
 
 EXPORT_SYMBOL(lis_rw_write_lock_irqsave_fcn);
-void lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(write_unlock((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_write_unlock_fcn);
-void lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
+void
+lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line)
 {
 	WARNF(write_unlock_irq((rwlock_t *) lock->rw_lock_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_rw_write_unlock_irq_fcn);
-void lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
+void
+lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flagp, char *file, int line)
 {
 	unsigned long flags = *flagp;
+
 	WARNF(write_unlock_irqrestore((rwlock_t *) lock->rw_lock_mem, flags), file, line);
 }
 
@@ -1998,58 +2318,71 @@ EXPORT_SYMBOL(lis_rw_write_unlock_irqrestore_fcn);
  */
 #if LIS_DEPRECARTED_FUNCTIONS
 lis_atomic_t lis_in_syscall = 0;
+
 EXPORT_SYMBOL(lis_in_syscall);
 lis_atomic_t lis_open_cnt = 0;
+
 EXPORT_SYMBOL(lis_open_cnt);
 lis_atomic_t lis_queues_running = 0;
+
 EXPORT_SYMBOL(lis_queues_running);
 lis_atomic_t lis_runq_req_cnt = 0;
+
 EXPORT_SYMBOL(lis_runq_req_cnt);
 lis_atomic_t lis_stdata_cnt = 0;
+
 EXPORT_SYMBOL(lis_stdata_cnt);
 lis_atomic_t lis_strcount = 0;
+
 EXPORT_SYMBOL(lis_strcount);
 lis_atomic_t lis_strstats[24][4] = { {0,}, };
 
 EXPORT_SYMBOL(lis_strstats);
 #endif
-void lis_atomic_add(lis_atomic_t *atomic_addr, int amt)
+void
+lis_atomic_add(lis_atomic_t *atomic_addr, int amt)
 {
 	return WARN(atomic_add(amt, (atomic_t *) atomic_addr));
 }
 
 EXPORT_SYMBOL(lis_atomic_add);
-void lis_atomic_dec(lis_atomic_t *atomic_addr)
+void
+lis_atomic_dec(lis_atomic_t *atomic_addr)
 {
 	return WARN(atomic_dec((atomic_t *) atomic_addr));
 }
 
 EXPORT_SYMBOL(lis_atomic_dec);
-void lis_atomic_inc(lis_atomic_t *atomic_addr)
+void
+lis_atomic_inc(lis_atomic_t *atomic_addr)
 {
 	return WARN(atomic_inc((atomic_t *) atomic_addr));
 }
 
 EXPORT_SYMBOL(lis_atomic_inc);
-void lis_atomic_set(lis_atomic_t *atomic_addr, int valu)
+void
+lis_atomic_set(lis_atomic_t *atomic_addr, int valu)
 {
 	return (void) WARN(atomic_set((atomic_t *) atomic_addr, valu));
 }
 
 EXPORT_SYMBOL(lis_atomic_set);
-void lis_atomic_sub(lis_atomic_t *atomic_addr, int amt)
+void
+lis_atomic_sub(lis_atomic_t *atomic_addr, int amt)
 {
 	return WARN(atomic_sub(amt, (atomic_t *) atomic_addr));
 }
 
 EXPORT_SYMBOL(lis_atomic_sub);
-int lis_atomic_dec_and_test(lis_atomic_t *atomic_addr)
+int
+lis_atomic_dec_and_test(lis_atomic_t *atomic_addr)
 {
 	return WARN(atomic_dec_and_test((atomic_t *) atomic_addr));
 }
 
 EXPORT_SYMBOL(lis_atomic_dec_and_test);
-int lis_atomic_read(lis_atomic_t *atomic_addr)
+int
+lis_atomic_read(lis_atomic_t *atomic_addr)
 {
 	return WARN(atomic_read((atomic_t *) atomic_addr));
 }
@@ -2060,13 +2393,15 @@ EXPORT_SYMBOL(lis_atomic_read);
  *  LiS weighty semaphore wrappers.  We just use a normal kernel semaphore
  *  embedded in the oversized LiS structure (sem_mem area).
  */
-int lis_down_fcn(lis_semaphore_t *lsem, char *file, int line)
+int
+lis_down_fcn(lis_semaphore_t *lsem, char *file, int line)
 {
 	return WARNF(down_interruptible((struct semaphore *) lsem->sem_mem), file, line);
 }
 
 EXPORT_SYMBOL(lis_down_fcn);
-lis_semaphore_t *lis_sem_alloc(int count)
+lis_semaphore_t *
+lis_sem_alloc(int count)
 {
 	lis_semaphore_t *lsem;
 	lsem = WARN(kmem_zalloc(sizeof(lis_semaphore_t), KM_NOSLEEP));
@@ -2076,20 +2411,23 @@ lis_semaphore_t *lis_sem_alloc(int count)
 }
 
 EXPORT_SYMBOL(lis_sem_alloc);
-lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem)
+lis_semaphore_t *
+lis_sem_destroy(lis_semaphore_t *lsem)
 {
 	WARN(kmem_free((void *) lsem, sizeof(*lsem)));
 	return NULL;
 }
 
 EXPORT_SYMBOL(lis_sem_destroy);
-void lis_sem_init(lis_semaphore_t *lsem, int count)
+void
+lis_sem_init(lis_semaphore_t *lsem, int count)
 {
 	return WARN(sema_init((struct semaphore *) lsem->sem_mem, count));
 }
 
 EXPORT_SYMBOL(lis_sem_init);
-void lis_up_fcn(lis_semaphore_t *lsem, char *file, int line)
+void
+lis_up_fcn(lis_semaphore_t *lsem, char *file, int line)
 {
 	return WARNF(up((struct semaphore *) lsem->sem_mem), file, line);
 }
@@ -2099,7 +2437,8 @@ EXPORT_SYMBOL(lis_up_fcn);
 /* 
  *  These are bad, don't use them.
  */
-void *lis_free_pages_fcn(void *ptr, char *file, int line)
+void *
+lis_free_pages_fcn(void *ptr, char *file, int line)
 {
 	swerr();
 	WARNF(free_pages((unsigned long) ptr, 0), file, line);
@@ -2107,25 +2446,31 @@ void *lis_free_pages_fcn(void *ptr, char *file, int line)
 }
 
 EXPORT_SYMBOL(lis_free_pages_fcn);
-void *lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line)
+void *
+lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line)
 {
 	int order;
+
 	for (order = 0, nbytes >>= PAGE_SHIFT; nbytes; order++, nbytes >>= 1) ;
 	return (void *) WARNF(__get_free_pages(GFP_ATOMIC, order), file, line);
 }
 
 EXPORT_SYMBOL(lis_get_free_pages_atomic_fcn);
-void *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
+void *
+lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 {
 	int order;
+
 	for (order = 0, nbytes >>= PAGE_SHIFT; nbytes; order++, nbytes >>= 1) ;
 	return (void *) WARNF(__get_free_pages(class, order), file, line);
 }
 
 EXPORT_SYMBOL(lis_get_free_pages_fcn);
-void *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line)
+void *
+lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line)
 {
 	int order;
+
 	for (order = 0, nbytes >>= PAGE_SHIFT; nbytes; order++, nbytes >>= 1) ;
 	return (void *) WARNF(__get_free_pages(GFP_KERNEL, order), file, line);
 }
@@ -2135,13 +2480,15 @@ EXPORT_SYMBOL(lis_get_free_pages_kernel_fcn);
 /* 
  *  These are just wrappered system calls.
  */
-int lis_mknod(char *name, int mode, dev_t dev)
+int
+lis_mknod(char *name, int mode, dev_t dev)
 {
 #ifdef HAVE_SYS_MKNOD_ADDR
 	asmlinkage long (*sys_mknod) (const char *filename, int mode, dev_t dev)
-	= (typeof(sys_mknod)) HAVE_SYS_MKNOD_ADDR;
+	    = (typeof(sys_mknod)) HAVE_SYS_MKNOD_ADDR;
 	mm_segment_t old_fs;
 	int ret;
+
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	ret = WARN(sys_mknod(name, mode, dev));
@@ -2154,13 +2501,15 @@ int lis_mknod(char *name, int mode, dev_t dev)
 }
 
 EXPORT_SYMBOL(lis_mknod);
-int lis_unlink(char *name)
+int
+lis_unlink(char *name)
 {
 #ifdef HAVE_SYS_UNLINK_ADDR
 	asmlinkage long (*sys_unlink) (const char *pathname)
-	= (typeof(sys_unlink)) HAVE_SYS_UNLINK_ADDR;
+	    = (typeof(sys_unlink)) HAVE_SYS_UNLINK_ADDR;
 	mm_segment_t old_fs;
 	int ret;
+
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	ret = WARN(sys_unlink(name));
@@ -2173,14 +2522,16 @@ int lis_unlink(char *name)
 }
 
 EXPORT_SYMBOL(lis_unlink);
-int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag, void *data)
+int
+lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag, void *data)
 {
 #ifdef HAVE_SYS_MOUNT_ADDR
 	asmlinkage long (*sys_mount) (char *dev_name, char *dir_name, char *type,
 				      unsigned long flags, void *data)
-	= (typeof(sys_mount)) HAVE_SYS_MOUNT_ADDR;
+	    = (typeof(sys_mount)) HAVE_SYS_MOUNT_ADDR;
 	mm_segment_t old_fs;
 	int ret;
+
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	ret = WARN(sys_mount(dev_name, dir_name, fstype, rwflag, data));
@@ -2194,13 +2545,15 @@ int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag
 
 EXPORT_SYMBOL(lis_mount);
 #if LIS_DEPRECARTED_FUNCTIONS
-int lis_umount2(char *path, int flags)
+int
+lis_umount2(char *path, int flags)
 {
 #ifdef HAVE_SYS_UMOUNT_ADDR
 	asmlinkage long (*sys_umount) (char *name, int flags)
-	= (typeof(sys_umount)) HAVE_SYS_UMOUNT_ADDR;
+	    = (typeof(sys_umount)) HAVE_SYS_UMOUNT_ADDR;
 	mm_segment_t old_fs;
 	int ret;
+
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	ret = WARN(sys_umount(path, flags));
@@ -2216,16 +2569,20 @@ EXPORT_SYMBOL(lis_umount2);
 #endif
 #if LIS_DEPRECARTED_FUNCTIONS
 #if HAVE_KERNEL_FATTACH_SUPPORT
-int lis_fattach(struct file *f, const char *path)
+int
+lis_fattach(struct file *f, const char *path)
 {
 	long do_fattach(const struct file *f, const char *path);
+
 	return WARN(do_fattach(f, path));
 }
 
 EXPORT_SYMBOL(lis_fattach);
-int lis_fdetach(const char *path)
+int
+lis_fdetach(const char *path)
 {
 	long do_fdetach(const char *path);
+
 	return WARN(do_fdetach(path));
 }
 
@@ -2234,9 +2591,11 @@ EXPORT_SYMBOL(lis_fdetach);
 #endif
 #if LIS_DEPRECARTED_FUNCTIONS
 #if HAVE_KERNEL_PIPE_SUPPORT
-int lis_pipe(unsigned int *fd)
+int
+lis_pipe(unsigned int *fd)
 {
 	long do_spipe(int *fd);
+
 	return WARN(do_spipe(fd));
 }
 
@@ -2245,14 +2604,16 @@ EXPORT_SYMBOL(lis_pipe);
 #endif
 
 #if LIS_DEPRECARTED_FUNCTIONS
-void lis_fdetach_all(void)
+void
+lis_fdetach_all(void)
 {
 	swerr();
 	return;
 }
 
 EXPORT_SYMBOL(lis_fdetach_all);
-void lis_fdetach_stream(stdata_t *head)
+void
+lis_fdetach_stream(stdata_t *head)
 {
 	swerr();
 	return;
@@ -2271,10 +2632,12 @@ EXPORT_SYMBOL(lis_fdetach_stream);
  *  @nminor:number of minor numbers (ignored)
  *  @name:the name of the device
  */
-int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const char *name)
+int
+lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const char *name)
 {
 	struct cdevsw *cdev;
 	int err;
+
 	if (nminor & MINORMASK)
 		return (-EINVAL);	/* handle multiple majors later */
 	if ((cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)) == NULL)
@@ -2299,10 +2662,12 @@ EXPORT_SYMBOL(lis_register_strdev);
  *  lis_unregister_strdev - emulation of LiS STREAMS device deregistration
  *  @major:major number to deregister
  */
-int lis_unregister_strdev(major_t major)
+int
+lis_unregister_strdev(major_t major)
 {
 	struct cdevsw *cdev;
 	int err;
+
 #ifdef MAX_CHRDEV
 	if (0 >= major || major >= MAX_CHRDEV)
 #else
@@ -2328,10 +2693,12 @@ EXPORT_SYMBOL(lis_unregister_strdev);
  *  @strtab:pointer to struct streamtab structure to register
  *  @name:the name of the module
  */
-modID_t lis_register_strmod(struct streamtab *strtab, const char *name)
+modID_t
+lis_register_strmod(struct streamtab *strtab, const char *name)
 {
 	struct fmodsw *fmod;
 	int err;
+
 	if ((fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)) == NULL)
 		return (-ENOMEM);
 	/* this is ugly, we have to ignore "name" for deregistration */
@@ -2351,10 +2718,12 @@ EXPORT_SYMBOL(lis_register_strmod);
  *  lis_unregister_strmod - emulation of LiS STREAMS module deregistration
  *  @strtab:point to struct streamtab structure to deregister
  */
-int lis_unregister_strmod(struct streamtab *strtab)
+int
+lis_unregister_strmod(struct streamtab *strtab)
 {
 	struct fmodsw *fmod;
 	int err;
+
 	/* this is ugly, we have to ignore "name" for deregistration */
 	/* we should be able to accept a cdev of NULL so that we don't need to export fmod_find and
 	   fmod_put when liscomp is loaded as a module */
@@ -2373,7 +2742,8 @@ EXPORT_SYMBOL(lis_unregister_strmod);
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 static
 #endif
-int __init liscomp_init(void)
+int __init
+liscomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 	printk(KERN_INFO LISCOMP_BANNER);
@@ -2386,7 +2756,8 @@ int __init liscomp_init(void)
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 static
 #endif
-void __exit liscomp_exit(void)
+void __exit
+liscomp_exit(void)
 {
 	return;
 }

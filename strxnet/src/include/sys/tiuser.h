@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.6 2005/07/14 22:04:24 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.7 2005/07/18 12:45:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:03 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-#include <sys/tpi.h>	/* common definitions */
+#include <sys/tpi.h>		/* common definitions */
 
 /* 
  * The following are the events returned from t_look().
@@ -237,6 +237,7 @@ struct t_uderr {
  * multi-threading environment a typical definition of t_errno is:
  */
 extern int *_t_errno __P((void));
+
 #define t_errno (*(_t_errno()))
 
 /* 
@@ -244,62 +245,89 @@ extern int *_t_errno __P((void));
  */
 /* TLI Library Function: t_accept - accept a connection request */
 extern int t_accept __P((int fd, int resfd, struct t_call * call));
+
 /* TLI Library Function: t_alloc - allocate a library structure */
 extern char *t_alloc __P((int fd, int struct_type, int fields));
+
 /* TLI Library Function: t_bind - bind an address to a transport endpoint */
 extern int t_bind __P((int fd, struct t_bind * req, struct t_bind * ret));
+
 /* TLI Library Function: t_close - close a transport endpoint */
 extern int t_close __P((int fd));
+
 /* TLI Library Function: t_connect - establish a connection */
 extern int t_connect __P((int fd, struct t_call * sndcall, struct t_call * rcvcall));
+
 /* TLI Library Function: t_error - produce error message */
 extern void t_error __P((const char *errmsg));
+
 /* TLI Library Function: t_free - free a library structure */
 extern int t_free __P((char *ptr, int struct_type));
+
 /* TLI Library Function: t_getinfo - get protocol-specific service information */
 extern int t_getinfo __P((int fd, struct t_info * info));
+
 /* TLI Library Function: t_getstate - get the current state */
 extern int t_getstate __P((int fd));
+
 /* TLI Library Function: t_listen - listen for a connection indication */
 extern int t_listen __P((int fd, struct t_call * call));
+
 /* TLI Library Function: t_look - look at current event on a transport endpoint */
 extern int t_look __P((int fd));
+
 #if 0
-extern int t_nonblocking __P((int fd)); /* not an XTI function */
+extern int t_nonblocking __P((int fd));	/* not an XTI function */
 #endif
 /* TLI Library Function: t_open - establish a transport endpoint */
 extern int t_open __P((const char *path, int oflag, struct t_info * info));
+
 /* TLI Library Function: t_optmgmt - manage options for a transport endpoint */
 extern int t_optmgmt __P((int fd, struct t_optmgmt * req, struct t_optmgmt * ret));
+
 /* TLI Library Function: t_rcv - receive data or expedited data on a connection */
 extern int t_rcv __P((int fd, char *buf, unsigned nbytes, int *flags));
+
 /* TLI Library Function: t_rcvconnect - receive the confirmation from a connection request */
 extern int t_rcvconnect __P((int fd, struct t_call * call));
+
 /* TLI Library Function: t_rcvdis - retrieve information from disconnect */
 extern int t_rcvdis __P((int fd, struct t_discon * discon));
+
 /* TLI Library Function: t_rcvrel - acknowledge receipt of an orderly release indication */
 extern int t_rcvrel __P((int fd));
+
 /* TLI Library Function: t_rcvudata - receive a data unit */
 extern int t_rcvudata __P((int fd, struct t_unitdata * unitdata, int *flags));
+
 /* TLI Library Function: t_rcvuderr - receive a unit data error indication */
 extern int t_rcvuderr __P((int fd, struct t_uderr * uderr));
+
 /* TLI Library Function: t_snd - send data or expedited data over a connection */
 extern int t_snd __P((int fd, char *buf, unsigned nbytes, int flags));
+
 /* TLI Library Function: t_snddis - send user-initiated disconnect request */
 extern int t_snddis __P((int fd, struct t_call * call));
+
 /* TLI Library Function: t_sndrel - initiate an orderly release */
 extern int t_sndrel __P((int fd));
+
 /* TLI Library Function: t_sndudata - send a data unit */
 extern int t_sndudata __P((int fd, struct t_unitdata * unitdata));
+
 /* TLI Library Function: t_strerror - generate error message string */
 extern char *t_strerror __P((int));
+
 /* TLI Library Function: t_sync - synchronise transport library */
 extern int t_sync __P((int fd));
+
 /* TLI Library Function: t_unbind - disable a transport endpoint */
 extern int t_unbind __P((int fd));
+
 /* TLI Library - deprecated direct access to error list */
 extern char *t_errlist[];
 extern char *t_errstr[];
+
 /* TLI Library - deprecated length of error list */
 extern int t_nerr;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_msg.h,v 0.9.2.2 2005/05/14 08:29:19 brian Exp $
+ @(#) $Id: sctp_msg.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_MSG_H__
 #define __SCTP_MSG_H__
 
-#ident "@(#) $RCSfile: sctp_msg.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:29:19 $"
+#ident "@(#) $RCSfile: sctp_msg.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/18 12:53:09 $"
 
 /*
  *  =========================================================================
@@ -189,8 +189,8 @@ struct sctp_ifops {
  *              the stream regardless of what s_state the stream is in.
  *
  */
-extern int sctp_bind_req(sctp_t * sp, uint16_t sport, uint32_t * sptr, size_t snum, ulong cons);
-extern int sctp_conn_req(sctp_t * sp, uint16_t dport, uint32_t * dptr, size_t dnum, mblk_t *dp);
+extern int sctp_bind_req(sctp_t * sp, uint16_t sport, uint32_t *sptr, size_t snum, ulong cons);
+extern int sctp_conn_req(sctp_t * sp, uint16_t dport, uint32_t *dptr, size_t dnum, mblk_t *dp);
 extern int sctp_conn_res(sctp_t * sp, mblk_t *cp, sctp_t * ap, mblk_t *dp);
 extern int sctp_data_req(sctp_t * sp, uint32_t ppi, uint16_t sid, uint ord, uint more, uint rctp,
 			 mblk_t *dp);
@@ -199,6 +199,7 @@ extern int sctp_reset_res(sctp_t * sp);
 extern int sctp_discon_req(sctp_t * sp, mblk_t *cp);
 extern int sctp_ordrel_req(sctp_t * sp);
 extern int sctp_unbind_req(sctp_t * sp);
+
 /*
  *  =========================================================================
  *

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:37 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:06:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:06:58 $"
 
-static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:37 $";
+static char const ident[] =
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:06:58 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT

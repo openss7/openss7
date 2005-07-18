@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.40 2005/07/18 00:58:50 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.41 2005/07/18 12:06:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 00:58:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/18 00:58:50 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/18 12:06:58 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -74,21 +74,25 @@
 
 #ifndef uchar
 typedef unsigned char uchar;		/* idiots! */
+
 #define uchar uchar
 #endif
 
 #ifndef uintptr_t
 typedef unsigned long uintptr_t;
+
 #define uintptr_t uintptr_t
 #endif
 
 #ifndef intptr_t
 typedef long intptr_t;
+
 #define intptr_t intptr_t
 #endif
 
 #ifndef __streams_dev_t
 typedef unsigned long __streams_dev_t;
+
 #define __streams_dev_t __streams_dev_t
 #endif
 
@@ -98,7 +102,7 @@ typedef unsigned long __streams_dev_t;
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
 #include <linux/poll.h>		/* for poll_table_struct */
 
-#include "sys/streams/config.h"		/* build specific configuration file */
+#include "sys/streams/config.h"	/* build specific configuration file */
 
 #include <sys/strdebug.h>	/* for debugging assertions */
 
@@ -160,6 +164,7 @@ typedef struct datab {
 	/* Linux Fast-STREAMS specific members */
 	atomic_t db_users;		/* actual reference count */
 } dblk_t;
+
 /* 18 bytes on 32 bit, 30 on 64 bit */
 
 #define DBLK_REFMIN	0x01	/* Solaris */
@@ -336,6 +341,7 @@ enum {
 	QB_WANTW_BIT,			/* back enable required */
 	QB_BACK_BIT,			/* UnixWare/Solaris/UXP/V */
 };
+
 #define QB_FULL	    (1 << QB_FULL_BIT	)
 #define QB_WANTW    (1 << QB_WANTW_BIT	)
 #define QB_BACK	    (1 << QB_BACK_BIT	)	/* UnixWare/Solaris */
@@ -562,6 +568,7 @@ struct fmodsw {
 	atomic_t d_refcnt;		/* Number of open or pushed count */
 	int d_major;			/* Major device number (for this entry) */
 };
+
 /* AIX fmodsw flags */
 #define F_MODSW_OLD_OPEN    0x1	/* Supports old-style (V.3) open/close paramters */
 #define F_MODSW_QSAFETY	    0x2	/* Module requires safe timeout/bufcall callbacks */
@@ -628,6 +635,7 @@ struct devnode {
 	int n_minor;			/* node minor device number */
 	struct cdevsw *n_dev;		/* character device */
 };
+
 #define N_MAJOR		0x01	/* major device node */
 
 #define PERIM_INNER	1
@@ -725,6 +733,7 @@ struct iocblk {
 	int ioc_rval;
 	long ioc_filler[4];
 };
+
 #define ioc_count       ioc_cnt.ul
 #define ioc_uid         ioc_cr->cr_uid
 #define ioc_gid         ioc_cr->cr_gid
@@ -740,6 +749,7 @@ struct iocblk {
 	uint ioc_flag;
 	mblk_t *__pad2;
 };
+
 #define ioc_uid		ioc_cr->cr_uid
 #define ioc_gid		ioc_cr->cr_gid
 
@@ -754,6 +764,7 @@ struct copyreq {
 	mblk_t *cq_private;
 	long cq_filler[4];
 };
+
 #define cq_addr cq_ad.cp
 #define cq_uid  cq_cr->cr_uid
 #define cq_gid  cq_cr->cr_gid
@@ -835,9 +846,11 @@ struct wantio {
 
 #undef bcid_t
 typedef int bcid_t;
+
 #define bcid_t bcid_t
 #undef bufcall_id_t
 typedef int bufcall_id_t;
+
 #define bufcall_id_t bufcall_id_t
 
 typedef void *weld_arg_t;
@@ -949,12 +962,14 @@ extern void setqsched(void);
 extern unsigned long freezestr(queue_t *q);
 extern void unfreezestr(queue_t *q, unsigned long pl);
 
-__EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg)
+__EXTERN_INLINE bcid_t
+esbbcall(int priority, void (*function) (long), long arg)
 {
 	return bufcall(0, priority, function, arg);
 }
 
-__EXTERN_INLINE int SAMESTR(queue_t *q)
+__EXTERN_INLINE int
+SAMESTR(queue_t *q)
 {
 	return ((q->q_next != NULL) && ((q->q_flag & QREADR) == (q->q_next->q_flag & QREADR)));
 }
@@ -962,37 +977,49 @@ __EXTERN_INLINE int SAMESTR(queue_t *q)
 #ifndef SAMESTR
 #define SAMESTR(__q) SAMESTR(__q)
 #endif
-__EXTERN_INLINE int canenable(queue_t *q)
+__EXTERN_INLINE int
+canenable(queue_t *q)
 {
 	return (!test_bit(QNOENB_BIT, &q->q_flag));
 }
-__EXTERN_INLINE int datamsg(unsigned char type)
+__EXTERN_INLINE int
+datamsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
+
 	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
-	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) != 0);
+	return (((1 << mod) &
+		 ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) !=
+		0);
 }
-__EXTERN_INLINE int ctlmsg(unsigned char type)
+__EXTERN_INLINE int
+ctlmsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
+
 	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
 	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
 }
-__EXTERN_INLINE int isdatablk(dblk_t * db)
+__EXTERN_INLINE int
+isdatablk(dblk_t * db)
 {
 	return datamsg(db->db_type);
 }
-__EXTERN_INLINE int isdatamsg(mblk_t *mp)
+__EXTERN_INLINE int
+isdatamsg(mblk_t *mp)
 {
 	return isdatablk(mp->b_datap);
 }
-__EXTERN_INLINE int pcmsg(unsigned char type)
+__EXTERN_INLINE int
+pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
-__EXTERN_INLINE int putctl(queue_t *q, int type)
+__EXTERN_INLINE int
+putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		put(q, mp);
@@ -1000,9 +1027,11 @@ __EXTERN_INLINE int putctl(queue_t *q, int type)
 	}
 	return (0);
 }
-__EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
+__EXTERN_INLINE int
+putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
@@ -1011,9 +1040,11 @@ __EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
 	}
 	return (0);
 }
-__EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
+__EXTERN_INLINE int
+putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
@@ -1023,9 +1054,11 @@ __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
 	}
 	return (0);
 }
-__EXTERN_INLINE int putnextctl(queue_t *q, int type)
+__EXTERN_INLINE int
+putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
@@ -1033,9 +1066,11 @@ __EXTERN_INLINE int putnextctl(queue_t *q, int type)
 	}
 	return (0);
 }
-__EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
+__EXTERN_INLINE int
+putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
@@ -1044,9 +1079,11 @@ __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
 	}
 	return (0);
 }
-__EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2)
+__EXTERN_INLINE int
+putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
+
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
@@ -1056,22 +1093,27 @@ __EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2)
 	}
 	return (0);
 }
-__EXTERN_INLINE int testb(size_t size, unsigned int priority)
+__EXTERN_INLINE int
+testb(size_t size, unsigned int priority)
 {
 	mblk_t *mp;
+
 	(void) priority;
 	if ((mp = allocb(size, priority)))
 		freeb(mp);
 	return (mp != NULL);
 }
 
-__EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2)
+__EXTERN_INLINE void
+linkb(mblk_t *mp1, mblk_t *mp2)
 {
 	mblk_t **mpp;
+
 	for (mpp = &mp1; *mpp; mpp = &(*mpp)->b_cont) ;
 	*mpp = mp2;
 }
-__EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2)
+__EXTERN_INLINE mblk_t *
+linkmsg(mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1) {
 		linkb(mp1, mp2);
@@ -1079,9 +1121,11 @@ __EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2)
 	}
 	return (mp2);
 }
-__EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp)
+__EXTERN_INLINE mblk_t *
+rmvb(mblk_t *mp, mblk_t *bp)
 {
 	mblk_t **mpp;
+
 	if (likely(bp != NULL)) {
 		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
 		if (likely(*mpp != NULL)) {
@@ -1091,12 +1135,14 @@ __EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp)
 	}
 	return ((mblk_t *) (-1));
 }
-__EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp)
+__EXTERN_INLINE mblk_t *
+unlinkb(mblk_t *mp)
 {
 	return (mp ? xchg(&mp->b_cont, NULL) : NULL);
 }
 
-__EXTERN_INLINE queue_t *OTHERQ(queue_t *q)
+__EXTERN_INLINE queue_t *
+OTHERQ(queue_t *q)
 {
 	return ((q->q_flag & QREADR) ? q + 1 : q - 1);
 }
@@ -1104,7 +1150,8 @@ __EXTERN_INLINE queue_t *OTHERQ(queue_t *q)
 #ifndef OTHERQ
 #define OTHERQ(__q) OTHERQ(__q)
 #endif
-__EXTERN_INLINE queue_t *RD(queue_t *q)
+__EXTERN_INLINE queue_t *
+RD(queue_t *q)
 {
 	return (q->q_flag & QREADR) ? q : q - 1;
 }
@@ -1112,7 +1159,8 @@ __EXTERN_INLINE queue_t *RD(queue_t *q)
 #ifndef RD
 #define RD(__q) RD(__q)
 #endif
-__EXTERN_INLINE queue_t *WR(queue_t *q)
+__EXTERN_INLINE queue_t *
+WR(queue_t *q)
 {
 	return ((q->q_flag & QREADR) ? q + 1 : q);
 }
@@ -1120,35 +1168,43 @@ __EXTERN_INLINE queue_t *WR(queue_t *q)
 #ifndef WR
 #define WR(__q) WR(__q)
 #endif
-__EXTERN_INLINE queue_t *backq(queue_t *q)
+__EXTERN_INLINE queue_t *
+backq(queue_t *q)
 {
 	struct queue *bq;
+
 	ensure(q, return (NULL));
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
 }
 
-__EXTERN_INLINE size_t msgdsize(mblk_t *mp)
+__EXTERN_INLINE size_t
+msgdsize(mblk_t *mp)
 {
 	size_t size = 0;
+
 	for (; mp; mp = mp->b_cont)
 		if (mp->b_datap->db_type == M_DATA)
 			if (mp->b_wptr > mp->b_rptr)
 				size += mp->b_wptr - mp->b_rptr;
 	return (size);
 }
-__EXTERN_INLINE size_t msgsize(mblk_t *mp)
+__EXTERN_INLINE size_t
+msgsize(mblk_t *mp)
 {
 	size_t size = 0;
+
 	for (; mp; mp = mp->b_cont)
 		if (mp->b_wptr > mp->b_rptr)
 			size += mp->b_wptr - mp->b_rptr;
 	return (size);
 }
-__EXTERN_INLINE size_t xmsgsize(mblk_t *mp)
+__EXTERN_INLINE size_t
+xmsgsize(mblk_t *mp)
 {
 	register mblk_t *bp = mp;
 	register int type = 0;
 	register size_t size = 0, blen;	/* find first non-zero length block for type */
+
 	for (; bp; bp = bp->b_cont)
 		if ((blen = bp->b_wptr - bp->b_rptr) > 0) {
 			type = bp->b_datap->db_type;
@@ -1165,40 +1221,49 @@ __EXTERN_INLINE size_t xmsgsize(mblk_t *mp)
 	return (size);
 }
 
-__EXTERN_INLINE ssize_t qsize(queue_t *q)
+__EXTERN_INLINE ssize_t
+qsize(queue_t *q)
 {
 	return q->q_msgs;
 }
 
-__EXTERN_INLINE void enableok(queue_t *q)
+__EXTERN_INLINE void
+enableok(queue_t *q)
 {
 	clear_bit(QNOENB_BIT, &q->q_flag);
 }
-__EXTERN_INLINE void freemsg(mblk_t *mp)
+__EXTERN_INLINE void
+freemsg(mblk_t *mp)
 {
 	mblk_t *mp_this;
+
 	while ((mp_this = mp)) {
 		mp = mp->b_cont;
 		freeb(mp_this);
 	}
 }
-__EXTERN_INLINE void noenable(queue_t *q)
+__EXTERN_INLINE void
+noenable(queue_t *q)
 {
 	set_bit(QNOENB_BIT, &q->q_flag);
 }
-__EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp)
+__EXTERN_INLINE void
+qreply(queue_t *q, mblk_t *mp)
 {
 	return putnext(OTHERQ(q), mp);
 }
 
 #undef timo_fcn_t
 typedef void timo_fcn_t (caddr_t arg);
+
 #define timo_fcn_t timo_fcn_t
 #undef toid_t
 typedef int toid_t;			/* SVR4 */
+
 #define toid_t toid_t
 #undef timout_id_t
 typedef int timeout_id_t;		/* Solaris */
+
 #define timeout_id_t timeout_id_t
 
 extern toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks);

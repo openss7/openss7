@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/07/15 23:09:10 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.9  2005/07/18 12:25:40  brian
+ - standard indentation
+
  Revision 0.9.2.8  2005/07/15 23:09:10  brian
  - checking in for sync
 
@@ -82,7 +85,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -103,7 +106,8 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
 
-__MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len)
+__MPS_EXTERN_INLINE int
+mi_bcmp(const void *s1, const void *s2, size_t len)
 {
 	return bcmp(s1, s2, len);
 }
@@ -111,41 +115,52 @@ __MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len)
 /*
  *  Memory allocation functions.
  */
-__MPS_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri)
+__MPS_EXTERN_INLINE void *
+mi_alloc(size_t size, unsigned int pri)
 {
 	size_t *sp;
+
 	if ((sp = kmem_alloc(size, KM_NOSLEEP)))
 		*sp++ = size;
 	return (sp);
 }
 
-__MPS_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri)
+__MPS_EXTERN_INLINE void *
+mi_alloc_sleep(size_t size, unsigned int pri)
 {
 	size_t *sp;
+
 	if ((sp = kmem_alloc(size, KM_SLEEP)))
 		*sp++ = size;
 	return (sp);
 }
-__MPS_EXTERN_INLINE caddr_t mi_zalloc(size_t size)
+__MPS_EXTERN_INLINE caddr_t
+mi_zalloc(size_t size)
 {
 	caddr_t memp;
+
 	if ((memp = mi_alloc(size, 0 /* BPRI_LO */ )))
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size)
+__MPS_EXTERN_INLINE caddr_t
+mi_zalloc_sleep(size_t size)
 {
 	caddr_t memp;
+
 	if ((memp = mi_alloc_sleep(size, 0 /* BPRI_LO */ )))
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE void mi_free(void *ptr)
+__MPS_EXTERN_INLINE void
+mi_free(void *ptr)
 {
 	size_t *sp;
+
 	if ((sp = ptr)) {
 		size_t size = *sp--;
-		(void) size; /* LiS ignores size */
+
+		(void) size;	/* LiS ignores size */
 		kmem_free(sp, size);
 	}
 }
@@ -154,6 +169,7 @@ __MPS_EXTERN_INLINE void mi_free(void *ptr)
  *  System wrapper functions.
  */
 extern int mi_sprintf(char *buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+
 #if 0
 /* not implemented yet */
 extern int mi_sprintf_putc(char *cookie, int ch);
@@ -166,7 +182,7 @@ extern long mi_strtol(const caddr_t str, caddr_t *ptr, int base);
 /*
  *  Some internals showing.
  */
-extern void mps_intr_disable(pl_t *plp);
+extern void mps_intr_disable(pl_t * plp);
 extern void mps_intr_enable(pl_t pl);
 
 #elif defined(_MPS_SOURCE)

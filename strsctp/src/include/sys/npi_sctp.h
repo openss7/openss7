@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9.2.2 2005/05/14 08:29:20 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:20 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1
@@ -84,6 +84,7 @@ typedef struct {
 	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
 	np_ulong NPI_version;		/* version # of npi that is supported */
 } __N_info_ack_t;
+
 #define N_info_ack_t __N_info_ack_t
 
 /*
@@ -98,6 +99,7 @@ typedef struct {
 	np_ulong PROTOID_length;	/* length of bound protocol ids */
 	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
 } __N_bind_ack_t;
+
 #define N_bind_ack_t __N_bind_ack_t
 
 #endif				/* N_VERSION_2 */

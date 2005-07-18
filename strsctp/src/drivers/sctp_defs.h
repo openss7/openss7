@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_defs.h,v 0.9.2.3 2005/05/14 08:29:18 brian Exp $
+ @(#) $Id: sctp_defs.h,v 0.9.2.4 2005/07/18 12:53:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:18 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_DEFS_H__
 #define __SCTP_DEFS_H__
 
-#ident "@(#) $RCSfile: sctp_defs.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:29:18 $"
+#ident "@(#) $RCSfile: sctp_defs.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:53:08 $"
 
 /*
  *  =========================================================================
@@ -153,9 +153,8 @@ struct sctp_no_rsrce {			/* Out of Resource */
 };
 struct sctp_bad_addr {			/* Unresolvable Address */
 	struct sctpehdr eh;
-	/*
-	   followed by 
- *//*
+	/* 
+   followed by *//*
    address parameter            
  */
 };
@@ -225,27 +224,20 @@ struct sctp_cookie {
 	uint16_t key_tag;		/* sender's tag for key */
 	uint16_t opt_len;		/* length of included ip options */
 
-	/*
-	   followed by opt.__data 
-	 */
-	/*
-	   followed by dtas 
-	 */
-	/*
-	   uint32_t dtas[0]; dest transport addresses 
-	 */
-	/*
-	   followed by stas 
-	 */
-	/*
-	   uint32_t stas[0]; srce transport addresses 
-	 */
-	/*
-	   followed by mac 
-	 */
-	/*
-	   uint8_t mac[160]; message authentication code 
-	 */
+	/* 
+	   followed by opt.__data */
+	/* 
+	   followed by dtas */
+	/* 
+	   uint32_t dtas[0]; dest transport addresses */
+	/* 
+	   followed by stas */
+	/* 
+	   uint32_t stas[0]; srce transport addresses */
+	/* 
+	   followed by mac */
+	/* 
+	   uint8_t mac[160]; message authentication code */
 };
 
 /*
@@ -460,9 +452,8 @@ struct sctp_msg {
    message control block 
  */
 typedef struct sctp_tcb {
-	/*
-	   for gaps, dups and acks on receive, frag on transmit 
-	 */
+	/* 
+	   for gaps, dups and acks on receive, frag on transmit */
 	struct sctp_tcb *next;		/* message linkage */
 	struct sctp_tcb *prev;		/* message linkage */
 	struct sctp_tcb *tail;		/* message linkage */

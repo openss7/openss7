@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:18 $
+ @(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:18 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:18 $"
+#ident "@(#) $RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:18 $";
+static char const ident[] =
+    "$RCSfile: sctp_hmac_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $";
 
 #include "sctp_compat.h"
 #include "sctp_sha1.h"
@@ -75,8 +76,10 @@ hmac_sha1(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
 	uint8_t k_opad[64];
 	uint8_t tk[16];
 	int i;
+
 	if (klen > 64) {
 		SHA_CTX ctx;
+
 		SHAInit(&ctx);
 		SHAUpdate(&ctx, key, klen);
 		SHAFinal(tk, &ctx);

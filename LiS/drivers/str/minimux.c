@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $"
 
 /************************************************************************
 *                      Miniature Multiplexor                            *
@@ -135,12 +135,12 @@ int mux_minors[MAXMUX];			/* index by minor, in-use flags */
 *									*
 ************************************************************************/
 static struct module_info mux_minfo = {
-	0,			/* id */
-	"mini-mux",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"mini-mux",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 /*
@@ -161,64 +161,64 @@ static int mux_lwsrv(queue_t *);
  * qinit structures (rd and wr side, upper) 
  */
 static struct qinit mux_rinit = {
-	NULL,			/* put */
-	mux_rsrv,		/* service */
-	mux_open,		/* open */
-	mux_close,		/* close */
-	NULL,			/* admin */
-	&mux_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	mux_rsrv,			/* service */
+	mux_open,			/* open */
+	mux_close,			/* close */
+	NULL,				/* admin */
+	&mux_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit mux_winit = {
-	mux_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&mux_minfo,		/* info */
-	NULL			/* stat */
+	mux_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&mux_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /*
  * qinit structures (rd and wr side, lower) 
  */
 static struct module_info mux_lminfo = {
-	0,			/* id */
-	"mini-mux-lwr",		/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"mini-mux-lwr",			/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 static struct qinit mux_lrinit = {
-	mux_lrput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&mux_lminfo,		/* info */
-	NULL			/* stat */
+	mux_lrput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&mux_lminfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit mux_lwinit = {
-	NULL,			/* put */
-	mux_lwsrv,		/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&mux_lminfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	mux_lwsrv,			/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&mux_lminfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the loopback driver.
  */
 struct streamtab mux_info = {
-	&mux_rinit,		/* read queue */
-	&mux_winit,		/* write queue */
-	&mux_lrinit,		/* mux read queue */
-	&mux_lwinit		/* mux write queue */
+	&mux_rinit,			/* read queue */
+	&mux_winit,			/* write queue */
+	&mux_lrinit,			/* mux read queue */
+	&mux_lwinit			/* mux write queue */
 };
 
 /************************************************************************

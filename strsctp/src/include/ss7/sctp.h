@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.2 2005/05/14 08:29:19 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_SCTP_H__
 #define __SS7_SCTP_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifdef __KERNEL__
 #include "../../include/npi.h"
@@ -74,21 +74,21 @@
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_SCTP */
-	/*
+	/* 
 	 *  FIXME: more...
 	 */
 } N_qos_sel_sctp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_OPT_SEL_SCTP */
-	/*
+	/* 
 	 *  FIXME: more...
 	 */
 } N_qos_opt_sel_sctp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_RANGE_SCTP */
-	/*
+	/* 
 	 *  FIXME: more...
 	 */
 } N_qos_range_sctp_t;
@@ -117,6 +117,7 @@ typedef struct {
 	np_ulong QOS_length;		/* QOS parameter set length */
 	np_ulong QOS_offset;		/* QOS parameter set offset */
 } SCTP_data_req_t;
+
 /*
  *  NC expedited data request with options
  */
@@ -126,6 +127,7 @@ typedef struct {
 	np_ulong QOS_length;		/* QOS parameter set length */
 	np_ulong QOS_offset;		/* QOS parameter set offset */
 } SCTP_exdata_req_t;
+
 /*
  *  NC data acknowledgement request with options
  */
@@ -145,6 +147,7 @@ typedef struct {
 	np_ulong QOS_length;		/* QOS parameter set length */
 	np_ulong QOS_offset;		/* QOS parameter set offset */
 } SCTP_data_ind_t;
+
 /*
  *  NC expedited data indication with options
  */
@@ -154,6 +157,7 @@ typedef struct {
 	np_ulong QOS_length;		/* QOS parameter set length */
 	np_ulong QOS_offset;		/* QOS parameter set offset */
 } SCTP_exdata_ind_t;
+
 /*
  *  NC data acknowledgement indications with options
  */
@@ -176,6 +180,7 @@ sctp_data_req(uint flags, uint ppi, uint sid, mblk_t *dp)
 	mblk_t *mp;
 	SCTP_data_req_t *p;
 	N_qos_str_sel_sctp_t *q;
+
 	if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (SCTP_data_req_t *) mp->b_wptr;
@@ -207,6 +212,7 @@ sctp_exdata_req(uint ppi, uint sid, mblk_t *dp)
 	mblk_t *mp;
 	SCTP_exdata_req_t *p;
 	N_qos_str_sel_sctp_t *q;
+
 	if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
 		mp->b_band = 254;
 		mp->b_datap->db_type = M_PROTO;
@@ -238,6 +244,7 @@ sctp_datack_req(uint ppi, uint sid, uint ssn, uint tsn)
 	mblk_t *mp;
 	SCTP_datack_req_t *p;
 	N_qos_str_sel_sctp_t *q;
+
 	if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (SCTP_datack_req_t *) mp->b_wptr;
@@ -267,6 +274,7 @@ sctp_data_ind(uint flags, uint ppi, uint sid, uint ssn, uint tsn, mblk_t *dp)
 	mblk_t *mp;
 	SCTP_data_ind_t *p;
 	N_qos_str_sel_sctp_t *q;
+
 	if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (SCTP_data_req_t *) mp->b_wptr;
@@ -298,6 +306,7 @@ sctp_exdata_ind(uint ppi, uint sid, uint ssn, uint tsn, mblk_t *dp)
 	mblk_t *mp;
 	SCTP_exdata_ind_t *p;
 	N_qos_str_sel_sctp_t *q;
+
 	if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
 		mp->b_band = 254;
 		mp->b_datap->db_type = M_PROTO;
@@ -329,6 +338,7 @@ sctp_datack_ind(uint ppi, uint sid, uint ssn, uint tsn)
 	mblk_t *mp;
 	SCTP_datack_ind_t *p;
 	N_qos_str_sel_sctp_t *q;
+
 	if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (SCTP_datack_ind_t *) mp->b_wptr;

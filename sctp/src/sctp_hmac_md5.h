@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hmac_md5.h,v 0.9.2.2 2005/05/14 08:29:34 brian Exp $
+ @(#) $Id: sctp_hmac_md5.h,v 0.9.2.3 2005/07/18 11:56:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,15 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_HMAC_MD5_H__
 #define __SCTP_HMAC_MD5_H__
 
-#ident "@(#) $RCSfile: sctp_hmac_md5.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_hmac_md5.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-extern void hmac_md5(uint8_t * text, int tlen, uint8_t * key, int klen, uint8_t * digest);
+extern void hmac_md5(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest);
 
 #endif				/* __SCTP_HMAC_MD5_H__ */

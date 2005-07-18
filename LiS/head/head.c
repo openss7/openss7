@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.5 $) $Date: 2005/06/23 10:54:07 $
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.7 $) $Date: 2005/07/13 12:01:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 10:54:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.5 $) $Date: 2005/06/23 10:54:07 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.7 $) $Date: 2005/07/13 12:01:16 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.5 2005/06/23 10:54:07 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.7 2005/07/13 12:01:16 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -274,7 +274,6 @@ C) Open vs Close
 #include <sys/cmn_err.h>
 
 #include <sys/LiS/modcnt.h>	/* for LIS_MODGET/LIS_MODPUT */
-
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
 
@@ -291,8 +290,7 @@ C) Open vs Close
  * Defines for measuring time intervals
  *
  * Each routine that is measuring its execution time will have a local
- * variable called "time_cell".  The measuring is enabled by a debug
- * bit.
+ * variable called "time_cell".  The measuring is enabled by a debug bit.
  *
  * time_cell is declared as an unsigned long initialized to zero.
  */
@@ -316,7 +314,8 @@ C) Open vs Close
  *
  *  This timer is restricted to a cycle of approx. 64 seconds.
  */
-unsigned long lis_hitime(void)
+unsigned long
+lis_hitime(void)
 {
 	struct timeval tv;
 
@@ -328,12 +327,13 @@ unsigned long lis_hitime(void)
 /*
  *  lis_usecs() -
  *
- *  this is similar to lis_hitime, but it isn't restricted to cycling
- *  at 64 seconds.  This has considerable semantic advantage; namely,
- *  it allows simpler comparison of times crossing a single cycle
- *  boundary because the full range of the underlying type is used.
+ *  this is similar to lis_hitime, but it isn't restricted to cycling at
+ *  64 seconds.  This has considerable semantic advantage; namely, it
+ *  allows simpler comparison of times crossing a single cycle boundary
+ *  because the full range of the underlying type is used.
  */
-unsigned long lis_usecs(void)
+unsigned long
+lis_usecs(void)
 {
 	struct timeval tv;
 
@@ -346,7 +346,8 @@ unsigned long lis_usecs(void)
  *
  *  millisecond-resolution clock similar otherwise to lis_usecs().
  */
-unsigned long lis_msecs(void)
+unsigned long
+lis_msecs(void)
 {
 	struct timeval tv;
 
@@ -362,7 +363,8 @@ unsigned long lis_msecs(void)
  *  this is included because some protocols (which might be implemented as
  *  STREAMS modules) specify timer events at this resolution...
  */
-unsigned long lis_dsecs(void)
+unsigned long
+lis_dsecs(void)
 {
 	struct timeval tv;
 
@@ -375,7 +377,8 @@ unsigned long lis_dsecs(void)
  *
  *  seconds-resolution clock similar otherwise to lis_usecs().
  */
-unsigned long lis_secs(void)
+unsigned long
+lis_secs(void)
 {
 	struct timeval tv;
 
@@ -387,8 +390,8 @@ unsigned long lis_secs(void)
  * Macro to do a putnext from the stream head.
  *
  * Do not call this macro while holding any locks since lis_runqueues may
- * call the queue runner, which may want locks that you are holding.  Nested
- * locks will probably save you, but best just not to do it.
+ * call the queue runner, which may want locks that you are holding.
+ * Nested locks will probably save you, but best just not to do it.
  */
 #define	PUTNEXT(q,m)				\
 	do {					\
@@ -397,10 +400,10 @@ unsigned long lis_secs(void)
 	} while (0)
 
 /*
- * Macro to determine whether there are any processes waiting on
- * a poll for a given stream.  When using kernel version 2.1 style
- * polling the queue head is a Linux specific structure, not our
- * portable poll list head.
+ * Macro to determine whether there are any processes waiting on a poll
+ * for a given stream.  When using kernel version 2.1 style polling the
+ * queue head is a Linux specific structure, not our portable poll list
+ * head.
  */
 #if defined(PORTABLE_POLL)
 #define	POLL_WAITING(hdp)	( (hdp)->sd_polllist.ph_list != NULL )
@@ -409,14 +412,13 @@ unsigned long lis_secs(void)
 #else
 #error "Either PORTABLE_POLL or LINUX_POLL must be defined"
 #endif
-
 #define	POLL_NOT_WAITING(hdp)	( ! POLL_WAITING(hdp) )
 
 /*  -------------------------------------------------------------------  */
 /*
  * This counter is used in keeping the code path tables and also in the
- * lock tracing.  It allows one to determine the relative order of 
- * traced events for forensic analysis.
+ * lock tracing.  It allows one to determine the relative order of traced
+ * events for forensic analysis.
  */
 int lis_seq_cntr;			/* used to establish ordering */
 
@@ -493,7 +495,8 @@ static char *lis_cp_fmt =		/* for printk */
 #endif
 
 #if defined(CONFIG_DEV)
-void lis_cpfl(void *p, long a, const char *fcn, const char *f, int l)
+void
+lis_cpfl(void *p, long a, const char *fcn, const char *f, int l)
 {
 	CPFL(p, a, fcn, f, l);
 }
@@ -559,29 +562,29 @@ mblk_t *lis_queue_contention_msg(void);	/* queue.c */
 /*  -------------------------------------------------------------------  */
 /*			   Streams Queue Structures                      */
 /*
- * The stream head itself acts as a streams driver (sort-of).  So
- * it needs to have qinit structures just like other drivers.
+ * The stream head itself acts as a streams driver (sort-of).  So it needs
+ * to have qinit structures just like other drivers.
  *
  * TBD:  We need a better way to set low and high water marks.
  * TBD:  Also packet sizes.
  */
 
 struct module_info strmhd_rdminfo = {
-	0,			/* mi_idnum */
-	"str_rput",		/* mi_idname */
-	LIS_MINPSZ,		/* mi_minpsz */
-	LIS_MAXPSZ,		/* mi_maxpsz */
-	0xFFFF,			/* mi_hiwat */
-	0xF000			/* mi_lowat */
+	0,				/* mi_idnum */
+	"str_rput",			/* mi_idname */
+	LIS_MINPSZ,			/* mi_minpsz */
+	LIS_MAXPSZ,			/* mi_maxpsz */
+	0xFFFF,				/* mi_hiwat */
+	0xF000				/* mi_lowat */
 };
 
 struct module_info strmhd_wrminfo = {
-	0,			/* mi_idnum */
-	"str_wput",		/* mi_idname */
-	LIS_MINPSZ,		/* mi_minpsz */
-	LIS_MAXPSZ,		/* mi_maxpsz */
-	0xFFFF,			/* mi_hiwat */
-	0xF000			/* mi_lowat */
+	0,				/* mi_idnum */
+	"str_wput",			/* mi_idname */
+	LIS_MINPSZ,			/* mi_minpsz */
+	LIS_MAXPSZ,			/* mi_maxpsz */
+	0xFFFF,				/* mi_hiwat */
+	0xF000				/* mi_lowat */
 };
 
 struct module_stat strmhd_rdmstat = { };	/* all counters == 0 */
@@ -589,28 +592,28 @@ struct module_stat strmhd_rdmstat = { };	/* all counters == 0 */
 struct module_stat strmhd_wrmstat = { };	/* all counters == 0 */
 
 struct qinit strmhd_rdinit = {
-	lis_strrput,		/* qi_putp */
-	lis_strrsrv,		/* qi_srvp */
-	NULL,			/* qi_qopen */
-	NULL,			/* qi_qclose */
-	NULL,			/* qi_qadmin */
-	&strmhd_rdminfo,	/* qi_minfo */
-	&strmhd_rdmstat		/* qi_mstat */
+	lis_strrput,			/* qi_putp */
+	lis_strrsrv,			/* qi_srvp */
+	NULL,				/* qi_qopen */
+	NULL,				/* qi_qclose */
+	NULL,				/* qi_qadmin */
+	&strmhd_rdminfo,		/* qi_minfo */
+	&strmhd_rdmstat			/* qi_mstat */
 };
 
 struct qinit strmhd_wrinit = {
-	NULL,			/* qi_putp */
-	&lis_strwsrv,		/* qi_srvp */
-	NULL,			/* qi_qopen */
-	NULL,			/* qi_qclose */
-	NULL,			/* qi_qadmin */
-	&strmhd_wrminfo,	/* qi_minfo */
-	&strmhd_wrmstat		/* qi_mstat */
+	NULL,				/* qi_putp */
+	&lis_strwsrv,			/* qi_srvp */
+	NULL,				/* qi_qopen */
+	NULL,				/* qi_qclose */
+	NULL,				/* qi_qadmin */
+	&strmhd_wrminfo,		/* qi_minfo */
+	&strmhd_wrmstat			/* qi_mstat */
 };
 
 struct streamtab strmhd_info = {
-	&strmhd_rdinit,		/* read queue init */
-	&strmhd_wrinit,		/* write queue init */
+	&strmhd_rdinit,			/* read queue init */
+	&strmhd_wrinit,			/* write queue init */
 	NULL,
 	NULL
 };
@@ -624,7 +627,8 @@ extern int lis_await_qsched(stdata_t *hd, queue_t *q);
 extern void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds);
 extern void lis_wakeup_close(caddr_t arg);
 static void check_for_wantenable(stdata_t *hd);
-static int lis_strdoioctl(struct file *f, stdata_t *hd, strioctl_t * ioc, cred_t *creds, int do_copyin);
+static int lis_strdoioctl(struct file *f, stdata_t *hd, strioctl_t * ioc, cred_t *creds,
+			  int do_copyin);
 int lis_doclose(struct inode *, struct file *, stdata_t *, cred_t *);
 static void lis_free_stdata(struct stdata *hd);
 static void lis_deallocate_polllist(stdata_t *hd);
@@ -650,10 +654,10 @@ extern mblk_t *lis_get_rput_q(stdata_t *hd);
 /*  -------------------------------------------------------------------  */
 /*                          lis_head_get				 */
 /*
- * Increment the reference count for the passed stream head structure.
- * If you pass a NULL pointer it allocates a stream head structure and
- * returns a pointer to it with ref count set to 1.  Return of NULL
- * value means allocation failure.
+ * Increment the reference count for the passed stream head structure.  If
+ * you pass a NULL pointer it allocates a stream head structure and
+ * returns a pointer to it with ref count set to 1.  Return of NULL value
+ * means allocation failure.
  *
  * There is something of a race between this routine and the put routine
  * concerning the count.  It should not matter since if one thread is
@@ -663,16 +667,18 @@ extern mblk_t *lis_get_rput_q(stdata_t *hd);
  *
  * This routine should be called any time some usage of the stream head is
  * pending, not just at open time.  That is, the stream head needs to be
- * "gotten" for read, write, getmsg, putmsg and messages flowing upstream into
- * the stream head.  "put" calls will balance these out.
+ * "gotten" for read, write, getmsg, putmsg and messages flowing upstream
+ * into the stream head.  "put" calls will balance these out.
  *
  * Thus, when the use count goes to zero there really are no more possible
  * usages of this stream head structure and it can be deallocated.
  */
 #if defined(CONFIG_DEV)
-stdata_t *lis_head_get_fcn(stdata_t *hd, const char *file, int line)
+stdata_t *
+lis_head_get_fcn(stdata_t *hd, const char *file, int line)
 #else
-stdata_t *lis_head_get_fcn(stdata_t *hd)
+stdata_t *
+lis_head_get_fcn(stdata_t *hd)
 #endif
 {
 #if !defined(CONFIG_DEV)
@@ -705,27 +711,28 @@ stdata_t *lis_head_get_fcn(stdata_t *hd)
 /*                          lis_head_put				 */
 /*
  * Decrements the reference count for the passed stream head structure.
- * If the count reaches zero then the structure is no longer needed and
- * it is deallocated.  This deallocation amounts to the second half of
- * the close process for the associated stream and involves actually
- * tearing down the stream.
+ * If the count reaches zero then the structure is no longer needed and it
+ * is deallocated.  This deallocation amounts to the second half of the
+ * close process for the associated stream and involves actually tearing
+ * down the stream.
  *
  * Return the original pointer of the structure is still valid.  Return
  * NULL if the count hits zero and the structure is deallocated.
  *
- * We lock the head prior to the testing of the ref count so that
- * another thread decrementing simultaneously will have to wait until
- * we have made our decisions before proceeding.  This allow the orderly
- * sequencing of the ref count, for example, down from 2-->1 by us and
- * for the other thread to notice that the count has reached 1 and
- * perform the deallocation.  If both threads do the atomic_dec at the
- * same time the count could go to zero without the structure being
- * deallocated.
+ * We lock the head prior to the testing of the ref count so that another
+ * thread decrementing simultaneously will have to wait until we have made
+ * our decisions before proceeding.  This allow the orderly sequencing of
+ * the ref count, for example, down from 2-->1 by us and for the other
+ * thread to notice that the count has reached 1 and perform the
+ * deallocation.  If both threads do the atomic_dec at the same time the
+ * count could go to zero without the structure being deallocated.
  */
 #if defined(CONFIG_DEV)
-stdata_t *lis_head_put_fcn(stdata_t *hd, const char *file, int line)
+stdata_t *
+lis_head_put_fcn(stdata_t *hd, const char *file, int line)
 #else
-stdata_t *lis_head_put_fcn(stdata_t *hd)
+stdata_t *
+lis_head_put_fcn(stdata_t *hd)
 #endif
 {
 #if !defined(CONFIG_DEV)
@@ -757,11 +764,12 @@ stdata_t *lis_head_put_fcn(stdata_t *hd)
 /*  -------------------------------------------------------------------  */
 /*			    lis_incr					 */
 /*
- * Increment an integer under spin lock protection and return its 
- * incremented value.  Useful for allocating unique numbers for
- * ioctls, etc.
+ * Increment an integer under spin lock protection and return its
+ * incremented value.  Useful for allocating unique numbers for ioctls,
+ * etc.
  */
-int lis_incr(int *intp)
+int
+lis_incr(int *intp)
 {
 	int ret;
 
@@ -774,10 +782,11 @@ int lis_incr(int *intp)
 /*  -------------------------------------------------------------------  */
 /*                          lis_down_nintr				 */
 /*
- * Do a "down" operation, but don't return until it either succeeds
- * or fails for some reason other than EINTR.
+ * Do a "down" operation, but don't return until it either succeeds or
+ * fails for some reason other than EINTR.
  */
-int lis_down_nintr(lis_semaphore_t *sem)
+int
+lis_down_nintr(lis_semaphore_t *sem)
 {
 	int rslt;
 
@@ -785,7 +794,8 @@ int lis_down_nintr(lis_semaphore_t *sem)
 	return (rslt);
 }
 
-int lis_down_nintr_head(stdata_t *hd, lis_semaphore_t *sem)
+int
+lis_down_nintr_head(stdata_t *hd, lis_semaphore_t *sem)
 {
 	int rslt;
 
@@ -798,7 +808,8 @@ int lis_down_nintr_head(stdata_t *hd, lis_semaphore_t *sem)
 
 /*  -------------------------------------------------------------------  */
 /*                            lis_clone_major				 */
-int lis_clone_major(void)
+int
+lis_clone_major(void)
 {
 	return (LIS_CLONE);	/* rtn major of clone device */
 }
@@ -806,24 +817,28 @@ int lis_clone_major(void)
 /*  -------------------------------------------------------------------  */
 /*                              str_mux_cycle				 */
 
-#if 0
-This whole mux - cycle business, as I see it, is completely artificial.In order to construct a cycle you would have to
-do
-	 something like the following:ioctl(fd2, I_LINK, fd3);
-2-- > 3 ioctl(fd1, I_LINK, fd2);
-1-- > 2-- > 3 ioctl(fd3, I_LINK, fd1);
-3-- > 1-- > 2-- > 3(cycle)
+/*
+	This whole mux - cycle business, as I see it, is completely artificial.
+	In order to construct a cycle you would have to do something like the
+	following:
+		ioctl(fd2, I_LINK, fd3);
+		2-- > 3 ioctl(fd1, I_LINK, fd2);
+		1-- > 2-- > 3 ioctl(fd3, I_LINK, fd1);
+		3-- > 1-- > 2-- > 3(cycle)
 
-    However, you can '' t
-do
-	this because the third ioctl will fail.fd3 has its STPLEX flag set so the ioctl is disallowed. -- DMG
+	However, you cannot do this because the third ioctl will fail.  fd3 has
+	its STPLEX flag set so the ioctl is disallowed. -- DMG
+*/
+#if 0
 /* returns non-zero if the given link leads to cyclic graph
  */
-	static int str_mux_cycle(stdata_t *from, stdata_t *to) {
+static int
+str_mux_cycle(stdata_t *from, stdata_t *to)
+{
 	(void) from;
 	(void) to;
 	return (0);		/* no graph detection */
-	}
+}
 #endif
 
 /*  -------------------------------------------------------------------  */
@@ -832,7 +847,9 @@ do
  *
  * Get a new muxid.  Ensure that it is not in use already.
  */
-static int new_muxid(void) {
+static int
+new_muxid(void)
+{
 	static int muxid;
 	int my_id;
 	stdata_t *hd;
@@ -865,11 +882,12 @@ static int new_muxid(void) {
  * Link the muxed stream under hd.  Return the l_index value.
  * 
  * Use a global running muxid so that if the same driver has multiple
- * control streams it can have unique muxids for its lowers without
- * having to know which control stream goes with which lower.
+ * control streams it can have unique muxids for its lowers without having
+ * to know which control stream goes with which lower.
  */
 static int
- str_link_mux(stdata_t *hd, stdata_t *muxed, int cmd) {
+str_link_mux(stdata_t *hd, stdata_t *muxed, int cmd)
+{
 	muxed->sd_mux.mx_cmd = cmd;	/* save cmd used to link */
 #if 0
 	muxed->sd_mux.mx_index = ++hd->sd_l_index;
@@ -886,24 +904,23 @@ static int
 
 /*  -------------------------------------------------------------------  */
 /* 
- * This routine unlinks the given multiplexor from the given
- * stream head.  It returns >= 0 for success, < 0 for failure.
+ * This routine unlinks the given multiplexor from the given stream head.
+ * It returns >= 0 for success, < 0 for failure.
  *
- * The parameters 'i', 'f' and 'head' refer to the control stream
- * of the multiplexor.  This stream may be open and we are unlinking
- * a specific lower indexed by l_index, or it may be closing and we
- * are unlinking all lower streams which were i_linked via this
- * control stream.
+ * The parameters 'i', 'f' and 'head' refer to the control stream of the
+ * multiplexor.  This stream may be open and we are unlinking a specific
+ * lower indexed by l_index, or it may be closing and we are unlinking all
+ * lower streams which were i_linked via this control stream.
  *
- * Any mux's below hd whose reference count is currently 1 will
- * be closed.  For any such mux's we recursively unlink any mux's
- * below those.
+ * Any mux's below hd whose reference count is currently 1 will be closed.
+ * For any such mux's we recursively unlink any mux's below those.
  *
- * We do not close hd.  We decrement its ref cnt if the command
- * is I_PUNLINK.
+ * We do not close hd.  We decrement its ref cnt if the command is
+ * I_PUNLINK.
  */
 static int
- lis_i_unlink(struct inode *i, struct file *f, stdata_t *hd, int l_index, int cmd, cred_t *creds) {
+lis_i_unlink(struct inode *i, struct file *f, stdata_t *hd, int l_index, int cmd, cred_t *creds)
+{
 	stdata_t *hp;
 	stdata_t *prev;
 	stdata_t *next;
@@ -959,8 +976,8 @@ static int
 
 		CP(hp, hp->sd_rq);
 		CLOCKADD();
-		if ((err = lis_strdoioctl(f, hd, &ioc, creds, 0)) < 0 && cmd == I_UNLINK	/* ignore errs for
-												   I_PUNLINK */
+		if ((err = lis_strdoioctl(f, hd, &ioc, creds, 0)) < 0 && cmd == I_UNLINK
+		    /* ignore errs for I_PUNLINK */
 		    ) {
 			CLOCKON();
 		      error_rtn:
@@ -987,9 +1004,11 @@ static int
 
 		CP(hd, hp);
 		if (LIS_DEBUG_IOCTL || LIS_DEBUG_LINK) {
-			printk("strioctl: I_UNLINK: ctl stream %s muxid=%d\n", hd->sd_name, lnk.l_index);
+			printk("strioctl: I_UNLINK: ctl stream %s muxid=%d\n", hd->sd_name,
+			       lnk.l_index);
 			printk("                    l_qtop=\"%s\" l_qbot=\"%s\"->\"%s\"\n",
-			       lis_queue_name(lnk.l_qtop), hp->sd_name, lis_queue_name(hp->sd_wq->q_next));
+			       lis_queue_name(lnk.l_qtop), hp->sd_name,
+			       lis_queue_name(hp->sd_wq->q_next));
 		}
 
 		/* restore queues */
@@ -1019,23 +1038,20 @@ static int
 		hp->sd_linkcnt--;	/* one less I_LINK */
 		CLR_SD_FLAG(hp, STPLEX);	/* no longer multiplexed */
 
-		/* perform any deferred puts/qenables from plumbing.  We do this even if the queue is closing since
-		   close logic may want to exchange some messages with the driver. */
+		/* perform any deferred puts/qenables from plumbing.  We do this even if the queue
+		   is closing since close logic may want to exchange some messages with the driver. 
+		 */
 		lis_unfreezestr(hp->sd_rq);
 
 		if (LIS_SD_OPENCNT(hp) == 1) {	/* about to close */
-			/* 
-			 * Close the lower stream.  The close routine may recurse
-			 * on lis_i_unlink() if the lower stream is itself the
-			 * control stream of a multiplexor.
-			 *
-			 * We do not have access to the file and inode of the
-			 * lower stream.  Because the sd_opencnt is sitting at 1,
-			 * the i_link is the only user of the stream.  The file
-			 * and inode have been closed.
-			 *
-			 * lis_doclose will "put" the stdata structure, hp.
-			 */
+			/* Close the lower stream.  The close routine may recurse on lis_i_unlink() 
+			   if the lower stream is itself the control stream of a multiplexor.
+
+			   We do not have access to the file and inode of the lower stream. Because 
+			   the sd_opencnt is sitting at 1, the i_link is the only user of the
+			   stream.  The file and inode have been closed.
+
+			   lis_doclose will "put" the stdata structure, hp. */
 			CLOCKADD();
 			lis_doclose(NULL, NULL, hp, creds);	/* close lower mux */
 			CLOCKON();
@@ -1046,7 +1062,8 @@ static int
 			rtn = -EIO;	/* if no other error */
 			printk("strioctl: I_UNLINK: "
 			       "ctl stream %s muxid=%d lower stream %s "
-			       "bad open count %d\n", hd->sd_name, lnk.l_index, hp->sd_name, LIS_SD_OPENCNT(hp) - 1);
+			       "bad open count %d\n", hd->sd_name, lnk.l_index, hp->sd_name,
+			       LIS_SD_OPENCNT(hp) - 1);
 		}
 
 		lis_head_put(hd);	/* decr ctl strm use cnt */
@@ -1062,39 +1079,39 @@ static int
 /*  -------------------------------------------------------------------  */
 /* lis_unlink_all
  *
- * This routine unlinks all the lowers from any control streams
- * that have the same major device number as the one for 'hd'.
+ * This routine unlinks all the lowers from any control streams that have
+ * the same major device number as the one for 'hd'.
  *
- * This is an AT&T feature in which the user uses I_PUNLINK to
- * construct a multiplexor and then exits, closing the control
- * stream.  Later, to dismantle the multiplexor, the user opens
- * just any old clone device to the top level of the multiplexor
- * and then issues an I_PUNLINK with the argument MUXID_ALL.
- * That is when this routine gets called.
+ * This is an AT&T feature in which the user uses I_PUNLINK to construct a
+ * multiplexor and then exits, closing the control stream.  Later, to
+ * dismantle the multiplexor, the user opens just any old clone device to
+ * the top level of the multiplexor and then issues an I_PUNLINK with the
+ * argument MUXID_ALL.  That is when this routine gets called.
  *
  * If it had been left up to me (DMG), I would have forced the user to
- * have a dedicated minor device for the control stream and 
- * re-open it for purposes of issuing the I_PUNLINK.  This clone
- * business opens a gaping security hole.
+ * have a dedicated minor device for the control stream and re-open it for
+ * purposes of issuing the I_PUNLINK.  This clone business opens a gaping
+ * security hole.
  *
- * Anyway, the technique is to traverse our linked list of all
- * stream heads looking for matches of major device number and
- * control stream-ness.  Perform an I_PUNLINK on all the qualified
- * stream heads, being careful about the list integrity since
- * streams heads being closed will get unlinked from the list.
+ * Anyway, the technique is to traverse our linked list of all stream
+ * heads looking for matches of major device number and control
+ * stream-ness.  Perform an I_PUNLINK on all the qualified stream heads,
+ * being careful about the list integrity since streams heads being closed
+ * will get unlinked from the list.
  *
- * If we find a stream that matches, we effectively simulate the
- * user opening the stream (bump usage counts), doing the I_PUNLINK,
- * and then closing the stream.
+ * If we find a stream that matches, we effectively simulate the user
+ * opening the stream (bump usage counts), doing the I_PUNLINK, and then
+ * closing the stream.
  *
- * If there is an error unlinking the lowers then we really will
- * lose the memory that is allocated for the lower streams.  Chances
- * are that the module use counts will stay positive and LiS will not
- * be able to be unloaded.  Thus, it is not a good idea for a driver
- * to respond with an error to an I_PUNLINK ioctl.
+ * If there is an error unlinking the lowers then we really will lose the
+ * memory that is allocated for the lower streams.  Chances are that the
+ * module use counts will stay positive and LiS will not be able to be
+ * unloaded.  Thus, it is not a good idea for a driver to respond with an
+ * error to an I_PUNLINK ioctl.
  */
 static int
- lis_unlink_all(struct inode *i, struct file *f, stdata_t *hd, cred_t *creds) {
+lis_unlink_all(struct inode *i, struct file *f, stdata_t *hd, cred_t *creds)
+{
 	stdata_t *hdp;
 	int n;
 	int maj;
@@ -1107,7 +1124,8 @@ static int
 		return (rtn);
 
 	lis_spin_lock(&lis_stdata_lock);
-	for (hdp = lis_stdata_head, n = 0; n == 0 || hdp != lis_stdata_head; hdp = hdp->sd_next, n++) {
+	for (hdp = lis_stdata_head, n = 0; n == 0 || hdp != lis_stdata_head;
+	     hdp = hdp->sd_next, n++) {
 		if (getmajor(hdp->sd_dev) != maj || hdp->sd_mux.mx_hd == NULL)
 			continue;	/* not our major, or not a ctl stream */
 
@@ -1132,17 +1150,19 @@ static int
  *
  * Called from strioctl to perform the I_LINK (I_PLINK) function.
  *
- * Note about I_PLINK:  This causes the refcnt of the top stream
- * to be incremented so that a close of that stream will not cause
- * the stream to be deallocated and the multiplexor dismantled.
- * However, if the stream does get closed then the stdata structure
- * will be laying around in memory with refcnt==1 and nothing holding
- * onto it.  It will be their until the next reboot.  Hopefully,
- * this multiplexor can take care of itself until then.
+ * Note about I_PLINK:  This causes the refcnt of the top stream to be
+ * incremented so that a close of that stream will not cause the stream to
+ * be deallocated and the multiplexor dismantled.  However, if the stream
+ * does get closed then the stdata structure will be laying around in
+ * memory with refcnt==1 and nothing holding onto it.  It will be their
+ * until the next reboot.  Hopefully, this multiplexor can take care of
+ * itself until then.
  *
  * "hd" is the control stream.  "muxed" is the lower stream.
  */
-int lis_i_link(struct inode *i, struct file *f, stdata_t *hd, int muxfd, int cmd, cred_t *creds) {
+int
+lis_i_link(struct inode *i, struct file *f, stdata_t *hd, int muxfd, int cmd, cred_t *creds)
+{
 	stdata_t *muxed;
 	queue_t *qtop;
 	linkblk_t lnk;
@@ -1171,7 +1191,8 @@ int lis_i_link(struct inode *i, struct file *f, stdata_t *hd, int muxfd, int cmd
 	if (LIS_DEBUG_IOCTL || LIS_DEBUG_LINK) {
 		printk("strioctl: I_LINK: ctl stream %s l_index=%d\n", hd->sd_name, lnk.l_index);
 		printk("                  l_qtop=\"%s\" l_qbot=\"%s\"->\"%s\"\n",
-		       lis_queue_name(lnk.l_qtop), muxed->sd_name, lis_queue_name(muxed->sd_wq->q_next)
+		       lis_queue_name(lnk.l_qtop), muxed->sd_name,
+		       lis_queue_name(muxed->sd_wq->q_next)
 		    );
 	}
 
@@ -1219,16 +1240,13 @@ int lis_i_link(struct inode *i, struct file *f, stdata_t *hd, int muxfd, int cmd
 
 	CLOCKON();
 
-	/* 
-	 * Set initial queue flags.
-	 *
-	 * We set the QWANTR flag of both sides of the queue so that
-	 * a putq into either queue will schedule the service procedure
-	 * to run.  The flag means that some service procedure "wants"
-	 * to "read" from the queue, that is, take messages out of it.
-	 *
-	 * Set the lower queue to have the same queue locking options
-	 * as the driver queue below it.
+	/* Set initial queue flags.
+
+	   We set the QWANTR flag of both sides of the queue so that a putq into either queue will
+	   schedule the service procedure to run.  The flag means that some service procedure
+	   "wants" to "read" from the queue, that is, take messages out of it.
+
+	   Set the lower queue to have the same queue locking options as the driver queue below it. 
 	 */
 	lis_freezestr(muxed->sd_rq);
 	if ((err = lis_set_q_sync(muxed->sd_rq, qtop->q_qlock_option)) < 0) {
@@ -1260,7 +1278,9 @@ int lis_i_link(struct inode *i, struct file *f, stdata_t *hd, int muxfd, int cmd
 /*  -------------------------------------------------------------------  */
 /* detach queues from stream and free the stream
  */
-static void lis_dismantle(stdata_t *hd, cred_t *creds) {
+static void
+lis_dismantle(stdata_t *hd, cred_t *creds)
+{
 	queue_t *q;
 
 	if (hd->sd_wq != NULL) {	/* still have strm head queue */
@@ -1280,7 +1300,8 @@ static void lis_dismantle(stdata_t *hd, cred_t *creds) {
 /* set read options
  */
 static int
- set_readopt(int *flags, int rmode) {
+set_readopt(int *flags, int rmode)
+{
 	long oflags = *flags;
 
 	switch (rmode & RMODEMASK) {
@@ -1312,10 +1333,11 @@ static int
 	return (0);
 }
 
-/* These will let you know if you should block on rd/wr as dictated by the
- * stream head and file flags. They should be called when the process should
- * block due to no free space or no msg avail.
- * Return non-zero if you shouldn't block and zero if you should do block 
+/*
+ * These will let you know if you should block on rd/wr as dictated by the
+ * stream head and file flags. They should be called when the process
+ * should block due to no free space or no msg avail.  Return non-zero if
+ * you shouldn't block and zero if you should do block 
  */
 #define should_notblock_rd(hd,fp) (F_ISSET(fp->f_flags,O_NONBLOCK))
 
@@ -1324,24 +1346,25 @@ static int
 
 /*  -------------------------------------------------------------------  */
 
-/* Will add q to the scan list.  This happens as a result of the
- * scanq timer expiring.
+/*
+ * Will add q to the scan list.  This happens as a result of the scanq
+ * timer expiring.
  *
- * One minor problem:  If the kernel is going to run the streams
- * queues before returning from the timer interrupt then we are OK.
- * If, however, it is up to us to run ourselves then we have two
- * choices:
+ * One minor problem:  If the kernel is going to run the streams queues
+ * before returning from the timer interrupt then we are OK.  If, however,
+ * it is up to us to run ourselves then we have two choices:
  *	1) wait until some user process enters the kernel on streams business
  *	2) run the queues here on top of the clock interrupt
- * I don't like either choice.  It would be best of the kernel ran
- * the streams queues from strategic places such as just before returning
- * from interrupt processing and just before returning to user level.
+ * I don't like either choice.  It would be best of the kernel ran the
+ * streams queues from strategic places such as just before returning from
+ * interrupt processing and just before returning to user level.
  *
  * NOTE: STREAMS queues are run by waking up a process so that everything
  *       is orderly. -- DMG
  */
 static void
- add_to_scanl(caddr_t arg) {
+add_to_scanl(caddr_t arg)
+{
 	lis_flags_t psw, pswq;
 	stdata_t *hd = (stdata_t *) arg;
 	queue_t *q;
@@ -1375,10 +1398,12 @@ static void
 }				/* add_to_scanl */
 
 static void
- start_scanl_timer(stdata_t *hd) {
+start_scanl_timer(stdata_t *hd)
+{
 	if (hd->sd_scantimer == 0)
 		hd->sd_scantimer = lis_timeout_fcn(add_to_scanl,
-						   (caddr_t) hd, SECS_TO(LIS_RTIME), "scan-list", MEM_TIMER);
+						   (caddr_t) hd, SECS_TO(LIS_RTIME), "scan-list",
+						   MEM_TIMER);
 
 }				/* start_scanl_timer */
 
@@ -1386,7 +1411,9 @@ static void
 /*
  * stdata list manipulations
  */
-static void ins_stdata(stdata_t *head) {
+static void
+ins_stdata(stdata_t *head)
+{
 	lis_spin_lock(&lis_stdata_lock);
 	K_ATOMIC_INC(&lis_stdata_cnt);	/* count stdata structs */
 	if (lis_stdata_head == NULL) {
@@ -1402,7 +1429,9 @@ static void ins_stdata(stdata_t *head) {
 	lis_spin_unlock(&lis_stdata_lock);
 }
 
-static void rem_stdata(stdata_t *head) {
+static void
+rem_stdata(stdata_t *head)
+{
 	if (head->sd_next == NULL || head->sd_prev == NULL)
 		return;		/* not in the list */
 
@@ -1427,16 +1456,19 @@ static void rem_stdata(stdata_t *head) {
 
 /*  -------------------------------------------------------------------  */
 /*
- * Allocate and initialize an stdata structure. Do not get any of
- * the locks, leave that up to the caller.
+ * Allocate and initialize an stdata structure. Do not get any of the
+ * locks, leave that up to the caller.
  */
-static stdata_t *lis_alloc_stdata(void) {
+static stdata_t *
+lis_alloc_stdata(void)
+{
 	queue_t *q = lis_allocq("stream-head");
 	stdata_t *head;
 
 	if (!q) {
 		if (LIS_DEBUG_OPEN)
-			printk("lis_alloc_stdata() - " "failed to allocate queues for stream head\n");
+			printk("lis_alloc_stdata() - "
+			       "failed to allocate queues for stream head\n");
 		return NULL;
 	}
 
@@ -1477,13 +1509,12 @@ static stdata_t *lis_alloc_stdata(void) {
 	LIS_MODGET();
 	LisUpCount(MODUSE);
 
-	/* 
-	 * Link stdata structure into master list
-	 */
+	/* Link stdata structure into master list */
 	ins_stdata(head);
 
 	if (LIS_DEBUG_OPEN || LIS_DEBUG_REFCNTS)
-		printk("lis_alloc_stdata() >> h@0x%p/%d/%d\n", head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head));
+		printk("lis_alloc_stdata() >> h@0x%p/%d/%d\n", head, LIS_SD_REFCNT(head),
+		       LIS_SD_OPENCNT(head));
 
 	CP(head, 0);
 	return (head);
@@ -1491,15 +1522,17 @@ static stdata_t *lis_alloc_stdata(void) {
 }				/* lis_alloc_stdata */
 
 /*  -------------------------------------------------------------------  */
-/* Releases the stream head in the i-node
+/*
+ * Releases the stream head in the i-node
  *
- * We have to wait until here to remove the stdata structure from
- * the list because sometimes a stream gets "closed" having been
- * I_PLINKed and hangs around in memory.  Later it has to be findable
- * so that it can be opened again and I_UNLINKed.
+ * We have to wait until here to remove the stdata structure from the list
+ * because sometimes a stream gets "closed" having been I_PLINKed and
+ * hangs around in memory.  Later it has to be findable so that it can be
+ * opened again and I_UNLINKed.
  */
 static void
- lis_free_stdata(struct stdata *hd) {
+lis_free_stdata(struct stdata *hd)
+{
 	mblk_t *mp;
 
 	if (LIS_DEBUG_CLOSE || LIS_DEBUG_REFCNTS)
@@ -1508,7 +1541,8 @@ static void
 		       (hd ? LIS_SD_REFCNT(hd) : 0), (hd ? LIS_SD_OPENCNT(hd) : 0),
 		       (hd && hd->sd_name ? hd->sd_name : ""));
 
-	/* must assert here that every pointer in the stdata struct which may hold dynamic memory is NULL. */
+	/* must assert here that every pointer in the stdata struct which may hold dynamic memory
+	   is NULL. */
 	if (hd == NULL || hd->magic != STDATA_MAGIC)
 		return;
 
@@ -1518,13 +1552,11 @@ static void
 	lis_runqueues();
 	K_ATOMIC_INC(&lis_in_syscall);	/* processing a system call */
 
-	/* 
-	 *  if sd_from is set, we're holding the inode it references;
-	 *  release it now
-	 */
+	/* if sd_from is set, we're holding the inode it references; release it now */
 	if (hd->sd_from) {
 		if (LIS_DEBUG_CLOSE || LIS_DEBUG_REFCNTS)
-			printk("    >> h@0x%p \"%s\" releasing sd_from %c@0x%p/%d\n", hd, hd->sd_name,
+			printk("    >> h@0x%p \"%s\" releasing sd_from %c@0x%p/%d\n", hd,
+			       hd->sd_name,
 #if defined(LINUX)
 			       'd', hd->sd_from, D_COUNT(hd->sd_from)
 #else
@@ -1586,12 +1618,13 @@ static void
 
 /*  -------------------------------------------------------------------  */
 
-/* Will check that inode & device are a proper STREAMS device
+/*
+ * Will check that inode & device are a proper STREAMS device
  *
- * Note:  This whole thing used to be a macro but the linker did
- *        something strange to the code that caused it not to
- *        work properly.  Making it into a procedure is an attempt
- *        to do an end-run around this problem. - DMG
+ * Note:  This whole thing used to be a macro but the linker did something
+ *        strange to the code that caused it not to work properly.  Making
+ *        it into a procedure is an attempt to do an end-run around this
+ *        problem. - DMG
  *
  * Anything that goes wrong here is cause for a message.  None of these
  * conditions should be able to happen.
@@ -1604,7 +1637,9 @@ static void
 			} while (0)
 
 int lis_global_major;
-int lis_check_ino(struct inode *i, char *msg) {
+int
+lis_check_ino(struct inode *i, char *msg)
+{
 	int maj;
 
 	if (!i) {
@@ -1620,7 +1655,8 @@ int lis_check_ino(struct inode *i, char *msg) {
 	maj = getmajor(GET_I_RDEV(i));
 	lis_global_major = maj;
 	if (!LIS_DEVOK(maj)) {
-		printk("lis_check_ino: major=%u minor=%u is not STREAMS\n", maj, getminor(GET_I_RDEV(i)));
+		printk("lis_check_ino: major=%u minor=%u is not STREAMS\n", maj,
+		       getminor(GET_I_RDEV(i)));
 		return (-ENXIO);
 	}
 
@@ -1630,11 +1666,13 @@ int lis_check_ino(struct inode *i, char *msg) {
 
 /*  -------------------------------------------------------------------  */
 
-/* copyin the buffer shown in usr strbuf struct sb, into *m.
- * As it's now it just copies the whole usr bufs to single blks.
+/*
+ * copyin the buffer shown in usr strbuf struct sb, into *m.  As it's now
+ * it just copies the whole usr bufs to single blks.
  */
 static int
- copyin_msgpart(struct file *f, stdata_t *hd, mblk_t **m, char *sb, int wroff) {
+copyin_msgpart(struct file *f, stdata_t *hd, mblk_t **m, char *sb, int wroff)
+{
 	strbuf_t kbuf;
 	int err;
 
@@ -1652,25 +1690,29 @@ static int
 	/* This prevents an oops when the stream is hung up */
 	if (F_ISSET(hd->sd_flag, STRCLOSE)) {
 		if (LIS_DEBUG_PUTMSG)
-			printk("copyin_msgpart: stream %s: stream is closed or closing\n", hd->sd_name);
+			printk("copyin_msgpart: stream %s: stream is closed or closing\n",
+			       hd->sd_name);
 		return (-EIO);
 	}
 
 	/* bb - When hung up a stream head must return ENXIO, this is clear */
 	if (F_ISSET(hd->sd_flag, STRHUP)) {
 		if (LIS_DEBUG_PUTMSG)
-			printk("copyin_msgpart: stream %s: stream has received M_HANGUP\n", hd->sd_name);
+			printk("copyin_msgpart: stream %s: stream has received M_HANGUP\n",
+			       hd->sd_name);
 		return (-ENXIO);
 	}
 
-	/* The if and else if should never happen. But if the conditions ** should occur the user should know
-	   immediately. */
+	/* The if and else if should never happen. But if the conditions ** should occur the user
+	   should know immediately. */
 	if (!hd->sd_wq)
 		printk("**ERROR --- Stream head has no write queue %lx\n", (long) hd);
 	else if (!hd->sd_wq->q_next)
-		printk("**ERROR --- No driver associated stream head %lx q=%lx\n", (long) hd, (long) hd->sd_wq);
+		printk("**ERROR --- No driver associated stream head %lx q=%lx\n", (long) hd,
+		       (long) hd->sd_wq);
 	else if (kbuf.len < (int) hd->sd_wq->q_next->q_minpsz
-		 || (hd->sd_wq->q_next->q_maxpsz != INFPSZ && kbuf.len > (int) hd->sd_wq->q_next->q_maxpsz)
+		 || (hd->sd_wq->q_next->q_maxpsz != INFPSZ
+		     && kbuf.len > (int) hd->sd_wq->q_next->q_maxpsz)
 	    )
 		return (-ERANGE);
 
@@ -1692,7 +1734,8 @@ static int
 /* copyin ctl & dat intro M_PROTO+M_DATA msg
  */
 static int
- copyin_msg(struct file *f, stdata_t *hd, mblk_t **m, strbuf_t * uctl, strbuf_t * udat) {
+copyin_msg(struct file *f, stdata_t *hd, mblk_t **m, strbuf_t * uctl, strbuf_t * udat)
+{
 	int err;
 	mblk_t *aux = NULL;
 
@@ -1737,17 +1780,20 @@ static int
 
 /*  -------------------------------------------------------------------  */
 
-/* copyout part of msg.
- * It will assume it's ctl and return MORECTL/MOREDATA if more data is left.
- * msg won't be touched if !doit 
- * this function doesn't free any block, just adjust b_[rw]ptr's
- * is_ctl is true for the ctl part / false for the data part.
+/*
+ * copyout part of msg.
  *
- * 'm' can be NULL which means do not copy anything, but update
- * the user's strbuf.
+ * It will assume it's ctl and return MORECTL/MOREDATA if more data is
+ * left.  msg won't be touched if !doit this function doesn't free any
+ * block, just adjust b_[rw]ptr's is_ctl is true for the ctl part / false
+ * for the data part.
+ *
+ * 'm' can be NULL which means do not copy anything, but update the user's
+ * strbuf.
  */
 static int
- copyout_msgpart(struct file *f, mblk_t *m, strbuf_t * sb, strbuf_t * usb, int is_ctl, int doit) {
+copyout_msgpart(struct file *f, mblk_t *m, strbuf_t * sb, strbuf_t * usb, int is_ctl, int doit)
+{
 	int err;
 	int rtn = 0;
 	int chunk;
@@ -1828,12 +1874,15 @@ static int
 /*  -------------------------------------------------------------------  */
 /* copyout msg to usr buffers given by ctl & dta.
  * m should be a proto+data msg.
- * this function doesn't free any block, just adjust b_[rw]ptr's
- * msg won't be touched if !doit 
+ * this function doesn't free any block, just adjust b_[rw]ptr's msg won't
+ * be touched if !doit 
  */
 static int
- copyout_msg(struct file *f, mblk_t *m, strbuf_t * kctl, strbuf_t * kdta, strbuf_t * uctl, strbuf_t * udta, int doit) {
+copyout_msg(struct file *f, mblk_t *m, strbuf_t * kctl, strbuf_t * kdta, strbuf_t * uctl,
+	    strbuf_t * udta, int doit)
+{
 	int errctl, errdta;
+
 	if ((errctl = copyout_msgpart(f, m, kctl, uctl, 1, doit)) < 0)
 		return (errctl);
 	else if ((errdta = copyout_msgpart(f, m, kdta, udta, 0, doit)) < 0)
@@ -1842,7 +1891,8 @@ static int
 }				/* copyout_msg */
 
 /*  -------------------------------------------------------------------  */
-/*Returns non-zero if we should hold msg on write at the stream head.
+/*
+ * Returns non-zero if we should hold msg on write at the stream head.
  */
 #define strholding(sd)	(lis_strhold && F_ISSET((sd)->sd_flag,STRHOLD))
 
@@ -1851,7 +1901,9 @@ static int
  *
  * Waits until the indicated queue is no longer being run.
  */
-int lis_await_qsched(stdata_t *hd, queue_t *q) {
+int
+lis_await_qsched(stdata_t *hd, queue_t *q)
+{
 	lis_flags_t psw_rq, psw_wq;
 	int rslt;
 	queue_t *rq;
@@ -1910,7 +1962,8 @@ int lis_await_qsched(stdata_t *hd, queue_t *q) {
 /* qdetach - unlink queue from stream, close driver/module, and free queue
  */
 void
- lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds) {
+lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
+{
 	lis_flags_t psw_rq, psw_wq;
 	lis_flags_t psw_prq, psw_pwq;	/* for locking previous queue */
 	lis_flags_t psw_nrq, psw_nwq;	/* for locking next queue */
@@ -1952,37 +2005,30 @@ void
 	}
 
 	lis_freezestr(rq);
-	/* 
-	 * freezestr will freeze the entire stream.  It will cross the midpoint
-	 * of a pipe and freeze all the way to the remote stream head queue.
-	 * If there is a previous queue we will save its pointer to use for
-	 * unfreezing, otherwise the next queue.
-	 */
+	/* freezestr will freeze the entire stream.  It will cross the midpoint of a pipe and
+	   freeze all the way to the remote stream head queue. If there is a previous queue we will 
+	   save its pointer to use for unfreezing, otherwise the next queue. */
 	if ((unfreeze_q = rq->q_next) == NULL && (unfreeze_q = wq->q_next) == rq)
 		unfreeze_q = NULL;
 
-	/* 
-	 * We want to know if we are closing the stream head queue of a 
-	 * pipe.  If so then we need to be on the lookout for the twist
-	 * in the stream and to disassociate the two ends.
-	 *
-	 * We may be simply popping a module off of one end of a pipe.  That
-	 * case is treated normally since it might be just an I_POP.
-	 */
+	/* We want to know if we are closing the stream head queue of a pipe.  If so then we need
+	   to be on the lookout for the twist in the stream and to disassociate the two ends.
+
+	   We may be simply popping a module off of one end of a pipe.  That case is treated
+	   normally since it might be just an I_POP. */
 	if (rq == hd->sd_rq && (hd_peer = hd->sd_peer) && hd_peer != hd) {
 		closing_pipe = 1;
 		if (LIS_DEBUG_CLOSE)
-			printk("lis_qdetach: stream %s closing pipe, peer %s\n", hd->sd_name, hd_peer->sd_name);
+			printk("lis_qdetach: stream %s closing pipe, peer %s\n", hd->sd_name,
+			       hd_peer->sd_name);
 	}
 
-	/* 
-	 * Lock ordering:  when getting both the queue lock and the qhead_lock, get
-	 * the queue lock first.  See lis_qenable which needs the qhead_lock but is
-	 * always called with the queue lock being held already.
-	 *
-	 * Ignore error returns from lis_lockq().
-	 * In case of error we want to be selective about unlocking.
-	 */
+	/* Lock ordering: when getting both the queue lock and the qhead_lock, get the queue lock
+	   first.  See lis_qenable which needs the qhead_lock but is always called with the queue
+	   lock being held already.
+
+	   Ignore error returns from lis_lockq(). In case of error we want to be selective about
+	   unlocking. */
 	wq_rslt = lis_lockq(wq);	/* lock the write queue */
 	rq_rslt = lis_lockq(rq);	/* lock the read queue */
 
@@ -1996,25 +2042,19 @@ void
 	LIS_QISRUNLOCK(rq, &psw_rq);
 	LIS_QISRUNLOCK(wq, &psw_wq);
 
-	/* 
-	 * Since we have the QPROCSOFF bits set it is now safe to let queuerun have
-	 * the queue lock if it has just removed this queue from the queue list.
-	 * It will notice the QPROCSOFF bits and not do anything.  We have to
-	 * release these locks before calling deschedule() so as to prevent a
-	 * deadly embrace with lis_qhead_lock.
-	 *
-	 * We need to not be holding any locks when we call the close routine
-	 * below.  The close routine may sleep, and sleeping while holding a
-	 * spinlock is a no-no.
-	 */
+	/* Since we have the QPROCSOFF bits set it is now safe to let queuerun have the queue lock
+	   if it has just removed this queue from the queue list. It will notice the QPROCSOFF bits 
+	   and not do anything.  We have to release these locks before calling deschedule() so as
+	   to prevent a deadly embrace with lis_qhead_lock.
+
+	   We need to not be holding any locks when we call the close routine below.  The close
+	   routine may sleep, and sleeping while holding a spinlock is a no-no. */
 	if (rq_rslt == 0)
 		lis_unlockq(rq);
 	if (wq_rslt == 0)
 		lis_unlockq(wq);
 
-	/* 
-	 * SVR4 STREAMS manual says to ignore close routine in the wq structure.
-	 */
+	/* SVR4 STREAMS manual says to ignore close routine in the wq structure. */
 	if (!LIS_CHECK_Q_MAGIC(rq) || !LIS_CHECK_Q_MAGIC(wq)) {
 		lis_unfreezestr(rq);
 		return;		/* lose the memory */
@@ -2028,7 +2068,8 @@ void
 
 	if (do_close && rq->q_qinfo != NULL && rq->q_qinfo->qi_qclose != NULL) {
 		if (LIS_DEBUG_CLOSE)
-			printk("lis_qdetach(q@0x%p,?%d,...) \"%s\" >> calling close(...)\n", rq, do_close, name);
+			printk("lis_qdetach(q@0x%p,?%d,...) \"%s\" >> calling close(...)\n", rq,
+			       do_close, name);
 
 		CP(rq, 0);
 		CLOCKADD();	/* user routine might sleep */
@@ -2040,45 +2081,36 @@ void
 		CLOCKON();
 	}
 
-	/* 
-	 * Now that the qprocs have been turned off and the close routine called
-	 * we need to ensure that the queues are not scheduled -- that is,
-	 * not in any scheduling list.  If we remove them from the list then
-	 * they won't be called.
-	 */
+	/* Now that the qprocs have been turned off and the close routine called we need to ensure
+	   that the queues are not scheduled -- that is, not in any scheduling list.  If we remove
+	   them from the list then they won't be called. */
 	deschedule(rq);		/* uses lis_qhead_lock */
 
-	/* 
-	 * If either queue service procedure is running on another CPU at this very
-	 * instant then we need to wait until it finishes execution.  This is the
-	 * case when the QRUNNING, QENAB and QSCAN flags are reset.
-	 *
-	 * The q_wakeup_sem is used by queuerun to wake us up if the QWAITING
-	 * flag is set.
-	 *
-	 * Signal consideration:  Because this is qdetach it is somewhat likely
-	 * that the process that we are running on has been signalled.  We want the
-	 * task structure signals to reflect this after we are done.  But in the
-	 * meantime we need to clear the signals so that we can sleep on a
-	 * semaphore without being "awakened" by signals that were raised
-	 * previously.
-	 */
+	/* If either queue service procedure is running on another CPU at this very instant then we 
+	   need to wait until it finishes execution.  This is the case when the QRUNNING, QENAB and 
+	   QSCAN flags are reset.
+
+	   The q_wakeup_sem is used by queuerun to wake us up if the QWAITING flag is set.
+
+	   Signal consideration: Because this is qdetach it is somewhat likely that the process
+	   that we are running on has been signalled.  We want the task structure signals to
+	   reflect this after we are done.  But in the meantime we need to clear the signals so
+	   that we can sleep on a semaphore without being "awakened" by signals that were raised
+	   previously. */
 	rslt = lis_await_qsched(hd, q);
 	if (rslt < 0)
-		printk("lis_qdetach(q@0x%p,...) " "    >> lis_down(&wakeup_sem) >> <ERROR %d>\n", rq, rslt);
+		printk("lis_qdetach(q@0x%p,...) " "    >> lis_down(&wakeup_sem) >> <ERROR %d>\n",
+		       rq, rslt);
 
 	if (hd != NULL) {
 		CLR_SD_FLAG(hd, STRFLUSHWT);
 	}
 
-	/* 
-	 * Now everybody that needs to know should know that the queue
-	 * is going away, and no drivers or service procedures should be
-	 * messing with it.  It is safe to do the rest with the queues
-	 * locked, but without interrupt protection.
-	 *
-	 * Ignore error in locking the queue.
-	 */
+	/* Now everybody that needs to know should know that the queue is going away, and no
+	   drivers or service procedures should be messing with it.  It is safe to do the rest with 
+	   the queues locked, but without interrupt protection.
+
+	   Ignore error in locking the queue. */
 
 	lis_lockq(wq);		/* lock the write queue */
 	lis_lockq(rq);		/* lock the read queue */
@@ -2091,25 +2123,21 @@ void
 
 	if (name && LIS_DEBUG_CLOSE)
 		printk("lis_qdetach(q@0x%p,...) \"%s\" >> "
-		       "wq=%p rq=%p next=%p unfrzq=%p prev=%p\n", q, name, wq, rq, next_q, unfreeze_q, prev_q);
-	/* 
-	 *  if this queue is last in a FIFO/pipe stream, the next queue
-	 *  from a write queue will be a read queue.  We handle that
-	 *  case below.
-	 *
-	 *  Lock previous and next queues as appropriate.
-	 *
-	 *  A word about lis_set_q_flags:  We set the QOPENING bit to cause
-	 *  puts into these queues to defer.  If we are called from pop_mod
-	 *  then there will be a call to check_for_wantenable() to follow
-	 *  shortly which will reset these bits and perform the deferred
-	 *  puts.  If we are called from close we are dismantling the 
-	 *  stream; closaction has already taken place so we don't care
-	 *  if the bits remain on.
-	 */
+		       "wq=%p rq=%p next=%p unfrzq=%p prev=%p\n", q, name, wq, rq, next_q,
+		       unfreeze_q, prev_q);
+	/* if this queue is last in a FIFO/pipe stream, the next queue from a write queue will be a 
+	   read queue.  We handle that case below.
+
+	   Lock previous and next queues as appropriate.
+
+	   A word about lis_set_q_flags: We set the QOPENING bit to cause puts into these queues to 
+	   defer.  If we are called from pop_mod then there will be a call to
+	   check_for_wantenable() to follow shortly which will reset these bits and perform the
+	   deferred puts.  If we are called from close we are dismantling the stream; closaction
+	   has already taken place so we don't care if the bits remain on. */
 	if (next_q == rq) {	/* FIFO linked to self */
-		/* all there is to lock is our queue, which we don't need to lock since we have the last reference to
-		   it except for the list pointers, and the previous queue. */
+		/* all there is to lock is our queue, which we don't need to lock since we have the 
+		   last reference to it except for the list pointers, and the previous queue. */
 		next_q = prev_q;
 		if (prev_q) {
 			LIS_QISRLOCK(prev_q, &psw_prq);
@@ -2134,19 +2162,19 @@ void
 
 	if (next_q) {
 		if (name && LIS_DEBUG_CLOSE)
-			printk("lis_qdetach(q@0x%p,...) \"%s\"" " >> linking around write queue\n", wq, name);
+			printk("lis_qdetach(q@0x%p,...) \"%s\"" " >> linking around write queue\n",
+			       wq, name);
 		OTHER(next_q)->q_next = prev_q;
 	}
 	if (prev_q) {
 		if (name && LIS_DEBUG_CLOSE)
-			printk("lis_qdetach(q@0x%p,...) \"%s\"" " >> linking around read queue\n", rq, name);
+			printk("lis_qdetach(q@0x%p,...) \"%s\"" " >> linking around read queue\n",
+			       rq, name);
 		WR(prev_q)->q_next = next_q;
 	}
 
-	/* 
-	 * Nobody can see the queues anymore but us.  Unlock them so that
-	 * the kernel sees that we are not holding any locks.
-	 */
+	/* Nobody can see the queues anymore but us.  Unlock them so that the kernel sees that we
+	   are not holding any locks. */
 	lis_unlockq(rq);
 	lis_unlockq(wq);
 
@@ -2164,17 +2192,13 @@ void
 
 	CP(rq, 0);
 	lis_freeq(rq);		/* frees both sides of the queue */
-	/* 
-	 * We have frozen the stream from our detached queue downward.  Having
-	 * unlinked our queue we now need to unfreeze the rest of the stream
-	 * below us.
-	 *
-	 * In the case of a pipe the unfreeze_q may very well be the read
-	 * queue on the other side of the pipe.  By now the linkage back to
-	 * our own 'hd' has been severed.  We unfreeze the other end and then
-	 * check our own head to see if it is still frozen.  If so then we need
-	 * a head_put to balance what freezestr did.
-	 */
+	/* We have frozen the stream from our detached queue downward.  Having unlinked our queue
+	   we now need to unfreeze the rest of the stream below us.
+
+	   In the case of a pipe the unfreeze_q may very well be the read queue on the other side
+	   of the pipe.  By now the linkage back to our own 'hd' has been severed.  We unfreeze the 
+	   other end and then check our own head to see if it is still frozen.  If so then we need
+	   a head_put to balance what freezestr did. */
 	if (unfreeze_q) {
 		CP(unfreeze_q, unfreeze_q->q_str);
 		lis_unfreezestr(unfreeze_q);	/* will balance lis_freezestr */
@@ -2188,7 +2212,8 @@ void
 	}
 
 	if (LIS_DEBUG_CLOSE)
-		printk("lis_qdetach: closing_pipe=%d hd=%p hd->sd_peer=%p\n", closing_pipe, hd, hd_peer);
+		printk("lis_qdetach: closing_pipe=%d hd=%p hd->sd_peer=%p\n", closing_pipe, hd,
+		       hd_peer);
 
 	if (closing_pipe) {	/* balance head_get in lis_get_pipe */
 		int flag;
@@ -2214,11 +2239,12 @@ void
 
 /*  -------------------------------------------------------------------  */
 /*
- *  lis_qopen() - calls the open routine associated with the read queue
- *  of q's pair (i.e., q may be a write queue).
+ *  lis_qopen() - calls the open routine associated with the read queue of
+ *  q's pair (i.e., q may be a write queue).
  */
 static int
- lis_qopen(queue_t *q, dev_t *devp, int flag, cred_t *credp) {
+lis_qopen(queue_t *q, dev_t *devp, int flag, cred_t *credp)
+{
 	queue_t *rq = RD(q);
 	int sflag;
 	dev_t dev = MKDEV(0, 0);
@@ -2244,27 +2270,32 @@ static int
 	if (name && LIS_DEBUG_OPEN)
 		printk("lis_qopen(q@0x%p,...) "
 		       "calling %s \"%s\" open @0x%p (dev=%x,flag=%x,sflag=%x)\n",
-		       q, (sflag == MODOPEN ? "module" : "driver"), name, rq->q_qinfo->qi_qopen, *devp, flag, sflag);
+		       q, (sflag == MODOPEN ? "module" : "driver"), name, rq->q_qinfo->qi_qopen,
+		       *devp, flag, sflag);
 
 	if ((err = (*(rq->q_qinfo->qi_qopen)) (rq, devp, flag, sflag, credp)) != 0) {
 		if (LIS_DEBUG_OPEN)
-			printk("lis_qopen(q@0x%p,...) \"%s\" >> error %d\n", q, lis_queue_name(q), err);
+			printk("lis_qopen(q@0x%p,...) \"%s\" >> error %d\n", q, lis_queue_name(q),
+			       err);
 		return (err < 0 ? err : -err);
 	} else
 		return (0);
 }
+
 /*
  *   lis_qattach - set up a queue pair for driver/module
  */
 static int
- lis_qattach(stdata_t *head, struct streamtab *info, dev_t *devp, int flags, cred_t *credp) {
+lis_qattach(stdata_t *head, struct streamtab *info, dev_t *devp, int flags, cred_t *credp)
+{
 	queue_t *newq, *newwq;
 	queue_t *q = (head ? (head->sd_rq ? head->sd_rq : NULL) : NULL);
 	queue_t *rq, *wq;
 	lis_flags_t psw1, psw2, psw3, psw4;
 	const char *name = (info ?
 			    (info->st_rdinit ?
-			     (info->st_rdinit->qi_minfo ? info->st_rdinit->qi_minfo->mi_idname : NULL) : NULL) : NULL);
+			     (info->st_rdinit->qi_minfo ? info->st_rdinit->qi_minfo->
+			      mi_idname : NULL) : NULL) : NULL);
 	int err;
 
 	if (!q)
@@ -2299,17 +2330,13 @@ static int
 	wq->q_next = newwq;
 	newq->q_str = newwq->q_str = head;
 
-	/* 
-	 * Set initial queue flags.
-	 *
-	 * We set the QWANTR flag of both sides of the queue so that
-	 * a putq into either queue will schedule the service procedure
-	 * to run.  The flag means that some service procedure "wants"
-	 * to "read" from the queue, that is, take messages out of it.
-	 *
-	 * QOPENING is set for a new queue and must be turned off by the
-	 * open routine.
-	 */
+	/* Set initial queue flags.
+
+	   We set the QWANTR flag of both sides of the queue so that a putq into either queue will
+	   schedule the service procedure to run.  The flag means that some service procedure
+	   "wants" to "read" from the queue, that is, take messages out of it.
+
+	   QOPENING is set for a new queue and must be turned off by the open routine. */
 	F_SET(newq->q_flag, QWANTR | QOPENING);
 	F_SET(newwq->q_flag, QWANTR | QOPENING);	/* yes, even tho it's the wrq */
 
@@ -2329,7 +2356,8 @@ static int
 /* Push this module in this stream and call its open proc.
  */
 static int
- push_mod(stdata_t *head, streamtab_t *mod, int id, dev_t *devp, int flags, cred_t *creds) {
+push_mod(stdata_t *head, streamtab_t *mod, int id, dev_t *devp, int flags, cred_t *creds)
+{
 	queue_t *lrq, *lwq;
 	int err;
 
@@ -2341,7 +2369,8 @@ static int
 
 	lis_freezestr(head->sd_rq);
 
-	if ((err = lis_await_qsched(head, head->sd_rq)) < 0 || (err = lis_await_qsched(head, lrq)) < 0)
+	if ((err = lis_await_qsched(head, head->sd_rq)) < 0
+	    || (err = lis_await_qsched(head, lrq)) < 0)
 		goto return_error;
 
 	if ((err = lis_qattach(head, mod, devp, flags, creds)) < 0)
@@ -2365,7 +2394,8 @@ static int
 /* Pop the top module off this stream and call its close proc.
  */
 static int
- pop_mod(stdata_t *head, int flags, cred_t *creds) {
+pop_mod(stdata_t *head, int flags, cred_t *creds)
+{
 	modID_t id;
 	int err;
 	const char *name;
@@ -2377,23 +2407,21 @@ static int
 
 	if (!head->sd_wq->q_next
 	    || !head->sd_wq->q_next->q_qinfo
-	    || !head->sd_wq->q_next->q_qinfo->qi_minfo || !(name = head->sd_wq->q_next->q_qinfo->qi_minfo->mi_idname)
+	    || !head->sd_wq->q_next->q_qinfo->qi_minfo
+	    || !(name = head->sd_wq->q_next->q_qinfo->qi_minfo->mi_idname)
 	    )
 		return (-EINVAL);
 
 	if ((id = lis_findmod(name)) > 0)	/* mod name to mod id */
 		lis_fmod_sw[id].f_count--;
 
-	/* 
-	 * We want to set the QFROZEN flag in three queues.  The stream head
-	 * queue, the queue for the module below and the queue for the module/
-	 * driver below that.
-	 *
-	 * Then we want to wait for qenables to complete on all three.
-	 *
-	 * Recovery from errors awaiting qsched completion involves putting
-	 * back the flags in all three queues.
-	 */
+	/* We want to set the QFROZEN flag in three queues.  The stream head queue, the queue for
+	   the module below and the queue for the module/ driver below that.
+
+	   Then we want to wait for qenables to complete on all three.
+
+	   Recovery from errors awaiting qsched completion involves putting back the flags in all
+	   three queues. */
 	if (SAMESTR(head->sd_wq)) {
 		queue_t *wqn = NULL;
 		queue_t *wqnn = NULL;
@@ -2420,7 +2448,8 @@ static int
 /* Set STREAMS options
  */
 static void
- set_options(stdata_t *hd, stroptions_t * so) {
+set_options(stdata_t *hd, stroptions_t * so)
+{
 	/* just set head flags as requested */
 	if (F_ISSET(so->so_flags, SO_MREADON))
 		SET_SD_FLAG(hd, SNDMREAD);
@@ -2474,12 +2503,14 @@ static void
 /* Wake up polling processes
  */
 static void
- lis_wake_up_poll(stdata_t *hd, int ev) {
+lis_wake_up_poll(stdata_t *hd, int ev)
+{
 #if defined(PORTABLE_POLL)
 	polldat_t *pd;
 
 	if (LIS_DEBUG_POLL)
-		printk("lis_wake_up_poll: stream %s: revents:%s\n", hd->sd_name, lis_poll_events((short) ev));
+		printk("lis_wake_up_poll: stream %s: revents:%s\n", hd->sd_name,
+		       lis_poll_events((short) ev));
 
 	for (pd = hd->sd_polllist.ph_list; pd != NULL; pd = pd->pd_next) {
 		pd->pd_events = (short) ev;	/* events being caused */
@@ -2492,7 +2523,8 @@ static void
 #elif defined(LINUX_POLL)
 
 	if (LIS_DEBUG_POLL)
-		printk("lis_wake_up_poll: stream %s: revents:%s\n", hd->sd_name, lis_poll_events((short) ev));
+		printk("lis_wake_up_poll: stream %s: revents:%s\n", hd->sd_name,
+		       lis_poll_events((short) ev));
 
 	wake_up_interruptible(&hd->sd_task_list);
 
@@ -2506,18 +2538,18 @@ static void
 
 /* deallocate poll list
  * 
- * Called from stdata structure deallocation code.  Shortly after
- * this routine returns the stdata structure will be deallocated.
- * We wake up any processes that are sleeping on poll data structures
- * chained off of this stdata structure.  Immediately upon return
- * from the wakeup, we go through the list and nullify the pointer
- * to the list head in all the pdat structures.  This means that
- * the poll code, when it finally wakes up, may find this head
- * pointer to be NULL.  If the poll code has not delinked the
- * poll entry by then, it may be in trouble.
+ * Called from stdata structure deallocation code.  Shortly after this
+ * routine returns the stdata structure will be deallocated.  We wake up
+ * any processes that are sleeping on poll data structures chained off of
+ * this stdata structure.  Immediately upon return from the wakeup, we go
+ * through the list and nullify the pointer to the list head in all the
+ * pdat structures.  This means that the poll code, when it finally wakes
+ * up, may find this head pointer to be NULL.  If the poll code has not
+ * delinked the poll entry by then, it may be in trouble.
  */
 static void
- lis_deallocate_polllist(stdata_t *hd) {
+lis_deallocate_polllist(stdata_t *hd)
+{
 #if defined(PORTABLE_POLL)
 	polldat_t *pd;
 
@@ -2543,7 +2575,8 @@ static void
 /* kill procs in elist w/ sig
  */
 static void
- kill_procs(struct strevent *elist, int sig, short e) {
+kill_procs(struct strevent *elist, int sig, short e)
+{
 	strevent_t *ev;
 	int res;
 
@@ -2554,41 +2587,53 @@ static void
 				if (LIS_DEBUG_SIG)
 					printk("kill_proc(pid=%d, sig=0x%x)\n", ev->se_pid, SIGURG);
 				if ((res = lis_kill_proc(ev->se_pid, SIGURG, 1)) < 0)
-					lis_error(LIS_ERROR, "kill_procs", "kill_proc: errno %d", res);
+					lis_error(LIS_ERROR, "kill_procs", "kill_proc: errno %d",
+						  res);
 
-				if (ev->se_evs & e & ~S_RDBAND) {	/* other events -> sigpoll too */
+				if (ev->se_evs & e & ~S_RDBAND) {	/* other events -> sigpoll
+									   too */
 					if (LIS_DEBUG_SIG)
-						printk("kill_proc(pid=%d, sig=0x%x)\n", ev->se_pid, SIGPOLL);
+						printk("kill_proc(pid=%d, sig=0x%x)\n", ev->se_pid,
+						       SIGPOLL);
 					if ((res = lis_kill_proc(ev->se_pid, SIGPOLL, 1)) < 0)
-						lis_error(LIS_ERROR, "kill_procs", "kill_proc: errno %d", res);
+						lis_error(LIS_ERROR, "kill_procs",
+							  "kill_proc: errno %d", res);
 				}
 			} else {
 				if (LIS_DEBUG_SIG)
-					printk("kill_proc(pid=%d, sig=0x%x)\n", ev->se_pid, SIGPOLL);
+					printk("kill_proc(pid=%d, sig=0x%x)\n", ev->se_pid,
+					       SIGPOLL);
 				if ((res = lis_kill_proc(ev->se_pid, SIGPOLL, 1)) < 0)
-					lis_error(LIS_ERROR, "kill_procs", "kill_proc: errno %d", res);
+					lis_error(LIS_ERROR, "kill_procs", "kill_proc: errno %d",
+						  res);
 			}
 		}
 
 }				/* kill_procs */
+
 /*  -------------------------------------------------------------------  */
 
-/* Will send relevant signals to the usr on arrival of M_[PC]SIG containing
- * `sig' at the stream head.
+/*
+ * Will send relevant signals to the usr on arrival of M_[PC]SIG
+ * containing `sig' at the stream head.
  */
 static void
- signalusr(int sig, stdata_t *hd) {
+signalusr(int sig, stdata_t *hd)
+{
 	if (sig == SIGPOLL)
 		kill_procs(hd->sd_siglist, SIGPOLL, SIGPOLL);	/* ?? !!! */
 	else if (F_ISSET(hd->sd_flag, STRISTTY))
 		lis_kill_pg(hd->sd_pgrp, sig, 1);
 }				/* signalusr */
+
 /*  -------------------------------------------------------------------  */
 
-/* Send an M_READ msg downstream
+/*
+ * Send an M_READ msg downstream
  */
 static int
- snd_mread(queue_t *wq, unsigned int ulen) {
+snd_mread(queue_t *wq, unsigned int ulen)
+{
 	mblk_t *mread = allocb(sizeof(ulen), BPRI_LO);
 	unsigned *uptr;
 
@@ -2605,11 +2650,14 @@ static int
 
 }				/* snd_mread */
 
-/* Send an M_FLUSH msg downstream
+/*
+ * Send an M_FLUSH msg downstream
  */
 static int
- lis_snd_mflush(queue_t *wq, int flag, int band) {
+lis_snd_mflush(queue_t *wq, int flag, int band)
+{
 	mblk_t *mf = allocb(2 * sizeof(int), BPRI_LO);	/* sizeof mflush msg (?) */
+
 	if (mf == NULL)
 		return (-ENOMEM);
 	else {
@@ -2623,12 +2671,15 @@ static int
 }				/* lis_snd_mflush */
 
 /*  -------------------------------------------------------------------  */
-/* Send an ioctl negative ack  msg downstream reusing mp (M_IOCTL) msg.
+/*
+ * Send an ioctl negative ack  msg downstream reusing mp (M_IOCTL) msg.
  */
 static int
- snd_iocnak(queue_t *wq, mblk_t *mp, int code) {
+snd_iocnak(queue_t *wq, mblk_t *mp, int code)
+{
 	iocblk_t *iocb = (iocblk_t *) (mp->b_rptr);
 	mblk_t *dtab;
+
 	lis_btype(mp) = M_IOCNAK;
 	iocb->ioc_error = code;
 	dtab = lis_unlinkb(mp);
@@ -2639,10 +2690,12 @@ static int
 
 /*  -------------------------------------------------------------------  */
 
-/* Is this ioc blk out of sequence?
+/*
+ * Is this ioc blk out of sequence?
  */
 static int
- bad_ioc_seq(mblk_t *mp, stdata_t *hd) {
+bad_ioc_seq(mblk_t *mp, stdata_t *hd)
+{
 	iocblk_t *iocb = (iocblk_t *) mp->b_rptr;
 
 	return (iocb->ioc_id != (uint) hd->sd_iocseq);
@@ -2651,10 +2704,12 @@ static int
 
 /*  -------------------------------------------------------------------  */
 
-/* Call every open procedure in this stream
+/*
+ * Call every open procedure in this stream
  */
 static int
- open_mods(stdata_t *head, dev_t *devp, int flags, cred_t *creds) {
+open_mods(stdata_t *head, dev_t *devp, int flags, cred_t *creds)
+{
 	queue_t *wq = (head ? head->sd_wq : NULL);
 	dev_t odev = *devp;
 	int err;
@@ -2688,8 +2743,9 @@ static int
  * Return 0 if the flush is complete and mp is disposed of.  Return 1 if
  * the flush is deferred and mp is still valid.
  */
-static
-int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq) {
+static int
+lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq)
+{
 	int msgs_before = lis_qsize(q);
 	lis_flags_t psw;
 	mblk_t *xp, *tmp = NULL;
@@ -2699,10 +2755,7 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq) {
 		       "M_FLUSH from \"%s\" on stream %s flags=0x%x flush_rputq=%d\n",
 		       lis_queue_name(backq(q)), shead->sd_name, *mp->b_rptr & 0xFF, flush_rputq);
 
-	/* 
-	 * Are we closing?  If so do not perform the flush, just wake up
-	 * the closing code.
-	 */
+	/* Are we closing? If so do not perform the flush, just wake up the closing code. */
 	if (F_ISSET(shead->sd_flag, STRFLUSHWT)) {	/* close-time flush */
 		CP(q, mp);
 		freemsg(mp);	/* discard message */
@@ -2711,10 +2764,7 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq) {
 		return (0);	/* "done" */
 	}
 
-	/* 
-	 * Is strrput or strread running?  If so, defer the flush until
-	 * strrsrv runs.
-	 */
+	/* Is strrput or strread running? If so, defer the flush until strrsrv runs. */
 	LIS_RDQISRLOCK(q, &psw);
 	if (q->q_flag & QREADING) {	/* read/getpmsg running */
 		LIS_RDQISRUNLOCK(q, &psw);
@@ -2725,42 +2775,33 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq) {
 	if (*mp->b_rptr & FLUSHR) {	/* flush read queue */
 		CP(mp, 0);
 		if (flush_rputq) {
-			/* 
-			 * Flush the rput temporary queue.  Its messages are 
-			 * accounted for in the stream head q structure.
-			 */
+			/* Flush the rput temporary queue.  Its messages are accounted for in the
+			   stream head q structure. */
 			while ((xp = lis_get_rput_q(shead)) != NULL) {
-				/* 
-				 * All messages are temporary saved in a local list.
-				 * Correct action will be taken after flush is complete.
-				 * Unqueueing now will preserves q_count value.
-				 */
+				/* All messages are temporary saved in a local list. Correct action 
+				   will be taken after flush is complete. Unqueueing now will
+				   preserves q_count value. */
 				xp->b_next = tmp;
 				tmp = xp;
 			}
 		}
-		/* 
-		 * Flush the "official" stream head queue.
-		 */
+		/* Flush the "official" stream head queue. */
 		if (F_ISSET(*mp->b_rptr, FLUSHBAND))
 			lis_flushband(LIS_RD(q), mp->b_rptr[1], FLUSHDATA);
 		else
 			lis_flushq(LIS_RD(q), FLUSHDATA);
 
 		LIS_RDQISRLOCK(shead->sd_rq, &psw);
-		if (shead->sd_rq->q_first == NULL || !lis_hipri(shead->sd_rq->q_first->b_datap->db_type)
+		if (shead->sd_rq->q_first == NULL
+		    || !lis_hipri(shead->sd_rq->q_first->b_datap->db_type)
 		    )
 			CLR_SD_FLAG(shead, STRPRI);	/* no PCPROTO at head */
 		LIS_RDQISRUNLOCK(shead->sd_rq, &psw);
 
 		*mp->b_rptr &= ~FLUSHR;	/* turn off flush read bit */
-		/* 
-		 * Do not discard messages corresponding to
-		 * an in-progress ioctl (IOCWAIT flag).
-		 * Discarding them could let the ioctl sleeping for ever
-		 * (unless timeout is activated)
-		 * Re-queuing now (after flush) preserves q_count value.
-		 */
+		/* Do not discard messages corresponding to an in-progress ioctl (IOCWAIT flag).
+		   Discarding them could let the ioctl sleeping for ever (unless timeout is
+		   activated) Re-queuing now (after flush) preserves q_count value. */
 		LIS_QISRLOCK(q, &psw);
 		while ((xp = tmp) != NULL) {
 			tmp = xp->b_next;
@@ -2805,11 +2846,13 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq) {
  * Handles setting error conditions on a stream head.  Used by M_ERROR
  * processing and file closing.
  *
- * Pass 0 for error code to reset error flag.  Pass -1 for error code
- * to ignore that particular flag.  Pass positive error code to set that
+ * Pass 0 for error code to reset error flag.  Pass -1 for error code to
+ * ignore that particular flag.  Pass positive error code to set that
  * error code in the stream head structure.
  */
-void lis_stream_error(stdata_t *shead, int rderr, int wrerr) {
+void
+lis_stream_error(stdata_t *shead, int rderr, int wrerr)
+{
 	if (rderr == 0) {
 		shead->sd_rerror = 0;
 		CLR_SD_FLAG(shead, STRDERR);
@@ -2826,10 +2869,8 @@ void lis_stream_error(stdata_t *shead, int rderr, int wrerr) {
 		SET_SD_FLAG(shead, STWRERR);
 	}
 
-	/* 
-	 * Wakeups and signals are performed whether there is an error or not, just
-	 * by virtue of calling this routine.
-	 */
+	/* Wakeups and signals are performed whether there is an error or not, just by virtue of
+	   calling this routine. */
 	if (F_ISSET(shead->sd_sigflags, S_ERROR))
 		kill_procs(shead->sd_siglist, SIGPOLL, S_ERROR);
 
@@ -2849,19 +2890,21 @@ void lis_stream_error(stdata_t *shead, int rderr, int wrerr) {
 /*  -------------------------------------------------------------------  */
 /* lis_process_rput - called from read service to actually process msg
  *
- * This is running as a service procedure and, therefore, does not have
- * to worry about interrupts.
+ * This is running as a service procedure and, therefore, does not have to
+ * worry about interrupts.
  *
- * The message was conveyed via a special list from strrput.  Now we 
- * put the message into the official read queue and wake up processes
- * that might be waiting for messages.
+ * The message was conveyed via a special list from strrput.  Now we put
+ * the message into the official read queue and wake up processes that
+ * might be waiting for messages.
  *
  * LOCK ORDERING:  We are entered with both the head and the queue
- * unlocked.  We need to lock both by locking the head first, and then
- * the queue -- the same order as the stream head code in strread or
+ * unlocked.  We need to lock both by locking the head first, and then the
+ * queue -- the same order as the stream head code in strread or
  * strgetpmsg.  We return with both locks available.
  */
-void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
+void
+lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
+{
 	int typ;
 	int err;
 
@@ -2896,9 +2939,11 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 			if (LIS_DEBUG_STRRPUT)
 				printk("lis_process_rput: "
 				       "discarding %s from \"%s\" on closed stream %s\n",
-				       lis_msg_type_name(mp), lis_queue_name(backq(q)), shead->sd_name);
+				       lis_msg_type_name(mp), lis_queue_name(backq(q)),
+				       shead->sd_name);
 			lis_freemsg(mp);	/* no hope of retrieving msg */
-			if (typ == M_FLUSH && F_ISSET(shead->sd_flag, STRFLUSHWT)) {	/* close-time flush */
+			if (typ == M_FLUSH && F_ISSET(shead->sd_flag, STRFLUSHWT)) {
+				/* close-time flush */
 				CP(q, 0);
 				CLR_SD_FLAG(shead, STRFLUSHWT);
 				lis_wakeup_close_wt(shead);
@@ -2918,7 +2963,8 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 	if (LIS_DEBUG_STRRPUT)
 		printk("lis_process_rput: "
 		       "received %s (%d) from \"%s\" on stream %s size %d\n",
-		       lis_msg_type_name(mp), typ, lis_queue_name(backq(q)), shead->sd_name, lis_msgsize(mp));
+		       lis_msg_type_name(mp), typ, lis_queue_name(backq(q)), shead->sd_name,
+		       lis_msgsize(mp));
 
 	CP(q, mp);
 	switch (typ) {
@@ -2980,9 +3026,7 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 			mp->b_rptr = mp->b_datap->db_base;
 			mp->b_wptr = mp->b_rptr;
 			*mp->b_wptr++ = EINVAL;	/* supply default errnum */
-			/* 
-			 * Fall into the one-byte case
-			 */
+			/* Fall into the one-byte case */
 		case 1:	/* set errnum for both sides */
 			rderr = *mp->b_rptr++;
 			wrerr = rderr;
@@ -3020,11 +3064,8 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 		break;
 
 	case M_FLUSH:		/* should be done in strrput */
-		/* 
-		 * This should not defer.  We have the q lock, so strrput or
-		 * strread should not be actively reading.  If this defers then
-		 * it is a bug.
-		 */
+		/* This should not defer.  We have the q lock, so strrput or strread should not be
+		   actively reading.  If this defers then it is a bug. */
 		CP(q, mp);
 		if (lis_head_flush(shead, q, mp, 0)) {	/* just the hd q *//* deferred */
 			printk("lis_process_rput: Bug: M_FLUSH: lis_head_flush fail\n");
@@ -3050,15 +3091,18 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 		break;
 	case M_IOCNAK:
 	case M_IOCACK:
-		printk("lis_process_rput: M_IOCNAK or M_IOCACK " "should have been handled by lis_strrput\n");
+		printk("lis_process_rput: M_IOCNAK or M_IOCACK "
+		       "should have been handled by lis_strrput\n");
 		break;
 	case M_COPYIN:
 		CP(mp, 0);
 #if 0				/* intercepted in strrput */
 		if (!F_ISSET(shead->sd_flag, IOCWAIT))
 			lis_freemsg(mp);
-		else if (F_ISSET(shead->sd_flag, STWRERR) || F_ISSET(shead->sd_flag, STRDERR) || bad_ioc_seq(mp, shead)) {
+		else if (F_ISSET(shead->sd_flag, STWRERR) || F_ISSET(shead->sd_flag, STRDERR)
+			 || bad_ioc_seq(mp, shead)) {
 			copyresp_t *res = (copyresp_t *) mp->b_rptr;
+
 			mp->b_wptr = (char *) (res + 1);
 			mp->b_datap->db_type = M_IOCDATA;
 			res->cp_rval = (caddr_t) 1;
@@ -3076,8 +3120,10 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 #if 0				/* intercepted in strrput */
 		if (!F_ISSET(shead->sd_flag, IOCWAIT))
 			lis_freemsg(mp);
-		else if (F_ISSET(shead->sd_flag, STWRERR) || F_ISSET(shead->sd_flag, STRDERR) || bad_ioc_seq(mp, shead)) {
+		else if (F_ISSET(shead->sd_flag, STWRERR) || F_ISSET(shead->sd_flag, STRDERR)
+			 || bad_ioc_seq(mp, shead)) {
 			copyresp_t *res = (copyresp_t *) mp->b_rptr;
+
 			mp->b_wptr = (char *) (res + 1);
 			mp->b_datap->db_type = M_IOCDATA;
 			res->cp_rval = (caddr_t) 1;
@@ -3115,20 +3161,23 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp) {
 /*  -------------------------------------------------------------------  */
 /* lis_strrsrv - stream head read service procedure.
  *
- * Process messages queued by the receive put procedure.  Running this
- * as a service procedure allows us not to have to worry so much about
- * interrupts.  The lis_strrput procedure *could* be entered from interrupt
- * level.  This service procedure is guaranteed to be running at task level.
+ * Process messages queued by the receive put procedure.  Running this as
+ * a service procedure allows us not to have to worry so much about
+ * interrupts.  The lis_strrput procedure *could* be entered from
+ * interrupt level.  This service procedure is guaranteed to be running at
+ * task level.
  *
  * The only interrupt level worry that we have is in taking messages out
  * of the rput list.
  *
- * LOCK ORDERING:  We are entered from the streams scheduler with the queue
- * locked.  The routine lis_process_rput needs both the head lock and the queue
- * lock.  It needs to get the head lock first, which means that we need to
- * release the qeuue lock.  
+ * LOCK ORDERING:  We are entered from the streams scheduler with the
+ * queue locked.  The routine lis_process_rput needs both the head lock
+ * and the queue lock.  It needs to get the head lock first, which means
+ * that we need to release the qeuue lock.  
  */
-int lis_strrsrv(queue_t *q) {
+int
+lis_strrsrv(queue_t *q)
+{
 	mblk_t *mp;
 	stdata_t *hd;
 	lis_flags_t psw;
@@ -3170,13 +3219,14 @@ int lis_strrsrv(queue_t *q) {
  *
  * Don't do anything but just queue the message for the service procedure.
  *
- * This routine could be called from interrupt context, though that is not good
- * programming practice.  Therefore, it needs to use SPL protection when
- * inserting the message into the list.  Because of the SPL we don't need to
- * lock the stream head.
+ * This routine could be called from interrupt context, though that is not
+ * good programming practice.  Therefore, it needs to use SPL protection
+ * when inserting the message into the list.  Because of the SPL we don't
+ * need to lock the stream head.
  */
 int
- lis_strrput(queue_t *q, mblk_t *mp) {
+lis_strrput(queue_t *q, mblk_t *mp)
+{
 	stdata_t *hd;
 	lis_flags_t psw;
 
@@ -3202,16 +3252,14 @@ int
 	LIS_RDQISRUNLOCK(q, &psw);
 	mp->b_next = NULL;
 
-	/* 
-	 * The flush wait logic in close has disabled qenables so that the
-	 * stream head read service procedure cannot run.  We need to catch
-	 * this case here so that close does not have to suffer a 50ms timeout.
-	 *
-	 * Flush logic must be performed immediately so as not to flush messages
-	 * that arrive AFTER the M_FLUSH.
-	 *
-	 * Handle ioctl ack/nak here so they do not get caught in flushes.
-	 */
+	/* The flush wait logic in close has disabled qenables so that the stream head read service 
+	   procedure cannot run.  We need to catch this case here so that close does not have to
+	   suffer a 50ms timeout.
+
+	   Flush logic must be performed immediately so as not to flush messages that arrive AFTER
+	   the M_FLUSH.
+
+	   Handle ioctl ack/nak here so they do not get caught in flushes. */
 	switch (mp->b_datap->db_type) {
 	case M_PCPROTO:
 		if (F_ISSET(hd->sd_flag, STRPRI)) {
@@ -3233,7 +3281,8 @@ int
 	case M_COPYOUT:
 	case M_IOCDATA:
 		LIS_RDQISRLOCK(q, &psw);
-		if (!F_ISSET(hd->sd_flag, IOCWAIT) || hd->sd_iocblk != NULL || (q->q_flag & QCLOSING) ||
+		if (!F_ISSET(hd->sd_flag, IOCWAIT) || hd->sd_iocblk != NULL
+		    || (q->q_flag & QCLOSING) ||
 		    /* F_ISSET(hd->sd_flag,(STWRERR|STRDERR)) || */
 		    bad_ioc_seq(mp, hd)
 		    ) {
@@ -3261,12 +3310,14 @@ int
 /*  -------------------------------------------------------------------  */
 /*  lis_strwsrv
  *
- * This is the stream head write service procedure.  It is used
- * for detecting that the stream below the stream head no longer
- * has messages queued for output so the stream can be closed.
+ * This is the stream head write service procedure.  It is used for
+ * detecting that the stream below the stream head no longer has messages
+ * queued for output so the stream can be closed.
  */
 
-int lis_strwsrv(queue_t *q) {
+int
+lis_strwsrv(queue_t *q)
+{
 	stdata_t *hd;
 	mblk_t *mp;
 	int couldput;
@@ -3296,7 +3347,8 @@ int lis_strwsrv(queue_t *q) {
 	    &&lis_qcountstrm(q) == 0	/* queues are empty */
 	    ) {
 		if (LIS_DEBUG_CLOSE)
-			printk("lis_strwsrv: stream %s empty, wake up close routine\n", hd->sd_name);
+			printk("lis_strwsrv: stream %s empty, wake up close routine\n",
+			       hd->sd_name);
 
 		CP(hd, 0);
 		lis_wakeup_close((caddr_t) hd);	/* wake up close */
@@ -3310,15 +3362,13 @@ int lis_strwsrv(queue_t *q) {
 			kill_procs(hd->sd_siglist, SIGPOLL, S_OUTPUT);
 		}
 
-		/* 
-		 * AT&T says in STREAMS Programmer's Guide:
-		 *
-		 * "S_WRBAND
-		 *
-		 * "A priority band greater than 0 of a queue downstream exists
-		 * and is writeable.  This notifies the user that there is room
-		 * on the queue for sending (or writing) priority data downstream."
-		 */
+		/* AT&T says in STREAMS Programmer's Guide:
+
+		   "S_WRBAND
+
+		   "A priority band greater than 0 of a queue downstream exists and is writeable.
+		   This notifies the user that there is room on the queue for sending (or writing)
+		   priority data downstream." */
 		if (F_ISSET(hd->sd_sigflags, S_WRBAND)
 		    && lis_bcanput_anyband(q->q_next)
 		    ) {
@@ -3348,13 +3398,14 @@ int lis_strwsrv(queue_t *q) {
 }				/* lis_strwsrv */
 
 /*  -------------------------------------------------------------------  */
-/* This is the tmout handling function.
- * it will be called on response to a tmout and is responsible to
- * take the right actions.
- * It should be called w/ an stream head as argument.
+/*
+ * This is the tmout handling function.  it will be called on response to
+ * a tmout and is responsible to take the right actions.  It should be
+ * called w/ an stream head as argument.
  */
 static void
- lis_do_tmout(unsigned long arg) {
+lis_do_tmout(unsigned long arg)
+{
 	stdata_t *hd = (stdata_t *) arg;
 
 	if (hd->magic != STDATA_MAGIC) {
@@ -3370,7 +3421,8 @@ static void
 }				/* lis_do_tmout */
 
 static void
- lis_do_rd_tmout(unsigned long arg) {
+lis_do_rd_tmout(unsigned long arg)
+{
 	stdata_t *hd = (stdata_t *) arg;
 
 	if (hd->magic != STDATA_MAGIC) {
@@ -3386,7 +3438,8 @@ static void
 /* lis_wait_for_wiocing - wait until ioc response arrived or timeout occur
  */
 static int
- lis_wait_for_wiocing(stdata_t *hd, int tmout, int ignore_errors) {
+lis_wait_for_wiocing(stdata_t *hd, int tmout, int ignore_errors)
+{
 	struct timer_list tl;
 	int rslt;
 
@@ -3425,7 +3478,8 @@ static int
 /* copyout bmlks for reads
  */
 static int
- copyout_blks(struct file *f, char *ubuff, long count, mblk_t *mp) {
+copyout_blks(struct file *f, char *ubuff, long count, mblk_t *mp)
+{
 	mblk_t *mb;
 	long ocount = count;
 	int len;
@@ -3447,21 +3501,23 @@ static int
 		return (err);	/* something went wrong */
 
 	if (count != 0)		/* hopefully, copied whole buffer */
-		printk("LiS:copyout_blks:" "count (%ld) doesn't match data (%ld)", ocount, ocount - count);
+		printk("LiS:copyout_blks:" "count (%ld) doesn't match data (%ld)", ocount,
+		       ocount - count);
 	return (0);
 }
 
 /*  -------------------------------------------------------------------  */
 /* strdoioctl - ioctl handler used by strioctl
  *
- * There is a special circumstance in which this routine is called
- * with a NULL pointer for 'f'.  This is from the i_unlink code in
- * which the file is not known.  We do not worry about null pointer
- * reference here since our only use of 'f' occurs with 'do_copyin'
- * is passed as a "true", which it is not from i_unlink code.
+ * There is a special circumstance in which this routine is called with a
+ * NULL pointer for 'f'.  This is from the i_unlink code in which the file
+ * is not known.  We do not worry about null pointer reference here since
+ * our only use of 'f' occurs with 'do_copyin' is passed as a "true",
+ * which it is not from i_unlink code.
  */
 static int
- lis_strdoioctl(struct file *f, stdata_t *hd, strioctl_t * ioc, cred_t *creds, int do_copyin) {
+lis_strdoioctl(struct file *f, stdata_t *hd, strioctl_t * ioc, cred_t *creds, int do_copyin)
+{
 	mblk_t *mioc = NULL;
 	mblk_t *mdta = NULL;
 	iocblk_t *iocb;
@@ -3486,7 +3542,8 @@ static int
 		return (-ENOMEM);
 	}
 	if (ioc->ic_len) {
-		if (do_copyin && (err = lis_check_umem(f, VERIFY_READ, ioc->ic_dp, ioc->ic_len)) < 0) {
+		if (do_copyin
+		    && (err = lis_check_umem(f, VERIFY_READ, ioc->ic_dp, ioc->ic_len)) < 0) {
 			ioc->ic_len = 0;	/* no data */
 			CLOCKOFF(IOCTLTIME);
 			return (err);
@@ -3511,6 +3568,7 @@ static int
 			mdta->b_wptr += ioc->ic_len;
 		} else {
 			void **ptr_ptr = (void **) mdta->b_wptr;
+
 			*ptr_ptr = ioc->ic_dp;	/* pass in ptr */
 			mdta->b_wptr += sizeof(*ptr_ptr);
 		}
@@ -3528,20 +3586,15 @@ static int
 	iocb->ioc_filler[1] = 0;
 	iocb->ioc_filler[2] = 0;
 	iocb->ioc_filler[3] = 0;
-	/* 
-	 * We only send one ioctl at a time downstream on a per stream basis.
-	 * To enforce this we hold this lock until the ioctl transaction with
-	 * the driver is complete, or until some error condition occurs.
-	 */
-	/* 
-	 * This routine is called only from strioctl or from the stream
-	 * head teardown code (via i_unlink).  strioctl holds the ioctl
-	 * semaphore which single-threads all ioctls on a given stream.
-	 */
+	/* We only send one ioctl at a time downstream on a per stream basis. To enforce this we
+	   hold this lock until the ioctl transaction with the driver is complete, or until some
+	   error condition occurs.
+
+	   This routine is called only from strioctl or from the stream head teardown code (via
+	   i_unlink).  strioctl holds the ioctl semaphore which single-threads all ioctls on a
+	   given stream. */
 	lis_head_get(hd);
-	/* 
-	 * Use RTN to return below here.
-	 */
+	/* Use RTN to return below here. */
 	iocb->ioc_id = hd->sd_iocseq = lis_incr(&lis_iocseq);
 	/* 
 	 * Reset items that could be not clean after a previous failing ioctl
@@ -3561,7 +3614,8 @@ static int
 
 	if (LIS_DEBUG_IOCTL)
 		printk("lis_strdoioctl: send %s to \"%s\" on stream %s, cmd(0x%x)\n",
-		       lis_msg_type_name(mioc), lis_queue_name(hd->sd_wq->q_next), hd->sd_name, iocb->ioc_cmd);
+		       lis_msg_type_name(mioc), lis_queue_name(hd->sd_wq->q_next), hd->sd_name,
+		       iocb->ioc_cmd);
 	SET_SD_FLAG(hd, IOCWAIT);	/* for strrput */
 	CLOCKADD();		/* exclude driver time */
 	CP(hd, 0);
@@ -3615,7 +3669,8 @@ static int
 
 			if (do_copyin) {
 				if (len > 0) {	/* data to return */
-					if ((err = lis_check_umem(f, VERIFY_WRITE, ioc->ic_dp, len)) < 0)
+					if ((err =
+					     lis_check_umem(f, VERIFY_WRITE, ioc->ic_dp, len)) < 0)
 						rval = err;	/* oops... */
 					else {
 						copyout_blks(f, ioc->ic_dp, len, dat);
@@ -3635,6 +3690,7 @@ static int
 		iocb = (iocblk_t *) mioc->b_rptr;
 		{
 			int res = -(iocb->ioc_error);
+
 			ioc->ic_len = 0;	/* no data */
 			RTN(res ? res : -EINVAL);
 		}
@@ -3657,7 +3713,8 @@ static int
 		}
 		lis_btype(mioc) = M_IOCDATA;
 		if ((err = lis_check_umem(f, VERIFY_READ, ubuf, len)) < 0
-		    || (dat = allocb(len, BPRI_LO)) == NULL || (err = lis_copyin(f, dat->b_wptr, ubuf, len)) < 0) {
+		    || (dat = allocb(len, BPRI_LO)) == NULL
+		    || (err = lis_copyin(f, dat->b_wptr, ubuf, len)) < 0) {
 			if (err < 0)
 				cr->cp_rval = (caddr_t) (long) (-err);
 			else
@@ -3713,16 +3770,18 @@ static int
 /*
  * lis_lookup_stdata
  *
- * Look through all the stdata structures for one that has the
- * given device id.  Return a pointer to it.
+ * Look through all the stdata structures for one that has the given
+ * device id.  Return a pointer to it.
  */
-static stdata_t *lis_lookup_stdata(dev_t *dev,
+static stdata_t *
+lis_lookup_stdata(dev_t *dev,
 #if defined(LINUX)
-				   struct dentry *from,
+		  struct dentry *from,
 #else
-				   struct inode *from,
+		  struct inode *from,
 #endif
-				   stdata_t *excluded) {
+		  stdata_t *excluded)
+{
 	stdata_t *hd;
 	int n;
 	dev_t odev = *dev;
@@ -3735,23 +3794,19 @@ static stdata_t *lis_lookup_stdata(dev_t *dev,
 
 	for (hd = lis_stdata_head, n = 0; n == 0 || hd != lis_stdata_head; hd = hd->sd_next, n++) {
 		if (hd->magic != STDATA_MAGIC) {
-			printk("lis_lookup_stdata(...) h@0x%p <MAGIC 0x%lx!=0x%lx>\n", hd, hd->magic, STDATA_MAGIC);
+			printk("lis_lookup_stdata(...) h@0x%p <MAGIC 0x%lx!=0x%lx>\n", hd,
+			       hd->magic, STDATA_MAGIC);
 			break;	/* don't believe sd_next */
 		}
 
 		if (hd != excluded) {
-			/* 
-			 * As long as the stream head is allocated the following
-			 * tests are valid -- we don't need the head lock.  Owning
-			 * the stdata_lock prevents free_stdata from actually freeing
-			 * the stream head, but if it is that far along we will notice
-			 * the STRCLOSE flag and omit looking at it.
-			 */
+			/* As long as the stream head is allocated the following tests are valid -- 
+			   we don't need the head lock.  Owning the stdata_lock prevents
+			   free_stdata from actually freeing the stream head, but if it is that far 
+			   along we will notice the STRCLOSE flag and omit looking at it. */
 			if (F_ISSET(hd->sd_flag, STRCLOSE))	/* stream is closing */
 				continue;	/* don't look at this entry */
-			/* 
-			 *  this allows us to reopen a cloned FIFO inode
-			 */
+			/* this allows us to reopen a cloned FIFO inode */
 			if (from && hd->sd_from && hd->sd_inode
 #if defined(LINUX)
 			    && (hd->sd_from->d_inode == from->d_inode)
@@ -3760,7 +3815,8 @@ static stdata_t *lis_lookup_stdata(dev_t *dev,
 				if ((LIS_DEBUG_OPEN && LIS_DEBUG_ADDRS) || LIS_DEBUG_REFCNTS)
 					printk("lis_lookup_stdata(d0x%x,%c@0x%p/%d,h@0x%p/%d/%d)"
 					       " <reopen>\n    >> "
-					       "h@0x%p/%d/%d i@0x%p/%d dev 0x%x\n", DEV_TO_INT(odev),
+					       "h@0x%p/%d/%d i@0x%p/%d dev 0x%x\n",
+					       DEV_TO_INT(odev),
 #if defined(LINUX)
 					       'd', from, (from ? D_COUNT(from) : 0),
 #endif
@@ -3769,7 +3825,8 @@ static stdata_t *lis_lookup_stdata(dev_t *dev,
 					       (excluded ? LIS_SD_OPENCNT(excluded) : 0),
 					       hd,
 					       LIS_SD_REFCNT(hd), LIS_SD_OPENCNT(hd),
-					       hd->sd_inode, I_COUNT(hd->sd_inode), DEV_TO_INT(hd->sd_dev));
+					       hd->sd_inode, I_COUNT(hd->sd_inode),
+					       DEV_TO_INT(hd->sd_dev));
 				*dev = hd->sd_dev;
 				lis_spin_unlock(&lis_stdata_lock);	/* done with lock */
 				return (hd);
@@ -3777,7 +3834,8 @@ static stdata_t *lis_lookup_stdata(dev_t *dev,
 			if (DEV_SAME(hd->sd_dev, odev)) {	/* same maj/minor */
 				if ((LIS_DEBUG_OPEN && LIS_DEBUG_ADDRS) || LIS_DEBUG_REFCNTS)
 					printk("lis_lookup_stdata(d0x%x,%c@0x%p/%d,h@0x%p/%d/%d)"
-					       " <same>\n    >> " "h@0x%p/%d/%d i@0x%p/%d\n", DEV_TO_INT(odev),
+					       " <same>\n    >> " "h@0x%p/%d/%d i@0x%p/%d\n",
+					       DEV_TO_INT(odev),
 #if defined(LINUX)
 					       'd', from, (from ? D_COUNT(from) : 0),
 #endif
@@ -3796,11 +3854,13 @@ static stdata_t *lis_lookup_stdata(dev_t *dev,
 	lis_spin_unlock(&lis_stdata_lock);
 
 	if ((LIS_DEBUG_OPEN && LIS_DEBUG_ADDRS) || LIS_DEBUG_REFCNTS)
-		printk("lis_lookup_stdata(d0x%x,%c@0x%p/%d,h@0x%p/%d/%d)" " => NULL\n", DEV_TO_INT(odev),
+		printk("lis_lookup_stdata(d0x%x,%c@0x%p/%d,h@0x%p/%d/%d)" " => NULL\n",
+		       DEV_TO_INT(odev),
 #if defined(LINUX)
 		       'd', from, (from ? D_COUNT(from) : 0),
 #endif
-		       excluded, (excluded ? LIS_SD_REFCNT(excluded) : 0), (excluded ? LIS_SD_OPENCNT(excluded) : 0));
+		       excluded, (excluded ? LIS_SD_REFCNT(excluded) : 0),
+		       (excluded ? LIS_SD_OPENCNT(excluded) : 0));
 
 	return (NULL);		/* not found */
 }
@@ -3814,8 +3874,10 @@ static stdata_t *lis_lookup_stdata(dev_t *dev,
 /*
  * Special code for opening a FIFO file.
  */
-static
-int lis_open_fifo(struct inode *i, struct file *f, stdata_t *head, int this_open, dev_t *ndev, cred_t *creds) {
+static int
+lis_open_fifo(struct inode *i, struct file *f, stdata_t *head, int this_open, dev_t *ndev,
+	      cred_t *creds)
+{
 	int maj = getmajor(head->sd_dev);
 	int err = 0;
 
@@ -3835,7 +3897,8 @@ int lis_open_fifo(struct inode *i, struct file *f, stdata_t *head, int this_open
 		printk("lis_open_fifo(i@0x%p/%d,f@0x%p/%d,h@0x%p/%d/%d)#%d"
 		       " \"%s\"\n",
 		       i, I_COUNT(i),
-		       f, F_COUNT(f), head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head), this_open, FILE_NAME(f));
+		       f, F_COUNT(f), head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head), this_open,
+		       FILE_NAME(f));
 
 	K_ATOMIC_DEC(&lis_in_syscall);	/* "done" with system call */
 	lis_runqueues();
@@ -3852,13 +3915,15 @@ int lis_open_fifo(struct inode *i, struct file *f, stdata_t *head, int this_open
 /*
  * check_for_wantenable
  *
- * Run down the list of queues originiating from the passed in head
- * and see if any of them have the QWANTENB bit set.
+ * Run down the list of queues originiating from the passed in head and
+ * see if any of them have the QWANTENB bit set.
  *
  * This is performed at the end of open operations (or push) so we also
  * clear the QOPENING flag while we are at it.
  */
-static void check_for_wantenable(stdata_t *hd) {
+static void
+check_for_wantenable(stdata_t *hd)
+{
 	lis_flags_t psw;
 	unsigned flags;
 	queue_t *q;
@@ -3892,10 +3957,12 @@ static void check_for_wantenable(stdata_t *hd) {
  *
  * The QFROZEN mechanism is an incomplete implementation of the standard
  * freezestr() construct.  The difference is that putq/getq/open/close can
- * take place for an LiS frozen stream, but standard semantics says not
- * to call these routines.
+ * take place for an LiS frozen stream, but standard semantics says not to
+ * call these routines.
  */
-void lis_freezestr(queue_t *q) {
+void
+lis_freezestr(queue_t *q)
+{
 	stdata_t *hd;
 	stdata_t *hd_peer;
 	queue_t *oq = NULL;
@@ -3927,7 +3994,9 @@ void lis_freezestr(queue_t *q) {
 	}
 }
 
-void lis_unfreezestr(queue_t *q) {
+void
+lis_unfreezestr(queue_t *q)
+{
 	stdata_t *hd;
 	stdata_t *hd_peer;
 
@@ -3946,10 +4015,8 @@ void lis_unfreezestr(queue_t *q) {
 		lis_head_put(hd_peer);
 	}
 
-	/* 
-	 * STREAM write or putmsg may be sleeping due to encountering a
-	 * frozen stream.  If so, wake them up now.
-	 */
+	/* STREAM write or putmsg may be sleeping due to encountering a frozen stream.  If so, wake 
+	   them up now. */
 	lis_wake_up_all_wwrite(hd);	/* wake up all write/putmsg */
 
 	lis_head_put(hd);	/* balance the "get" */
@@ -3958,16 +4025,18 @@ void lis_unfreezestr(queue_t *q) {
 /*  -------------------------------------------------------------------  */
 /* lis_stropen - open a stream (see Magic Garden 7.9.3 and 7.9.4)
  *
- * The stream head represents a single stream.  It has the status of
- *  an inode in the operating system.  As such it can be referenced by
- *  multiple files, but there must be a single inode per stream.  This
- *  routine enforces that relationship.  Moreover, the inode corresponding
- *  to a stream will be independent of any (other) filesystem.  This
- *  makes it safe (once again) to have stdata structures and inodes keep
- *  references to each other.
+ * The stream head represents a single stream.  It has the status of an
+ * inode in the operating system.  As such it can be referenced by
+ * multiple files, but there must be a single inode per stream.  This
+ * routine enforces that relationship.  Moreover, the inode corresponding
+ * to a stream will be independent of any (other) filesystem.  This makes
+ * it safe (once again) to have stdata structures and inodes keep
+ * references to each other.
  */
 
-static int get_sd_opening_sem(stdata_t *head) {
+static int
+get_sd_opening_sem(stdata_t *head)
+{
 	int ret;
 
 	CP(head, head->sd_dev);
@@ -3976,13 +4045,16 @@ static int get_sd_opening_sem(stdata_t *head) {
 	return (ret);
 }
 
-static void release_sd_opening_sem(stdata_t *head) {
+static void
+release_sd_opening_sem(stdata_t *head)
+{
 	CLR_SD_FLAG(head, STROSEM_HELD);
 	lis_up(&head->sd_opening);
 }
 
 int
- lis_stropen(struct inode *i, struct file *f) {
+lis_stropen(struct inode *i, struct file *f)
+{
 	struct stdata *head = NULL;
 	cred_t creds;
 	dev_t odev;
@@ -3996,6 +4068,7 @@ int
 	int f_count = F_COUNT(f);	/* file open count */
 	unsigned long time_cell = 0;
 	unsigned long this_open;
+
 #if defined(LINUX)
 	struct dentry *from;
 	struct dentry *oldd;
@@ -4014,15 +4087,11 @@ int
 
 #if defined(LINUX)
 	from = f->f_dentry;	/* save this for lookup_stdata() */
-	/* 
-	 *  we save the following for passing to cleanup_file_opening(),
-	 *  and bump the counts in case of a failure.  I.e., if these are
-	 *  non-LiS, we'll put() them once during this process, but we
-	 *  can't let them be disposed of, since if the open fails, the OS
-	 *  will try to dispose of them also.  This extra initial get on
-	 *  them will keep them around, and we'll account for it (via the
-	 *  counts we save here) in cleanup_file_opening().
-	 */
+	/* we save the following for passing to cleanup_file_opening(), and bump the counts in case 
+	   of a failure.  I.e., if these are non-LiS, we'll put() them once during this process,
+	   but we can't let them be disposed of, since if the open fails, the OS will try to
+	   dispose of them also.  This extra initial get on them will keep them around, and we'll
+	   account for it (via the counts we save here) in cleanup_file_opening(). */
 	oldd = lis_dget(f->f_dentry);
 	oldd_cnt = D_COUNT(oldd) - 1;
 	oldmnt = FILE_MNTGET(f);
@@ -4038,7 +4107,8 @@ int
 		       i, I_COUNT(i), f, f_count, this_open,
 		       getmajor(GET_I_RDEV(i)),
 		       getminor(GET_I_RDEV(i)), f->f_mode, f->f_flags,
-		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt), K_ATOMIC_READ(&lis_stdata_cnt));
+		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt),
+		       K_ATOMIC_READ(&lis_stdata_cnt));
 
 		if (LIS_DEBUG_REFCNTS) {
 #if defined(LINUX)
@@ -4048,43 +4118,35 @@ int
 		}
 	}
 
-	/* 
-	 * For more information about race conditions see "Analysis of
-	 * open/close locking" near the top of this file.
-	 *
-	 * Get a stream head structure to associate with the file.
-	 * The principle of STREAMS is that if a program opens some
-	 * particular {maj,min} device then all such opens should funnel
-	 * through the same stream head structure.  The exceptions are if
-	 * the maj is the clone device or if the CLONEOPEN flag is set,
-	 * in which case there is always a new structure allocated; and
-	 * FIFOs, which use CLONEOPEN and allocate a new structure if
-	 * the underlying inode is not open.  (Note in the latter case
-	 * that in typical implementations, FIFOs have their own file
-	 * type and are not char special - i.e., they don't have (maj,min) -
-	 * but LiS can't do this since Linux kernel FIFOs use that type,
-	 * so LiS has no choice but to implement them as char specials.)
-	 *
-	 * Re-opening any other existing {maj,min} mainly just causes
-	 * an increment of the reference/open count, but it should be noted
-	 * that a driver can do whatever it wants to do when CLONEOPEN
-	 * is set.  It will be passed a new head, but it can use an old
-	 * one if it chooses.  This routine must handle the case where
-	 * a new head is rejected by a driver in favor of an existing one.
-	 *
-	 * SMP considerations:  Open may be running concurrently on several
-	 * CPUs and all of them may be after the same {maj,min}.  One
-	 * opener needs to perform a full open and the others need to
-	 * find the result of this open and use it.  This implies holding
-	 * a semaphore during the open so that the "losers" can sleep.
-	 *
-	 * We use a global semaphore to serialize opens until the identity
-	 * of the head structure can be established.  Then the opener gets
-	 * a semaphore in the head structure for the remainder of the
-	 * open.  It holds this semaphore even across the call to the
-	 * user's open routine.  This is because we must not let a second
-	 * opener in until the file is completely opened by the first opener.
-	 */
+	/* For more information about race conditions see "Analysis of open/close locking" near the 
+	   top of this file.
+
+	   Get a stream head structure to associate with the file. The principle of STREAMS is that 
+	   if a program opens some particular {maj,min} device then all such opens should funnel
+	   through the same stream head structure.  The exceptions are if the maj is the clone
+	   device or if the CLONEOPEN flag is set, in which case there is always a new structure
+	   allocated; and FIFOs, which use CLONEOPEN and allocate a new structure if the underlying 
+	   inode is not open.  (Note in the latter case that in typical implementations, FIFOs have 
+	   their own file type and are not char special - i.e., they don't have (maj,min) - but LiS 
+	   can't do this since Linux kernel FIFOs use that type, so LiS has no choice but to
+	   implement them as char specials.)
+
+	   Re-opening any other existing {maj,min} mainly just causes an increment of the
+	   reference/open count, but it should be noted that a driver can do whatever it wants to
+	   do when CLONEOPEN is set.  It will be passed a new head, but it can use an old one if it 
+	   chooses.  This routine must handle the case where a new head is rejected by a driver in
+	   favor of an existing one.
+
+	   SMP considerations: Open may be running concurrently on several CPUs and all of them may 
+	   be after the same {maj,min}.  One opener needs to perform a full open and the others
+	   need to find the result of this open and use it.  This implies holding a semaphore
+	   during the open so that the "losers" can sleep.
+
+	   We use a global semaphore to serialize opens until the identity of the head structure
+	   can be established.  Then the opener gets a semaphore in the head structure for the
+	   remainder of the open.  It holds this semaphore even across the call to the user's open
+	   routine.  This is because we must not let a second opener in until the file is
+	   completely opened by the first opener. */
 	K_ATOMIC_INC(&lis_in_syscall);	/* processing a system call */
 	odev = GET_I_RDEV(i);	/* get {maj,min} */
 	maj = getmajor(odev);
@@ -4102,9 +4164,7 @@ int
 		head = lis_head_get(head);	/* increase ref cnt */
 		CP(head, odev);
 	} else {		/* opening new stream */
-		/* 
-		 * Always get a new stream head structure for a clone open.
-		 */
+		/* Always get a new stream head structure for a clone open. */
 		if (dev_is_clone || (head = lis_lookup_stdata(&odev, from, NULL)) == NULL) {
 			existing_head = 0;
 			head = lis_head_get(NULL);	/* allocates new structure */
@@ -4114,15 +4174,12 @@ int
 				goto error_rtn;
 			}
 
-			/* 
-			 * In order for lis_lookup_stdata to locate this stream head
-			 * in case of a simultaneous open to this same device by another
-			 * thread, we have to plant the maj/min device id in the stream
-			 * head structure now.
-			 *
-			 * Note however, that for a just-allocated stream head structure
-			 * the open count is still zero.
-			 */
+			/* In order for lis_lookup_stdata to locate this stream head in case of a
+			   simultaneous open to this same device by another thread, we have to
+			   plant the maj/min device id in the stream head structure now.
+
+			   Note however, that for a just-allocated stream head structure the open
+			   count is still zero. */
 			head->sd_dev = odev;
 		} else {
 			existing_head = 1;
@@ -4149,26 +4206,21 @@ int
 		stdata_locked = 0;
 	}
 
-	/* 
-	 * Releasing stdata_sem could allow this stream to be closed by
-	 * another thread.
-	 *
-	 * We want to get the stream's opening semaphore under circumstances
-	 * in which there is not other open in progress on this stream.
-	 */
+	/* Releasing stdata_sem could allow this stream to be closed by another thread.
+
+	   We want to get the stream's opening semaphore under circumstances in which there is not
+	   other open in progress on this stream. */
 	if ((err = get_sd_opening_sem(head)) < 0)
 		goto error_rtn;
 
 	CP(head, odev);
 	hd_locked = 1;		/* now have head's opening sem */
 
-	/* 
-	 * If the sd_dev does not match the device that we are trying to open
-	 * then we are in a race with another open.  Most likely is that this
-	 * head was used for a clone open and the sd_dev changed.
-	 *
-	 * We need to start over.
-	 */
+	/* If the sd_dev does not match the device that we are trying to open then we are in a race 
+	   with another open.  Most likely is that this head was used for a clone open and the
+	   sd_dev changed.
+
+	   We need to start over. */
 	if (existing_head && !DEV_SAME(head->sd_dev, odev)) {	/* clone open changed sd_dev */
 		CP(head, odev);
 		release_sd_opening_sem(head);
@@ -4177,14 +4229,10 @@ int
 		goto retry_from_start;	/* start over again */
 	}
 
-	/* 
-	 * If the STRCLOSE flag is set then we are in a race with
-	 * the close routine.  The close routine is going to be messing
-	 * with this head structure, big time.  So we have to retry
-	 * from the top and get us a new head structure.  Note that this
-	 * one can no longer be found in a search due to the STRCLOSE
-	 * flag being set.
-	 */
+	/* If the STRCLOSE flag is set then we are in a race with the close routine.  The close
+	   routine is going to be messing with this head structure, big time.  So we have to retry
+	   from the top and get us a new head structure.  Note that this one can no longer be found 
+	   in a search due to the STRCLOSE flag being set. */
 	CP(head, odev);
 	if (F_ISSET(head->sd_flag, STRCLOSE)) {
 		SET_FILE_STR(f, NULL);	/* unhook from file */
@@ -4195,10 +4243,8 @@ int
 		goto retry_from_start;
 	}
 
-	/* 
-	 * We now have the head to use and are protected against further
-	 * opens on this {maj,min} until we are finished.
-	 */
+	/* We now have the head to use and are protected against further opens on this {maj,min}
+	   until we are finished. */
 
 	creds.cr_uid = (uid_t) EUID(f);
 	creds.cr_gid = (gid_t) EGID(f);
@@ -4207,43 +4253,37 @@ int
 
 	SET_FILE_STR(f, head);	/* point file to strm hd */
 
-	/* 
-	 * If this is a reopen of an existing stream then there is
-	 * not much to do.
-	 */
+	/* If this is a reopen of an existing stream then there is not much to do. */
 	if (LIS_SD_OPENCNT(head) >= 1) {
 		CP(head, odev);
 		if (head->magic != STDATA_MAGIC) {	/* paranoia */
 			printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 			       "    >> hd@0x%p MAGIC 0x%lx!=0x%lx <EINVAL>\n",
-			       i, I_COUNT(i), f, f_count, this_open, head, head->magic, STDATA_MAGIC);
+			       i, I_COUNT(i), f, f_count, this_open, head, head->magic,
+			       STDATA_MAGIC);
 			err = -EINVAL;
 			head = NULL;	/* pretend no strm head */
 			goto error_rtn;
 		}
 
-		/* 
-		 * Stream was created by previous open of device: sleep if still
-		 * opening, then call every module open() and awake sleepers
-		 *
-		 *  FIXME - we're holding a head-specific lock here (sd_opening) -
-		 *  the head might get replaced, and if so, the locking might
-		 *  get fouled up (see drivers/str/connld.c).  -JB 12/6/02
-		 */
+		/* Stream was created by previous open of device: sleep if still opening, then call 
+		   every module open() and awake sleepers
+
+		   FIXME - we're holding a head-specific lock here (sd_opening) - the head might
+		   get replaced, and if so, the locking might get fouled up (see
+		   drivers/str/connld.c).  -JB 12/6/02 */
 		head->sd_file = f;	/* in case a mod needs to know */
 		ndev = odev;
 		if ((err = open_mods(head, &ndev, f->f_flags, &creds)) < 0) {
 			CP(head, -err);
-			printk("lis_stropen(...)#%ld\n" "    >> open_mods() error (%d)\n", this_open, err);
+			printk("lis_stropen(...)#%ld\n" "    >> open_mods() error (%d)\n",
+			       this_open, err);
 			goto error_rtn;
 		}
 
 		head->sd_file = NULL;	/* done with this now */
 
-		/* 
-		 *  'connld' (or the like) may have completely replaced
-		 *  the stream - check for that
-		 */
+		/* 'connld' (or the like) may have completely replaced the stream - check for that */
 		if (i != FILE_INODE(f)) {
 			CP(head, i);
 			i = FILE_INODE(f);
@@ -4251,14 +4291,12 @@ int
 			CP(head, i);
 		}
 
-		/* 
-		 * When re-opening an existing stream the driver is not allowed
-		 * to change the dev.
-		 */
+		/* When re-opening an existing stream the driver is not allowed to change the dev. */
 		if (!DEV_SAME(ndev, odev)) {
 			CP(head, EBUSY);
 			printk("lis_stropen(...)#%ld\n"
-			       "    >> re-open changed dev from 0x%x to 0x%x error (%d)\n", this_open, odev, ndev, err);
+			       "    >> re-open changed dev from 0x%x to 0x%x error (%d)\n",
+			       this_open, odev, ndev, err);
 			err = -EBUSY;
 			goto error_rtn;
 		}
@@ -4266,20 +4304,14 @@ int
 		goto successful_rtn;
 	}
 
-	/* 
-	 * This is a new stream head.  This is the long-form of the open
-	 * routine.  This is where we have to take clone devices into account.
-	 * See below for more.
-	 */
+	/* This is a new stream head.  This is the long-form of the open routine.  This is where we 
+	   have to take clone devices into account. See below for more. */
 	CP(head, odev);
 	if (LIS_DEV_CAN_REOPEN(maj)) {
-		/* 
-		 *  cloned minor devices of this major can be reopened -
-		 *
-		 *  we "grab" the current inode and keep it as sd_from, so
-		 *  we can be sure it's valid if we need to check it
-		 *  (we don't keep 'sd_from' if cloning from a clone major)
-		 */
+		/* cloned minor devices of this major can be reopened -
+
+		   we "grab" the current inode and keep it as sd_from, so we can be sure it's valid 
+		   if we need to check it (we don't keep 'sd_from' if cloning from a clone major) */
 		CP(head, odev);
 #if defined(LINUX)
 		head->sd_from = lis_dget(f->f_dentry);
@@ -4290,7 +4322,8 @@ int
 		SET_SD_FLAG(head, STREOPEN);
 		if (LIS_DEBUG_OPEN || LIS_DEBUG_REFCNTS)
 			printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
-			       "    >> <= %c@0x%p/++%d <can reopen>\n", i, I_COUNT(i), f, f_count, this_open,
+			       "    >> <= %c@0x%p/++%d <can reopen>\n", i, I_COUNT(i), f, f_count,
+			       this_open,
 #if defined(LINUX)
 			       'd', head->sd_from, D_COUNT(head->sd_from)
 #else
@@ -4299,11 +4332,8 @@ int
 			    );
 	}
 
-	/* 
-	 * Now we want a new inode for the file.  We want the inode (and
-	 * accompanying dentry) to be allocated under the "root" of the
-	 * LiS file system.  lis_set_up_inode arranges for this.
-	 */
+	/* Now we want a new inode for the file.  We want the inode (and accompanying dentry) to be 
+	   allocated under the "root" of the LiS file system.  lis_set_up_inode arranges for this. */
 	i = lis_set_up_inode(f, i);	/* allocate an LiS inode */
 	if (i == NULL) {
 		err = -ENOMEM;	/* couldn't allocate struct */
@@ -4330,13 +4360,10 @@ int
 		lis_setq(head->sd_rq, &strmhd_rdinit, &strmhd_wrinit);
 
 		lis_new_stream_name(head, f);
-		/* 
-		 * lis_qattach will call the user's open routine, which is allowed
-		 * to sleep.  We are holding no locks and still have the
-		 * semaphore for the stream head.  We hold this semaphore
-		 * across this call.  Others simultaneous openers of this same
-		 * stream will just have to wait.
-		 */
+		/* lis_qattach will call the user's open routine, which is allowed to sleep.  We
+		   are holding no locks and still have the semaphore for the stream head.  We hold
+		   this semaphore across this call.  Others simultaneous openers of this same
+		   stream will just have to wait. */
 		K_ATOMIC_DEC(&lis_in_syscall);	/* "done" with a system call */
 		lis_runqueues();
 		err = lis_qattach(head, head->sd_strtab, &ndev, f->f_flags, &creds);
@@ -4346,34 +4373,26 @@ int
 	if (err < 0)		/* failed qopen */
 		goto error_rtn;	/* go cleanup */
 
-	/* 
-	 * Queues are attached and the user's open routine has returned
-	 * success.  The only remaining complication is that it may have
-	 * been a clone open.  If not, we are pretty much done.
-	 *
-	 * If it is a clone open then we need to adopt the new {maj,min}.
-	 * It is possible that the newly assigned "ndev" will match the
-	 * {maj,min} of an already-open stream.  If that is the case then
-	 * we need to abandon the stream-head that we have here and
-	 * perform a directed open to the existing stream.  This is an
-	 * unusual case.
-	 *
-	 * The more usual case is that we just adopt the new {maj,min}
-	 * into the existing head structure.  In this case we want to
-	 * also allocate a new inode for the cloned device; the old one
-	 * really pointed to the clone driver instead of the target
-	 * driver.
-	 */
+	/* Queues are attached and the user's open routine has returned success.  The only
+	   remaining complication is that it may have been a clone open.  If not, we are pretty
+	   much done.
+
+	   If it is a clone open then we need to adopt the new {maj,min}. It is possible that the
+	   newly assigned "ndev" will match the {maj,min} of an already-open stream.  If that is
+	   the case then we need to abandon the stream-head that we have here and perform a
+	   directed open to the existing stream.  This is an unusual case.
+
+	   The more usual case is that we just adopt the new {maj,min} into the existing head
+	   structure.  In this case we want to also allocate a new inode for the cloned device; the 
+	   old one really pointed to the clone driver instead of the target driver. */
 	if (!DEV_SAME(ndev, odev)) {	/* clone open *//* changed the device */
 		stdata_t *other_hd;
 
-		/* 
-		 * If the clone open redirects us to an existing stream then
-		 * we need to close the stream just opened and open the
-		 * new stream as if it were a directed (non-clone) file open.
-		 *
-		 * The lookup_stdata routine will find it for us.
-		 */
+		/* If the clone open redirects us to an existing stream then we need to close the
+		   stream just opened and open the new stream as if it were a directed (non-clone)
+		   file open.
+
+		   The lookup_stdata routine will find it for us. */
 		CP(head, odev);
 		CP(head, ndev);
 		if ((err = lis_down(&lis_stdata_sem)) < 0)
@@ -4384,38 +4403,30 @@ int
 #else
 		from = FILE_INODE(f);
 #endif
-		/* 
-		 * If the device id got changed by the clone driver then the
-		 * driver's open routine has been called by the clone driver
-		 * itself.
-		 *
-		 * If that device has not been opened then we will continue to
-		 * open it using this stream head.  However, if the target driver
-		 * picked a device that is already open that is considered an
-		 * error.
-		 *
-		 * A simultaneous directed open to ndev could have allocated the
-		 * head pointed to by other_hd.  This means that the clone picked
-		 * an in-use dev, which is an error.
-		 */
+		/* If the device id got changed by the clone driver then the driver's open routine
+		   has been called by the clone driver itself.
+
+		   If that device has not been opened then we will continue to open it using this
+		   stream head.  However, if the target driver picked a device that is already open 
+		   that is considered an error.
+
+		   A simultaneous directed open to ndev could have allocated the head pointed to by 
+		   other_hd.  This means that the clone picked an in-use dev, which is an error. */
 		other_hd = lis_lookup_stdata(&ndev, from, head);
 		if (other_hd != NULL) {	/* ndev is already in use */
 			err = -EBUSY;
 			printk("lis_stropen(...)#%ld\n"
-			       "    >> clone-open picked in-use dev 0x%x error (%d)\n", this_open, ndev, err);
+			       "    >> clone-open picked in-use dev 0x%x error (%d)\n", this_open,
+			       ndev, err);
 			goto error_rtn;
 		}
 
-		/* 
-		 * This is the case in which the clone open is going to use the
-		 * same stream head that was used to call the clone driver, but
-		 * with the new dev value filled in.
-		 *
-		 * We still own the sd_opening semaphore on this stream.  We will
-		 * hold it until we store the new dev into the head structure.
-		 * Once that is done any simultaneous open directed to this dev
-		 * will find this structure.
-		 */
+		/* This is the case in which the clone open is going to use the same stream head
+		   that was used to call the clone driver, but with the new dev value filled in.
+
+		   We still own the sd_opening semaphore on this stream.  We will hold it until we
+		   store the new dev into the head structure. Once that is done any simultaneous
+		   open directed to this dev will find this structure. */
 		CP(head, ndev);
 		SET_FILE_STR(f, head);	/* point file to strm hd */
 		maj = getmajor(ndev);
@@ -4444,21 +4455,17 @@ int
 			       LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
 			       head->sd_name, FILE_INODE(f), I_COUNT(FILE_INODE(f)));
 	} else {		/* ndev == odev non-clone */
-		/* 
-		 *  We always want a new inode for a stream; if head->sd_inode
-		 *  isn't set yet, we may have a non-STREAMS inode, that is,
-		 *  one that is not owned by the LiS "root" file system.
-		 *
-		 *  The reason we always want a new inode for a stream is so
-		 *  that non-STREAMS file systems won't muck about with them;
-		 *  i.e., we want streams inodes to be independent of other
-		 *  filesystems
-		 *
-		 *  Coincidentally (for now), this also provides a means to
-		 *  identify a stream; the i_dev major in an inode for a
-		 *  stream will be lis_major, and the i_dev minor will be the
-		 *  major of the stream's driver.
-		 */
+		/* We always want a new inode for a stream; if head->sd_inode isn't set yet, we may 
+		   have a non-STREAMS inode, that is, one that is not owned by the LiS "root" file
+		   system.
+
+		   The reason we always want a new inode for a stream is so that non-STREAMS file
+		   systems won't muck about with them; i.e., we want streams inodes to be
+		   independent of other filesystems
+
+		   Coincidentally (for now), this also provides a means to identify a stream; the
+		   i_dev major in an inode for a stream will be lis_major, and the i_dev minor will 
+		   be the major of the stream's driver. */
 		CP(head, odev);
 		if (!head->sd_inode) {
 			CP(head, 0);
@@ -4481,12 +4488,12 @@ int
 			streamtab_t *st = lis_modstr(id);
 
 			if (!st || id == LIS_NULL_MID) {
-				/* 
-				 *  Module not present. Probably one of:
-				 *  a) Module open for a previous autopush slept, giving
-				 *     kerneld(8) or root time to unload our loadable module.
-				 *  b) A configured loadable module could not be loaded.
-				 */
+				/* Module not present. Probably one of:
+
+				   a) Module open for a previous autopush slept, giving kerneld(8)
+				   or root time to unload our loadable module.
+
+				   b) A configured loadable module could not be loaded. */
 				err = -ENOSR;	/* Assume (a), retry may succeed */
 				goto error_rtn;
 			}
@@ -4507,31 +4514,24 @@ int
 		head->sd_creds = creds;	/* LiS creds */
 	}
 #if defined(LINUX)
-	/* 
-	 *  synchronize FIFO read/write openers after (almost) everything else 
-	 *
-	 *  this is really only needed for FIFOs being opened O_RDONLY
-	 *  or O_WRONLY; the only likely failure case is O_WRONLY|O_NONBLOCK
-	 *  when no reader is open, which will return -ENXIO.
-	 *
-	 *  note that this is also done for pipe ends but really isn't needed,
-	 *  since pipe ends are always opened O_RDWR; unfortunately, we
-	 *  can't tell at this point whether a FIFO being opened will become
-	 *  a pipe end or not (FIXME).
-	 */
+	/* synchronize FIFO read/write openers after (almost) everything else
+
+	   this is really only needed for FIFOs being opened O_RDONLY or O_WRONLY; the only likely
+	   failure case is O_WRONLY|O_NONBLOCK when no reader is open, which will return -ENXIO.
+
+	   note that this is also done for pipe ends but really isn't needed, since pipe ends are
+	   always opened O_RDWR; unfortunately, we can't tell at this point whether a FIFO being
+	   opened will become a pipe end or not (FIXME). */
 	if (F_ISSET(head->sd_flag, STFIFO))
 		if ((err = lis_fifo_open_sync(i, f)) < 0)
 			goto error_rtn;
 	lis_cleanup_file_opening(f, head, 0, oldd, oldd_cnt, oldmnt, oldmnt_cnt);
 #endif
 
-	/* 
-	 * Increment our open count for the first open of the file.  For
-	 * subsequent opens leave the open count alone since we will only
-	 * get one call to close and that is when the file's count goes
-	 * to zero.  Similarly, we need to "put" the head structure because
-	 * we called "get" for this open, but there will be no matching close.
-	 */
+	/* Increment our open count for the first open of the file.  For subsequent opens leave the 
+	   open count alone since we will only get one call to close and that is when the file's
+	   count goes to zero.  Similarly, we need to "put" the head structure because we called
+	   "get" for this open, but there will be no matching close. */
 	if (f_count == 1)
 		K_ATOMIC_INC(&head->sd_opencnt);	/* count opens to stream */
 	else if (f_count > 1)
@@ -4542,9 +4542,7 @@ int
 		release_sd_opening_sem(head);
 	}
 
-	/* 
-	 * Clear opening flag.  This allows the queue to be scheduled.
-	 */
+	/* Clear opening flag.  This allows the queue to be scheduled. */
 	CLR_SD_FLAG(head, STWOPEN);
 	if (LIS_DEBUG_OPEN || LIS_DEBUG_REFCNTS) {
 		printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
@@ -4553,11 +4551,13 @@ int
 		       i, I_COUNT(i), f, f_count, this_open,
 		       head,
 		       LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
-		       head->sd_name, FILE_INODE(f), I_COUNT(FILE_INODE(f)), head->sd_rq, head->sd_wq);
+		       head->sd_name, FILE_INODE(f), I_COUNT(FILE_INODE(f)), head->sd_rq,
+		       head->sd_wq);
 		if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) {
 #if defined(LINUX)
 			printk("    >> d@0x%p/%d m@0x%p/%d\n",
-			       f->f_dentry, D_COUNT(f->f_dentry), f->f_vfsmnt, MNT_COUNT(f->f_vfsmnt));
+			       f->f_dentry, D_COUNT(f->f_dentry), f->f_vfsmnt,
+			       MNT_COUNT(f->f_vfsmnt));
 #endif
 			lis_show_inode_aliases(i);
 		}
@@ -4565,7 +4565,8 @@ int
 		printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld done OK...\n"
 		       "    >> <[%d] %d LiS inode(s), %d open stream(s)>\n",
 		       i, I_COUNT(i), f, f_count, this_open,
-		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt), K_ATOMIC_READ(&lis_stdata_cnt));
+		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt),
+		       K_ATOMIC_READ(&lis_stdata_cnt));
 	}
 
 	CP(head, -err);
@@ -4594,7 +4595,8 @@ int
 		       " >> ERROR (%d)\n"
 		       "    >> <[%d] %d LiS inode(s), %d open stream(s)>\n",
 		       name, this_open, err,
-		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt), K_ATOMIC_READ(&lis_stdata_cnt));
+		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt),
+		       K_ATOMIC_READ(&lis_stdata_cnt));
 	}
 
 	SET_FILE_STR(f, NULL);	/* unhook from file */
@@ -4612,7 +4614,8 @@ int
 
 		if (LIS_SD_OPENCNT(head) == 0) {	/* last open */
 			if (SAMESTR(head->sd_wq))	/* get q below strm head */
-				lis_qdetach(LIS_RD(head->sd_wq->q_next), 1, head->sd_open_flags, &head->sd_creds);
+				lis_qdetach(LIS_RD(head->sd_wq->q_next), 1, head->sd_open_flags,
+					    &head->sd_creds);
 			lis_dismantle(head, &creds);	/* deallocate strm head queue */
 		}
 
@@ -4632,7 +4635,8 @@ int
 /* strwrite - write to a stream (see Magic Garden 7.9.5)
  */
 ssize_t
- lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op) {
+lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
+{
 	stdata_t *hd;
 	mblk_t *held;
 	int chunk;
@@ -4643,21 +4647,18 @@ ssize_t
 
 #define RTN(e)  do { err=(e); goto return_point; } while (0)
 
-	/* Just in case we're holding messages in the write side we use head->sd_wmsg msg to hold data to be sent. When 
-	   it's time to send it we just lis_putnext() such message.  If we're not holding then we just lis_putnext()
-	   the message w/ the usr data.  */
+	/* Just in case we're holding messages in the write side we use head->sd_wmsg msg to hold
+	   data to be sent. When it's time to send it we just lis_putnext() such message.  If we're 
+	   not holding then we just lis_putnext() the message w/ the usr data.  */
 
 	CHECK_INO(i, "lis_strwrite");	/* may return */
 
 #if 0
-	/* 
-	 *  This no longer works on FC4 2.6.11 kernel: validity checks are performed
-	 *  on the length before we get here.  We might as well patch this out for
-	 *  all kernels and use the ioctl method instead.  Emulating an system call
-	 *  in this fashion was foolish in the first place: the normal method for
-	 *  system call emulation under UNIX is with ioctl. -bb
-	 *  Wed Jun 22 20:56:59 MDT 2005
-	 */
+	/* This no longer works on FC4 2.6.11 kernel: validity checks are performed on the length
+	   before we get here.  We might as well patch this out for all kernels and use the ioctl
+	   method instead.  Emulating an system call in this fashion was foolish in the first
+	   place: the normal method for system call emulation under UNIX is with ioctl. -bb Wed Jun 
+	   22 20:56:59 MDT 2005 */
 	if (ulen == LIS_GETMSG_PUTMSG_ULEN) {
 		putpmsg_args_t args;
 
@@ -4687,7 +4688,8 @@ ssize_t
 
 	if (!ulen && !F_ISSET(hd->sd_wropt, SNDZERO)) {	/* we don't send anything */
 		if (LIS_DEBUG_WRITE)
-			printk("strwrite: stream %s: write length zero and SNDZERO not set\n", hd->sd_name);
+			printk("strwrite: stream %s: write length zero and SNDZERO not set\n",
+			       hd->sd_name);
 
 		RTN(0);
 	}
@@ -4723,15 +4725,17 @@ ssize_t
 
 		if (F_ISSET(hd->sd_flag, STRCLOSE)) {
 			if (LIS_DEBUG_WRITE)
-				printk("strwrite: stream %s: stream is closed or closing\n", hd->sd_name);
+				printk("strwrite: stream %s: stream is closed or closing\n",
+				       hd->sd_name);
 			RTN(-ENODEV);
 		}
 
-		/* bb - was incorrect, stream must return ENXIO rather than ENODEV when M_HANGUP received, this is
-		   clear. */
+		/* bb - was incorrect, stream must return ENXIO rather than ENODEV when M_HANGUP
+		   received, this is clear. */
 		if (F_ISSET(hd->sd_flag, STRHUP)) {
 			if (LIS_DEBUG_WRITE)
-				printk("strwrite: stream %s: stream has received M_HANGUP\n", hd->sd_name);
+				printk("strwrite: stream %s: stream has received M_HANGUP\n",
+				       hd->sd_name);
 			RTN(-ENXIO);
 		}
 
@@ -4743,13 +4747,16 @@ ssize_t
 		    || F_ISSET(hd->sd_flag, STRFROZEN)) {
 			if (should_notblock_wr(hd, fp)) {
 				if (LIS_DEBUG_WRITE)
-					printk("strwrite: stream %s: flw cntrl blocked, return EAGAIN\n", hd->sd_name);
+					printk
+					    ("strwrite: stream %s: flw cntrl blocked, return EAGAIN\n",
+					     hd->sd_name);
 				lis_unlockq(hd->sd_wq);
 				RTN(-EAGAIN);
 			}
 
 			if (LIS_DEBUG_WRITE)
-				printk("strwrite: stream %s: flw cntrl blocked, sleep\n", hd->sd_name);
+				printk("strwrite: stream %s: flw cntrl blocked, sleep\n",
+				       hd->sd_name);
 			CLOCKADD();
 			err = lis_wait_on_wwrite(hd);	/* unlocks & relocks sd_wq */
 			CLOCKON();
@@ -4763,13 +4770,15 @@ ssize_t
 
 		lis_unlockq(hd->sd_wq);
 
-		/* get mblk if there's not one This section of code must be single threaded if there are multple writes 
-		   running simultaneously on different CPUs. The semaphore protects sd_wmsg. */
+		/* get mblk if there's not one This section of code must be single threaded if
+		   there are multple writes running simultaneously on different CPUs. The semaphore 
+		   protects sd_wmsg. */
 		lis_down(&hd->sd_write_sem);
 		held = hd->sd_wmsg;
 		chunk = lis_min((int) hd->sd_maxpsz, ulen - written);
 		newmsg = (held == NULL);
-		if (held == NULL && (held = hd->sd_wmsg = allocb(chunk + hd->sd_wroff, BPRI_LO)) == NULL) {
+		if (held == NULL
+		    && (held = hd->sd_wmsg = allocb(chunk + hd->sd_wroff, BPRI_LO)) == NULL) {
 			lis_up(&hd->sd_write_sem);
 			RTN(written ? written : -ENOMEM);
 		}
@@ -4791,10 +4800,15 @@ ssize_t
 			written += chunk;
 			held->b_wptr += chunk;
 
-			if (strholding(hd) && held->b_datap->db_lim - held->b_wptr > written) {	/* hold for more data */
+			if (strholding(hd) && held->b_datap->db_lim - held->b_wptr > written) {	/* hold 
+												   for 
+												   more 
+												   data 
+												 */
 				if (LIS_DEBUG_WRITE)
 					printk("strwrite: stream %s: "
-					       "hold message %d bytes for scan timer\n", hd->sd_name, chunk);
+					       "hold message %d bytes for scan timer\n",
+					       hd->sd_name, chunk);
 
 				if (newmsg)
 					start_scanl_timer(hd);
@@ -4804,13 +4818,10 @@ ssize_t
 			}
 		}
 
-		/* 
-		 * Either there was not enough room in the existing message
-		 * to hold the next write, or we wrote to a new message
-		 * and the write-holding mechanism is not active.
-		 *
-		 * In either case, now is the time to send the message downstream.
-		 */
+		/* Either there was not enough room in the existing message to hold the next write, 
+		   or we wrote to a new message and the write-holding mechanism is not active.
+
+		   In either case, now is the time to send the message downstream. */
 		if (hd->sd_scantimer != 0) {	/* scantimer running */
 			untimeout(hd->sd_scantimer);	/* cancel the timer */
 			hd->sd_scantimer = 0;	/* note timer is not running */
@@ -4850,7 +4861,9 @@ ssize_t
  * head of the queue.  If there is, remove it and signal the user.
  *
  */
-static void lis_check_m_sig(stdata_t *hd) {
+static void
+lis_check_m_sig(stdata_t *hd)
+{
 	mblk_t *hdmp;
 
 	hdmp = hd->sd_rq->q_first;
@@ -4870,28 +4883,26 @@ static void lis_check_m_sig(stdata_t *hd) {
 /*  -------------------------------------------------------------------  */
 /* lis_requeue - requeue a message in stream head queue
  *
- * We need to pay attention to intr disables.  If we are re-inserting
- * a high priority message and an interrupt has meanwhile inserted
- * a high priority message at the head of the queue, then we should
- * delete the new message and insert our old one.  As if the new
- * message arrived at the stream head with ours still in place.
+ * We need to pay attention to intr disables.  If we are re-inserting a
+ * high priority message and an interrupt has meanwhile inserted a high
+ * priority message at the head of the queue, then we should delete the
+ * new message and insert our old one.  As if the new message arrived at
+ * the stream head with ours still in place.
  *
  * The caller holds the queue lock.
  */
-static void lis_requeue(stdata_t *hd, mblk_t *mp) {
+static void
+lis_requeue(stdata_t *hd, mblk_t *mp)
+{
 	mblk_t *hdmp;
 	queue_t *hd_rq;
 	lis_flags_t psw;
 
 	hd_rq = hd->sd_rq;
-	/* 
-	 * If we are about to insert a PCPROTO into the queue we need
-	 * to check to see if the current head message is also a
-	 * PCPROTO, and delete it if it is.
-	 *
-	 * Setting the STRPRI bit keeps strrput from adding any more
-	 * PCPROTOs to the queue.
-	 */
+	/* If we are about to insert a PCPROTO into the queue we need to check to see if the
+	   current head message is also a PCPROTO, and delete it if it is.
+
+	   Setting the STRPRI bit keeps strrput from adding any more PCPROTOs to the queue. */
 	if (lis_btype(mp) == M_PCPROTO) {
 		SET_SD_FLAG(hd, STRPRI);
 		LIS_QISRLOCK(hd_rq, &psw);
@@ -4918,7 +4929,8 @@ static void lis_requeue(stdata_t *hd, mblk_t *mp) {
 /* lis_strread - read from a stream head
  */
 ssize_t
- lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op) {
+lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
+{
 	stdata_t *hd;
 	queue_t *hd_rq = NULL;
 	mblk_t *mp;
@@ -4942,14 +4954,11 @@ ssize_t
 	CHECK_INO(i, "lis_strrread");
 
 #if 0
-	/* 
-	 *  This no longer works on FC4 2.6.11 kernel: validity checks are performed
-	 *  on the length before we get here.  We might as well patch this out for
-	 *  all kernels and use the ioctl method instead.  Emulating an system call
-	 *  in this fashion was foolish in the first place: the normal method for
-	 *  system call emulation under UNIX is with ioctl. -bb
-	 *  Wed Jun 22 20:56:59 MDT 2005
-	 */
+	/* This no longer works on FC4 2.6.11 kernel: validity checks are performed on the length
+	   before we get here.  We might as well patch this out for all kernels and use the ioctl
+	   method instead.  Emulating an system call in this fashion was foolish in the first
+	   place: the normal method for system call emulation under UNIX is with ioctl. -bb Wed Jun 
+	   22 20:56:59 MDT 2005 */
 	if (ulen == LIS_GETMSG_PUTMSG_ULEN) {
 		getpmsg_args_t args;
 
@@ -4966,10 +4975,8 @@ ssize_t
 		return (-ENODEV);
 
 	lis_head_get(hd);
-	/* 
-	 * The very first thing is to sleep on the semaphore that single
-	 * threads read operations.  getpmsg uses the same semaphore.
-	 */
+	/* The very first thing is to sleep on the semaphore that single threads read operations.
+	   getpmsg uses the same semaphore. */
 	if ((err = lis_sleep_on_read_sem(hd)) < 0)
 		return (err);	/* signalled out */
 
@@ -5008,19 +5015,22 @@ ssize_t
 		while (hd_rq->q_first == NULL && msgs_read == 0) {	/* nothing to read */
 			if (F_ISSET(hd->sd_flag, STRDERR)) {
 				if (LIS_DEBUG_READ)
-					printk("strread: stream %s: stream has received M_ERROR %d\n",
-					       hd->sd_name, hd->sd_rerror);
+					printk
+					    ("strread: stream %s: stream has received M_ERROR %d\n",
+					     hd->sd_name, hd->sd_rerror);
 				RTN(-hd->sd_rerror);
 			}
 
 			if (F_ISSET(hd->sd_flag, STRHUP | STRCLOSE)) {
 				if (LIS_DEBUG_READ)
-					printk("strread: stream %s: stream has received M_HANGUP\n", hd->sd_name);
+					printk("strread: stream %s: stream has received M_HANGUP\n",
+					       hd->sd_name);
 
 				RTN(0);
 			}
 
-			if (!mread_sent && F_ISSET(hd->sd_flag, SNDMREAD)) {	/* only send once per user call */
+			if (!mread_sent && F_ISSET(hd->sd_flag, SNDMREAD)) {	/* only send once
+										   per user call */
 				hd_rq->q_flag &= ~QREADING;
 				LIS_QISRUNLOCK(hd_rq, &psw);
 				qisrlocked = 0;
@@ -5050,13 +5060,16 @@ ssize_t
 			 */
 			if (should_notblock_rd(hd, fp)) {
 				if (LIS_DEBUG_READ)
-					printk("strread: stream %s: O_NONBLOCK set, return EAGAIN\n", hd->sd_name);
+					printk
+					    ("strread: stream %s: O_NONBLOCK set, return EAGAIN\n",
+					     hd->sd_name);
 
 				RTN(-EAGAIN);
 			}
 
 			if (LIS_DEBUG_READ)
-				printk("strread: stream %s: O_NONBLOCK not set, sleep\n", hd->sd_name);
+				printk("strread: stream %s: O_NONBLOCK not set, sleep\n",
+				       hd->sd_name);
 			hd_rq->q_flag &= ~QREADING;
 			LIS_QISRUNLOCK(hd_rq, &psw);
 			qisrlocked = 0;
@@ -5116,6 +5129,7 @@ ssize_t
 
 				if (nbytes <= 0) {	/* time for nxt blk *//* includes bad blocks */
 					mblk_t *dust = mp;	/* and zero-lgth msgs */
+
 					mp = lis_unlinkb(mp);
 					lis_freeb(dust);
 				}
@@ -5130,9 +5144,11 @@ ssize_t
 			}
 			if (LIS_DEBUG_READ)
 				printk("strread: stream %s: RDOPT=0x%x user buffer %d bytes, "
-				       "read %d error %d\n", hd->sd_name, hd->sd_rdopt, ulen, count, err);
+				       "read %d error %d\n", hd->sd_name, hd->sd_rdopt, ulen, count,
+				       err);
 			if (ulen == count	/* filled user buffer */
-			    || (hd->sd_rdopt & RMODEMASK) != RNORM || msg_lgth == 0	/* 0-lgth msg */
+			    || (hd->sd_rdopt & RMODEMASK) != RNORM || msg_lgth == 0	/* 0-lgth
+											   msg */
 			    || msg_marked	/* at marked msg */
 			    ) {	/* return to user */
 				RTN(count);
@@ -5173,6 +5189,7 @@ ssize_t
 
 			if (F_ISSET(hd->sd_rdopt, RPROTDIS)) {	/* discard M_PROTO *//* deliver M_DATA */
 				mblk_t *proto = mp;	/* the M_PROTO */
+
 				if (LIS_DEBUG_READ)
 					printk(" discard M_PROTO block, retain M_DATA\n");
 				mp = lis_unlinkb(mp);	/* mp is M_DATA or NULL */
@@ -5192,7 +5209,8 @@ ssize_t
 
 		case M_READ:	/* add to-be-discarded msgs here */
 			if (LIS_DEBUG_READ)
-				printk("strread: stream %s: read %s: discard\n", hd->sd_name, lis_msg_type_name(mp));
+				printk("strread: stream %s: read %s: discard\n", hd->sd_name,
+				       lis_msg_type_name(mp));
 			lis_freemsg(mp);
 			break;
 
@@ -5241,7 +5259,8 @@ ssize_t
 /* strputmsg - stream head handler for putmsg
  */
 int
- lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band, int flags) {
+lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band, int flags)
+{
 	int err = 0;
 	int couldput;
 	mblk_t *msg;
@@ -5324,7 +5343,8 @@ int
 				lis_freemsg(msg);
 				RTN(-EINVAL);	/* no, sorry */
 			}
-		} else /* regular priority msg */ if (F_ISSET(flags, MSG_BAND)) {	/* non-zero band */
+		} else /* regular priority msg */ if (F_ISSET(flags, MSG_BAND)) {
+			/* non-zero band */
 			if (band >= 0 && band <= LIS_MAX_BAND)	/* range check */
 				lis_bband(msg) = (unsigned char) band;
 			else {
@@ -5344,14 +5364,12 @@ int
 		}
 	}
 
-	/* 
-	 * wait for flow control 
-	 *
-	 * If we are sending a high priority message (M_PCPROTO) ignore flow
-	 * control and send the messasge downstream unconditionally.
-	 *
-	 * Always check for error or hangup.
-	 */
+	/* wait for flow control
+
+	   If we are sending a high priority message (M_PCPROTO) ignore flow control and send the
+	   messasge downstream unconditionally.
+
+	   Always check for error or hangup. */
 	do {
 		if (F_ISSET(hd->sd_flag, STWRERR)) {
 			if (LIS_DEBUG_PUTMSG)
@@ -5364,7 +5382,8 @@ int
 
 		if (F_ISSET(hd->sd_flag, STRHUP | STRCLOSE)) {
 			if (LIS_DEBUG_PUTMSG)
-				printk("strputmsg: stream %s: stream has received M_HANGUP\n", hd->sd_name);
+				printk("strputmsg: stream %s: stream has received M_HANGUP\n",
+				       hd->sd_name);
 			freemsg(msg);
 			RTN(-ENODEV);
 		}
@@ -5387,7 +5406,8 @@ int
 		    && should_notblock_wr(hd, fp)	/* NDELAY or NONBLOCK */
 		    ) {
 			if (LIS_DEBUG_PUTMSG)
-				printk("strputmsg: stream %s: flw cntrl blocked, return EAGAIN\n", hd->sd_name);
+				printk("strputmsg: stream %s: flw cntrl blocked, return EAGAIN\n",
+				       hd->sd_name);
 			freemsg(msg);
 
 			lis_unlockq(hd->sd_wq);
@@ -5396,7 +5416,8 @@ int
 
 		if (!couldput) {	/* flw cntrl blocked */
 			if (LIS_DEBUG_PUTMSG)
-				printk("strputmsg: stream %s: flw cntrl blocked, sleep\n", hd->sd_name);
+				printk("strputmsg: stream %s: flw cntrl blocked, sleep\n",
+				       hd->sd_name);
 
 			CLOCKADD();
 			err = lis_wait_on_wwrite(hd);	/* unlocks & relocks sd_wq */
@@ -5444,19 +5465,21 @@ int
 /*  -------------------------------------------------------------------  */
 /* strgetmsg - stream head handler for getmsg
  *
- * If 'doit' is set then this is a getmsg or getpmsg system call.
- * In this case 'ctl', 'dat' and 'flagsp' are all user space addresses.
- * 'bandp' can be NULL if the call is from getmsg().  It will be
- * a non-null user-space address if the call is from getpmsg().
+ * If 'doit' is set then this is a getmsg or getpmsg system call.  In this
+ * case 'ctl', 'dat' and 'flagsp' are all user space addresses.  'bandp'
+ * can be NULL if the call is from getmsg().  It will be a non-null
+ * user-space address if the call is from getpmsg().
  *
- * If 'doit' is not set then this is an I_PEEK call.  In this case
- * 'ctl', 'dat' and 'flagsp' and 'bandp' point to kernel memory.
+ * If 'doit' is not set then this is an I_PEEK call.  In this case 'ctl',
+ * 'dat' and 'flagsp' and 'bandp' point to kernel memory.
  *
- * Note that getmsg() and I_PEEK use one encoding of the flags
- * (the RS_...) and that getpmsg() uses another (the MSG_...).
+ * Note that getmsg() and I_PEEK use one encoding of the flags (the
+ * RS_...) and that getpmsg() uses another (the MSG_...).
  */
 int
- lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp, int *flagsp, int doit) {
+lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp, int *flagsp,
+	       int doit)
+{
 	strbuf_t *ctl = (strbuf_t *) ctlp;
 	strbuf_t *dat = (strbuf_t *) datp;
 	const char *ctl_type = "";
@@ -5484,10 +5507,8 @@ int
 		return (-ENODEV);
 
 	lis_head_get(hd);
-	/* 
-	 * The very first thing is to sleep on the semaphore that single
-	 * threads read operations.  strread uses the same semaphore.
-	 */
+	/* The very first thing is to sleep on the semaphore that single threads read operations.
+	   strread uses the same semaphore. */
 	if ((err = lis_sleep_on_read_sem(hd)) < 0)
 		return (err);	/* signalled out */
 
@@ -5495,15 +5516,18 @@ int
 	K_ATOMIC_INC(&lis_in_syscall);	/* processing a system call */
 	if (F_ISSET(hd->sd_flag, STRDERR))
 		RTN(-hd->sd_rerror);
-	else if (doit && ctl != NULL && (err = lis_check_umem(fp, VERIFY_READ, ctl, sizeof(strbuf_t))) < 0)
+	else if (doit && ctl != NULL
+		 && (err = lis_check_umem(fp, VERIFY_READ, ctl, sizeof(strbuf_t))) < 0)
 		RTN(err);
-	else if (doit && dat != NULL && (err = lis_check_umem(fp, VERIFY_READ, dat, sizeof(strbuf_t))) < 0)
+	else if (doit && dat != NULL
+		 && (err = lis_check_umem(fp, VERIFY_READ, dat, sizeof(strbuf_t))) < 0)
 		RTN(err);
 	else if (flagsp == NULL)
 		RTN(-EFAULT);
 	else if (doit && (err = lis_check_umem(fp, VERIFY_READ, flagsp, sizeof(int))) < 0)
 		RTN(err);
-	else if (doit && bandp != NULL && (err = lis_check_umem(fp, VERIFY_READ, bandp, sizeof(int))) < 0)
+	else if (doit && bandp != NULL
+		 && (err = lis_check_umem(fp, VERIFY_READ, bandp, sizeof(int))) < 0)
 		RTN(err);
 
 	if (F_ISSET(hd->sd_flag, STPLEX)) {
@@ -5549,7 +5573,8 @@ int
 				RTN(err);
 
 			qlocked = 1;
-			while (rdq->q_first == NULL && (hd->sd_flag & (STRHUP | STRDERR | STRCLOSE)) == 0) {
+			while (rdq->q_first == NULL
+			       && (hd->sd_flag & (STRHUP | STRDERR | STRCLOSE)) == 0) {
 				if (should_notblock_rd(hd, fp))
 					RTN(-EAGAIN);
 
@@ -5571,16 +5596,12 @@ int
 		band = *bandp;
 	}
 
-	/* 
-	 * Lock the rd queue.  Every exit from here on should go out
-	 * via the "return_point" label for cleanup purposes.  The queue
-	 * lock keeps the read service procedure from running and messing
-	 * with the queue.
-	 *
-	 * There is only one copy of getpmsg or read running per stream,
-	 * gated by the sd_read_sem.  So we don't have to worry about 
-	 * interference from other user calls.
-	 */
+	/* Lock the rd queue.  Every exit from here on should go out via the "return_point" label
+	   for cleanup purposes.  The queue lock keeps the read service procedure from running and
+	   messing with the queue.
+
+	   There is only one copy of getpmsg or read running per stream, gated by the sd_read_sem.
+	   So we don't have to worry about interference from other user calls. */
 	if (!qlocked && (err = lis_lockq(rdq)) < 0)
 		RTN(err);
 
@@ -5599,23 +5620,19 @@ int
 			rtn = 0;
 		} else if (F_ISSET(hd->sd_flag, STRDERR))
 			err = -hd->sd_rerror;
-		/* 
-		 * Return the strbuf structures whether or not there are errors.
-		 * copyout_msg will not modify our len values due to the NULL
-		 * message parameter.
-		 */
+		/* Return the strbuf structures whether or not there are errors. copyout_msg will
+		   not modify our len values due to the NULL message parameter. */
 		rtn = copyout_msg(fp, NULL, &kctl, &kdat, (strbuf_t *) ctl, (strbuf_t *) dat, doit);
 
 		goto return_point;	/* go return 'rtn' */
 	}
 
 	if (LIS_DEBUG_GETMSG && LIS_DEBUG_DMP_MBLK && LIS_DEBUG_ADDRS) {
-		printk("lis_strgetpmsg: q=%lx, mp=%lx, mp->b_rptr=%lx\n", (long) rdq, (long) mp, (long) mp->b_rptr);
+		printk("lis_strgetpmsg: q=%lx, mp=%lx, mp->b_rptr=%lx\n", (long) rdq, (long) mp,
+		       (long) mp->b_rptr);
 	}
 
-	/* 
-	 * At this point we have a message.  Ensure that it is
-	 * of the type that we want to process.
+	/* At this point we have a message.  Ensure that it is of the type that we want to process. 
 	 */
 	mtype = lis_btype(mp);
 	if (LIS_DEBUG_GETMSG) {
@@ -5666,7 +5683,8 @@ int
 					err = -EINVAL;	/* invalid flags */
 					goto return_point;	/* go return 'rtn' */
 				}
-				if (mp->b_band < (unsigned char) band) {	/* msg in wrong band */
+				if (mp->b_band < (unsigned char) band) {	/* msg in wrong
+										   band */
 					err = -EBADMSG;
 					goto return_point;	/* go return 'rtn' */
 				}
@@ -5693,11 +5711,8 @@ int
 			band = mp->b_band;	/* band to return */
 		}
 
-		/* 
-		 * Now we commit to removing the message from the read queue
-		 * Up until here error conditions could have left the message
-		 * in the queue.
-		 */
+		/* Now we commit to removing the message from the read queue Up until here error
+		   conditions could have left the message in the queue. */
 		mp = lis_getq(rdq);	/* remove from queue */
 		if (mp == NULL) {
 			printk("strgetpmsg: empty queue: addr of queue 0x%lx\n", (long) rdq);
@@ -5754,15 +5769,10 @@ int
 		qreading = 0;
 	}
 
-	/* 
-	 * mp is either the removed message or the dup'd copy for PEEK.  So
-	 * it must be disposed of in either case before we exit.  That's what
-	 * this next section of code does.
-	 */
+	/* mp is either the removed message or the dup'd copy for PEEK.  So it must be disposed of
+	   in either case before we exit.  That's what this next section of code does. */
 
-	/* 
-	 * copyout_msg will copy data to usr returning MORECTL,MOREDATA status
-	 */
+	/* copyout_msg will copy data to usr returning MORECTL,MOREDATA status */
 	if ((rtn = copyout_msg(fp, mp, &kctl, &kdat, (strbuf_t *) ctl, (strbuf_t *) dat, doit)) < 0)
 		lis_freemsg(mp);
 	else if (doit) {	/* getmsg/getpmsg */
@@ -5802,8 +5812,9 @@ int
 
 		if (!doit)
 			*flagsp = flags;	/* return flags to kernal space */
-		else /* return flags to user space */ if ((err = lis_check_umem(fp, VERIFY_WRITE, flagsp, sizeof(int)))
-							  == 0)
+		else /* return flags to user space */
+	    if ((err = lis_check_umem(fp, VERIFY_WRITE, flagsp, sizeof(int)))
+		== 0)
 			err = lis_copyout(fp, &flags, flagsp, sizeof(flags));
 	}
 
@@ -5814,7 +5825,8 @@ int
 		*bandp = band;
 
 	if (LIS_DEBUG_GETMSG) {
-		printk("strgetmsg:    maxlen     len    return=0x%x flags=0x%x band=%d", err ? err : rtn, flags, band);
+		printk("strgetmsg:    maxlen     len    return=0x%x flags=0x%x band=%d",
+		       err ? err : rtn, flags, band);
 		printk(" stream %s\n", hd->sd_name);
 		printk("  control:    %6d  %6d    %s\n", kctl.maxlen, kctl.len, ctl_type);
 		printk("     data:    %6d  %6d    %s\n", kdat.maxlen, kdat.len, dat_type);
@@ -5845,12 +5857,13 @@ int
 /*  -------------------------------------------------------------------  */
 /* strioctl - handle IOCTLs at the stream head
  *
- * The sd_wioc semaphore is used to ensure that only one ioctl per
- * stream is outstanding at a time.  This helps to minimize the 
- * locking of the stream head structure.
+ * The sd_wioc semaphore is used to ensure that only one ioctl per stream
+ * is outstanding at a time.  This helps to minimize the locking of the
+ * stream head structure.
  */
 int
- lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg) {
+lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg)
+{
 	stdata_t *hd;
 	int err = 0, flush_pri = 0;
 	cred_t creds;
@@ -5866,7 +5879,8 @@ int
 	if (LIS_DEBUG_IOCTL && LIS_DEBUG_ADDRS)
 		printk("lis_strioctl(i@0x%p/%d,f@0x%p/%d,cmd=0x%x,arg=0x%lx)"
 		       " << i_rdev=0x%x\n",
-		       i, (i ? I_COUNT(i) : 0), f, (f ? F_COUNT(f) : 0), cmd, arg, (i ? GET_I_RDEV(i) : 0));
+		       i, (i ? I_COUNT(i) : 0), f, (f ? F_COUNT(f) : 0), cmd, arg,
+		       (i ? GET_I_RDEV(i) : 0));
 
 	hd = FILE_STR(f);
 	if (hd == NULL)
@@ -5883,19 +5897,19 @@ int
 
 	if (F_ISSET(hd->sd_flag, STPLEX)) {
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...) \"%s\" >> stream has been I_LINKed\n", hd->sd_name);
+			printk("lis_strioctl(...) \"%s\" >> stream has been I_LINKed\n",
+			       hd->sd_name);
 
 		err = -EINVAL;
 		goto return_no_unlock;
 	}
 
-	/* 
-	 * Single-thread ioctls on this stream
-	 */
+	/* Single-thread ioctls on this stream */
 	if ((err = lis_lock_wioc(hd)) < 0)
 		goto return_no_unlock;
 
-	switch (cmd) {		/* the often an ioc is called the * closer it should be to the begin of the sw */
+	switch (cmd) {		/* the often an ioc is called the * closer it should be to the
+				   begin of the sw */
 	case I_NREAD:		/* tested */
 	{
 		int bytes = 0;
@@ -5922,6 +5936,7 @@ int
 		strbuf_t *ctl = &(pb.ctlbuf), *dat = &(pb.databuf);
 		int band = 0;
 		int res, flags;
+
 		if ((err = lis_check_umem(f, VERIFY_READ,
 					  (char *) arg, sizeof(strpeek_t))) < 0
 		    || (err = lis_check_umem(f, VERIFY_WRITE,
@@ -5948,6 +5963,7 @@ int
 		else {
 			strioctl_t ioc;
 			int res;
+
 			if ((err = lis_check_umem(f, VERIFY_READ,
 						  (char *) arg, sizeof(strioctl_t))) < 0
 			    || (err = lis_check_umem(f, VERIFY_WRITE,
@@ -5975,17 +5991,20 @@ int
 			RTN(err);
 		else {
 			char *mname;
+
 			if ((err = lis_copyin_str(f, (char *) arg, &mname, FMNAMESZ + 1)) < 0)
 				RTN(err);
 
 			if (LIS_DEBUG_IOCTL)
-				printk("lis_strioctl(...,I_PUSH,\"%s\") %s <<\n", mname, hd->sd_name);
+				printk("lis_strioctl(...,I_PUSH,\"%s\") %s <<\n", mname,
+				       hd->sd_name);
 
 			id = lis_loadmod(mname);
 			if (id == LIS_NULL_MID || (st = lis_modstr(id)) == NULL) {
 				err = -EINVAL;
 				if (LIS_DEBUG_IOCTL)
-					printk("lis_strioctl(...,I_PUSH,\"%s\")" " >> module not found\n", mname);
+					printk("lis_strioctl(...,I_PUSH,\"%s\")"
+					       " >> module not found\n", mname);
 
 				FREE((caddr_t) mname);
 			} else {
@@ -6037,9 +6056,11 @@ int
 	{
 		int namelen;
 		char *name;
+
 		if ((err = lis_check_umem(f, VERIFY_WRITE, (char *) arg, FMNAMESZ + 1)) < 0) {
 			if (LIS_DEBUG_IOCTL)
-				printk("lis_strioctl(...,I_LOOK,...)" " >> lis_check_umem failed with err=%d\n", err);
+				printk("lis_strioctl(...,I_LOOK,...)"
+				       " >> lis_check_umem failed with err=%d\n", err);
 			RTN(err);
 		}
 		if (!hd->sd_pushcnt) {
@@ -6064,6 +6085,7 @@ int
 	case I_FLUSHBAND:
 	{
 		struct bandinfo bi;
+
 		if ((err = lis_check_umem(f, VERIFY_READ,
 					  (char *) arg, sizeof(bandinfo_t))) < 0
 		    || (err = lis_copyin(f, &bi, (char *) arg, sizeof(bandinfo_t))) < 0)
@@ -6087,6 +6109,7 @@ int
 #endif
 			{
 				int res = lis_snd_mflush(hd->sd_wq, arg, flush_pri);
+
 				RTN(res);
 			}
 			break;
@@ -6098,6 +6121,7 @@ int
 #endif
 			{
 				int res = lis_snd_mflush(hd->sd_wq, arg, flush_pri);
+
 				RTN(res);
 			}
 			break;
@@ -6109,6 +6133,7 @@ int
 #endif
 			{
 				int res = lis_snd_mflush(hd->sd_wq, arg, flush_pri);
+
 				RTN(res);
 			}
 		default:
@@ -6173,7 +6198,8 @@ int
 		}
 
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_FIND,\"%s\") \"%s\" %d module(s)\n", mname, hd->sd_name, nmods);
+			printk("lis_strioctl(...,I_FIND,\"%s\") \"%s\" %d module(s)\n", mname,
+			       hd->sd_name, nmods);
 
 		for (q = (hd->sd_wq ? hd->sd_wq->q_next : NULL); q && nmods; q = q->q_next, nmods--) {
 			if (!LIS_CHECK_Q_MAGIC(q)) {
@@ -6194,8 +6220,10 @@ int
 	case I_SRDOPT:
 	{
 		int res = set_readopt(&hd->sd_rdopt, arg);
+
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_SRDOPT,%ld) \"%s\" >> rslt=%d\n", arg, hd->sd_name, res);
+			printk("lis_strioctl(...,I_SRDOPT,%ld) \"%s\" >> rslt=%d\n", arg,
+			       hd->sd_name, res);
 		RTN(res);
 	}
 	case I_GRDOPT:
@@ -6205,7 +6233,8 @@ int
 			RTN(err);
 		rmode = hd->sd_rdopt;
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_GRDOPT,...) \"%s\" << mode=0x%x\n", hd->sd_name, rmode);
+			printk("lis_strioctl(...,I_GRDOPT,...) \"%s\" << mode=0x%x\n", hd->sd_name,
+			       rmode);
 		err = lis_copyout(f, &rmode, (char *) arg, sizeof(int));
 	}
 		break;
@@ -6327,7 +6356,8 @@ int
 				RTN(err);
 
 			couldput = (K_ATOMIC_READ(&hd->sd_wrcnt) == 0) &&
-			    !F_ISSET(hd->sd_flag, STRFROZEN) && lis_bcanputnext(hd->sd_wq, (unsigned char) 0);
+			    !F_ISSET(hd->sd_flag, STRFROZEN)
+			    && lis_bcanputnext(hd->sd_wq, (unsigned char) 0);
 			if (!couldput && (should_notblock_wr(hd, f)
 					  || F_ISSET(strfdinsert.flags, MSG_HIPRI)
 			    )
@@ -6373,7 +6403,8 @@ int
 			RTN(err);
 
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_GWROPT,...) \"%s\" >> mode=0x%x\n", hd->sd_name, hd->sd_wropt);
+			printk("lis_strioctl(...,I_GWROPT,...) \"%s\" >> mode=0x%x\n", hd->sd_name,
+			       hd->sd_wropt);
 
 		err = lis_copyout(f, &hd->sd_wropt, (char *) arg, sizeof(int));
 		RTN(err);
@@ -6394,16 +6425,13 @@ int
 			if (LIS_DEBUG_IOCTL)
 				printk("lis_strioctl(...,I_RECVFD,...) \"%s\"\n", hd->sd_name);
 
-			/* 
-			 *  synchronize with the sender if needed; we will wait
-			 *  as long as an IOCTL would wait by default (i.e., 15 secs).
-			 *  note that this potential wait can be "tuned" and/or avoided
-			 *  by preceding the ioctl(I_RECVFD) with a poll(POLLIN), since
-			 *  M_PASSFP is treated like a data message by poll().  If no
-			 *  message is available after poll() has waited the specified
-			 *  time, the caller can respond accordingly (possibly by not
-			 *  calling ioctl(I_RECVFD) at all).
-			 */
+			/* synchronize with the sender if needed; we will wait as long as an IOCTL
+			   would wait by default (i.e., 15 secs). note that this potential wait can 
+			   be "tuned" and/or avoided by preceding the ioctl(I_RECVFD) with a
+			   poll(POLLIN), since M_PASSFP is treated like a data message by poll().
+			   If no message is available after poll() has waited the specified time,
+			   the caller can respond accordingly (possibly by not calling
+			   ioctl(I_RECVFD) at all). */
 			if ((err = lis_lockq(hd->sd_rq)) < 0)
 				RTN(err);
 
@@ -6412,7 +6440,8 @@ int
 				int rslt;
 
 				if (LIS_DEBUG_IOCTL)
-					printk("lis_strioctl(...,I_RECVFD,...)" " >> waiting for an M_PASSFP\n");
+					printk("lis_strioctl(...,I_RECVFD,...)"
+					       " >> waiting for an M_PASSFP\n");
 				lis_tmout(&tl, lis_do_rd_tmout, (long) hd, SECS_TO(LIS_DFLT_TIM));
 				rslt = lis_sleep_on_wread(hd);	/* unlocks & relocks q */
 				if (rslt < 0) {
@@ -6422,14 +6451,13 @@ int
 					RTN(rslt);
 				}
 				if (LIS_DEBUG_IOCTL)
-					printk("lis_strioctl(...,I_RECVFD,...)" " >> wait terminated\n");
+					printk("lis_strioctl(...,I_RECVFD,...)"
+					       " >> wait terminated\n");
 				lis_untmout(&tl);
 			}
 
-			/* 
-			 *  we should have a message - it should be an M_PASSFP
-			 *  if not, lis_recvfd will return an error
-			 */
+			/* we should have a message - it should be an M_PASSFP if not, lis_recvfd
+			   will return an error */
 			err = lis_recvfd(hd, &recv, f);
 			lis_unlockq(hd->sd_rq);
 			if (err < 0)
@@ -6447,12 +6475,14 @@ int
 				nmods++;
 
 			if (LIS_DEBUG_IOCTL)
-				printk("lis_strioctl(...,I_LIST,NULL) \"%s\" >> return %d\n", hd->sd_name, nmods);
+				printk("lis_strioctl(...,I_LIST,NULL) \"%s\" >> return %d\n",
+				       hd->sd_name, nmods);
 			RTN(nmods);
 		} else {
 			str_list_t list;
 			queue_t *q;
 			int nmods;
+
 			if ((err = lis_check_umem(f, VERIFY_READ, (char *) arg,
 						  sizeof(str_list_t))) < 0
 			    || (err = lis_check_umem(f, VERIFY_WRITE, (char *) arg,
@@ -6462,25 +6492,31 @@ int
 			if (list.sl_nmods <= 0)
 				RTN(-EINVAL);
 			if ((err = lis_check_umem(f, VERIFY_WRITE,
-						  list.sl_modlist, sizeof(struct str_mlist) * list.sl_nmods)) < 0)
+						  list.sl_modlist,
+						  sizeof(struct str_mlist) * list.sl_nmods)) < 0)
 				RTN(err);
 
 			if (hd->sd_wq == NULL || (q = hd->sd_wq->q_next) == NULL) {
-				printk("lis_strioctl(...,I_LIST,...)" " \"%s\" >> NULL queue ptrs\n", hd->sd_name);
+				printk("lis_strioctl(...,I_LIST,...)"
+				       " \"%s\" >> NULL queue ptrs\n", hd->sd_name);
 				RTN(0);	/* really a bug */
 			}
 
 			for (nmods = 0; q && list.sl_nmods--; q = q->q_next, list.sl_modlist++) {
 				if (!LIS_CHECK_Q_MAGIC(q))
 					break;
-				if ((err = lis_copyout(f, lis_queue_name(q), list.sl_modlist->l_name, FMNAMESZ)) < 0) {
+				if ((err =
+				     lis_copyout(f, lis_queue_name(q), list.sl_modlist->l_name,
+						 FMNAMESZ)) < 0) {
 					RTN(err);
 				}
 				nmods++;
 				if (!SAMESTR(q))
 					break;
 			}
-			if ((err = lis_copyout(f, &nmods, &((str_list_t *) arg)->sl_nmods, sizeof(int))) < 0)
+			if ((err =
+			     lis_copyout(f, &nmods, &((str_list_t *) arg)->sl_nmods,
+					 sizeof(int))) < 0)
 				RTN(err);
 
 			if (LIS_DEBUG_IOCTL)
@@ -6494,8 +6530,9 @@ int
 		mblk_t *mp;
 		int rtn = 0;
 
-		/* Switch on arg and return whether the first msg in the stream head read queue is marked if arg is
-		   ANYMARK. Return whether is it the last marked message if arg is LASTMARK. */
+		/* Switch on arg and return whether the first msg in the stream head read queue is
+		   marked if arg is ANYMARK. Return whether is it the last marked message if arg is 
+		   LASTMARK. */
 		if (hd->sd_wq == NULL	/* no queue */
 		    || hd->sd_rq == NULL	/* no rd queue */
 		    || (mp = hd->sd_rq->q_first) == NULL	/* no msg */
@@ -6515,7 +6552,8 @@ int
 
 				rtn = 1;	/* assume no other msg marked */
 				for (mp = mp->b_next; mp != NULL; mp = mp->b_next) {
-					if (mp->b_flag & MSGMARK) {	/* some other msg is marked */
+					if (mp->b_flag & MSGMARK) {	/* some other msg is marked 
+									 */
 						rtn = 0;	/* condition not met */
 						break;
 					}
@@ -6528,7 +6566,8 @@ int
 			}
 
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_ATMARK,%ld) \"%s\" >> return %d\n", arg, hd->sd_name, rtn);
+			printk("lis_strioctl(...,I_ATMARK,%ld) \"%s\" >> return %d\n", arg,
+			       hd->sd_name, rtn);
 		RTN(rtn);
 	}
 		break;
@@ -6558,7 +6597,8 @@ int
 			RTN(-ENODATA);
 		res = hd->sd_rq->q_first->b_band;
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_GETBAND,...) \"%s\" >> rslt=%d\n", hd->sd_name, res);
+			printk("lis_strioctl(...,I_GETBAND,...) \"%s\" >> rslt=%d\n", hd->sd_name,
+			       res);
 		err = lis_copyout(f, &res, (char *) arg, sizeof(int));
 		RTN(err);
 	}
@@ -6572,7 +6612,8 @@ int
 		else {
 			res = lis_bcanputnext(hd->sd_wq, (unsigned char) arg);
 			if (LIS_DEBUG_IOCTL)
-				printk("lis_strioctl(...,I_CANPUT,...)" " \"%s\" >> rslt=%d\n", hd->sd_name, res);
+				printk("lis_strioctl(...,I_CANPUT,...)" " \"%s\" >> rslt=%d\n",
+				       hd->sd_name, res);
 			RTN(res);
 		}
 	}
@@ -6592,7 +6633,8 @@ int
 			RTN(err);
 		res = hd->sd_closetime;
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_GETCLTIME,...) \"%s\" >> rslt=%d\n", hd->sd_name, res);
+			printk("lis_strioctl(...,I_GETCLTIME,...) \"%s\" >> rslt=%d\n", hd->sd_name,
+			       res);
 		err = lis_copyout(f, &res, (char *) arg, sizeof(int));
 		RTN(err);
 	}
@@ -6607,8 +6649,11 @@ int
 		if (F_ISSET(hd->sd_flag, STRHUP | STRCLOSE))
 			RTN(-ENXIO);
 
-		if (hd->sd_strtab->st_muxrinit == NULL || hd->sd_strtab->st_muxwinit == NULL)	/* must have lower
-												   qinits */
+		if (hd->sd_strtab->st_muxrinit == NULL || hd->sd_strtab->st_muxwinit == NULL)	/* must 
+												   have 
+												   lower
+												   qinits 
+												 */
 			RTN(-EINVAL);
 
 		CLOCKADD();
@@ -6638,6 +6683,7 @@ int
 		struct strpmsg args, *argsp = (typeof(argsp)) arg;
 		struct strbuf *ctlp = NULL;
 		struct strbuf *datp = NULL;
+
 		if ((err = lis_check_umem(f, VERIFY_READ, (char *) arg, sizeof(args))) < 0)
 			RTN(err);
 		if ((err = lis_copyin(f, &args, (char *) arg, sizeof(args))) < 0)
@@ -6656,6 +6702,7 @@ int
 		struct strbuf *datp = NULL;
 		int *bandp = NULL;
 		int *flagsp = NULL;
+
 		if ((err = lis_check_umem(f, VERIFY_READ, (char *) arg, sizeof(args))) < 0)
 			RTN(err);
 		if ((err = lis_copyin(f, &args, (char *) arg, sizeof(args))) < 0)
@@ -6671,18 +6718,16 @@ int
 		RTN(lis_strgetpmsg(i, f, ctlp, datp, bandp, flagsp, 1));
 	}
 
-		/* 
-		 *  the following three _ioc_ routines do their own user-to-
-		 *  kernel space stuff internally; we just need to get 'arg' to
-		 *  them in appropriate form.
-		 */
+		/* the following three _ioc_ routines do their own user-to- kernel space stuff
+		   internally; we just need to get 'arg' to them in appropriate form. */
 	case I_LIS_PIPE:
 		if (LIS_DEBUG_IOCTL)
 			printk("lis_strioctl(...,I_LIS_PIPE,...)\n");
 		RTN(lis_ioc_pipe((unsigned int *) arg));
 	case I_LIS_FATTACH:
 		if (LIS_DEBUG_IOCTL)
-			printk("lis_strioctl(...,I_LIS_FATTACH,\"%s\") << \"%s\"\n", (char *) arg, hd->sd_name);
+			printk("lis_strioctl(...,I_LIS_FATTACH,\"%s\") << \"%s\"\n", (char *) arg,
+			       hd->sd_name);
 		RTN(lis_ioc_fattach(f, (char *) arg));
 	case I_LIS_FDETACH:
 		if (LIS_DEBUG_IOCTL)
@@ -6705,12 +6750,16 @@ int
 		stats->queues_running = K_ATOMIC_READ(&lis_queues_running);
 		stats->runq_req_cnt = K_ATOMIC_READ(&lis_runq_req_cnt);
 		memcpy(stats->runq_cnts, (void *) lis_runq_cnts, sizeof(stats->runq_cnts));
-		memcpy(stats->queuerun_cnts, (void *) lis_queuerun_cnts, sizeof(stats->queuerun_cnts));
-		memcpy(stats->active_flags, (void *) lis_runq_active_flags, sizeof(stats->active_flags));
+		memcpy(stats->queuerun_cnts, (void *) lis_queuerun_cnts,
+		       sizeof(stats->queuerun_cnts));
+		memcpy(stats->active_flags, (void *) lis_runq_active_flags,
+		       sizeof(stats->active_flags));
 		memcpy(stats->runq_pids, (void *) lis_runq_pids, sizeof(stats->runq_pids));
 		memcpy(stats->runq_wakeups, (void *) lis_runq_wakeups, sizeof(stats->runq_wakeups));
-		memcpy(stats->setqsched_cnts, (void *) lis_setqsched_cnts, sizeof(stats->setqsched_cnts));
-		memcpy(stats->setqsched_isr_cnts, (void *) lis_setqsched_isr_cnts, sizeof(stats->setqsched_isr_cnts));
+		memcpy(stats->setqsched_cnts, (void *) lis_setqsched_cnts,
+		       sizeof(stats->setqsched_cnts));
+		memcpy(stats->setqsched_isr_cnts, (void *) lis_setqsched_isr_cnts,
+		       sizeof(stats->setqsched_isr_cnts));
 		err = lis_copyout(f, stats, (char *) arg, sizeof(*stats));
 		FREE(stats);
 		RTN(err);
@@ -6751,11 +6800,13 @@ int
 		    || (mp->b_cont
 			&& (err = lis_copyout(f, mp->b_cont->b_rptr,
 					      (char *) arg + cnt1,
-					      (cnt2 = mp->b_cont->b_wptr - mp->b_cont->b_rptr))) < 0)
+					      (cnt2 =
+					       mp->b_cont->b_wptr - mp->b_cont->b_rptr))) < 0)
 		    || (mp->b_cont->b_cont
-			&& (err = lis_copyout(f, mp->b_cont->b_cont->b_rptr,
-					      (char *) arg + cnt1 + cnt2,
-					      mp->b_cont->b_cont->b_wptr - mp->b_cont->b_cont->b_rptr)) < 0)
+			&& (err =
+			    lis_copyout(f, mp->b_cont->b_cont->b_rptr, (char *) arg + cnt1 + cnt2,
+					mp->b_cont->b_cont->b_wptr - mp->b_cont->b_cont->b_rptr)) <
+			0)
 
 		    )
 			RTN(err);
@@ -6779,7 +6830,9 @@ int
 
 		if ((err = lis_check_umem(f, VERIFY_WRITE,
 					  (char *) arg, msgdsize(mp))) < 0
-		    || (err = lis_copyout(f, mp->b_rptr, (char *) arg, (cnt1 = mp->b_wptr - mp->b_rptr))) < 0)
+		    || (err =
+			lis_copyout(f, mp->b_rptr, (char *) arg,
+				    (cnt1 = mp->b_wptr - mp->b_rptr))) < 0)
 			RTN(err);
 
 		freemsg(mp);
@@ -6847,11 +6900,12 @@ int
 		break;
 
 	default:
-		/* encapsulate ioctl(fd,cmd,arg)as if the user specified instead ioctl(fd,I_STR,{cmd,arg}) and pass
-		   down to strdoioctl() */
+		/* encapsulate ioctl(fd,cmd,arg)as if the user specified instead
+		   ioctl(fd,I_STR,{cmd,arg}) and pass down to strdoioctl() */
 	{
 		strioctl_t ioc;
 		int res;
+
 		ioc.ic_cmd = cmd;
 		ioc.ic_timout = LIS_LNTIME;
 		ioc.ic_len = TRANSPARENT;
@@ -6867,9 +6921,7 @@ int
 	}
 	}			/* sw cmd */
 
-	/* 
-	 * Fall into return point and return the value of "err".
-	 */
+	/* Fall into return point and return the value of "err". */
       return_point:
 	CP(hd, err);
 	lis_unlock_wioc(hd);
@@ -6888,10 +6940,12 @@ int
 /*  -------------------------------------------------------------------  */
 /* lis_poll_bits - evaluate poll bits for a stream			 */
 /*
- * Used by lis_strpoll and by lis_poll_2_1 to evaluate a stream and
- * return poll events appropriate to the stream.
+ * Used by lis_strpoll and by lis_poll_2_1 to evaluate a stream and return
+ * poll events appropriate to the stream.
  */
-unsigned lis_poll_bits(stdata_t *hd) {
+unsigned
+lis_poll_bits(stdata_t *hd)
+{
 	int revents = 0;
 	int mtype;
 	lis_flags_t psw;
@@ -6946,7 +7000,8 @@ unsigned lis_poll_bits(stdata_t *hd) {
 
       rtn_point:
 	if (LIS_DEBUG_POLL)
-		printk("lis_poll_bits: stream %s: revents:%s\n", hd->sd_name, lis_poll_events((short) revents));
+		printk("lis_poll_bits: stream %s: revents:%s\n", hd->sd_name,
+		       lis_poll_events((short) revents));
 
 	return (revents);	/* return events */
 
@@ -6957,18 +7012,18 @@ unsigned lis_poll_bits(stdata_t *hd) {
 /*  -------------------------------------------------------------------  */
 /* strpoll - called from lis_syspoll() poll() syscall handler
  *
- * The STREAMS poll function is called with the file info and
- * a pointer to a polldat structure.  The STREAMS routine
- * interrogates the file for the requested conditions according
- * to the 'pd_events' field in the polldat structure.  It returns
- * a bit-mask of the events that satisfy the conditions, if any.
- * The STREAMS routine also sets the pd_headp pointer to point to
- * its list head in its stream structure for the polldat list.
+ * The STREAMS poll function is called with the file info and a pointer to
+ * a polldat structure.  The STREAMS routine interrogates the file for the
+ * requested conditions according to the 'pd_events' field in the polldat
+ * structure.  It returns a bit-mask of the events that satisfy the
+ * conditions, if any.  The STREAMS routine also sets the pd_headp pointer
+ * to point to its list head in its stream structure for the polldat list.
  * The caller takes care of linking the structure into the list.
  */
 #ifdef PORTABLE_POLL
 int
- lis_strpoll(struct inode *i, struct file *f, void *ptr) {
+lis_strpoll(struct inode *i, struct file *f, void *ptr)
+{
 	polldat_t *pdat_ptr = (polldat_t *) ptr;
 	int revents = 0;
 	int events = pdat_ptr->pd_events | POLLERR | POLLHUP;
@@ -6989,7 +7044,8 @@ int
 	/* allows insertion */
 	if (LIS_DEBUG_POLL)
 		printk("strpoll: stream %s: events:%s revents:%s\n",
-		       hd->sd_name, lis_poll_events((short) events), lis_poll_events((short) revents));
+		       hd->sd_name, lis_poll_events((short) events),
+		       lis_poll_events((short) revents));
 
 	CLOCKOFF(POLLTIME);
 
@@ -7006,7 +7062,9 @@ int
  * This routine is used as a timout routine and as a utility function.
  * The argument is really a pointer to a streamhead structure.
  */
-void lis_wakeup_close(caddr_t arg) {
+void
+lis_wakeup_close(caddr_t arg)
+{
 	stdata_t *hd = (stdata_t *) arg;
 
 	if (hd->magic == STDATA_MAGIC) {
@@ -7022,10 +7080,12 @@ void lis_wakeup_close(caddr_t arg) {
 /*  -------------------------------------------------------------------  */
 /* lis_wakeup_flush
  *
- * Called if the M_FLUSH sent downstream at close time does not come
- * back to the stream head in a timely manner.
+ * Called if the M_FLUSH sent downstream at close time does not come back
+ * to the stream head in a timely manner.
  */
-void lis_wakeup_flush(caddr_t arg) {
+void
+lis_wakeup_flush(caddr_t arg)
+{
 	stdata_t *hd = (stdata_t *) arg;
 
 	if (hd->magic == STDATA_MAGIC) {
@@ -7045,7 +7105,9 @@ void lis_wakeup_flush(caddr_t arg) {
  *
  * The queue is unlocked when this routine is called.
  */
-static void deschedule(queue_t *q) {
+static void
+deschedule(queue_t *q)
+{
 	lis_flags_t psw;
 	lis_flags_t psw1, psw2;
 	queue_t *rq, *wq;
@@ -7075,14 +7137,16 @@ static void deschedule(queue_t *q) {
 				if (p_prev != NULL)	/* trailing ptr valid? */
 					p_prev->q_scnxt = p_scan->q_scnxt;	/* link around q */
 				else	/* prev still is q_head */
-					lis_scanqhead = p_scan->q_scnxt;	/* link hd around q */
+					lis_scanqhead = p_scan->q_scnxt;	/* link hd around q 
+										 */
 				/* NULL if last elt in list */
 				if (lis_scanqtail == p_scan)	/* last elt in list? */
 					lis_scanqtail = p_prev;	/* back up tail ptr */
 				/* NULL if only elt in list */
 				/* do not move prev ptr */
 				LIS_QISRUNLOCK(p_scan, &psw1);
-				lis_head_put((stdata_t *) p_scan->q_str);	/* balance ins scanl */
+				lis_head_put((stdata_t *) p_scan->q_str);	/* balance ins
+										   scanl */
 			} else	/* not our element */
 				p_prev = p_scan;	/* keep trailing ptr */
 
@@ -7132,7 +7196,8 @@ static void deschedule(queue_t *q) {
 				/* do not move prev ptr */
 				LisDownCount(QSCHEDS);
 				hd = (stdata_t *) p_scan->q_str;
-				if (hd->magic == STDATA_MAGIC && (hd->sd_wq == p_scan || hd->sd_rq == p_scan)
+				if (hd->magic == STDATA_MAGIC
+				    && (hd->sd_wq == p_scan || hd->sd_rq == p_scan)
 				    )
 					lis_head_put(hd);	/* balance qenable */
 			} else	/* not our element */
@@ -7163,10 +7228,12 @@ static void deschedule(queue_t *q) {
 	lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw);
 }
 
-/* mark_closing - mark both read and write queues as closing, all
- * the way down to the driver's queues.
+/* mark_closing - mark both read and write queues as closing, all the way
+ * down to the driver's queues.
  */
-static void mark_closing(queue_t *sd_wq) {
+static void
+mark_closing(queue_t *sd_wq)
+{
 	queue_t *sd_rq;
 	queue_t *q;
 	lis_flags_t psw_wq, psw_rq;
@@ -7196,17 +7263,19 @@ static void mark_closing(queue_t *sd_wq) {
 /*
  * close_action
  *
- * A helper routine to perform close activities on a stream whose
- * open count just went to zero.
+ * A helper routine to perform close activities on a stream whose open
+ * count just went to zero.
  *
  * It is possible that the close mechanism could be implemented more
  * elegently by performing these functions from lis_head_put.  The
- * technique would be to keep the stream intact, but disconnected
- * from file I/O, until all the flushing traffic settles down and
- * then perform these functions when the refcnt finally goes to
- * zero.  But I am going to save that restructuring for another time.
+ * technique would be to keep the stream intact, but disconnected from
+ * file I/O, until all the flushing traffic settles down and then perform
+ * these functions when the refcnt finally goes to zero.  But I am going
+ * to save that restructuring for another time.
  */
-static void close_action(stdata_t *head) {
+static void
+close_action(stdata_t *head)
+{
 	int rslt;
 	stdata_t *hd_peer;
 	lis_flags_t psw;
@@ -7214,15 +7283,15 @@ static void close_action(stdata_t *head) {
 	CP(head, 0);
 	SET_SD_FLAG(head, STRCLOSE);
 
-	/* 
-	 *  if we're a pipe, set the peer's STRHUP flag (but don't hang up
-	 *  the peer - it may still have to receive passed FDs, etc...)
-	 */
-	if ((hd_peer = head->sd_peer) && hd_peer != head && !F_ISSET(hd_peer->sd_flag, STRHUP | STRCLOSE)) {
+	/* if we're a pipe, set the peer's STRHUP flag (but don't hang up the peer - it may still
+	   have to receive passed FDs, etc...) */
+	if ((hd_peer = head->sd_peer) && hd_peer != head
+	    && !F_ISSET(hd_peer->sd_flag, STRHUP | STRCLOSE)) {
 		int flag;
 
 		if (LIS_DEBUG_CLOSE)
-			printk("close_action: closing pipe %s <===> %s\n", head->sd_name, hd_peer->sd_name);
+			printk("close_action: closing pipe %s <===> %s\n", head->sd_name,
+			       hd_peer->sd_name);
 		CP(head, 0);
 		lis_spin_lock_irqsave(&hd_peer->sd_lock, &psw);
 		hd_peer->sd_flag |= STRHUP;
@@ -7242,7 +7311,8 @@ static void close_action(stdata_t *head) {
 		CP(head, 0);
 		if (LIS_DEBUG_CLOSE)
 			printk("lis_tear_down_stream: "
-			       "stream %s waiting %dms for queues to drain\n", head->sd_name, head->sd_closetime);
+			       "stream %s waiting %dms for queues to drain\n", head->sd_name,
+			       head->sd_closetime);
 
 		if (SAMESTR(head->sd_wq)) {
 			LIS_QISRLOCK(head->sd_wq->q_next, &psw);
@@ -7252,7 +7322,8 @@ static void close_action(stdata_t *head) {
 
 		head->sd_close_timer =
 		    lis_timeout_fcn(lis_wakeup_close,
-				    (caddr_t) head, lis_milli_to_ticks(head->sd_closetime), "stream-close", MEM_TIMER);
+				    (caddr_t) head, lis_milli_to_ticks(head->sd_closetime),
+				    "stream-close", MEM_TIMER);
 		K_ATOMIC_DEC(&lis_in_syscall);	/* "done" with a system call */
 		lis_runqueues();
 		lis_down(&head->sd_closing);	/* sleep for awhile */
@@ -7273,36 +7344,30 @@ static void close_action(stdata_t *head) {
 		CP(head, 0);
 	}
 
-	/* 
-	 * The possible I_UNLINK above is that last legitimate message that can
-	 * be sent on the stream.  From now on message traffic is suppressed.
-	 *
-	 * By locking the queue we assure ourselves that there are no put
-	 * procedures running on other CPUs.  Then we prevent further qenables
-	 * on the stream head queue pair.  This keeps the service procedures
-	 * from running.  Since we haven't called the driver's close routine
-	 * yet, there could still be some interrupt level activity on the q.
-	 *
-	 * lis_qdetach will sync up with any residual service procedures
-	 * running on other CPUs.
-	 */
+	/* The possible I_UNLINK above is that last legitimate message that can be sent on the
+	   stream.  From now on message traffic is suppressed.
+
+	   By locking the queue we assure ourselves that there are no put procedures running on
+	   other CPUs.  Then we prevent further qenables on the stream head queue pair.  This keeps 
+	   the service procedures from running.  Since we haven't called the driver's close routine
+	   yet, there could still be some interrupt level activity on the q.
+
+	   lis_qdetach will sync up with any residual service procedures running on other CPUs. */
 	CP(head, head->sd_wq);
 	mark_closing(head->sd_wq);
 
-	/* 
-	 * Flush the stream and wait for the M_FLUSH to come back to
-	 * the stream head.  Then close all the queues.  We run a short
-	 * timer in case the M_FLUSH gets lost downstream somewhere.
-	 *
-	 * In the case of a STREAMS pipe, SAMESTR will return 0 and we
-	 * will omit the flushing operation.  When the other end of the
-	 * pipe closes it will flush its own messages.
-	 */
+	/* Flush the stream and wait for the M_FLUSH to come back to the stream head.  Then close
+	   all the queues.  We run a short timer in case the M_FLUSH gets lost downstream
+	   somewhere.
+
+	   In the case of a STREAMS pipe, SAMESTR will return 0 and we will omit the flushing
+	   operation.  When the other end of the pipe closes it will flush its own messages. */
 	if (SAMESTR(head->sd_wq)) {	/* is there a "downstream" */
 		SET_SD_FLAG(head, STRCLOSEWT | STRFLUSHWT);	/* allows wakeups */
 		head->sd_close_timer = lis_timeout_fcn(lis_wakeup_flush,
 						       (caddr_t) head,
-						       lis_milli_to_ticks(50), "stream-flush", MEM_TIMER);
+						       lis_milli_to_ticks(50), "stream-flush",
+						       MEM_TIMER);
 		lis_snd_mflush(head->sd_wq, FLUSHRW, 0);
 		CP(head, head->sd_flag);
 		rslt = 0;
@@ -7335,15 +7400,16 @@ static void close_action(stdata_t *head) {
 /* doclose - dec refcnt & dismantle the stream when sd_opencnt gets to 0.
  *
  * This routine is called from several different contexts.  One is from
- * lis_strclose which is on the straightforward close path in closing
- * a file.  Another is from the unlink code when a stream is unlinked
- * from below a multiplexor and this is the last use of the stream.  In the
+ * lis_strclose which is on the straightforward close path in closing a
+ * file.  Another is from the unlink code when a stream is unlinked from
+ * below a multiplexor and this is the last use of the stream.  In the
  * latter case, both file and inode pointers will be NULL since the file
  * and inode are both long gone.  It is also called from fdetach-related
  * routines.
  */
 int
- lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds) {
+lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds)
+{
 	int opencnt;
 	unsigned long time_cell = 0;
 	long this_doclose;
@@ -7351,14 +7417,12 @@ int
 
 	CLOCKON();
 
-	/* 
-	 * For information about race conditions see "Analysis of
-	 * open/close locking" near the top of this file.
-	 *
-	 */
+	/* For information about race conditions see "Analysis of open/close locking" near the top
+	   of this file. */
 	if (head == NULL || head->magic != STDATA_MAGIC) {
 		printk("lis_doclose(...,h@0x%p,...)"
-		       " << MAGIC 0x%lx!=0x%lx <EINVAL>\n", head, (head ? head->magic : 0), STDATA_MAGIC);
+		       " << MAGIC 0x%lx!=0x%lx <EINVAL>\n", head, (head ? head->magic : 0),
+		       STDATA_MAGIC);
 		return (-EINVAL);
 	}
 
@@ -7367,7 +7431,8 @@ int
 	this_doclose = K_ATOMIC_READ(&lis_doclose_cnt);
 
 	if ((LIS_DEBUG_CLOSE || LIS_DEBUG_ADDRS) || LIS_DEBUG_REFCNTS) {
-		printk("lis_doclose(i@0x%p/%d,f@0x%p/%d,h@0x%p/%d/%d.%d,...)#%ld/%d\n" "    << \"%s\" "
+		printk("lis_doclose(i@0x%p/%d,f@0x%p/%d,h@0x%p/%d/%d.%d,...)#%ld/%d\n"
+		       "    << \"%s\" "
 #if defined(LINUX) && defined(KERNEL_2_1)
 		       "d@0x%p/%d "
 #endif
@@ -7380,85 +7445,64 @@ int
 #if defined(LINUX) && defined(KERNEL_2_1)
 		       (f ? f->f_dentry : NULL), (f && f->f_dentry ? D_COUNT(f->f_dentry) : 0),
 #endif
-		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt), K_ATOMIC_READ(&lis_stdata_cnt));
+		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt),
+		       K_ATOMIC_READ(&lis_stdata_cnt));
 		lis_print_stream(head);
 	}
 #if defined(LINUX)
-	/* 
-	 *  FIFOs/pipes: synchronize at close time before anything else
-	 */
+	/* FIFOs/pipes: synchronize at close time before anything else */
 	if (i && f && F_ISSET(head->sd_flag, STFIFO))
 		lis_fifo_close_sync(i, f);
 #endif
 
-	/* 
-	 *  if we're hungup and fattached but no M_PASSFPs are queued,
-	 *  fdetach now - BEFORE we acquire any locks, because fdetach
-	 *  will itself call here once for each active fattach
-	 */
-	if ((head->sd_flag & (STRHUP | STRATTACH)) == (STRHUP | STRATTACH) && head->sd_rfdcnt == 0) {	/* no passfps
+	/* if we're hungup and fattached but no M_PASSFPs are queued, fdetach now - BEFORE we
+	   acquire any locks, because fdetach will itself call here once for each active fattach */
+	if ((head->sd_flag & (STRHUP | STRATTACH)) == (STRHUP | STRATTACH) && head->sd_rfdcnt == 0) {	/* no 
+													   passfps
 													   queued */
 		CP(head, 0);
 		lis_fdetach_stream(head);
 	}
 
-	/* 
-	 * We get the stdata semaphore and hold it until we decide
-	 * whether or not this is the last close.  This prevents
-	 * any other closes on this same stream, or any open to
-	 * this stream from running until we decide whether or not
-	 * to set the STRCLOSE bit in the head flags.  Setting this
-	 * bit will prevent this stream from being found in a
-	 * search of the stdata structures.  Once that bit is set
-	 * an open attempt on the same {maj,min} will allocate a
-	 * new stream head and not use the one that we are closing.
-	 *
-	 * Getting the sd_opening semaphore serializes a simultaneous
-	 * open and close on the same stream -- possible with directed
-	 * opens to the same {maj,min}.
-	 *
-	 * What this all means is that once that bit is set we can
-	 * go about closing the stream without being bothered from
-	 * above.  There are still driver races to be considered.
-	 */
+	/* We get the stdata semaphore and hold it until we decide whether or not this is the last
+	   close.  This prevents any other closes on this same stream, or any open to this stream
+	   from running until we decide whether or not to set the STRCLOSE bit in the head flags.
+	   Setting this bit will prevent this stream from being found in a search of the stdata
+	   structures.  Once that bit is set an open attempt on the same {maj,min} will allocate a
+	   new stream head and not use the one that we are closing.
+
+	   Getting the sd_opening semaphore serializes a simultaneous open and close on the same
+	   stream -- possible with directed opens to the same {maj,min}.
+
+	   What this all means is that once that bit is set we can go about closing the stream
+	   without being bothered from above.  There are still driver races to be considered. */
 	lis_down_nosig(&head->sd_opening);
 	SET_SD_FLAG(head, STROSEM_HELD);
 
 	lis_del_from_elist(&head->sd_siglist, PID(f), S_ALL);
 
-	/* 
-	 * opencnt might be zero if we are called from stropen to close
-	 * the clone driver part of a clone open.  The open count for the
-	 * stream head that was used for the clone driver still has its
-	 * open count set to zero.
-	 */
+	/* opencnt might be zero if we are called from stropen to close the clone driver part of a
+	   clone open.  The open count for the stream head that was used for the clone driver still 
+	   has its open count set to zero. */
 	if ((opencnt = LIS_SD_OPENCNT(head)) > 0) {
 		K_ATOMIC_DEC(&head->sd_opencnt);	/* decr open count */
 		opencnt--;
 	}
 
-	/* 
-	 * If the open count is now down to the plink count
-	 * then all that is left are the plinks.  This means that
-	 * this is really the last close of the stream and the inode
-	 * is about to disappear.  We clear the inode ptr in the
-	 * stdata structure.  There will be no more accesses of
-	 * this stream from above via the file system.
-	 *
-	 * The stream remains allocated but cannot be reached via an
-	 * open.  Open will allocate a new stdata structure upon a
-	 * re-open.
-	 */
+	/* If the open count is now down to the plink count then all that is left are the plinks.
+	   This means that this is really the last close of the stream and the inode is about to
+	   disappear.  We clear the inode ptr in the stdata structure.  There will be no more
+	   accesses of this stream from above via the file system.
+
+	   The stream remains allocated but cannot be reached via an open.  Open will allocate a
+	   new stdata structure upon a re-open. */
 	CP(head, opencnt);
 	if (head->sd_linkcnt != 0 && opencnt <= head->sd_linkcnt) {
 		lis_free_elist(&head->sd_siglist);	/* do in signal masks */
 	}
 
-	/* 
-	 * If f and i are non-NULL then we were called from the system
-	 * close routine.  Otherwise it is an embedded call from something
-	 * such as i_unlink.
-	 */
+	/* If f and i are non-NULL then we were called from the system close routine.  Otherwise it 
+	   is an embedded call from something such as i_unlink. */
 	if (f && (F_COUNT(f) <= 0)) {	/* detach from file */
 		SET_FILE_STR(f, NULL);
 		/* f->f_op = NULL; */
@@ -7471,19 +7515,15 @@ int
 	}
 
 	if (opencnt == 0) {	/* last open */
-		/* 
-		 * Since the STRCLOSE flag is important to stream lookups, acquire
-		 * the stdata semaphore before changing this flag.
-		 */
+		/* Since the STRCLOSE flag is important to stream lookups, acquire the stdata
+		   semaphore before changing this flag. */
 		lis_down_nosig(&lis_stdata_sem);
 		head->sd_creds = *creds;	/* closer's credentials */
 		SET_SD_FLAG(head, STRCLOSE);	/* mark as closing */
 		lis_up(&lis_stdata_sem);	/* allow opens again */
 
-		/* 
-		 * Release the semaphore before calling close_action.  i_unlink
-		 * will make a nested call into us.
-		 */
+		/* Release the semaphore before calling close_action.  i_unlink will make a nested
+		   call into us. */
 		if (sem2_err == 0)	/* if <0 we're really busted */
 			release_sd_opening_sem(head);
 
@@ -7502,7 +7542,8 @@ int
 		printk("lis_doclose(...)#%ld/%d"
 		       " >> <[%d] %d LiS inode(s), %d open stream(s)>\n",
 		       this_doclose, K_ATOMIC_READ(&lis_close_cnt),
-		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt), K_ATOMIC_READ(&lis_stdata_cnt));
+		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt),
+		       K_ATOMIC_READ(&lis_stdata_cnt));
 
 	CLOCKOFF(CLOSETIME);
 
@@ -7511,7 +7552,8 @@ int
 }				/* lis_doclose */
 
 int
- lis_strclose(struct inode *i, struct file *f) {
+lis_strclose(struct inode *i, struct file *f)
+{
 	struct stdata *head;
 	cred_t creds;
 	unsigned long time_cell = 0;
@@ -7536,11 +7578,13 @@ int
 		       "d@0x%p/%d "
 #endif
 		       "<[%d] %d LiS inode(s), %d open stream(s)>\n",
-		       i, I_COUNT(i), f, F_COUNT(f), this_close, getmajor(GET_I_RDEV(i)), getminor(GET_I_RDEV(i)),
+		       i, I_COUNT(i), f, F_COUNT(f), this_close, getmajor(GET_I_RDEV(i)),
+		       getminor(GET_I_RDEV(i)),
 #if defined(LINUX) && defined(KERNEL_2_1)
 		       f->f_dentry, D_COUNT(f->f_dentry),
 #endif
-		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt), K_ATOMIC_READ(&lis_stdata_cnt));
+		       K_ATOMIC_READ(&lis_mnt_cnt), K_ATOMIC_READ(&lis_inode_cnt),
+		       K_ATOMIC_READ(&lis_stdata_cnt));
 
 	if (!I_COUNT(i)) {
 		printk("lis_strclose: called with unused inode (inode 0x%p file 0x%p)", i, f);
@@ -7590,7 +7634,9 @@ int
  * The technique would be to call the driver's close routine, flush the
  * stream and just let the message traffic settle down.  Then de-allocate.
  */
-static void lis_tear_down_stream(stdata_t *head) {
+static void
+lis_tear_down_stream(stdata_t *head)
+{
 
 	lis_free_stdata(head);	/* free the stdata structure */
 }
@@ -7599,7 +7645,9 @@ static void lis_tear_down_stream(stdata_t *head) {
 
 /* Initialize some glob vars...
  */
-void lis_init_head(void) {
+void
+lis_init_head(void)
+{
 #if (defined(LINUX) && defined(USE_KMEM_CACHE))
 	lis_init_locks();
 #endif
@@ -7613,8 +7661,8 @@ void lis_init_head(void) {
 	lis_nstrpush = 0;
 	lis_strhold = 0;
 	lis_strthresh = 0;
-	/* lis_iocseq=whichever get's in the air -- so we have some kind of random number for this seq # <-should be
-	   fixed */
+	/* lis_iocseq=whichever get's in the air -- so we have some kind of random number for this
+	   seq # <-should be fixed */
 
 	lis_sem_init(&lis_stdata_sem, 1);
 	lis_sem_init(&lis_close_sem, 1);
@@ -7642,7 +7690,9 @@ void lis_init_head(void) {
 /*
  * Terminate code
  */
-void lis_terminate_head(void) {
+void
+lis_terminate_head(void)
+{
 	lis_terminate_mod();
 	lis_terminate_msg();
 #if (defined(LINUX) && defined(USE_KMEM_CACHE))
@@ -7659,7 +7709,9 @@ void lis_terminate_head(void) {
 /*
  * This must be the very last thing
  */
-void lis_terminate_final(void) {
+void
+lis_terminate_final(void)
+{
 	lis_terminate_mem();
 #if !defined(USER)
 	lis_free_all_pages();	/* from lis page allocator */

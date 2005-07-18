@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: os7_namespace.h,v 0.9.2.3 2005/05/14 08:29:32 brian Exp $
+ @(#) $Id: os7_namespace.h,v 0.9.2.4 2005/07/18 11:56:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:32 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:31 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_OS7_NAMESPACE_H__
 #define __OS7_OS7_NAMESPACE_H__
 
-#ident "@(#) $RCSfile: os7_namespace.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: os7_namespace.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #undef NET_SCTP_ADAPTATION_LAYER_INFO
 #undef NET_SCTP_ASSOC_MAX_RETRANS

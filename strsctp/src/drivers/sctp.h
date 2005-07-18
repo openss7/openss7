@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.4 2005/07/15 23:09:55 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.5 2005/07/18 12:53:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:55 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_H__
 #define __SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/15 23:09:55 $"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/18 12:53:04 $"
 
 /*
  *  =========================================================================
@@ -209,6 +209,7 @@ struct sctp_daddr {
 
 	size_t packets;			/* packet count */
 };
+
 /*
  *  Some destination flags.
  */
@@ -354,6 +355,7 @@ struct sctp {
 	toid_t timer_shutdown;		/* shutdown timer */
 	toid_t timer_sack;		/* sack timer */
 };
+
 /*
  *  Some flags.
  */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -134,6 +134,7 @@ MODULE_ALIAS("streams-sth");
 #endif
 
 modID_t modid = CONFIG_STREAMS_STH_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -195,7 +196,8 @@ struct streamtab str_info = {
  *  @file: user file pointer
  *  @sd: stream head pointer
  */
-static int check_stream_io(struct file *file, struct stdata *sd)
+static int
+check_stream_io(struct file *file, struct stdata *sd)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -215,7 +217,8 @@ static int check_stream_io(struct file *file, struct stdata *sd)
  *  @file: user file pointer
  *  @sd: stream head pointer
  */
-static int check_stream_rd(struct file *file, struct stdata *sd)
+static int
+check_stream_rd(struct file *file, struct stdata *sd)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -250,7 +253,8 @@ static int check_stream_rd(struct file *file, struct stdata *sd)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int check_stream_wr(struct file *file, struct stdata *sd)
+static int
+check_stream_wr(struct file *file, struct stdata *sd)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -295,7 +299,8 @@ static int check_stream_wr(struct file *file, struct stdata *sd)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int check_stream_oc(struct file *file, struct stdata *sd)
+static int
+check_stream_oc(struct file *file, struct stdata *sd)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -331,7 +336,8 @@ static int check_stream_oc(struct file *file, struct stdata *sd)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
+static int
+check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -361,7 +367,8 @@ static int check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
+static int
+check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -398,7 +405,8 @@ static int check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
+static int
+check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -443,7 +451,8 @@ static int check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
+static int
+check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
 {
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
@@ -485,9 +494,11 @@ static int check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
  *  @band: band number
  *  @timeo: pointer to time remaining
  */
-static int strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
+static int
+strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
 {
 	int err = 0;
+
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
 	if (!bcanputnext(sd->sd_wq, band)) {
@@ -515,7 +526,8 @@ static int strwaitband(struct file *file, struct stdata *sd, int band, long *tim
  *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
  *  @band: band from which to retrieve message
  */
-static mblk_t *strgetq(struct stdata *sd, int flags, int band)
+static mblk_t *
+strgetq(struct stdata *sd, int flags, int band)
 {
 	ensure(sd, return (NULL));
 	if (flags == MSG_HIPRI) {
@@ -527,6 +539,7 @@ static mblk_t *strgetq(struct stdata *sd, int flags, int band)
 	} else {
 		mblk_t *mp;
 		queue_t *q = sd->sd_rq;
+
 	      get_another:
 		if (test_bit(STRPRI_BIT, &sd->sd_flag))
 			return (ERR_PTR(-EBADMSG));
@@ -566,9 +579,11 @@ static mblk_t *strgetq(struct stdata *sd, int flags, int band)
  *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
  *  @band: priority band from which to get message
  */
-static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
+static mblk_t *
+strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
 {
 	mblk_t *mp;
+
 	ensure(file, return (NULL));
 	ensure(sd, return (NULL));
 	/* maybe we'll get lucky... */
@@ -579,6 +594,7 @@ static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int 
 	{
 		DECLARE_WAITQUEUE(wait, current);
 		long timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
+
 		add_wait_queue(&sd->sd_waitq, &wait);
 		for (;;) {
 			set_current_state(TASK_INTERRUPTIBLE);
@@ -600,7 +616,8 @@ static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int 
  *  @file: user file pointer
  *  @sd: stream head
  */
-static void strwakeopen(struct file *file, struct stdata *sd)
+static void
+strwakeopen(struct file *file, struct stdata *sd)
 {
 	ensure(file, return);
 	ensure(sd, return);
@@ -616,10 +633,12 @@ static void strwakeopen(struct file *file, struct stdata *sd)
  *  @file: user file pointer
  *  @sd: stream head
  */
-static int strwaitopen(struct file *file, struct stdata *sd)
+static int
+strwaitopen(struct file *file, struct stdata *sd)
 {
 	int err = 0;
 	int locked, frozen;
+
 	ensure(file, return (-EBADF));
 	ensure(sd, return (-ENOSTR));
 	if ((err = check_stream_oc(file, sd)) == 0
@@ -627,6 +646,7 @@ static int strwaitopen(struct file *file, struct stdata *sd)
 		|| (frozen = test_bit(STFROZEN_BIT, &sd->sd_flag)))) {
 		DECLARE_WAITQUEUE(wait, current);
 		long timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
+
 		add_wait_queue(&sd->sd_waitq, &wait);
 		if (locked) {
 			/* Wait for the STWOPEN bit.  Only one open can be performed on a stream at 
@@ -672,14 +692,16 @@ static int strwaitopen(struct file *file, struct stdata *sd)
  *  waiting for a response, processing the response and resulting in a return value.  Any number of
  *  %COPYIN and %COPYOUT operations can be included in the process.
  */
-static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, size_t dlen,
-			long *timeo, int *rval)
+static int
+strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, size_t dlen,
+	     long *timeo, int *rval)
 {
 	struct stdata *sd = stri_lookup(file);
 	union ioctypes *ioc;
 	mblk_t *mp;
 	int err;
 	ulong type;
+
 	err = -ENOSR;
 	if (!(mp = allocb(sizeof(*ioc), BPRI_MED)))
 		goto freedp_and_out;
@@ -735,6 +757,7 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 		/* now we have a response message block */
 		switch ((type = mp->b_datap->db_type)) {
 			union ioctypes *ioc;
+
 		case M_IOCACK:
 		case M_IOCNAK:
 			ioc = (typeof(ioc)) mp->b_rptr;
@@ -748,6 +771,7 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 		{
 			char *ptr;
 			size_t len;
+
 			ioc = (typeof(ioc)) mp->b_rptr;
 			ptr = ioc->copyreq.cq_addr;
 			len = ioc->copyreq.cq_size;
@@ -822,11 +846,13 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
  *  @cmd: ioctl command, always %I_ATMARK
  *  @arg: ioctl argument
  */
-static int str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	unsigned long flags;
 	int err = 0;
 	queue_t *q = sd->sd_rq;
+
 	trace();
 	qrlock(q, &flags);
 	switch (arg) {
@@ -856,9 +882,11 @@ static int str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_CANPUT
  *  @arg: ioctl argument
  */
-static int str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err = -EINVAL;
+
 	trace();
 	if (arg < 256 || arg == ANYBAND)
 		if (!(err = check_stream_wr(file, sd)))
@@ -873,9 +901,11 @@ static int str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_CKBAND
  *  @arg: ioctl argument
  */
-static int str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err = -EINVAL;
+
 	trace();
 	if (arg < 256 || arg == ANYBAND)
 		if (!(err = check_stream_io(file, sd)))
@@ -890,13 +920,15 @@ static int str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_FDINSERT
  *  @arg: ioctl argument
  */
-static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err = 0;
 	mblk_t *mp;
 	struct strfdinsert fdi, *valp = (typeof(valp)) arg;
 	struct stdata *sd2;
 	struct file *f2;
+
 	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))) < 0)
 		goto exit;
@@ -919,8 +951,10 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
 		goto erange;
 	{
 		long timeo;
+
 		if (fdi.databuf.len >= 0) {
 			queue_t *wq;
+
 			if (fdi.databuf.len > sysctl_str_strmsgsz)
 				goto erange;
 			wq = sd->sd_wq->q_next;
@@ -939,6 +973,7 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
 		mp->b_datap->db_type = (fdi.flags == RS_HIPRI) ? M_PCPROTO : M_PROTO;
 		if (fdi.databuf.len >= 0) {
 			mblk_t *dp;
+
 			if (!(dp = allocb(fdi.databuf.len, BPRI_MED)))
 				goto free_enosr;
 			dp->b_datap->db_type = M_DATA;
@@ -978,11 +1013,13 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
  *  @cmd: ioctl command, always %I_FIND
  *  @arg: ioctl argument
  */
-static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	const char *name = (typeof(name)) arg;
 	queue_t *wq;
 	int err;
+
 	trace();
 	err = -EFAULT;
 	if (strnlen_user(name, FMNAMESZ + 1)) {
@@ -990,6 +1027,7 @@ static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, un
 		srlock(sd);
 		for (wq = sd->sd_wq; wq; wq = SAMESTR(wq) ? wq->q_next : NULL) {
 			const char *idname = wq->q_qinfo->qi_minfo->mi_idname;
+
 			if (!strncmp(idname, name, FMNAMESZ))
 				err = 1;
 		}
@@ -1005,12 +1043,13 @@ static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command, always %I_FLUSHBAND
  *  @arg: ioctl argument
  */
-static int str_i_flushband(struct file *file, struct stdata *sd, unsigned int cmd,
-			   unsigned long arg)
+static int
+str_i_flushband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	mblk_t *mp;
 	struct bandinfo bi, *valp = (struct bandinfo *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		return (err);
@@ -1037,10 +1076,12 @@ static int str_i_flushband(struct file *file, struct stdata *sd, unsigned int cm
  *  @cmd: ioctl command, always %I_FLUSH
  *  @arg: ioctl argument
  */
-static int str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	mblk_t *mp;
+
 	trace();
 	if (arg & ~(FLUSHR | FLUSHW | FLUSHRW))
 		return (-EINVAL);
@@ -1062,11 +1103,13 @@ static int str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, u
  *  @cmd: ioctl command, always %I_GETBAND
  *  @arg: ioctl argument
  */
-static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	unsigned long flags;
 	int err;
 	int *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
@@ -1095,11 +1138,12 @@ static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @cmd: ioctl command, always %I_GETCLTIME
  *  @arg: ioctl argument
  */
-static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cmd,
-			   unsigned long arg)
+static int
+str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	int closetime, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
@@ -1119,11 +1163,12 @@ static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cm
  *  @cmd: ioctl command, always %I_SETCLTIME
  *  @arg: ioctl argument
  */
-static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cmd,
-			   unsigned long arg)
+static int
+str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	int closetime, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		return (err);
@@ -1144,9 +1189,11 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
  *  @cmd: ioctl command, always %I_GETSIG
  *  @arg: ioctl argument
  */
-static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, flags, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
@@ -1166,9 +1213,11 @@ static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_SETSIG
  *  @arg: ioctl argument
  */
-static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+
 	trace();
 	err = -EINVAL;
 	if (arg & ~(S_ALL))
@@ -1193,9 +1242,11 @@ static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_GRDOPT
  *  @arg: ioctl argument
  */
-static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, rdopt, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
@@ -1215,9 +1266,11 @@ static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_SRDOPT
  *  @arg: ioctl argument
  */
-static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, mode, prot;
+
 	trace();
 	mode = arg & (RMODEMASK);
 	prot = arg & (RPROTMASK);
@@ -1238,9 +1291,11 @@ static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_GWROPT
  *  @arg: ioctl argument
  */
-static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, wropt, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
@@ -1260,9 +1315,11 @@ static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_SWROPT
  *  @arg: ioctl argument
  */
-static int str_i_swropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_swropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+
 	trace();
 	if ((arg & ~(SNDZERO | SNDPIPE | SNDHOLD)))
 		return (-EINVAL);
@@ -1285,12 +1342,14 @@ static int str_i_swropt(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @qbot: lower multiplexing driver write queue pointer
  *  @index: multiplex index
  */
-static int str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t *qtop,
-			       queue_t *qbot, int index)
+static int
+str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t *qtop,
+		    queue_t *qbot, int index)
 {
 	int err, rval;
 	struct linkblk *lbp;
 	mblk_t *mp;
+
 	trace();
 	err = -ENOSR;
 	if (!(mp = allocb(sizeof(*lbp), BPRI_MED)))
@@ -1302,6 +1361,7 @@ static int str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t 
 	lbp->l_index = index;
 	{
 		long timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
+
 		err = strsendioctl(file, cmd, crp, mp, sizeof(*lbp), &timeo, &rval);
 	}
 	if (err < 0)
@@ -1318,7 +1378,8 @@ static int str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t 
  *  @cmd: ioctl command, always %I_LINK or %I_PLINK
  *  @arg: ioctl argument
  */
-static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	struct file *f2;
@@ -1326,6 +1387,7 @@ static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, u
 	struct linkblk *l;
 	queue_t *qtop, *qbot;
 	int index;
+
 	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
@@ -1383,7 +1445,8 @@ static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, u
  *  @cmd: ioctl command, always %I_LINK
  *  @arg: ioctl argument
  */
-static int str_i_link(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_link(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	return str_i_xlink(file, sd, cmd, arg);
 }
@@ -1395,7 +1458,8 @@ static int str_i_link(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command, always %I_PLINK
  *  @arg: ioctl argument
  */
-static int str_i_plink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_plink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	trace();
 	return str_i_xlink(file, sd, cmd, arg);
@@ -1408,11 +1472,13 @@ static int str_i_plink(struct file *file, struct stdata *sd, unsigned int cmd, u
  *  @cmd: ioctl command, always %I_UNLINK or %I_PUNLINK
  *  @arg: ioctl argument
  */
-static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	struct stdata **sdp;
 	int err;
 	long index = arg;
+
 	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
@@ -1420,6 +1486,7 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
 	if (index != MUXID_ALL) {
 		queue_t *qtop, *qbot;
 		struct stdata *sd2;
+
 		for (; *sdp && (*sdp)->sd_linkblk->l_index != index; sdp = &(*sdp)->sd_link_next) ;
 		err = -EINVAL;
 		if ((sd2 = *sdp)) {
@@ -1439,6 +1506,7 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
 	} else {
 		queue_t *qtop, *qbot;
 		struct stdata *sd2;
+
 		for (qtop = sd->sd_wq; qtop && SAMESTR(qtop); qtop = qtop->q_next) ;
 		while ((sd2 = *sdp)) {
 			index = sd2->sd_linkblk->l_index;
@@ -1466,7 +1534,8 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @cmd: ioctl command, always %I_UNLINK
  *  @arg: ioctl argument
  */
-static int str_i_unlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_unlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	trace();
 	return str_i_xunlink(file, sd, cmd, arg);
@@ -1479,7 +1548,8 @@ static int str_i_unlink(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_PUNLINK
  *  @arg: ioctl argument
  */
-static int str_i_punlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_punlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	return str_i_xunlink(file, sd, cmd, arg);
 }
@@ -1491,13 +1561,15 @@ static int str_i_punlink(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @cmd: ioctl command, always %I_LIST
  *  @arg: ioctl argument
  */
-static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, nmods, i;
 	struct str_list sl, *valp = (struct str_list *) arg;
 	struct str_mlist *sm;
 	struct queue **qp;
 	char fmname[FMNAMESZ + 1];
+
 	trace();
 	nmods = sd->sd_pushcnt + 1;
 	if (valp == NULL)
@@ -1528,11 +1600,13 @@ static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command, always %I_LOOK
  *  @arg: ioctl argument
  */
-static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err = 0;
 	queue_t *q;
 	char fmname[FMNAMESZ + 1], *valp = (char *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, FMNAMESZ + 1)))
 		goto exit;
@@ -1562,10 +1636,12 @@ static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command, always %I_NREAD
  *  @arg: ioctl argument
  */
-static int str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	unsigned long flags;
 	int err, bytes, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		goto exit;
@@ -1590,12 +1666,14 @@ static int str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, u
  *  @cmd: ioctl command, always %I_PEEK
  *  @arg: ioctl argument
  */
-static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	unsigned long flags;
 	int err, rtn = 0;
 	struct strpeek sp, *valp = (struct strpeek *) arg;
 	queue_t *q = sd->sd_rq;
+
 	trace();
 	if (!valp)
 		return (-EINVAL);
@@ -1622,6 +1700,7 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 		ssize_t clen = sp.ctlbuf.maxlen;
 		ssize_t dlen = sp.databuf.maxlen;
 		ssize_t davail, cavail;
+
 		if (!(mp = q->q_first)) {
 			err = 0;
 			rtn = 0;
@@ -1640,14 +1719,15 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 				if (dlen == -1)
 					break;
 				if (blen > dlen) {
-					if (__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr,
-						       dlen))
+					if (__copy_to_user
+					    (sp.databuf.buf + sp.databuf.len, dp->b_rptr, dlen))
 						return (-EFAULT);
 					sp.databuf.len += dlen;
 					dlen = 0;
 					break;
 				}
-				if (__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr, blen))
+				if (__copy_to_user
+				    (sp.databuf.buf + sp.databuf.len, dp->b_rptr, blen))
 					return (-EFAULT);
 				sp.databuf.len += blen;
 				dlen -= blen;
@@ -1656,8 +1736,8 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 				if (clen == -1)
 					break;
 				if (blen > clen) {
-					if (__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr,
-						       clen))
+					if (__copy_to_user
+					    (sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr, clen))
 						return (-EFAULT);
 					sp.ctlbuf.len += clen;
 					clen = 0;
@@ -1684,11 +1764,13 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command, always %I_PUSH
  *  @arg: ioctl argument
  */
-static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	char name[FMNAMESZ + 1];
 	dev_t dev = sd->sd_dev;
+
 	trace();
 	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0)
 		goto error;
@@ -1707,9 +1789,11 @@ static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command, always %I_POP
  *  @arg: ioctl argument
  */
-static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+
 	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
@@ -1723,9 +1807,11 @@ static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, uns
  *  freefd_func: - free function for file descriptor
  *  @arg: file pointer as caddr_t argument
  */
-static void freefd_func(caddr_t arg)
+static void
+freefd_func(caddr_t arg)
 {
 	struct file *file = (struct file *) arg;
+
 	trace();
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
@@ -1740,12 +1826,14 @@ static void freefd_func(caddr_t arg)
  *  @cmd: ioctl command, always %I_SENDFD
  *  @arg: ioctl argument
  */
-static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	struct file *f2;
 	mblk_t *mp;
 	queue_t *rq;
+
 	trace();
 	if (!(f2 = fget(arg)))
 		goto ebadf;
@@ -1757,6 +1845,7 @@ static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, 
 		goto eagain;
 	else {
 		frtn_t freefd = { freefd_func, (caddr_t) f2 };
+
 		if (!(mp = esballoc((void *) f2, sizeof(*f2), BPRI_MED, &freefd)))
 			goto enosr;
 	}
@@ -1785,12 +1874,14 @@ static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_RECVFD
  *  @arg: ioctl argument, a pointer to a &struct strrecvfd structure
  */
-static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	struct strrecvfd sr, *valp = (struct strrecvfd *) arg;
 	mblk_t *mp;
 	int fd, err;
 	struct file *f2;
+
 	trace();
 	if (!valp)
 		goto einval;
@@ -1849,11 +1940,13 @@ static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command, always %I_STR
  *  @arg: ioctl argument, pointer to a &struct strioctl structure
  */
-static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, rval = 0;
 	mblk_t *mp;
 	struct strioctl ic, *valp = (typeof(valp)) arg;
+
 	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
@@ -1871,6 +1964,7 @@ static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, uns
 	mp->b_wptr += ic.ic_len;
 	{
 		long timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
+
 		timeo = ic.ic_timout == -1 ? timeo : drv_msectohz(ic.ic_timout);
 		err = strsendioctl(file, I_STR, current_creds, mp, ic.ic_len, &timeo, &rval);
 	}
@@ -1888,9 +1982,11 @@ static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, uns
  *  @cmd: ioctl command, always %I_GERROPT
  *  @arg: ioctl argument, pointer to an integer to contain the returned error options
  */
-static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, eropt, *valp = (int *) arg;
+
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
@@ -1910,9 +2006,11 @@ static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @cmd: ioctl command, always %I_SERROPT
  *  @arg: ioctl argument, integer error options to set
  */
-static int str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+
 	trace();
 	if ((arg & ~(RERRNONPERSIST | WERRNONPERSIST)))
 		return (-EINVAL);
@@ -1929,9 +2027,11 @@ static int str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @cmd: ioctl command, always %I_ANCHOR
  *  @arg: ioctl argument, integer index at which point to position anchor
  */
-static int str_i_anchor(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_anchor(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+
 	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		return (err);
@@ -1946,11 +2046,12 @@ static int str_i_anchor(struct file *file, struct stdata *sd, unsigned int cmd, 
  *  @cmd: ioctl command
  *  @arg: ioctl argument
  */
-static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int cmd,
-			     unsigned long arg)
+static int
+str_i_transparent(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, rval;
 	mblk_t *mp;
+
 	trace();
 	err = -ENOSR;
 	if (!(mp = allocb(sizeof(arg), BPRI_MED)))
@@ -1959,6 +2060,7 @@ static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int 
 	mp->b_wptr += sizeof(unsigned long);
 	{
 		long timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
+
 		err = strsendioctl(file, cmd, current_creds, mp, TRANSPARENT, &timeo, &rval);
 	}
 	if (err < 0)
@@ -1982,7 +2084,8 @@ static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int 
  *  @off: offset to which to seek
  *  @when: from whence to seek
  */
-loff_t strllseek(struct file *file, loff_t off, int whence)
+loff_t
+strllseek(struct file *file, loff_t off, int whence)
 {
 	return (-ESPIPE);
 }
@@ -1992,10 +2095,12 @@ loff_t strllseek(struct file *file, loff_t off, int whence)
  *  @file: user file pointer for the open stream
  *  @poll: poll table pointer
  */
-unsigned int strpoll(struct file *file, struct poll_table_struct *poll)
+unsigned int
+strpoll(struct file *file, struct poll_table_struct *poll)
 {
 	struct stdata *sd;
 	unsigned int mask;
+
 	sd = stri_lookup(file);
 	mask = 0;
 	poll_wait(file, &sd->sd_waitq, poll);
@@ -2025,7 +2130,8 @@ unsigned int strpoll(struct file *file, struct poll_table_struct *poll)
  *  @file: user file pointer for the open stream
  *  @vma: pointer to a virtual memory area structure
  */
-int strmmap(struct file *file, struct vm_area_struct *vma)
+int
+strmmap(struct file *file, struct vm_area_struct *vma)
 {
 	return (-ENODEV);
 }
@@ -2046,11 +2152,13 @@ int strmmap(struct file *file, struct vm_area_struct *vma)
  *  inodes do not.  Only fifo and socket (UNIX domain) inodes (regardless of S_IFMT) pass external
  *  inodes to this function.
  */
-int stropen(struct inode *inode, struct file *file)
+int
+stropen(struct inode *inode, struct file *file)
 {
 	int err, sflag;
 	struct stdata *sd;
 	dev_t dev;
+
 	ptrace(("%s: opening stream\n", __FUNCTION__));
 	dev = file->private_data ? *((dev_t *) file->private_data) : inode->i_ino;
 	sflag = ((file->f_flags & O_CLONE) == O_CLONE) ? CLONEOPEN : DRVOPEN;
@@ -2058,6 +2166,7 @@ int stropen(struct inode *inode, struct file *file)
 	if (sflag == CLONEOPEN || !(sd = sd_get((struct stdata *) inode->i_pipe))) {
 		queue_t *q;
 		struct cdevsw *cdev;
+
 		printd(("%s: need new stream head\n", __FUNCTION__));
 		if (!(cdev = cdrv_get(getmajor(dev))))
 			return (-ENXIO);
@@ -2134,6 +2243,7 @@ int stropen(struct inode *inode, struct file *file)
 	sd->sd_writers += (file->f_mode & FWRITE) ? 1 : 0;
 	if (!sd->sd_inode && dev != sd->sd_dev) {
 		struct dentry *dentry;
+
 		/* we need a new dentry and inode in the device shadow directory */
 		printd(("%s: changing inode\n", __FUNCTION__));
 		dentry = spec_dentry(sd->sd_dev, NULL);
@@ -2191,7 +2301,8 @@ int stropen(struct inode *inode, struct file *file)
  *  error code now.  Returning an error here does not stop the strclose function from being called
  *  afterward.
  */
-int strflush(struct file *file)
+int
+strflush(struct file *file)
 {
 	ptrace(("%s: stream close\n", __FUNCTION__));
 	return (0);
@@ -2213,12 +2324,15 @@ int strflush(struct file *file)
  *  Return Value: The return value from this function is ignored.  It is the return value from the
  *  flush() above that is used in return to the close(2) call.
  */
-int strclose(struct inode *inode, struct file *file)
+int
+strclose(struct inode *inode, struct file *file)
 {
 	struct stdata *sd;
+
 	ptrace(("%s: closing stream\n", __FUNCTION__));
 	if ((sd = sd_get(stri_lookup(file)))) {
 		int err = 0;
+
 		printd(("%s: exiting stream head\n", __FUNCTION__));
 		stri_lookup(file) = NULL;
 		sd->sd_readers -= (file->f_mode & FREAD) ? 1 : 0;
@@ -2227,6 +2341,7 @@ int strclose(struct inode *inode, struct file *file)
 			queue_t *wq, *qq;
 			int oflag = make_oflag(file);
 			cred_t *crp = current_creds;
+
 			printd(("%s: last close\n", __FUNCTION__));
 			/* last close */
 			if (test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag)) {
@@ -2247,8 +2362,10 @@ int strclose(struct inode *inode, struct file *file)
 				if (!(oflag & (O_NONBLOCK | O_NDELAY)) && qq->q_msgs
 				    && !signal_pending(current)) {
 					struct queinfo *qu = (typeof(qu)) (qq - 1);
+
 					DECLARE_WAITQUEUE(wait, current);
 					long timeo = sd->sd_closetime;
+
 					add_wait_queue(&qu->qu_qwait, &wait);
 					for (;;) {
 						set_current_state(TASK_INTERRUPTIBLE);
@@ -2273,6 +2390,7 @@ int strclose(struct inode *inode, struct file *file)
 			assert(inode == sd->sd_inode);
 			{
 				struct stdata **sdp;
+
 				for (sdp = (struct stdata **) &(inode->i_pipe); *sdp && *sdp != sd;
 				     sdp = &((*sdp)->sd_clone)) ;
 				if (*sdp && *sdp == sd) {
@@ -2310,10 +2428,12 @@ int strclose(struct inode *inode, struct file *file)
  *  @file: user file pointer
  *  @on: aysnc io flag
  */
-int strfasync(int fd, struct file *file, int on)
+int
+strfasync(int fd, struct file *file, int on)
 {
 	int err;
 	struct stdata *sd;
+
 	sd = stri_lookup(file);
 	if ((err = fasync_helper(fd, file, on, &sd->sd_siglist)) < 0)
 		goto error;
@@ -2332,7 +2452,8 @@ int strfasync(int fd, struct file *file, int on)
  *  This performs the readv file operation for a stream directly and provides whatever optimization
  *  can be acheived by mapping mblks into separate io vector components.
  */
-ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos)
+ssize_t
+strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q = sd->sd_rq;
@@ -2340,6 +2461,7 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
 	size_t total = 0;
 	mblk_t *mp;
 	int err;
+
 	if (ppos != &file->f_pos)
 		return (-ESPIPE);
 	if (len == 0)
@@ -2388,6 +2510,7 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
 			   delivering any data part.  The control part of the message is discarded
 			   and the data part is processed. */
 			mblk_t *dp, **mpp, **mpp_next = &mp;
+
 			while ((dp = *(mpp = mpp_next))) {
 				if (dp->b_datap->db_type != M_DATA) {
 					*mpp = dp->b_cont;
@@ -2402,6 +2525,7 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
 		}
 		{
 			size_t count = msgsize(mp);
+
 			/* All read modes terminate on a zero length message. */
 			if (!count) {
 				freemsg(mp);
@@ -2467,6 +2591,7 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
 }
 
 int strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
+
 /**
  *  strread: - read file operations for a stream
  *  @file: file pointer for the stream
@@ -2474,10 +2599,12 @@ int strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
  *  @len: length of the user buffer
  *  @ppos: seek position
  */
-ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
+ssize_t
+strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
 	struct stdata *sd = stri_lookup(file);
+
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* read emulation of the putpmsg system call: the problem with this approach is that it
 	   almost completely destroys the ability to have a 64-bit application running against a
@@ -2485,6 +2612,7 @@ ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		int err;
 		struct strpmsg sg, *valp = (struct strpmsg *) buf;
+
 		if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 			goto error;
 		if (__copy_from_user(&sg, valp, sizeof(sg)))
@@ -2515,7 +2643,8 @@ ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
  *  @count: size of io vector
  *  @ppos: seek position
  */
-ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos)
+ssize_t
+strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos)
 {
 	int i;
 	mblk_t *mp = NULL, *dp;
@@ -2524,6 +2653,7 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
 	long timeo;
 	queue_t *wq;
 	int err;
+
 	if ((err = check_stream_wr(file, sd)))
 		goto error;
 	/* If the driver has established direct IO then we call the driver's writev procedure */
@@ -2540,8 +2670,10 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
 		goto error;
 	if (total > 0) {
 		size_t wroff;
+
 		for (i = 0, wroff = sd->sd_wroff; i < count; i++, wroff = 0) {
 			size_t len;
+
 			if ((len = iov[i].iov_len)) {
 				if (!(dp = allocb(wroff + len, BPRI_MED)))
 					goto abort;
@@ -2554,6 +2686,7 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
 		}
 	} else {
 		size_t wroff = sd->sd_wroff;
+
 		if (!(sd->sd_wropt & SNDZERO))
 			goto einval;
 		if (!(dp = allocb(wroff + 0, BPRI_MED)))
@@ -2581,6 +2714,7 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
 }
 
 int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
+
 /**
  *  strwrite: - write file operation for a stream
  *  @file: file pointer for the stream
@@ -2588,10 +2722,12 @@ int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
  *  @len: length of user data
  *  @ppos: seek position
  */
-ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
+ssize_t
+strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
 	struct stdata *sd = stri_lookup(file);
+
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* write emulation of the putpmsg system call: the problem with this approach is that it
 	   almost completely destroys the ability to have a 64-bit application running against a
@@ -2599,6 +2735,7 @@ ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		int err;
 		struct strpmsg sp, *valp = (struct strpmsg *) buf;
+
 		if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 			goto error;
 		if (__copy_from_user(&sp, valp, sizeof(sp)))
@@ -2626,9 +2763,11 @@ ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
  *  __strfreepage: - free routine function to free a esballoc'ed page
  *  @data: &struct page pointer passed as a caddr_t argument
  */
-static void __strfreepage(caddr_t data)
+static void
+__strfreepage(caddr_t data)
 {
 	struct page *page = (struct page *) data;
+
 	(void) page;		/* shut up compiler */
 	kunmap(page);
 }
@@ -2644,12 +2783,14 @@ static void __strfreepage(caddr_t data)
  *  @frtn: free routine to free the allocated page
  *  @timeo: the amount of time remaining to wait
  */
-static mblk_t *strwaitpage(struct file *file, size_t size, int prio, int band, int type,
-			   caddr_t base, struct free_rtn *frtn, long *timeo)
+static mblk_t *
+strwaitpage(struct file *file, size_t size, int prio, int band, int type,
+	    caddr_t base, struct free_rtn *frtn, long *timeo)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *wq = sd->sd_wq->q_next;
 	mblk_t *mp;
+
 	if (unlikely(size > sysctl_str_strmsgsz))
 		return ERR_PTR(-ERANGE);
 	if (type == M_DATA && (wq->q_minpsz > size || size > wq->q_maxpsz))
@@ -2689,12 +2830,13 @@ static mblk_t *strwaitpage(struct file *file, size_t size, int prio, int band, i
  *  @ppos: seek position
  *  @more: more pages to send
  */
-ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos,
-		    int more)
+ssize_t
+strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more)
 {
 	mblk_t *mp;
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q;
+
 	if (sd->sd_directio && sd->sd_directio->sendpage)
 		return sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
 	if (!(q = sd->sd_wq->q_next))
@@ -2705,6 +2847,7 @@ ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t siz
 		char *base = kmap(page) + offset;
 		struct free_rtn frtn = { __strfreepage, (caddr_t) page };
 		long timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
+
 		mp = strwaitpage(file, size, BPRI_MED, 0, M_DATA, base, &frtn, &timeo);
 		if (IS_ERR(mp)) {
 			kunmap(page);
@@ -2733,12 +2876,14 @@ ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t siz
  *
  *  Notices: GLIBC2 puts -1 in band when it is called as putmsg().
  */
-int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags)
+int
+strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags)
 {
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp = NULL, *dp;
 	ssize_t clen, dlen;
 	int err;
+
 	if (sd->sd_directio && sd->sd_directio->putpmsg)
 		return sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
 	if ((err = check_stream_wr(file, sd)))
@@ -2768,6 +2913,7 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	}
 	if (dlen >= 0) {
 		queue_t *wq = sd->sd_wq->q_next;
+
 		if (dlen > sysctl_str_strmsgsz)
 			goto erange;
 		if (wq->q_minpsz > dlen || dlen > wq->q_maxpsz)
@@ -2775,6 +2921,7 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	}
 	if ((band != -1 && flags == MSG_BAND) || (band == -1 && flags == 0)) {
 		long timeo;
+
 		timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
 		if ((err = strwaitband(file, sd, band == -1 ? 0 : band, &timeo)))
 			goto exit;
@@ -2789,6 +2936,7 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	}
 	if (dlen >= 0) {	/* zero-length data parts are allowed */
 		size_t wroff = sd->sd_wroff;
+
 		if (!(dp = allocb(wroff + dlen, BPRI_HI)))
 			goto enosr;
 		mp->b_datap->db_type = M_DATA;
@@ -2832,10 +2980,12 @@ EXPORT_SYMBOL(strputpmsg);
  *
  *  GLIBC2 puts NULL in bandp for getmsg().
  */
-int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp)
+int
+strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp)
 {
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp = NULL, *dp;
+
 	if (sd->sd_directio && sd->sd_directio->getpmsg)
 		return sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
 	if (!flagsp)
@@ -2877,6 +3027,7 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 		ssize_t dlen = datp ? datp->maxlen : -1;
 		ssize_t davail = msgdsize(dp);	/* M_DATA blocks */
 		ssize_t cavail = msgsize(dp) - davail;	/* isdatablks */
+
 		if (cavail && cavail > clen)
 			rval |= MORECTL;
 		if (davail && davail > dlen)
@@ -2972,10 +3123,12 @@ EXPORT_SYMBOL(strgetpmsg);
  *  @cmd: ioctl command, always %I_PUTPMSG
  *  @arg: ioctl argument, a pointer to the &struct strpmsg structure
  */
-static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	struct strpmsg sp, *valp = (struct strpmsg *) arg;
+
 	/* verify all areas */
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		goto error;
@@ -2998,10 +3151,12 @@ static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @cmd: ioctl command, always %I_GETPMSG
  *  @arg: ioctl argument, a pointer to the &struct strpmsg structure
  */
-static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	struct strpmsg sg, *valp = (struct strpmsg *) arg;
+
 	/* verify all areas */
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		goto error;
@@ -3023,7 +3178,8 @@ static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
  *  @file: file pointer for stream
  *  @path: path to which to fattach the stream
  */
-static int strfattach(struct file *file, const char *path)
+static int
+strfattach(struct file *file, const char *path)
 {
 #if HAVE_KERNEL_FATTACH_SUPPORT
 	return do_fattach(file, path);	/* see strattach.c */
@@ -3039,10 +3195,12 @@ static int strfattach(struct file *file, const char *path)
  *  @cmd: ioctl command, always %I_FATTACH
  *  @arg: a pointer to a character string describing the path
  */
-static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	char path[256];
+
 	if ((err = strncpy_from_user(path, (const char *) arg, 256)) < 0)
 		goto error;
 	if ((err = check_stream_io(file, sd)) < 0)
@@ -3056,7 +3214,8 @@ static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd,
  *  strfdetach: - fdetach system call
  *  @path: path from which to fdetach the stream
  */
-static int strfdetach(const char *path)
+static int
+strfdetach(const char *path)
 {
 #if HAVE_KERNEL_FATTACH_SUPPORT
 	return do_fdetach(path);	/* see strattach.c */
@@ -3072,10 +3231,12 @@ static int strfdetach(const char *path)
  *  @cmd: ioctl command, always %I_FDETACH
  *  @arg: a pointer to a character string describing the path
  */
-static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
 	char path[256];
+
 	if ((err = strncpy_from_user(path, (const char *) arg, 256)) < 0)
 		goto error;
 	return strfdetach(path);
@@ -3087,7 +3248,8 @@ static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd,
  *  strpipe: - pipe system call
  *  @fds: array to which to return two file descriptors
  */
-static int strpipe(int fds[2])
+static int
+strpipe(int fds[2])
 {
 #if HAVE_KERNEL_PIPE_SUPPORT
 	return do_spipe(fds);	/* see strpipe.c */
@@ -3103,9 +3265,11 @@ static int strpipe(int fds[2])
  *  @cmd: ioctl command, always %I_PIPE
  *  @arg: pointer to array into which to receive two file descriptors
  */
-static int str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+static int
+str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, *fds = (int *) arg;
+
 	if ((err = verify_area(VERIFY_WRITE, fds, 2 * sizeof(*fds))))
 		goto error;
 	return strpipe(fds);
@@ -3120,10 +3284,12 @@ static int str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, un
  *  @cmd: ioctl command
  *  @arg: ioctl arg
  */
-int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
+int
+strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+
 	(void) size;
 	trace();
 	switch (cmd) {
@@ -3270,9 +3436,11 @@ EXPORT_SYMBOL(strm_f_ops);
  *  wake up any synchronous or asynchronous waiters waiting for flow control to subside.  This
  *  permit back-enabling from the module beneath the stream head to work properly.
  */
-int strwsrv(queue_t *q)
+int
+strwsrv(queue_t *q)
 {
 	struct stdata *sd = q->q_ptr;
+
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_interruptible(&sd->sd_waitq);
 	return (0);
@@ -3294,9 +3462,11 @@ EXPORT_SYMBOL(strwsrv);
  *  @q: pointer to the queue to which to put the message
  *  @mp: the message to put on the queue
  */
-int strrput(queue_t *q, mblk_t *mp)
+int
+strrput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd = q->q_ptr;
+
 	switch ((msg_type_t) mp->b_datap->db_type) {
 	case M_PCPROTO:	/* bi - protocol info */
 	{
@@ -3351,6 +3521,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	case M_PCSETOPTS:	/* up - set stream head options */
 	{
 		struct stroptions *so = (typeof(so)) mp->b_rptr;
+
 		if (so->so_flags ^ (SO_MREADON | SO_MREADOFF)) {
 			if (so->so_flags & SO_MREADON)
 				set_bit(SNDMREAD_BIT, &sd->sd_flag);
@@ -3421,6 +3592,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	case M_ERROR:		/* up - report error */
 	{
 		int what = 0;
+
 		if (mp->b_rptr[0] != (typeof(mp->b_rptr[0])) NOERROR) {
 			sd->sd_rerror = mp->b_rptr[0];
 			if (!test_and_set_bit(STRDERR_BIT, &sd->sd_flag)) {
@@ -3484,6 +3656,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	case M_COPYOUT:	/* up - copy data to user */
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+
 		if (!sd->sd_iocblk && test_bit(IOCWAIT_BIT, &sd->sd_flag)
 		    && !(sd->sd_flag & (STRDERR | STWRERR))
 		    && ioc->copyreq.cq_id == sd->sd_iocid && waitqueue_active(&sd->sd_waitq)) {
@@ -3501,6 +3674,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	case M_IOCNAK:		/* up - refuse ioctl */
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+
 		if (!sd->sd_iocblk && test_bit(IOCWAIT_BIT, &sd->sd_flag)
 		    && !(sd->sd_flag & (STRDERR | STWRERR))
 		    && ioc->iocblk.ioc_id == sd->sd_iocid && waitqueue_active(&sd->sd_waitq)) {
@@ -3514,6 +3688,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	case M_IOCTL:		/* dn - io control */
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+
 		mp->b_datap->db_type = M_IOCNAK;
 		ioc->iocblk.ioc_error = EOPNOTSUPP;
 		ioc->iocblk.ioc_rval = -1;
@@ -3523,6 +3698,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	case M_LETSPLAY:	/* up - AIX only */
 	{
 		struct strlp *lp = (typeof(lp)) mp->b_rptr;
+
 		if (lp->lp_count == sd->sd_pushcnt) {
 			/* we don't queue data in the stream head write queue */
 			mp->b_datap->db_type = M_BACKDONE;
@@ -3577,20 +3753,24 @@ EXPORT_SYMBOL(strrput);
  *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
  *  @crp:	pointer to user's credentials structure
  */
-static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int err;
 	struct stdata *sd;
+
 	ptrace(("%s: stream head open for major %hu, minor %hu, sflag %d, crp %p\n", __FUNCTION__,
 		getmajor(*devp), getminor(*devp), sflag, crp));
 	if (q->q_ptr != NULL) {
 		/* already open: we walk down the queue chain calling open on each of the modules
 		   and the driver */
 		queue_t *wq = WR(q), *wq_next;
+
 		printd(("%s: stream head already open, opening down\n", __FUNCTION__));
 		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 		while ((wq = wq_next)) {
 			int new_sflag;
+
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			new_sflag = wq_next ? MODOPEN : sflag;
 			printd(("%s: calling qopen for module/driver\n", __FUNCTION__));
@@ -3605,6 +3785,7 @@ static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			struct cdevsw *cdev = sd->sd_cdevsw;
 			struct fmodsw *fmod = (struct fmodsw *) cdev;
 			struct streamtab *st;
+
 			printd(("%s: performing qattach\n", __FUNCTION__));
 			/* 1st step: attach the driver and call its open routine */
 			st = sd->sd_strtab = cdev->d_str;
@@ -3632,7 +3813,8 @@ static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
  *  @oflag: open flags
  *  @crp: pointer to user's credentials structure
  */
-static int str_close(queue_t *q, int oflag, cred_t *crp)
+static int
+str_close(queue_t *q, int oflag, cred_t *crp)
 {
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
@@ -3663,7 +3845,8 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
  *  This is the separation point where we convert the external device number to an internal device
  *  number.  The external device number is contained in inode->i_rdev.
  */
-STATIC int cdev_open(struct inode *inode, struct file *file)
+STATIC int
+cdev_open(struct inode *inode, struct file *file)
 {
 	int err;
 	struct cdevsw *cdev;
@@ -3673,6 +3856,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	modID_t modid;
 	dev_t dev;
 	int sflag;
+
 	ptrace(("%s: opening character device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
@@ -3756,9 +3940,11 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
  *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
  *  cb_ops.
  */
-int register_strdev(struct cdevsw *cdev, major_t major)
+int
+register_strdev(struct cdevsw *cdev, major_t major)
 {
 	int err;
+
 	if (!cdev->d_fop)
 		cdev->d_fop = &strm_f_ops;
 	if (!(cdev->d_mode & S_IFMT))
@@ -3802,7 +3988,8 @@ EXPORT_SYMBOL(register_strdev);
  *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
  *		and permission is therefore denied.
  */
-int unregister_strdev(struct cdevsw *cdev, major_t major)
+int
+unregister_strdev(struct cdevsw *cdev, major_t major)
 {
 	unregister_clone(cdev);
 	return unregister_cmajor(cdev, major);
@@ -3834,7 +4021,8 @@ static struct fmodsw sth_fmod = {
 };
 
 /* bleedin' mercy! */
-static inline void put_filesystem(struct file_system_type *fs)
+static inline void
+put_filesystem(struct file_system_type *fs)
 {
 #if HAVE_KFUNC_MODULE_PUT
 	module_put(fs->owner);
@@ -3847,9 +4035,11 @@ static inline void put_filesystem(struct file_system_type *fs)
 #ifdef CONFIG_STREAMS_STH_MODULE
 static
 #endif
-int __init sth_init(void)
+int __init
+sth_init(void)
 {
 	int result;
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 	printk(KERN_INFO STH_BANNER);
 #else
@@ -3868,7 +4058,8 @@ int __init sth_init(void)
 #ifdef CONFIG_STREAMS_STH_MODULE
 static
 #endif
-void __exit sth_exit(void)
+void __exit
+sth_exit(void)
 {
 	unregister_strmod(&sth_fmod);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 01:40:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -97,10 +97,13 @@ MODULE_ALIAS("streams-osfcompat");
 #endif
 
 __OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp);
+
 EXPORT_SYMBOL(puthere);
 __OSF_EXTERN_INLINE time_t lbolt(void);
+
 EXPORT_SYMBOL(lbolt);
 __OSF_EXTERN_INLINE time_t time(void);
+
 EXPORT_SYMBOL(time);
 
 struct str_comm {
@@ -119,11 +122,13 @@ static struct str_comm *str_list = NULL;
  *  -------------------------------------------------------------------------
  *  for V4 open
  */
-int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+int
+streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct str_comm *sp, **spp = &str_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN) {
@@ -148,10 +153,12 @@ int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
+
 		for (; *(spp) && (dmajor = getmajor((*spp)->dev)) < cmajor; spp = &(*spp)->next) ;
 		for (; *(spp) && dmajor == getmajor((*spp)->dev) &&
 		     getminor(makedevice(0, cminor)) != 0; spp = &(*spp)->next, cminor++) {
 			minor_t dminor = getminor((*spp)->dev);
+
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor)
@@ -197,11 +204,13 @@ EXPORT_SYMBOL(streams_open_comm);
  *  -------------------------------------------------------------------------
  *  for V3 open
  */
-int streams_open_ocomm(dev_t dev, unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag,
-		       cred_t *crp)
+int
+streams_open_ocomm(dev_t dev, unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag,
+		   cred_t *crp)
 {
 	dev_t mydev = dev;
 	int err;
+
 	if ((err = streams_open_comm(size, q, &mydev, oflag, sflag, crp)))
 		return (err);
 	*devp = mydev;
@@ -215,12 +224,14 @@ EXPORT_SYMBOL(streams_open_ocomm);
  *  -------------------------------------------------------------------------
  *  for both V3 and V4 close
  */
-int streams_close_comm(queue_t *q, int oflag, cred_t *crp)
+int
+streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 {
 	spin_lock(&str_list_lock);
 	if (q->q_ptr) {
 		struct str_comm *sp = ((struct str_comm *) q->q_ptr) - 1;
 		size_t size = sp->size;
+
 		/* found it */
 		if ((*sp->prev = sp->next))
 			sp->next->prev = sp->prev;
@@ -228,7 +239,7 @@ int streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 		sp->prev = &sp->next;
 		sp->size = 0;
 		q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-		(void) size; /* LiS doesn't actually use this */
+		(void) size;	/* LiS doesn't actually use this */
 		kmem_free(sp, sizeof(*sp) + size);
 	}
 	spin_unlock(&str_list_lock);
@@ -244,7 +255,8 @@ EXPORT_SYMBOL(streams_close_comm);
  *  STRMOD_ADD
  *  -------------------------------------------------------------------------
  */
-dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
+dev_t
+strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
 #if LIS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
@@ -253,6 +265,7 @@ dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 		major_t major = getmajor(dev);
 		minor_t minor = getminor(dev);
 		int result;
+
 		if ((result = lis_register_strdev(major, st, minor, sa->sa_name)) > 0) {
 			major = result;
 			dev = makedevice(major, minor);
@@ -265,6 +278,7 @@ dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	{
 		modID_t modid;
 		int result;
+
 		if ((result = lis_register_strmod(st, sa->sa_name)) > 0) {
 			modid = result;
 			dev = makedevice(modid, 0);
@@ -283,6 +297,7 @@ dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	{
 		struct cdevsw *cdev;
 		int err;
+
 		if (!(cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)))
 			return (NODEV);
 		cdev->d_name = sa->sa_name;
@@ -326,6 +341,7 @@ dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	{
 		struct fmodsw *fmod;
 		int err;
+
 		if (!(fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)))
 			return (NODEV);
 		fmod->f_name = sa->sa_name;
@@ -377,7 +393,8 @@ EXPORT_SYMBOL(strmod_add);
  *  STRMOD_DEL
  *  -------------------------------------------------------------------------
  */
-int strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
+int
+strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
 #if LIS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
@@ -395,6 +412,7 @@ int strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	{
 		struct cdevsw *cdev;
 		int err;
+
 		if ((cdev = cdev_str(st)) == NULL)
 			return (ENOENT);
 		if ((err = unregister_strdev(cdev, getmajor(dev))) == 0)
@@ -405,6 +423,7 @@ int strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	{
 		struct fmodsw *fmod;
 		int err;
+
 		if (!(fmod = fmod_str(st)))
 			return (ENOENT);
 		if ((err = unregister_strmod(fmod)) == 0)
@@ -422,7 +441,8 @@ EXPORT_SYMBOL(strmod_del);
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 static
 #endif
-int __init osfcomp_init(void)
+int __init
+osfcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 	printk(KERN_INFO OSFCOMP_BANNER);
@@ -431,10 +451,12 @@ int __init osfcomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 static
 #endif
-void __exit osfcomp_exit(void)
+void __exit
+osfcomp_exit(void)
 {
 	return;
 }

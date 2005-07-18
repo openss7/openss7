@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -147,11 +147,11 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 		int flags;
 	};
 	struct __lis_putpmsg_args args = {
-	      fd:fd,
-	      ctlptr:ctlptr,
-	      datptr:datptr,
-	      band:band,
-	      flags:flags,
+		fd:fd,
+		ctlptr:ctlptr,
+		datptr:datptr,
+		band:band,
+		flags:flags,
 	};
 
 	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));

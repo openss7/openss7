@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/05/14 08:34:43 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:07:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -56,7 +56,8 @@
 /* common inlines */
 
 /* queue structure read/write locks */
-static __inline__ void qrlock(queue_t *q, ulong *flagsp)
+static __inline__ void
+qrlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
 		local_irq_save(*flagsp);
@@ -66,7 +67,8 @@ static __inline__ void qrlock(queue_t *q, ulong *flagsp)
 		read_lock(&q->q_rwlock);
 	return;
 }
-static __inline__ void qrunlock(queue_t *q, ulong *flagsp)
+static __inline__ void
+qrunlock(queue_t *q, ulong *flagsp)
 {
 	if (q->q_owner == current)
 		q->q_nest--;
@@ -76,7 +78,8 @@ static __inline__ void qrunlock(queue_t *q, ulong *flagsp)
 		local_irq_restore(*flagsp);
 	return;
 }
-static __inline__ void qwlock(queue_t *q, ulong *flagsp)
+static __inline__ void
+qwlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
 		local_irq_save(*flagsp);
@@ -89,7 +92,8 @@ static __inline__ void qwlock(queue_t *q, ulong *flagsp)
 	}
 	return;
 }
-static __inline__ void qwunlock(queue_t *q, ulong *flagsp)
+static __inline__ void
+qwunlock(queue_t *q, ulong *flagsp)
 {
 	if (q->q_owner == current) {
 		if (q->q_nest > 0)
@@ -105,7 +109,8 @@ static __inline__ void qwunlock(queue_t *q, ulong *flagsp)
 	}
 	swerr();
 }
-static __inline__ void qlockinit(queue_t *q)
+static __inline__ void
+qlockinit(queue_t *q)
 {
 	q->q_owner = NULL;
 	q->q_nest = 0;
@@ -113,27 +118,33 @@ static __inline__ void qlockinit(queue_t *q)
 }
 
 /* queue pair nesting read/write locks */
-static __inline__ void qprlock(queue_t *rq)
+static __inline__ void
+qprlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current)
 		qu->qu_nest++;
 	else
 		read_lock(&qu->qu_lock);
 	return;
 }
-static __inline__ void qprunlock(queue_t *rq)
+static __inline__ void
+qprunlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current)
 		qu->qu_nest--;
 	else
 		read_unlock(&qu->qu_lock);
 	return;
 }
-static __inline__ void qpwlock(queue_t *rq)
+static __inline__ void
+qpwlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current)
 		qu->qu_nest++;
 	else {
@@ -143,9 +154,11 @@ static __inline__ void qpwlock(queue_t *rq)
 	}
 	return;
 }
-static __inline__ void qpwunlock(queue_t *rq)
+static __inline__ void
+qpwunlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current) {
 		if (qu->qu_nest > 0)
 			qu->qu_nest--;
@@ -158,18 +171,22 @@ static __inline__ void qpwunlock(queue_t *rq)
 	}
 	swerr();
 }
-static __inline__ void qplockinit(queue_t *rq)
+static __inline__ void
+qplockinit(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	qu->qu_owner = NULL;
 	qu->qu_nest = 0;
 	rwlock_init(&qu->qu_lock);
 }
 
 #if 0
-static __inline__ void qpupgrade(queue_t *rq)
+static __inline__ void
+qpupgrade(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current) {
 		return;
 	}
@@ -182,7 +199,8 @@ static __inline__ void qpupgrade(queue_t *rq)
 #endif
 
 /* stream head wread/write locks */
-static __inline__ void srlock(struct stdata *sd)
+static __inline__ void
+srlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
 		if (sd->sd_owner == current)
@@ -193,7 +211,8 @@ static __inline__ void srlock(struct stdata *sd)
 	}
 	swerr();
 }
-static __inline__ void srunlock(struct stdata *sd)
+static __inline__ void
+srunlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
 		if (sd->sd_owner == current)
@@ -204,7 +223,8 @@ static __inline__ void srunlock(struct stdata *sd)
 	}
 	swerr();
 }
-static __inline__ void swlock(struct stdata *sd, unsigned long *flagsp)
+static __inline__ void
+swlock(struct stdata *sd, unsigned long *flagsp)
 {
 	if (likely(sd != NULL)) {
 		if (sd->sd_owner == current)
@@ -218,7 +238,8 @@ static __inline__ void swlock(struct stdata *sd, unsigned long *flagsp)
 	}
 	swerr();
 }
-static __inline__ void swunlock(struct stdata *sd, unsigned long *flagsp)
+static __inline__ void
+swunlock(struct stdata *sd, unsigned long *flagsp)
 {
 	if (likely(sd != NULL)) {
 		if (sd->sd_owner == current)
@@ -231,7 +252,8 @@ static __inline__ void swunlock(struct stdata *sd, unsigned long *flagsp)
 	}
 	swerr();
 }
-static __inline__ void __swlock(struct stdata *sd)
+static __inline__ void
+__swlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
 		if (sd->sd_owner == current)
@@ -245,7 +267,8 @@ static __inline__ void __swlock(struct stdata *sd)
 	}
 	swerr();
 }
-static __inline__ void __swunlock(struct stdata *sd)
+static __inline__ void
+__swunlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
 		if (sd->sd_owner == current)
@@ -258,7 +281,8 @@ static __inline__ void __swunlock(struct stdata *sd)
 	}
 	swerr();
 }
-static __inline__ void slockinit(struct stdata *sd)
+static __inline__ void
+slockinit(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
 		rwlock_init(&sd->sd_qlock);
@@ -268,41 +292,49 @@ static __inline__ void slockinit(struct stdata *sd)
 	}
 	swerr();
 }
-static __inline__ void hrlock(queue_t *q)
+static __inline__ void
+hrlock(queue_t *q)
 {
 	trace();
 	ensure(q, return);
 	srlock(((struct queinfo *) RD(q))->qu_str);
 }
-static __inline__ void hrunlock(queue_t *q)
+static __inline__ void
+hrunlock(queue_t *q)
 {
 	trace();
 	ensure(q, return);
 	srunlock(((struct queinfo *) RD(q))->qu_str);
 }
-static __inline__ void hwlock(queue_t *q, unsigned long *flagsp)
+static __inline__ void
+hwlock(queue_t *q, unsigned long *flagsp)
 {
 	trace();
 	swlock(((struct queinfo *) RD(q))->qu_str, flagsp);
 }
-static __inline__ void hwunlock(queue_t *q, unsigned long *flagsp)
+static __inline__ void
+hwunlock(queue_t *q, unsigned long *flagsp)
 {
 	trace();
 	swunlock(((struct queinfo *) RD(q))->qu_str, flagsp);
 }
-static __inline__ void __hwlock(queue_t *q)
+static __inline__ void
+__hwlock(queue_t *q)
 {
 	__swlock(((struct queinfo *) RD(q))->qu_str);
 }
-static __inline__ void __hwunlock(queue_t *q)
+static __inline__ void
+__hwunlock(queue_t *q)
 {
 	__swunlock(((struct queinfo *) RD(q))->qu_str);
 }
 
 /* queue band gets and puts */
-static __inline__ qband_t *bget(qband_t *qb)
+static __inline__ qband_t *
+bget(qband_t *qb)
 {
 	struct qbinfo *qbi;
+
 	if (qb) {
 		qbi = (typeof(qbi)) qb;
 		if (atomic_read(&qbi->qbi_refs) < 1)
@@ -311,11 +343,14 @@ static __inline__ qband_t *bget(qband_t *qb)
 	}
 	return (qb);
 }
-static __inline__ void bput(qband_t **bp)
+static __inline__ void
+bput(qband_t **bp)
 {
 	qband_t *qb;
+
 	if ((qb = xchg(bp, NULL))) {
 		struct qbinfo *qbi = (typeof(qbi)) qb;
+
 		if (atomic_read(&qbi->qbi_refs) >= 1) {
 			if (atomic_dec_and_test(&qbi->qbi_refs))
 				freeqb(qb);
@@ -325,9 +360,11 @@ static __inline__ void bput(qband_t **bp)
 }
 
 /* queue gets and puts */
-static __inline__ queue_t *qget(queue_t *q)
+static __inline__ queue_t *
+qget(queue_t *q)
 {
 	struct queinfo *qu;
+
 	ptrace(("%s: getting queue %p\n", __FUNCTION__, q));
 	if (q) {
 		qu = (typeof(qu)) RD(q);
@@ -339,14 +376,17 @@ static __inline__ queue_t *qget(queue_t *q)
 	}
 	return (q);
 }
-static __inline__ void qput(queue_t **qp)
+static __inline__ void
+qput(queue_t **qp)
 {
 	queue_t *q;
+
 	ptrace(("%s: putting queue %p\n", __FUNCTION__, *qp));
 	ensure(qp, return);
 	if ((q = xchg(qp, NULL))) {
 		queue_t *rq = RD(q);
 		struct queinfo *qu = (typeof(qu)) rq;
+
 		if (atomic_read(&qu->qu_refs) >= 1) {
 			if (atomic_dec_and_test(&qu->qu_refs)) {
 				printd(("%s: queue %p is being freed\n", __FUNCTION__, qu));
@@ -362,12 +402,15 @@ static __inline__ void qput(queue_t **qp)
 /* 
  *  Syncrhronization queues...
  */
-static __inline__ int shared_tryentersq(queue_t *q)
+static __inline__ int
+shared_tryentersq(queue_t *q)
 {
 	struct syncq *sq;
+
 	if ((sq = q->q_syncq)) {
 		unsigned long flags;
 		int result = 0;
+
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if (sq->sq_count >= 0) {
 			sq->sq_count++;
@@ -378,12 +421,15 @@ static __inline__ int shared_tryentersq(queue_t *q)
 	}
 	return (1);
 }
-static __inline__ int exclus_tryentersq(queue_t *q)
+static __inline__ int
+exclus_tryentersq(queue_t *q)
 {
 	struct syncq *sq;
+
 	if ((sq = q->q_syncq)) {
 		unsigned long flags;
 		int result = 0;
+
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if (sq->sq_count == 0) {
 			sq->sq_count = -1;
@@ -396,12 +442,15 @@ static __inline__ int exclus_tryentersq(queue_t *q)
 }
 
 #if 0
-static __inline__ void shared_leavesq(queue_t *q)
+static __inline__ void
+shared_leavesq(queue_t *q)
 {
 	struct syncq *sq;
+
 	if ((sq = q->q_syncq)) {
 		unsigned long flags;
 		struct strevent *se, *se_next;
+
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if ((--sq->sq_count) <= 0) {
 			sq->sq_count = 0;
@@ -430,12 +479,15 @@ static __inline__ void shared_leavesq(queue_t *q)
 		return;
 	}
 }
-static __inline__ void exclus_leavesq(queue_t *q)
+static __inline__ void
+exclus_leavesq(queue_t *q)
 {
 	struct syncq *sq;
+
 	if ((sq = q->q_syncq)) {
 		unsigned long flags;
 		struct strevent *se, *se_next;
+
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if ((se = sq->sq_head)) {
 			if (in_streams()) {
@@ -461,9 +513,11 @@ static __inline__ void exclus_leavesq(queue_t *q)
 	}
 }
 
-static __inline__ void leavesq(queue_t *q, struct syncq *sq)
+static __inline__ void
+leavesq(queue_t *q, struct syncq *sq)
 {
 	unsigned long flags;
+
 	if (sq == NULL)
 		goto exit;
 	spin_lock_irqsave(&sq->sq_lock, flags);
@@ -477,6 +531,7 @@ static __inline__ void leavesq(queue_t *q, struct syncq *sq)
 		/* check for pending events */
 		if (in_streams()) {
 			struct strevent *se;
+
 			while ((se = sq->sq_head)) {
 				if (!(sq->sq_head = se->se_next))
 					sq->sq_tail = &sq->sq_head;
@@ -508,9 +563,11 @@ static __inline__ void leavesq(queue_t *q, struct syncq *sq)
 	return;
 }
 
-static __inline__ void qleavesq(queue_t *q, const int type)
+static __inline__ void
+qleavesq(queue_t *q, const int type)
 {
 	struct syncq *sq = q->q_syncq;
+
 	switch (type) {
 	case PERIM_INNER:
 		return leavesq(q, sq);
@@ -524,7 +581,8 @@ static __inline__ void qleavesq(queue_t *q, const int type)
 }
 #endif
 
-static __inline__ int enter_exclus(syncq_t *sq, unsigned long *flagsp)
+static __inline__ int
+enter_exclus(syncq_t *sq, unsigned long *flagsp)
 {
 	if (sq) {
 		spin_lock_irqsave(&sq->sq_lock, *flagsp);
@@ -535,7 +593,8 @@ static __inline__ int enter_exclus(syncq_t *sq, unsigned long *flagsp)
 	}
 	return (1);		/* with sq unlocked */
 }
-static __inline__ int enter_shared(syncq_t *sq, unsigned long *flagsp)
+static __inline__ int
+enter_shared(syncq_t *sq, unsigned long *flagsp)
 {
 	if (sq) {
 		spin_lock_irqsave(&sq->sq_lock, *flagsp);
@@ -546,17 +605,20 @@ static __inline__ int enter_shared(syncq_t *sq, unsigned long *flagsp)
 	}
 	return (1);
 }
-static __inline__ void unlock_syncq(syncq_t *sq, unsigned long *flagsp)
+static __inline__ void
+unlock_syncq(syncq_t *sq, unsigned long *flagsp)
 {
 	if (sq) {
 		spin_unlock_irqrestore(&sq->sq_lock, *flagsp);
 	}
 }
 
-static __inline__ void leave_exclus(syncq_t *sq)
+static __inline__ void
+leave_exclus(syncq_t *sq)
 {
 	if (sq) {
 		unsigned long flags;
+
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if (!++sq->sq_count) {
 			sq->sq_owner = NULL;
@@ -566,10 +628,12 @@ static __inline__ void leave_exclus(syncq_t *sq)
 		spin_unlock_irqrestore(&sq->sq_lock, flags);
 	}
 }
-static __inline__ void leave_shared(syncq_t *sq)
+static __inline__ void
+leave_shared(syncq_t *sq)
 {
 	if (sq) {
 		unsigned long flags;
+
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if (!--sq->sq_count) {
 			if (sq->sq_head)

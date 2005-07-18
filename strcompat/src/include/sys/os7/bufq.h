@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/12 13:54:43 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:25:40 $"
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -118,6 +118,7 @@ __OS7_EXTERN_INLINE void
 __bufq_add(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
+
 	q->q_msgs++;
 	while (md) {
 		if (md->b_wptr > md->b_rptr)
@@ -134,6 +135,7 @@ __OS7_EXTERN_INLINE void
 __bufq_sub(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
+
 	while (md) {
 		if (md->b_wptr > md->b_rptr) {
 			if (q->q_count >= md->b_wptr - md->b_rptr)
@@ -219,6 +221,7 @@ __OS7_EXTERN_INLINE mblk_t *
 __bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
+
 	if ((mp = q->q_head)) {
 		if ((q->q_head = mp->b_next))
 			mp->b_next->b_prev = NULL;
@@ -235,6 +238,7 @@ __OS7_EXTERN_INLINE mblk_t *
 bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
+
 	ensure(q, return (NULL));
 	bufq_lock(q);
 	mp = __bufq_dequeue(q);
@@ -246,6 +250,7 @@ __OS7_EXTERN_INLINE mblk_t *
 __bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
+
 	if ((mp = q->q_tail)) {
 		if ((q->q_tail = mp->b_prev))
 			mp->b_prev->b_next = NULL;
@@ -262,6 +267,7 @@ __OS7_EXTERN_INLINE mblk_t *
 bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
+
 	ensure(q, return (NULL));
 	bufq_lock(q);
 	mp = __bufq_dequeue_tail(q);
@@ -304,6 +310,7 @@ __OS7_EXTERN_INLINE void
 bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
+
 	ensure(q1 && q2, return);
 	while ((mp = bufq_dequeue_tail(q2)))
 		bufq_queue_head(q1, mp);
@@ -317,6 +324,7 @@ __OS7_EXTERN_INLINE void
 bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
+
 	ensure(q1 && q2, return);
 	while ((mp = bufq_dequeue(q2)))
 		bufq_queue(q1, mp);
@@ -379,6 +387,7 @@ __OS7_EXTERN_INLINE void
 freechunks(mblk_t *mp)
 {
 	mblk_t *dp, *dp_next;
+
 	for (dp = mp; dp; dp_next = dp->b_next, freemsg(dp), dp = dp_next) ;
 }
 #endif

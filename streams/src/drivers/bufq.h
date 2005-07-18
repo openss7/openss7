@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.5 2005/05/14 08:34:40 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.6 2005/07/18 12:06:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:34:40 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:06:58 $"
 
 typedef struct bufq {
 	spinlock_t q_lock;
@@ -110,6 +110,7 @@ static inline void
 __bufq_add(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
+
 	q->q_msgs++;
 	while (md) {
 		if (md->b_wptr > md->b_rptr)
@@ -126,6 +127,7 @@ static inline void
 __bufq_sub(bufq_t * q, mblk_t *mp)
 {
 	mblk_t *md = mp;
+
 	while (md) {
 		if (md->b_wptr > md->b_rptr) {
 			if (q->q_count >= md->b_wptr - md->b_rptr)
@@ -157,6 +159,7 @@ static inline void
 bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
+
 	ensure(q && mp, return);
 	bufq_lock(q, &flags);
 	__bufq_queue(q, mp);
@@ -167,6 +170,7 @@ static inline void
 bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
+
 	ensure(q && mp, return);
 	bufq_lock(q, &flags);
 	if ((mp->b_next = q->q_head))
@@ -183,6 +187,7 @@ static inline void
 bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	unsigned long flags;
+
 	bufq_lock(q, &flags);
 	ensure(q && mp && np, return);
 	if ((np->b_prev = mp->b_prev))
@@ -199,6 +204,7 @@ static inline void
 bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	unsigned long flags;
+
 	ensure(q && mp && np, return);
 	bufq_lock(q, &flags);
 	if ((np->b_next = mp->b_next))
@@ -215,6 +221,7 @@ static inline mblk_t *
 __bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
+
 	if ((mp = q->q_head)) {
 		if ((q->q_head = mp->b_next))
 			mp->b_next->b_prev = NULL;
@@ -232,6 +239,7 @@ bufq_dequeue(bufq_t * q)
 {
 	unsigned long flags;
 	mblk_t *mp;
+
 	ensure(q, return (NULL));
 	bufq_lock(q, &flags);
 	mp = __bufq_dequeue(q);
@@ -243,6 +251,7 @@ static inline mblk_t *
 __bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
+
 	if ((mp = q->q_tail)) {
 		if ((q->q_tail = mp->b_prev))
 			mp->b_prev->b_next = NULL;
@@ -260,6 +269,7 @@ bufq_dequeue_tail(bufq_t * q)
 {
 	unsigned long flags;
 	mblk_t *mp;
+
 	ensure(q, return (NULL));
 	bufq_lock(q, &flags);
 	mp = __bufq_dequeue_tail(q);
@@ -289,6 +299,7 @@ static inline mblk_t *
 bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
+
 	ensure(q && mp, return (NULL));
 	bufq_lock(q, &flags);
 	__bufq_unlink(q, mp);
@@ -303,6 +314,7 @@ static inline void
 bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
+
 	ensure(q1 && q2, return);
 	while ((mp = bufq_dequeue_tail(q2)))
 		bufq_queue_head(q1, mp);
@@ -316,6 +328,7 @@ static inline void
 bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
+
 	ensure(q1 && q2, return);
 	while ((mp = bufq_dequeue(q2)))
 		bufq_queue(q1, mp);
@@ -325,6 +338,7 @@ static inline void
 bufq_freehead(bufq_t * q)
 {
 	unsigned long flags;
+
 	bufq_lock(q, &flags);
 	if (q->q_head)
 		freemsg(__bufq_dequeue(q));
@@ -335,6 +349,7 @@ static inline void
 bufq_purge(bufq_t * q)
 {
 	unsigned long flags;
+
 	bufq_lock(q, &flags);
 	while (q->q_head)
 		freemsg(__bufq_dequeue(q));
@@ -358,6 +373,7 @@ static inline void
 bufq_supply(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
+
 	bufq_lock(q, &flags);
 	__bufq_supply(q, mp);
 	bufq_unlock(q, &flags);
@@ -367,6 +383,7 @@ static inline mblk_t *
 bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 {
 	unsigned long flags;
+
 	bufq_lock(q, &flags);
 	if (bufq_length(q) > maxcount || bufq_size(q) > maxsize) {
 		bufq_unlock(q, &flags);
@@ -381,6 +398,7 @@ static inline void
 freechunks(mblk_t *mp)
 {
 	mblk_t *dp, *dp_next;
+
 	for (dp = mp; dp; dp_next = dp->b_next, freemsg(dp), dp = dp_next) ;
 }
 

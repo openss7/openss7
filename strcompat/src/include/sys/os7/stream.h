@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/15 23:09:21 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/18 12:25:40  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/07/15 23:09:21  brian
  - checking in for sync
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_OS7_STREAM_H__
 #define __SYS_OS7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."
@@ -83,14 +86,14 @@
 
 #if defined CONFIG_STREAMS_COMPAT_OS7 || defined CONFIG_STREAMS_COMPAT_OS7_MODULE
 
-#include <sys/os7/debug.h>		/* generic debugging macros */
-#include <sys/os7/bufq.h>		/* generic buffer queues */
-#include <sys/os7/priv.h>		/* generic data structures */
-#include <sys/os7/lock.h>		/* generic queue locking functions */
-#include <sys/os7/queue.h>		/* generic put and srv routines */
-#include <sys/os7/allocb.h>		/* generic buffer allocation routines */
-#include <sys/os7/timer.h>		/* generic timer handling */
-#include <sys/os7/bufpool.h>		/* generic buffer pools */
+#include <sys/os7/debug.h>	/* generic debugging macros */
+#include <sys/os7/bufq.h>	/* generic buffer queues */
+#include <sys/os7/priv.h>	/* generic data structures */
+#include <sys/os7/lock.h>	/* generic queue locking functions */
+#include <sys/os7/queue.h>	/* generic put and srv routines */
+#include <sys/os7/allocb.h>	/* generic buffer allocation routines */
+#include <sys/os7/timer.h>	/* generic timer handling */
+#include <sys/os7/bufpool.h>	/* generic buffer pools */
 
 #elif defined _OS7_SOURCE
 #warning "_OS7_SOURCE defined by not CONFIG_STREAMS_COMPAT_OS7"

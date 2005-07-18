@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.7 2005/07/15 23:08:37 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.8 2005/07/18 12:25:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.8  2005/07/18 12:25:39  brian
+ - standard indentation
+
  Revision 0.9.2.7  2005/07/15 23:08:37  brian
  - checking in for sync
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -103,19 +106,22 @@
 
 /* These functions are missing from LiS, but in the core in LfS */
 
-__LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len)
+__LFS_EXTERN_INLINE int
+bcmp(const void *s1, const void *s2, size_t len)
 {
 	return memcmp(s1, s2, len);
 }
 
 /* LiS 2.18.0 deprecated these for some reason... */
-__LFS_EXTERN_INLINE int copyin(const void *from, void *to, size_t len)
+__LFS_EXTERN_INLINE int
+copyin(const void *from, void *to, size_t len)
 {
 	if (copy_from_user(to, from, len))
 		return (-EFAULT);
 	return (0);
 }
-__LFS_EXTERN_INLINE int copyout(const void *from, void *to, size_t len)
+__LFS_EXTERN_INLINE int
+copyout(const void *from, void *to, size_t len)
 {
 	if (copy_to_user(to, from, len))
 		return (-EFAULT);
@@ -139,7 +145,8 @@ __LFS_EXTERN_INLINE int copyout(const void *from, void *to, size_t len)
 
 extern int drv_getparm(const unsigned int parm, void *value_p);
 
-__LFS_EXTERN_INLINE int drv_priv(cred_t *crp)
+__LFS_EXTERN_INLINE int
+drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
 	if (crp->cr_uid == 0 || crp->cr_ruid == 0)
@@ -148,28 +155,34 @@ __LFS_EXTERN_INLINE int drv_priv(cred_t *crp)
 }
 
 /* FIXME: There are faster ways to do these... */
-__LFS_EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz)
+__LFS_EXTERN_INLINE unsigned long
+drv_hztomsec(unsigned long hz)
 {
 	return ((hz * 1000) / HZ);
 }
-__LFS_EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz)
+__LFS_EXTERN_INLINE unsigned long
+drv_hztousec(unsigned long hz)
 {
 	return ((hz * 1000000) / HZ);
 }
-__LFS_EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec)
+__LFS_EXTERN_INLINE unsigned long
+drv_msectohz(unsigned long msec)
 {
 	return (((msec + 999) * HZ) / 1000);
 }
-__LFS_EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec)
+__LFS_EXTERN_INLINE unsigned long
+drv_usectohz(unsigned long usec)
 {
 	return (((usec + 999999) * HZ) / 1000000);
 }
 
-__LFS_EXTERN_INLINE void drv_usecwait(unsigned long usec)
+__LFS_EXTERN_INLINE void
+drv_usecwait(unsigned long usec)
 {
 	return (udelay(usec));
 }
-__LFS_EXTERN_INLINE void delay(unsigned long ticks)
+__LFS_EXTERN_INLINE void
+delay(unsigned long ticks)
 {
 	set_current_state(TASK_INTERRUPTIBLE);
 	while ((ticks = schedule_timeout(ticks))) ;

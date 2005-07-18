@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tihdr.h,v 0.9.2.4 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: tihdr.h,v 0.9.2.5 2005/07/18 12:45:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:03 $ by $Author: brian $
 
  $Log: tihdr.h,v $
+ Revision 0.9.2.5  2005/07/18 12:45:03  brian
+ - standard indentation
+
  Revision 0.9.2.4  2005/05/14 08:28:29  brian
  - copyright header correction
 
@@ -62,17 +65,19 @@
 #ifndef _SYS_TIHDR_H
 #define _SYS_TIHDR_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define T_CURRENT_VERSION 5
 
 #ifndef t_scalar_t
 typedef int32_t t_scalar_t;
+
 #define t_scalar_t t_scalar_t
 #endif
 
 #ifndef t_uscalar_t
 typedef u_int32_t t_uscalar_t;
+
 #define t_uscalar_t t_uscalar_t
 #endif
 

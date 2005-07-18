@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:27 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:45:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:27 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:45:04 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:27 $";
+static char const ident[] =
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:45:04 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -215,9 +216,11 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 
  * @{
  */
 
-extern void __pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg);
+extern void __pthread_cleanup_push(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
+				   void *arg);
 extern void __pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute);
-extern void __pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg);
+extern void __pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer,
+					 void (*routine) (void *), void *arg);
 extern void __pthread_cleanup_pop_restore(struct _pthread_cleanup_buffer *buffer, int execute);
 extern void __pthread_testcancel(void);
 extern int __pthread_setcanceltype(int type, int *oldtype);
@@ -275,7 +278,8 @@ _pthread_cleanup_pop(struct _pthread_cleanup_buffer *buffer, int execute)
 }
 
 void
-_pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *), void *arg)
+_pthread_cleanup_push_defer(struct _pthread_cleanup_buffer *buffer, void (*routine) (void *),
+			    void *arg)
 {
 	if (__pthread_cleanup_push_defer)
 		return __pthread_cleanup_push_defer(buffer, routine, arg);
@@ -364,6 +368,7 @@ pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
 int __xnet_t_errno;
 
 extern int *__h_errno_location(void);
+
 #pragma weak __h_errno_location
 
 #pragma weak __t_errno_location
@@ -612,9 +617,9 @@ __xnet_u_reset_event(struct _t_user *user)
 		user->moreedu = 0;
 		user->moremsg = 0;
 	} else {
-		/*
-		   When we are clearing an expedited data event, we must revert to an outstanding data event. 
-		 */
+		/* 
+		   When we are clearing an expedited data event, we must revert to an outstanding
+		   data event. */
 		user->prim = 0;
 		user->event = T_DATA;
 		user->ctrl.maxlen = user->ctlmax;
@@ -632,12 +637,14 @@ __xnet_u_reset_event(struct _t_user *user)
 static int
 __xnet_u_max_addr(struct _t_user *user)
 {
-	return (user->info.addr == T_INFINITE ? MAXINT : (user->info.addr >= 0 ? user->info.addr : 0));
+	return (user->info.addr ==
+		T_INFINITE ? MAXINT : (user->info.addr >= 0 ? user->info.addr : 0));
 }
 static int
 __xnet_u_max_options(struct _t_user *user)
 {
-	return (user->info.options == T_INFINITE ? MAXINT : (user->info.options >= 0 ? user->info.options : 0));
+	return (user->info.options ==
+		T_INFINITE ? MAXINT : (user->info.options >= 0 ? user->info.options : 0));
 }
 static int
 __xnet_u_max_tsdu(struct _t_user *user)
@@ -649,22 +656,26 @@ static int
 __xnet_u_max_etsdu(struct _t_user *user)
 {
 	return ((user->info.etsdu == T_INFINITE
-		 || user->info.etsdu == 0) ? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
+		 || user->info.etsdu == 0) ? MAXINT : (user->info.etsdu >=
+						       0 ? user->info.etsdu : 0));
 }
 static int
 __xnet_u_max_connect(struct _t_user *user)
 {
-	return (user->info.connect == T_INFINITE ? MAXINT : (user->info.connect >= 0 ? user->info.connect : 0));
+	return (user->info.connect ==
+		T_INFINITE ? MAXINT : (user->info.connect >= 0 ? user->info.connect : 0));
 }
 static int
 __xnet_u_max_discon(struct _t_user *user)
 {
-	return (user->info.discon == T_INFINITE ? MAXINT : (user->info.discon >= 0 ? user->info.discon : 0));
+	return (user->info.discon ==
+		T_INFINITE ? MAXINT : (user->info.discon >= 0 ? user->info.discon : 0));
 }
 static int
 __xnet_u_max_tidu(struct _t_user *user)
 {
-	return (user->info.tidu == T_INFINITE ? MAXINT : (user->info.tidu >= 0 ? user->info.tidu : 0));
+	return (user->info.tidu ==
+		T_INFINITE ? MAXINT : (user->info.tidu >= 0 ? user->info.tidu : 0));
 }
 
 /*
@@ -699,7 +710,8 @@ int __xnet_t_rcvreldata(int fd, struct t_discon *discon);
 int __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags);
 int __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags);
 int __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags);
-int __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags);
+int __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		       unsigned int iovcount, int *flags);
 int __xnet_t_removeleaf(int fd, int leafid, int reason);
 int __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags);
 int __xnet_t_snddis(int fd, const struct t_call *call);
@@ -710,10 +722,13 @@ int __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_io
 		     unsigned int iovcount, int flags);
 int __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata);
 int __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags);
+
 #if 0
-int __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags);
+int __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
+		     unsigned int iovcount, int flags);
 #endif
-int __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount);
+int __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		       unsigned int iovcount);
 int __xnet_t_sysconf(int name);
 int __xnet_t_unbind(int fd);
 const char *__xnet_t_strerror(int errnum);
@@ -756,6 +771,7 @@ static int
 __xnet_t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flagsp)
 {
 	int ret;
+
 	if ((ret = getmsg(fd, ctrl, data, flagsp)) >= 0)
 		return (ret);
 	t_errno = TSYSERR;
@@ -798,6 +814,7 @@ static int
 __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
 	int ret;
+
 	if ((ret = putmsg(fd, ctrl, data, flags)) >= 0)
 		return (ret);
 	t_errno = TSYSERR;
@@ -841,6 +858,7 @@ static int
 __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	int ret;
+
 	if ((ret = putpmsg(fd, ctrl, data, band, flags)) != -1)
 		return (ret);
 	t_errno = TSYSERR;
@@ -872,6 +890,7 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 	struct _t_user *user = _t_fds[fd];
 	int ret, flag = 0;
 	union T_primitives *p = (typeof(p)) user->ctlbuf;
+
 	switch (user->event) {
 	case T_DATA:
 	case T_EXDATA:
@@ -904,9 +923,8 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 		if (user->ctrl.len || user->data.len) {
 			if (user->event == 0 || user->ctrl.len > 0)
 				__xnet_u_setevent(user, user->ctrl.len ? p->type : -1, 0);
-			/*
-			   There is a little extra handling for data indications 
-			 */
+			/* 
+			   There is a little extra handling for data indications */
 			switch (user->prim) {
 			case -1:	/* just data */
 				user->moredat = ((ret & MOREDATA) != 0);
@@ -921,10 +939,12 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 				break;
 			case T_OPTDATA_IND:
 				if (p->optdata_ind.DATA_flag & T_ODF_EX) {
-					user->moreedu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moreedu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moreexp = ((ret & MOREDATA) != 0);
 				} else {
-					user->moresdu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moresdu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moredat = ((ret & MOREDATA) != 0);
 				}
 				break;
@@ -945,10 +965,9 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 			if ((user->event & expect))
 				user->data.len = 0;	/* consumed */
 			else {
-				/*
-				   didn't get what we were expecting, so we need to move any data from the user buffer
-				   back to the look buffer 
-				 */
+				/* 
+				   didn't get what we were expecting, so we need to move any data
+				   from the user buffer back to the look buffer */
 				if (user->data.len > 0)
 					memcpy(user->datbuf, user->data.buf, user->data.len);
 				user->data.buf = user->datbuf;
@@ -995,6 +1014,7 @@ __xnet_t_getevent(int fd)
 	struct _t_user *user = _t_fds[fd];
 	int ret, flag = 0;
 	union T_primitives *p = (typeof(p)) user->ctlbuf;
+
 	switch (user->event) {
 	case 0:
 		__xnet_u_reset_event(user);
@@ -1006,9 +1026,8 @@ __xnet_t_getevent(int fd)
 			goto tsync;
 		if (user->ctrl.len || user->data.len) {
 			__xnet_u_setevent(user, user->ctrl.len ? p->type : -1, 0);
-			/*
-			   There is a little extra handling for data indications 
-			 */
+			/* 
+			   There is a little extra handling for data indications */
 			switch (user->prim) {
 			case -1:	/* just data */
 				user->moredat = ((ret & MOREDATA) != 0);
@@ -1023,10 +1042,12 @@ __xnet_t_getevent(int fd)
 				break;
 			case T_OPTDATA_IND:
 				if (p->optdata_ind.DATA_flag & T_ODF_EX) {
-					user->moreedu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moreedu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moreexp = ((ret & MOREDATA) != 0);
 				} else {
-					user->moresdu = ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
+					user->moresdu =
+					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moredat = ((ret & MOREDATA) != 0);
 				}
 				break;
@@ -1119,6 +1140,7 @@ __xnet_t_putuser(void *arg)
 {
 	int fd = *(int *) arg;
 	struct _t_user *user = _t_fds[fd];
+
 	__xnet_user_unlock(user);
 	__xnet_list_unlock(NULL);
 	return;
@@ -1138,6 +1160,7 @@ __xnet_t_getuser(int fd)
 {
 	struct _t_user *user;
 	int err;
+
 	if ((err = __xnet_list_rdlock()))
 		goto list_lock_error;
 	if (0 > fd || fd >= OPEN_MAX || !(user = _t_fds[fd]))
@@ -1191,6 +1214,7 @@ static struct _t_user *
 __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 {
 	struct _t_user *user;
+
 	if (0 > fd || fd >= OPEN_MAX || !(user = _t_fds[fd]))
 		goto tbadf;
 	if (user->flags & TUF_SYNC_REQUIRED)
@@ -1237,6 +1261,7 @@ static int
 __xnet_t_ioctl(int fd, int cmd, void *arg)
 {
 	int ret;
+
 	switch ((ret = ioctl(fd, cmd, arg))) {
 	case 0:
 		return (0);
@@ -1278,6 +1303,7 @@ static int
 __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen)
 {
 	struct strioctl ioc;
+
 	ioc.ic_cmd = cmd;
 	ioc.ic_timout = _T_TIMEOUT;
 	ioc.ic_len = arglen;
@@ -1300,6 +1326,7 @@ int
 __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 {
 	struct _t_user *user, *resuser;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WRES_CIND)))
 		goto error;
 	if (fd == resfd) {
@@ -1308,7 +1335,11 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			goto tindout;
 		if (user->ocnt < 1)
 			goto tproto;
-	} else if (!(resuser = __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_UNBND | TSF_IDLE)))
+	} else
+	    if (!
+		(resuser =
+		 __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+				  TSF_UNBND | TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -1330,21 +1361,22 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 		goto tbadopt;
 	if (call && call->udata.len > __xnet_u_max_connect(user))
 		goto tbaddata;
-	/*
-	   Check if we need to bind the responding stream to the responding address.  This also rules out the case
-	   where the listening stream and the responding stream are the same address. 
-	 */
+	/* 
+	   Check if we need to bind the responding stream to the responding address.  This also
+	   rules out the case where the listening stream and the responding stream are the same
+	   address. */
 	if (resuser->statef & TSF_UNBND) {
 		size_t add_len = (call && call->addr.len > 0) ? call->addr.len : 0;
 		struct {
 			struct T_bind_req prim;
 			unsigned char addr[add_len];
 		} req;
-		/*
-		   There is no way to pass the responding address to the stream as there is in the NPI, therefore, we
-		   must bind the stream to the proper responding address before accepting the connection indication.
-		   This sets the local name associated with the accepting stream. 
-		 */
+
+		/* 
+		   There is no way to pass the responding address to the stream as there is in the
+		   NPI, therefore, we must bind the stream to the proper responding address before
+		   accepting the connection indication. This sets the local name associated with
+		   the accepting stream. */
 		req.prim.PRIM_type = T_BIND_REQ;
 		req.prim.ADDR_length = add_len;
 		req.prim.ADDR_offset = add_len ? sizeof(req.prim) : 0;
@@ -1355,10 +1387,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			goto error;
 		__xnet_u_setstate_const(resuser, TS_IDLE);
 	}
-	/*
-	   XNS 5.2 says that if the responding stream is already bound that it must be bound to the same address a
-	   specified in call->addr, so we don't check 
-	 */
+	/* 
+	   XNS 5.2 says that if the responding stream is already bound that it must be bound to the 
+	   same address a specified in call->addr, so we don't check */
 	{
 		size_t opt_len = (call && call->opt.len > 0) ? call->opt.len : 0;
 		size_t dat_len = (call && call->udata.len > 0) ? call->udata.len : 0;
@@ -1367,6 +1398,7 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			unsigned char opt[opt_len];
 			unsigned char udata[dat_len];
 		} req;
+
 		req.prim.PRIM_type = T_CONN_RES;
 		req.prim.ACCEPTOR_id = resuser->token;
 		req.prim.OPT_length = opt_len;
@@ -1419,6 +1451,7 @@ int
 __xnet_t_accept_r(int fd, int resfd, const struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_accept(fd, resfd, call);
@@ -1453,6 +1486,7 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 {
 #if defined HAVE_XTI_ATM_H
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER)))
 		goto error;
 #ifdef DEBUG
@@ -1469,6 +1503,7 @@ __xnet_t_addleaf(int fd, int leafid, struct netbuf *addr)
 			struct t_atm_add_leaf leaf;
 		} opts;
 		struct t_optmgmt req, ret;
+
 		req.opt.maxlen = 0;
 		req.opt.len = sizeof(opts);
 		req.opt.buf = (char *) &opts;
@@ -1530,6 +1565,7 @@ int
 __xnet_t_addleaf_r(int fd, int leafid, struct netbuf *addr)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_addleaf(fd, leafid, addr);
@@ -1569,17 +1605,20 @@ char *
 __xnet_t_alloc(int fd, int type, int fields)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 	switch (type) {
 	case T_BIND:
 	{
 		struct t_bind *bind;
+
 		if (!(bind = (struct t_bind *) malloc(sizeof(*bind))))
 			goto badalloc;
 		memset(bind, 0, sizeof(*bind));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1604,11 +1643,13 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_OPTMGMT:
 	{
 		struct t_optmgmt *opts;
+
 		if (!(opts = (struct t_optmgmt *) malloc(sizeof(*opts))))
 			goto badalloc;
 		memset(opts, 0, sizeof(*opts));
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1633,6 +1674,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_CALL:
 	{
 		struct t_call *call;
+
 		if (user->info.servtype == T_CLTS)
 			goto tnostructype;
 		if (!(call = (struct t_call *) malloc(sizeof(*call))))
@@ -1640,6 +1682,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(call, 0, sizeof(*call));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1661,6 +1704,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1686,6 +1730,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_UDATA) {
 			int len;
+
 			switch ((len = user->info.connect)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_CONNLEN;
@@ -1718,6 +1763,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_DIS:
 	{
 		struct t_discon *discon;
+
 		if (user->info.servtype == T_CLTS)
 			goto tnostructype;
 		if (!(discon = (struct t_discon *) malloc(sizeof(*discon))))
@@ -1725,6 +1771,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(discon, 0, sizeof(*discon));
 		if (fields & T_UDATA) {
 			int len;
+
 			switch ((len = user->info.discon)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_DISCLEN;;
@@ -1749,6 +1796,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_UNITDATA:
 	{
 		struct t_unitdata *udata;
+
 		if (user->info.servtype != T_CLTS)
 			goto tnostructype;
 		if (!(udata = (struct t_unitdata *) malloc(sizeof(*udata))))
@@ -1756,6 +1804,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(udata, 0, sizeof(*udata));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1777,6 +1826,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1802,6 +1852,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_UDATA) {
 			int len;
+
 			switch ((len = user->info.tsdu)) {
 			case T_INFINITE:
 			case 0:
@@ -1834,6 +1885,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_UDERROR:
 	{
 		struct t_uderr *uderr;
+
 		if (user->info.servtype != T_CLTS)
 			goto tnostructype;
 		if (!(uderr = (struct t_uderr *) malloc(sizeof(*uderr))))
@@ -1841,6 +1893,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		memset(uderr, 0, sizeof(*uderr));
 		if (fields & T_ADDR) {
 			int len;
+
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
@@ -1862,6 +1915,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 		}
 		if (fields & T_OPT) {
 			int len;
+
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
@@ -1890,6 +1944,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 	case T_INFO:
 	{
 		struct t_info *inf;
+
 		if (!(inf = (struct t_info *) malloc(sizeof(*inf))))
 			goto badalloc;
 		memset(inf, 0, sizeof(*inf));
@@ -1916,6 +1971,7 @@ char *
 __xnet_t_alloc_r(int fd, int type, int fields)
 {
 	char *ret = NULL;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_alloc(fd, type, fields);
@@ -1943,6 +1999,7 @@ int
 __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, TSF_UNBND)))
 		goto error;
 #ifdef DEBUG
@@ -1967,6 +2024,7 @@ __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 				unsigned char addr[add_max];
 			} ack;
 		} buf;
+
 		buf.req.prim.PRIM_type = T_BIND_REQ;
 		buf.req.prim.ADDR_length = add_len;
 		buf.req.prim.ADDR_offset = add_len ? sizeof(buf.req.prim) : 0;
@@ -1983,7 +2041,8 @@ __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 					goto tbufovflw;
 				if ((ret->addr.len = buf.ack.prim.ADDR_length))
 					memcpy(ret->addr.buf,
-					       ((char *) &buf) + buf.ack.prim.ADDR_offset, ret->addr.len);
+					       ((char *) &buf) + buf.ack.prim.ADDR_offset,
+					       ret->addr.len);
 			}
 			ret->qlen = buf.ack.prim.CONIND_number;
 		}
@@ -2011,6 +2070,7 @@ int
 __xnet_t_bind_r(int fd, const struct t_bind *req, struct t_bind *ret)
 {
 	int rtv = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		rtv = __xnet_t_bind(fd, req, ret);
@@ -2037,6 +2097,7 @@ __xnet_t_close(int fd)
 {
 	struct _t_user *user;
 	int ret;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if ((ret = close(fd)) == 0 || errno != EINTR) {
@@ -2075,6 +2136,7 @@ int
 __xnet_t_close_r(int fd)
 {
 	int err, ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_list_unlock, NULL);
 	if ((err = __xnet_list_wrlock()) == 0) {
 		ret = __xnet_t_close(fd);
@@ -2103,6 +2165,7 @@ int
 __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -2116,11 +2179,13 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 		goto einval;
 	if (sndcall->udata.len < 0 || (sndcall->udata.len > 0 && !sndcall->udata.buf))
 		goto einval;
-	if (rcvcall && (rcvcall->addr.maxlen < 0 || (rcvcall->addr.maxlen > 0 && !rcvcall->addr.buf)))
+	if (rcvcall
+	    && (rcvcall->addr.maxlen < 0 || (rcvcall->addr.maxlen > 0 && !rcvcall->addr.buf)))
 		goto einval;
 	if (rcvcall && (rcvcall->opt.maxlen < 0 || (rcvcall->opt.maxlen > 0 && !rcvcall->opt.buf)))
 		goto einval;
-	if (rcvcall && (rcvcall->udata.maxlen < 0 || (rcvcall->udata.maxlen > 0 && !rcvcall->udata.buf)))
+	if (rcvcall
+	    && (rcvcall->udata.maxlen < 0 || (rcvcall->udata.maxlen > 0 && !rcvcall->udata.buf)))
 		goto einval;
 #endif
 	if (sndcall && sndcall->addr.len > __xnet_u_max_addr(user))
@@ -2139,6 +2204,7 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 			unsigned char opt[opt_len];
 			unsigned char udata[dat_len];
 		} req;
+
 		req.prim.PRIM_type = T_CONN_REQ;
 		req.prim.DEST_length = add_len;
 		req.prim.DEST_offset = add_len ? sizeof(req.prim) : 0;
@@ -2185,6 +2251,7 @@ int
 __xnet_t_connect_r(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_connect(fd, sndcall, rcvcall)) == -1)
@@ -2217,6 +2284,7 @@ int
 __xnet_t_error_r(const char *errmsg)
 {
 	int oldtype, ret;
+
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldtype);
 	ret = __xnet_t_error(errmsg);
 	pthread_setcanceltype(oldtype, NULL);
@@ -2248,6 +2316,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_BIND:
 	{
 		struct t_bind *bind = (struct t_bind *) ptr;
+
 		if (bind->addr.buf)
 			free(bind->addr.buf);
 		free(bind);
@@ -2256,6 +2325,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_OPTMGMT:
 	{
 		struct t_optmgmt *opts = (struct t_optmgmt *) ptr;
+
 		if (opts->opt.buf)
 			free(opts->opt.buf);
 		free(opts);
@@ -2264,6 +2334,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_CALL:
 	{
 		struct t_call *call = (struct t_call *) ptr;
+
 		if (call->addr.buf)
 			free(call->addr.buf);
 		if (call->opt.buf)
@@ -2276,6 +2347,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_DIS:
 	{
 		struct t_discon *discon = (struct t_discon *) ptr;
+
 		if (discon->udata.buf)
 			free(discon->udata.buf);
 		free(discon);
@@ -2284,6 +2356,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_UNITDATA:
 	{
 		struct t_unitdata *unitdata = (struct t_unitdata *) ptr;
+
 		if (unitdata->addr.buf)
 			free(unitdata->addr.buf);
 		if (unitdata->opt.buf)
@@ -2295,6 +2368,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_UDERROR:
 	{
 		struct t_uderr *uderr = (struct t_uderr *) ptr;
+
 		if (uderr->addr.buf)
 			free(uderr->addr.buf);
 		if (uderr->opt.buf)
@@ -2305,6 +2379,7 @@ __xnet_t_free(void *ptr, int type)
 	case T_INFO:
 	{
 		struct t_info *info = (struct t_info *) ptr;
+
 		free(info);
 		return (0);
 	}
@@ -2360,6 +2435,7 @@ int
 __xnet_t_getinfo(int fd, struct t_info *info)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 #ifdef DEBUG
@@ -2371,6 +2447,7 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 			struct T_info_req req;
 			struct T_info_ack ack;
 		} buf;
+
 		buf.req.PRIM_type = T_INFO_REQ;
 		if (__xnet_t_strioctl(fd, TI_GETINFO, &buf, sizeof(&buf)) != 0)
 			goto error;
@@ -2382,13 +2459,11 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 		user->info.discon = buf.ack.DDATA_size;
 		user->info.servtype = buf.ack.SERV_type;
 		user->info.flags = buf.ack.PROVIDER_flag;
-		/*
-		   need a define around this one 'cause it doesn't exist in XNS 5.2 
-		 */
+		/* 
+		   need a define around this one 'cause it doesn't exist in XNS 5.2 */
 		user->info.tidu = buf.ack.TIDU_size;
-		/*
-		   ignore CURRENT_state 
-		 */
+		/* 
+		   ignore CURRENT_state */
 		if (info)
 			*info = user->info;
 		return (0);
@@ -2409,6 +2484,7 @@ int
 __xnet_t_getinfo_r(int fd, struct t_info *info)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_getinfo(fd, info);
@@ -2434,6 +2510,7 @@ int
 __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 	{
@@ -2448,6 +2525,7 @@ __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 				unsigned char rem[add_max];
 			} ack;
 		} buf;
+
 		buf.req.prim.PRIM_type = T_ADDR_REQ;
 		if (__xnet_t_strioctl(fd, TI_GETADDRS, &buf, sizeof(buf)) != 0)
 			goto error;
@@ -2456,9 +2534,11 @@ __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 		if (rem && rem->addr.maxlen < buf.ack.prim.REMADDR_length)
 			goto tbufovflw;
 		if (loc && (loc->addr.len = buf.ack.prim.LOCADDR_length))
-			memcpy(loc->addr.buf, (char *) &buf + buf.ack.prim.LOCADDR_offset, loc->addr.len);
+			memcpy(loc->addr.buf, (char *) &buf + buf.ack.prim.LOCADDR_offset,
+			       loc->addr.len);
 		if (rem && (rem->addr.len = buf.ack.prim.REMADDR_length))
-			memcpy(rem->addr.buf, (char *) &buf + buf.ack.prim.REMADDR_offset, rem->addr.len);
+			memcpy(rem->addr.buf, (char *) &buf + buf.ack.prim.REMADDR_offset,
+			       rem->addr.len);
 		return (0);
 	}
       tbufovflw:
@@ -2472,6 +2552,7 @@ int
 __xnet_t_getprotaddr_r(int fd, struct t_bind *loc, struct t_bind *rem)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_getprotaddr(fd, loc, rem);
@@ -2495,6 +2576,7 @@ int
 __xnet_t_getstate(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->statef & (TSF_UNBND | TSF_IDLE | TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER |
@@ -2502,7 +2584,8 @@ __xnet_t_getstate(int fd)
 		return (user->state);
 	}
 	if (user->statef & (TSF_WACK_DREQ6 | TSF_WACK_DREQ7 | TSF_WACK_DREQ9 | TSF_WACK_DREQ10 |
-			    TSF_WACK_DREQ11 | TSF_WACK_BREQ | TSF_WACK_UREQ | TSF_WACK_CREQ | TSF_WACK_CRES))
+			    TSF_WACK_DREQ11 | TSF_WACK_BREQ | TSF_WACK_UREQ | TSF_WACK_CREQ |
+			    TSF_WACK_CRES))
 		goto tstatechng;
 	goto tproto;
       tstatechng:
@@ -2520,6 +2603,7 @@ int
 __xnet_t_getstate_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_getstate(fd);
@@ -2544,7 +2628,11 @@ int
 __xnet_t_listen(int fd, struct t_call *call)
 {
 	struct _t_user *user;
-	if (!(user = __xnet_t_tstuser(fd, T_LISTEN, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WRES_CIND | TSF_IDLE)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, T_LISTEN, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_WRES_CIND | TSF_IDLE)))
 		goto error;
 	if ((user->statef & TSF_IDLE) && user->qlen <= 0)
 		goto tbadqlen;
@@ -2554,6 +2642,7 @@ __xnet_t_listen(int fd, struct t_call *call)
 	case T_LISTEN:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		__xnet_u_setstate_const(user, TS_WRES_CIND);
 		user->ocnt++;
 		if (call) {
@@ -2565,9 +2654,11 @@ __xnet_t_listen(int fd, struct t_call *call)
 			if (call->udata.maxlen && call->udata.maxlen < user->data.len)
 				goto tbufovflw;
 			if (call->addr.maxlen && (call->addr.len = p->conn_ind.SRC_length))
-				memcpy(call->addr.buf, (char *) p + p->conn_ind.SRC_offset, call->addr.len);
+				memcpy(call->addr.buf, (char *) p + p->conn_ind.SRC_offset,
+				       call->addr.len);
 			if (call->opt.maxlen && (call->opt.len = p->conn_ind.OPT_length))
-				memcpy(call->opt.buf, (char *) p + p->conn_ind.OPT_offset, call->opt.len);
+				memcpy(call->opt.buf, (char *) p + p->conn_ind.OPT_offset,
+				       call->opt.len);
 			if (call->udata.maxlen && (call->udata.len = user->data.len))
 				memcpy(call->udata.buf, user->data.buf, call->udata.len);
 		}
@@ -2607,6 +2698,7 @@ int
 __xnet_t_listen_r(int fd, struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_listen(fd, call)) == -1)
@@ -2632,14 +2724,15 @@ int
 __xnet_t_look(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->event == 0) {
-		/*
-		   we are after normal messages only. 
-		 */
+		/* 
+		   we are after normal messages only. */
 		int ret, flag = 0;
 		union T_primitives *p = (typeof(p)) user->ctlbuf;
+
 		user->ctrl.maxlen = user->ctlmax;
 		user->ctrl.len = 0;
 		user->ctrl.buf = user->ctlbuf;
@@ -2669,14 +2762,12 @@ __xnet_t_look(int fd)
 			goto tsync;
 		switch (user->state) {
 		case T_UNINIT:
-			/*
-			   cannot have any events - should have never gotten here 
-			 */
+			/* 
+			   cannot have any events - should have never gotten here */
 			goto tsync;
 		case T_UNBND:
-			/*
-			   cannot have any events - should have never gotten here 
-			 */
+			/* 
+			   cannot have any events - should have never gotten here */
 			goto tsync;
 		case T_IDLE:
 			switch (user->info.servtype) {
@@ -2684,14 +2775,12 @@ __xnet_t_look(int fd)
 			case T_COTS_ORD:
 				if (user->qlen > 0)
 					goto tincon;
-				/*
-				   cannot have any events - should have never gotten here 
-				 */
+				/* 
+				   cannot have any events - should have never gotten here */
 				goto tsync;
 			case T_CLTS:
-				/*
-				   T_UNITDATA_IND, T_UDERROR_IND 
-				 */
+				/* 
+				   T_UNITDATA_IND, T_UDERROR_IND */
 				if (user->ctrl.len == 0) {
 					if ((user->gflags = (ret & MOREDATA))) {
 						user->event = T_DATA;
@@ -2715,9 +2804,8 @@ __xnet_t_look(int fd)
 				goto tsync;
 			}
 		case T_OUTCON:
-			/*
-			   T_CONN_CON or T_DISCON_IND 
-			 */
+			/* 
+			   T_CONN_CON or T_DISCON_IND */
 			switch ((user->prim = p->type)) {
 			case T_CONN_CON:
 				user->event = T_CONNECT;
@@ -2731,9 +2819,8 @@ __xnet_t_look(int fd)
 			user->gflags = 0;
 			return (user->event);
 		case T_INCON:
-			/*
-			   T_CONN_IND or T_DISCON_IND 
-			 */
+			/* 
+			   T_CONN_IND or T_DISCON_IND */
 		      tincon:
 			switch ((user->prim = p->type)) {
 			case T_CONN_IND:
@@ -2748,13 +2835,11 @@ __xnet_t_look(int fd)
 			user->gflags = 0;
 			return (user->event);
 		case T_DATAXFER:
-			/*
-			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND 
-			 */
+			/* 
+			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND */
 		case T_OUTREL:
-			/*
-			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND 
-			 */
+			/* 
+			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND */
 			if (user->ctrl.len == 0) {
 				if ((user->gflags = (ret & MOREDATA))) {
 					user->event = T_DATA;
@@ -2770,7 +2855,8 @@ __xnet_t_look(int fd)
 				user->event = T_EXDATA;
 				break;
 			case T_OPTDATA_IND:
-				user->event = (p->optdata_ind.DATA_flag & T_ODF_EX) ? T_EXDATA : T_DATA;
+				user->event =
+				    (p->optdata_ind.DATA_flag & T_ODF_EX) ? T_EXDATA : T_DATA;
 				break;
 			case T_ORDREL_IND:
 				if (ret & MOREDATA) {
@@ -2808,9 +2894,8 @@ __xnet_t_look(int fd)
 			user->gflags = (ret & MOREDATA);
 			return (user->event);
 		case T_INREL:
-			/*
-			   T_DISCON_IND 
-			 */
+			/* 
+			   T_DISCON_IND */
 			switch ((user->prim = p->type)) {
 			case T_DISCON_IND:
 				user->event = T_DISCONNECT;
@@ -2842,6 +2927,7 @@ int
 __xnet_t_look_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_look(fd);
@@ -2861,12 +2947,15 @@ int
 __xnet_t_peek(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->event == 0) {
 		struct pollfd pfd;
+
 		pfd.fd = fd;
-		pfd.events = (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
+		pfd.events =
+		    (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
 		pfd.revents = 0;
 		switch (poll(&pfd, 1, 0)) {
 		case 1:
@@ -2910,11 +2999,14 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 {
 	struct _t_user *user;
 	int err, fd;
+
 	t_errno = TSYSERR;
 	if (!(user = (struct _t_user *) malloc(sizeof(*user))))
 		goto enomem;
 	memset(user, 0, sizeof(*user));
-	user->ctlmax = sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN + _T_DEFAULT_OPTLEN;
+	user->ctlmax =
+	    sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN +
+	    _T_DEFAULT_OPTLEN;
 	user->datmax = _T_DEFAULT_DATALEN;
 	if (!(user->ctlbuf = (char *) malloc(user->ctlmax)))
 		goto enobufs;
@@ -2924,15 +3016,15 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 		goto badopen;
 	if (ioctl(fd, I_PUSH, "timod") != 0)
 		goto badioctl;
-	/*
-	   need to pick up all the capabilities from the stream 
-	 */
+	/* 
+	   need to pick up all the capabilities from the stream */
 	{
 		int i;
 		union {
 			struct T_capability_req req;
 			struct T_capability_ack ack;
 		} buf;
+
 		buf.req.PRIM_type = T_CAPABILITY_REQ;
 		buf.req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
 		if (__xnet_t_strioctl(fd, TI_CAPABILITY, &buf, sizeof(buf)) != 0)
@@ -2944,7 +3036,8 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 		   generate an acceptor id and also has the ability to complete the info structure
 		   from a @c T_INFO_REQ. 
 		 */
-		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) != (TC1_INFO | TC1_ACCEPTOR_ID))
+		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) !=
+		    (TC1_INFO | TC1_ACCEPTOR_ID))
 			goto badbits;
 		/**
 		   Although we have done a brand new open, we may have opened the same transport
@@ -3031,6 +3124,7 @@ int
 __xnet_t_open_r(const char *path, int oflag, struct t_info *info)
 {
 	int err, ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_list_unlock, NULL);
 	if ((err = __xnet_list_wrlock()) == 0) {
 		ret = __xnet_t_open(path, oflag, info);
@@ -3059,6 +3153,7 @@ int
 __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
 		goto error;
 #ifdef DEBUG
@@ -3084,6 +3179,7 @@ __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 				unsigned char opts[opt_max];
 			} ack;
 		} buf;
+
 		buf.req.prim.PRIM_type = T_OPTMGMT_REQ;
 		buf.req.prim.OPT_length = opt_len;
 		buf.req.prim.OPT_offset = opt_len ? sizeof(buf.req.prim) : 0;
@@ -3097,7 +3193,8 @@ __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 			if (ret->opt.maxlen < buf.ack.prim.OPT_length)
 				goto tbufovflw;
 			if ((ret->opt.len = buf.ack.prim.OPT_length))
-				memcpy(ret->opt.buf, (char *) &buf + buf.ack.prim.OPT_offset, ret->opt.len);
+				memcpy(ret->opt.buf, (char *) &buf + buf.ack.prim.OPT_offset,
+				       ret->opt.len);
 		}
 		return (0);
 	}
@@ -3123,6 +3220,7 @@ int
 __xnet_t_optmgmt_r(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 {
 	int rtv = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		rtv = __xnet_t_optmgmt(fd, req, ret);
@@ -3150,7 +3248,11 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, event = 0, flag = 0, result;
-	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 	if (nbytes == 0)
 		return (0);
@@ -3160,10 +3262,12 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 #endif
 	{
 		struct strbuf data;
+
 		data.maxlen = nbytes;
 		data.len = 0;
 		data.buf = buf ? buf : NULL;
-		if ((result = __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
+		if ((result =
+		     __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
 			event = result;
 		for (;;) {
 			switch (result) {
@@ -3175,7 +3279,8 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 			case T_EXDATA:
 				if (event != T_EXDATA)
 					goto tlook;
-				flag = ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
+				flag =
+				    ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
 				break;
 			case 0:
 				goto tnodata;
@@ -3226,6 +3331,7 @@ int
 __xnet_t_rcv_r(int fd, char *buf, unsigned int nbytes, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcv(fd, buf, nbytes, flags)) == -1)
@@ -3253,7 +3359,10 @@ __xnet_t_rcvconnect(int fd, struct t_call *call)
 {
 	struct _t_user *user;
 	union T_primitives *p;
-	if (!(user = __xnet_t_tstuser(fd, T_CONNECT, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WCON_CREQ)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, T_CONNECT, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WCON_CREQ)))
 		goto error;
 #ifdef DEBUG
 	if (call && (call->addr.maxlen < 0 || (call->addr.maxlen > 0 && !call->addr.buf)))
@@ -3276,9 +3385,11 @@ __xnet_t_rcvconnect(int fd, struct t_call *call)
 			if (call->udata.maxlen && call->udata.maxlen < user->data.len)
 				goto tbufovflw;
 			if (call->addr.maxlen && (call->addr.len = p->conn_con.RES_length))
-				memcpy(call->addr.buf, (char *) p + p->conn_con.RES_offset, call->addr.len);
+				memcpy(call->addr.buf, (char *) p + p->conn_con.RES_offset,
+				       call->addr.len);
 			if (call->opt.maxlen && (call->opt.len = p->conn_con.OPT_length))
-				memcpy(call->opt.buf, (char *) p + p->conn_con.OPT_offset, call->opt.len);
+				memcpy(call->opt.buf, (char *) p + p->conn_con.OPT_offset,
+				       call->opt.len);
 			if (call->udata.maxlen && (call->udata.len = user->data.len))
 				memcpy(call->udata.buf, user->data.buf, call->udata.len);
 		}
@@ -3318,6 +3429,7 @@ int
 __xnet_t_rcvconnect_r(int fd, struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvconnect(fd, call)) == -1)
@@ -3345,6 +3457,7 @@ int
 __xnet_t_rcvdis(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, T_DISCONNECT, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_DATA_XFER | TSF_WCON_CREQ | TSF_WIND_ORDREL |
 				      TSF_WREQ_ORDREL | TSF_WRES_CIND)))
@@ -3352,13 +3465,15 @@ __xnet_t_rcvdis(int fd, struct t_discon *discon)
 	if (user->state == T_INCON && user->ocnt < 1)
 		goto toutstate;
 #ifdef DEBUG
-	if (discon && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
+	if (discon
+	    && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
 		goto einval;
 #endif
 	switch (__xnet_t_getevent(fd)) {
 	case T_DISCONNECT:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		if (user->ocnt && --user->ocnt)
 			__xnet_u_setstate_const(user, TS_WRES_CIND);
 		else
@@ -3410,6 +3525,7 @@ int
 __xnet_t_rcvdis_r(int fd, struct t_discon *discon)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_rcvdis(fd, discon);
@@ -3448,6 +3564,7 @@ __xnet_t_rcvleafchange(int fd, struct t_leaf_status *change)
 {
 #if defined HAVE_XTI_ATM_H
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER)))
 		goto error;
 #ifdef DEBUG
@@ -3460,6 +3577,7 @@ __xnet_t_rcvleafchange(int fd, struct t_leaf_status *change)
 			struct t_atm_leaf_ind leaf;
 		} opts;
 		struct t_optmgmt req, ret;
+
 		req.opt.maxlen = 0;
 		req.opt.len = sizeof(opts);
 		req.opt.buf = (char *) &opts;
@@ -3517,6 +3635,7 @@ int
 __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_rcvleafchange(fd, change);
@@ -3540,7 +3659,10 @@ int
 __xnet_t_rcvrel(int fd)
 {
 	struct _t_user *user;
-	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 	switch (__xnet_t_getevent(fd)) {
 	case T_ORDREL:
@@ -3573,6 +3695,7 @@ int
 __xnet_t_rcvrel_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvrel(fd)) == -1)
@@ -3599,16 +3722,21 @@ int
 __xnet_t_rcvreldata(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
-	if (!(user = __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, T_ORDREL, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
-	if (discon && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
+	if (discon
+	    && (discon->udata.maxlen < 0 || (discon->udata.maxlen > 0 && !discon->udata.buf)))
 		goto einval;
 #endif
 	switch (__xnet_t_getevent(fd)) {
 	case T_ORDREL:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		if (user->state == T_DATAXFER)
 			__xnet_u_setstate(user, TS_WREQ_ORDREL);
 		if (user->state == T_OUTREL)
@@ -3657,6 +3785,7 @@ int
 __xnet_t_rcvreldata_r(int fd, struct t_discon *discon)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvreldata(fd, discon)) == -1)
@@ -3691,7 +3820,11 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0;
-	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!optdata)
@@ -3706,6 +3839,7 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 	case T_EXDATA:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		switch (user->prim) {
 		case T_DATA_IND:
 			if (optdata->addr.maxlen >= 0)
@@ -3713,27 +3847,31 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			if (optdata->opt.maxlen >= 0)
 				optdata->opt.len = 0;
 			if (optdata->udata.maxlen
-			    && (optdata->udata.maxlen = min(optdata->udata.maxlen, user->data.len))) {
+			    && (optdata->udata.maxlen =
+				min(optdata->udata.maxlen, user->data.len))) {
 				memcpy(optdata->udata.buf, user->data.buf, optdata->udata.len);
 				user->data.len -= optdata->udata.len;
 				user->data.buf += optdata->udata.len;
 			}
 			if (flags)
-				*flags |= (user->moresdu || user->moredat || user->data.len > 0) ? T_MORE : 0;
+				*flags |= (user->moresdu || user->moredat
+					   || user->data.len > 0) ? T_MORE : 0;
 			break;
 		case T_EXDATA_IND:
 			if (optdata->addr.maxlen >= 0)
 				optdata->addr.len = 0;
 			if (optdata->opt.maxlen >= 0)
 				optdata->opt.len = 0;
-			if (optdata->udata.maxlen && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
+			if (optdata->udata.maxlen
+			    && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
 				memcpy(optdata->udata.buf, user->data.buf, optdata->udata.len);
 				user->data.len -= optdata->udata.len;
 				user->data.buf += optdata->udata.len;
 			}
 			if (flags)
 				*flags |= (user->moreedu || user->moreexp
-					   || user->data.len > 0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
+					   || user->data.len >
+					   0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
 			break;
 		case T_OPTDATA_IND:
 			if (optdata->addr.maxlen >= 0)
@@ -3741,8 +3879,10 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			if (optdata->opt.maxlen && optdata->opt.maxlen < p->optdata_ind.OPT_length)
 				goto tbufovflw;
 			if (optdata->opt.maxlen && (optdata->opt.len = p->optdata_ind.OPT_length))
-				memcpy(optdata->opt.buf, (char *) p + p->optdata_ind.OPT_offset, optdata->opt.len);
-			if (optdata->udata.maxlen && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
+				memcpy(optdata->opt.buf, (char *) p + p->optdata_ind.OPT_offset,
+				       optdata->opt.len);
+			if (optdata->udata.maxlen
+			    && (optdata->udata.len = min(optdata->udata.maxlen, user->data.len))) {
 				memcpy(optdata->udata.buf, user->data.buf, optdata->udata.len);
 				user->data.len -= optdata->udata.len;
 				user->data.buf += optdata->udata.len;
@@ -3750,10 +3890,12 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			if (p->optdata_ind.DATA_flag & T_ODF_EX) {
 				if (flags)
 					*flags |= (user->moreedu || user->moreexp
-						   || user->data.len > 0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
+						   || user->data.len >
+						   0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
 			} else {
 				if (flags)
-					*flags |= (user->moresdu || user->moredat || user->data.len > 0) ? T_MORE : 0;
+					*flags |= (user->moresdu || user->moredat
+						   || user->data.len > 0) ? T_MORE : 0;
 			}
 			break;
 		default:
@@ -3797,6 +3939,7 @@ int
 __xnet_t_rcvopt_r(int fd, struct t_unitdata *optdata, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvopt(fd, optdata, flags)) == -1)
@@ -3829,6 +3972,7 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, flag = 0, result;
+
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 #ifdef DEBUG
@@ -3841,23 +3985,31 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 		return (0);
 	{
 		struct strbuf data;
+
 		data.maxlen = unitdata->udata.maxlen > 0 ? unitdata->udata.maxlen : 0;
 		data.len = 0;
 		data.buf = unitdata->udata.buf;
 		if ((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA) {
 			union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 			switch (user->prim) {
 			case T_UNITDATA_IND:
-				if (unitdata->addr.maxlen && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
+				if (unitdata->addr.maxlen
+				    && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
 					goto tbufovflw;
-				if (unitdata->opt.maxlen && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
+				if (unitdata->opt.maxlen
+				    && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
 					goto tbufovflw;
-				if (unitdata->addr.maxlen && (unitdata->addr.len = p->unitdata_ind.SRC_length))
+				if (unitdata->addr.maxlen
+				    && (unitdata->addr.len = p->unitdata_ind.SRC_length))
 					memcpy(unitdata->addr.buf,
-					       (char *) p + p->unitdata_ind.SRC_offset, unitdata->addr.len);
-				if (unitdata->opt.maxlen && (unitdata->opt.len = p->unitdata_ind.OPT_length))
+					       (char *) p + p->unitdata_ind.SRC_offset,
+					       unitdata->addr.len);
+				if (unitdata->opt.maxlen
+				    && (unitdata->opt.len = p->unitdata_ind.OPT_length))
 					memcpy(unitdata->opt.buf,
-					       (char *) p + p->unitdata_ind.OPT_offset, unitdata->opt.len);
+					       (char *) p + p->unitdata_ind.OPT_offset,
+					       unitdata->opt.len);
 				break;
 			default:
 				unitdata->addr.len = 0;
@@ -3922,6 +4074,7 @@ int
 __xnet_t_rcvudata_r(int fd, struct t_unitdata *unitdata, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvudata(fd, unitdata, flags)) == -1)
@@ -3949,6 +4102,7 @@ int
 __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, T_UDERR, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 #ifdef DEBUG
@@ -3961,6 +4115,7 @@ __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 	case T_UDERR:
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 		if (uderr) {
 			uderr->error = p->uderror_ind.ERROR_type;
 			if (uderr->addr.maxlen && uderr->addr.maxlen < p->uderror_ind.DEST_length)
@@ -3968,9 +4123,11 @@ __xnet_t_rcvuderr(int fd, struct t_uderr *uderr)
 			if (uderr->opt.maxlen && uderr->opt.maxlen < p->uderror_ind.OPT_length)
 				goto tbufovflw;
 			if (uderr->addr.maxlen && (uderr->addr.len = p->uderror_ind.DEST_length))
-				memcpy(uderr->addr.buf, (char *) p + p->uderror_ind.DEST_offset, uderr->addr.len);
+				memcpy(uderr->addr.buf, (char *) p + p->uderror_ind.DEST_offset,
+				       uderr->addr.len);
 			if (uderr->opt.maxlen && (uderr->opt.len = p->uderror_ind.OPT_length))
-				memcpy(uderr->opt.buf, (char *) p + p->uderror_ind.OPT_offset, uderr->opt.len);
+				memcpy(uderr->opt.buf, (char *) p + p->uderror_ind.OPT_offset,
+				       uderr->opt.len);
 		}
 		__xnet_u_reset_event(user);
 		return (0);
@@ -4008,6 +4165,7 @@ int
 __xnet_t_rcvuderr_r(int fd, struct t_uderr *uderr)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_rcvuderr(fd, uderr);
@@ -4036,7 +4194,11 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, nbytes, n = 0, event = 0, flag = 0, result;
-	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!flags)
@@ -4051,10 +4213,12 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 		goto tbaddata;
 	{
 		struct strbuf data;
+
 		data.maxlen = iov[0].iov_len;
 		data.len = 0;
 		data.buf = iov[0].iov_base;
-		if ((result = __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
+		if ((result =
+		     __xnet_t_getdata(fd, &data, (T_DATA | T_EXDATA))) & (T_DATA | T_EXDATA))
 			event = result;
 		for (n = 0;;) {
 			switch (result) {
@@ -4066,7 +4230,8 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 			case T_EXDATA:
 				if (event != T_EXDATA)
 					goto tlook;
-				flag = ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
+				flag =
+				    ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
 				break;
 			case 0:
 				goto tnodata;
@@ -4127,6 +4292,7 @@ int
 __xnet_t_rcvv_r(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvv(fd, iov, iovcount, flags)) == -1)
@@ -4155,10 +4321,12 @@ int t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
  * This function is a thread cancellation point.
  */
 int
-__xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
+__xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount,
+		   int *flags)
 {
 	struct _t_user *user;
 	int copied = 0, nbytes, n = 0, flag = 0, result;
+
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 	for (nbytes = 0, n = 0; n < iovcount; nbytes += iov[n].iov_len, n++) ;
@@ -4172,24 +4340,32 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 #endif
 	{
 		struct strbuf data;
+
 		data.maxlen = iov[0].iov_len;
 		data.len = 0;
 		data.buf = iov[0].iov_base;
 		if ((result = __xnet_t_getdata(fd, &data, T_DATA)) == T_DATA) {
 			union T_primitives *p = (typeof(p)) user->ctrl.buf;
+
 			switch (user->prim) {
 			case T_UNITDATA_IND:
 				if (unitdata) {
-					if (unitdata->addr.maxlen && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
+					if (unitdata->addr.maxlen
+					    && unitdata->addr.maxlen < p->unitdata_ind.SRC_length)
 						goto tbufovflw;
-					if (unitdata->opt.maxlen && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
+					if (unitdata->opt.maxlen
+					    && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
 						goto tbufovflw;
-					if (unitdata->addr.maxlen && (unitdata->addr.len = p->unitdata_ind.OPT_length))
+					if (unitdata->addr.maxlen
+					    && (unitdata->addr.len = p->unitdata_ind.OPT_length))
 						memcpy(unitdata->addr.buf,
-						       (char *) p + p->unitdata_ind.SRC_offset, unitdata->addr.len);
-					if (unitdata->opt.maxlen && (unitdata->opt.len = p->unitdata_ind.OPT_length))
+						       (char *) p + p->unitdata_ind.SRC_offset,
+						       unitdata->addr.len);
+					if (unitdata->opt.maxlen
+					    && (unitdata->opt.len = p->unitdata_ind.OPT_length))
 						memcpy(unitdata->opt.buf,
-						       (char *) p + p->unitdata_ind.OPT_offset, unitdata->opt.len);
+						       (char *) p + p->unitdata_ind.OPT_offset,
+						       unitdata->opt.len);
 				}
 				break;
 			default:
@@ -4267,9 +4443,11 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 }
 
 int
-__xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
+__xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		     unsigned int iovcount, int *flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_rcvvudata(fd, unitdata, iov, iovcount, flags)) == -1)
@@ -4281,7 +4459,8 @@ __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, u
 	return (ret);
 }
 
-int t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount, int *flags)
+int t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount,
+		int *flags)
     __attribute__ ((alias("__xnet_t_rcvvudata_r")));
 
 /**
@@ -4306,6 +4485,7 @@ __xnet_t_removeleaf(int fd, int leafid, int reason)
 {
 #if defined HAVE_XTI_ATM_H
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER)))
 		goto error;
 	{
@@ -4314,6 +4494,7 @@ __xnet_t_removeleaf(int fd, int leafid, int reason)
 			struct t_atm_drop_leaf leaf;
 		} opts;
 		struct t_optmgmt req, ret;
+
 		req.opt.maxlen = 0;
 		req.opt.len = sizeof(opts);
 		req.opt.buf = (char *) &opts;
@@ -4364,6 +4545,7 @@ int
 __xnet_t_removeleaf_r(int fd, int leafid, int reason)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_removeleaf(fd, leafid, reason);
@@ -4402,7 +4584,11 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 {
 	struct _t_user *user;
 	int written = 0;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -4420,6 +4606,7 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 		int band = (flags & T_EXPEDITED) ? 1 : 0;
 		struct T_exdata_req prim;	/* same as T_data_req */
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(prim);
 		ctrl.buf = (char *) &prim;
@@ -4464,6 +4651,7 @@ int
 __xnet_t_snd_r(int fd, char *buf, unsigned int nbytes, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_snd(fd, buf, nbytes, flags)) == -1)
@@ -4491,6 +4679,7 @@ int
 __xnet_t_snddis(int fd, const struct t_call *call)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER |
 				      TSF_WIND_ORDREL | TSF_WREQ_ORDREL)))
@@ -4511,6 +4700,7 @@ __xnet_t_snddis(int fd, const struct t_call *call)
 			struct T_discon_req prim;
 			unsigned char udata[dat_len];
 		} req;
+
 		req.prim.PRIM_type = T_DISCON_REQ;
 		req.prim.SEQ_number = call ? call->sequence : 0;
 		if (dat_len)
@@ -4566,6 +4756,7 @@ int
 __xnet_t_snddis_r(int fd, const struct t_call *call)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_snddis(fd, call);
@@ -4594,6 +4785,7 @@ int
 __xnet_t_sndrel(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -4601,6 +4793,7 @@ __xnet_t_sndrel(int fd)
 	{
 		struct T_ordrel_req prim;
 		struct strbuf ctrl;
+
 		prim.PRIM_type = T_ORDREL_REQ;
 		ctrl.maxlen = sizeof(prim);
 		ctrl.len = sizeof(prim);
@@ -4630,6 +4823,7 @@ int
 __xnet_t_sndrel_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndrel(fd)) == -1)
@@ -4661,6 +4855,7 @@ int
 __xnet_t_sndreldata(int fd, struct t_discon *discon)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -4676,6 +4871,7 @@ __xnet_t_sndreldata(int fd, struct t_discon *discon)
 	{
 		struct T_ordrel_req prim;
 		struct strbuf ctrl, data;
+
 		prim.PRIM_type = T_ORDREL_REQ;
 		ctrl.maxlen = sizeof(prim);
 		ctrl.len = sizeof(prim);
@@ -4722,6 +4918,7 @@ int
 __xnet_t_sndreldata_r(int fd, struct t_discon *discon)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndreldata(fd, discon)) == -1)
@@ -4751,7 +4948,11 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 {
 	struct _t_user *user;
 	int written = 0;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WIND_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!optdata)
@@ -4772,6 +4973,7 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -4779,7 +4981,8 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 		data.len = dat_len;
 		data.buf = optdata ? optdata->udata.buf : NULL;
 		req.prim.PRIM_type = T_OPTDATA_REQ;
-		req.prim.DATA_flag = ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
+		req.prim.DATA_flag =
+		    ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
 		req.prim.OPT_length = opt_len;
 		req.prim.OPT_offset = opt_len ? sizeof(req.prim) : 0;
 		if (opt_len)
@@ -4788,7 +4991,8 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 			data.len = min(__xnet_u_max_tidu(user), dat_len - written);
 			data.buf = optdata->udata.buf + written;
 			req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0)
-			    | (((flags & T_MORE) || (written + data.len < dat_len)) ? T_ODF_MORE : 0);
+			    | (((flags & T_MORE) || (written + data.len < dat_len)) ? T_ODF_MORE :
+			       0);
 			if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND))
 				goto error;
 			written += data.len;
@@ -4819,6 +5023,7 @@ int
 __xnet_t_sndopt_r(int fd, const struct t_unitdata *optdata, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndopt(fd, optdata, flags)) == -1)
@@ -4848,11 +5053,16 @@ int t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
  * This function is a thread cancellation point.
  */
 int
-__xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags)
+__xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
+		 unsigned int iovcount, int flags)
 {
 	struct _t_user *user;
 	int written = 0, nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!iov)
@@ -4872,6 +5082,7 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -4888,7 +5099,8 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
 				req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0) |
-				    (((flags & T_MORE) || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
+				    (((flags & T_MORE)
+				      || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -4921,6 +5133,7 @@ __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iove
 		   unsigned int iovcount, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndvopt(fd, optdata, iov, iovcount, flags)) == -1)
@@ -4932,7 +5145,8 @@ __xnet_t_sndvopt_r(int fd, const struct t_unitdata *optdata, const struct t_iove
 	return (ret);
 }
 
-int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags)
+int t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec *iov,
+	      unsigned int iovcount, int flags)
     __attribute__ ((alias("__xnet_t_sndvopt_r")));
 
 /**
@@ -4954,6 +5168,7 @@ int
 __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -4965,7 +5180,8 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 		goto einval;
 	if (unitdata && (unitdata->opt.len < 0 || (unitdata->opt.len > 0 && !unitdata->opt.buf)))
 		goto einval;
-	if (unitdata && (unitdata->udata.len < 0 || (unitdata->udata.len > 0 && !unitdata->udata.buf)))
+	if (unitdata
+	    && (unitdata->udata.len < 0 || (unitdata->udata.len > 0 && !unitdata->udata.buf)))
 		goto einval;
 #endif
 	if (unitdata && unitdata->addr.len > __xnet_u_max_addr(user))
@@ -4987,6 +5203,7 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = sizeof(req);
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -5036,6 +5253,7 @@ int
 __xnet_t_sndudata_r(int fd, const struct t_unitdata *unitdata)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndudata(fd, unitdata)) == -1)
@@ -5070,7 +5288,11 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 {
 	struct _t_user *user;
 	int written = 0, nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
 		goto tlook;
@@ -5090,6 +5312,7 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 		int n = 0, partial = 0;
 		struct T_exdata_req prim;	/* same as T_data_req */
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(prim);
 		ctrl.buf = (char *) &prim;
@@ -5139,6 +5362,7 @@ int
 __xnet_t_sndv_r(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndv(fd, iov, iovcount, flags)) == -1)
@@ -5169,11 +5393,16 @@ int t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flags)
  * This function is a thread cancellation point.
  */
 int
-__xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
+__xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
+		 unsigned int iovcount, int flags)
 {
 	struct _t_user *user;
 	int written = 0, nbytes, i;
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
+
+	if (!
+	    (user =
+	     __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
+			      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
 #ifdef DEBUG
 	if (!iov)
@@ -5199,6 +5428,7 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -5206,7 +5436,8 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 		data.len = nbytes;
 		data.buf = NULL;
 		req.prim.PRIM_type = T_OPTDATA_REQ;
-		req.prim.DATA_flag = ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
+		req.prim.DATA_flag =
+		    ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
 		req.prim.OPT_length = opt_len;
 		req.prim.OPT_offset = opt_len ? sizeof(req.prim) : 0;
 		if (opt_len)
@@ -5216,7 +5447,8 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
 				req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0)
-				    | (((flags & T_MORE) || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
+				    | (((flags & T_MORE) || (written + data.len < nbytes)) ?
+				       T_ODF_MORE : 0);
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -5248,9 +5480,11 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, u
 }
 
 int
-__xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
+__xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
+		   unsigned int iovcount, int flags)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndvopt(fd, options, iov, iovcount, flags)) == -1)
@@ -5262,7 +5496,8 @@ __xnet_t_sndvopt_r(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
 	return (ret);
 }
 
-int t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount, int flags)
+int t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov, unsigned int iovcount,
+	      int flags)
     __attribute__ ((alias("__xnet_t_sndvopt_r")));
 #endif
 
@@ -5287,6 +5522,7 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 {
 	struct _t_user *user;
 	int nbytes, i;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 	if (__xnet_t_peek(fd) > 0)
@@ -5318,6 +5554,7 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 			unsigned char opt[opt_len];
 		} req;
 		struct strbuf ctrl, data;
+
 		ctrl.maxlen = 0;
 		ctrl.len = sizeof(req);
 		ctrl.buf = (char *) &req;
@@ -5371,9 +5608,11 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 }
 
 int
-__xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int iovcount)
+__xnet_t_sndvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
+		     unsigned int iovcount)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		if ((ret = __xnet_t_sndvudata(fd, unitdata, iov, iovcount)) == -1)
@@ -5667,6 +5906,7 @@ int
 __xnet_t_sync(int fd)
 {
 	struct _t_user *user;
+
 	if (0 > fd || fd >= OPEN_MAX)
 		goto tbadf;
 	if ((user = _t_fds[fd])) {
@@ -5691,11 +5931,14 @@ __xnet_t_sync(int fd)
 			struct T_capability_req req;
 			struct T_capability_ack ack;
 		} buf;
+
 		t_errno = TSYSERR;
 		if (!(user = (struct _t_user *) malloc(sizeof(*user))))
 			goto enomem;
 		memset(user, 0, sizeof(*user));
-		user->ctlmax = sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN + _T_DEFAULT_OPTLEN;
+		user->ctlmax =
+		    sizeof(union T_primitives) + _T_DEFAULT_ADDRLEN + _T_DEFAULT_ADDRLEN +
+		    _T_DEFAULT_OPTLEN;
 		user->datmax = _T_DEFAULT_DATALEN;
 		if (!(user->ctlbuf = (char *) malloc(user->ctlmax)))
 			goto enobufs;
@@ -5712,7 +5955,8 @@ __xnet_t_sync(int fd)
 		   generate an acceptor id and also has the ability to complete the info structure
 		   from a @c T_INFO_REQ. 
 		 */
-		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) != (TC1_INFO | TC1_ACCEPTOR_ID))
+		if ((buf.ack.CAP_bits1 & (TC1_INFO | TC1_ACCEPTOR_ID)) !=
+		    (TC1_INFO | TC1_ACCEPTOR_ID))
 			goto tproto;
 		user->flags |= TUF_SYNC_REQUIRED;
 		for (i = 0; i < OPEN_MAX; i++)
@@ -5723,9 +5967,8 @@ __xnet_t_sync(int fd)
 				break;
 			}
 #if 0
-		/*
-		   FIXME: get these with fcntl 
-		 */
+		/* 
+		   FIXME: get these with fcntl */
 		user->fflags = oflag;
 #endif
 		user->info.addr = buf.ack.INFO_ack.ADDR_size;
@@ -5742,9 +5985,8 @@ __xnet_t_sync(int fd)
 		if (user->flags & TUF_SYNC_REQUIRED)
 			__xnet_u_setstate(user, buf.ack.INFO_ack.CURRENT_state);
 		pthread_rwlock_init(&user->lock, NULL);	/* destroyed for existing structure */
-		/*
-		   FIXME: need to install pthread_atfork handlert o re-initialize read-write locks 
-		 */
+		/* 
+		   FIXME: need to install pthread_atfork handlert o re-initialize read-write locks */
 		_t_fds[fd] = user;
 		user->flags &= ~TUF_SYNC_REQUIRED;
 		return __xnet_t_getstate(fd);
@@ -5790,6 +6032,7 @@ int
 __xnet_t_sync_r(int fd)
 {
 	int err, ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_list_unlock, NULL);
 	if ((err = __xnet_list_wrlock()) == 0) {
 		ret = __xnet_t_sync(fd);
@@ -5860,6 +6103,7 @@ int
 __xnet_t_unbind(int fd)
 {
 	struct _t_user *user;
+
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, TSF_IDLE)))
 		goto error;
 	if (user->info.servtype == T_CLTS || user->qlen > 0)
@@ -5871,6 +6115,7 @@ __xnet_t_unbind(int fd)
 			struct T_ok_ack ack;
 			struct T_error_ack err;
 		} buf;
+
 		buf.req.PRIM_type = T_UNBIND_REQ;
 		if (__xnet_t_strioctl(fd, TI_UNBIND, &buf, sizeof(buf)) != 0)
 			goto error;
@@ -5890,6 +6135,7 @@ int
 __xnet_t_unbind_r(int fd)
 {
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__xnet_t_putuser, &fd);
 	if (__xnet_t_getuser(fd)) {
 		ret = __xnet_t_unbind(fd);
@@ -5904,10 +6150,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.13 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.14 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.13 $)
- * @date \$Date: 2005/07/14 22:04:27 $
+ * @version \$Name:  $(\$Revision: 0.9.2.14 $)
+ * @date \$Date: 2005/07/18 12:45:04 $
  *
  * @}
  */

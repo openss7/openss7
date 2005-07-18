@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $";
+static char const ident[] =
+    "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
 
 #define __NO_VERSION__
 
@@ -134,8 +135,8 @@ static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -161,6 +162,7 @@ typedef struct sctp_addr {
 	uint16_t port __attribute__ ((packed));
 	uint32_t addr[0] __attribute__ ((packed));
 } sctp_addr_t;
+
 #define sctp_addr_t sctp_addr_t
 #endif				/* sctp_addr_t */
 
@@ -288,6 +290,7 @@ sctp_default_opts_size(sctp_t * sp, sctp_opts_t * ops)
 	size_t len = 0;
 	const size_t hlen = sizeof(struct t_opthdr);
 	const size_t olen = hlen + sizeof(t_scalar_t);
+
 	if (!ops || ops->bcast) {
 		len += olen;
 	}
@@ -458,9 +461,8 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->status = T_SUCCESS;
 		*((t_scalar_t *) * p)++ = sctp_default_sid;
 	}
-	/*
-	   note ssn and tsn are per-packet 
-	 */
+	/* 
+	   note ssn and tsn are per-packet */
 
 	if (!ops || ops->ropt) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -611,6 +613,7 @@ sctp_current_opts_size(sctp_t * sp, sctp_opts_t * ops)
 	size_t len = 0;
 	const size_t hlen = sizeof(struct t_opthdr);
 	const size_t olen = hlen + sizeof(t_scalar_t);
+
 	if (!ops || ops->bcast) {
 		len += olen;
 	}
@@ -694,6 +697,7 @@ sctp_current_opts_size(sctp_t * sp, sctp_opts_t * ops)
 	}
 	if (!ops || ops->hb) {
 		size_t n = ops ? (ops->hb->len - hlen) / sizeof(t_sctp_hb_t) : sp->danum;
+
 		if (!n)
 			n = sp->danum;
 		if (n)
@@ -701,6 +705,7 @@ sctp_current_opts_size(sctp_t * sp, sctp_opts_t * ops)
 	}
 	if (!ops || ops->rto) {
 		size_t n = ops ? (ops->rto->len - hlen) / sizeof(t_sctp_rto_t) : sp->danum;
+
 		if (!n)
 			n = sp->danum;
 		if (n)
@@ -804,9 +809,8 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->status = T_SUCCESS;
 		*((t_scalar_t *) * p)++ = sp->sid;
 	}
-	/*
-	   note ssn and tsn are per-packet 
-	 */
+	/* 
+	   note ssn and tsn are per-packet */
 
 	if (!ops || ops->ropt) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -952,6 +956,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 	}
 	if (!ops || ops->hb) {
 		size_t n = ops ? (ops->hb->len - hlen) / sizeof(t_sctp_hb_t) : sp->danum;
+
 		if (!n)
 			n = sp->danum;
 		if (n) {
@@ -965,6 +970,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 
 			for (sd = sp->daddr; n && sd; n--, sd = sd->next) {
 				t_sctp_hb_t *hb = ((t_sctp_hb_t *) * p)++;
+
 				hb->hb_dest = sd->daddr;
 				hb->hb_onoff = sd->hb_onoff;
 				hb->hb_itvl = (sd->hb_itvl * 1000 + HZ - 1) / HZ;
@@ -973,6 +979,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 	}
 	if (!ops || ops->rto) {
 		size_t n = ops ? (ops->rto->len - hlen) / sizeof(t_sctp_rto_t) : sp->danum;
+
 		if (!n)
 			n = sp->danum;
 		if (n) {
@@ -986,6 +993,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 
 			for (sd = sp->daddr; n && sd; n--, sd = sd->next) {
 				t_sctp_rto_t *rto = ((t_sctp_rto_t *) * p)++;
+
 				rto->rto_dest = sd->daddr;
 				rto->rto_initial = (sp->rto_ini * 1000 + HZ - 1) / HZ;
 				rto->rto_min = (sd->rto_min * 1000 + HZ - 1) / HZ;
@@ -1019,6 +1027,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 
 			for (sd = sp->daddr; n && sd; n--, sd = sd->next) {
 				t_sctp_dest_status_t *dest = ((t_sctp_dest_status_t *) * p)++;
+
 				dest->dest_addr = sd->daddr;
 				dest->dest_cwnd = sd->cwnd;
 				dest->dest_unack = sd->in_flight;
@@ -1042,6 +1051,7 @@ sctp_set_opts_size(sctp_t * sp, sctp_opts_t * ops)
 	size_t len = 0;
 	const size_t hlen = sizeof(struct t_opthdr);
 	const size_t olen = hlen + sizeof(t_scalar_t);
+
 	if (ops->bcast) {
 		len += olen;
 	}
@@ -1452,6 +1462,7 @@ sctp_parse_opts(sctp_opts_t * ops, unsigned char *opt_ptr, size_t opt_len)
 {
 	struct t_opthdr *oh = (struct t_opthdr *) opt_ptr;
 	unsigned char *opt_end = opt_ptr + opt_len;
+
 	for (; opt_ptr + sizeof(*oh) <= opt_end && oh->len >= sizeof(*oh)
 	     && opt_ptr + oh->len <= opt_end; opt_ptr += oh->len, oh = (struct t_opthdr *) opt_ptr) {
 		switch (oh->level) {
@@ -1583,6 +1594,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->bcast) {
 		if (ops->bcast->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->bcast + 1);
+
 			switch (*val) {
 			case T_YES:
 				sp->ip_broadcast = 1;
@@ -1598,6 +1610,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->norte) {
 		if (ops->norte->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->norte + 1);
+
 			switch (*val) {
 			case T_YES:
 				sp->ip_dontroute = 1;
@@ -1611,18 +1624,17 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 		}
 	}
 	if (ops->opts) {
-		/*
-		   not supported yet 
-		 */
+		/* 
+		   not supported yet */
 	}
 	if (ops->reuse) {
-		/*
-		   not supported yet 
-		 */
+		/* 
+		   not supported yet */
 	}
 	if (ops->tos) {
 		if (ops->tos->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->tos + 1);
+
 			sp->ip_tos = *val & 0xff;
 			*val = sp->ip_tos;
 			ops->flags |= TF_IP_TOS;
@@ -1631,6 +1643,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->ttl) {
 		if (ops->ttl->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->ttl + 1);
+
 			sp->ip_ttl = *val & 0xff;
 			*val = sp->ip_ttl;
 			ops->flags |= TF_IP_TTL;
@@ -1639,6 +1652,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->nd) {
 		if (ops->nd->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->nd + 1);
+
 			switch (*val) {
 			case T_YES:
 				sp->options &= ~SCTP_OPTION_NAGLE;
@@ -1655,6 +1669,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->cork) {
 		if (ops->cork->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->cork + 1);
+
 			switch (*val) {
 			case T_YES:
 				sp->options |= SCTP_OPTION_CORK;
@@ -1670,6 +1685,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->ppi) {
 		if (ops->ppi->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->ppi + 1);
+
 			sp->ppi = *val;
 			*val = sp->ppi;
 			ops->flags |= TF_SCTP_PPI;
@@ -1678,24 +1694,24 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->sid) {
 		if (ops->sid->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->sid + 1);
+
 			sp->sid = *val;
 			*val = sp->sid;
 			ops->flags |= TF_SCTP_SID;
 		}
 	}
 	if (ops->ssn) {
-		/*
-		   not writeable 
-		 */
+		/* 
+		   not writeable */
 	}
 	if (ops->tsn) {
-		/*
-		   not writeable 
-		 */
+		/* 
+		   not writeable */
 	}
 	if (ops->ropt) {
 		if (ops->ropt->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->ropt + 1);
+
 			switch (*val) {
 			case T_YES:
 				sp->i_flags |= TF_SCTP_RECVOPT;
@@ -1711,6 +1727,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->cklife) {
 		if (ops->cklife->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->cklife + 1);
+
 			if (*val < 10)
 				*val = 10;
 			sp->ck_life = (*val * HZ + 999) / 1000;
@@ -1721,6 +1738,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->sack) {
 		if (ops->sack->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->sack + 1);
+
 			sp->max_sack = (*val * HZ + 999) / 1000;
 			*val = (sp->max_sack * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_SACK_DELAY;
@@ -1729,6 +1747,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->path) {
 		if (ops->path->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->path + 1);
+
 			sp->rtx_path = *val;
 			*val = sp->rtx_path;
 			ops->flags |= TF_SCTP_PATH_MAX_RETRANS;
@@ -1737,6 +1756,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->assoc) {
 		if (ops->assoc->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->assoc + 1);
+
 			sp->max_retrans = *val;
 			*val = sp->max_retrans;
 			ops->flags |= TF_SCTP_ASSOC_MAX_RETRANS;
@@ -1745,6 +1765,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->init) {
 		if (ops->init->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->init + 1);
+
 			sp->max_inits = *val;
 			*val = sp->max_inits;
 			ops->flags |= TF_SCTP_MAX_INIT_RETRIES;
@@ -1753,6 +1774,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->hbitvl) {
 		if (ops->hbitvl->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->hbitvl + 1);
+
 			sp->hb_itvl = (*val * HZ + 999) / 1000;
 			*val = (sp->hb_itvl * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_HEARTBEAT_ITVL;
@@ -1761,6 +1783,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->rtoinit) {
 		if (ops->rtoinit->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->rtoinit + 1);
+
 			sp->rto_ini = (*val * HZ + 999) / 1000;
 			*val = (sp->rto_ini * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_RTO_INITIAL;
@@ -1769,6 +1792,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->rtomin) {
 		if (ops->rtomin->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->rtomin + 1);
+
 			sp->rto_min = (*val * HZ + 999) / 1000;
 			*val = (sp->rto_min * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_RTO_MIN;
@@ -1777,6 +1801,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->rtomax) {
 		if (ops->rtomax->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->rtomax + 1);
+
 			sp->rto_max = (*val * HZ + 999) / 1000;
 			*val = (sp->rto_max * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_RTO_MAX;
@@ -1785,6 +1810,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->ostr) {
 		if (ops->ostr->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->ostr + 1);
+
 			sp->req_ostr = *val;
 			*val = sp->req_ostr;
 			ops->flags |= TF_SCTP_OSTREAMS;
@@ -1793,6 +1819,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->istr) {
 		if (ops->istr->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->istr + 1);
+
 			sp->max_istr = *val;
 			*val = sp->max_istr;
 			ops->flags |= TF_SCTP_ISTREAMS;
@@ -1801,6 +1828,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->ckinc) {
 		if (ops->ckinc->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->ckinc + 1);
+
 			sp->ck_inc = (*val * HZ + 999) / 1000;
 			*val = (sp->ck_inc * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_COOKIE_INC;
@@ -1809,6 +1837,7 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->titvl) {
 		if (ops->titvl->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->titvl + 1);
+
 			sp->throttle = (*val * HZ + 999) / 1000;
 			*val = (sp->throttle * 1000 + HZ - 1) / HZ;
 			ops->flags |= TF_SCTP_THROTTLE_ITVL;
@@ -1817,38 +1846,36 @@ sctp_negotiate_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (ops->hmac) {
 		if (ops->hmac->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->hmac + 1);
+
 			sp->hmac = *val;
 			*val = sp->hmac;
 			ops->flags |= TF_SCTP_MAC_TYPE;
 		}
 	}
 	if (ops->mseg) {
-		/*
-		   not writeable 
-		 */
+		/* 
+		   not writeable */
 	}
 	if (ops->debug) {
 		if (ops->debug->len >= olen) {
 			t_scalar_t *val = (t_scalar_t *) (ops->debug + 1);
+
 			sp->options = *val;
 			*val = sp->options;
 			ops->flags |= TF_SCTP_DEBUG;
 		}
 	}
 	if (ops->hb) {
-		/*
-		   not support yet 
-		 */
+		/* 
+		   not support yet */
 	}
 	if (ops->rto) {
-		/*
-		   not support yet 
-		 */
+		/* 
+		   not support yet */
 	}
 	if (ops->status) {
-		/*
-		   not writeable 
-		 */
+		/* 
+		   not writeable */
 	}
 	return;
 }
@@ -1863,7 +1890,7 @@ sctp_check_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (!ops)
 		return;
 	ops->flags = TF_SCTP_ALLOPS;
-	/*
+	/* 
 	 *  FIXME: actually check some options.
 	 */
 	fixme(("Actually check some options.\n"));
@@ -1896,6 +1923,7 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 	size_t src_len = danum ? sizeof(uint16_t) + danum * sizeof(uint32_t) : 0;
 	size_t str_len = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
 	size_t opt_len = 2 * str_len;
+
 	ensure(((1 << sp->i_state) & (TSF_IDLE | TSF_WRES_CIND)), return (-EFAULT));
 	if (bufq_length(&sp->conq) < sp->conind) {
 		if (canputnext(sp->rq)) {
@@ -1909,9 +1937,8 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 				p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
 				p->SEQ_number = (ulong) cp;
 
-				/*
-				   place address information from cookie 
-				 */
+				/* 
+				   place address information from cookie */
 				if (danum)
 					*((uint16_t *) mp->b_wptr)++ = ck->dport;
 				if (danum--)
@@ -1919,9 +1946,8 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 				while (danum--)
 					*((uint32_t *) mp->b_wptr)++ = *daptr++;
 
-				/*
-				   indicate options 
-				 */
+				/* 
+				   indicate options */
 				oh = ((struct t_opthdr *) mp->b_wptr)++;
 				oh->len = str_len;
 				oh->level = T_INET_SCTP;
@@ -1929,9 +1955,8 @@ t_conn_ind(sctp_t * sp, mblk_t *cp)
 				oh->status = T_SUCCESS;
 				*((t_scalar_t *) mp->b_wptr)++ = ck->n_istr;
 
-				/*
-				   indicate options 
-				 */
+				/* 
+				   indicate options */
 				oh = ((struct t_opthdr *) mp->b_wptr)++;
 				oh->len = str_len;
 				oh->level = T_INET_SCTP;
@@ -1971,6 +1996,7 @@ t_conn_con(sctp_t * sp)
 	size_t res_len = sp->danum ? sizeof(uint16_t) + sp->danum * sizeof(sd->daddr) : 0;
 	size_t str_len = sizeof(*oh) + sizeof(t_scalar_t);
 	size_t opt_len = 2 * str_len;
+
 	ensure((sp->i_state == TS_WCON_CREQ), return (-EFAULT));
 	if (canputnext(sp->rq)) {
 		if ((mp = allocb(sizeof(*p) + res_len + opt_len, BPRI_MED))) {
@@ -1983,17 +2009,15 @@ t_conn_con(sctp_t * sp)
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) + res_len : 0;
 
-			/*
-			   place destination (responding) address 
-			 */
+			/* 
+			   place destination (responding) address */
 			if (sd)
 				*((uint16_t *) mp->b_wptr)++ = sp->dport;
 			for (; sd; sd = sd->next)
 				*((uint32_t *) mp->b_wptr)++ = sd->daddr;
 
-			/*
-			   indicate options 
-			 */
+			/* 
+			   indicate options */
 			oh = ((struct t_opthdr *) mp->b_wptr)++;
 			oh->len = str_len;
 			oh->level = T_INET_SCTP;
@@ -2001,9 +2025,8 @@ t_conn_con(sctp_t * sp)
 			oh->status = T_SUCCESS;
 			*((t_scalar_t *) mp->b_wptr)++ = sp->n_istr;
 
-			/*
-			   indicate options 
-			 */
+			/* 
+			   indicate options */
 			oh = ((struct t_opthdr *) mp->b_wptr)++;
 			oh->len = str_len;
 			oh->level = T_INET_SCTP;
@@ -2038,6 +2061,7 @@ t_discon_ind(sctp_t * sp, long reason, mblk_t *seq)
 {
 	mblk_t *mp;
 	struct T_discon_ind *p;
+
 	ensure(((1 << sp->
 		 i_state) & (TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL |
 			     TSF_WREQ_ORDREL)), return (-EFAULT));
@@ -2078,6 +2102,7 @@ t_data_ind(sctp_t * sp, ulong more, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_data_ind *p;
+
 	ensure(((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WIND_ORDREL)), return (-EFAULT));
 	if (canputnext(sp->rq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -2108,6 +2133,7 @@ t_exdata_ind(sctp_t * sp, ulong more, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_exdata_ind *p;
+
 	ensure(((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WIND_ORDREL)), return (-EFAULT));
 	if (canputnext(sp->rq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -2138,6 +2164,7 @@ t_info_ack(sctp_t * sp)
 {
 	mblk_t *mp;
 	struct T_info_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_info_ack *) mp->b_wptr)++;
@@ -2170,6 +2197,7 @@ t_bind_ack(sctp_t * sp)
 	struct T_bind_ack *p;
 	struct sctp_saddr *ss = sp->saddr;
 	size_t add_len = sp->sanum ? sizeof(sp->sport) + sp->sanum * sizeof(ss->saddr) : 0;
+
 	ensure((sp->i_state == TS_WACK_BREQ), return (-EFAULT));
 	if ((mp = allocb(sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2199,6 +2227,7 @@ t_error_ack(sctp_t * sp, ulong prim, long err)
 {
 	mblk_t *mp;
 	struct T_error_ack *p;
+
 	switch (err) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -2246,7 +2275,7 @@ t_error_ack(sctp_t * sp, ulong prim, long err)
 		case TS_WACK_DREQ11:
 			sp->i_state = TS_WREQ_ORDREL;
 			break;
-			/*
+			/* 
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  send TOUTSTATE or TNOTSUPPORT or are responding to
@@ -2269,6 +2298,7 @@ t_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 {
 	mblk_t *mp;
 	struct T_ok_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_ok_ack *) mp->b_wptr)++;
@@ -2285,6 +2315,7 @@ t_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 		{
 			queue_t *aq = (queue_t *) tok;
 			sctp_t *ap = (sctp_t *) aq->q_ptr;
+
 			if (ap) {
 				ap->i_state = TS_DATA_XFER;
 				sctp_cleanup_read(sp);	/* deliver to user what is possible */
@@ -2316,7 +2347,7 @@ t_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 			else
 				sp->i_state = TS_IDLE;
 			break;
-			/*
+			/* 
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  are responding to a T_OPTMGMT_REQ in other than
@@ -2340,6 +2371,7 @@ t_optmgmt_ack(sctp_t * sp, ulong flags, sctp_opts_t * ops)
 	mblk_t *mp;
 	size_t opt_len = sctp_opts_size(flags, sp, ops);
 	struct T_optmgmt_ack *p;
+
 	if ((mp = allocb(sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_optmgmt_ack *) mp->b_wptr)++;
@@ -2368,6 +2400,7 @@ t_ordrel_ind(sctp_t * sp)
 {
 	mblk_t *mp;
 	struct T_ordrel_ind *p;
+
 	ensure(((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WIND_ORDREL)), return (-EFAULT));
 	if (canputnext(sp->rq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -2405,6 +2438,7 @@ t_optdata_ind(sctp_t * sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t ts
 	struct T_optdata_ind *p;
 	size_t str_len = sizeof(*oh) + sizeof(t_scalar_t);
 	size_t opt_len = 0;
+
 	ensure(((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WREQ_ORDREL)), return (-EFAULT));
 	if (canputnext(sp->rq)) {
 		if (sp->i_flags & TF_SCTP_RECVOPT)
@@ -2419,9 +2453,8 @@ t_optdata_ind(sctp_t * sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t ts
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) : 0;
 
-			/*
-			   indicate options 
-			 */
+			/* 
+			   indicate options */
 			if (sp->i_flags & TF_SCTP_RECVOPT) {
 				oh = ((struct t_opthdr *) mp->b_wptr)++;
 				oh->len = str_len;
@@ -2475,6 +2508,7 @@ t_addr_ack(sctp_t * sp)
 	struct sctp_daddr *sd = sp->daddr;
 	size_t loc_len = sp->sanum ? sizeof(sp->sport) + sp->sanum * sizeof(ss->saddr) : 0;
 	size_t rem_len = sp->danum ? sizeof(sp->dport) + sp->danum * sizeof(sd->daddr) : 0;
+
 	if ((mp = allocb(sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_addr_ack *) mp->b_wptr)++;
@@ -2509,6 +2543,7 @@ t_capability_ack(sctp_t * sp, ulong caps)
 	mblk_t *mp;
 	struct T_capability_ack *p;
 	uint caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_capability_ack *) mp->b_wptr)++;
@@ -2655,6 +2690,7 @@ t_conn_req(sctp_t * sp, mblk_t *mp)
 	struct sctp_addr *a;
 	size_t anum;
 	const struct T_conn_req *p = (struct T_conn_req *) mp->b_rptr;
+
 	if (sp->i_state != TS_IDLE)
 		goto outstate;
 	sp->i_state = TS_WACK_CREQ;
@@ -2673,18 +2709,20 @@ t_conn_req(sctp_t * sp, mblk_t *mp)
 	{
 		struct t_opthdr *rto = NULL;
 		struct t_opthdr *hb = NULL;
-		/*
-		   address per-association options 
-		 */
+
+		/* 
+		   address per-association options */
 		if (p->OPT_length) {
 			unsigned char *op = mp->b_rptr + p->OPT_offset;
 			unsigned char *oe = op + p->OPT_length;
 			struct t_opthdr *oh = (struct t_opthdr *) op;
+
 			err = 0;
 			for (;
 			     op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh) && op + oh->len <= oe;
 			     op += oh->len, oh = (struct t_opthdr *) op) {
 				t_scalar_t val = *((t_scalar_t *) (oh + 1));
+
 				if (oh->level == T_INET_SCTP)
 					switch (oh->name) {
 					case T_SCTP_ISTREAMS:
@@ -2747,19 +2785,18 @@ t_conn_req(sctp_t * sp, mblk_t *mp)
 				goto error;
 		}
 #if 0
-		/*
-		   allocate addresses now 
-		 */
+		/* 
+		   allocate addresses now */
 		if ((err = sctp_alloc_daddrs(sp, a->port, a->addr, anum)))
 			goto error;
-		/*
-		   address per-destination options 
-		 */
+		/* 
+		   address per-destination options */
 		if (rto) {
 			struct sctp_daddr
 			*sd;
 			t_sctp_rto_t *op = (t_sctp_rto_t *) rto->value;
 			t_sctp_rto_t *oe = (t_sctp_rto_t *) (((caddr_t) rto) + rto->len);
+
 			for (; op + 1 <= oe; op++) {
 				if ((sd = sctp_find_daddr(sp, op->rto_dest))) {
 					sd->rto = op->rto_initial;
@@ -2781,6 +2818,7 @@ t_conn_req(sctp_t * sp, mblk_t *mp)
 			*sd;
 			t_sctp_hb_t *op = (t_sctp_hb_t *) hb->value;
 			t_sctp_hb_t *oe = (t_sctp_hb_t *) (((caddr_t) hb) + hb->len);
+
 			for (; op + 1 <= oe; op++) {
 				if ((sd = sctp_find_daddr(sp, op->hb_dest))) {
 					sd->hb_onoff = op->hb_onoff;
@@ -2841,6 +2879,7 @@ STATIC mblk_t *
 t_seq_check(sctp_t * sp, ulong seq)
 {
 	mblk_t *mp = bufq_head(&sp->conq);
+
 	for (; mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
 	usual(mp);
 	return (mp);
@@ -2852,6 +2891,7 @@ t_tok_check(ulong acceptor)
 {
 	sctp_t *ap;
 	queue_t *aq = (queue_t *) acceptor;
+
 	for (ap = sctp_t_list; ap && ap->rq != aq; ap = ap->next) ;
 	usual(ap);
 	return (ap);
@@ -2864,6 +2904,7 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 	sctp_t *ap;
 	const size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_conn_res *p = (struct T_conn_res *) mp->b_rptr;
+
 	if (sp->i_state != TS_WRES_CIND)
 		goto outstate;
 	sp->i_state = TS_WACK_CRES;
@@ -2878,26 +2919,27 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 		goto badf;
 	if (ap->i_state == TS_IDLE && ap->conind)
 		goto resqlen;
-	/*
-	   protect at least r00t streams from users 
-	 */
+	/* 
+	   protect at least r00t streams from users */
 	if (sp->cred.cr_uid != 0 && ap->cred.cr_uid != sp->cred.cr_uid)
 		goto access;
 	{
 		uint ap_oldstate = ap->i_state;
 		struct t_opthdr *rto = NULL;
 		struct t_opthdr *hb = NULL;
-		/*
-		   address per-association options 
-		 */
+
+		/* 
+		   address per-association options */
 		if (p->OPT_length) {
 			unsigned char *op = mp->b_rptr + p->OPT_offset;
 			unsigned char *oe = op + p->OPT_length;
 			struct t_opthdr *oh = (struct t_opthdr *) op;
+
 			for (;
 			     op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh) && op + oh->len <= oe;
 			     op += oh->len, oh = (struct t_opthdr *) op) {
 				t_scalar_t val = *((t_scalar_t *) (oh + 1));
+
 				if (oh->level == T_INET_SCTP)
 					switch (oh->name) {
 					case T_SCTP_SID:
@@ -2953,14 +2995,14 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 				goto error;
 		}
 #if 0
-		/*
-		   address per-destination options 
-		 */
+		/* 
+		   address per-destination options */
 		if (rto) {
 			struct sctp_daddr
 			*sd;
 			t_sctp_rto_t *op = (t_sctp_rto_t *) rto->value;
 			t_sctp_rto_t *oe = (t_sctp_rto_t *) (((caddr_t) rto) + rto->len);
+
 			for (; op + 1 <= oe; op++) {
 				if ((sd = sctp_find_daddr(sp, op->rto_dest))) {
 					sd->rto = op->rto_initial;
@@ -2981,6 +3023,7 @@ t_conn_res(sctp_t * sp, mblk_t *mp)
 			*sd;
 			t_sctp_hb_t *op = (t_sctp_hb_t *) hb->value;
 			t_sctp_hb_t *oe = (t_sctp_hb_t *) (((caddr_t) hb) + hb->len);
+
 			for (; op + 1 <= oe; op++) {
 				if ((sd = sctp_find_daddr(sp, op->hb_dest))) {
 					sd->hb_onoff = op->hb_onoff;
@@ -3102,6 +3145,7 @@ t_discon_req(sctp_t * sp, mblk_t *mp)
 	mblk_t *cp = NULL;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	struct T_discon_req *p = (struct T_discon_req *) mp->b_rptr;
+
 	if (!
 	    ((1 << sp->
 	      i_state) & (TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL |
@@ -3158,6 +3202,7 @@ STATIC int
 t_error_reply(sctp_t * sp, int err)
 {
 	mblk_t *mp;
+
 	switch (err) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -3185,6 +3230,7 @@ STATIC int
 t_write(sctp_t * sp, mblk_t *mp)
 {
 	int err;
+
 	if (sp->i_state == TS_IDLE)
 		goto discard;
 	if (!((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WREQ_ORDREL)))
@@ -3195,6 +3241,7 @@ t_write(sctp_t * sp, mblk_t *mp)
 		ulong ord = 1;
 		ulong more = 0;
 		ulong rcpt = 0;
+
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp)))
 			goto error;
 		return (1);	/* absorbed */
@@ -3216,6 +3263,7 @@ t_data_req(sctp_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_data_req *p = (struct T_data_req *) mp->b_rptr;
+
 	if (sp->i_state == TS_IDLE)
 		goto discard;
 	if (mlen < sizeof(*p))
@@ -3228,6 +3276,7 @@ t_data_req(sctp_t * sp, mblk_t *mp)
 		ulong ord = 1;
 		ulong more = p->MORE_flag;
 		ulong rcpt = 0;
+
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto error;
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
@@ -3259,6 +3308,7 @@ t_exdata_req(sctp_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_exdata_req *p = (struct T_exdata_req *) mp->b_rptr;
+
 	if (sp->i_state == TS_IDLE)
 		goto discard;
 	if (mlen < sizeof(*p))
@@ -3271,6 +3321,7 @@ t_exdata_req(sctp_t * sp, mblk_t *mp)
 		ulong ord = 0;
 		ulong more = p->MORE_flag;
 		ulong rcpt = 0;
+
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
 			goto error;
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
@@ -3313,6 +3364,7 @@ t_bind_req(sctp_t * sp, mblk_t *mp)
 	int err;
 	const size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_bind_req *p = (struct T_bind_req *) mp->b_rptr;
+
 	if (sp->i_state != TS_UNBND)
 		goto outstate;
 	sp->i_state = TS_WACK_BREQ;
@@ -3321,12 +3373,12 @@ t_bind_req(sctp_t * sp, mblk_t *mp)
 	{
 		struct sctp_addr *a = (struct sctp_addr *) (mp->b_rptr + p->ADDR_offset);
 		size_t anum = (p->ADDR_length - sizeof(a->port)) / sizeof(a->addr[0]);
+
 		if ((mlen < p->ADDR_offset + p->ADDR_length) ||
 		    (p->ADDR_length != sizeof(*a) + anum * sizeof(a->addr[0])))
 			goto badaddr;
-		/*
-		   we don't allow wildcards just yet 
-		 */
+		/* 
+		   we don't allow wildcards just yet */
 		if (!anum || (!a->port && !(a->port = sctp_get_port())))
 			goto noaddr;
 		if (sp->cred.cr_uid != 0 && a->port < 1024)
@@ -3369,6 +3421,7 @@ t_unbind_req(sctp_t * sp, mblk_t *mp)
 {
 	int err;
 	const struct T_unbind_req *p = (struct T_unbind_req *) mp->b_rptr;
+
 	(void) p;
 	if (sp->i_state != TS_IDLE)
 		goto outstate;
@@ -3422,6 +3475,7 @@ t_optmgmt_req(sctp_t * sp, mblk_t *mp)
 	int err = 0;
 	const size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_optmgmt_req *p = (struct T_optmgmt_req *) mp->b_rptr;
+
 #ifdef TS_WACK_OPTREQ
 	if (sp->i_state == TS_IDLE)
 		sp->i_state = TS_WACK_OPTREQ;
@@ -3436,6 +3490,7 @@ t_optmgmt_req(sctp_t * sp, mblk_t *mp)
 		unsigned char *opt_ptr = mp->b_rptr + p->OPT_offset;
 		struct sctp_opts ops = { 0L, NULL, };
 		struct sctp_opts *opsp = NULL;
+
 		if (opt_len) {
 			if ((err = sctp_parse_opts(&ops, opt_ptr, opt_len)))
 				goto error;
@@ -3449,9 +3504,8 @@ t_optmgmt_req(sctp_t * sp, mblk_t *mp)
 			sctp_negotiate_opts(sp, opsp);
 			return t_optmgmt_ack(sp, flags, opsp);
 		case T_DEFAULT:
-			/*
-			   return defaults for the specified options 
-			 */
+			/* 
+			   return defaults for the specified options */
 		case T_CURRENT:
 			return t_optmgmt_ack(sp, flags, opsp);
 		default:
@@ -3539,6 +3593,7 @@ STATIC int
 t_ordrel_req(sctp_t * sp, mblk_t *mp)
 {
 	int err;
+
 	if (!((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto outstate;
 	switch (sp->i_state) {
@@ -3574,6 +3629,7 @@ t_optdata_req(sctp_t * sp, mblk_t *mp)
 	int err;
 	const size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_optdata_req *p = (struct T_optdata_req *) mp->b_rptr;
+
 	if (sp->i_state == TS_IDLE)
 		goto discard;
 	if (mlen < sizeof(*p))
@@ -3588,10 +3644,12 @@ t_optdata_req(sctp_t * sp, mblk_t *mp)
 		ulong ord = !(p->DATA_flag & T_ODF_EX);
 		ulong more = (p->DATA_flag & T_ODF_MORE);
 		ulong rcpt = 0;
+
 		if (p->OPT_length) {
 			unsigned char *op = mp->b_rptr + p->OPT_offset;
 			unsigned char *oe = op + p->OPT_length;
 			struct t_opthdr *oh = (struct t_opthdr *) op;
+
 			for (; op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh)
 			     && op + oh->len <= oe; op += oh->len, oh = (struct t_opthdr *) op) {
 				if (oh->level == T_INET_SCTP)
@@ -3655,6 +3713,7 @@ sctp_t_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sctp_t *sp = (sctp_t *) q->q_ptr;
 	ulong oldstate = sp->i_state;
+
 	switch ((prim = *((ulong *) mp->b_rptr))) {
 	case T_CONN_REQ:
 		rtn = t_conn_req(sp, mp);
@@ -3714,12 +3773,14 @@ STATIC int
 sctp_t_w_data(queue_t *q, mblk_t *mp)
 {
 	sctp_t *sp = (sctp_t *) q->q_ptr;
+
 	return t_write(sp, mp);
 }
 STATIC int
 sctp_t_r_data(queue_t *q, mblk_t *mp)
 {
 	sctp_t *sp = (sctp_t *) q->q_ptr;
+
 	return sctp_recv_msg(sp, mp);
 }
 
@@ -3734,6 +3795,7 @@ STATIC int
 sctp_t_r_error(queue_t *q, mblk_t *mp)
 {
 	sctp_t *sp = (sctp_t *) q->q_ptr;
+
 	rare();
 	return sctp_recv_err(sp, mp);
 }
@@ -3778,6 +3840,7 @@ STATIC int
 sctp_t_r_other(queue_t *q, mblk_t *mp)
 {
 	sctp_t *sp = SCTP_PRIV(q);
+
 	rare();
 	cmn_err(CE_WARN, "Unsupported block type %d on RD(q) %d\n", mp->b_datap->db_type,
 		sp->cminor);
@@ -3788,6 +3851,7 @@ STATIC int
 sctp_t_w_other(queue_t *q, mblk_t *mp)
 {
 	sctp_t *sp = SCTP_PRIV(q);
+
 	rare();
 	cmn_err(CE_WARN, "Unsupported block type %d on WR(q) %d\n", mp->b_datap->db_type,
 		sp->cminor);
@@ -3840,9 +3904,11 @@ sctp_t_r_prim(queue_t *q, mblk_t *mp)
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-STATIC INLINE int sctp_t_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE int
+sctp_t_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked = 0;
+
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if ((mp->b_datap->db_type >= QPCTL || !q->q_count) &&
@@ -3915,12 +3981,15 @@ STATIC INLINE int sctp_t_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mb
  *  SRVQ Put Routine
  *  -----------------------------------
  */
-STATIC INLINE int sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE int
+sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
+
 	ensure(q, return (-EFAULT));
 	if (sctp_trylockq(q)) {
 		mblk_t *mp;
+
 		while ((mp = getq(q))) {
 			/* 
 			 * Fast Path
@@ -4035,6 +4104,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	int cmajor = getmajor(*devp);
 	int cminor = getminor(*devp);
 	sctp_t *sp, **spp = &sctp_t_list;
+
 	(void) crp;
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
@@ -4049,6 +4119,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
 	for (; *spp && cminor <= SCTP_T_CMINORS; spp = &(*spp)->next) {
 		ushort dminor = (*spp)->cminor;
+
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {
@@ -4090,6 +4161,7 @@ void
 sctp_t_init(void)
 {
 	int cmajor;
+
 	if ((cmajor =
 	     lis_register_strdev(SCTP_T_CMAJOR_0, &sctp_t_info, SCTP_T_CMINORS,
 				 sctp_t_minfo.mi_idname)) < 0) {

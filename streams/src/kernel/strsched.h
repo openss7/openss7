@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 10:38:57 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 10:38:57 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:01 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -58,7 +58,6 @@
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
-
 
 #ifndef __SCHED_EXTERN_INLINE
 #define __SCHED_EXTERN_INLINE extern __inline__
@@ -127,11 +126,14 @@ typedef enum {
 	CTX_ISR,			/* hard interrupt context */
 } context_t;
 
-__SCHED_EXTERN_INLINE int in_streams(void)
+__SCHED_EXTERN_INLINE int
+in_streams(void)
 {
 	return (!in_irq() && (this_thread->flags & QUEUEFLAG));
 }
-__SCHED_EXTERN_INLINE context_t current_context(void)
+
+__SCHED_EXTERN_INLINE context_t
+current_context(void)
 {
 	if (in_irq())
 		return (CTX_ISR);

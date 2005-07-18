@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/18 01:03:10 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 16:15:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 01:03:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 16:15:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/18 01:03:10 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 16:15:23 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/18 01:03:10 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 16:15:23 $";
 
 /* 
  *  AIX Utility: strace - Prints STREAMS trace messages.
@@ -61,6 +61,8 @@ static char const ident[] =
 
 #define _XOPEN_SOURCE 600
 
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -92,18 +94,34 @@ static int output = 1;
 #define FLAG_SPECIAL	(1<<5)	/* 0x */
 #define FLAG_LARGE	(1<<6)	/* use 'ABCDEF' instead of 'abcdef' */
 
-#define __WSIZE		(sizeof(short))
-#define WORD_ALIGN(__x) (((__x) + __WSIZE - 1) & ~(__WSIZE - 1))
+#define PROMOTE_TYPE		int
+#define PROMOTE_SIZE		(sizeof(PROMOTE_TYPE))
+#define PROMOTE_ALIGN(__x)	(((__x) + PROMOTE_SIZE - 1) & ~(PROMOTE_SIZE - 1))
+#define PROMOTE_SIZEOF(__x)	((sizeof(__x) < PROMOTE_SIZE) ? PROMOTE_SIZE : sizeof(__x))
+#define PROMOTE_ARGVAL(__type,__ptr) \
+				(long long)({  \
+					long long val; \
+					if (sizeof(__type) < PROMOTE_SIZEOF(__type)) { \
+						val = (long long)*((PROMOTE_TYPE *)(__ptr)); \
+						__ptr = (typeof(__ptr))((char *)__ptr + PROMOTE_SIZE); \
+					} else { \
+						val = (long long)*((__type *)(__ptr)); \
+						__ptr = (typeof(__ptr))((char *)__ptr + sizeof(__type)); \
+					} \
+					val; \
+				})
 
 /*
  *  This function prints a formatted number to a file pointer.  It is largely
  *  taken from /usr/src/linux/lib/vsprintf.c
  */
-static void number(FILE * fp, long long num, int base, int width, int decimal, int flags)
+static void
+number(FILE * fp, long long num, int base, int width, int decimal, int flags)
 {
 	char sign;
 	int i;
 	char tmp[66];
+
 	if (flags & FLAG_LEFT)
 		flags &= ~FLAG_ZEROPAD;
 	if (base < 2 || base > 16)
@@ -137,8 +155,10 @@ static void number(FILE * fp, long long num, int base, int width, int decimal, i
 		tmp[i++] = '0';
 	else {
 		const char *hexdig = (flags & FLAG_LARGE) ? "0123456789ABCDEF" : "0123456789abcdef";
+
 		while (num != 0) {
 			lldiv_t result = lldiv(num, base);
+
 			tmp[i++] = hexdig[result.rem];
 			num = result.quot;
 		}
@@ -167,6 +187,7 @@ static void number(FILE * fp, long long num, int base, int width, int decimal, i
 	}
 	if (!(flags & FLAG_LEFT)) {
 		char pad = (flags & FLAG_ZEROPAD) ? '0' : ' ';
+
 		while (width-- > 0)
 			fputc(pad, fp);
 	}
@@ -188,7 +209,8 @@ static void number(FILE * fp, long long num, int base, int width, int decimal, i
  *
  *  This function is largely adapted from /usr/src/linux/lib/vsprintf.c
  */
-static void fprintf_text(FILE * fp, const char *buf, int len)
+static void
+fprintf_text(FILE * fp, const char *buf, int len)
 {
 	const char *fmt, *args, *end;
 	char type;
@@ -197,7 +219,7 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 
 	fmt = buf;
 	flen = strnlen(fmt, len);
-	plen = WORD_ALIGN(flen + 1);
+	plen = PROMOTE_ALIGN(flen + 1);
 	args = &buf[plen];
 	end = buf + len;
 	for (; *fmt; ++fmt) {
@@ -236,9 +258,10 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 			for (width = 0; isdigit(*fmt); width *= 10, width += (*fmt - '0')) ;
 		else if (*fmt == '*') {
 			++fmt;
-			if (args + sizeof(int) <= end) {
-				if ((width = *(int *) args) < 0) {
-					args += sizeof(int);
+			if (args + PROMOTE_SIZEOF(int) <= end) {
+				width = PROMOTE_ARGVAL(int, args);
+
+				if (width < 0) {
 					width = -width;
 					flags |= FLAG_LEFT;
 				}
@@ -252,9 +275,9 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 				for (decimal = 0; isdigit(*fmt);
 				     decimal *= 10, decimal += (*fmt - '0')) ;
 			else if (*fmt == '*') {
-				if (args + sizeof(int) <= end) {
-					decimal = *(int *) args;
-					args += sizeof(int);
+				if (args + PROMOTE_SIZEOF(int) <= end) {
+					decimal = PROMOTE_ARGVAL(int, args);
+
 					if (decimal < 0)
 						decimal = 0;
 				} else
@@ -265,9 +288,12 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 		type = 'i';
 		switch (*fmt) {
 		case 'h':
-		case 'L':
-		case 'Z':
 			type = *fmt;
+			++fmt;
+			if (*fmt == 'h') {
+				type = 'c';
+				++fmt;
+			}
 			break;
 		case 'l':
 			type = *fmt;
@@ -277,18 +303,27 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 				++fmt;
 			}
 			break;
+		case 'q':
+		case 'L':
+		case 'Z':
+		case 'z':
+		case 't':
+			type = *fmt;
+			++fmt;
+			break;
 		}
 		switch (*fmt) {
 		case 'c':
 		{
 			char c = ' ';
+
 			if (!(flags & FLAG_LEFT))
 				while (--width > 0)
 					fputc(' ', fp);
-			if (args + sizeof(short) <= end) {
-				c = (char) *(short *) args;
-				args += sizeof(short);
-			} else
+			if (args + PROMOTE_SIZEOF(char) <= end)
+				 c = PROMOTE_ARGVAL(char, args);
+
+			else
 				args = end;
 			fputc(c, fp);
 			while (--width > 0)
@@ -299,21 +334,20 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 		{
 			const char *s;
 			int i;
-			size_t prec, len = 0, plen = 0;
+			size_t len = 0, plen = 0;
 
 			s = args;
-			prec = decimal;
-			if (decimal < 0 || decimal > 64)
-				prec = 64;
 			if (args < end) {
-				len = strnlen(s, prec);
-				plen = WORD_ALIGN(len + 1);
+				len = strlen(s);
+				plen = PROMOTE_ALIGN(len + 1);
 			} else
 				args = end;
 			if (args + plen <= end)
 				args += plen;
 			else
 				args = end;
+			if (len > (size_t)decimal)
+				len = (size_t)decimal;
 			if (!(flags & FLAG_LEFT))
 				while (len < width--)
 					fputc(' ', fp);
@@ -357,55 +391,71 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 				break;
 			}
 			switch (type) {
-			case 'p':
-				if (args + sizeof(void *) <= end) {
-					num = (unsigned long) *(void **) args;
-					args += sizeof(void *);
-				} else
+			case 'c':	/* really 'hh' type */
+				if (args + PROMOTE_SIZEOF(unsigned char) <= end)
+					 num = PROMOTE_ARGVAL(unsigned char, args);
+
+				else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (signed char) num;
+				break;
+			case 'h':
+				if (args + PROMOTE_SIZEOF(unsigned short) <= end)
+					 num = PROMOTE_ARGVAL(unsigned short, args);
+
+				else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (signed short) num;
+				break;
+			case 'p':	/* really 'p' conversion */
+				if (args + PROMOTE_SIZEOF(uintptr_t) <= end)
+					num = PROMOTE_ARGVAL(uintptr_t, args);
+				else
 					args = end;
 				flags &= ~FLAG_SIGN;
 				break;
 			case 'l':
-				if (args + sizeof(unsigned long) <= end) {
-					num = *(unsigned long *) args;
-					args += sizeof(unsigned long);
-				} else
+				if (args + PROMOTE_SIZEOF(unsigned long) <= end)
+					 num = PROMOTE_ARGVAL(unsigned long, args);
+
+				else
 					args = end;
 				if (flags & FLAG_SIGN)
 					num = (signed long) num;
 				break;
-			case 'L':
-				if (args + sizeof(unsigned long long) <= end) {
-					num = *(unsigned long long *) args;
-					args += sizeof(unsigned long long);
-				} else
+			case 'q':
+			case 'L':	/* really 'll' type */
+				if (args + PROMOTE_SIZEOF(unsigned long long) <= end)
+					 num = PROMOTE_ARGVAL(unsigned long long, args);
+
+				else
 					args = end;
 				if (flags & FLAG_SIGN)
 					num = (signed long long) num;
 				break;
 			case 'Z':
-				if (args + sizeof(size_t) <= end) {
-					num = *(size_t *) args;
-					args += sizeof(size_t);
-				} else
+			case 'z':
+				if (args + PROMOTE_SIZEOF(size_t) <= end)
+					 num = PROMOTE_ARGVAL(size_t, args);
+
+				else
 					args = end;
 				if (flags & FLAG_SIGN)
 					num = (ssize_t) num;
 				break;
-			case 'h':
-				if (args + sizeof(unsigned short) <= end) {
-					num = *(unsigned short *) args;
-					args += sizeof(unsigned short);
-				} else
+			case 't':
+				if (args + PROMOTE_SIZEOF(ptrdiff_t) <= end)
+					num = PROMOTE_ARGVAL(ptrdiff_t, args);
+				else
 					args = end;
-				if (flags & FLAG_SIGN)
-					num = (signed short) num;
 				break;
 			default:
-				if (args + sizeof(unsigned int) <= end) {
-					num = *(unsigned int *) args;
-					args += sizeof(unsigned int);
-				} else
+				if (args + PROMOTE_SIZEOF(unsigned int) <= end)
+					 num = PROMOTE_ARGVAL(unsigned int, args);
+
+				else
 					args = end;
 				if (flags & FLAG_SIGN)
 					num = (signed int) num;
@@ -428,7 +478,8 @@ static void fprintf_text(FILE * fp, const char *buf, int len)
 	}
 }
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -440,7 +491,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -453,7 +505,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -487,7 +540,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -533,7 +587,8 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	int i, fd, count;
 	struct trace_ids *tids;
@@ -573,7 +628,7 @@ int main(int argc, char *argv[])
 			output = 0;
 			debug = 0;
 			break;
-		case 'd':	/* -d, --debug */
+		case 'd':	/* -d, --debug [LEVEL] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -584,7 +639,7 @@ int main(int argc, char *argv[])
 				goto bad_option;
 			debug = val;
 			break;
-		case 'v':	/* -v, --verbose */
+		case 'v':	/* -v, --verbose [LEVEL] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {

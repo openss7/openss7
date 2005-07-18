@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $"
 
 /************************************************************************
 *									*
@@ -219,32 +219,32 @@ extern void Rsys_hex_print(char *, unsigned char *, int);
 ************************************************************************/
 
 struct module_info ip_to_streams_minfo = { 0	/* mi_idnum */
-	    , "ip_to_streams"	/* mi_idname */
-	    , 0			/* mi_minpsz */
-	    , INFPSZ		/* mi_maxpsz */
-	    , 20000		/* mi_hiwat */
-	    , 2000		/* mi_lowat */
+	    , "ip_to_streams"		/* mi_idname */
+	    , 0				/* mi_minpsz */
+	    , INFPSZ			/* mi_maxpsz */
+	    , 20000			/* mi_hiwat */
+	    , 2000			/* mi_lowat */
 };
 struct qinit ip_to_streams_rinit = { ip_to_streams_rput, ip_to_streams_rsrv	/* qi_srvp */
 	    , ip_to_streams_open	/* qi_open */
 	    , ip_to_streams_close	/* qi_close */
-	    , NULL		/* qi_admin */
+	    , NULL			/* qi_admin */
 	    , &ip_to_streams_minfo	/* qi_minfo */
-	    , NULL		/* qi_mstat */
+	    , NULL			/* qi_mstat */
 };
 struct qinit ip_to_streams_winit = { ip_to_streams_wput	/* qi_putp */
 	    , ip_to_streams_wsrv	/* qi_srvp */
-	    , NULL		/* qi_open */
-	    , NULL		/* qi_close */
-	    , NULL		/* qi_admin */
+	    , NULL			/* qi_open */
+	    , NULL			/* qi_close */
+	    , NULL			/* qi_admin */
 	    , &ip_to_streams_minfo	/* qi_minfo */
-	    , NULL		/* qi_mstat */
+	    , NULL			/* qi_mstat */
 };
 
 struct streamtab ip_to_streams_info = { &ip_to_streams_rinit	/* read queue definition */
 	    , &ip_to_streams_winit	/* write queue definition */
-	    , NULL		/* mux read queue */
-	    , NULL		/* mux write queue */
+	    , NULL			/* mux read queue */
+	    , NULL			/* mux write queue */
 };
 
 int ip_to_streamsdevflag = 0;

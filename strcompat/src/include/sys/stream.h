@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/15 23:08:22 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/18 12:25:38  brian
+ - standard indentation
+
  Revision 0.9.2.2  2005/07/15 23:08:22  brian
  - checking in for sync
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifdef LIS
 #include <sys/LiS/stream.h>
@@ -79,14 +82,17 @@ union ioctypes {
 	struct copyreq copyreq;
 	struct copyresp copyresp;
 };
+
 /* LIS forgets to typedef this */
 #ifndef bcid_t
 typedef int bcid_t;
+
 #define bcid_t bcid_t
 #endif
 /* LIS forgets to typedef this */
 #ifndef bufcall_id_t
 typedef int bufcall_id_t;
+
 #define bufcall_id_t bufcall_id_t
 #endif
 #endif

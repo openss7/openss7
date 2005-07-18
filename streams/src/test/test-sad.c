@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/06 12:03:56 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:07:05 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/06 12:03:56 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
- Revision 0.9.2.8  2005/06/06 12:03:56  brian
- - upgraded test suites
+ Revision 0.9.2.9  2005/07/18 12:07:05  brian
+ - standard indentation
+
+ Revision 0.9.2.7  2005/07/18 12:07:05  brian
+ - standard indentation
 
  Revision 0.9.2.6  2005/06/06 12:03:56  brian
  - upgraded test suites
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/06 12:03:56 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:07:05 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/06 12:03:56 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:07:05 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -129,7 +132,6 @@ static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-
 
 /*
  *  -------------------------------------------------------------------------
@@ -170,7 +172,6 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT 500		// 100
 #define LONG_WAIT 5000		// 500
 #define LONGER_WAIT 10000	// 5000
-
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -243,10 +244,12 @@ static int state;
 /*
  *  Return the current time in milliseconds.
  */
-static long now(void)
+static long
+now(void)
 {
 	long ret;
 	struct timeval now;
+
 	if (gettimeofday(&now, NULL)) {
 		last_errno = errno;
 		lockf(fileno(stdout), F_LOCK, 0);
@@ -262,7 +265,8 @@ static long now(void)
 	ret += (now.tv_usec + 999L) / 1000L;
 	return ret;
 }
-static long milliseconds(char *t)
+static long
+milliseconds(char *t)
 {
 	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
@@ -274,7 +278,8 @@ static long milliseconds(char *t)
 	}
 	return now();
 }
-static long milliseconds_2nd(char *t)
+static long
+milliseconds_2nd(char *t)
 {
 	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
@@ -293,9 +298,11 @@ static long milliseconds_2nd(char *t)
  *  timer as specified by arguments.  Return SUCCESS if the interval is within
  *  the allowable range and FAILURE otherwise.
  */
-static int check_time(const char *t, long i, long lo, long hi)
+static int
+check_time(const char *t, long i, long lo, long hi)
 {
 	float tol, dlo, dhi, itv;
+
 	itv = i * timer_scale;
 	dlo = lo;
 	dhi = hi;
@@ -316,11 +323,13 @@ static int check_time(const char *t, long i, long lo, long hi)
 		return __RESULT_FAILURE;
 }
 
-static int time_event(int event)
+static int
+time_event(int event)
 {
 	if (verbose > 4) {
 		float t, m;
 		struct timeval now;
+
 		gettimeofday(&now, NULL);
 		if (!test_start)
 			test_start = now.tv_sec;
@@ -338,17 +347,20 @@ static int time_event(int event)
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	sigemptyset(&act.sa_mask);
@@ -363,12 +375,14 @@ static int timer_sethandler(void)
 /*
  *  Start an interval timer as the overall test timer.
  */
-static int start_tt(long duration)
+static int
+start_tt(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
+
 	if (timer_sethandler())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -376,17 +390,21 @@ static int start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
-static int start_st(long duration)
+static int
+start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
+
 	return start_tt(sdur);
 }
 
-static int stop_tt(void)
+static int
+stop_tt(void)
 {
 	struct itimerval setting = { {0, 0}, {0, 0} };
 	sigset_t mask;
 	struct sigaction act;
+
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return __RESULT_FAILURE;
 	act.sa_handler = SIG_DFL;
@@ -409,7 +427,8 @@ static int stop_tt(void)
  *  -------------------------------------------------------------------------
  */
 
-char *errno_string(long err)
+char *
+errno_string(long err)
 {
 	switch (err) {
 	case 0:
@@ -661,13 +680,15 @@ char *errno_string(long err)
 	default:
 	{
 		static char buf[32];
+
 		snprintf(buf, sizeof(buf), "[%ld]", err);
 		return buf;
 	}
 	}
 }
 
-const char *event_string(int event)
+const char *
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_NO_MSG:
@@ -691,7 +712,8 @@ const char *event_string(int event)
 	}
 }
 
-const char *ioctl_string(int cmd, intptr_t arg)
+const char *
+ioctl_string(int cmd, intptr_t arg)
 {
 	switch (cmd) {
 	case I_NREAD:
@@ -797,8 +819,8 @@ const char *ioctl_string(int cmd, intptr_t arg)
 	}
 }
 
-
-void print_less(int child)
+void
+print_less(int child)
 {
 	if (verbose < 1 || !show)
 		return;
@@ -826,12 +848,14 @@ void print_less(int child)
 	return;
 }
 
-void print_more(void)
+void
+print_more(void)
 {
 	show = 1;
 }
 
-void print_simple(int child, const char *msgs[])
+void
+print_simple(int child, const char *msgs[])
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child]);
@@ -839,7 +863,8 @@ void print_simple(int child, const char *msgs[])
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_simple_int(int child, const char *msgs[], int val)
+void
+print_simple_int(int child, const char *msgs[], int val)
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val);
@@ -847,7 +872,8 @@ void print_simple_int(int child, const char *msgs[], int val)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_double_int(int child, const char *msgs[], int val, int val2)
+void
+print_double_int(int child, const char *msgs[], int val, int val2)
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val, val2);
@@ -855,7 +881,8 @@ void print_double_int(int child, const char *msgs[], int val, int val2)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_simple_string(int child, const char *msgs[], const char *string)
+void
+print_simple_string(int child, const char *msgs[], const char *string)
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string);
@@ -863,18 +890,21 @@ void print_simple_string(int child, const char *msgs[], const char *string)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_pipe(int child)
+void
+print_pipe(int child)
 {
 	static const char *msgs[] = {
 		"  pipe()      ----->v  v<------------------------------>v                   \n",
 		"                    v  v<------------------------------>v<-----     pipe()  \n",
 		"                    .  .                                .                   \n",
 	};
+
 	if (verbose > 3)
 		print_simple(child, msgs);
 }
 
-void print_open(int child)
+void
+print_open(int child)
 {
 	static const char *msgs[] = {
 		"open()        ----->v                                |  |                   \n",
@@ -882,11 +912,13 @@ void print_open(int child)
 		"    open()    ----->v                                |  |                   \n",
 		"                    .                                .  .                   \n",
 	};
+
 	if (verbose > 3)
 		print_simple(child, msgs);
 }
 
-void print_close(int child)
+void
+print_close(int child)
 {
 	static const char *msgs[] = {
 		"close()       ----->X                                |  |                   \n",
@@ -894,11 +926,13 @@ void print_close(int child)
 		"    close()   ----->X                                |  |                   \n",
 		"                    .                                .  .                   \n",
 	};
+
 	if (verbose > 3)
 		print_simple(child, msgs);
 }
 
-void print_preamble(int child)
+void
+print_preamble(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+------------Preamble------------+--+                   \n",
@@ -906,11 +940,13 @@ void print_preamble(int child)
 		"    ----------------+------------Preamble------------+--+                   \n",
 		"--------------------+-------------Preamble--------------+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_inconclusive(int child)
+void
+print_inconclusive(int child)
 {
 	static const char *msgs[] = {
 		"????????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
@@ -918,11 +954,13 @@ void print_inconclusive(int child)
 		"    ????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
 		"????????????????????|?????????? INCONCLUSIVE ????????|??|???????????????????[%d]\n",
 	};
+
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
 }
 
-void print_test(int child)
+void
+print_test(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+---------------Test-------------+--+                   \n",
@@ -930,11 +968,13 @@ void print_test(int child)
 		"    ----------------+---------------Test-------------+--+                   \n",
 		"--------------------+---------------Test-------------+--+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_failed(int child)
+void
+print_failed(int child)
 {
 	static const char *msgs[] = {
 		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
@@ -942,11 +982,13 @@ void print_failed(int child)
 		"    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
 		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXXX[%d]\n",
 	};
+
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
 }
 
-void print_script_error(int child)
+void
+print_script_error(int child)
 {
 	static const char *msgs[] = {
 		"####################|########### SCRIPT ERROR ######|##|                    [%d]\n",
@@ -954,11 +996,13 @@ void print_script_error(int child)
 		"    ################|########### SCRIPT ERROR ######|##|                    [%d]\n",
 		"####################|########### SCRIPT ERROR ######|##|####################[%d]\n",
 	};
+
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
 }
 
-void print_passed(int child)
+void
+print_passed(int child)
 {
 	static const char *msgs[] = {
 		"********************|************* PASSED ***********|**|                   [%d]\n",
@@ -966,11 +1010,13 @@ void print_passed(int child)
 		"    ****************|************* PASSED ***********|**|                   [%d]\n",
 		"********************|************* PASSED ***********|**|*******************[%d]\n",
 	};
+
 	if (verbose > 2)
 		print_simple_int(child, msgs, state);
 }
 
-void print_postamble(int child)
+void
+print_postamble(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+-------------Postamble----------+--+                   \n",
@@ -978,11 +1024,13 @@ void print_postamble(int child)
 		"    ----------------+-------------Postamble----------+--+                   \n",
 		"--------------------+-------------Postamble----------+--+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_test_end(int child)
+void
+print_test_end(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+--------------------------------+--+                   \n",
@@ -990,11 +1038,13 @@ void print_test_end(int child)
 		"    ----------------+--------------------------------+--+                   \n",
 		"--------------------+--------------------------------+--+-------------------\n",
 	};
+
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
-void print_terminated(int child, int signal)
+void
+print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
 		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
@@ -1002,11 +1052,13 @@ void print_terminated(int child, int signal)
 		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
 		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
 	};
+
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
 }
 
-void print_stopped(int child, int signal)
+void
+print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
 		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
@@ -1014,11 +1066,13 @@ void print_stopped(int child, int signal)
 		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
 		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
 	};
+
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
 }
 
-void print_timeout(int child)
+void
+print_timeout(int child)
 {
 	static const char *msgs[] = {
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
@@ -1026,13 +1080,15 @@ void print_timeout(int child)
 		"    ++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++[%d]\n",
 	};
+
 	if (show_timeout || verbose > 0) {
 		print_simple_int(child, msgs, state);
 		show_timeout--;
 	}
 }
 
-void print_nothing(int child)
+void
+print_nothing(int child)
 {
 	static const char *msgs[] = {
 		"- - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
@@ -1040,11 +1096,13 @@ void print_nothing(int child)
 		"    - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
 		"- - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|- - - - - - - - - -[%d]\n",
 	};
+
 	if (verbose > 1)
 		print_simple_int(child, msgs, state);
 }
 
-void print_string_state(int child, const char *msgs[], const char *string)
+void
+print_string_state(int child, const char *msgs[], const char *string)
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string, state);
@@ -1052,7 +1110,8 @@ void print_string_state(int child, const char *msgs[], const char *string)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_syscall(int child, const char *command)
+void
+print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"%-14s<----/|                                |  |                   [%d]\n",
@@ -1060,12 +1119,13 @@ void print_syscall(int child, const char *command)
 		"    %-14s</|                                |  |                   [%d]\n",
 		"                    |          %-14s        |  |                   [%d]\n",
 	};
+
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-
-void print_command(int child, const char *command)
+void
+print_command(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"%-14s<----/|                                |  |                   [%d]\n",
@@ -1073,11 +1133,13 @@ void print_command(int child, const char *command)
 		"    %-14s</|                                |  |                   [%d]\n",
 		"                    |          %-14s        |  |                   [%d]\n",
 	};
+
 	if (verbose > 3)
 		print_string_state(child, msgs, command);
 }
 
-void print_string_int_state(int child, const char *msgs[], const char *string, int val)
+void
+print_string_int_state(int child, const char *msgs[], const char *string, int val)
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string, val, state);
@@ -1085,7 +1147,8 @@ void print_string_int_state(int child, const char *msgs[], const char *string, i
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_errno(int child, long error)
+void
+print_errno(int child, long error)
 {
 	static const char *msgs[] = {
 		"%-14s<----/|                                |  |                   [%d]\n",
@@ -1093,11 +1156,13 @@ void print_errno(int child, long error)
 		"    %-14s</|                                |  |                   [%d]\n",
 		"                    |          %-14s        |  |                   [%d]\n",
 	};
+
 	if (verbose > 3)
 		print_string_state(child, msgs, errno_string(error));
 }
 
-void print_success(int child)
+void
+print_success(int child)
 {
 	static const char *msgs[] = {
 		"ok            <----/|                                |  |                   [%d]\n",
@@ -1105,11 +1170,13 @@ void print_success(int child)
 		"    ok        <----/|                                |  |                   [%d]\n",
 		"                    |                ok              |  |                   [%d]\n",
 	};
+
 	if (verbose > 4)
 		print_simple_int(child, msgs, state);
 }
 
-void print_success_value(int child, int value)
+void
+print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
 		"%10d<--------/|                                |  |                   [%d]\n",
@@ -1117,11 +1184,13 @@ void print_success_value(int child, int value)
 		"    %10d<----/|                                |  |                   [%d]\n",
 		"                    |            [%10d]        |  |                   [%d]\n",
 	};
+
 	if (verbose)
 		print_double_int(child, msgs, value, state);
 }
 
-void print_ioctl(int child, int cmd, intptr_t arg)
+void
+print_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
 		"ioctl(2)----------->|       %16s         |  |                   [%d]\n",
@@ -1129,11 +1198,13 @@ void print_ioctl(int child, int cmd, intptr_t arg)
 		"    ioctl(2)------->|       %16s         |  |                   [%d]\n",
 		"                    |       %16s ioctl(2)|  |                   [%d]\n",
 	};
+
 	if (verbose > 3)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
-void print_datcall(int child, const char *command, size_t bytes)
+void
+print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
 		"%1$14s- - ->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
@@ -1141,11 +1212,13 @@ void print_datcall(int child, const char *command, size_t bytes)
 		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
 		"                    |< + %2$4d bytes  %1$14s  |  |                   [%3$d]\n",
 	};
+
 	if ((verbose && show_data) || verbose > 1)
 		print_string_int_state(child, msgs, command, bytes);
 }
 
-void print_expect(int child, int want)
+void
+print_expect(int child, int want)
 {
 	static const char *msgs[] = {
 		"(%-14s)    |- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
@@ -1153,11 +1226,13 @@ void print_expect(int child, int want)
 		"    (%-14s)|- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
 		"                    |- - -[Expected %-14s] -|- |                    [%d]\n",
 	};
+
 	if (verbose > 1 && show)
 		print_string_state(child, msgs, event_string(want));
 }
 
-void print_string(int child, const char *string)
+void
+print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
 		"%-16s    |                                |  |                    \n",
@@ -1165,11 +1240,13 @@ void print_string(int child, const char *string)
 		"    %-16s|                                |  |                    \n",
 		"                    |  |      %-16s       |  |                    \n",
 	};
+
 	if (verbose > 1 && show)
 		print_simple_string(child, msgs, string);
 }
 
-void print_time_state(int child, const char *msgs[], ulong time)
+void
+print_time_state(int child, const char *msgs[], ulong time)
 {
 	lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], time, state);
@@ -1177,7 +1254,8 @@ void print_time_state(int child, const char *msgs[], ulong time)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_waiting(int child, ulong time)
+void
+print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
 		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
@@ -1185,12 +1263,10 @@ void print_waiting(int child, ulong time)
 		"    / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
 		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / / [%d]\n",
 	};
+
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
 }
-
-
-
 
 /*
  *  -------------------------------------------------------------------------
@@ -1199,7 +1275,8 @@ void print_waiting(int child, ulong time)
  *
  *  -------------------------------------------------------------------------
  */
-int test_ioctl(int child, int cmd, intptr_t arg)
+int
+test_ioctl(int child, int cmd, intptr_t arg)
 {
 	print_ioctl(child, cmd, arg);
 	for (;;) {
@@ -1215,9 +1292,11 @@ int test_ioctl(int child, int cmd, intptr_t arg)
 	}
 }
 
-int test_insertfd(int child, int resfd,  int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
+int
+test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
 	struct strfdinsert fdi;
+
 	if (ctrl) {
 		fdi.ctlbuf.maxlen = ctrl->maxlen;
 		fdi.ctlbuf.len = ctrl->len;
@@ -1239,12 +1318,13 @@ int test_insertfd(int child, int resfd,  int offset, struct strbuf *ctrl, struct
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
 
-int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
+int
+test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
@@ -1289,7 +1369,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 	}
 }
 
-int test_write(int child, const void *buf, size_t len)
+int
+test_write(int child, const void *buf, size_t len)
 {
 	print_syscall(child, "write(2)------");
 	for (;;) {
@@ -1305,7 +1386,8 @@ int test_write(int child, const void *buf, size_t len)
 	return (__RESULT_SUCCESS);
 }
 
-int test_writev(int child, const struct iovec *iov, int num)
+int
+test_writev(int child, const struct iovec *iov, int num)
 {
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
@@ -1321,7 +1403,8 @@ int test_writev(int child, const struct iovec *iov, int num)
 	return (__RESULT_SUCCESS);
 }
 
-int test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
+int
+test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 {
 	print_syscall(child, "getmsg(2)-----");
 	for (;;) {
@@ -1335,7 +1418,8 @@ int test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	return (__RESULT_SUCCESS);
 }
 
-int test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
+int
+test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
 {
 	print_syscall(child, "getpmsg(2)----");
 	for (;;) {
@@ -1349,7 +1433,8 @@ int test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp
 	return (__RESULT_SUCCESS);
 }
 
-int test_read(int child, void *buf, size_t count)
+int
+test_read(int child, void *buf, size_t count)
 {
 	print_syscall(child, "read(2)-------");
 	for (;;) {
@@ -1363,7 +1448,8 @@ int test_read(int child, void *buf, size_t count)
 	return (__RESULT_SUCCESS);
 }
 
-int test_readv(int child, const struct iovec *iov, int count)
+int
+test_readv(int child, const struct iovec *iov, int count)
 {
 	print_syscall(child, "readv(2)------");
 	for (;;) {
@@ -1377,11 +1463,11 @@ int test_readv(int child, const struct iovec *iov, int count)
 	return (__RESULT_SUCCESS);
 }
 
-
-
-int test_nonblock(int child)
+int
+test_nonblock(int child)
 {
 	long flags;
+
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
@@ -1407,9 +1493,11 @@ int test_nonblock(int child)
 	return (__RESULT_SUCCESS);
 }
 
-int test_block(int child)
+int
+test_block(int child)
 {
 	long flags;
+
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
@@ -1435,9 +1523,11 @@ int test_block(int child)
 	return (__RESULT_SUCCESS);
 }
 
-int test_pipe(int child)
+int
+test_pipe(int child)
 {
 	int fds[2];
+
 	for (;;) {
 		print_pipe(child);
 		if (pipe(fds) >= 0) {
@@ -1453,9 +1543,11 @@ int test_pipe(int child)
 	}
 }
 
-int test_open(int child, const char *name)
+int
+test_open(int child, const char *name)
 {
 	int fd;
+
 	for (;;) {
 		print_open(child);
 		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
@@ -1470,9 +1562,11 @@ int test_open(int child, const char *name)
 	}
 }
 
-int test_close(int child)
+int
+test_close(int child)
 {
 	int fd = test_fd[child];
+
 	test_fd[child] = 0;
 	for (;;) {
 		print_close(child);
@@ -1495,7 +1589,8 @@ int test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int stream_start(int child, int index)
+static int
+stream_start(int child, int index)
 {
 	switch (child) {
 	case 1:
@@ -1521,7 +1616,8 @@ static int stream_start(int child, int index)
 	}
 }
 
-static int stream_stop(int child)
+static int
+stream_stop(int child)
 {
 	switch (child) {
 	case 1:
@@ -1553,14 +1649,16 @@ static int stream_stop(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int begin_tests(int index)
+static int
+begin_tests(int index)
 {
 	state = 0;
 	show_acks = 1;
 	return (__RESULT_SUCCESS);
 }
 
-static int end_tests(void)
+static int
+end_tests(void)
 {
 	show_acks = 0;
 	return (__RESULT_SUCCESS);
@@ -1574,14 +1672,17 @@ static int end_tests(void)
  *  -------------------------------------------------------------------------
  */
 
-int preamble_0(int child)
+int
+preamble_0(int child)
 {
 	if (!test_fd[child] && test_open(child, devname) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
 }
-int postamble_0(int child)
+
+int
+postamble_0(int child)
 {
 	if (test_fd[child] && test_close(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
@@ -1613,7 +1714,8 @@ struct test_stream {
 #define desc_case_1_1 "\
 Checks that one stream can be opened and closed."
 
-int test_case_1_1(int child)
+int
+test_case_1_1(int child)
 {
 	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
@@ -1647,7 +1749,8 @@ struct test_stream test_1_1_2 = { preamble_1_1_2, test_case_1_1_2, postamble_1_1
 #define desc_case_1_2 "\
 Checks that three streams can be opened and closed."
 
-int test_case_1_2(int child)
+int
+test_case_1_2(int child)
 {
 	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
@@ -1679,9 +1782,11 @@ struct test_stream test_1_2_2 = { preamble_1_2_2, test_case_1_2_2, postamble_1_2
  *
  *  -------------------------------------------------------------------------
  */
-int run_stream(int child, struct test_stream *stream)
+int
+run_stream(int child, struct test_stream *stream)
 {
 	int result = __RESULT_SCRIPT_ERROR;
+
 	print_preamble(child);
 	state = 100;
 	if (stream->preamble && stream->preamble(child) != __RESULT_SUCCESS) {
@@ -1725,11 +1830,13 @@ int run_stream(int child, struct test_stream *stream)
  *  Fork multiple children to do the actual testing.
  */
 
-int test_run(struct test_stream *stream[])
+int
+test_run(struct test_stream *stream[])
 {
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
+
 	start_tt(5000);
 	if (stream[0]) {
 		switch ((child[0] = fork())) {
@@ -1805,6 +1912,7 @@ int test_run(struct test_stream *stream[])
 				}
 			} else if (WIFSIGNALED(this_status)) {
 				int signal = WTERMSIG(this_status);
+
 				if (this_child == child[0]) {
 					print_terminated(0, signal);
 					if (child[1])
@@ -1834,6 +1942,7 @@ int test_run(struct test_stream *stream[])
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
+
 				if (this_child == child[0]) {
 					print_stopped(0, signal);
 					if (child[0])
@@ -1929,7 +2038,8 @@ struct test_case {
 
 static int summary = 0;
 
-void print_header(void)
+void
+print_header(void)
 {
 	if (verbose <= 0)
 		return;
@@ -1939,7 +2049,8 @@ void print_header(void)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-int do_tests(void)
+int
+do_tests(void)
 {
 	int i;
 	int result = __RESULT_INCONCLUSIVE;
@@ -1948,6 +2059,7 @@ int do_tests(void)
 	int failures = 0;
 	int skipped = 0;
 	int aborted = 0;
+
 	print_header();
 	show = 0;
 	if (verbose > 0) {
@@ -2107,7 +2219,8 @@ int do_tests(void)
 	}
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2161,7 +2274,8 @@ regulations).\n\
 ");
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2179,7 +2293,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2192,7 +2307,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2237,12 +2353,14 @@ Options:\n\
 ", argv[0], devname);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	size_t l, n;
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
 			t->run = 1;
@@ -2251,6 +2369,7 @@ int main(int argc, char *argv[])
 	}
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -2272,6 +2391,7 @@ int main(int argc, char *argv[])
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
@@ -2426,7 +2546,7 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/*
+	/* 
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)

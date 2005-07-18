@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.13 2005/07/14 22:04:06 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.14 2005/07/18 12:25:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:06 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7_DDI_H__
 #define __SYS_UW7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:06 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:25:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -77,42 +77,52 @@ int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 
 typedef atomic_t atomic_int_t;
 
-__UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t * counter, int value)
+__UW7_EXTERN_INLINE void
+ATOMIC_INT_ADD(atomic_int_t * counter, int value)
 {
 	atomic_add(value, counter);
 }
-__UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag)
+__UW7_EXTERN_INLINE atomic_int_t *
+ATOMIC_INT_ALLOC(int flag)
 {
 	atomic_int_t *counter;
+
 	if ((counter = kmem_alloc(sizeof(*counter), flag)))
 		*counter = (atomic_int_t) ATOMIC_INIT(0);
 	return (counter);
 }
-__UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter)
+__UW7_EXTERN_INLINE void
+ATOMIC_INT_DEALLOC(atomic_int_t * counter)
 {
 	kmem_free(counter, sizeof(*counter));
 }
-__UW7_EXTERN_INLINE int ATOMIC_INT_DECR(atomic_int_t * counter)
+__UW7_EXTERN_INLINE int
+ATOMIC_INT_DECR(atomic_int_t * counter)
 {
 	return atomic_dec_and_test(counter);
 }
-__UW7_EXTERN_INLINE void ATOMIC_INT_INCR(atomic_int_t * counter)
+__UW7_EXTERN_INLINE void
+ATOMIC_INT_INCR(atomic_int_t * counter)
 {
 	atomic_inc(counter);
 }
-__UW7_EXTERN_INLINE void ATOMIC_INT_INIT(atomic_int_t * counter, int value)
+__UW7_EXTERN_INLINE void
+ATOMIC_INT_INIT(atomic_int_t * counter, int value)
 {
 	atomic_set(counter, value);
 }
-__UW7_EXTERN_INLINE int ATOMIC_INT_READ(atomic_int_t * counter)
+__UW7_EXTERN_INLINE int
+ATOMIC_INT_READ(atomic_int_t * counter)
 {
 	return atomic_read(counter);
 }
-__UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t * counter, int value)
+__UW7_EXTERN_INLINE void
+ATOMIC_INT_SUB(atomic_int_t * counter, int value)
 {
 	atomic_sub(value, counter);
 }
-__UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value)
+__UW7_EXTERN_INLINE void
+ATOMIC_INT_WRITE(atomic_int_t * counter, int value)
 {
 	atomic_set(counter, value);
 }

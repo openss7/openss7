@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/07 20:29:47 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:07:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/07 20:29:47 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:07:02 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/07 20:29:47 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:07:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -69,7 +69,7 @@ static char const ident[] =
 #include <sys/strsubr.h>
 
 #include "sys/config.h"
-#include "src/modules/sth.h"		/* for str_minfo */
+#include "src/modules/sth.h"	/* for str_minfo */
 #include "strsysctl.h"		/* extern verification */
 
 int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
@@ -185,7 +185,8 @@ static ctl_table streams_root_table[] = {
 	{0}
 };
 
-int strsysctl_init(void)
+int
+strsysctl_init(void)
 {
 	sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
 	sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
@@ -195,7 +196,9 @@ int strsysctl_init(void)
 		return (0);
 	return (-EIO);
 }
-void strsysctl_exit(void)
+
+void
+strsysctl_exit(void)
 {
 	unregister_sysctl_table(xchg(&streams_sysctl_handle, NULL));
 }

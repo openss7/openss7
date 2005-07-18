@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:29:35 $
+ @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:35 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-udps.c,v $
+ Revision 0.9.2.7  2005/07/18 11:56:35  brian
+ - standard indentation
+
  Revision 0.9.2.6  2005/05/14 08:29:35  brian
  - copyright header correction
 
@@ -72,9 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:29:35 $"
+#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:35 $"
 
-static char const ident[] = "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:29:35 $";
+static char const ident[] =
+    "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:35 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -111,6 +115,7 @@ timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -127,6 +132,7 @@ static int
 start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {1, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -145,6 +151,7 @@ test_udps(void)
 	int len = 0;
 	long inp_count = 0, out_count = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
+
 //      unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
 	unsigned char ur_msg[4096];
 
@@ -377,8 +384,10 @@ main(int argc, char **argv)
 	short port = 10000;
 	int time;
 	struct hostent *haddr;
+
 	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -397,6 +406,7 @@ main(int argc, char **argv)
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "l:r:p:t:qvhVC?");

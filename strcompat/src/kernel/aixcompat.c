@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -107,10 +107,12 @@ MODULE_ALIAS("streams-aixcompat");
  *  WANTIO
  *  -------------------------------------------------------------------------
  */
-int wantio(queue_t *q, struct wantio *w)
+int
+wantio(queue_t *q, struct wantio *w)
 {
 	queue_t *wq = WR(q);
 	struct stdata *sd = ((struct queinfo *) (wq - 1))->qu_str;
+
 	if (w) {
 		// qget(wq);
 		xchg(&sd->sd_directio, w);
@@ -128,6 +130,7 @@ EXPORT_SYMBOL(wantio);		/* aix/ddi.h */
  *  -------------------------------------------------------------------------
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *));
+
 EXPORT_SYMBOL(wantmsg);		/* aix/ddi.h */
 #endif
 
@@ -135,7 +138,8 @@ EXPORT_SYMBOL(wantmsg);		/* aix/ddi.h */
  *  STR_INSTALL
  *  -------------------------------------------------------------------------
  */
-int str_install_AIX(int cmd, strconf_t * sc)
+int
+str_install_AIX(int cmd, strconf_t * sc)
 {
 	if (!sc)
 		return (EINVAL);
@@ -144,6 +148,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 #if LIS
 	{
 		int err;
+
 		if ((err = lis_register_strdev(sc->sc_major, sc->sc_str, 255, sc->sc_name)) > 0)
 			sc->sc_major = err;
 		return (err < 0 ? -err : 0);
@@ -153,6 +158,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 		{
 			struct cdevsw *cdev;
 			int err;
+
 #ifdef MAX_CHRDEV
 			if (0 >= sc->sc_major || sc->sc_major >= MAX_CHRDEV)
 #else
@@ -222,6 +228,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 		{
 			struct cdevsw *cdev;
 			int err;
+
 			if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
 				return (EINVAL);
 			if ((cdev = sdev_get(sc->sc_major)) == NULL)
@@ -238,6 +245,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 #if LIS
 	{
 		int err;
+
 		if ((err = lis_register_strmod(sc->sc_str, sc->sc_name)) > 0)
 			sc->sc_major = err;
 		return (err < 0 ? -err : 0);
@@ -247,6 +255,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 		{
 			struct fmodsw *fmod;
 			int err;
+
 			if (!sc->sc_str || !sc->sc_str->st_rdinit
 			    || !sc->sc_str->st_rdinit->qi_minfo)
 				return (EINVAL);
@@ -316,6 +325,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 		{
 			struct fmodsw *fmod;
 			int err;
+
 			if (!(fmod = fmod_str(sc->sc_str)))
 				return (ENOENT);
 			if ((err = unregister_strmod(fmod)) == 0)
@@ -332,7 +342,8 @@ EXPORT_SYMBOL(str_install_AIX);	/* strconf.h */
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 static
 #endif
-int __init aixcomp_init(void)
+int __init
+aixcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 	printk(KERN_INFO AIXCOMP_BANNER);
@@ -341,10 +352,12 @@ int __init aixcomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 static
 #endif
-void __exit aixcomp_exit(void)
+void __exit
+aixcomp_exit(void)
 {
 	return;
 }

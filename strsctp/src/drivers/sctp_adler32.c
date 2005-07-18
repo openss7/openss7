@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/16 21:07:33 $
+ @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/16 21:07:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/16 21:07:33 $"
+#ident "@(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/16 21:07:33 $";
+static char const ident[] =
+    "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
@@ -81,6 +82,7 @@ adler32(uint32_t adler, void *buf, size_t len)
 	register uint32_t s2 = (adler >> 16) & 0xffff;
 	register uint8_t *ptr = buf;
 	register int k;
+
 	if (!ptr)
 		return 1L;
 	while (len > 0) {

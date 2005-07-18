@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
 
-static char const ident[] = "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $";
+static char const ident[] =
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
 
 #define __NO_VERSION__
 
@@ -134,8 +135,8 @@ static char const ident[] = "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -664,7 +665,7 @@ n_error_ack(sctp_t * sp, int prim, int err)
 		case NS_WACK_DREQ11:
 			sp->i_state = NS_WRES_RIND;
 			break;
-			/*
+			/* 
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  send NOUTSTATE or NNOTSUPPORT or are responding
@@ -741,7 +742,7 @@ n_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 			else
 				sp->i_state = NS_IDLE;
 			break;
-			/*
+			/* 
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  are responding to an N_OPTMGMT_REQ in other than
@@ -1160,9 +1161,8 @@ n_conn_res(sctp_t * sp, mblk_t *mp)
 		goto badtoken1;
 	if (ap->i_state == NS_IDLE && ap->conind)
 		goto badtoken2;
-	/*
-	   protect at least r00t streams from users 
-	 */
+	/* 
+	   protect at least r00t streams from users */
 	if (sp->cred.cr_uid != 0 && (ap->cred.cr_uid != sp->cred.cr_uid))
 		goto access;
 	{
@@ -1265,7 +1265,7 @@ n_discon_req(sctp_t * sp, mblk_t *mp)
 		goto badaddr;
 	if (sp->i_state == NS_WACK_DREQ7 && !(cp = n_seq_check(sp, p->SEQ_number)))
 		goto badseq;
-	/*
+	/* 
 	 *  XXX: What do we do with the disconnect reason?  Nothing?
 	 */
 	if ((err = sctp_discon_req(sp, cp)))
@@ -1485,9 +1485,8 @@ n_bind_req(sctp_t * sp, mblk_t *mp)
 		goto badaddr;
 	if (p->ADDR_length != sizeof(a->port) + anum * sizeof(a->addr[0]))
 		goto badaddr;
-	/*
-	   we don't allow wildcards just yet 
-	 */
+	/* 
+	   we don't allow wildcards just yet */
 	if (!anum || (!a->port && !(a->port = sctp_get_port())))
 		goto noaddr;
 	if (sp->cred.cr_uid != 0 && a->port < 1024)
@@ -1909,9 +1908,11 @@ sctp_n_r_prim(queue_t *q, mblk_t *mp)
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-STATIC INLINE int sctp_n_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE int
+sctp_n_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked;
+
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if ((mp->b_datap->db_type >= QPCTL || !q->q_count) &&
@@ -1984,12 +1985,15 @@ STATIC INLINE int sctp_n_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mb
  *  SRVQ Put Routine
  *  -----------------------------------
  */
-STATIC INLINE int sctp_n_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE int
+sctp_n_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
+
 	ensure(q, return (-EFAULT));
 	if (sctp_trylockq(q)) {
 		mblk_t *mp;
+
 		while ((mp = getq(q))) {
 			/* 
 			 * Fast Path

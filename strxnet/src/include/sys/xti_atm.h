@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_atm.h,v 0.9.2.3 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: xti_atm.h,v 0.9.2.4 2005/07/18 12:45:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_ATM_H
 #define _SYS_XTI_ATM_H
 
-#ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -79,6 +79,7 @@ struct t_leaf_status {
 	int32_t status;			/* current status */
 	int32_t reason;			/* reason for leaf removal */
 };
+
 #define t_leaf_status t_leaf_status
 
 #define T_LEAF_NOCHANGE		0
@@ -92,7 +93,7 @@ struct t_leaf_status {
 #define T_ATM_ABSENT		(-1)
 #define T_ATM_PRESENT		(-2)
 #define T_ATM_ANY		(-3)
- /*
+ /* 
   * In the 3 constants defined immediately above, the specific value
   * is not mandatory, but any conformin g value must be negative.
   */
@@ -295,9 +296,8 @@ struct t_atm_blli {
 #define T_ATM_IPI_ID		2	/* ID via ISO/IEC TR 9577 */
 #define T_ATM_SNAP_ID		3	/* ID via SNAP */
 #define T_ATM_USER_ID		4	/* ID via user codepoints */
- /*
-    Constant values in the above 4 definitions are not mandatory 
-  */
+ /* 
+    Constant values in the above 4 definitions are not mandatory */
 
 #define T_ATM_BLLI_NORMAL_MODE		 1
 #define T_ATM_BLLI_EXTENDED_MODE	 2

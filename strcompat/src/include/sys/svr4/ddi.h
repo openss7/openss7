@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.18 2005/07/15 23:09:39 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.19 2005/07/18 12:25:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/15 23:09:39 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/18 12:25:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -71,11 +71,13 @@
 
 #ifndef lock_t
 typedef spinlock_t lock_t;
+
 #define lock_t lock_t
 #endif
 
 #ifndef pl_t
 typedef long pl_t;
+
 #define pl_t pl_t
 #endif
 
@@ -116,24 +118,31 @@ extern pl_t spl7(void);
 #define splhi	    spl7
 
 typedef int processorid_t;
+
 #if LFS
-__SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
+__SVR4_EXTERN_INLINE toid_t
+dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
 {
-	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+				unsigned long pl, int cpu);
 	return __timeout(NULL, timo_fcn, arg, ticks, pl, processor);
 }
-__SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
+__SVR4_EXTERN_INLINE toid_t
+itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
 {
-	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+				unsigned long pl, int cpu);
 	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
 }
 #endif
 
-__SVR4_EXTERN_INLINE major_t getemajor(dev_t dev)
+__SVR4_EXTERN_INLINE major_t
+getemajor(dev_t dev)
 {
 	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
-__SVR4_EXTERN_INLINE minor_t geteminor(dev_t dev)
+__SVR4_EXTERN_INLINE minor_t
+geteminor(dev_t dev)
 {
 	return (MINOR(getminor(dev)));
 }
@@ -143,10 +152,11 @@ extern int itoemajor(major_t imajor, int prevemaj);
 #ifdef LOCK_ALLOC
 #undef LOCK_ALLOC
 #endif
-__SVR4_EXTERN_INLINE lock_t *LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
-					int flag)
+__SVR4_EXTERN_INLINE lock_t *
+LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 {
 	lock_t *lockp;
+
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
 		spin_lock_init(lockp);
 	return (lockp);
@@ -155,7 +165,8 @@ __SVR4_EXTERN_INLINE lock_t *LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lk
 #ifdef LOCK_DEALLOC
 #undef LOCK_DEALLOC
 #endif
-__SVR4_EXTERN_INLINE void LOCK_DEALLOC(lock_t * lockp)
+__SVR4_EXTERN_INLINE void
+LOCK_DEALLOC(lock_t * lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
 }
@@ -163,7 +174,8 @@ __SVR4_EXTERN_INLINE void LOCK_DEALLOC(lock_t * lockp)
 #ifdef LOCK_OWNED
 #undef LOCK_OWNED
 #endif
-__SVR4_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp)
+__SVR4_EXTERN_INLINE int
+LOCK_OWNED(lock_t * lockp)
 {
 	return (1);
 }
@@ -171,9 +183,11 @@ __SVR4_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp)
 #ifdef TRYLOCK
 #undef TRYLOCK
 #endif
-__SVR4_EXTERN_INLINE pl_t TRYLOCK(lock_t * lockp, pl_t pl)
+__SVR4_EXTERN_INLINE pl_t
+TRYLOCK(lock_t * lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
+
 	if (spin_trylock(lockp))
 		return (old_pl);
 	splx(old_pl);
@@ -183,7 +197,8 @@ __SVR4_EXTERN_INLINE pl_t TRYLOCK(lock_t * lockp, pl_t pl)
 #ifdef UNLOCK
 #undef UNLOCK
 #endif
-__SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl)
+__SVR4_EXTERN_INLINE void
+UNLOCK(lock_t * lockp, pl_t pl)
 {
 	spin_unlock(lockp);
 	splx(pl);
@@ -192,59 +207,74 @@ __SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl)
 #ifdef LOCK
 #undef LOCK
 #endif
-__SVR4_EXTERN_INLINE pl_t LOCK(lock_t * lockp, pl_t pl)
+__SVR4_EXTERN_INLINE pl_t
+LOCK(lock_t * lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
+
 	spin_lock(lockp);
 	return (old_pl);
 }
 
-__SVR4_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
-				       int flag)
+__SVR4_EXTERN_INLINE rwlock_t *
+RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 {
 	rwlock_t *lockp;
+
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
 		rwlock_init(lockp);
 	return (lockp);
 }
-__SVR4_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp)
+__SVR4_EXTERN_INLINE void
+RW_DEALLOC(rwlock_t *lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
 }
-__SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl)
+
+__SVR4_EXTERN_INLINE pl_t
+RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
+
 	read_lock(lockp);
 	return (old_pl);
 }
 extern pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
 extern pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
-__SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl)
+__SVR4_EXTERN_INLINE void
+RW_UNLOCK(rwlock_t *lockp, pl_t pl)
 {
 	read_unlock(lockp);
 	splx(pl);
 }
-__SVR4_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *lockp, pl_t pl)
+
+__SVR4_EXTERN_INLINE pl_t
+RW_WRLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
+
 	write_lock(lockp);
 	return (old_pl);
 }
 
 typedef struct semaphore sleep_t;
 
-__SVR4_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag)
+__SVR4_EXTERN_INLINE sleep_t *
+SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag)
 {
 	sleep_t *lockp;
+
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
 		init_MUTEX(lockp);
 	return (lockp);
 }
-__SVR4_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t * lockp)
+__SVR4_EXTERN_INLINE void
+SLEEP_DEALLOC(sleep_t * lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
 }
-__SVR4_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp)
+__SVR4_EXTERN_INLINE int
+SLEEP_LOCKAVAIL(sleep_t * lockp)
 {
 	if (!down_trylock(lockp)) {
 		up(lockp);
@@ -252,47 +282,57 @@ __SVR4_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp)
 	}
 	return (0);
 }
-__SVR4_EXTERN_INLINE void SLEEP_LOCK(sleep_t * lockp, int priority)
+__SVR4_EXTERN_INLINE void
+SLEEP_LOCK(sleep_t * lockp, int priority)
 {
 	down(lockp);
 }
-__SVR4_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t * lockp)
+__SVR4_EXTERN_INLINE int
+SLEEP_LOCKOWNED(sleep_t * lockp)
 {
 	return (1);
 }
-__SVR4_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t * lockp, int priority)
+__SVR4_EXTERN_INLINE int
+SLEEP_LOCK_SIG(sleep_t * lockp, int priority)
 {
 	return down_interruptible(lockp);
 }
-__SVR4_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t * lockp)
+__SVR4_EXTERN_INLINE int
+SLEEP_TRYLOCK(sleep_t * lockp)
 {
 	return (down_trylock(lockp) == 0);
 }
-__SVR4_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp)
+__SVR4_EXTERN_INLINE void
+SLEEP_UNLOCK(sleep_t * lockp)
 {
 	up(lockp);
 }
 
-__SVR4_EXTERN_INLINE sv_t *SV_ALLOC(int flag)
+__SVR4_EXTERN_INLINE sv_t *
+SV_ALLOC(int flag)
 {
 	sv_t *svp;
+
 	if ((svp = kmem_alloc(sizeof(*svp), flag))) {
 		init_waitqueue_head(&svp->sv_waitq);
 		svp->sv_condv = 1;
 	}
 	return (svp);
 }
-__SVR4_EXTERN_INLINE void SV_BROADCAST(sv_t * svp, int flags)
+__SVR4_EXTERN_INLINE void
+SV_BROADCAST(sv_t * svp, int flags)
 {
 	svp->sv_condv = 1;
 	wake_up_interruptible_all(&svp->sv_waitq);
 }
-__SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp)
+__SVR4_EXTERN_INLINE void
+SV_DEALLOC(sv_t * svp)
 {
 	kmem_free(svp, sizeof(*svp));
 }
 extern void SV_SIGNAL(sv_t * svp);
-__SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
+__SVR4_EXTERN_INLINE void
+SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
 {
 	DECLARE_WAITQUEUE(wait, current);
 	add_wait_queue(&svp->sv_waitq, &wait);
@@ -310,9 +350,11 @@ __SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&svp->sv_waitq, &wait);
 }
-__SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
+__SVR4_EXTERN_INLINE int
+SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
 {
 	int signal = 0;
+
 	DECLARE_WAITQUEUE(wait, current);
 	add_wait_queue(&svp->sv_waitq, &wait);
 	for (;;) {

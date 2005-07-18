@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/14 22:04:10 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/14 22:04:10 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/14 22:04:10 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/14 22:04:10 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -97,14 +97,18 @@ MODULE_ALIAS("streams-suncompat");
 #endif
 
 __SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q);
+
 EXPORT_SYMBOL(freezestr_SUN);
 __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
+
 EXPORT_SYMBOL(unfreezestr_SUN);
 
 #if LFS
-static __inline__ void qpwlock(queue_t *rq)
+static __inline__ void
+qpwlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current)
 		qu->qu_nest++;
 	else {
@@ -113,9 +117,11 @@ static __inline__ void qpwlock(queue_t *rq)
 		qu->qu_owner = current;
 	}
 }
-static __inline__ void qpwunlock(queue_t *rq)
+static __inline__ void
+qpwunlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
+
 	if (qu->qu_owner == current) {
 		if (qu->qu_nest > 0)
 			qu->qu_nest--;
@@ -133,9 +139,11 @@ static __inline__ void qpwunlock(queue_t *rq)
  *  qwait:  - wait for a procedure to be called on a queue pair
  *  @rq:    a pointer to the read queue of the queue pair
  */
-void qwait(queue_t *rq)
+void
+qwait(queue_t *rq)
 {
 	struct queinfo *qu = (typeof(qu)) rq;
+
 	DECLARE_WAITQUEUE(wait, current);
 	assert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
@@ -158,10 +166,12 @@ EXPORT_SYMBOL(qwait);		/* sun/ddi.h */
  *  qwait_sig: - wait for a procedure on a queue pair or signal
  *  @rq:    a pointer to the read queue of the queue pair
  */
-int qwait_sig(queue_t *rq)
+int
+qwait_sig(queue_t *rq)
 {
 	int ret = 0;
 	struct queinfo *qu = (typeof(qu)) rq;
+
 	DECLARE_WAITQUEUE(wait, current);
 	assert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
@@ -191,15 +201,19 @@ EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg)
+bufcall_id_t
+qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg)
 {
-	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
+	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
+				long arg);
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
 }
+
 EXPORT_SYMBOL(qbufcall);	/* sun/ddi.h */
-timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks)
+timeout_id_t
+qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks)
 {
 	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 				unsigned long pl, int cpu);
@@ -207,6 +221,7 @@ timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long tic
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());
 }
+
 EXPORT_SYMBOL(qtimeout);	/* sun/ddi.h */
 #endif
 /**
@@ -215,19 +230,24 @@ EXPORT_SYMBOL(qtimeout);	/* sun/ddi.h */
  *  @bcid:	buffer call id returned by qbufcall()
  *  Notices:	Don't ever call this function with an expired bufcall id.
  */
-void qunbufcall(queue_t *q, bufcall_id_t bcid)
+void
+qunbufcall(queue_t *q, bufcall_id_t bcid)
 {
 	unbufcall(bcid);
 }
+
 EXPORT_SYMBOL(qunbufcall);	/* sun/ddi.h */
-clock_t quntimeout(queue_t *q, timeout_id_t toid)
+clock_t
+quntimeout(queue_t *q, timeout_id_t toid)
 {
 	return untimeout(toid);
 }
+
 EXPORT_SYMBOL(quntimeout);	/* sun/ddi.h */
 #if LFS
 /* LIS already has queclass defined */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
+
 EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
 #endif
 #if LFS
@@ -245,8 +265,8 @@ EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
  *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
  *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
  */
-__SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp),
-				 int perimeter)
+__SUN_EXTERN_INLINE void
+qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter)
 {
 	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
 			      int perim, int type);
@@ -254,21 +274,29 @@ __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t 
 		return;
 	// never();
 }
+
 EXPORT_SYMBOL(qwriter);		/* sun/ddi.h */
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void);
+
 EXPORT_SYMBOL(ddi_get_cred);	/* sun/ddi.h */
 #endif
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void);
+
 EXPORT_SYMBOL(ddi_get_lbolt);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE pid_t ddi_get_pid(void);
+
 EXPORT_SYMBOL(ddi_get_pid);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE time_t ddi_get_time(void);
+
 EXPORT_SYMBOL(ddi_get_time);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE unsigned short ddi_getiminor(dev_t dev);
+
 EXPORT_SYMBOL(ddi_getiminor);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep);
+
 EXPORT_SYMBOL(ddi_umem_alloc);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep);
+
 EXPORT_SYMBOL(ddi_umem_free);
 
 #if 0
@@ -540,49 +568,70 @@ extern int ddi_unmap_regs(void);
  *  Solaris helper functions from sys/strsun.h
  */
 __SUN_EXTERN_INLINE unsigned char *DB_BASE(mblk_t *mp);
+
 EXPORT_SYMBOL(DB_BASE);
 __SUN_EXTERN_INLINE unsigned char *DB_LIM(mblk_t *mp);
+
 EXPORT_SYMBOL(DB_LIM);
 __SUN_EXTERN_INLINE size_t DB_REF(mblk_t *mp);
+
 EXPORT_SYMBOL(DB_REF);
 __SUN_EXTERN_INLINE int DB_TYPE(mblk_t *mp);
+
 EXPORT_SYMBOL(DB_TYPE);
 __SUN_EXTERN_INLINE long MBLKL(mblk_t *mp);
+
 EXPORT_SYMBOL(MBLKL);
 __SUN_EXTERN_INLINE long MBLKSIZE(mblk_t *mp);
+
 EXPORT_SYMBOL(MBLKSIZE);
 __SUN_EXTERN_INLINE long MBLKHEAD(mblk_t *mp);
+
 EXPORT_SYMBOL(MBLKHEAD);
 __SUN_EXTERN_INLINE long MBLKTAIL(mblk_t *mp);
+
 EXPORT_SYMBOL(MBLKTAIL);
 __SUN_EXTERN_INLINE long MBLKIN(mblk_t *mp, ssize_t off, size_t len);
+
 EXPORT_SYMBOL(MBLKIN);
 __SUN_EXTERN_INLINE long OFFSET(void *p, void *base);
+
 EXPORT_SYMBOL(OFFSET);
 __SUN_EXTERN_INLINE void merror(queue_t *q, mblk_t *mp, int error);
+
 EXPORT_SYMBOL(merror);
 __SUN_EXTERN_INLINE void mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval);
+
 EXPORT_SYMBOL(mioc2ack);
 __SUN_EXTERN_INLINE void miocack(queue_t *q, mblk_t *mp, int count, int rval);
+
 EXPORT_SYMBOL(miocack);
 __SUN_EXTERN_INLINE void miocnak(queue_t *q, mblk_t *mp, int count, int error);
+
 EXPORT_SYMBOL(miocnak);
-__SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int type, uint32_t primtype);
+__SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int type,
+				      uint32_t primtype);
 EXPORT_SYMBOL(mexchange);
 __SUN_EXTERN_INLINE mblk_t *mexpandb(mblk_t *mp, int i1, int i2);
+
 EXPORT_SYMBOL(mexpandb);
 __SUN_EXTERN_INLINE int miocpullup(mblk_t *mp, size_t len);
+
 EXPORT_SYMBOL(miocpullup);
 #if 0
 /* contained in the base package */
 __SUN_EXTERN_INLINE size_t msgsize(mblk_t *mp);
+
 EXPORT_SYMBOL(msgsize);
 #endif
 __SUN_EXTERN_INLINE void mcopymsg(mblk_t *mp, unsigned char *buf);
+
 EXPORT_SYMBOL(mcopymsg);
 __SUN_EXTERN_INLINE void mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr);
+
 EXPORT_SYMBOL(mcopyin);
 __SUN_EXTERN_INLINE void mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp);
+
 EXPORT_SYMBOL(mcopyout);
 
 /* 
@@ -590,18 +639,24 @@ EXPORT_SYMBOL(mcopyout);
  */
 
 __SUN_EXTERN_INLINE int nodev(void);
+
 EXPORT_SYMBOL(nodev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nulldev(void);
+
 EXPORT_SYMBOL(nulldev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nochpoll(void);
+
 EXPORT_SYMBOL(nochpoll);	/* strconf.h */
 __SUN_EXTERN_INLINE int ddi_prop_op(void);
+
 EXPORT_SYMBOL(ddi_prop_op);
 
 struct mod_ops mod_strmops = { MODREV_1, 0, };
+
 EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
-int mod_install(struct modlinkage *ml)
+int
+mod_install(struct modlinkage *ml)
 {
 	/* FIXME: this is our register function, write it! */
 	if (ml->ml_rev != MODREV_1)
@@ -613,8 +668,10 @@ int mod_install(struct modlinkage *ml)
 	if (ml->ml_linkage[0] == (void *) &mod_strmops) {
 		struct modlstrmod *mod = ml->ml_linkage[0];
 		int err;
+
 #if LIS
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
+
 		if ((err = lis_register_strmod(st, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
 			/* for LiS we save the modid in the mi_idnum */
 			st->st_rdinit->qi_minfo->mi_idnum = err;
@@ -625,9 +682,11 @@ int mod_install(struct modlinkage *ml)
 #if LFS
 		/* registering a module */
 		struct fmodsw *fmod;
+
 		/* FIXME: write this */
 		if ((fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP))) {
 			struct streamtab *st = mod->strmod_fmodsw->f_str;
+
 			fmod->f_name = st->st_rdinit->qi_minfo->mi_idname;
 			fmod->f_str = st;
 			fmod->f_flag = mod->strmod_fmodsw->f_flag;
@@ -645,8 +704,10 @@ int mod_install(struct modlinkage *ml)
 	} else {
 		struct modldrv *drv = ml->ml_linkage[0];
 		int err;
+
 #if LIS
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+
 		if ((err =
 		     lis_register_strdev(0, st, 255, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
 			/* for LiS we save the major in the mi_idnum */
@@ -658,9 +719,11 @@ int mod_install(struct modlinkage *ml)
 #if LFS
 		/* registering a driver */
 		struct cdevsw *cdev;
+
 		if ((cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP))) {
 			/* call device attach function to get node information */
 			struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+
 			cdev->d_name = st->st_rdinit->qi_minfo->mi_idname;
 			cdev->d_str = st;
 			cdev->d_flag = drv->drv_dev_ops->devo_cb_ops->cb_flag;	/* convert these? */
@@ -683,7 +746,8 @@ int mod_install(struct modlinkage *ml)
 
 EXPORT_SYMBOL(mod_install);	/* strconf.h */
 
-int mod_remove(struct modlinkage *ml)
+int
+mod_remove(struct modlinkage *ml)
 {
 	/* FIXME: this is our unregister function, write it! */
 	if (ml->ml_rev != MODREV_1)
@@ -696,8 +760,10 @@ int mod_remove(struct modlinkage *ml)
 		/* was a module */
 		struct modlstrmod *mod = ml->ml_linkage[0];
 		int err;
+
 #if LIS
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
+
 		if ((err = lis_unregister_strmod(st)) >= 0)
 			return (DDI_SUCCESS);
 		return (-err);
@@ -705,6 +771,7 @@ int mod_remove(struct modlinkage *ml)
 #if LFS
 		struct fmodsw *fmod;
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
+
 		if ((fmod = fmod_str(st))) {
 			printd(("%s: %s: streams module\n", __FUNCTION__, fmod->f_name));
 			err = unregister_strmod(fmod);
@@ -719,8 +786,10 @@ int mod_remove(struct modlinkage *ml)
 		/* was a driver */
 		struct modldrv *drv = ml->ml_linkage[0];
 		int err;
+
 #if LIS
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+
 		if ((err = lis_unregister_strdev(st->st_rdinit->qi_minfo->mi_idnum)) >= 0)
 			return (DDI_SUCCESS);
 		return (-err);
@@ -728,6 +797,7 @@ int mod_remove(struct modlinkage *ml)
 #if LFS
 		struct cdevsw *cdev;
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+
 		if ((cdev = cdev_str(st))) {
 			if ((err = unregister_strdev(cdev, 0)) == 0)
 				kmem_free(cdev, sizeof(*cdev));
@@ -740,7 +810,8 @@ int mod_remove(struct modlinkage *ml)
 
 EXPORT_SYMBOL(mod_remove);	/* strconf.h */
 
-int mod_info(struct modlinkage *ml, struct modinfo *mi)
+int
+mod_info(struct modlinkage *ml, struct modinfo *mi)
 {
 	return (0);		/* never called */
 }
@@ -750,7 +821,8 @@ EXPORT_SYMBOL(mod_info);	/* strconf.h */
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 static
 #endif
-int __init suncomp_init(void)
+int __init
+suncomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 	printk(KERN_INFO SUNCOMP_BANNER);
@@ -759,10 +831,12 @@ int __init suncomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 static
 #endif
-void __exit suncomp_exit(void)
+void __exit
+suncomp_exit(void)
 {
 	return;
 }

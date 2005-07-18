@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.29 2005/07/15 23:09:51 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.30 2005/07/18 12:06:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/15 23:09:51 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -143,7 +143,7 @@ typedef struct syncq {
 	spinlock_t sq_lock;		/* spin lock for this structure */
 	int sq_count;			/* no of threads inside (negative for exclusive) */
 	struct task_struct *sq_owner;	/* exclusive owner */
-//	wait_queue_head_t sq_waitq;	/* waiters */
+//      wait_queue_head_t sq_waitq;     /* waiters */
 	struct strevent *sq_head;	/* head of event queue */
 	struct strevent **sq_tail;	/* tail of event queue */
 	struct syncq *sq_outer;		/* synch queue outside this one (if any) */
@@ -163,7 +163,7 @@ struct stdata {
 	mblk_t *sd_iocblk;		/* message to return for ioctl */
 	struct stdata *sd_other;	/* other stream head for pipes */
 	struct streamtab *sd_strtab;	/* driver streamtab */
-	struct inode *sd_inode;         /* back pointer to inode */
+	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
 	struct file *sd_file;		/* back pointer to file */
 	ulong sd_flag;			/* stream head state */
@@ -171,32 +171,32 @@ struct stdata {
 	ulong sd_wropt;			/* write options */
 	ulong sd_eropt;			/* error options */
 	ulong sd_iocid;			/* sequence id for active ioctl */
-//	ushort sd_iocwait;		/* number of procs awaiting ioctl */
-//	struct task_struct *sd_sidp;	/* controlling session id */
-//	struct task_struct *sd_pgidp;	/* controlling process group */
+//      ushort sd_iocwait;              /* number of procs awaiting ioctl */
+//      struct task_struct *sd_sidp;    /* controlling session id */
+//      struct task_struct *sd_pgidp;   /* controlling process group */
 	ushort sd_wroff;		/* write offset */
 	int sd_rerror;			/* read error */
 	int sd_werror;			/* write error */
 	int sd_opens;			/* number of successful opens */
 	int sd_readers;			/* number of streampipe readers */
 	int sd_writers;			/* number of streampipe writers */
-//	int sd_rwaiters;		/* number of waiters on read */
-//	int sd_wwaiters;		/* number of waiters on write */
+//      int sd_rwaiters;                /* number of waiters on read */
+//      int sd_wwaiters;                /* number of waiters on write */
 	int sd_pushcnt;			/* number of modules pushed */
 	int sd_nanchor;			/* number of modules anchored */
-	unsigned long sd_sigflags;		/* signal flags */
+	unsigned long sd_sigflags;	/* signal flags */
 	struct fasync_struct *sd_siglist;	/* list of procs for SIGPOLL */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
 	wait_queue_head_t sd_waitq;	/* waiters */
-//	mblk_t *sd_mark;		/* pointer to marked message */
+//      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
-//	ulong sd_rtime;			/* time to forward held message */
+//      ulong sd_rtime;                 /* time to forward held message */
 	rwlock_t sd_qlock;		/* lock for queues under this stream */
 	struct task_struct *sd_owner;	/* exclusive lock owner */
 	int sd_nest;			/* lock nesting */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */
-//	struct semaphore sd_mutex;	/* mutex for system calls */
+//      struct semaphore sd_mutex;      /* mutex for system calls */
 	struct stdata *sd_clone;	/* clone streams */
 	struct stdata *sd_links;	/* linked streams */
 	struct stdata *sd_link_next;	/* next linked stream */
@@ -359,6 +359,7 @@ struct strthread {
 	struct strevent *freeevnt_head;	/* head of free stream events cached */
 	struct strevent **freeevnt_tail;	/* tail of free stream events cached */
 } __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
 /* aligned so processors keep out of each other's way */
 
 enum {
@@ -587,9 +588,11 @@ extern void freestr(struct stdata *sd);
 extern struct stdata *sd_get(struct stdata *sd);
 extern void sd_put(struct stdata *sd);
 
-extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp);
+extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
+		    cred_t *crp);
 
-extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg, int perim, int type);
+extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg, int perim,
+		      int type);
 
 extern struct devinfo *di_alloc(struct cdevsw *cdev);
 extern void di_put(struct devinfo *di);
@@ -602,7 +605,8 @@ extern int sysctl_str_strctlsz;
 extern int register_clone(struct cdevsw *cdev);
 extern int unregister_clone(struct cdevsw *cdev);
 
-extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp);
+extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
+		      int *flagsp);
 extern int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
 extern int strrput(queue_t *q, mblk_t *mp);
 extern int strwsrv(queue_t *q);

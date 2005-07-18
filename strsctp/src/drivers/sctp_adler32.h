@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_adler32.h,v 0.9.2.2 2005/05/14 08:29:17 brian Exp $
+ @(#) $Id: sctp_adler32.h,v 0.9.2.3 2005/07/18 12:53:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -53,7 +53,8 @@
 #define __SCTP_ADLER32_H__
 
 #define BASE 65521L		/* largest prime smaller than 65536 */
-#define NMAX 5552		/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
+#define NMAX 5552		/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <=
+				   2^32-1 */
 
 extern uint32_t adler32(uint32_t adler, void *buf, size_t len);
 

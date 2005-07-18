@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.11  2005/07/18 12:25:42  brian
+ - standard indentation
+
  Revision 0.9.2.10  2005/07/14 03:40:11  brian
  - updates for check pass
 
@@ -83,9 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $";
+static char const ident[] =
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -108,7 +112,7 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -148,18 +152,23 @@ MODULE_ALIAS("streams-lfscompat");
 
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
 __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp);
+
 EXPORT_SYMBOL(appq);
 
 __LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len);
+
 EXPORT_SYMBOL(bcmp);
 
-int bcanget(queue_t *q, int band)
+int
+bcanget(queue_t *q, int band)
 {
 	int result;
 	lis_flags_t flags;
+
 	LIS_RDQISRLOCK(q, &flags);
 	switch (band) {
 		struct qband *qb;
+
 	case 0:
 		result = (q->q_first ? 1 : 0);
 		break;
@@ -168,7 +177,8 @@ int bcanget(queue_t *q, int band)
 		result = (qb ? qb->qb_first->b_band : 0);
 		break;
 	default:
-		for (qb = q->q_bandp; qb && (!qb->qb_first || (qb->qb_first->b_band != band)); qb = qb->qb_next) ;
+		for (qb = q->q_bandp; qb && (!qb->qb_first || (qb->qb_first->b_band != band));
+		     qb = qb->qb_next) ;
 		result = (qb ? band : 0);
 		break;
 	}
@@ -178,10 +188,12 @@ int bcanget(queue_t *q, int band)
 
 EXPORT_SYMBOL(bcanget);
 
-int canget(queue_t *q)
+int
+canget(queue_t *q)
 {
 	int result;
 	lis_flags_t flags;
+
 	LIS_QISRLOCK(q, &flags);
 	if (!q->q_first) {
 		if (!F_ISSET(q->q_flag, QWANTR)) {
@@ -201,12 +213,15 @@ EXPORT_SYMBOL(canget);
 
 /* LiS 2.18.0 deprecated these for some reason... */
 __LFS_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
+
 EXPORT_SYMBOL(copyin);
 
 __LFS_EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
+
 EXPORT_SYMBOL(copyout);
 
-int drv_getparm(const unsigned int parm, void *value_p)
+int
+drv_getparm(const unsigned int parm, void *value_p)
 {
 	switch (parm) {
 	case LBOLT:
@@ -239,6 +254,7 @@ int drv_getparm(const unsigned int parm, void *value_p)
 	case TIME:
 	{
 		struct timeval tv;
+
 		do_gettimeofday(&tv);
 		*(time_t *) value_p = tv.tv_sec;
 		return (0);
@@ -271,83 +287,110 @@ int drv_getparm(const unsigned int parm, void *value_p)
 EXPORT_SYMBOL(drv_getparm);
 
 __LFS_EXTERN_INLINE int drv_priv(cred_t *crp);
+
 EXPORT_SYMBOL(drv_priv);
 
 __LFS_EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
+
 EXPORT_SYMBOL(drv_hztomsec);
 
 __LFS_EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
+
 EXPORT_SYMBOL(drv_hztousec);
 
 __LFS_EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
+
 EXPORT_SYMBOL(drv_msectohz);
 
 __LFS_EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
+
 EXPORT_SYMBOL(drv_usectohz);
 
 __LFS_EXTERN_INLINE void drv_usecwait(unsigned long usec);
+
 EXPORT_SYMBOL(drv_usecwait);
 
 __LFS_EXTERN_INLINE void delay(unsigned long ticks);
+
 EXPORT_SYMBOL(delay);
 
 __LFS_EXTERN_INLINE int enableq(queue_t *q);
+
 EXPORT_SYMBOL(enableq);
 
 __LFS_EXTERN_INLINE qi_qadmin_t getadmin(modID_t modid);
+
 EXPORT_SYMBOL(getadmin);
 
 __LFS_EXTERN_INLINE modID_t getmid(const char *name);
+
 EXPORT_SYMBOL(getmid);
 
 __LFS_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
+
 EXPORT_SYMBOL(linkmsg);
 
 __LFS_EXTERN_INLINE int pcmsg(unsigned char type);
+
 EXPORT_SYMBOL(pcmsg);
 
 __LFS_EXTERN_INLINE int datamsg(unsigned char type);
+
 EXPORT_SYMBOL(datamsg);
 
 __LFS_EXTERN_INLINE int ctlmsg(unsigned char type);
+
 EXPORT_SYMBOL(ctlmsg);
 
-__LFS_EXTERN_INLINE int isdatablk(dblk_t *db);
+__LFS_EXTERN_INLINE int isdatablk(dblk_t * db);
+
 EXPORT_SYMBOL(isdatablk);
 
 __LFS_EXTERN_INLINE int isdatamsg(mblk_t *mp);
+
 EXPORT_SYMBOL(isdatamsg);
 
 __LFS_EXTERN_INLINE int putctl(queue_t *q, int type);
+
 EXPORT_SYMBOL(putctl);
 
 __LFS_EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
+
 EXPORT_SYMBOL(putctl1);
 
 __LFS_EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2);
+
 EXPORT_SYMBOL(putctl2);
 
 __LFS_EXTERN_INLINE int putnextctl(queue_t *q, int type);
+
 EXPORT_SYMBOL(putnextctl);
 
 __LFS_EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
+
 EXPORT_SYMBOL(putnextctl1);
 
 __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
+
 EXPORT_SYMBOL(putnextctl2);
 
 /*
  *  This is a default implemenation for strlog(9).  We print directly to the log
  *  files.  That is not good: we want to filter things out.  A proper log driver
  *  is in the strutil package.  We provide a hook here so that that package can
- *  hook into this call.
+ *  hook into this call.  Because we cannot filter, only SL_ERROR messages are
+ *  printed to the system logs.  SL_TRACE messages are never printed and 0 is
+ *  returned.
  */
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
-static int vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
+static int
+vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	unsigned long flags;
 	static char str_err_buf[1024];
+	int rval = 1;
+
 	spin_lock_irqsave(&str_err_lock, flags);
 	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 	if (flag & SL_FATAL) {
@@ -366,21 +409,33 @@ static int vstrlog_default(short mid, short sid, char level, unsigned short flag
 		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
 		       (int) sid, str_err_buf);
 	} else {		/* SL_TRACE */
+#if 0
 		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
 		       (int) sid, str_err_buf);
+#else
+		/* Because we have no trace filter facilities without the presence of a full
+		   STREAMS-based logger, we do not log SL_TRACE messages because they might be
+		   generated way too fast, expecting to be filtered.  Use the full STREAMS-based
+		   loger in strutil package if you want to trace messages. */
+		rval = 0;
+#endif
 	}
 	spin_unlock_irqrestore(&str_err_lock, flags);
-	return (1);
+	return (rval);
 }
 
 vstrlog_t vstrlog = &vstrlog_default;
+
 EXPORT_SYMBOL(vstrlog);
 
-int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
+int
+strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	int result = 0;
+
 	if (vstrlog != NULL) {
 		va_list args;
+
 		va_start(args, fmt);
 		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
 		va_end(args);
@@ -390,62 +445,75 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 
 EXPORT_SYMBOL(strlog);
 
-
 /*
  *  The following are from src/include/sys/lfs/strconf.h
  */
 
 __LFS_EXTERN_INLINE int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
+
 EXPORT_SYMBOL(register_strnod);
 
 __LFS_EXTERN_INLINE int register_strdev(struct cdevsw *cdev, major_t major);
+
 EXPORT_SYMBOL(register_strdev);
 
 __LFS_EXTERN_INLINE int register_strdrv(struct cdevsw *cdev);
+
 EXPORT_SYMBOL(register_strdrv);
 
 __LFS_EXTERN_INLINE int register_strmod(struct _fmodsw *fmod);
+
 EXPORT_SYMBOL(register_strmod);
 
 __LFS_EXTERN_INLINE int unregister_strnod(struct cdevsw *cdev, minor_t minor);
+
 EXPORT_SYMBOL(unregister_strnod);
 
 __LFS_EXTERN_INLINE int unregister_strdev(struct cdevsw *cdev, major_t major);
+
 EXPORT_SYMBOL(unregister_strdev);
 
 __LFS_EXTERN_INLINE int unregister_strdrv(struct cdevsw *cdev);
+
 EXPORT_SYMBOL(unregister_strdrv);
 
 __LFS_EXTERN_INLINE int unregister_strmod(struct _fmodsw *fmod);
+
 EXPORT_SYMBOL(unregister_strmod);
 
 __LFS_EXTERN_INLINE int apush_get(struct strapush *sap);
+
 EXPORT_SYMBOL(apush_get);
 
 __LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
+
 EXPORT_SYMBOL(apush_set);
 
 __LFS_EXTERN_INLINE int apush_vml(struct str_list *slp);
+
 EXPORT_SYMBOL(apush_vml);
 
 __LFS_EXTERN_INLINE int autopush_del(struct strapush *sap);
+
 EXPORT_SYMBOL(autopush_del);
 
 __LFS_EXTERN_INLINE int autopush_add(struct strapush *sap);
+
 EXPORT_SYMBOL(autopush_add);
 
 __LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods);
+
 EXPORT_SYMBOL(autopush_vml);
 
 __LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev);
+
 EXPORT_SYMBOL(autopush_find);
-
-
 
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE
 static
 #endif
-int __init lfscomp_init(void)
+int __init
+lfscomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE
 	printk(KERN_INFO LFSCOMP_BANNER);
@@ -454,10 +522,12 @@ int __init lfscomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE
 static
 #endif
-void __exit lfscomp_exit(void)
+void __exit
+lfscomp_exit(void)
 {
 	return;
 }

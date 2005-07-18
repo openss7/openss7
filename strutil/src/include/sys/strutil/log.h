@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.6 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.7 2005/07/18 12:38:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_LOG_H__
 #define __SYS_STREAMS_LOG_H__
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:38:48 $"
 
 #ifndef __SYS_LOG_H__
 #warn "Do no include sys/streams/log.h directly, include sys/log.h instead."

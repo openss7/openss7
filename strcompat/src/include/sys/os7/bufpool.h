@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -83,6 +83,7 @@ __OS7_EXTERN_INLINE mblk_t *
 __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
+
 	if (size <= FASTBUF && prior == BPRI_HI) {
 		if ((mp = pool->head)) {
 			pool->head = mp->b_cont;
@@ -104,6 +105,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
+
 	if (size <= FASTBUF && prior == BPRI_HI) {
 		spin_lock(&pool->lock);
 		if ((mp = pool->head)) {
@@ -128,6 +130,7 @@ __OS7_EXTERN_INLINE mblk_t *
 ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
+
 	if (size <= FASTBUF && prior == BPRI_HI) {
 		spin_lock_bh(&pool->lock);
 		if ((mp = pool->head)) {
@@ -223,6 +226,7 @@ __OS7_EXTERN_INLINE void
 __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
+
 	while ((bp = bp_next)) {
 		bp_next = bp->b_cont;
 		__ss7_fast_freeb(pool, bp);
@@ -236,6 +240,7 @@ __OS7_EXTERN_INLINE void
 ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
+
 	while ((bp = bp_next)) {
 		bp_next = bp->b_cont;
 		ss7_fast_freeb(pool, bp);
@@ -249,6 +254,7 @@ __OS7_EXTERN_INLINE void
 ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
+
 	while ((bp = bp_next)) {
 		bp_next = bp->b_cont;
 		ss7_fast_freeb_bh(pool, bp);
@@ -289,6 +295,7 @@ __OS7_EXTERN_INLINE void
 ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
 {
 	mblk_t *mp;
+
 	atomic_add(n, &pool->reserve);
 	/* 
 	   precharge the pool */
@@ -320,9 +327,11 @@ __OS7_EXTERN_INLINE void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
 	unsigned long flags;
+
 	spin_lock_irqsave(&pool->lock, flags);
 	if (pool->initialized) {
 		mblk_t *bp;
+
 		while ((bp = pool->head)) {
 			pool->head = bp->b_cont;
 			freeb(bp);

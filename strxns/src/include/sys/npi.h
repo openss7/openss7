@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi.h,v 0.9.2.2 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: npi.h,v 0.9.2.3 2005/07/18 12:40:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -57,7 +57,7 @@
 #ifndef SYS_NPI_H
 #define SYS_NPI_H		/* mark file as included */
 
-#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:26:12 $"
+#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/18 12:40:29 $"
 
 typedef int32_t np_long;
 typedef u_int32_t np_ulong;
@@ -508,9 +508,8 @@ typedef struct {
 	np_ulong ADDR_length;		/* length of address */
 	np_ulong ADDR_offset;		/* offset of address */
 	np_ulong CONIND_number;		/* requested # of connect- */
-	/*
-	   indications to be queued 
-	 */
+	/* 
+	   indications to be queued */
 	np_ulong BIND_flags;		/* bind flags */
 	np_ulong PROTOID_length;	/* length of bound protocol ids */
 	np_ulong PROTOID_offset;	/* offset of bound protocol ids */

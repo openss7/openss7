@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:38:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:38:51 $"
 
 static char const ident[] =
-    "$RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:38:51 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -73,7 +73,8 @@ static char const ident[] =
 static int output = 1;
 static int debug = 0;
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -85,7 +86,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -98,7 +100,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -124,7 +127,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -170,14 +174,17 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-void insf(int argc, char *argv[])
+void
+insf(int argc, char *argv[])
 {
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -192,6 +199,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "qd::v::VCh?", long_options, &option_index);
 #else
 		c = getopt(argc, argv, "qd::v::VCh?");

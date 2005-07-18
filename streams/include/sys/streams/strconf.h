@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.16 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.17 2005/07/18 12:06:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:06:58 $"
 
 #ifndef __SYS_STRCONF_H__
 #warn "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -90,7 +90,6 @@ typedef enum {
 	SQLVL_QUEUE = 5,		/* queue level */
 	SQLVL_NOP = 6,			/* no synchronization */
 } sqlvl_t;
-
 
 extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
 extern int register_strdev(struct cdevsw *cdev, major_t major);

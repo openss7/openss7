@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $
+ @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $"
+#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:25:42 $"
 
 static char const ident[] =
-    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $";
+    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:25:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR3COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $"
+#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:25:42 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR3COMP_LICENSE	"GPL"
@@ -97,17 +97,21 @@ MODULE_ALIAS("streams-svr3compat");
 #endif
 
 __SVR3_EXTERN_INLINE major_t emajor(dev_t dev);
+
 EXPORT_SYMBOL(emajor);		/* uw7/ddi.h */
 __SVR3_EXTERN_INLINE minor_t eminor(dev_t dev);
+
 EXPORT_SYMBOL(eminor);		/* uw7/ddi.h */
 
 __SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t bsize, int type, uint bpri);
+
 EXPORT_SYMBOL(alloc_proto);	/* svr3/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
 static
 #endif
-int __init svr3comp_init(void)
+int __init
+svr3comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
 	printk(KERN_INFO SVR3COMP_BANNER);
@@ -116,10 +120,12 @@ int __init svr3comp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
 static
 #endif
-void __exit svr3comp_exit(void)
+void __exit
+svr3comp_exit(void)
 {
 	return;
 }

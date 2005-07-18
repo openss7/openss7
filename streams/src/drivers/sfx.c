@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -109,6 +109,7 @@ MODULE_ALIAS("streams-sfx");
 #endif
 
 modID_t modid = CONFIG_STREAMS_SFX_MODID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -122,6 +123,7 @@ MODULE_ALIAS("streams-driver-sfx");
 #endif
 
 major_t major = CONFIG_STREAMS_SFX_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -172,13 +174,16 @@ static struct streamtab sfx_info = {
  *
  *  -------------------------------------------------------------------------
  */
-static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int err;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		/* we walk down the queue chain calling open on each of the modules and the driver */
 		queue_t *wq = WR(q), *wq_next;
+
 		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 		while ((wq = wq_next)) {
 			/* all opens are module opens on fifos, there is no driver */
@@ -192,8 +197,10 @@ static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
 		dev_t dev = *devp;
 		struct stdata *sd;
+
 		if ((sd = ((struct queinfo *) q)->qu_str)) {
 			struct cdevsw *sdev = sd->sd_cdevsw;
+
 			/* 1st step: attach the driver and call its open routine */
 			/* we are the driver and this *is* the open routine */
 			/* 2nd step: check for redirected return */
@@ -212,7 +219,8 @@ static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	MOD_DEC_USE_COUNT;
 	return (err <= 0 ? err : -err);
 }
-static int sfx_close(queue_t *q, int oflag, cred_t *crp)
+static int
+sfx_close(queue_t *q, int oflag, cred_t *crp)
 {
 	return (0);
 }
@@ -229,9 +237,11 @@ static struct cdevsw sfx_cdev = {
 #ifdef CONFIG_STREAMS_SFX_MODULE
 static
 #endif
-int __init sfx_init(void)
+int __init
+sfx_init(void)
 {
 	int err;
+
 #ifdef CONFIG_STREAMS_SFX_MODULE
 	printk(KERN_INFO SFX_BANNER);
 #else
@@ -244,10 +254,12 @@ int __init sfx_init(void)
 		major = err;
 	return (0);
 };
+
 #ifdef CONFIG_STREAMS_SFX_MODULE
 static
 #endif
-void __exit sfx_exit(void)
+void __exit
+sfx_exit(void)
 {
 	unregister_strdev(&sfx_cdev, major);
 };

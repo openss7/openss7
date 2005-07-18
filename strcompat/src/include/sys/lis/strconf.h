@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.10 2005/07/15 23:08:50 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.11 2005/07/18 12:25:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/15 23:08:50 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:40 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -111,7 +111,8 @@ struct lis_strapush {
 	char sap_list[LIS_MAXAPUSH][LIS_FMNAMESZ + 1];
 };
 
-extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const char *name);
+extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
+			       const char *name);
 extern int lis_unregister_strdev(major_t major);
 extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name);
 extern int lis_unregister_strmod(struct streamtab *strtab);
@@ -119,6 +120,7 @@ extern int lis_unregister_strmod(struct streamtab *strtab);
 extern int lis_apush_get(struct lis_strapush *ap) __depr;
 extern int lis_apush_set(struct lis_strapush *ap) __depr;
 extern int lis_apush_vml(struct str_list *slp) __depr;
+
 #if 0
 extern int lis_apushm(dev_t dev, const char *mods[]) __depr;
 #endif
@@ -127,6 +129,7 @@ extern int lis_apushm(dev_t dev, const char *mods[]) __depr;
 extern int lis_check_q_magic(queue_t *q, char *file, int line) __depr;
 #endif
 extern int lis_clone_major(void) __depr;
+
 #if 0
 #if HAVE_KERNEL_FATTACH_SUPPORT
 extern int lis_fattach(struct file *f, const char *path) __depr;
@@ -153,6 +156,7 @@ extern int lis_ioc_fdetach(char *path) __depr;
 extern int lis_ioc_pipe(unsigned int *fildes) __depr;
 extern struct inode *lis_old_inode(struct file *f, struct inode *i) __depr;
 extern lis_atomic_t lis_open_cnt __depr;
+
 #if HAVE_KERNEL_PIPE_SUPPORT
 extern int lis_pipe(unsigned int *fd) __depr;
 #endif
@@ -175,15 +179,17 @@ extern volatile unsigned long lis_setqsched_isr_cnts[NR_CPUS] __depr;
 extern lis_atomic_t lis_stdata_cnt __depr;
 extern int lis_strclose(struct inode *i, struct file *f) __depr;
 extern lis_atomic_t lis_strcount __depr;
-extern int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp,
-			  int *flagsp, int doit) __depr;
-extern int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg) __depr;
+extern int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp,
+			  int *bandp, int *flagsp, int doit) __depr;
+extern int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd,
+			unsigned long arg) __depr;
 extern int lis_stropen(struct inode *i, struct file *f) __depr;
-extern int lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band,
-			  int flags) __depr;
+extern int lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp,
+			  int band, int flags) __depr;
 extern ssize_t lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op) __depr;
 extern lis_atomic_t lis_strstats[24][4] __depr;
-extern ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op) __depr;
+extern ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen,
+			    loff_t *op) __depr;
 extern int lis_valid_mod_list(struct str_list ml) __depr;
 #endif
 

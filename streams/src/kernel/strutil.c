@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:22 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/18 12:07:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:22 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/18 12:07:02 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:22 $";
+static char const ident[] =
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/18 12:07:02 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -87,28 +88,34 @@ static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.
 #include "strsched.h"		/* for current_context() */
 #include "strutil.h"		/* for q locking and puts and gets */
 
-static inline int db_ref(dblk_t * db)
+static inline int
+db_ref(dblk_t * db)
 {
 	return (db->db_ref = atomic_read(&db->db_users));
 }
-static inline void db_set(dblk_t * db, int val)
+static inline void
+db_set(dblk_t * db, int val)
 {
 	atomic_set(&db->db_users, val);
 	db_ref(db);
 }
-static inline void db_inc(dblk_t * db)
+static inline void
+db_inc(dblk_t * db)
 {
 	atomic_inc(&db->db_users);
 	db_ref(db);
 }
-static inline void db_dec(dblk_t * db)
+static inline void
+db_dec(dblk_t * db)
 {
 	atomic_dec(&db->db_users);
 	db_ref(db);
 }
-static inline int db_dec_and_test(dblk_t * db)
+static inline int
+db_dec_and_test(dblk_t * db)
 {
 	int ret = atomic_dec_and_test(&db->db_users);
+
 	db_ref(db);
 	return ret;
 }
@@ -120,23 +127,28 @@ static inline int db_dec_and_test(dblk_t * db)
 #define databuf_offset \
 	(((unsigned char *)&((struct mdbblock *)0)->databuf) - ((unsigned char *)0))
 
-static inline mblk_t *db_to_mb(dblk_t * db)
+static inline mblk_t *
+db_to_mb(dblk_t * db)
 {
 	return ((mblk_t *) ((unsigned char *) db - datablk_offset + msgblk_offset));
 }
-static inline unsigned char *db_to_buf(dblk_t * db)
+static inline unsigned char *
+db_to_buf(dblk_t * db)
 {
 	return ((unsigned char *) db - datablk_offset + databuf_offset);
 }
-static inline unsigned char *mb_to_buf(mblk_t *mb)
+static inline unsigned char *
+mb_to_buf(mblk_t *mb)
 {
 	return ((unsigned char *) mb - msgblk_offset + databuf_offset);
 }
-static inline dblk_t *mb_to_db(mblk_t *mb)
+static inline dblk_t *
+mb_to_db(mblk_t *mb)
 {
 	return ((dblk_t *) ((unsigned char *) mb - msgblk_offset + datablk_offset));
 }
-static inline struct mdbblock *mb_to_mdb(mblk_t *mb)
+static inline struct mdbblock *
+mb_to_mdb(mblk_t *mb)
 {
 	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
 }
@@ -150,11 +162,13 @@ static inline struct mdbblock *mb_to_mdb(mblk_t *mb)
  *
  *  Return Values: (1) - success; (0) - failure
  */
-int adjmsg(mblk_t *mp, ssize_t length)
+int
+adjmsg(mblk_t *mp, ssize_t length)
 {
 	mblk_t *bp, *sp;
 	int type;
 	ssize_t blen, size;
+
 	if (!mp)
 		goto error;
 	type = mp->b_datap->db_type;
@@ -220,15 +234,18 @@ EXPORT_SYMBOL(adjmsg);
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-mblk_t *allocb(size_t size, uint priority)
+mblk_t *
+allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
+
 	// if (size > sysctl_str_strmsgsz)
 	// goto error;
 	if ((mp = mdbblock_alloc(priority, &allocb))) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		unsigned char *base = md->databuf;
 		dblk_t *db = &md->datablk.d_dblock;
+
 		if (size <= FASTBUF)
 			size = FASTBUF;
 		else if (!(base = kmem_alloc(size, KM_NOSLEEP)))
@@ -258,11 +275,14 @@ EXPORT_SYMBOL(allocb);
  *
  *  Notices: Unlike LiS we do not align the copy.  The driver must me wary of alignment.
  */
-mblk_t *copyb(mblk_t *bp)
+mblk_t *
+copyb(mblk_t *bp)
 {
 	mblk_t *mp = NULL;
+
 	if (bp) {
 		ssize_t size = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0;
+
 		if ((mp = allocb(size, BPRI_MED))) {
 			bcopy(bp->b_rptr, mp->b_wptr, size);
 			mp->b_wptr += size;
@@ -282,10 +302,12 @@ EXPORT_SYMBOL(copyb);
  *
  *  Copies all the message blocks in message @msg and returns a pointer to the copied message.
  */
-mblk_t *copymsg(mblk_t *msg)
+mblk_t *
+copymsg(mblk_t *msg)
 {
 	mblk_t *mp = NULL;
 	register mblk_t *bp, **mpp = &mp;
+
 	for (bp = msg; bp; bp = bp->b_cont, mpp = &(*mpp)->b_cont)
 		if (!(*mpp = copyb(bp)))
 			goto error;
@@ -302,18 +324,22 @@ EXPORT_SYMBOL(copymsg);
  *  @type:	type to test
  */
 __EXTERN_INLINE int datamsg(unsigned char type);
+
 EXPORT_SYMBOL(datamsg);
 
 /**
  *  dupb:	- duplicates a message block
  *  @bp:	message block to duplicate
  */
-mblk_t *dupb(mblk_t *bp)
+mblk_t *
+dupb(mblk_t *bp)
 {
 	mblk_t *mp;
+
 	if ((mp = mdbblock_alloc(BPRI_HI, &dupb))) {
 		struct mdbblock *md = (struct mdbblock *) mp;
 		dblk_t *db = bp->b_datap;
+
 		db_inc(db);
 		*mp = *bp;
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
@@ -333,10 +359,12 @@ EXPORT_SYMBOL(dupb);
  *  Duplicates an entire message using dupb() to duplicate each of the message blocks in the
  *  message.  Returns a pointer to the duplicate message.
  */
-mblk_t *dupmsg(mblk_t *msg)
+mblk_t *
+dupmsg(mblk_t *msg)
 {
 	mblk_t *mp = NULL;
 	register mblk_t *bp, **mpp = &mp;
+
 	for (bp = msg; bp; bp = bp->b_cont, mpp = &(*mpp)->b_cont)
 		if (!(*mpp = dupb(bp)))
 			goto error;
@@ -355,12 +383,15 @@ EXPORT_SYMBOL(dupmsg);
  *  @priority:	priority of message block header allocation
  *  @freeinfo:	free routine callback
  */
-mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
+mblk_t *
+esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
+
 	if ((mp = mdbblock_alloc(priority, &esballoc))) {
 		struct mdbblock *md = (struct mdbblock *) mp;
 		dblk_t *db = &md->datablk.d_dblock;
+
 		/* set up internal buffer with free routine info */
 		*(struct free_rtn *) md->databuf = *freeinfo;
 		/* set up data block */
@@ -382,9 +413,11 @@ EXPORT_SYMBOL(esballoc);
  *  freeb:	- free a message block
  *  @mp:	message block to free
  */
-void freeb(mblk_t *mp)
+void
+freeb(mblk_t *mp)
 {
 	dblk_t *dp, *db;
+
 	/* check null ptr, message still on queue, double free */
 	if (!mp || mp->b_queue || !(db = xchg(&mp->b_datap, NULL)))
 		goto bug;
@@ -392,6 +425,7 @@ void freeb(mblk_t *mp)
 	if (db_dec_and_test(db)) {
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
+
 		if (db->db_base != db_to_buf(db)) {
 			/* handle external data buffer */
 			if (!db->db_frtnp)
@@ -403,8 +437,9 @@ void freeb(mblk_t *mp)
 		if (!mb->b_datap)
 			mdbblock_free(mb);
 	}
-	/* if the message block refers to the associated data block then we have already freed the mdbblock above when
-	   necessary; otherwise the entire mdbblock can go if the datab is also unused */
+	/* if the message block refers to the associated data block then we have already freed the
+	   mdbblock above when necessary; otherwise the entire mdbblock can go if the datab is also 
+	   unused */
 	if (db != (dp = mb_to_db(mp)) && !db_ref(dp))
 		mdbblock_free(mp);
 	return;
@@ -420,6 +455,7 @@ EXPORT_SYMBOL(freeb);
  *  @mp:	the message to free
  */
 __EXTERN_INLINE void freemsg(mblk_t *mp);
+
 EXPORT_SYMBOL(freemsg);
 
 /**
@@ -427,6 +463,7 @@ EXPORT_SYMBOL(freemsg);
  *  @dp:	data block to test
  */
 __EXTERN_INLINE int isdatablk(dblk_t * dp);
+
 EXPORT_SYMBOL(isdatablk);
 
 /**
@@ -434,6 +471,7 @@ EXPORT_SYMBOL(isdatablk);
  *  @mp:	message block to test
  */
 __EXTERN_INLINE int isdatamsg(mblk_t *mp);
+
 EXPORT_SYMBOL(isdatamsg);
 
 /**
@@ -441,6 +479,7 @@ EXPORT_SYMBOL(isdatamsg);
  *  @type:	the type to check
  */
 __EXTERN_INLINE int pcmsg(unsigned char type);
+
 EXPORT_SYMBOL(pcmsg);
 
 /**
@@ -449,6 +488,7 @@ EXPORT_SYMBOL(pcmsg);
  *  @mp2:	message block to link
  */
 __EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
+
 EXPORT_SYMBOL(linkb);
 
 /**
@@ -457,6 +497,7 @@ EXPORT_SYMBOL(linkb);
  *  @mp2:	message to link
  */
 __EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
+
 EXPORT_SYMBOL(linkmsg);
 
 /**
@@ -464,6 +505,7 @@ EXPORT_SYMBOL(linkmsg);
  *  @mp:	message across which to calculate data bytes
  */
 __EXTERN_INLINE size_t msgdsize(mblk_t *mp);
+
 EXPORT_SYMBOL(msgdsize);
 
 /**
@@ -474,11 +516,13 @@ EXPORT_SYMBOL(msgdsize);
  *  Pulls up @length  bytes into the returned message.  This is for handling headers as a contiguous
  *  range of bytes.
  */
-mblk_t *msgpullup(mblk_t *msg, ssize_t length)
+mblk_t *
+msgpullup(mblk_t *msg, ssize_t length)
 {
 	mblk_t *mp = NULL, **mpp = &mp;
 	register mblk_t *bp = NULL;
 	register ssize_t size, blen, type, len;
+
 	if (!msg)
 		goto error;
 	if (!(len = length))
@@ -541,6 +585,7 @@ EXPORT_SYMBOL(msgpullup);
  *  @mp:	message for which to calculate size
  */
 __EXTERN_INLINE size_t msgsize(mblk_t *mp);
+
 EXPORT_SYMBOL(msgsize);
 
 /**
@@ -551,18 +596,20 @@ EXPORT_SYMBOL(msgsize);
  *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling headers
  *  as a contiguous range of bytes.
  */
-int pullupmsg(mblk_t *mp, ssize_t len)
+int
+pullupmsg(mblk_t *mp, ssize_t len)
 {
 	dblk_t *db, *dp;
 	ssize_t size, blen, type;
 	mblk_t *bp, **mpp;
 	unsigned char *base;
 	struct mdbblock *md;
+
 	if (!mp || len < -1)
 		goto error;
-	/* There actually is a way on 2.4 and 2.6 kernels to determine if the memory is suitable for DMA if it was
-	   allocated with kmalloc, but that's for later, and only if necessary. If you need ISA DMA memory, please use
-	   esballoc. */
+	/* There actually is a way on 2.4 and 2.6 kernels to determine if the memory is suitable
+	   for DMA if it was allocated with kmalloc, but that's for later, and only if necessary.
+	   If you need ISA DMA memory, please use esballoc. */
 	if (!len || ((blen = mp->b_wptr - mp->b_rptr) >= len && len >= 0
 		     && !((ulong) (mp->b_rptr) & (L1_CACHE_BYTES - 1))))
 		return (1);	/* success */
@@ -605,6 +652,7 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 	if (db_dec_and_test(db)) {
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
+
 		if (db->db_base != db_to_buf(db)) {
 			/* handle external data buffer */
 			if (!db->db_frtnp)
@@ -617,7 +665,8 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 			mdbblock_free(mb);
 	}
 	for (mpp = &mp->b_cont; (bp = *mpp);) {
-		if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0) > 0 && bp->b_datap->db_type != type)
+		if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0) > 0
+		    && bp->b_datap->db_type != type)
 			break;
 		if (size >= blen) {	/* use whole block (even if zero) */
 			bcopy(bp->b_rptr, mp->b_wptr, blen);
@@ -651,6 +700,7 @@ EXPORT_SYMBOL(pullupmsg);
  *  @bp:    the block to remove
  */
 __EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp);
+
 EXPORT_SYMBOL(rmvb);
 
 /**
@@ -659,6 +709,7 @@ EXPORT_SYMBOL(rmvb);
  *  @priority:	allocation priority to test
  */
 __EXTERN_INLINE int testb(size_t size, uint priority);
+
 EXPORT_SYMBOL(testb);
 
 /**
@@ -666,6 +717,7 @@ EXPORT_SYMBOL(testb);
  *  @mp:	message to unlink
  */
 __EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
+
 EXPORT_SYMBOL(unlinkb);
 
 /**
@@ -678,19 +730,23 @@ EXPORT_SYMBOL(unlinkb);
  *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
 __EXTERN_INLINE size_t xmsgsize(mblk_t *mp);
+
 EXPORT_SYMBOL(xmsgsize);
 
 static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
+
 /**
  *  appq:	- append a message onto a queue
  *  @q:		the queue to append to
  *  @emp:	existing message on queue
  *  @nmp:	the message to append
  */
-int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+int
+appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
 	unsigned long flags;
+
 	qwlock(q, &flags);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
 	qwunlock(q, &flags);
@@ -717,15 +773,18 @@ EXPORT_SYMBOL(appq);
  *  @q:		this queue
  */
 __EXTERN_INLINE queue_t *backq(queue_t *q);
+
 EXPORT_SYMBOL(backq);
 
 /**
  *  qbackenable: - backenable a queue
  *  @q:		the queue to backenable
  */
-void qbackenable(queue_t *q)
+void
+qbackenable(queue_t *q)
 {
 	queue_t *qp;
+
 	ptrace(("%s; back-enabling queue %p\n", __FUNCTION__, q));
 	ensure(q, return);
 	ptrace(("%s; locking queue %p\n", __FUNCTION__, q));
@@ -749,9 +808,11 @@ EXPORT_SYMBOL(qbackenable);
 /*
  *  __bcangetany:
  */
-static int __bcangetany(queue_t *q)
+static int
+__bcangetany(queue_t *q)
 {
 	struct qband *qb;
+
 	for (qb = q->q_bandp; qb && qb->qb_first; qb = qb->qb_next) ;
 	return (qb ? qb->qb_band : 0);
 }
@@ -759,9 +820,11 @@ static int __bcangetany(queue_t *q)
 /*
  *  __bcanget:
  */
-static int __bcanget(queue_t *q, unsigned char band)
+static int
+__bcanget(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
+
 	for (qb = q->q_bandp; qb && (qb->qb_band > band); qb = qb->qb_next) ;
 	if (qb && qb->qb_band == band && !qb->qb_count)
 		qb = NULL;
@@ -769,15 +832,18 @@ static int __bcanget(queue_t *q, unsigned char band)
 }
 
 static int __canget(queue_t *q);
+
 /**
  *  bcanget:	- check whether messages are on a queue
  *  @q:		queue to check
  *  @band:	band to check
  */
-int bcanget(queue_t *q, int band)
+int
+bcanget(queue_t *q, int band)
 {
 	int result;
 	unsigned long flags;
+
 	qrlock(q, &flags);
 	switch (band) {
 	case 0:
@@ -799,12 +865,15 @@ EXPORT_SYMBOL(bcanget);
 /*
  *  __bcanputany:
  */
-static int __bcanputany(queue_t *q)
+static int
+__bcanputany(queue_t *q)
 {
 	queue_t *q_next;
+
 	if ((q_next = q)) {
 		struct qband *qb;
 		unsigned long flags;
+
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
 		qrlock(q, &flags);
@@ -820,17 +889,20 @@ static int __bcanputany(queue_t *q)
 /*
  *  __bcanput:
  */
-static int __bcanput(queue_t *q, unsigned char band)
+static int
+__bcanput(queue_t *q, unsigned char band)
 {
 	queue_t *q_next;
+
 	if ((q_next = q)) {
 		struct qband *qb;
 		unsigned long flags;
+
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
 		qrlock(q, &flags);
-		/* bands are sorted in decending priority so that we can quit the search early for higher priority
-		   bands */
+		/* bands are sorted in decending priority so that we can quit the search early for
+		   higher priority bands */
 		for (qb = q->q_bandp; qb && (qb->qb_band > band); qb = qb->qb_next) ;
 		if (qb && qb->qb_band == band && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 			set_bit(QB_WANTW_BIT, &qb->qb_flag);
@@ -846,6 +918,7 @@ static int __bcanput(queue_t *q, unsigned char band)
 }
 
 static int __canput(queue_t *q);
+
 /**
  *  bcanput:	- check whether message can be put to a queue
  *  @q:		queue to check
@@ -858,9 +931,11 @@ static int __canput(queue_t *q);
  *
  *  Use bcanput or bcanputnext with band -1 to check for any writable non-zero band.
  */
-int bcanput(queue_t *q, int band)
+int
+bcanput(queue_t *q, int band)
 {
 	int result;
+
 	hrlock(q);		/* read lock queue chain */
 	switch (band) {
 	case 0:
@@ -884,9 +959,11 @@ EXPORT_SYMBOL(bcanput);
  *  @q:		this queue
  *  @band:	band to check
  */
-int bcanputnext(queue_t *q, int band)
+int
+bcanputnext(queue_t *q, int band)
 {
 	int result;
+
 	hrlock(q);		/* read lock queue chain */
 	switch (band) {
 	case 0:
@@ -910,14 +987,17 @@ EXPORT_SYMBOL(bcanputnext);
  *  @q:		queue to check
  */
 __EXTERN_INLINE int canenable(queue_t *q);
+
 EXPORT_SYMBOL(canenable);
 
 /*
  *  __canget:
  */
-static int __canget(queue_t *q)
+static int
+__canget(queue_t *q)
 {
 	int result = 1;
+
 	if (!q->q_first) {
 		result = 0;
 		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
@@ -933,10 +1013,12 @@ static int __canget(queue_t *q)
  *  We treat a canget that fails like a getq that returns null visa vi backenable.  That way poll
  *  and strread that use this will properly backenable the queue.
  */
-int canget(queue_t *q)
+int
+canget(queue_t *q)
 {
 	int result;
 	unsigned long flags;
+
 	qrlock(q, &flags);
 	result = __canget(q);
 	qrunlock(q, &flags);
@@ -950,9 +1032,11 @@ EXPORT_SYMBOL(canget);
 /*
  *  __canput:
  */
-static int __canput(queue_t *q)
+static int
+__canput(queue_t *q)
 {
 	queue_t *q_next;
+
 	if ((q_next = q)) {
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
@@ -973,9 +1057,11 @@ static int __canput(queue_t *q)
  *  Don't call these functions with NULL q pointers!  To walk the list of queues we take a reader
  *  lock on the stream head.
  */
-int canput(queue_t *q)
+int
+canput(queue_t *q)
 {
 	int result;
+
 	hrlock(q);		/* read lock queue chain */
 	result = __canput(q);
 	hrunlock(q);
@@ -988,9 +1074,11 @@ EXPORT_SYMBOL(canput);
  *  canputnext: - check whether messages can be put to the queue after this one
  *  @q:		this queue
  */
-int canputnext(queue_t *q)
+int
+canputnext(queue_t *q)
 {
 	int result;
+
 	hrlock(q);		/* read lock queue chain */
 	result = __canput(q->q_next);
 	hrunlock(q);
@@ -1004,9 +1092,11 @@ EXPORT_SYMBOL(canputnext);
  *
  * Find a queue band.  This must be called with the queue read or write locked.
  */
-static inline struct qband *__find_qband(queue_t *q, unsigned char band)
+static inline struct qband *
+__find_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
+
 	for (qb = q->q_bandp; qb && qb->qb_band > band; qb = qb->qb_next) ;
 	if (qb && qb->qb_band == band)
 		return (qb);
@@ -1014,14 +1104,17 @@ static inline struct qband *__find_qband(queue_t *q, unsigned char band)
 }
 
 static int __rmvq(queue_t *q, mblk_t *mp);
+
 /*
  *  __flushband:
  */
-static int __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
+static int
+__flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 {
 	mblk_t *mp, *mp_next;
 	struct qband *qb;
 	int backenable = 0;
+
 	if (band != 0) {
 		if ((qb = __find_qband(q, band))) {
 			switch (flag) {
@@ -1040,8 +1133,8 @@ static int __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 			default:
 				swerr();
 			case FLUSHALL:
-				/* This is faster.  For flushall, we link the qband chain onto the free list and null
-				   out qband counts and markers. */
+				/* This is faster.  For flushall, we link the qband chain onto the
+				   free list and null out qband counts and markers. */
 				if ((**mppp = qb->qb_first)) {
 					/* link around entire band */
 					if (qb->qb_first->b_prev)
@@ -1115,18 +1208,20 @@ static int __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
  *  @band:	the band to flush
  *  @flag:	how to flush, %FLUSHALL or %FLUSHDATA
  */
-void flushband(queue_t *q, int band, int flag)
+void
+flushband(queue_t *q, int band, int flag)
 {
 	int backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long flags;
+
 	qwlock(q, &flags);
 	backenable = __flushband(q, flag, band, &mpp);
 	qwunlock(q, &flags);
 	if (backenable)
 		qbackenable(q);
-	/* we want to free messages with the locks off so that other CPUs can process this queue and we don't block
-	   interrupts too long */
+	/* we want to free messages with the locks off so that other CPUs can process this queue
+	   and we don't block interrupts too long */
 	mb();
 	freechain(mp, mpp);
 }
@@ -1137,9 +1232,11 @@ EXPORT_SYMBOL(flushband);
  *  freezestr:	- freeze a stream for direct queue access
  *  @q:		queue to freeze
  */
-unsigned long freezestr(queue_t *q)
+unsigned long
+freezestr(queue_t *q)
 {
 	unsigned long flags = 0;
+
 	hwlock(q, &flags);
 	qwlock(q, NULL);
 	return ((q->q_iflags = flags));
@@ -1161,13 +1258,16 @@ EXPORT_SYMBOL(freezestr);
  *  the side-effect that the identified module may be loaded by module identifier.  The kernel
  *  module demand loaded will have the module name or alias "streams-modid-%u".
  */
-qi_qadmin_t getadmin(modID_t modid)
+qi_qadmin_t
+getadmin(modID_t modid)
 {
 	qi_qadmin_t qadmin = NULL;
 	struct fmodsw *fmod;
+
 	if ((fmod = fmod_get(modid))) {
 		struct streamtab *st;
 		struct qinit *qi;
+
 		printd(("%s: %s: got module\n", __FUNCTION__, fmod->f_name));
 		if ((st = fmod->f_str) && (qi = st->st_rdinit))
 			qadmin = qi->qi_qadmin;
@@ -1192,12 +1292,15 @@ EXPORT_SYMBOL(getadmin);
  *  the side-effect that the named module may be loaded by module name.  The kernel module demand
  *  loaded will have the module name or alias "streams-%s".
  */
-modID_t getmid(const char *name)
+modID_t
+getmid(const char *name)
 {
 	struct fmodsw *fmod;
 	struct cdevsw *cdev;
+
 	if ((fmod = fmod_find(name))) {
 		modID_t modid = fmod->f_modid;
+
 		printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
 		printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 		fmod_put(fmod);
@@ -1205,6 +1308,7 @@ modID_t getmid(const char *name)
 	}
 	if ((cdev = cdev_find(name))) {
 		modID_t modid = cdev->d_modid;
+
 		printd(("%s: %s: found device\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 		sdev_put(cdev);
@@ -1220,9 +1324,11 @@ EXPORT_SYMBOL(getmid);
  *
  *  Faster than __rmvq, same idea
  */
-mblk_t *__getq(queue_t *q, int *be)
+mblk_t *
+__getq(queue_t *q, int *be)
 {
 	mblk_t *mp;
+
 	if ((mp = q->q_first)) {
 		clear_bit(QWANTR_BIT, &q->q_flag);
 		*be = __rmvq(q, mp);
@@ -1235,11 +1341,13 @@ mblk_t *__getq(queue_t *q, int *be)
  *  getq:	- get messags from a queue
  *  @q:		the queue from which to get messages
  */
-mblk_t *getq(queue_t *q)
+mblk_t *
+getq(queue_t *q)
 {
 	mblk_t *mp;
 	unsigned long flags;
 	int backenable = 0;
+
 	ensure(q, return (NULL));
 	qwlock(q, &flags);
 	mp = __getq(q, &backenable);
@@ -1256,11 +1364,14 @@ EXPORT_SYMBOL(getq);
  *
  *  Find or create a queue band.  This must be called with the queue write locked.
  */
-static struct qband *__get_qband(queue_t *q, unsigned char band)
+static struct qband *
+__get_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb, *qp, **qbp;
+
 	/* find insertion point for band */
-	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band; qp = *qbp, qbp = &(*qbp)->qb_next) ;
+	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band;
+	     qp = *qbp, qbp = &(*qbp)->qb_next) ;
 	if (!(qb = *qbp) || qb->qb_band < band) {
 		/* not found, create one */
 		if ((qb = allocqb())) {
@@ -1277,14 +1388,17 @@ static struct qband *__get_qband(queue_t *q, unsigned char band)
 }
 
 int __putq(queue_t *q, mblk_t *mp);
+
 /*
  *  __insq:
  */
-static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+static int
+__insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int enable = 0;
 	struct qband *qb = NULL;
 	size_t size;
+
 	if (!emp)
 		goto putq;
 	if (q != emp->b_queue)
@@ -1300,7 +1414,8 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	} else {
 		if (emp->b_datap->db_type >= QPCTL || emp->b_band < nmp->b_band)
 			goto out_of_order;
-		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL && emp->b_prev->b_band > nmp->b_band)
+		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL
+		    && emp->b_prev->b_band > nmp->b_band)
 			goto out_of_order;
 		enable = q->q_first ? 0 : 1;	/* on empty queue */
 		if (unlikely(nmp->b_band)) {
@@ -1353,10 +1468,12 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
  *  @emp:	the existing message before which to insert
  *  @nmp:	the new message to insert
  */
-int insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+int
+insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
 	unsigned long flags;
+
 	qwlock(q, &flags);
 	result = __insq(q, emp, nmp);
 	qwunlock(q, &flags);
@@ -1383,14 +1500,17 @@ EXPORT_SYMBOL(insq);
  *  @q:		one queue
  */
 __EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
+
 EXPORT_SYMBOL(OTHERQ);
 
 /*
  *  __put:
  */
-static void __put(queue_t *q, mblk_t *mp)
+static void
+__put(queue_t *q, mblk_t *mp)
 {
 	struct queinfo *qu = (typeof(qu)) RD(q);
+
 	q->q_qinfo->qi_putp(q, mp);
 	if (unlikely(waitqueue_active(&qu->qu_qwait)))
 		wake_up_all(&qu->qu_qwait);
@@ -1399,15 +1519,18 @@ static void __put(queue_t *q, mblk_t *mp)
 /*
  *  _put:
  */
-static void _put(queue_t *q, mblk_t *mp)
+static void
+_put(queue_t *q, mblk_t *mp)
 {
 	struct syncq *isq;
 	unsigned long flags;
+
 	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
 	if (!(isq = q->q_syncq))
 		__put(q, mp);
 	else {
 		struct syncq *osq = isq->sq_outer;
+
 		if (enter_shared(osq, &flags)) {
 			if (isq->sq_flag & D_MTPUTSHARED) {
 				if (enter_shared(isq, &flags)) {
@@ -1444,7 +1567,8 @@ static void _put(queue_t *q, mblk_t *mp)
  *
  *  Your put routines must be MT-safe.  That simple.  Don't put to put routines that don't exist.
  */
-void put(queue_t *q, mblk_t *mp)
+void
+put(queue_t *q, mblk_t *mp)
 {
 	hrlock(q);
 	_put(q, mp);
@@ -1458,7 +1582,8 @@ EXPORT_SYMBOL(put);
  *  @q:		this queue
  *  @mp:	message to put
  */
-void putnext(queue_t *q, mblk_t *mp)
+void
+putnext(queue_t *q, mblk_t *mp)
 {
 	hrlock(q);
 	_put(q->q_next, mp);
@@ -1470,12 +1595,14 @@ EXPORT_SYMBOL(putnext);
 /*
  *  __putbq:
  */
-static int __putbq(queue_t *q, mblk_t *mp)
+static int
+__putbq(queue_t *q, mblk_t *mp)
 {
 	int enable = 0;
 	mblk_t *fmp;
 	struct qband *qb = NULL;
 	size_t size = msgsize(mp);
+
 	if (mp->b_datap->db_type < QPCTL) {
 #if 0
 		enable = q->q_first ? 0 : 1;	/* enable on empty queue XXX */
@@ -1484,6 +1611,7 @@ static int __putbq(queue_t *q, mblk_t *mp)
 			fmp = q->q_first;
 		} else {
 			struct qband *qp;
+
 			if (!(fmp = q->q_first))
 				goto insert;	/* place at head of queue */
 			if (!(qb = __get_qband(q, mp->b_band)))
@@ -1558,10 +1686,12 @@ static int __putbq(queue_t *q, mblk_t *mp)
  *  @q:		queue to place back message
  *  @mp:	message to place back
  */
-int putbq(queue_t *q, mblk_t *mp)
+int
+putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
 	unsigned long flags;
+
 	qwlock(q, &flags);
 	result = __putbq(q, mp);
 	qwunlock(q, &flags);
@@ -1577,11 +1707,13 @@ int putbq(queue_t *q, mblk_t *mp)
 	default:
 		never();
 	case 0:		/* failure */
-		/* This should never happen, because it takes a qband structure allocation failure to get here, and
-		   since we are putting the message back on the queue, there should already be a qband structure.
-		   Unless, however, putbq() is just used to insert messages ahead of others rather than really putting
-		   them back. Nevertheless, a way to avoid this error is to always ensure that a qband structure exists 
-		   (e.g., with strqset) before calling putbq on a band for the first time. */
+		/* This should never happen, because it takes a qband structure allocation failure
+		   to get here, and since we are putting the message back on the queue, there
+		   should already be a qband structure. Unless, however, putbq() is just used to
+		   insert messages ahead of others rather than really putting them back.
+		   Nevertheless, a way to avoid this error is to always ensure that a qband
+		   structure exists (e.g., with strqset) before calling putbq on a band for the
+		   first time. */
 		return (0);
 	}
 }
@@ -1594,6 +1726,7 @@ EXPORT_SYMBOL(putbq);
  *  @type:	the message type
  */
 __EXTERN_INLINE int putctl(queue_t *q, int type);
+
 EXPORT_SYMBOL(putctl);
 
 /**
@@ -1603,6 +1736,7 @@ EXPORT_SYMBOL(putctl);
  *  @param:	the 1 byte parameter
  */
 __EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
+
 EXPORT_SYMBOL(putctl1);
 
 /**
@@ -1613,6 +1747,7 @@ EXPORT_SYMBOL(putctl1);
  *  @param2:	the second 1 byte parameter
  */
 __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2);
+
 EXPORT_SYMBOL(putctl2);
 
 /**
@@ -1621,6 +1756,7 @@ EXPORT_SYMBOL(putctl2);
  *  @type:	the message type
  */
 __EXTERN_INLINE int putnextctl(queue_t *q, int type);
+
 EXPORT_SYMBOL(putnextctl);
 
 /**
@@ -1630,6 +1766,7 @@ EXPORT_SYMBOL(putnextctl);
  *  @param:	the 1 byte parameter
  */
 __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
+
 EXPORT_SYMBOL(putnextctl1);
 
 /**
@@ -1640,6 +1777,7 @@ EXPORT_SYMBOL(putnextctl1);
  *  @param2:	the second 1 byte parameter
  */
 __EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
+
 EXPORT_SYMBOL(putnextctl2);
 
 /*
@@ -1651,12 +1789,14 @@ EXPORT_SYMBOL(putnextctl2);
  *  should be empty.  This is a little better than LiS in that it does not examine the band of
  *  messages on the queue.
  */
-int __putq(queue_t *q, mblk_t *mp)
+int
+__putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
 	mblk_t *lmp;
 	struct qband *qb = NULL;
 	size_t size = msgsize(mp);
+
 	if (mp->b_datap->db_type >= QPCTL) {
 		enable = 2;	/* always enable on high priority */
 		if ((lmp = q->q_pctl))
@@ -1678,6 +1818,7 @@ int __putq(queue_t *q, mblk_t *mp)
 			lmp = q->q_last;
 		} else {
 			struct qband *qp;
+
 			if (!(lmp = q->q_last))
 				goto append;	/* place at end of queue */
 			if (!(qb = __get_qband(q, mp->b_band)))
@@ -1737,10 +1878,12 @@ int __putq(queue_t *q, mblk_t *mp)
  *  @q:		queue to which to put the message
  *  @mp:	message to put
  */
-int putq(queue_t *q, mblk_t *mp)
+int
+putq(queue_t *q, mblk_t *mp)
 {
 	int result;
 	unsigned long flags;
+
 	qwlock(q, &flags);
 	result = __putq(q, mp);
 	qwunlock(q, &flags);
@@ -1756,9 +1899,10 @@ int putq(queue_t *q, mblk_t *mp)
 	default:
 		never();
 	case 0:		/* failure */
-		/* This can happen and it is bad.  We use the return value to putq but it is typically ignored by the
-		   module.  One way to ensure that this never happens is to call strqset() for the band before calling
-		   putq on the band for the first time. (See also putbq()) */
+		/* This can happen and it is bad.  We use the return value to putq but it is
+		   typically ignored by the module.  One way to ensure that this never happens is
+		   to call strqset() for the band before calling putq on the band for the first
+		   time. (See also putbq()) */
 		return (0);
 	}
 }
@@ -1766,6 +1910,7 @@ int putq(queue_t *q, mblk_t *mp)
 EXPORT_SYMBOL(putq);
 
 int setsq(queue_t *q, struct fmodsw *fmod, int mux);
+
 /**
  *  qattach: - attach a stream head, module or driver queue pair to a stream head
  *  @sd:	stream head data structure identifying stream
@@ -1775,13 +1920,15 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux);
  *  @sflag:	streams flag, can be %DRVOPEN, %CLONEOPEN, %MODOPEN
  *  @crp:	&cred_t pointer to credentials of opening task
  */
-int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp)
+int
+qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct streamtab *st;
 	queue_t *q;
 	dev_t odev;
 	struct cdevsw *cdev;
 	int err;
+
 	err = -ENOMEM;
 	ptrace(("%s: attaching module %s\n", __FUNCTION__, fmod->f_name));
 	if (!(q = allocq())) {
@@ -1809,17 +1956,20 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 				getmajor(*devp), getmajor(odev)));
 			err = -ENOENT;
 			if (!(cdev = cdrv_get(getmajor(*devp)))) {
-				printd(("%s: could not find new major %hu\n", __FUNCTION__, getmajor(*devp)));
+				printd(("%s: could not find new major %hu\n", __FUNCTION__,
+					getmajor(*devp)));
 				goto enoent;
 			}
 			printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 			err = -ENOENT;
 			if (!(st = cdev->d_str)) {
-				pswerr(("%s: device has no streamtab, should not happen\n", __FUNCTION__));
+				pswerr(("%s: device has no streamtab, should not happen\n",
+					__FUNCTION__));
 				goto put_noent;
 			}
 			if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0) {
-				printd(("%s: could not set queues to new streamtab\n", __FUNCTION__));
+				printd(("%s: could not set queues to new streamtab\n",
+					__FUNCTION__));
 				goto put_noent;
 			}
 			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
@@ -1856,10 +2006,12 @@ EXPORT_SYMBOL(qattach);
  *  @oflag:	open flags
  *  @crp:	credentials of closing task
  */
-int qclose(queue_t *q, int oflag, cred_t *crp)
+int
+qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	int result = ENXIO;
 	int (*q_close) (queue_t *, int, cred_t *);
+
 	if ((q_close = q->q_qinfo->qi_qclose))
 		if (!(result = q_close(q, oflag, crp)))
 			qprocsoff(q);
@@ -1883,13 +2035,15 @@ EXPORT_SYMBOL(qclose);
  *  Notices: rq should have already been removed from a queue with qprocsoff() and must be a valid
  *  pointer or bad things will happen.
  */
-void qdelete(queue_t *q)
+void
+qdelete(queue_t *q)
 {
 	unsigned long flags = 0;
 	struct queinfo *qu = (typeof(qu)) q;
 	struct stdata *sd = qu->qu_str;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+
 	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	wq = rq + 1;
 	swlock(sd, &flags);
@@ -1919,9 +2073,11 @@ EXPORT_SYMBOL(qdelete);
  *
  *  Context: qdetach() is meant to be called in user context.
  */
-int qdetach(queue_t *q, int flags, cred_t *crp)
+int
+qdetach(queue_t *q, int flags, cred_t *crp)
 {
 	int err;
+
 	ptrace(("%s: detaching queue\n", __FUNCTION__));
 	err = qclose(q, flags, crp);
 	if (err)
@@ -1948,13 +2104,15 @@ EXPORT_SYMBOL(qdetach);
  *
  *  Notices: irq should not already be inserted on a queue or bad things will happen.
  */
-void qinsert(queue_t *brq, queue_t *irq)
+void
+qinsert(queue_t *brq, queue_t *irq)
 {
 	struct queinfo *iqu = (typeof(iqu)) irq;
 	queue_t *iwq = irq + 1;
 	struct queinfo *bqu = (typeof(bqu)) brq;
 	queue_t *bwq = brq + 1;
 	unsigned long flags = 0;
+
 	ptrace(("%s: half insert of queue pair under stream head\n", __FUNCTION__));
 	hwlock(brq, &flags);
 	iqu->qu_str = sd_get(bqu->qu_str);
@@ -1977,9 +2135,11 @@ EXPORT_SYMBOL(qinsert);
  *  @sflag:	stream flag, can be %DRVOPEN, %MODOPEN, %CLONEOPEN
  *  @crp:	pointer to the opening task's credential structure
  */
-int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+int
+qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int (*q_open) (queue_t *, dev_t *, int, int, cred_t *);
+
 	if ((q_open = q->q_qinfo->qi_qopen))
 		return q_open(q, devp, oflag, sflag, crp);
 	return (-ENOPKG);
@@ -2002,12 +2162,14 @@ EXPORT_SYMBOL(qopen);
  *  Notices: qprocsoff() does not fully delete the queue pair from the stream.  It is still
  *  half-attached.  Use qdelete() to complete the final removal of the queue pair from the stream.
  */
-void qprocsoff(queue_t *q)
+void
+qprocsoff(queue_t *q)
 {
 	unsigned long flags = 0;
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+
 	ptrace(("%s: turning off procs\n", __FUNCTION__));
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
@@ -2019,11 +2181,13 @@ void qprocsoff(queue_t *q)
 		/* bypass this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
+
 			bq->q_next = qget(rq->q_next);
 			qput(&qn);
 		}
 		if ((bq = backq(wq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
+
 			bq->q_next = qget(wq->q_next);
 			qput(&qn);
 		}
@@ -2051,12 +2215,14 @@ EXPORT_SYMBOL(qprocsoff);
  *  Notices: qprocson() does fully inserts the queue pair into the stream.  It must be half-inserted
  *  with qinsert() before qprocson() can be called.
  */
-void qprocson(queue_t *q)
+void
+qprocson(queue_t *q)
 {
 	unsigned long flags = 0;
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+
 	ptrace(("%s: turning on procs\n", __FUNCTION__));
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
@@ -2067,11 +2233,13 @@ void qprocson(queue_t *q)
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
+
 			bq->q_next = qget(rq);
 			qput(&qn);
 		}
 		if ((bq = backq(wq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
+
 			bq->q_next = qget(wq);
 			qput(&qn);
 		}
@@ -2088,7 +2256,8 @@ EXPORT_SYMBOL(qprocson);
  *  @oflag:	open flags to call module open procedure
  *  @crp:	credential pointer for module open procedure
  */
-int qpop(struct stdata *sd, int oflag, cred_t *crp)
+int
+qpop(struct stdata *sd, int oflag, cred_t *crp)
 {
 	if (sd->sd_pushcnt <= 0)
 		goto einval;
@@ -2114,10 +2283,12 @@ EXPORT_SYMBOL(qpop);
  *  @oflag:	open flags to call module open procedure
  *  @crp:	credential pointer for module open procedure
  */
-int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *crp)
+int
+qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *crp)
 {
 	int err;
 	struct fmodsw *fmod;
+
 	if (sd->sd_pushcnt >= sysctl_str_nstrpush)
 		goto enosr;
 	if (!(fmod = fmod_find(name)))
@@ -2144,6 +2315,7 @@ EXPORT_SYMBOL(qpush);
  *  @mp:	message reply
  */
 __EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp);
+
 EXPORT_SYMBOL(qreply);
 
 /**
@@ -2151,6 +2323,7 @@ EXPORT_SYMBOL(qreply);
  *  @q:		queue to count messages
  */
 __EXTERN_INLINE ssize_t qsize(queue_t *q);
+
 EXPORT_SYMBOL(qsize);
 
 /**
@@ -2159,9 +2332,11 @@ EXPORT_SYMBOL(qsize);
  *
  *  Notices: qcountstrm() is only for LiS compatibility.
  */
-ssize_t qcountstrm(queue_t *q)
+ssize_t
+qcountstrm(queue_t *q)
 {
 	int count = 0;
+
 	hrlock(q);
 	while (SAMESTR(q)) {
 		q = q->q_next;
@@ -2178,15 +2353,18 @@ EXPORT_SYMBOL(qcountstrm);
  *  @q:		write queue pointer
  */
 __EXTERN_INLINE queue_t *RD(queue_t *q);
+
 EXPORT_SYMBOL(RD);
 
 /*
  *  __rmvq:
  */
-static int __rmvq(queue_t *q, mblk_t *mp)
+static int
+__rmvq(queue_t *q, mblk_t *mp)
 {
 	int backenable = 0;
 	struct qband *qb;
+
 	if (mp->b_prev)
 		mp->b_prev->b_next = mp->b_next;
 	if (mp->b_next)
@@ -2227,14 +2405,16 @@ static int __rmvq(queue_t *q, mblk_t *mp)
  *  @q:		queue from which to remove message
  *  @mp:	message to remove
  */
-void rmvq(queue_t *q, mblk_t *mp)
+void
+rmvq(queue_t *q, mblk_t *mp)
 {
 	unsigned long flags;
 	int backenable;
+
 	q = mp->b_queue;
 	ensure(q, return);
-	/* We ignore the queue pointer provided by the user because we know which queue the message belongs to (if
-	   any). */
+	/* We ignore the queue pointer provided by the user because we know which queue the message 
+	   belongs to (if any). */
 	qwlock(q, &flags);
 	backenable = __rmvq(q, mp);
 	qwunlock(q, &flags);
@@ -2249,12 +2429,14 @@ EXPORT_SYMBOL(rmvq);
  *  @q:		this queue
  */
 __EXTERN_INLINE int SAMESTR(queue_t *q);
+
 EXPORT_SYMBOL(SAMESTR);
 
 /*
  *  __setq:
  */
-static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
+static void
+__setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	q->q_qinfo = rinit;
 	q->q_maxpsz = rinit->qi_minfo->mi_maxpsz;
@@ -2275,11 +2457,13 @@ static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
  *  @rinit:	read queue init structure
  *  @winit:	write queue initi structure
  */
-void setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
+void
+setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	unsigned long flags;
 	queue_t *rq = q;
 	queue_t *wq = q + 1;
+
 	/* always take read lock before write lock */
 	/* nobody else takes two locks */
 	qwlock(rq, &flags);
@@ -2302,9 +2486,11 @@ struct syncq syncq_global;
  *
  *  Set synchronization queue associated with a new queue pair.
  */
-int setsq(queue_t *q, struct fmodsw *fmod, int mux)
+int
+setsq(queue_t *q, struct fmodsw *fmod, int mux)
 {
 	struct syncq *sqr, *sqw;
+
 	/* make sure there is none to start */
 	sq_put(&(q + 0)->q_syncq);
 	sq_put(&(q + 1)->q_syncq);
@@ -2372,9 +2558,11 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux)
  *  @band:	from which queue band
  *  @val:	location of return value
  */
-int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
+int
+strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
 	int err = 0;
+
 	if (!band) {
 		switch (what) {
 		case QHIWAT:
@@ -2408,6 +2596,7 @@ int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 	} else {
 		struct qband *qb;
 		unsigned long flags;
+
 		qrlock(q, &flags);
 		do {
 			if (!(qb = __get_qband(q, band)))
@@ -2460,9 +2649,11 @@ EXPORT_SYMBOL(strqget);
  *  @band:	to which queue band
  *  @val:	value to set
  */
-int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
+int
+strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
 	int err = 0;
+
 	if (!band) {
 		switch (what) {
 		case QMAXPSZ:
@@ -2490,6 +2681,7 @@ int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 	} else {
 		unsigned long flags;
 		struct qband *qb;
+
 		qwlock(q, &flags);
 		do {
 			if (!(qb = __get_qband(q, band)))
@@ -2529,12 +2721,23 @@ int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 
 EXPORT_SYMBOL(strqset);
 
+/*
+ *  This is a default implemenation for strlog(9).  We print directly to the log
+ *  files.  That is not good: we want to filter things out.  A proper log driver
+ *  is in the strutil package.  We provide a hook here so that that package can
+ *  hook into this call.  Because we cannot filter, only SL_ERROR messages are
+ *  printed to the system logs.  SL_TRACE messages are never printed and 0 is
+ *  returned.
+ */
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
-static int vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
+static int
+vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	unsigned long flags;
 	static char str_err_buf[1024];
+	int rval = 1;
+
 	spin_lock_irqsave(&str_err_lock, flags);
 	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 	if (flag & SL_FATAL) {
@@ -2553,14 +2756,23 @@ static int vstrlog_default(short mid, short sid, char level, unsigned short flag
 		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
 		       (int) sid, str_err_buf);
 	} else {		/* SL_TRACE */
+#if 0
 		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
 		       (int) sid, str_err_buf);
+#else
+		/* Because we have no trace filter facilities without the presence of a full
+		   STREAMS-based logger, we do not log SL_TRACE messages because they might be
+		   generated way too fast, expecting to be filtered.  Use the full STREAMS-based
+		   loger in strutil package if you want to trace messages. */
+		rval = 0;
+#endif
 	}
 	spin_unlock_irqrestore(&str_err_lock, flags);
-	return (1);
+	return (rval);
 }
 
 vstrlog_t vstrlog = &vstrlog_default;
+
 EXPORT_SYMBOL(vstrlog);
 
 /**
@@ -2572,11 +2784,14 @@ EXPORT_SYMBOL(vstrlog);
  *  @fmt:	printf(3) format
  *  @...:	format specific arguments
  */
-int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
+int
+strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	int result = 0;
+
 	if (vstrlog != NULL) {
 		va_list args;
+
 		va_start(args, fmt);
 		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
 		va_end(args);
@@ -2591,7 +2806,8 @@ EXPORT_SYMBOL(strlog);
  *  @q:			the queue in the stream to thaw
  *  @flags:		spl flags
  */
-void unfreezestr(queue_t *q, unsigned long flags)
+void
+unfreezestr(queue_t *q, unsigned long flags)
 {
 	flags = q->q_iflags;
 	qwunlock(q, NULL);
@@ -2605,16 +2821,20 @@ EXPORT_SYMBOL(unfreezestr);
  *  @q:		read queue pointer
  */
 __EXTERN_INLINE queue_t *WR(queue_t *q);
+
 EXPORT_SYMBOL(WR);
 
 static spinlock_t cmn_err_lock = SPIN_LOCK_UNLOCKED;
+
 /*
  *  vcmn_err:
  */
-void vcmn_err(int err_lvl, const char *fmt, va_list args)
+void
+vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	unsigned long flags;
 	static char cmn_err_buf[1024], *cmn_err_ptr = cmn_err_buf;
+
 	spin_lock_irqsave(&cmn_err_lock, flags);
 	vsnprintf(cmn_err_buf, sizeof(cmn_err_buf), fmt, args);
 	if (cmn_err_buf[0] == '^' || cmn_err_buf[0] == '!')
@@ -2654,9 +2874,11 @@ EXPORT_SYMBOL(vcmn_err);
  *  @fmt:	printf(3) format
  *  @...:	format arguments
  */
-void cmn_err(int err_lvl, const char *fmt, ...)
+void
+cmn_err(int err_lvl, const char *fmt, ...)
 {
 	va_list args;
+
 	va_start(args, fmt);
 	vcmn_err(err_lvl, fmt, args);
 	va_end(args);
@@ -2666,41 +2888,53 @@ void cmn_err(int err_lvl, const char *fmt, ...)
 EXPORT_SYMBOL(cmn_err);
 
 __EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
+
 EXPORT_SYMBOL(copyin);
 
 __EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
+
 EXPORT_SYMBOL(copyout);
 
 __EXTERN_INLINE void delay(unsigned long ticks);
+
 EXPORT_SYMBOL(delay);
 
 __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p);
+
 EXPORT_SYMBOL(drv_getparm);
 
 __EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
+
 EXPORT_SYMBOL(drv_hztomsec);
 
 __EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
+
 EXPORT_SYMBOL(drv_hztousec);
 
 __EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
+
 EXPORT_SYMBOL(drv_msectohz);
 
 __EXTERN_INLINE int drv_priv(cred_t *crp);
+
 EXPORT_SYMBOL(drv_priv);
 
 __EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
+
 EXPORT_SYMBOL(drv_usectohz);
 
 __EXTERN_INLINE void drv_usecwait(unsigned long usec);
+
 EXPORT_SYMBOL(drv_usecwait);
 
 __EXTERN_INLINE major_t getmajor(dev_t dev);
+
 EXPORT_SYMBOL(getmajor);
 
 __EXTERN_INLINE minor_t getminor(dev_t dev);
+
 EXPORT_SYMBOL(getminor);
 
 __EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor);
-EXPORT_SYMBOL(makedevice);
 
+EXPORT_SYMBOL(makedevice);

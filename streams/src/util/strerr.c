@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/18 12:07:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/18 12:07:06 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/18 12:07:06 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -100,7 +100,8 @@ char devname[256] = "";
 char mailuid[256] = "";
 char pidfile[256] = "";
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -112,7 +113,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -125,7 +127,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -167,7 +170,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -224,10 +228,12 @@ enum {
 	STRERR_FAILURE = -1,
 };
 
-int sig_register(int signum, RETSIGTYPE(*handler) (int))
+int
+sig_register(int signum, RETSIGTYPE(*handler) (int))
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = handler ? handler : SIG_DFL;
 	act.sa_flags = handler ? SA_RESTART : 0;
 	sigemptyset(&act.sa_mask);
@@ -243,45 +249,53 @@ int alm_signal = 0;
 int hup_signal = 0;
 int trm_signal = 0;
 
-RETSIGTYPE alm_handler(int signum)
+RETSIGTYPE
+alm_handler(int signum)
 {
 	alm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int alm_catch(void)
+int
+alm_catch(void)
 {
 	return sig_register(SIGALRM, &alm_handler);
 }
 
-int alm_block(void)
+int
+alm_block(void)
 {
 	return sig_register(SIGALRM, NULL);
 }
 
-int alm_action(void)
+int
+alm_action(void)
 {
 	alm_signal = 0;
 	return (0);
 }
 
-RETSIGTYPE hup_handler(int signum)
+RETSIGTYPE
+hup_handler(int signum)
 {
 	hup_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int hup_catch(void)
+int
+hup_catch(void)
 {
 	return sig_register(SIGALRM, &hup_handler);
 }
 
-int hup_block(void)
+int
+hup_block(void)
 {
 	return sig_register(SIGALRM, NULL);
 }
 
-int hup_action(void)
+int
+hup_action(void)
 {
 	hup_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGHUP, reopening files.");
@@ -309,52 +323,60 @@ int hup_action(void)
 	return (0);
 }
 
-RETSIGTYPE trm_handler(int signum)
+RETSIGTYPE
+trm_handler(int signum)
 {
 	trm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int trm_catch(void)
+int
+trm_catch(void)
 {
 	return sig_register(SIGALRM, &trm_handler);
 }
 
-int trm_block(void)
+int
+trm_block(void)
 {
 	return sig_register(SIGALRM, NULL);
 }
 
 void strerr_exit(int retval);
 
-int trm_action(void)
+int
+trm_action(void)
 {
 	trm_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGTERM, shutting down");
 	strerr_exit(0);
-	return (0); /* should be no return */
+	return (0);		/* should be no return */
 }
 
-void sig_catch(void)
+void
+sig_catch(void)
 {
 	alm_catch();
 	hup_catch();
 	trm_catch();
 }
 
-void sig_block(void)
+void
+sig_block(void)
 {
 	alm_block();
 	hup_block();
 	trm_block();
 }
 
-int start_timer(long duration)
+int
+start_timer(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
+
 	if (alm_catch())
 		return STRERR_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -365,7 +387,8 @@ int start_timer(long duration)
 
 int sterr_stop(void);
 
-void strerr_exit(int retval)
+void
+strerr_exit(int retval)
 {
 	syslog(LOG_NOTICE, "Exiting %d", retval);
 	fflush(stdout);
@@ -376,10 +399,12 @@ void strerr_exit(int retval)
 	exit(retval);
 }
 
-void strerr_enter(int argc, char *argv[])
+void
+strerr_enter(int argc, char *argv[])
 {
 	if (nomead) {
 		pid_t pid;
+
 		if ((pid = fork()) < 0) {
 			perror(__FUNCTION__);
 			exit(2);
@@ -395,13 +420,16 @@ void strerr_enter(int argc, char *argv[])
 		} else if (pid != 0) {
 			if (nomead || pidfile[0] != '\0') {
 				FILE *pidf;
+
 				/* initialize default filename */
 				if (pidfile[0] == '\0')
-					snprintf(pidfile, sizeof(pidfile), "%s", "/var/run/strerr.pid");
+					snprintf(pidfile, sizeof(pidfile), "%s",
+						 "/var/run/strerr.pid");
 				if (output > 1)
-					syslog(LOG_NOTICE, "Writing daemon pid to file %s", pidfile);
+					syslog(LOG_NOTICE, "Writing daemon pid to file %s",
+					       pidfile);
 				if ((pidf = fopen(pidfile, "w+"))) {
-					fprintf(pidf, "%d", (int)pid);
+					fprintf(pidf, "%d", (int) pid);
 					fflush(pidf);
 					fclose(pidf);
 				} else {
@@ -429,6 +457,7 @@ void strerr_enter(int argc, char *argv[])
 	if (nomead || outfile[0] != '\0') {
 		struct tm tm;
 		time_t curtime;
+
 		time(&curtime);
 		localtime_r(&curtime, &tm);
 		/* initialize default filename */
@@ -464,9 +493,11 @@ void strerr_enter(int argc, char *argv[])
 	syslog(LOG_NOTICE, "Startup complete.");
 }
 
-void strerr_open(void)
+void
+strerr_open(void)
 {
 	struct strioctl ioc;
+
 	/* open log device */
 	if (devname[0] == '\0') {
 		/* search if not specified */
@@ -494,16 +525,19 @@ void strerr_open(void)
 		strerr_exit(1);
 	}
 }
-void strerr_close(void)
+void
+strerr_close(void)
 {
 	if (close(strlog_fd) < 0)
 		perror(__FUNCTION__);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -526,6 +560,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?", long_options,
 				     &option_index);
 #else
@@ -633,6 +668,7 @@ int main(int argc, char *argv[])
 		struct pollfd pfd[] = {
 			{strlog_fd, POLLIN | POLLPRI | POLLERR | POLLHUP, 0}
 		};
+
 		if (trm_signal)
 			trm_action();
 		if (hup_signal)
@@ -659,6 +695,7 @@ int main(int argc, char *argv[])
 				struct strbuf ctl = { 1024, 1024, cbuf };
 				struct strbuf dat = { 1024, 1024, dbuf };
 				struct log_ctl *lc;
+
 				if ((ret = getmsg(strlog_fd, &ctl, &dat, &flags)) < 0) {
 					perror(__FUNCTION__);
 					exit(1);

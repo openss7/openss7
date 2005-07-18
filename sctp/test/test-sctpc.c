@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:29:35 $
+ @(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 11:56:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:35 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctpc.c,v $
+ Revision 0.9.2.9  2005/07/18 11:56:34  brian
+ - standard indentation
+
  Revision 0.9.2.8  2005/05/14 08:29:35  brian
  - copyright header correction
 
@@ -72,9 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:29:35 $"
+#ident "@(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 11:56:34 $"
 
-static char const ident[] = "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:29:35 $";
+static char const ident[] =
+    "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 11:56:34 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -116,6 +120,7 @@ timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -132,6 +137,7 @@ static int
 start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {rep_time, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -322,6 +328,7 @@ test_sctpc(void)
 		if (timer_timeout) {
 #if 0
 			int inq = 0, outq = 0;
+
 			if ((ioctl(fd, SIOCINQ, &inq)) < 0) {
 				perror("ioctl");
 				goto dead;
@@ -357,6 +364,7 @@ test_sctpc(void)
 		}
 		if (pfd[0].revents & POLLIN) {
 			int rtn;
+
 			if ((rtn =
 			     recv(fd, ur_msg + inp_offset, len - inp_offset, MSG_DONTWAIT)) < 0) {
 				if (errno == EINTR || errno == EAGAIN)
@@ -370,6 +378,7 @@ test_sctpc(void)
 				if (inp_offset >= len) {
 					struct timeval tnow;
 					struct timeval *tv = (struct timeval *) ur_msg;
+
 					if (gettimeofday(&tnow, NULL) < 0) {
 						perror("gettimeofday");
 						goto dead;
@@ -393,8 +402,10 @@ test_sctpc(void)
 	      skip_pollin:
 		if (pfd[0].revents & POLLOUT) {
 			int rtn;
+
 			if (!out_offset) {
 				struct timeval *tv = (struct timeval *) my_msg;
+
 				if (gettimeofday(tv, NULL) < 0) {
 					perror("gettimeofday");
 					goto dead;
@@ -578,8 +589,10 @@ main(int argc, char **argv)
 	char **hostrp = &hostr;
 	short port = 10000;
 	struct hostent *haddr;
+
 	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -599,6 +612,7 @@ main(int argc, char **argv)
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "l:r:t:p:w:nqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "l:r:p:t:qvhVC?");

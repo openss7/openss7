@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:14 $"
 
 /*
  *  tirdwr module.
@@ -93,42 +93,42 @@ STATIC int tirdwr_rput(queue_t *, mblk_t *);
 STATIC int tirdwr_wput(queue_t *, mblk_t *);
 
 STATIC struct module_info tirdwr_minfo = {
-	0,			/* Module ID number */
-	"tirdwr",		/* Module name */
-	0,			/* Min packet size accepted */
-	INFPSZ,			/* Max packet size accepted */
-	0,			/* Hi water mark ignored, no queue service */
-	0			/* Low water mark ignored, no queue service */
+	0,				/* Module ID number */
+	"tirdwr",			/* Module name */
+	0,				/* Min packet size accepted */
+	INFPSZ,				/* Max packet size accepted */
+	0,				/* Hi water mark ignored, no queue service */
+	0				/* Low water mark ignored, no queue service */
 };
 
 STATIC struct qinit tirdwr_rinit = {
-	tirdwr_rput,		/* Read put */
-	NULL,			/* No read queue service */
-	tirdwr_open,		/* Each open */
-	tirdwr_close,		/* Last close */
-	NULL,			/* Reserved */
-	&tirdwr_minfo,		/* Information */
-	NULL			/* No statistics */
+	tirdwr_rput,			/* Read put */
+	NULL,				/* No read queue service */
+	tirdwr_open,			/* Each open */
+	tirdwr_close,			/* Last close */
+	NULL,				/* Reserved */
+	&tirdwr_minfo,			/* Information */
+	NULL				/* No statistics */
 };
 
 STATIC struct qinit tirdwr_winit = {
-	tirdwr_wput,		/* Write put */
-	NULL,			/* No write queue service */
-	NULL,			/* Each open */
-	NULL,			/* Last close */
-	NULL,			/* Reserved */
-	&tirdwr_minfo,		/* Information */
-	NULL			/* No statistics */
+	tirdwr_wput,			/* Write put */
+	NULL,				/* No write queue service */
+	NULL,				/* Each open */
+	NULL,				/* Last close */
+	NULL,				/* Reserved */
+	&tirdwr_minfo,			/* Information */
+	NULL				/* No statistics */
 };
 
 #ifdef MODULE
 STATIC
 #endif
 struct streamtab tirdwr_info = {
-	&tirdwr_rinit,		/* Read queue */
-	&tirdwr_winit,		/* Write queue */
-	NULL,			/* Not a multiplexer */
-	NULL			/* Not a multiplexer */
+	&tirdwr_rinit,			/* Read queue */
+	&tirdwr_winit,			/* Write queue */
+	NULL,				/* Not a multiplexer */
+	NULL				/* Not a multiplexer */
 };
 
 /*

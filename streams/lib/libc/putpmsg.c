@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:06:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:06:58 $"
 
-static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $";
+static char const ident[] =
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:06:58 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -98,8 +99,11 @@ static int
 __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	struct strpmsg args;
-	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) { -1, -1, NULL});
-	args.databuf = datptr ? *datptr : ((struct strbuf) { -1, -1, NULL});
+
+	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) {
+					  -1, -1, NULL});
+	args.databuf = datptr ? *datptr : ((struct strbuf) {
+					   -1, -1, NULL});
 	args.band = band;
 	args.flags = flags;
 	return (write(fd, &args, LFS_GETMSG_PUTMSG_ULEN));

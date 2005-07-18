@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:46 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/18 12:07:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:46 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/18 12:07:00 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:46 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/18 12:07:00 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -98,14 +98,17 @@ static char const ident[] =
  *  register_strmod: - register STREAMS module
  *  @fmod: STREAMS module structure to register
  */
-int register_strmod(struct fmodsw *fmod)
+int
+register_strmod(struct fmodsw *fmod)
 {
 	int err = 0;
+
 	ptrace(("registering STREAMS module %s\n", fmod->f_name));
 	write_lock(&fmodsw_lock);
 	do {
 		modID_t modid;
 		struct module_info *mi;
+
 		err = -EINVAL;
 		if (!fmod || !fmod->f_name || !fmod->f_name[0]) {
 			printd(("invalid argument\n"));
@@ -113,6 +116,7 @@ int register_strmod(struct fmodsw *fmod)
 		} else {
 			struct streamtab *st;
 			struct qinit *qi;
+
 			err = -EINVAL;
 			if (!(st = fmod->f_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
 				printd(("invalid argument\n"));
@@ -156,9 +160,11 @@ EXPORT_SYMBOL(register_strmod);
  *  unregister_strmod:
  *  @fmod: STREAMS module structure to unregister
  */
-int unregister_strmod(struct fmodsw *fmod)
+int
+unregister_strmod(struct fmodsw *fmod)
 {
 	int err = 0;
+
 	ptrace(("uregistering STREAMS module %s\n", fmod->f_name));
 	write_lock(&fmodsw_lock);
 	do {
@@ -186,15 +192,18 @@ EXPORT_SYMBOL(unregister_strmod);
  *  @cdev: STREAMS device structure to register
  *  @mnt: mount point of the Shadow Special Filesystem
  */
-int register_strdrv(struct cdevsw *cdev)
+int
+register_strdrv(struct cdevsw *cdev)
 {
 	int err = 0;
+
 	ptrace(("registering STREAMS driver %s\n", cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
 		modID_t modid;
 		struct module_info *mi;
 		struct cdevsw *c;
+
 		err = -EINVAL;
 		if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
 			printd(("invalid argument\n"));
@@ -202,6 +211,7 @@ int register_strdrv(struct cdevsw *cdev)
 		} else {
 			struct streamtab *st;
 			struct qinit *qi;
+
 			err = -EINVAL;
 			if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
 				printd(("invalid argument\n"));
@@ -259,9 +269,11 @@ EXPORT_SYMBOL(register_strdrv);
  *  unregister_strdrv:
  *  @cdev: STREAMS driver structure to unregister
  */
-int unregister_strdrv(struct cdevsw *cdev)
+int
+unregister_strdrv(struct cdevsw *cdev)
 {
 	int err = 0;
+
 	ptrace(("unregistering STREAMS driver %s\n", cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
@@ -319,10 +331,12 @@ EXPORT_SYMBOL(unregister_strdrv);
  *  only one character major device number will be allocated.  If @major is zero on each call, a new
  *  available major device number will be allocated on each call.
  */
-STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
-			   struct file_operations *fops)
+STATIC int
+register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
+		struct file_operations *fops)
 {
 	int err = 0;
+
 	ptrace(("registering major %hu device node %s to driver %s\n", major, cmaj->n_name,
 		cdev->d_name));
 	write_lock(&cdevsw_lock);
@@ -385,14 +399,17 @@ STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t ma
  *  call to register_xinode()
  *  or the call will fail.
  */
-STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
+STATIC int
+unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 {
 	int err = 0;
+
 	ptrace(("unregistering major %hu device node %s from driver %s\n", major, cmaj->n_name,
 		cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
 		struct devnode *d;
+
 		err = -EINVAL;
 		if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
 			printd(("invalid arguments\n"));
@@ -429,9 +446,11 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t 
 				cmaj->n_major));
 		} else {
 			struct list_head *pos;
+
 			/* deregister all major device numbers */
 			list_for_each(pos, &cdev->d_majors) {
 				cmaj = list_entry(pos, struct devnode, n_list);
+
 				unregister_chrdev(cmaj->n_major, cdev->d_name);
 				cmaj_del(cmaj, cdev);
 				printd(("STREAMS: unregistered driver %s, major %hu\n",
@@ -444,10 +463,12 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t 
 	return (err);
 }
 
-int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
+int
+register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 {
 	int err;
 	struct devnode *cmaj;
+
 	ptrace(("registering major %hu for device %s\n", major, cdev->d_name));
 	if ((err = register_strdrv(cdev)) < 0 && err != -EBUSY) {
 		printd(("could not register STREAMS driver %s\n", cdev->d_name));
@@ -485,10 +506,12 @@ int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *
 
 EXPORT_SYMBOL(register_cmajor);
 
-int unregister_cmajor(struct cdevsw *cdev, major_t major)
+int
+unregister_cmajor(struct cdevsw *cdev, major_t major)
 {
 	int err;
 	struct devnode *cmaj;
+
 	ptrace(("unregistering major %hu for device %s\n", major, cdev->d_name));
 	err = -ENXIO;
 	if (!(cmaj = cmaj_get(cdev, major))) {
@@ -518,13 +541,16 @@ EXPORT_SYMBOL(unregister_cmajor);
  *  @cmin: minor device node structure pointer
  *  @minor: minor device number
  */
-int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
+int
+register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 {
 	int err = 0;
+
 	ptrace(("registering minor %hu, %s to driver %s\n", minor, cmin->n_name, cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
 		struct devnode *n;
+
 		err = -EINVAL;
 		if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
 			printd(("invalid argument\n"));
@@ -606,13 +632,16 @@ EXPORT_SYMBOL(register_strnod);
  *  @cmin: minor device node structure pointer
  *  @minor: minor device number
  */
-int unregister_strnod(struct cdevsw *cdev, minor_t minor)
+int
+unregister_strnod(struct cdevsw *cdev, minor_t minor)
 {
 	int err = 0;
+
 	ptrace(("unregistering minor %hu from driver %s\n", minor, cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
 		struct devnode *cmin;
+
 		err = -EINVAL;
 		if (!cdev) {
 			printd(("invalid arguments\n"));
@@ -631,11 +660,13 @@ int unregister_strnod(struct cdevsw *cdev, minor_t minor)
 		} else {
 			/* deregister all minor devices */
 			struct list_head *pos;
+
 			if (!cdev->d_minors.next)
 				INIT_LIST_HEAD(&cdev->d_minors);
 			/* deregister all minor device numbers */
 			list_for_each(pos, &cdev->d_minors) {
 				cmin = list_entry(pos, struct devnode, n_list);
+
 				cmin_del(cmin, cdev);
 				printd(("STEAMS: unregistered driver %s, minor %hu, %s\n",
 					cdev->d_name, cmin->n_minor, cmin->n_name));
@@ -656,7 +687,8 @@ EXPORT_SYMBOL(unregister_strnod);
  */
 
 #ifndef HAVE_FILE_MOVE_ADDR
-STATIC void _file_move(struct file *file, struct list_head *list)
+STATIC void
+_file_move(struct file *file, struct list_head *list)
 {
 	if (!list)
 		return;
@@ -667,7 +699,8 @@ STATIC void _file_move(struct file *file, struct list_head *list)
 }
 #endif
 
-STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
+STATIC INLINE void
+file_swap_put(struct file *f1, struct file *f2)
 {
 #ifdef HAVE_FILE_MOVE_ADDR
 	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
@@ -690,15 +723,18 @@ STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
  *  @dev: device for which to find a dentry
  *  @sflagp: flags to modify (if any)
  */
-struct dentry *spec_dentry(dev_t dev, int *sflagp)
+struct dentry *
+spec_dentry(dev_t dev, int *sflagp)
 {
 	struct dentry *dentry;
 	struct cdevsw *cdev;
+
 	ptrace(("%s: finding dentry for major %hu minor %hu\n", __FUNCTION__, getmajor(dev),
 		getminor(dev)));
 	{
 		struct qstr name;
 		char buf[32];
+
 		dentry = ERR_PTR(-ENXIO);
 		if (!(cdev = cdrv_get(getmajor(dev))))
 			goto done;
@@ -712,6 +748,7 @@ struct dentry *spec_dentry(dev_t dev, int *sflagp)
 		name.hash = full_name_hash(name.name, name.len);
 		{
 			struct vfsmount *mnt;
+
 			dentry = ERR_PTR(-EIO);
 			if (!(mnt = specfs_get()))
 				goto done;
@@ -723,7 +760,8 @@ struct dentry *spec_dentry(dev_t dev, int *sflagp)
 		}
 	}
 	if (IS_ERR(dentry)) {
-		ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__, -(int)PTR_ERR(dentry)));
+		ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__,
+			-(int) PTR_ERR(dentry)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
@@ -734,10 +772,12 @@ struct dentry *spec_dentry(dev_t dev, int *sflagp)
 		struct qstr name;
 		char buf[32];
 		struct dentry *parent = dentry;
+
 		printd(("%s: parent dentry %s, inode %ld\n", __FUNCTION__, parent->d_name.name,
 			parent->d_inode->i_ino));
 		{
 			struct devnode *cmin;
+
 			printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(dev)));
 			if ((cmin = cmin_get(cdev, getminor(dev)))) {
 				if (sflagp && cmin->n_flag & D_CLONE)
@@ -762,7 +802,8 @@ struct dentry *spec_dentry(dev_t dev, int *sflagp)
 		dput(parent);
 	}
 	if (IS_ERR(dentry)) {
-		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -(int)PTR_ERR(dentry)));
+		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__,
+			-(int) PTR_ERR(dentry)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
@@ -788,12 +829,14 @@ EXPORT_SYMBOL(spec_dentry);
  *
  *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
  */
-int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
+int
+spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 {
 	int err;
 	struct file *file;		/* new file pointer to use */
 	struct dentry *dentry;
 	struct vfsmount *mnt;
+
 	ptrace(("%s: performing special open\n", __FUNCTION__));
 	dentry = spec_dentry(dev, &sflag);
 	err = PTR_ERR(dentry);

@@ -183,6 +183,7 @@ extern __inline__ void
 __strace(struct sock *sk)
 {
 	char *sname = "(???)";
+
 	if (sk)
 		switch (sk->state) {
 		case __OS7_SCTP_ESTABLISHED:
@@ -479,6 +480,7 @@ struct __os7_sctp_hbitvl {
 	uint hb_act;			/* activation flag */
 	uint hb_itvl;			/* interval in milliseconds */
 };
+
 /*
  *  User __OS7_SCTP_RTO socket option structure
  */
@@ -490,6 +492,7 @@ struct __os7_sctp_rtoval {
 	uint rto_max;			/* RTO.Max (milliseconds) */
 	uint max_retrans;		/* Path.Max.Retrans (retires) */
 };
+
 /*
  *  User __OS7_SCTP_STATUS socket option structure
  */

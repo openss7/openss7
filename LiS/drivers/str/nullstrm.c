@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: nullstrm.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: nullstrm.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/13 12:01:14 $"
 
 /*                               -*- Mode: C -*- 
  * nullstrm.c --- Streams NULL driver
@@ -88,12 +88,12 @@
 /* Module info for the loopback driver
  */
 static struct module_info null_minfo = {
-	0,			/* id */
-	"null",			/* name */
-	0,			/* min packet size accepted */
-	INFPSZ,			/* max packet size accepted */
-	10240L,			/* high water mark */
-	512L			/* low water mark */
+	0,				/* id */
+	"null",				/* name */
+	0,				/* min packet size accepted */
+	INFPSZ,				/* max packet size accepted */
+	10240L,				/* high water mark */
+	512L				/* low water mark */
 };
 
 /* These are the entry points to the driver: open, close, write side put and
@@ -107,32 +107,32 @@ static int null_rsrv(queue_t *);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit null_rinit = {
-	NULL,			/* put */
-	null_rsrv,		/* service */
-	null_open,		/* open */
-	null_close,		/* close */
-	NULL,			/* admin */
-	&null_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	null_rsrv,			/* service */
+	null_open,			/* open */
+	null_close,			/* close */
+	NULL,				/* admin */
+	&null_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit null_winit = {
-	null_wput,		/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&null_minfo,		/* info */
-	NULL			/* stat */
+	null_wput,			/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&null_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the loopback driver.
  */
 struct streamtab null_info = {
-	&null_rinit,		/* read queue */
-	&null_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&null_rinit,			/* read queue */
+	&null_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 /*  -------------------------------------------------------------------  */

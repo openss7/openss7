@@ -2,10 +2,10 @@
 /*
  *  Driver device numbering
  */
-#if 0 /* Now defined in the LiS configuration */
-#define LDL_MAJOR	58 /* Driver major device number	*/
+#if 0				/* Now defined in the LiS configuration */
+#define LDL_MAJOR	58	/* Driver major device number */
 #endif
-#define LDL_N_MINOR	256 /* Number of minors			*/
+#define LDL_N_MINOR	256	/* Number of minors */
 
 #ident "@(#) LiS ldl.h 2.9 12/19/00 21:08:37 "
 
@@ -48,7 +48,6 @@
  *  Default flags
  */
 #define LDLFLAG_DEFAULT	0
-
 
 /*
  *  Ethernet framing types
@@ -158,13 +157,12 @@
  *
  *
  */
-#define LDL_FRAME_MASK         0x00f00000 /* Mask for framing */
-#define LDL_FRAME_EII          0x00000000 /* Ethernet 2 framing (default) */
-#define LDL_FRAME_802_2        0x00100000 /* IEEE 802.2 LLC framing */
-#define LDL_FRAME_SNAP         0x00200000 /* Sub-Network Access Protocol */
-#define LDL_FRAME_802_3        0x00300000 /* Ulgy IPX over raw 802.3 framing   */
-#define LDL_FRAME_RAW_LLC      0x00400000 /* Raw LLC frames */
-
+#define LDL_FRAME_MASK         0x00f00000	/* Mask for framing */
+#define LDL_FRAME_EII          0x00000000	/* Ethernet 2 framing (default) */
+#define LDL_FRAME_802_2        0x00100000	/* IEEE 802.2 LLC framing */
+#define LDL_FRAME_SNAP         0x00200000	/* Sub-Network Access Protocol */
+#define LDL_FRAME_802_3        0x00300000	/* Ulgy IPX over raw 802.3 framing */
+#define LDL_FRAME_RAW_LLC      0x00400000	/* Raw LLC frames */
 
 /*
  *  IOCTLs
@@ -195,41 +193,40 @@ struct ldl_flags_ioctl {
  */
 #ifndef __KERNEL__
 #ifndef atomic_t
-typedef long atomic_t;		/* no not volatile as in the kernel */
+typedef long atomic_t;			/* no not volatile as in the kernel */
+
 #define atomic_t atomic_t
 #endif
 #endif
 
-typedef struct ldl_gstats_ioctl			/* global statistics */
-{						/* for entire driver */
-    atomic_t	attach_req_cnt ;
-    atomic_t	detach_req_cnt ;
-    atomic_t	bind_req_cnt ;
-    atomic_t	unbind_req_cnt ;
-    atomic_t	subs_bind_req_cnt ;
-    atomic_t	subs_unbind_req_cnt ;
-    atomic_t	udqos_req_cnt ;
-    atomic_t	ok_ack_cnt ;
-    atomic_t	error_ack_cnt ;
-    atomic_t	unitdata_req_cnt ;	/* including M_DATA */
-    atomic_t	unitdata_req_q_cnt ;	/* including M_DATA */
-    atomic_t	unitdata_ind_cnt ;	/* including M_DATA */
-    atomic_t	unitdata_q_cnt ;	/* including M_DATA */
-    atomic_t	unitdata_drp_cnt ;	/* including M_DATA */
-    atomic_t	uderror_ind_cnt ;
-    atomic_t	ioctl_cnt ;
-    atomic_t	net_rx_cnt ;		/* # pkts from below */
-    atomic_t	net_rx_drp_cnt ;	/* usually mem-alloc fail */
-    atomic_t	net_tx_cnt ;		/* # pkts xmitted */
-    atomic_t	net_tx_fail_cnt ;
+typedef struct ldl_gstats_ioctl {	/* global statistics *//* for entire driver */
+	atomic_t attach_req_cnt;
+	atomic_t detach_req_cnt;
+	atomic_t bind_req_cnt;
+	atomic_t unbind_req_cnt;
+	atomic_t subs_bind_req_cnt;
+	atomic_t subs_unbind_req_cnt;
+	atomic_t udqos_req_cnt;
+	atomic_t ok_ack_cnt;
+	atomic_t error_ack_cnt;
+	atomic_t unitdata_req_cnt;	/* including M_DATA */
+	atomic_t unitdata_req_q_cnt;	/* including M_DATA */
+	atomic_t unitdata_ind_cnt;	/* including M_DATA */
+	atomic_t unitdata_q_cnt;	/* including M_DATA */
+	atomic_t unitdata_drp_cnt;	/* including M_DATA */
+	atomic_t uderror_ind_cnt;
+	atomic_t ioctl_cnt;
+	atomic_t net_rx_cnt;		/* # pkts from below */
+	atomic_t net_rx_drp_cnt;	/* usually mem-alloc fail */
+	atomic_t net_tx_cnt;		/* # pkts xmitted */
+	atomic_t net_tx_fail_cnt;
 
-} ldl_gstats_ioctl_t ;
+} ldl_gstats_ioctl_t;
 
-typedef struct ldl_lstats_ioctl			/* local statistics */
-{						/* per stream */
-    int			to_be_done ;
+typedef struct ldl_lstats_ioctl {	/* local statistics *//* per stream */
+	int to_be_done;
 
-} ldl_lstats_ioctl_t ;
+} ldl_lstats_ioctl_t;
 
 /*
  * Debug bits

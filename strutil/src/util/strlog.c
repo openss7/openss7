@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/18 06:18:54 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/18 12:38:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 06:18:54 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.c,v $
+ Revision 0.9.2.2  2005/07/18 12:38:51  brian
+ - standard indentation
+
  Revision 0.9.2.1  2005/07/18 06:18:54  brian
  - updating log facility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/18 06:18:54 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/18 12:38:51 $"
 
-static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/18 06:18:54 $";
+static char const ident[] =
+    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/18 12:38:51 $";
 
 /*
  *  Linux Fast-STREAMS Utility: strlog - logs STREAMS error or trace messages
@@ -89,7 +93,12 @@ static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.1
 static int debug = 0;
 static int output = 1;
 
-static void version(int argc, char **argv)
+static short mid = 0;			/* module identifier */
+static short sid = 0;			/* subunit identifier */
+static int priority = 0;		/* facility and level */
+
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -101,41 +110,57 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [MODULE UNIT PRIORITY] ...\n\
+    %1$s [options] [MESSAGE ...]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [MODULE UNIT PRIORITY] ...\n\
+    %1$s [options] [MESSAGE ...]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
-    MODULE\n\
-        the module ID of the module to trace, -1 for any module\n\
-    UNIT\n\
-	the unit ID (typically minor number) of the instance of the module\n\
-	to trace, -1 for any unit\n\
-    PRIORITY\n\
-        the maximum priority of messages to display\n\
+    MESSAGE\n\
+        a message string to be sent to the logger\n\
+        if no message string, and no -f option, read from stdin\n\
 Options:\n\
+    -M, --mid MID\n\
+        module id for STREAMS logger\n\
+    -S, --sid SID\n\
+        unit id for STREAMS logger\n\
+    -p, --priority PRIORITY\n\
+        number or \"facility.level\" notation PRIORITY\n\
+    -f, --file FILE\n\
+        read messages to log from FILE\n\
+    -s, --stderr\n\
+        also log messages to standard output\n\
+    -t, --tag TAG\n\
+        for compatibility with logger(1); ignored\n\
+    -i, --id\n\
+        for compatibility with logger(1); ignored\n\
+    -u, --socket DEVICE\n\
+        for compatibility with logger(1); ignored\n\
+    -d, --datagram\n\
+        for compatibility with logger(1); ignored\n\
     -q, --quiet\n\
         suppress output\n\
-    -d, --debug [LEVEL]\n\
+    -D, --debug [LEVEL]\n\
         increase or set debugging verbosity\n\
     -v, --verbose [LEVEL]\n\
         increase or set output verbosity\n\
@@ -148,7 +173,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -194,7 +220,8 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	int i, fd, count;
 	struct trace_ids *tids;
@@ -207,8 +234,17 @@ int main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"mid",		required_argument,	NULL, 'M'},
+			{"sid",		required_argument,	NULL, 'S'},
+			{"priority",	required_argument,	NULL, 'p'},
+			{"file",	required_argument,	NULL, 'f'},
+			{"stderr",	no_argument,		NULL, 's'},
+			{"tag",		required_argument,	NULL, 't'},
+			{"id",		no_argument,		NULL, 'i'},
+			{"socket",	required_argument,	NULL, 'u'},
+			{"datagram",	no_argument,		NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
-			{"debug",	optional_argument,	NULL, 'd'},
+			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
@@ -228,13 +264,46 @@ int main(int argc, char *argv[])
 			break;
 		}
 		switch (c) {
+		case 'M':	/* -M, --mid MID */
+			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffUL)
+				goto bad_option;
+			mid = val;
+			break;
+		case 'S':	/* -S, --sid SID */
+			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffUL)
+				goto bad_option;
+			sid = val;
+			break;
+		case 'p':	/* -p, --priority PRIORITTY */
+			if (isdigit(*optarg)) {
+				/* its a number, use it */
+				if ((val = strlol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				priority = val;
+			} else {
+				char facil_name[9];
+				char level_name[9];
+
+				sscanf(optarg, "%8[a-z].%8[a-z]", facil_name, level_name);
+			strspn}
+			break;
+		case 'f':	/* -f, --file FILE */
+			break;
+		case 's':	/* -s, --stderr */
+			break;
+		case 't':	/* -t, --tag TAG */
+		case 'i':	/* -i, --id */
+		case 'u':	/* -u, --socket DEVICE */
+		case 'd':	/* -d, --datagram */
+			/* these four are ignored for compatibiltiy with logger(1) */
+			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
 			output = 0;
 			debug = 0;
 			break;
-		case 'd':	/* -d, --debug */
+		case 'D':	/* -D, --debug */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -293,12 +362,14 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 	}
+
 	if (optind >= argc) {
 		/* no message argument provided */
-	} else {
+	}
+
+	else {
 		/* a message argument(s) was provided */
 		count = (argc - optind);
 	}
-	exit (0);
+	exit(0);
 }
-

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_sha1.h,v 0.9.2.2 2005/05/14 08:29:34 brian Exp $
+ @(#) $Id: sctp_sha1.h,v 0.9.2.3 2005/07/18 11:56:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_SHA1_H__
 #define __SCTP_SHA1_H__
 
-#ident "@(#) $RCSfile: sctp_sha1.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_sha1.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* 
  *  The structure for storing SHS info
@@ -64,7 +64,7 @@ typedef struct {
 } SHA_CTX;
 
 extern void SHAInit(SHA_CTX * sha1);
-extern void SHAUpdate(SHA_CTX * sha1, uint8_t * buf, int len);
-extern void SHAFinal(uint8_t * out, SHA_CTX * sha1);
+extern void SHAUpdate(SHA_CTX * sha1, uint8_t *buf, int len);
+extern void SHAFinal(uint8_t *out, SHA_CTX * sha1);
 
 #endif				/* __SCTP_SHA1_H__ */

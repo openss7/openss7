@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/22 12:07:11 $
+ @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 12:07:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/22 12:07:11 $"
+#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $"
 
-static char const ident[] = "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/22 12:07:11 $";
+static char const ident[] =
+    "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:09 $";
 
 #include "sctp_compat.h"
 #include "sctp_sha1.h"
@@ -149,6 +150,7 @@ SHSTransform(uint32_t *dig, uint32_t *dat)
 {
 	uint32_t A, B, C, D, E;		/* Local vars */
 	uint32_t xd[16];		/* Expanded data */
+
 	/* Set up first buffer and local data buffer */
 	A = dig[0];
 	B = dig[1];
@@ -272,6 +274,7 @@ SHAUpdate(SHA_CTX * sha1, uint8_t *buf, int len)
 {
 	uint32_t tmp;
 	int cnt;
+
 	/* Update bitcount */
 	tmp = sha1->lo;
 	if ((sha1->lo = tmp + ((uint32_t) len << 3)) < tmp)
@@ -282,6 +285,7 @@ SHAUpdate(SHA_CTX * sha1, uint8_t *buf, int len)
 	/* Handle any leading odd-sized chunks */
 	if (cnt) {
 		uint8_t *p = (uint8_t *) sha1->dat + cnt;
+
 		cnt = 64 - cnt;
 		if (len < cnt) {
 			memcpy(p, buf, len);
@@ -315,6 +319,7 @@ SHAFinal(uint8_t *out, SHA_CTX * sha1)
 	int len;
 	unsigned int i, j;
 	uint8_t *dat;
+
 	/* Compute number of bytes mod 64 */
 	len = (int) sha1->lo;
 	len = (len >> 3) & 0x3F;

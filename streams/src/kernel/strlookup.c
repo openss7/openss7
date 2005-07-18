@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:55:19 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/18 12:07:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:55:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:55:19 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/18 12:07:00 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:55:19 $";
+static char const ident[] =
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/18 12:07:00 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -171,9 +172,11 @@ EXPORT_SYMBOL(cmin_count);
 /**
  *  init_fmod_hash: - initialize the list_head structures in the fmod hash
  */
-STATIC INLINE void init_fmod_hash(void)
+STATIC INLINE void
+init_fmod_hash(void)
 {
 	int i;
+
 	for (i = 0; i < STRMOD_HASH_SIZE; i++)
 		INIT_LIST_HEAD((fmodsw_hash + i));
 }
@@ -181,9 +184,11 @@ STATIC INLINE void init_fmod_hash(void)
 /**
  *  init_cdev_hash: - initialize the list_head structures in the cdev hash
  */
-STATIC INLINE void init_cdev_hash(void)
+STATIC INLINE void
+init_cdev_hash(void)
 {
 	int i;
+
 	for (i = 0; i < STRDEV_HASH_SIZE; i++)
 		INIT_LIST_HEAD((cdevsw_hash + i));
 }
@@ -191,9 +196,11 @@ STATIC INLINE void init_cdev_hash(void)
 /**
  *  init_cmin_hash: - initialize the list_head structures in the cmin hash
  */
-STATIC INLINE void init_cmin_hash(void)
+STATIC INLINE void
+init_cmin_hash(void)
 {
 	int i;
+
 	for (i = 0; i < STRNOD_HASH_SIZE; i++)
 		INIT_LIST_HEAD((cminsw_hash + i));
 }
@@ -206,11 +213,14 @@ STATIC INLINE void init_cmin_hash(void)
  *  hashes without locking or acquisition of the result.  This function can be called multiple times
  *  with the same @major with very little performance impact.
  */
-struct devnode *__cmaj_lookup(major_t major)
+struct devnode *
+__cmaj_lookup(major_t major)
 {
 	struct list_head *pos, *slot = strdev_hash_slot(major);
+
 	list_for_each(pos, slot) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_hash);
+
 		if (cmaj->n_major == major) {
 			/* cache to front */
 			list_del(&cmaj->n_hash);
@@ -231,9 +241,11 @@ EXPORT_SYMBOL(__cmaj_lookup);
  *  acquisition of the result.  This function can be called multiple times with the same @major with
  *  very little performance impact.
  */
-struct cdevsw *__cdev_lookup(major_t major)
+struct cdevsw *
+__cdev_lookup(major_t major)
 {
 	struct devnode *cmaj;
+
 	if ((cmaj = __cmaj_lookup(major)))
 		return (cmaj->n_dev);
 	return (NULL);
@@ -249,11 +261,14 @@ EXPORT_SYMBOL(__cdev_lookup);
  *  acquisition of the result.  This function can be called multiple times with the same @modid with
  *  very little performance impact.
  */
-struct cdevsw *__cdrv_lookup(modID_t modid)
+struct cdevsw *
+__cdrv_lookup(modID_t modid)
 {
 	struct list_head *pos, *slot = strmod_hash_slot(modid);
+
 	list_for_each(pos, slot) {
 		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_hash);
+
 		if (cdev->d_modid == modid) {
 			/* cache to front */
 			list_del(&cdev->d_hash);
@@ -271,11 +286,14 @@ EXPORT_SYMBOL(__cdrv_lookup);
  *  @cdev: pointer to character device switch entry
  *  @minor: minor device number
  */
-struct devnode *__cmin_lookup(struct cdevsw *cdev, minor_t minor)
+struct devnode *
+__cmin_lookup(struct cdevsw *cdev, minor_t minor)
 {
 	struct list_head *pos, *slot = strnod_hash_slot(minor);
+
 	list_for_each(pos, slot) {
 		struct devnode *cmin = list_entry(pos, struct devnode, n_hash);
+
 		if (cmin->n_dev == cdev && cmin->n_minor == minor) {
 			/* pull to head of slot */
 			list_del(&cmin->n_hash);
@@ -296,11 +314,14 @@ EXPORT_SYMBOL(__cmin_lookup);
  *  acquisition of the result.  This function can be called multiple times with the same @modid with
  *  very little performance impact.
  */
-struct fmodsw *__fmod_lookup(modID_t modid)
+struct fmodsw *
+__fmod_lookup(modID_t modid)
 {
 	struct list_head *pos, *slot = strmod_hash_slot(modid);
+
 	list_for_each(pos, slot) {
 		struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_hash);
+
 		if (fmod->f_modid == modid) {
 			/* pull to front of slot */
 			list_del(&fmod->f_hash);
@@ -313,11 +334,14 @@ struct fmodsw *__fmod_lookup(modID_t modid)
 
 EXPORT_SYMBOL(__fmod_lookup);
 
-struct cdevsw *__cdev_search(const char *name)
+struct cdevsw *
+__cdev_search(const char *name)
 {
 	struct list_head *pos, *slot = &cdevsw_list;
+
 	list_for_each(pos, slot) {
 		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_list);
+
 		if (!strncmp(cdev->d_name, name, FMNAMESZ)) {
 			/* pull to front of slot */
 			list_del(&cdev->d_list);
@@ -330,11 +354,14 @@ struct cdevsw *__cdev_search(const char *name)
 
 EXPORT_SYMBOL(__cdev_search);
 
-struct fmodsw *__fmod_search(const char *name)
+struct fmodsw *
+__fmod_search(const char *name)
 {
 	struct list_head *pos, *slot = &fmodsw_list;
+
 	list_for_each(pos, slot) {
 		struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_list);
+
 		if (!strncmp(fmod->f_name, name, FMNAMESZ)) {
 			/* pull to front of slot */
 			list_del(&fmod->f_list);
@@ -347,11 +374,14 @@ struct fmodsw *__fmod_search(const char *name)
 
 EXPORT_SYMBOL(__fmod_search);
 
-struct devnode *__cmin_search(struct cdevsw *cdev, const char *name)
+struct devnode *
+__cmin_search(struct cdevsw *cdev, const char *name)
 {
 	struct list_head *pos, *slot = &cdev->d_minors;
+
 	list_for_each(pos, slot) {
 		struct devnode *cmin = list_entry(pos, struct devnode, n_list);
+
 		if (!strncmp(cmin->n_name, name, FMNAMESZ)) {
 			/* pull to head of slot */
 			list_del(&cmin->n_list);
@@ -364,9 +394,11 @@ struct devnode *__cmin_search(struct cdevsw *cdev, const char *name)
 
 EXPORT_SYMBOL(__cmin_search);
 
-void *__smod_search(const char *name)
+void *
+__smod_search(const char *name)
 {
 	void *fmod = NULL;
+
 	if (!fmod)
 		fmod = __cdev_search(name);
 	if (!fmod)
@@ -381,15 +413,19 @@ EXPORT_SYMBOL(__smod_search);
  *  @major: major device number to look up
  *  @load: flag indicating whether to attempt to demand load the module
  */
-STATIC struct cdevsw *cdev_lookup(major_t major, int load)
+STATIC struct cdevsw *
+cdev_lookup(major_t major, int load)
 {
 	struct cdevsw *cdev = NULL;
+
 #ifdef CONFIG_KMOD
 	int reload;
+
 	read_lock(&cdevsw_lock);
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[64];
+
 			if ((cdev = __cdev_lookup(major)))
 				break;
 			if (!load)
@@ -416,7 +452,8 @@ STATIC struct cdevsw *cdev_lookup(major_t major, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__, cdev->d_name));
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					cdev->d_name));
 				break;
 			}
 		cdev = NULL;
@@ -435,15 +472,19 @@ STATIC struct cdevsw *cdev_lookup(major_t major, int load)
  *  @modid: module identifier to look up
  *  @load: flag indicating whether to attempt to demand load the module
  */
-STATIC struct cdevsw *cdrv_lookup(modID_t modid, int load)
+STATIC struct cdevsw *
+cdrv_lookup(modID_t modid, int load)
 {
 	struct cdevsw *cdev = NULL;
+
 #ifdef CONFIG_KMOD
 	int reload;
+
 	read_lock(&fmodsw_lock);
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char modname[64];
+
 			if ((cdev = __cdrv_lookup(modid)))
 				break;
 			if (!load)
@@ -478,15 +519,19 @@ STATIC struct cdevsw *cdrv_lookup(modID_t modid, int load)
  *  @modid: module identifier to look up
  *  @load: flag indicating whether to attempt to demand load the module
  */
-STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
+STATIC struct fmodsw *
+fmod_lookup(modID_t modid, int load)
 {
 	struct fmodsw *fmod = NULL;
+
 #ifdef CONFIG_KMOD
 	int reload;
+
 	read_lock(&fmodsw_lock);
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char modname[64];
+
 			if ((fmod = __fmod_lookup(modid)))
 				break;
 			if (!load)
@@ -521,14 +566,18 @@ STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
  *  @cdev:	cdevsw structure for the driver
  *  @major:	major device number to look up
  */
-STATIC struct devnode *cmaj_lookup(const struct cdevsw *cdev, major_t major)
+STATIC struct devnode *
+cmaj_lookup(const struct cdevsw *cdev, major_t major)
 {
 	struct devnode *cmaj = NULL;
+
 	read_lock(&cdevsw_lock);
 	if (cdev && cdev->d_majors.next) {
 		register struct list_head *pos;
+
 		list_for_each(pos, &cdev->d_majors) {
 			struct devnode *d = list_entry(pos, struct devnode, n_list);
+
 			if (d->n_major == major) {
 				cmaj = d;
 				break;
@@ -544,14 +593,18 @@ STATIC struct devnode *cmaj_lookup(const struct cdevsw *cdev, major_t major)
  *  @cdev:	cdevsw structure for the driver
  *  @minor:	minor device number to look up
  */
-STATIC struct devnode *cmin_lookup(const struct cdevsw *cdev, minor_t minor)
+STATIC struct devnode *
+cmin_lookup(const struct cdevsw *cdev, minor_t minor)
 {
 	struct devnode *cmin = NULL;
+
 	read_lock(&cdevsw_lock);
 	if (cdev && cdev->d_minors.next) {
 		register struct list_head *pos;
+
 		list_for_each(pos, &cdev->d_minors) {
 			struct devnode *n = list_entry(pos, struct devnode, n_list);
+
 			if (n->n_minor == minor) {
 				cmin = n;
 				break;
@@ -571,9 +624,11 @@ STATIC struct devnode *cmin_lookup(const struct cdevsw *cdev, minor_t minor)
  *  peformance impact will be minimal.  If the device is not found by name, an attempt will be made
  *  to demand load the kernel module "streams-%s" and then "/dev/streams/%s".
  */
-STATIC struct cdevsw *cdev_search(const char *name, int load)
+STATIC struct cdevsw *
+cdev_search(const char *name, int load)
 {
 	struct cdevsw *cdev = NULL;
+
 #ifdef CONFIG_KMOD
 	int reload;
 #endif
@@ -582,6 +637,7 @@ STATIC struct cdevsw *cdev_search(const char *name, int load)
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[64];
+
 			if ((cdev = __cdev_search(name)))
 				break;
 			if (!load)
@@ -624,9 +680,11 @@ STATIC struct cdevsw *cdev_search(const char *name, int load)
  *  peformance impact will be minimal.  If the module is not found by name, an attempt will be made
  *  to demand load the kernel module "streams-%s".
  */
-STATIC struct fmodsw *fmod_search(const char *name, int load)
+STATIC struct fmodsw *
+fmod_search(const char *name, int load)
 {
 	struct fmodsw *fmod = NULL;
+
 #ifdef CONFIG_KMOD
 	int reload;
 #endif
@@ -635,6 +693,7 @@ STATIC struct fmodsw *fmod_search(const char *name, int load)
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[64];
+
 			if ((fmod = __fmod_search(name)))
 				break;
 			if (!load)
@@ -665,14 +724,18 @@ STATIC struct fmodsw *fmod_search(const char *name, int load)
  *  @cdev: character device major structure
  *  @name: name to look up
  */
-STATIC struct devnode *cmin_search(const struct cdevsw *cdev, const char *name)
+STATIC struct devnode *
+cmin_search(const struct cdevsw *cdev, const char *name)
 {
 	struct devnode *cmin = NULL;
+
 	read_lock(&cdevsw_lock);
 	if (cdev && cdev->d_minors.next) {
 		register struct list_head *pos;
+
 		list_for_each(pos, &cdev->d_minors) {
 			struct devnode *n = list_entry(pos, struct devnode, n_list);
+
 			if (!strncmp(n->n_name, name, FMNAMESZ)) {
 				cmin = n;
 				break;
@@ -687,13 +750,16 @@ STATIC struct devnode *cmin_search(const struct cdevsw *cdev, const char *name)
  *  fmod_str:	- look up a fmod by streamtab
  *  @str:	streamtab to look up
  */
-struct fmodsw *fmod_str(const struct streamtab *str)
+struct fmodsw *
+fmod_str(const struct streamtab *str)
 {
 	struct fmodsw *fmod = NULL;
 	struct list_head *pos;
+
 	read_lock(&fmodsw_lock);
 	list_for_each(pos, &fmodsw_list) {
 		fmod = list_entry(pos, struct fmodsw, f_list);
+
 		if (fmod->f_str == str)
 			break;
 		fmod = NULL;
@@ -708,13 +774,16 @@ EXPORT_SYMBOL(fmod_str);
  *  cdev_str:	- look up a cdev by streamtab
  *  @str:	streamtab to look up
  */
-struct cdevsw *cdev_str(const struct streamtab *str)
+struct cdevsw *
+cdev_str(const struct streamtab *str)
 {
 	struct cdevsw *cdev = NULL;
 	struct list_head *pos;
+
 	read_lock(&cdevsw_lock);
 	list_for_each(pos, &cdevsw_list) {
 		cdev = list_entry(pos, struct cdevsw, d_list);
+
 		if (cdev->d_str == str)
 			break;
 		cdev = NULL;
@@ -740,7 +809,8 @@ EXPORT_SYMBOL(cdev_str);
  *  Context: When the calling context can block, an attempt will be made to load the driver by major
  *  device number.
  */
-struct cdevsw *sdev_get(major_t major)
+struct cdevsw *
+sdev_get(major_t major)
 {
 	return cdev_lookup(major, !in_interrupt());
 }
@@ -751,7 +821,8 @@ EXPORT_SYMBOL(sdev_get);
  *  sdev_put:	- put a reference to a STREAMS device
  *  @cdev:	STREAMS device structure pointer to put
  */
-void sdev_put(struct cdevsw *cdev)
+void
+sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
 		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
@@ -765,7 +836,8 @@ EXPORT_SYMBOL(sdev_put);
  *  cdrv_get:	- get a reference to a STREAMS driver
  *  @modid:	module id number of the STREAMS driver
  */
-struct cdevsw *cdrv_get(modID_t modid)
+struct cdevsw *
+cdrv_get(modID_t modid)
 {
 	return cdrv_lookup(modid, !in_interrupt());
 }
@@ -776,7 +848,8 @@ EXPORT_SYMBOL(cdrv_get);
  *  cdrv_put:	- put a reference to a STREAMS driver
  *  @cdev:	STREAMS driver structure pointer to put
  */
-void cdrv_put(struct cdevsw *cdev)
+void
+cdrv_put(struct cdevsw *cdev)
 {
 	sdev_put(cdev);
 }
@@ -792,7 +865,8 @@ EXPORT_SYMBOL(cdrv_put);
  *  Context: When the calling context can block, an attempt will be made to load the module by
  *  module identifier.
  */
-struct fmodsw *fmod_get(modID_t modid)
+struct fmodsw *
+fmod_get(modID_t modid)
 {
 	return fmod_lookup(modid, !in_interrupt());
 }
@@ -804,7 +878,8 @@ EXPORT_SYMBOL(fmod_get);
  *  @fmod: STREAMS module structure pointer to put
  *
  */
-void fmod_put(struct fmodsw *fmod)
+void
+fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
 		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
@@ -819,7 +894,8 @@ EXPORT_SYMBOL(fmod_put);
  *  @cdev:	cdevsw structure for device
  *  @major:	major device number
  */
-struct devnode *cmaj_get(const struct cdevsw *cdev, major_t major)
+struct devnode *
+cmaj_get(const struct cdevsw *cdev, major_t major)
 {
 	return cmaj_lookup(cdev, major);
 }
@@ -831,7 +907,8 @@ EXPORT_SYMBOL(cmaj_get);
  *  @cdev:	cdevsw structure for device
  *  @minor:	minor device number
  */
-struct devnode *cmin_get(const struct cdevsw *cdev, minor_t minor)
+struct devnode *
+cmin_get(const struct cdevsw *cdev, minor_t minor)
 {
 	return cmin_lookup(cdev, minor);
 }
@@ -850,7 +927,8 @@ EXPORT_SYMBOL(cmin_get);
  *
  *  Context: When the calling context can block, an attempt will be made to load the driver by name.
  */
-struct cdevsw *cdev_find(const char *name)
+struct cdevsw *
+cdev_find(const char *name)
 {
 	return cdev_search(name, !in_interrupt());
 }
@@ -872,10 +950,12 @@ EXPORT_SYMBOL(cdev_find);
  *
  *  Context: When the calling context can block, an attempt will be made to load the driver by name.
  */
-struct cdevsw *cdev_match(const char *name)
+struct cdevsw *
+cdev_match(const char *name)
 {
 	int i;
 	char root[FMNAMESZ + 1];
+
 	snprintf(root, sizeof(root), "%s", name);
 	for (i = 0; i < FMNAMESZ && root[i] != '.'; i++) ;
 	root[i] = '\0';
@@ -898,14 +978,16 @@ EXPORT_SYMBOL(cdev_match);
  *
  *  Context: When the calling context can block, an attempt will be made to load the module by name.
  */
-struct fmodsw *fmod_find(const char *name)
+struct fmodsw *
+fmod_find(const char *name)
 {
 	return fmod_search(name, !in_interrupt());
 }
 
 EXPORT_SYMBOL(fmod_find);
 
-struct devnode *cmin_find(const struct cdevsw *cdev, const char *name)
+struct devnode *
+cmin_find(const struct cdevsw *cdev, const char *name)
 {
 	return cmin_search(cdev, name);
 }
@@ -918,12 +1000,15 @@ EXPORT_SYMBOL(cmin_find);
  *  @major: the external major device number
  *  @minor: the external minor device number
  */
-minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
+minor_t
+cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 {
 	struct list_head *pos;
+
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 	list_for_each(pos, &cdev->d_majors) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
+
 		if (major == cmaj->n_major)
 			break;
 		minor += (1U << MINORBITS);
@@ -933,7 +1018,8 @@ minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 
 EXPORT_SYMBOL(cdev_minor);
 
-void fmod_add(struct fmodsw *fmod, modID_t modid)
+void
+fmod_add(struct fmodsw *fmod, modID_t modid)
 {
 	fmod->f_modid = modid;
 	list_add(&fmod->f_list, &fmodsw_list);
@@ -943,7 +1029,8 @@ void fmod_add(struct fmodsw *fmod, modID_t modid)
 
 EXPORT_SYMBOL(fmod_add);
 
-void fmod_del(struct fmodsw *fmod)
+void
+fmod_del(struct fmodsw *fmod)
 {
 	/* remove from list and hash */
 	list_del_init(&fmod->f_list);
@@ -952,13 +1039,16 @@ void fmod_del(struct fmodsw *fmod)
 
 EXPORT_SYMBOL(fmod_del);
 
-int cdev_add(struct cdevsw *cdev, modID_t modid)
+int
+cdev_add(struct cdevsw *cdev, modID_t modid)
 {
 	struct inode *inode;
 	struct super_block *sb;
+
 	{
 		dev_t dev = makedevice(0, modid);
 		struct vfsmount *mnt;
+
 		if (!(mnt = specfs_get()))
 			return (-ENODEV);
 		sb = mnt->mnt_sb;
@@ -999,7 +1089,8 @@ int cdev_add(struct cdevsw *cdev, modID_t modid)
 
 EXPORT_SYMBOL(cdev_add);
 
-void cdev_del(struct cdevsw *cdev)
+void
+cdev_del(struct cdevsw *cdev)
 {
 	/* put away dentry if necessary */
 	iput(xchg(&cdev->d_inode, NULL));
@@ -1012,7 +1103,8 @@ void cdev_del(struct cdevsw *cdev)
 
 EXPORT_SYMBOL(cdev_del);
 
-void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
+void
+cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 {
 	cmaj->n_major = major;
 	cmaj->n_minor = 0;	/* FIXME */
@@ -1026,7 +1118,8 @@ void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 
 EXPORT_SYMBOL(cmaj_add);
 
-void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
+void
+cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 	list_del_init(&cmaj->n_list);
@@ -1037,13 +1130,16 @@ void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 
 EXPORT_SYMBOL(cmaj_del);
 
-int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
+int
+cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 {
 	struct inode *inode;
 	struct super_block *sb;
+
 	{
 		dev_t dev = makedevice(cdev->d_modid, minor);
 		struct vfsmount *mnt;
+
 		if (!(mnt = specfs_get()))
 			return (-ENODEV);
 		sb = mnt->mnt_sb;
@@ -1087,7 +1183,8 @@ int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 
 EXPORT_SYMBOL(cmin_add);
 
-void cmin_del(struct devnode *cmin, struct cdevsw *cdev)
+void
+cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
 	/* put away dentry if required */
 	iput(xchg(&cmin->n_inode, NULL));
@@ -1102,7 +1199,8 @@ void cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 
 EXPORT_SYMBOL(cmin_del);
 
-int strlookup_init(void)
+int
+strlookup_init(void)
 {
 	init_fmod_hash();
 	init_cdev_hash();
@@ -1110,8 +1208,8 @@ int strlookup_init(void)
 	return (0);
 }
 
-void strlookup_exit(void)
+void
+strlookup_exit(void)
 {
 	return;
 }
-

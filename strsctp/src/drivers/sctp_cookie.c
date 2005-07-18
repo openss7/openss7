@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:10 $
+ @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:10 $"
+#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:10 $";
+static char const ident[] =
+    "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:53:08 $";
 
 /*
  *  This file contains all the algorithms for generating MAC for SCTP cookies
@@ -143,8 +144,8 @@ static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -281,6 +282,7 @@ sctp_sign_cookie(sp, ck)
 
 #if 0
 	int i;
+
 	ptrace(("Signing cookie:\n"));
 	printk("text = %u, tlen = %d\n", (uint) text, tlen);
 	printk("ktag = %d, klen = %d\n", ktag, klen);
@@ -317,6 +319,7 @@ sctp_verify_cookie(sp, ck)
 
 #if 0
 	int i;
+
 	ptrace(("Verifying cookie:\n"));
 	printk("text = %u, tlen = %d\n", (uint) text, tlen);
 	printk("ktag = %d, klen = %d\n", ktag, klen);

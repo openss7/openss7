@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:07:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:07:06 $"
 
 static char const ident[] =
-    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:07:06 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -83,7 +83,8 @@ static char const ident[] =
 static int debug = 0;
 static int verbose = 1;
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -95,7 +96,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -110,7 +112,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -151,7 +154,8 @@ Options:\n\
 ", argv[0]);
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -212,10 +216,12 @@ char mbuf[OPTS_MAX] = { '\0', };
 int flen = 0;
 int mlen = 0;
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -235,6 +241,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "h:pu:af:dqvHVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "h:pu:af:dqvHVC?");

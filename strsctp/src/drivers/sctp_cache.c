@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:46:10 $
+ @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:46:10 $"
+#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $"
 
-static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:46:10 $";
+static char const ident[] =
+    "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:53:08 $";
 
 #define __NO_VERSION__
 
@@ -134,8 +135,8 @@ static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
-        sa_family_t     ss_family;
-        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+	sa_family_t ss_family;
+	char __data[_SS_MAXSIZE - sizeof(sa_family_t)];
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
@@ -292,6 +293,7 @@ __sctp_daddr_alloc(sp, daddr, errp)
 	int *errp;
 {
 	sctp_daddr_t *sd;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -303,7 +305,7 @@ __sctp_daddr_alloc(sp, daddr, errp)
 		seldom();
 		return (NULL);
 	}
-	/*
+	/* 
 	 *  TODO: need to check permissions (TACCES) for broadcast or multicast addresses
 	 *  and whether host addresses are valid (TBADADDR).
 	 */
@@ -319,9 +321,8 @@ __sctp_daddr_alloc(sp, daddr, errp)
 		sd->mtu = 576;	/* fix up after routing */
 		sd->ssthresh = 2 * sd->mtu;	/* fix up after routing */
 		sd->cwnd = sd->mtu;	/* fix up after routing */
-		/*
-		   per destination defaults 
-		 */
+		/* 
+		   per destination defaults */
 		sd->hb_itvl = sp->hb_itvl;	/* heartbeat interval */
 		sd->rto_max = sp->rto_max;	/* maximum RTO */
 		sd->rto_min = sp->rto_min;	/* minimum RTO */
@@ -345,6 +346,7 @@ sctp_daddr_include(sp, daddr, errp)
 	int *errp;
 {
 	sctp_daddr_t *sd;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -365,7 +367,7 @@ __sctp_daddr_free(sd)
 	sctp_daddr_t *sd;
 {
 	ensure(sd, return);
-	/*
+	/* 
 	 *  Need to free any cached IP routes.
 	 */
 	if (sd->dst_cache) {
@@ -399,6 +401,7 @@ STATIC void
 __sctp_free_daddrs(sctp_t * sp)
 {
 	sctp_daddr_t *sd, *sd_next;
+
 	ensure(sp, return);
 	sd_next = sp->daddr;
 	usual(sd_next);
@@ -418,9 +421,10 @@ __sctp_free_daddrs(sctp_t * sp)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 int
-sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t * daddrs, size_t dnum)
+sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t *daddrs, size_t dnum)
 {
 	int err = 0;
+
 	ensure(sp, return (-EFAULT));
 	ensure(daddrs || !dnum, return (-EFAULT));
 	SCTPHASH_WLOCK();
@@ -466,6 +470,7 @@ __sctp_saddr_alloc(sp, saddr, errp)
 	int *errp;
 {
 	sctp_saddr_t *ss;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -500,6 +505,7 @@ sctp_saddr_include(sp, saddr, errp)
 	int *errp;
 {
 	sctp_saddr_t *ss;
+
 	assert(errp);
 	ensure(sp, *errp = -EFAULT;
 	       return (NULL));
@@ -535,6 +541,7 @@ STATIC void
 __sctp_free_saddrs(sctp_t * sp)
 {
 	sctp_saddr_t *ss, *ss_next;
+
 	assert(sp);
 	ss_next = sp->saddr;
 	usual(ss_next);
@@ -558,6 +565,7 @@ sctp_alloc_saddrs(sp, sport, saddrs, snum)
 	size_t snum;
 {
 	int err = 0;
+
 	ensure(sp, return (-EFAULT));
 	ensure(saddrs || !snum, return (-EFAULT));
 	SCTPHASH_WLOCK();
@@ -599,6 +607,7 @@ sctp_strm_alloc(stp, sid, errp)
 	int *errp;
 {
 	sctp_strm_t *st;
+
 	if ((st = kmem_cache_alloc(sctp_strm_cachep, SLAB_ATOMIC))) {
 		bzero(st, sizeof(*st));
 		if ((st->next = (*stp)))
@@ -636,6 +645,7 @@ sctp_free_strms(sp)
 	sctp_t *sp;
 {
 	sctp_strm_t *st, *st_next;
+
 	assert(sp);
 	st_next = sp->ostrm;
 	usual(st_next);
@@ -676,9 +686,8 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 	assert(q);
 	assert(spp);
 
-	/*
-	   must have these 4 
-	 */
+	/* 
+	   must have these 4 */
 	ensure(ops->sctp_conn_ind, return (NULL));
 	ensure(ops->sctp_conn_con, return (NULL));
 	ensure(ops->sctp_data_ind, return (NULL));
@@ -691,9 +700,8 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		MOD_INC_USE_COUNT;
 		bzero(sp, sizeof(*sp));
 
-		/*
-		   link into master list 
-		 */
+		/* 
+		   link into master list */
 		if ((sp->next = *spp))
 			sp->next->prev = &sp->next;
 		sp->prev = spp;
@@ -708,9 +716,8 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		sp->i_state = 0;
 		sp->s_state = SCTP_CLOSED;
 
-		/*
-		   ip defaults 
-		 */
+		/* 
+		   ip defaults */
 		sp->ip_tos = sctp_default_ip_tos;
 		sp->ip_ttl = sctp_default_ip_ttl;
 		sp->ip_proto = sctp_default_ip_proto;
@@ -718,9 +725,8 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		sp->ip_broadcast = sctp_default_ip_broadcast;
 		sp->ip_priority = sctp_default_ip_priority;
 
-		/*
-		   per association defaults 
-		 */
+		/* 
+		   per association defaults */
 		sp->max_istr = sctp_default_max_istreams;
 		sp->req_ostr = sctp_default_req_ostreams;
 		sp->max_inits = sctp_default_max_init_retries;
@@ -734,9 +740,8 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 		sp->ppi = sctp_default_ppi;
 		sp->max_sack = sctp_default_max_sack_delay;
 
-		/*
-		   per destination association defaults 
-		 */
+		/* 
+		   per destination association defaults */
 		sp->rto_ini = sctp_default_rto_initial;
 		sp->rto_min = sctp_default_rto_min;
 		sp->rto_max = sctp_default_rto_max;
@@ -846,8 +851,10 @@ sctp_free_priv(q)
 #ifdef _DEBUG
 	if (sp->oooq.q_msgs && sp->oooq.q_head) {
 		mblk_t *mp;
+
 		for (mp = sp->oooq.q_head; mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
+
 			printk("oooq tsn = %u\n", cb->tsn);
 		}
 	}
@@ -864,8 +871,10 @@ sctp_free_priv(q)
 #ifdef _DEBUG
 	if (sp->rtxq.q_msgs && sp->rtxq.q_head) {
 		mblk_t *mp;
+
 		for (mp = sp->rtxq.q_head; mp; mp = mp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
+
 			printk("rtxq tsn = %u\n", cb->tsn);
 		}
 	}
@@ -877,9 +886,8 @@ sctp_free_priv(q)
 	unusual(sp->ackq.q_msgs);
 	bufq_purge(&sp->ackq);
 
-	/*
-	   do we really need to keep this stuff hanging around for retrieval? 
-	 */
+	/* 
+	   do we really need to keep this stuff hanging around for retrieval? */
 	if (sp->ostrm || sp->istrm) {
 		sctp_free_strms(sp);
 	}
@@ -920,16 +928,15 @@ sctp_disconnect(sp)
 	SCTPHASH_WLOCK();
 	{
 		sctp_daddr_t *sd;
+
 		sp->s_state = sp->conind ? SCTP_LISTEN : SCTP_CLOSED;
 
-		/*
-		   remove from connected hashes 
-		 */
+		/* 
+		   remove from connected hashes */
 		__sctp_conn_unhash(sp);
 
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		if (sp->timer_init) {
 			untimeout(xchg(&sp->timer_init, 0));
 		}
@@ -990,14 +997,12 @@ __sctp_disconnect(sp)
 	{
 		sp->s_state = sp->conind ? SCTP_LISTEN : SCTP_CLOSED;
 
-		/*
-		   remove from connected hashes 
-		 */
+		/* 
+		   remove from connected hashes */
 		__sctp_conn_unhash(sp);
 
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		if (sp->timer_init) {
 			seldom();
 			untimeout(xchg(&sp->timer_init, 0));
@@ -1095,9 +1100,8 @@ sctp_reset(sp)
 
 	sp->pmtu = 576;
 
-	/*
-	   purge queues 
-	 */
+	/* 
+	   purge queues */
 	unusual(sp->rcvq.q_msgs);
 	bufq_purge(&sp->rcvq);
 	unusual(sp->sndq.q_msgs);

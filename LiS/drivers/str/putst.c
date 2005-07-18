@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: putst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/13 12:01:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: putst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/13 12:01:14 $"
 
 /************************************************************************
 *                          Pullup Test Driver				*
@@ -79,12 +79,12 @@
 #include <sys/osif.h>
 
 static struct module_info putst_minfo = {
-	0,			/* id */
-	"putst",		/* name */
-	0,			/* min packet size accepted */
-	0,			/* max packet size accepted */
-	0,			/* high water mark */
-	0			/* low water mark */
+	0,				/* id */
+	"putst",			/* name */
+	0,				/* min packet size accepted */
+	0,				/* max packet size accepted */
+	0,				/* high water mark */
+	0				/* low water mark */
 };
 
 static int _RP putst_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -94,32 +94,32 @@ static int putst_test(void);
 /* qinit structures (rd and wr side) 
  */
 static struct qinit putst_rinit = {
-	NULL,			/* put */
-	NULL,			/* service */
-	putst_open,		/* open */
-	putst_close,		/* close */
-	NULL,			/* admin */
-	&putst_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	NULL,				/* service */
+	putst_open,			/* open */
+	putst_close,			/* close */
+	NULL,				/* admin */
+	&putst_minfo,			/* info */
+	NULL				/* stat */
 };
 
 static struct qinit putst_winit = {
-	NULL,			/* put */
-	NULL,			/* service */
-	NULL,			/* open */
-	NULL,			/* close */
-	NULL,			/* admin */
-	&putst_minfo,		/* info */
-	NULL			/* stat */
+	NULL,				/* put */
+	NULL,				/* service */
+	NULL,				/* open */
+	NULL,				/* close */
+	NULL,				/* admin */
+	&putst_minfo,			/* info */
+	NULL				/* stat */
 };
 
 /* streamtab for the printk driver.
  */
 struct streamtab putst_info = {
-	&putst_rinit,		/* read queue */
-	&putst_winit,		/* write queue */
-	NULL,			/* mux read queue */
-	NULL			/* mux write queue */
+	&putst_rinit,			/* read queue */
+	&putst_winit,			/* write queue */
+	NULL,				/* mux read queue */
+	NULL				/* mux write queue */
 };
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_inet.h,v 0.9.2.5 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: xti_inet.h,v 0.9.2.6 2005/07/18 12:45:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_INET_H
 #define _SYS_XTI_INET_H
 
-#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #include <sys/xti_ip.h>
 #include <sys/xti_udp.h>
 #include <sys/xti_tcp.h>
 
 #endif				/* _SYS_XTI_INET_H */
-

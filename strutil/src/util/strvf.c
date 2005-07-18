@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/17 08:06:47 $
+ @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:38:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/17 08:06:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/17 08:06:47 $"
+#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:38:51 $"
 
 static char const ident[] =
-    "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/17 08:06:47 $";
+    "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:38:51 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -90,7 +90,8 @@ char basname[256] = "";
 char outpdir[256] = "/var/log/streams";
 char devname[256] = "";
 
-static void version(int argc, char **argv)
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -102,7 +103,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -115,7 +117,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -153,7 +156,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -199,7 +203,8 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-void strvf_exit(int retval)
+void
+strvf_exit(int retval)
 {
 	if (retval) {
 		fprintf(stderr, "--------------------------------------------------\n");
@@ -214,9 +219,11 @@ void strvf_exit(int retval)
 	exit(retval);
 }
 
-void strvf(int argc, char *argv[])
+void
+strvf(int argc, char *argv[])
 {
 	int fd;
+
 	if (basname[0] == '\0')
 		snprintf(basname, sizeof(basname), "strvf");
 	if (logging || outfile[0] != '\0') {
@@ -271,6 +278,7 @@ void strvf(int argc, char *argv[])
 		char datbuf[] = "\0\1\2\3\4\5\6\7";
 		struct strbuf ctl = { sizeof(ctlbuf), sizeof(ctlbuf), ctlbuf };
 		struct strbuf dat = { sizeof(datbuf), sizeof(datbuf), datbuf };
+
 		fprintf(stdout, "Putmsg to device %s\n", devname);
 		fflush(stdout);
 		if ((ret = putmsg(fd, &ctl, &dat, flags)) < 0) {
@@ -288,6 +296,7 @@ void strvf(int argc, char *argv[])
 		char datbuf[8];
 		struct strbuf ctl = { sizeof(ctlbuf), sizeof(ctlbuf), ctlbuf };
 		struct strbuf dat = { sizeof(datbuf), sizeof(datbuf), datbuf };
+
 		fprintf(stdout, "Getmsg from device %s\n", devname);
 		fflush(stdout);
 		if ((ret = getmsg(fd, &ctl, &dat, &flags)) < 0) {
@@ -303,6 +312,7 @@ void strvf(int argc, char *argv[])
 		int ret;
 		char iocbuf[] = "\0\1\2\3\4\5\6\7";
 		struct strioctl ioc = { I_STR, 0, sizeof(iocbuf), iocbuf };
+
 		fprintf(stdout, "Ioctl of device %s\n", devname);
 		fflush(stdout);
 		if ((ret = ioctl(fd, I_STR, &ioc)) < 0) {
@@ -329,10 +339,12 @@ void strvf(int argc, char *argv[])
 	strvf_exit(0);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -353,6 +365,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "n:b:O:o:e:D:qdvhVC?", long_options,
 				     &option_index);
 #else

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_md5.h,v 0.9.2.2 2005/05/14 08:29:34 brian Exp $
+ @(#) $Id: sctp_md5.h,v 0.9.2.3 2005/07/18 11:56:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:34 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_MD5_H__
 #define __SCTP_MD5_H__
 
-#ident "@(#) $RCSfile: sctp_md5.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_md5.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 typedef struct {
 	uint32_t buf[4];
