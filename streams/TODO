@@ -3,6 +3,63 @@ Things to do:
 
 - Finish the documentation.
 
+  PART DONE: updated documentation alot.
+
 - Finish the full STREAMS logger and proper implementation of the strlog()
   utility.
+
+  DONE: Added to strutil package.
+
+- Need to rework the specfs.  There are now several situations to consider:
+
+  The following four situations require the specfs.
+
+  a) 2.4 kernel without devfs
+  b) 2.6 kernel without devfs
+  c) 2.4 kernel with devfs but without devfsd
+  d) 2.6 kernel with devfs but without devfsd
+
+  The following two situations could use devfs instead of specfs.
+
+  e) 2.4 kernel with devfs and with devfsd
+  f) 2.6 kernel with devfs and with devfsd
+
+  The following one situation could use udev instead of devfs or specfs.
+
+  g) 2.6 kernel with udev
+
+  To get this to work requires that there be an independent layer between the
+  filesystem providing device access for STREAMS and the STREAMS subsystem.  A
+  set of registration functions need to be provided and a common set of callouts
+  from the filesystem made to the STREAMS executive.
+
+  The registration functions need to be called when a STREAMS driver loads and
+  the filesystem needs to do the right thing.  This also needs to include the
+  registration of major and minor devices, including clone devices.
+
+  The callout functions from the filesystem need to invoke the STREAMS device
+  file operations in a predictable manner, and the STREAMS subsystem requires
+  the ability to chain open calls, or even open STREAMS devices from within the
+  kernel (e.g. for pipes and connld and such).
+
+  It is difficult to get the filesystem (specfs, devfs, udev) to hold data
+  structures in a manner that is also usable by the STREAMS subsystem, so the
+  filesystem adaptation layer needs to maintain data structures in the same
+  manner for all filesystems.
+
+  Well,...  After a little investigation, it is all messed up.  udev doesn't
+  do what we need when demand loading pseudo devices, and devfs is probably
+  not used anymore (I found most production kernels disabled for devfs) so it
+  looks like spefs is the way to go.  I might use udev for "real" device
+  drivers, but that's just for SS7.  So it looks like we are stuck with mounting
+  the specfs.  I notice that ptys still use their own filesystem too...
+
+  So, what we need now is to rework data structures and the specfs to be a
+  little more stable.
+
+- Kernel objects are another thing.  For 2.6 kernels, we need to hold our data
+  structures in the kobject manner so that the /sys filesystem is usable.  This
+  requires another adaptation layer because 2.4 kernels do this in a completely
+  different way.  Much of our /proc filesystem stuff needs to move into /sys for
+  2.6 kernels by stay the same for 2.4 kernels.
 

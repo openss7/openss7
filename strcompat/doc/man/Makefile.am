@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:03:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 15:52:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:40 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 15:52:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -126,8 +126,6 @@ endif
 
 
 mps_unimpl_pages = \
-	man9/mi_mpprintf.9 \
-	man9/mi_mpprintf_nr.9 \
 	man9/mi_sprintf_putc.9
 
 mps_compat_pages = \
@@ -154,6 +152,8 @@ mps_compat_pages = \
 	man9/mi_first_ptr.9 \
 	man9/mi_free.9 \
 	man9/mi_freeq.9 \
+	man9/mi_mpprintf.9 \
+	man9/mi_mpprintf_nr.9 \
 	man9/mi_next_dev_ptr.9 \
 	man9/mi_next_ptr.9 \
 	man9/mi_offset_param.9 \

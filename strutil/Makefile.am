@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/17 08:06:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 16:33:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/17 08:06:26 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 16:33:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -548,9 +548,11 @@ AUTOCONFIG_H			= src/$(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 ##
-EXPORT_SRCFILES			=
+EXPORT_SRCFILES			= \
+				  src/drivers/clone.c
 
-EXPORT_VERFILES			=
+EXPORT_VERFILES			= \
+				  $(PKGINCL)/versions/clone.ver
 
 GENKSYMS_CPPFLAGS		= \
 				  -I./src/drivers -I$(srcdir)/src/drivers \
