@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/19 11:15:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 16:34:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/19 11:15:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/19 11:15:07 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/19 11:15:07 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:11 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/19 11:15:07 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -157,9 +157,11 @@ static struct module_info log_minfo = {
 	mi_lowat:STRLOW,
 };
 
+queue_t *log_conq = NULL;
 queue_t *log_errq = NULL;
 queue_t *log_trcq = NULL;
 
+int conlog_sequence = 0;
 int errlog_sequence = 0;
 int trclog_sequence = 0;
 
@@ -206,6 +208,21 @@ log_put(queue_t *q, mblk_t *mp)
 	case M_IOCTL:
 		ioc = (typeof(ioc)) mp->b_rptr;
 		switch (ioc->iocblk.ioc_cmd) {
+		case I_CONSLOG:
+			err = -EPERM;
+			if (ioc->iocblk.ioc_uid != 0)
+				goto nak;
+			err = -EOPNOTSUPP;
+			if (ioc->iocblk.ioc_count == TRANSPARENT)
+				goto nak;
+			err = -EFAULT;
+			if (!dp)
+				goto nak;
+			err = -ENXIO;
+			if (log_conq != NULL)
+				goto nak;
+			log_conq = RD(q);
+			goto ack;
 		case I_ERRLOG:
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
@@ -804,7 +821,11 @@ log_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, v
 	queue_t *logq = NULL;
 	mblk_t *mp;
 
-	if (flags & SL_ERROR && log_errq) {
+	if (flags & SL_CONSOLE && log_conq) {
+		logq = log_conq;
+		seq_no = ++conlog_sequence;
+		/* the console logger sees all logs */
+	} else if (flags & SL_ERROR && log_errq) {
 		logq = log_errq;
 		seq_no = ++errlog_sequence;
 		/* the error logger sees all logs */

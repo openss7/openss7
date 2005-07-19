@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.9 2005/07/18 12:25:38 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.10 2005/07/19 11:21:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/19 11:21:18 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRLOG_H__
 #define __SYS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:25:38 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/19 11:21:18 $"
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -63,10 +63,13 @@
 #define SL_NOTE	    0x0040
 #define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
 
+#define LOGMSGSZ    1024	/* max format string length */
 #define NLOGARGS    3		/* max number of arguments (really unlimited) */
 
-#define I_ERRLOG	(__SID | 65)	/* error log */
-#define I_TRCLOG	(__SID | 66)	/* trace log */
+#define LOGCTL		(('L')<<8)
+#define I_ERRLOG	(LOGCTL | 1)	/* error logger */
+#define I_TRCLOG	(LOGCTL | 2)	/* trace logger */
+#define I_CONSLOG	(LOGCTL | 3)	/* console logger */
 
 extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
     __attribute__ ((format(printf, 5, 6)));

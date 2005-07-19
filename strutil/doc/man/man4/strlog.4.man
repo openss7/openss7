@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strlog.4.man,v 0.9.2.13 2005/07/18 06:18:53 brian Exp $
+.\" @(#) $Id: strlog.4.man,v 0.9.2.14 2005/07/19 11:15:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/18 06:18:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/19 11:15:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -75,8 +75,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B strlog
-\- strlog \fISTREAMS\fP device
+.B strlog, log
+\- \fISTREAMS\fP log device
 .\"
 .\"
 .SH SYNOPSIS
@@ -90,6 +90,10 @@ sort-adjacent-labels
 .B #include <syslog.h>
 .HP 12
 .BI "int " fd " = open(" /dev/strlog ", " oflag );
+.PD 0
+.HP 12
+.BI "int " fd " = open(" /dev/conslog ", " oflag );
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -99,8 +103,15 @@ is a file descriptor for an strlog stream opened using the
 .BR open (2)
 system call on one of the following devices:
 .TP
-.RI \*(lq /dev/strlog \*(rq
-This device is accessible to all users.
+.RI \*(lq /dev/strlog ",\*(rq \*(lq" /dev/streams/strlog \*(rq
+This clone device is accessible to all users.  This device can either be used by a console, error or trace
+logger, or can be used to generate log messages with
+.BR putmsg (2).
+.TP
+.RI \*(lq /dev/conslog ",\*(rq \*(lq" /dev/streams/conslog \*(rq
+This non-clone device is accessble to all users.  This device can be used to generate log messages
+to the console with
+.BR putmsg "(2) or " write (2).
 .PP
 The
 .B strlog
@@ -112,9 +123,12 @@ driver is a
 .I STREAMS
 software device driver that provides an interface for the
 .I STREAMS
+console logging
+.BR ( strlogd (8)),
 error logging
 .RB ( strerr (8))
-and event tracing
+and
+event tracing
 .RB ( strace (8))
 processes.
 The
@@ -131,9 +145,12 @@ A subset of ioctl
 .RB ( streamio (7))
 operations and
 .I STREAMS
-messages for interaction with a user-level error logger
+messages for interaction with a user-level
+console logger
+.RB ( strlogd (8)),
+error logger
 .RB ( strerr (8)),
-a trace logger
+trace logger
 .RB ( strace (8)),
 or processes that need to submit their own log messages
 .RB ( strlog (1)).
@@ -147,17 +164,28 @@ utility.
 The
 .B strlog
 driver is opened using the clone interface,
-.BR /dev/strlog .
+.BR /dev/strlog ,
+or the non-clone interface
+.BR /dev/conslog .
+.PP
 Each open of the
 .B /dev/strlog
 device obtains a separate stream to
 .BR strlog .
-To receive log message, a process first notifies the
+To receive log messages, a process first notifies the
 .B strlog
-driver whether it is an error logger or a trace logger by using the
+driver whether it is a console logger, an error logger or a trace logger by using the
 .I I_STR
 .RB ( streamio (7))
 operation.
+.PP
+For the console logger, the
+.I I_STR
+operation has a
+.B ic_cmd
+parameter value of
+.BR I_CONSLOG
+with no accompanying data.
 .PP
 For the error logger, the
 .I I_STR
@@ -201,7 +229,6 @@ Following is the format of the
 .B trace_ids
 structure:
 .PP
-.RS
 .nf
 \fC\s-1
 struct trace_ids {
@@ -238,7 +265,13 @@ A value of minus one
 indicates that this trace id entry applies to any log level.
 .TP
 .I ti_flags
-.RE
+this member is only present for
+.IR AIX \(rg
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+(Mentat) implementations and serves no purpose for the user.  It is not used to filter trace
+messages.
 .PP
 If any of the fields of the
 .B trace_ids
@@ -259,8 +292,8 @@ value in the
 .B trace_ids
 structure.
 .PP
-At most, one trace logger and one error logger can be active at a time.  After
-the logger process has identified itself by using the ioctl
+At most, one console logger, one error logger and one trace logger can be active
+at a time.  After the logger process has identified itself by using the ioctl
 .RB ( streamio (7))
 operation, the
 .B strlog
@@ -271,13 +304,12 @@ system call.  The control part of the message contains a
 .B log_ctl
 structure, which specifies the
 .IR mid ", " sid ", " level " and " flags
-fields, as well as the time in ticks since boot that the message was
-submitted, the corresponding time in seconds since Jan. 1, 1970, and a
-sequence number.  The time in seconds since 1970 is provided so that the date
-and time of the message can be easily computed; the time in ticks since boot
-is provided so that the relative timing of log messages can be determined.
+fields, as well as the time in ticks since boot that the message was submitted,
+the corresponding time in seconds since Jan. 1, 1970, and a sequence number.
+The time in seconds since 1970 is provided so that the date and time of the
+message can be easily computed; the time in ticks since boot is provided so that
+the relative timing of log messages can be determined.
 .PP
-.RS
 .nf
 \fC\s-1
 struct log_ctl {
@@ -310,36 +342,31 @@ specifies the level for screening lower-level event messages from a tracer.
 .I flags
 contains several flags that can be set in various combinations.  The flags are
 as follows:
-.sp
-.DS
 .RS
-.TS
-tab(:);
-lblsss.
-SL_ERROR:T{
+.TP \w'SL_CONSOLE\(em'u
+.B SL_CONSOLE
+message is for the console logger.
+.PD 0
+.TP
+.B SL_ERROR
 message is for the error logger.
-T}
-SL_TRACE:T{
-message is for the tracer.
-T}
-SL_CONSOLE:T{
-message will be printed to the console.
-T}
-SL_FATAL:T{
+.TP
+.B SL_TRACE
+message is for the trace logger.
+.TP
+.B SL_FATAL
 notification of a fatal error.
-T}
-SL_NOTIFY:T{
-requests to mail a copy of a message to the system administrator.
-T}
-SL_WARN:T{
+.TP
+.B SL_WARN
 message is a warning.
-T}
-SL_NOTE:T{
+.TP
+.B SL_NOTE
 message is a note.
-T}
-.TE
+.TP
+.B SL_NOTIFY
+requests to mail a copy of a message to the system administrator.
+.PD
 .RE
-.DE
 .TP
 .I ltime
 time in seconds since January 1, 1970.
@@ -375,41 +402,58 @@ Messages originating from the kernel have facility code set to
 Most message originating from user processes will have the facility code set
 to
 .BR LOG_USER .
-.RE
 .PP
-Different sequence number are maintained for the error logging and trace
-logging streams so that gaps in the sequence of messages can be determined.
-(During times of high message traffic, some message may not be delivered by
-the logger to avoid tying up system resources).  The data part of the message
-contains the unexpanded text of the format string (null-terminated), followed by
-the arguments to the format string (up to the number specified by the
+Different sequence number are maintained for the error logging and trace logging
+streams so that gaps in the sequence of messages can be determined.  (During
+times of high message traffic, some message may not be delivered by the logger
+to avoid tying up system resources).
+.PP
+The data part of the message contains the unexpanded text of the format string
+(null-terminated), followed by the arguments to the format string (up to the
+number specified by the
 .B NLOGARGS
 value), aligned on the first word
 .RB ( int )
 boundary following the format string.
+The format string can be a maximum of
+.B LOGMSGSZ
+in length.  Longer format messages will be truncated.
 .PP
 A process may also send a message of the same structure to the log driver, even
-if it is not an error or trace logger.  The only fields of the
+if it is not a console, error or trace logger.  The only fields of the
 .B log_ctl
 structure in the control part of the message that are accepted are the
 .IR level " and " flags
 fields.  All other fields are filled in by the log driver before being forwarded
 to the appropriate logger.  The data portion must contain a null-terminated
-format string, and any arguments (up to
+format string, of maximum length
+.BR LOGMSGSZ ,
+and any arguments (up to
 .BR NLOGARGS )
 must be packed in an integral number of words
 .RB ( int )
 each, on the next word
 .RB ( int )
 boundary following the end of the format string.
+.PP
+In addition, a process may also send a message of the same structure to the
+console logger using the
+.B log_ctl
+structure and the
+.BR putmsg (2)
+system call, or can simply write the data portion of the message using the
+.BR write (2)
+system call.
+.PP
 The
 .BR strlog (1)
-facility is provided for issuing log messages from shell scripts.
+facility is provided for issuing console, error and trace log messages from shell scripts.
+This is similar to the POSIX
+.BR logger (1)
+command.
 .PP
 Attempting to issue an
-.I I_TRCLOG
-or
-.I I_ERRLOG
+.IR I_TRCLOG ", " I_ERRLOG " or " I_CONSLOG
 operation when a logging process of the given type already exists result in
 the
 .RB [ ENXIO ]
@@ -452,16 +496,21 @@ drivers supports the following
 .BR streamio (7)
 .B I_STR
 input ouput controls:
-.SS I_ERRLOG
-.PP
-Indicates an error logger.  No
-.B trace_ids
-is required.
 .SS I_TRCLOG
 .PP
 Indicates a trace logger.  A data buffer consisting of an array of one or more
 .B trace_ids
 structures must be included.
+.SS I_ERRLOG
+.PP
+Indicates an error logger.  No
+.B trace_ids
+is required.
+.SS I_CONSLOG
+.PP
+Indicates a console logger.  No
+.B trace_ids
+is required.
 .\"
 .\"
 .SH NOTICES
@@ -551,11 +600,22 @@ The external file system
 .I STREAMS
 log device.
 .TP
+.B /dev/conslog
+The external file system
+console log device.
+.TP
 .BR /dev/streams/strlog ", " /devices/strlog
 The
 .BR specfs (5)
 shadow special filesystem
 .I STREAMS
+log device.
+.TP
+.BR /dev/streams/conslog ", " /devices/conslog
+The
+.BR specfs (5)
+shadow special filesystem
+console
 log device.
 .\"
 .\"
@@ -564,10 +624,13 @@ log device.
 .BR open (2),
 .BR strerr (8),
 .BR strace (8),
+.BR strlogd (8),
 .BR strlog (9),
 .BR streamio (7),
 .BR strlog (1),
-.BR getmsg (2).
+.BR getmsg (2),
+.BR putmsg (2),
+.BR write (2).
 .\"
 .\"
 .SH BUGS
@@ -584,9 +647,14 @@ is compatible with systems based on
 .[
 svr42
 .]
+including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR AIX \(rg
@@ -602,19 +670,33 @@ does not have a
 field in the
 .B log_ctl
 structure.
+.IP \(em
 .IR HP-UX \(rg
 does not support priority or facility codes.
+.IP \(em
+.IR HP-UX \(rg
+does not suppor the
+.B I_CONSLOG
+input output control.
 .IP \(em
 .IR OSF/1 \(rg
 calls this device
 .BR /dev/streams/log .
 .IP \(em
-.IR Solaris \(rg
-does not provide the
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+do not provide the
 .I ti_flags
 field of the
 .B trace_ids
-structure.
+structure;
+.IR AIX \(rg,
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+do.
 .IP \(em
 .IR Solaris \(rg
 declares
@@ -626,6 +708,16 @@ and
 to be
 .BR time32_t " or " time_t ,
 depending on a 64 or 32-bit architecture.
+.IP \(em
+On most systems, the
+.I STREAMS
+log device is called
+.BR /dev/log ;
+however,
+.B Linux
+has a BSD-based log device by that name, so the device
+.B /dev/strlog
+is used instead.
 .\"
 .\"
 .SH CONFORMANCE
@@ -634,10 +726,14 @@ depending on a 64 or 32-bit architecture.
 .[
 svr42cr
 .]
-IBR AIX \(rg,
-IBR HP-UX \(rg
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
 and
-.IR OSF/1 \(rg
+.IR UnixWare \(rg
+.IR 
 documentation.
 .[
 aixdoc
@@ -647,6 +743,15 @@ hpuxdoc
 .]
 .[
 osfdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
 .]
 .\"
 .\"

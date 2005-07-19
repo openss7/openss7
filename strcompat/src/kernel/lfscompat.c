@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/19 11:21:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.12  2005/07/19 11:21:19  brian
+ - updated strlog(9) for compatibility
+
  Revision 0.9.2.11  2005/07/18 12:25:42  brian
  - standard indentation
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -112,7 +115,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:42 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -375,52 +378,46 @@ __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2
 EXPORT_SYMBOL(putnextctl2);
 
 /*
- *  This is a default implemenation for strlog(9).  We print directly to the log
- *  files.  That is not good: we want to filter things out.  A proper log driver
- *  is in the strutil package.  We provide a hook here so that that package can
- *  hook into this call.  Because we cannot filter, only SL_ERROR messages are
- *  printed to the system logs.  SL_TRACE messages are never printed and 0 is
- *  returned.
+ *  This is a default implementation for strlog(9).  When SL_CONSOLE is set, we print directly to
+ *  the console using printk(9).  For SL_ERROR and SL_TRACE, we have no STREAMS error or trace
+ *  loggers running, so we marks those messages as unseen by those loggers.  We also provide a hook
+ *  here so that the strutil package can hook into this call.  Because we cannot filter, only
+ *  SL_CONSOLE messages are printed to the system logs.  This follows the rules for setting the
+ *  priority according described in log(4).
  */
-static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
-
 static int
 vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
-	unsigned long flags;
-	static char str_err_buf[1024];
 	int rval = 1;
 
-	spin_lock_irqsave(&str_err_lock, flags);
-	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
-	if (flag & SL_FATAL) {
-		printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-		       (int) sid, str_err_buf);
-	} else if (flag & SL_ERROR) {
-		printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-		       (int) sid, str_err_buf);
-	} else if (flag & SL_WARN) {
-		printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-		       (int) sid, str_err_buf);
-	} else if (flag & SL_NOTE) {
-		printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-		       (int) sid, str_err_buf);
-	} else if (flag & SL_CONSOLE) {
-		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-		       (int) sid, str_err_buf);
-	} else {		/* SL_TRACE */
-#if 0
-		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-		       (int) sid, str_err_buf);
-#else
-		/* Because we have no trace filter facilities without the presence of a full
-		   STREAMS-based logger, we do not log SL_TRACE messages because they might be
-		   generated way too fast, expecting to be filtered.  Use the full STREAMS-based
-		   loger in strutil package if you want to trace messages. */
-		rval = 0;
-#endif
+	if (flag & SL_CONSOLE) {
+		static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
+		static char str_err_buf[LOGMSGSZ];
+		unsigned long flags;
+		short lev = (short) level;
+
+		spin_lock_irqsave(&str_err_lock, flags);
+		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
+#define STRLOG_PFX "strlog(%hd)[%hd,%hd]: %s\n"
+		if (flag & SL_FATAL)
+			printk(KERN_CRIT STRLOG_PFX, lev, mid, sid, str_err_buf);
+		else if (flag & SL_ERROR)
+			printk(KERN_ERR STRLOG_PFX, lev, mid, sid, str_err_buf);
+		else if (flag & SL_WARN)
+			printk(KERN_WARNING STRLOG_PFX, lev, mid, sid, str_err_buf);
+		else if (flag & SL_NOTE)
+			printk(KERN_NOTICE STRLOG_PFX, lev, mid, sid, str_err_buf);
+		else if (flag & SL_TRACE)
+			printk(KERN_DEBUG STRLOG_PFX, lev, mid, sid, str_err_buf);
+		else
+			printk(KERN_INFO STRLOG_PFX, lev, mid, sid, str_err_buf);
+#undef STRLOG_PFX
+		spin_unlock_irqrestore(&str_err_lock, flags);
 	}
-	spin_unlock_irqrestore(&str_err_lock, flags);
+	if (flag & SL_ERROR)
+		rval = 0;	/* no error logger */
+	if (flag & SL_TRACE)
+		rval = 0;	/* no trace logger */
 	return (rval);
 }
 

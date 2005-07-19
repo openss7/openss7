@@ -117,6 +117,7 @@ node	/dev/echo	     c	*	clone		echo
 node	/dev/nuls	     c	*	clone		nuls
 node	/dev/pipe	     c	*	pipe		0
 node	/dev/strlog	     c	*	clone		log
+node	/dev/conslog	     c  *	log		1
 node	/dev/sfx	     c	*	sfx		0
 node	/dev/spx	     c	*	spx		0
 #node	/dev/socksys	     c	*	socksys		0

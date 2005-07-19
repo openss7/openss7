@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/18 12:38:51 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/19 11:15:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/19 11:15:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.c,v $
+ Revision 0.9.2.3  2005/07/19 11:15:08  brian
+ - added syslogd and friends
+
  Revision 0.9.2.2  2005/07/18 12:38:51  brian
  - standard indentation
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/18 12:38:51 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/19 11:15:08 $"
 
 static char const ident[] =
-    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/18 12:38:51 $";
+    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/19 11:15:08 $";
 
 /*
  *  Linux Fast-STREAMS Utility: strlog - logs STREAMS error or trace messages
@@ -86,16 +89,15 @@ static char const ident[] =
 #endif
 
 #include <time.h>
+#include <sys/time.h>
 #include <stropts.h>
 #include <sys/strlog.h>
+#define SYSLOG_NAMES
 #include <syslog.h>
+#include <sys/sad.h>
 
 static int debug = 0;
 static int output = 1;
-
-static short mid = 0;			/* module identifier */
-static short sid = 0;			/* subunit identifier */
-static int priority = 0;		/* facility and level */
 
 static void
 version(int argc, char **argv)
@@ -146,6 +148,14 @@ Options:\n\
         unit id for STREAMS logger\n\
     -p, --priority PRIORITY\n\
         number or \"facility.level\" notation PRIORITY\n\
+    -E, --error\n\
+        generate error log (the default if nothing specified)\n\
+    -T, --trace\n\
+        generate trace log\n\
+    -N, --notify\n\
+        notify the system administrator (by mail)\n\
+    -c, --console\n\
+        display log to the console\n\
     -f, --file FILE\n\
         read messages to log from FILE\n\
     -s, --stderr\n\
@@ -220,14 +230,61 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
+void
+log_line(short mid, short sid, char priority, int logflags, unsigned long seq, const char *line,
+	 int stderr_also)
+{
+	if (stderr_also) {
+		const char *flags = "???";
+		struct timespec tv = { 0, 0 };
+		clock_gettime(CLOCK_MONOTONIC, &tv);
+		switch (logflags & (SL_TRACE | SL_FATAL | SL_NOTIFY)) {
+		case 0:
+			flags = "   ";
+			break;
+		case SL_NOTIFY:
+			flags = "  N";
+			break;
+		case SL_FATAL:
+			flags = " F ";
+			break;
+		case SL_FATAL | SL_NOTIFY:
+			flags = " FN";
+			break;
+		case SL_TRACE:
+			flags = "T  ";
+			break;
+		case SL_TRACE | SL_NOTIFY:
+			flags = "T N";
+			break;
+		case SL_TRACE | SL_FATAL:
+			flags = "TF ";
+			break;
+		case SL_TRACE | SL_FATAL | SL_NOTIFY:
+			flags = "TFN";
+			break;
+		}
+		fprintf(stderr, "%3lu %12lu %12lu %s %5hd %5hd %s\n", seq, time(NULL), tv.tv_sec,
+			flags, mid, sid, line);
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
-	int i, fd, count;
-	struct trace_ids *tids;
-	struct strioctl ic;
+	int options;
+	int my_logflags = 0;		/* user specified flags */
+	int xflags = 0;			/* extra flags */
+	int stderr_also = 0;		/* log also to stderr */
+	int logflags = SL_ERROR;	/* logger flags */
+	int priority = LOG_USER | LOG_DEBUG;	/* facility and level */
+	short mid = 0;			/* module identifier */
+	short sid = 0;			/* subunit identifier */
+	char filename[256] = "";	/* file name */
+	int use_file = 0;		/* use file in filename */
+	int read_stdin = 0;		/* read from stdin */
 
-	while (1) {
+	for (options = 0;; options++) {
 		int c, val;
 
 #if defined _GNU_SOURCE
@@ -237,6 +294,10 @@ main(int argc, char *argv[])
 			{"mid",		required_argument,	NULL, 'M'},
 			{"sid",		required_argument,	NULL, 'S'},
 			{"priority",	required_argument,	NULL, 'p'},
+			{"error",	no_argument,		NULL, 'E'},
+			{"trace",	no_argument,		NULL, 'T'},
+			{"notify",	no_argument,		NULL, 'N'},
+			{"console",	no_argument,		NULL, 'c'},
 			{"file",	required_argument,	NULL, 'f'},
 			{"stderr",	no_argument,		NULL, 's'},
 			{"tag",		required_argument,	NULL, 't'},
@@ -254,9 +315,10 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "qdvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "M:S:p:ETNcf:st:iu:dqD::v::hVC?", long_options,
+				     &option_index);
 #else
-		c = getopt(argc, argv, "qdvhVC?");
+		c = getopt(argc, argv, "M:S:p:ETNcf:st:iu:dqD::v::hVC?");
 #endif
 		if (c == -1) {
 			if (debug)
@@ -268,63 +330,136 @@ main(int argc, char *argv[])
 			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffUL)
 				goto bad_option;
 			mid = val;
-			break;
+			continue;
 		case 'S':	/* -S, --sid SID */
 			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffUL)
 				goto bad_option;
 			sid = val;
-			break;
+			continue;
 		case 'p':	/* -p, --priority PRIORITTY */
+		{
+			CODE *fac = NULL;
+			CODE *pri = NULL;
+
 			if (isdigit(*optarg)) {
 				/* its a number, use it */
-				if ((val = strlol(optarg, NULL, 0)) < 0)
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				for (fac = facilitynames; fac->c_name; fac++)
+					if (LOG_FAC(val) == LOG_FAC(fac->c_val))
+						break;
+				if (!fac->c_name)
+					goto bad_option;
+				for (pri = prioritynames; pri->c_name; pri++)
+					if (val == pri->c_val)
+						break;
+				if (!pri->c_name)
 					goto bad_option;
 				priority = val;
 			} else {
 				char facil_name[9];
 				char level_name[9];
 
-				sscanf(optarg, "%8[a-z].%8[a-z]", facil_name, level_name);
-			strspn}
-			break;
+				if (sscanf(optarg, "%8[a-z].%8[a-z]", facil_name, level_name) != 2)
+					goto bad_option;
+				if (facil_name[0] == '\0')
+					goto bad_option;
+				for (fac = facilitynames; fac->c_name; fac++)
+					if (strncmp(fac->c_name, facil_name, 9) == 0)
+						break;
+				if (!fac->c_name)
+					goto bad_option;
+				if (level_name[0] == '\0')
+					goto bad_option;
+				for (pri = prioritynames; pri->c_name; pri++)
+					if (strncmp(pri->c_name, level_name, 9) == 0)
+						break;
+				if (!pri->c_name)
+					goto bad_option;
+			}
+			/* things are ok now */
+			priority = LOG_MAKEPRI(LOG_FAC(fac->c_val), pri->c_val);
+			switch (LOG_PRI(priority)) {
+			case LOG_EMERG:
+				xflags |= SL_FATAL;
+				break;
+			case LOG_ALERT:
+			case LOG_CRIT:
+			case LOG_ERR:
+				break;
+			case LOG_WARNING:
+				xflags |= SL_WARN;
+				break;
+			case LOG_NOTICE:
+				xflags |= SL_NOTE;
+				break;
+			case LOG_INFO:
+			case LOG_DEBUG:
+				break;
+			}
+			continue;
+		}
+		case 'E':	/* -E, --error */
+			my_logflags |= SL_ERROR;
+			continue;
+		case 'T':	/* -T, --trace */
+			my_logflags |= SL_TRACE;
+			continue;
+		case 'N':	/* -N, --notify */
+			my_logflags |= SL_NOTIFY | SL_ERROR;
+			continue;
+		case 'c':	/* -c, --console */
+			my_logflags |= SL_CONSOLE | SL_ERROR;
+			continue;
 		case 'f':	/* -f, --file FILE */
-			break;
+			if (strnlen(optarg, sizeof(filename) + 1) > sizeof(filename))
+				goto bad_option;
+			strncpy(filename, optarg, sizeof(filename));
+			if (filename[0] == '\0')
+				goto bad_option;
+			if (strncmp(filename, "-", sizeof(filename)) == 0) {
+				filename[0] = '\0';
+				read_stdin = 1;
+			} else
+				use_file = 1;
+			continue;
 		case 's':	/* -s, --stderr */
-			break;
+			stderr_also = 1;
+			continue;
 		case 't':	/* -t, --tag TAG */
 		case 'i':	/* -i, --id */
 		case 'u':	/* -u, --socket DEVICE */
 		case 'd':	/* -d, --datagram */
 			/* these four are ignored for compatibiltiy with logger(1) */
-			break;
+			continue;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
 			output = 0;
 			debug = 0;
-			break;
+			continue;
 		case 'D':	/* -D, --debug */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
-				break;
+				continue;
 			}
 			if ((val = strtol(optarg, NULL, 0)) < 0)
 				goto bad_option;
 			debug = val;
-			break;
+			continue;
 		case 'v':	/* -v, --verbose */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				output++;
-				break;
+				continue;
 			}
 			if ((val = strtol(optarg, NULL, 0)) < 0)
 				goto bad_option;
 			output = val;
-			break;
+			continue;
 		case 'h':	/* -h, --help */
 		case 'H':	/* -H, --? */
 			if (debug)
@@ -345,12 +480,17 @@ main(int argc, char *argv[])
 		default:
 		      bad_option:
 			optind--;
+			goto bad_nonopt;
 		      bad_nonopt:
 			if (output > 0 || debug > 0) {
 				if (optind < argc) {
+					const char *delim = "";
+
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
-					while (optind < argc)
-						fprintf(stderr, "%s ", argv[optind++]);
+					while (optind < argc) {
+						fprintf(stderr, "%s%s", delim, argv[optind++]);
+						delim = " ";
+					}
 					fprintf(stderr, "'\n");
 				} else {
 					fprintf(stderr, "%s: missing option or argument", argv[0]);
@@ -362,14 +502,48 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-
 	if (optind >= argc) {
-		/* no message argument provided */
-	}
+		char buffer[1024];
+		char *line;
+		unsigned long lineno;
+		FILE *f = stdin;
 
-	else {
+		/* no message argument provided */
+		if (use_file == 0 && read_stdin == 0)
+			/* nowhere to get messages from */
+			goto bad_nonopt;
+		if (use_file) {
+			if ((f = fopen(filename, "r")) == NULL) {
+				if (output || debug)
+					perror(__FUNCTION__);
+				exit(1);
+			}
+		}
+		logflags = (my_logflags ? my_logflags : logflags) | xflags;
+		/* read the file one line at a time */
+		for (lineno = 1; (line = fgets(buffer, sizeof(buffer), f)) != NULL; lineno++) {
+			size_t len;
+
+			line[sizeof(buffer)] = '\0';
+			/* find newline */
+			len = strnlen(line, sizeof(buffer));
+			/* chop the newline */
+			if (len > 0 && line[len - 1] == '\n') {
+				len--;
+				line[len] = '\0';
+			}
+			log_line(mid, sid, priority, logflags, lineno, line, stderr_also);
+		}
+		fclose(f);
+	} else {
 		/* a message argument(s) was provided */
-		count = (argc - optind);
+		if (read_stdin)
+			goto bad_nonopt;
+		logflags = (my_logflags ? my_logflags : logflags) | xflags;
+		/* log messages one string at a time */
+		for (; optind < argc; optind++)
+			log_line(mid, sid, priority, logflags, (argc - optind), argv[optind],
+				 stderr_also);
 	}
 	exit(0);
 }

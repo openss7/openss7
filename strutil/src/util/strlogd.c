@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.11 2005/07/19 11:15:08 brian Exp $
+ @(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/19 11:15:08 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -47,56 +48,15 @@
 
  Last Modified $Date: 2005/07/19 11:15:08 $ by $Author: brian $
 
+ -----------------------------------------------------------------------------
+
+ $Log: strlogd.c,v $
+ Revision 0.9.2.1  2005/07/19 11:15:08  brian
+ - added syslogd and friends
+
  *****************************************************************************/
 
-#ifndef __SYS_STRUTIL_STRLOG_H__
-#define __SYS_STRUTIL_STRLOG_H__
+#ident "@(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/19 11:15:08 $"
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/19 11:15:08 $"
+static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/19 11:15:08 $";
 
-#ifndef __SYS_STRLOG_H__
-#warn "Do no include sys/strutil/strlog.h directly, include sys/strlog.h instead."
-#endif
-
-#define SL_ERROR    0x0001
-#define SL_TRACE    0x0002
-#define SL_NOTIFY   0x0004
-#define SL_CONSOLE  0x0008
-#define SL_FATAL    0x0010
-#define SL_WARN	    0x0020
-#define SL_NOTE	    0x0040
-#define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
-
-#define LOGMSGSZ    1024	/* max format string length */
-#define NLOGARGS    3		/* max number of arguments (really unlimited) */
-
-#define LOGCTL		(('L')<<8)
-#define I_ERRLOG	(LOGCTL | 1)	/* error logger */
-#define I_TRCLOG	(LOGCTL | 2)	/* trace logger */
-#define I_CONSLOG	(LOGCTL | 3)	/* console logger */
-
-extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
-    __attribute__ ((format(printf, 5, 6)));
-
-typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
-extern vstrlog_t vstrlog;
-
-struct trace_ids {
-	short ti_mid;
-	short ti_sid;
-	char ti_level;
-	short ti_flags;			/* not for Solaris */
-};
-
-struct log_ctl {
-	short mid;
-	short sid;
-	char level;
-	short flags;
-	long ltime;			/* clock32_t or clock_t under Solaris */
-	long ttime;			/* time32_t or time_t under Solaris */
-	int seq_no;
-	int pri;			/* priority = (facility|level) except HPUX */
-};
-
-#endif				/* __SYS_STRUTIL_STRLOG_H__ */

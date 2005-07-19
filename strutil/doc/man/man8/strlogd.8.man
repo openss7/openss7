@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strerr.8.man,v 0.9.2.16 2005/07/19 11:15:07 brian Exp $
+.\" @(#) $Id: strlogd.8.man,v 0.9.2.1 2005/07/19 11:15:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -71,108 +71,90 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRERR 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH STRLOGD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B strerr
-\- receives error log messages from the \fISTREAMS\fR \fBlog\fR(4) driver
+.B strlogd
+\- \fISTREAMS\fR logger \fBsyslogd\fR(8) helper
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
-\fBstrerr\fR [\fIoptions\fR] [{\fB-a\fR|\fB--admin\fR[=]}\fIMAILUID\fR] [{\fB-d\fR|\fB--directory\fR[=]}\fIDIRECTORY\fR]
+.ad l
+.hy 0
+.HP \w'strlogd\ 'u
+\fBstrlogd\fR [\fIoptions\fR] [\fB-nqDv\fR]
+[{\fB-p\fR|\fB--pidfile\fR[=]}[\fIPIDFILE\fR]]
+[{\fB-l\fR|\fB--logdev\fR[=]}[\fILOGDEVICE\fR]]
+[{\fB-D\fR|\fB--debug\fR[=]}[\fILEVEL\fR]]
+[{\fB-v\fR|\fB--verbose\fR[=]}[\fILEVEL\fR]]
 .PD 0
-.HP 12
-\fBstrerr\fR {\fB-h\fR|\fB--help\fR}
-.HP 12
-\fBstrerr\fR {\fB-V\fR|\fB--version\fR}
-.HP 12
-\fBstrerr\fR {\fB-C\fR|\fB--copying\fR}
+.HP
+\fBstrlogd\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBstrlogd\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBstrlogd\fR {\fB-C\fR|\fB--copying\fR}
 .PD
+.ad b
+.hy 6
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 The
-.B strerr
-daemon receives error log messages from the
+.B strlogd
+deamon provides some capabilities for the
 .I STREAMS
-log driver and appends them to a log file.  The error log files produced
-reside in the directory
-.BR /var/adm/streams " or " /var/log/streams ,
-or a user-specified directory,
-and are named
-.BI error. mm-dd\fR,
-where
-.I mm
-is the month and
-.I dd
-is the day of the messages contained in each log file.
-.PP
-Messages that appear in the error log are intended to report exceptional
-conditions that require the attention of the person who administers your
-system.  Those messages indicating the total failure of a
+logger not provided by
+.BR syslogd (8).
+The
+.B strlogd
+daemon receives console log messages from the
 .I STREAMS
-driver or module should have the
-.B F
-flag set.  Those messages requiring the immediate attention of the
-administrator should have the
-.B N
-flag set, which causes the error logger to send the message to that person by
-way of the
-.BR mail (1)
-command.  The priority level usually has no meaning in the error log, but does
-have meaning if the message is also sent to the tracer process.
+log driver and issues them to
+.BR syslog (3).
+.BR syslogd (8)
+is then responsible for processing the messages.
 .PP
-Once initiated, the
-.B strerr
+Messages that appear in the console log are intended to report exceptional conditions that require
+the attention of a person who administers your system.  Those messages indicating the total failure
+a
+.I STREAMS
+driver or module will be logged with
+.BR LOG_EMERG .
+Those messages requiring the immediate attention of the administrator, and which should be mailed to
+the system adminstrator must be mailed using the facilities of
+.BR syslogd (8).
+The
+.BR strlogd
+console logger will not mail these messages (although the error logger,
+.BR strerr (8),
+will).
+The priority level has no meaning in the console log, but does have meaning if the message is also
+sent to the trace logger.
+.PP
+Once intiated, the
+.B strlogd
 daemon continues to execute until terminated by the user.  Usually, the
-.B strerr
+.B strlogd
 daemon is executed asynchronously.
 .\"
 .\"
 .SH OPTIONS
 .PP
 .TP
-\fB-a\fR, \fB--admin\fR \fIMAILUID\fR
-Specifies the mail user or alias to which to send all mail messages.  Mail is
-sent to
-.RB \(lq root \(rq
-by default.
-.TP
-\fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
-Specifies a directory to contain the messages.  Default is to search for
-.RB \(lq /var/adm/streams \(rq
-and then
-.RB \(lq /var/log/streams .\(rq
-.TP
 \fB-n\fR, \fB--nodaemon\fR
 Do not daemonize, run in the foreground, print error logs to
 .BR stderr .
-.TP
-\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
-Specify the log file basename.  Default is
-.RB \(lq error \(rq .
-.TP
-\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
-Specifiy the log file output name.  Default is
-.RI \(lq BASENAME . mm-dd \(rq,
-where
-.I mm-dd
-is the current month and day of month.
-When run in th3 foreground, the default is ignored.
-.TP
-\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
-Specify the error file output name.  Default is
-.RI \(lq BASENAME .error\(rq.
-When run in the foreground, the default is ignored.
+This option is most usefull for debugging
+.BR strlogd .
 .TP
 \fB-p\fR, \fB--pidfile\fR \fIPIDFILE\fR
 Specify the pid file output name.  Default is
-.RB \(lq /var/run/strerr.pid .\(rq
-When run in the foreground, the default is ignored.
+.RB \*(lq /var/run/strlogd.pid .\*(rq
+When run in the forground, the default is ignored.
 .TP
 \fB-l\fR, \fB--logdev\fR \fILOGDEVICE\fR
 Specifies the log device.  Default is to search
@@ -182,141 +164,79 @@ and
 .RB \(lq /dev/log .\(rq
 .TP
 \fB-q\fR, \fB--quiet\fR
-Suppresses normal output.
+Suppress normal output.
 .TP
-\fB-D\fR, \fB--debug\fR [\fILEVEL\fr]
+\fB-D\fR, \fB--debug\fR [\fILEVEL\fR]
 Increase or specify the debug output
 .IR LEVEL .
 When a debug
 .I LEVEL
 has been specified,
-.B strerr
+.B strlogd
 will log to
-.BR stdout ,
-prints debug messages to
-.BR stderr ,
+.IR stdout ,
+print debug messages to
+.IR stderr ,
 and will not place itself in the background.
-.TP
+This option may be repeated.
 \fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
-Increase or specify the verbosity
-.I LEVEL
-of the output.  This option may be repeated.
+Increase or specify the output verbosity
+.IR LEVEL .
+This option may be repeated.
 .TP
 \fB-h\fR, \fB--help\fR
-When this options is encountered,
-.B strerr
+When this option is encountered,
+.B strlogd
 displays usage information on
 .I stdout
-and exits.
+and exits.  No further processing of options or arguments is performed and no actions are taken.
 .TP
 \fB-V\fR, \fB--version\fR
 When this option is encountered,
-.B strerr
-displays versions information on
+.B strlogd
+displays version information on
 .I stdout
-and exits.
+and exits.  No further processing of options or arguments is performed and no actions are taken.
 .TP
 \fB-C\fR, \fB--copying\fR
 When this option is encountered,
-.B strerr
-displays copying and copyright information on
+.B strlogd
+displays copying information on
 .I stdout
-and exits.
-.\"
-.\"
-.SH "FILE FORMAT"
-.PP
-The format of an error log message is:
-.RB < seq "> <" time "> <" ticks "> <" flags "> <" mid "> <" sud "> <" text >
-These fields are defined as follows:
-.TP
-.RB < seq >
-Error sequence number.
-.TP
-.RB < time >
-Time of the message in hh:mm:ss.
-.TP
-.RB < ticks >
-Time of the message in machine ticks since boot priority level.
-.TP
-.RB < flags >
-One of the following values:
-.RS
-.TP
-.B T
-The message was also sent to a tracing process.
-.TP
-.B F
-Indicates a fatal error.
-.TP
-.B N
-Send mail to the person who administers your system.
-.RE
-.TP
-.RB < mid >
-Module ID number of source.
-.TP
-.RB < sud >
-Sub-ID number of source.
-.TP
-.RB < text >
-Formatted text of the error message.
-On multiprocessor systems,
-.RB < text >
-is composed of two parts:
-.RS
-.IP \(bu
-the number of processors where the owner of the message has sent it.
-.IP \(bu
-the formatted text itself.
-.RE
+and exits.  No further processing of options or arguments is performed and no actions are taken.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
-An exit status of zero (0) indicates that the command was successful; one (1)
-indicates that an error occurred and a diagnostic message is printed on
-.BR stderr ;
-two (2) indicates that the option syntax was in error and a diagnostic message
-is printed on
-.BR stderr .
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.RB ( 1 )
+indicates that an error occured and a diagnostic message is printed on
+.IR stderr ;
+two
+.RB ( 2 )
+indicates that the options syntax was in error and a diagnostic message is printed on
+.IR stderr .
 .PP
 The
 .B --quiet
 option suppresses the printing of diagnostic messages to
-.BR stderr .
-.\"
-.\"
-.SH SIGNALS
-.PP
-.B strerr
-catches the
-.B SIGHUP
-signal
-.RB "(see " signal (7)).
-.TP
-.B SIGHUP
-When the
-.B SIGHUP
-signal is caught,
-.B strerr
-will close the current log file and open a new (or reopen the existing) log
-file.  This is for use with
-.BR logrotate (8).
+.IR stderr .
 .\"
 .\"
 .SH NOTICES
 .PP
 Only one
-.BR strerr
+.B strlogd
 daemon at a time is permitted to open the
 .I STREAMS
-log driver.  If a module or driver is generating a large number of error
-messages, running the error logger causes a degradation in
+log driver as a console logger.  If a module or driver is generating a large number of error
+messages, running the console logger causes a degredation in
 .I STREAMS
-performance.  If a large number of messages are generated in a short time, the
-log driver any not be able to deliver some of the messages.  This situation is
-indicated by gaps in the sequence numbering of the messages in the log files.
+performance.  If a large number of messages are generated in a short time, the log driver may not be
+able to deliver some messages.  This situation is indicated by gaps in the sequence numbering of the
+messages in the log files.
 .\"
 .\"
 .\".SH EXAMPLES
@@ -326,25 +246,20 @@ indicated by gaps in the sequence numbering of the messages in the log files.
 .SH DEVICES
 .PP
 .TP
-.BR /dev/strlog ", " /dev/streams/log " or " /dev/log
+.BR /dev/strlog ", " /dev/streams/strlog
 the
 .I STREAMS
-logging device.
+logging device.  See
+.BR strlog (4).
 .\"
 .\"
 .SH FILES
 .PP
 .TP
-.B /usr/sbin/strerr
+.B /usr/sbin/strlogd
 contains the
-.B strerr
+.B strlogd
 command.
-.TP
-.BR /var/log/streams " or " /var/adm/streams
-directory containing the error log files.
-.TP
-.BI /var/log/streams/error. "mm-dd \fR or " /var/adm/streams/error. mm-dd
-error log file.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -352,48 +267,43 @@ error log file.
 .BR log (4),
 .BR strlog (4),
 .BR strlog (9),
+.BR strlog (1),
+.BR strerr (8),
 .BR strace (8),
-.BR strclean (8).
+.BR syslogd (8),
+.BR syslog (3).
 .\"
 .\"
 .SH BUGS
 .PP
-.B strerr
+.BR strlogd
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B strerr
-is compatible with
+.B strlogd
+is compatible with implementations of
+.BR syslogd
+on
 .IR "SVR 4.2" ,
 and systems based on
-.B "SVR 4.2"
+.IR "SVR 4.2" ,
 such as
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR SUPER-UX \(rg
 and
-.IR UXP/V \(rg
+.IR UnixWare \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Options
-.BR -n ", " -b ", " -o ", " -e ", " -p " and " -l
-and all long options, are specific to this
+All long options are specific to this
 .I @PACKAGE_TITLE@
-.[
-lfs
-.]
 implementation of
-.B strerr
+.BR strlogd
 and should not be used by portable applications.
-.IP \(em
-No other implementation documents the
-.BR -q ", " -D ", " -v ", " -h ", " -V " or " -C
-options.
-They should not be used by portable applications.
 .IP \(em
 Options
 .BR --help " and " --version
@@ -402,36 +312,17 @@ are provided for compatibility with GNU coding standards;
 OpenSS7 coding standards.
 .IP \(em
 .IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR SUPER-UX \(rg
 and
-.IR UXP/V \(rg
-do not document the
-.BR -a " or " -d
-options;
-.IR HP-UX \(rg
-and
-.IR OSF/1 \(rg
-do.
-.IP \(em
-All other implementations document the log file directory as
-.B /var/adm/streams
-instead of
-.BR /var/log/streams .
-.B /var/log/streams
-is used under
-.B Linux
-for compatibility with the
-.BR "Linux File Standard" .
-For compatibility,
-.B strerr
-first checks if the directory
-.B /var/adm/streams
-exists, and then creates
-.B /var/log/streams
-if necessary, unless a directory is specified with the
-.B -d
-option.
+.IR UnixWare \(rg,
+do not document this daemon directly, on these systems the functions performed by the
+.B strlogd
+daemon are described as being performed by the
+.BR syslogd (8)
+daemon.
 .IP \(em
 Under
 .IR "SVR 4.2"
@@ -461,14 +352,14 @@ error logger is called
 instead of
 .BR /dev/strlog .
 For compatibility with these operating environments,
-.B strerr
+.B strlogd
 attempts to open
 .BR /dev/streams/log ", " /dev/strlog " and then " /dev/log
 if not specified with the
 .B -l
 option.
 The call to
-.B strerr
+.B strlogd
 will fail if there is no
 .IR STREAMS -based
 log device in this search sequence, or specified with the
@@ -477,6 +368,7 @@ option.
 .\"
 .\"
 .SH CONFORMANCE
+.PP
 .PP
 .IR "SVR 4.2" ;
 .[
@@ -516,12 +408,10 @@ uxpdoc
 .\"
 .SH HISTORY
 .PP
-.B strerr
-first appear in
-.IR "SVR 4" .
-.[
-svr4
-.]
+.B strlogd
+is new for the
+.I @PACAKGE_TITLE@
+package.
 .\"
 .\"
 .[

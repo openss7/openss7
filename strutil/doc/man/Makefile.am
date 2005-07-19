@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/17 08:01:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/19 11:15:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/17 08:01:19 $ by $Author: brian $
+# Last Modified $Date: 2005/07/19 11:15:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,7 @@ if PKG_BUILD_INDEP
 man_MANS = \
 	man1/strchg.1 \
 	man1/strconf.1 \
+	man1/strlog.1 \
 	man1/strreset.1 \
 	man3/pipe.3 \
 	man3/s_pipe.3 \
@@ -93,12 +94,14 @@ man_MANS = \
 	man8/strerr.8 \
 	man8/strinfo.8 \
 	man8/strload.8 \
+	man8/strlogd.8 \
 	man8/strsetup.8 \
 	man8/strvf.8
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \
 	man1/strconf.1.man \
+	man1/strlog.1.man \
 	man1/strreset.1.man \
 	man3/pipe.3.man \
 	man3/s_pipe.3.man \
@@ -132,6 +135,7 @@ dist_noinst_MANS = \
 	man8/strerr.8.man \
 	man8/strinfo.8.man \
 	man8/strload.8.man \
+	man8/strlogd.8.man \
 	man8/strsetup.8.man \
 	man8/strvf.8.man
 

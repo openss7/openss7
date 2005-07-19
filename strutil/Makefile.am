@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 16:33:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/19 11:15:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/18 16:33:55 $ by $Author: brian $
+# Last Modified $Date: 2005/07/19 11:15:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,12 +94,14 @@ sbin_PROGRAMS			= \
 				  strace \
 				  strerr \
 				  strinfo \
+				  strlogd \
 				  strvf \
 				  @PACKAGE_TARNAME@_mknod
 
 bin_PROGRAMS			= \
 				  strchg \
 				  strconf \
+				  strlog \
 				  strreset
 
 dist_sbin_SCRIPTS		= \
@@ -129,6 +131,12 @@ strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strconf_LDADD			= $(STREAMS_LDADD)
 strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
+
+strlog_SOURCES			= src/util/strlog.c
+strlog_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strlog_LDADD			= $(STREAMS_LDADD) -lrt
+strlog_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+strlog_CFLAGS			= $(USER_CFLAGS)
 
 strreset_SOURCES		= src/util/strreset.c
 strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -207,6 +215,12 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 
 #@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
 #	touch $@
+
+strlogd_SOURCES			= src/util/strlogd.c
+strlogd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+strlogd_LDADD			= $(STREAMS_LDADD)
+strlogd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+strlogd_CFLAGS			= $(USER_CFLAGS)
 
 #strsetup_SOURCES		= src/util/strsetup.c
 #strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -585,7 +599,8 @@ if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/strace.sh \
-				  src/util/init/strerr.sh
+				  src/util/init/strerr.sh \
+				  src/util/init/strlogd.sh
 
 ## WITH_RCSD_DIRECTORY
 else
@@ -593,18 +608,21 @@ else
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/strace \
-				  src/util/init/strerr
+				  src/util/init/strerr \
+				  src/util/init/strlogd
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
 dist_sysconf_DATA		= \
 				  strsetup.conf \
-				  strload.conf
+				  strload.conf \
+				  strlogd.conf
 
 dist_config_DATA		= \
 				  src/util/sysconfig/strace \
-				  src/util/sysconfig/strerr
+				  src/util/sysconfig/strerr \
+				  src/util/sysconfig/strlogd
 
 ## INSTALL_INITSCRIPTS
 endif
