@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 16:15:23 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/20 13:02:41 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,23 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 16:15:23 $ by $Author: brian $
+ Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 16:15:23 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/20 13:02:41 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 16:15:23 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/20 13:02:41 $";
 
-/* 
- *  AIX Utility: strace - Prints STREAMS trace messages.
+/*
+ *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
  */
 
 #define _XOPEN_SOURCE 600
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stropts.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -71,20 +72,49 @@ static char const ident[] =
 #include <sys/types.h>
 #include <ctype.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/poll.h>
+#include <sys/time.h>
 #include <sys/ioctl.h>
-
+#include <fcntl.h>
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
-
 #include <time.h>
-#include <stropts.h>
-#include <sys/strlog.h>
+#include <signal.h>
 #include <syslog.h>
+#include <sys/utsname.h>
+#include <sys/strlog.h>
 
-static int debug = 0;
-static int output = 1;
+const char *program = "strace";
+const char *loggername = "trace";
+
+static int nomead = 0;			/* default foreground mode */
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
+
+int strlog_fd = -1;
+
+char outfile[256] = "";
+char errfile[256] = "";
+char outpath[256] = "";
+char errpath[256] = "";
+char basname[256] = "";
+char cfgfile[256] = "";
+char outpdir[256] = "/var/log/streams";
+char devname[256] = "";
+char mailuid[256] = "";
+char pidfile[256] = "";
+
+/* search path for log devices */
+static const char *logdevices[] = {
+	"/dev/streams/strlog",
+	"/dev/streams/log",
+	"/dev/strlog",
+	"/dev/log",
+	NULL
+};
+
+#define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 
 #define FLAG_ZEROPAD	(1<<0)	/* pad with zero */
 #define FLAG_SIGN	(1<<1)	/* unsigned/signed long */
@@ -115,17 +145,19 @@ static int output = 1;
  *  This function prints a formatted number to a file pointer.  It is largely
  *  taken from /usr/src/linux/lib/vsprintf.c
  */
-static void
-number(FILE * fp, long long num, int base, int width, int decimal, int flags)
+static int
+number(char *sbuf, const char *end, long long num, int base, int width, int decimal, int flags)
 {
 	char sign;
 	int i;
+	char *str;
 	char tmp[66];
 
+	str = sbuf;
 	if (flags & FLAG_LEFT)
 		flags &= ~FLAG_ZEROPAD;
 	if (base < 2 || base > 16)
-		return;
+		goto done;
 	sign = '\0';
 	if (flags & FLAG_SIGN) {
 		if (num < 0) {
@@ -167,67 +199,99 @@ number(FILE * fp, long long num, int base, int width, int decimal, int flags)
 		decimal = i;
 	width -= decimal;
 	if (!(flags & (FLAG_ZEROPAD | FLAG_LEFT)))
-		while (width-- > 0)
-			fputc(' ', fp);
-	if (sign != '\0')
-		fputc(sign, fp);
+		while (width-- > 0) {
+			*str = ' ';
+			if (++str >= end)
+				goto done;
+		}
+	if (sign != '\0') {
+		*str = sign;
+		if (++str >= end)
+			goto done;
+	}
 	if (flags & FLAG_SPECIAL) {
 		switch (base) {
 		case 8:
-			fputc('0', fp);
+			*str = '0';
+			if (++str >= end)
+				goto done;
 			break;
 		case 16:
-			fputc('0', fp);
+			*str = '0';
+			if (++str >= end)
+				goto done;
 			if (flags & FLAG_LARGE)
-				fputc('X', fp);
+				*str = 'X';
 			else
-				fputc('x', fp);
+				*str = 'x';
+			if (++str >= end)
+				goto done;
 			break;
 		}
 	}
 	if (!(flags & FLAG_LEFT)) {
 		char pad = (flags & FLAG_ZEROPAD) ? '0' : ' ';
 
-		while (width-- > 0)
-			fputc(pad, fp);
+		while (width-- > 0) {
+			*str = pad;
+			if (++str >= end)
+				goto done;
+		}
 	}
-	while (i < decimal--)
-		fputc('0', fp);
-	while (i-- > 0)
-		fputc(tmp[i], fp);
-	while (width-- > 0)
-		fputc(' ', fp);
-	return;
+	while (i < decimal--) {
+		*str = '0';
+		if (++str >= end)
+			goto done;
+	}
+	while (i-- > 0) {
+		*str = tmp[i];
+		if (++str >= end)
+			goto done;
+	}
+	while (width-- > 0) {
+		*str = ' ';
+		if (++str >= end)
+			goto done;
+	}
+      done:
+	return (str - sbuf);
 }
 
 /*
- *  This function does an fprintf from the buffer using a slight variation of
- *  the fprintf that is identical to that used inside the kernel.  There are
+ *  This function does an snprintf from the buffer using a slight variation of
+ *  the snprintf that is identical to that used inside the kernel.  There are
  *  some constructs that are not supported.  Also, the kernel passes a format
  *  string followed by the arguments on the next word aligned boundary, and this
  *  is what is necessary to format them.
  *
  *  This function is largely adapted from /usr/src/linux/lib/vsprintf.c
  */
-static void
-fprintf_text(FILE * fp, const char *buf, int len)
+static int
+snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 {
-	const char *fmt, *args, *end;
+	const char *fmt, *args, *aend, *end;
+	char *str;
 	char type;
 	size_t flen, plen;
 	int flags = 0, width = -1, decimal = -1, base = 10;
 
+	if (slen == 0)
+		return (0);
 	fmt = buf;
 	flen = strnlen(fmt, len);
 	plen = PROMOTE_ALIGN(flen + 1);
 	args = &buf[plen];
-	end = buf + len;
+	aend = buf + len;
+	str = sbuf;
+	end = str + slen - 1;	/* room for null */
 	for (; *fmt; ++fmt) {
 		const char *pos;
 		unsigned long long num = 0;
 
 		if (*fmt != '%') {
-			fputc(*fmt, fp);
+			*str = *fmt;
+			if (++str >= end)
+				goto done;
 			continue;
 		}
 		pos = fmt;	/* remember position of % */
@@ -258,7 +322,7 @@ fprintf_text(FILE * fp, const char *buf, int len)
 			for (width = 0; isdigit(*fmt); width *= 10, width += (*fmt - '0')) ;
 		else if (*fmt == '*') {
 			++fmt;
-			if (args + PROMOTE_SIZEOF(int) <= end) {
+			if (args + PROMOTE_SIZEOF(int) <= aend) {
 				width = PROMOTE_ARGVAL(int, args);
 
 				if (width < 0) {
@@ -266,7 +330,7 @@ fprintf_text(FILE * fp, const char *buf, int len)
 					flags |= FLAG_LEFT;
 				}
 			} else
-				args = end;
+				args = aend;
 		}
 		/* get the decimal precision */
 		if (*fmt == '.') {
@@ -275,13 +339,13 @@ fprintf_text(FILE * fp, const char *buf, int len)
 				for (decimal = 0; isdigit(*fmt);
 				     decimal *= 10, decimal += (*fmt - '0')) ;
 			else if (*fmt == '*') {
-				if (args + PROMOTE_SIZEOF(int) <= end) {
+				if (args + PROMOTE_SIZEOF(int) <= aend) {
 					decimal = PROMOTE_ARGVAL(int, args);
 
 					if (decimal < 0)
 						decimal = 0;
 				} else
-					args = end;
+					args = aend;
 			}
 		}
 		/* get conversion type */
@@ -318,16 +382,24 @@ fprintf_text(FILE * fp, const char *buf, int len)
 			char c = ' ';
 
 			if (!(flags & FLAG_LEFT))
-				while (--width > 0)
-					fputc(' ', fp);
-			if (args + PROMOTE_SIZEOF(char) <= end)
+				while (--width > 0) {
+					*str = ' ';
+					if (++str >= end)
+						goto done;
+				}
+			if (args + PROMOTE_SIZEOF(char) <= aend)
 				 c = PROMOTE_ARGVAL(char, args);
 
 			else
-				args = end;
-			fputc(c, fp);
-			while (--width > 0)
-				fputc(' ', fp);
+				args = aend;
+			*str = c;
+			if (++str >= end)
+				goto done;
+			while (--width > 0) {
+				*str = ' ';
+				if (++str >= end)
+					goto done;
+			}
 			continue;
 		}
 		case 's':
@@ -337,28 +409,39 @@ fprintf_text(FILE * fp, const char *buf, int len)
 			size_t len = 0, plen = 0;
 
 			s = args;
-			if (args < end) {
+			if (args < aend) {
 				len = strlen(s);
 				plen = PROMOTE_ALIGN(len + 1);
 			} else
-				args = end;
-			if (args + plen <= end)
+				args = aend;
+			if (args + plen <= aend)
 				args += plen;
 			else
-				args = end;
-			if (len > (size_t)decimal)
-				len = (size_t)decimal;
+				args = aend;
+			if (len > (size_t) decimal)
+				len = (size_t) decimal;
 			if (!(flags & FLAG_LEFT))
-				while (len < width--)
-					fputc(' ', fp);
-			for (i = 0; i < len; ++i, ++s)
-				fputc(*s, fp);
-			while (len < width--)
-				fputc(' ', fp);
+				while (len < width--) {
+					*str = ' ';
+					if (++str >= end)
+						goto done;
+				}
+			for (i = 0; i < len; ++i, ++s) {
+				*str = *s;
+				if (++str >= end)
+					goto done;
+			}
+			while (len < width--) {
+				*str = ' ';
+				if (++str >= end)
+					goto done;
+			}
 			continue;
 		}
 		case '%':
-			fputc('%', fp);
+			*str = '%';
+			if (++str >= end)
+				goto done;
 			continue;
 		case 'p':
 		case 'o':
@@ -392,90 +475,99 @@ fprintf_text(FILE * fp, const char *buf, int len)
 			}
 			switch (type) {
 			case 'c':	/* really 'hh' type */
-				if (args + PROMOTE_SIZEOF(unsigned char) <= end)
+				if (args + PROMOTE_SIZEOF(unsigned char) <= aend)
 					 num = PROMOTE_ARGVAL(unsigned char, args);
 
 				else
-					args = end;
+					args = aend;
 				if (flags & FLAG_SIGN)
 					num = (signed char) num;
 				break;
 			case 'h':
-				if (args + PROMOTE_SIZEOF(unsigned short) <= end)
+				if (args + PROMOTE_SIZEOF(unsigned short) <= aend)
 					 num = PROMOTE_ARGVAL(unsigned short, args);
 
 				else
-					args = end;
+					args = aend;
 				if (flags & FLAG_SIGN)
 					num = (signed short) num;
 				break;
 			case 'p':	/* really 'p' conversion */
-				if (args + PROMOTE_SIZEOF(uintptr_t) <= end)
+				if (args + PROMOTE_SIZEOF(uintptr_t) <= aend)
 					num = PROMOTE_ARGVAL(uintptr_t, args);
 				else
-					args = end;
+					args = aend;
 				flags &= ~FLAG_SIGN;
 				break;
 			case 'l':
-				if (args + PROMOTE_SIZEOF(unsigned long) <= end)
+				if (args + PROMOTE_SIZEOF(unsigned long) <= aend)
 					 num = PROMOTE_ARGVAL(unsigned long, args);
 
 				else
-					args = end;
+					args = aend;
 				if (flags & FLAG_SIGN)
 					num = (signed long) num;
 				break;
 			case 'q':
 			case 'L':	/* really 'll' type */
-				if (args + PROMOTE_SIZEOF(unsigned long long) <= end)
+				if (args + PROMOTE_SIZEOF(unsigned long long) <= aend)
 					 num = PROMOTE_ARGVAL(unsigned long long, args);
 
 				else
-					args = end;
+					args = aend;
 				if (flags & FLAG_SIGN)
 					num = (signed long long) num;
 				break;
 			case 'Z':
 			case 'z':
-				if (args + PROMOTE_SIZEOF(size_t) <= end)
+				if (args + PROMOTE_SIZEOF(size_t) <= aend)
 					 num = PROMOTE_ARGVAL(size_t, args);
 
 				else
-					args = end;
+					args = aend;
 				if (flags & FLAG_SIGN)
 					num = (ssize_t) num;
 				break;
 			case 't':
-				if (args + PROMOTE_SIZEOF(ptrdiff_t) <= end)
+				if (args + PROMOTE_SIZEOF(ptrdiff_t) <= aend)
 					num = PROMOTE_ARGVAL(ptrdiff_t, args);
 				else
-					args = end;
+					args = aend;
 				break;
 			default:
-				if (args + PROMOTE_SIZEOF(unsigned int) <= end)
+				if (args + PROMOTE_SIZEOF(unsigned int) <= aend)
 					 num = PROMOTE_ARGVAL(unsigned int, args);
 
 				else
-					args = end;
+					args = aend;
 				if (flags & FLAG_SIGN)
 					num = (signed int) num;
 				break;
 			}
-			number(fp, num, base, width, decimal, flags);
+			str += number(str, end, num, base, width, decimal, flags);
+			if (str >= end)
+				goto done;
 			continue;
 		case '\0':
-			fputc('%', fp);	/* put the original % back */
-			/* put the bad format characters */
-			for (; fmt > pos; fputc(*pos, fp), pos++) ;
-			break;
 		default:
-			fputc('%', fp);	/* put the original % back */
+			*str = '%';	/* put the original % back */
+			if (++str >= end)
+				goto done;
 			/* put the bad format characters */
-			for (; fmt > pos; fputc(*pos, fp), pos++) ;
+			for (; fmt > pos; pos++) {
+				*str = *pos;
+				if (++str >= end)
+					goto done;
+			}
+			if (*fmt == '\0')
+				break;
 			continue;
 		}
 		break;
 	}
+      done:
+	*str = '\0';
+	return (str - sbuf);
 }
 
 static void
@@ -525,9 +617,25 @@ Arguments:\n\
     PRIORITY\n\
         the maximum priority of messages to display\n\
 Options:\n\
+    -a, --admin MAILID\n\
+        specify a mail address for notifications, default: 'root'\n\
+    -n, --noforeground\n\
+        daemonize, do not run in the foreground, default: foreground\n\
+    -d, --directory DIRECTORY\n\
+        specify a directory for log files, default: '/var/log/streams'\n\
+    -b, --basename BASENAME\n\
+        file basename, default: '%3$s'\n\
+    -o, --outfile OUTFILE\n\
+        redirect output to OUTFILE, default: ${BASENAME}.mm-dd\n\
+    -e, --errfile ERRFILE\n\
+        redirect errors to ERRFILE, default: ${BASENAME}.errors\n\
+    -p, --pidfile PIDFILE\n\
+        when running as daemon, output pid to PIDFILE, default: /var/run/%2$s.pid\n\
+    -l, --logdev LOGDEVICE\n\
+        log device to open, default: '/dev/strlog'\n\
     -q, --quiet\n\
         suppress output\n\
-    -d, --debug [LEVEL]\n\
+    -D, --debug [LEVEL]\n\
         increase or set debugging verbosity\n\
     -v, --verbose [LEVEL]\n\
         increase or set output verbosity\n\
@@ -537,7 +645,7 @@ Options:\n\
         prints the version and exits\n\
     -C, --copying\n\
         prints copying permissions and exits\n\
-", argv[0]);
+", argv[0], program, loggername);
 }
 
 static void
@@ -587,13 +695,345 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
+/* events */
+enum {
+	STRLOG_NONE = 0,
+	STRLOG_SUCCESS = 0,
+	STRLOG_TIMEOUT,
+	STRLOG_PCPROTO,
+	STRLOG_PROTO,
+	STRLOG_DATA,
+	STRLOG_FAILURE = -1,
+};
+
+int
+sig_register(int signum, RETSIGTYPE(*handler) (int))
+{
+	sigset_t mask;
+	struct sigaction act;
+
+	act.sa_handler = handler ? handler : SIG_DFL;
+	act.sa_flags = handler ? SA_RESTART : 0;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(signum, &act, NULL))
+		return STRLOG_FAILURE;
+	sigemptyset(&mask);
+	sigaddset(&mask, signum);
+	sigprocmask(handler ? SIG_UNBLOCK : SIG_BLOCK, &mask, NULL);
+	return STRLOG_SUCCESS;
+}
+
+int alm_signal = 0;
+int hup_signal = 0;
+int trm_signal = 0;
+
+RETSIGTYPE
+alm_handler(int signum)
+{
+	alm_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+
+int
+alm_catch(void)
+{
+	return sig_register(SIGALRM, &alm_handler);
+}
+
+int
+alm_block(void)
+{
+	return sig_register(SIGALRM, NULL);
+}
+
+int
+alm_action(void)
+{
+	alm_signal = 0;
+	return (0);
+}
+
+RETSIGTYPE
+hup_handler(int signum)
+{
+	hup_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+
+int
+hup_catch(void)
+{
+	return sig_register(SIGALRM, &hup_handler);
+}
+
+int
+hup_block(void)
+{
+	return sig_register(SIGALRM, NULL);
+}
+
+int
+hup_action(void)
+{
+	hup_signal = 0;
+	syslog(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
+	if (output > 1)
+		syslog(MY_FACILITY(LOG_NOTICE), "Reopening output file %s", outpath);
+	if (outpath[0] != '\0') {
+		fflush(stdout);
+		fclose(stdout);
+		if (freopen(outpath, "a", stdout) == NULL) {
+			syslog(MY_FACILITY(LOG_ERR), "%m");
+			syslog(MY_FACILITY(LOG_ERR), "Could not reopen stdout file %s", outpath);
+		}
+		// output_header(void);
+	}
+	if (output > 1)
+		syslog(MY_FACILITY(LOG_NOTICE), "Reopening error file %s", errpath);
+	if (errpath[0] != '\0') {
+		fflush(stderr);
+		fclose(stderr);
+		if (freopen(errpath, "a", stderr) == NULL) {
+			syslog(MY_FACILITY(LOG_ERR), "%m");
+			syslog(MY_FACILITY(LOG_ERR), "Could not reopen stderr file %s", errpath);
+		}
+	}
+	return (0);
+}
+
+RETSIGTYPE
+trm_handler(int signum)
+{
+	trm_signal = 1;
+	return (RETSIGTYPE) (0);
+}
+
+int
+trm_catch(void)
+{
+	return sig_register(SIGALRM, &trm_handler);
+}
+
+int
+trm_block(void)
+{
+	return sig_register(SIGALRM, NULL);
+}
+
+void strlog_exit(int retval);
+
+int
+trm_action(void)
+{
+	trm_signal = 0;
+	syslog(MY_FACILITY(LOG_WARNING), "%s: Caught SIGTERM, shutting down", program);
+	strlog_exit(0);
+	return (0);		/* should be no return */
+}
+
+void
+sig_catch(void)
+{
+	alm_catch();
+	hup_catch();
+	trm_catch();
+}
+
+void
+sig_block(void)
+{
+	alm_block();
+	hup_block();
+	trm_block();
+}
+
+int
+start_timer(long duration)
+{
+	struct itimerval setting = {
+		{0, 0},
+		{duration / 1000, (duration % 1000) * 1000}
+	};
+
+	if (alm_catch())
+		return STRLOG_FAILURE;
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return STRLOG_FAILURE;
+	alm_signal = 0;
+	return STRLOG_SUCCESS;
+}
+
+void
+strlog_exit(int retval)
+{
+	syslog(MY_FACILITY(LOG_NOTICE), "%s: Exiting %d", program, retval);
+	fflush(stdout);
+	fflush(stderr);
+	sig_block();
+	closelog();
+	exit(retval);
+}
+
+void
+strlog_enter(int argc, char *argv[])
+{
+	if (nomead) {
+		pid_t pid;
+
+		if ((pid = fork()) < 0) {
+			perror(argv[0]);
+			exit(2);
+		} else if (pid != 0) {
+			/* parent exits */
+			exit(0);
+		}
+		setsid();	/* become a session leader */
+		/* fork once more for SVR4 */
+		if ((pid = fork()) < 0) {
+			perror(argv[0]);
+			exit(2);
+		} else if (pid != 0) {
+			if (nomead || pidfile[0] != '\0') {
+				FILE *pidf;
+
+				/* initialize default filename */
+				if (pidfile[0] == '\0')
+					snprintf(pidfile, sizeof(pidfile), "/var/run/%s.pid",
+						 program);
+				if (output > 1)
+					syslog(MY_FACILITY(LOG_NOTICE),
+					       "%s: Writing daemon pid to file %s", program,
+					       pidfile);
+				if ((pidf = fopen(pidfile, "w+"))) {
+					fprintf(pidf, "%d", (int) pid);
+					fflush(pidf);
+					fclose(pidf);
+				} else {
+					syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
+					syslog(MY_FACILITY(LOG_ERR),
+					       "%s: Could not write pid to file %s", program,
+					       pidfile);
+					strlog_exit(2);
+				}
+			}
+			/* parent exits */
+			exit(0);
+		}
+		/* release current directory */
+		if (chdir("/") < 0) {
+			perror(argv[0]);
+			exit(2);
+		}
+		umask(0);	/* clear file creation mask */
+		/* rearrange file streams */
+		fclose(stdin);
+	}
+	/* continue as foreground or background */
+	openlog(NULL, LOG_CONS | LOG_NDELAY | (nomead ? 0 : LOG_PERROR), MY_FACILITY(0));
+	if (basname[0] == '\0')
+		snprintf(basname, sizeof(basname), loggername);
+	if (nomead || outfile[0] != '\0') {
+		struct tm tm;
+		time_t curtime;
+
+		time(&curtime);
+		localtime_r(&curtime, &tm);
+		/* initialize default filename */
+		if (outfile[0] == '\0')
+			snprintf(outpath, sizeof(outpath), "%s/%s.%02d-%02d", outpdir, basname,
+				 tm.tm_mon, tm.tm_mday);
+		else
+			snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
+		if (output > 1)
+			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stdout to file %s",
+			       program, outpath);
+		fflush(stdout);
+		if (freopen(outpath, "a", stdout) == NULL) {
+			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
+			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stdout to %s", program,
+			       outpath);
+			strlog_exit(2);
+		}
+	}
+	if (nomead || errfile[0] != '\0') {
+		/* initialize default filename */
+		if (errfile[0] == '\0')
+			snprintf(errpath, sizeof(errpath), "%s/%s.errors", outpdir, basname);
+		else
+			snprintf(errpath, sizeof(errpath), "%s/%s", outpdir, errfile);
+		if (output > 1)
+			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stderr to file %s",
+			       program, errpath);
+		fflush(stderr);
+		if (freopen(errpath, "a", stderr) == NULL) {
+			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
+			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stderr to %s", program,
+			       errpath);
+			strlog_exit(2);
+		}
+	}
+	sig_catch();
+	// output_header();
+	syslog(MY_FACILITY(LOG_NOTICE), "%s: Startup complete.", program);
+}
+
+void
+strlog_open(int argc, char *argv[], struct trace_ids *tids, size_t count)
+{
+	struct strioctl ioc;
+
+	/* open log device */
+	if (devname[0] == '\0') {
+		const char **dev;
+
+		/* search if not specified */
+		if (debug)
+			fprintf(stderr, "%s: searching for log device\n", argv[0]);
+		for (dev = logdevices; (*dev); dev++) {
+			if (debug)
+				fprintf(stderr, "%s: trying device %s\n", argv[0], (*dev));
+			if ((strlog_fd = open((*dev), O_RDWR)) == 0)
+				break;
+		}
+		if ((*dev) == NULL) {
+			perror(argv[0]);
+			strlog_exit(1);
+		}
+	} else {
+		if (debug)
+			fprintf(stderr, "%s: opening specified device %s\n", argv[0], devname);
+		if ((strlog_fd = open(devname, O_RDWR)) < 0) {
+			perror(argv[0]);
+			strlog_exit(1);
+		}
+	}
+	if (debug)
+		fprintf(stderr, "%s: success\n", argv[0]);
+	/* setup log device for logging */
+	ioc.ic_cmd = I_TRCLOG;
+	ioc.ic_timout = 0;
+	ioc.ic_len = count * sizeof(struct trace_ids);
+	ioc.ic_dp = (char *) tids;
+	if (debug)
+		fprintf(stderr, "%s: performing ioctl on log device\n", argv[0]);
+	if (ioctl(strlog_fd, I_STR, &ioc) < 0) {
+		perror(argv[0]);
+		strlog_exit(1);
+	}
+	if (debug)
+		fprintf(stderr, "%s: success\n", argv[0]);
+}
+
+void
+strlog_close(int argc, char *argv[])
+{
+	if (close(strlog_fd) < 0)
+		perror(argv[0]);
+}
+
 int
 main(int argc, char *argv[])
 {
-	int i, fd, count;
-	struct trace_ids *tids;
-	struct strioctl ic;
-
 	while (1) {
 		int c, val;
 
@@ -601,8 +1041,16 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"admin",	required_argument,	NULL, 'a'},
+			{"noforeground",no_argument,		NULL, 'n'},
+			{"directory",	required_argument,	NULL, 'd'},
+			{"basename",	required_argument,	NULL, 'b'},
+			{"outfile",	required_argument,	NULL, 'o'},
+			{"errfile",	required_argument,	NULL, 'e'},
+			{"pidfile",	required_argument,	NULL, 'p'},
+			{"logdev",	required_argument,	NULL, 'l'},
 			{"quiet",	no_argument,		NULL, 'q'},
-			{"debug",	optional_argument,	NULL, 'd'},
+			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
@@ -612,9 +1060,10 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "qdvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
+				     &option_index);
 #else
-		c = getopt(argc, argv, "qdvhVC?");
+		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
 #endif
 		if (c == -1) {
 			if (debug)
@@ -622,22 +1071,56 @@ main(int argc, char *argv[])
 			break;
 		}
 		switch (c) {
+		case 'n':	/* -n, --noforeground */
+			if (debug)
+				fprintf(stderr, "%s: suppressing deamon mode\n", argv[0]);
+			nomead = 1;
+			break;
+		case 'a':	/* -a, --admin MAILID */
+			if (debug)
+				fprintf(stderr, "%s: setting mail id to %s\n", argv[0], optarg);
+			strncpy(mailuid, optarg, 256);
+			break;
+		case 'd':	/* -d, --directory DIRECTORY */
+			strncpy(outpdir, optarg, 256);
+			break;
+		case 'b':	/* -b, --basename BASNAME */
+			strncpy(basname, optarg, 256);
+			break;
+		case 'o':	/* -o, --outfile OUTFILE */
+			strncpy(outfile, optarg, 256);
+			break;
+		case 'e':	/* -e, --errfile ERRFILE */
+			strncpy(errfile, optarg, 256);
+			break;
+		case 'p':	/* -p, --pidfile PIDFILE */
+			if (debug)
+				fprintf(stderr, "%s: setting pid file to %s\n", argv[0], optarg);
+			strncpy(pidfile, optarg, 256);
+			break;
+		case 'l':	/* -l, --logdev DEVNAME */
+			if (debug)
+				fprintf(stderr, "%s: setting device name to %s\n", argv[0], optarg);
+			strncpy(devname, optarg, 256);
+			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
 			output = 0;
 			debug = 0;
 			break;
-		case 'd':	/* -d, --debug [LEVEL] */
+		case 'D':	/* -D, --debug [LEVEL] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
-				break;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
 			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			debug = val;
+			if (debug)
+				nomead = 0;
 			break;
 		case 'v':	/* -v, --verbose [LEVEL] */
 			if (debug)
@@ -687,119 +1170,144 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	if (optind == argc) {
-		count = 1;
-		if ((tids = calloc(count, sizeof(struct trace_ids))) == NULL) {
-			perror(argv[0]);
-			exit(1);
-		}
-		tids->ti_mid = -1;
-		tids->ti_sid = -1;
-		tids->ti_level = -1;
-		tids->ti_flags = -1;
-	} else if (optind < argc && (argc - optind) % 3 == 0) {
-		count = (argc - optind) / 3;
-		if ((tids = calloc(count, sizeof(struct trace_ids))) == NULL) {
-			perror(argv[0]);
-			exit(1);
-		}
-		for (i = 0; i < count; i++) {
-			if (strncmp(argv[optind], "all", 4)) {
-				tids[i].ti_mid = -1;
-			} else {
-			}
-			optind++;
-			if (strncmp(argv[optind], "all", 4)) {
-				tids[i].ti_sid = -1;
-			} else {
-			}
-			optind++;
-			if (strncmp(argv[optind], "all", 4)) {
-				tids[i].ti_level = -1;
-			} else {
-			}
-			optind++;
-			tids[i].ti_flags = -1;
-		}
-	} else
-		goto bad_nonopt;
-	/* open log device */
-	if ((fd = open("/dev/strlog", O_RDWR)) < 0) {
-		if ((fd = open("/dev/streams/log", O_RDWR)) < 0) {
-			if ((fd = open("/dev/log", O_RDWR)) < 0) {
+	{
+		int count = 0;
+		struct trace_ids *tids = NULL;
+
+		if (optind == argc) {
+			count = 1;
+			if ((tids = calloc(count, sizeof(struct trace_ids))) == NULL) {
 				perror(argv[0]);
 				exit(1);
 			}
-		}
-	}
-	/* set up log device for tracing */
-	ic.ic_cmd = I_TRCLOG;
-	ic.ic_timout = 0;
-	ic.ic_len = count * sizeof(struct trace_ids);
-	ic.ic_dp = (char *) tids;
-	if (ioctl(fd, I_STR, ic) < 0) {
-		perror(argv[0]);
-		exit(1);
-	}
-	for (;;) {
-		int ret, flags;
-		char cbuf[1024];
-		char dbuf[1024];
-		struct strbuf ctl = { 1024, 1024, cbuf };
-		struct strbuf dat = { 1024, 1024, dbuf };
-		struct log_ctl *lc;
+			tids->ti_mid = -1;
+			tids->ti_sid = -1;
+			tids->ti_level = -1;
+			tids->ti_flags = -1;
+		} else if (optind < argc && (argc - optind) % 3 == 0) {
+			int i;
 
-		if ((ret = getmsg(fd, &ctl, &dat, &flags)) < 0) {
-			perror(argv[0]);
-			exit(1);
-		}
-		if (ret != 0) {
-			fprintf(stderr, "%s: %s\n", argv[0], strerror(ERANGE));
-			exit(1);
-		}
-		lc = (struct log_ctl *) cbuf;
-		if (ctl.len < sizeof(*lc))
-			continue;
-		if (dat.len <= 0)
-			continue;
-		fprintf(stdout, "%d", lc->seq_no);
-		fprintf(stdout, " %s", ctime(&lc->ltime));
-		fprintf(stdout, "%lu", (unsigned long) lc->ttime);
-		fprintf(stdout, "%3d", lc->level);
-		switch (lc->flags & (SL_ERROR | SL_FATAL | SL_NOTIFY)) {
+			count = (argc - optind) / 3;
+			if ((tids = calloc(count, sizeof(struct trace_ids))) == NULL) {
+				perror(argv[0]);
+				exit(1);
+			}
+			for (i = 0; i < count; i++) {
+				if (strncmp(argv[optind], "all", 4)) {
+					tids[i].ti_mid = -1;
+				} else {
+				}
+				optind++;
+				if (strncmp(argv[optind], "all", 4)) {
+					tids[i].ti_sid = -1;
+				} else {
+				}
+				optind++;
+				if (strncmp(argv[optind], "all", 4)) {
+					tids[i].ti_level = -1;
+				} else {
+				}
+				optind++;
+				tids[i].ti_flags = -1;
+			}
+		} else
+			goto bad_nonopt;
+		/* open log device */
+		strlog_open(argc, argv, tids, count);
+	}
+	strlog_enter(argc, argv);
+	for (;;) {
+		struct pollfd pfd[] = {
+			{strlog_fd, POLLIN | POLLPRI | POLLERR | POLLHUP, 0}
+		};
+
+		if (trm_signal)
+			trm_action();
+		if (hup_signal)
+			hup_action();
+		if (alm_signal)
+			alm_action();
+		if (output > 2)
+			fprintf(stderr, "entering poll loop\n");
+		switch (poll(pfd, 1, -1)) {
+		case -1:
+			if (errno == EAGAIN || errno == EINTR || errno == ERESTART)
+				continue;
+			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
+			syslog(MY_FACILITY(LOG_ERR), "%s: poll error", program);
+			strlog_exit(1);
+			return STRLOG_FAILURE;
 		case 0:
-			fprintf(stdout, "   ");
+			return STRLOG_NONE;
+		case 1:
+			if (pfd[0].revents & (POLLIN | POLLPRI)) {
+				int ret, flags;
+				char cbuf[1024];
+				char dbuf[2048];
+				struct strbuf ctl = { 1024, 1024, cbuf };
+				struct strbuf dat = { 2048, 2048, dbuf };
+				struct log_ctl *lc;
+				char sbuf[1024];
+				char fchar[] = "          ";
+				char *fstr = fchar;
+
+				if ((ret = getmsg(strlog_fd, &ctl, &dat, &flags)) < 0) {
+					perror(argv[0]);
+					exit(1);
+				}
+				if (ret != 0) {
+					errno = ERANGE;
+					perror(argv[0]);
+					exit(1);
+				}
+				lc = (struct log_ctl *) cbuf;
+				if (ctl.len < sizeof(*lc))
+					continue;
+				if (dat.len <= 0)
+					continue;
+				if (nomead && outfile[0] != '\0') {
+					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
+					fprintf(stdout, "%d", lc->seq_no);
+					fprintf(stdout, " %s", ctime(&lc->ltime));
+					fprintf(stdout, "%lu", (unsigned long) lc->ttime);
+					fprintf(stdout, "%3d", lc->level);
+					if (lc->flags & SL_ERROR)
+						*fstr++ = 'E';
+					if (lc->flags & SL_FATAL)
+						*fstr++ = 'F';
+					if (lc->flags & SL_NOTIFY)
+						*fstr++ = 'N';
+					*fstr++ = '\0';
+					fprintf(stdout, "%s", fchar);
+					fprintf(stdout, "%d", lc->mid);
+					fprintf(stdout, "%d", lc->sid);
+					fprintf(stdout, "%s", sbuf);
+					fprintf(stdout, "\n");
+					fflush(stdout);
+				}
+			}
+			if (pfd[0].revents & POLLNVAL) {
+				syslog(MY_FACILITY(LOG_ERR), "%s: device invalid", program);
+				strlog_exit(1);
+				return STRLOG_FAILURE;
+			}
+			if (pfd[0].revents & POLLHUP) {
+				syslog(MY_FACILITY(LOG_ERR), "%s: device hangup", program);
+				strlog_exit(1);
+				return STRLOG_FAILURE;
+			}
+			if (pfd[0].revents & POLLERR) {
+				syslog(MY_FACILITY(LOG_ERR), "%s: device error", program);
+				strlog_exit(1);
+				return STRLOG_FAILURE;
+			}
 			break;
-		case SL_ERROR:
-			fprintf(stdout, "E  ");
-			break;
-		case SL_FATAL:
-			fprintf(stdout, "F  ");
-			break;
-		case SL_NOTIFY:
-			fprintf(stdout, "N  ");
-			break;
-		case SL_ERROR | SL_FATAL:
-			fprintf(stdout, "EF ");
-			break;
-		case SL_ERROR | SL_NOTIFY:
-			fprintf(stdout, "EN ");
-			break;
-		case SL_FATAL | SL_NOTIFY:
-			fprintf(stdout, "FN ");
-			break;
-		case SL_ERROR | SL_FATAL | SL_NOTIFY:
-			fprintf(stdout, "EFN");
-			break;
+		default:
+			syslog(MY_FACILITY(LOG_ERR), "%s: poll error", program);
+			strlog_exit(1);
+			return STRLOG_FAILURE;
 		}
-		fprintf(stdout, "%d", lc->mid);
-		fprintf(stdout, "%d", lc->sid);
-		fprintf_text(stdout, dbuf, dat.len);
-		fprintf(stdout, "\n");
-		fflush(stdout);
 	}
-	if (close(fd) < 0) {
-		perror(argv[0]);
-	}
+	strlog_close(argc, argv);
 	exit(0);
 }

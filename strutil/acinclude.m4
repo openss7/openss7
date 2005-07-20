@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/17 08:06:26 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/20 13:02:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/17 08:06:26 $ by $Author: brian $
+# Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -542,7 +542,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
-			read_trylock write_trylock \
+			read_trylock write_trylock atomic_add_return \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [
 			case "$lk_func" in
 			    pcibios_*)

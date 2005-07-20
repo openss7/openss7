@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/19 11:15:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/20 13:02:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/19 11:15:06 $ by $Author: brian $
+# Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -616,8 +616,7 @@ endif
 
 dist_sysconf_DATA		= \
 				  strsetup.conf \
-				  strload.conf \
-				  strlogd.conf
+				  strload.conf
 
 dist_config_DATA		= \
 				  src/util/sysconfig/strace \
