@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 09:14:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2005/07/21 09:14:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,15 +58,19 @@
 AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     PACKAGE_TITLE='$2'
     AC_SUBST([PACKAGE_TITLE])dnl
+    m4_ifndef([AC_PACKAGE_TITLE], [m4_define([AC_PACKAGE_TITLE], [$2])])
     PACKAGE_SHORTTITLE='$1'
     AC_SUBST([PACKAGE_SHORTTITLE])dnl
+    m4_ifndef([AC_PACKAGE_SHORTTITLE], [m4_define([AC_PACKAGE_SHORTTITLE], [$1])])
     upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     lower='abcdefghijklmnopqrstuvwxyz'
     PACKAGE_LCNAME=`echo "$PACKAGE_NAME" | sed -e y/$upper/$lower/`
     AC_SUBST([PACKAGE_LCNAME])dnl
+    m4_ifndef([AC_PACKAGE_LCNAME], [m4_define([AC_PACKAGE_LCNAME], [m4_tolower(AC_PACKAGE_NAME)])])
     PACKAGE_UCNAME=`echo "$PACKAGE_NAME" | sed -e y/$lower/$upper/`
-    unset upper lower
     AC_SUBST([PACKAGE_UCNAME])dnl
+    m4_ifndef([AC_PACKAGE_UCNAME], [m4_define([AC_PACKAGE_UCNAME], [m4_toupper(AC_PACKAGE_NAME)])])
+    unset upper lower
     PACKAGE_DATE=`date -I`
     AC_SUBST([PACKAGE_DATE])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_DATE], ["$PACKAGE_DATE"], [The package release date.])
