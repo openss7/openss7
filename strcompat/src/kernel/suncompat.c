@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:25:42 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -204,8 +204,6 @@ EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */
 bufcall_id_t
 qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg)
 {
-	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
-				long arg);
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
@@ -215,8 +213,6 @@ EXPORT_SYMBOL(qbufcall);	/* sun/ddi.h */
 timeout_id_t
 qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks)
 {
-	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-				unsigned long pl, int cpu);
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());

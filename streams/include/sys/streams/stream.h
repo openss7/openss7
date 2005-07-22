@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.42 2005/07/21 22:52:06 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.43 2005/07/22 06:06:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 22:52:06 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/21 22:52:06 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/22 06:06:51 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -909,7 +909,6 @@ extern int bcanputnext(queue_t *q, int band);
 extern int canget(queue_t *q);
 extern int canput(queue_t *q);
 extern int canputnext(queue_t *q);
-extern int enableq(queue_t *q);
 extern int insq(queue_t *q, mblk_t *emp, mblk_t *mp);
 extern int pullupmsg(mblk_t *mp, ssize_t len);
 extern int putbq(queue_t *q, mblk_t *mp);
@@ -982,6 +981,16 @@ canenable(queue_t *q)
 {
 	return (!test_bit(QNOENB_BIT, &q->q_flag));
 }
+
+__EXTERN_INLINE int
+ctlmsg(unsigned char type)
+{
+	unsigned char mod = (type & ~QPCTL);
+
+	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
+	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
+}
+
 __EXTERN_INLINE int
 datamsg(unsigned char type)
 {
@@ -992,29 +1001,35 @@ datamsg(unsigned char type)
 		 ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) !=
 		0);
 }
-__EXTERN_INLINE int
-ctlmsg(unsigned char type)
-{
-	unsigned char mod = (type & ~QPCTL);
 
-	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
-	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
+__EXTERN_INLINE int
+enableq(queue_t *q)
+{
+	if (q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag)) {
+		qenable(q);
+		return (1);
+	}
+	return (0);
 }
+
 __EXTERN_INLINE int
 isdatablk(dblk_t * db)
 {
 	return datamsg(db->db_type);
 }
+
 __EXTERN_INLINE int
 isdatamsg(mblk_t *mp)
 {
 	return isdatablk(mp->b_datap);
 }
+
 __EXTERN_INLINE int
 pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
+
 __EXTERN_INLINE int
 putctl(queue_t *q, int type)
 {
@@ -1027,6 +1042,7 @@ putctl(queue_t *q, int type)
 	}
 	return (0);
 }
+
 __EXTERN_INLINE int
 putctl1(queue_t *q, int type, int param)
 {
@@ -1040,6 +1056,7 @@ putctl1(queue_t *q, int type, int param)
 	}
 	return (0);
 }
+
 __EXTERN_INLINE int
 putctl2(queue_t *q, int type, int param1, int param2)
 {
@@ -1054,6 +1071,7 @@ putctl2(queue_t *q, int type, int param1, int param2)
 	}
 	return (0);
 }
+
 __EXTERN_INLINE int
 putnextctl(queue_t *q, int type)
 {
@@ -1066,6 +1084,7 @@ putnextctl(queue_t *q, int type)
 	}
 	return (0);
 }
+
 __EXTERN_INLINE int
 putnextctl1(queue_t *q, int type, int param)
 {
@@ -1079,6 +1098,7 @@ putnextctl1(queue_t *q, int type, int param)
 	}
 	return (0);
 }
+
 __EXTERN_INLINE int
 putnextctl2(queue_t *q, int type, int param1, int param2)
 {
@@ -1093,6 +1113,7 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 	}
 	return (0);
 }
+
 __EXTERN_INLINE int
 testb(size_t size, unsigned int priority)
 {
@@ -1112,6 +1133,7 @@ linkb(mblk_t *mp1, mblk_t *mp2)
 	for (mpp = &mp1; *mpp; mpp = &(*mpp)->b_cont) ;
 	*mpp = mp2;
 }
+
 __EXTERN_INLINE mblk_t *
 linkmsg(mblk_t *mp1, mblk_t *mp2)
 {
@@ -1121,6 +1143,7 @@ linkmsg(mblk_t *mp1, mblk_t *mp2)
 	}
 	return (mp2);
 }
+
 __EXTERN_INLINE mblk_t *
 rmvb(mblk_t *mp, mblk_t *bp)
 {
@@ -1135,6 +1158,7 @@ rmvb(mblk_t *mp, mblk_t *bp)
 	}
 	return ((mblk_t *) (-1));
 }
+
 __EXTERN_INLINE mblk_t *
 unlinkb(mblk_t *mp)
 {
@@ -1188,6 +1212,7 @@ msgdsize(mblk_t *mp)
 				size += mp->b_wptr - mp->b_rptr;
 	return (size);
 }
+
 __EXTERN_INLINE size_t
 msgsize(mblk_t *mp)
 {
@@ -1198,6 +1223,7 @@ msgsize(mblk_t *mp)
 			size += mp->b_wptr - mp->b_rptr;
 	return (size);
 }
+
 __EXTERN_INLINE size_t
 xmsgsize(mblk_t *mp)
 {
@@ -1232,6 +1258,7 @@ enableok(queue_t *q)
 {
 	clear_bit(QNOENB_BIT, &q->q_flag);
 }
+
 __EXTERN_INLINE void
 freemsg(mblk_t *mp)
 {
@@ -1242,11 +1269,13 @@ freemsg(mblk_t *mp)
 		freeb(mp_this);
 	}
 }
+
 __EXTERN_INLINE void
 noenable(queue_t *q)
 {
 	set_bit(QNOENB_BIT, &q->q_flag);
 }
+
 __EXTERN_INLINE void
 qreply(queue_t *q, mblk_t *mp)
 {

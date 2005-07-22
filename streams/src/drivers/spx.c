@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 06:06:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -135,6 +135,15 @@ MODULE_ALIAS("/dev/streams/spx");
 MODULE_ALIAS("/dev/streams/spx/*");
 #endif
 #endif
+
+static struct module_info spx_minfo = {
+	mi_idnum:CONFIG_STREAMS_SPX_MODID,
+	mi_idname:CONFIG_STREAMS_SPX_NAME,
+	mi_minpsz:0,
+	mi_maxpsz:INFPSZ,
+	mi_hiwat:STRHIGH,
+	mi_lowat:STRLOW,
+};
 
 typedef struct spx {
 	struct spx *next;
@@ -245,6 +254,13 @@ spx_wput(queue_t *q, mblk_t *mp)
 #endif
 }
 
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  OPEN and CLOSE
+ *
+ *  -------------------------------------------------------------------------
+ */
 static int
 spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
@@ -324,15 +340,6 @@ spx_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-static struct module_info spx_minfo = {
-	mi_idnum:CONFIG_STREAMS_SPX_MODID,
-	mi_idname:CONFIG_STREAMS_SPX_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
-};
-
 static struct qinit spx_rqinit = {
 	qi_putp:spx_rput,
 	qi_qopen:spx_open,
@@ -342,6 +349,7 @@ static struct qinit spx_rqinit = {
 
 static struct qinit spx_wqinit = {
 	qi_putp:spx_wput,
+	qi_srvp:NULL,
 	qi_minfo:&spx_minfo,
 };
 

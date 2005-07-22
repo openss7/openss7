@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:21 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/22 06:06:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 06:06:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:21 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/22 06:06:52 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:21 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/22 06:06:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:21 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/22 06:06:52 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -207,6 +207,13 @@ typedef struct nuls {
 static spinlock_t nuls_lock = SPIN_LOCK_UNLOCKED;
 static struct nuls *nuls_list = NULL;
 
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  OPEN and CLOSE
+ *
+ *  -------------------------------------------------------------------------
+ */
 static int
 nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
@@ -301,6 +308,7 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit nuls_rqinit = {
+	qi_putp:NULL,
 	qi_qopen:nuls_open,
 	qi_qclose:nuls_close,
 	qi_minfo:&nuls_minfo,
@@ -308,6 +316,7 @@ static struct qinit nuls_rqinit = {
 
 static struct qinit nuls_wqinit = {
 	qi_putp:nuls_put,
+	qi_srvp:NULL,
 	qi_minfo:&nuls_minfo,
 };
 

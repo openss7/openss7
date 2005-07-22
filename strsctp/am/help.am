@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 20:09:58 $
+# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/22 06:55:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 20:09:58 $ by $Author: brian $
+## Last Modified $Date: 2005/07/22 06:55:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -212,7 +212,18 @@ MY_PHONY += help
 README-make: Makefile
 	@grep '^#!' Makefile | sed -e 's|^#!||' > $@
 
-EXTRA_DIST += README-make
-CLEANFILES += README-make
+EXTRA_DIST  += README-make
+CLEANFILES  += README-make
+ALL_LOCAL   += README-make
+
+##
+# Place configure --help specific instructions in INSTALL-$(PACKAGE)
+##
+INSTALL-$(PACKAGE): $(top_srcdir)/configure
+	$(top_srcdir)/configure --help=recursive > $@
+
+EXTRA_DIST  += INSTALL-$(PACKAGE)
+CLEANFILES  += INSTALL-$(PACKAGE)
+ALL_LOCAL   += INSTALL-$(PACKAGE)
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

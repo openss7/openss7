@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.5 2005/07/18 15:52:10 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.6 2005/07/22 06:06:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 15:52:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 06:06:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.6  2005/07/22 06:06:50  brian
+ - working up streams/src/kernel/strsched.h
+
  Revision 0.9.2.5  2005/07/18 15:52:10  brian
  - implemented mps mpprintf functions
 
@@ -70,7 +73,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -201,21 +204,23 @@ extern void mi_timer_move(queue_t *q, mblk_t *mp);
 extern int mi_timer_valid(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
 
-#if LFS
 /*
  *  Buffer call helper function.
  */
 __MPS_EXTERN_INLINE void
 mi_bufcall(queue_t *q, int size, int priority)
 {
-	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
-				long arg);
+#if LFS
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
 		qenable(q);
-}
 #endif
+#if LIS
+	if (bufcall(size, priority, (void (*)) (long) qenable, (long) q) == 0)
+		qenable(q);
+#endif
+}
 
 /*
  *  Message block allocation helper functions.
