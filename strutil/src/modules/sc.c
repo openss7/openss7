@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:38:48 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:38:48 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/18 12:38:48 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -86,7 +86,7 @@ static char const ident[] =
 #define SC_SPLASH	SC_DEVICE	" - " \
 			SC_REVISION
 
-#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
+#ifdef CONFIG_STREAMS_SC_MODULE
 MODULE_AUTHOR(SC_CONTACT);
 MODULE_DESCRIPTION(SC_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SC_DEVICE);
@@ -113,8 +113,10 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 
 #ifdef MODULE_ALIAS
+#if LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SC_MODID));
 MODULE_ALIAS("streams-module-sc");
+#endif
 #endif
 
 static struct module_info sc_minfo = {
@@ -266,7 +268,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 						if (n >= count)
 							break;
 						cdev = list_entry(pos, struct cdevsw, d_list);
-
 						qinit = cdev->d_str->st_rdinit;
 						mlist->major = cdev->d_major;
 						mlist->mi = *qinit->qi_minfo;
@@ -282,7 +283,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 						if (n >= count)
 							break;
 						fmod = list_entry(pos, struct fmodsw, f_list);
-
 						qinit = fmod->f_str->st_rdinit;
 						mlist->major = 0;
 						mlist->mi = *qinit->qi_minfo;
@@ -446,7 +446,7 @@ static struct fmodsw sc_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
+#ifdef CONFIG_STREAMS_SC_MODULE
 static
 #endif
 int __init
@@ -454,7 +454,7 @@ sc_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
+#ifdef CONFIG_STREAMS_SC_MODULE
 	printk(KERN_INFO SC_BANNER);
 #else
 	printk(KERN_INFO SC_SPLASH);
@@ -467,7 +467,7 @@ sc_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
+#ifdef CONFIG_STREAMS_SC_MODULE
 static
 #endif
 void __exit
@@ -480,7 +480,7 @@ sc_exit(void)
 	return (void) (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
+#ifdef CONFIG_STREAMS_SC_MODULE
 module_init(sc_init);
 module_exit(sc_exit);
 #endif

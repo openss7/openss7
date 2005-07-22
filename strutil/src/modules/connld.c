@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -64,15 +64,14 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#ifdef LIS
+#if LIS
 #define CONFIG_STREAMS_CONNLD_MODID	CONNLD_MOD_ID
 #define CONFIG_STREAMS_CONNLD_NAME	CONNLD_MOD_NAME
-#define fmodsw				_fmodsw
 #endif
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:38:48 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -84,7 +83,7 @@ static char const ident[] =
 #define CONNLD_SPLASH		CONNLD_DEVICE		" - " \
 				CONNLD_REVISION		"\n"
 
-#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
 MODULE_AUTHOR(CONNLD_CONTACT);
 MODULE_DESCRIPTION(CONNLD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CONNLD_DEVICE);
@@ -113,8 +112,10 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for CONNLD.");
 
 #ifdef MODULE_ALIAS
+#if LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CONNLD_MODID));
 MODULE_ALIAS("streams-module-connld");
+#endif
 #endif
 
 static struct module_info connld_minfo = {
@@ -169,6 +170,9 @@ static struct streamtab connld_info = {
 	st_wrinit:&connld_qinit,
 };
 
+#if LIS
+#define fmodsw _fmodsw
+#endif
 static struct fmodsw connld_fmod = {
 	f_name:CONFIG_STREAMS_CONNLD_NAME,
 	f_str:&connld_info,
@@ -176,7 +180,7 @@ static struct fmodsw connld_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
 static
 #endif
 int __init
@@ -184,7 +188,7 @@ connld_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
 	printk(KERN_INFO CONNLD_BANNER);
 #else
 	printk(KERN_INFO CONNLD_SPLASH);
@@ -197,7 +201,7 @@ connld_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
 static
 #endif
 void __exit
@@ -210,7 +214,7 @@ connld_exit(void)
 	return (void) (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
 module_init(connld_init);
 module_exit(connld_exit);
 #endif

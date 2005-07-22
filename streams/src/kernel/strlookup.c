@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/18 12:07:00 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/18 12:07:00 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:22 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/18 12:07:00 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:22 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -135,15 +135,15 @@ struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here *
 struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
 struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
 
-#if	defined CONFIG_STREAMS_SC_MODULE
+#if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL(cdevsw_lock);
 EXPORT_SYMBOL(cdevsw_list);
 #endif
-#if	defined CONFIG_STREAMS_SC_MODULE
+#if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL(fmodsw_lock);
 EXPORT_SYMBOL(fmodsw_list);
 #endif
-#if	defined CONFIG_STREAMS_SC_MODULE
+#if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL(nodesw_lock);
 EXPORT_SYMBOL(cminsw_list);
 #endif
@@ -156,7 +156,7 @@ int cdev_count = 0;
 int fmod_count = 0;
 int cmin_count = 0;
 
-#if defined CONFIG_STREAMS_SC_MODULE
+#if defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL(cdev_count);
 EXPORT_SYMBOL(fmod_count);
 EXPORT_SYMBOL(cmin_count);
@@ -854,7 +854,7 @@ cdrv_put(struct cdevsw *cdev)
 	sdev_put(cdev);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(cdrv_put);
 #endif
 
@@ -933,7 +933,7 @@ cdev_find(const char *name)
 	return cdev_search(name, !in_interrupt());
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(cdev_find);
 #endif
 
@@ -962,7 +962,7 @@ cdev_match(const char *name)
 	return cdev_find(root);
 }
 
-#ifdef CONFIG_STREAMS_NSDEV_MODULE
+#if defined CONFIG_STREAMS_NSDEV_MODULE || !defined CONFIG_STREAMS_NSDEV
 EXPORT_SYMBOL(cdev_match);
 #endif
 

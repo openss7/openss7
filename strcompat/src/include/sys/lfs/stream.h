@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.5 2005/07/18 12:25:39 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.6 2005/07/21 20:47:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.6  2005/07/21 20:47:17  brian
+ - sync with notebook
+
  Revision 0.9.2.5  2005/07/18 12:25:39  brian
  - standard indentation
 
@@ -70,7 +73,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -296,6 +299,12 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 }
 
 #define putnextctl2(_q,_type,_param1,_param2) putnextctl2(_q,_type,_param1,_param2)
+
+__LFS_EXTERN_INLINE void setq(queue_t *q, struct qinit *rinit, struct qinit *wrinit)
+{
+	return lis_setq(q, rinit, wrinit);
+}
+
 
 #elif defined _LFS_SOURCE
 #warning "_LFS_SOURCE defined by not CONFIG_STREAMS_COMPAT_LFS"

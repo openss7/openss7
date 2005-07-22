@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:06:59 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:06:59 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:06:59 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:06:59 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -135,10 +135,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/fifo");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/streams/fifo");
 MODULE_ALIAS("/dev/streams/fifo/*");
+#endif
 #endif
 
 static struct module_info fifo_minfo = {

@@ -40,10 +40,10 @@ objname	module	sc		sc
 # If you do not use the loadable keyword at all, everything is linked
 # into streams.o.
 #
-#@CONFIG_STREAMS_UTIL_STH_MODULE_TRUE@loadable sth
-@CONFIG_STREAMS_UTIL_PIPEMOD_MODULE_TRUE@loadable pipemod
-@CONFIG_STREAMS_UTIL_CONNLD_MODULE_TRUE@loadable connld
-@CONFIG_STREAMS_UTIL_SC_MODULE_TRUE@loadable sc
+#@CONFIG_STREAMS_STH_MODULE_TRUE@loadable sth
+@CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@loadable pipemod
+@CONFIG_STREAMS_CONNLD_MODULE_TRUE@loadable connld
+@CONFIG_STREAMS_SC_MODULE_TRUE@loadable sc
 #loadable timod
 #loadable tirdwr
 #loadable sockmod

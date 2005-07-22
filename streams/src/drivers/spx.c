@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,11 +67,11 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strreg.h"
+#include "src/kernel/strreg.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:22 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -128,10 +128,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
 MODULE_ALIAS("/dev/spx");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
 MODULE_ALIAS("/dev/streams/spx");
 MODULE_ALIAS("/dev/streams/spx/*");
+#endif
 #endif
 
 typedef struct spx {

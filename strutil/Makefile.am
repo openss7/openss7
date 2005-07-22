@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/20 13:02:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/21 20:47:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
+# Last Modified $Date: 2005/07/21 20:47:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -344,55 +344,55 @@ libUTILlink_a_SOURCES		= \
 
 libUTILlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 
-if CONFIG_STREAMS_UTIL_CLONE
+if CONFIG_STREAMS_CLONE
 libUTILlink_a_SOURCES		+= src/drivers/clone.c
 libUTILlink_a_DEPENDENCIES	+= src/drivers/clone.h
 endif
-if CONFIG_STREAMS_UTIL_ECHO
+if CONFIG_STREAMS_ECHO
 libUTILlink_a_SOURCES		+= src/drivers/echo.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_FIFO
+if CONFIG_STREAMS_FIFO
 libUTILlink_a_SOURCES		+= src/drivers/fifo.c
 libUTILlink_a_DEPENDENCIES	+= src/drivers/fifo.h
 endif
-if CONFIG_STREAMS_UTIL_LOG
+if CONFIG_STREAMS_LOG
 libUTILlink_a_SOURCES		+= src/drivers/log.c
 libUTILlink_a_DEPENDENCIES	+= src/drivers/log.h src/include/sys/log.h src/include/sys/strlog.h src/include/sys/strutil/log.h src/include/sys/strutil/strlog.h
 endif
-if CONFIG_STREAMS_UTIL_NSDEV
+if CONFIG_STREAMS_NSDEV
 libUTILlink_a_SOURCES		+= src/drivers/nsdev.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_NULS
+if CONFIG_STREAMS_NULS
 libUTILlink_a_SOURCES		+= src/drivers/nuls.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_PIPE
+if CONFIG_STREAMS_PIPE
 libUTILlink_a_SOURCES		+= src/drivers/pipe.c
 libUTILlink_a_DEPENDENCIES	+= src/drivers/pipe.h
 endif
-if CONFIG_STREAMS_UTIL_SAD
+if CONFIG_STREAMS_SAD
 libUTILlink_a_SOURCES		+= src/drivers/sad.c
 libUTILlink_a_DEPENDENCIES	+= src/include/sys/sad.h src/include/sys/strutil/sad.h
 endif
-if CONFIG_STREAMS_UTIL_SFX
+if CONFIG_STREAMS_SFX
 libUTILlink_a_SOURCES		+= src/drivers/sfx.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_SPX
+if CONFIG_STREAMS_SPX
 libUTILlink_a_SOURCES		+= src/drivers/spx.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_PIPEMOD
+if CONFIG_STREAMS_PIPEMOD
 libUTILlink_a_SOURCES		+= src/modules/pipemod.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_CONNLD
+if CONFIG_STREAMS_CONNLD
 libUTILlink_a_SOURCES		+= src/modules/connld.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_SC
+if CONFIG_STREAMS_SC
 libUTILlink_a_SOURCES		+= src/modules/sc.c
 libUTILlink_a_DEPENDENCIES	+= src/include/sys/sc.h src/include/sys/strutil/sc.h
 endif
@@ -413,20 +413,20 @@ libUTILmods_a_SOURCES		= \
 
 libUTILmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 
-if CONFIG_STREAMS_UTIL_PIPEMOD_MODULE
+if CONFIG_STREAMS_PIPEMOD_MODULE
 libUTILmods_a_SOURCES		+= src/modules/pipemod.c
 libUTILmods_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_CONNLD_MODULE
+if CONFIG_STREAMS_CONNLD_MODULE
 libUTILmods_a_SOURCES		+= src/modules/connld.c
 libUTILmods_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_SC_MODULE
+if CONFIG_STREAMS_SC_MODULE
 libUTILmods_a_SOURCES		+= src/modules/sc.c
 libUTILmods_a_DEPENDENCIES	+= src/include/sys/sc.h src/include/sys/strutil/sc.h
 endif
 
-libUTILmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libUTILmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libUTILmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILmods_a_OBJECTS):	$(libUTILmods_a_DEPENDENCIES)
@@ -457,48 +457,48 @@ libUTILdrvs_a_SOURCES		= \
 
 libUTILdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 
-if CONFIG_STREAMS_UTIL_CLONE_MODULE
+if CONFIG_STREAMS_CLONE_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/clone.c
 libUTILdrvs_a_DEPENDENCIES	+= src/drivers/clone.h
 endif
-if CONFIG_STREAMS_UTIL_ECHO_MODULE
+if CONFIG_STREAMS_ECHO_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/echo.c
 libUTILdrvs_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_FIFO_MODULE
+if CONFIG_STREAMS_FIFO_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/fifo.c
 libUTILdrvs_a_DEPENDENCIES	+= src/drivers/fifo.h
 endif
-if CONFIG_STREAMS_UTIL_LOG_MODULE
+if CONFIG_STREAMS_LOG_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/log.c
 libUTILdrvs_a_DEPENDENCIES	+= src/drivers/log.h src/include/sys/log.h src/include/sys/strlog.h src/include/sys/strutil/log.h src/include/sys/strutil/strlog.h
 endif
-if CONFIG_STREAMS_UTIL_NSDEV_MODULE
+if CONFIG_STREAMS_NSDEV_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/nsdev.c
 libUTILdrvs_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_NULS_MODULE
+if CONFIG_STREAMS_NULS_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/nuls.c
 libUTILdrvs_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_PIPE_MODULE
+if CONFIG_STREAMS_PIPE_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/pipe.c
 libUTILdrvs_a_DEPENDENCIES	+= src/drivers/pipe.h
 endif
-if CONFIG_STREAMS_UTIL_SAD_MODULE
+if CONFIG_STREAMS_SAD_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/sad.c
 libUTILdrvs_a_DEPENDENCIES	+= src/include/sys/sad.h src/include/sys/strutil/sad.h
 endif
-if CONFIG_STREAMS_UTIL_SFX_MODULE
+if CONFIG_STREAMS_SFX_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/sfx.c
 libUTILdrvs_a_DEPENDENCIES	+=
 endif
-if CONFIG_STREAMS_UTIL_SPX_MODULE
+if CONFIG_STREAMS_SPX_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/spx.c
 libUTILdrvs_a_DEPENDENCIES	+=
 endif
 
-libUTILdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libUTILdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libUTILdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILdrvs_a_OBJECTS):	$(libUTILdrvs_a_DEPENDENCIES)
@@ -562,11 +562,21 @@ AUTOCONFIG_H			= src/$(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 ##
-EXPORT_SRCFILES			= \
-				  src/drivers/clone.c
+EXPORT_SRCFILES			=
+if CONFIG_STREAMS_CLONE
+EXPORT_SRCFILES			+= src/drivers/clone.c
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_SRCFILES			+= src/drivers/clone.c
+endif
 
-EXPORT_VERFILES			= \
-				  $(PKGINCL)/versions/clone.ver
+EXPORT_VERFILES			=
+if CONFIG_STREAMS_CLONE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
+endif
 
 GENKSYMS_CPPFLAGS		= \
 				  -I./src/drivers -I$(srcdir)/src/drivers \

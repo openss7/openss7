@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:18 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/18 12:25:42 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:18 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -339,11 +339,9 @@ EXPORT_SYMBOL(lis_safe_putnext);
 __LIS_EXTERN_INLINE void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l);
 
 EXPORT_SYMBOL(lis_safe_qreply);
-#if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 
 EXPORT_SYMBOL(lis_setq);
-#endif
 __LIS_EXTERN_INLINE int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val);
 
 EXPORT_SYMBOL(lis_strqget);

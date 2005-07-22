@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/21 20:47:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:01 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/21 20:47:23 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/21 20:47:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/18 12:07:01 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/21 20:47:23 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1242,16 +1242,16 @@ spec_delete_inode(struct inode *inode)
 			inode->u.generic_ip = NULL;
 		/* fall through */
 	default:
-#ifdef CONFIG_STREAMS_FIFO
+//#ifdef CONFIG_STREAMS_FIFO
 	case S_IFIFO:
 		/* unnamed pipe inodes potentially have stream heads hanging off of the i_pipe
 		   pointer and nothing hanging off of the u.generic_ip pointer. */
-#endif
-#ifdef CONFIG_STREAMS_SOCKSYS
+//#endif
+//#ifdef CONFIG_STREAMS_SOCKSYS
 	case S_IFSOCK:
 		/* socket inodes potentially have stream heads hanging off of the i_pipe pointer
 		   and nothing hanging off of the u.generic_ip_pointer. */
-#endif
+//#endif
 		/* When we referemce the inode from the stdata structure, we hold a reference count 
 		   on the inode.  We should never get here with the the sd_inode reference still
 		   held.  Forced deletions might get us here anyway. */

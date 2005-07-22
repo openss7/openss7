@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/15 00:46:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,13 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/15 00:46:05 $ by $Author: brian $
+# Last Modified $Date: 2005/07/21 20:47:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 0.9.2.23  2005/06/15 00:46:05  brian
-# - corrected a couple targets
+# Revision 0.9.2.24  2005/07/21 20:47:25  brian
+# - sync with notebook
+#
+# Revision 0.9.2.20  2005/07/21 20:47:25  brian
+# - sync with notebook
 #
 # Revision 0.9.2.19  2005/06/15 00:46:05  brian
 # - corrected a couple targets
@@ -121,19 +124,69 @@ package.m4: $(top_srcdir)/configure
 TESTSUITE_DEPS		= \
 			kernel.at \
 			$(TESTSUITE)-streams.at \
-			$(TESTSUITE)-clone.at \
-			$(TESTSUITE)-connld.at \
-			$(TESTSUITE)-echo.at \
-			$(TESTSUITE)-fifo.at \
-			$(TESTSUITE)-log.at \
-			$(TESTSUITE)-nsdev.at \
-			$(TESTSUITE)-nuls.at \
-			$(TESTSUITE)-pipemod.at \
-			$(TESTSUITE)-sad.at \
-			$(TESTSUITE)-sc.at \
 			$(TESTSUITE).at \
 			local.at \
 			package.m4
+if CONFIG_STREAMS_CLONE
+TESTSUITE_DEPS		+= $(TESTSUITE)-clone.at
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-clone.at
+endif
+if CONFIG_STREAMS_CONNLD
+TESTSUITE_DEPS		+= $(TESTSUITE)-connld.at
+endif
+if CONFIG_STREAMS_CONNLD_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-connld.at
+endif
+if CONFIG_STREAMS_ECHO
+TESTSUITE_DEPS		+= $(TESTSUITE)-echo.at
+endif
+if CONFIG_STREAMS_ECHO_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-echo.at
+endif
+if CONFIG_STREAMS_FIFO
+TESTSUITE_DEPS		+= $(TESTSUITE)-fifo.at
+endif
+if CONFIG_STREAMS_FIFO_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-fifo.at
+endif
+if CONFIG_STREAMS_LOG
+TESTSUITE_DEPS		+= $(TESTSUITE)-log.at
+endif
+if CONFIG_STREAMS_LOG_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-log.at
+endif
+if CONFIG_STREAMS_NSDEV
+TESTSUITE_DEPS		+= $(TESTSUITE)-nsdev.at
+endif
+if CONFIG_STREAMS_NSDEV_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-nsdev.at
+endif
+if CONFIG_STREAMS_NULS
+TESTSUITE_DEPS		+= $(TESTSUITE)-nuls.at
+endif
+if CONFIG_STREAMS_NULS_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-nuls.at
+endif
+if CONFIG_STREAMS_PIPEMOD
+TESTSUITE_DEPS		+= $(TESTSUITE)-pipemod.at
+endif
+if CONFIG_STREAMS_PIPEMOD_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-pipemod.at
+endif
+if CONFIG_STREAMS_SAD
+TESTSUITE_DEPS		+= $(TESTSUITE)-sad.at
+endif
+if CONFIG_STREAMS_SAD_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-sad.at
+endif
+if CONFIG_STREAMS_SC
+TESTSUITE_DEPS		+= $(TESTSUITE)-sc.at
+endif
+if CONFIG_STREAMS_SC_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-sc.at
+endif
 
 # my rule
 $(TESTSUITE): $(TESTSUITE_DEPS)

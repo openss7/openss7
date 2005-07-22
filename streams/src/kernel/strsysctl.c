@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:07:02 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:23 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:07:02 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -94,7 +94,7 @@ int sysctl_str_max_mblk = 10;		/* max no of headers on free list */
 int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
 
 EXPORT_SYMBOL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
-#if defined CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sysctl_str_strctlsz);
 #endif
 

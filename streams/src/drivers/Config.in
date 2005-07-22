@@ -16,44 +16,79 @@
 # not all drivers do.  It is only known to work for 'fifo' at this time.
 #
 #	name		prefix	major	n-minors  n-majors
-driver	clone		clone	*
-driver	fifo		fifo	*
-driver	loop		loop	*
-driver	sad		sad	*
-driver	nsdev		nsdev	*
-driver	echo		echo	*
-driver	nuls		nuls	*
-driver	pipe		pipe	*
-driver	log		log	*
-#driver	sfx		sfx	*
-#driver	spx		spx	*
-#driver	socksys		socksys	*
-#driver	unix		unix	*
-#driver	xnet		xnet	*
+@CONFIG_STREAMS_CLONE_TRUE@	driver	clone		clone	*
+@CONFIG_STREAMS_ECHO_TRUE@	driver	echo		echo	*
+@CONFIG_STREAMS_FIFO_TRUE@	driver	fifo		fifo	*
+@CONFIG_STREAMS_LOG_TRUE@	driver	log		log	*
+@CONFIG_STREAMS_LOOP_TRUE@	driver	loop		loop	*
+@CONFIG_STREAMS_NSDEV_TRUE@	driver	nsdev		nsdev	*
+@CONFIG_STREAMS_NULS_TRUE@	driver	nuls		nuls	*
+@CONFIG_STREAMS_PIPE_TRUE@	driver	pipe		pipe	*
+@CONFIG_STREAMS_SAD_TRUE@	driver	sad		sad	*
+@CONFIG_STREAMS_SFX_TRUE@	driver	sfx		sfx	*
+@CONFIG_STREAMS_SPX_TRUE@	driver	spx		spx	*
+#@CONFIG_STREAMS_SOCKSYS_TRUE@	driver	socksys		socksys	*
+#@CONFIG_STREAMS_UNIX_TRUE@	driver	unix		unix	*
+#@CONFIG_STREAMS_XNET_TRUE@	driver	xnet		xnet	*
 #
 # this must be 30 for iBCS compatibility
 #
-#driver	inet		inet	30
+#@CONFIG_STREAMS_INET_TRUE@	driver	inet		inet	30
+
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	driver	clone		clone	*
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	driver	echo		echo	*
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	driver	fifo		fifo	*
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	driver	log		log	*
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	driver	loop		loop	*
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	driver	nsdev		nsdev	*
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	driver	nuls		nuls	*
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	driver	pipe		pipe	*
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	driver	sad		sad	*
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	driver	sfx		sfx	*
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	driver	spx		spx	*
+#@CONFIG_STREAMS_SOCKSYS_MODULE_TRUE@	driver	socksys		socksys	*
+#@CONFIG_STREAMS_UNIX_MODULE_TRUE@	driver	unix		unix	*
+#@CONFIG_STREAMS_XNET_MODULE_TRUE@	driver	xnet		xnet	*
+#
+# this must be 30 for iBCS compatibility
+#
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	driver	inet		inet	30
 
 #
 # Object name specifications
 #
 #	type	name		object name
-objname driver	clone		clone
-objname driver	fifo		fifo
-objname driver	loop		loop
-objname driver	sad		sad
-objname	driver	nsdev		nsdev
-objname	driver	echo		echo
-objname	driver	nuls		nuls
-objname	driver	pipe		pipe
-objname driver	log		log
-#objname	driver	sfx		sfx
-#objname	driver	spx		spx
-#objname	driver	socksys		socksys
-#objname	driver	unix		unix
-#objname	driver	xnet		xnet
-#objname driver	inet		inet
+@CONFIG_STREAMS_CLONE_TRUE@	objname driver	clone		clone
+@CONFIG_STREAMS_ECHO_TRUE@	objname	driver	echo		echo
+@CONFIG_STREAMS_FIFO_TRUE@	objname driver	fifo		fifo
+@CONFIG_STREAMS_LOG_TRUE@	objname driver	log		log
+@CONFIG_STREAMS_LOOP_TRUE@	objname driver	loop		loop
+@CONFIG_STREAMS_NSDEV_TRUE@	objname	driver	nsdev		nsdev
+@CONFIG_STREAMS_NULS_TRUE@	objname	driver	nuls		nuls
+@CONFIG_STREAMS_PIPE_TRUE@	objname	driver	pipe		pipe
+@CONFIG_STREAMS_SAD_TRUE@	objname driver	sad		sad
+@CONFIG_STREAMS_SFX_TRUE@	objname	driver	sfx		sfx
+@CONFIG_STREAMS_SPX_TRUE@	objname	driver	spx		spx
+#@CONFIG_STREAMS_SOCKSYS_TRUE@	objname	driver	socksys		socksys
+#@CONFIG_STREAMS_UNIX_TRUE@	objname	driver	unix		unix
+#@CONFIG_STREAMS_XNET_TRUE@	objname	driver	xnet		xnet
+#@CONFIG_STREAMS_INET_TRUE@	objname	driver	inet		inet
+
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	objname driver	clone		clone
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	objname	driver	echo		echo
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	objname driver	fifo		fifo
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	objname driver	log		log
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	objname driver	loop		loop
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	objname	driver	nsdev		nsdev
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	objname	driver	nuls		nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	objname	driver	pipe		pipe
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	objname driver	sad		sad
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	objname	driver	sfx		sfx
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	objname	driver	spx		spx
+#@CONFIG_STREAMS_SOCKSYS_MODULE_TRUE@	objname	driver	socksys		socksys
+#@CONFIG_STREAMS_UNIX_MODULE_TRUE@	objname	driver	unix		unix
+#@CONFIG_STREAMS_XNET_MODULE_TRUE@	objname	driver	xnet		xnet
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	objname	driver	inet		inet
 
 #
 # Autopush specifications
@@ -68,21 +103,21 @@ objname driver	log		log
 #
 # Loadable specifications
 #
-@CONFIG_STREAMS_CLONE_MODULE_TRUE@loadable clone
-@CONFIG_STREAMS_FIFO_MODULE_TRUE@loadable fifo
-@CONFIG_STREAMS_LOOP_MODULE_TRUE@loadable loop
-@CONFIG_STREAMS_SAD_MODULE_TRUE@loadable sad
-@CONFIG_STREAMS_NSDEV_MODULE_TRUE@loadable nsdev
-@CONFIG_STREAMS_ECHO_MODULE_TRUE@loadable echo
-@CONFIG_STREAMS_NULS_MODULE_TRUE@loadable nuls
-@CONFIG_STREAMS_PIPE_MODULE_TRUE@loadable pipe
-@CONFIG_STREAMS_LOG_MODULE_TRUE@loadable log
-#loadable sfx
-#loadable spx
-#loadable socksys
-#loadable unix
-#loadable xnet
-#loadable inet
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	loadable clone
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	loadable echo
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	loadable fifo
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	loadable log
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	loadable loop
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	loadable nsdev
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	loadable nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	loadable pipe
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	loadable sad
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	loadable sfx
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	loadable spx
+#@CONFIG_STREAMS_SOCKSYS_MODULE_TRUE@	loadable socksys
+#@CONFIG_STREAMS_UNIX_MODULE_TRUE@	loadable unix
+#@CONFIG_STREAMS_XNET_MODULE_TRUE@	loadable xnet
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	loadable inet
 
 #
 # Initialization specifications
@@ -105,56 +140,109 @@ objname driver	log		log
 # example of how to use lis_mknod.
 #
 #	name	          type	perm	major		minor
-#node	/dev/loop.1	     c	0644	loop-around	1
-#node	/dev/loop.2	     c	*	loop-around	2
-#node	/dev/loop_clone	     c	*	clone-drvr	loop-around
-node	/dev/clone	     c	*	clone		0
-node	/dev/fifo	     c  0666    clone		fifo
-node	/dev/loop	     c  0666    clone		loop
-node	/dev/sad	     c	*	clone		sad
-node	/dev/nsdev	     c	*	nsdev		0
-node	/dev/echo	     c	*	clone		echo
-node	/dev/nuls	     c	*	clone		nuls
-node	/dev/pipe	     c	*	pipe		0
-node	/dev/strlog	     c	*	clone		log
-#node	/dev/sfx	     c	*	sfx		0
-#node	/dev/spx	     c	*	spx		0
-#node	/dev/socksys	     c	*	socksys		0
-#node	/dev/unix	     c	*	unix		0
-#node	/dev/xnet	     c	*	xnet		0
+@CONFIG_STREAMS_CLONE_TRUE@	node	/dev/clone	     c	*	clone		0
+@CONFIG_STREAMS_ECHO_TRUE@	node	/dev/echo	     c	*	clone		echo
+@CONFIG_STREAMS_FIFO_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
+@CONFIG_STREAMS_LOG_TRUE@	node	/dev/strlog	     c	*	clone		log
+@CONFIG_STREAMS_LOG_TRUE@	node	/dev/conslog	     c	*	log		1
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.1	     c	0644	loop-around	1
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.2	     c	*	loop-around	2
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop_clone	     c	*	clone-drvr	loop-around
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_NSDEV_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
+@CONFIG_STREAMS_NULS_TRUE@	node	/dev/nuls	     c	*	clone		nuls
+@CONFIG_STREAMS_PIPE_TRUE@	node	/dev/pipe	     c	*	pipe		0
+@CONFIG_STREAMS_SAD_TRUE@	node	/dev/sad	     c	*	clone		sad
+@CONFIG_STREAMS_SFX_TRUE@	node	/dev/sfx	     c	*	sfx		0
+@CONFIG_STREAMS_SPX_TRUE@	node	/dev/spx	     c	*	spx		0
+#@CONFIG_STREAMS_SOCKSYS_TRUE@	node	/dev/socksys	     c	*	socksys		0
+#@CONFIG_STREAMS_UNIX_TRUE@	node	/dev/unix	     c	*	unix		0
+#@CONFIG_STREAMS_XNET_TRUE@	node	/dev/xnet	     c	*	xnet		0
 #
 # These are iBCS devices that should already be installed on a
 # system that supports the iBCS.  The /dev entries are supposed
 # to by symbolic links to the /dev/inet entries.  arp and rip
 # are supposed to be symbolic links to udp
 #
-#node	/dev/ip		     c	0666	inet		32
-#node	/dev/icmp	     c	0666	inet		33
-#node	/dev/ggp	     c	0666	inet		34
-#node	/dev/ipip	     c	0666	inet		35
-#node	/dev/tcp	     c	0666	inet		36
-#node	/dev/egp	     c	0666	inet		37
-#node	/dev/pup	     c	0666	inet		38
-#node	/dev/udp	     c	0666	inet		39
-#node	/dev/idp	     c	0666	inet		40
-#node	/dev/rawip	     c	0666	inet		41
-#node	/dev/arp	     c	0666	inet		39
-#node	/dev/rip	     c	0666	inet		39
-#node	/dev/inet/ip	     c	0666	inet		32
-#node	/dev/inet/icmp	     c	0666	inet		33
-#node	/dev/inet/ggp	     c	0666	inet		34
-#node	/dev/inet/ipip	     c	0666	inet		35
-#node	/dev/inet/tcp	     c	0666	inet		36
-#node	/dev/inet/egp	     c	0666	inet		37
-#node	/dev/inet/pup	     c	0666	inet		38
-#node	/dev/inet/udp	     c	0666	inet		39
-#node	/dev/inet/idp	     c	0666	inet		40
-#node	/dev/inet/rawip	     c	0666	inet		41
-#node	/dev/inet/arp	     c	0666	inet		39
-#node	/dev/inet/rip	     c	0666	inet		39
-#node	/dev/ticots_ord	     c	0666	inet		42
-#node	/dev/ticots	     c	0666	inet		43
-#node	/dev/ticlts	     c	0666	inet		44
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/ip		     c	0666	inet		32
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/icmp	     c	0666	inet		33
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/ggp	     c	0666	inet		34
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/ipip	     c	0666	inet		35
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/tcp	     c	0666	inet		36
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/egp	     c	0666	inet		37
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/pup	     c	0666	inet		38
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/udp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/idp	     c	0666	inet		40
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/rawip	     c	0666	inet		41
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/arp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/rip	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/ip	     c	0666	inet		32
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/icmp	     c	0666	inet		33
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/ggp	     c	0666	inet		34
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/ipip	     c	0666	inet		35
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/tcp	     c	0666	inet		36
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/egp	     c	0666	inet		37
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/pup	     c	0666	inet		38
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/udp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/idp	     c	0666	inet		40
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/rawip	     c	0666	inet		41
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/arp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/inet/rip	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/ticots_ord	     c	0666	inet		42
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/ticots	     c	0666	inet		43
+#@CONFIG_STREAMS_INET_TRUE@	node	/dev/ticlts	     c	0666	inet		44
+
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	node	/dev/clone	     c	*	clone		0
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	node	/dev/echo	     c	*	clone		echo
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/strlog	     c	*	clone		log
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/conslog	     c	*	log		1
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.1	     c	0644	loop-around	1
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.2	     c	*	loop-around	2
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop_clone	     c	*	clone-drvr	loop-around
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	node	/dev/nuls	     c	*	clone		nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	node	/dev/pipe	     c	*	pipe		0
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	node	/dev/sad	     c	*	clone		sad
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	node	/dev/sfx	     c	*	sfx		0
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	node	/dev/spx	     c	*	spx		0
+#@CONFIG_STREAMS_SOCKSYS_MODULE_TRUE@	node	/dev/socksys	     c	*	socksys		0
+#@CONFIG_STREAMS_UNIX_MODULE_TRUE@	node	/dev/unix	     c	*	unix		0
+#@CONFIG_STREAMS_XNET_MODULE_TRUE@	node	/dev/xnet	     c	*	xnet		0
+#
+# These are iBCS devices that should already be installed on a
+# system that supports the iBCS.  The /dev entries are supposed
+# to by symbolic links to the /dev/inet entries.  arp and rip
+# are supposed to be symbolic links to udp
+#
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/ip		     c	0666	inet		32
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/icmp	     c	0666	inet		33
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/ggp	     c	0666	inet		34
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/ipip	     c	0666	inet		35
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/tcp	     c	0666	inet		36
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/egp	     c	0666	inet		37
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/pup	     c	0666	inet		38
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/udp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/idp	     c	0666	inet		40
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/rawip	     c	0666	inet		41
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/arp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/rip	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/ip	     c	0666	inet		32
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/icmp	     c	0666	inet		33
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/ggp	     c	0666	inet		34
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/ipip	     c	0666	inet		35
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/tcp	     c	0666	inet		36
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/egp	     c	0666	inet		37
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/pup	     c	0666	inet		38
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/udp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/idp	     c	0666	inet		40
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/rawip	     c	0666	inet		41
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/arp	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/inet/rip	     c	0666	inet		39
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/ticots_ord	     c	0666	inet		42
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/ticots	     c	0666	inet		43
+#@CONFIG_STREAMS_INET_MODULE_TRUE@	node	/dev/ticlts	     c	0666	inet		44
 
 #
 # Device specifications

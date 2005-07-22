@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fdetach.8.man,v 0.9.2.14 2005/05/14 08:34:15 brian Exp $
+.\" @(#) $Id: fdetach.8.man,v 0.9.2.15 2005/07/21 20:47:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -95,11 +95,9 @@ sort-adjacent-labels
 .\"
 .SH OPTIONS
 .PP
-.TP
+The following options can be used in conjunction with a
 .I path
-the path to the file to which the
-.I STREAMS
-special file is attached.
+argument:
 .TP
 .BR -d ", " --debug " [" \fIlevel\fR ]
 Increase or specify the debug verbosity level of the output.  This option may
@@ -111,6 +109,11 @@ Suppresses normal output.
 .BR -v ", " --verbose " [" \fIlevel\fR ]
 Increase or specify the verbosity level of the output.  This option may be
 repeated.
+.PP
+The following options are general command options.  When one of these options is encountered, the
+requested information is displayed and
+.B fdetach
+exits without processing further options or arguments and without performing any other actions.
 .TP
 .BR -h ", " --help
 When this option is encountered,
@@ -138,6 +141,15 @@ If
 is executed without a
 .I path
 name, a short usage summary is printed.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+[\fIpath\fR]
+the path to the file to which the
+.I STREAMS
+special file is attached.
 .\"
 .\"
 .SH DESCRIPTION
@@ -242,7 +254,7 @@ command.  However,
 may be used in its stead.
 For compatibility with
 .IR AIX \(rg,
-.B Linux Fast-STREAMS
+.I @PACKAGE_TITLE@
 supports the use of the
 .BR umount (8)
 command to detach named streams.

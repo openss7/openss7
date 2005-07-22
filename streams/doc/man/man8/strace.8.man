@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strace.8.man,v 0.9.2.12 2005/05/14 08:34:15 brian Exp $
+.\" @(#) $Id: strace.8.man,v 0.9.2.13 2005/07/21 20:47:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -81,149 +81,213 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
-\fBstrace\fR [ \fImod\fR \fIsub\fR \fIpri\fR ] ...
+.ad l
+.hy 0
+.HP \w'strace\ 'u
+\fBstrace\fR [\fIoptions\fR]
+[\fB-nqDv\fR]
+[{\fB-d\fR|\fB--directory\fR[=]}\fIdirectory\fR]
+[{\fB-p\fR|\fB--pidfile\fR[=]}[\fIpidfile\fR]]
+[{\fB-l\fR|\fB--logdev\fR[=]}[\fIlogdevice\fR]]
+[{\fB-D\fR|\fB--debug\fR[=]}[\fILEVEL\fR]]
+[{\fB-v\fR|\fB--verbose\fR[=]}[\fILEVEL\fR]]
+[\fImid\fR \fIsid\fR \fIlevel\fR] ...
 .PD 0
-.HP 12
+.HP
 \fBstrace\fR {\fB-h\fR|\fB--help\fR}
-.HP 12
+.HP
 \fBstrace\fR {\fB-V\fR|\fB--version\fR}
-.HP 12
+.HP
 \fBstrace\fR {\fB-C\fR|\fB--copying\fR}
 .PD
+.ad b
+.hy 6
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 The
 .B strace
-command gets
-.I STREAMS
-event trace messages from
-.I STREAMS
-drivers and modules via the
+receives trace event messages from the
 .I STREAMS
 log driver
-.RB ( strlog (4)),
-and writes these messages to standard output.  By default,
+.RB ( log (4))
+and writes these messages to standard output.
+When run as a daemon,
+.B strace
+appends these messages to a log file.
+The error log files produced
+reside in the directory
+.BR /var/adm/streams " or " /var/log/streams ,
+or a user-specified directory,
+and are named
+.BI trace. mm-dd\fR,
+where
+.I mm
+is the month and
+.I dd
+is the day of the messages contained in each log file.
+.PP
+By default,
 .B strace
 without arguments writes all
 .I STREAMS
 trace messages from all drivers and modules.
 .B strace
 with command-line arguments limits the trace messages received.
+.PP
+Messages that appear in the trace log are intended to report debugging
+information that assists with troubleshooting a running
+.I STREAMS
+module or driver.
+Messages indicating the total failure of a
+.I STREAMS
+driver or module should have the
+.B F
+flag set.  Those messages requiring the immediate attention of the
+administrator should have the
+.B N
+flag set, which causes the console logger to send the message to that person by
+way of the
+.BR mail (1)
+command.  The priority level usually has no meaning in the error log, but does
+have meaning if the message is sent to the trace process.  Messages of lower
+priority levels can be filtered out.
+.PP
+Once initiated, the
+.B strace
+daemon continues to execute until terminated by the user.  Usually, the
+.B strace
+daemon is executed asynchronously.
 .\"
 .\"
 .SH OPTIONS
 .PP
 .TP
-\fB-D\fR, \fB--daemon\fR
-Daemonize, run in the background, redirect
-.B stdout
-to
-.I OUTFILE
-and
-.B stderr
-to
-.IR ERRFILE .
-.TP
-\fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
-Only significant when running as a daemon.
+\fB-d\fR, \fB--directory\fR \fIdirectory\fR
 Specifies a directory to contain the messages.  Default is to search for
 .RB \(lq /var/adm/streams \(rq
 and then
 .RB \(lq /var/log/streams .\(rq
 .TP
-\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
-Only significant when running as a daemon.
-Specify the log and error file base name.  Default is
-.RB \(lq trace \(rq.
+\fB-n\fR, \fB--noforeground\fR
+Daemonize, do not run in the foreground, print output to
+.I outfile
+and error logs to
+.IR errfile .
+This option is most usefull for debugging
+.BR strace .
 .TP
-\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
-Only significant when running as a daemon.
-Specify the log file output name.  Default is
-.RI \(lq BASENAME . pid ,\(rq
+\fB-b\fR, \fB--basename\fR \fIbasename\fR
+Specify the log file basename.  Default is
+.RB \(lq trace \(rq .
+.TP
+\fB-o\fR, \fB--outfile\fR \fIoutfile\fR
+Specifiy the log file output name.
+When run as a daemon, the default is
+.RI \(lq basename . mm-dd \(rq,
 where
-.I pid
-is the current process id.
-When run in the foreground,
+.I mm-dd
+is the current month and day of month.
+When run in the foreground, the default is ignored and all output is to
+.IR stdout .
+When specified, standard output is redirected to the specified file regardless of whether
 .B strace
-ignores the default.
+is being run in the foreground or as a daemon.
 .TP
-\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
-Only significant when running as a daemon.
-Specify the error file name.  Default is
-.RI \(lq BASENAME . error .\(rq
-When run in the foreground,
+\fB-e\fR, \fB--errfile\fR \fIerrfile\fR
+Specify the error file output name.
+When run as a daemon, the default is
+.RI \(lq /dev/null \(rq
+and all errors are logged to
+.BR syslogd (8).
+When run in the foreground, the default is ignored and all errors are logged to
+.IR stderr .
+When specified, standard error is redirected to the specified file regardless of whether
 .B strace
-ignores the default.
+is being run in the foreground or as a daemon.
 .TP
-\fB-p\fR, \fB--pidfile\fR \fIPIDFILE\fR
-Only significant when running as a daemon.
-Specify the pid file name to which to write the pid of the daemon process.  The default is
+\fB-p\fR, \fB--pidfile\fR \fIpidfile\fR
+Specify the pid file output name.  Default is
 .RB \(lq /var/run/strace.pid .\(rq
-When run in the foreground,
-.B strace
-ignores the default.
+When run in the foreground, the default is ignored.
 .TP
-\fB-l\fR, \fB--logdev\fR \fILOGDEVICE\fR
+\fB-l\fR, \fB--logdev\fR \fIlogdevice\fR
 Specifies the log device.  Default is to search
-.RB \(lq /dev/strlog ,\(rq
-.RB \(lq /dev/streams/log \(rq
+.RB \(lq /dev/streams/strlog ,\(rq
+.RB \(lq /dev/streams/log ,\(rq
+.RB \(lq /dev/strlog \(rq
 and
 .RB \(lq /dev/log .\(rq
 .TP
 \fB-q\fR, \fB--quiet\fR
 Suppresses normal output.
+This option is equivalent to
+.BR --verbose = 0 .
 .TP
-\fB-d\fR, \fB--debug\fR [\fIlevel\fR]
-Increase or specify the debug output level.  This option may be repeated.
+\fB-D\fR, \fB--debug\fR [\fIlevel\fR]
+Increase or specify the debug output
+.IR level .
+When a debug
+.I level
+has been specified,
+.B strace
+will log to
+.IR stdout ,
+prints debug messages to
+.IR stderr ,
+and will not place itself in the background.
+This option may be repeated.
 .TP
 \fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
-Increase or specify the verbosity level of the output.  This option may be
-repeated.
+Increase or specify the verbosity
+.I level
+of the output.  This option may be repeated.
 .TP
 \fB-h\fR, \fB--help\fR
-When this options is encountered,
-.B scls
+When this option is encountered,
+.B strace
 displays usage information on
 .I stdout
 and exits.
+No further processing of options or arguments is performed and no actions are taken.
 .TP
 \fB-V\fR, \fB--version\fR
 When this option is encountered,
-.B scls
-displays versions information on
+.B strace
+displays version information on
 .I stdout
 and exits.
+No further processing of options or arguments is performed and no actions are taken.
 .TP
 \fB-C\fR, \fB--copying\fR
 When this option is encountered,
-.B scls
+.B strace
 displays copying and copyright information on
 .I stdout
 and exits.
+No further processing of options or arguments is performed and no actions are taken.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 The arguments, which must be specified in groups of three, are:
 .TP
-.B mod
+.I mid
 Specifies the
 .I STREAMS
 module identification number from the
 .B streamtab
 entry.
 .TP
-.B sub
+.I sid
 Specifies a sub-identification number (often corresponding to a minor device).
 .TP
-.B pri
+.I level
 Specifies a tracing priority level.
 .B strace
 gets messages of a level equal to or less than the value specified by
-.BR pri .
+.BR level .
 Only positive integer values are allowed.
 .PP
 The value
@@ -246,25 +310,26 @@ criteria.
 .I STREAMS
 trace event messages have the following format:
 .HP
-.RB < seq "> <" time "> <" tick "> <" pri "> <" ind "> <" mod "> <" sub "> <" text >
+.RB < seq "> <" time "> <" ticks "> <" level "> <" flags "> <" mid "> <" sid "> <" text >
 .PP
 Components are interpreted as follows:
-.TP
+.TP \w'<flags>\(em'u
 .RB < seq >
-Trace event sequence number.
+Trace sequence number.
+.PD 0
 .TP
 .RB < time >
 Time the message was sent expressed in hh:mm:ss.
 .TP
-.RB < tick >
-Time the message was sent express in machine ticks since last boot.
+.RB < ticks >
+Time the message was sent expressed in machine ticks since last boot.
 .TP
-.RB < pri >
-Tracing priority level as defined by the
+.RB < level >
+Tracing level as defined by the
 .I STREAMS
 driver or module that originates the messages.
 .TP
-.RB < ind >
+.RB < flags >
 Any combination of the following three message indicators:
 .RS
 .IP \fBE\fP 3
@@ -275,24 +340,60 @@ The message signalled a fatal error.
 The message has also been mailed to the system administrator.
 .RE
 .TP
-.RB < mod >
+.RB < mid >
 Module identification number of the trace message source.
 .TP
-.RB < sub >
+.RB < sid >
 Sub-identification number of the trace message source.
 .TP
 .RB < text >
-Trace message text.
+Formatted text of the trace message.
+.PD
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
-An exit status of zero (0) indicates that the command was successful; one (1)
-indicates that an error occurred and a diagnostic message is printed to
-.BR stderr ;
-two (2) indicates that the option or argument syntax was in error and a
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.RB ( 1 )
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two
+.RB ( 2 )
+indicates that the option or argument syntax was in error and a
 diagnostic message is printed to
-.BR stderr .
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH SIGNALS
+.PP
+.B strace
+catches the
+.B SIGHUP
+signal
+.RB "(see " signal (7)).
+.TP
+.B SIGHUP
+When the
+.B SIGHUP
+signal is caught,
+.B strace
+will close the current log file and open a new (or reopen the existing) log
+file.  This is for use with
+.BR logrotate (8).
+.TP
+.B SIGTERM
+When the
+.B SIGTERM
+signal is caught,
+.B strace
+flushes and closes all of its log files and then exits.
 .\"
 .\"
 .SH NOTICES
@@ -303,10 +404,17 @@ has no ressemblence to the system-call tracing utility of the same name:
 .PP
 Only one
 .B strace
-process can open the
+daemon or process at a time is permitted to open the
 .I STREAMS
-log driver at a time.
+log driver as a trace logger.
+If a module or driver is generating a large number of trace
+messages, running the trace logger causes a degradation in
+.I STREAMS
+performance.  If a large number of messages are generated in a short time, the
+log driver may not be able to deliver some of the messages.  This situation is
+indicated by gaps in the sequence numbering of the messages in the log files.
 .PP
+When run in the foreground,
 .B strace
 runs until terminated by the caller.
 .PP
@@ -328,7 +436,8 @@ Due to performance considerations, only one
 command is permitted to open the
 .I STREAMS
 .B log
-driver at a time.  The
+driver at a time.
+The
 .B log
 driver has a list of the triplets specified in the command invocation, and
 compares each potential trace message against this list to decide if it should
@@ -336,12 +445,13 @@ be formatted and sent up to the
 .B strace
 process.  Hence, long lists of triplets have a greater impact on overall
 .I STREAMS
-performance.  Running the
+performance.
+Running the
 .B strace
 command has the most impact on the timing of modules and drivers generating
 the trace messages that are sent to the
 .B strace
-process.  If trace message are generated faster than the
+process.  If trace messages are generated faster than the
 .B strace
 process can handle them, some of the messages will be lost.  This last case
 can be determined by examining the sequence numbers on the trace messages
@@ -355,10 +465,12 @@ output.
 .SH DEVICES
 .PP
 .TP
-.BR /dev/strlog ", " /dev/streams/log " or " /dev/log
+.BR /dev/streams/strlog ", " /dev/streams/log ", " /dev/strlog " or " /dev/log
 the
 .I STREAMS
 logging device.
+See
+.BR strlog (4).
 .\"
 .\"
 .SH FILES
@@ -374,12 +486,21 @@ directory containing the error log files.
 .TP
 .BI /var/log/streams/trace. "pid \fR or " /var/adm/streams/trace. pid
 trace log file.
+.TP
+.BR /etc/init.d/strace " or " /etc/strace.sh
+an SysV or Debian init script for starting the trace logger.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR log (4),
 .BR strlog (4),
-.BR strerr (8).
+.BR strlog (9),
+.BR strlog (1),
+.BR strerr (8),
+.BR strclean (8),
+.BR syslogd (8),
+.BR syslog (3).
 .\"
 .\"
 .SH BUGS
@@ -391,33 +512,36 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .B strace
-is compatible with systems based on
+is compatible with
 .IR "SVR 4.2" ,
 .[
 svr42cr
 .]
+and systems based on
+.IR "SVR 4.2" ,
+such as
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
-.IR UnixWare \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
 .IR UXP/V \(rg,
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 Options
-.BI -D ", " -b ", " -o ", " -e " and " -l ,
+.BR -n ", " -D ", " -b ", " -o ", " -e ", " -p " and " -l ,
 and all long options, are specific to this
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
+.I @PACKAGE_TITLE@
 implementation of
 .B strace
 and should not be used by portable applications.
 .IP \(em
-Not other implementation documents the
-.BR -q ", " -d ", " -v ", " -h ", " -V " or " -C
-options.  They should not be used for portable applications.
+No other implementation documents the
+.BR -q ", " -D ", " -v ", " -h ", " -V " or " -C
+options.
+They should not be used by portable applications.
 .IP \(em
 Options
 .BR --help " and " --version
@@ -425,22 +549,39 @@ are provided for compatibility with GNU coding standards;
 .BR --copying ,
 OpenSS7 coding standards.
 .IP \(em
+All other implementations document the log file directory as
+.B /var/adm/streams
+instead of
+.BR /var/log/streams .
+.B /var/log/streams
+is used under
+.B Linux
+for compatibility with the
+.BR "Linux File Standard" .
+For compatibility,
+.B strace
+first checks if the directory
+.B /var/adm/streams
+exists, and then creates
+.B /var/log/streams
+if necessary, unless a directory is specified with the
+.B -d
+option.
+.IP \(em
 .B "SVR 4.2"
-and system based on
+and systems based on
 .B "SVR 4.2"
-permit only on
+only describe
 .B strace
-process to be active at a time.
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
+as operating in the foreground.
+.I @PACKAGE_TITLE@
 .B strace
-permits multiple
+permits
 .B strace
-processes to be running simultaneously.
-The first process to register for the given trace id filter will receive those
-trace messages and no other trace process will receive them.
+to be run in the background as a daemon process.  This is useful for running
+background, high-level traces in running systems.  This is accomplished in a
+manner similar to
+.BR strerr (8).
 .IP \(em
 Under
 .IR "SVR 4.2"
@@ -449,9 +590,12 @@ svr42cr
 .]
 and
 .IR UnixWare \(rg
+.[
+uw7doc
+.]
 the
 .I STREAMS
-trace logger is called
+log device is called
 .B /dev/log
 rather than
 .BR /dev/strlog .
@@ -463,23 +607,30 @@ based log mechanism (BSD-style) logging device named
 .IP \(em
 Under
 .IR OSF/1 \(rg
+.[
+osfdoc
+.]
 the
 .I STREAMS
-trace logger is called
-.BR /dev/streams/log .
+log device is called
+.B /dev/streams/log
+instead of
+.BR /dev/strlog .
 .IP \(em
 For compatibility with these operating environments,
 .B strace
 attempts to open
-.BR /dev/streams/log ,
-.BR /dev/strlog
-and then
-.BR /dev/log .
+.BR /dev/streams/strlog ", " /dev/streams/log ", " /dev/strlog " and then " /dev/log
+if not specified with the
+.B -l
+option.
 The call to
 .B strace
 will fail if there is no
 .IR STREAMS -based
-log device in this search sequence.
+log device in this search sequence, or specified with the
+.B -l
+option.
 .\"
 .\"
 .SH CONFORMANCE
@@ -492,8 +643,10 @@ svr42cr
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
-.IR UnixWare \(rg,
-.IR UXP/V \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
 documentation.
 .[
 aixdoc
@@ -506,6 +659,9 @@ osfdoc
 .]
 .[
 soldoc
+.]
+.[
+suxdoc
 .]
 .[
 uw7doc
@@ -521,7 +677,7 @@ uxpdoc
 first appeared in
 .IR "SVR 4" .
 .[
-svr42cr
+svr4
 .]
 .\"
 .\"

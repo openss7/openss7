@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:24 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:07:02 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:24 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -119,8 +119,10 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 
 #ifdef MODULE_ALIAS
+#if LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SC_MODID));
 MODULE_ALIAS("streams-module-sc");
+#endif
 #endif
 
 static struct module_info sc_minfo = {
@@ -215,10 +217,13 @@ sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_LIST:
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
+				struct fmodsw *fmod;
+				struct cdevsw *cdev;
+				struct list_head *pos;
 				int n, count;
 				struct sc_list *list;
 				struct sc_mlist *mlist;
-				struct list_head *pos;
+				struct qinit *qinit;
 
 				switch (sc->iocstate) {
 				case 1:
@@ -245,37 +250,31 @@ sc_wput(queue_t *q, mblk_t *mp)
 					/* list all devices */
 					read_lock(&cdevsw_lock);
 					list_for_each(pos, &cdevsw_list) {
-						if (n < count) {
-							struct cdevsw *cdev =
-							    list_entry(pos, struct cdevsw, d_list);
-							struct qinit *qinit =
-							    cdev->d_str->st_rdinit;
-							mlist->major = cdev->d_major;
-							mlist->mi = *qinit->qi_minfo;
-							if (qinit->qi_mstat)
-								mlist->ms = *qinit->qi_mstat;
-							n++;
-							mlist++;
-						} else
+						if (n >= count)
 							break;
+						cdev = list_entry(pos, struct cdevsw, d_list);
+						qinit = cdev->d_str->st_rdinit;
+						mlist->major = cdev->d_major;
+						mlist->mi = *qinit->qi_minfo;
+						if (qinit->qi_mstat)
+							mlist->ms = *qinit->qi_mstat;
+						n++;
+						mlist++;
 					}
 					read_unlock(&cdevsw_lock);
 					/* list all modules */
 					read_lock(&fmodsw_lock);
 					list_for_each(pos, &fmodsw_list) {
-						if (n < count) {
-							struct fmodsw *fmod =
-							    list_entry(pos, struct fmodsw, f_list);
-							struct qinit *qinit =
-							    fmod->f_str->st_rdinit;
-							mlist->major = 0;
-							mlist->mi = *qinit->qi_minfo;
-							if (qinit->qi_mstat)
-								mlist->ms = *qinit->qi_mstat;
-							n++;
-							mlist++;
-						} else
+						if (n >= count)
 							break;
+						fmod = list_entry(pos, struct fmodsw, f_list);
+						qinit = fmod->f_str->st_rdinit;
+						mlist->major = 0;
+						mlist->mi = *qinit->qi_minfo;
+						if (qinit->qi_mstat)
+							mlist->ms = *qinit->qi_mstat;
+						n++;
+						mlist++;
 					}
 					read_unlock(&fmodsw_lock);
 					/* zero all excess elements */

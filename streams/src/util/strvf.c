@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:07:07 $
+ @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/21 20:47:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:07:07 $"
+#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/21 20:47:25 $"
 
 static char const ident[] =
-    "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:07:07 $";
+    "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/21 20:47:25 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #include <signal.h>
 #include <syslog.h>
 #include <sys/utsname.h>
-#include <strlog.h>
+#include <sys/strlog.h>
 
 static int logging = 1;
 static int output = 1;

@@ -16,17 +16,35 @@
 # not all drivers do.  It is only known to work for 'fifo' at this time.
 #
 #	name		prefix	major	n-minors  n-majors
-driver	clone		clone	*
-driver	fifo		fifo	*
-#driver	loop		loop	*
-driver	sad		sad	*
-driver	nsdev		nsdev	*
-driver	echo		echo	*
-driver	nuls		nuls	*
-driver	pipe		pipe	*
-driver	log		log	*
-driver	sfx		sfx	*
-driver	spx		spx	*
+@CONFIG_STREAMS_CLONE_TRUE@	driver	clone		clone	*
+@CONFIG_STREAMS_FIFO_TRUE@	driver	fifo		fifo	*
+@CONFIG_STREAMS_LOOP_TRUE@	driver	loop		loop	*
+@CONFIG_STREAMS_SAD_TRUE@	driver	sad		sad	*
+@CONFIG_STREAMS_NSDEV_TRUE@	driver	nsdev		nsdev	*
+@CONFIG_STREAMS_ECHO_TRUE@	driver	echo		echo	*
+@CONFIG_STREAMS_NULS_TRUE@	driver	nuls		nuls	*
+@CONFIG_STREAMS_PIPE_TRUE@	driver	pipe		pipe	*
+@CONFIG_STREAMS_LOG_TRUE@	driver	log		log	*
+@CONFIG_STREAMS_SFX_TRUE@	driver	sfx		sfx	*
+@CONFIG_STREAMS_SPX_TRUE@	driver	spx		spx	*
+#driver	socksys		socksys	*
+#driver	unix		unix	*
+#driver	xnet		xnet	*
+#
+# this must be 30 for iBCS compatibility
+#
+#driver	inet		inet	30
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	driver	clone		clone	*
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	driver	fifo		fifo	*
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	driver	loop		loop	*
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	driver	sad		sad	*
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	driver	nsdev		nsdev	*
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	driver	echo		echo	*
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	driver	nuls		nuls	*
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	driver	pipe		pipe	*
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	driver	log		log	*
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	driver	sfx		sfx	*
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	driver	spx		spx	*
 #driver	socksys		socksys	*
 #driver	unix		unix	*
 #driver	xnet		xnet	*
@@ -39,21 +57,36 @@ driver	spx		spx	*
 # Object name specifications
 #
 #	type	name		object name
-objname driver	clone		clone
-objname driver	fifo		fifo
-#objname driver	loop		loop
-objname driver	sad		sad
-objname	driver	nsdev		nsdev
-objname	driver	echo		echo
-objname	driver	nuls		nuls
-objname	driver	pipe		pipe
-objname driver	log		log
-objname	driver	sfx		sfx
-objname	driver	spx		spx
+@CONFIG_STREAMS_CLONE_TRUE@	objname driver	clone		clone
+@CONFIG_STREAMS_FIFO_TRUE@	objname driver	fifo		fifo
+@CONFIG_STREAMS_LOOP_TRUE@	objname driver	loop		loop
+@CONFIG_STREAMS_SAD_TRUE@	objname driver	sad		sad
+@CONFIG_STREAMS_NSDEV_TRUE@	objname	driver	nsdev		nsdev
+@CONFIG_STREAMS_ECHO_TRUE@	objname	driver	echo		echo
+@CONFIG_STREAMS_NULS_TRUE@	objname	driver	nuls		nuls
+@CONFIG_STREAMS_PIPE_TRUE@	objname	driver	pipe		pipe
+@CONFIG_STREAMS_LOG_TRUE@	objname driver	log		log
+@CONFIG_STREAMS_SFX_TRUE@	objname	driver	sfx		sfx
+@CONFIG_STREAMS_SPX_TRUE@	objname	driver	spx		spx
 #objname	driver	socksys		socksys
 #objname	driver	unix		unix
 #objname	driver	xnet		xnet
-#objname driver	inet		inet
+#objname	driver	inet		inet
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	objname driver	clone		clone
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	objname driver	fifo		fifo
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	objname driver	loop		loop
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	objname driver	sad		sad
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	objname	driver	nsdev		nsdev
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	objname	driver	echo		echo
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	objname	driver	nuls		nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	objname	driver	pipe		pipe
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	objname driver	log		log
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	objname	driver	sfx		sfx
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	objname	driver	spx		spx
+#objname	driver	socksys		socksys
+#objname	driver	unix		unix
+#objname	driver	xnet		xnet
+#objname	driver	inet		inet
 
 #
 # Autopush specifications
@@ -68,17 +101,17 @@ objname	driver	spx		spx
 #
 # Loadable specifications
 #
-@CONFIG_STREAMS_UTIL_CLONE_MODULE_TRUE@loadable clone
-@CONFIG_STREAMS_UTIL_FIFO_MODULE_TRUE@loadable fifo
-#@CONFIG_STREAMS_UTIL_LOOP_MODULE_TRUE@loadable loop
-@CONFIG_STREAMS_UTIL_SAD_MODULE_TRUE@loadable sad
-@CONFIG_STREAMS_UTIL_NSDEV_MODULE_TRUE@loadable nsdev
-@CONFIG_STREAMS_UTIL_ECHO_MODULE_TRUE@loadable echo
-@CONFIG_STREAMS_UTIL_NULS_MODULE_TRUE@loadable nuls
-@CONFIG_STREAMS_UTIL_PIPE_MODULE_TRUE@loadable pipe
-@CONFIG_STREAMS_UTIL_LOG_MODULE_TRUE@loadable log
-loadable sfx
-loadable spx
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@loadable clone
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@loadable fifo
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@loadable loop
+@CONFIG_STREAMS_SAD_MODULE_TRUE@loadable sad
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@loadable nsdev
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@loadable echo
+@CONFIG_STREAMS_NULS_MODULE_TRUE@loadable nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@loadable pipe
+@CONFIG_STREAMS_LOG_MODULE_TRUE@loadable log
+#loadable sfx
+#loadable spx
 #loadable socksys
 #loadable unix
 #loadable xnet
@@ -105,21 +138,39 @@ loadable spx
 # example of how to use lis_mknod.
 #
 #	name	          type	perm	major		minor
-#node	/dev/loop.1	     c	0644	loop-around	1
-#node	/dev/loop.2	     c	*	loop-around	2
-#node	/dev/loop_clone	     c	*	clone-drvr	loop-around
-node	/dev/clone	     c	*	clone		0
-node	/dev/fifo	     c  0666    clone		fifo
-#node	/dev/loop	     c  0666    clone		loop
-node	/dev/sad	     c	*	clone		sad
-node	/dev/nsdev	     c	*	nsdev		0
-node	/dev/echo	     c	*	clone		echo
-node	/dev/nuls	     c	*	clone		nuls
-node	/dev/pipe	     c	*	pipe		0
-node	/dev/strlog	     c	*	clone		log
-node	/dev/conslog	     c  *	log		1
-node	/dev/sfx	     c	*	sfx		0
-node	/dev/spx	     c	*	spx		0
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.1	     c	0644	loop-around	1
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.2	     c	*	loop-around	2
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop_clone	     c	*	clone-drvr	loop-around
+@CONFIG_STREAMS_CLONE_TRUE@	node	/dev/clone	     c	*	clone		0
+@CONFIG_STREAMS_FIFO_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_SAD_TRUE@	node	/dev/sad	     c	*	clone		sad
+@CONFIG_STREAMS_NSDEV_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
+@CONFIG_STREAMS_ECHO_TRUE@	node	/dev/echo	     c	*	clone		echo
+@CONFIG_STREAMS_NULS_TRUE@	node	/dev/nuls	     c	*	clone		nuls
+@CONFIG_STREAMS_PIPE_TRUE@	node	/dev/pipe	     c	*	pipe		0
+@CONFIG_STREAMS_LOG_TRUE@	node	/dev/strlog	     c	*	clone		log
+@CONFIG_STREAMS_LOG_TRUE@	node	/dev/conslog	     c	*	log		1
+@CONFIG_STREAMS_SFX_TRUE@	node	/dev/sfx	     c	*	sfx		0
+@CONFIG_STREAMS_SPX_TRUE@	node	/dev/spx	     c	*	spx		0
+#node	/dev/socksys	     c	*	socksys		0
+#node	/dev/unix	     c	*	unix		0
+#node	/dev/xnet	     c	*	xnet		0
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.1	     c	0644	loop-around	1
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.2	     c	*	loop-around	2
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop_clone	     c	*	clone-drvr	loop-around
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@	node	/dev/clone	     c	*	clone		0
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_SAD_MODULE_TRUE@	node	/dev/sad	     c	*	clone		sad
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@	node	/dev/echo	     c	*	clone		echo
+@CONFIG_STREAMS_NULS_MODULE_TRUE@	node	/dev/nuls	     c	*	clone		nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@	node	/dev/pipe	     c	*	pipe		0
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/strlog	     c	*	clone		log
+@CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/conslog	     c	*	log		1
+@CONFIG_STREAMS_SFX_MODULE_TRUE@	node	/dev/sfx	     c	*	sfx		0
+@CONFIG_STREAMS_SPX_MODULE_TRUE@	node	/dev/spx	     c	*	spx		0
 #node	/dev/socksys	     c	*	socksys		0
 #node	/dev/unix	     c	*	unix		0
 #node	/dev/xnet	     c	*	xnet		0

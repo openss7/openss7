@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strclean.8.man,v 0.9.2.13 2005/05/14 08:34:15 brian Exp $
+.\" @(#) $Id: strclean.8.man,v 0.9.2.14 2005/07/21 20:47:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,24 +93,21 @@ sort-adjacent-labels
 .PD
 .\"
 .\"
-.SH DESCRIPTION
-.PP
-The
-.B strclean
-command is used to clean up the
-.I STREAMS
-error-logger directory on a regular basis: for example, by using the
-.BR cron (8)
-daemon.  By default, all files with names matching
-.BI error.mm-dd
-in the
-.B /var/log/streams
-.\".B /var/adm/streams
-directory that have not been modified in the last three days are removed.
-.\"
-.\"
 .SH OPTIONS
 .PP
+The following options can be used with the
+.B strclean
+command:
+.TP
+\fB-a\fR, \fB--age\fR \fIAGE\fR
+Specifies the maximum age, in days, other than three (3), for a log file.
+If not specified,
+.I AGE
+defaults to three (3).
+.TP
+\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
+file basename.  The default is
+.RB ' errors '.
 .TP
 \fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
 Specifies a directory other than
@@ -122,11 +119,17 @@ defaults to
 .BR /var/log/streams .
 .\".BR /var/adm/streams .
 .TP
-\fB-a\fR, \fB--age\fR \fIAGE\fR
-Specifies the maximum age, in days, other than three (3), for a log file.
-If not specified,
-.I AGE
-defaults to three (3).
+\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
+removes files matching
+.IR OUTFILE .
+The default file match is
+.RB ' errors.[0-1][0-9]-[0-3][0-9] '.
+.TP
+\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
+removes files matching
+.IR ERRFILE .
+The default file match is
+.RB ' errors.errors '.
 .TP
 \fB-q\fR, \fB--quiet\fR
 Suppresses normal output.
@@ -148,6 +151,11 @@ and will not place itself in the background.
 Increase or specify the verbosity
 .I LEVEL
 of the output.  This option may be repeated.
+.PP
+The following options are general command options.  When one of these options is encountered, the
+requested information is displayed and
+.B strclean
+exits without processing further options or arguments and without performing any other actions.
 .TP
 \fB-h\fR, \fB--help\fR
 When this options is encountered,
@@ -169,6 +177,22 @@ When this option is encountered,
 displays copying and copyright information on
 .I stdout
 and exits.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strclean
+command is used to clean up the
+.I STREAMS
+error-logger directory on a regular basis: for example, by using the
+.BR cron (8)
+daemon.  By default, all files with names matching
+.BI error.mm-dd
+in the
+.B /var/log/streams
+.\".B /var/adm/streams
+directory that have not been modified in the last three days are removed.
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -198,7 +222,7 @@ daemon on a daily or weekly basis.
 .SH NOTICES
 .PP
 .B strclean
-could easily be implemented as a script.
+could easily be implemented as a script (and is).
 .\"
 .\"
 .\".SH EXAMPLES
@@ -275,10 +299,7 @@ are provided for compatibility with GNU coding standards;
 OpenSS7 coding standards.
 .IP \(em
 Under
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
+.I @PACKAGE_TITLE@
 .B strclean
 will also clean out trace files left in the log directory and which are older
 than
@@ -326,7 +347,7 @@ uxpdoc
 .PP
 .PP
 .B strclean
-first appear in
+first appeared in
 .IR "SVR 4" .
 .[
 svr4

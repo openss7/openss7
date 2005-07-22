@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.15 2005/05/14 08:34:15 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.16 2005/07/21 20:47:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -622,10 +622,7 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-.B Linux Fast-STREAMS
-.[
-LfS
-.]
+.I @PACKAGE_TITLE@
 .B autopush
 is compatible with
 .IR "SVR 4.2" ,
@@ -710,7 +707,7 @@ mention using the
 module to enhance the
 .BR sad (4)
 driver.
-.B Linux Fast-STREAMS
+.I @PACKAGE_TITLE@
 also provides an
 .BR sc (4)
 module that can be pushed (or not) to the same effect.
@@ -724,10 +721,7 @@ provides a
 driver but does not provide an
 .B autopush
 command.
-.B Linux Fast-STREAMS
-.[
-LfS
-.]
+.I @PACKAGE_TITLE@
 provides for this deficiency.
 .IP \(em
 Options
@@ -736,7 +730,7 @@ are provided for compatibility with GNU coding standards;
 .BR --copying ", " --debug ", " --verbose " and " --quiet ,
 OpenSS7 coding standards.
 .PP
-.B Linux Fast-STREAMS
+.I @PACKAGE_TITLE@
 provides a number of additional options.  Portable configurations should use
 only short options and should limit themselves to the following three forms of
 the command:

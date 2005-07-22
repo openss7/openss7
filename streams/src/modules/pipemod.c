@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -119,8 +119,10 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for PIPEMOD.");
 
 #ifdef MODULE_ALIAS
+#if LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PIPEMOD_MODID));
 MODULE_ALIAS("streams-module-pipemod");
+#endif
 #endif
 
 static struct module_info pipemod_minfo = {

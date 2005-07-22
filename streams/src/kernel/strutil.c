@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/19 11:21:19 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/21 22:52:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/19 11:21:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 22:52:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/19 11:21:19 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/21 22:52:09 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/19 11:21:19 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/21 22:52:09 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -788,7 +788,6 @@ qbackenable(queue_t *q)
 	ptrace(("%s; back-enabling queue %p\n", __FUNCTION__, q));
 	ensure(q, return);
 	ptrace(("%s; locking queue %p\n", __FUNCTION__, q));
-	hrlock(q);		/* read lock queue chain */
 	for (qp = backq(q); qp; qp = backq(qp)) {
 		ensure(qp->q_qinfo, continue);
 		ptrace(("%s; checking queue %p for service procedure\n", __FUNCTION__, qp));
@@ -799,7 +798,6 @@ qbackenable(queue_t *q)
 		}
 	}
 	ptrace(("%s; unlocking queue %p\n", __FUNCTION__, q));
-	hrunlock(q);
 	return;
 }
 
@@ -842,9 +840,8 @@ int
 bcanget(queue_t *q, int band)
 {
 	int result;
-	unsigned long flags;
 
-	qrlock(q, &flags);
+	qrlock_bh(q);
 	switch (band) {
 	case 0:
 		result = (__canget(q) & 1);	/* mask off backenable bit */
@@ -856,7 +853,7 @@ bcanget(queue_t *q, int band)
 		result = __bcanget(q, band);
 		break;
 	}
-	qrunlock(q, &flags);
+	qrunlock_bh(q);
 	return (result);
 }
 
@@ -872,13 +869,12 @@ __bcanputany(queue_t *q)
 
 	if ((q_next = q)) {
 		struct qband *qb;
-		unsigned long flags;
 
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
-		qrlock(q, &flags);
+		qrlock_bh(q);
 		for (qb = q->q_bandp; qb && test_bit(QB_FULL_BIT, &qb->qb_flag); qb = qb->qb_next) ;
-		qrunlock(q, &flags);
+		qrunlock_bh(q);
 		/* a non-existent band is considered unwritable */
 		return (qb ? 1 : 0);
 	}
@@ -896,28 +892,25 @@ __bcanput(queue_t *q, unsigned char band)
 
 	if ((q_next = q)) {
 		struct qband *qb;
-		unsigned long flags;
 
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
-		qrlock(q, &flags);
+		qrlock_bh(q);
 		/* bands are sorted in decending priority so that we can quit the search early for
 		   higher priority bands */
 		for (qb = q->q_bandp; qb && (qb->qb_band > band); qb = qb->qb_next) ;
 		if (qb && qb->qb_band == band && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 			set_bit(QB_WANTW_BIT, &qb->qb_flag);
-			qrunlock(q, &flags);
+			qrunlock_bh(q);
 			return (0);
 		}
-		qrunlock(q, &flags);
+		qrunlock_bh(q);
 		/* a non-existent band is considered empty */
 		return (1);
 	}
 	swerr();
 	return (0);
 }
-
-static int __canput(queue_t *q);
 
 /**
  *  bcanput:	- check whether message can be put to a queue
@@ -936,10 +929,9 @@ bcanput(queue_t *q, int band)
 {
 	int result;
 
-	hrlock(q);		/* read lock queue chain */
 	switch (band) {
 	case 0:
-		result = __canput(q);
+		result = canput(q);
 		break;
 	case ANYBAND:
 		result = __bcanputany(q);
@@ -948,7 +940,6 @@ bcanput(queue_t *q, int band)
 		result = __bcanput(q, band);
 		break;
 	}
-	hrunlock(q);
 	return (result);
 }
 
@@ -962,22 +953,7 @@ EXPORT_SYMBOL(bcanput);
 int
 bcanputnext(queue_t *q, int band)
 {
-	int result;
-
-	hrlock(q);		/* read lock queue chain */
-	switch (band) {
-	case 0:
-		result = __canput(q->q_next);
-		break;
-	case ANYBAND:
-		result = __bcanputany(q->q_next);
-		break;
-	default:
-		result = __bcanput(q->q_next, band);
-		break;
-	}
-	hrunlock(q);
-	return (result);
+	return (bcanput(q->q_next, band));
 }
 
 EXPORT_SYMBOL(bcanputnext);
@@ -1017,11 +993,10 @@ int
 canget(queue_t *q)
 {
 	int result;
-	unsigned long flags;
 
-	qrlock(q, &flags);
+	qrlock_bh(q);
 	result = __canget(q);
-	qrunlock(q, &flags);
+	qrunlock_bh(q);
 	if (result & 2)
 		qbackenable(q);
 	return (result & 1);
@@ -1029,11 +1004,15 @@ canget(queue_t *q)
 
 EXPORT_SYMBOL(canget);
 
-/*
- *  __canput:
+/**
+ *  canput:	- check wheter message can be put to a queue
+ *  @q:		the queue to check
+ *
+ *  Don't call these functions with NULL q pointers!  To walk the list of queues we take a reader
+ *  lock on the stream head.
  */
-static int
-__canput(queue_t *q)
+int
+canput(queue_t *q)
 {
 	queue_t *q_next;
 
@@ -1050,24 +1029,6 @@ __canput(queue_t *q)
 	return (0);
 }
 
-/**
- *  canput:	- check wheter message can be put to a queue
- *  @q:		the queue to check
- *
- *  Don't call these functions with NULL q pointers!  To walk the list of queues we take a reader
- *  lock on the stream head.
- */
-int
-canput(queue_t *q)
-{
-	int result;
-
-	hrlock(q);		/* read lock queue chain */
-	result = __canput(q);
-	hrunlock(q);
-	return (result);
-}
-
 EXPORT_SYMBOL(canput);
 
 /**
@@ -1077,12 +1038,7 @@ EXPORT_SYMBOL(canput);
 int
 canputnext(queue_t *q)
 {
-	int result;
-
-	hrlock(q);		/* read lock queue chain */
-	result = __canput(q->q_next);
-	hrunlock(q);
-	return (result);
+	return (canput(q->q_next));
 }
 
 EXPORT_SYMBOL(canputnext);
@@ -1212,8 +1168,8 @@ void
 flushband(queue_t *q, int band, int flag)
 {
 	int backenable;
-	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long flags;
+	mblk_t *mp = NULL, **mpp = &mp;
 
 	qwlock(q, &flags);
 	backenable = __flushband(q, flag, band, &mpp);
@@ -1237,8 +1193,7 @@ freezestr(queue_t *q)
 {
 	unsigned long flags = 0;
 
-	hwlock(q, &flags);
-	qwlock(q, NULL);
+	qwlock(q, &flags);
 	return ((q->q_iflags = flags));
 }
 
@@ -1345,8 +1300,8 @@ mblk_t *
 getq(queue_t *q)
 {
 	mblk_t *mp;
-	unsigned long flags;
 	int backenable = 0;
+	unsigned long flags;
 
 	ensure(q, return (NULL));
 	qwlock(q, &flags);
@@ -1570,9 +1525,7 @@ _put(queue_t *q, mblk_t *mp)
 void
 put(queue_t *q, mblk_t *mp)
 {
-	hrlock(q);
 	_put(q, mp);
-	hrunlock(q);
 }
 
 EXPORT_SYMBOL(put);
@@ -1585,9 +1538,7 @@ EXPORT_SYMBOL(put);
 void
 putnext(queue_t *q, mblk_t *mp)
 {
-	hrlock(q);
 	_put(q->q_next, mp);
-	hrunlock(q);
 }
 
 EXPORT_SYMBOL(putnext);
@@ -1939,7 +1890,7 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 		printd(("%s: could not set queues\n", __FUNCTION__));
 		goto freeq_error;
 	}
-	qinsert(sd->sd_rq, q);	/* half insert under stream head */
+	qinsert(sd, q);		/* half insert under stream head */
 	qprocsoff(q);		/* does not alter q_next pointers, just flags */
 	odev = *devp;		/* remember calling device number */
 	if ((err = qopen(q, devp, oflag, sflag, crp))) {
@@ -2038,11 +1989,11 @@ EXPORT_SYMBOL(qclose);
 void
 qdelete(queue_t *q)
 {
-	unsigned long flags = 0;
 	struct queinfo *qu = (typeof(qu)) q;
 	struct stdata *sd = qu->qu_str;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+	unsigned long flags;
 
 	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	wq = rq + 1;
@@ -2091,11 +2042,11 @@ EXPORT_SYMBOL(qdetach);
 
 /**
  *  qinsert:	- insert a queue pair below another in a stream
- *  @brq:	read queue of queue pair beneath which to insert
+ *  @sd:	stream head under which to insert
  *  @irq:	read queue of queue pair to insert
  *
  *  qinsert() half-inserts the queue pair identified by @irq beneath the queue pair on the stream
- *  identified by @brq.  This is only a half-insert.  The q->q_next pointers of the queue pair to be
+ *  identified by @sd.  This is only a half-insert.  The q->q_next pointers of the queue pair to be
  *  inserted, @irq, are adjusted, but the stream remains unaffected.  qprocson() must be called on
  *  @irq to complete the insertion and properly set flags.
  *
@@ -2103,18 +2054,24 @@ EXPORT_SYMBOL(qdetach);
  *  procedure.
  *
  *  Notices: irq should not already be inserted on a queue or bad things will happen.
+ *
+ *  Locking: This function needs to be called with a read lock on the stream head.  Because brq
+ *  (bottom read queue) must be protected, the read lock on the stream head must be taken by the
+ *  caller.
  */
 void
-qinsert(queue_t *brq, queue_t *irq)
+qinsert(struct stdata *sd, queue_t *irq)
 {
-	struct queinfo *iqu = (typeof(iqu)) irq;
-	queue_t *iwq = irq + 1;
-	struct queinfo *bqu = (typeof(bqu)) brq;
-	queue_t *bwq = brq + 1;
-	unsigned long flags = 0;
+	queue_t *iwq, *brq, *bwq;
+	struct queinfo *iqu, *bqu;
 
+	srlock_bh(sd);
+	brq = sd->sd_rq;
+	iqu = (typeof(iqu)) irq;
+	iwq = irq + 1;
+	bqu = (typeof(bqu)) brq;
+	bwq = brq + 1;
 	ptrace(("%s: half insert of queue pair under stream head\n", __FUNCTION__));
-	hwlock(brq, &flags);
 	iqu->qu_str = sd_get(bqu->qu_str);
 	irq->q_next = qget(brq);
 	if (bwq->q_next != brq) {	/* not a fifo */
@@ -2122,7 +2079,7 @@ qinsert(queue_t *brq, queue_t *irq)
 	} else {		/* is a fifo */
 		iwq->q_next = qget(irq);
 	}
-	hwunlock(brq, &flags);
+	srunlock_bh(sd);
 }
 
 EXPORT_SYMBOL(qinsert);
@@ -2165,7 +2122,6 @@ EXPORT_SYMBOL(qopen);
 void
 qprocsoff(queue_t *q)
 {
-	unsigned long flags = 0;
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
@@ -2176,8 +2132,8 @@ qprocsoff(queue_t *q)
 		set_bit(QHLIST_BIT, &wq->q_flag);
 		set_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
 		set_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
-		/* spin here until put or srv procedures exit */
-		hwlock(rq, &flags);
+		/* spin here waiting for queue procedures to exit */
+		hwlock_bh(rq);
 		/* bypass this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
@@ -2191,7 +2147,7 @@ qprocsoff(queue_t *q)
 			bq->q_next = qget(wq->q_next);
 			qput(&qn);
 		}
-		hwunlock(rq, &flags);
+		hwunlock_bh(rq);
 		/* put procs must check QHLIST bit after acquiring hrlock */
 		/* srv procs must check QNOENB bit after acquiring hrlock */
 	} else
@@ -2209,16 +2165,22 @@ EXPORT_SYMBOL(qprocsoff);
  *  q->q_next pointers of the upstream modules for each queue in the queue pair.  This effectively
  *  undoes the bypass created by qprocsoff().
  *
- *  Context: qprocson() should only be called from qattach(), qdetach() or a stream head close
+ *  Context: qprocson() should only be called from qattach(), qdetach() or a stream head open
  *  procedure.  The user should call qprocson() from the qopen() procedure before returning.
  *
- *  Notices: qprocson() does fully inserts the queue pair into the stream.  It must be half-inserted
- *  with qinsert() before qprocson() can be called.
+ *  Notices: qprocson() fully inserts the queue pair into the stream.  It must be half-inserted with
+ *  qinsert() before qprocson() can be called.
+ *
+ *  Locking:  The module's qopen() procedure is called with no stream head locks held.  Before linking
+ *  the queue pair in, qprocson takes a write lock on the stream head.  This means that all queue
+ *  synchronous procedures must exit before the lock is acquired.  We are holding the stream head
+ *  open bit, so no other open or close can occur.  Stream head write locks are only be taken from
+ *  user context (we just try to take them from interrupt level (in_interrupt() && !in_irq())),
+ *  therefore, the write lock does not need to disable the bottom half.
  */
 void
 qprocson(queue_t *q)
 {
-	unsigned long flags = 0;
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
@@ -2229,7 +2191,8 @@ qprocson(queue_t *q)
 		clear_bit(QHLIST_BIT, &wq->q_flag);
 		clear_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
 		clear_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
-		hwlock(rq, &flags);
+		/* spin here waiting for queue procedures to exit */
+		hwlock_bh(rq);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
@@ -2243,7 +2206,7 @@ qprocson(queue_t *q)
 			bq->q_next = qget(wq);
 			qput(&qn);
 		}
-		hwunlock(rq, &flags);
+		hwunlock_bh(rq);
 	} else
 		printd(("%s: procs already turned on\n", __FUNCTION__));
 }
@@ -2337,12 +2300,10 @@ qcountstrm(queue_t *q)
 {
 	int count = 0;
 
-	hrlock(q);
 	while (SAMESTR(q)) {
 		q = q->q_next;
 		count += q->q_count;
 	}
-	hrunlock(q);
 	return (count);
 }
 
@@ -2408,8 +2369,8 @@ __rmvq(queue_t *q, mblk_t *mp)
 void
 rmvq(queue_t *q, mblk_t *mp)
 {
-	unsigned long flags;
 	int backenable;
+	unsigned long flags;
 
 	q = mp->b_queue;
 	ensure(q, return);
@@ -2460,18 +2421,19 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 void
 setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
-	unsigned long flags;
 	queue_t *rq = q;
 	queue_t *wq = q + 1;
 
 	/* always take read lock before write lock */
 	/* nobody else takes two locks */
-	qwlock(rq, &flags);
-	qwlock(wq, &flags);
+	local_bh_disable();
+	qwlock(rq, NULL);
+	qwlock(wq, NULL);
 	__setq(q, rinit, winit);
 	/* unlock in reverse order */
-	qwunlock(wq, &flags);
-	qwunlock(rq, &flags);
+	qwunlock(wq, NULL);
+	qwunlock(rq, NULL);
+	local_bh_enable();
 }
 
 EXPORT_SYMBOL(setq);
@@ -2595,9 +2557,8 @@ strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 		}
 	} else {
 		struct qband *qb;
-		unsigned long flags;
 
-		qrlock(q, &flags);
+		qrlock_bh(q);
 		do {
 			if (!(qb = __get_qband(q, band)))
 				goto enomem;
@@ -2635,7 +2596,7 @@ strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 			err = -ENOMEM;
 			break;
 		} while (0);
-		qrunlock(q, &flags);
+		qrunlock_bh(q);
 	}
 	return (-err);
 }
@@ -2804,8 +2765,7 @@ void
 unfreezestr(queue_t *q, unsigned long flags)
 {
 	flags = q->q_iflags;
-	qwunlock(q, NULL);
-	hwunlock(q, &flags);
+	qwunlock(q, &flags);
 }
 
 EXPORT_SYMBOL(unfreezestr);

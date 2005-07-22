@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/18 12:07:02 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3446,7 +3446,8 @@ strwsrv(queue_t *q)
 	return (0);
 }
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE
+#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
+ || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE
 EXPORT_SYMBOL(strwsrv);
 #endif
 
@@ -3734,7 +3735,8 @@ strrput(queue_t *q, mblk_t *mp)
 	}
 }
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE
+#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
+ || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE
 EXPORT_SYMBOL(strrput);
 #endif
 

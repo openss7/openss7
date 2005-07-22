@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/21 20:47:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/21 20:47:22 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/21 20:47:22 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -66,14 +66,14 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strsched.h"
-#include "strsad.h"		/* for autopush */
-#include "sth.h"
-#include "fifo.h"		/* for fifo stuff */
+#include "src/kernel/strsched.h"
+#include "src/kernel/strsad.h"		/* for autopush */
+#include "src/modules/sth.h"
+#include "src/drivers/fifo.h"		/* for fifo stuff */
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:06:59 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/21 20:47:22 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -133,10 +133,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs (0 for allo
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/sfx");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/streams/sfx");
 MODULE_ALIAS("/dev/streams/sfx/*");
+#endif
 #endif
 
 static struct module_info sfx_minfo = {
@@ -147,6 +149,9 @@ static struct module_info sfx_minfo = {
 	mi_hiwat:STRHIGH,
 	mi_lowat:STRLOW,
 };
+
+static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+static int sfx_close(queue_t *q, int oflag, cred_t *crp);
 
 static struct qinit sfx_rinit = {
 	qi_putp:strrput,
@@ -229,7 +234,7 @@ static struct cdevsw sfx_cdev = {
 	d_name:CONFIG_STREAMS_SFX_NAME,
 	d_str:&sfx_info,
 	d_flag:0,
-	d_fop:&sfx_ops,
+	d_fop:&strm_f_ops,
 	d_mode:S_IFIFO | S_IRUGO | S_IWUGO,
 	d_kmod:THIS_MODULE,
 };

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/14 10:38:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 10:38:51 $ by $Author: brian $
+# Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,8 +56,6 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
-	log.h \
-	sad.h \
 	strlog.h \
 	stropts.h \
 	sys/cmn_err.h \
@@ -65,10 +63,6 @@ nobase_pkginclude_HEADERS = \
 	sys/debug.h \
 	sys/dki.h \
 	sys/kmem.h \
-	sys/log.h \
-	sys/sad.h \
-	sys/sc.h \
-	sys/spec_fs_i.h \
 	sys/strconf.h \
 	sys/strdebug.h \
 	sys/stream.h \
@@ -80,15 +74,44 @@ nobase_pkginclude_HEADERS = \
 	sys/streams/debug.h \
 	sys/streams/dki.h \
 	sys/streams/kmem.h \
-	sys/streams/log.h \
-	sys/streams/sad.h \
-	sys/streams/sc.h \
 	sys/streams/strconf.h \
 	sys/streams/strdebug.h \
 	sys/streams/stream.h \
 	sys/streams/strlog.h \
 	sys/streams/stropts.h \
 	sys/streams/strsubr.h
+
+if CONFIG_STREAMS_LOG
+nobase_pkginclude_HEADERS += log.h
+nobase_pkginclude_HEADERS += sys/log.h
+nobase_pkginclude_HEADERS += sys/streams/log.h
+endif
+if CONFIG_STREAMS_LOG_MODULE
+nobase_pkginclude_HEADERS += log.h
+nobase_pkginclude_HEADERS += sys/log.h
+nobase_pkginclude_HEADERS += sys/streams/log.h
+endif
+if CONFIG_STREAMS_SAD
+nobase_pkginclude_HEADERS += sad.h
+nobase_pkginclude_HEADERS += sys/sad.h
+nobase_pkginclude_HEADERS += sys/streams/sad.h
+endif
+if CONFIG_STREAMS_SAD_MODULE
+nobase_pkginclude_HEADERS += sad.h
+nobase_pkginclude_HEADERS += sys/sad.h
+nobase_pkginclude_HEADERS += sys/streams/sad.h
+endif
+if CONFIG_STREAMS_SC
+nobase_pkginclude_HEADERS += sys/sc.h
+nobase_pkginclude_HEADERS += sys/streams/sc.h
+endif
+if CONFIG_STREAMS_SC_MODULE
+nobase_pkginclude_HEADERS += sys/sc.h
+nobase_pkginclude_HEADERS += sys/streams/sc.h
+endif
+
+##nobase_pkginclude_HEADERS += \
+##	sys/spec_fs_i.h \
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/streams/config.h \

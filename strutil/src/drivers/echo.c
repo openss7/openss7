@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:38:48 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:38:48 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $";
 
 #define _LFS_SOURCE
 
@@ -67,7 +67,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/18 12:38:48 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -79,7 +79,7 @@ static char const ident[] =
 #define ECHO_SPLASH	ECHO_DEVICE	" - " \
 			ECHO_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 MODULE_AUTHOR(ECHO_CONTACT);
 MODULE_DESCRIPTION(ECHO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
@@ -124,10 +124,12 @@ MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto alloca
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/echo");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/streams/echo");
 MODULE_ALIAS("/dev/streams/echo/*");
+#endif
 #endif
 
 static struct module_info echo_minfo = {
@@ -323,7 +325,7 @@ static struct cdevsw echo_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 static
 #endif
 int __init
@@ -331,7 +333,7 @@ echo_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 	printk(KERN_INFO ECHO_BANNER);
 #else
 	printk(KERN_INFO ECHO_SPLASH);
@@ -344,7 +346,7 @@ echo_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 static
 #endif
 void __exit
@@ -353,7 +355,7 @@ echo_exit(void)
 	unregister_strdev(&echo_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 module_init(echo_init);
 module_exit(echo_exit);
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/19 11:21:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.13  2005/07/21 20:47:18  brian
+ - sync with notebook
+
  Revision 0.9.2.12  2005/07/19 11:21:19  brian
  - updated strlog(9) for compatibility
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -115,7 +118,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/19 11:21:19 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -376,6 +379,10 @@ EXPORT_SYMBOL(putnextctl1);
 __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
 
 EXPORT_SYMBOL(putnextctl2);
+
+__LFS_EXTERN_INLINE void setq(queue_t *q, struct qinit *rinit, struct qinit *wrinit);
+
+EXPORT_SYMBOL(setq);
 
 /*
  *  This is a default implementation for strlog(9).  When SL_CONSOLE is set, we print directly to

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:07:02 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -115,8 +115,10 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for CONNLD.");
 
 #ifdef MODULE_ALIAS
+#if LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CONNLD_MODID));
 MODULE_ALIAS("streams-module-connld");
+#endif
 #endif
 
 static struct module_info connld_minfo = {

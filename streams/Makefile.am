@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/07/18 00:58:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/07/21 20:47:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/18 00:58:47 $ by $Author: brian $
+# Last Modified $Date: 2005/07/21 20:47:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,41 +66,135 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-bin_PROGRAMS			= \
+##
+## These are for ptys and should be part of the strutil or strio package.
+##
+bin_PROGRAMS			=
+if CONFIG_STREAMS_UTILS
+bin_PROGRAMS			+= \
 				  strchg \
 				  strconf \
 				  strreset
+endif
 
 sbin_PROGRAMS			= \
-				  autopush \
-				  fattach \
-				  fdetach \
-				  insf \
-				  scls \
-				  strace \
-				  strerr \
-				  strinfo \
-				  strvf \
 				  @PACKAGE_TARNAME@_mknod
+if CONFIG_STREAMS_SAD
+sbin_PROGRAMS			+= autopush
+endif
+if CONFIG_STREAMS_SAD_MODULE
+sbin_PROGRAMS			+= autopush
+endif
+if CONFIG_STREAMS_LOG
+sbin_PROGRAMS			+= strace strerr
+endif
+if CONFIG_STREAMS_LOG_MODULE
+sbin_PROGRAMS			+= strace strerr
+endif
+if CONFIG_STREAMS_SC
+sbin_PROGRAMS			+= scls strinfo
+endif
+if CONFIG_STREAMS_SC_MODULE
+sbin_PROGRAMS			+= scls strinfo
+endif
+if CONFIG_STREAMS_PIPE
+sbin_PROGRAMS			+= fattach fdetach
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+sbin_PROGRAMS			+= fattach fdetach
+endif
+if CONFIG_STREAMS_UTILS
+sbin_PROGRAMS			+= \
+				  insf \
+				  strvf
+endif
 
-dist_sbin_SCRIPTS		= \
-				  src/util/strclean \
+dist_sbin_SCRIPTS		=
+if CONFIG_STREAMS_LOG
+dist_sbin_SCRIPTS		+= src/util/strclean
+endif
+if CONFIG_STREAMS_LOG_MODULE
+dist_sbin_SCRIPTS		+= src/util/strclean
+endif
+if CONFIG_STREAMS_UTILS
+dist_sbin_SCRIPTS		+= \
 				  src/util/strload \
 				  src/util/strsetup
+endif
 
-libexec_PROGRAMS		= \
-				  test-clone \
-				  test-connld \
-				  test-echo \
-				  test-fifo \
-				  test-log \
-				  test-nsdev \
-				  test-nuls \
-				  test-pipe \
-				  test-pipemod \
-				  test-sad \
-				  test-sc \
-				  test-streams
+libexec_PROGRAMS		=
+if CONFIG_STREAMS_STH
+libexec_PROGRAMS		+= test-streams
+endif
+if CONFIG_STREAMS_STH_MODULE
+libexec_PROGRAMS		+= test-streams
+endif
+if CONFIG_STREAMS_CLONE
+libexec_PROGRAMS		+= test-clone
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+libexec_PROGRAMS		+= test-clone
+endif
+if CONFIG_STREAMS_CONNLD
+libexec_PROGRAMS		+= test-connld
+endif
+if CONFIG_STREAMS_CONNLD_MODULE
+libexec_PROGRAMS		+= test-connld
+endif
+if CONFIG_STREAMS_ECHO
+libexec_PROGRAMS		+= test-echo
+endif
+if CONFIG_STREAMS_ECHO_MODULE
+libexec_PROGRAMS		+= test-echo
+endif
+if CONFIG_STREAMS_FIFO
+libexec_PROGRAMS		+= test-fifo
+endif
+if CONFIG_STREAMS_FIFO_MODULE
+libexec_PROGRAMS		+= test-fifo
+endif
+if CONFIG_STREAMS_LOG
+libexec_PROGRAMS		+= test-log
+endif
+if CONFIG_STREAMS_LOG_MODULE
+libexec_PROGRAMS		+= test-log
+endif
+if CONFIG_STREAMS_NSDEV
+libexec_PROGRAMS		+= test-nsdev
+endif
+if CONFIG_STREAMS_NSDEV_MODULE
+libexec_PROGRAMS		+= test-nsdev
+endif
+if CONFIG_STREAMS_NULS
+libexec_PROGRAMS		+= test-nuls
+endif
+if CONFIG_STREAMS_NULS_MODULE
+libexec_PROGRAMS		+= test-nuls
+endif
+if CONFIG_STREAMS_PIPE
+libexec_PROGRAMS		+= test-pipe
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+libexec_PROGRAMS		+= test-pipe
+endif
+if CONFIG_STREAMS_PIPEMOD
+libexec_PROGRAMS		+= test-pipemod
+endif
+if CONFIG_STREAMS_PIPEMOD_MODULE
+libexec_PROGRAMS		+= test-pipemod
+endif
+if CONFIG_STREAMS_SAD
+libexec_PROGRAMS		+= test-sad
+endif
+if CONFIG_STREAMS_SAD_MODULE
+libexec_PROGRAMS		+= test-sad
+endif
+if CONFIG_STREAMS_SC
+libexec_PROGRAMS		+= test-sc
+endif
+if CONFIG_STREAMS_SC_MODULE
+libexec_PROGRAMS		+= test-sc
+endif
 
 
 #LFS_EXTRA_TESTS		= 
@@ -198,12 +292,12 @@ if CONFIG_STREAMS_LOG
 libLfS_streams_a_SOURCES	+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
 				   src/drivers/log.h src/drivers/log.c
 endif
-#if CONFIG_STREAMS_SFX
-#libLfS_streams_a_SOURCES	+= src/drivers/sfx.c
-#endif
-#if CONFIG_STREAMS_SPX
-#libLfS_streams_a_SOURCES	+= src/drivers/spx.c
-#endif
+if CONFIG_STREAMS_SFX
+libLfS_streams_a_SOURCES	+= src/drivers/sfx.c
+endif
+if CONFIG_STREAMS_SPX
+libLfS_streams_a_SOURCES	+= src/drivers/spx.c
+endif
 
 libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLfS_streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
@@ -241,12 +335,12 @@ if CONFIG_STREAMS_LOG_MODULE
 libLfS_drivers_a_SOURCES	+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
 				   src/drivers/log.h src/drivers/log.c
 endif
-#if CONFIG_STREAMS_SFX_MODULE
-#libLfS_drivers_a_SOURCES		+= src/drivers/sfx.c
-#endif
-#if CONFIG_STREAMS_SPX_MODULE
-#libLfS_drivers_a_SOURCES		+= src/drivers/spx.c
-#endif
+if CONFIG_STREAMS_SFX_MODULE
+libLfS_drivers_a_SOURCES	+= src/drivers/sfx.c
+endif
+if CONFIG_STREAMS_SPX_MODULE
+libLfS_drivers_a_SOURCES	+= src/drivers/spx.c
+endif
 
 libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLfS_drivers_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
@@ -416,17 +510,17 @@ strace_LDFLAGS			= -static libstreams.la
 strace_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strace_CFLAGS			= $(USER_CFLAGS)
 
-#strclean_SOURCES		= src/util/strclean.c
-#strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-#strclean_LDFLAGS		= -static libstreams.la
-#strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-#strclean_CFLAGS		= $(USER_CFLAGS)
+##strclean_SOURCES		= src/util/strclean.c
+##strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+##strclean_LDFLAGS		= -static libstreams.la
+##strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+##strclean_CFLAGS		= $(USER_CFLAGS)
 
-#@srcdir@/src/util/strclean.c:
-#	touch $@
+##@srcdir@/src/util/strclean.c:
+##	touch $@
 
-#@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
-#	touch $@
+##@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
+##	touch $@
 
 strerr_SOURCES			= src/util/strerr.c
 strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -440,29 +534,29 @@ strinfo_LDFLAGS			= -static libstreams.la
 strinfo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strinfo_CFLAGS			= $(USER_CFLAGS)
 
-#strload_SOURCES		= src/util/strload.c
-#strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-#strload_LDFLAGS		= -static libstreams.la
-#strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-#strload_CFLAGS			= $(USER_CFLAGS)
+##strload_SOURCES		= src/util/strload.c
+##strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+##strload_LDFLAGS		= -static libstreams.la
+##strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+##strload_CFLAGS			= $(USER_CFLAGS)
 
-#@srcdir@/src/util/strload.c:
-#	touch $@
+##@srcdir@/src/util/strload.c:
+##	touch $@
 
-#@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
-#	touch $@
+##@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
+##	touch $@
 
-#strsetup_SOURCES		= src/util/strsetup.c
-#strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-#strsetup_LDFLAGS		= -static libstreams.la
-#strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-#strsetup_CFLAGS		= $(USER_CFLAGS)
+##strsetup_SOURCES		= src/util/strsetup.c
+##strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+##strsetup_LDFLAGS		= -static libstreams.la
+##strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+##strsetup_CFLAGS		= $(USER_CFLAGS)
 
-#@srcdir@/src/util/strsetup.c:
-#	touch $@
+##@srcdir@/src/util/strsetup.c:
+##	touch $@
 
-#@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
-#	touch $@
+##@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
+##	touch $@
 
 strvf_SOURCES			= src/util/strvf.c
 strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -555,9 +649,19 @@ EXPORT_SRCFILES			= \
 				  src/kernel/strspecfs.c \
 				  src/kernel/strsysctl.c \
 				  src/kernel/strutil.c \
-				  src/kernel/strsyms.c \
-				  src/drivers/clone.c \
-				  src/modules/sth.c
+				  src/kernel/strsyms.c
+if CONFIG_STREAMS_CLONE
+EXPORT_SRCFILES			+= src/drivers/clone.c
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_SRCFILES			+= src/drivers/clone.c
+endif
+if CONFIG_STREAMS_STH
+EXPORT_SRCFILES			+= src/modules/sth.c
+endif
+if CONFIG_STREAMS_STH_MODULE
+EXPORT_SRCFILES			+= src/modules/sth.c
+endif
 
 EXPORT_VERFILES			= \
 				  $(PKGINCL)/versions/strattach.ver \
@@ -569,9 +673,19 @@ EXPORT_VERFILES			= \
 				  $(PKGINCL)/versions/strspecfs.ver \
 				  $(PKGINCL)/versions/strsysctl.ver \
 				  $(PKGINCL)/versions/strutil.ver \
-				  $(PKGINCL)/versions/strsyms.ver \
-				  $(PKGINCL)/versions/clone.ver \
-				  $(PKGINCL)/versions/sth.ver
+				  $(PKGINCL)/versions/strsyms.ver
+if CONFIG_STREAMS_CLONE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
+endif
+if CONFIG_STREAMS_STH
+EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
+endif
+if CONFIG_STREAMS_STH_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
+endif
 
 GENKSYMS_CPPFLAGS		= \
 				  -I./src/kernel -I$(srcdir)/src/kernel \
@@ -605,9 +719,15 @@ if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/specfs.sh \
-				  src/util/init/strace.sh \
-				  src/util/init/strerr.sh \
 				  src/util/init/@PACKAGE_LCNAME@.sh
+if CONFIG_STREAMS_LOG
+dist_initrd_SCRIPTS		+= src/util/init/strace.sh \
+				   src/util/init/strerr.sh
+endif
+if CONFIG_STREAMS_LOG_MODULE
+dist_initrd_SCRIPTS		+= src/util/init/strace.sh \
+				   src/util/init/strerr.sh
+endif
 
 ## WITH_RCSD_DIRECTORY
 else
@@ -615,23 +735,38 @@ else
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/specfs \
-				  src/util/init/strace \
-				  src/util/init/strerr \
 				  src/util/init/@PACKAGE_LCNAME@
+if CONFIG_STREAMS_LOG
+dist_initrd_SCRIPTS		+= src/util/init/strace \
+				   src/util/init/strerr
+endif
+if CONFIG_STREAMS_LOG_MODULE
+dist_initrd_SCRIPTS		+= src/util/init/strace \
+				   src/util/init/strerr
+endif
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
 dist_sysconf_DATA		= \
-				  strsetup.conf \
-				  strload.conf \
 				  src/util/sysconfig/@PACKAGE_LCNAME@.conf
+if CONFIG_STREAMS_UTILS
+dist_sysconf_DATA		+= \
+				  strsetup.conf \
+				  strload.conf
+endif
 
 dist_config_DATA		= \
 				  src/util/sysconfig/specfs \
-				  src/util/sysconfig/strace \
-				  src/util/sysconfig/strerr \
 				  src/util/sysconfig/@PACKAGE_LCNAME@
+if CONFIG_STREAMS_LOG
+dist_config_DATA		+= src/util/sysconfig/strace \
+				   src/util/sysconfig/strerr
+endif
+if CONFIG_STREAMS_LOG_MODULE
+dist_config_DATA		+= src/util/sysconfig/strace \
+				   src/util/sysconfig/strerr
+endif
 
 ## INSTALL_INITSCRIPTS
 endif

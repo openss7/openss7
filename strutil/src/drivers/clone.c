@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/18 12:38:48 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/18 12:38:48 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $";
 
 #define _LFS_SOURCE
 
@@ -61,7 +61,7 @@ static char const ident[] =
 
 #include "clone.h"		/* extern verification */
 
-#ifdef LIS
+#if LIS
 #define CONFIG_STREAMS_CLONE_MODID	CLONE_DRV_ID
 #define CONFIG_STREAMS_CLONE_NAME	CLONE_DRV_NAME
 #define CONFIG_STREAMS_CLONE_MAJOR	CLONE_CMAJOR_0
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/18 12:38:48 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -85,7 +85,7 @@ static char const ident[] =
 #define CLONE_SPLASH	CLONE_DEVICE	" - " \
 			CLONE_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 MODULE_AUTHOR(CLONE_CONTACT);
 MODULE_DESCRIPTION(CLONE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CLONE_DEVICE);
@@ -132,11 +132,15 @@ module_param(major, uint, 0);
 MODULE_PARM_DESC(major, "Major device number for CLONE driver.");
 
 #ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-0");
 MODULE_ALIAS("/dev/clone");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("/dev/streams/clone");
 MODULE_ALIAS("/dev/streams/clone/*");
+#endif
 #endif
 
 LFSSTATIC struct module_info clone_minfo = {
@@ -368,7 +372,7 @@ EXPORT_SYMBOL(unregister_clone);
  *  -------------------------------------------------------------------------
  */
 
-#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 LFSSTATIC
 #endif
 int __init
@@ -377,7 +381,7 @@ clone_init(void)
 #if LFS
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 	printk(KERN_INFO CLONE_BANNER);
 #else
 	printk(KERN_INFO CLONE_SPLASH);
@@ -391,7 +395,7 @@ clone_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 LFSSTATIC
 #endif
 void __exit
@@ -402,7 +406,7 @@ clone_exit(void)
 #endif
 };
 
-#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 module_init(clone_init);
 module_exit(clone_exit);
 #endif

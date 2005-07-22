@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,38 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $";
+
+/*
+ *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
+ *  distinct from the Linux syslog and klog.  One of the primary purposes of providing such a
+ *  logging device is to suport the strlog(9) trace faciltiy.  This is a useful tool for debugging
+ *  and interrogation of a live system.  Both Linux STREAMS (LiS) and Linux Fast-STREAMS (LfS) have
+ *  been equipped with a hook to the strlog(9) function.  This hook is a vstrlog function pointer
+ *  that defaults to internal kernel logging.  When the strlog(9) function is called by a STREAMS
+ *  driver or module, we here first scan for whether there is an open trace or error logging stream
+ *  willing to accept the message (from mid, sid and level).  If there is a logger that wishes to
+ *  accept the message, it is formatted and sent upstream.  If there is no logger, or if the logger
+ *  is flow controlled, the message is simply dropped.  This means that a STREAMS driver or module
+ *  can generate alot of trace information without worrying about its impact on system performance.
+ *  Normally calls to strlog(9) would be simply null operations.  Only when a trace or error logger
+ *  is present in the system would information be passed upstream.  This is far preferrable to
+ *  cmn_err(9) which generates each and every message to the kernel log.
+ */
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/interrupt.h>	/* for local_bh_disable */
+#include <linux/ctype.h>	/* for isdigit */
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -72,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/18 12:06:59 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -129,10 +148,17 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-log driver.");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/log");
+MODULE_ALIAS("/dev/strlog");
+MODULE_ALIAS("/dev/conslog");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");
+MODULE_ALIAS("/dev/streams/strlog");
+MODULE_ALIAS("/dev/streams/strlog/*");
+MODULE_ALIAS("/dev/streams/conslog");
+#endif
 #endif
 
 static struct module_info log_minfo = {
@@ -144,11 +170,29 @@ static struct module_info log_minfo = {
 	mi_lowat:STRLOW,
 };
 
+queue_t *log_conq = NULL;
 queue_t *log_errq = NULL;
 queue_t *log_trcq = NULL;
 
-int errlog_sequence = 0;
-int trclog_sequence = 0;
+atomic_t conlog_sequence = ATOMIC_INIT(0);
+atomic_t errlog_sequence = ATOMIC_INIT(0);
+atomic_t trclog_sequence = ATOMIC_INIT(0);
+
+#if !defined HAVE_KFUNC_ATOMIC_ADD_RETURN
+static spinlock_t my_atomic_lock = SPIN_LOCK_UNLOCKED;
+int my_atomic_add_return(int val, atomic_t *atomic) {
+	int ret;
+	unsigned long flags;
+	spin_lock_irqsave(&my_atomic_lock, flags);
+	atomic_add(val, atomic);
+	ret = atomic_read(atomic);
+	spin_unlock_irqrestore(&my_atomic_lock, flags);
+	return (ret);
+}
+#undef atomic_add_return
+#define atomic_add_return my_atomic_add_return
+#endif
+
 
 /* private structures */
 struct log {
@@ -158,6 +202,99 @@ struct log {
 	int traceids;			/* the number of trace ids in the trace block */
 	mblk_t *traceblk;		/* a message block containing trace ids */
 };
+
+#define PROMOTE_SIZE		(sizeof(int))
+#define PROMOTE_ALIGN(__x)	(((__x) + PROMOTE_SIZE - 1) & ~(PROMOTE_SIZE - 1))
+#define PROMOTE_SIZEOF(__x)	((sizeof(__x) < PROMOTE_SIZE) ? PROMOTE_SIZE : sizeof(__x))
+
+/*
+ *  Determine whether the message is filtered or not.  Return 1 if the message
+ *  is to be delivered to the trace logger and 0 if it is not.
+ */
+static int inline
+log_trace_filter(queue_t *q, short mid, short sid, char level)
+{
+	int rval = 0;
+
+	if (q) {
+		struct log *p = (typeof(p)) q->q_ptr;
+		struct trace_ids *ti;
+		int i;
+
+		for (i = 0, ti = (typeof(ti)) p->traceblk->b_rptr; i < p->traceids; i++, ti++) {
+			if ((ti->ti_mid == mid || ti->ti_mid == (short) (-1UL))
+			    && (ti->ti_sid == sid || ti->ti_sid == (short) (-1UL))
+			    && (ti->ti_level >= level || ti->ti_level == (char) (-1UL))) {
+				/* trace logger sees this message */
+				rval = 1;
+				break;
+			}
+		}
+	}
+	return (rval);
+}
+
+/*
+ *  Allocate a control block portion for a log message and fill it out.
+ */
+static inline mblk_t *
+log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags, int seq_no,
+	      int source)
+{
+	struct log_ctl *lp;
+	mblk_t *mp = NULL;
+	int pri;
+
+	if (flags & SL_WARN)
+		pri = LOG_WARNING;
+	else if (flags & SL_FATAL)
+		pri = LOG_ERR;
+	else if (flags & SL_NOTE)
+		pri = LOG_NOTICE;
+	else if (flags & SL_TRACE)
+		pri = LOG_DEBUG;
+	else
+		pri = LOG_INFO;
+	if ((mp = allocb(sizeof(*lp), BPRI_MED))) {
+		struct timeval tv;
+
+		mp->b_datap->db_type = M_PROTO;
+		lp = (typeof(lp)) mp->b_rptr;
+		mp->b_wptr = mp->b_rptr + sizeof(*lp);
+		mp->b_band = (7 - pri);
+		lp->mid = mid;
+		lp->sid = sid;
+		lp->level = level;
+		lp->flags = flags;
+		lp->ttime = jiffies;
+		do_gettimeofday(&tv);
+		lp->ltime = tv.tv_sec;
+		lp->seq_no = seq_no;
+		lp->pri = source | pri;
+	}
+	return (mp);
+}
+
+/*
+ *  Try to allocate a control block, duplicate the data block, and deliver the
+ *  message.  Return 1 on success, 0 on failure.
+ */
+static inline int
+log_deliver_msg(queue_t *q, short mid, short sid, char level, int flags, int seq, mblk_t *dp,
+		int source)
+{
+	int rval = 0;
+	mblk_t *bp, *mp;
+
+	if (q && (bp = dupmsg(dp)) && (mp = log_alloc_ctl(q, mid, sid, level, flags, seq, source))) {
+		mp->b_cont = bp;
+		if (bcanput(q, mp->b_band) && putq(q, mp))
+			rval = 1;
+		else
+			freemsg(mp);
+	}
+	return (rval);
+}
 
 static int
 log_put(queue_t *q, mblk_t *mp)
@@ -189,6 +326,21 @@ log_put(queue_t *q, mblk_t *mp)
 	case M_IOCTL:
 		ioc = (typeof(ioc)) mp->b_rptr;
 		switch (ioc->iocblk.ioc_cmd) {
+		case I_CONSLOG:
+			err = -EPERM;
+			if (ioc->iocblk.ioc_uid != 0)
+				goto nak;
+			err = -EOPNOTSUPP;
+			if (ioc->iocblk.ioc_count == TRANSPARENT)
+				goto nak;
+			err = -EFAULT;
+			if (!dp)
+				goto nak;
+			err = -ENXIO;
+			if (log_conq != NULL)
+				goto nak;
+			log_conq = RD(q);
+			goto ack;
 		case I_ERRLOG:
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
@@ -236,6 +388,40 @@ log_put(queue_t *q, mblk_t *mp)
 		goto nak;
 	case M_PROTO:
 	case M_PCPROTO:
+	{
+		struct log_ctl *lp;
+		struct timeval tv;
+
+		if (!log_conq && !log_errq && !log_trcq)
+			break;
+		if (mp->b_wptr < mp->b_rptr + sizeof(*lp))
+			break;
+		do_gettimeofday(&tv);
+		lp = (typeof(lp)) mp->b_rptr;
+		if (lp->flags & (SL_CONSOLE | SL_ERROR | SL_TRACE)) {
+			if (lp->flags & SL_CONSOLE)
+				log_deliver_msg(log_conq, lp->mid, lp->sid, lp->level, lp->flags,
+						atomic_add_return(1, &conlog_sequence), mp,
+						LOG_USER);
+			if (lp->flags & SL_ERROR)
+				log_deliver_msg(log_errq, lp->mid, lp->sid, lp->level, lp->flags,
+						atomic_add_return(1, &errlog_sequence), mp,
+						LOG_USER);
+			if (lp->flags & SL_TRACE
+			    && log_trace_filter(log_trcq, lp->mid, lp->sid, lp->level))
+				log_deliver_msg(log_trcq, lp->mid, lp->sid, lp->level, lp->flags,
+						atomic_add_return(1, &trclog_sequence), mp,
+						LOG_USER);
+		}
+		break;
+	}
+	case M_DATA:
+		/* just for /dev/conslog */
+		if (getminor(log->dev) != 1)
+			break;
+		/* only for the console */
+		log_deliver_msg(log_conq, 0, 0, 0, SL_CONSOLE,
+				atomic_add_return(1, &conlog_sequence), mp, LOG_USER);
 		break;
 	}
 	freemsg(mp);
@@ -274,7 +460,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	switch (sflag) {
 	case CLONEOPEN:
 		if (cminor < 1)
-			cminor = 1;
+			cminor = 2;
 	case DRVOPEN:
 	{
 		major_t dmajor = 0;
@@ -282,7 +468,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		if (cminor < 1)
 			return (ENXIO);
-		spin_lock(&log_lock);
+		spin_lock_bh(&log_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
@@ -290,13 +476,13 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor && sflag != CLONEOPEN) {
-				spin_unlock(&log_lock);
+				spin_unlock_bh(&log_lock);
 				kmem_free(p, sizeof(*p));
 				return (EIO);	/* bad error */
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
-			spin_unlock(&log_lock);
+			spin_unlock_bh(&log_lock);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */
 		}
@@ -306,7 +492,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		p->prev = pp;
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
-		spin_unlock(&log_lock);
+		spin_unlock_bh(&log_lock);
 		return (0);
 	}
 	}
@@ -320,13 +506,13 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
-	spin_lock(&log_lock);
+	spin_lock_bh(&log_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	spin_unlock(&log_lock);
+	spin_unlock_bh(&log_lock);
 	return (0);
 }
 
@@ -355,6 +541,419 @@ static struct cdevsw log_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
+/*
+ * This is where we hook into the STREAMS strlog(9) function.
+ */
+
+static vstrlog_t oldlog = NULL;
+
+/*
+ *  Allocate a data block and fill it in with the format string and an argument
+ *  list beignning with the integer aligned following the format string.  We
+ *  need to parse the format string (twice: once for sizing and once to assemble
+ *  the list) to do this, so the number of arguments passed should be small
+ *  (NLOGARGS is 3).  We process as many arguments as passed but you shouold not
+ *  send mor than NLOGARGS.
+ */
+static mblk_t *
+log_alloc_data(char *fmt, va_list args)
+{
+	mblk_t *bp;
+	size_t len = strnlen(fmt, LOGMSGSZ);
+	size_t plen = PROMOTE_ALIGN(len + 1);
+
+	fmt[len] = '\0';	/* force null termination and truncate */
+	if ((bp = allocb(plen, BPRI_MED))) {
+		va_list args2;
+		size_t nargs = 0, alen = 0;
+		char type;
+		mblk_t *dp;
+
+		bp->b_datap->db_type = M_DATA;
+		bp->b_wptr = bp->b_rptr;
+		va_copy(args2, args);
+		for (; *fmt; ++fmt, bp->b_wptr++) {
+			if ((*bp->b_wptr = *fmt) != '%')
+				continue;
+			/* flags */
+			for (++fmt, bp->b_wptr++;; ++fmt, bp->b_wptr++) {
+				switch ((*bp->b_wptr = *fmt)) {
+				case '-':
+					continue;
+				case '+':
+					continue;
+				case ' ':
+					continue;
+				case '#':
+					continue;
+				case '0':
+					continue;
+				default:
+					break;
+				}
+				break;
+			}
+			/* field width */
+			if (isdigit((*bp->b_wptr = *fmt))) {
+				++fmt;
+				bp->b_wptr++;
+				while (isdigit((*bp->b_wptr = *fmt))) {
+					++fmt;
+					bp->b_wptr++;
+				}
+			} else if ((*bp->b_wptr = *fmt) == '*') {
+				++fmt;
+				bp->b_wptr++;
+				alen += PROMOTE_SIZEOF(int);
+				(void) va_arg(args2, int);
+
+				if (++nargs == NLOGARGS)
+					break;
+			}
+			/* get precision */
+			if ((*bp->b_wptr = *fmt) == '.') {
+				++fmt;
+				bp->b_wptr++;
+				if (isdigit((*bp->b_wptr = *fmt))) {
+					++fmt;
+					bp->b_wptr++;
+					while (isdigit((*bp->b_wptr = *fmt))) {
+						++fmt;
+						bp->b_wptr++;
+					}
+				} else if ((*bp->b_wptr = *fmt) == '*') {
+					++fmt;
+					bp->b_wptr++;
+					alen += PROMOTE_SIZEOF(int);
+
+					(void) va_arg(args2, int);
+
+					if (++nargs == NLOGARGS)
+						break;
+				}
+			}
+			/* get qualifier */
+			type = 'i';
+			switch ((*bp->b_wptr = *fmt)) {
+			case 'h':
+				type = *fmt;
+				++fmt;
+				bp->b_wptr++;
+				if ((*bp->b_wptr = *fmt) == 'h') {
+					++fmt;
+					bp->b_wptr++;
+					type = 'c';
+				}
+				break;
+			case 'l':
+				type = *fmt;
+				++fmt;
+				bp->b_wptr++;
+				if ((*bp->b_wptr = *fmt) == 'l') {
+					++fmt;
+					bp->b_wptr++;
+					type = 'L';
+				}
+				break;
+			case 'q':
+			case 'L':
+			case 'Z':
+			case 'z':
+			case 't':
+				type = *fmt;
+				++fmt;
+				bp->b_wptr++;
+				break;
+			}
+			switch ((*bp->b_wptr = *fmt)) {
+			case 'c':
+			case 'p':
+			case 'o':
+			case 'X':
+			case 'x':
+			case 'd':
+			case 'i':
+			case 'u':
+				switch (*fmt) {
+				case 'c':
+					type = 'c';
+					break;
+				case 'p':
+					type = 'p';
+					break;
+				}
+				switch (type) {
+				case 'c':
+					alen += PROMOTE_SIZEOF(char);
+					(void) va_arg(args2, int);
+
+					break;
+				case 'p':
+					alen += PROMOTE_SIZEOF(void *);
+					(void) va_arg(args2, void *);
+
+					break;
+				case 't':
+					alen += PROMOTE_SIZEOF(ptrdiff_t);
+					(void) va_arg(args2, ptrdiff_t);
+					break;
+				case 'l':
+					alen += PROMOTE_SIZEOF(long);
+					(void) va_arg(args2, long);
+
+					break;
+				case 'q':
+				case 'L':
+					alen += PROMOTE_SIZEOF(long long);
+					(void) va_arg(args2, long long);
+
+					break;
+				case 'Z':
+				case 'z':
+					alen += PROMOTE_SIZEOF(size_t);
+					(void) va_arg(args2, size_t);
+
+					break;
+				case 'h':
+					alen += PROMOTE_SIZEOF(short);
+					(void) va_arg(args2, int);
+
+					break;
+				case 'i':
+				default:
+					alen += PROMOTE_SIZEOF(int);
+					(void) va_arg(args2, int);
+
+					break;
+				}
+				if (++nargs == NLOGARGS)
+					break;
+				continue;
+			case 's':
+			{
+				char *s = va_arg(args, char *);
+				size_t len = strnlen(s, LOGMSGSZ);
+				size_t plen = PROMOTE_ALIGN(len + 1);
+
+				alen += plen;
+				if (++nargs == NLOGARGS)
+					break;
+				continue;
+			}
+			case '%':
+			default:
+				continue;
+			}
+			break;
+		}
+		va_end(args2);
+		/* pass through once more with arguments */
+		if ((dp = allocb(alen, BPRI_MED))) {
+			fmt = bp->b_rptr;
+			for (; *fmt; ++fmt) {
+				if (*fmt != '%')
+					continue;
+				/* flags */
+				for (++fmt;; ++fmt) {
+					switch (*fmt) {
+					case '-':
+						continue;
+					case '+':
+						continue;
+					case ' ':
+						continue;
+					case '#':
+						continue;
+					case '0':
+						continue;
+					default:
+						break;
+					}
+					break;
+				}
+				/* field width */
+				if (isdigit(*fmt)) {
+					++fmt;
+					while (isdigit(*fmt)) {
+						++fmt;
+					}
+				} else if (*fmt == '*') {
+					++fmt;
+					*(int *) dp->b_wptr = va_arg(args, int);
+					dp->b_wptr += PROMOTE_SIZEOF(int);
+
+					if (!--nargs)
+						break;
+				}
+				/* get precision */
+				if (*fmt == '.') {
+					++fmt;
+					if (isdigit(*fmt)) {
+						++fmt;
+						while (isdigit(*fmt)) {
+							++fmt;
+						}
+					} else if (*fmt == '*') {
+						++fmt;
+						*(int *) dp->b_wptr = va_arg(args, int);
+						dp->b_wptr += PROMOTE_SIZEOF(int);
+
+						if (!--nargs)
+							break;
+					}
+				}
+				/* get qualifier */
+				type = 'i';
+				switch (*fmt) {
+				case 'h':
+					++fmt;
+					if (*fmt == 'h') {
+						type = 'c';
+						++fmt;
+					}
+					break;
+				case 'l':
+					++fmt;
+					if (*fmt == 'l') {
+						type = 'L';
+						++fmt;
+					}
+					break;
+				case 'L':
+				case 'Z':
+				case 'z':
+				case 't':
+					type = *fmt;
+					++fmt;
+					break;
+				}
+				switch (*fmt) {
+				case 'c':
+				case 'n':
+				case 'p':
+				case 'o':
+				case 'X':
+				case 'x':
+				case 'd':
+				case 'i':
+				case 'u':
+					switch (*fmt) {
+					case 'c':
+						type = 'c';
+						break;
+					case 'p':
+						type = 'p';
+						break;
+					}
+					switch (type) {
+					case 'p':
+						*(void **) dp->b_wptr = va_arg(args, void *);
+						dp->b_wptr += PROMOTE_SIZEOF(void *);
+
+						break;
+					case 'l':
+						*(long *) dp->b_wptr = va_arg(args, long);
+						dp->b_wptr += PROMOTE_SIZEOF(long);
+
+						break;
+					case 'L':
+						*(long long *) dp->b_wptr = va_arg(args, long long);
+						dp->b_wptr += PROMOTE_SIZEOF(long long);
+
+						break;
+					case 'Z':
+					case 'z':
+						*(size_t *) dp->b_wptr = va_arg(args, size_t);
+						dp->b_wptr += PROMOTE_SIZEOF(size_t);
+
+						break;
+					case 't':
+						*(ptrdiff_t *) dp->b_wptr = va_arg(args, ptrdiff_t);
+						dp->b_wptr += PROMOTE_SIZEOF(ptrdiff_t);
+						break;
+					case 'h':
+						*(short *) dp->b_wptr = va_arg(args, int);
+						dp->b_wptr += PROMOTE_SIZEOF(short);
+
+						break;
+					case 'c':
+						*(short *) dp->b_wptr = va_arg(args, int);
+						dp->b_wptr += PROMOTE_SIZEOF(short);
+
+						break;
+					default:
+						*(int *) dp->b_wptr = va_arg(args, int);
+						dp->b_wptr += PROMOTE_SIZEOF(int);
+
+						break;
+					}
+					if (!--nargs)
+						break;
+					continue;
+				case 's':
+				{
+					char *s = va_arg(args, char *);
+					size_t len = strnlen(s, LOGMSGSZ);
+					size_t plen = PROMOTE_ALIGN(len + 1);
+
+					strncpy(dp->b_wptr, s, len);
+					dp->b_wptr[len] = '\0';
+					dp->b_wptr += plen;
+					if (!--nargs)
+						break;
+					continue;
+				}
+				case '%':
+				default:
+					continue;
+				}
+				break;
+			}
+			bp->b_cont = dp;
+		} else {
+			freemsg(bp);
+			bp = NULL;
+		}
+	}
+	return (bp);
+}
+
+static int
+log_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, va_list args)
+{
+	/* check if the log is for the console, error or trace logger */
+	int rval = 1;
+
+	if (flags & (SL_CONSOLE | SL_ERROR | SL_TRACE)) {
+		mblk_t *dp;
+
+		/* allocate the data block first so we can dup it */
+		if ((dp = log_alloc_data(fmt, args))) {
+			/* the console logger sees all logs */
+			if (flags & SL_CONSOLE
+			    && !log_deliver_msg(log_conq, mid, sid, level, flags,
+						atomic_add_return(1, &conlog_sequence), dp,
+						LOG_KERN))
+				rval = 0;
+			/* the error logger sees all logs */
+			if (flags & SL_ERROR
+			    && !log_deliver_msg(log_errq, mid, sid, level, flags,
+						atomic_add_return(1, &errlog_sequence), dp,
+						LOG_KERN))
+				rval = 0;
+			/* the trace logger sees selected logs */
+			if (flags & SL_TRACE && log_trace_filter(log_trcq, mid, sid, level)
+			    && !log_deliver_msg(log_trcq, mid, sid, level, flags,
+						atomic_add_return(1, &trclog_sequence), dp,
+						LOG_KERN))
+				rval = 0;
+			/* free original data block */
+			freemsg(dp);
+		}
+	}
+	return (rval);
+}
+
 #ifdef CONFIG_STREAMS_LOG_MODULE
 static
 #endif
@@ -373,6 +972,8 @@ log_init(void)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
+	/* hook into vstrlog */
+	oldlog = xchg(&vstrlog, &log_vstrlog);
 	return (0);
 }
 
@@ -382,6 +983,8 @@ static
 void __exit
 log_exit(void)
 {
+	/* unhook from vstrlog */
+	vstrlog = oldlog;
 	unregister_strdev(&log_cdev, major);
 }
 

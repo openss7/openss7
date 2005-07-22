@@ -1,0 +1,646 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: strlog.1.man,v 0.9.2.1 2005/07/21 20:47:19 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/21 20:47:19 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRLOG 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
+.\"
+.\"
+.SH NAME
+.B strlog
+\- write a message to the \fISTREAMS\fR logger
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.HP \w'strlog\ 'u
+\fBstrlog\fR
+[\fIOPTIONS\fR]
+.\"[\fB-ids\fR]
+[\fB-s\fR]
+[\fB-M\fR\ \fImid\fR]
+[\fB-S\fR\ \fIsid\fR]
+[\fB-p\fR\ \fIpriority\fR]
+[\fB-f\fR\ \fIfile\fR]
+.\"[\fB-t\fR\ \fItag\fR]
+.\"[\fB-u\fR\ \fIsocket\fR]
+[\fImessage\fR\ \fI...\fR]
+.PD 0
+.HP
+\fBstrlog\fR {{\fB-h\fR|\fB--help\fR}|{\fB-V\fR|\fB--version\fR}|{\fB-C\fR|\fB--copying\fR}}
+.PD
+.ad b
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B strlog
+is a shell script interface to the
+.IR STREAMS -based
+logger,
+.BR strlog (4).
+.B strlog
+accepts messages on the command line
+.RI ( message )
+or from
+.I file
+using the
+.B -f
+option, and delivers those messages to the
+.I STREAMS
+logger,
+.BR strlog (4).
+The
+.BR -M " and " -S
+options can be used to set the
+.I STREAMS
+module identifier,
+.IR mid ,
+and unit identifier,
+.IR sid .
+These identifiers, once set, are applicable to all messages logged.
+The
+.B -p
+option can be used to set the logging
+.I facility
+and
+.I level
+as described below.
+The priority, once set, is applicable to all messages logged.
+.PP
+Normally,
+.B strlog
+generates a message and passes it to the
+.I STREAMS
+logger,
+using the
+.BR putmsg (2)
+interface to the log driver,
+.BR strlog (4).
+Using the
+.B -s
+option, the user can request that the message be formatted and logged to standard error,
+.IR stderr ,
+as well as the
+.I STREAMS
+logger.
+.PP
+The
+.BR -t ", " -i ", " -u " and " -d
+options are provided for compatibility with
+.BR logger (1),
+and are ignored.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-M\fR, \fB--mid\fR \fImid\fR
+Specifies the module identifier,
+.IR mid ,
+to be included in the
+.I STREAMS
+log.  If this option is not present, the
+.I mid
+defaults to zero
+.RB ( 0 ).
+The value of
+.IR mid ,
+specified last with this option (or by default) applies to all messages specified on the command
+line, contained in
+.IR file ,
+or read from
+.IR stdin .
+.TP
+\fB-S\fR, \fB--sid\fR \fIsid\fR
+Specifies the unit identifier,
+.IR sid ,
+to be included in the
+.I STREAMS
+log.  If this option is not present, the
+.I sid
+defaults to zero
+.RB ( 0 ).
+The value of
+.IR sid ,
+specified last with this option (or by default) applies to all messages specified on the command
+line, contained in
+.IR file ,
+or read from
+.IR stdin .
+.TP
+\fB-p\fR, \fB--priority\fR \fIpriority\fR
+Specify the concatenated system log facility and level for the log message.
+.I priority
+can either be specified as a numeric value, or as a symbolic name using a dot notation:
+.IR facility . level .
+If this option is not specified,
+.I priority
+defaults to
+.BR user . info .
+The value of
+.IR priority ,
+specified last with this option (or by default) applies to all messages specified on the command
+line, contained in
+.IR file ,
+or read from
+.IR stdin .
+.TP
+\fB-f\fR, \fB--file\fR \fIfile\fR
+Provided for compatibility with
+.BR logger (1);
+when this option is specified, any
+.I message
+arguments are ingored and logger input is taken from
+.IR file .
+If
+.I file
+is
+.RB \(lq - \(rq,
+then
+.I stdin
+is read instead of a file.
+Each line of input read from
+.I file
+is treated as a separate
+.I message
+and a separate invocation of
+.BR strlog .
+That is, each line of the input is formatted and passed to the
+.I STREAMS
+logger in the same fashion as though each line of input were specified as the
+.I message
+string argument to a separate
+.B strlog
+command.
+The
+.IR mid ", " sid " and " priority
+specified on the command line (or arrived at by default) are applied to each line of the input.
+.TP
+\fB-s\fR, \fB--stderr\fR
+Provided for compatibility with
+.BR logger (1);
+this option causes the output to also be written to
+.IR stderr ,
+in a format similar to that provided by the
+.I STREAMS
+.BR strace (8)
+and
+.BR strerr (8)
+loggers.
+See
+.BR strace (8)
+and
+.BR strerr (8)
+for a description of those formats.
+.TP
+\fB-t\fR, \fB--tag\fR \fItag\fR
+Provided for compatibility with
+.BR logger (1);
+this option is ignored.
+.TP
+\fB-i\fR, \fB--id\fR
+Provided for compatibility with
+.BR logger (1);
+this option is ignored.
+.TP
+\fB-u\fR, \fB--socket\fR \fIdevice\fR
+Provided for compatibility with
+.BR logger (1);
+this option is ignored.
+.TP
+\fB-d\fR, \fB--datagram\fR
+Provided for compatibility with
+.BR logger (1);
+this option is ignored.
+.TP
+\fB-D\fR, \fB--debug\fR [\fIlevel\fR]
+Increases or sets to \fIlevel\fR the debug verbosity, typically for debugging purposes.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increases or sets to \fIlevel\fR the output verbosity, typically for diagnostic purposes.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+(Equivalent to
+.BR --verbose = 0 .)
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+When this option is encountered,
+.B strlog
+prints usage information and then exits.  No additional option scanning or other actions are
+performed.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B strlog
+prints version information and then exits.  No additional option scanning or other actions are
+performed.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B strlog
+prints version information and then exits.  No additional option scanning or other actions are
+performed.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+\fR[\fImessage\fR \fI...\fR]
+Zero or more message strings to be logged, concatentated together with a single space between them.
+If no
+.I message
+argument is specified, and option
+.B -f
+is not given, then the message strings will be read from
+.IR stdin .
+See the description under the
+.B -f
+option, above.
+.\"
+.\"
+.SH FORMAT
+.PP
+.TP \w'facility\(em'u
+.I facility
+is the log facility, and can be one of the following symbols:
+.PP
+.DS
+.TS
+tab(:);
+lbw(\w'security'u)nlssss.
+auth:0:T{
+.hy 6
+security information of a sensitive nature.
+T}
+authpriv:0:T{
+.hy 6
+security information of a sensitive nature.
+T}
+cron:0:T{
+.hy 6
+.BR cron (8)
+jobs
+T}
+daemon:0:T{
+.hy 6
+messages fron daemon processes.
+T}
+ftp:0:T{
+.hy 6
+.BR ftp (1)
+jobs
+T}
+kern:0:T{
+.hy 6
+message from kernel processes.
+T}
+lpr:0:T{
+.hy 6
+.BR lpr (1)
+messages.
+T}
+mail:0:T{
+.hy 6
+.BR mail (1)
+messages.
+T}
+news:0:T{
+.hy 6
+.BR news (1)
+messages.
+T}
+security:0:T{
+.hy 6
+a deprecated synonym for
+.BR auth .
+T}
+syslog:0:T{
+.hy 6
+.BR syslog (3)
+messages.
+T}
+user:0:T{
+.hy 6
+log messages from a user.
+T}
+uucp:0:T{
+.hy 6
+.BR uucp (1)
+messages.
+T}
+local0:0:T{
+.hy 6
+locally defined level 0.
+T}
+local1:0:T{
+.hy 6
+locally defined level 1.
+T}
+local2:0:T{
+.hy 6
+locally defined level 2.
+T}
+local3:0:T{
+.hy 6
+locally defined level 3.
+T}
+local4:0:T{
+.hy 6
+locally defined level 4.
+T}
+local5:0:T{
+.hy 6
+locally defined level 5.
+T}
+local6:0:T{
+.hy 6
+locally defined level 6.
+T}
+local7:0:T{
+.hy 6
+locally defined level 7.
+T}
+.TE
+.DE
+.TP \w'facility\(em'u
+.I level
+.PP
+.DS
+.TS
+tab(:);
+lbw(\w'security'u)nlssss.
+alert:0:T{
+.hy 6
+T}
+crit:0:T{
+.hy 6
+T}
+debug:0:T{
+.hy 6
+T}
+emerg:0:T{
+.hy 6
+T}
+err:0:T{
+.hy 6
+T}
+error:0:T{
+.hy 6
+T}
+info:0:T{
+.hy 6
+T}
+notice:0:T{
+.hy 6
+T}
+panic:0:T{
+.hy 6
+T}
+warning:0:T{
+.hy 6
+T}
+warn:0:T{
+.hy 6
+T}
+.TE
+.DE
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B strlog
+command is intended to be used with the
+.IR STREAMS -based
+logger.  See
+.BR strlog (4).
+This is most useful for trace messages associated with
+.I STREAMS
+drivers and modules, of which there are no counterpart in the
+.B Linux
+.IR BSD -based
+system loggers.  Trace messages are filtered by the
+.I STREAMS
+logger,
+.BR strlog (4)
+and are collected in files using the system trace utility,
+.BR strace (8).
+Processes that wish to generate trace messages to the
+.I STREAMS
+logger should use this
+.B strlog
+utility.
+Processes that wish to generate error messages to the
+.I STREAMS
+logger can use this
+.B strlog
+utility or the
+.B Linux
+.IR BSD -based
+.BR logger (1)
+utility.
+.PP
+The
+.B strlog
+utility is also useful for testing the
+.IR STREAMS -based
+logger,
+.BR strlog (4).
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.B strlog
+returns a zero
+.RB ( 0 )
+exit status on success, and a positive, non-zero
+.RB ( >0 )
+exit status on failure.
+When
+.B strlog
+fails, it prints a diagnostic message on standard error,
+.IR stderr ,
+and exits with an exit status of one
+.RB ( 1 )
+if an internal failure occured, and an exit status of two
+.RB ( 2 )
+if there was an error in option syntax.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.B strlog
+uses the
+.I STREAMS
+loggin device,
+.BR strlog (4),
+which is normally present as the
+.B /dev/strlog
+device.
+.TP
+.BR /dev/strlog ", " /dev/streams/strlog
+the
+.I STREAMS
+log device,
+.BR strlog (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/bin/strlog
+contains the
+.B strlog
+command.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The following environment variables affect the execution of
+.BR strlog :
+.TP
+.B LANG
+Provide a default value for the i18n variables that are unset or null.  See
+.BR locale (1).
+.TP
+.B LC_ALL
+If set to a non-emtpy string, override the values of all other i18n variables.
+.TP
+.B LC_CTYPE
+Determine the local for the interpretation of sequences of bytes of data as characters (for example,
+single-byte as opposed to multi-byte characters in arguments).
+.TP
+.B LC_MESSAGES
+Determine the locale that should be used to affect the format and contents of diagnostic messages
+written to standard error,
+.IR stderr .
+(This means diagnostic messages from
+.B strlog
+to the user or application, not diagnostic messages that the user is sending to the
+.I STREAMS
+logger.)
+.TP
+.B NLSPATH
+Determine the location of message catalogs for the processing of
+.BR LC_MESSAGES .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR logger (1),
+.BR strlog (4),
+.BR strlog (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B strlog
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+When used without options,
+.B strlog
+can be used as a POSIX compliant
+.BR logger (1p)
+command.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SuSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strlog
+is first provided with
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

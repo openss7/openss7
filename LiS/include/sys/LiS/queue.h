@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 1.1.1.5.4.2 2005/04/12 22:45:25 brian Exp $
+ @(#) $Id: queue.h,v 1.1.1.5.4.5 2005/07/13 12:01:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:25 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:20 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.h,v 1.1.1.5.4.2 2005/04/12 22:45:25 brian Exp $
+ * RCS Id          : $Id: queue.h,v 1.1.1.5.4.5 2005/07/13 12:01:20 brian Exp $
  * Purpose         : here you have utilites to handle str queues.
  * ----------------______________________________________________
  *
@@ -68,7 +68,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 1
 
-#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.2 $) $Date: 2005/04/12 22:45:25 $"
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/07/13 12:01:20 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -415,9 +415,7 @@ extern void lis_retry_qenable(queue_t *q);
  *
  */
 #ifdef __KERNEL__
-#ifdef __LIS_INTERNAL__
 extern void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
-#endif
 #endif				/* __KERNEL__ */
 
 /* lis_flushband - flush messages in a specified priority band.

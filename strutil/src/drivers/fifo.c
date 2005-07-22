@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:38:48 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:38:48 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $";
 
 #define _LFS_SOURCE
 
@@ -76,7 +76,7 @@ extern struct file_operations strm_f_ops;
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:38:48 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -88,7 +88,7 @@ extern struct file_operations strm_f_ops;
 #define FIFO_SPLASH	FIFO_DEVICE	" - " \
 			FIFO_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 MODULE_AUTHOR(FIFO_CONTACT);
 MODULE_DESCRIPTION(FIFO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(FIFO_DEVICE);
@@ -136,10 +136,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/fifo");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/streams/fifo");
 MODULE_ALIAS("/dev/streams/fifo/*");
+#endif
 #endif
 
 LFSSTATIC struct module_info fifo_minfo = {
@@ -402,7 +404,7 @@ unregister_fifo(void)
  *  -------------------------------------------------------------------------
  */
 
-#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 LFSSTATIC
 #endif
 int __init
@@ -413,7 +415,7 @@ fifo_init(void)
 #else
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 	printk(KERN_INFO FIFO_BANNER);
 #else
 	printk(KERN_INFO FIFO_SPLASH);
@@ -430,7 +432,7 @@ fifo_init(void)
 #endif
 };
 
-#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 LFSSTATIC
 #endif
 void __exit
@@ -444,7 +446,7 @@ fifo_exit(void)
 #endif
 };
 
-#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 module_init(fifo_init);
 module_exit(fifo_exit);
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/18 12:07:00 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/21 20:47:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/18 12:07:00 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/21 20:47:23 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/18 12:07:00 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/21 20:47:23 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -818,7 +818,7 @@ spec_dentry(dev_t dev, int *sflagp)
 	goto done;
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(spec_dentry);
 #endif
 
@@ -868,6 +868,7 @@ spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 	return (err);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
+         || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
 EXPORT_SYMBOL(spec_open);
 #endif

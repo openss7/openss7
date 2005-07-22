@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/21 20:47:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/21 20:47:21 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/21 20:47:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:58 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/21 20:47:21 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -127,10 +127,12 @@ MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto alloca
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/echo");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/streams/echo");
 MODULE_ALIAS("/dev/streams/echo/*");
+#endif
 #endif
 
 static struct module_info echo_minfo = {

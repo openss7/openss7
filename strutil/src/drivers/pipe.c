@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:26 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:26 $";
 
 #define _LFS_SOURCE
 
@@ -61,7 +61,7 @@ static char const ident[] =
 
 #include "pipe.h"		/* extern verification */
 
-#ifdef LIS
+#if LIS
 #define CONFIG_STREAMS_PIPE_MODID	PIPE_DRV_ID
 #define CONFIG_STREAMS_PIPE_NAME	PIPE_DRV_NAME
 #define CONFIG_STREAMS_PIPE_MAJOR	PIPE_CMAJOR_0
@@ -72,7 +72,7 @@ extern struct file_operations strm_f_ops;
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:38:48 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:26 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -84,7 +84,7 @@ extern struct file_operations strm_f_ops;
 #define PIPE_SPLASH	PIPE_DEVICE	" - " \
 			PIPE_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 MODULE_AUTHOR(PIPE_CONTACT);
 MODULE_DESCRIPTION(PIPE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPE_DEVICE);
@@ -132,10 +132,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allo
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/pipe");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/streams/pipe");
 MODULE_ALIAS("/dev/streams/pipe/*");
+#endif
 #endif
 
 static struct module_info pipe_minfo = {
@@ -250,7 +252,7 @@ static struct cdevsw pipe_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 static
 #endif
 int __init
@@ -258,7 +260,7 @@ pipe_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 	printk(KERN_INFO PIPE_BANNER);
 #else
 	printk(KERN_INFO PIPE_SPLASH);
@@ -271,7 +273,7 @@ pipe_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 static
 #endif
 void __exit
@@ -280,7 +282,7 @@ pipe_exit(void)
 	unregister_strdev(&pipe_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 module_init(pipe_init);
 module_exit(pipe_exit);
 #endif

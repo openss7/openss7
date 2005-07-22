@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/20 13:02:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/21 20:47:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
+# Last Modified $Date: 2005/07/21 20:47:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,348 +150,436 @@ AC_DEFUN([_UTIL_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _UTIL_SETUP_OPTIONS
+# _UTIL_SETUP_DEBUG
 # -----------------------------------------------------------------------------
-AC_DEFUN([_UTIL_SETUP_OPTIONS], [dnl
-    AC_ARG_ENABLE([util-clone],
-	AS_HELP_STRING([--enable-util-clone],
-	    [enable clone driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_clone="$enableval"],
-	    [enable_util_clone='module'])
-    AC_ARG_ENABLE([util-echo],
-	AS_HELP_STRING([--enable-util-echo],
-	    [enable echo driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_echo="$enableval"],
-	    [enable_util_echo='module'])
-    AC_ARG_ENABLE([util-fifo],
-	AS_HELP_STRING([--enable-util-fifo],
-	    [enable fifo driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_fifo="$enableval"],
-	    [enable_util_fifo='module'])
-    AC_ARG_ENABLE([util-log],
-	AS_HELP_STRING([--enable-util-log],
-	    [enable log driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_log="$enableval"],
-	    [enable_util_log='module'])
-    AC_ARG_ENABLE([util-nsdev],
-	AS_HELP_STRING([--enable-util-nsdev],
-	    [enable nsdev driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_nsdev="$enableval"],
-	    [enable_util_nsdev='module'])
-    AC_ARG_ENABLE([util-nuls],
-	AS_HELP_STRING([--enable-util-nuls],
-	    [enable nuls driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_nuls="$enableval"],
-	    [enable_util_nuls='module'])
-    AC_ARG_ENABLE([util-pipe],
-	AS_HELP_STRING([--enable-util-pipe],
-	    [enable pipe driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_pipe="$enableval"],
-	    [enable_util_pipe='module'])
-    AC_ARG_ENABLE([util-sad],
-	AS_HELP_STRING([--enable-util-sad],
-	    [enable sad driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_sad="$enableval"],
-	    [enable_util_sad='module'])
-    AC_ARG_ENABLE([util-sfx],
-	AS_HELP_STRING([--enable-util-sfx],
-	    [enable sfx driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_sfx="$enableval"],
-	    [enable_util_sfx='module'])
-    AC_ARG_ENABLE([util-spx],
-	AS_HELP_STRING([--enable-util-spx],
-	    [enable spx driver.
-	    @<:@default=module@:>@]),
-	    [enable_util_spx="$enableval"],
-	    [enable_util_spx='module'])
-    AC_ARG_ENABLE([util-pipemod],
-	AS_HELP_STRING([--enable-util-pipemod],
-	    [enable pipemod module.
-	    @<:@default=module@:>@]),
-	    [enable_util_pipemod="$enableval"],
-	    [enable_util_pipemod='module'])
-    AC_ARG_ENABLE([util-connld],
-	AS_HELP_STRING([--enable-util-connld],
-	    [enable connld module.
-	    @<:@default=module@:>@]),
-	    [enable_util_connld="$enableval"],
-	    [enable_util_connld='module'])
-    AC_ARG_ENABLE([util-sc],
-	AS_HELP_STRING([--enable-util-sc],
-	    [enable sc module.
-	    @<:@default=module@:>@]),
-	    [enable_util_sc="$enableval"],
-	    [enable_util_sc='module'])
-    AC_CACHE_CHECK([for util clone driver], [util_clone], [dnl
-	util_clone="${enable_util_clone:-module}"
-	if test :$util_clone = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_clone='yes'
-	fi])
-    AC_CACHE_CHECK([for util echo driver], [util_echo], [dnl
-	util_echo="${enable_util_echo:-module}"
-	if test :$util_echo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_echo='yes'
-	fi])
-    AC_CACHE_CHECK([for util fifo driver], [util_fifo], [dnl
-	util_fifo="${enable_util_fifo:-module}"
-	if test :$util_fifo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_fifo='yes'
-	fi])
-    AC_CACHE_CHECK([for util log driver], [util_log], [dnl
-	util_log="${enable_util_log:-module}"
-	if test :$util_log = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_log='yes'
-	fi])
-    AC_CACHE_CHECK([for util nsdev driver], [util_nsdev], [dnl
-	util_nsdev="${enable_util_nsdev:-module}"
-	if test :$util_nsdev = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_nsdev='yes'
-	fi])
-    AC_CACHE_CHECK([for util nuls driver], [util_nuls], [dnl
-	util_nuls="${enable_util_nuls:-module}"
-	if test :$util_nuls = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_nuls='yes'
-	fi])
-    AC_CACHE_CHECK([for util pipe driver], [util_pipe], [dnl
-	util_pipe="${enable_util_pipe:-module}"
-	if test :$util_pipe = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_pipe='yes'
-	fi])
-    AC_CACHE_CHECK([for util sad driver], [util_sad], [dnl
-	util_sad="${enable_util_sad:-module}"
-	if test :$util_sad = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_sad='yes'
-	fi])
-    AC_CACHE_CHECK([for util sfx driver], [util_sfx], [dnl
-	util_sfx="${enable_util_sfx:-module}"
-	if test :$util_sfx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_sfx='yes'
-	fi])
-    AC_CACHE_CHECK([for util spx driver], [util_spx], [dnl
-	util_spx="${enable_util_spx:-module}"
-	if test :$util_spx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_spx='yes'
-	fi])
-    AC_CACHE_CHECK([for util pipemod module], [util_pipemod], [dnl
-	util_pipemod="${enable_util_pipemod:-module}"
-	if test :$util_pipemod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_pipemod='yes'
-	fi])
-    AC_CACHE_CHECK([for util connld module], [util_connld], [dnl
-	util_connld="${enable_util_connld:-module}"
-	if test :$util_connld = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_connld='yes'
-	fi])
-    AC_CACHE_CHECK([for util sc module], [util_sc], [dnl
-	util_sc="${enable_util_sc:-module}"
-	if test :$util_sc = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_sc='yes'
-	fi])
-    case ${util_clone:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_CLONE], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the clone driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the clone driver for linkage with the kernel.])
+AC_DEFUN([_UTIL_SETUP_DEBUG], [dnl
+    case "$linux_cv_debug" in
+	_DEBUG)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to perform
+		    internal structure tracking within the STREAMS executive
+		    as well as to provide additional /proc filesystem files
+		    for examining internal structures.])
 	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_CLONE_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the clone driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the clone driver as a loadable kernel
-	    module.])
+	_TEST)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [], [Define to perform
+		    performance testing with debugging.  This mode does not
+		    dump massive amounts of information into system logs, but
+		    peforms all assertion checks.])
+	    ;;
+	_SAFE)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [], [Define to perform
+		    fundamental assertion checks.  This is a safer mode of
+		    operation.])
+	    ;;
+	_NONE | *)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [], [Define to perform
+		    no assertion checks but report software errors.  This is
+		    the smallest footprint, highest performance mode of
+		    operation.])
 	    ;;
     esac
-    case ${util_echo:-module} in
+])# _UTIL_SETUP_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _UTIL_SETUP_MODULES
+# -----------------------------------------------------------------------------
+AC_DEFUN([_UTIL_SETUP_MODULES], [dnl
+    AC_ARG_ENABLE([module-pipemod],
+	AS_HELP_STRING([--enable-module-pipemod],
+	    [enable pipemod module for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_module_pipemod="$enableval"],
+	    [enable_module_pipemod='module'])
+    AC_ARG_ENABLE([module-connld],
+	AS_HELP_STRING([--enable-module-connld],
+	    [enable connld module for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_module_connld="$enableval"],
+	    [enable_module_connld='module'])
+    AC_ARG_ENABLE([module-sc],
+	AS_HELP_STRING([--enable-module-sc],
+	    [enable sc module for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_module_sc="$enableval"],
+	    [enable_module_sc='module'])
+    AC_CACHE_CHECK([for util module pipemod], [util_module_pipemod], [dnl
+	util_module_pipemod="${enable_module_pipemod:-module}"
+	if test :$util_module_pipemod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_module_pipemod='yes'
+	fi])
+    AC_CACHE_CHECK([for util module connld], [util_module_connld], [dnl
+	util_module_connld="${enable_module_connld:-module}"
+	if test :$util_module_connld = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_module_connld='yes'
+	fi])
+    AC_CACHE_CHECK([for util module sc], [util_module_sc], [dnl
+	util_module_sc="${enable_module_sc:-module}"
+	if test :$util_module_sc = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_module_sc='yes'
+	fi])
+dnl --------------------------------------
+    case ${util_module_pipemod:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_ECHO], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the echo driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the echo driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_ECHO_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the echo driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the echo driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_fifo:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_FIFO], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the fifo driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the fifo driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_FIFO_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the fifo driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the fifo driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_log:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_LOG], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the log driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the log driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_LOG_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the log driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the log driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_nsdev:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_NSDEV], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the nsdev driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the nsdev driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_NSDEV_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the nsdev driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the nsdev driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_nuls:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_NULS], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the nuls driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the nuls driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_NULS_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the nuls driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the nuls driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_pipe:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_PIPE], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the pipe driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the pipe driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_PIPE_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the pipe driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the pipe driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_sad:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SAD], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the sad driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the sad driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SAD_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the sad driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the sad driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_sfx:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SFX], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the sfx driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the sfx driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SFX_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the sfx driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the sfx driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_spx:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SPX], [], [When defined,] AC_PACKAGE_NAME [
-	    will include the spx driver for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the spx driver for linkage with the kernel.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SPX_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the spx driver as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the spx driver as a loadable kernel
-	    module.])
-	    ;;
-    esac
-    case ${util_pipemod:-module} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_PIPEMOD], [], [When defined,] AC_PACKAGE_NAME [
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD], [], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipemod module for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the pipemod module for linkage with the kernel.])
+	    AC_PACKAGE_TITLE [will not include the pipemod module for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_PIPEMOD_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the pipemod module as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the pipemod module as a loadable kernel
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the pipemod module as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the pipemod module as a loadable kernel
 	    module.])
 	    ;;
     esac
-    case ${util_connld:-module} in
+    case ${util_module_connld:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_CONNLD], [], [When defined,] AC_PACKAGE_NAME [
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD], [], [When defined,] AC_PACKAGE_TITLE [
 	    will include the connld module for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the connld module for linkage with the kernel.])
+	    AC_PACKAGE_TITLE [will not include the connld module for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_CONNLD_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the connld module as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the connld module as a loadable kernel
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the connld module as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the connld module as a loadable kernel
 	    module.])
 	    ;;
     esac
-    case ${util_sc:-module} in
+    case ${util_module_sc:-module} in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SC], [], [When defined,] AC_PACKAGE_NAME [
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC], [], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sc module for linkage with the kernel.  When undefined,]
-	    AC_PACKAGE_NAME [will not include the sc module for linkage with the kernel.])
+	    AC_PACKAGE_TITLE [will not include the sc module for linkage with the kernel.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SC_MODULE], [], [When defined,]
-	    AC_PACKAGE_NAME [will include the sc module as a loadable kernel module.  When
-	    undefined,] AC_PACKAGE_NAME [will not include the sc module as a loadable kernel
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the sc module as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the sc module as a loadable kernel
 	    module.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_CLONE],		[test :${util_clone:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_CLONE_MODULE],	[test :${util_clone:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_ECHO],		[test :${util_echo:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_ECHO_MODULE],	[test :${util_echo:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_FIFO],		[test :${util_fifo:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_FIFO_MODULE],	[test :${util_fifo:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_LOG],		[test :${util_log:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_LOG_MODULE],	[test :${util_log:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_NSDEV],		[test :${util_nsdev:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_NSDEV_MODULE],	[test :${util_nsdev:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_NULS],		[test :${util_nuls:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_NULS_MODULE],	[test :${util_nuls:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_PIPE],		[test :${util_pipe:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_PIPE_MODULE],	[test :${util_pipe:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SAD],		[test :${util_sad:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SAD_MODULE],	[test :${util_sad:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SFX],		[test :${util_sfx:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SFX_MODULE],	[test :${util_sfx:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SPX],		[test :${util_spx:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SPX_MODULE],	[test :${util_spx:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_PIPEMOD],	[test :${util_pipemod:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_PIPEMOD_MODULE],[test :${util_pipemod:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_CONNLD],	[test :${util_connld:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_CONNLD_MODULE],	[test :${util_connld:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SC],		[test :${util_sc:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SC_MODULE],	[test :${util_sc:-module}	= :module])
-])# _UTIL_SETUP_OPTIONS
+dnl ===========================
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],		[test :${util_module_pipemod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE],	[test :${util_module_pipemod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],		[test :${util_module_connld:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],	[test :${util_module_connld:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC],			[test :${util_module_sc:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],		[test :${util_module_sc:-module}	= :module])
+])# _UTIL_SETUP_MODULES
+# =============================================================================
+
+# =============================================================================
+# _UTIL_SETUP_DRIVERS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_UTIL_SETUP_DRIVERS], [dnl
+    AC_ARG_ENABLE([driver-clone],
+	AS_HELP_STRING([--enable-driver-clone],
+	    [enable clone driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_clone="$enableval"],
+	    [enable_driver_clone='module'])
+    AC_ARG_ENABLE([driver-echo],
+	AS_HELP_STRING([--enable-driver-echo],
+	    [enable echo driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_echo="$enableval"],
+	    [enable_driver_echo='module'])
+    AC_ARG_ENABLE([driver-fifo],
+	AS_HELP_STRING([--enable-driver-fifo],
+	    [enable fifo driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_fifo="$enableval"],
+	    [enable_driver_fifo='module'])
+    AC_ARG_ENABLE([driver-log],
+	AS_HELP_STRING([--enable-driver-log],
+	    [enable log driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_log="$enableval"],
+	    [enable_driver_log='module'])
+    AC_ARG_ENABLE([driver-loop],
+	AS_HELP_STRING([--enable-driver-loop],
+	    [enable loop driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_loop="$enableval"],
+	    [enable_driver_loop='module'])
+    AC_ARG_ENABLE([driver-nsdev],
+	AS_HELP_STRING([--enable-driver-nsdev],
+	    [enable nsdev driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_nsdev="$enableval"],
+	    [enable_driver_nsdev='module'])
+    AC_ARG_ENABLE([driver-nuls],
+	AS_HELP_STRING([--enable-driver-nuls],
+	    [enable nuls driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_nuls="$enableval"],
+	    [enable_driver_nuls='module'])
+    AC_ARG_ENABLE([driver-pipe],
+	AS_HELP_STRING([--enable-driver-pipe],
+	    [enable pipe driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_pipe="$enableval"],
+	    [enable_driver_pipe='module'])
+    AC_ARG_ENABLE([driver-sad],
+	AS_HELP_STRING([--enable-driver-sad],
+	    [enable sad driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_sad="$enableval"],
+	    [enable_driver_sad='module'])
+    AC_ARG_ENABLE([driver-sfx],
+	AS_HELP_STRING([--enable-driver-sfx],
+	    [enable sfx driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_sfx="$enableval"],
+	    [enable_driver_sfx='module'])
+    AC_ARG_ENABLE([driver-spx],
+	AS_HELP_STRING([--enable-driver-spx],
+	    [enable spx driver for linkage with the kernel.
+	    @<:@default=module@:>@]),
+	    [enable_driver_spx="$enableval"],
+	    [enable_driver_spx='module'])
+    AC_CACHE_CHECK([for util driver clone], [util_driver_clone], [dnl
+	util_driver_clone="${enable_driver_clone:-module}"
+	if test :$util_driver_clone = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_clone='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver echo], [util_driver_echo], [dnl
+	util_driver_echo="${enable_driver_echo:-module}"
+	if test :$util_driver_echo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_echo='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver fifo], [util_driver_fifo], [dnl
+	util_driver_fifo="${enable_driver_fifo:-module}"
+	if test :$util_driver_fifo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_fifo='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver log], [util_driver_log], [dnl
+	util_driver_log="${enable_driver_log:-module}"
+	if test :$util_driver_log = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_log='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver loop],  [util_driver_loop], [dnl
+	util_driver_loop="${enable_driver_loop:-module}"
+	if test :$util_driver_loop = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_loop='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver nsdev], [util_driver_nsdev], [dnl
+	util_driver_nsdev="${enable_driver_nsdev:-module}"
+	if test :$util_driver_nsdev = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_nsdev='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver nuls], [util_driver_nuls], [dnl
+	util_driver_nuls="${enable_driver_nuls:-module}"
+	if test :$util_driver_nuls = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_nuls='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver pipe], [util_driver_pipe], [dnl
+	util_driver_pipe="${enable_driver_pipe:-module}"
+	if test :$util_driver_pipe = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_pipe='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver sad], [util_driver_sad], [dnl
+	util_driver_sad="${enable_driver_sad:-module}"
+	if test :$util_driver_sad = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_sad='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver sfx], [util_driver_sfx], [dnl
+	util_driver_sfx="${enable_driver_sfx:-module}"
+	if test :$util_driver_sfx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_sfx='yes'
+	fi])
+    AC_CACHE_CHECK([for util driver spx], [util_driver_spx], [dnl
+	util_driver_spx="${enable_driver_spx:-module}"
+	if test :$util_driver_spx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_driver_spx='yes'
+	fi])
+dnl ------------------------------------
+    case ${util_driver_clone:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the clone driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the clone driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the clone driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the clone driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_echo:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the echo driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the echo driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the echo driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the echo driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_fifo:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the fifo driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the fifo driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the fifo driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the fifo driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_log:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the log driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the log driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the log driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the log driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_loop:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the loop driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the loop driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the loop driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the loop driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_nsdev:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the nsdev driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the nsdev driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the nsdev driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the nsdev driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_nuls:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the nuls driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the nuls driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the nuls driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the nuls driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_pipe:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the pipe driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the pipe driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the pipe driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the pipe driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_sad:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the sad driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the sad driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the sad driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the sad driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_sfx:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SFX], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the sfx driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the sfx driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SFX_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the sfx driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the sfx driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+    case ${util_driver_spx:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SPX], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the spx driver for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the spx driver for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SPX_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the spx driver as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the spx driver as a loadable kernel
+	    module.])
+	    ;;
+    esac
+dnl =================================
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE],		[test :${util_driver_clone:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE],	[test :${util_driver_clone:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO],		[test :${util_driver_echo:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE],	[test :${util_driver_echo:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO],		[test :${util_driver_fifo:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE],	[test :${util_driver_fifo:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG],		[test :${util_driver_log:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE],		[test :${util_driver_log:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP],		[test :${util_driver_loop:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],	[test :${util_driver_loop:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],		[test :${util_driver_nsdev:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],	[test :${util_driver_nsdev:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS],		[test :${util_driver_nuls:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],	[test :${util_driver_nuls:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE],		[test :${util_driver_pipe:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE],	[test :${util_driver_pipe:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD],		[test :${util_driver_sad:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE],		[test :${util_driver_sad:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX],		[test :${util_driver_sfx:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE],		[test :${util_driver_sfx:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX],		[test :${util_driver_spx:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE],		[test :${util_driver_spx:-module}	= :module])
+])# _UTIL_SETUP_DRIVERS
+# =============================================================================
+
+# =============================================================================
+# _UTIL_SETUP_FIFOS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_UTIL_SETUP_FIFOS], [dnl
+    AC_ARG_ENABLE([streams-fifos],
+	AS_HELP_STRING([--enable-streams-fifos],
+	    [enable override of system fifos with STREAMS-based fifos.
+	    @<:@default=no@:>@]),
+	[enable_streams_fifos="$enableval"],
+	[enable_streams_fifos='no'])
+    if test :"$enable_streams_fifos" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OVERRIDE_FIFOS], [], [When defined,]
+		AC_PACKAGE_TITLE [will override the Linux system defined
+		FIFOs at startup.  This should be used with care for a while,
+		until streams FIFOs are proven.])
+    fi
+])# _UTIL_SETUP_FIFOS
 # =============================================================================
 
 # =============================================================================
@@ -500,12 +588,32 @@ AC_DEFUN([_UTIL_SETUP_OPTIONS], [dnl
 AC_DEFUN([_UTIL_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
-    _UTIL_CONFIG_KERNEL
     _GENKSYMS
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _UTIL_CHECK_KERNEL
+    _UTIL_SETUP_DEBUG
     _LINUX_STREAMS
+    _UTIL_SETUP_MODULES
+    _UTIL_SETUP_DRIVERS
+    _UTIL_SETUP_FIFOS
     _STRCOMP
-    _UTIL_SETUP_OPTIONS
 ])# _UTIL_SETUP
+# =============================================================================
+
+# =============================================================================
+# _UTIL_SETUP_MODULE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_UTIL_SETUP_MODULE], [dnl
+])# _UTIL_SETUP_MODULE
+# =============================================================================
+
+# =============================================================================
+# _UTIL_CHECK_KERNEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_UTIL_CHECK_KERNEL], [dnl
+    _UTIL_CONFIG_KERNEL
+])# _UTIL_CHECK_KERNEL
 # =============================================================================
 
 # =============================================================================
@@ -516,7 +624,9 @@ AC_DEFUN([_UTIL_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h linux/slab.h linux/hardirq.h linux/security.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
+			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
+			  asm/uaccess.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -542,8 +652,10 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
-			read_trylock write_trylock atomic_add_return \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [
+			cpumask_scnprintf __symbol_get __symbol_put \
+			read_trylock write_trylock atomic_add_return path_lookup \
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
+			num_online_cpus generic_delete_inode], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -568,6 +680,9 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#if HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
@@ -588,9 +703,13 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#if HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
-			 read_trylock write_trylock], [:], [:], [
+			 read_trylock write_trylock num_online_cpus \
+			 cpumask_scnprintf access_ok], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -620,6 +739,9 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#if HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
@@ -658,14 +780,17 @@ dnl specific information has been put in place instead.  We don't really care
 dnl one way to the other, but this check discovers which way is used.
 dnl 
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
-			 struct task_struct.session,
-			 struct task_struct.pgrp,
-			 struct super_block.s_fs_info,
-			 struct super_block.u.generic_sbp,
-			 struct file_system_type.read_super,
-			 struct file_system_type.get_sb,
-			 struct super_operations.read_inode2,
-			 struct kstatfs.f_type], [:], [:], [
+			  struct file_operations.flush,
+			  struct super_operations.drop_inode,
+			  struct task_struct.session,
+			  struct task_struct.pgrp,
+			  struct super_block.s_fs_info,
+			  struct super_block.u.generic_sbp,
+			  struct file_system_type.read_super,
+			  struct file_system_type.get_sb,
+			  struct super_operations.read_inode2,
+			  struct kstatfs.f_type,
+			  struct kobject.kref], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -687,6 +812,92 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
+	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
+	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
+	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq_irqoff])
+	_LINUX_KERNEL_SYMBOL_EXPORT([put_filp])
+	_LINUX_KERNEL_ENV([dnl
+	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
+			   [linux_cv_have_iop_lookup_nameidata], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif]],
+			[[struct inode_operations temp;
+(*temp.lookup)((struct inode *)0, (struct dentry *)0, (struct nameidata *)0);]]) ],
+		    [linux_cv_have_iop_lookup_nameidata='yes'],
+		    [linux_cv_have_iop_lookup_nameidata='no'])
+	    ])
+	    if test :$linux_cv_have_iop_lookup_nameidata = :yes ; then
+		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1],
+		    [Set if inode_operation lookup function takes nameidata pointer.])
+	    fi
+	    AC_CACHE_CHECK([for kernel do_settimeofday with timespec],
+			   [linux_cv_have_timespec_settimeofday], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+			[[struct timespec ts;
+int retval;
+retval = do_settimeofday(&ts);]]) ],
+		[linux_cv_have_timespec_settimeofday='yes'],
+		[linux_cv_have_timespec_settimeofday='no'])
+	    ])
+	    if test :$linux_cv_have_timespec_settimeofday = :yes ; then
+		AC_DEFINE([HAVE_TIMESPEC_DO_SETTIMEOFDAY], [1],
+		    [Define if do_settimeofday takes struct timespec and returns int.])
+	    fi
+	])
 ])# _UTIL_CONFIG_KERNEL
 # =============================================================================
 
@@ -716,7 +927,7 @@ AC_DEFUN([_UTIL_STRCONF], [dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF dnl
+    _STRCONF
 ])# _UTIL_STRCONF
 # =============================================================================
 

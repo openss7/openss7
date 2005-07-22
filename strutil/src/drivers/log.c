@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/20 13:02:41 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/20 13:02:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/20 13:02:41 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/20 13:02:41 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #include "log.h"
 
-#ifdef LIS
+#if LIS
 #define CONFIG_STREAMS_LOG_MODID	LOG_DRV_ID
 #define CONFIG_STREAMS_LOG_NAME		LOG_DRV_NAME
 #define CONFIG_STREAMS_LOG_MAJOR	LOG_CMAJOR_0
@@ -87,7 +87,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/20 13:02:41 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -99,7 +99,7 @@ static char const ident[] =
 #define LOG_SPLASH	LOG_DEVICE	" - " \
 			LOG_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
+#ifdef CONFIG_STREAMS_LOG_MODULE
 MODULE_AUTHOR(LOG_CONTACT);
 MODULE_DESCRIPTION(LOG_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LOG_DEVICE);
@@ -144,15 +144,17 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-log driver.");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR) "-*");
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
-MODULE_ALIAS("/dev/conslog");
-MODULE_ALIAS("/dev/streams/conslog");
 MODULE_ALIAS("/dev/log");
+MODULE_ALIAS("/dev/strlog");
+MODULE_ALIAS("/dev/conslog");
+#if LFS
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");
-MODULE_ALIAS("/dev/strlog");
 MODULE_ALIAS("/dev/streams/strlog");
 MODULE_ALIAS("/dev/streams/strlog/*");
+MODULE_ALIAS("/dev/streams/conslog");
+#endif
 #endif
 
 static struct module_info log_minfo = {
@@ -948,7 +950,7 @@ log_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, v
 	return (rval);
 }
 
-#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
+#ifdef CONFIG_STREAMS_LOG_MODULE
 static
 #endif
 int __init
@@ -956,7 +958,7 @@ log_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
+#ifdef CONFIG_STREAMS_LOG_MODULE
 	printk(KERN_INFO LOG_BANNER);
 #else
 	printk(KERN_INFO LOG_SPLASH);
@@ -971,7 +973,7 @@ log_init(void)
 	return (0);
 }
 
-#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
+#ifdef CONFIG_STREAMS_LOG_MODULE
 static
 #endif
 void __exit
@@ -982,7 +984,7 @@ log_exit(void)
 	unregister_strdev(&log_cdev, major);
 }
 
-#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
+#ifdef CONFIG_STREAMS_LOG_MODULE
 module_init(log_init);
 module_exit(log_exit);
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/18 12:07:01 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/21 22:52:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:01 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 22:52:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/18 12:07:01 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/21 22:52:09 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/18 12:07:01 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/21 22:52:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -516,7 +516,7 @@ di_alloc(struct cdevsw *cdev)
 	return (di);
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(di_alloc);
 #endif
 struct devinfo *
@@ -561,7 +561,7 @@ di_put(struct devinfo *di)
 	swerr();
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(di_put);
 #endif
 
@@ -771,12 +771,11 @@ flushq(queue_t *q, int flag)
 {
 	int backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
-	unsigned long flags;
 
 	ensure(q, return);
-	qwlock(q, &flags);
+	qwlock_bh(q);
 	backenable = __flushq(q, flag, &mpp);
-	qwunlock(q, &flags);
+	qwunlock_bh(q);
 	if (backenable)
 		qbackenable(q);
 	/* we want to free messages with the locks off so that other CPUs can process this queue
@@ -960,7 +959,7 @@ alloclk(void)
 	return (l);
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(alloclk);
 #endif
 void
@@ -982,7 +981,7 @@ freelk(struct linkblk *l)
 	kmem_cache_free(si->si_cache, li);
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(freelk);
 #endif
 
@@ -2427,7 +2426,7 @@ sd_get(struct stdata *sd)
 	return (sd);
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sd_get);
 #endif
 void
@@ -2449,7 +2448,7 @@ sd_put(struct stdata *sd)
 	return;
 }
 
-#ifdef CONFIG_STREAMS_STH_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sd_put);
 #endif
 

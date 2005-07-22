@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.12 $) $Date: 2005/07/18 00:55:40 $
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.13 $) $Date: 2005/07/18 11:51:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 00:55:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.12 $) $Date: 2005/07/18 00:55:40 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.13 $) $Date: 2005/07/18 11:51:26 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -335,6 +335,7 @@ EXPORT_SYMBOL(lis_secs);
 EXPORT_SYMBOL(lis_sem_alloc);
 EXPORT_SYMBOL(lis_sem_destroy);
 EXPORT_SYMBOL(lis_sem_init);
+EXPORT_SYMBOL(lis_setq); /* for clone and friends */
 #if HAVE_KFUNC_SLEEP_ON
 EXPORT_SYMBOL(lis_sleep_on);
 #endif

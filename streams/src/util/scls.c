@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/21 20:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/21 20:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 12:07:06 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/21 20:47:24 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -69,6 +69,7 @@ static char const ident[] =
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
