@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/21 22:52:09 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/22 12:46:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 22:52:09 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 12:46:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/21 22:52:09 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/22 12:46:59 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/21 22:52:09 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/22 12:46:59 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -740,6 +740,14 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
  *  @q:		the queue to append to
  *  @emp:	existing message on queue
  *  @nmp:	the message to append
+ *
+ *  CONTEXT: appq() can be called from any context; however, the caller is responsibile for
+ *  exclusive access to and validity of the passed in message pointers.  This requires freezing the
+ *  stream or otherwise locking the queue (e.g. MPSTR_QLOCK) in advance.
+ *
+ *  MP-STREAMS: The qwrlock() that we take on the queue protects the queue elements, but this is a
+ *  recursive lock so that if the queue has already been locked by us with freezestr() or
+ *  MPSTR_QLOCK() then we will not fail to acquire the additional queue write lock.
  */
 int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
@@ -747,9 +755,10 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	int result;
 	unsigned long flags;
 
-	qwlock(q, &flags);
+	qwlock_irqsave(q, &flags);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
+	/* do back enabling outside the locks */
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -776,6 +785,25 @@ __EXTERN_INLINE queue_t *backq(queue_t *q);
 
 EXPORT_SYMBOL(backq);
 
+/*
+ *  _qbackenable: - backenable a queue
+ *  @q:		the queue to backenable
+ *  
+ *  This version is with no stream head locks taken.
+ */
+static void
+_qbackenable(queue_t *q)
+{
+	queue_t *qp;
+
+	for (qp = backq(q); qp; qp = backq(qp))
+		if (qp->q_qinfo->qi_srvp) {
+			enableq(qp);	/* normal enable */
+			break;
+		}
+	return;
+}
+
 /**
  *  qbackenable: - backenable a queue
  *  @q:		the queue to backenable
@@ -783,22 +811,9 @@ EXPORT_SYMBOL(backq);
 void
 qbackenable(queue_t *q)
 {
-	queue_t *qp;
-
-	ptrace(("%s; back-enabling queue %p\n", __FUNCTION__, q));
-	ensure(q, return);
-	ptrace(("%s; locking queue %p\n", __FUNCTION__, q));
-	for (qp = backq(q); qp; qp = backq(qp)) {
-		ensure(qp->q_qinfo, continue);
-		ptrace(("%s; checking queue %p for service procedure\n", __FUNCTION__, qp));
-		if (qp->q_qinfo->qi_srvp) {
-			ptrace(("%s; found queue to enable %p\n", __FUNCTION__, qp));
-			enableq(qp);	/* normal enable */
-			break;
-		}
-	}
-	ptrace(("%s; unlocking queue %p\n", __FUNCTION__, q));
-	return;
+	hrlock(q);
+	_qbackenable(q);
+	hrunlock(q);
 }
 
 EXPORT_SYMBOL(qbackenable);
@@ -840,8 +855,9 @@ int
 bcanget(queue_t *q, int band)
 {
 	int result;
+	unsigned long flags;
 
-	qrlock_bh(q);
+	qrlock_irqsave(q, &flags);
 	switch (band) {
 	case 0:
 		result = (__canget(q) & 1);	/* mask off backenable bit */
@@ -853,7 +869,7 @@ bcanget(queue_t *q, int band)
 		result = __bcanget(q, band);
 		break;
 	}
-	qrunlock_bh(q);
+	qrunlock_irqrestore(q, &flags);
 	return (result);
 }
 
@@ -869,12 +885,13 @@ __bcanputany(queue_t *q)
 
 	if ((q_next = q)) {
 		struct qband *qb;
+		unsigned long flags;
 
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
-		qrlock_bh(q);
+		qrlock_irqsave(q, &flags);
 		for (qb = q->q_bandp; qb && test_bit(QB_FULL_BIT, &qb->qb_flag); qb = qb->qb_next) ;
-		qrunlock_bh(q);
+		qrunlock_irqrestore(q, &flags);
 		/* a non-existent band is considered unwritable */
 		return (qb ? 1 : 0);
 	}
@@ -892,24 +909,40 @@ __bcanput(queue_t *q, unsigned char band)
 
 	if ((q_next = q)) {
 		struct qband *qb;
+		unsigned long flags;
 
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
-		qrlock_bh(q);
+		qrlock_irqsave(q, &flags);
 		/* bands are sorted in decending priority so that we can quit the search early for
 		   higher priority bands */
 		for (qb = q->q_bandp; qb && (qb->qb_band > band); qb = qb->qb_next) ;
 		if (qb && qb->qb_band == band && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 			set_bit(QB_WANTW_BIT, &qb->qb_flag);
-			qrunlock_bh(q);
+			qrunlock_irqrestore(q, &flags);
 			return (0);
 		}
-		qrunlock_bh(q);
+		qrunlock_irqrestore(q, &flags);
 		/* a non-existent band is considered empty */
 		return (1);
 	}
 	swerr();
 	return (0);
+}
+
+static int __canput(queue_t *q);
+
+static int
+_bcanput(queue_t *q, int band)
+{
+	switch (band) {
+	case 0:
+		return (__canput(q));
+	case ANYBAND:
+		return (__bcanputany(q));
+	default:
+		return (__bcanput(q, band));
+	}
 }
 
 /**
@@ -929,17 +962,9 @@ bcanput(queue_t *q, int band)
 {
 	int result;
 
-	switch (band) {
-	case 0:
-		result = canput(q);
-		break;
-	case ANYBAND:
-		result = __bcanputany(q);
-		break;
-	default:
-		result = __bcanput(q, band);
-		break;
-	}
+	hrlock(q);
+	result = _bcanput(q, band);
+	hrunlock(q);
 	return (result);
 }
 
@@ -953,7 +978,12 @@ EXPORT_SYMBOL(bcanput);
 int
 bcanputnext(queue_t *q, int band)
 {
-	return (bcanput(q->q_next, band));
+	int result;
+
+	hrlock(q);
+	result = _bcanput(q->q_next, band);
+	hrunlock(q);
+	return (result);
 }
 
 EXPORT_SYMBOL(bcanputnext);
@@ -982,6 +1012,20 @@ __canget(queue_t *q)
 	return (result);
 }
 
+static int
+_canget(queue_t *q)
+{
+	int result;
+	unsigned long flags;
+
+	qrlock_irqsave(q, &flags);
+	result = __canget(q);
+	qrunlock_irqrestore(q, &flags);
+	if (result & 2)
+		qbackenable(q);
+	return (result & 1);
+}
+
 /**
  *  canget:	- check whether messages are on queue
  *  @q:		queue to check
@@ -994,25 +1038,16 @@ canget(queue_t *q)
 {
 	int result;
 
-	qrlock_bh(q);
-	result = __canget(q);
-	qrunlock_bh(q);
-	if (result & 2)
-		qbackenable(q);
-	return (result & 1);
+	hrlock(q);
+	result = _canget(q);
+	hrunlock(q);
+	return (result);
 }
 
 EXPORT_SYMBOL(canget);
 
-/**
- *  canput:	- check wheter message can be put to a queue
- *  @q:		the queue to check
- *
- *  Don't call these functions with NULL q pointers!  To walk the list of queues we take a reader
- *  lock on the stream head.
- */
-int
-canput(queue_t *q)
+static int
+__canput(queue_t *q)
 {
 	queue_t *q_next;
 
@@ -1029,6 +1064,24 @@ canput(queue_t *q)
 	return (0);
 }
 
+/**
+ *  canput:	- check wheter message can be put to a queue
+ *  @q:		the queue to check
+ *
+ *  Don't call these functions with NULL q pointers!  To walk the list of queues we take a reader
+ *  lock on the stream head.
+ */
+int
+canput(queue_t *q)
+{
+	int result;
+
+	hrlock(q);
+	result = __canput(q);
+	hrunlock(q);
+	return (result);
+}
+
 EXPORT_SYMBOL(canput);
 
 /**
@@ -1038,7 +1091,12 @@ EXPORT_SYMBOL(canput);
 int
 canputnext(queue_t *q)
 {
-	return (canput(q->q_next));
+	int result;
+
+	hrlock(q);
+	result = __canput(q->q_next);
+	hrunlock(q);
+	return (result);
 }
 
 EXPORT_SYMBOL(canputnext);
@@ -1171,9 +1229,10 @@ flushband(queue_t *q, int band, int flag)
 	unsigned long flags;
 	mblk_t *mp = NULL, **mpp = &mp;
 
-	qwlock(q, &flags);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	backenable = __flushband(q, flag, band, &mpp);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 	if (backenable)
 		qbackenable(q);
 	/* we want to free messages with the locks off so that other CPUs can process this queue
@@ -1193,7 +1252,8 @@ freezestr(queue_t *q)
 {
 	unsigned long flags = 0;
 
-	qwlock(q, &flags);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	return ((q->q_iflags = flags));
 }
 
@@ -1223,10 +1283,8 @@ getadmin(modID_t modid)
 		struct streamtab *st;
 		struct qinit *qi;
 
-		printd(("%s: %s: got module\n", __FUNCTION__, fmod->f_name));
 		if ((st = fmod->f_str) && (qi = st->st_rdinit))
 			qadmin = qi->qi_qadmin;
-		printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 		fmod_put(fmod);
 	}
 	return (qadmin);
@@ -1256,16 +1314,12 @@ getmid(const char *name)
 	if ((fmod = fmod_find(name))) {
 		modID_t modid = fmod->f_modid;
 
-		printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
-		printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 		fmod_put(fmod);
 		return (modid);
 	}
 	if ((cdev = cdev_find(name))) {
 		modID_t modid = cdev->d_modid;
 
-		printd(("%s: %s: found device\n", __FUNCTION__, cdev->d_name));
-		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 		sdev_put(cdev);
 		return (modid);
 	}
@@ -1275,11 +1329,15 @@ getmid(const char *name)
 EXPORT_SYMBOL(getmid);
 
 /*
- *  __getq:
+ *  __getq:	- get next message off a queue
+ *  @q:		the queue from which to get the message
  *
- *  Faster than __rmvq, same idea
+ *  CONTEXT:	This function must be called with the queue write locked.
+ *
+ *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
+ *  no message on the queue.
  */
-mblk_t *
+static mblk_t *
 __getq(queue_t *q, int *be)
 {
 	mblk_t *mp;
@@ -1304,9 +1362,10 @@ getq(queue_t *q)
 	unsigned long flags;
 
 	ensure(q, return (NULL));
-	qwlock(q, &flags);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	mp = __getq(q, &backenable);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 	if (backenable)
 		qbackenable(q);
 	return (mp);
@@ -1429,9 +1488,10 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	int result;
 	unsigned long flags;
 
-	qwlock(q, &flags);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	result = __insq(q, emp, nmp);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -1486,31 +1546,34 @@ _put(queue_t *q, mblk_t *mp)
 	else {
 		struct syncq *osq = isq->sq_outer;
 
-		if (enter_shared(osq, &flags)) {
+		/* XXX: do these locks have to be so severe? */
+		if (enter_shared_irqsave(osq, &flags)) {
 			if (isq->sq_flag & D_MTPUTSHARED) {
-				if (enter_shared(isq, &flags)) {
+				/* XXX: do these locks have to be so severe? */
+				if (enter_shared_irqsave(isq, &flags)) {
 					__put(q, mp);
 					leave_shared(isq);
 				} else {
 					/* can't enter inner perimeter, defer */
 					__defer_put(isq, q, mp);
-					unlock_syncq(isq, &flags);
+					unlock_synq_irqrestore(isq, &flags);
 				}
 			} else {
-				if (enter_exclus(isq, &flags)) {
+				/* XXX: do these locks have to be so severe? */
+				if (entex_exclus_irqsave(isq, &flags)) {
 					__put(q, mp);
 					leave_exclus(isq);
 				} else {
 					/* can't enter inner perimeter, defer */
 					__defer_put(isq, q, mp);
-					unlock_syncq(isq, &flags);
+					unlock_synq_irqrestore(isq, &flags);
 				}
 			}
 			leave_shared(osq);
 		} else {
 			/* can't enter outer perimeter, defer */
 			__defer_put(osq, q, mp);
-			unlock_syncq(osq, &flags);
+			unlock_synq_irqrestore(osq, &flags);
 		}
 	}
 }
@@ -1520,12 +1583,17 @@ _put(queue_t *q, mblk_t *mp)
  *  @q:		the queue's procedure to call
  *  @mp:	the message to place on the queue
  *
- *  Your put routines must be MT-safe.  That simple.  Don't put to put routines that don't exist.
+ *  Don't put to put routines that don't exist.
+ *
+ *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure is
+ *  aware that it may be called in ISR context.
  */
 void
 put(queue_t *q, mblk_t *mp)
 {
+	hrlock(q);
 	_put(q, mp);
+	hrunlock(q);
 }
 
 EXPORT_SYMBOL(put);
@@ -1534,11 +1602,16 @@ EXPORT_SYMBOL(put);
  *  putnext:	- put a message on the queue next to this one
  *  @q:		this queue
  *  @mp:	message to put
+ *
+ *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure (of
+ *  the next queue) is aware that it may be called in ISR context.
  */
 void
 putnext(queue_t *q, mblk_t *mp)
 {
+	hrlock(q);
 	_put(q->q_next, mp);
+	hrunlock(q);
 }
 
 EXPORT_SYMBOL(putnext);
@@ -1643,9 +1716,10 @@ putbq(queue_t *q, mblk_t *mp)
 	int result;
 	unsigned long flags;
 
-	qwlock(q, &flags);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	result = __putbq(q, mp);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -1835,9 +1909,10 @@ putq(queue_t *q, mblk_t *mp)
 	int result;
 	unsigned long flags;
 
-	qwlock(q, &flags);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	result = __putq(q, mp);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -1860,6 +1935,7 @@ putq(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL(putq);
 
+static int __setsq(queue_t *q, struct fmodsw *fmod, int mux);
 int setsq(queue_t *q, struct fmodsw *fmod, int mux);
 
 /**
@@ -1870,6 +1946,8 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux);
  *  @oflag:	open flags
  *  @sflag:	streams flag, can be %DRVOPEN, %CLONEOPEN, %MODOPEN
  *  @crp:	&cred_t pointer to credentials of opening task
+ *
+ *  CONTEXT: Must only be called from stream head or qopen()/qclose() procedures.
  */
 int
 qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp)
@@ -1881,60 +1959,38 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 	int err;
 
 	err = -ENOMEM;
-	ptrace(("%s: attaching module %s\n", __FUNCTION__, fmod->f_name));
-	if (!(q = allocq())) {
-		printd(("%s: could not alloca queue pair\n", __FUNCTION__));
+	if (!(q = allocq()))
 		goto error;
-	}
-	if ((err = setsq(q, fmod, 0)) < 0) {
-		printd(("%s: could not set queues\n", __FUNCTION__));
+	if ((err = __setsq(q, fmod, 0)) < 0)
 		goto freeq_error;
-	}
 	qinsert(sd, q);		/* half insert under stream head */
 	qprocsoff(q);		/* does not alter q_next pointers, just flags */
 	odev = *devp;		/* remember calling device number */
 	if ((err = qopen(q, devp, oflag, sflag, crp))) {
 		if (err > 0)
 			err = -err;
-		printd(("%s: error from qopen, errno %d\n", __FUNCTION__, -err));
 		goto qerror;
 	}
 	if (sflag != MODOPEN) {
 		/* magic garden */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
-			printd(("%s: returned major %hu is not called major %hu\n", __FUNCTION__,
-				getmajor(*devp), getmajor(odev)));
 			err = -ENOENT;
-			if (!(cdev = cdrv_get(getmajor(*devp)))) {
-				printd(("%s: could not find new major %hu\n", __FUNCTION__,
-					getmajor(*devp)));
+			if (!(cdev = cdrv_get(getmajor(*devp))))
 				goto enoent;
-			}
-			printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 			err = -ENOENT;
-			if (!(st = cdev->d_str)) {
-				pswerr(("%s: device has no streamtab, should not happen\n",
-					__FUNCTION__));
+			if (!(st = cdev->d_str))
 				goto put_noent;
-			}
-			if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0) {
-				printd(("%s: could not set queues to new streamtab\n",
-					__FUNCTION__));
+			if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0)
 				goto put_noent;
-			}
-			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 			cdrv_put(cdev);
 		}
-	} else if (odev != *devp) {
+	} else if (odev != *devp)
 		/* module is supposed to ignore devp */
 		*devp = odev;
-		pswerr(("%s: module altered device number\n", __FUNCTION__));
-	}
 	qprocson(q);		/* in case qopen() forgot */
 	return (0);
       put_noent:
-	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 	cdrv_put(cdev);
       enoent:
 	qdetach(q, oflag, crp);	/* need to call close */
@@ -1956,6 +2012,8 @@ EXPORT_SYMBOL(qattach);
  *  @q:		read queue of the queue pair to close
  *  @oflag:	open flags
  *  @crp:	credentials of closing task
+ *
+ *  CONTEXT: Must only be called from stream head or qopen()/qclose() procedures.
  */
 int
 qclose(queue_t *q, int oflag, cred_t *crp)
@@ -1995,13 +2053,13 @@ qdelete(queue_t *q)
 	queue_t *wq = (q + 1);
 	unsigned long flags;
 
-	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	wq = rq + 1;
-	swlock(sd, &flags);
+	/* XXX: are these strict locks necessary? */
+	swlock_irqsave(sd, &flags);
 	qput(&rq->q_next);
 	qput(&wq->q_next);
 	qu->qu_str = NULL;
-	swunlock(sd, &flags);
+	swunlock_irqrestore(sd, &flags);
 	qput(&q);
 	sd_put(sd);
 }
@@ -2029,10 +2087,7 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 {
 	int err;
 
-	ptrace(("%s: detaching queue\n", __FUNCTION__));
 	err = qclose(q, flags, crp);
-	if (err)
-		printd(("%s: error on qclose, errno %d\n", __FUNCTION__, -err));
 	qprocsoff(q);		/* in case qi_qclose procedure forgot */
 	qdelete(q);
 	return (err);
@@ -2065,13 +2120,12 @@ qinsert(struct stdata *sd, queue_t *irq)
 	queue_t *iwq, *brq, *bwq;
 	struct queinfo *iqu, *bqu;
 
-	srlock_bh(sd);
+	srlock(sd);
 	brq = sd->sd_rq;
 	iqu = (typeof(iqu)) irq;
 	iwq = irq + 1;
 	bqu = (typeof(bqu)) brq;
 	bwq = brq + 1;
-	ptrace(("%s: half insert of queue pair under stream head\n", __FUNCTION__));
 	iqu->qu_str = sd_get(bqu->qu_str);
 	irq->q_next = qget(brq);
 	if (bwq->q_next != brq) {	/* not a fifo */
@@ -2079,7 +2133,7 @@ qinsert(struct stdata *sd, queue_t *irq)
 	} else {		/* is a fifo */
 		iwq->q_next = qget(irq);
 	}
-	srunlock_bh(sd);
+	srunlock(sd);
 }
 
 EXPORT_SYMBOL(qinsert);
@@ -2126,14 +2180,15 @@ qprocsoff(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
-	ptrace(("%s: turning off procs\n", __FUNCTION__));
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
+		unsigned long flags;
+
 		set_bit(QHLIST_BIT, &wq->q_flag);
 		set_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
 		set_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
 		/* spin here waiting for queue procedures to exit */
-		hwlock_bh(rq);
+		hwlock_irqsave(rq, &flags);
 		/* bypass this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
@@ -2147,11 +2202,10 @@ qprocsoff(queue_t *q)
 			bq->q_next = qget(wq->q_next);
 			qput(&qn);
 		}
-		hwunlock_bh(rq);
+		hwunlock_irqrestore(rq, &flags);
 		/* put procs must check QHLIST bit after acquiring hrlock */
 		/* srv procs must check QNOENB bit after acquiring hrlock */
-	} else
-		printd(("%s: procs already turned off\n", __FUNCTION__));
+	}
 }
 
 EXPORT_SYMBOL(qprocsoff);
@@ -2185,14 +2239,15 @@ qprocson(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
-	ptrace(("%s: turning on procs\n", __FUNCTION__));
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
+		unsigned long flags;
+
 		clear_bit(QHLIST_BIT, &wq->q_flag);
 		clear_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
 		clear_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
 		/* spin here waiting for queue procedures to exit */
-		hwlock_bh(rq);
+		hwlock_irqsave(rq, &flags);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
@@ -2206,9 +2261,8 @@ qprocson(queue_t *q)
 			bq->q_next = qget(wq);
 			qput(&qn);
 		}
-		hwunlock_bh(rq);
-	} else
-		printd(("%s: procs already turned on\n", __FUNCTION__));
+		hwunlock_irqrestore(rq, &flags);
+	}
 }
 
 EXPORT_SYMBOL(qprocson);
@@ -2256,12 +2310,10 @@ qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *crp)
 		goto enosr;
 	if (!(fmod = fmod_find(name)))
 		goto einval;
-	printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
 	if ((err = qattach(sd, fmod, devp, oflag, MODOPEN, crp)) != 0)
 		goto error;
 	sd->sd_pushcnt++;
       error:
-	printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 	fmod_put(fmod);
 	return (err);
       einval:
@@ -2293,17 +2345,22 @@ EXPORT_SYMBOL(qsize);
  *  qcountstrm:	- count the numer of messages along a stream
  *  @q:		queue to begin with
  *
- *  Notices: qcountstrm() is only for LiS compatibility.
+ *  Notices: qcountstrm() is only for LiS compatibility.  Note that the count may be invalidated
+ *  before it is completed being calculated.
+ *
+ *  CONTEXT: Any.
  */
 ssize_t
 qcountstrm(queue_t *q)
 {
 	int count = 0;
 
+	hrlock(q);
 	while (SAMESTR(q)) {
 		q = q->q_next;
 		count += q->q_count;
 	}
+	hrunlock(q);
 	return (count);
 }
 
@@ -2318,7 +2375,16 @@ __EXTERN_INLINE queue_t *RD(queue_t *q);
 EXPORT_SYMBOL(RD);
 
 /*
- *  __rmvq:
+ *  __rmvq:	- remove a message from a queue
+ *  @q:		the queue from which to remove the message
+ *  @mp:	the message to removed
+ *
+ *  CONTEXT:	This function must be called with the queue write locked, either explicitly or by
+ *  calling freezestr().
+ *
+ *  RETURN VALUE: Returns an integer indicating whether back enabling should be performed.  A return
+ *  value of zero (0) indicates that back enabling is not necessary.  A return value of one (1)
+ *  indicates that back enabling of queues is required.
  */
 static int
 __rmvq(queue_t *q, mblk_t *mp)
@@ -2365,6 +2431,8 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  rmvq:	- remove a messge from a queue
  *  @q:		queue from which to remove message
  *  @mp:	message to remove
+ *
+ *  CONTEXT:
  */
 void
 rmvq(queue_t *q, mblk_t *mp)
@@ -2372,13 +2440,14 @@ rmvq(queue_t *q, mblk_t *mp)
 	int backenable;
 	unsigned long flags;
 
-	q = mp->b_queue;
-	ensure(q, return);
 	/* We ignore the queue pointer provided by the user because we know which queue the message 
 	   belongs to (if any). */
-	qwlock(q, &flags);
+	q = mp->b_queue;
+	ensure(q, return);
+	/* XXX: are these strict locks necessary? */
+	qwlock_irqsave(q, &flags);
 	backenable = __rmvq(q, mp);
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 	if (backenable)
 		qbackenable(q);
 }
@@ -2423,33 +2492,26 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	queue_t *rq = q;
 	queue_t *wq = q + 1;
+	unsigned long flags;
 
 	/* always take read lock before write lock */
 	/* nobody else takes two locks */
-	local_bh_disable();
-	qwlock(rq, NULL);
-	qwlock(wq, NULL);
+	local_irq_save(flags);
+	qwlock(rq);
+	qwlock(wq);
 	__setq(q, rinit, winit);
 	/* unlock in reverse order */
-	qwunlock(wq, NULL);
-	qwunlock(rq, NULL);
-	local_bh_enable();
+	qwunlock(wq);
+	qwunlock(rq);
+	local_irq_restore(flags);
 }
 
 EXPORT_SYMBOL(setq);
 
 struct syncq syncq_global;
 
-/**
- *  setsq:	- set synchornization charateristics on a queue pair
- *  @q:		read queue in queue pair to set
- *  @fmod:	module to which queue pair belongs
- *  @mux:	non-zero for lower multiplexing driver queue pair
- *
- *  Set synchronization queue associated with a new queue pair.
- */
-int
-setsq(queue_t *q, struct fmodsw *fmod, int mux)
+static int
+__setsq(queue_t *q, struct fmodsw *fmod, int mux)
 {
 	struct syncq *sqr, *sqw;
 
@@ -2514,6 +2576,35 @@ setsq(queue_t *q, struct fmodsw *fmod, int mux)
 }
 
 /**
+ *  setsq:	- set synchornization charateristics on a queue pair
+ *  @q:		read queue in queue pair to set
+ *  @fmod:	module to which queue pair belongs
+ *  @mux:	non-zero for lower multiplexing driver queue pair
+ *
+ *  Set synchronization queue associated with a new queue pair.
+ */
+int
+setsq(queue_t *q, struct fmodsw *fmod, int mux)
+{
+	int result;
+	queue_t *rq = q;
+	queue_t *wq = q + 1;
+	unsigned long flags;
+
+	/* always take read lock before write lock */
+	/* nobody else takes two locks */
+	local_irq_save(flags);
+	qwlock(rq);
+	qwlock(wq);
+	result = __setsq(q, fmod, mux);
+	/* unlock in reverse order */
+	qwunlock(wq);
+	qwunlock(rq);
+	local_irq_restore(flags);
+	return (result);
+}
+
+/**
  *  strqget:	- get characteristics of a queue
  *  @q:		queue to query
  *  @what:	what characteristic to get
@@ -2557,8 +2648,9 @@ strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 		}
 	} else {
 		struct qband *qb;
+		unsigned long flags;
 
-		qrlock_bh(q);
+		qrlock_irqsave(q, &flags);
 		do {
 			if (!(qb = __get_qband(q, band)))
 				goto enomem;
@@ -2596,7 +2688,7 @@ strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 			err = -ENOMEM;
 			break;
 		} while (0);
-		qrunlock_bh(q);
+		qrunlock_irqrestore(q, &flags);
 	}
 	return (-err);
 }
@@ -2643,7 +2735,8 @@ strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 		unsigned long flags;
 		struct qband *qb;
 
-		qwlock(q, &flags);
+		/* XXX: are these strict locks necessary? */
+		qwlock_irqsave(q, &flags);
 		do {
 			if (!(qb = __get_qband(q, band)))
 				goto enomem;
@@ -2675,7 +2768,7 @@ strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 			err = -ENOMEM;
 			break;
 		} while (0);
-		qwunlock(q, &flags);
+		qwunlock_irqrestore(q, &flags);
 	}
 	return (-err);
 }
@@ -2701,6 +2794,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 		unsigned long flags;
 		short lev = (short) level;
 
+		/* XXX: are these strict locks necessary? */
 		spin_lock_irqsave(&str_err_lock, flags);
 		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 #define STRLOG_PFX "strlog(%hd)[%hd,%hd]: %s\n"
@@ -2765,7 +2859,7 @@ void
 unfreezestr(queue_t *q, unsigned long flags)
 {
 	flags = q->q_iflags;
-	qwunlock(q, &flags);
+	qwunlock_irqrestore(q, &flags);
 }
 
 EXPORT_SYMBOL(unfreezestr);
@@ -2789,6 +2883,7 @@ vcmn_err(int err_lvl, const char *fmt, va_list args)
 	unsigned long flags;
 	static char cmn_err_buf[1024], *cmn_err_ptr = cmn_err_buf;
 
+	/* XXX: are these strict locks necessary? */
 	spin_lock_irqsave(&cmn_err_lock, flags);
 	vsnprintf(cmn_err_buf, sizeof(cmn_err_buf), fmt, args);
 	if (cmn_err_buf[0] == '^' || cmn_err_buf[0] == '!')

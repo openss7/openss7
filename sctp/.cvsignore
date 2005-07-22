@@ -15,9 +15,9 @@ config.cache
 config.h
 config.status
 libtool
-sctp-0.2.20-1.lsm
-sctp.i
-sctp.lsm
-sctp.spec
+*.lsm
+*.spec
 stamp-h1
 config.site
+config.cache
+INSTALL.*

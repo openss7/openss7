@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:23 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/22 12:46:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:23 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 12:46:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:23 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/22 12:46:59 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:23 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/22 12:46:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -138,6 +138,7 @@ autopush_find(dev_t dev)
 	if ((cdev = cdrv_get(getmajor(dev))) == NULL)
 		goto notfound;
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+	/* XXX: do these logs have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
 		ap_get(api);
@@ -192,6 +193,7 @@ autopush_add(struct strapush *sap)
 	if ((cdev = sdev_get(sap->sap_major)) == NULL)
 		goto error;
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+	/* XXX: do these logs have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
@@ -223,6 +225,7 @@ autopush_del(struct strapush *sap)
 	if ((cdev = sdev_get(sap->sap_major)) == NULL)
 		goto error;
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+	/* XXX: do these logs have to be so severe? */
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);

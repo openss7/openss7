@@ -10,3 +10,14 @@ intl
 COPYING
 INSTALL
 *.log
+Makefile
+config.cache
+config.h
+config.status
+libtool
+*.lsm
+*.spec
+stamp-h1
+config.site
+config.cache
+INSTALL.*

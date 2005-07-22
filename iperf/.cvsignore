@@ -15,7 +15,9 @@ config.cache
 config.h
 config.status
 libtool
-iperf*.lsm
-iperf.spec
+*.lsm
+*.spec
 stamp-h1
 config.site
+config.cache
+INSTALL.*

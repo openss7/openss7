@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 12:47:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/21 20:47:24 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -854,7 +854,7 @@ str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	queue_t *q = sd->sd_rq;
 
 	trace();
-	qrlock(q, &flags);
+	qrlock_irqsave(q, &flags);
 	switch (arg) {
 	case ANYMARK:
 		if (q->q_first && q->q_first->b_flag & MSGMARK)
@@ -871,7 +871,7 @@ str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 		err = -EINVAL;
 		break;
 	}
-	qrunlock(q, &flags);
+	qrunlock_irqrestore(q, &flags);
 	return (err);
 }
 
@@ -1115,14 +1115,14 @@ str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
 		return (err);
 	if ((err = check_stream_io(file, sd)))
 		return (err);
-	qrlock(sd->sd_rq, &flags);
+	qrlock_irqsave(sd->sd_rq, &flags);
 	do {
 		err = -ENODATA;
 		if (!(sd->sd_rq->q_first))
 			break;
 		err = sd->sd_rq->q_first->b_band;
 	} while (0);
-	qrunlock(sd->sd_rq, &flags);
+	qrunlock_irqrestore(sd->sd_rq, &flags);
 	if (err == -ENODATA)
 		return (err);
 	err = -EFAULT;
@@ -1647,10 +1647,10 @@ str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lon
 		goto exit;
 	if ((err = check_stream_io(file, sd)))
 		goto exit;
-	qrlock(sd->sd_rq, &flags);
+	qrlock_irqsave(sd->sd_rq, &flags);
 	err = qsize(sd->sd_rq);
 	bytes = msgdsize(sd->sd_rq->q_first);
-	qrunlock(sd->sd_rq, &flags);
+	qrunlock_irqrestore(sd->sd_rq, &flags);
 	err = -EFAULT;
 	if (__copy_to_user(valp, &bytes, sizeof(bytes)))
 		return (err);
@@ -1693,7 +1693,7 @@ str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 	/* all areas verified, check readable */
 	if ((err = check_stream_io(file, sd)))
 		return (err);
-	qrlock(q, &flags);
+	qrlock_irqsave(q, &flags);
 	do {
 		mblk_t *mp, *dp;
 		ssize_t blen;
@@ -1751,7 +1751,7 @@ str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 		}
 		rtn = 1;
 	} while (0);
-	qrunlock(q, &flags);
+	qrunlock_irqrestore(q, &flags);
 	if (err < 0)
 		return (err);
 	return (rtn);

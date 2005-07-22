@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/21 20:47:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/22 13:17:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/21 20:47:19 $ by $Author: brian $
+# Last Modified $Date: 2005/07/22 13:17:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -767,6 +767,7 @@ driver_pages += \
 endif
 if CONFIG_STREAMS_LOG
 driver_pages += \
+	man4/conslog.4 \
 	man4/log.4 \
 	man4/strlog.4 \
 	man8/test-log.8 \
@@ -776,6 +777,7 @@ driver_pages += \
 endif
 if CONFIG_STREAMS_LOG_MODULE
 driver_pages += \
+	man4/conslog.4 \
 	man4/log.4 \
 	man4/strlog.4 \
 	man8/test-log.8 \
@@ -1933,6 +1935,7 @@ dist_noinst_driver_pages += \
 endif
 if CONFIG_STREAMS_LOG
 dist_noinst_driver_pages += \
+	man4/conslog.4.man \
 	man4/log.4.man \
 	man4/strlog.4.man \
 	man8/test-log.8.man \
@@ -1942,6 +1945,7 @@ dist_noinst_driver_pages += \
 endif
 if CONFIG_STREAMS_LOG_MODULE
 dist_noinst_driver_pages += \
+	man4/conslog.4.man \
 	man4/log.4.man \
 	man4/strlog.4.man \
 	man8/test-log.8.man \

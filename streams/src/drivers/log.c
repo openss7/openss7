@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/22 12:46:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:21 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -180,19 +180,23 @@ atomic_t trclog_sequence = ATOMIC_INIT(0);
 
 #if !defined HAVE_KFUNC_ATOMIC_ADD_RETURN
 static spinlock_t my_atomic_lock = SPIN_LOCK_UNLOCKED;
-int my_atomic_add_return(int val, atomic_t *atomic) {
+int
+my_atomic_add_return(int val, atomic_t *atomic)
+{
 	int ret;
 	unsigned long flags;
+
+	/* XXX: do these locks have to be so severe? */
 	spin_lock_irqsave(&my_atomic_lock, flags);
 	atomic_add(val, atomic);
 	ret = atomic_read(atomic);
 	spin_unlock_irqrestore(&my_atomic_lock, flags);
 	return (ret);
 }
+
 #undef atomic_add_return
 #define atomic_add_return my_atomic_add_return
 #endif
-
 
 /* private structures */
 struct log {
