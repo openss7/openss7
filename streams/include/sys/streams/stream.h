@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.41 2005/07/18 12:06:58 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.42 2005/07/21 22:52:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 22:52:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/21 22:52:06 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -950,7 +950,7 @@ extern void putnext(queue_t *q, mblk_t *mp);
 extern void qbackenable(queue_t *q);
 extern void qdelete(queue_t *rq);
 extern void qenable(queue_t *q);
-extern void qinsert(queue_t *brq, queue_t *irq);
+extern void qinsert(struct stdata *sd, queue_t *rq);
 extern void qprocsoff(queue_t *q);
 extern void qprocson(queue_t *q);
 extern void unbufcall(bcid_t bcid);

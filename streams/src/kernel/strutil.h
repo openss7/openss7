@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/21 22:52:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 22:52:09 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -79,6 +79,24 @@ qrunlock(queue_t *q, ulong *flagsp)
 	return;
 }
 static __inline__ void
+qrlock_bh(queue_t *q)
+{
+	if (q->q_owner == current)
+		q->q_nest++;
+	else
+		read_lock_bh(&q->q_rwlock);
+	return;
+}
+static __inline__ void
+qrunlock_bh(queue_t *q)
+{
+	if (q->q_owner == current)
+		q->q_nest--;
+	else
+		read_unlock_bh(&q->q_rwlock);
+	return;
+}
+static __inline__ void
 qwlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
@@ -105,6 +123,33 @@ qwunlock(queue_t *q, ulong *flagsp)
 		}
 		if (flagsp)
 			local_irq_restore(*flagsp);
+		return;
+	}
+	swerr();
+}
+static __inline__ void
+qwlock_bh(queue_t *q)
+{
+	if (q->q_owner == current)
+		q->q_nest++;
+	else {
+		write_lock_bh(&q->q_rwlock);
+		q->q_owner = current;
+		q->q_nest = 0;
+	}
+	return;
+}
+static __inline__ void
+qwunlock_bh(queue_t *q)
+{
+	if (q->q_owner == current) {
+		if (q->q_nest > 0)
+			q->q_nest--;
+		else {
+			q->q_owner = NULL;
+			q->q_nest = 0;
+			write_unlock_bh(&q->q_rwlock);
+		}
 		return;
 	}
 	swerr();
@@ -224,6 +269,30 @@ srunlock(struct stdata *sd)
 	swerr();
 }
 static __inline__ void
+srlock_bh(struct stdata *sd)
+{
+	if (likely(sd != NULL)) {
+		if (sd->sd_owner == current)
+			sd->sd_nest++;
+		else
+			read_lock_bh(&sd->sd_qlock);
+		return;
+	}
+	swerr();
+}
+static __inline__ void
+srunlock_bh(struct stdata *sd)
+{
+	if (likely(sd != NULL)) {
+		if (sd->sd_owner == current)
+			sd->sd_nest--;
+		else
+			read_unlock_bh(&sd->sd_qlock);
+		return;
+	}
+	swerr();
+}
+static __inline__ void
 swlock(struct stdata *sd, unsigned long *flagsp)
 {
 	if (likely(sd != NULL)) {
@@ -282,6 +351,18 @@ __swunlock(struct stdata *sd)
 	swerr();
 }
 static __inline__ void
+swlock_bh(struct stdata *sd)
+{
+	local_bh_disable();
+	__swlock(sd);
+}
+static __inline__ void
+swunlock_bh(struct stdata *sd)
+{
+	__swunlock(sd);
+	local_bh_enable();
+}
+static __inline__ void
 slockinit(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
@@ -327,6 +408,18 @@ static __inline__ void
 __hwunlock(queue_t *q)
 {
 	__swunlock(((struct queinfo *) RD(q))->qu_str);
+}
+static __inline__ void
+hwlock_bh(queue_t *q)
+{
+	local_bh_disable();
+	__hwlock(q);
+}
+static __inline__ void
+hwunlock_bh(queue_t *q)
+{
+	__hwunlock(q);
+	local_bh_enable();
 }
 
 /* queue band gets and puts */
