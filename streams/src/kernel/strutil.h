@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/22 12:47:00 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/23 03:50:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 12:47:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -568,6 +568,7 @@ qput(queue_t **qp)
 	}
 }
 
+#if defined CONFIG_STREAMS_SYNCQS
 /* 
  *  Syncrhronization queues...
  */
@@ -620,19 +621,22 @@ shared_leavesq(queue_t *q)
 
 	if ((sq = q->q_syncq)) {
 		unsigned long flags;
-		struct strevent *se, *se_next;
 
 		/* XXX: are these strict locks necessary? */
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if ((--sq->sq_count) <= 0) {
+			struct strevent *se;
+
 			sq->sq_count = 0;
-			if (sq->sq_head) {
+			if ((se = sq->sq_head)) {
 				if (in_streams()) {
+					/* if we are in streams, run them now */
+					struct strevent *se_next;
+					
 					sq->sq_head = NULL;
 					sq->sq_tail = &sq->sq_head;
 					for (se_next = se; (se = se_next);) {
 						se_next = se->se_next;
-						/* if we in streams, run them now */
 						spin_unlock_irqrestore(&sq->sq_lock, flags);
 						qrunevent(q, se);
 						/* XXX: are these strict locks necessary? */
@@ -801,6 +805,9 @@ leave_exclus(syncq_t *sq)
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if (!++sq->sq_count) {
 			sq->sq_owner = NULL;
+			/* If we have a backlog, schedule the thread to process the backlog.  I
+			   don't think that we should do this this way, we might as well process
+			   the backlog now. */
 			if (sq->sq_head)
 				sqsched(sq);
 		}
@@ -816,11 +823,15 @@ leave_shared(syncq_t *sq)
 		/* XXX: do these locks have to be so severe? */
 		spin_lock_irqsave(&sq->sq_lock, flags);
 		if (!--sq->sq_count) {
+			/* If we have a backlog, schedule the thread to process the backlog.  I
+			   don't think that we should do this this way, we might as well process
+			   the backlog now. */
 			if (sq->sq_head)
 				sqsched(sq);
 		}
 		spin_unlock_irqrestore(&sq->sq_lock, flags);
 	}
 }
+#endif
 
 #endif				/* __LOCAL_STRUTIL_H__ */

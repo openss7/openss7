@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/22 06:06:52 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/23 03:50:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -110,8 +110,10 @@ extern void sq_put(struct syncq **sqp);
 /* freeing chains of message blocks */
 extern void freechain(mblk_t *mp, mblk_t **mpp);
 
+#if defined CONFIG_STREAMS_SYNCQS
 /* synq functions */
 extern void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
+#endif
 
 /* stuff for examining streams information lists */
 extern struct strinfo Strinfo[DYN_SIZE];
@@ -147,5 +149,7 @@ current_context(void)
 /* for initialization */
 extern int strsched_init(void);
 extern void strsched_exit(void);
+#if defined CONFIG_STREAMS_SYNCQS
 extern void sqsched(syncq_t *sq);
+#endif
 #endif				/* __LOCAL_STRSCHED_H__ */

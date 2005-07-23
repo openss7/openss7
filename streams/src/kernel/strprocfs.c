@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:07:00 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/23 03:50:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:07:00 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/23 03:50:43 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/18 12:07:00 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/23 03:50:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -575,7 +575,9 @@ static char *dyn_name[DYN_SIZE] = {
 	"DYN_STRAPUSH:",
 	"DYN_DEVINFO:",
 	"DYN_MODINFO:",
+#if defined CONFIG_STREAMS_SYNCQS
 	"DYN_SYNQ:",
+#endif
 };
 
 /* list the strinfo structure counts */

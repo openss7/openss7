@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.31 2005/07/22 06:06:51 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.32 2005/07/23 03:50:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/22 06:06:51 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/23 03:50:42 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -138,6 +138,7 @@ struct strevent {
 #define se_arg	    x.b.arg
 #define se_size	    x.b.size
 
+#if defined CONFIG_STREAMS_SYNCQS
 /* synchronization queue structure */
 typedef struct syncq {
 	spinlock_t sq_lock;		/* spin lock for this structure */
@@ -154,6 +155,7 @@ typedef struct syncq {
 	struct syncq *sq_next;		/* list of all structures */
 	struct syncq *sq_prev;		/* list of all structures */
 } syncq_t;
+#endif
 
 /* stream head private structure */
 struct stdata {
@@ -333,7 +335,9 @@ enum {
 	DYN_STRAPUSH,			/* struct apinfo */
 	DYN_DEVINFO,			/* struct devinfo */
 	DYN_MODINFO,			/* struct mdlinfo */
+#if defined CONFIG_STREAMS_SYNCQS
 	DYN_SYNCQ,			/* struct syncq */
+#endif
 	DYN_SIZE,			/* size */
 };
 
@@ -342,8 +346,10 @@ struct strthread {
 	queue_t *qhead;			/* first queue in scheduled queues */
 	queue_t **qtail;		/* last queue in scheduled queues */
 	queue_t *currentq;		/* current queue being processed */
+#if defined CONFIG_STREAMS_SYNCQS
 	syncq_t *sqhead;		/* first syncq in scheduled syncqs */
 	syncq_t **sqtail;		/* last sycnq in scheduled sycnqs */
+#endif
 	struct strevent *strbcalls_head;	/* head of bufcalls pending exec */
 	struct strevent **strbcalls_tail;	/* tail of bufcalls pending exec */
 	struct strevent *strtimout_head;	/* head of timeouts pending exec */
@@ -606,6 +612,8 @@ extern int sysctl_str_strctlsz;
 
 extern int register_clone(struct cdevsw *cdev);
 extern int unregister_clone(struct cdevsw *cdev);
+
+extern void runqueues(void);
 
 extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
 		      int *flagsp);

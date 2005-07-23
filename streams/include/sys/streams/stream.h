@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.43 2005/07/22 06:06:51 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.44 2005/07/23 03:50:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/22 06:06:51 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/23 03:50:42 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -383,7 +383,9 @@ typedef struct queue {
 	kmutex_t q_lock;
 	struct stdata *q_stream;
 #endif
+#if defined CONFIG_STREAMS_SYNCQS
 	struct syncq *q_syncq;
+#endif
 #if 0
 	unsigned char q_nband;
 	kcondvar_t q_wait;

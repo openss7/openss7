@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/22 12:46:59 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/23 03:50:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 12:46:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/22 12:46:59 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/23 03:50:43 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/22 12:46:59 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/23 03:50:43 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1537,10 +1537,13 @@ __put(queue_t *q, mblk_t *mp)
 static void
 _put(queue_t *q, mblk_t *mp)
 {
+#if defined CONFIG_STREAMS_SYNCQS
 	struct syncq *isq;
 	unsigned long flags;
+#endif
 
 	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
+#if defined CONFIG_STREAMS_SYNCQS
 	if (!(isq = q->q_syncq))
 		__put(q, mp);
 	else {
@@ -1576,6 +1579,9 @@ _put(queue_t *q, mblk_t *mp)
 			unlock_synq_irqrestore(osq, &flags);
 		}
 	}
+#else
+	__put(q, mp);
+#endif
 }
 
 /**
@@ -2508,11 +2514,14 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 
 EXPORT_SYMBOL(setq);
 
+#if defined CONFIG_STREAMS_SYNCQS
 struct syncq syncq_global;
+#endif
 
 static int
 __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 {
+#if defined CONFIG_STREAMS_SYNCQS
 	struct syncq *sqr, *sqw;
 
 	/* make sure there is none to start */
@@ -2570,9 +2579,12 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 			setq(q, fmod->f_str->st_muxrinit, fmod->f_str->st_muxwinit);
 	} else
 		swerr();
+#endif
 	return (0);
+#if defined CONFIG_STREAMS_SYNCQS
       enomem:
 	return (-ENOMEM);
+#endif
 }
 
 /**

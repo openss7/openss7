@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/22 12:46:59 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/23 03:50:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 12:46:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/22 12:46:59 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/23 03:50:43 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/22 12:46:59 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/23 03:50:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -992,6 +992,7 @@ freelk(struct linkblk *l)
 EXPORT_SYMBOL(freelk);		/* include/sys/streams/strsubr.h */
 #endif
 
+#if defined CONFIG_STREAMS_SYNCQS
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -1082,6 +1083,7 @@ sq_put(struct syncq **sqp)
 		}
 	}
 }
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1484,7 +1486,7 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
  *  @q:		associated queue
  *  @mp:	associated message block
  *  @arg:	associated argument
- *  @perim:	sychornization perimiter
+ *  @perim:	exclusive sychornization perimiter
  *  @type:	function call type, currently %SE_STRPUT or %SE_WRITER
  *
  *  Deferrable functions that use defer_func() are streams_put() and qwriter().
@@ -1516,6 +1518,7 @@ EXPORT_SYMBOL(defer_func);	/* include/sys/streams/strsubr.h */
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
  *  -------------------------------------------------------------------------
  */
+#if defined CONFIG_STREAMS_SYNCQS
 void
 __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
 {
@@ -1526,7 +1529,7 @@ __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
 		se->x.p.queue = qget(q);
 		se->x.p.func = (void *) put;
 		se->x.p.arg = q;
-		se->x.p.perim = PERIM_INNER | PERIM_OUTER;
+		se->x.p.perim = PERIM_INNER;
 		se->x.p.mp = mp;
 		*xchg(&sq->sq_tail, &se->se_next) = se;
 		return;
@@ -1542,265 +1545,199 @@ defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
 	unlock_synq_irqrestore(sq, flagsp);
 }
 
-/*
- *  sq_stream:	- execute deferred %SE_STREAM event
- *  @se:	deferred event
- */
-static void
-sq_stream(struct strevent *se)
+static inline void
+do_stream(struct strevent *se)
 {
 }
 
-/*
- *  sq_bufcall:	- execute deferred %SE_BUFCALL event
- *  @se:	deferred event
- */
-static void
-sq_bufcall(struct strevent *se)
+static inline void
+do_bufcall(struct strevent *se)
 {
-	queue_t *q = se->x.b.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;	/* XXX */
-	unsigned long flags;
-
-	/* XXX: do these locks have to be so severe? */
-	if (enter_shared_irqsave(osq, &flags)) {
-		/* XXX: do these locks have to be so severe? */
-		if (entex_exclus_irqsave(isq, &flags)) {
-			/* we are inside the perimeters */
-			/* if no sync, running on correct cpu */
-			if (se->x.b.func)
-				se->x.b.func(se->x.b.arg);
-			leave_exclus(isq);
-			event_free(se);
-		} else
-			defer_event(isq, se, &flags);
-	} else
-		defer_event(osq, se, &flags);
+	if (se->x.b.func)
+		se->x.b.func(se->x.b.arg);
 }
 
-/*
- *  sq_timeout:	- execute deferred %SE_TIMEOUT event
- *  @se:	deferred event
- */
-static void
-sq_timeout(struct strevent *se)
+static inline void
+do_timeout(struct strevent *se)
 {
-	queue_t *q = se->x.t.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
 	unsigned long flags;
 
-	/* XXX: do these locks have to be so severe? */
-	if (enter_shared_irqsave(osq, &flags)) {
-		/* XXX: do these locks have to be so severe? */
-		if (entex_exclus_irqsave(isq, &flags)) {
-			/* we are inside the perimeters */
-			/* if no sync, running on correct cpu */
-			if (se->x.t.pl)
-				local_irq_save(flags);
-			if (se->x.t.func)
-				se->x.t.func(se->x.t.arg);
-			if (se->x.t.pl)
-				local_irq_restore(flags);
-			leave_exclus(isq);
-			event_free(se);
-		} else
-			defer_event(isq, se, &flags);
-		leave_shared(osq);
-	} else
-		defer_event(osq, se, &flags);
+	if (se->x.t.pl)
+		local_irq_save(flags);
+	if (se->x.t.func)
+		se->x.t.func(se->x.t.arg);
+	if (se->x.t.pl)
+		local_irq_restore(flags);
 }
 
-/*
- *  sq_weldq:	- execute deferred %SE_WELDQ event
- *  @se:	deferred event
- */
-static void
-sq_weldq(struct strevent *se)
+static inline void
+do_weldq(struct strevent *se)
 {
-	queue_t *q = se->x.w.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
+	queue_t *qn1 = NULL, *qn3 = NULL;
 	unsigned long flags;
 
-	/* XXX: do these locks have to be so severe? */
-	if (enter_shared_irqsave(osq, &flags)) {
-		/* XXX: do these locks have to be so severe? */
-		if (entex_exclus_irqsave(isq, &flags)) {
-			queue_t *qn1 = NULL, *qn3 = NULL;
-
-			local_irq_save(flags);
-			if (se->x.w.q1)
-				hwlock(se->x.w.q1);
-			if (se->x.w.q3)
-				hwlock(se->x.w.q3);
-			if (se->x.w.q1) {
-				qn1 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q1->q_next = qget(se->x.w.q2);
-			}
-			if (se->x.w.q3) {
-				qn3 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q3->q_next = qget(se->x.w.q4);
-			}
-			if (se->x.w.q3)
-				hwunlock(se->x.w.q3);
-			if (se->x.w.q1)
-				hwunlock(se->x.w.q1);
-			local_irq_restore(flags);
-			leave_exclus(isq);
-			qput(&se->x.w.q1);
-			qput(&se->x.w.q2);
-			qput(&se->x.w.q3);
-			qput(&se->x.w.q4);
-			event_free(se);
-			qput(&qn1);
-			qput(&qn3);
-		} else
-			defer_event(isq, se, &flags);
-		leave_shared(osq);
-	} else
-		defer_event(osq, se, &flags);
+	local_irq_save(flags);
+	if (se->x.w.q1)
+		hwlock(se->x.w.q1);
+	if (se->x.w.q3)
+		hwlock(se->x.w.q3);
+	if (se->x.w.q1) {
+		qn1 = xchg(&se->x.w.q1->q_next, NULL);
+		se->x.w.q1->q_next = qget(se->x.w.q2);
+	}
+	if (se->x.w.q3) {
+		qn3 = xchg(&se->x.w.q1->q_next, NULL);
+		se->x.w.q3->q_next = qget(se->x.w.q4);
+	}
+	if (se->x.w.q3)
+		hwunlock(se->x.w.q3);
+	if (se->x.w.q1)
+		hwunlock(se->x.w.q1);
+	local_irq_restore(flags);
+	qput(&se->x.w.q1);
+	qput(&se->x.w.q2);
+	qput(&se->x.w.q3);
+	qput(&se->x.w.q4);
+	qput(&qn1);
+	qput(&qn3);
 }
 
-/*
- *  sq_unweldq:	- execute deferred %SE_UNWELDQ event
- *  @se:	deferred event
- */
-static void
-sq_unweldq(struct strevent *se)
+static inline void
+do_unweldq(struct strevent *se)
 {
-	queue_t *q = se->x.w.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
+	queue_t *qn1 = NULL, *qn3 = NULL;
 	unsigned long flags;
 
-	/* XXX: do these locks have to be so severe? */
-	if (enter_shared_irqsave(osq, &flags)) {
-		/* XXX: do these locks have to be so severe? */
-		if (entex_exclus_irqsave(isq, &flags)) {
-			queue_t *qn1 = NULL, *qn3 = NULL;
-
-			local_irq_save(flags);
-			if (se->x.w.q1)
-				hwlock(se->x.w.q1);
-			if (se->x.w.q3)
-				hwlock(se->x.w.q3);
-			if (se->x.w.q1) {
-				qn1 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q1->q_next = qget(se->x.w.q2);
-			}
-			if (se->x.w.q3) {
-				qn3 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q3->q_next = qget(se->x.w.q4);
-			}
-			if (se->x.w.q3)
-				hwunlock(se->x.w.q3);
-			if (se->x.w.q1)
-				hwunlock(se->x.w.q1);
-			local_irq_restore(flags);
-			leave_exclus(isq);
-			qput(&se->x.w.q1);
-			qput(&se->x.w.q2);
-			qput(&se->x.w.q3);
-			qput(&se->x.w.q4);
-			event_free(se);
-			qput(&qn1);
-			qput(&qn3);
-		} else
-			defer_event(isq, se, &flags);
-		leave_shared(osq);
-	} else
-		defer_event(osq, se, &flags);
+	local_irq_save(flags);
+	if (se->x.w.q1)
+		hwlock(se->x.w.q1);
+	if (se->x.w.q3)
+		hwlock(se->x.w.q3);
+	if (se->x.w.q1) {
+		qn1 = xchg(&se->x.w.q1->q_next, NULL);
+		se->x.w.q1->q_next = qget(se->x.w.q2);
+	}
+	if (se->x.w.q3) {
+		qn3 = xchg(&se->x.w.q1->q_next, NULL);
+		se->x.w.q3->q_next = qget(se->x.w.q4);
+	}
+	if (se->x.w.q3)
+		hwunlock(se->x.w.q3);
+	if (se->x.w.q1)
+		hwunlock(se->x.w.q1);
+	local_irq_restore(flags);
+	qput(&se->x.w.q1);
+	qput(&se->x.w.q2);
+	qput(&se->x.w.q3);
+	qput(&se->x.w.q4);
+	qput(&qn1);
+	qput(&qn3);
 }
 
-/*
- *  sq_strput:	- execute deferred %SE_STRPUT event
- *  @se:	deferred event
- */
-static void
-sq_strput(struct strevent *se)
+static inline void
+do_strput(struct strevent *se)
 {
-	queue_t *q = se->x.p.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
-	unsigned long flags;
-
-	hrlock(q);
-	/* XXX: do these locks have to be so severe? */
-	if (enter_shared_irqsave(osq, &flags)) {
-		if (isq->sq_flag & D_MTPUTSHARED) {
-			/* XXX: do these locks have to be so severe? */
-			if (enter_shared_irqsave(isq, &flags)) {
-				se->x.p.func(q, se->x.p.mp);
-				leave_exclus(isq);
-				event_free(se);
-			} else
-				defer_event(isq, se, &flags);
-		} else {
-			/* XXX: do these locks have to be so severe? */
-			if (entex_exclus_irqsave(isq, &flags)) {
-				se->x.p.func(q, se->x.p.mp);
-				leave_exclus(isq);
-				event_free(se);
-			} else
-				defer_event(isq, se, &flags);
-		}
-		leave_shared(osq);
-	} else
-		defer_event(osq, se, &flags);
-	hrunlock(q);
+	se->x.p.func(q, se->x.p.mp);
 }
 
-/*
- *  sq_writer:	- execute deferred %SE_WRITER event
- *  @se:	deferred event
- */
-static void
-sq_writer(struct strevent *se)
+static inline void
+do_writer(struct strevent *se)
 {
-	queue_t *q = se->x.p.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;
-	unsigned long flags;
+	se->x.p.func(q, se->x.p.mp);
+}
 
-	hrlock(q);
-	switch (se->x.p.perim) {
-	case PERIM_INNER:
+static inline void
+do_putp(struct strevent *se)
+{
+	se->x.p.func(se->x.p.arg, se->x.p.mp);
+}
+
+static inline void
+do_event(struct strevent *se)
+{
+	struct seinfo *s = (typeof(s)) se;
+
+	switch (s->s_type) {
+	case SE_STREAM:
+		return do_stream(se);
+	case SE_BUFCALL:
+		return do_bufcall(se);
+	case SE_TIMEOUT:
+		return do_timeout(se);
+	case SE_WELDQ:
+		return do_weldq(se);
+	case SE_UNWELDQ:
+		return do_unweldq(se);
+	case SE_STRPUT:
+		return do_strput(se);
+	case SE_WRITER:
+		return do_writer(se);
+	case SE_PUTP:
+		return do_putp(se);
+	default:
+		swerr();
+		return;
+	}
+}
+
+static void
+sq_do_event(struct strevent *se)
+{
+	if (se->x.p.perim & PERIM_OUTER) {
+		queue_t *q = se->x.b.queue;
+		syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;	/* XXX */
+		unsigned long oflags;
+
 		/* XXX: do these locks have to be so severe? */
-		if (enter_shared_irqsave(osq, &flags)) {
-			/* XXX: do these locks have to be so severe? */
-			if (entex_exclus_irqsave(isq, &flags)) {
-				se->x.p.func(q, se->x.p.mp);
-				leave_exclus(isq);
-				event_free(se);
-			} else
-				defer_event(isq, se, &flags);
-			leave_shared(osq);
-		} else
-			defer_event(osq, se, &flags);
-		break;
-	case PERIM_OUTER:
-		/* XXX: do these locks have to be so severe? */
-		if (entex_exclus_irqsave(osq, &flags)) {
-			se->x.p.func(q, se->x.p.mp);
+		if (entex_exclus_irqsave(osq, &oflags)) {
+			do_event(se);
 			leave_exclus(osq);
 			event_free(se);
 		} else
-			defer_event(osq, se, &flags);
-		break;
-	default:
-		swerr();
-		break;
-	}
-	hrunlock(q);
-}
+			defer_event(osq, se, &oflags);
+	} else if (se->x.p.perim & PERIM_INNER) {
+		queue_t *q = se->x.b.queue;
+		syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;	/* XXX */
+		unsigned long oflags;
 
-/*
- *  sq_putp:	- execute deferred %SE_PUTP event
- *  @se:	deferred event
- */
-static void
-sq_putp(struct strevent *se)
-{
-	/* this will defer itself if necessary */
-	se->x.p.func(se->x.p.arg, se->x.p.mp);
-	event_free(se);
+		/* XXX: do these locks have to be so severe? */
+		if (enter_shared_irqsave(osq, &oflags)) {
+			unsigned long iflags;
+
+			/* XXX: do these locks have to be so severe? */
+			if (entex_exclus_irqsave(isq, &iflags)) {
+				/* we are inside the perimeters */
+				/* if no sync, running on correct cpu */
+				do_event(se);
+				leave_exclus(isq);
+				event_free(se);
+			} else
+				defer_event(isq, se, &iflags);
+		} else
+			defer_event(osq, se, &oflags);
+	} else {
+		queue_t *q = se->x.b.queue;
+		syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;	/* XXX */
+		unsigned long oflags;
+
+		/* XXX: do these locks have to be so severe? */
+		if (enter_shared_irqsave(osq, &oflags)) {
+			unsigned long iflags;
+
+			/* XXX: do these locks have to be so severe? */
+			if (entex_shared_irqsave(isq, &iflags)) {
+				/* we are inside the perimeters */
+				/* if no sync, running on correct cpu */
+				do_event(se);
+				leave_shared(isq);
+				event_free(se);
+			} else
+				defer_event(isq, se, &iflags);
+		} else
+			defer_event(osq, se, &oflags);
+	}
 }
+#endif
 
 /**
  *  kmem_alloc:	- allocate memory
@@ -1992,6 +1929,7 @@ doevents(struct strthread *t)
 	}
 }
 
+#if defined CONFIG_STREAMS_SYNCQS
 /*
  *  backlog:	- process message backlog
  *  @t:		STREAMS execution thread
@@ -2015,41 +1953,15 @@ backlog(struct strthread *t)
 				sq->sq_tail = &sq->sq_head;
 				spin_unlock_irqrestore(&sq->sq_lock, flags);
 				while ((se = se_next)) {
-					struct seinfo *s = (typeof(s)) se;
-
 					se_next = xchg(&se->se_next, NULL);
-					switch (s->s_type) {
-					case SE_STREAM:
-						sq_stream(se);
-						break;
-					case SE_BUFCALL:	/* this is a qbufcall */
-						sq_bufcall(se);
-						break;
-					case SE_TIMEOUT:	/* this is a qtimeout */
-						sq_timeout(se);
-						break;
-					case SE_WELDQ:	/* this is a weldq */
-						sq_weldq(se);
-						break;
-					case SE_UNWELDQ:	/* this is an unweldq */
-						sq_unweldq(se);
-						break;
-					case SE_STRPUT:	/* this is a streams_put */
-						sq_strput(se);
-						break;
-					case SE_WRITER:	/* this is a qwriter */
-						sq_writer(se);
-						break;
-					case SE_PUTP:	/* this is a put */
-						sq_putp(se);
-						break;
-					}
+					sq_do_event(se);
 				}
 			} else
 				spin_unlock_irqrestore(&sq->sq_lock, flags);
 		}
 	}
 }
+#endif
 
 /*
  *  bufcalls:	- process bufcalls
@@ -2204,6 +2116,7 @@ qschedule(queue_t *q)
 	}
 }
 
+#if defined CONFIG_STREAMS_SYNCQS
 /**
  *  sqsched - schedule a synchronization queue
  *  @sq: the synchronization queue to schedule
@@ -2213,6 +2126,9 @@ qschedule(queue_t *q)
  *
  *  MP-STREAMS: Note that because we are just pushing the tail, the atomic exchange takes care of
  *  concurrency and other exclusion measures are not necessary here.
+ *
+ *  IMPLEMENTATION:  I don't think that we should do this.  When we leave a barrier, we should check
+ *  if we can simply run the backlog and, if we can, simply run the backlog in the current thread.
  */
 void
 sqsched(syncq_t *sq)
@@ -2227,6 +2143,7 @@ sqsched(syncq_t *sq)
 			raise_softirq(STREAMS_SOFTIRQ);
 	}
 }
+#endif
 
 /**
  *  qenable:	- schedule a queue for execution
@@ -2322,18 +2239,22 @@ freechain(mblk_t *mp, mblk_t **mpp)
 }
 
 /*
- *  runqueues:	- run scheduled STRAMS events on the current processor
+ *  _runqueues:	- run scheduled STRAMS events on the current processor
  *  @unused:	unused
+ *
+ *  This is the internal softirq version of runqueues().
  */
 static void
-runqueues(struct softirq_action *unused)
+_runqueues(struct softirq_action *unused)
 {
 	struct strthread *t = this_thread;
 
 	set_bit(queueflag, &t->flags);
+#if defined CONFIG_STREAMS_SYNCQS
 	/* catch up on backlog first */
 	if (t->flags & QSYNCFLAG)
 		backlog(t);
+#endif
 	/* do timeouts */
 	if (t->flags & STRTIMOUT)
 		timeouts(t);
@@ -2354,6 +2275,27 @@ runqueues(struct softirq_action *unused)
 		freeblocks(t);
 	clear_bit(queueflag, &t->flags);
 }
+
+/**
+ *  _runqueues:	- run scheduled STRAMS events on the current processor
+ *  @unused:	unused
+ *
+ *  This is the external version of runqueues() that can be called in user context at the end of a
+ *  system call.  All stream heads (regular stream head, fifo/pipe stream head, socket stream
+ *  head) need this function exported so that they can be called at the end of a system call.
+ */
+void
+runqueues(void)
+{
+	local_bh_disable();	/* simulates softirq context */
+	if (this_thread->
+	    flags & (QSYNCFLAG | STRTIMOUT | STREVENTS | STRBCFLAG | STRBCWAIT | QRUNFLAG |
+		     FLUSHWORK | FREEBLKS))
+		_runqueues(NULL);
+	local_bh_enable();	/* go back to user context */
+}
+
+EXPORT_SYMBOL(runqueues);	/* include/sys/streams/strsubr.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -2513,8 +2455,12 @@ static struct cacheinfo {
 	"DYN_QBAND", sizeof(struct qbinfo), 0, SLAB_HWCACHE_ALIGN, &qbinfo_ctor, NULL}, {
 	"DYN_STRAPUSH", sizeof(struct apinfo), 0, SLAB_HWCACHE_ALIGN, &apinfo_ctor, NULL}, {
 	"DYN_DEVINFO", sizeof(struct devinfo), 0, SLAB_HWCACHE_ALIGN, &devinfo_ctor, NULL}, {
-	"DYN_MODINFO", sizeof(struct mdlinfo), 0, SLAB_HWCACHE_ALIGN, &mdlinfo_ctor, NULL}, {
-	"DYN_SYNCQ", sizeof(struct syncq), 0, SLAB_HWCACHE_ALIGN, &syncq_ctor, NULL}
+		"DYN_MODINFO", sizeof(struct mdlinfo), 0, SLAB_HWCACHE_ALIGN, &mdlinfo_ctor, NULL
+#if defined CONFIG_STREAMS_SYNCQS
+	}, {
+		"DYN_SYNCQ", sizeof(struct syncq), 0, SLAB_HWCACHE_ALIGN, &syncq_ctor, NULL
+#endif
+	}
 };
 
 /* Note: that we only have one cache for both MSGBLOCKs and MDBBLOCKs */
@@ -2619,7 +2565,7 @@ strsched_init(void)
 		t->freeevnt_head = NULL;
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
-	open_softirq(STREAMS_SOFTIRQ, runqueues, NULL);
+	open_softirq(STREAMS_SOFTIRQ, _runqueues, NULL);
 	return (0);
 }
 
