@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:44 $
+ @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/26 12:50:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STH_H__
 #define __LOCAL_STH_H__
 
-#if 0
-extern loff_t strllseek(struct file *file, loff_t off, int whence);
-extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
-extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
-extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
-extern int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
-extern int strmmap(struct file *filp, struct vm_area_struct *vma);
-extern int stropen(struct inode *inode, struct file *file);
-extern int strflush(struct file *file);
-extern int strclose(struct inode *inode, struct file *file);
-extern int strfasync(int fd, struct file *file, int on);
-extern ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len,
-			loff_t *ppos);
-extern ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count,
-			 loff_t *ppos);
-extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
-			   loff_t *ppos, int more);
-#endif
-extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
-		      int *flagsp);
-extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
-		      int flags);
-
-extern struct file_operations strm_f_ops;
-
 extern struct smodule_info str_minfo;	/* for strsysctl.c */
-
-extern int strrput(queue_t *q, mblk_t *mp);
-extern int strwsrv(queue_t *q);
 
 #endif				/* __LOCAL_STH_H__ */

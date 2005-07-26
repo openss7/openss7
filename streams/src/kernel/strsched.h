@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/23 03:50:43 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/26 12:50:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:50 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -123,6 +123,7 @@ extern struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 
 typedef enum {
 	CTX_PROC,			/* process context */
+	CTX_ATOMIC,			/* atomic (no postpone) context */
 	CTX_STREAMS,			/* STREAMS softirq interrupt context */
 	CTX_INT,			/* soft interrupt context */
 	CTX_ISR,			/* hard interrupt context */

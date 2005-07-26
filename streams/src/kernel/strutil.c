@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/23 03:50:43 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/26 12:50:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/23 03:50:43 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/26 12:50:50 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/23 03:50:43 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/26 12:50:50 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -789,7 +789,8 @@ EXPORT_SYMBOL(backq);
  *  _qbackenable: - backenable a queue
  *  @q:		the queue to backenable
  *  
- *  This version is with no stream head locks taken.
+ *  CONTEXT: _qbackenable() can only be called from STREAMS context, or from any other context once
+ *  a stream head read lock has been acquired.
  */
 static void
 _qbackenable(queue_t *q)
@@ -807,13 +808,19 @@ _qbackenable(queue_t *q)
 /**
  *  qbackenable: - backenable a queue
  *  @q:		the queue to backenable
+ *
+ *  CONTEXT: qbackenable() can be called from any context.
  */
 void
 qbackenable(queue_t *q)
 {
-	hrlock(q);
-	_qbackenable(q);
-	hrunlock(q);
+	if (likely(in_streams() != 0))
+		_qbackenable(q);
+	else {
+		hrlock(q);
+		_qbackenable(q);
+		hrunlock(q);
+	}
 }
 
 EXPORT_SYMBOL(qbackenable);
@@ -930,14 +937,24 @@ __bcanput(queue_t *q, unsigned char band)
 	return (0);
 }
 
-static int __canput(queue_t *q);
+static int _canput(queue_t *q);
 
+/**
+ *  _bcanput:	- check whether message can be put to a queue
+ *  @q:		queue to check
+ *  @band:	band to check
+ *
+ *  This is a version of bcanput() that does not take stream head locks.
+ *
+ *  CONTEXT: _bcanput() can only be called from STREAMS context, or from any context after a stream
+ *  head read lock is acquired.
+ */
 static int
 _bcanput(queue_t *q, int band)
 {
 	switch (band) {
 	case 0:
-		return (__canput(q));
+		return (_canput(q));
 	case ANYBAND:
 		return (__bcanputany(q));
 	default:
@@ -956,33 +973,61 @@ _bcanput(queue_t *q, int band)
  *  bit semantics on the queue band are atomic.
  *
  *  Use bcanput or bcanputnext with band -1 to check for any writable non-zero band.
+ *
+ *  CONTEXT: bcanput() can be called from any context.  From STREAMS context or when stream head
+ *  read locks have already been taken, it is more efficient to call _bcanput().
  */
 int
 bcanput(queue_t *q, int band)
 {
 	int result;
 
-	hrlock(q);
-	result = _bcanput(q, band);
-	hrunlock(q);
+	if (likely(in_streams() != 0))
+		result = _bcanput(q, band);
+	else {
+		hrlock(q);
+		result = _bcanput(q, band);
+		hrunlock(q);
+	}
 	return (result);
 }
 
 EXPORT_SYMBOL(bcanput);
 
+/*
+ *  _bcanputnext: - check whether messages can be put to queue after this one
+ *  @q:		this queue
+ *  @band:	band to check
+ *
+ *  CONTEXT: _bcanputnext() can only be called from STREAMS context, or from any context after a
+ *  stream head read lock is acquired.
+ */
+static int
+_bcanputnext(queue_t *q, int band)
+{
+	return _bcanput(q->q_next, band);
+}
+
 /**
  *  bcanputnext: - check whether messages can be put to queue after this one
  *  @q:		this queue
  *  @band:	band to check
+ *
+ *  CONTEXT: bcanputnext() can be called from any context.  From STREAMS context or when stream head
+ *  read locks have already been taken, it is more efficient to call _bcanputnext().
  */
 int
 bcanputnext(queue_t *q, int band)
 {
 	int result;
 
-	hrlock(q);
-	result = _bcanput(q->q_next, band);
-	hrunlock(q);
+	if (likely(in_streams() != 0))
+		result = _bcanput(q->q_next, band);
+	else {
+		hrlock(q);
+		result = _bcanput(q->q_next, band);
+		hrunlock(q);
+	}
 	return (result);
 }
 
@@ -1012,6 +1057,14 @@ __canget(queue_t *q)
 	return (result);
 }
 
+/*
+ *  _canget:	- check whether messages are on queue
+ *  @q:		queue to check
+ *
+ *  CONTEXT: _canget() can only be called from STREAMS context, or from any context after a stream
+ *  head read lock has been acquired.
+ *
+ */
 static int
 _canget(queue_t *q)
 {
@@ -1038,16 +1091,27 @@ canget(queue_t *q)
 {
 	int result;
 
-	hrlock(q);
-	result = _canget(q);
-	hrunlock(q);
+	if (likely(in_streams() != 0))
+		result = _canget(q);
+	else {
+		hrlock(q);
+		result = _canget(q);
+		hrunlock(q);
+	}
 	return (result);
 }
 
 EXPORT_SYMBOL(canget);
 
+/*
+ *  canput:	- check wheter message can be put to a queue
+ *  @q:		the queue to check
+ *
+ *  CONTEXT: canput() can only be called from STREAMS context, or from any context after a stream
+ *  head read lock has been aquired.
+ */
 static int
-__canput(queue_t *q)
+_canput(queue_t *q)
 {
 	queue_t *q_next;
 
@@ -1076,13 +1140,23 @@ canput(queue_t *q)
 {
 	int result;
 
-	hrlock(q);
-	result = __canput(q);
-	hrunlock(q);
+	if (likely(in_stream() != 0))
+		result = _canput(q);
+	else {
+		hrlock(q);
+		result = _canput(q);
+		hrunlock(q);
+	}
 	return (result);
 }
 
 EXPORT_SYMBOL(canput);
+
+static int
+_canputnext(queue_t *q)
+{
+	return _canput(q->q_next);
+}
 
 /**
  *  canputnext: - check whether messages can be put to the queue after this one
@@ -1093,9 +1167,13 @@ canputnext(queue_t *q)
 {
 	int result;
 
-	hrlock(q);
-	result = __canput(q->q_next);
-	hrunlock(q);
+	if (likely(in_streams != 0))
+		result = _canputnext(q);
+	else {
+		hrlock(q);
+		result = _canputnext(q);
+		hrunlock(q);
+	}
 	return (result);
 }
 
@@ -1592,17 +1670,26 @@ _put(queue_t *q, mblk_t *mp)
  *  Don't put to put routines that don't exist.
  *
  *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure is
- *  aware that it may be called in ISR context.
+ *  aware that it may be called in ISR context.  Also, if called in hardirq context, neither
+ *  message filtering nor sychronization will be performed.  If you want to have a sychronized put()
+ *  use the streams_put() function.
  */
 void
 put(queue_t *q, mblk_t *mp)
 {
-	hrlock(q);
-	_put(q, mp);
-	hrunlock(q);
+	if (likely(in_irq() != 0))
+		__put(q, mp);
+	else
+		_put(q, mp);
 }
 
 EXPORT_SYMBOL(put);
+
+static void
+_putnext(queue_t *q, mblk_t *mp)
+{
+	_put(q->q_next, mp);
+}
 
 /**
  *  putnext:	- put a message on the queue next to this one
@@ -1610,14 +1697,20 @@ EXPORT_SYMBOL(put);
  *  @mp:	message to put
  *
  *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure (of
- *  the next queue) is aware that it may be called in ISR context.
+ *  the next queue) is aware that it may be called in ISR context.  Better still, just don't call
+ *  this function from ISR context.
  */
 void
 putnext(queue_t *q, mblk_t *mp)
 {
-	hrlock(q);
-	_put(q->q_next, mp);
-	hrunlock(q);
+	assert(!in_irq());
+	if (likely(in_streams() != 0))
+		_putnext(q, mp);
+	else {
+		hrlock(q);
+		_putnext(q, mp);
+		hrunlock(q);
+	}
 }
 
 EXPORT_SYMBOL(putnext);
@@ -1967,10 +2060,11 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 	err = -ENOMEM;
 	if (!(q = allocq()))
 		goto error;
+	(q + 0)->q_flag |= QHLIST | QNOENB;
+	(q + 1)->q_flag |= QHLIST | QNOENB;
 	if ((err = __setsq(q, fmod, 0)) < 0)
 		goto freeq_error;
 	qinsert(sd, q);		/* half insert under stream head */
-	qprocsoff(q);		/* does not alter q_next pointers, just flags */
 	odev = *devp;		/* remember calling device number */
 	if ((err = qopen(q, devp, oflag, sflag, crp))) {
 		if (err > 0)
@@ -1978,17 +2072,22 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 		goto qerror;
 	}
 	if (sflag != MODOPEN) {
-		/* magic garden */
+		/* XXX: Magic Garden say that if we are opening and the major device number
+		   returned from qopen() is not the same as the major number passed, that we need
+		   to do a setq on the queue from the streamtab associated with the new major
+		   device number. */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
 			err = -ENOENT;
 			if (!(cdev = cdrv_get(getmajor(*devp))))
 				goto enoent;
-			err = -ENOENT;
-			if (!(st = cdev->d_str))
-				goto put_noent;
-			if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0)
-				goto put_noent;
+			if ((struct fmodsw *) cdev != fmod) {
+				err = -ENOENT;
+				if (!(st = cdev->d_str))
+					goto put_noent;
+				if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0)
+					goto put_noent;
+			}
 			cdrv_put(cdev);
 		}
 	} else if (odev != *devp)
@@ -1999,12 +2098,11 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
       put_noent:
 	cdrv_put(cdev);
       enoent:
-	qdetach(q, oflag, crp);	/* need to call close */
-	goto error;
+	qclose(q, oflag, crp);	/* need to call close */
       qerror:
 	*devp = odev;
-	qprocsoff(q);		/* doesn't alter anything if procs still turned off */
-	qdelete(q);		/* remove half insert */
+	qprocsoff(q);		/* in case qopen called qprocson */
+	qdelete(q);		/* half delete */
       freeq_error:
 	qput(&q);
       error:
@@ -2019,18 +2117,29 @@ EXPORT_SYMBOL(qattach);
  *  @oflag:	open flags
  *  @crp:	credentials of closing task
  *
- *  CONTEXT: Must only be called from stream head or qopen()/qclose() procedures.
+ *  CONTEXT: Must only be called from a blockable context.
  */
 int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
-	int result = ENXIO;
+	int err = -ENXIO;
 	int (*q_close) (queue_t *, int, cred_t *);
 
-	if ((q_close = q->q_qinfo->qi_qclose))
-		if (!(result = q_close(q, oflag, crp)))
-			qprocsoff(q);
-	return (result);
+	if ((q_close = q->q_qinfo->qi_qclose)) {
+#if CONFIG_STREAMS_SYNCQS
+		struct syncq *sq;
+
+		if (unlikely((err = enter_outer_syncq_wait(q, &sq)) != 0))
+			goto error;
+#endif
+		err = q_close(q, oflag, crp);
+#if CONFIG_STREAMS_SYNCQS
+		leave_outer_syncq_wait(sq);
+#endif
+	}
+	goto error;
+      error:
+	return (err);
 }
 
 EXPORT_SYMBOL(qclose);
@@ -2044,11 +2153,11 @@ EXPORT_SYMBOL(qclose);
  *  remains unaffected.  qprocsoff() must be called before calling qdelete() to properly remove the
  *  queue pair from the stream.
  *
- *  Context: qdelete() should only be called from the qattach() or qdetach() procedure or a stream
+ *  CONTEXT: qdelete() should only be called from the qattach() or qdetach() procedure or a stream
  *  head open or close procedure.
  *
- *  Notices: rq should have already been removed from a queue with qprocsoff() and must be a valid
- *  pointer or bad things will happen.
+ *  NOTICES: rq should have already been removed from a queue with qprocsoff() (but we check again
+ *  anyway) and must be a valid pointer or bad things will happen.
  */
 void
 qdelete(queue_t *q)
@@ -2057,7 +2166,7 @@ qdelete(queue_t *q)
 	struct stdata *sd = qu->qu_str;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
-	unsigned long flags;
+	unsigned long flags = 0;
 
 	wq = rq + 1;
 	/* XXX: are these strict locks necessary? */
@@ -2094,8 +2203,8 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 	int err;
 
 	err = qclose(q, flags, crp);
-	qprocsoff(q);		/* in case qi_qclose procedure forgot */
-	qdelete(q);
+	qprocsoff(q);		/* in case qclose forgot */
+	qdelete(q);		/* half delete */
 	return (err);
 }
 
@@ -2123,19 +2232,19 @@ EXPORT_SYMBOL(qdetach);
 void
 qinsert(struct stdata *sd, queue_t *irq)
 {
-	queue_t *iwq, *brq, *bwq;
-	struct queinfo *iqu, *bqu;
+	queue_t *iwq, *srq, *swq;
+	struct queinfo *iqu, *squ;
 
 	srlock(sd);
-	brq = sd->sd_rq;
+	srq = sd->sd_rq;
 	iqu = (typeof(iqu)) irq;
 	iwq = irq + 1;
-	bqu = (typeof(bqu)) brq;
-	bwq = brq + 1;
-	iqu->qu_str = sd_get(bqu->qu_str);
-	irq->q_next = qget(brq);
-	if (bwq->q_next != brq) {	/* not a fifo */
-		iwq->q_next = qget(bwq->q_next);
+	squ = (typeof(squ)) srq;
+	swq = srq + 1;
+	iqu->qu_str = sd_get(squ->qu_str);
+	irq->q_next = qget(srq);
+	if (swq->q_next != srq) {	/* not a fifo */
+		iwq->q_next = qget(swq->q_next);
 	} else {		/* is a fifo */
 		iwq->q_next = qget(irq);
 	}
@@ -2151,15 +2260,34 @@ EXPORT_SYMBOL(qinsert);
  *  @oflag:	open flags
  *  @sflag:	stream flag, can be %DRVOPEN, %MODOPEN, %CLONEOPEN
  *  @crp:	pointer to the opening task's credential structure
+ *
+ *  Note that if a syncrhonization queue exitsts and Solaris compatible flags D_MTOUTPERIM and
+ *  D_MTOCEXCL are set in the outer perimeter syncrhonization queue, then we must either enter the
+ *  outer perimeter exclusive, or block awaiting exclusive access to the outer perimeter.
+ *
+ *  CONTEXT: Must only be called from a blockable context.
  */
 int
 qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int (*q_open) (queue_t *, dev_t *, int, int, cred_t *);
+	int err = -ENOPKG;
 
-	if ((q_open = q->q_qinfo->qi_qopen))
-		return q_open(q, devp, oflag, sflag, crp);
-	return (-ENOPKG);
+	if ((q_open = q->q_qinfo->qi_qopen)) {
+#if CONFIG_STREAMS_SYNCQS
+		struct syncq *sq;
+
+		if (unlikely((err = enter_outer_syncq_wait(q, &sq)) != 0))
+			goto error;
+#endif
+		err = q_open(q, devp, oflag, sflag, crp);
+#if CONFIG_STREAMS_SYNCQS
+		leave_outer_syncq_wait(sq);
+#endif
+	}
+	goto error;
+      error:
+	return (err);
 }
 
 EXPORT_SYMBOL(qopen);
@@ -2188,7 +2316,7 @@ qprocsoff(queue_t *q)
 
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
-		unsigned long flags;
+		unsigned long flags = 0;
 
 		set_bit(QHLIST_BIT, &wq->q_flag);
 		set_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
@@ -2197,20 +2325,22 @@ qprocsoff(queue_t *q)
 		hwlock_irqsave(rq, &flags);
 		/* bypass this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
-			queue_t *qn = xchg(&bq->q_next, NULL);
+			queue_t *qn = bq->q_next;
 
+			bq->q_next = NULL;
 			bq->q_next = qget(rq->q_next);
 			qput(&qn);
 		}
 		if ((bq = backq(wq))) {
-			queue_t *qn = xchg(&bq->q_next, NULL);
+			queue_t *qn = bq->q_next;
 
+			bq->q_next = NULL;
 			bq->q_next = qget(wq->q_next);
 			qput(&qn);
 		}
 		hwunlock_irqrestore(rq, &flags);
-		/* put procs must check QHLIST bit after acquiring hrlock */
-		/* srv procs must check QNOENB bit after acquiring hrlock */
+		/* XXX: put procs must check QHLIST bit after acquiring hrlock */
+		/* XXX: srv procs must check QNOENB bit after acquiring hrlock */
 	}
 }
 
@@ -2247,7 +2377,7 @@ qprocson(queue_t *q)
 
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
-		unsigned long flags;
+		unsigned long flags = 0;
 
 		clear_bit(QHLIST_BIT, &wq->q_flag);
 		clear_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
@@ -2347,6 +2477,26 @@ __EXTERN_INLINE ssize_t qsize(queue_t *q);
 
 EXPORT_SYMBOL(qsize);
 
+/*
+ *  _qcountstrm:	- count the numer of messages along a stream
+ *  @q:		queue to begin with
+ *
+ *  CONTEXT: _qcountstrm() can only be called from STREAMS context, or from any context once a
+ *  stream head read lock has been acquired.
+ *
+ */
+ssize_t
+_qcountstrm(queue_t *q)
+{
+	ssize_t count = 0;
+
+	while (q && SAMESTR(q)) {
+		q = q->q_next;
+		count += q->q_count;
+	}
+	return (count);
+}
+
 /**
  *  qcountstrm:	- count the numer of messages along a stream
  *  @q:		queue to begin with
@@ -2359,14 +2509,15 @@ EXPORT_SYMBOL(qsize);
 ssize_t
 qcountstrm(queue_t *q)
 {
-	int count = 0;
+	ssize_t count;
 
-	hrlock(q);
-	while (SAMESTR(q)) {
-		q = q->q_next;
-		count += q->q_count;
+	if (likely(in_streams() != 0))
+		count = _qcountstrm(q);
+	else {
+		hrlock(q);
+		count = _qcountstrm(q);
+		hrunlock(q);
 	}
-	hrunlock(q);
 	return (count);
 }
 
@@ -2515,63 +2666,156 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 EXPORT_SYMBOL(setq);
 
 #if defined CONFIG_STREAMS_SYNCQS
-struct syncq syncq_global;
+struct syncq *global_syncq = NULL;
 #endif
 
+/*
+ *  __setsq:	- set synchronization queues for a new queue pair
+ *  @fmod:	fmodsw table entry for this module
+ *  @mux:	are we being linked under a multiplexing driver?
+ *
+ *  This function establishes the links to the necessary syncrhonization queues for a newly created
+ *  queue pair.  Both outer and inner perimiters are established.  D_MP modules have no perimiters.
+ *  SQLVL_NOP modules have no inner perimeter.  D_MTOUTPERIM modules have an outer perimeter.
+ *  Modules cannot have an outer perimeter and an inner perimeter of D_MTPERMOD or SQLVL_MODULE or
+ *  wider.
+ *
+ *  If the inner perimeter is SQLVL_MODULE or SQLVL_ELSEWHERE, then it is the responsibility of the
+ *  registration function to find or allocate a synchronization queue and attach it to fmod->f_syncq
+ *  for use by this function.  This makes the algorithm for locating an "elsewhere" module
+ *  independent of this function.  Although this function could allocate synchronization queues for
+ *  the SQLVL_MODULE case, to avoid races it should only be performed in the registration functions.
+ */
 static int
 __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 {
 #if defined CONFIG_STREAMS_SYNCQS
-	struct syncq *sqr, *sqw;
-
 	/* make sure there is none to start */
 	sq_put(&(q + 0)->q_syncq);
 	sq_put(&(q + 1)->q_syncq);
 	if (fmod == NULL)
 		return (0);	/* just remove */
-	switch (fmod->f_sqlvl) {
-	case SQLVL_NOP:	/* none */
-		break;
-	case SQLVL_QUEUE:
-		/* allocate one syncq for each queue */
-		if (!(sqr = sq_alloc()))
-			goto enomem;
-		if (!(sqw = sq_alloc())) {
-			sq_put(&sqr);
-			goto enomem;
+	if (!(fmod->f_flag & D_MP)) {
+		struct syncq *sqr, *sqw, *sqo = NULL;
+
+		/* propagate flags to f_sqlvl, this should have already been done by the
+		   registration function */
+		if (fmod->f_sqlvl == SQLVL_DEFAULT) {
+			if (fmod->f_flag & D_MTPERQ)
+				fmod->f_sqlvl = SQLVL_QUEUE;
+			else if (fmod->f_flag & D_MTQPAIR)
+				fmod->f_sqlvl = SQLVL_QUEUEPAIR;
+			else if (fmod->f_flag & D_MTPERMOD)
+				fmod->f_sqlvl = SQLVL_MODULE;
 		}
-		sqr->sq_level = fmod->f_sqlvl;
-		sqw->sq_level = fmod->f_sqlvl;
+		if (fmod->f_flag & D_MTOUTPERIM) {
+			/* find the outer perimeter syncq for the module */
+			if ((fmod->f_flag & (D_MTPERMOD | D_MP))
+			    || (!((1 << fmod->f_sqlvl)
+				  & ((1 << SQLVL_NONE) | (1 << SQLVL_QUEUE) |
+				     (1 << SQLVL_QUEUEPAIR)))))
+				pswerr(("invalid flags\n"));
+			if (!(sqo = sq_get(fmod->f_syncq))) {
+				pswerr(("registration function forgot to allocate syncq\n"));
+				if (!(sqo = sq_alloc()))
+					goto enomem;
+				fmod->f_syncq = sqo;
+				sqo->sq_level = fmod->f_sqlvl;
+				sqo->sq_flag = fmod->f_flag | D_MTOUTPERIM;
+			}
+			/* we have a reference to sqo */
+		}
+		switch (fmod->f_sqlvl) {
+		case SQLVL_NOP:	/* none */
+			sqr = sqo;
+			sqw = sq_get(sqr);
+			break;
+		case SQLVL_QUEUE:
+			/* allocate one syncq for each queue */
+			if (!(sqr = sq_alloc())) {
+				sq_put(&sqo);
+				goto enomem;
+			}
+			if (!(sqw = sq_alloc())) {
+				sq_put(&sqo);
+				sq_put(&sqr);
+				goto enomem;
+			}
+			sqr->sq_level = fmod->f_sqlvl;
+			sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			sqr->sq_outer = sqo;
+			sqw->sq_level = fmod->f_sqlvl;
+			sqw->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			sqw->sq_outer = sg_get(sqo);
+			break;
+		case SQLVL_QUEUEPAIR:
+			/* allocate one syncq for the queue pair */
+			if (!(sqr = sq_alloc())) {
+				sq_put(&sqo);
+				goto enomem;
+			}
+			sqr->sq_level = fmod->f_sqlvl;
+			sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			sqr->sq_outer = sqo;
+			sqw = sq_get(sqr);
+			break;
+		default:
+			swerr();
+		case SQLVL_DEFAULT:
+		case SQLVL_MODULE:	/* default */
+			/* find the module and use its syncq */
+			/* The registration function is responsible for allocating the module
+			   synchronization queue and attaching it to the module structure */
+			if (!(sqr = sq_get(fmod->f_syncq))) {
+				pswerr(("registration function forgot to allocate syncq\n"));
+				if (!(sqr = sq_alloc())) {
+					sq_put(&sqo);
+					goto enomem;
+				}
+				fmod->f_syncq = sqr;
+				sqr->sq_level = fmod->f_sqlvl;
+				sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+				sqr->sq_outer = sqo;
+			}
+			sqw = sq_get(sqr);
+			break;
+		case SQLVL_ELSEWHERE:
+			/* find the elsewhere syncq and use it */
+			/* The registration function is responsible for finding and allocating the
+			   external synchronization queue and attaching it to the module structure */
+			if (!(sqr = sq_get(fmod->f_syncq))) {
+				pswerr(("registration function forgot to allocate syncq\n"));
+				if (!(sqr = sq_alloc())) {
+					sq_put(&sqo);
+					goto enomem;
+				}
+				fmod->f_syncq = sqr;
+				sqr->sq_level = fmod->f_sqlvl;
+				sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			}
+			sqw = sq_get(sqr);
+			/* cannot have outer perimeter at this level */
+			sq_put(&sqo);
+			break;
+		case SQLVL_GLOBAL:	/* for testing */
+			/* use the global syncq */
+			if (!(sqr = sq_get(global_syncq))) {
+				if (!(sqr = sq_alloc())) {
+					sq_put(&sqo);
+					goto enomem;
+				}
+				sqr->sq_level = fmod->f_sqlvl;
+				sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			}
+			sqw = sq_get(sqr);
+			/* cannot have outer perimeter at this level */
+			sq_put(&sqo);
+			break;
+		}
 		(q + 0)->q_syncq = sqr;
 		(q + 1)->q_syncq = sqw;
-		break;
-	case SQLVL_QUEUEPAIR:
-		/* allocate one syncq for the queue pair */
-		if (!(sqr = sq_alloc()))
-			goto enomem;
-		sqw = sq_get(sqr);
-		sqr->sq_level = fmod->f_sqlvl;
-		sqw->sq_level = fmod->f_sqlvl;
-		(q + 0)->q_syncq = sqr;
-		(q + 1)->q_syncq = sqw;
-		break;
-	default:
-		swerr();
-	case SQLVL_DEFAULT:
-	case SQLVL_MODULE:	/* default */
-		/* find the module and use its syncq */
-		(q + 0)->q_syncq = sq_get(fmod->f_syncq);
-		(q + 1)->q_syncq = sq_get(fmod->f_syncq);
-		break;
-	case SQLVL_ELSEWHERE:	/* not fully supported */
-		/* find the elsewhere syncq and use it */
-		break;
-	case SQLVL_GLOBAL:	/* for testing */
-		/* use the gloable syncq */
-		(q + 0)->q_syncq = sq_get(&syncq_global);
-		(q + 1)->q_syncq = sq_get(&syncq_global);
-		break;
 	}
+#endif
 	if (fmod->f_str) {
 		if (!mux)
 			setq(q, fmod->f_str->st_rdinit, fmod->f_str->st_wrinit);
@@ -2579,7 +2823,6 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 			setq(q, fmod->f_str->st_muxrinit, fmod->f_str->st_muxwinit);
 	} else
 		swerr();
-#endif
 	return (0);
 #if defined CONFIG_STREAMS_SYNCQS
       enomem:

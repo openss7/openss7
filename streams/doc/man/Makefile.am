@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/22 13:17:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/26 12:50:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/22 13:17:50 $ by $Author: brian $
+# Last Modified $Date: 2005/07/26 12:50:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1174,6 +1174,7 @@ man_MANS = \
 	man9/register_strnod.9 \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
+	man9/runqueues.9 \
 	man9/sd_get.9 \
 	man9/sd_put.9 \
 	man9/sdev_get.9 \
@@ -2339,6 +2340,7 @@ dist_noinst_MANS = \
 	man9/register_strnod.9.man \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
+	man9/runqueues.9.man \
 	man9/sd_get.9.man \
 	man9/sd_put.9.man \
 	man9/sdev_get.9.man \

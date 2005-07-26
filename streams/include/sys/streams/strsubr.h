@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.32 2005/07/23 03:50:42 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.33 2005/07/26 12:50:44 brian unstable $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/23 03:50:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:44 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/23 03:50:42 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/26 12:50:44 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -124,6 +124,13 @@ struct strevent {
 			int perim;
 			mblk_t *mp;
 		} p;			/* strput request */
+		struct {
+			queue_t *queue;
+			mblk_t *mp;
+		} q;			/* put procedure request */
+		struct {
+			queue_t *queue;
+		} s;			/* service procedure request */
 	} x;
 	struct strevent *se_next;
 	struct strevent *se_prev;	/* actually hash list */
@@ -144,7 +151,7 @@ typedef struct syncq {
 	spinlock_t sq_lock;		/* spin lock for this structure */
 	int sq_count;			/* no of threads inside (negative for exclusive) */
 	struct task_struct *sq_owner;	/* exclusive owner */
-//      wait_queue_head_t sq_waitq;     /* waiters */
+	wait_queue_head_t sq_waitq;     /* qopen/qclose waiters */
 	struct strevent *sq_head;	/* head of event queue */
 	struct strevent **sq_tail;	/* tail of event queue */
 	struct syncq *sq_outer;		/* synch queue outside this one (if any) */
@@ -249,6 +256,7 @@ enum {
 	STRCLOSE_BIT,
 	SNDMREAD_BIT,
 	STRHOLD_BIT,
+	STRNDEL_BIT,
 	STRMSIG_BIT,
 	STRDELIM_BIT,
 	STRTOSTOP_BIT,
@@ -271,6 +279,7 @@ enum {
 #define STRCLOSE    (1<<STRCLOSE_BIT)	/* wait for strclose to complete */
 #define SNDMREAD    (1<<SNDMREAD_BIT)	/* send M_READ msg when read issued */
 #define STRHOLD	    (1<<STRHOLD_BIT)	/* coallese written messages */
+#define STRNDEL	    (1<<STRNDEL_BIT)	/* non-STREAM tty semantic for O_NDELAY */
 #define STRMSIG	    (1<<STRMSIG_BIT)	/* M_SIG at head of queue */
 #define STRDELIM    (1<<STRDELIM_BIT)	/* generate delimited messages */
 #define STRTOSTOP   (1<<STRTOSTOP_BIT)	/* stop timeout */
@@ -457,6 +466,7 @@ struct linkinfo {
 #define SE_STRPUT	5
 #define SE_WRITER	6
 #define SE_PUTP		7
+#define SE_SRVP		8
 
 struct seinfo {
 	struct strevent s_strevent;
@@ -615,9 +625,26 @@ extern int unregister_clone(struct cdevsw *cdev);
 
 extern void runqueues(void);
 
-extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
-		      int *flagsp);
-extern int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
+/* Default stream head functions for use by wantio procedures. */
+extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
+extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
+extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
+extern ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos);
+extern ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos);
+extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more);
+extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp);
+extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags);
+extern int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
+#if 0
+extern loff_t strllseek(struct file *file, loff_t off, int whence);
+extern int strmmap(struct file *filp, struct vm_area_struct *vma);
+extern int stropen(struct inode *inode, struct file *file);
+extern int strflush(struct file *file);
+extern int strclose(struct inode *inode, struct file *file);
+extern int strfasync(int fd, struct file *file, int on);
+#endif
+
+/* stream head read put and write service procedures for use by replacement stream heads */
 extern int strrput(queue_t *q, mblk_t *mp);
 extern int strwsrv(queue_t *q);
 

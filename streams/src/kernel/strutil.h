@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/23 03:50:43 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/26 12:50:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
+
+/* global synchq */
+extern struct syncq *global_syncq;
 
 /* common inlines */
 
@@ -830,6 +833,488 @@ leave_shared(syncq_t *sq)
 				sqsched(sq);
 		}
 		spin_unlock_irqrestore(&sq->sq_lock, flags);
+	}
+}
+
+/*
+ *  enter_inner_syncq_exclus: - enter the inner barrier exclusive
+ *  @q:	    the queue against which to synchronize
+ *  @se:    the STREAMS event to synchronize
+ *  @sqp:   a pointer to the place to return the syncq reference
+ */
+static __inline__ int
+enter_inner_syncq_exclus(queue_t *q, struct strevent *se, struct syncq **sqp)
+{
+	struct syncq *osq = NULL, *isq = NULL;
+	int rval = 1;
+
+	if (unlikely(q == NULL))
+		goto done;
+	if (unlikely((osq = q->q_syncq) == NULL))
+		goto done;
+	if (unlikely((osq->sq_flag & D_MTOUTPERIM) == 0)) {
+		isq = osq;
+		osq = isq->sq_outer;
+	}
+	{
+		unsigned long flags;
+
+		if (osq) {
+			spinlock_irqsave(&osq->sq_lock, flags);
+			if (osq->sq_owner == current)
+				osq->sq_nest++;
+			else if (osq->sq_count >= 0) {
+				osq->sq_count++;
+			} else {
+				if (se) {
+					/* queue up deferred event */
+					se->se_prev = osq->sq_tail;
+					se->se_next = *(osq->sq_tail);
+					*(osq->sq_tail) = se;
+				}
+				rval = 0;
+			}
+			spinunlock_irqrestore(&osq->sq_lock, flags);
+		}
+		if (rval) {
+			spinlock_irqsave(&isq->sq_lock, flags);
+			if (isq->sq_owner == current)
+				isq->sq_nest++;
+			else if (isq->sq_count == 0) {
+				isq->sq_owner = current;
+				--isq->sq_count;
+			} else {
+				if (se) {
+					/* queue up deferred event */
+					se->se_prev = isq->sq_tail;
+					se->se_next = *(isq->sq_tail);
+					*(isq->sq_tail) = se;
+				}
+				rval = 0;
+			}
+			spinunlock_irqrestore(&isq->sq_lock, flags);
+		}
+	}
+      done:
+	if (sqp != NULL)
+		*sqp = isq;
+	/* either in the barriers (rval == 1) or queued up against syncq (rval == 0) */
+	return (rval);
+
+}
+
+/*
+ *  enter_outer_syncq_wait: = enter outer barrier shared or exclusive from process context
+ *  @q:	    the queue against which to synchronize
+ *  @se:    the STREAMS even to syncrhonize
+ *  @sqp:   a pointer to the place to return the syncq reference
+ */
+static __inline__ int
+enter_outer_syncq_wait(queue_t *q, struct syncq **sqp)
+{
+	struct syncq *sq = NULL;
+	int err = 0;
+
+	if (unlikely(q == NULL))
+		goto done;
+	if (unlikely((sq = q->q_syncq) == NULL))
+		goto done;
+	if (unlikely((sq->sq_flag & D_MTOUTPERIM) == 0)) {
+		sq = NULL;
+		goto done;
+	}
+	{
+		unsigned long flags;
+		struct stdata *sd;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_owner == current)
+			sq->sq_nest++;
+		else if (sq->sq_count == 0) {
+			sq->sq_owner = current;
+			--sq->sq_count;
+		} else {
+			DECLARE_WAITQUEUE(wait, current);
+			add_wait_queue(&sq->sq_waitq, &wait);
+			for (;;) {
+				set_current_state(TASK_INTERRUPTIBLE);
+				sd = ((struct queinfo *) q)->qu_str;
+				if (!sd) {
+					err = -ENOSTR;
+					break;
+				}
+				if (sd->sd_flag & (STPLEX | STRCLOSE | STRHUP)) {
+					if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
+						err = -EINVAL;
+						break;
+					}
+					if (test_bit(STRCLOSE_BIT, &sd->sd_flag)) {
+						err = -EIO;
+						break;
+					}
+					if (test_bit(STRHUP_BIT, &sd->sd_flag)) {
+						if (sd->sd_flag & (STRISFIFO | STRISPIPE))
+							err = -EPIPE;
+						else
+							err = -ENXIO;
+						break;
+					}
+				}
+				if (sd->sd_flag & (STRISFIFO | STRISPIPE)) {
+					if (sd->sd_other == NULL) {
+						err = -EPIPE;
+						break;
+					}
+					if (test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)) {
+						err = -EPIPE;
+						break;
+					}
+				}
+				if (signal_pending(current)) {
+					err = -EINTR;
+					break;
+				}
+				if (sq->sq_flag & D_MTOCEXCL) {
+					if (sq->sq_count == 0
+					    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+						/* available or left for us by leave function */
+						/* set exclusive */
+						sq->sq_owner = current;
+						sq->sq_count = -1;
+						err = 0;
+						break;
+					}
+				} else {
+					if (sq->sq_count >= 0
+					    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+						/* available or left for us by leave function */
+						/* set shared */
+						sq->sq_owner = NOLL;
+						sq->sq_count =
+						    (sq->sq_count == -1) ? 1 : sq->sq_count + 1;
+						err = 0;
+						break;
+					}
+				}
+				spinunlock_irqrestore(&sq->sq_lock, flags);
+				schedule();
+				spinlock_irqsave(&sq->sq_lock, flags);
+			}
+			set_current_state(TASK_RUNNING);
+			remove_wait_queue(&sq->sq_waitq, &wait);
+		}
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+      done:
+	if (sqp != NULL)
+		*sqp = sq;
+	return (err);
+}
+
+static __inline__ int
+leave_outer_syncq_wait(struct syncq *sq)
+{
+	struct syncq *osq = NULL;
+
+	/* not inside barrier */
+	if (likely(sq == NULL))
+		return;
+	/* no sychronization */
+	if (likely((osq = global_sync) == NULL && (osq = q->q_sync) == NULL))
+		return;
+	/* no outer barrier */
+	if (likely((osq->sq_flag & D_MTOUTPERIM) == 0 && (osq = osq->sq_outer) == NULL))
+		return;
+	if (unlikely(osq != sq))
+		swerr();
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_flag & D_MTOCEXCL) {
+			if (sq->sq_owner == current && --sq->sq_nest < 0) {
+				register struct strevent *se, *se_next;
+
+				sq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				/* just run them all exclusive: anything that wanted to enter the
+				   outer perimeter shared and the inner perimeter exclusive will
+				   run nicely with just the outer perimeter exclusive; this is
+				   because the outer perimeter is always more restrictive than the 
+				   inner perimeter. */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					/* fake it out that we are STREAMS executive */
+					local_bh_disable();
+					set_bit(queueflag, &this_thread->flags);
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+					/* remove fakeout */
+					clear_bit(queueflag, &this_thread->flags);
+					local_bh_enable();
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		} else {
+			if (--sq->sq_count == 0) {
+				struct strthread *t = current_thread;
+				struct strevent *se;
+
+				/* just left shared for the last time, the last guy out is
+				   responsible for processing the backlog */
+				sq->sq_nest = 0;
+				sq->sq_owner == current;
+				sq->sq_count = -1;
+				/* we are now in the barrier exclusive */
+				/* just run them all exclusive: anything that wanted to enter the
+				   outer perimeter shared and the inner perimeter exclusive will
+				   run nicely with just the outer perimeter exclusive; this is
+				   because the outer perimeter is always more restrictive than the
+				   inner perimeter. */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					/* fake it out that we are STREAMS executive */
+					local_bh_disable();
+					set_bit(queueflag, &this_thread->flags);
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+					/* remove fakeout */
+					clear_bit(queueflag, &this_thread->flags);
+					local_bh_enable();
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		}
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+}
+
+/*
+ *  enter_outer_syncq_exclus: - enter the outer barrier exclusive
+ *  @q:	    the queue against which to synchronize
+ *  @se:    the STREAMS event to synchronize
+ *  @sqp:   a pointer to the place to return the syncq reference
+ */
+static __inline__ int
+enter_outer_syncq_exclus(queue_t *q, struct strevent *se, struct syncq **sqp)
+{
+	struct syncq *sq = NULL;
+	int rval = 1;
+
+	if (unlikely(q == NULL))
+		goto done;
+	if (unlikely((sq = q->q_syncq) == NULL))
+		goto done;
+	if (unlikely((sq->sq_flag & D_MTOUTPERIM) == 0)) {
+		sq = NULL;
+		goto done;
+	}
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_owner == current)
+			sq->sq_nest++;
+		else if (sq->sq_count == 0) {
+			sq->sq_owner = current;
+			--sq->sq_count;
+		} else {
+			if (se) {
+				/* queue up deferred event */
+				se->se_prev = sq->sq_tail;
+				se->se_next = *(sq->sq_tail);
+				*(sq->sq_tail) = se;
+			}
+			rval = 0;
+		}
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+      done:
+	if (sqp != NULL)
+		*sqp = sq;
+	return (rval);
+}
+
+/*
+ *  leave_outer_syncq_exclus: - leave the outer barrier that was entered exclusive
+ *  @sq:    the synchronization queue to leave
+ */
+static __inline__ void
+leave_outer_syncq_exclus(struct syncq *sq)
+{
+	struct syncq *osq = NULL;
+
+	/* not inside barrier */
+	if (likely(sq == NULL))
+		return;
+	/* no sychronization */
+	if (likely((osq = global_sync) == NULL && (osq = q->q_sync) == NULL))
+		return;
+	/* no outer barrier */
+	if (likely((osq->sq_flag & D_MTOUTPERIM) == 0 && (osq = osq->sq_outer) == NULL))
+		return;
+	if (unlikely(osq != sq))
+		swerr();
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_owner == current) {
+			if (--sq->sq_nest < 0) {
+				register struct strevent *se, *se_next;
+
+				sq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						/* just run them all exclusive: anything that wanted
+						 * to enter the outer perimeter shared and the inner
+						 * perimeter exclusive will run nicely with just the
+						 * outer perimeter exclusive; this is because the
+						 * outer perimeter is always more restrictive than
+						 * the inner perimeter. */
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				 * owner, and one of the waiters will pick it up, the others will
+				 * wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		} else
+			swerr();
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+}
+
+/*
+ *  leave_inner_syncq_exclus: - leave the inner barrier that was entered exclusive
+ *  @sq:    the synchronization queue to leave
+ */
+static __inline__ void
+leave_inner_syncq_exclus(struct syncq *sq)
+{
+	struct syncq *osq = NULL, *isq = NULL;
+
+	if (unlikely(sq == NULL))
+		return;
+	if (unlikely((osq = q->q_syncq) == NULL))
+		return;
+	if (unlikely((osq->sq_flag & D_MTOUTPERIM) == 0)) {
+		isq = osq;
+		osq = isq->sq_outer;
+	}
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&isq->sq_lock, flags);
+		if (isq->sq_owner == current) {
+			if (--isq->sq_nest < 0) {
+				struct strevent *se;
+
+				isq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				while ((se_next = xchg(&isq->sq_head, NULL))) {	/* MP-SAFE */
+					isq->sq_tail = &isq->sq_head;
+					spin_unlock_irqrestore(&isq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						/* just run them all exclusive: anything that
+						   wanted to enter the inner perimeter shared will
+						   run nicely with the inner perimeter exclusive. */
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&isq->sq_lock, flags);
+				}
+				/* finally unlock the queue */
+				isq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				 * owner, and one of the waiters will pick it up, the others will
+				 * wait some more */
+				if (unlikely(waitqueue_active(&isq->sq_waitq)))
+					wake_up_all(&isq->sq_waitq);
+				else
+					isq->sq_count = 0;
+			}
+		} else
+			swerr();
+		spinunlock_irqrestore(&isq->sq_lock, flags);
+		if (osq) {
+			spinlock_irqsave(&osq->sq_lock, flags);
+			if (--osq->sq_count == 0) {
+				/* just left shared for the last time */
+				struct strthread *t = current_thread;
+				struct strevent *se;
+
+				osq->sq_nest = 0;
+				osq->sq_owner == current;
+				osq->sq_count = -1;
+				/* we are now in the barrier exclusive */
+				while ((se_next = xchg(&osq->sq_head, NULL))) {	/* MP-SAFE */
+					osq->sq_tail = &osq->sq_head;
+					spin_unlock_irqrestore(&osq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						/* just run them all exclusive: anything that
+						   wanted to enter the outer perimeter shared and
+						   the inner perimeter exclusive will run nicely
+						   with just the outer perimeter exclusive; this is 
+						   because the outer perimeter is always more
+						   restrictive than the inner perimeter. */
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&osq->sq_lock, flags);
+				}
+				/* finally unlock the queue */
+				osq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				 * owner, and one of the waiters will pick it up, the others will
+				 * wait some more */
+				if (unlikely(waitqueue_active(&osq->sq_waitq)))
+					wake_up_all(&osq->sq_waitq);
+				else
+					osq->sq_count = 0;
+			}
+			spinunlock_irqrestore(&osq->sq_lock, flags);
+		}
 	}
 }
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/21 20:47:23 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/26 12:50:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:23 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/21 20:47:23 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/26 12:50:50 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/21 20:47:23 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/26 12:50:50 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -486,6 +486,9 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 	cmaj->n_str = cdev->d_str;
 	cmaj->n_flag = cdev->d_flag;
 	cmaj->n_modid = cdev->d_modid;
+	cmin->n_count = ATOMIC_INIT(0);
+	cmaj->n_sqlvl = cdev->d_sqlvl;
+	cmaj->n_kmod = cdev->n_kmod;
 	cmaj->n_major = major;
 	cmaj->n_mode = cdev->d_mode;
 	cmaj->n_minor = 0;

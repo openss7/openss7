@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.44 2005/07/23 03:50:42 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.45 2005/07/26 12:50:44 brian unstable $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/23 03:50:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:44 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/23 03:50:42 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/26 12:50:44 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -236,6 +236,7 @@ typedef enum msg_type {
 	M_LETSPLAY = 0x97,		/* ^ A */
 	M_DONTPLAY = 0x98,		/* v A */
 	M_BACKDONE = 0x99,		/* v A */
+	M_PCTTY = 0x9a,			/* v A */
 } msg_type_t;
 
 /* 40 bytes on 32 bit, 76 on 64 bit */
@@ -844,6 +845,7 @@ struct wantio {
 	ssize_t (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
 	int (*getpmsg) (struct file *, struct strbuf *, struct strbuf *, int *, int *);
 	int (*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
+	int (*ioctl) (struct inode *, struct file *, unsigned int, unsigned long);
 };
 
 #undef bcid_t

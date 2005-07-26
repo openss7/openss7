@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 12:47:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/26 12:50:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/22 12:47:07 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -160,7 +160,6 @@ static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 static int str_close(queue_t *q, int oflag, cred_t *crp);
 
 int strrput(queue_t *q, mblk_t *mp);
-int strwsrv(queue_t *q);
 
 static struct qinit str_rinit = {
 	qi_putp:strrput,
@@ -169,7 +168,11 @@ static struct qinit str_rinit = {
 	qi_minfo:&str_minfo,
 };
 
+int strwput(queue_t *q, mblk_t *mp);
+int strwsrv(queue_t *q);
+
 static struct qinit str_winit = {
+	qi_putp:strwput,
 	qi_srvp:strwsrv,
 	qi_minfo:&str_minfo,
 };
@@ -442,7 +445,8 @@ check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 	if (unlikely(signal_pending(current)))
 		return ((*timeo == MAX_SCHEDULE_TIMEOUT) ? -ERESTARTSYS : -EINTR);
 	if (unlikely(*timeo == 0))
-		return ((file->f_flags & (O_NONBLOCK | O_NDELAY)) ? -EAGAIN : -ETIME);
+		return (((file->f_flags & (O_NONBLOCK | O_NDELAY))
+			 && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? -EAGAIN : -ETIME);
 	return (0);
 }
 
@@ -525,51 +529,102 @@ strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
  *  @sd: stream head
  *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
  *  @band: band from which to retrieve message
+ *  @flagsp: pointer to save irq flags.
+ *
+ *  LOCKING: This function must be called wtih the queue write locked and irq flags saved in flagsp.
+ *
+ *  We write lock the queue so that we can do getq() in one place and put it back with putbq() in
+ *  another without races with other procedures acting on the queue.  Also there needs to be
+ *  atomicity between setting or clearing the STRPRI bit and placing or removing an M_PCPROTO from
+ *  the queue.  The write lock acheives that atomicity too.  Perhaps we should not even use the
+ *  STRPRI bit, because we could always check q->q_first->b_datap->db_type with the queue locked,
+ *  but that is 3 pointer dereferences.  But, perhaps we don't need to use atomic bit operations on
+ *  the STRPRI bit inside the locks.
+ *
+ *  NOTICES: Note that M_PCPROTO is the only priority message that we place on the stream head read
+ *  queue, so if the STRPRI bit is set, there is one (and only one) there.
+ *
+ *  Strangely, Magic Garden Chapter 7 says that ldterm sets the stream head into raw mode, that an
+ *  M_READ message is issued downstream with every read and that ldterm responds immediately with a
+ *  0 length message to create a short read.  So that is one M_READ for each and every write.
+ *  UnixWare says to send an M_DATA containing the number of bytes of read request downstream
+ *  whenever, the driver or module has requested it with SO_MREADON in M_SETOPTS, no data is
+ *  currently available at the stream head, and the reader is about to sleep.  The following
+ *  satisfies the later.
+ *
+ *  AIX ldterm documentation says that "[t]he M_READ is sent by the stream head to noitfy downstream
+ *  modules when an application has issued a read request and not enough data is queued at the
+ *  stream head to satisfy the request.  The message contains the number of characters requested by
+ *  the application.  If the request can be satisfied, the M_READ message block is transformed into
+ *  an M_DATA block with the requested data appended.  This message is then forwarded upstream."
+ *  This appears consistent with the UnixWare description.
+ *
+ *  HPUX says, the M_READ "message is sent by the stream head to notify downstream modules when an
+ *  application has issued a read request and there is not enough data queued at the stream head to
+ *  satsify the request.  The M_READ is sent downstream normally when ldterm is operating in
+ *  non-cannonical input mode.
+ *
+ *  SUX says, that M_READ is a "[h]igh priority control message used to indicate the occurence of a
+ *  read(2) when there are no data on the stream head read queue." And, "M_READ is generated by the
+ *  stream head and sent downstream for a read(2) system call if no messages are waiting to be read
+ *  at the stream head and if read notification has been enabled.  Read notification is enabled with
+ *  SO_MREADON flag of M_SETOPTS message and disabled by use of the SO_MREADOFF flag.   The message
+ *  content is set to the value of the nbyte paramter (the number of bytes to be read) in the
+ *  read(2) call.  M_READ is intended to notify modules and drivers of the occurence of a read.  It
+ *  is also intended to support communication between streams that reside in separate processors.
+ *  The use of the M_READ message is developer dependent.  Modules may take specific action and pass
+ *  on or free the M_READ message.  Modules that do not recognize this message must pass it on.  All
+ *  other drivers may or may not take action and then free the message."
  */
 static mblk_t *
-strgetq(struct stdata *sd, int flags, int band)
+strgetq(struct stdata *sd, int flags, int band, unsigned long len, unsigned long *flagsp)
 {
-	ensure(sd, return (NULL));
-	if (flags == MSG_HIPRI) {
-		/* M_PCPROTO is the only high priority messsage on the queue and there can only be
-		   one of them. (And we do not expect another...) */
-		if (test_and_clear_bit(STRPRI_BIT, &sd->sd_flag))
-			return (getq(sd->sd_rq));
-		return (NULL);
-	} else {
-		mblk_t *mp;
-		queue_t *q = sd->sd_rq;
+	mblk_t *mp = NULL;
 
+	ensure(sd && sd->sd_wq, return (NULL));
+	if ((flags == MSG_HIPRI) && test_and_clear_bit(STRPRI_BIT, &sd->sd_flag))
+		mp = getq(sd->sd_rq);
+	else {
 	      get_another:
-		if (test_bit(STRPRI_BIT, &sd->sd_flag))
-			return (ERR_PTR(-EBADMSG));
-		if ((mp = getq(q))) {
+		if (test_bit(STRPRI_BIT, &sd->sd_flag)) {
+			mp = ERR_PTR(-EBADMSG);
+		} else if ((mp = getq(sd->sd_rq))) {
 			/* process signals now */
-			if (mp->b_datap->db_type == M_SIG) {
+			if (unlikely(mp->b_datap->db_type == M_SIG)) {
+				qwunlock_irqrestore(sd->sd_wq, flagsp);
 				if (mp->b_rptr[0] == SIGPOLL)
 					kill_fasync(&sd->sd_siglist, SIGPOLL, POLL_MSG);
 				/* otherwise we would send the signal if it were a control
 				   terminal; however, streams devices are never control terminals
 				   in Linux */
 				freemsg(mp);
+				qwlock_irqsave(sd->sd_wq, flagsp);
 				goto get_another;
 			}
-			if (flags == MSG_HIPRI && mp->b_datap->db_type == M_PCPROTO)
-				return (mp);
-			if (flags == MSG_ANY && mp->b_datap->db_type != M_PASSFP)
-				return (mp);
-			if ((1 << mp->b_datap->db_type) & ((1 << M_PROTO) | (1 << M_DATA))
-			    && mp->b_band >= band)
-				return (mp);
-			putbq(q, mp);
-			return (ERR_PTR(-EBADMSG));
+			if ((flags != MSG_HIPRI || mp->b_datap->db_type != M_PCPROTO)
+			    && (flags != MSG_ANY || mp->b_datap->db_type == M_PASSFP)
+			    && (!((1 << mp->b_datap->db_type) & ((1 << M_PROTO) | (1 << M_DATA)))
+				|| mp->b_band < band)) {
+				putbq(sd->sd_rq, mp);
+				mp = ERR_PTR(-EBADMSG);
+			}
+		} else if (test_bit(SNDMREAD_BIT, &sd->sd_flag)) {
+			qwunlock_irqrestore(sd->sd_wq, flagsp);
+			if (len) {
+				mblk_t *mr;
+
+				if ((mr = allocb(sizeof(&len), BPRI_HI))) {
+					mr->b_datap->db_type = M_READ;
+					*((typeof(&len)) mr->b_rptr) = len;
+					mr->b_wptr = mp->b_rptr + sizeof(&len);
+					putnext(sd->sd_wq, mr);
+				} else
+					mp = ERR_PTR(-ENOSR);
+			}
+			qwlock_irqsave(sd->sd_wq, flagsp);
 		}
-		/* need M_READ? */
-		if (test_bit(SNDMREAD_BIT, &sd->sd_flag))
-			if (!putnextctl(sd->sd_wq, M_READ))
-				return (ERR_PTR(-ENOSR));
-		return (mp);
 	}
+	return (mp);
 }
 
 /**
@@ -578,9 +633,13 @@ strgetq(struct stdata *sd, int flags, int band)
  *  @sd: stream head
  *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
  *  @band: priority band from which to get message
+ *  @flagsp: pointer to saved irq flags.
+ *
+ *  LOCKING: This function must be called wtih the queue write locked and irq flags saved in flagsp.
  */
 static mblk_t *
-strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
+strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned long len,
+	    unsigned long *flagsp)
 {
 	mblk_t *mp;
 
@@ -588,7 +647,7 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
 	ensure(sd, return (NULL));
 	/* maybe we'll get lucky... */
 	/* also we must make an attempt before returning ENXIO, EPIPE or rderror */
-	if ((mp = strgetq(sd, flags, band)))
+	if ((mp = strgetq(sd, flags, band, len, flagsp)))
 		return (mp);
 	/* only here it there's nothing left on the queue */
 	{
@@ -601,9 +660,11 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
 			set_bit(RSLEEP_BIT, &sd->sd_flag);
 			if (IS_ERR(mp = ERR_PTR(check_wakeup_rd(file, sd, &timeo))))
 				break;
-			if ((mp = strgetq(sd, flags, band)))
+			if ((mp = strgetq(sd, flags, band, 0, flagsp)))
 				break;
+			qwunlock_irqrestore(sd->sd_wq, flagsp);
 			timeo = schedule_timeout(timeo);
+			qwlock_irqsave(sd->sd_wq, flagsp);
 		}
 		set_current_state(TASK_RUNNING);
 		remove_wait_queue(&sd->sd_waitq, &wait);
@@ -736,6 +797,10 @@ strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, size_t dlen,
 	/* here we are holding the IOCWAIT bit */
 	for (;;) {
 		putnext(sd->sd_wq, mp);
+		/* We call runqueues() here to give the driver an opportunity to respond
+		   immediately, even if it queues the message in its service procedure. */
+		runqueues();
+		/* We might already have a response. */
 		if (!(mp = xchg(&sd->sd_iocblk, NULL))) {
 			/* We are waiting for a response to our downwards ioctl message.  Wait
 			   until the message arrives or the io check fails. */
@@ -890,7 +955,7 @@ str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	trace();
 	if (arg < 256 || arg == ANYBAND)
 		if (!(err = check_stream_wr(file, sd)))
-			return (bcanput(sd->sd_wq, arg) ? 1 : 0);
+			return (bcanputnext(sd->sd_wq, arg) ? 1 : 0);
 	return (err);
 }
 
@@ -957,6 +1022,8 @@ str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd, unsigned 
 
 			if (fdi.databuf.len > sysctl_str_strmsgsz)
 				goto erange;
+			/* FIXME: we really need to take a read lock on the stream head */
+			/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 			wq = sd->sd_wq->q_next;
 			if (wq->q_minpsz > fdi.databuf.len || fdi.databuf.len > wq->q_maxpsz)
 				goto erange;
@@ -985,6 +1052,9 @@ str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd, unsigned 
 		mp->b_wptr += fdi.ctlbuf.len;
 		bcopy(&sd2->sd_rq, mp->b_rptr + fdi.offset, sizeof(sd2->sd_rq));
 		putnext(sd->sd_wq, mp);
+		/* We call runqueues() here to give the message an opportunity to flow to the other
+		   end and get processed. */
+		runqueues();
 	}
       put_exit:
 	fput(f2);
@@ -1024,14 +1094,14 @@ str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 	err = -EFAULT;
 	if (strnlen_user(name, FMNAMESZ + 1)) {
 		err = 0;
-		srlock(sd);
+		srlock_bh(sd);
 		for (wq = sd->sd_wq; wq; wq = SAMESTR(wq) ? wq->q_next : NULL) {
 			const char *idname = wq->q_qinfo->qi_minfo->mi_idname;
 
 			if (!strncmp(idname, name, FMNAMESZ))
 				err = 1;
 		}
-		srunlock(sd);
+		srunlock_bh(sd);
 	}
 	return (err);
 }
@@ -1066,6 +1136,10 @@ str_i_flushband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned
 	*mp->b_wptr++ = bi.bi_pri;
 	mp->b_flag |= MSGNOLOOP;
 	putnext(sd->sd_wq, mp);
+	/* It should not be necessary to call runqueues() here because driver and module put
+	   procedures should not queue M_FLUSH messages, however, if one mistakenly does, we want
+	   them processed immediately anyway. */
+	runqueues();
 	return (0);
 }
 
@@ -1093,6 +1167,10 @@ str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lon
 	*mp->b_wptr++ = arg;
 	mp->b_flag |= MSGNOLOOP;
 	putnext(sd->sd_wq, mp);
+	/* It should not be necessary to call runqueues() here because driver and module put
+	   procedures should not queue M_FLUSH messages, however, if one mistakenly does, we want
+	   them processed immediately anyway. */
+	runqueues();
 	return (0);
 }
 
@@ -1412,6 +1490,7 @@ str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lon
 	qbot = sd2->sd_wq;
 	setq(qbot - 1, sd->sd_strtab->st_muxrinit, sd->sd_strtab->st_muxwinit);
 	qbot->q_ptr = (qbot - 1)->q_ptr = NULL;
+	/* FIXME: we really need to take a read lock on the stream head */
 	for (qtop = sd->sd_wq; qtop && SAMESTR(qtop); qtop = qtop->q_next) ;
 	if ((err = str_send_link_ioctl(file, cmd, current_creds, qtop, qbot, index)) < 0)
 		goto resetq_error;
@@ -1491,6 +1570,7 @@ str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
 		err = -EINVAL;
 		if ((sd2 = *sdp)) {
 			qbot = sd2->sd_wq;
+			/* FIXME: we really need to take a read lock on the stream head */
 			for (qtop = sd->sd_wq; qtop && SAMESTR(qtop); qtop = qtop->q_next) ;
 			if ((err = str_send_link_ioctl(file, cmd, current_creds,
 						       qtop, qbot, index)) < 0)
@@ -1507,6 +1587,7 @@ str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
 		queue_t *qtop, *qbot;
 		struct stdata *sd2;
 
+		/* FIXME: we really need to take a read lock on the stream head */
 		for (qtop = sd->sd_wq; qtop && SAMESTR(qtop); qtop = qtop->q_next) ;
 		while ((sd2 = *sdp)) {
 			index = sd2->sd_linkblk->l_index;
@@ -1584,6 +1665,7 @@ str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 		return (-EINVAL);
 	if ((err = verify_area(VERIFY_WRITE, sm, sizeof(*sm) * nmods)) < 0)
 		return (err);
+	/* FIXME: we really need to take a read lock on the stream head */
 	for (qp = &sd->sd_wq->q_next, i = 0; *qp && i < nmods; qp = &(*qp)->q_next, i++, sm++) {
 		snprintf(fmname, FMNAMESZ + 1, (*qp)->q_qinfo->qi_minfo->mi_idname);
 		err = -EFAULT;
@@ -1610,21 +1692,22 @@ str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, FMNAMESZ + 1)))
 		goto exit;
-	srlock(sd);
+	srlock_bh(sd);
 	err = -EINVAL;
 	if (sd->sd_pushcnt <= 0)
 		goto unlock_exit;
 	err = -EINVAL;
+	/* FIXME: we really need to take a read lock on the stream head */
 	if (!(q = sd->sd_wq->q_next) || !SAMESTR(sd->sd_wq))
 		goto unlock_exit;
 	snprintf(fmname, FMNAMESZ + 1, q->q_qinfo->qi_minfo->mi_idname);
-	srunlock(sd);
+	srunlock_bh(sd);
 	err = -EFAULT;
 	if (__copy_to_user(valp, fmname, FMNAMESZ + 1))
 		return (err);
 	return (0);
       unlock_exit:
-	srunlock(sd);
+	srunlock_bh(sd);
       exit:
 	return (err);
 }
@@ -1837,7 +1920,7 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	trace();
 	if (!(f2 = fget(arg)))
 		goto ebadf;
-	srlock(sd);
+	srlock_bh(sd);
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
 	rq = sd->sd_other->sd_rq;
@@ -1852,7 +1935,7 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	mp->b_datap->db_type = M_PASSFP;
 	mp->b_wptr += sizeof(*f2);
 	putq(rq, mp);
-	srunlock(sd);
+	srunlock_bh(sd);
 	return (0);
       enosr:
 	err = (-ENOSR);
@@ -1861,7 +1944,7 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	err = (-EAGAIN);
       error:
 	fput(f2);
-	srunlock(sd);
+	srunlock_bh(sd);
 	return (err);
       ebadf:
 	return (-EBADF);
@@ -1873,6 +1956,14 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
  *  @sd: stream head of current open stream
  *  @cmd: ioctl command, always %I_RECVFD
  *  @arg: ioctl argument, a pointer to a &struct strrecvfd structure
+ *
+ *  NOTICES: Calling getq() and later calling putbq() is maybe not a good idea.  We have to think
+ *  about another process calling getq in the mean time, and, of course getting the wrong message,
+ *  or heaven forbid, no message.  So what we want to do is peek the queue for the right type of
+ *  message with the queue locked and then remove the right message or unlock the queue.
+ *
+ *  LOCKING: We write lock the queue to protect the atomicity of the STRPRI bit and the getq() and
+ *  putbq() operations.
  */
 static int
 str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
@@ -1881,6 +1972,7 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	mblk_t *mp;
 	int fd, err;
 	struct file *f2;
+	unsigned long flags;
 
 	trace();
 	if (!valp)
@@ -1892,6 +1984,8 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 		goto error;
 	if ((err = fd = get_unused_fd()) < 0)
 		goto error;
+	/* protect atomicity of STRPRI bit, getq() and putbq() operations */
+	qwlock_irqsave(sd->sd_rq, &flags);
 	if (test_bit(STRPRI_BIT, &sd->sd_flag))
 		goto pri_msg;
 	if ((mp = getq(sd->sd_rq)) == NULL)
@@ -1908,6 +2002,7 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	sr.gid = f2->f_gid;
 	if (__copy_to_user(valp, &sr, sizeof(sr)))
 		goto efault;
+	qwunlock_irqrestore(sd->sd_rq, &flags);
 	freemsg(mp);
 	return (0);
       efault:
@@ -1918,16 +2013,17 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	goto putbq_error;
       eagain:
 	err = (-EAGAIN);
-	goto put_fd_error;
+	goto unlock_error;
       pri_msg:
 	err = (-EBADMSG);
-	goto put_fd_error;
+	goto unlock_error;
       einval:
 	err = (-EINVAL);
 	goto error;
       putbq_error:
 	putbq(sd->sd_rq, mp);
-      put_fd_error:
+      unlock_error:
+	qwunlock_irqrestore(sd->sd_rq, &flags);
 	put_unused_fd(fd);
       error:
 	return (err);
@@ -2116,13 +2212,26 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 		mask |= POLLIN | POLLRDNORM;
 	if (bcanget(sd->sd_rq, ANYBAND))
 		mask |= POLLIN | POLLRDBAND;
-	if (bcanput(sd->sd_wq, 0))
+	if (bcanputnext(sd->sd_wq, 0))
 		mask |= POLLOUT | POLLWRNORM;
-	if (bcanput(sd->sd_wq, ANYBAND))
+	if (bcanputnext(sd->sd_wq, ANYBAND))
 		mask |= POLLOUT | POLLWRBAND;
-	if (sd->sd_directio && sd->sd_directio->poll)
-		mask |= sd->sd_directio->poll(file, poll);
+	/* The above have no side effects that would require running the STREAMS scheduler, so we
+	   do not do runqueues(). */
 	return (mask);
+}
+
+EXPORT_SYMBOL(strpoll);
+
+static unsigned int
+_strpoll(struct file *file, struct poll_table_struct *poll)
+{
+	struct stdata *sd;
+
+	sd = stri_lookup(file);
+	if (sd->sd_directio && sd->sd_directio->poll)
+		return (sd->sd_directio->poll(file, poll));
+	return strpoll(file, poll);
 }
 
 /**
@@ -2179,7 +2288,6 @@ stropen(struct inode *inode, struct file *file)
 			return (-ENOSR);
 		}
 		printd(("%s: creating stream head for %s\n", __FUNCTION__, cdev->d_name));
-		/* FIXME: need to find/create and attach syncq. */
 		if (!(sd = allocstr())) {
 			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 			cdrv_put(cdev);
@@ -2299,13 +2407,20 @@ stropen(struct inode *inode, struct file *file)
  *  TODO: Because this is the only function from which we can return an error return value, we need
  *  to investigate a number of things about the stream at this point and decide whether to return an
  *  error code now.  Returning an error here does not stop the strclose function from being called
- *  afterward.
+ *  afterward. (XXX: I think this is now covered with the call to check_stream_oc() below.)
  */
 int
 strflush(struct file *file)
 {
+	struct stdata *sd;
+	int err = -ENOSTR;
+
 	ptrace(("%s: stream close\n", __FUNCTION__));
-	return (0);
+	if ((sd = sd_get(stri_lookup(file)))) {
+		err = check_stream_oc(file, sd);
+		sd_put(sd);
+	}
+	return (err);
 }
 
 /**
@@ -2321,8 +2436,12 @@ strflush(struct file *file)
  *  iput() which uses a superblock put_inode() operation followed by a superblock delete_inode()
  *  operation.
  *
- *  Return Value: The return value from this function is ignored.  It is the return value from the
+ *  RETURN VALUE: The return value from this function is ignored.  It is the return value from the
  *  flush() above that is used in return to the close(2) call.
+ *
+ *  NOTICES: Note that it is the fact that we have set our sd_readers to zero or our sd_writers to
+ *  zero that tells the other end of the pipe how to reads and writes and such; however, we need to
+ *  wake the other end blocked on read or write to that fact before it is forced to time out.
  */
 int
 strclose(struct inode *inode, struct file *file)
@@ -2337,6 +2456,15 @@ strclose(struct inode *inode, struct file *file)
 		stri_lookup(file) = NULL;
 		sd->sd_readers -= (file->f_mode & FREAD) ? 1 : 0;
 		sd->sd_writers -= (file->f_mode & FWRITE) ? 1 : 0;
+		if ((sd->sd_flag & STRISPIPE) && sd->sd_other) {
+			/* readers or writers could have disappeared even if not final close */
+			if (((sd->sd_readers == 0) && (file->f_mode & FREAD)) ||
+			    ((sd->sd_writers == 0) && (file->f_mode & FWRITE))) {
+				/* need to wake other end of pipe */
+				if (waitqueue_active(&sd->sd_other->sd_waitq))
+					wake_up_interruptible(&sd->sd_other->sd_waitq);
+			}
+		}
 		if (--sd->sd_opens == 0) {
 			queue_t *wq, *qq;
 			int oflag = make_oflag(file);
@@ -2357,6 +2485,8 @@ strclose(struct inode *inode, struct file *file)
 			err = str_i_unlink(file, sd, I_UNLINK, MUXID_ALL);
 			/* 2nd step: call the close routine of each module and pop the module. */
 			printd(("%s: closing queues\n", __FUNCTION__));
+			/* FIXME: we really need to take a read lock on the stream head */
+			/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 			wq = sd->sd_wq;
 			while ((qq = wq->q_next) && SAMESTR(wq)) {
 				if (!(oflag & (O_NONBLOCK | O_NDELAY)) && qq->q_msgs
@@ -2453,17 +2583,22 @@ strfasync(int fd, struct file *file, int on)
  *  can be acheived by mapping mblks into separate io vector components.
  */
 ssize_t
-strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos)
+strreadv(struct file *file, const struct iovec *iov, unsigned long segs, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q = sd->sd_rq;
 	unsigned short msgdelim;
 	size_t total = 0;
 	mblk_t *mp;
-	int err;
+	int err, i;
+	unsigned long flags;
+	unsigned long len;
 
 	if (ppos != &file->f_pos)
 		return (-ESPIPE);
+	if (segs == 0)
+		return (0);
+	for (i = 0, len = 0; i < segs; len += iov[i].iov_len, i++) ;
 	if (len == 0)
 		return (0);
 	if ((err = check_stream_rd(file, sd))) {
@@ -2471,12 +2606,27 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *
 			return (0);	/* end of file on hangup */
 		return (err);
 	}
-	/* If the driver has registered for direct IO, then we call the driver's readv procedure. */
-	if (sd->sd_directio && sd->sd_directio->readv)
-		return sd->sd_directio->readv(file, iov, len, ppos);
+#if 0
+	/* Strangely, Magic Garden Chapter 7 says that ldterm sets the stream head into raw mode,
+	   that an M_READ message is issued downstream with every read and that ldterm responds
+	   immediately with a 0 length message to create a short read.  So that is one M_READ for
+	   each and every write.  UnixWare says to send an M_DATA containing the number of bytes of
+	   read request downstream whenever, the driver or module has requested it with SO_MREADON
+	   in M_SETOPTS, no data is currently available at the stream head, and the reader is about
+	   to sleep.  The following would satisfy the first, but strgetq() above satisfies the
+	   later. */
+	if (test_bit(SNDMREAD_BIT, &sd->sd_flag))
+		if (!putnextctl(sd->sd_wq, M_READ))
+			return (-ENOSR);
+#endif
+	/* Protect atomicity of STRPRI, strwaitgmsg() and putbq() operation */
+	qwlock_irqsave(q, &flags);
 	for (;;) {
-		if ((err = PTR_ERR(mp = strwaitgmsg(file, sd, MSG_BAND, 0))) < 0)
-			return (err);
+		if (IS_ERR(mp = strwaitgmsg(file, sd, MSG_BAND, 0, len, &flags))) {
+			if (PTR_ERR(mp) == -EAGAIN && test_bit(STRNDEL_BIT, &sd->sd_flag))
+				mp = NULL;
+			break;
+		}
 		switch (sd->sd_rdopt & (RPROTDAT | RPROTDIS | RPROTNORM)) {
 		default:
 		case RPROTNORM:
@@ -2489,7 +2639,7 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *
 				if (mp->b_datap->db_type == M_PCPROTO)
 					set_bit(STRPRI_BIT, &sd->sd_flag);
 				putbq(q, mp);
-				return (-EBADMSG);
+				mp = ERR_PTR(-EBADMSG);
 			}
 			break;
 		}
@@ -2523,7 +2673,9 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *
 			break;
 		}
 		}
-		{
+		if (IS_ERR(mp))
+			break;
+		else {
 			size_t count = msgsize(mp);
 
 			/* All read modes terminate on a zero length message. */
@@ -2587,10 +2739,31 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *
 		}
 		break;
 	}
+	qwunlock_irqrestore(q, &flags);
+	if (total == 0 && IS_ERR(mp))
+		total = PTR_ERR(mp);
+	/* We really only need to do a runqueues() if a M_READ message has been generated
+	   downstream or if we read something and the read queue was flow contolled (resulting in
+	   back enabling of the read side stream).  But, for now we don't check the necessary
+	   condition, we just run queues if there is something to do anyway. */
+	runqueues();
 	return (total);
 }
 
-int strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
+EXPORT_SYMBOL(strreadv);
+
+static ssize_t
+_strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos)
+{
+	struct stdata *sd;
+
+	sd = stri_lookup(file);
+	if (sd->sd_directio && sd->sd_directio->readv)
+		return (sd->sd_directio->readv(file, iov, len, ppos));
+	return (strreadv(file, iov, len, ppos));
+}
+
+static int _strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
 
 /**
  *  strread: - read file operations for a stream
@@ -2603,6 +2776,18 @@ ssize_t
 strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
+
+	iov.iov_base = (void *) buf;
+	iov.iov_len = len;
+	/* Note that runqueues() is called by strreadv() */
+	return strreadv(file, &iov, 1, ppos);
+}
+
+EXPORT_SYMBOL(strread);
+
+static ssize_t
+_strread(struct file *file, char *buf, size_t len, loff_t *ppos)
+{
 	struct stdata *sd = stri_lookup(file);
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -2623,17 +2808,14 @@ strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 		if (sg.databuf.maxlen > 0
 		    && (err = verify_area(VERIFY_WRITE, sg.databuf.buf, sg.databuf.maxlen)) < 0)
 			goto error;
-		return strgetpmsg(file, &sg.ctlbuf, &sg.databuf, &sg.band, &sg.flags);
+		return _strgetpmsg(file, &sg.ctlbuf, &sg.databuf, &sg.band, &sg.flags);
 	      error:
 		return (err);
 	}
 #endif
-	/* If the driver has registered for direct IO, then we call the driver's read procedure. */
 	if (sd->sd_directio && sd->sd_directio->read)
-		return sd->sd_directio->read(file, buf, len, ppos);
-	iov.iov_base = (void *) buf;
-	iov.iov_len = len;
-	return strreadv(file, &iov, 1, ppos);
+		return (sd->sd_directio->read(file, buf, len, ppos));
+	return (strread(file, buf, len, ppos));
 }
 
 /**
@@ -2656,16 +2838,16 @@ strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_
 
 	if ((err = check_stream_wr(file, sd)))
 		goto error;
-	/* If the driver has established direct IO then we call the driver's writev procedure */
-	if (sd->sd_directio && sd->sd_directio->writev)
-		return sd->sd_directio->writev(file, iov, count, ppos);
 	for (total = 0, i = 0; i < count; total += iov[i].iov_len, i++) ;
 	if (total > sysctl_str_strmsgsz)
 		goto erange;
+	/* FIXME: we really need to take a read lock on the stream head */
+	/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 	wq = sd->sd_wq->q_next;
 	if (wq->q_minpsz > total || total > wq->q_maxpsz)
 		goto erange;
-	timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
+	timeo = ((file->f_flags & (O_NONBLOCK | O_NDELAY))
+		 && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 	if ((err = strwaitband(file, sd, 0, &timeo)))
 		goto error;
 	if (total > 0) {
@@ -2696,13 +2878,15 @@ strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_
 		mp = linkmsg(mp, dp);
 	}
 	mp->b_flag |= MSGDELIM;
+      returnsize:
 	putnext(sd->sd_wq, mp);
+	/* We need to call runqueues() after the putnext() to ensure that the driver service
+	   procedure and the reply gets scheduled. */
+	runqueues();
 	return (size);
       abort:
-	if (size) {
-		putnext(sd->sd_wq, mp);
-		return (size);
-	}
+	if (size)
+		goto returnsize;
       error:
 	return (err);
       einval:
@@ -2713,7 +2897,20 @@ strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_
 	return (-ENOSR);
 }
 
-int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
+EXPORT_SYMBOL(strwritev);
+
+static ssize_t
+_strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos)
+{
+	struct stdata *sd;
+
+	sd = stri_lookup(file);
+	if (sd->sd_directio && sd->sd_directio->writev)
+		return (sd->sd_directio->writev(file, iov, count, ppos));
+	return (strwritev(file, iov, count, ppos));
+}
+
+static int _strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
 
 /**
  *  strwrite: - write file operation for a stream
@@ -2726,9 +2923,22 @@ ssize_t
 strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
+
+	iov.iov_base = (void *) buf;
+	iov.iov_len = len;
+	/* Note that runqueues() is called by strwritev() */
+	return strwritev(file, &iov, 1, ppos);
+}
+
+EXPORT_SYMBOL(strwrite);
+
+static ssize_t
+_strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
+{
 	struct stdata *sd = stri_lookup(file);
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	/* FIXME: we really need to do these as an ioctl now */
 	/* write emulation of the putpmsg system call: the problem with this approach is that it
 	   almost completely destroys the ability to have a 64-bit application running against a
 	   32-bit kernel because the pointers cannot be properly converted. */
@@ -2746,17 +2956,14 @@ strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 		if (sp.databuf.len > 0
 		    && (err = verify_area(VERIFY_READ, sp.databuf.buf, sp.databuf.len)) < 0)
 			goto error;
-		return strputpmsg(file, &sp.ctlbuf, &sp.databuf, sp.band, sp.flags);
+		return _strputpmsg(file, &sp.ctlbuf, &sp.databuf, sp.band, sp.flags);
 	      error:
 		return (err);
 	}
 #endif
-	/* If the driver has established direct IO then we call the driver's write procedure */
 	if (sd->sd_directio && sd->sd_directio->write)
-		return sd->sd_directio->write(file, buf, len, ppos);
-	iov.iov_base = (void *) buf;
-	iov.iov_len = len;
-	return strwritev(file, &iov, 1, ppos);
+		return (sd->sd_directio->write(file, buf, len, ppos));
+	return (strwrite(file, buf, len, ppos));
 }
 
 /**
@@ -2788,31 +2995,50 @@ strwaitpage(struct file *file, size_t size, int prio, int band, int type,
 	    caddr_t base, struct free_rtn *frtn, long *timeo)
 {
 	struct stdata *sd = stri_lookup(file);
-	queue_t *wq = sd->sd_wq->q_next;
+	queue_t *wq;
 	mblk_t *mp;
 
 	if (unlikely(size > sysctl_str_strmsgsz))
 		return ERR_PTR(-ERANGE);
+	srlock_bh(sd);
+	wq = sd->sd_wq->q_next;
 	if (type == M_DATA && (wq->q_minpsz > size || size > wq->q_maxpsz))
 		return ERR_PTR(-ERANGE);
 	if ((band != -1 && !bcanput(wq, band))) {
 		/* wait for band to become available */
 		DECLARE_WAITQUEUE(wait, current);
 		add_wait_queue(&sd->sd_waitq, &wait);
+		srunlock_bh(sd);
 		for (;;) {
-			set_current_state(TASK_INTERRUPTIBLE);
 			set_bit(WSLEEP_BIT, &sd->sd_flag);
 			if (IS_ERR(mp = ERR_PTR(check_wakeup_wr(file, sd, timeo))))
 				break;
-			if (bcanput(wq, band))
+			mp = ERR_PTR(-EIO);
+			srlock_bh(sd);
+			if (!(wq = sd->sd_wq->q_next)) {
+				srunlock_bh(sd);
 				break;
+			}
+			mp = ERR_PTR(-ERANGE);
+			if (type == M_DATA && (wq->q_minpsz > size || size > wq->q_maxpsz)) {
+				srunlock_bh(sd);
+				break;
+			}
+			mp = NULL;
+			if (bcanput(wq, band)) {
+				srunlock_bh(sd);
+				break;
+			}
+			srunlock_bh(sd);
+			set_current_state(TASK_INTERRUPTIBLE);
 			*timeo = schedule_timeout(*timeo);
+			set_current_state(TASK_RUNNING);
 		}
-		set_current_state(TASK_RUNNING);
 		remove_wait_queue(&sd->sd_waitq, &wait);
 		if (IS_ERR(mp))
 			return (mp);
-	}
+	} else
+		srunlock_bh(sd);
 	if ((mp = esballoc(base, size, prio, frtn))) {
 		mp->b_datap->db_type = type;
 		mp->b_band = (band == -1) ? 0 : band;
@@ -2837,8 +3063,8 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q;
 
-	if (sd->sd_directio && sd->sd_directio->sendpage)
-		return sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
+	/* FIXME: we really need to take a read lock on the stream head */
+	/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 	if (!(q = sd->sd_wq->q_next))
 		goto espipe;
 	if (q->q_minpsz > size || size > q->q_maxpsz || size > sysctl_str_strmsgsz)
@@ -2846,7 +3072,8 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	if (ppos == &file->f_pos) {
 		char *base = kmap(page) + offset;
 		struct free_rtn frtn = { __strfreepage, (caddr_t) page };
-		long timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
+		long timeo = ((file->f_flags & (O_NONBLOCK | O_NDELAY))
+			      && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 
 		mp = strwaitpage(file, size, BPRI_MED, 0, M_DATA, base, &frtn, &timeo);
 		if (IS_ERR(mp)) {
@@ -2856,12 +3083,26 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		if (!more)
 			mp->b_flag |= MSGDELIM;
 		putnext(sd->sd_wq, mp);
+		/* We want to give the driver queues an opportunity to run. */
+		runqueues();
 		return (size);
 	}
       erange:
 	return (-ERANGE);
       espipe:
 	return (-ESPIPE);
+}
+
+EXPORT_SYMBOL(strsendpage);
+
+static ssize_t
+_strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more)
+{
+	struct stdata *sd = stri_lookup(file);
+
+	if (sd->sd_directio && sd->sd_directio->sendpage)
+		return (sd->sd_directio->sendpage(file, page, offset, size, ppos, more));
+	return (strsendpage(file, page, offset, size, ppos, more));
 }
 
 /**
@@ -2884,8 +3125,6 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 	ssize_t clen, dlen;
 	int err;
 
-	if (sd->sd_directio && sd->sd_directio->putpmsg)
-		return sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
 	if ((err = check_stream_wr(file, sd)))
 		goto exit;
 	if (band != -1) {
@@ -2912,6 +3151,8 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 			goto erange;
 	}
 	if (dlen >= 0) {
+		/* FIXME: we really need to take a read lock on the stream head */
+		/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 		queue_t *wq = sd->sd_wq->q_next;
 
 		if (dlen > sysctl_str_strmsgsz)
@@ -2920,9 +3161,9 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 			goto erange;
 	}
 	if ((band != -1 && flags == MSG_BAND) || (band == -1 && flags == 0)) {
-		long timeo;
+		long timeo = ((file->f_flags & (O_NONBLOCK | O_NDELAY))
+			      && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 
-		timeo = file->f_flags & (O_NONBLOCK | O_NDELAY) ? 0 : MAX_SCHEDULE_TIMEOUT;
 		if ((err = strwaitband(file, sd, band == -1 ? 0 : band, &timeo)))
 			goto exit;
 	}
@@ -2949,6 +3190,8 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 			mp->b_flag |= MSGDELIM;
 	}
 	putnext(sd->sd_wq, mp);
+	/* We want to give the driver queues an opportunity to run. */
+	runqueues();
 	return (0);
       einval:
 	return (-EINVAL);
@@ -2963,6 +3206,16 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 }
 
 EXPORT_SYMBOL(strputpmsg);
+
+static int
+_strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags)
+{
+	struct stdata *sd = stri_lookup(file);
+
+	if (sd->sd_directio && sd->sd_directio->putpmsg)
+		return (sd->sd_directio->putpmsg(file, ctlp, datp, band, flags));
+	return (strputpmsg(file, ctlp, datp, band, flags));
+}
 
 /**
  *  strgetpmsg: - getpmsg file operation for a stream
@@ -2986,8 +3239,6 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp = NULL, *dp;
 
-	if (sd->sd_directio && sd->sd_directio->getpmsg)
-		return sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
 	if (!flagsp)
 		goto einval;
 	ctlp->len = datp->len = 0;
@@ -3019,76 +3270,87 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 			goto einval;
 		}
 	}
-	if (!IS_ERR(dp = ERR_PTR(check_stream_rd(file, sd)))
-	    && !IS_ERR(dp = strwaitgmsg(file, sd, *flagsp, bandp ? *bandp : 0))) {
-		int rval = 0;
-		ssize_t blen;
-		ssize_t clen = ctlp ? ctlp->maxlen : -1;
-		ssize_t dlen = datp ? datp->maxlen : -1;
-		ssize_t davail = msgdsize(dp);	/* M_DATA blocks */
-		ssize_t cavail = msgsize(dp) - davail;	/* isdatablks */
+	if (!IS_ERR(dp = ERR_PTR(check_stream_rd(file, sd)))) {
+		unsigned long flags;
+		unsigned long len;
 
-		if (cavail && cavail > clen)
-			rval |= MORECTL;
-		if (davail && davail > dlen)
-			rval |= MOREDATA;
-		if (bandp) {
-			/* getpmsg */
-			if (dp->b_datap->db_type > QPCTL)
-				*flagsp = MSG_HIPRI;
-			else {
-				*flagsp = MSG_BAND;
-				*bandp = dp->b_band;
-			}
-		} else {
-			/* getmsg */
-			if (dp->b_datap->db_type > QPCTL)
-				*flagsp = RS_HIPRI;
-			else
-				*flagsp = 0;
-		}
-		for (mp = dp; (dp = mp); mp = unlinkb(dp), freeb(dp)) {
-			if ((blen = dp->b_wptr - dp->b_rptr) <= 0)
-				continue;
-			if (dp->b_datap->db_type == M_DATA) {
-				/* goes in data part */
-				if (dlen == -1)
-					break;
-				if (blen > dlen) {
-					bcopy(dp->b_rptr, datp->buf, dlen);
-					dp->b_rptr += dlen;
-					datp->len += dlen;
-					dlen = 0;
-					break;
+		len = datp ? ((datp->maxlen > 0) ? datp->maxlen : 0) : 0;
+		/* Protect taking the message off the queue, reading some of it, and the placing
+		   the remainder back onto the queue. */
+		qwlock_irqsave(sd->sd_rq, &flags);
+		if (!IS_ERR(dp = strwaitgmsg(file, sd, *flagsp, bandp ? *bandp : 0, len, &flags))) {
+			int rval = 0;
+			ssize_t blen;
+			ssize_t clen = ctlp ? ctlp->maxlen : -1;
+			ssize_t dlen = datp ? datp->maxlen : -1;
+			ssize_t davail = msgdsize(dp);	/* M_DATA blocks */
+			ssize_t cavail = msgsize(dp) - davail;	/* isdatablks */
+
+			if (cavail && cavail > clen)
+				rval |= MORECTL;
+			if (davail && davail > dlen)
+				rval |= MOREDATA;
+			if (bandp) {
+				/* getpmsg */
+				if (dp->b_datap->db_type > QPCTL)
+					*flagsp = MSG_HIPRI;
+				else {
+					*flagsp = MSG_BAND;
+					*bandp = dp->b_band;
 				}
-				bcopy(dp->b_rptr, datp->buf, blen);
-				dp->b_rptr += blen;
-				datp->len += blen;
-				dlen -= blen;
 			} else {
-				/* goes in ctrl part */
-				if (clen == -1)
-					break;;
-				if (blen > clen) {
-					bcopy(dp->b_rptr, ctlp->buf, clen);
-					dp->b_rptr += clen;
-					ctlp->len += clen;
-					clen = 0;
-					break;
-				}
-				bcopy(dp->b_rptr, ctlp->buf, blen);
-				dp->b_rptr += blen;
-				ctlp->len += blen;
-				clen -= blen;
+				/* getmsg */
+				if (dp->b_datap->db_type > QPCTL)
+					*flagsp = RS_HIPRI;
+				else
+					*flagsp = 0;
 			}
-		}
-		dp = ERR_PTR(rval);
-	}
-	if (mp) {
-		/* mark if putting back high priority */
-		if ((bandp && *flagsp == MSG_HIPRI) || (!bandp && *flagsp == RS_HIPRI))
-			set_bit(STRPRI_BIT, &sd->sd_flag);
-		putbq(sd->sd_rq, mp);
+			for (mp = dp; (dp = mp); mp = unlinkb(dp), freeb(dp)) {
+				if ((blen = dp->b_wptr - dp->b_rptr) <= 0)
+					continue;
+				if (dp->b_datap->db_type == M_DATA) {
+					/* goes in data part */
+					if (dlen == -1)
+						break;
+					if (blen > dlen) {
+						bcopy(dp->b_rptr, datp->buf, dlen);
+						dp->b_rptr += dlen;
+						datp->len += dlen;
+						dlen = 0;
+						break;
+					}
+					bcopy(dp->b_rptr, datp->buf, blen);
+					dp->b_rptr += blen;
+					datp->len += blen;
+					dlen -= blen;
+				} else {
+					/* goes in ctrl part */
+					if (clen == -1)
+						break;;
+					if (blen > clen) {
+						bcopy(dp->b_rptr, ctlp->buf, clen);
+						dp->b_rptr += clen;
+						ctlp->len += clen;
+						clen = 0;
+						break;
+					}
+					bcopy(dp->b_rptr, ctlp->buf, blen);
+					dp->b_rptr += blen;
+					ctlp->len += blen;
+					clen -= blen;
+				}
+			}
+			dp = ERR_PTR(rval);
+			if (mp) {
+				/* mark if putting back high priority */
+				if ((bandp && *flagsp == MSG_HIPRI)
+				    || (!bandp && *flagsp == RS_HIPRI))
+					set_bit(STRPRI_BIT, &sd->sd_flag);
+				putbq(sd->sd_rq, mp);
+			}
+		} else if (PTR_ERR(dp) == -EAGAIN && test_bit(STRNDEL_BIT, &sd->sd_flag))
+			dp = NULL;
+		qwunlock_irqrestore(sd->sd_rq, &flags);
 	}
 	if (PTR_ERR(dp) == -ENXIO) {
 		/* end of file on hangup */
@@ -3104,6 +3366,16 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 }
 
 EXPORT_SYMBOL(strgetpmsg);
+
+static int
+_strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp)
+{
+	struct stdata *sd = stri_lookup(file);
+
+	if (sd->sd_directio && sd->sd_directio->getpmsg)
+		return (sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp));
+	return (strgetpmsg(file, ctlp, datp, bandp, flagsp));
+}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3139,7 +3411,7 @@ str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
 	if (sp.databuf.len > 0
 	    && (err = verify_area(VERIFY_READ, sp.databuf.buf, sp.databuf.len)) < 0)
 		goto error;
-	return strputpmsg(file, &sp.ctlbuf, &sp.databuf, sp.band, sp.flags);
+	return _strputpmsg(file, &sp.ctlbuf, &sp.databuf, sp.band, sp.flags);
       error:
 	return (err);
 }
@@ -3168,7 +3440,7 @@ str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
 	if (sg.databuf.maxlen > 0
 	    && (err = verify_area(VERIFY_WRITE, sg.databuf.buf, sg.databuf.maxlen)) < 0)
 		goto error;
-	return strgetpmsg(file, &sg.ctlbuf, &sg.databuf, &sg.band, &sg.flags);
+	return _strgetpmsg(file, &sg.ctlbuf, &sg.databuf, &sg.band, &sg.flags);
       error:
 	return (err);
 }
@@ -3391,6 +3663,18 @@ strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long
 	return str_i_transparent(file, sd, cmd, arg);
 }
 
+EXPORT_SYMBOL(strioctl);
+
+static int
+_strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
+{
+	struct stdata *sd = stri_lookup(file);
+
+	if (sd->sd_directio && sd->sd_directio->ioctl)
+		return (sd->sd_directio->ioctl(inode, file, cmd, arg));
+	return (strioctl(inode, file, cmd, arg));
+}
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -3401,40 +3685,36 @@ strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long
 struct file_operations strm_f_ops ____cacheline_aligned = {
 	owner:NULL,
 	llseek:strllseek,
-	read:strread,
-	write:strwrite,
-	poll:strpoll,
-	ioctl:strioctl,
+	read:_strread,
+	write:_strwrite,
+	poll:_strpoll,
+	ioctl:_strioctl,
 	mmap:strmmap,
 	open:stropen,
 	flush:strflush,
 	release:strclose,
 	fasync:strfasync,
-	readv:strreadv,
-	writev:strwritev,
-	sendpage:strsendpage,
+	readv:_strreadv,
+	writev:_strwritev,
+	sendpage:_strsendpage,
 #ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
-	getpmsg:strgetpmsg,
-	putpmsg:strputpmsg,
+	getpmsg:_strgetpmsg,
+	putpmsg:_strputpmsg,
 #endif
 };
 
 EXPORT_SYMBOL(strm_f_ops);
 
-/* 
- *  -------------------------------------------------------------------------
- *
- *  SRVP Write Service Procedure
- *
- *  -------------------------------------------------------------------------
- */
 /**
  *  strwsrv: - STREAM head write queue service procedure
  *  @q: write queue to service
  *
  *  We don't actually ever put a message on the write queue, we just use the service procedure to
  *  wake up any synchronous or asynchronous waiters waiting for flow control to subside.  This
- *  permit back-enabling from the module beneath the stream head to work properly.
+ *  permit back-enabling from the module beneath the stream head to work properly.  So, for example,
+ *  when we do a canputnext(sd->sd_wq) it sets the QWANTW on sd->sd_wq->q_next if the module below
+ *  the stream head is flow controlled.  When congestion subsides to the low water mark, the queue
+ *  will backenable us and we will run an wake up any waiters blocked on flow control.
  */
 int
 strwsrv(queue_t *q)
@@ -3447,21 +3727,28 @@ strwsrv(queue_t *q)
 }
 
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE
+ || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
+ || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
 EXPORT_SYMBOL(strwsrv);
 #endif
 
-/* 
- *  -------------------------------------------------------------------------
- *
- *  PUTP Read Put Procedure
- *
- *  -------------------------------------------------------------------------
- */
 /**
  *  strrput: - STREAM head read queue put procedure
  *  @q: pointer to the queue to which to put the message
  *  @mp: the message to put on the queue
+ *
+ *  The only priority message that we put on the queue is the M_PCPROTO message (and only one of
+ *  those is allowed at a time).  The only normal messages that we put on the queue are the M_DATA,
+ *  M_PROTO, M_PASSFP and M_SIG messages.  All other messages are dealt with directly.  In that way,
+ *  when the driver beneath the stream head replies to most messages, such as M_IOCTL, the reply is
+ *  handled immediately and without the need to invoke the STREAMS scheduler.  Also, this procedure
+ *  uses atomic bit operations and other SMP safeguards and is run without any synchronization
+ *  queues, meaning that put calls are never deferred.
+ *
+ *  NOTICES: Note that there is no read service procedure, even though we put to the queue.  This is
+ *  ok because we are at the end of the stream, so our QFULL and QBFULL flags will still be checked
+ *  and failure returned to (and QWANTW and QBWANTW flags set by) canput() and bcanput() in the
+ *  proper circumstances, meaning the back-enabling will occur when getq() and rmvq() are called.
  */
 int
 strrput(queue_t *q, mblk_t *mp)
@@ -3471,15 +3758,21 @@ strrput(queue_t *q, mblk_t *mp)
 	switch ((msg_type_t) mp->b_datap->db_type) {
 	case M_PCPROTO:	/* bi - protocol info */
 	{
+		unsigned long flags;
+
+		/* protect atomicity of STRPRI bit and putq() */
+		qwlock_irqsave(q, &flags);
 		if (test_bit(STRPRI_BIT, &sd->sd_flag)) {
 			freemsg(mp);
-			return (0);
+			qwunlock_irqrestore(q, &flags);
+		} else {
+			putq(q, mp);
+			qwunlock_irqrestore(q, &flags);
+			if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
+				wake_up_interruptible(&sd->sd_waitq);
+			if (test_bit(S_HIPRI_BIT, &sd->sd_sigflags))
+				kill_fasync(&sd->sd_siglist, SIGPOLL, POLL_PRI);
 		}
-		putq(q, mp);
-		if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
-			wake_up_interruptible(&sd->sd_waitq);
-		if (test_bit(S_HIPRI_BIT, &sd->sd_sigflags))
-			kill_fasync(&sd->sd_siglist, SIGPOLL, POLL_PRI);
 		return (0);
 	}
 	case M_DATA:		/* bi - data */
@@ -3531,9 +3824,9 @@ strrput(queue_t *q, mblk_t *mp)
 		}
 		if (so->so_flags ^ (SO_NDELON | SO_NDELOFF)) {
 			if (so->so_flags & SO_NDELON)
-				clear_bit(STRHOLD_BIT, &sd->sd_flag);
+				clear_bit(STRNDEL_BIT, &sd->sd_flag);
 			else if (so->so_flags & SO_NDELOFF)
-				set_bit(STRHOLD_BIT, &sd->sd_flag);
+				set_bit(STRNDEL_BIT, &sd->sd_flag);
 		}
 		if (so->so_flags & SO_STRHOLD)
 			set_bit(STRHOLD_BIT, &sd->sd_flag);
@@ -3736,7 +4029,8 @@ strrput(queue_t *q, mblk_t *mp)
 }
 
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE
+ || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
+ || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
 EXPORT_SYMBOL(strrput);
 #endif
 
@@ -4014,6 +4308,9 @@ EXPORT_SYMBOL(unregister_strdev);
    with module id 0 */
 
 /* We actually register it a position 1 with module id 1 */
+
+/* Note that we use D_MP flag here because all our put and service routines are MP-SAFE and we don't
+ * want to have any synchronization queues attached to the stream head. */
 
 static struct fmodsw sth_fmod = {
 	f_name:CONFIG_STREAMS_STH_NAME,

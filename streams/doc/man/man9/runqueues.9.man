@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: runqueues.9.man,v 0.9.2.1 2005/07/23 03:50:42 brian Exp $
+.\" @(#) $Id: runqueues.9.man,v 0.9.2.2 2005/07/26 12:50:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/23 03:50:42 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/26 12:50:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -105,14 +105,32 @@ event.
 .PP
 .BR runqueues ()
 processes outstanding events in the following order:
-.IP \(bu \w'\(bu\(em'u
+.IP 1) \w'0)\(em'u
 .I Syncrhonization queue events:-
 Processes backlogged
 .I STREAMS
 events awaiting access to sychronization queues (barriers).
-.IP \(bu
+.IP ""
+This is a funny one, because if there exists a synchronization queue, there exists a queue against
+which to defer these events.  I still have to convert the entire process to execute syncrhonization
+queue events waiting outside barriers when a task leaves the barrier instead of with
+.I STREAMS
+scheduling in this manner.
+.IP ""
+This
+.I STREAMS
+scheduling task will probably disappear.
+.IP 2)
 .I Timeouts:-
-.IP \(bu
+These are
+.BR timeout (9)
+events that have timed out at the
+.B Linux
+timer, but are awaiting execution of the callback function.
+.IP ""
+If the timeout is referenced against a queue, then this may result in a further deferral against the
+synchronization queue associated with the queue.
+.IP 3)
 .I STREAMS events:-
 Processes deferred
 .I STREAMS
@@ -120,118 +138,290 @@ events, including the following:
 .RS
 .TP
 .B SE_STREAM
+This is a deferred
+.BR qenable (9)
+call generated from the context in which
+.BR qenable (9)
+was called, and are awaiting processing within the
+.I STREAMS
+executive.
+.IP ""
+.BR qenable (9)
+events are not normally deferred in this manner.
+Normally they are processed in (5), below, or are deferred against a synchronization queue.
 .TP
 .B SE_BUFCALL
 This is a deferred
 .BR bufcall (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which
+.BR kmem_free (9)
+was called, and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR bufcall (9)
+events are not normally deferred in this manner.
+Normally they are processed in (4), below, or are deferred against a synchornization queue.
 .TP
 .B SE_TIMEOUT
 This is a deferred
 .BR timeout (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which the
+.B Linux
+kernel timer expired
+.RB ( TIMEOUT_SOFTIRQ ),
+and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR timeout (9)
+events are not normally deferred in this manner.
+Normally they are processed in (2), above, or are deferred against a synchornization queue.
 .TP
 .B SE_WELDQ
 This is a deferred
 .BR weldq (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which
+.BR weldq (9)
+was called, and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR weldq (9)
+events are normally deferred in this manner when no synchronization queue exists.
+When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_UNWELDQ
 This is a deferred
 .BR unweldq (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which
+.BR unweldq (9)
+was called, and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR unweldq (9)
+events are normally deferred in this manner when no synchronization queue exists.
+When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_STRPUT
 This is a deferred
 .BR streams_put (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which
+.BR streams_put (9)
+was called, and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR streams_put (9)
+events are normally deferred in this manner when no synchronization queue exists.
+When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_WRITER
 This is a deferred
 .BR qwriter (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which
+.BR qwriter (9)
+was called, and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR qwriter (9)
+events are normally deferred in this manner when no synchronization queue exists.
+When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_PUTP
 This is a deferred
 .BR put (9)
-callback generated from a
-.RI non- STREAMS
-context awaiting processing within the
+callback generated from the context in which
+.BR put (9)
+was called, and are awaiting processing within the
 .I STREAMS
 executive.
+.IP ""
+.BR put (9)
+events are normally deferred in this manner when no synchronization queue exists.
+When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
 .RE
-.IP \(bu
+.IP 4)
 .I Buffer callbacks:-
-.IP \(bu
+These are
+.BR bufcall (9)
+callbacks that can be invoked by
+.BR freeb (9)
+or
+.BR kmem_free (9),
+and which are awaiting processing of the callback function.
+.IP ""
+If the buffer callback is referenced against a queue, then this may result in a further deferral
+against the synchronization queue associated with the queue.
+.IP 5)
 .I Queue service procedures:-
-.IP \(bu
+These are queue service procedures that have been enabled but which are awaiting execution of the
+service procedure.
+.IP ""
+This may result in a further deferal against the sychronization queue associated with the queue.
+.IP 6)
 .I Freeing flushed messages:-
-.IP \(bu
+These are chains of messages stripped from queues that were flushed that are awaiting being
+individually freed back to the message pool.
+.IP 7)
 .I Freeing cached message blocks:-
+These are cached message blocks that are available for immediate use by
+.BR allocb (9)
+and
+.BR esballoc (9)
+with priority
+.B BRI_HI
+during this queue run.  An excess number of blocks will be freed back to the kernel memory caches.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR runqueues ()
+is an internal
+.I STREAMS
+function that should not be used by
+.I STREAMS
+modules and drivers directly.
+It is intended for use by specialized
+.I STREAMS
+modules that implement a specialized stream head.
+In such cases,
+.BR runqueues ()
+needs to be called before returning from a (successful) system call that invoked the 
+.I STREAMS
+scheduler to more responsively process user requests.
+.PP
+Under
+.I @PACKAGE_TITLE@
+and most
+UNIX systems,
+.BR runqueues ()
+(or an equivalent)
+is called by the stream head when a message has been
+.BR put (9)
+to the driver or module beneath the stream head, or if a condition has changed that may have
+resulted in the enabling of any queue.
+Calling
+.BR runqueues ()
+in this way, ensures immediate delivery of the message, or processing of the service procedure, as
+well as delivery of any reply.
+In the absence of barriers (sychronization queues), it fairly much ensures that the first module or
+driver below the stream head with a service procedure has its
+.BR put (9)
+procedure called in user context.
+The best way, however, to ensure that a system call results in a user-context call to the driver or
+module is to use the
+.BR wantio (9)
+capability from
+.IR AIX \(rg
+.[
+aixspg
+.]
+to intercept system calls to the stream head.
 .\"
 .\"
 .SH RETURN
 .PP
+.BR runqueues ()
+returns
+.BR void .
 .\"
 .\"
 .SH ERRORS
 .PP
+.BR runqueues ()
+always succeeds.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR runqueues ()
+can be called from any blockable context; however, it is normally only called from user context and
+from within a system call on a stream head..
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR runqueues ()
+is MP-SAFE.
+.BR runqueues ()
+only runs outstanding tasks queued against the current processor.
 .\"
 .\"
 .SH NOTICES
 .PP
+.BR runqueues ()
+does not invoke syncrhonization queue events that are waiting outside the outer or inner barrier due
+to the current thread of execution being inside one of those barriers.  It requires the calling
+thread to leave the barrier before those events will be processed.  See
+.BR mp-streams (9).
+.PP
+.BR runqueues ()
+only invokes scheduled events that were scheduled for execution on the current processor.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR runqueues ()
+calls the functions that would otherwise have been invoked by triggering the
+.B STREAMS_SOFTIRQ
+soft irq, but in the current context, and with bottom halves enabled.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR timeout (9),
+.BR qenable (9),
+.BR bufcall (9),
+.BR kmem_free (9),
+.BR weldq (9),
+.BR unweldq (9),
+.BR streams_put (9),
+.BR qwriter (9),
+.BR put (9),
+.BR wantio (9),
+.BR freeb (9),
+.BR kmem_free (9),
+.BR allocb (9),
+.BR esballoc (9),
+.BR mp-streams (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR runqueues ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR runqueues ()
+is compatible with descriptions of
+.I STREAMS
+internals for
+.IR "SVR 4" ,
+.[
+magic
+.]
+with the following portability considerations.
+.IP \(em \w'\(em\(em'u
+.I SVR 4.2 MP
+and systems based on
+.I SVR 4
+do not export this function.
+.IP \(em
+Source and binary compatibility is not guaranteed.
+.IP \(em
+This implementation may do more or less than the equivalent
+.I SVR 4
+function.
+.IP \(em
+.BR runqueues ()
+will not be called by portable
+.I STREAMS
+drivers and modules.
 .PP
 See
 .BR STREAMS (9)
@@ -240,10 +430,27 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.BR runqueues ()
+is compliant with the description of the internal
+.BR runqueues ()
+function of
+.IR "SVR 4" .
+.[
+magic
+.]
+.[
+svr4
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR runqueues ()
+first appeared (as an internal function) in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[
