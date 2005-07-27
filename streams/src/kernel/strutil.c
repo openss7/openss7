@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/26 12:50:50 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/27 07:42:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/26 12:50:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/27 07:42:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/26 12:50:50 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/27 07:42:33 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/26 12:50:50 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/27 07:42:33 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1596,100 +1596,26 @@ __EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
 
 EXPORT_SYMBOL(OTHERQ);
 
-/*
- *  __put:
+/**
+ *  qwakeup:	- wait waiters on a queue pair
+ *  @q:		the read queue of the queue pair
+ *
+ *  NOTICES: Do not pass this function NULL or invalid q pointers, or pointers to the write side
+ *  queue of the pair.
  */
-static void
-__put(queue_t *q, mblk_t *mp)
+void
+qwakeup(queue_t *q)
 {
-	struct queinfo *qu = (typeof(qu)) RD(q);
+	struct queinfo *qu = (typeof(qu)) q;
 
-	q->q_qinfo->qi_putp(q, mp);
+	assert(q);
+	assert(q == RD(q));
+
 	if (unlikely(waitqueue_active(&qu->qu_qwait)))
 		wake_up_all(&qu->qu_qwait);
 }
 
-/*
- *  _put:
- */
-static void
-_put(queue_t *q, mblk_t *mp)
-{
-#if defined CONFIG_STREAMS_SYNCQS
-	struct syncq *isq;
-	unsigned long flags;
-#endif
-
-	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
-#if defined CONFIG_STREAMS_SYNCQS
-	if (!(isq = q->q_syncq))
-		__put(q, mp);
-	else {
-		struct syncq *osq = isq->sq_outer;
-
-		/* XXX: do these locks have to be so severe? */
-		if (enter_shared_irqsave(osq, &flags)) {
-			if (isq->sq_flag & D_MTPUTSHARED) {
-				/* XXX: do these locks have to be so severe? */
-				if (enter_shared_irqsave(isq, &flags)) {
-					__put(q, mp);
-					leave_shared(isq);
-				} else {
-					/* can't enter inner perimeter, defer */
-					__defer_put(isq, q, mp);
-					unlock_synq_irqrestore(isq, &flags);
-				}
-			} else {
-				/* XXX: do these locks have to be so severe? */
-				if (entex_exclus_irqsave(isq, &flags)) {
-					__put(q, mp);
-					leave_exclus(isq);
-				} else {
-					/* can't enter inner perimeter, defer */
-					__defer_put(isq, q, mp);
-					unlock_synq_irqrestore(isq, &flags);
-				}
-			}
-			leave_shared(osq);
-		} else {
-			/* can't enter outer perimeter, defer */
-			__defer_put(osq, q, mp);
-			unlock_synq_irqrestore(osq, &flags);
-		}
-	}
-#else
-	__put(q, mp);
-#endif
-}
-
-/**
- *  put:	- call a queue's qi_putq() procedure
- *  @q:		the queue's procedure to call
- *  @mp:	the message to place on the queue
- *
- *  Don't put to put routines that don't exist.
- *
- *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure is
- *  aware that it may be called in ISR context.  Also, if called in hardirq context, neither
- *  message filtering nor sychronization will be performed.  If you want to have a sychronized put()
- *  use the streams_put() function.
- */
-void
-put(queue_t *q, mblk_t *mp)
-{
-	if (likely(in_irq() != 0))
-		__put(q, mp);
-	else
-		_put(q, mp);
-}
-
-EXPORT_SYMBOL(put);
-
-static void
-_putnext(queue_t *q, mblk_t *mp)
-{
-	_put(q->q_next, mp);
-}
+EXPORT_SYMBOL(qwakeup);
 
 /**
  *  putnext:	- put a message on the queue next to this one
@@ -1703,14 +1629,11 @@ _putnext(queue_t *q, mblk_t *mp)
 void
 putnext(queue_t *q, mblk_t *mp)
 {
-	assert(!in_irq());
-	if (likely(in_streams() != 0))
-		_putnext(q, mp);
-	else {
-		hrlock(q);
-		_putnext(q, mp);
-		hrunlock(q);
-	}
+	queue_t *qn;
+	assure(!in_irq());
+	qn = getq(q->q_next);
+	putq(qn, mp);
+	qput(&qn);
 }
 
 EXPORT_SYMBOL(putnext);
