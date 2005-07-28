@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/26 12:50:50 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/28 14:45:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/26 12:50:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:45:45 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -102,10 +102,12 @@ extern void modi_put(struct mdlinfo *mi);
 extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
 
+#if defined CONFIG_STREAMS_SYNCQS
 /* ctors and dtors for syncq */
 extern struct syncq *sq_alloc(void);
 extern struct syncq *sq_get(struct syncq *sq);
 extern void sq_put(struct syncq **sqp);
+#endif
 
 /* freeing chains of message blocks */
 extern void freechain(mblk_t *mp, mblk_t **mpp);
