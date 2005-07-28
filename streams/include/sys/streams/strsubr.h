@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.33 2005/07/26 12:50:44 brian unstable $
+ @(#) $Id: strsubr.h,v 0.9.2.34 2005/07/27 20:34:00 brian unstable $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/26 12:50:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/27 20:34:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/26 12:50:44 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/27 20:34:00 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -117,20 +117,6 @@ struct strevent {
 			void *arg;
 			queue_t *q1, *q2, *q3, *q4;
 		} w;			/* weld request */
-		struct {
-			queue_t *queue;
-			void (*func) (void *, mblk_t *);
-			void *arg;
-			int perim;
-			mblk_t *mp;
-		} p;			/* strput request */
-		struct {
-			queue_t *queue;
-			mblk_t *mp;
-		} q;			/* put procedure request */
-		struct {
-			queue_t *queue;
-		} s;			/* service procedure request */
 	} x;
 	struct strevent *se_next;
 	struct strevent *se_prev;	/* actually hash list */
@@ -445,6 +431,7 @@ struct mbinfo {
 	mblk_t m_mblock;
 	void (*m_func) (void);		/* allocating function SVR4 compatible */
 	queue_t *m_queue;		/* last queue for this block */
+	void *m_private;		/* private information for deferral */
 	struct list_head m_list;
 };
 struct dbinfo {
@@ -463,10 +450,6 @@ struct linkinfo {
 #define SE_TIMEOUT	2
 #define SE_WELDQ	3
 #define SE_UNWELDQ	4
-#define SE_STRPUT	5
-#define SE_WRITER	6
-#define SE_PUTP		7
-#define SE_SRVP		8
 
 struct seinfo {
 	struct strevent s_strevent;
@@ -608,9 +591,6 @@ extern void sd_put(struct stdata *sd);
 
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
-
-extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg, int perim,
-		      int type);
 
 extern struct devinfo *di_alloc(struct cdevsw *cdev);
 extern void di_put(struct devinfo *di);

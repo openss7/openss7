@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/07/27 07:42:33 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/07/27 20:34:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/27 07:42:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/27 20:34:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/07/27 07:42:33 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/07/27 20:34:12 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/07/27 07:42:33 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/07/27 20:34:12 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -271,7 +271,7 @@ raise_bufcalls(void)
 
 	for (i = 0, t = &strthreads[0]; i < NR_CPUS; i++, t++)
 		if (test_bit(strbcwait, &t->flags))
-			if(!test_and_set_bit(strbcflag, &t->flags))
+			if (!test_and_set_bit(strbcflag, &t->flags))
 				cpu_raise_softirq(i, STREAMS_SOFTIRQ);
 #else
 	return raise_local_bufcalls();
@@ -1398,36 +1398,6 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	}
 	return (se);
 }
-static struct strevent *
-defer_strput_event(streams_put_t func, queue_t *q, mblk_t *mp, void *arg)
-{
-	struct strevent *se;
-
-	if ((se = event_alloc(SE_STRPUT, q))) {
-		se->x.p.queue = qget(q);
-		se->x.p.func = func;
-		se->x.p.arg = arg;
-		se->x.p.perim = 0;
-		se->x.p.mp = mp;
-		schedule_event(se);
-	}
-	return (se);
-}
-static struct strevent *
-defer_writer_event(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
-{
-	struct strevent *se;
-
-	if ((se = event_alloc(SE_WRITER, q))) {
-		se->x.p.queue = qget(q);
-		se->x.p.func = (void (*)(void *, mblk_t *)) func;
-		se->x.p.arg = q;
-		se->x.p.perim = perim;
-		se->x.p.mp = mp;
-		schedule_event(se);
-	}
-	return (se);
-}
 
 /*
  *  __bufcall:	- generate a buffer callback
@@ -1716,62 +1686,11 @@ unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
 
 EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
 
-/*
- *  defer_func:	- defer a STREAMS procedure call
- *  @func:	function call to defer
- *  @q:		associated queue
- *  @mp:	associated message block
- *  @arg:	associated argument
- *  @perim:	exclusive sychornization perimiter
- *  @type:	function call type, currently %SE_STRPUT or %SE_WRITER
- *
- *  Deferrable functions that use defer_func() are streams_put() and qwriter().
- */
-int
-defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg, int perim, int type)
-{
-	struct strevent *se;
-
-	if ((se = event_alloc(type, q))) {
-		struct strthread *t = this_thread;
-
-		se->x.p.queue = qget(q);
-		se->x.p.func = func;
-		se->x.p.arg = arg;
-		se->x.p.perim = perim;
-		se->x.p.mp = mp;
-		*xchg(&t->strevents_tail, &se->se_next) = se;	/* MP-SAFE */
-		if (!test_and_set_bit(strevents, &t->flags))
-			raise_softirq(STREAMS_SOFTIRQ);
-		return (0);
-	}
-	return (ENOMEM);
-}
-
-EXPORT_SYMBOL(defer_func);	/* include/sys/streams/strsubr.h */
-
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
  *  -------------------------------------------------------------------------
  */
 #if defined CONFIG_STREAMS_SYNCQS
-void
-__defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
-{
-	/* must be called with sq locked */
-	struct strevent *se;
-
-	if ((se = event_alloc(SE_STRPUT, q))) {
-		se->x.p.queue = qget(q);
-		se->x.p.func = (void *) put;
-		se->x.p.arg = q;
-		se->x.p.perim = PERIM_INNER;
-		se->x.p.mp = mp;
-		*xchg(&sq->sq_tail, &se->se_next) = se;
-		return;
-	}
-	never();
-}
 
 /* Execution of deferred events */
 static void
@@ -1785,7 +1704,66 @@ defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
  *  Immediate event processing.
  */
 
-/**
+/*
+ *  strwrit:	- execute a function
+ *  @q:		the queue to pass to the function
+ *  @mp:	the message to pass to the function
+ *  @func:	the function
+ */
+static void
+strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
+{
+	assert(q);
+	assert(func);
+	{
+		struct strthread *t = this_thread;
+		queue_t *oldq;
+
+		assert(!t->curentq || in_irq());
+		/* oldq could be non-NULL if called from hardirq */
+		oldq = t->currentq;
+		t->currentq = qget(q);
+		func(arg, mp);
+		t->currentq = oldq;
+		qput(&q);
+	}
+}
+
+/*
+ *  strfunc:	- execute a function like a queue's put procedure
+ *  @func:	the function to execute
+ *  @q:		the queue whose put procedure to immitate
+ *  @mp:	the message to pass to the function
+ *  @arg:	the first argument to pass to the function
+ *
+ *  strfunc() is similar to put(9) with the following exceptions
+ *
+ *  - strfunc() executes func(arg, mp) instead of qi_putp(q, mp)
+ *  - strfunc() returns void
+ *  - strfunc() does not perform any synchronization
+ */
+static void
+strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+{
+	int result = -1;
+
+	assert(q);
+	assert(func);
+	{
+		struct strthread *t = this_thread;
+		queue_t *oldq;
+
+		assert(!t->curentq || in_irq());
+		/* oldq could be non-NULL if called from hardirq */
+		oldq = t->currentq;
+		t->currentq = qget(q);
+		func(arg, mp);
+		t->currentq = oldq;
+		qput(&q);
+	}
+}
+
+/*
  *  putp:	- execute a queue's put procedure
  *  @q:		the queue onto which to put the message
  *  @mp:	the message to put
@@ -1795,7 +1773,7 @@ defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
  *  - putp() returns the integer result from the modules put procedure.
  *  - putp() does not perform any synchronization
  */
-int
+static int
 putp(queue_t *q, mblk_t *mp)
 {
 	int result = -1;
@@ -1803,20 +1781,6 @@ putp(queue_t *q, mblk_t *mp)
 	assert(q);
 	assert(q->q_qinfo);
 	assert(q->q_qinfo->qi_putp);
-
-	/* skip message filtering at hard irq */
-	if (!in_irq()) {
-		while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
-		if (q) {
-			/* some queue wants the message */
-			assert(q->q_qinfo);
-			assert(q->q_qinfo->qi_putp);
-		} else {
-			/* no queue wants the message */
-			freemsg(mp);
-			goto done;
-		}
-	}
 	{
 		struct strthread *t = this_thread;
 		queue_t *oldq;
@@ -1833,8 +1797,6 @@ putp(queue_t *q, mblk_t *mp)
       done:
 	return (result);
 }
-
-EXPORT_SYMBOL(putp);
 
 /**
  *  srvp:	- execute a queue's service procedure
@@ -1869,7 +1831,7 @@ EXPORT_SYMBOL(putp);
  *  service procedure.  In safe mode, this will cause kernel assertions to fail and will panic the
  *  kernel.
  */
-int
+static int
 srvp(queue_t *q)
 {
 	int result = -1;
@@ -1898,6 +1860,857 @@ srvp(queue_t *q)
 
 EXPORT_SYMBOL(srvp);
 
+#if CONFIG_STREAMS_SYNCQS
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Synchronization functions.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  Enter functions:
+ */
+
+/*
+ *  enter_outer_syncq_wait: = enter outer barrier shared or exclusive from process context
+ *  @q:	    the queue against which to synchronize
+ *  @se:    the STREAMS even to syncrhonize
+ *  @sqp:   a pointer to the place to return the syncq reference
+ */
+static int
+enter_outer_syncq_wait(queue_t *q, struct syncq **sqp)
+{
+	struct syncq *sq = NULL;
+	int err = 0;
+
+	if (unlikely(q == NULL))
+		goto done;
+	if (unlikely((sq = q->q_syncq) == NULL))
+		goto done;
+	if (unlikely((sq->sq_flag & D_MTOUTPERIM) == 0) && (sq = sq->sq_outer) == NULL)
+		goto done;
+	{
+		unsigned long flags;
+		struct stdata *sd;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_owner == current)
+			sq->sq_nest++;
+		else if (sq->sq_count == 0) {
+			sq->sq_owner = current;
+			--sq->sq_count;
+		} else {
+			DECLARE_WAITQUEUE(wait, current);
+			add_wait_queue(&sq->sq_waitq, &wait);
+			for (;;) {
+				set_current_state(TASK_INTERRUPTIBLE);
+				sd = ((struct queinfo *) q)->qu_str;
+				if (!sd) {
+					err = -ENOSTR;
+					break;
+				}
+				if (sd->sd_flag & (STPLEX | STRCLOSE | STRHUP)) {
+					if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
+						err = -EINVAL;
+						break;
+					}
+					if (test_bit(STRCLOSE_BIT, &sd->sd_flag)) {
+						err = -EIO;
+						break;
+					}
+					if (test_bit(STRHUP_BIT, &sd->sd_flag)) {
+						if (sd->sd_flag & (STRISFIFO | STRISPIPE))
+							err = -EPIPE;
+						else
+							err = -ENXIO;
+						break;
+					}
+				}
+				if (sd->sd_flag & (STRISFIFO | STRISPIPE)) {
+					if (sd->sd_other == NULL) {
+						err = -EPIPE;
+						break;
+					}
+					if (test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)) {
+						err = -EPIPE;
+						break;
+					}
+				}
+				if (signal_pending(current)) {
+					err = -EINTR;
+					break;
+				}
+				if (sq->sq_flag & D_MTOCEXCL) {
+					if (sq->sq_count == 0
+					    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+						/* available or left for us by leave function */
+						/* set exclusive */
+						sq->sq_owner = current;
+						sq->sq_count = -1;
+						err = 0;
+						break;
+					}
+				} else {
+					if (sq->sq_count >= 0
+					    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+						/* available or left for us by leave function */
+						/* set shared */
+						sq->sq_owner = NULL;
+						sq->sq_count =
+						    (sq->sq_count == -1) ? 1 : sq->sq_count + 1;
+						err = 0;
+						break;
+					}
+				}
+				spinunlock_irqrestore(&sq->sq_lock, flags);
+				schedule();
+				spinlock_irqsave(&sq->sq_lock, flags);
+			}
+			set_current_state(TASK_RUNNING);
+			remove_wait_queue(&sq->sq_waitq, &wait);
+		}
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+      done:
+	if (sqp != NULL)
+		*sqp = sq;
+	return (err);
+}
+
+struct syncq_cookie {
+	queue_t *sc_q;
+	mblk_t *sc_mp;
+	struct strevent *sc_se;
+	syncq_t *sc_osq;
+	syncq_t *sc_isq;
+	syncq_t *sc_sq;
+};
+
+static int
+defer_syncq(struct syncq_cookie *sc, unsigned long *flagsp)
+{
+	context_t ctx = current_context();
+
+	switch (ctx) {
+	case CTX_PROC:
+	case CTX_ATOMIC:
+	{
+		/* refuse to defer in process context */
+		struct syncq *sq = sc->sc_sq;
+		queue_t *q = sc->sc_q;
+		int rval = 0;
+
+		DECLARE_WAITQUEUE(wait, current);
+		add_wait_queue(&sq->sq_waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			sd = ((struct queinfo *) RD(q))->qu_str;
+			if (!sd) {
+				rval = -ENOSTR;
+				break;
+			}
+			if (sd->sd_flag & (STPLEX | STRCLOSE | STRHUP)) {
+				if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
+					rval = -EINVAL;
+					break;
+				}
+				if (test_bit(STRCLOSE_BIT, &sd->sd_flag)) {
+					rval = -EIO;
+					break;
+				}
+				if (test_bit(STRHUP_BIT, &sd->sd_flag)) {
+					if (sd->sd_flag & (STRISFIFO | STRISPIPE))
+						rval = -EPIPE;
+					else
+						rval = -ENXIO;
+					break;
+				}
+			}
+			if (sd->sd_flag & (STRISFIFO | STRISPIPE)) {
+				if (sd->sd_other == NULL) {
+					rval = -EPIPE;
+					break;
+				}
+				if (test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)) {
+					rval = -EPIPE;
+					break;
+				}
+			}
+			if (signal_pending(current)) {
+				rval = -EINTR;
+				break;
+			}
+			if (sc->sc_exclus) {
+				if (sq->sq_count == 0
+				    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+					/* available or left for us by leave function */
+					/* set exclusive */
+					sq->sq_owner = current;
+					sq->sq_count = -1;
+					rval = 1;
+					break;
+				}
+			} else {
+				if (sq->sq_count >= 0
+				    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+					/* available or left for us by leave function */
+					/* set shared */
+					sq->sq_owner = NULL;
+					sq->sq_count = (sq->sq_count == -1) ? 1 : sq->sq_count + 1;
+					rval = 1;
+					break;
+				}
+			}
+			spinunlock_irqrestore(&sq->sq_lock, *flagsp);
+			schedule();
+			spinlock_irqsave(&sq->sq_lock, *flagsp);
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&sq->sq_waitq, &wait);
+		return (rval);
+	}
+	default:
+	case CTX_STREAMS:
+	case CTX_INT:
+	case CTX_ISR:
+	{
+		/* always defer if not in process context */
+		struct strevent *se;
+
+		if ((se = sc->sc_se))
+			*(sc->se_prev = xchg(&sc->sc_sq->sq_etail, &se->se_next)) = se;
+		else {
+			mblk_t *mp;
+
+			if ((mp = sc->sc_mp))
+				*xchg(&sc->sc_sq->sq_mtail, &mp->b_next) = mp;
+			else {
+				queue_t *q;
+
+				if ((q = sc->sc_q))
+					*xchg(&sc->sc_sq->sq_qtail, &q->q_link) = q;
+			}
+		}
+		return (0);
+	}
+	}
+}
+static int
+find_syncq(struct syncq_cookie *sc)
+{
+	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & D_MTOUTPERIM)) {
+		sc->sc_isq = sc->sc_osq;
+		sc->sc_osq = sc->sc_isq->sq_outer;
+	}
+	return (sc->sc_osq != NULL);
+}
+static int
+find_syncqs(struct syncq_cookie *sc)
+{
+	if (q && (sc->sc_osq = q->q_syncq) && !(sc->sc_osq->sq_flag & D_MTOUTPERIM)) {
+		sc->sc_isq = sc->sc_osq;
+		sc->sc_osq = sc->sc_isq->sq_outer;
+	}
+	return (sc->sc_osq || sc->sc_isq);
+}
+static int
+enter_syncq_exclus(struct syncq_cookie *sc)
+{
+	int rval = 1;
+	unsigned long flags;
+	syncq_t *sq = sc->sc_sq;
+
+	sc->sc_exclus = 1;
+	spinlock_irqsave(&sq->sq_lock, flags);
+	if (sq->sq_owner == current)
+		sq->sq_nest++;
+	else if (sq->sq_count == 0) {
+		sq->sq_owner = current;
+		--sq->sq_count;
+	} else
+		rval = defer_syncq(sc, &flags);
+	spinunlock_irqrestore(&sq->sq_lock, flags);
+	return (rval);
+}
+static int
+enter_syncq_shared(struct syncq_cookie *sc)
+{
+	int rval = 1;
+	unsigned long flags;
+	syncq_t *sq = sc->sc_sq;
+
+	sc->sc_exclus = 0;
+	spinlock_irqsave(&sq->sq_lock, flags);
+	if (sq->sq_owner == current)
+		sq->sq_nest++;
+	else if (sq->sq_count >= 0)
+		sq->sq_count++;
+	else
+		rval = defer_syncq(sc, &flags);
+	spinunlock_irqrestore(&sq->sq_lock, flags);
+	return (rval);
+}
+static int
+enter_outer_syncq_exclus(struct syncq_cookie *sc)
+{
+	if (find_syncq(sc) && (sc->sc_sq = sc->sc_osq))
+		return enter_syncq_exclus(sc);
+	return (1);
+}
+static int
+enter_outer_syncq_shared(struct syncq_cookie *sc)
+{
+	if (find_syncq(sc) && (sc->sc_sq = sc->sc_osq))
+		return enter_syncq_shared(sc);
+	return (1);
+}
+static int
+enter_inner_syncq_exclus(struct syncq_cookie *sc)
+{
+	if (find_syncqs(sc)) {
+		if ((sc->sc_sq = sc->sc_osq)) {
+			int rval;
+
+			if ((rval = enter_syncq_shared(sc)) <= 0)
+				return (rval);
+		}
+		if ((sc->sc_sq = sc->sc_isq))
+			return enter_syncq_exclus(sc);
+	}
+	return (1);
+}
+static int
+enter_inner_syncq_shared(struct syncq_cookie *sc)
+{
+	if (find_syncqs(sc)) {
+		if ((sc->sc_sq = sc->sc_osq)) {
+			int rval;
+
+			if ((rval = enter_syncq_shared(sc)) <= 0)
+				return (rval);
+		}
+		if ((sc->sc_sq = sc->sc_isq))
+			return enter_syncq_shared(sc);
+	}
+	return (1);
+}
+static int
+enter_inner_syncq_asputp(struct syncq_cookie *sc)
+{
+	if (find_syncqs(sc)) {
+		if ((sc->sc_sq = sc->sc_osq)) {
+			int rval;
+
+			if ((rval = enter_syncq_shared(sc)) <= 0)
+				return (rval);
+		}
+		if ((sc->sc_sq = sc->sc_isq)) {
+			if (sc->sc_isq->sq_flag & D_MTPUTSHARED)
+				return enter_syncq_shared(sc);
+			else
+				return enter_syncq_exclus(sc);
+		}
+	}
+	return (1);
+}
+static int
+enter_inner_syncq_asopen(struct syncq_cookie *sc)
+{
+	if (find_syncqs(sc)) {
+		if ((sc->sc_sq = sc->sc_osq)) {
+			if (sc->sc_sq->sq_flag & D_MTOCEXCL)
+				return enter_syncq_exclus(sc);
+			else {
+				int rval;
+
+				if ((rval = enter_syncq_shared(sc)) <= 0)
+					return (rval);
+			}
+		}
+		if ((sc->sc_sq = sc->sc_isq))
+			return enter_syncq_exclus(sc);
+	}
+	return (1);
+}
+
+static int
+enter_syncq_writer(struct syncq_cookie *sc, void (*func) (queue_t *, mblk_t *), int perim)
+{
+	struct mbinfo *m = (typeof(m)) sc->sc_mp;
+
+	m->m_func = (void *) strwrit;
+	m->m_queue = sc->sc_q;
+	m->m_private = (void *) func;
+
+	assert(perim == PERIM_OUTER || perim == PERIM_INNER);
+
+	if (perim & PERIM_OUTER)
+		return enter_outer_syncq_exclus(sc);
+	if (perim & PERIM_INNER)
+		return enter_inner_syncq_exclus(sc);
+	return (1);
+}
+
+static int
+enter_inner_syncq_func(struct syncq_cookie *sc, void (*func) (void *, mblk_t *), void *arg)
+{
+	struct mbinfo *m = (typeof(m)) sc->sc_mp;
+
+	m->m_func = (void *) func;
+	m->m_queue = sc->sc_q;
+	m->m_private = arg;
+
+	return enter_inner_syncq_asputp(sc);
+}
+
+static int
+enter_inner_syncq_putp(struct syncq_cookie *sc)
+{
+	struct mbinfo *m = (typeof(m)) sc->sc_mp;
+
+	m->m_func = (void *) putp;
+	m->m_queue = sc->sc_q;
+	m->m_private = NULL;
+
+	return enter_inner_syncq_asputp(sc);
+}
+
+static int
+enter_inner_syncq_srvp(struct syncq_cookie *sc)
+{
+	return enter_inner_syncq_exclus(sc);
+}
+
+static void
+leave_syncq(struct syncq_cookie *sc)
+{
+	syncq_t *sq;
+	if (likely((sq = sc->sc_sq) == NULL))
+		return;
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sc->sc_exclus) {
+			/* last entry was exclusive */
+			if (sq->sq_owner == current && --sq->sq_nest < 0) {
+				register struct strevent *se, *se_next;
+
+				sq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				/* just run them all exclusive: anything that wanted to enter the
+				   outer perimeter shared and the inner perimeter exclusive will
+				   run nicely with just the outer perimeter exclusive; this is
+				   because the outer perimeter is always more restrictive than the
+				   inner perimeter. */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					/* fake it out that we are STREAMS executive */
+					local_bh_disable();
+					set_bit(queueflag, &this_thread->flags);
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+					/* remove fakeout */
+					clear_bit(queueflag, &this_thread->flags);
+					local_bh_enable();
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		} else {
+			/* last entry was shared */
+			if (--sq->sq_count == 0) {
+				struct strthread *t = current_thread;
+				struct strevent *se;
+
+				/* just left shared for the last time, the last guy out is
+				   responsible for processing the backlog */
+				sq->sq_nest = 0;
+				sq->sq_owner == current;
+				sq->sq_count = -1;
+				/* we are now in the barrier exclusive */
+				/* just run them all exclusive: anything that wanted to enter the
+				   outer perimeter shared and the inner perimeter exclusive will
+				   run nicely with just the outer perimeter exclusive; this is
+				   because the outer perimeter is always more restrictive than the
+				   inner perimeter. */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					/* fake it out that we are STREAMS executive */
+					local_bh_disable();
+					set_bit(queueflag, &this_thread->flags);
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+					/* remove fakeout */
+					clear_bit(queueflag, &this_thread->flags);
+					local_bh_enable();
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		}
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+}
+
+static int
+leave_outer_syncq_wait(struct syncq *sq)
+{
+	struct syncq *osq = NULL;
+
+	/* not inside barrier */
+	if (likely(sq == NULL))
+		return;
+	/* no sychronization */
+	if (likely((osq = global_sync) == NULL && (osq = q->q_sync) == NULL))
+		return;
+	/* no outer barrier */
+	if (likely((osq->sq_flag & D_MTOUTPERIM) == 0 && (osq = osq->sq_outer) == NULL))
+		return;
+	if (unlikely(osq != sq))
+		swerr();
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_flag & D_MTOCEXCL) {
+			if (sq->sq_owner == current && --sq->sq_nest < 0) {
+				register struct strevent *se, *se_next;
+
+				sq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				/* just run them all exclusive: anything that wanted to enter the
+				   outer perimeter shared and the inner perimeter exclusive will
+				   run nicely with just the outer perimeter exclusive; this is
+				   because the outer perimeter is always more restrictive than the
+				   inner perimeter. */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					/* fake it out that we are STREAMS executive */
+					local_bh_disable();
+					set_bit(queueflag, &this_thread->flags);
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+					/* remove fakeout */
+					clear_bit(queueflag, &this_thread->flags);
+					local_bh_enable();
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		} else {
+			if (--sq->sq_count == 0) {
+				struct strthread *t = current_thread;
+				struct strevent *se;
+
+				/* just left shared for the last time, the last guy out is
+				   responsible for processing the backlog */
+				sq->sq_nest = 0;
+				sq->sq_owner == current;
+				sq->sq_count = -1;
+				/* we are now in the barrier exclusive */
+				/* just run them all exclusive: anything that wanted to enter the
+				   outer perimeter shared and the inner perimeter exclusive will
+				   run nicely with just the outer perimeter exclusive; this is
+				   because the outer perimeter is always more restrictive than the
+				   inner perimeter. */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					/* fake it out that we are STREAMS executive */
+					local_bh_disable();
+					set_bit(queueflag, &this_thread->flags);
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+					/* remove fakeout */
+					clear_bit(queueflag, &this_thread->flags);
+					local_bh_enable();
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		}
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+}
+
+/*
+ *  leave_outer_syncq_exclus: - leave the outer barrier that was entered exclusive
+ *  @sq:    the synchronization queue to leave
+ */
+static void
+leave_outer_syncq_exclus(struct syncq *sq)
+{
+	struct syncq *osq = NULL;
+
+	/* not inside barrier */
+	if (likely(sq == NULL))
+		return;
+	/* no sychronization */
+	if (likely((osq = global_sync) == NULL && (osq = q->q_sync) == NULL))
+		return;
+	/* no outer barrier */
+	if (likely((osq->sq_flag & D_MTOUTPERIM) == 0 && (osq = osq->sq_outer) == NULL))
+		return;
+	if (unlikely(osq != sq))
+		swerr();
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&sq->sq_lock, flags);
+		if (sq->sq_owner == current) {
+			if (--sq->sq_nest < 0) {
+				register struct strevent *se, *se_next;
+
+				sq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				while ((se_next = xchg(&sq->sq_head, NULL))) {	/* MP-SAFE */
+					sq->sq_tail = &sq->sq_head;
+					spin_unlock_irqrestore(&sq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						/* just run them all exclusive: anything that
+						   wanted to enter the outer perimeter shared and
+						   the inner perimeter exclusive will run nicely
+						   with just the outer perimeter exclusive; this is 
+						   because the outer perimeter is always more
+						   restrictive than the inner perimeter. */
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&sq->sq_lock, flags);
+				}
+				/* finally unlock the queue */
+				sq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&sq->sq_waitq)))
+					wake_up_all(&sq->sq_waitq);
+				else
+					sq->sq_count = 0;
+			}
+		} else
+			swerr();
+		spinunlock_irqrestore(&sq->sq_lock, flags);
+	}
+}
+
+/*
+ *  leave_inner_syncq_exclus: - leave the inner barrier that was entered exclusive
+ *  @sq:    the synchronization queue to leave
+ */
+static void
+leave_inner_syncq_exclus(struct syncq *sq)
+{
+	struct syncq *osq = NULL, *isq = NULL;
+
+	if (unlikely(sq == NULL))
+		return;
+	if (unlikely((osq = q->q_syncq) == NULL))
+		return;
+	if (unlikely((osq->sq_flag & D_MTOUTPERIM) == 0)) {
+		isq = osq;
+		osq = isq->sq_outer;
+	}
+	{
+		unsigned long flags;
+
+		spinlock_irqsave(&isq->sq_lock, flags);
+		if (isq->sq_owner == current) {
+			if (--isq->sq_nest < 0) {
+				struct strevent *se;
+
+				isq->sq_nest = 0;
+				/* we are still in the barrier exclusive */
+				while ((se_next = xchg(&isq->sq_head, NULL))) {	/* MP-SAFE */
+					isq->sq_tail = &isq->sq_head;
+					spin_unlock_irqrestore(&isq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						/* just run them all exclusive: anything that
+						   wanted to enter the inner perimeter shared will
+						   run nicely with the inner perimeter exclusive. */
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&isq->sq_lock, flags);
+				}
+				/* finally unlock the queue */
+				isq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&isq->sq_waitq)))
+					wake_up_all(&isq->sq_waitq);
+				else
+					isq->sq_count = 0;
+			}
+		} else
+			swerr();
+		spinunlock_irqrestore(&isq->sq_lock, flags);
+		if (osq) {
+			spinlock_irqsave(&osq->sq_lock, flags);
+			if (--osq->sq_count == 0) {
+				/* just left shared for the last time */
+				struct strthread *t = current_thread;
+				struct strevent *se;
+
+				osq->sq_nest = 0;
+				osq->sq_owner == current;
+				osq->sq_count = -1;
+				/* we are now in the barrier exclusive */
+				while ((se_next = xchg(&osq->sq_head, NULL))) {	/* MP-SAFE */
+					osq->sq_tail = &osq->sq_head;
+					spin_unlock_irqrestore(&osq->sq_lock, flags);
+					/* process backlog */
+					while ((se = se_next)) {
+						se_next = xchg(&se->se_next, NULL);
+						/* just run them all exclusive: anything that
+						   wanted to enter the outer perimeter shared and
+						   the inner perimeter exclusive will run nicely
+						   with just the outer perimeter exclusive; this is 
+						   because the outer perimeter is always more
+						   restrictive than the inner perimeter. */
+						sq_doevent_synced(se);
+					}
+					spin_lock_irqsave(&osq->sq_lock, flags);
+				}
+				/* finally unlock the queue */
+				osq->sq_owner = NULL;
+				/* if we have waiters, we leave the queue locked but with a NULL
+				   owner, and one of the waiters will pick it up, the others will
+				   wait some more */
+				if (unlikely(waitqueue_active(&osq->sq_waitq)))
+					wake_up_all(&osq->sq_waitq);
+				else
+					osq->sq_count = 0;
+			}
+			spinunlock_irqrestore(&osq->sq_lock, flags);
+		}
+	}
+}
+
+#endif
+
+/**
+ *  qwriter:	- call a function after gaining exclusive access to a perimeter
+ *  @q:		the queue against which to synchronize and pass to the function
+ *  @mp:	a message to pass to the function
+ *  @func:	the function to call once access is gained
+ *  @perim:	the perimeter to which to gain access
+ *
+ *  Queue writers enter the requested perimeter exclusive.  If the perimeter deos not exist, the
+ *  function is invoked without sychronization.  The call to @func might be immediate or might be
+ *  deferred.  If this function is called from ISR context, be aware that @func might execute at ISR
+ *  context.
+ *
+ *  qwriter() callbacks enter the outer perimeter exclusive if the outer perimeter exists and
+ *  PERIM_OUTER is set in perim; otherwise, it enters the inner perimeter exclusive if the inner
+ *  perimeter exists and PERIM_INNER is set in perim.  If no perimeters exist, or the perimeter
+ *  corresponding to the PERIM_OUTER and PERIM_INNER setting does not exist, the callback function
+ *  is still executed, however only STREAMS MP safety syncrhonization is performed.
+ *
+ *  NOTICES: Solaris restricts from where this function can be called to put(9), srv(9), qwriter(9),
+ *  qtimeout(9) or qbufcall(9) procedures.  We make no restrictions.
+ *
+ *  @mp must not be NULL, otherwise it is not possible to defer the callback.  @mp cannot be on an
+ *  existing queue.
+ *
+ */
+void
+qwriter(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+{
+#if CONFIG_STREAMS_SYNCQS
+	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
+
+	if (unlikely(enter_syncq_writer(sc, func, perim) == 0))
+		return;
+#endif
+	strwrit(q, mp, func);
+#if CONFIG_STREAMS_SYNCQS
+	leave_syncq(sc);
+#endif
+}
+
+EXPORT_SYMBOL(qwriter);
+
+/**
+ *  qstrfunc:	- execute a function like the queue's put procedure synchronized
+ *  @func:	the function to imitate the queue's put procedure
+ *  @q:		the queue whose put procedure is to be imitated
+ *  @mp:	the message to pass to the function
+ *  @arg:	the first argument to pass to the function
+ *
+ *  streams_put(9) callouts function precisely like put(9), however, they invoke a callout function
+ *  instead of the queue's put procedure.  streams_put() events always need a valid queue reference
+ *  against which to synchronize.
+ */
+static int
+qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+{
+#if CONFIG_STREAMS_SYNCQS
+	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
+
+	if (unlikely(enter_inner_syncq_func(sc, func, arg) == 0))
+		return;
+#endif
+	strfunc(func, q, mp, arg);
+#if CONFIG_STREAMS_SYNCQS
+	leave_syncq(sc);
+#endif
+	return;
+}
+
 /**
  *  qputp:	- execute a queue's put procedure synchronized
  *  @q:		the queue whose put procedure is to be executed
@@ -1913,19 +2726,40 @@ EXPORT_SYMBOL(srvp);
  *  If this function is called from process context, and the barrier is raised, the calling process
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
+ *
+ *  NOTICES: AIX-style message filtering is performed outside synchronization.  This means that the
+ *  message filtering function must be fully re-entrant and able to run concurrently with other
+ *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
+ *  queue's private structure).
  */
-int
+static int
 qputp(queue_t *q, mblk_t *mp)
 {
 	int result;
+
+	/* skip message filtering at hard irq */
+	if (!in_irq()) {
+		queue_t *newq, *q_next;
+
+		for (newq = qget(q); newq && (!newq->q_ftmsg || !newq->q_ftmsg(mp));
+		     q_next = qget(newq->q_next), qput(&newq), newq = q_next) ;
+		if (!newq) {
+			/* no queue wants the message - throw it away */
+			freemsg(mp);
+			goto done;
+		}
+		q = newq;
+		qput(&newq);
+	}
 #if CONFIG_STREAMS_SYNCQS
-	struct syncq *sq;
-	if (unlikely(enter_inner_syncq_putp(q, &sq) == 0))
+	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
+
+	if (unlikely(enter_inner_syncq_putp(sc) == 0))
 		return;
 #endif
 	result = putp(q, mp);
 #if CONFIG_STREAMS_SYNCQS
-	leave_inner_syncq_putp(sq);
+	leave_syncq(sc);
 #endif
 	return (result);
 }
@@ -1943,28 +2777,132 @@ qputp(queue_t *q, mblk_t *mp)
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-int
+static int
 qsrvp(queue_t *q)
 {
 	int result;
+
 #if CONFIG_STREAMS_SYNCQS
 	struct syncq *sq;
-	if (unlikely(enter_inner_syncq_srvp(q, &sq) == 0))
+	struct syncq_cookie ck = {.sc_q = q, }, &sc = &ck;
+
+	if (unlikely(enter_inner_syncq_srvp(sc) == 0))
 		return;
 #endif
 	result = srvp(q);
 #if CONFIG_STREAMS_SYNCQS
-	leave_inner_syncq_srvp(sq);
+	leave_syncq(sc);
 #endif
 	return (result);
 }
+
+/**
+ *  qopen:	- call a module's qi_qopen entry point
+ *  @q:		the read queue of the module queue pair to open
+ *  @devp:	pointer to the opening and returned device number
+ *  @oflag:	open flags
+ *  @sflag:	stream flag, can be %DRVOPEN, %MODOPEN, %CLONEOPEN
+ *  @crp:	pointer to the opening task's credential structure
+ *
+ *  Note that if a syncrhonization queue exitsts and Solaris compatible flags D_MTOUTPERIM and
+ *  D_MTOCEXCL are set in the outer perimeter syncrhonization queue, then we must either enter the
+ *  outer perimeter exclusive, or block awaiting exclusive access to the outer perimeter.
+ *
+ *  CONTEXT: Must only be called from a blockable context.
+ */
+int
+qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+{
+	int (*q_open) (queue_t *, dev_t *, int, int, cred_t *);
+	int err = -ENOPKG;
+
+	assert(q);
+	assert(q->q_qinfo);
+
+	if ((q_open = q->q_qinfo->qi_qopen)) {
+#if CONFIG_STREAMS_SYNCQS
+		struct syncq_cookie ck = {.sc_q = q, }, *se = &ck;
+
+		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
+			goto error;
+#endif
+		err = q_open(q, devp, oflag, sflag, crp);
+#if CONFIG_STREAMS_SYNCQS
+		leave_outer_syncq_wait(sc);
+#endif
+	}
+	goto error;
+      error:
+	return (err);
+}
+
+EXPORT_SYMBOL(qopen);
+
+/**
+ *  qclose:	- invoke a queue pair's qi_qclose entry point
+ *  @q:		read queue of the queue pair to close
+ *  @oflag:	open flags
+ *  @crp:	credentials of closing task
+ *
+ *  CONTEXT: Must only be called from a blockable context.
+ */
+int
+qclose(queue_t *q, int oflag, cred_t *crp)
+{
+	int err = -ENXIO;
+	int (*q_close) (queue_t *, int, cred_t *);
+
+	assert(q);
+	assert(q->q_qinfo);
+
+	if ((q_close = q->q_qinfo->qi_qclose)) {
+#if CONFIG_STREAMS_SYNCQS
+		struct syncq_cookie ck = {.sc_q = q, }, *se = &ck;
+
+		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
+			goto error;
+#endif
+		err = q_close(q, oflag, crp);
+#if CONFIG_STREAMS_SYNCQS
+		leave_outer_syncq_wait(sc);
+#endif
+	}
+	goto error;
+      error:
+	return (err);
+}
+
+EXPORT_SYMBOL(qclose);
+
+/**
+ *  streams_put: - call a function like a queue's put procedure
+ *  @func:	the function to call
+ *  @q:		the queue whose put procedure to immitate
+ *  @mp:	the message to pass to the function
+ *  @arg:	the first argument to pass to the function
+ *
+ *  NOTICES: Don't call functions that do not exist.
+ *
+ *  streams_put(NULL, q, mp, NULL) is identical to calling put(q, mp).
+ *
+ *  CONTEXT: Any.  But beware that if you call this function from an ISR that the function is aware
+ *  that it may be called in ISR context.  Also, if called in hardirq context, message filtering
+ *  will not be performed.
+ */
+void
+streams_put(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+{
+	(void) qstrfunc(func, q, mp, arg);
+}
+
+EXPORT_SYMBOL(streams_put);
 
 /**
  *  put:	- call a queue's qi_putq() procedure
  *  @q:		the queue's procedure to call
  *  @mp:	the message to place on the queue
  *
- *  NOTICES: Don't put to put routines that don't exist.
+ *  NOTICES: Don't put to put routines that do not exist.
  *
  *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure is
  *  aware that it may be called in ISR context.  Also, if called in hardirq context, message
@@ -1973,7 +2911,10 @@ qsrvp(queue_t *q)
 void
 put(queue_t *q, mblk_t *mp)
 {
-	(void)qputp(q, mp);
+	assert(q);
+	assert(q->q_qinfo);
+	assert(q->q_qinfo->qi_putp);
+	(void) qputp(q, mp);
 }
 
 EXPORT_SYMBOL(put);
@@ -2025,7 +2966,7 @@ static void
 do_timeout_synced(struct strevent *se)
 {
 	queue_t *q;
-	void (*func)(caddr_t);
+	void (*func) (caddr_t);
 
 	q = se->x.t.queue;
 	if ((func = se->x.t.func)) {
@@ -2123,49 +3064,6 @@ do_unweldq_synced(struct strevent *se)
 }
 
 static void
-do_strput_synced(strevent * se)
-{
-	queue_t *q;
-	void (*func) (void *, mblk_t *);
-
-	q = se->x.w.queue;
-	if ((func = se->x.p.func)) {
-		unsigned long flags;
-		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-		struct strthread *t = this_thread;
-		t->currentq = q;
-		if (safe)
-			local_irq_save(flags);
-		func(se->x.p.arg, se->x.p.mp);
-		if (safe)
-			local_irq_restore(flags);
-		t->currentq = NULL;
-	}
-	qput(&q);
-}
-
-static void
-do_writer_synced(struct strevent *se)
-{
-	queue_t *q;
-
-	q = se->x.p.queue;
-	if (se->x.p.func) {
-		unsigned long flags;
-		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-		struct strthread *t = this_thread;
-		t->currentq = q;
-		if (safe)
-			local_irq_save(flags);
-		se->x.p.func(se->x.p.arg, se->x.p.mp);
-		if (safe)
-			local_irq_restore(flags);
-		t->currentq = NULL;
-	}
-	qput(&q);
-}
-
-static void
 sq_doevent_synced(struct strevent *se)
 {
 	struct seinfo *s = (typeof(s)) se;
@@ -2181,10 +3079,6 @@ sq_doevent_synced(struct strevent *se)
 		return do_weldq_synced(se);
 	case SE_UNWELDQ:
 		return do_unweldq_synced(se);
-	case SE_WRITER:
-		return do_writer_synced(se);
-	case SE_STRPUT:
-		return do_strput_synced(se);
 	default:
 		swerr();
 		return;
@@ -2204,14 +3098,14 @@ static void
 do_bufcall_event(struct strevent *se)
 {
 #if CONFIG_STREAMS_SYNCQS
-	struct syncq *sq;
+	struct syncq_cookie ck = {.sc_q = se->x.b.queue,.sc_se = se, }, *sc = &ck;
 
-	if (unlikely(enter_inner_syncq_exclus(se->x.b.queue, se, &sq) == 0))
+	if (unlikely(enter_inner_syncq_exclus(sc) == 0))
 		return;
 #endif
 	do_bufcall_synced(se);
 #if CONFIG_STREAMS_SYNCQS
-	leave_inner_syncq_exclus(sq);
+	leave_syncq(sc);
 #endif
 	sefree(se);
 }
@@ -2224,14 +3118,14 @@ static void
 do_timeout_event(struct strevent *se)
 {
 #if CONFIG_STREAMS_SYNCQS
-	struct syncq *sq;
+	struct syncq_cookie ck = {.sc_q = se->x.t.queue,.sc_se = se, }, *sc = &ck;
 
-	if (unlikely(enter_inner_syncq_exclus(se->x.t.queue, se, &sq) == 0))
+	if (unlikely(enter_inner_syncq_exclus(sc) == 0))
 		return;
 #endif
 	do_timeout_synced(se);
 #if CONFIG_STREAMS_SYNCQS
-	leave_inner_syncq_exclus(sq);
+	leave_syncq(sc);
 #endif
 	sefree(se);
 }
@@ -2246,14 +3140,14 @@ static void
 do_weldq_event(struct strevent *se)
 {
 #if CONFIG_STREAMS_SYNCQS
-	struct sycnq *sq;
+	struct syncq_cookie ck = {.sc_q = se->x.w.queue,.sc_se = se, }, *sc = &ck;
 
-	if (unlikely(enter_outer_syncq_exclus(se->x.w.queue, se, &sq) == 0))
+	if (unlikely(enter_outer_syncq_exclus(sc) == 0))
 		return;
 #endif
 	do_weldq_synced(se->x.w.queue, se);
 #if CONFIG_STREAMS_SYNCQS
-	leave_outer_syncq_exclus(sq);
+	leave_syncq(sc);
 #endif
 	sefree(se);
 }
@@ -2268,65 +3162,15 @@ static inline void
 do_unweldq_event(struct strevent *se)
 {
 #if CONFIG_STREAMS_SYNCQS
-	struct sycnq *sq;
+	struct syncq_cookie ck = {.sc_q = se->x.w.queue,.sc_se = se, }, *sc = &ck;
 
-	if (unlikely(enter_outer_syncq_exclus(se->x.w.queue, se, &sq) == 0))
+	if (unlikely(enter_outer_syncq_exclus(sc) == 0))
 		return;
 #endif
 	do_unweldq_synced(se);
 #if CONFIG_STREAMS_SYNCQS
-	leave_outer_syncq_exclus(sq);
+	leave_syncq(sc);
 #endif
-	sefree(se);
-}
-
-/*
- *  streams_put callouts function precisely like put(9), however, they invoke a callout function
- *  instead of the queue's put procedure.  streams_put events always have a valid queue reference
- *  against which to synchronize.
- */
-static void
-do_strput_event(struct strevent *se)
-{
-#if CONFIG_STREAMS_SYNCQS
-	struct sycnq *sq;
-
-	if (unlikely(enter_inner_syncq_exclus(se->x.w.queue, se, &sq) == 0))
-		return;
-#endif
-	do_strput_synced(se);
-#if CONFIG_STREAMS_SYNCQS
-	leave_inner_syncq_exclus(sq);
-#endif
-	sefree(se);
-}
-
-/*
- *  qwriter callouts enter the outer perimeter exclusive if the outer perimeter exists and
- *  PERIM_OUTER is set in perim; otherwise, it enters the inner perimeter exclusive if the inner
- *  perimeter exists and PERIM_INNER is set in perim.  If no perimeters exist, or the perimeter
- *  corresponding to the PERIM_OUTER and PERIM_INNER setting does not exist, the callout function is
- *  still executed, however only STREAMS MP safety syncrhonization is performed.
- */
-static void
-do_writer_event(struct strevent *se)
-{
-#if CONFIG_STREAMS_SYNCQS
-	struct sycnq *sq;
-
-	if (se->x.p.perim & PERIM_OUTER) {
-		if (unlikely(enter_outer_syncq_exclus(se->x.p.queue, se, &sq) == 0))
-			return;
-		do_writer_synced(se);
-		leave_outer_syncq_exclus(sq);
-	} else if (se->x.p.perim & PERIM_INNER) {
-		if (unlikely(enter_inner_syncq_exclus(se->x.p.queue, se, &sq) == 0))
-			return;
-		do_writer_synced(se);
-		leave_inner_syncq_exclus(sq);
-	} else
-#endif
-		do_writer_synced(se);
 	sefree(se);
 }
 
@@ -2346,10 +3190,6 @@ sq_doevent(struct strevent *se)
 		return do_weldq_event(se);
 	case SE_UNWELDQ:
 		return do_unweldq_event(se);
-	case SE_WRITER:
-		return do_writer_event(se);
-	case SE_STRPUT:
-		return do_strput_event(se);
 	default:
 		swerr();
 		return;

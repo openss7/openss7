@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/27 07:42:33 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/07/27 20:34:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/27 07:42:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/27 20:34:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/27 07:42:33 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/07/27 20:34:12 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/27 07:42:33 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/07/27 20:34:12 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2035,39 +2035,6 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 EXPORT_SYMBOL(qattach);
 
 /**
- *  qclose:	- invoke a queue pair's qi_qclose entry point
- *  @q:		read queue of the queue pair to close
- *  @oflag:	open flags
- *  @crp:	credentials of closing task
- *
- *  CONTEXT: Must only be called from a blockable context.
- */
-int
-qclose(queue_t *q, int oflag, cred_t *crp)
-{
-	int err = -ENXIO;
-	int (*q_close) (queue_t *, int, cred_t *);
-
-	if ((q_close = q->q_qinfo->qi_qclose)) {
-#if CONFIG_STREAMS_SYNCQS
-		struct syncq *sq;
-
-		if (unlikely((err = enter_outer_syncq_wait(q, &sq)) != 0))
-			goto error;
-#endif
-		err = q_close(q, oflag, crp);
-#if CONFIG_STREAMS_SYNCQS
-		leave_outer_syncq_wait(sq);
-#endif
-	}
-	goto error;
-      error:
-	return (err);
-}
-
-EXPORT_SYMBOL(qclose);
-
-/**
  *  qdelete:	- delete a queue pair from a stream
  *  @rq:	read queue of queue pair to delete
  *
@@ -2175,45 +2142,6 @@ qinsert(struct stdata *sd, queue_t *irq)
 }
 
 EXPORT_SYMBOL(qinsert);
-
-/**
- *  qopen:	- call a module's qi_qopen entry point
- *  @q:		the read queue of the module queue pair to open
- *  @devp:	pointer to the opening and returned device number
- *  @oflag:	open flags
- *  @sflag:	stream flag, can be %DRVOPEN, %MODOPEN, %CLONEOPEN
- *  @crp:	pointer to the opening task's credential structure
- *
- *  Note that if a syncrhonization queue exitsts and Solaris compatible flags D_MTOUTPERIM and
- *  D_MTOCEXCL are set in the outer perimeter syncrhonization queue, then we must either enter the
- *  outer perimeter exclusive, or block awaiting exclusive access to the outer perimeter.
- *
- *  CONTEXT: Must only be called from a blockable context.
- */
-int
-qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
-{
-	int (*q_open) (queue_t *, dev_t *, int, int, cred_t *);
-	int err = -ENOPKG;
-
-	if ((q_open = q->q_qinfo->qi_qopen)) {
-#if CONFIG_STREAMS_SYNCQS
-		struct syncq *sq;
-
-		if (unlikely((err = enter_outer_syncq_wait(q, &sq)) != 0))
-			goto error;
-#endif
-		err = q_open(q, devp, oflag, sflag, crp);
-#if CONFIG_STREAMS_SYNCQS
-		leave_outer_syncq_wait(sq);
-#endif
-	}
-	goto error;
-      error:
-	return (err);
-}
-
-EXPORT_SYMBOL(qopen);
 
 /**
  *  qprocsoff:	- turn off qi_putp and qi_srvp procedures for a queue pair
