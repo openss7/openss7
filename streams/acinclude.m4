@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/07/21 20:47:18 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/07/28 14:45:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/21 20:47:18 $ by $Author: brian $
+# Last Modified $Date: 2005/07/28 14:45:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -174,6 +174,30 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 	    ;;
     esac
 ])# _LFS_SETUP_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _LFS_SETUP_SYNCQS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
+    AC_ARG_ENABLE([streams-syncqs],
+	AS_HELP_STRING([--enable-streams-syncqs],
+	    [enable STREAMS synchronization queues.
+	    @<:@default=disabled@:>@]),
+	    [enable_streams_syncqs="$enableval"],
+	    [enable_streams_syncqs='yes'])
+    AC_CACHE_CHECK([for STREAMS synchronization], [lfs_streams_syncqs], [dnl
+	lfs_streams_syncqs="${enable_streams_utils:-yes}"
+	])
+    case ${lfs_streams_syncqs:-yes} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SYNCQS], [], [When defined]
+	    AC_PACKAGE_TITLE [will include support for synchronization queues
+	    and levels.])
+	    ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SYNCQS], [test :${lfs_streams_syncqs:-yes} = :yes])
+])# _LFS_SETUP_SYNCQS
 # =============================================================================
 
 # =============================================================================
@@ -638,6 +662,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_CHECK_KERNEL
     _LFS_SETUP_DEBUG
     _LFS_SETUP_MODULE
+    _LFS_SETUP_SYNCQS
     _LFS_SETUP_UTILS
     _LFS_SETUP_MODULES
     _LFS_SETUP_DRIVERS

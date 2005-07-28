@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/28 14:13:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/26 12:50:54 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/28 14:13:59 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/28 14:13:59 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/26 12:50:54 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/28 14:13:59 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -647,6 +647,8 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned 
 	ensure(sd, return (NULL));
 	/* maybe we'll get lucky... */
 	/* also we must make an attempt before returning ENXIO, EPIPE or rderror */
+	/* also we need to trigger QWANTR bit and empty queue backenabling */
+	/* also we need to trigger M_READ messages */
 	if ((mp = strgetq(sd, flags, band, len, flagsp)))
 		return (mp);
 	/* only here it there's nothing left on the queue */
@@ -954,8 +956,12 @@ str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 
 	trace();
 	if (arg < 256 || arg == ANYBAND)
-		if (!(err = check_stream_wr(file, sd)))
-			return (bcanputnext(sd->sd_wq, arg) ? 1 : 0);
+		if (!(err = check_stream_wr(file, sd))) {
+			if (arg != ANYBAND)
+				return (bcanputnext(sd->sd_wq, arg) ? 1 : 0);
+			else
+				return (bcanputnextany(sd->sd_wq) ? 1 : 0);
+		}
 	return (err);
 }
 
@@ -973,8 +979,12 @@ str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 
 	trace();
 	if (arg < 256 || arg == ANYBAND)
-		if (!(err = check_stream_io(file, sd)))
-			return (bcanget(sd->sd_rq, arg) ? 1 : 0);
+		if (!(err = check_stream_io(file, sd))) {
+			if (arg != ANYBAND)
+				return (bcanget(sd->sd_rq, arg) ? 1 : 0);
+			else
+				return (bcangetany(sd->sd_rq) ? 1 : 0);
+		}
 	return (err);
 }
 
@@ -2208,13 +2218,13 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 		mask |= POLLPRI;
 	if (test_bit(STRMSIG_BIT, &sd->sd_flag))
 		mask |= POLLMSG;
-	if (bcanget(sd->sd_rq, 0))
+	if (canget(sd->sd_rq))
 		mask |= POLLIN | POLLRDNORM;
-	if (bcanget(sd->sd_rq, ANYBAND))
+	if (bcangetany(sd->sd_rq))
 		mask |= POLLIN | POLLRDBAND;
-	if (bcanputnext(sd->sd_wq, 0))
+	if (canputnext(sd->sd_wq))
 		mask |= POLLOUT | POLLWRNORM;
-	if (bcanputnext(sd->sd_wq, ANYBAND))
+	if (bcanputnextany(sd->sd_wq))
 		mask |= POLLOUT | POLLWRBAND;
 	/* The above have no side effects that would require running the STREAMS scheduler, so we
 	   do not do runqueues(). */
@@ -2301,7 +2311,7 @@ stropen(struct inode *inode, struct file *file)
 		sd->sd_flag = STWOPEN;	/* hold open bit */
 		sd->sd_rq = q;
 		sd->sd_wq = q + 1;
-		((struct queinfo *) q)->qu_str = sd;
+		qstream(q) = sd;
 		sd->sd_cdevsw = cdev;
 		switch (cdev->d_mode & S_IFMT) {
 		case S_IFIFO:
@@ -3714,7 +3724,7 @@ EXPORT_SYMBOL(strm_f_ops);
  *  permit back-enabling from the module beneath the stream head to work properly.  So, for example,
  *  when we do a canputnext(sd->sd_wq) it sets the QWANTW on sd->sd_wq->q_next if the module below
  *  the stream head is flow controlled.  When congestion subsides to the low water mark, the queue
- *  will backenable us and we will run an wake up any waiters blocked on flow control.
+ *  will backenable us and we will run and wake up any waiters blocked on flow control.
  */
 int
 strwsrv(queue_t *q)
@@ -4077,7 +4087,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
 		printd(("%s: stream head first open\n", __FUNCTION__));
-		if ((sd = ((struct queinfo *) q)->qu_str)) {
+		if ((sd = qstream(q))) {
 			struct cdevsw *cdev = sd->sd_cdevsw;
 			struct fmodsw *fmod = (struct fmodsw *) cdev;
 			struct streamtab *st;
@@ -4112,7 +4122,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 static int
 str_close(queue_t *q, int oflag, cred_t *crp)
 {
-	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
+	if (!q->q_ptr || q->q_ptr != qstream(q))
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);

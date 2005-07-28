@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/23 03:50:43 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/28 14:13:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/23 03:50:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/23 03:50:43 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/28 14:13:54 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/23 03:50:43 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/28 14:13:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -791,7 +791,6 @@ get_streams_queue_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", q_lowat");
 	len += snprintf(page + len, maxlen - len, ", q_bandp");
 	len += snprintf(page + len, maxlen - len, ", q_nband");
-	len += snprintf(page + len, maxlen - len, ", q_pctl");
 	len += snprintf(page + len, maxlen - len, ", q_msgs");
 	// len += snprintf(page + len, maxlen - len, ", q_rwlock");
 	len += snprintf(page + len, maxlen - len, ", q_iflags");
@@ -819,7 +818,6 @@ get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
 	len += snprintf(page + len, maxlen - len, ", %u", q->q_lowat);
 	len += snprintf(page + len, maxlen - len, ", %p", q->q_bandp);
 	len += snprintf(page + len, maxlen - len, ", %hhu", q->q_nband);
-	len += snprintf(page + len, maxlen - len, ", %p", q->q_pctl);
 	len += snprintf(page + len, maxlen - len, ", %d", q->q_msgs);
 	// len += snprintf(page + len, maxlen - len, "%d", q->q_rwlock);
 	len += snprintf(page + len, maxlen - len, ", %lu", q->q_iflags);

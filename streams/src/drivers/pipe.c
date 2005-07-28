@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:21 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:21 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:21 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:21 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -210,7 +210,7 @@ pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		dev_t dev = *devp;
 		struct stdata *sd;
 
-		if ((sd = ((struct queinfo *) q)->qu_str)) {
+		if ((sd = qstream(q))) {
 			/* 1st step: attach the driver and call its open routine */
 			/* we are the driver and this *is* the open routine */
 			/* FIXME: create another stream head and attach it to the first */
@@ -233,7 +233,7 @@ pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 static int
 pipe_close(queue_t *q, int oflag, cred_t *crp)
 {
-	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
+	if (!q->q_ptr || q->q_ptr != qstream(q))
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);

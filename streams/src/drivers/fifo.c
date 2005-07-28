@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:21 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -213,7 +213,7 @@ fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
 		dev_t dev = *devp;
 
-		if ((sd = ((struct queinfo *) q)->qu_str)) {
+		if ((sd = qstream(q))) {
 			/* 1st step: attach the driver and call its open routine */
 			/* we are the driver and this *is* the open routine */
 			/* start off life as a fifo */
@@ -296,7 +296,7 @@ fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 static int
 fifo_qclose(queue_t *q, int oflag, cred_t *crp)
 {
-	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
+	if (!q->q_ptr || q->q_ptr != qstream(q))
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);

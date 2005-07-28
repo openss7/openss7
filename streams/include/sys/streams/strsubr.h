@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.34 2005/07/27 20:34:00 brian unstable $
+ @(#) $Id: strsubr.h,v 0.9.2.36 2005/07/28 14:45:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/27 20:34:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:45:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/27 20:34:00 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/28 14:45:42 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -137,9 +137,14 @@ typedef struct syncq {
 	spinlock_t sq_lock;		/* spin lock for this structure */
 	int sq_count;			/* no of threads inside (negative for exclusive) */
 	struct task_struct *sq_owner;	/* exclusive owner */
+	int sq_nest;			/* lock nesting */
 	wait_queue_head_t sq_waitq;     /* qopen/qclose waiters */
-	struct strevent *sq_head;	/* head of event queue */
-	struct strevent **sq_tail;	/* tail of event queue */
+	struct strevent *sq_ehead;	/* head of event queue */
+	struct strevent **sq_etail;	/* tail of event queue */
+	queue_t *sq_qhead;		/* head of service queue */
+	queue_t **sq_qtail;		/* tail of service queue */
+	mblk_t *sq_mhead;		/* head of put queue */
+	mblk_t **sq_mtail;		/* tail of put queue */
 	struct syncq *sq_outer;		/* synch queue outside this one (if any) */
 	unsigned int sq_flag;		/* synch queue flags */
 	unsigned int sq_level;		/* synch queue level */
@@ -414,6 +419,8 @@ struct queinfo {
 #define qu_mod qu_u.fmod
 #define qu_dev qu_u.cdev
 #endif
+
+#define qstream(__q) (((struct queinfo *)RD((__q)))->qu_str)
 
 enum {
 	QU_MODULE_BIT,			/* queue pair is for module */

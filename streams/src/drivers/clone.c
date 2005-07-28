@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/26 12:50:47 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/26 12:50:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/26 12:50:47 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/26 12:50:47 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/26 12:50:47 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -317,9 +317,9 @@ register_clone(struct cdevsw *cdev)
 	cmin->n_str = cdev->d_str;
 	cmin->n_flag = clone_cdev.d_flag;
 	cmin->n_modid = cdev->d_modid;
-	cmin->n_count = ATOMIC_INIT(0);
+	cmin->n_count = (atomic_t) ATOMIC_INIT(0);
 	cmin->n_sqlvl = cdev->d_sqlvl;
-	cmin->n_kmod = cdev->n_kmod;
+	cmin->n_kmod = cdev->d_kmod;
 	cmin->n_major = clone_cdev.d_major;
 	cmin->n_mode = clone_cdev.d_mode;
 	cmin->n_minor = cdev->d_major;

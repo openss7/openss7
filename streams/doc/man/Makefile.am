@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/26 12:50:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/28 14:13:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/26 12:50:37 $ by $Author: brian $
+# Last Modified $Date: 2005/07/28 14:13:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1224,6 +1224,16 @@ man_MANS = \
 	man9/weld_fcn_t.9 \
 	man9/weldq.9 \
 	man9/xmsgsize.9 \
+	man9/bcangetany.9 \
+	man9/bcanputany.9 \
+	man9/bcanputnextany.9 \
+	man9/strioctl.9 \
+	man9/strpoll.9 \
+	man9/strread.9 \
+	man9/strreadv.9 \
+	man9/strsendpage.9 \
+	man9/strwrite.9 \
+	man9/strwritev.9 \
 	$(MANS_UNUSED) \
 	$(driver_pages) \
 	$(module_pages) \
@@ -2390,6 +2400,16 @@ dist_noinst_MANS = \
 	man9/weld_fcn_t.9.man \
 	man9/weldq.9.man \
 	man9/xmsgsize.9.man \
+	man9/bcangetany.9.man \
+	man9/bcanputany.9.man \
+	man9/bcanputnextany.9.man \
+	man9/strioctl.9.man \
+	man9/strpoll.9.man \
+	man9/strread.9.man \
+	man9/strreadv.9.man \
+	man9/strsendpage.9.man \
+	man9/strwrite.9.man \
+	man9/strwritev.9.man \
 	$(dist_noinst_driver_pages) \
 	$(dist_noinst_module_pages) \
 	$(dist_noinst_util_pages)

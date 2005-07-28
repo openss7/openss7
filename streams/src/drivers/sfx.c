@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/22 06:06:52 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/22 06:06:52 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/22 06:06:52 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/22 06:06:52 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -181,7 +181,7 @@ sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		dev_t dev = *devp;
 		struct stdata *sd;
 
-		if ((sd = ((struct queinfo *) q)->qu_str)) {
+		if ((sd = qstream(q))) {
 			struct cdevsw *sdev = sd->sd_cdevsw;
 
 			/* 1st step: attach the driver and call its open routine */

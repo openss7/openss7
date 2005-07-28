@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.45 2005/07/26 12:50:44 brian unstable $
+ @(#) $Id: stream.h,v 0.9.2.46 2005/07/28 14:13:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/26 12:50:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/28 14:13:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/26 12:50:44 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/28 14:13:48 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -341,11 +341,13 @@ enum {
 	QB_FULL_BIT,			/* band full flow control */
 	QB_WANTW_BIT,			/* back enable required */
 	QB_BACK_BIT,			/* UnixWare/Solaris/UXP/V */
+	QB_WANTR_BIT,			/* this is mine */
 };
 
 #define QB_FULL	    (1 << QB_FULL_BIT	)
 #define QB_WANTW    (1 << QB_WANTW_BIT	)
 #define QB_BACK	    (1 << QB_BACK_BIT	)	/* UnixWare/Solaris */
+#define QB_WANTR    (1 << QB_WANTR_BIT	)
 
 #define NBAND	    256		/* UnixWare/Solaris */
 
@@ -372,7 +374,6 @@ typedef struct queue {
 	unsigned char qpad1[2];		/* padding */
 	struct queue *q_other;		/* LiS, OSF */
 	/* Linux fast-STREAMS specific members */
-	struct msgb *q_pctl;		/* tail of queued QPCTL messages */
 	ssize_t q_msgs;			/* messages on queue */
 	rwlock_t q_rwlock;		/* lock for this queue structure */
 	unsigned long q_iflags;		/* interrupt flags for freeze */
@@ -907,12 +908,10 @@ extern bcid_t bufcall(unsigned size, int priority, void (*function) (long), long
 
 extern int adjmsg(mblk_t *mp, ssize_t length);
 extern int appq(queue_t *q, mblk_t *mp1, mblk_t *mp2);
-extern int bcanget(queue_t *q, int band);
-extern int bcanput(queue_t *q, int band);
-extern int bcanputnext(queue_t *q, int band);
-extern int canget(queue_t *q);
-extern int canput(queue_t *q);
-extern int canputnext(queue_t *q);
+extern int bcanget(queue_t *q, unsigned char band);
+extern int bcangetany(queue_t *q);
+extern int bcanput(queue_t *q, unsigned char band);
+extern int bcanputany(queue_t *q);
 extern int insq(queue_t *q, mblk_t *emp, mblk_t *mp);
 extern int pullupmsg(mblk_t *mp, ssize_t len);
 extern int putbq(queue_t *q, mblk_t *mp);
@@ -949,7 +948,6 @@ extern void flushq(queue_t *q, int flag);
 extern void freeb(mblk_t *bp);
 extern void freeq(queue_t *q);
 extern void put(queue_t *q, mblk_t *mp);
-extern void putnext(queue_t *q, mblk_t *mp);
 extern void qbackenable(queue_t *q);
 extern void qdelete(queue_t *rq);
 extern void qenable(queue_t *q);
@@ -964,6 +962,34 @@ extern void setqsched(void);
 /* Note: Solaris has a different prototype for these: see sunddi.h */
 extern unsigned long freezestr(queue_t *q);
 extern void unfreezestr(queue_t *q, unsigned long pl);
+
+__EXTERN_INLINE int
+bcanputnext(queue_t *q, unsigned char band)
+{
+	return bcanput(q->q_next, band);
+}
+
+__EXTERN_INLINE int
+bcanputnextany(queue_t *q)
+{
+	return bcanputany(q->q_next);
+}
+
+__EXTERN_INLINE int
+canget(queue_t *q)
+{
+	return bcanget(q, 0);
+}
+
+__EXTERN_INLINE int canput(queue_t *q)
+{
+	return bcanput(q, 0);
+}
+
+__EXTERN_INLINE int canputnext(queue_t *q)
+{
+	return canput(q->q_next);
+}
 
 __EXTERN_INLINE bcid_t
 esbbcall(int priority, void (*function) (long), long arg)
@@ -1074,6 +1100,12 @@ putctl2(queue_t *q, int type, int param1, int param2)
 		return (1);
 	}
 	return (0);
+}
+
+__EXTERN_INLINE void
+putnext(queue_t *q, mblk_t *mp)
+{
+	put(q->q_next, mp);
 }
 
 __EXTERN_INLINE int

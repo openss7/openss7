@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: enableq.9.man,v 0.9.2.7 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: enableq.9.man,v 0.9.2.8 2005/07/28 14:13:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/28 14:13:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -138,13 +138,14 @@ fails to schedule the queue service procedure, it returns false (0).
 .SH ERRORS
 .PP
 .BR enableq ()
-silently if the
+fails and returns false (0)
+if the
 .B QNOENB
 flag was set by
 .BR noenable (9)
 for the queue,
 .IR q ,
-or fi the queue has no service procedure
+or if the queue has no service procedure
 .RI ( q->q_info->qi_srvp
 is
 .BR NULL ).
