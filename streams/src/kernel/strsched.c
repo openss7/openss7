@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/29 05:11:24 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/29 12:58:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 05:11:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/29 05:11:24 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/29 12:58:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/29 05:11:24 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/29 12:58:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -713,7 +713,9 @@ queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 
 		bzero(qu, sizeof(*qu));
 		/* initialize queue locks */
+#if 0
 		qplockinit((queue_t *) qu);
+#endif
 		qlockinit(&qu->rq);
 		qlockinit(&qu->wq);
 		qu->rq.q_flag = QREADR;
@@ -1473,7 +1475,7 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  */
 static inline int
 __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
-	weld_arg_t arg, queue_t *protq)
+	  weld_arg_t arg, queue_t *protq)
 {
 	return ((defer_unweldq_event(q1, q2, q3, q4, func, arg, protq) != 0) ? 0 : EAGAIN);
 }
@@ -1763,6 +1765,7 @@ defer_syncq(struct syncq_cookie *sc, unsigned long *flagsp, int exclus)
 		add_wait_queue(&sq->sq_waitq, &wait);
 		for (;;) {
 			struct stdata *sd;
+
 			set_current_state(TASK_INTERRUPTIBLE);
 			sd = qstream(q);
 			if (!sd) {
@@ -1858,7 +1861,7 @@ defer_syncq(struct syncq_cookie *sc, unsigned long *flagsp, int exclus)
 static int
 find_syncq(struct syncq_cookie *sc)
 {
-	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & D_MTOUTPERIM)) {
+	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
 	}
@@ -1867,7 +1870,7 @@ find_syncq(struct syncq_cookie *sc)
 static int
 find_syncqs(struct syncq_cookie *sc)
 {
-	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & D_MTOUTPERIM)) {
+	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
 	}
@@ -1888,17 +1891,19 @@ enter_syncq_exclus(struct syncq_cookie *sc)
 	syncq_t *sq = sc->sc_sq;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	/* must defer if there is already a backlog :XXX */
-	if (sq->sq_link)
-		rval = defer_syncq(sc, &flags, 1);
-	else if (sq->sq_owner == current)
-		sq->sq_nest++;
-	else if (sq->sq_count == 0) {
-		sq->sq_owner = current;
-		--sq->sq_count;
-	} else
-		/* defer if we cannot acquire lock */
-		rval = defer_syncq(sc, &flags, 1);
+	if (!sq->sq_ehead && !sq->sq_qhead && !sq->sq_mhead) {
+		if (sq->sq_owner == current) {
+			sq->sq_nest++;
+			goto done;
+		} else if (sq->sq_count == 0) {
+			sq->sq_owner = current;
+			--sq->sq_count;
+			goto done;
+		}
+	}
+	/* defer if we cannot acquire lock, or if there is already a backlog */
+	rval = defer_syncq(sc, &flags, 1);
+      done:
 	spin_unlock_irqrestore(&sq->sq_lock, flags);
 	return (rval);
 }
@@ -1932,7 +1937,7 @@ enter_syncq_shared(struct syncq_cookie *sc)
 static int
 enter_outer_syncq_exclus(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -1940,11 +1945,12 @@ enter_outer_syncq_exclus(struct syncq_cookie *sc)
 		return enter_syncq_exclus(sc);
 	return (1);
 }
+
 #if 0
 static int
 enter_outer_syncq_shared(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -1956,7 +1962,7 @@ enter_outer_syncq_shared(struct syncq_cookie *sc)
 static int
 enter_inner_syncq_exclus(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -1972,11 +1978,12 @@ enter_inner_syncq_exclus(struct syncq_cookie *sc)
 	}
 	return (1);
 }
+
 #if 0
 static int
 enter_inner_syncq_shared(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -1996,7 +2003,7 @@ enter_inner_syncq_shared(struct syncq_cookie *sc)
 static int
 enter_inner_syncq_asputp(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -2008,7 +2015,7 @@ enter_inner_syncq_asputp(struct syncq_cookie *sc)
 				return (rval);
 		}
 		if ((sc->sc_sq = sc->sc_isq)) {
-			if (sc->sc_isq->sq_flag & D_MTPUTSHARED)
+			if (sc->sc_isq->sq_flag & SQ_SHARED)
 				return enter_syncq_shared(sc);
 			else
 				return enter_syncq_exclus(sc);
@@ -2019,13 +2026,13 @@ enter_inner_syncq_asputp(struct syncq_cookie *sc)
 static int
 enter_inner_syncq_asopen(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
 	if (find_syncqs(sc)) {
 		if ((sc->sc_sq = sc->sc_osq)) {
-			if (sc->sc_sq->sq_flag & D_MTOCEXCL)
+			if (sc->sc_sq->sq_flag & SQ_EXCLUS)
 				return enter_syncq_exclus(sc);
 			else {
 				int rval;
@@ -2045,7 +2052,7 @@ enter_syncq_writer(struct syncq_cookie *sc, void (*func) (queue_t *, mblk_t *), 
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -2067,7 +2074,7 @@ enter_inner_syncq_func(struct syncq_cookie *sc, void (*func) (void *, mblk_t *),
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -2083,7 +2090,7 @@ enter_inner_syncq_putp(struct syncq_cookie *sc)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -2097,7 +2104,7 @@ enter_inner_syncq_putp(struct syncq_cookie *sc)
 static int
 enter_inner_syncq_srvp(struct syncq_cookie *sc)
 {
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely(sc->sc_q->q_syncq == NULL))
 		return (1);
 
@@ -2125,33 +2132,12 @@ clear_backlog(syncq_t *sq, unsigned long *flagsp)
 	switch (current_context()) {
 	case CTX_PROC:
 	case CTX_ATOMIC:
-		break;
-	case CTX_INT:
-		set_bit(queueflag, &t->flags);
-		runsyncq(sq, flagsp);
-		clear_bit(queueflag, &t->flags);
-		break;
-	case CTX_STREAMS:
-		/* If we are already in STREAMS context, just process the backlog. */
-		runsyncq(sq, flagsp);
-		break;
-	case CTX_ISR:
-	/* If we are at hard irq context we do not want to process the backlog in hard interrupts,
-	   so we always schedule it for later backlog clearing by the STREAMS scheduler (or another 
-	   process that picks up its duties). */
-		sq->sq_nest = 0;
-		sq->sq_owner = NULL;
-		sq->sq_count = 0;
-		sqsched(sq);
-		break;
-	}
-	return;
-	/* If we are at process or at soft irq context and have not yet become one with the STREAMS 
-	   scheduler, then the queuerun flag will not be set.  If we are in STREAMS context, it
-	   will be set. */
 	{
 		struct strthread *t = this_thread;
 
+		/* If we are at process or at soft irq context and have not yet become one with the 
+		   STREAMS scheduler, then the queuerun flag will not be set.  If we are in STREAMS 
+		   context, it will be set. */
 		if (test_bit(queueflag, &t->flags)) {
 			local_bh_disable();
 			if (!test_and_set_bit(queueflag, &t->flags)) {
@@ -2163,7 +2149,32 @@ clear_backlog(syncq_t *sq, unsigned long *flagsp)
 			}
 			local_bh_enable();
 		}
+		break;
 	}
+	case CTX_INT:
+	{
+		struct strthread *t = this_thread;
+
+		set_bit(queueflag, &t->flags);
+		runsyncq(sq, flagsp);
+		clear_bit(queueflag, &t->flags);
+		break;
+	}
+	case CTX_STREAMS:
+		/* If we are already in STREAMS context, just process the backlog. */
+		runsyncq(sq, flagsp);
+		break;
+	case CTX_ISR:
+		/* If we are at hard irq context we do not want to process the backlog in hard
+		   interrupts, so we always schedule it for later backlog clearing by the STREAMS
+		   scheduler (or another process that picks up its duties). */
+		sq->sq_nest = 0;
+		sq->sq_owner = NULL;
+		sq->sq_count = 0;
+		sqsched(sq);
+		break;
+	}
+	return;
 }
 
 static void
@@ -2171,7 +2182,7 @@ leave_syncq(struct syncq_cookie *sc)
 {
 	syncq_t *sq;
 
-	/* fast path for D_MP modules */
+	/* fast path for MP modules */
 	if (likely((sq = sc->sc_sq) == NULL))
 		return;
 
@@ -2264,7 +2275,7 @@ qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
  *  @mp:	the message to pass to the put procedure
  *
  *  Put procedures enter the outer perimeter shared and the inner perimeter exclusive, unless the
- *  D_MTPUTSHARED flag is set, in which case they enter the inner perimeter shared. If the outer
+ *  %SQ_SHARED flag is set, in which case they enter the inner perimeter shared. If the outer
  *  perimeter does not exist, only the inner perimeter will be entered.  If the inner perimeter does
  *  not exist, the put procedure is executed without synchronization.  If the event cannot enter a
  *  perimeter (is blocked) it is deferred against the synchronization queue.  Put procedures always
@@ -2352,9 +2363,9 @@ qsrvp(queue_t *q)
  *  @sflag:	stream flag, can be %DRVOPEN, %MODOPEN, %CLONEOPEN
  *  @crp:	pointer to the opening task's credential structure
  *
- *  Note that if a syncrhonization queue exitsts and Solaris compatible flags D_MTOUTPERIM and
- *  D_MTOCEXCL are set in the outer perimeter syncrhonization queue, then we must either enter the
- *  outer perimeter exclusive, or block awaiting exclusive access to the outer perimeter.
+ *  Note that if a syncrhonization queue exists and the flags %SQ_OUTER and %SQ_EXCLUS are set in
+ *  the outer perimeter syncrhonization queue, then we must either enter the outer perimeter
+ *  exclusive, or block awaiting exclusive access to the outer perimeter.
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
@@ -2433,7 +2444,7 @@ EXPORT_SYMBOL(qclose);
  *  the MPS compatible mps_become_writer(9) function.
  */
 void
-__strwrit(queue_t *q, mblk_t *mp, void (*func)(queue_t *, mblk_t *), int perim)
+__strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 {
 	qstrwrit(q, mp, func, perim);
 }
@@ -2490,15 +2501,15 @@ sq_doput_synced(mblk_t *mp)
 {
 	struct mbinfo *m = (typeof(m)) mp;
 
-	if ((void *)m->m_func == (void *) &putp) {
+	if ((void *) m->m_func == (void *) &putp) {
 		/* deferred function is a qputp function */
 		(void) putp(m->m_queue, mp);
-	} else if ((void *)m->m_func == (void *) &strwrit) {
+	} else if ((void *) m->m_func == (void *) &strwrit) {
 		/* deferred function is a qstrwrit function */
 		strwrit(m->m_queue, mp, m->m_private);
 	} else {
 		/* deferred function is a qstrfunc function */
-		strfunc((void *)m->m_func, m->m_queue, mp, m->m_private);
+		strfunc((void *) m->m_func, m->m_queue, mp, m->m_private);
 	}
 }
 
@@ -2550,11 +2561,13 @@ do_bufcall_synced(struct strevent *se)
 	if (likely((func = se->x.b.func) != NULL)) {
 		struct strthread *t = this_thread;
 		queue_t *oldq;
-		unsigned long flags = 0;
+		unsigned long flags;
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 
 		if (unlikely(safe))
 			local_irq_save(flags);
+		else
+			flags = 0;
 		if (likely(q != NULL))
 			hrlock(q);
 		oldq = xchg(&t->currentq, qget(q));
@@ -2601,11 +2614,13 @@ do_timeout_synced(struct strevent *se)
 	if (likely((func = se->x.t.func) != NULL)) {
 		struct strthread *t = this_thread;
 		queue_t *oldq;
-		unsigned long flags = 0;
+		unsigned long flags;
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
 
 		if (unlikely(safe))
 			local_irq_save(flags);
+		else
+			flags = 0;
 		if (likely(q != NULL))
 			hrlock(q);
 		oldq = xchg(&t->currentq, qget(q));
@@ -3557,6 +3572,16 @@ str_term_caches(void)
 
 /*
  *  str_init_caches:	- initialize caches
+ *
+ *  STREAMS scheduler cache initialization function.  We have ten or eleven memory caches that we
+ *  use to allocate various fixed size structures.  They are:
+ *
+ *  %DYN_STREAM - stream head memory cache.
+ *
+ *  %DYN_QUEUE - queue pair memory cache.
+ *
+ *  %DYN_MSGBLOCK - 
+ *
  */
 static int
 str_init_caches(void)
@@ -3590,6 +3615,14 @@ str_init_caches(void)
 
 #ifndef open_softirq
 #ifdef HAVE_OPEN_SOFTIRQ_ADDR
+/**
+ *  open_softirq:   - open a soft irq kernel function
+ *  @action:	    the function to invoke
+ *  @data:	    private data (not used)
+ *
+ *  This function is used when the kernel does not export the open_softirq() kernel function.  We
+ *  hook this function to the address ripped from the kernel symbol table.
+ */
 void
 open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
@@ -3602,6 +3635,9 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 
 /**
  *  strsched_init:  - initialize the STREAMS scheduler
+ *
+ *  This is an initialization function for STREAMS scheduler items in this file.  It is invoked by
+ *  the STREAMS kernel module or kernel initialization function.
  */
 int
 strsched_init(void)
@@ -3635,6 +3671,12 @@ strsched_init(void)
 	return (0);
 }
 
+/**
+ *  strsched_exit:  - tear down the STREAMS scheduler
+ *
+ *  This is a termination function for the STREAMS scheduler items in this file.  It is invoked by
+ *  the STREAMS kernel module or kernel termination function.
+ */
 void
 strsched_exit(void)
 {

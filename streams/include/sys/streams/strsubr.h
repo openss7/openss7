@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.36 2005/07/28 14:45:42 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.37 2005/07/29 12:58:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:45:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/28 14:45:42 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/07/29 12:58:39 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -153,6 +153,24 @@ typedef struct syncq {
 	struct syncq *sq_next;		/* list of all structures */
 	struct syncq *sq_prev;		/* list of all structures */
 } syncq_t;
+
+/* we _really_ need our own flags here... */
+enum {
+	SQ_OUTER_BIT,
+	SQ_INNER_BIT,
+	SQ_EXCLUS_BIT,
+	SQ_SHARED_BIT,
+	SQ_WAITERS_BIT,
+	SQ_BACKLOG_BIT,
+	SQ_SCHED_BIT,
+};
+#define SQ_OUTER	(1<<SQ_OUTER_BIT)	/* this is an outer barrier (for Solaris compat) */
+#define SQ_INNER	(1<<SQ_INNER_BIT)	/* this is an inner barrier */
+#define SQ_EXCLUS	(1<<SQ_EXCLUS_BIT)	/* qopen/qclose excl at outer barrier */
+#define SQ_SHARED	(1<<SQ_SHARED_BIT)	/* put shared at the inner barrier */
+#define SQ_WAITERS	(1<<SQ_WAITERS_BIT)	/* this syncq has waiters */
+#define SQ_BACKLOG	(1<<SQ_BACKLOG_BIT)	/* this syncq has a backlog left by non-waiters */
+#define SQ_SCHED	(1<<SQ_SCHED_BIT)	/* this syncq is scheduled for backlog clearing */
 #endif
 
 /* stream head private structure */
@@ -191,9 +209,7 @@ struct stdata {
 //      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
 //      ulong sd_rtime;                 /* time to forward held message */
-	rwlock_t sd_qlock;		/* lock for queues under this stream */
-	struct task_struct *sd_owner;	/* exclusive lock owner */
-	int sd_nest;			/* lock nesting */
+	klock_t sd_klock;		/* lock for queues under this stream */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */
 //      struct semaphore sd_mutex;      /* mutex for system calls */
@@ -409,9 +425,9 @@ struct queinfo {
 #endif
 	atomic_t qu_refs;		/* references to this structure */
 	wait_queue_head_t qu_qwait;	/* wait queue for qwait */
-	rwlock_t qu_lock;		/* procs lock */
-	struct task_struct *qu_owner;	/* exclusive locker */
-	uint qu_nest;			/* exclusive lock nest */
+#if 0
+	klock_t qu_klock;		/* lock for this queue pair */
+#endif
 	struct list_head qu_list;
 };
 

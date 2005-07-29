@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.11 2005/07/18 12:06:58 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.12 2005/07/29 12:58:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DKI_H__
 #define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/29 12:58:39 $"
 
 #ifndef __SYS_DKI_H__
 #warn "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
@@ -102,5 +102,13 @@ typedef struct lis_cred {
 	(((__f)->f_flags & ~O_ACCMODE) | \
 	 ((__f)->f_mode & O_ACCMODE) | \
 	 ((__f)->f_flags & FNDELAY ? (O_NONBLOCK | O_NDELAY) : 0))
+
+typedef struct klock {
+	unsigned long kl_isrflags;
+	rwlock_t kl_lock;
+	struct task_struct *kl_owner;
+	uint kl_nest;
+	wait_queue_head_t kl_waitq;
+} klock_t;
 
 #endif				/* __SYS_STREAMS_DKI_H__ */

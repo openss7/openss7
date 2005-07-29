@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdevsw.9.man,v 0.9.2.10 2005/05/14 08:34:21 brian Exp $
+.\" @(#) $Id: cdevsw.9.man,v 0.9.2.11 2005/07/29 12:58:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/29 12:58:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -87,17 +87,25 @@ structure is formatted as follows:
 .nf
 \fC\s-2
 struct cdevsw {
+        struct list_head d_list;        /* list of all structures */
+        struct list_head d_hash;        /* list of module hashes in slot */
         const char *d_name;             /* driver name */
         struct streamtab *d_str;        /* pointer to streamtab for driver */
-        ushort d_flag;                  /* driver flags */
+        uint d_flag;                    /* driver flags */
+        uint d_modid;                   /* driver moidule id */
+        atomic_t d_count;               /* open count */
+        int d_sqlvl;                    /* q sychronization level */
+        struct syncq *d_syncq;          /* synchronization queue */
         struct module *d_kmod;          /* kernel module */
-        ushort d_count;                 /* open count */
-        ushort d_regs;                  /* registration count */
-        struct list_head d_list;        /* list of all structures */
-        struct file_operations *d_fop;  /* file operations */
+        int d_major;                    /* base major device number */
+        struct inode *d_inode;          /* specfs inode */
         mode_t d_mode;                  /* inode mode */
+        struct file_operations *d_fop;  /* file operations */
+        struct list_head d_majors;      /* major device nodes for this device */
+        struct list_head d_minors;      /* minor device nodes for this device */
         struct list_head d_apush;       /* autopush list */
         struct stdata *d_plinks;        /* permanent links for this device */
+        struct list_head d_stlist;      /* stream head list for this device */
 };
 \s+2\fP
 .fi
@@ -108,7 +116,11 @@ struct cdevsw {
 The
 .B cdevsw
 structure contains the following members:
-.TP \w'\ d_plinks\ 'u
+.TP \w'\ d_majors\ 'u
+.I d_list
+.TP
+.I d_hash
+.TP
 .I d_name
 .TP
 .I d_str
@@ -131,6 +143,37 @@ See
 .IR \*(lqFlags\*(rq ,
 below.
 .TP
+.I d_modid
+.TP
+.I d_count
+The number of opens of this driver.  This value must be set to zero before
+registration.
+.TP
+.I d_sqlvl
+Synchronization queue level, can be one of the following:
+.RS
+.TP
+.B SQLVL_DEFAULT
+.PD 0
+.TP
+.B SQLVL_GLOBAL
+.TP
+.B SQLVL_ELSEWHERE
+.TP
+.B SQLVL_MODULE
+.TP
+.B SQLVL_QUEUEPAIR
+.TP
+.B SQLVL_QUEUE
+.TP
+.B SQLVL_NOP
+.TP
+.B SQLVL_PERSTREAM
+.PD
+.RE
+.TP
+.I d_syncq
+.TP
 .I d_kmod
 The loadable kernel module (see
 .BR kmod (9))
@@ -145,79 +188,96 @@ when the reference to the
 .BR cdevsw (9)
 structure is released.
 .TP
-.I d_count
-The number of opens of this driver.  This value must be set to zero before
-registration.
+.I d_major
 .TP
-.I d_regs
-The number of times this driver has been registered.  This value must be set
-to zero before registration.
+.I d_inode
 .TP
-.I d_list
+.I d_mode
 .TP
 .I d_fop
 .TP
-.I d_mode
+.I d_majors
+.TP
+.I d_minors
 .TP
 .I d_apush
 .TP
 .I d_plinks
+.TP
+.I d_stlist
 .\"
 .\"
 .SS Flags
 .PP
-.TP \w'\ D_MTOUTEPERIM\ 'u
+.TP \w'\ D_MTOUTPERIM\ 'u
 .B D_REOPEN
+The driver or module can return a device number other than its own and the stream head must reopen
+that device number.
 .TP
 .B D_CLONE
+The driver is a clone driver.  (The driver will always get a new and unique stream head on each
+open.)
 .TP
 .B D_FIFO
+The driver is a
+.BR fifo (4)
+driver.
 .TP
 .B D_PIPE
+The driver is a
+.BR pipe (4)
+driver.
 .TP
 .B D_SOCK
+The driver is a
+.BR sock (4)
+driver.
 .TP
 .B D_LIS
+Attempt to be LiS compatible with this module.
 .TP
 .B D_HEAD
+The driver is a stream head.
 .TP
 .B D_NSDEV
+The driver is a Named STREAMS device.  (This is similar to a clone driver in that the driver will
+always get a new and unique stream head on each open.)
 .PP
 The following flags are provided for
 .IR Solaris \(rg
 compatibility:
-.TP \w'\ D_MTOUTEPERIM\ 'u
+.TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MP
-specifies that the driver is MT-SAFE.
+specifies that the driver is MP-SAFE.
 .PP
 The following inner perimeter flags are provided for
 .IR Solaris \(rg
 compatibility:
-.TP \w'\ D_MTOUTEPERIM\ 'u
+.TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MTPERMOD
 specifies that an inner perimeter exists and that the inner perimeter encircles all queue pairs in the
 module.
 Only one of
 .BR D_MTPERMOD ,
-.BR D_MTAPAIR " and " M_MTPERQ
+.BR D_MTQPAIR " and " M_MTPERQ
 may be set.
 Only one of
-.BR D_MTPERMOD " and " D_MTOUTEPERIM
+.BR D_MTPERMOD " and " D_MTOUTPERIM
 may be set.
 .TP
-.B D_MTAPAIR
+.B D_MTWPAIR
 specifies that an inner perimeter exists and that the inner perimeter encircles each queue pair in the
 module.
 Only one of
 .BR D_MTPERMOD ,
-.BR D_MTAPAIR " and " M_MTPERQ
+.BR D_MTWPAIR " and " M_MTPERQ
 may be set.
 .TP
 .B D_MTPERQ
 specifies that an inner perimeter exists and that the inner perimeter encircles each queue in the module.
 Only one of
 .BR D_MTPERMOD ,
-.BR D_MTAPAIR " and " M_MTPERQ
+.BR D_MTWPAIR " and " M_MTPERQ
 may be set.
 .TP
 .B D_MTPUTSHARED
@@ -232,11 +292,11 @@ are set (i.e. there is no inner perimeter).
 .PP
 The following outer perimeter flags are provided for
 .IR Solaris \(rg:
-.TP \w'\ D_MTOUTEPERIM\ 'u
-.B D_MTOUTEPERIM
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_MTOUTPERIM
 specifies that an outer perimeter exists and that the outer perimeter encircles all queue pairs in the module.
 Only one of
-.BR D_MTPERMOD " and " D_MTOUTEPERIM
+.BR D_MTPERMOD " and " D_MTOUTPERIM
 may be set.
 .TP
 .B D_MTOCEXCL
@@ -245,10 +305,32 @@ specifies that the
 and
 .BR qclose (9)
 procedures will enter the outer perimeter (if it exists) exclusive instead of
-(the default) shared.
+(the default) entering the outer perimeter shared and the inner perimeter exclusive.
 This flag has no effect if
 .B D_MTOTEPERIM
 is not set (i.e. there is no outer perimeter).
+.PP
+THe following flags are provided for
+.IR AIX \(rg
+compatibility:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_SAFE
+The module requires safe (interrupts disabled) callbacks.
+.TP
+.B D_UP
+Per-stream synchronization for uni-processor emulation.
+.PP
+THe following flags are provided for
+.IR OSF \(rg
+compatibility:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_64BIT
+The module handles 64-bit offsets.
+.TP
+.B D_NEW
+The module has an SVR4 prototype qopen and qclose procedure instead of SVR3 ones.
+
+
 .\"
 .\"
 .SH DESCRIPTION

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.46 2005/07/28 14:13:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.47 2005/07/29 12:58:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/28 14:13:48 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/29 12:58:39 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -375,10 +375,7 @@ typedef struct queue {
 	struct queue *q_other;		/* LiS, OSF */
 	/* Linux fast-STREAMS specific members */
 	ssize_t q_msgs;			/* messages on queue */
-	rwlock_t q_rwlock;		/* lock for this queue structure */
-	unsigned long q_iflags;		/* interrupt flags for freeze */
-	struct task_struct *q_owner;	/* owner of the exclusive lock */
-	int q_nest;			/* lock nesting */
+	klock_t q_klock;		/* lock for this queue structure */
 	int (*q_ftmsg) (mblk_t *);	/* message filter */
 #if 0
 	/* Solaris has these specific fields following q_bandp */

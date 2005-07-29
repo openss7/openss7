@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/29 05:11:24 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 05:11:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/29 05:11:24 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/29 05:11:24 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/07/29 05:11:24 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -575,7 +575,7 @@ strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
  *  other drivers may or may not take action and then free the message."
  */
 static mblk_t *
-strgetq(struct stdata *sd, int flags, int band, unsigned long len, unsigned long *flagsp)
+strgetq(struct stdata *sd, int flags, int band, unsigned long len)
 {
 	mblk_t *mp = NULL;
 
@@ -589,25 +589,26 @@ strgetq(struct stdata *sd, int flags, int band, unsigned long len, unsigned long
 		} else if ((mp = getq(sd->sd_rq))) {
 			/* process signals now */
 			if (unlikely(mp->b_datap->db_type == M_SIG)) {
-				qwunlock_irqrestore(sd->sd_wq, flagsp);
+				qwunlock(sd->sd_wq);
 				if (mp->b_rptr[0] == SIGPOLL)
 					kill_fasync(&sd->sd_siglist, SIGPOLL, POLL_MSG);
 				/* otherwise we would send the signal if it were a control
 				   terminal; however, streams devices are never control terminals
 				   in Linux */
 				freemsg(mp);
-				qwlock_irqsave(sd->sd_wq, flagsp);
-				goto get_another;
-			}
-			if ((flags != MSG_HIPRI || mp->b_datap->db_type != M_PCPROTO)
-			    && (flags != MSG_ANY || mp->b_datap->db_type == M_PASSFP)
-			    && (!((1 << mp->b_datap->db_type) & ((1 << M_PROTO) | (1 << M_DATA)))
-				|| mp->b_band < band)) {
+				if (qwlock_wait_sig(sd->sd_wq) == 0)
+					goto get_another;
+				mp = ERR_PTR(-ERESTARTSYS);
+			} else if ((flags != MSG_HIPRI || mp->b_datap->db_type != M_PCPROTO)
+				   && (flags != MSG_ANY || mp->b_datap->db_type == M_PASSFP)
+				   && (!((1 << mp->b_datap->db_type)
+					 & ((1 << M_PROTO) | (1 << M_DATA)))
+				       || mp->b_band < band)) {
 				putbq(sd->sd_rq, mp);
 				mp = ERR_PTR(-EBADMSG);
 			}
 		} else if (test_bit(SNDMREAD_BIT, &sd->sd_flag)) {
-			qwunlock_irqrestore(sd->sd_wq, flagsp);
+			qwunlock(sd->sd_wq);
 			if (len) {
 				mblk_t *mr;
 
@@ -619,7 +620,8 @@ strgetq(struct stdata *sd, int flags, int band, unsigned long len, unsigned long
 				} else
 					mp = ERR_PTR(-ENOSR);
 			}
-			qwlock_irqsave(sd->sd_wq, flagsp);
+			/* XXX: can we sleep on this lock? */
+			qwlock(sd->sd_wq);
 		}
 	}
 	return (mp);
@@ -633,11 +635,10 @@ strgetq(struct stdata *sd, int flags, int band, unsigned long len, unsigned long
  *  @band: priority band from which to get message
  *  @flagsp: pointer to saved irq flags.
  *
- *  LOCKING: This function must be called wtih the queue write locked and irq flags saved in flagsp.
+ *  LOCKING: This function must be called wtih the queue write locked.
  */
 static mblk_t *
-strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned long len,
-	    unsigned long *flagsp)
+strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned long len)
 {
 	mblk_t *mp;
 
@@ -647,7 +648,7 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned 
 	/* also we must make an attempt before returning ENXIO, EPIPE or rderror */
 	/* also we need to trigger QWANTR bit and empty queue backenabling */
 	/* also we need to trigger M_READ messages */
-	if ((mp = strgetq(sd, flags, band, len, flagsp)))
+	if ((mp = strgetq(sd, flags, band, len)))
 		return (mp);
 	/* only here it there's nothing left on the queue */
 	{
@@ -660,11 +661,12 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned 
 			set_bit(RSLEEP_BIT, &sd->sd_flag);
 			if (IS_ERR(mp = ERR_PTR(check_wakeup_rd(file, sd, &timeo))))
 				break;
-			if ((mp = strgetq(sd, flags, band, 0, flagsp)))
+			if ((mp = strgetq(sd, flags, band, 0)))
 				break;
-			qwunlock_irqrestore(sd->sd_wq, flagsp);
+			qwunlock(sd->sd_wq);
 			timeo = schedule_timeout(timeo);
-			qwlock_irqsave(sd->sd_wq, flagsp);
+			/* FIXME: can sleep on lock... */
+			qwlock(sd->sd_wq);
 		}
 		set_current_state(TASK_RUNNING);
 		remove_wait_queue(&sd->sd_waitq, &wait);
@@ -1102,14 +1104,14 @@ str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 	err = -EFAULT;
 	if (strnlen_user(name, FMNAMESZ + 1)) {
 		err = 0;
-		srlock_bh(sd);
+		srlock(sd);
 		for (wq = sd->sd_wq; wq; wq = SAMESTR(wq) ? wq->q_next : NULL) {
 			const char *idname = wq->q_qinfo->qi_minfo->mi_idname;
 
 			if (!strncmp(idname, name, FMNAMESZ))
 				err = 1;
 		}
-		srunlock_bh(sd);
+		srunlock(sd);
 	}
 	return (err);
 }
@@ -1700,7 +1702,7 @@ str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, FMNAMESZ + 1)))
 		goto exit;
-	srlock_bh(sd);
+	srlock(sd);
 	err = -EINVAL;
 	if (sd->sd_pushcnt <= 0)
 		goto unlock_exit;
@@ -1709,13 +1711,13 @@ str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 	if (!(q = sd->sd_wq->q_next) || !SAMESTR(sd->sd_wq))
 		goto unlock_exit;
 	snprintf(fmname, FMNAMESZ + 1, q->q_qinfo->qi_minfo->mi_idname);
-	srunlock_bh(sd);
+	srunlock(sd);
 	err = -EFAULT;
 	if (__copy_to_user(valp, fmname, FMNAMESZ + 1))
 		return (err);
 	return (0);
       unlock_exit:
-	srunlock_bh(sd);
+	srunlock(sd);
       exit:
 	return (err);
 }
@@ -1928,7 +1930,7 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	trace();
 	if (!(f2 = fget(arg)))
 		goto ebadf;
-	srlock_bh(sd);
+	srlock(sd);
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
 	rq = sd->sd_other->sd_rq;
@@ -1943,7 +1945,7 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	mp->b_datap->db_type = M_PASSFP;
 	mp->b_wptr += sizeof(*f2);
 	putq(rq, mp);
-	srunlock_bh(sd);
+	srunlock(sd);
 	return (0);
       enosr:
 	err = (-ENOSR);
@@ -1952,7 +1954,7 @@ str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	err = (-EAGAIN);
       error:
 	fput(f2);
-	srunlock_bh(sd);
+	srunlock(sd);
 	return (err);
       ebadf:
 	return (-EBADF);
@@ -1980,7 +1982,6 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	mblk_t *mp;
 	int fd, err;
 	struct file *f2;
-	unsigned long flags;
 
 	trace();
 	if (!valp)
@@ -1993,7 +1994,8 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	if ((err = fd = get_unused_fd()) < 0)
 		goto error;
 	/* protect atomicity of STRPRI bit, getq() and putbq() operations */
-	qwlock_irqsave(sd->sd_rq, &flags);
+	if (qwlock_wait_sig(sd->sd_rq) != 0)
+		goto erestartsys;
 	if (test_bit(STRPRI_BIT, &sd->sd_flag))
 		goto pri_msg;
 	if ((mp = getq(sd->sd_rq)) == NULL)
@@ -2010,7 +2012,7 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
 	sr.gid = f2->f_gid;
 	if (__copy_to_user(valp, &sr, sizeof(sr)))
 		goto efault;
-	qwunlock_irqrestore(sd->sd_rq, &flags);
+	qwunlock(sd->sd_rq);
 	freemsg(mp);
 	return (0);
       efault:
@@ -2022,6 +2024,9 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
       eagain:
 	err = (-EAGAIN);
 	goto unlock_error;
+      erestartsys:
+	err = (-ERESTARTSYS);
+	goto unlock_error;
       pri_msg:
 	err = (-EBADMSG);
 	goto unlock_error;
@@ -2031,7 +2036,7 @@ str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned lo
       putbq_error:
 	putbq(sd->sd_rq, mp);
       unlock_error:
-	qwunlock_irqrestore(sd->sd_rq, &flags);
+	qwunlock(sd->sd_rq);
 	put_unused_fd(fd);
       error:
 	return (err);
@@ -2599,7 +2604,6 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long segs, loff_t 
 	size_t total = 0;
 	mblk_t *mp;
 	int err, i;
-	unsigned long flags;
 	unsigned long len;
 
 	if (ppos != &file->f_pos)
@@ -2628,9 +2632,12 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long segs, loff_t 
 			return (-ENOSR);
 #endif
 	/* Protect atomicity of STRPRI, strwaitgmsg() and putbq() operation */
-	qwlock_irqsave(q, &flags);
+	if (unlikely(qwlock_wait_sig(q) != 0)) {
+		err = -ERESTARTSYS;
+		return (err);
+	}
 	for (;;) {
-		if (IS_ERR(mp = strwaitgmsg(file, sd, MSG_BAND, 0, len, &flags))) {
+		if (IS_ERR(mp = strwaitgmsg(file, sd, MSG_BAND, 0, len))) {
 			if (PTR_ERR(mp) == -EAGAIN && test_bit(STRNDEL_BIT, &sd->sd_flag))
 				mp = NULL;
 			break;
@@ -2747,7 +2754,7 @@ strreadv(struct file *file, const struct iovec *iov, unsigned long segs, loff_t 
 		}
 		break;
 	}
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	if (total == 0 && IS_ERR(mp))
 		total = PTR_ERR(mp);
 	/* We really only need to do a runqueues() if a M_READ message has been generated
@@ -3008,7 +3015,7 @@ strwaitpage(struct file *file, size_t size, int prio, int band, int type,
 
 	if (unlikely(size > sysctl_str_strmsgsz))
 		return ERR_PTR(-ERANGE);
-	srlock_bh(sd);
+	srlock(sd);
 	wq = sd->sd_wq->q_next;
 	if (type == M_DATA && (wq->q_minpsz > size || size > wq->q_maxpsz))
 		return ERR_PTR(-ERANGE);
@@ -3016,28 +3023,28 @@ strwaitpage(struct file *file, size_t size, int prio, int band, int type,
 		/* wait for band to become available */
 		DECLARE_WAITQUEUE(wait, current);
 		add_wait_queue(&sd->sd_waitq, &wait);
-		srunlock_bh(sd);
+		srunlock(sd);
 		for (;;) {
 			set_bit(WSLEEP_BIT, &sd->sd_flag);
 			if (IS_ERR(mp = ERR_PTR(check_wakeup_wr(file, sd, timeo))))
 				break;
 			mp = ERR_PTR(-EIO);
-			srlock_bh(sd);
+			srlock(sd);
 			if (!(wq = sd->sd_wq->q_next)) {
-				srunlock_bh(sd);
+				srunlock(sd);
 				break;
 			}
 			mp = ERR_PTR(-ERANGE);
 			if (type == M_DATA && (wq->q_minpsz > size || size > wq->q_maxpsz)) {
-				srunlock_bh(sd);
+				srunlock(sd);
 				break;
 			}
 			mp = NULL;
 			if (bcanput(wq, band)) {
-				srunlock_bh(sd);
+				srunlock(sd);
 				break;
 			}
-			srunlock_bh(sd);
+			srunlock(sd);
 			set_current_state(TASK_INTERRUPTIBLE);
 			*timeo = schedule_timeout(*timeo);
 			set_current_state(TASK_RUNNING);
@@ -3046,7 +3053,7 @@ strwaitpage(struct file *file, size_t size, int prio, int band, int type,
 		if (IS_ERR(mp))
 			return (mp);
 	} else
-		srunlock_bh(sd);
+		srunlock(sd);
 	if ((mp = esballoc(base, size, prio, frtn))) {
 		mp->b_datap->db_type = type;
 		mp->b_band = (band == -1) ? 0 : band;
@@ -3279,14 +3286,14 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 		}
 	}
 	if (!IS_ERR(dp = ERR_PTR(check_stream_rd(file, sd)))) {
-		unsigned long flags;
 		unsigned long len;
 
 		len = datp ? ((datp->maxlen > 0) ? datp->maxlen : 0) : 0;
 		/* Protect taking the message off the queue, reading some of it, and the placing
 		   the remainder back onto the queue. */
-		qwlock_irqsave(sd->sd_rq, &flags);
-		if (!IS_ERR(dp = strwaitgmsg(file, sd, *flagsp, bandp ? *bandp : 0, len, &flags))) {
+		if (unlikely(qwlock_wait_sig(sd->sd_rq) != 0))
+			return (-ERESTARTSYS);
+		if (!IS_ERR(dp = strwaitgmsg(file, sd, *flagsp, bandp ? *bandp : 0, len))) {
 			int rval = 0;
 			ssize_t blen;
 			ssize_t clen = ctlp ? ctlp->maxlen : -1;
@@ -3358,7 +3365,7 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 			}
 		} else if (PTR_ERR(dp) == -EAGAIN && test_bit(STRNDEL_BIT, &sd->sd_flag))
 			dp = NULL;
-		qwunlock_irqrestore(sd->sd_rq, &flags);
+		qwunlock(sd->sd_rq);
 	}
 	if (PTR_ERR(dp) == -ENXIO) {
 		/* end of file on hangup */
@@ -3766,16 +3773,14 @@ strrput(queue_t *q, mblk_t *mp)
 	switch ((msg_type_t) mp->b_datap->db_type) {
 	case M_PCPROTO:	/* bi - protocol info */
 	{
-		unsigned long flags;
-
 		/* protect atomicity of STRPRI bit and putq() */
-		qwlock_irqsave(q, &flags);
+		qwlock(q);
 		if (test_bit(STRPRI_BIT, &sd->sd_flag)) {
 			freemsg(mp);
-			qwunlock_irqrestore(q, &flags);
+			qwunlock(q);
 		} else {
 			putq(q, mp);
-			qwunlock_irqrestore(q, &flags);
+			qwunlock(q);
 			if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
 				wake_up_interruptible(&sd->sd_waitq);
 			if (test_bit(S_HIPRI_BIT, &sd->sd_sigflags))

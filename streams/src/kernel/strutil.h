@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/28 14:13:56 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/29 12:58:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:56 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -60,457 +60,6 @@ extern int __rmvq(queue_t *q, mblk_t *mp);
 extern int __flushq(queue_t *q, int flag, mblk_t ***mppp);
 
 /* common inlines */
-
-/* queue structure read/write locks */
-static __inline__ void
-qrlock(queue_t *q)
-{
-	if (q->q_owner == current)
-		q->q_nest++;
-	else
-		read_lock(&q->q_rwlock);
-	return;
-}
-static __inline__ void
-qrunlock(queue_t *q)
-{
-	if (q->q_owner == current)
-		q->q_nest--;
-	else
-		read_unlock(&q->q_rwlock);
-	return;
-}
-static __inline__ void
-qrlock_irqsave(queue_t *q, ulong *flagsp)
-{
-	if (flagsp)
-		local_irq_save(*flagsp);
-	if (q->q_owner == current)
-		q->q_nest++;
-	else
-		read_lock(&q->q_rwlock);
-	return;
-}
-static __inline__ void
-qrunlock_irqrestore(queue_t *q, ulong *flagsp)
-{
-	if (q->q_owner == current)
-		q->q_nest--;
-	else
-		read_unlock(&q->q_rwlock);
-	if (flagsp)
-		local_irq_restore(*flagsp);
-	return;
-}
-static __inline__ void
-qrlock_bh(queue_t *q)
-{
-	if (q->q_owner == current)
-		q->q_nest++;
-	else
-		read_lock_bh(&q->q_rwlock);
-	return;
-}
-static __inline__ void
-qrunlock_bh(queue_t *q)
-{
-	if (q->q_owner == current)
-		q->q_nest--;
-	else
-		read_unlock_bh(&q->q_rwlock);
-	return;
-}
-static __inline__ void
-qwlock(queue_t *q)
-{
-	if (q->q_owner == current)
-		q->q_nest++;
-	else {
-		write_lock(&q->q_rwlock);
-		q->q_owner = current;
-		q->q_nest = 0;
-	}
-	return;
-}
-static __inline__ void
-qwunlock(queue_t *q)
-{
-	if (q->q_owner == current) {
-		if (q->q_nest > 0)
-			q->q_nest--;
-		else {
-			q->q_owner = NULL;
-			q->q_nest = 0;
-			write_unlock(&q->q_rwlock);
-		}
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-qwlock_irqsave(queue_t *q, ulong *flagsp)
-{
-	if (flagsp)
-		local_irq_save(*flagsp);
-	if (q->q_owner == current)
-		q->q_nest++;
-	else {
-		write_lock(&q->q_rwlock);
-		q->q_owner = current;
-		q->q_nest = 0;
-	}
-	return;
-}
-static __inline__ void
-qwunlock_irqrestore(queue_t *q, ulong *flagsp)
-{
-	if (q->q_owner == current) {
-		if (q->q_nest > 0)
-			q->q_nest--;
-		else {
-			q->q_owner = NULL;
-			q->q_nest = 0;
-			write_unlock(&q->q_rwlock);
-		}
-		if (flagsp)
-			local_irq_restore(*flagsp);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-qwlock_bh(queue_t *q)
-{
-	if (q->q_owner == current)
-		q->q_nest++;
-	else {
-		write_lock_bh(&q->q_rwlock);
-		q->q_owner = current;
-		q->q_nest = 0;
-	}
-	return;
-}
-static __inline__ void
-qwunlock_bh(queue_t *q)
-{
-	if (q->q_owner == current) {
-		if (q->q_nest > 0)
-			q->q_nest--;
-		else {
-			q->q_owner = NULL;
-			q->q_nest = 0;
-			write_unlock_bh(&q->q_rwlock);
-		}
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-qlockinit(queue_t *q)
-{
-	q->q_owner = NULL;
-	q->q_nest = 0;
-	rwlock_init(&q->q_rwlock);
-}
-
-/* queue pair nesting read/write locks */
-static __inline__ void
-qprlock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current)
-		qu->qu_nest++;
-	else
-		read_lock(&qu->qu_lock);
-	return;
-}
-static __inline__ void
-qprunlock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current)
-		qu->qu_nest--;
-	else
-		read_unlock(&qu->qu_lock);
-	return;
-}
-static __inline__ int
-qprtrylock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current)
-		qu->qu_nest++;
-	else {
-#if CONFIG_SMP && HAVE_READ_TRYLOCK
-		return read_trylock(&qu->qu_lock);
-#else
-		read_lock(&qu->qu_lock);
-#endif
-
-	}
-	return (1);
-}
-static __inline__ void
-qpwlock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current)
-		qu->qu_nest++;
-	else {
-		write_lock(&qu->qu_lock);
-		qu->qu_nest = 0;
-		qu->qu_owner = current;
-	}
-	return;
-}
-static __inline__ void
-qpwunlock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current) {
-		if (qu->qu_nest > 0)
-			qu->qu_nest--;
-		else {
-			qu->qu_owner = NULL;
-			qu->qu_nest = 0;
-			write_unlock(&qu->qu_lock);
-		}
-		return;
-	}
-	swerr();
-}
-static __inline__ int
-qpwtrylock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-	int result = 1;
-
-	if (qu->qu_owner == current)
-		qu->qu_nest++;
-	else if ((result = write_trylock(&qu->qu_lock))) {
-		qu->qu_nest = 0;
-		qu->qu_owner = current;
-	}
-	return (result);
-}
-static __inline__ void
-qplockinit(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	qu->qu_owner = NULL;
-	qu->qu_nest = 0;
-	rwlock_init(&qu->qu_lock);
-}
-
-#if 0
-static __inline__ void
-qpupgrade(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current) {
-		return;
-	}
-	read_unlock(&qu->qu_lock);
-	/* this is not a fully atomic upgrade - but that's ok too */
-	write_lock(&qu->qu_lock);
-	qu->qu_nest = 0;
-	qu->qu_owner = current;
-}
-#endif
-
-/* stream head wread/write locks */
-static __inline__ void
-srlock(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			sd->sd_nest++;
-		else
-			read_lock(&sd->sd_qlock);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-srunlock(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			sd->sd_nest--;
-		else
-			read_unlock(&sd->sd_qlock);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-srlock_bh(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			sd->sd_nest++;
-		else
-			read_lock_bh(&sd->sd_qlock);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-srunlock_bh(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			sd->sd_nest--;
-		else
-			read_unlock_bh(&sd->sd_qlock);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-swlock_irqsave(struct stdata *sd, unsigned long *flagsp)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			sd->sd_nest++;
-		else {
-			write_lock_irqsave(&sd->sd_qlock, *flagsp);
-			sd->sd_nest = 0;
-			sd->sd_owner = current;
-		}
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-swunlock_irqrestore(struct stdata *sd, unsigned long *flagsp)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			if (--sd->sd_nest > 0)
-				return;
-		sd->sd_owner = NULL;
-		sd->sd_nest = 0;
-		write_unlock_irqrestore(&sd->sd_qlock, *flagsp);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-swlock(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			sd->sd_nest++;
-		else {
-			write_lock(&sd->sd_qlock);
-			sd->sd_nest = 0;
-			sd->sd_owner = current;
-		}
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-swunlock(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current)
-			if (--sd->sd_nest > 0)
-				return;
-		sd->sd_owner = NULL;
-		sd->sd_nest = 0;
-		write_unlock(&sd->sd_qlock);
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-swlock_bh(struct stdata *sd)
-{
-	local_bh_disable();
-	swlock(sd);
-}
-static __inline__ void
-swunlock_bh(struct stdata *sd)
-{
-	swunlock(sd);
-	local_bh_enable();
-}
-static __inline__ void
-slockinit(struct stdata *sd)
-{
-	if (likely(sd != NULL)) {
-		rwlock_init(&sd->sd_qlock);
-		sd->sd_nest = 0;
-		sd->sd_owner = NULL;
-		return;
-	}
-	swerr();
-}
-static __inline__ void
-hrlock(queue_t *q)
-{
-	struct stdata *sd = qstream(q);
-	srlock(sd);
-	if (sd->sd_other)
-		srlock(sd->sd_other);
-}
-static __inline__ void
-hrunlock(queue_t *q)
-{
-	struct stdata *sd = qstream(q);
-	if (sd->sd_other)
-		srunlock(sd->sd_other);
-	srunlock(sd);
-}
-static __inline__ void
-hwlock(queue_t *q)
-{
-	struct stdata *sd = qstream(q);
-	swlock(sd);
-	if (sd->sd_other)
-		swlock(sd->sd_other);
-}
-static __inline__ void
-hwunlock(queue_t *q)
-{
-	struct stdata *sd = qstream(q);
-	if (sd->sd_other)
-		swunlock(sd->sd_other);
-	swunlock(sd);
-}
-static __inline__ void
-hwlock_irqsave(queue_t *q, unsigned long *flagsp)
-{
-	local_irq_save(*flagsp);
-	hwlock(q);
-}
-static __inline__ void
-hwunlock_irqrestore(queue_t *q, unsigned long *flagsp)
-{
-	hwunlock(q);
-	local_irq_restore(*flagsp);
-}
-static __inline__ void
-hwlock_bh(queue_t *q)
-{
-	local_bh_disable();
-	hwlock(q);
-}
-static __inline__ void
-hwunlock_bh(queue_t *q)
-{
-	hwunlock(q);
-	local_bh_enable();
-}
 
 /* queue band gets and puts */
 static __inline__ qband_t *
@@ -572,5 +121,226 @@ qput(queue_t **qp)
 			swerr();
 	}
 }
+
+/*
+ *  This file contains a set of specialized STREAMS kernel locks that have the following
+ *  charactersistics:
+ *
+ *  - they are read/write locks
+ *  - taking a write lock suppresses local hard interrupts
+ *  - taking a read lock suppresses local soft interrupts
+ *  - a processor can take a write lock on a lock that it has already write locked and it remains
+ *    write locked for that processor
+ *  - a processor can take a read lock on a lock that it has already write locked and it remains
+ *    write locked for that processor
+ *  - a processor can take a read lock on a lock that is unlocked or already read locked
+ *  - the caller does not have to supply a "flags" argument, flags are saved internally
+ *  - a blockable process can choose to wait on a write lock rather than spinning.
+ *  - a blockable process can choose to wait on a write lock or signals rather than spinning.
+ *
+ *  These characteristics meet the needs of STREAMS as follows:
+ *
+ *  - write locks can be taken from all contexts except hard irq.
+ *  - read locks can be taken from all contexts including hard irq.
+ */
+
+#if 0
+/* defined in include/sys/streams/dki.h */
+typedef struct klock {
+	unsigned long kl_isrflags;
+	rwlock_t kl_lock;
+	struct task_struct *kl_owner;
+	uint kl_nest;
+	wait_queue_head_t kl_waitq;
+} klock_t;
+#endif
+
+static __inline__ void
+klockinit(klock_t *kl)
+{
+	kl->kl_isrflags = 0;
+	rwlock_init(&kl->kl_lock);
+	kl->kl_owner = NULL;
+	kl->kl_nest = 0;
+	init_waitqueue_head(&kl->kl_waitq);
+}
+static __inline__ void
+kwlock(klock_t *kl)
+{
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else {
+		unsigned long flags;
+
+		local_irq_save(flags);
+		write_lock(&kl->kl_lock);
+		kl->kl_isrflags = flags;
+		kl->kl_owner = current;
+		kl->kl_nest = 0;
+	}
+}
+static __inline__ int
+kwtrylock(klock_t *kl)
+{
+	int locked = 1;
+
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else {
+		unsigned long flags;
+
+		local_irq_save(flags);
+		if (write_trylock(&kl->kl_lock)) {
+			kl->kl_isrflags = flags;
+			kl->kl_owner = current;
+			kl->kl_nest = 0;
+		} else {
+			local_irq_restore(flags);
+			locked = 0;
+		}
+	}
+	return (locked);
+}
+static __inline__ void
+kwlock_wait(klock_t *kl)
+{
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else if (!kwtrylock(kl)) {
+		DECLARE_WAITQUEUE(wait, current);
+		add_wait_queue_exclusive(&kl->kl_waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_UNINTERRUPTIBLE);
+			if (kwtrylock(kl))
+				break;
+			schedule();
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&kl->kl_waitq, &wait);
+	}
+}
+static __inline__ int
+kwlock_wait_sig(klock_t *kl)
+{
+	int err = 0;
+
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else if (!kwtrylock(kl)) {
+		DECLARE_WAITQUEUE(wait, current);
+		add_wait_queue_exclusive(&kl->kl_waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			if (signal_pending(current)) {
+				err = -EINTR;
+				break;
+			}
+			if (kwtrylock(kl))
+				break;
+			schedule();
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&kl->kl_waitq, &wait);
+	}
+	return (err);
+}
+static __inline__ void
+kwunlock(klock_t *kl)
+{
+	if (kl->kl_nest > 0)
+		kl->kl_nest--;
+	else {
+		unsigned long flags = kl->kl_isrflags;
+
+		kl->kl_owner = NULL;
+		kl->kl_nest = 0;
+		if (waitqueue_active(&kl->kl_waitq))
+			wake_up(&kl->kl_waitq);
+		write_unlock(&kl->kl_lock);
+		local_irq_restore(flags);
+	}
+}
+static __inline__ void
+krlock(klock_t *kl)
+{
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else
+		read_lock_bh(&kl->kl_lock);
+}
+static __inline__ void
+krunlock(klock_t *kl)
+{
+	if (kl->kl_nest > 0)
+		kl->kl_nest--;
+	else {
+		if (waitqueue_active(&kl->kl_waitq))
+			wake_up(&kl->kl_waitq);
+		read_unlock_bh(&kl->kl_lock);
+	}
+}
+static __inline__ void
+krlock_irqsave(klock_t *kl, unsigned long *flagsp)
+{
+	if (kl->kl_owner == current) {
+		kl->kl_nest++;
+		*flagsp = 0;
+	} else
+		read_lock_irqsave(&kl->kl_lock, *flagsp);
+}
+static __inline__ void
+krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
+{
+	if (kl->kl_nest > 0)
+		kl->kl_nest--;
+	else {
+		if (waitqueue_active(&kl->kl_waitq))
+			wake_up(&kl->kl_waitq);
+		read_unlock_irqrestore(&kl->kl_lock, *flagsp);
+	}
+}
+
+/* for stream heads */
+#define slockinit(__sd)			klockinit(&(__sd)->sd_klock)
+#define swlock(__sd)			kwlock(&(__sd)->sd_klock)
+#define swlock(__sd)			kwlock(&(__sd)->sd_klock)
+#define swtrylock(__sd)			kwtrylock(&(__sd)->sd_klock)
+#define swlock_wait(__sd)		kwlock_wait(&(__sd)->sd_klock)
+#define swlock_wait_sig(__sd)		kwlock_wait_sig(&(__sd)->sd_klock)
+#define swunlock(__sd)			kwunlock(&(__sd)->sd_klock)
+#define srlock(__sd)			krlock(&(__sd)->sd_klock)
+#define srunlock(__sd)			krunlock(&(__sd)->sd_klock)
+
+/* for stream heads from queues */
+#define hwlock(__q)			kwlock(&(qstream(__q))->sd_klock)
+#define hwtrylock(__q)			kwtrylock(&(qstream(__q))->sd_klock)
+#define hwlock_wait(__q)		kwlock_wait(&(qstream(__q))->sd_klock)
+#define hwlock_wait_sig(__q)		kwlock_wait_sig(&(qstream(__q))->sd_klock)
+#define hwunlock(__q)			kwunlock(&(qstream(__q))->sd_klock)
+#define hrlock(__q)			krlock(&(qstream(__q))->sd_klock)
+#define hrunlock(__q)			krunlock(&(qstream(__q))->sd_klock)
+
+#if 0
+/* for queue pairs */
+#define qplockinit(__rq)		klockinit(&((struct queinfo*)(__rq))->qu_klock)
+#define qpwlock(__rq)			kwlock(&((struct queinfo*)(__rq))->qu_klock)
+#define qpwtrylock(__rq)		kwtrylock(&((struct queinfo*)(__rq))->qu_klock)
+#define qpwlock_wait(__rq)		kwlock_wait(&((struct queinfo*)(__rq))->qu_klock)
+#define qpwlock_wait_sig(__rq)		kwlock_wait_sig(&((struct queinfo*)(__rq))->qu_klock)
+#define qpwunlock(__rq)			kwunlock(&((struct queinfo*)(__rq))->qu_klock)
+#define qprlock(__rq)			krlock(&((struct queinfo*)(__rq))->qu_klock)
+#define qprunlock(__rq)			krunlock(&((struct queinfo*)(__rq))->qu_klock)
+#endif
+
+/* for queues */
+#define qlockinit(__q)			klockinit(&(__q)->q_klock)
+#define qwlock(__q)			kwlock(&(__q)->q_klock)
+#define qwtrylock(__q)			kwtrylock(&(__q)->q_klock)
+#define qwlock_wait(__q)		kwlock_wait(&(__q)->q_klock)
+#define qwlock_wait_sig(__q)		kwlock_wait_sig(&(__q)->q_klock)
+#define qwunlock(__q)			kwunlock(&(__q)->q_klock)
+#define qrlock_irqsave(__q,__f)		krlock_irqsave(&(__q)->q_klock,(__f))
+#define qrunlock_irqrestore(__q,__f)	krunlock_irqrestore(&(__q)->q_klock,(__f))
+
 
 #endif				/* __LOCAL_STRUTIL_H__ */

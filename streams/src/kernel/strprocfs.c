@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/28 14:13:54 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 13:05:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:54 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 13:05:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/28 14:13:54 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 13:05:01 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/28 14:13:54 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 13:05:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -651,8 +651,8 @@ get_streams_stdata_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_closetime");
 //      len += snprintf(page + len, maxlen - len, ", sd_rtime");
 //      len += snprintf(page + len, maxlen - len, ", sd_qlock");
-	len += snprintf(page + len, maxlen - len, ", sd_owner");
-	len += snprintf(page + len, maxlen - len, ", sd_nest");
+// 	len += snprintf(page + len, maxlen - len, ", sd_owner");
+// 	len += snprintf(page + len, maxlen - len, ", sd_nest");
 //      len += snprintf(page + len, maxlen - len, ", sd_mutex");
 	len += snprintf(page + len, maxlen - len, ", sd_links");
 	len += snprintf(page + len, maxlen - len, ", sd_link_next");
@@ -698,8 +698,8 @@ get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_closetime);
 //      len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_rtime);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_qlock);
-	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_owner);
-	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_nest);
+// 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_owner);
+// 	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_nest);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mutex);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_links);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_link_next);
@@ -793,7 +793,7 @@ get_streams_queue_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", q_nband");
 	len += snprintf(page + len, maxlen - len, ", q_msgs");
 	// len += snprintf(page + len, maxlen - len, ", q_rwlock");
-	len += snprintf(page + len, maxlen - len, ", q_iflags");
+	// len += snprintf(page + len, maxlen - len, ", q_iflags");
 	return (len);
 }
 static int
@@ -820,7 +820,7 @@ get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
 	len += snprintf(page + len, maxlen - len, ", %hhu", q->q_nband);
 	len += snprintf(page + len, maxlen - len, ", %d", q->q_msgs);
 	// len += snprintf(page + len, maxlen - len, "%d", q->q_rwlock);
-	len += snprintf(page + len, maxlen - len, ", %lu", q->q_iflags);
+	// len += snprintf(page + len, maxlen - len, ", %lu", q->q_iflags);
       done:
 	return (len);
 }
@@ -837,8 +837,8 @@ get_streams_queinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }, qu_str");
 	len += snprintf(page + len, maxlen - len, ", qu_refs");
 	len += snprintf(page + len, maxlen - len, ", qu_qwait");
-	len += snprintf(page + len, maxlen - len, ", qu_owner");
-	len += snprintf(page + len, maxlen - len, ", qu_nest");
+	// len += snprintf(page + len, maxlen - len, ", qu_owner");
+	// len += snprintf(page + len, maxlen - len, ", qu_nest");
 	return (len);
 }
 static int
@@ -856,8 +856,8 @@ get_streams_queinfo_data(char *page, ssize_t maxlen, struct queinfo *qu)
 	len += snprintf(page + len, maxlen - len, " }, %p", qu->qu_str);
 	len += snprintf(page + len, maxlen - len, ", %d", atomic_read(&qu->qu_refs));
 	len += snprintf(page + len, maxlen - len, ", %d", waitqueue_active(&qu->qu_qwait));
-	len += snprintf(page + len, maxlen - len, ", %d", qu->qu_owner ? qu->qu_owner->pid : 0);
-	len += snprintf(page + len, maxlen - len, ", %u", qu->qu_nest);
+	// len += snprintf(page + len, maxlen - len, ", %d", qu->qu_owner ? qu->qu_owner->pid : 0);
+	// len += snprintf(page + len, maxlen - len, ", %u", qu->qu_nest);
       done:
 	return (len);
 }

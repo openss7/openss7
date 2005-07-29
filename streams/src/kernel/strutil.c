@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/07/28 14:45:45 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/29 12:58:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:45:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 12:58:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/07/28 14:45:45 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/29 12:58:42 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/07/28 14:45:45 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/29 12:58:42 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -753,11 +753,10 @@ int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
-	unsigned long flags;
 
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	/* do back enabling outside the locks */
 	switch (result) {
 	case 3:		/* success - priority enable */
@@ -822,7 +821,7 @@ int
 bcangetany(queue_t *q)
 {
 	int found = 0;
-	unsigned long flags;
+	unsigned long flags __attribute((unused)) = 0;
 	mblk_t *b;
 
 	qrlock_irqsave(q, &flags);
@@ -1156,15 +1155,14 @@ void
 flushband(queue_t *q, int band, int flag)
 {
 	int backenable;
-	unsigned long flags;
 	mblk_t *mp = NULL, **mpp = &mp;
 
 	assert(q);
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	if (backenable)
 		qbackenable(q);
 	/* we want to free messages with the locks off so that other CPUs can process this queue
@@ -1244,15 +1242,14 @@ void
 flushq(queue_t *q, int flag)
 {
 	int backenable;
-	unsigned long flags;
 	mblk_t *mp = NULL, **mpp = &mp;
 
 	assert(q);
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	backenable = __flushq(q, flag, &mpp);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	if (backenable)
 		qbackenable(q);
 	/* we want to free messages with the locks off so that other CPUs can process this queue
@@ -1270,11 +1267,8 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
 unsigned long
 freezestr(queue_t *q)
 {
-	unsigned long flags = 0;
-
-	/* XXX: are these strict locks necessary? */
-	qwlock_irqsave(q, &flags);
-	return ((q->q_iflags = flags));
+	qwlock(q);
+	return (q->q_klock.kl_isrflags);
 }
 
 EXPORT_SYMBOL(freezestr);
@@ -1379,13 +1373,12 @@ getq(queue_t *q)
 {
 	mblk_t *mp;
 	int backenable = 0;
-	unsigned long flags;
 
 	ensure(q, return (NULL));
 	/* XXX: are these strict locks necessary? */
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	mp = __getq(q, &backenable);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	if (backenable)
 		qbackenable(q);
 	return (mp);
@@ -1504,12 +1497,10 @@ int
 insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
-	unsigned long flags;
 
-	/* XXX: are these strict locks necessary? */
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	result = __insq(q, emp, nmp);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -1637,11 +1628,10 @@ int
 putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
-	unsigned long flags;
 
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	result = __putbq(q, mp);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -1817,11 +1807,10 @@ int
 putq(queue_t *q, mblk_t *mp)
 {
 	int result;
-	unsigned long flags;
 
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	result = __putq(q, mp);
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	switch (result) {
 	case 3:		/* success - priority enable */
 		qenable(q);
@@ -1943,15 +1932,13 @@ qdelete(queue_t *q)
 	struct stdata *sd = qu->qu_str;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
-	unsigned long flags = 0;
 
 	wq = rq + 1;
-	/* XXX: are these strict locks necessary? */
-	swlock_irqsave(sd, &flags);
+	swlock_wait(sd);
 	qput(&rq->q_next);
 	qput(&wq->q_next);
 	qu->qu_str = NULL;
-	swunlock_irqrestore(sd, &flags);
+	swunlock(sd);
 	qput(&q);
 	sd_put(sd);
 }
@@ -2012,7 +1999,7 @@ qinsert(struct stdata *sd, queue_t *irq)
 	queue_t *iwq, *srq, *swq;
 	struct queinfo *iqu, *squ;
 
-	srlock_bh(sd);
+	srlock(sd);
 	srq = sd->sd_rq;
 	iqu = (typeof(iqu)) irq;
 	iwq = irq + 1;
@@ -2025,7 +2012,7 @@ qinsert(struct stdata *sd, queue_t *irq)
 	} else {		/* is a fifo */
 		iwq->q_next = qget(irq);
 	}
-	srunlock_bh(sd);
+	srunlock(sd);
 }
 
 EXPORT_SYMBOL(qinsert);
@@ -2054,13 +2041,11 @@ qprocsoff(queue_t *q)
 
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
-		unsigned long flags = 0;
-
 		set_bit(QHLIST_BIT, &wq->q_flag);
 		set_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
 		set_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
 		/* spin here waiting for queue procedures to exit */
-		hwlock_irqsave(rq, &flags);
+		hwlock(rq);
 		/* bypass this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = bq->q_next;
@@ -2076,7 +2061,7 @@ qprocsoff(queue_t *q)
 			bq->q_next = qget(wq->q_next);
 			qput(&qn);
 		}
-		hwunlock_irqrestore(rq, &flags);
+		hwunlock(rq);
 		/* XXX: put procs must check QHLIST bit after acquiring hrlock */
 		/* XXX: srv procs must check QNOENB bit after acquiring hrlock */
 	}
@@ -2115,13 +2100,11 @@ qprocson(queue_t *q)
 
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
-		unsigned long flags = 0;
-
 		clear_bit(QHLIST_BIT, &wq->q_flag);
 		clear_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
 		clear_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
 		/* spin here waiting for queue procedures to exit */
-		hwlock_irqsave(rq, &flags);
+		hwlock(rq);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
@@ -2135,7 +2118,7 @@ qprocson(queue_t *q)
 			bq->q_next = qget(wq);
 			qput(&qn);
 		}
-		hwunlock_irqrestore(rq, &flags);
+		hwunlock(rq);
 	}
 }
 
@@ -2327,12 +2310,11 @@ void
 rmvq(queue_t *q, mblk_t *mp)
 {
 	int backenable = 0;
-	unsigned long flags;
 
 	assert(q);
 	assert(mp);
 
-	qwlock_irqsave(q, &flags);
+	qwlock(q);
 	{
 		assert(q->q_owner == current);
 		assert(q->q_nest >= 1);
@@ -2341,7 +2323,7 @@ rmvq(queue_t *q, mblk_t *mp)
 
 		backenable = __rmvq(q, mp);
 	}
-	qwunlock_irqrestore(q, &flags);
+	qwunlock(q);
 	if (backenable)
 		qbackenable(q);
 }
@@ -2438,7 +2420,11 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 		/* propagate flags to f_sqlvl, this should have already been done by the
 		   registration function */
 		if (fmod->f_sqlvl == SQLVL_DEFAULT) {
-			if (fmod->f_flag & D_MTPERQ)
+			if (fmod->f_flag & D_UP)
+				fmod->f_sqlvl = SQLVL_PERSTREAM;
+			else if (fmod->f_flag & D_MP)
+				fmod->f_sqlvl = SQLVL_NOP;
+			else if (fmod->f_flag & D_MTPERQ)
 				fmod->f_sqlvl = SQLVL_QUEUE;
 			else if (fmod->f_flag & D_MTQPAIR)
 				fmod->f_sqlvl = SQLVL_QUEUEPAIR;
@@ -2458,7 +2444,7 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 					goto enomem;
 				fmod->f_syncq = sqo;
 				sqo->sq_level = fmod->f_sqlvl;
-				sqo->sq_flag = fmod->f_flag | D_MTOUTPERIM;
+				sqo->sq_flag = SQ_OUTER | ((fmod->f_flag & D_MTOCEXCL) ?  SQ_EXCLUS : 0);
 			}
 			/* we have a reference to sqo */
 		}
@@ -2479,10 +2465,10 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 				goto enomem;
 			}
 			sqr->sq_level = fmod->f_sqlvl;
-			sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 			sqr->sq_outer = sqo;
 			sqw->sq_level = fmod->f_sqlvl;
-			sqw->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			sqw->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 			sqw->sq_outer = sq_get(sqo);
 			break;
 		case SQLVL_QUEUEPAIR:
@@ -2492,7 +2478,7 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 				goto enomem;
 			}
 			sqr->sq_level = fmod->f_sqlvl;
-			sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+			sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 			sqr->sq_outer = sqo;
 			sqw = sq_get(sqr);
 			break;
@@ -2511,7 +2497,7 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 				}
 				fmod->f_syncq = sqr;
 				sqr->sq_level = fmod->f_sqlvl;
-				sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+				sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 				sqr->sq_outer = sqo;
 			}
 			sqw = sq_get(sqr);
@@ -2528,7 +2514,7 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 				}
 				fmod->f_syncq = sqr;
 				sqr->sq_level = fmod->f_sqlvl;
-				sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+				sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 			}
 			sqw = sq_get(sqr);
 			/* cannot have outer perimeter at this level */
@@ -2542,7 +2528,7 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 					goto enomem;
 				}
 				sqr->sq_level = fmod->f_sqlvl;
-				sqr->sq_flag = fmod->f_flag & ~(D_MTOUTPERIM);
+				sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 			}
 			sqw = sq_get(sqr);
 			/* cannot have outer perimeter at this level */
@@ -2724,11 +2710,10 @@ strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 			break;
 		}
 	} else {
-		unsigned long flags;
 		struct qband *qb;
 
 		/* XXX: are these strict locks necessary? */
-		qwlock_irqsave(q, &flags);
+		qwlock(q);
 		do {
 			if (!(qb = __get_qband(q, band)))
 				goto enomem;
@@ -2760,7 +2745,7 @@ strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 			err = -ENOMEM;
 			break;
 		} while (0);
-		qwunlock_irqrestore(q, &flags);
+		qwunlock(q);
 	}
 	return (-err);
 }
@@ -2850,8 +2835,8 @@ EXPORT_SYMBOL(strlog);
 void
 unfreezestr(queue_t *q, unsigned long flags)
 {
-	flags = q->q_iflags;
-	qwunlock_irqrestore(q, &flags);
+	(void) flags;
+	qwunlock(q);
 }
 
 EXPORT_SYMBOL(unfreezestr);

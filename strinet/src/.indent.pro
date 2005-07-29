@@ -86,3 +86,4 @@
 -Tu_char
 -Tuchar
 -Tulong
+-Tklock_t
