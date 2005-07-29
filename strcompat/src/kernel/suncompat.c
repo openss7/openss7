@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 14:30:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -104,37 +104,6 @@ __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
 EXPORT_SYMBOL(unfreezestr_SUN);
 
 #if LFS
-static __inline__ void
-qpwlock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current)
-		qu->qu_nest++;
-	else {
-		write_lock(&qu->qu_lock);
-		qu->qu_nest = 0;
-		qu->qu_owner = current;
-	}
-}
-static __inline__ void
-qpwunlock(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-
-	if (qu->qu_owner == current) {
-		if (qu->qu_nest > 0)
-			qu->qu_nest--;
-		else {
-			qu->qu_owner = NULL;
-			qu->qu_nest = 0;
-			write_unlock(&qu->qu_lock);
-		}
-		return;
-	}
-	swerr();
-}
-
 /**
  *  qwait:  - wait for a procedure to be called on a queue pair
  *  @rq:    a pointer to the read queue of the queue pair
@@ -147,15 +116,11 @@ qwait(queue_t *rq)
 	DECLARE_WAITQUEUE(wait, current);
 	assert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
-	qpwlock(rq);
 	add_wait_queue(&qu->qu_qwait, &wait);
 	set_current_state(TASK_UNINTERRUPTIBLE);
-	qpwunlock(rq);
 	schedule();
-	qpwlock(rq);
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&qu->qu_qwait, &wait);
-	qpwunlock(rq);
 }
 
 EXPORT_SYMBOL(qwait);		/* sun/ddi.h */
@@ -175,17 +140,13 @@ qwait_sig(queue_t *rq)
 	DECLARE_WAITQUEUE(wait, current);
 	assert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
-	qpwlock(rq);
 	add_wait_queue(&qu->qu_qwait, &wait);
 	set_current_state(TASK_INTERRUPTIBLE);
-	qpwunlock(rq);
 	schedule();
-	qpwlock(rq);
 	if (signal_pending(current))
 		ret = 1;
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&qu->qu_qwait, &wait);
-	qpwunlock(rq);
 	return (ret);
 }
 

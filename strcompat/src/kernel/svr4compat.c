@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:25:42 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 14:30:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:25:42 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:25:42 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/18 12:25:42 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -105,20 +105,22 @@ MPSTR_QLOCK(queue_t *q)
 	lis_flags_t flags;
 
 	lis_rw_write_lock_irqsave(&q->q_isr_lock, &flags);
+	return (flags);
 #endif
 #if LFS
-	unsigned long flags;
 
-	local_irq_save(flags);
-	if (q->q_owner == current)
-		q->q_nest++;
+	if (q->q_klock.kl_owner == current)
+		q->q_klock.kl_nest++;
 	else {
-		write_lock(&q->q_rwlock);
-		q->q_owner = current;
-		q->q_nest = 0;
+		unsigned long flags;
+		local_irq_save(flags);
+		write_lock(&q->q_klock.kl_lock);
+		q->q_klock.kl_isrflags = flags;
+		q->q_klock.kl_owner = current;
+		q->q_klock.kl_nest = 0;
 	}
+	return (q->q_klock.kl_isrflags);
 #endif
-	return (flags);
 }
 
 EXPORT_SYMBOL(MPSTR_QLOCK);	/* svr4/ddi.h */
@@ -134,20 +136,19 @@ MPSTR_QRELE(queue_t *q, long s)
 	return;
 #endif
 #if LFS
-	if (q->q_owner == current) {
-		unsigned long flags = s;
+	if (q->q_klock.kl_nest > 0)
+		q->q_klock.kl_nest--;
+	else {
+		unsigned long flags = q->q_klock.kl_isrflags;
 
-		if (q->q_nest > 0)
-			q->q_nest--;
-		else {
-			q->q_owner = NULL;
-			q->q_nest = 0;
-			write_unlock(&q->q_rwlock);
-		}
+		q->q_klock.kl_owner = NULL;
+		q->q_klock.kl_nest = 0;
+		if (waitqueue_active(&q->q_klock.kl_waitq))
+			wake_up(&q->q_klock.kl_waitq);
+		write_unlock(&q->q_klock.kl_lock);
 		local_irq_restore(flags);
-		return;
 	}
-	swerr();
+	return;
 #endif
 }
 
@@ -164,17 +165,18 @@ MPSTR_STPLOCK(struct stdata *sd)
 	return (flags);
 #endif
 #if LFS
-	unsigned long flags;
-
-	local_irq_save(flags);
-	if (sd->sd_owner == current)
-		sd->sd_nest++;
+	if (sd->sd_klock.kl_owner == current)
+		sd->sd_klock.kl_nest++;
 	else {
-		write_lock(&sd->sd_qlock);
-		sd->sd_nest = 0;
-		sd->sd_owner = current;
+		unsigned long flags;
+
+		local_irq_save(flags);
+		write_lock(&sd->sd_klock.kl_lock);
+		sd->sd_klock.kl_isrflags = flags;
+		sd->sd_klock.kl_owner = current;
+		sd->sd_klock.kl_nest = 0;
 	}
-	return (flags);
+	return (sd->sd_klock.kl_isrflags);
 #endif
 }
 
@@ -191,20 +193,18 @@ MPSTR_STPRELE(struct stdata *sd, long s)
 	return;
 #endif
 #if LFS
-	if (sd->sd_owner == current) {
-		unsigned long flags = s;
+	if (sd->sd_klock.kl_nest > 0)
+		sd->sd_klock.kl_nest--;
+	else {
+		unsigned long flags = sd->sd_klock.kl_isrflags;
 
-		if (sd->sd_nest > 0)
-			sd->sd_nest--;
-		else {
-			sd->sd_owner = NULL;
-			sd->sd_nest = 0;
-			write_unlock(&sd->sd_qlock);
-		}
+		sd->sd_klock.kl_owner = NULL;
+		sd->sd_klock.kl_nest = 0;
+		if (waitqueue_active(&sd->sd_klock.kl_waitq))
+			wake_up(&sd->sd_klock.kl_waitq);
+		write_unlock(&sd->sd_klock.kl_lock);
 		local_irq_restore(flags);
-		return;
 	}
-	swerr();
 #endif
 }
 
