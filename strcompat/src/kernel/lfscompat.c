@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:18 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.14  2005/07/29 07:37:51  brian
+ - changes to compile with latest streams package.
+
  Revision 0.9.2.13  2005/07/21 20:47:18  brian
  - sync with notebook
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -118,7 +121,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/21 20:47:18 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -148,9 +151,9 @@ MODULE_ALIAS("streams-lfscompat");
  *  kmem_zalloc_node, qattach, qclose, qdetach, qopen, qpop, qpush, qready,
  *  sealloc, sefree, setq, setqsched
  *
- *  Of these, these four are still important:
+ *  Of these, these six are still important:
  *
- *  defer_func, __bufcall, __timeout, unweldq, weldq
+ *  __bufcall, __timeout, __strwrit, __strfunc, unweldq, weldq
  *
  */
 

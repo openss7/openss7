@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/22 06:06:51 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.17  2005/07/29 07:37:51  brian
+ - changes to compile with latest streams package.
+
  Revision 0.9.2.16  2005/07/22 06:06:51  brian
  - working up streams/src/kernel/strsched.h
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/22 06:06:51 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/22 06:06:51 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -132,7 +135,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/22 06:06:51 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -1919,7 +1922,8 @@ void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 	LIS_QISRUNLOCK(q, &flags);
 #endif
 #if LFS
-	defer_func((void *) proc, q, mp, (void *) q, PERIM_INNER | PERIM_OUTER, SE_WRITER);
+	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func)(queue_t *, mblk_t *), int perim);
+	__strwrit(q, mp, proc, PERIM_INNER|PERIM_OUTER);
 #endif
 }
 

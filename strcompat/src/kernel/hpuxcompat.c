@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -145,11 +145,8 @@ EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 void
 streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 {
-	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
-			      int perim, int type);
-	if (defer_func(func, q, mp, priv, 0, SE_STRPUT) == 0)
-		return;
-	// never();
+	extern void __strfunc(void (*func)(void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg);
+	__strfunc(func, q, mp, priv);
 }
 
 EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */

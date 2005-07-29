@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/22 06:06:51 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/29 07:37:51 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -264,11 +264,8 @@ EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void
 qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter)
 {
-	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
-			      int perim, int type);
-	if (defer_func((void (*)(void *, mblk_t *)) func, qp, mp, qp, perimeter, SE_WRITER) == 0)
-		return;
-	// never();
+	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func)(queue_t *, mblk_t *), int perim);
+	__strwrit(qp, mp, func, perimeter);
 }
 
 EXPORT_SYMBOL(qwriter);		/* sun/ddi.h */
