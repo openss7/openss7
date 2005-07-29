@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/07/28 14:45:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/29 05:11:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:45:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 05:11:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/07/28 14:45:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/29 05:11:24 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/07/28 14:45:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/29 05:11:24 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1728,8 +1728,6 @@ srvp(queue_t *q)
 	return (result);
 }
 
-EXPORT_SYMBOL(srvp);
-
 #ifdef CONFIG_STREAMS_SYNCQS
 /*
  *  -------------------------------------------------------------------------
@@ -1875,6 +1873,13 @@ find_syncqs(struct syncq_cookie *sc)
 	}
 	return (sc->sc_osq || sc->sc_isq);
 }
+
+/*
+ *  enter_syncq_exclus: - enter a syncrhonization barrier exclusive
+ *  @sc:	synchronization state cookie pointer
+ *
+ *  NOTES:
+ */
 static int
 enter_syncq_exclus(struct syncq_cookie *sc)
 {
@@ -1883,21 +1888,25 @@ enter_syncq_exclus(struct syncq_cookie *sc)
 	syncq_t *sq = sc->sc_sq;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	/* must defer if there is an unprocessable backlog */
+	/* must defer if there is already a backlog :XXX */
 	if (sq->sq_link)
-		goto defer;
+		rval = defer_syncq(sc, &flags, 1);
 	else if (sq->sq_owner == current)
 		sq->sq_nest++;
 	else if (sq->sq_count == 0) {
 		sq->sq_owner = current;
 		--sq->sq_count;
-	} else {
-	      defer:
+	} else
+		/* defer if we cannot acquire lock */
 		rval = defer_syncq(sc, &flags, 1);
-	}
 	spin_unlock_irqrestore(&sq->sq_lock, flags);
 	return (rval);
 }
+
+/*
+ *  enter_syncq_exclus: - enter a syncrhonization barrier shared
+ *  @sc:	synchronization state cookie pointer
+ */
 static int
 enter_syncq_shared(struct syncq_cookie *sc)
 {
@@ -1906,20 +1915,20 @@ enter_syncq_shared(struct syncq_cookie *sc)
 	syncq_t *sq = sc->sc_sq;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	/* must defer if there is an unprocessable backlog */
+	/* must defer if there is already a backlog :XXX */
 	if (sq->sq_link)
-		goto defer;
+		rval = defer_syncq(sc, &flags, 1);
 	else if (sq->sq_owner == current)
 		sq->sq_nest++;
 	else if (sq->sq_count >= 0)
 		sq->sq_count++;
-	else {
-	      defer:
+	else
+		/* defer if we cannot acquire lock */
 		rval = defer_syncq(sc, &flags, 0);
-	}
 	spin_unlock_irqrestore(&sq->sq_lock, flags);
 	return (rval);
 }
+
 static int
 enter_outer_syncq_exclus(struct syncq_cookie *sc)
 {
@@ -2105,35 +2114,56 @@ void runsyncq(struct syncq *, unsigned long *flagsp);
  *  CONTEXT: This function can be called from any context, and we do, but only from leave_syncq().
  *
  *  NOTICES: It is questionable whether it is better to service the backlog from the exiting thread
- *  or to simply schedule the synchronization queue to have its backlog cleared as in the hard irq
- *  case.  Clearing it now could have some latency advantages because we do not have to task switch,
- *  however, it might fail to take advantage of some inherent paralellisms.
+ *  or to simply schedule the synchronization queue to have its backlog cleared.  Clearing it now
+ *  could have some latency advantages because we do not have to task switch, however, it might fail
+ *  to take advantage of some inherent paralellisms.
  */
 static void
 clear_backlog(syncq_t *sq, unsigned long *flagsp)
 {
-	/* If we are at hard irq, we cannot clear the backlog, so we will just schedule the
-	 * syncrhonization queue for service at soft irq and go away. */
-	if (likely(in_irq())) {
-		sqsched(sq);
-		/* unlock it -- don't worry, new lockers check for an unprocessed backlog */
+	/* using current_context() is faster that rechecking in_irq and others repeatedly */
+	switch (current_context()) {
+	case CTX_PROC:
+	case CTX_ATOMIC:
+		break;
+	case CTX_INT:
+		set_bit(queueflag, &t->flags);
+		runsyncq(sq, flagsp);
+		clear_bit(queueflag, &t->flags);
+		break;
+	case CTX_STREAMS:
+		/* If we are already in STREAMS context, just process the backlog. */
+		runsyncq(sq, flagsp);
+		break;
+	case CTX_ISR:
+	/* If we are at hard irq context we do not want to process the backlog in hard interrupts,
+	   so we always schedule it for later backlog clearing by the STREAMS scheduler (or another 
+	   process that picks up its duties). */
 		sq->sq_nest = 0;
 		sq->sq_owner = NULL;
 		sq->sq_count = 0;
-		return;
+		sqsched(sq);
+		break;
 	}
-	/* If we are at process context and have not yet become one with the scheduler, then the
-	 * queuerun flag will not be set.  If we are in STREAMS context, it will be set. */
-	if (!test_and_set_bit(qsyncflag, &this_thread->flags)) {
-		/* Fake out that we are the STREAMS scheduler. */
-		local_bh_disable();
-		runsyncq(sq, flagsp);
-		local_bh_enable();
-		clear_bit(qsyncflag, &this_thread->flags);
-		return;
+	return;
+	/* If we are at process or at soft irq context and have not yet become one with the STREAMS 
+	   scheduler, then the queuerun flag will not be set.  If we are in STREAMS context, it
+	   will be set. */
+	{
+		struct strthread *t = this_thread;
+
+		if (test_bit(queueflag, &t->flags)) {
+			local_bh_disable();
+			if (!test_and_set_bit(queueflag, &t->flags)) {
+				/* Fake out that we are the STREAMS scheduler. */
+				runsyncq(sq, flagsp);
+				clear_bit(queueflag, &t->flags);
+				local_bh_enable();
+				return;
+			}
+			local_bh_enable();
+		}
 	}
-	/* If we are already in STREAMS context, just process the backlog. */
-	runsyncq(sq, flagsp);
 }
 
 static void
@@ -2162,7 +2192,7 @@ leave_syncq(struct syncq_cookie *sc)
 #endif
 
 /**
- *  qwriter:	- call a function after gaining exclusive access to a perimeter
+ *  qstrwrit:	- call a function after gaining exclusive access to a perimeter
  *  @q:		the queue against which to synchronize and pass to the function
  *  @mp:	a message to pass to the function
  *  @func:	the function to call once access is gained
@@ -2173,21 +2203,21 @@ leave_syncq(struct syncq_cookie *sc)
  *  deferred.  If this function is called from ISR context, be aware that @func might execute at ISR
  *  context.
  *
- *  qwriter() callbacks enter the outer perimeter exclusive if the outer perimeter exists and
+ *  qstrwrit() callbacks enter the outer perimeter exclusive if the outer perimeter exists and
  *  PERIM_OUTER is set in perim; otherwise, it enters the inner perimeter exclusive if the inner
  *  perimeter exists and PERIM_INNER is set in perim.  If no perimeters exist, or the perimeter
  *  corresponding to the PERIM_OUTER and PERIM_INNER setting does not exist, the callback function
  *  is still executed, however only STREAMS MP safety syncrhonization is performed.
  *
- *  NOTICES: Solaris restricts from where this function can be called to put(9), srv(9), qwriter(9),
+ *  NOTICES: Solaris restricts from where this function can be called to put(9), srv(9), qstrwrit(9),
  *  qtimeout(9) or qbufcall(9) procedures.  We make no restrictions.
  *
  *  @mp must not be NULL, otherwise it is not possible to defer the callback.  @mp cannot be on an
  *  existing queue.
  *
  */
-void
-qwriter(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+static void
+qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
 	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
@@ -2201,8 +2231,6 @@ qwriter(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 #endif
 }
 
-EXPORT_SYMBOL(qwriter);
-
 /**
  *  qstrfunc:	- execute a function like the queue's put procedure synchronized
  *  @func:	the function to imitate the queue's put procedure
@@ -2210,8 +2238,8 @@ EXPORT_SYMBOL(qwriter);
  *  @mp:	the message to pass to the function
  *  @arg:	the first argument to pass to the function
  *
- *  streams_put(9) callouts function precisely like put(9), however, they invoke a callout function
- *  instead of the queue's put procedure.  streams_put() events always need a valid queue reference
+ *  qstrfunc() callouts function precisely like put(9), however, they invoke a callout function
+ *  instead of the queue's put procedure.  qstrfunc() events always need a valid queue reference
  *  against which to synchronize.
  */
 static void
@@ -2395,7 +2423,25 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 EXPORT_SYMBOL(qclose);
 
 /**
- *  streams_put: - call a function like a queue's put procedure
+ *  __strwrit: - call a function after gaining exlusive access to the perimeter
+ *  @q:		the queue against which to synchronize and pass to the function
+ *  @mp:	a message to pass to the function
+ *  @func:	the function to call once access is gained
+ *  @perim:	the perimeter to which to gain access
+ *
+ *  NOTICES: __strwrit() is used to implement the Solaris compatible qwriter(9) function as well as
+ *  the MPS compatible mps_become_writer(9) function.
+ */
+void
+__strwrit(queue_t *q, mblk_t *mp, void (*func)(queue_t *, mblk_t *), int perim)
+{
+	qstrwrit(q, mp, func, perim);
+}
+
+EXPORT_SYMBOL(__strwrit);
+
+/**
+ *  __strfunc: - call a function like a queue's put procedure
  *  @func:	the function to call
  *  @q:		the queue whose put procedure to immitate
  *  @mp:	the message to pass to the function
@@ -2403,19 +2449,19 @@ EXPORT_SYMBOL(qclose);
  *
  *  NOTICES: Don't call functions that do not exist.
  *
- *  streams_put(NULL, q, mp, NULL) is identical to calling put(q, mp).
+ *  __strfunc(NULL, q, mp, NULL) is identical to calling put(q, mp).
  *
  *  CONTEXT: Any.  But beware that if you call this function from an ISR that the function is aware
  *  that it may be called in ISR context.  Also, if called in hardirq context, message filtering
  *  will not be performed.
  */
 void
-streams_put(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+__strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	qstrfunc(func, q, mp, arg);
 }
 
-EXPORT_SYMBOL(streams_put);
+EXPORT_SYMBOL(__strfunc);
 
 /**
  *  put:	- call a queue's qi_putq() procedure
@@ -2439,6 +2485,29 @@ put(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL(put);
 
+static void
+sq_doput_synced(mblk_t *mp)
+{
+	struct mbinfo *m = (typeof(m)) mp;
+
+	if ((void *)m->m_func == (void *) &putp) {
+		/* deferred function is a qputp function */
+		(void) putp(m->m_queue, mp);
+	} else if ((void *)m->m_func == (void *) &strwrit) {
+		/* deferred function is a qstrwrit function */
+		strwrit(m->m_queue, mp, m->m_private);
+	} else {
+		/* deferred function is a qstrfunc function */
+		strfunc((void *)m->m_func, m->m_queue, mp, m->m_private);
+	}
+}
+
+static void
+sq_dosrv_synced(queue_t *q)
+{
+	(void) srvp(q);
+}
+
 /*
  *  Synchronized event processing.
  */
@@ -2450,23 +2519,52 @@ do_stream_synced(struct strevent *se)
 }
 #endif
 
+/*
+ *  do_bufcall_synced: - process a buffer callback after syncrhonization
+ *  @se:	    %SE_BUFCALL STREAMS event to process
+ *
+ *  do_bufcall_synced() process a STREAMS buffer callback event after syncrhonization has already
+ *  been performed on the associated queue.  Buffer callback events do not always have STREAMS
+ *  queues associated with them.  Buffer callbacks can be generated from interrupt service routines,
+ *  in which case, unless the qbufcall(9) form is used, the buffer callback will not be associated
+ *  with a queue.  If the buffer callback is associated with a queue, the queue is tested for
+ *  %QSAFE, in which case interrupts are disabled across the callback.  Also, a stream head read
+ *  lock is acquired across the callback to protect q->q_next dereferencing within the callback.
+ *
+ *  Buffer callbacks that are associated with a queue, are termed "syncrhonous" callbacks.  Buffer
+ *  callbacks that are not associated with any queue are termed "asynchronous" callbacks.
+ *  Asyncrhonous callbacks require the callback function to take a stream head read lock to protect
+ *  any calls to q->q_next dereferencing STREAMS functions.
+ *
+ *  OPTIMIZATION: do_bufcall_synced() is optimized for the more common case where we have a valid
+ *  callback function that is associated with a queue, does not suppress interrupts (this is just an
+ *  itimeout(9) and AIX compatibility feature).
+ */
 static void
 do_bufcall_synced(struct strevent *se)
 {
 	queue_t *q;
-	unsigned long flags = 0;
-	int safe;
+	void (*func) (long);
 
 	q = se->x.b.queue;
-	safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-	if (safe)
-		local_irq_save(flags);
-	this_thread->currentq = q;
-	if (se->x.b.func)
-		se->x.b.func(se->x.b.arg);
-	this_thread->currentq = NULL;
-	if (safe)
-		local_irq_restore(flags);
+	if (likely((func = se->x.b.func) != NULL)) {
+		struct strthread *t = this_thread;
+		queue_t *oldq;
+		unsigned long flags = 0;
+		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
+
+		if (unlikely(safe))
+			local_irq_save(flags);
+		if (likely(q != NULL))
+			hrlock(q);
+		oldq = xchg(&t->currentq, qget(q));
+		func(se->x.b.arg);
+		t->currentq = oldq;
+		if (likely(q != NULL))
+			hrunlock(q);
+		if (unlikely(safe))
+			local_irq_restore(flags);
+	}
 	qput(&q);
 }
 
@@ -2483,6 +2581,15 @@ do_bufcall_synced(struct strevent *se)
  *  can run concurrent with any other queue procedure (qi_putp, qi_srvp, qi_qopen, qi_qclose) or
  *  concurrent with any other callback or callout (other timeouts, bufcalls, free routines, qwriter,
  *  streams_put, weldq or unweldq).
+ *
+ *  Timeout callbacks that are associated with a queue, are termed "syncrhonous" callbacks.  Timeout
+ *  callbacks that are not associated with any queue are termed "asynchronous" callbacks.
+ *  Asyncrhonous callbacks require the callback function to take a stream head read lock to protect
+ *  any calls to q->q_next dereferencing STREAMS functions.
+ *
+ *  OPTIMIZATION: do_timeout_synced() is optimized for the more common case where we have a valid
+ *  callback function that is associated with a queue, does not suppress interrupts (this is just an
+ *  itimeout(9) and AIX compatibility feature).
  */
 static void
 do_timeout_synced(struct strevent *se)
@@ -2491,18 +2598,23 @@ do_timeout_synced(struct strevent *se)
 	void (*func) (caddr_t);
 
 	q = se->x.t.queue;
-	if ((func = se->x.t.func)) {
-		unsigned long flags = 0;
-		int safe = (se->x.t.pl || (q && test_bit(QSAFE_BIT, &q->q_flag)));
+	if (likely((func = se->x.t.func) != NULL)) {
 		struct strthread *t = this_thread;
+		queue_t *oldq;
+		unsigned long flags = 0;
+		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
 
-		t->currentq = q;
-		if (safe)
+		if (unlikely(safe))
 			local_irq_save(flags);
+		if (likely(q != NULL))
+			hrlock(q);
+		oldq = xchg(&t->currentq, qget(q));
 		func(se->x.t.arg);
-		if (safe)
+		t->currentq = oldq;
+		if (likely(q != NULL))
+			hrunlock(q);
+		if (unlikely(safe))
 			local_irq_restore(flags);
-		t->currentq = NULL;
 	}
 	qput(&q);
 }
@@ -2854,8 +2966,6 @@ doevents(struct strthread *t)
  * function must be called with the syncrhonization queue spin lock locked and flags saved to
  * @flagsp.
  */
-extern void sq_doput_synced(mblk_t *mp);
-extern void sq_dosrv_synced(queue_t *q);
 void
 runsyncq(struct syncq *sq, unsigned long *flagsp)
 {
@@ -3204,6 +3314,8 @@ _runqueues(struct softirq_action *unused)
 {
 	struct strthread *t = this_thread;
 
+	assert(!test_bit(queueflag, &t->flags));
+
 	set_bit(queueflag, &t->flags);
 #if defined CONFIG_STREAMS_SYNCQS
 	/* catch up on backlog first */
@@ -3243,9 +3355,8 @@ void
 runqueues(void)
 {
 	local_bh_disable();	/* simulates softirq context */
-	if (this_thread->
-	    flags & (QSYNCFLAG | STRTIMOUT | STREVENTS | STRBCFLAG | STRBCWAIT | QRUNFLAG |
-		     FLUSHWORK | FREEBLKS))
+	if (this_thread->flags & (QSYNCFLAG | STRTIMOUT | STREVENTS | STRBCFLAG | STRBCWAIT
+				  | QRUNFLAG | FLUSHWORK | FREEBLKS))
 		_runqueues(NULL);
 	local_bh_enable();	/* go back to user context */
 }

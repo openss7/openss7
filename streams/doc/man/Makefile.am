@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/07/28 14:13:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/29 05:11:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/28 14:13:42 $ by $Author: brian $
+# Last Modified $Date: 2005/07/29 05:11:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1053,7 +1053,6 @@ man_MANS = \
 	man9/datab.9 \
 	man9/datamsg.9 \
 	man9/dblk_t.9 \
-	man9/defer_func.9 \
 	man9/delay.9 \
 	man9/di_alloc.9 \
 	man9/di_put.9 \
@@ -2228,7 +2227,6 @@ dist_noinst_MANS = \
 	man9/datab.9.man \
 	man9/datamsg.9.man \
 	man9/dblk_t.9.man \
-	man9/defer_func.9.man \
 	man9/delay.9.man \
 	man9/di_alloc.9.man \
 	man9/di_put.9.man \

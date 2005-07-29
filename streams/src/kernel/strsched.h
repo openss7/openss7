@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/28 14:45:45 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 05:11:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:45:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 05:11:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -146,6 +146,10 @@ current_context(void)
 		return (CTX_STREAMS);
 	if (in_interrupt())
 		return (CTX_INT);
+#if HAVE_KFUNC_IN_ATOMIC
+	if (in_atomic())
+		return (CTX_ATOMIC);
+#endif
 	return (CTX_PROC);
 }
 
