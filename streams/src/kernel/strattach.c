@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:59 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/29 22:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:59 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/29 22:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 12:06:59 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/29 22:20:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -97,7 +97,7 @@ static struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * roo
 static int (*check_mnt) (struct vfsmount * mnt)
 = (typeof(check_mnt)) HAVE_CHECK_MNT_ADDR;
 #else
-static inline int
+static int
 check_mnt(struct vfsmount *mnt)
 {
 	return mnt->mnt_namespace == current->namespace;

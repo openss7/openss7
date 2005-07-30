@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.47 2005/07/29 12:58:39 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.48 2005/07/29 22:20:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 12:58:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/29 12:58:39 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/29 22:20:09 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -901,16 +901,42 @@ typedef enum qfields {
 	QBAD,				/* last (AIX and SUPER-UX) */
 } qfields_t;
 
-extern bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg);
+/* Message utilities. */
 
 extern int adjmsg(mblk_t *mp, ssize_t length);
+extern mblk_t *allocb(size_t size, unsigned int priority);
+extern mblk_t *copyb(mblk_t *mp);
+extern void freeb(mblk_t *bp);
+extern void freemsg(mblk_t *mp);
+extern mblk_t *copymsg(mblk_t *mp);
+extern int ctlmsg(unsigned char type);
+extern int datamsg(unsigned char type);
+extern mblk_t *dupb(mblk_t *mp);
+extern mblk_t *dupmsg(mblk_t *mp);
+extern mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo);
+__EXTERN_INLINE int isdatablk(dblk_t * db);
+__EXTERN_INLINE int isdatamsg(mblk_t *mp);
+__EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
+__EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
+extern size_t msgdsize(mblk_t *mp);
+extern mblk_t *msgpullup(mblk_t *mp, ssize_t length);
+extern size_t msgsize(mblk_t *mp);
+__EXTERN_INLINE int pcmsg(unsigned char type);
+extern int pullupmsg(mblk_t *mp, ssize_t len);
+extern mblk_t *rmvb(mblk_t *mp, mblk_t *bp);
+extern int testb(size_t size, unsigned int priority);
+__EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
+extern size_t xmsgsize(mblk_t *mp);
+
+
+extern bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg);
+
 extern int appq(queue_t *q, mblk_t *mp1, mblk_t *mp2);
 extern int bcanget(queue_t *q, unsigned char band);
 extern int bcangetany(queue_t *q);
 extern int bcanput(queue_t *q, unsigned char band);
 extern int bcanputany(queue_t *q);
 extern int insq(queue_t *q, mblk_t *emp, mblk_t *mp);
-extern int pullupmsg(mblk_t *mp, ssize_t len);
 extern int putbq(queue_t *q, mblk_t *mp);
 extern int putq(queue_t *q, mblk_t *mp);
 extern int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag,
@@ -926,14 +952,7 @@ extern int strqset(queue_t *q, qfields_t what, unsigned char band, long val);
 extern int weldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
 extern int unweldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
 
-extern mblk_t *allocb(size_t size, unsigned int priority);
-extern mblk_t *copyb(mblk_t *mp);
-extern mblk_t *copymsg(mblk_t *mp);
-extern mblk_t *dupb(mblk_t *mp);
-extern mblk_t *dupmsg(mblk_t *mp);
-extern mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo);
 extern mblk_t *getq(queue_t *q);
-extern mblk_t *msgpullup(mblk_t *mp, ssize_t len);
 
 extern modID_t getmid(const char *name);
 extern qi_qadmin_t getadmin(modID_t modid);
@@ -942,7 +961,6 @@ extern ssize_t qcountstrm(queue_t *q);
 
 extern void flushband(queue_t *q, int band, int flag);
 extern void flushq(queue_t *q, int flag);
-extern void freeb(mblk_t *bp);
 extern void freeq(queue_t *q);
 extern void put(queue_t *q, mblk_t *mp);
 extern void qbackenable(queue_t *q);
@@ -959,6 +977,72 @@ extern void setqsched(void);
 /* Note: Solaris has a different prototype for these: see sunddi.h */
 extern unsigned long freezestr(queue_t *q);
 extern void unfreezestr(queue_t *q, unsigned long pl);
+
+/* Basics. */
+
+static __inline__ void
+bcopy(const void *from, void *to, size_t len)
+{
+	memcpy(to, from, len);
+}
+
+static __inline__ void
+bzero(void *data, size_t len)
+{
+	memset(data, 0, len);
+}
+
+static __inline__ int
+bcmp(const void *s1, const void *s2, size_t len)
+{
+	return memcmp(s1, s2, len);
+}
+
+/* Message functions. */
+
+__EXTERN_INLINE int
+isdatablk(dblk_t * db)
+{
+	return datamsg(db->db_type);
+}
+
+__EXTERN_INLINE int
+isdatamsg(mblk_t *mp)
+{
+	return isdatablk(mp->b_datap);
+}
+
+__EXTERN_INLINE void
+linkb(mblk_t *mp1, mblk_t *mp2)
+{
+	register mblk_t **bp;
+	for (bp = &mp1; *bp; bp = &(*bp)->b_cont) ;
+	*bp = mp2;
+}
+
+__EXTERN_INLINE mblk_t *
+linkmsg(mblk_t *mp1, mblk_t *mp2)
+{
+	if (mp1) {
+		linkb(mp1, mp2);
+		return (mp1);
+	}
+	return (mp2);
+}
+
+__EXTERN_INLINE int
+pcmsg(unsigned char type)
+{
+	return ((type & QPCTL) != 0);
+}
+
+__EXTERN_INLINE mblk_t *
+unlinkb(mblk_t *mp)
+{
+	return (mp ? xchg(&mp->b_cont, NULL) : NULL);
+}
+
+/* Queue functions. */
 
 __EXTERN_INLINE int
 bcanputnext(queue_t *q, unsigned char band)
@@ -1006,98 +1090,14 @@ SAMESTR(queue_t *q)
 __EXTERN_INLINE int
 canenable(queue_t *q)
 {
-	return (!test_bit(QNOENB_BIT, &q->q_flag));
+	return (!(q->q_flag & QNOENB));
 }
 
-__EXTERN_INLINE int
-ctlmsg(unsigned char type)
-{
-	unsigned char mod = (type & ~QPCTL);
+extern int enableq(queue_t *q);
 
-	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
-	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
-}
-
-__EXTERN_INLINE int
-datamsg(unsigned char type)
-{
-	unsigned char mod = (type & ~QPCTL);
-
-	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
-	return (((1 << mod) &
-		 ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) !=
-		0);
-}
-
-__EXTERN_INLINE int
-enableq(queue_t *q)
-{
-	if (q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag)) {
-		qenable(q);
-		return (1);
-	}
-	return (0);
-}
-
-__EXTERN_INLINE int
-isdatablk(dblk_t * db)
-{
-	return datamsg(db->db_type);
-}
-
-__EXTERN_INLINE int
-isdatamsg(mblk_t *mp)
-{
-	return isdatablk(mp->b_datap);
-}
-
-__EXTERN_INLINE int
-pcmsg(unsigned char type)
-{
-	return ((type & QPCTL) != 0);
-}
-
-__EXTERN_INLINE int
-putctl(queue_t *q, int type)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		put(q, mp);
-		return (1);
-	}
-	return (0);
-}
-
-__EXTERN_INLINE int
-putctl1(queue_t *q, int type, int param)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param;
-		put(q, mp);
-		return (1);
-	}
-	return (0);
-}
-
-__EXTERN_INLINE int
-putctl2(queue_t *q, int type, int param1, int param2)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param1;
-		*mp->b_wptr++ = (unsigned char) param2;
-		put(q, mp);
-		return (1);
-	}
-	return (0);
-}
+extern int putctl(queue_t *q, int type);
+extern int putctl1(queue_t *q, int type, int param);
+extern int putctl2(queue_t *q, int type, int param1, int param2);
 
 __EXTERN_INLINE void
 putnext(queue_t *q, mblk_t *mp)
@@ -1105,98 +1105,9 @@ putnext(queue_t *q, mblk_t *mp)
 	put(q->q_next, mp);
 }
 
-__EXTERN_INLINE int
-putnextctl(queue_t *q, int type)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		putnext(q, mp);
-		return (1);
-	}
-	return (0);
-}
-
-__EXTERN_INLINE int
-putnextctl1(queue_t *q, int type, int param)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param;
-		putnext(q, mp);
-		return (1);
-	}
-	return (0);
-}
-
-__EXTERN_INLINE int
-putnextctl2(queue_t *q, int type, int param1, int param2)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param1;
-		*mp->b_wptr++ = (unsigned char) param2;
-		putnext(q, mp);
-		return (1);
-	}
-	return (0);
-}
-
-__EXTERN_INLINE int
-testb(size_t size, unsigned int priority)
-{
-	mblk_t *mp;
-
-	(void) priority;
-	if ((mp = allocb(size, priority)))
-		freeb(mp);
-	return (mp != NULL);
-}
-
-__EXTERN_INLINE void
-linkb(mblk_t *mp1, mblk_t *mp2)
-{
-	mblk_t **mpp;
-
-	for (mpp = &mp1; *mpp; mpp = &(*mpp)->b_cont) ;
-	*mpp = mp2;
-}
-
-__EXTERN_INLINE mblk_t *
-linkmsg(mblk_t *mp1, mblk_t *mp2)
-{
-	if (mp1) {
-		linkb(mp1, mp2);
-		return (mp1);
-	}
-	return (mp2);
-}
-
-__EXTERN_INLINE mblk_t *
-rmvb(mblk_t *mp, mblk_t *bp)
-{
-	mblk_t **mpp;
-
-	if (likely(bp != NULL)) {
-		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
-		if (likely(*mpp != NULL)) {
-			*mpp = xchg(&bp->b_cont, NULL);
-			return (mp);
-		}
-	}
-	return ((mblk_t *) (-1));
-}
-
-__EXTERN_INLINE mblk_t *
-unlinkb(mblk_t *mp)
-{
-	return (mp ? xchg(&mp->b_cont, NULL) : NULL);
-}
+extern int putnextctl(queue_t *q, int type);
+extern int putnextctl1(queue_t *q, int type, int param);
+extern int putnextctl2(queue_t *q, int type, int param1, int param2);
 
 __EXTERN_INLINE queue_t *
 OTHERQ(queue_t *q)
@@ -1229,55 +1140,7 @@ __EXTERN_INLINE queue_t *
 backq(queue_t *q)
 {
 	struct queue *bq;
-
-	ensure(q, return (NULL));
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
-}
-
-__EXTERN_INLINE size_t
-msgdsize(mblk_t *mp)
-{
-	size_t size = 0;
-
-	for (; mp; mp = mp->b_cont)
-		if (mp->b_datap->db_type == M_DATA)
-			if (mp->b_wptr > mp->b_rptr)
-				size += mp->b_wptr - mp->b_rptr;
-	return (size);
-}
-
-__EXTERN_INLINE size_t
-msgsize(mblk_t *mp)
-{
-	size_t size = 0;
-
-	for (; mp; mp = mp->b_cont)
-		if (mp->b_wptr > mp->b_rptr)
-			size += mp->b_wptr - mp->b_rptr;
-	return (size);
-}
-
-__EXTERN_INLINE size_t
-xmsgsize(mblk_t *mp)
-{
-	register mblk_t *bp = mp;
-	register int type = 0;
-	register size_t size = 0, blen;	/* find first non-zero length block for type */
-
-	for (; bp; bp = bp->b_cont)
-		if ((blen = bp->b_wptr - bp->b_rptr) > 0) {
-			type = bp->b_datap->db_type;
-			size += blen;
-			break;
-		}		/* finish counting rest of message */
-	for (; bp; bp = bp->b_cont)
-		if ((blen = bp->b_wptr - bp->b_rptr) > 0) {
-			if (bp->b_datap->db_type == type)
-				size += blen;
-			else
-				break;
-		}
-	return (size);
 }
 
 __EXTERN_INLINE ssize_t
@@ -1286,28 +1149,8 @@ qsize(queue_t *q)
 	return q->q_msgs;
 }
 
-__EXTERN_INLINE void
-enableok(queue_t *q)
-{
-	clear_bit(QNOENB_BIT, &q->q_flag);
-}
-
-__EXTERN_INLINE void
-freemsg(mblk_t *mp)
-{
-	mblk_t *mp_this;
-
-	while ((mp_this = mp)) {
-		mp = mp->b_cont;
-		freeb(mp_this);
-	}
-}
-
-__EXTERN_INLINE void
-noenable(queue_t *q)
-{
-	set_bit(QNOENB_BIT, &q->q_flag);
-}
+extern void enableok(queue_t *q);
+extern void noenable(queue_t *q);
 
 __EXTERN_INLINE void
 qreply(queue_t *q, mblk_t *mp)

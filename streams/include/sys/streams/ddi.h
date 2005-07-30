@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.27 2005/07/18 12:06:58 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.28 2005/07/29 22:20:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/29 22:20:09 $"
 
 #ifndef __SYS_DDI_H__
 #warn "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -261,22 +261,6 @@ delay(unsigned long ticks)
 	set_current_state(TASK_INTERRUPTIBLE);
 	while ((ticks = schedule_timeout(ticks))) ;
 	set_current_state(TASK_RUNNING);
-}
-
-static __inline__ void
-bcopy(const void *from, void *to, size_t len)
-{
-	memcpy(to, from, len);
-}
-__EXTERN_INLINE void
-bzero(void *data, size_t len)
-{
-	memset(data, 0, len);
-}
-static __inline__ int
-bcmp(const void *s1, const void *s2, size_t len)
-{
-	return memcmp(s1, s2, len);
 }
 
 /* these are SVR 4 D3DK functions that need to be implemented yet */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.6 2005/07/18 12:06:58 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.7 2005/07/29 22:20:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/29 22:20:09 $"
 
 typedef struct bufq {
 	spinlock_t q_lock;
@@ -160,7 +160,9 @@ bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
 
-	ensure(q && mp, return);
+	assert(q);
+	assert(mp);
+
 	bufq_lock(q, &flags);
 	__bufq_queue(q, mp);
 	bufq_unlock(q, &flags);
@@ -171,7 +173,9 @@ bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
 
-	ensure(q && mp, return);
+	assert(q);
+	assert(mp);
+
 	bufq_lock(q, &flags);
 	if ((mp->b_next = q->q_head))
 		mp->b_next->b_prev = mp;
@@ -188,8 +192,11 @@ bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	unsigned long flags;
 
+	assert(q);
+	assert(mp);
+	assert(np);
+
 	bufq_lock(q, &flags);
-	ensure(q && mp && np, return);
 	if ((np->b_prev = mp->b_prev))
 		np->b_prev->b_next = np;
 	else
@@ -205,7 +212,10 @@ bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	unsigned long flags;
 
-	ensure(q && mp && np, return);
+	assert(q);
+	assert(mp);
+	assert(np);
+
 	bufq_lock(q, &flags);
 	if ((np->b_next = mp->b_next))
 		np->b_next->b_prev = np;
@@ -240,7 +250,8 @@ bufq_dequeue(bufq_t * q)
 	unsigned long flags;
 	mblk_t *mp;
 
-	ensure(q, return (NULL));
+	assert(q);
+
 	bufq_lock(q, &flags);
 	mp = __bufq_dequeue(q);
 	bufq_unlock(q, &flags);
@@ -270,7 +281,8 @@ bufq_dequeue_tail(bufq_t * q)
 	unsigned long flags;
 	mblk_t *mp;
 
-	ensure(q, return (NULL));
+	assert(q);
+
 	bufq_lock(q, &flags);
 	mp = __bufq_dequeue_tail(q);
 	bufq_unlock(q, &flags);
@@ -280,7 +292,9 @@ bufq_dequeue_tail(bufq_t * q)
 static inline mblk_t *
 __bufq_unlink(bufq_t * q, mblk_t *mp)
 {
-	ensure(q && mp, return (NULL));
+	assert(q);
+	assert(mp);
+
 	if (mp->b_next)
 		mp->b_next->b_prev = mp->b_prev;
 	else
@@ -300,7 +314,9 @@ bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	unsigned long flags;
 
-	ensure(q && mp, return (NULL));
+	assert(q);
+	assert(mp);
+
 	bufq_lock(q, &flags);
 	__bufq_unlink(q, mp);
 	bufq_unlock(q, &flags);
@@ -315,7 +331,9 @@ bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
 
-	ensure(q1 && q2, return);
+	assert(q1);
+	assert(q2);
+
 	while ((mp = bufq_dequeue_tail(q2)))
 		bufq_queue_head(q1, mp);
 	return;
@@ -329,7 +347,9 @@ bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
 
-	ensure(q1 && q2, return);
+	assert(q1);
+	assert(q2);
+
 	while ((mp = bufq_dequeue(q2)))
 		bufq_queue(q1, mp);
 }

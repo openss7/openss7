@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/29 22:20:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 12:58:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/29 22:20:10 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/29 22:20:10 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 12:58:46 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/07/29 22:20:10 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -200,8 +200,9 @@ struct streamtab str_info = {
 static int
 check_stream_io(struct file *file, struct stdata *sd)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -221,8 +222,9 @@ check_stream_io(struct file *file, struct stdata *sd)
 static int
 check_stream_rd(struct file *file, struct stdata *sd)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (!(file->f_mode & FREAD))
 		return (-EBADF);
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR))) {
@@ -257,8 +259,9 @@ check_stream_rd(struct file *file, struct stdata *sd)
 static int
 check_stream_wr(struct file *file, struct stdata *sd)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (!(file->f_mode & FWRITE))
 		return (-EBADF);
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STWRERR))) {
@@ -303,8 +306,9 @@ check_stream_wr(struct file *file, struct stdata *sd)
 static int
 check_stream_oc(struct file *file, struct stdata *sd)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -340,8 +344,9 @@ check_stream_oc(struct file *file, struct stdata *sd)
 static int
 check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -371,8 +376,9 @@ check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
 static int
 check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -409,8 +415,9 @@ check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
 static int
 check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -456,8 +463,9 @@ check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 static int
 check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
 {
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -501,8 +509,9 @@ strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
 {
 	int err = 0;
 
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if (!bcanputnext(sd->sd_wq, band)) {
 		/* wait for band to become available */
 		DECLARE_WAITQUEUE(wait, current);
@@ -579,7 +588,9 @@ strgetq(struct stdata *sd, int flags, int band, unsigned long len)
 {
 	mblk_t *mp = NULL;
 
-	ensure(sd && sd->sd_wq, return (NULL));
+	assert(sd);
+	assert(sd->sd_wq);
+
 	if ((flags == MSG_HIPRI) && test_and_clear_bit(STRPRI_BIT, &sd->sd_flag))
 		mp = getq(sd->sd_rq);
 	else {
@@ -642,8 +653,9 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned 
 {
 	mblk_t *mp;
 
-	ensure(file, return (NULL));
-	ensure(sd, return (NULL));
+	assert(file);
+	assert(sd);
+
 	/* maybe we'll get lucky... */
 	/* also we must make an attempt before returning ENXIO, EPIPE or rderror */
 	/* also we need to trigger QWANTR bit and empty queue backenabling */
@@ -682,8 +694,9 @@ strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band, unsigned 
 static void
 strwakeopen(struct file *file, struct stdata *sd)
 {
-	ensure(file, return);
-	ensure(sd, return);
+	assert(file);
+	assert(sd);
+
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	/* wake up anybody waiting on open bit */
@@ -702,8 +715,9 @@ strwaitopen(struct file *file, struct stdata *sd)
 	int err = 0;
 	int locked, frozen;
 
-	ensure(file, return (-EBADF));
-	ensure(sd, return (-ENOSTR));
+	assert(file);
+	assert(sd);
+
 	if ((err = check_stream_oc(file, sd)) == 0
 	    && ((locked = test_and_set_bit(STWOPEN_BIT, &sd->sd_flag))
 		|| (frozen = test_bit(STFROZEN_BIT, &sd->sd_flag)))) {
@@ -879,7 +893,6 @@ strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, size_t dlen,
 			continue;
 		}
 		default:
-			swerr();
 			freemsg(mp);
 			err = -EIO;
 			break;
@@ -2332,7 +2345,6 @@ stropen(struct inode *inode, struct file *file)
 			setq(q, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
 			break;
 		default:
-			swerr();
 		case S_IFCHR:
 			printd(("%s: stream head is CHR\n", __FUNCTION__));
 			sd->sd_wropt = 0;	/* default write ops */
@@ -2541,9 +2553,6 @@ strclose(struct inode *inode, struct file *file)
 						__FUNCTION__));
 					*sdp = sd->sd_clone;
 					sd->sd_clone = NULL;
-				} else {
-					pswerr(("%s: could not find stream head in clone list\n",
-						__FUNCTION__));
 				}
 				sd->sd_inode = NULL;
 				sd_put(sd);
@@ -2561,7 +2570,6 @@ strclose(struct inode *inode, struct file *file)
 		sd_put(sd);	/* could be final put */
 		return (err);
 	}
-	pswerr(("%s: no stream head\n", __FUNCTION__));
 	return (-ENOSTR);
 }
 
@@ -4332,8 +4340,9 @@ static struct fmodsw sth_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
+#if 0
 /* bleedin' mercy! */
-static inline void
+static void
 put_filesystem(struct file_system_type *fs)
 {
 #if HAVE_KFUNC_MODULE_PUT
@@ -4343,6 +4352,7 @@ put_filesystem(struct file_system_type *fs)
 		__MOD_DEC_USE_COUNT(fs->owner);
 #endif
 }
+#endif
 
 #ifdef CONFIG_STREAMS_STH_MODULE
 static

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/29 22:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 12:46:55 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/29 22:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/29 22:20:09 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 12:46:55 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/29 22:20:09 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -215,7 +215,7 @@ struct log {
  *  Determine whether the message is filtered or not.  Return 1 if the message
  *  is to be delivered to the trace logger and 0 if it is not.
  */
-static int inline
+static int
 log_trace_filter(queue_t *q, short mid, short sid, char level)
 {
 	int rval = 0;
@@ -241,7 +241,7 @@ log_trace_filter(queue_t *q, short mid, short sid, char level)
 /*
  *  Allocate a control block portion for a log message and fill it out.
  */
-static inline mblk_t *
+static mblk_t *
 log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags, int seq_no,
 	      int source)
 {
@@ -283,7 +283,7 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
  *  Try to allocate a control block, duplicate the data block, and deliver the
  *  message.  Return 1 on success, 0 on failure.
  */
-static inline int
+static int
 log_deliver_msg(queue_t *q, short mid, short sid, char level, int flags, int seq, mblk_t *dp,
 		int source)
 {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/29 12:58:42 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/07/29 22:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 12:58:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/29 12:58:42 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/07/29 22:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/29 12:58:42 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/07/29 22:20:09 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -87,31 +87,260 @@ static char const ident[] =
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "src/kernel/strsched.h"		/* for current_context() */
 #include "src/kernel/strutil.h"		/* for q locking and puts and gets */
+/*
+ *  This file (also) contains a set of specialized STREAMS kernel locks that have the following
+ *  charactersistics:
+ *
+ *  - they are read/write locks
+ *  - taking a write lock suppresses local hard interrupts
+ *  - taking a read lock suppresses local soft interrupts
+ *  - a processor can take a write lock on a lock that it has already write locked and it remains
+ *    write locked for that processor
+ *  - a processor can take a read lock on a lock that it has already write locked and it remains
+ *    write locked for that processor
+ *  - a processor can take a read lock on a lock that is unlocked or already read locked
+ *  - the caller does not have to supply a "flags" argument, flags are saved internally
+ *  - a blockable process can choose to wait on a write lock rather than spinning.
+ *  - a blockable process can choose to wait on a write lock or signals rather than spinning.
+ *
+ *  These characteristics meet the needs of STREAMS as follows:
+ *
+ *  - write locks can be taken from all contexts except hard irq.
+ *  - read locks can be taken from all contexts including hard irq.
+ */
 
-static inline int
+void
+klockinit(klock_t *kl)
+{
+	kl->kl_isrflags = 0;
+	rwlock_init(&kl->kl_lock);
+	kl->kl_owner = NULL;
+	kl->kl_nest = 0;
+	init_waitqueue_head(&kl->kl_waitq);
+}
+void
+kwlock(klock_t *kl)
+{
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else {
+		unsigned long flags;
+
+		local_irq_save(flags);
+		write_lock(&kl->kl_lock);
+		kl->kl_isrflags = flags;
+		kl->kl_owner = current;
+		kl->kl_nest = 0;
+	}
+}
+int
+kwtrylock(klock_t *kl)
+{
+	int locked = 1;
+
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else {
+		unsigned long flags;
+
+		local_irq_save(flags);
+		if (write_trylock(&kl->kl_lock)) {
+			kl->kl_isrflags = flags;
+			kl->kl_owner = current;
+			kl->kl_nest = 0;
+		} else {
+			local_irq_restore(flags);
+			locked = 0;
+		}
+	}
+	return (locked);
+}
+void
+kwlock_wait(klock_t *kl)
+{
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else if (!kwtrylock(kl)) {
+		DECLARE_WAITQUEUE(wait, current);
+		add_wait_queue_exclusive(&kl->kl_waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_UNINTERRUPTIBLE);
+			if (kwtrylock(kl))
+				break;
+			schedule();
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&kl->kl_waitq, &wait);
+	}
+}
+int
+kwlock_wait_sig(klock_t *kl)
+{
+	int err = 0;
+
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else if (!kwtrylock(kl)) {
+		DECLARE_WAITQUEUE(wait, current);
+		add_wait_queue_exclusive(&kl->kl_waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			if (signal_pending(current)) {
+				err = -EINTR;
+				break;
+			}
+			if (kwtrylock(kl))
+				break;
+			schedule();
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&kl->kl_waitq, &wait);
+	}
+	return (err);
+}
+void
+kwunlock(klock_t *kl)
+{
+	if (kl->kl_nest > 0)
+		kl->kl_nest--;
+	else {
+		unsigned long flags = kl->kl_isrflags;
+
+		kl->kl_owner = NULL;
+		kl->kl_nest = 0;
+		if (waitqueue_active(&kl->kl_waitq))
+			wake_up(&kl->kl_waitq);
+		write_unlock(&kl->kl_lock);
+		local_irq_restore(flags);
+	}
+}
+void
+krlock(klock_t *kl)
+{
+	if (kl->kl_owner == current)
+		kl->kl_nest++;
+	else
+		read_lock_bh(&kl->kl_lock);
+}
+void
+krunlock(klock_t *kl)
+{
+	if (kl->kl_nest > 0)
+		kl->kl_nest--;
+	else {
+		if (waitqueue_active(&kl->kl_waitq))
+			wake_up(&kl->kl_waitq);
+		read_unlock_bh(&kl->kl_lock);
+	}
+}
+void
+krlock_irqsave(klock_t *kl, unsigned long *flagsp)
+{
+	if (kl->kl_owner == current) {
+		kl->kl_nest++;
+		*flagsp = 0;
+	} else
+		read_lock_irqsave(&kl->kl_lock, *flagsp);
+}
+void
+krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
+{
+	if (kl->kl_nest > 0)
+		kl->kl_nest--;
+	else {
+		if (waitqueue_active(&kl->kl_waitq))
+			wake_up(&kl->kl_waitq);
+		read_unlock_irqrestore(&kl->kl_lock, *flagsp);
+	}
+}
+
+/* queue band gets and puts */
+qband_t *
+bget(qband_t *qb)
+{
+	struct qbinfo *qbi;
+
+	if (qb) {
+		qbi = (typeof(qbi)) qb;
+		if (atomic_read(&qbi->qbi_refs) < 1)
+			swerr();
+		atomic_inc(&qbi->qbi_refs);
+	}
+	return (qb);
+}
+void
+bput(qband_t **bp)
+{
+	qband_t *qb;
+
+	if ((qb = xchg(bp, NULL))) {
+		struct qbinfo *qbi = (typeof(qbi)) qb;
+
+		if (atomic_read(&qbi->qbi_refs) >= 1) {
+			if (atomic_dec_and_test(&qbi->qbi_refs))
+				freeqb(qb);
+		} else
+			swerr();
+	}
+}
+
+/* queue gets and puts */
+queue_t *
+qget(queue_t *q)
+{
+	struct queinfo *qu;
+
+	if (q) {
+		qu = (typeof(qu)) RD(q);
+		if (atomic_read(&qu->qu_refs) < 1)
+			swerr();
+		atomic_inc(&qu->qu_refs);
+	}
+	return (q);
+}
+void
+qput(queue_t **qp)
+{
+	queue_t *q;
+
+	if ((q = xchg(qp, NULL))) {
+		queue_t *rq = RD(q);
+		struct queinfo *qu = (typeof(qu)) rq;
+
+		if (atomic_read(&qu->qu_refs) >= 1) {
+			if (atomic_dec_and_test(&qu->qu_refs))
+				freeq(rq);
+		} else
+			swerr();
+	}
+}
+
+static int
 db_ref(dblk_t * db)
 {
 	return (db->db_ref = atomic_read(&db->db_users));
 }
-static inline void
+static void
 db_set(dblk_t * db, int val)
 {
 	atomic_set(&db->db_users, val);
 	db_ref(db);
 }
-static inline void
+static void
 db_inc(dblk_t * db)
 {
 	atomic_inc(&db->db_users);
 	db_ref(db);
 }
-static inline void
+#if 0
+static void
 db_dec(dblk_t * db)
 {
 	atomic_dec(&db->db_users);
 	db_ref(db);
 }
-static inline int
+#endif
+static int
 db_dec_and_test(dblk_t * db)
 {
 	int ret = atomic_dec_and_test(&db->db_users);
@@ -127,27 +356,29 @@ db_dec_and_test(dblk_t * db)
 #define databuf_offset \
 	(((unsigned char *)&((struct mdbblock *)0)->databuf) - ((unsigned char *)0))
 
-static inline mblk_t *
+static mblk_t *
 db_to_mb(dblk_t * db)
 {
 	return ((mblk_t *) ((unsigned char *) db - datablk_offset + msgblk_offset));
 }
-static inline unsigned char *
+static unsigned char *
 db_to_buf(dblk_t * db)
 {
 	return ((unsigned char *) db - datablk_offset + databuf_offset);
 }
-static inline unsigned char *
+#if 0
+static unsigned char *
 mb_to_buf(mblk_t *mb)
 {
 	return ((unsigned char *) mb - msgblk_offset + databuf_offset);
 }
-static inline dblk_t *
+#endif
+static dblk_t *
 mb_to_db(mblk_t *mb)
 {
 	return ((dblk_t *) ((unsigned char *) mb - msgblk_offset + datablk_offset));
 }
-static inline struct mdbblock *
+static struct mdbblock *
 mb_to_mdb(mblk_t *mb)
 {
 	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
@@ -162,10 +393,9 @@ mb_to_mdb(mblk_t *mb)
  *
  *  Return Values: (1) - success; (0) - failure
  */
-int
-adjmsg(mblk_t *mp, ssize_t length)
+int adjmsg(mblk_t *mp, ssize_t length)
 {
-	mblk_t *bp, *sp;
+	mblk_t *b, *bp;
 	int type;
 	ssize_t blen, size;
 
@@ -177,10 +407,10 @@ adjmsg(mblk_t *mp, ssize_t length)
 	else if (length < 0) {
 		/* trim from head of message */
 		/* check if we can do the trim */
-		for (size = length, bp = mp; bp; bp = bp->b_cont) {
-			if (bp->b_datap->db_type != type)
+		for (size = length, b = mp; b; b = b->b_cont) {
+			if (b->b_datap->db_type != type)
 				goto error;
-			if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+			if ((blen = b->b_wptr - b->b_rptr) <= 0)
 				continue;
 			if ((size -= blen) <= 0)
 				goto trim_head;
@@ -188,24 +418,24 @@ adjmsg(mblk_t *mp, ssize_t length)
 		goto error;
 	      trim_head:
 		/* do the trimming */
-		for (size = length, bp = mp; bp; bp = bp->b_cont) {
-			if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+		for (size = length, b = mp; b; b = b->b_cont) {
+			if ((blen = b->b_wptr - b->b_rptr) <= 0)
 				continue;
 			blen = size < blen ? size : blen;
-			bp->b_rptr += blen;
+			b->b_rptr += blen;
 			if ((size -= blen) <= 0)
 				return (1);	/* success */
 		}
 	} else if (length > 0) {
 		/* trim from tail of message */
 		/* check if we can do the trim */
-		for (size = 0, sp = NULL, bp = mp; bp; bp = bp->b_cont) {
-			if (bp->b_datap->db_type != type) {
-				type = bp->b_datap->db_type;
-				sp = bp;
+		for (size = 0, bp = NULL, b = mp; b; b = b->b_cont) {
+			if (b->b_datap->db_type != type) {
+				type = b->b_datap->db_type;
+				bp = b;
 				size = 0;
 			}
-			if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+			if ((blen = b->b_wptr - b->b_rptr) <= 0)
 				continue;
 			size += blen;
 		}
@@ -214,11 +444,11 @@ adjmsg(mblk_t *mp, ssize_t length)
 		goto error;
 	      trim_tail:
 		/* do the trimming */
-		for (bp = sp; bp; bp = bp->b_cont) {
-			if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+		for (b = bp; b; b = b->b_cont) {
+			if ((blen = b->b_wptr - b->b_rptr) <= 0)
 				continue;
 			blen = size < blen ? size : blen;
-			bp->b_wptr = bp->b_rptr + blen;
+			b->b_wptr = b->b_rptr + blen;
 			if ((size -= blen) <= 0)
 				return (1);	/* success */
 		}
@@ -227,7 +457,7 @@ adjmsg(mblk_t *mp, ssize_t length)
 	return (0);
 }
 
-EXPORT_SYMBOL(adjmsg);
+EXPORT_SYMBOL(adjmsg); /* include/sys/streams/stream.h */
 
 /**
  *  allocb:	- allocate a message block
@@ -271,30 +501,29 @@ EXPORT_SYMBOL(allocb);
  *  copyb:	- copy a message block
  *  @bp:	the message block to copy
  *
- *  Return Values: Returns the copy of the message or %NULL on failure.
+ *  Return Value: Returns the copy of the message or %NULL on failure.
  *
  *  Notices: Unlike LiS we do not align the copy.  The driver must me wary of alignment.
  */
-mblk_t *
-copyb(mblk_t *bp)
+extern mblk_t *copyb(mblk_t *mp)
 {
-	mblk_t *mp = NULL;
+	mblk_t *b = NULL;
 
-	if (bp) {
-		ssize_t size = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0;
+	if (mp) {
+		ssize_t size = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 
-		if ((mp = allocb(size, BPRI_MED))) {
-			bcopy(bp->b_rptr, mp->b_wptr, size);
-			mp->b_wptr += size;
-			mp->b_datap->db_type = bp->b_datap->db_type;
-			mp->b_band = bp->b_band;
-			mp->b_flag = bp->b_flag;
+		if ((b = allocb(size, BPRI_MED))) {
+			bcopy(mp->b_rptr, b->b_wptr, size);
+			b->b_wptr += size;
+			b->b_datap->db_type = mp->b_datap->db_type;
+			b->b_band = mp->b_band;
+			b->b_flag = mp->b_flag;
 		}
 	}
-	return (mp);
+	return (b);
 }
 
-EXPORT_SYMBOL(copyb);
+EXPORT_SYMBOL(copyb); /* include/sys/streams/stream.h */
 
 /**
  *  copymsg:	- copy a message
@@ -302,28 +531,49 @@ EXPORT_SYMBOL(copyb);
  *
  *  Copies all the message blocks in message @msg and returns a pointer to the copied message.
  */
-mblk_t *
-copymsg(mblk_t *msg)
+mblk_t *copymsg(mblk_t *mp)
 {
-	mblk_t *mp = NULL;
-	register mblk_t *bp, **mpp = &mp;
+	mblk_t *msg = NULL;
+	register mblk_t *b, **bp = &msg;
 
-	for (bp = msg; bp; bp = bp->b_cont, mpp = &(*mpp)->b_cont)
-		if (!(*mpp = copyb(bp)))
+	for (b = mp; b; b = b->b_cont, bp = &(*bp)->b_cont)
+		if (!(*bp = copyb(b)))
 			goto error;
-	return (mp);
+	return (msg);
       error:
 	freemsg(mp);
 	return (NULL);
 }
 
-EXPORT_SYMBOL(copymsg);
+EXPORT_SYMBOL(copymsg); /* include/sys/streams/stream.h */
+
+/**
+ *  ctlmsg:	- test for control message type
+ *  @type:	type to test
+ */
+int ctlmsg(unsigned char type)
+{
+	unsigned char mod = (type & ~QPCTL);
+
+	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
+	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
+}
+
+EXPORT_SYMBOL(ctlmsg); /* include/sys/streams/stream.h */
 
 /**
  *  datamsg:	- test for data message type
  *  @type:	type to test
  */
-__EXTERN_INLINE int datamsg(unsigned char type);
+int datamsg(unsigned char type)
+{
+	unsigned char mod = (type & ~QPCTL);
+
+	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
+	return (((1 << mod) &
+		 ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) !=
+		0);
+}
 
 EXPORT_SYMBOL(datamsg);
 
@@ -359,22 +609,21 @@ EXPORT_SYMBOL(dupb);
  *  Duplicates an entire message using dupb() to duplicate each of the message blocks in the
  *  message.  Returns a pointer to the duplicate message.
  */
-mblk_t *
-dupmsg(mblk_t *msg)
+mblk_t *dupmsg(mblk_t *mp)
 {
-	mblk_t *mp = NULL;
-	register mblk_t *bp, **mpp = &mp;
+	mblk_t *msg = NULL;
+	register mblk_t *b, **bp = &msg;
 
-	for (bp = msg; bp; bp = bp->b_cont, mpp = &(*mpp)->b_cont)
-		if (!(*mpp = dupb(bp)))
+	for (b = msg; b; b = b->b_cont, bp = &(*bp)->b_cont)
+		if (!(*bp = dupb(b)))
 			goto error;
-	return (mp);
+	return (msg);
       error:
-	freemsg(mp);
+	freemsg(msg);
 	return (NULL);
 }
 
-EXPORT_SYMBOL(dupmsg);
+EXPORT_SYMBOL(dupmsg); /* include/sys/streams/stream.h */
 
 /**
  *  esballoc:	- allocate a message block with an external buffer
@@ -444,7 +693,6 @@ freeb(mblk_t *mp)
 		mdbblock_free(mp);
 	return;
       bug:
-	swerr();
 	return;
 }
 
@@ -454,7 +702,12 @@ EXPORT_SYMBOL(freeb);
  *  freemsg:	- free a message
  *  @mp:	the message to free
  */
-__EXTERN_INLINE void freemsg(mblk_t *mp);
+void freemsg(mblk_t *mp)
+{
+	register mblk_t *b, *bp;
+
+	for (b = mp; (bp = b); b = b->b_cont, freeb(bp));
+}
 
 EXPORT_SYMBOL(freemsg);
 
@@ -504,7 +757,17 @@ EXPORT_SYMBOL(linkmsg);
  *  msgdsize:	- calculate size of data in message
  *  @mp:	message across which to calculate data bytes
  */
-__EXTERN_INLINE size_t msgdsize(mblk_t *mp);
+size_t msgdsize(mblk_t *mp)
+{
+	register mblk_t *b;
+	size_t size = 0;
+
+	for (b = mp; b; b = b->b_cont)
+		if (b->b_datap->db_type == M_DATA)
+			if (b->b_wptr > b->b_rptr)
+				size += b->b_wptr - b->b_rptr;
+	return (size);
+}
 
 EXPORT_SYMBOL(msgdsize);
 
@@ -516,11 +779,10 @@ EXPORT_SYMBOL(msgdsize);
  *  Pulls up @length  bytes into the returned message.  This is for handling headers as a contiguous
  *  range of bytes.
  */
-mblk_t *
-msgpullup(mblk_t *msg, ssize_t length)
+mblk_t *msgpullup(mblk_t *mp, ssize_t length)
 {
-	mblk_t *mp = NULL, **mpp = &mp;
-	register mblk_t *bp = NULL;
+	mblk_t *msg = NULL, **bp = &msg;
+	register mblk_t *b = NULL;
 	register ssize_t size, blen, type, len;
 
 	if (!msg)
@@ -529,10 +791,10 @@ msgpullup(mblk_t *msg, ssize_t length)
 		goto copy_rest;
 	type = msg->b_datap->db_type;
 	size = 0;
-	for (bp = msg; bp; bp = bp->b_cont) {
-		if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+	for (b = msg; b; b = b->b_cont) {
+		if ((blen = b->b_wptr - b->b_rptr) <= 0)
 			continue;
-		if (bp->b_datap->db_type == type)
+		if (b->b_datap->db_type == type)
 			break;
 		if ((size += blen) > len && len > 0)
 			goto copy_len;
@@ -542,40 +804,40 @@ msgpullup(mblk_t *msg, ssize_t length)
 	if (len < 0)
 		len = size;
       copy_len:
-	if (!(mp = allocb(len, BPRI_MED)))
+	if (!(msg = allocb(len, BPRI_MED)))
 		goto error;
-	mpp = &mp->b_cont;
-	for (bp = msg; bp; bp = bp->b_cont) {
-		if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+	bp = &msg->b_cont;
+	for (b = msg; b; b = b->b_cont) {
+		if ((blen = b->b_wptr - b->b_rptr) <= 0)
 			continue;
-		if (bp->b_datap->db_type != type)
+		if (b->b_datap->db_type != type)
 			break;
 		if ((size = blen - len) <= 0) {
-			bcopy(bp->b_rptr, mp->b_wptr, blen);
-			mp->b_wptr += blen;
+			bcopy(b->b_rptr, msg->b_wptr, blen);
+			msg->b_wptr += blen;
 			len -= blen;
 			continue;
 		} else {
-			bcopy(bp->b_rptr, mp->b_wptr, len);
-			mp->b_wptr += len;
-			if (!(*mpp = copyb(bp)))
+			bcopy(b->b_rptr, msg->b_wptr, len);
+			msg->b_wptr += len;
+			if (!(*bp = copyb(b)))
 				goto error;
-			(*mpp)->b_datap->db_type = bp->b_datap->db_type;
-			(*mpp)->b_rptr += size;
-			mpp = &(*mpp)->b_cont;
-			bp = bp->b_cont;
+			(*bp)->b_datap->db_type = b->b_datap->db_type;
+			(*bp)->b_rptr += size;
+			bp = &(*bp)->b_cont;
+			b = b->b_cont;
 			break;
 		}
 	}
       copy_rest:
-	if (bp)			/* just copy rest of message */
-		if (!(*mpp = copymsg(bp)))
+	if (b)			/* just copy rest of message */
+		if (!(*bp = copymsg(b)))
 			goto error;
-	return (mp);
+	return (msg);
       error:
-	if (mp)
-		freemsg(mp);
-	return (mp);
+	if (msg)
+		freemsg(msg);
+	return (msg);
 }
 
 EXPORT_SYMBOL(msgpullup);
@@ -584,7 +846,16 @@ EXPORT_SYMBOL(msgpullup);
  *  msgsize:	- calculate size of a message
  *  @mp:	message for which to calculate size
  */
-__EXTERN_INLINE size_t msgsize(mblk_t *mp);
+size_t msgsize(mblk_t *mp)
+{
+	register mblk_t *b;
+	size_t size = 0;
+
+	for (b = mp; b; b = b->b_cont)
+		if (b->b_wptr > b->b_rptr)
+			size += b->b_wptr - b->b_rptr;
+	return (size);
+}
 
 EXPORT_SYMBOL(msgsize);
 
@@ -699,7 +970,19 @@ EXPORT_SYMBOL(pullupmsg);
  *  @mp:    message from which to remove the block
  *  @bp:    the block to remove
  */
-__EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp);
+mblk_t *rmvb(mblk_t *mp, mblk_t *bp)
+{
+	mblk_t **mpp;
+
+	if (likely(bp != NULL)) {
+		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
+		if (likely(*mpp != NULL)) {
+			*mpp = xchg(&bp->b_cont, NULL);
+			return (mp);
+		}
+	}
+	return ((mblk_t *) (-1));
+}
 
 EXPORT_SYMBOL(rmvb);
 
@@ -708,7 +991,15 @@ EXPORT_SYMBOL(rmvb);
  *  @size:	size of buffer for which to test
  *  @priority:	allocation priority to test
  */
-__EXTERN_INLINE int testb(size_t size, uint priority);
+int testb(size_t size, uint priority)
+{
+	mblk_t *mp;
+
+	(void) priority;
+	if ((mp = allocb(size, priority)))
+		freeb(mp);
+	return (mp != NULL);
+}
 
 EXPORT_SYMBOL(testb);
 
@@ -729,7 +1020,27 @@ EXPORT_SYMBOL(unlinkb);
  *  not.  This implementation does not wrap the size, and skips initial zero-length message blocks.
  *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
-__EXTERN_INLINE size_t xmsgsize(mblk_t *mp);
+size_t xmsgsize(mblk_t *mp)
+{
+	register mblk_t *bp = mp;
+	register int type = 0;
+	register size_t size = 0, blen;	/* find first non-zero length block for type */
+
+	for (; bp; bp = bp->b_cont)
+		if ((blen = bp->b_wptr - bp->b_rptr) > 0) {
+			type = bp->b_datap->db_type;
+			size += blen;
+			break;
+		}		/* finish counting rest of message */
+	for (; bp; bp = bp->b_cont)
+		if ((blen = bp->b_wptr - bp->b_rptr) > 0) {
+			if (bp->b_datap->db_type == type)
+				size += blen;
+			else
+				break;
+		}
+	return (size);
+}
 
 EXPORT_SYMBOL(xmsgsize);
 
@@ -898,7 +1209,6 @@ bcanputany(queue_t *q)
 		/* a non-existent band is considered unwritable */
 		return (qb ? 1 : 0);
 	}
-	swerr();
 	return (0);
 }
 
@@ -1019,7 +1329,7 @@ EXPORT_SYMBOL(canputnext);
  *
  * Find a queue band.  This must be called with the queue read or write locked.
  */
-static inline struct qband *
+static struct qband *
 __find_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
@@ -1374,8 +1684,8 @@ getq(queue_t *q)
 	mblk_t *mp;
 	int backenable = 0;
 
-	ensure(q, return (NULL));
-	/* XXX: are these strict locks necessary? */
+	assert(q);
+
 	qwlock(q);
 	mp = __getq(q, &backenable);
 	qwunlock(q);
@@ -1473,7 +1783,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	nmp->b_size = size;
 	return (1 + enable);	/* success */
       bug:
-	swerr();
       enomem:
 	/* couldn't allocate a band structure! */
 	goto failure;
@@ -1663,7 +1972,17 @@ EXPORT_SYMBOL(putbq);
  *  @q:		the queue to put to
  *  @type:	the message type
  */
-__EXTERN_INLINE int putctl(queue_t *q, int type);
+int putctl(queue_t *q, int type)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		put(q, mp);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(putctl);
 
@@ -1673,7 +1992,18 @@ EXPORT_SYMBOL(putctl);
  *  @type:	the message type
  *  @param:	the 1 byte parameter
  */
-__EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
+int putctl1(queue_t *q, int type, int param)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		*mp->b_wptr++ = (unsigned char) param;
+		put(q, mp);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(putctl1);
 
@@ -1684,7 +2014,19 @@ EXPORT_SYMBOL(putctl1);
  *  @param1:	the first 1 byte parameter
  *  @param2:	the second 1 byte parameter
  */
-__EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2);
+int putctl2(queue_t *q, int type, int param1, int param2)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		*mp->b_wptr++ = (unsigned char) param1;
+		*mp->b_wptr++ = (unsigned char) param2;
+		put(q, mp);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(putctl2);
 
@@ -1693,7 +2035,17 @@ EXPORT_SYMBOL(putctl2);
  *  @q:		this queue
  *  @type:	the message type
  */
-__EXTERN_INLINE int putnextctl(queue_t *q, int type);
+int putnextctl(queue_t *q, int type)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(putnextctl);
 
@@ -1703,7 +2055,18 @@ EXPORT_SYMBOL(putnextctl);
  *  @type:	the message type
  *  @param:	the 1 byte parameter
  */
-__EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
+int putnextctl1(queue_t *q, int type, int param)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		*mp->b_wptr++ = (unsigned char) param;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(putnextctl1);
 
@@ -1714,7 +2077,19 @@ EXPORT_SYMBOL(putnextctl1);
  *  @param1:	the first 1 byte parameter
  *  @param2:	the second 1 byte parameter
  */
-__EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
+int putnextctl2(queue_t *q, int type, int param1, int param2)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		*mp->b_wptr++ = (unsigned char) param1;
+		*mp->b_wptr++ = (unsigned char) param2;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(putnextctl2);
 
@@ -2316,8 +2691,8 @@ rmvq(queue_t *q, mblk_t *mp)
 
 	qwlock(q);
 	{
-		assert(q->q_owner == current);
-		assert(q->q_nest >= 1);
+		assert(q->q_klock.kl_owner == current);
+		assert(q->q_klock.kl_nest >= 1);
 		assert(mp->b_queue);
 		assert(q == mp->b_queue);
 
@@ -2439,7 +2814,6 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 				     (1 << SQLVL_QUEUEPAIR)))))
 				pswerr(("invalid flags\n"));
 			if (!(sqo = sq_get(fmod->f_syncq))) {
-				pswerr(("registration function forgot to allocate syncq\n"));
 				if (!(sqo = sq_alloc()))
 					goto enomem;
 				fmod->f_syncq = sqo;
@@ -2483,14 +2857,12 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 			sqw = sq_get(sqr);
 			break;
 		default:
-			swerr();
 		case SQLVL_DEFAULT:
 		case SQLVL_MODULE:	/* default */
 			/* find the module and use its syncq */
 			/* The registration function is responsible for allocating the module
 			   synchronization queue and attaching it to the module structure */
 			if (!(sqr = sq_get(fmod->f_syncq))) {
-				pswerr(("registration function forgot to allocate syncq\n"));
 				if (!(sqr = sq_alloc())) {
 					sq_put(&sqo);
 					goto enomem;
@@ -2507,7 +2879,6 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 			/* The registration function is responsible for finding and allocating the
 			   external synchronization queue and attaching it to the module structure */
 			if (!(sqr = sq_get(fmod->f_syncq))) {
-				pswerr(("registration function forgot to allocate syncq\n"));
 				if (!(sqr = sq_alloc())) {
 					sq_put(&sqo);
 					goto enomem;
@@ -2544,8 +2915,7 @@ __setsq(queue_t *q, struct fmodsw *fmod, int mux)
 			setq(q, fmod->f_str->st_rdinit, fmod->f_str->st_wrinit);
 		else
 			setq(q, fmod->f_str->st_muxrinit, fmod->f_str->st_muxwinit);
-	} else
-		swerr();
+	}
 	return (0);
 #if defined CONFIG_STREAMS_SYNCQS
       enomem:

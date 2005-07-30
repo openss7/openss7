@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.18  2005/07/29 22:20:02  brian
+ - corrections for debug compile
+ - some size optimizations
+
  Revision 0.9.2.17  2005/07/29 07:37:51  brian
  - changes to compile with latest streams package.
 
@@ -104,10 +108,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -135,7 +139,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/29 07:37:51 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -587,8 +591,10 @@ void mi_copy_done(queue_t *q, mblk_t *mp, int err)
 {
 	union ioctypes *ioc;
 
-	ensure(mp, return);
-	ensure(q && mp->b_wptr >= mp->b_rptr + sizeof(*ioc), goto error);
+	assert(mp);
+	assert(q);
+	assert(mp->b_wptr >= mp->b_rptr + sizeof(*ioc));
+
 	ioc = (typeof(ioc)) mp->b_rptr;
 	switch (mp->b_datap->db_type) {
 	case M_IOCDATA:

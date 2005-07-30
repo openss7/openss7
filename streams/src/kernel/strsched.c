@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/29 12:58:42 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/07/29 22:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 12:58:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/29 12:58:42 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/07/29 22:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/29 12:58:42 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/07/29 22:20:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1040,7 +1040,7 @@ seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		write_unlock_irqrestore(&event_hash_lock, flags);
 	}
 }
-static inline struct strevent *
+static struct strevent *
 event_alloc(int type, queue_t *q)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
@@ -1068,7 +1068,7 @@ event_alloc(int type, queue_t *q)
 	}
 	return (se);
 }
-static inline void
+static void
 event_free(struct strevent *se)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
@@ -1247,7 +1247,7 @@ strsched_timeout(struct strevent *se)
 }
 
 #if 0
-static inline long
+static long
 defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 {
 	long id = 0;
@@ -1261,7 +1261,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	return (id);
 }
 #endif
-static inline long
+static long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long), long arg)
 {
 	long id = 0;
@@ -1276,7 +1276,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long)
 	}
 	return (id);
 }
-static inline long
+static long
 defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
 		    int cpu)
 {
@@ -1294,7 +1294,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	}
 	return (id);
 }
-static inline long
+static long
 defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		  weld_arg_t arg, queue_t *q)
 {
@@ -1313,7 +1313,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	}
 	return (id);
 }
-static inline long
+static long
 defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		    weld_arg_t arg, queue_t *q)
 {
@@ -1454,7 +1454,7 @@ EXPORT_SYMBOL(untimeout);	/* include/sys/streams/stream.h */
  *
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
-static inline int
+static int
 __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	weld_arg_t arg, queue_t *protq)
 {
@@ -1473,7 +1473,7 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  *
  *  Issues the STREAMS event necessary to unweld two queue pairs apart with synchronization.
  */
-static inline int
+static int
 __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	  weld_arg_t arg, queue_t *protq)
 {
@@ -1581,7 +1581,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 		struct strthread *t = this_thread;
 		queue_t *oldq;
 
-		assert(!t->curentq || in_irq());
+		assert(!t->currentq || in_irq());
 		/* oldq could be non-NULL if called from hardirq */
 		oldq = t->currentq;
 		t->currentq = qget(q);
@@ -1613,7 +1613,7 @@ strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 		struct strthread *t = this_thread;
 		queue_t *oldq;
 
-		assert(!t->curentq || in_irq());
+		assert(!t->currentq || in_irq());
 		/* oldq could be non-NULL if called from hardirq */
 		oldq = t->currentq;
 		t->currentq = qget(q);
@@ -1658,7 +1658,7 @@ putp(queue_t *q, mblk_t *mp)
 		struct strthread *t = this_thread;
 		queue_t *oldq;
 
-		assert(!t->curentq || in_irq());
+		assert(!t->currentq || in_irq());
 		/* oldq could be non-NULL if called from hardirq */
 		oldq = t->currentq;
 		t->currentq = qget(q);
@@ -1715,7 +1715,7 @@ srvp(queue_t *q)
 
 		assert(q->q_qinfo);
 		assert(q->q_qinfo->qi_srvp);
-		assert(!t->curentq || in_irq());
+		assert(!t->currentq || in_irq());
 		/* oldq could be non-NULL if called from hardirq */
 		oldq = t->currentq;
 		t->currentq = qget(q);
@@ -2337,7 +2337,7 @@ qputp(queue_t *q, mblk_t *mp)
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-static int
+static inline int
 qsrvp(queue_t *q)
 {
 	int result;
@@ -2736,7 +2736,7 @@ sq_doevent_synced(struct strevent *se)
 }
 #endif
 
-static inline void
+static void
 do_stream_event(struct strevent *se)
 {
 }
@@ -2809,7 +2809,7 @@ do_weldq_event(struct strevent *se)
  *  not exist the inner barrier is entered exclusive, and if that does not exist, only normal
  *  STREAMS MP safety is used.  stream head write locking is used to protect pointer dereferencing.
  */
-static inline void
+static void
 do_unweldq_event(struct strevent *se)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2825,7 +2825,7 @@ do_unweldq_event(struct strevent *se)
 	sefree(se);
 }
 
-static inline void
+static void
 sq_doevent(struct strevent *se)
 {
 	struct seinfo *s = (typeof(s)) se;
@@ -2918,7 +2918,7 @@ EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
  *  
  *  Process all oustanding timeouts in the order in which they were received.
  */
-static inline void
+static void
 timeouts(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -2930,7 +2930,7 @@ timeouts(struct strthread *t)
 			while ((se = se_next)) {
 				se_next = xchg(&se->se_next, NULL);
 				/* this might further defer against a synchronization queue */
-				sq_doevent(se);
+				do_timeout_event(se);
 			}
 		}
 	} while (test_bit(strtimout, &t->flags));
@@ -2940,7 +2940,7 @@ timeouts(struct strthread *t)
  *  doevents:	- process STREAMS events
  *  @t:		STREAMS execution thread
  */
-static inline void
+static void
 doevents(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -3071,7 +3071,7 @@ runsyncq(struct syncq *sq, unsigned long *flagsp)
  *  access was requested.  This is acceptable and reduces the burder of tracking two perimeters with
  *  shared or exclusive access.
  */
-static inline void
+static void
 backlog(struct strthread *t)
 {
 	register syncq_t *sq, *sq_link;
@@ -3105,7 +3105,7 @@ backlog(struct strthread *t)
  *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
  *  an allocation is successful.
  */
-static inline void
+static void
 bufcalls(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -3117,7 +3117,7 @@ bufcalls(struct strthread *t)
 			while ((se = se_next)) {
 				se_next = xchg(&se->se_next, NULL);
 				/* this might further defer against a synchronization queue */
-				sq_doevent(se);
+				do_bufcall_event(se);
 			}
 		}
 	} while (test_bit(strbcwait, &t->flags));
@@ -3129,7 +3129,7 @@ bufcalls(struct strthread *t)
  *
  *  Run queue service procedures.
  */
-static inline void
+static void
 queuerun(struct strthread *t)
 {
 	register queue_t *q, *q_link;
@@ -3149,7 +3149,7 @@ queuerun(struct strthread *t)
 /**
  *  setqsched:	- schedule execution of queue procedures
  */
-void inline
+void
 setqsched(void)
 {
 	struct strthread *t = this_thread;
@@ -3163,7 +3163,7 @@ EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
 /**
  *  qready:	- test if queue procedures are scheduled
  */
-int inline
+int
 qready(void)
 {
 	struct strthread *t = this_thread;
@@ -3248,7 +3248,14 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
  *  procedure if a service procedure exists for @q, and if the queue has not been previously
  *  noenabled with noenable() (i.e. the %QNOENB flag is set on the queue).
  */
-__EXTERN_INLINE int enableq(queue_t *q);
+int enableq(queue_t *q)
+{
+	if (q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag)) {
+		qenable(q);
+		return (1);
+	}
+	return (0);
+}
 
 EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
 
@@ -3259,7 +3266,10 @@ EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
  *  This function simply clears the %QNOENB flag on the queue.  It does not schedule the queue.
  *  That must be done with a separate call to enableq() or qenable().
  */
-__EXTERN_INLINE void enableok(queue_t *q);
+void enableok(queue_t *q)
+{
+	clear_bit(QNOENB_BIT, &q->q_flag);
+}
 
 EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
 
@@ -3269,7 +3279,10 @@ EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
  *
  *  This function simply sets the %QNOENB flag on the queue.
  */
-__EXTERN_INLINE void noenable(queue_t *q);
+void noenable(queue_t *q)
+{
+	set_bit(QNOENB_BIT, &q->q_flag);
+}
 
 EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 
@@ -3280,7 +3293,7 @@ EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
  *  Free chains of message blocks outstanding from flush operations that were left over at the end
  *  of the CPU run.
  */
-static inline void
+static void
 freechains(struct strthread *t)
 {
 	register mblk_t *mp, *mp_next;

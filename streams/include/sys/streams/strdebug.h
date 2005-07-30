@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.13 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.14 2005/07/29 22:20:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 22:20:09 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warn "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."

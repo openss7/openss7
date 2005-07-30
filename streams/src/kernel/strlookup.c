@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:22 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/29 22:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:22 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/29 22:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:22 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/29 22:20:09 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -172,7 +172,7 @@ EXPORT_SYMBOL(cmin_count);
 /**
  *  init_fmod_hash: - initialize the list_head structures in the fmod hash
  */
-STATIC INLINE void
+STATIC void
 init_fmod_hash(void)
 {
 	int i;
@@ -184,7 +184,7 @@ init_fmod_hash(void)
 /**
  *  init_cdev_hash: - initialize the list_head structures in the cdev hash
  */
-STATIC INLINE void
+STATIC void
 init_cdev_hash(void)
 {
 	int i;
@@ -196,7 +196,7 @@ init_cdev_hash(void)
 /**
  *  init_cmin_hash: - initialize the list_head structures in the cmin hash
  */
-STATIC INLINE void
+STATIC void
 init_cmin_hash(void)
 {
 	int i;
@@ -1006,6 +1006,7 @@ cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 	struct list_head *pos;
 
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+
 	list_for_each(pos, &cdev->d_majors) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
 
@@ -1108,8 +1109,10 @@ cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 {
 	cmaj->n_major = major;
 	cmaj->n_minor = 0;	/* FIXME */
-	/* add to list and hash */
+
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+
+	/* add to list and hash */
 	if (list_empty(&cdev->d_majors))
 		cdev->d_major = major;
 	list_add_tail(&cmaj->n_list, &cdev->d_majors);
@@ -1122,6 +1125,7 @@ void
 cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+
 	list_del_init(&cmaj->n_list);
 	list_del_init(&cmaj->n_hash);
 	if (list_empty(&cdev->d_majors))
@@ -1173,8 +1177,10 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 		cmin->n_mode = cdev->d_mode;
 	if (!(cmin->n_mode & S_IFMT))
 		cmin->n_mode = S_IFCHR | S_IRUGO | S_IWUGO;
-	/* add to list and hash */
+
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+
+	/* add to list and hash */
 	list_add(&cmin->n_list, &cdev->d_minors);
 	list_add(&cmin->n_hash, strnod_hash_slot(minor));
 	cmin_count++;
@@ -1191,7 +1197,9 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 	cmin->n_dev = NULL;
 	cmin->n_modid = -1;
 	cmin->n_minor = -1;
+
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);
 	cmin_count--;
