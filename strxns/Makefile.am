@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/18 00:58:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:32:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/18 00:58:53 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:32:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,7 +122,7 @@ mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNSmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
@@ -134,7 +134,7 @@ drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
@@ -200,7 +200,7 @@ mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNSmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
@@ -212,7 +212,7 @@ drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 

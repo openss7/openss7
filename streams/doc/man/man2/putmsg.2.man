@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putmsg.2.man,v 0.9.2.12 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: putmsg.2.man,v 0.9.2.13 2005/08/29 10:06:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:30 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -88,9 +88,10 @@ sort-adjacent-labels
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'dataptr\(em'u
 .I fd
 the file descriptor to which to put a message.
+.PD 0
 .TP
 .I ctlptr
 a pointer to a
@@ -102,6 +103,7 @@ structure holding the data part of the message.
 .TP
 .I flags
 putmsg flags.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -158,10 +160,11 @@ struct strbuf {
 };
 \s+2\fR
 .fi
-.TP
+.TP \w'maxlen\(em'u
 .I maxlen
 Not used by
 .BR putmsg() .
+.PD 0
 .TP
 .I len
 The length of the information pointed to by
@@ -171,6 +174,7 @@ The length of the information pointed to by
 A pointer to the buffer that contains
 .I len
 bytes of information.
+.PD
 .PP
 .I ctlptr
 points to a
@@ -185,7 +189,7 @@ of the
 .B strbuf
 structure pointed to by
 .I ctlptr
-indiates the start of the information to sent in the control part, and
+indicates the start of the information to sent in the control part, and
 the
 .I len
 member indicates the length of the information for the control part.
@@ -203,7 +207,7 @@ of the
 .B strbuf
 structure pointed to by
 .I ctlptr
-indiates the start of the information to sent in the data part, and
+indicates the start of the information to sent in the data part, and
 the
 .I len
 member indicates the length of the information for the data part.
@@ -214,7 +218,7 @@ can be zero (0) to send zero-length data.
 specifies whether to send a high priority message or a normal priority message.
 .I flags
 can be one of the following values:
-.TP
+.TP \w'RS_HIPRI\(em'u
 .B RS_HIPRI
 Specifies that a high priority message is to be sent and the request must contain a
 control part
@@ -233,18 +237,146 @@ When there is only a data part, an
 .B M_DATA
 message
 is placed on the stream head.
+.PP
+When the
+.BR O_NONBLOCK "(or " O_NDELAY )
+file flag is clear,
+.BR putmsg ()
+blocks for normal priority messages (ones for which
+.I flags
+is set to zero
+.RB ( 0 ))
+when the stream cannot accept data (the stream write queue is full due to internal flow conditions).
+For normal priority messages (ones for which
+.I flags
+is set to zero
+.RB ( 0 )),
+when the
+.BR O_NONBLOCK "(or " O_NDELAY )
+file flag is set, and the stream cannot accept data (the stream write queue is full due to internal
+flow conditions),
+.BR putmsg ()
+will fail, return minus one
+.RB ( -1 )
+and set the global error number,
+.IR errno (3)
+to
+.RB [ EAGAIN "] (or [" EWOULDBLOCK ]).
+.PP
+When the stream head is set for
+old TTY
+semantics for
+.BR O_NDELAY ,
+and the
+.BR O_NDELAY "(or " O_NONBLOCK )
+file flag is clear,
+.BR putmsg ()
+blocks for normal priority messages (ones for which
+.I flags
+is set to zero
+.RB ( 0 ))
+when the stream cannot accept data (the stream write queue is full due to internal flow conditions).
+For normal priority messages (ones for which
+.I flags
+is set to zero
+.RB ( 0 )),
+when the
+.BR O_NDELAY "(or " O_NONBLOCK )
+file flag is set, and the stream cannot accept data (the stream write queue is full due to internal
+flow conditions),
+.BR putmsg ()
+will terminate and return zero
+.RB ( 0 ).
+.PP
+For high priority messages (ones for which
+.I flags
+is set to
+.BR RS_HIPRI ),
+.BR putmsg ()
+will neither block nor fail on flow control conditions, regardless of the stream head
+.B O_NDELAY
+semantics, or the setting of
+.BR O_NDELAY
+or
+.BR O_NONBLOCK .
+.PP
+Unlike
+.BR write (2s)
+or
+.BR writev (2s),
+.BR putmsg (),
+unless prevented by the lack of internal
+.I STREAMS
+resources, blocks awaiting the availability of message blocks to service the request, regardless of
+the stream head
+.B O_NDELAY
+semantics or the settings of the
+.BR O_NDELAY " or " O_NONBLOCK
+file flags.  This is necessary because no partial messages will be written by
+.BR putmsg ().
+When prevented by the lack of internal
+.I STREAMS
+resources,
+.BR putmsg ()
+will fail, return minus one
+.RB ( -1 )
+and set the global error number,
+.IR errno (3),
+to
+.RB [ ENOSR ].
+.\"
+.\"
+.SS STREAMS Semantics for O_NDELAY
+.PP
+When
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set,
+.BR putmsg ()
+will fail, return minus one
+.RB ( -1 )
+and set the global error number,
+.IR errno (3),
+to
+.RB [ EAGAIN ]
+if flow control is in effect when the call is received.  It will block, unless prevented by lack of
+internal
+.I STREAMS
+resources, awaiting the availability of message buffers.
+.PP
+When
+.BR O_NDELAY " (or " O_NONBLOCK )
+is clear,
+.BR putmsg ()
+will block on flow control and, unless prevented by the lack of internal
+.I STREAMS
+resources, will block if buffers are not available.
+.\"
+.\"
+.SS Old TTY Semantics for O_NDELAY
+.PP
+Regardless of the setting of
+.BR O_NDELAY " (or " O_NONBLOCK ),
+.BR putmsg ()
+will block on flow control and, unless prevented by lack of internal
+.I STREAMS
+resources, will also block on the availability of message buffers.
+.\"
+.\"
+.SS STREAMS-base Pipes and FIFOs
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
 .B putmsg()
-returns zero (0).
-.PP
+returns zero
+.RB ( 0 ).
 Upon failure,
 .B putmsg()
-returns 1 and sets
-.I errno
+returns minus one
+.RB ( -1 )
+and sets the global error number,
+.IR errno (3)
 to an appropriate error number.
 .\"
 .\"
@@ -252,34 +384,104 @@ to an appropriate error number.
 .PP
 When
 .B putmsg()
-fails, it returns -1 and sets
-.I errno
+fails, it returns minus one
+.RB ( -1 )
+and sets the global error number,
+.IR errno (3),
 to one of the following:
 .\".TP
 .\".RB [ EACCES ]
 .\".I fd
 .\"is a dynamic device, and write permission on the device is denied.
-.TP
-.RB [ EAGAIN ]
-The stream head is set for non-blocking operation and
-.B putmsg()
-would block: that is, the message is being sent with
-.I flags
-set to
-.B MSG_BAND
-and the queue
-is flow controlled.
+.TP \w'[EWOULDBLOCK]\(en'u
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
 .TP
 .RB [ EBADF ]
 .I fd
-is not a valid file descriptor or is not open for reading.
+is not a valid open file descriptor or is not open for reading.
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.B putmsg()
+system call.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked (directly or indirectly) downstream from a
+.I STREAMS
+multiplexing driver.
+.TP
+.RB [ EIO ]
+.I fd
+refers to a stream that has closed or is in the process of closing.
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to a stream that has received an
+.BR M_HANGUP (9)
+message.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO that has received an
+.BR M_HANGUP (9)
+message.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe whose other end has closed or is closing.  A
+.B SIGPIPE
+signal will also be sent to the calling process.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO that has no readers.
+.TP
+.RB [ ETIME ]
+The stream head is set for blocking operation and
+.BR putmsg ()
+has blocked for an excessively long period of time.
+.TP
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation using
+.I STREAMS
+.B O_NDELAY
+semantics
+and
+.BR putmsg ()
+would otherwise block: that is, the message is being sent with
+.I flags
+set to zero
+.RB ( 0 )
+and the stream write queue is full due to internal flow control conditions.
+.TP
+.RB [ EWOULDBLOCK ]
+Same as
+.RB [ EAGAIN ].
+.TP
+.RB [ EINTR ]
+A signal arrived before the operation could complete.
+.TP
+.RB [ ERESTARTSYS ]
+A signal arrived before the operation could begin.  That is, the operation has neither blocked nor
+written any data.
 .TP
 .RB [ EFAULT ]
 .IR ctlptr ", " datptr ", " ctlptr->buf " or " datptr->buf
 point outside the caller's address space.
-.TP
-.RB [ EINTR ]
-A signal arrived before the operation could complete.
 .TP
 .RB [ EINVAL ]
 The value of
@@ -294,42 +496,11 @@ such as when
 is specified as
 .B RS_HIPRI
 and
-there is no control part;
-or,
-.I fd
-refers to a stream that is linked under a
-.I STREAMS
-multiplexing driver.
-.TP
-.RB [ EIO ]
-I/O error, or,
-.I fd
-refers to a stream that is open but is in the process of closing, or refers to
-a pipe and the other end of the pipe is closed.
-.TP
-.RB [ EISDIR ]
-.I fd
-refers to a directory.
-.TP
-.RB [ ENODEV ]
-.I fd
-refers to a device that does not support the
-.B putmsg()
-system call.
+there is no control part.
 .TP
 .RB [ ENOSR ]
 .I STREAMS
 resources were insufficient to complete the operation.
-.TP
-.RB [ ENOSTR ]
-.I fd
-refers to a device that has no stream associated with it.
-.TP
-.RB [ ENXIO ]
-A
-.B M_HANGUP
-message arrived at the stream head for the specified
-.IR fd .
 .TP
 .RB [ ERANGE ]
 The
@@ -363,35 +534,121 @@ conditions form part of the necessary documentation of the protocol module.
 .\"
 .SH NOTICES
 .PP
+.\"
+.\"
 .SS Multi-Threading
 .PP
 .BR putmsg ()
-is thread-safe; however, multiple threads performing concurrent partial writes
-on the same stream will interfere with each other.  POSIX mandatory file
-locks, (see
-.BR lockf (3)),
-can be used to avoid interference.
+is thread-safe.
+Because
+.BR putmsg ()
+does not allow partial writes
+(unlike
+.BR write (2s)),
+.B POSIX
+mandatory locks
+(see
+.BR lockf (3))
+are not necessary
+to make write operations atomic.
+.\"
+.\"
 .SS "Asynchronous I/O"
 .PP
 If the file is set for blocking operation (see
 .BR fcntl (2)),
-then
+or old TTY semantics for
+.B O_NDELAY
+are set for the stream head,
 .BR putmsg ()
-will block waiting for the stream to permit sending messages under flow
-control.
-.RB ( putmsg ()
-will not wait for a message block to formulate the
+will block waiting for the stream to permit sending messages under flow control.
+.\"
+.\"
+.PP
+When the file is set for non-blocking operation, and the stream is set
+for
 .I STREAMS
-message, but will return
+semantics for
+.BR O_NDELAY ,
+.BR putmsg ()
+will not block, but will fail, return minus one
+.RB ( -1 ),
+and populate the global error number,
+.IR errno (3)
+with
+.RB [ EAGAIN ].
+.\"
+.\"
+.PP
+Regardless of the stream head semantics for
+.BR O_NDELAY ,
+or the setting of the
+.BR O_NDELAY " and " O_NONBLOCK
+file flags, for
+high priority messages (for which
+.I flags
+is set to
+.BR RS_HIPRI ),
+.BR putmsg ()
+will not block on flow control, because
+.I STREAMS
+flow control conditions do not apply to high priority messages.
+.\"
+.\"
+.PP
+Regardless of the stream head semantics for
+.BR O_NDELAY ,
+or the setting of the
+.BR O_NDELAY " and " O_NONBLOCK
+file flags,
+.BR putmsg ()
+will block, unless prevented by lack of internal
+.I STREAMS
+resources, awaiting the availability of message blocks to complete the operation.
+When prevented from blocking due to a lack of internal
+.I STREAMS
+resources,
+.BR putmsg ()
+wil fail, return minus one
+.RB ( -1 ),
+and set the global error number,
+.IR errno (3)
+to
+.RB [ ENOSR ].
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+When an implementation returns
 .RB [ ENOSR ]
-if it cannot allocate the necessary message block).
-When the file is set for non-blocking operation,
-.BR putmsg ()
-will not block, but will return the appropriate error number
-.RB ([ ENOSTR "], [" EAGAIN "], [" EWOULDBLOCK ])
-if the
+is not clear.
+.PP
+An implementation that uses
+.BR bufcall (9)
+to implement waiting for the availability of message blocks might fail allocate a
+.BR bufcall (9)
+callback due to the unavailability of
 .I STREAMS
-message could not be formulated and sent immediately.
+resources.  That is, a call to
+.BR bufcall (9)
+to create a buffer callback fails and returns zero
+.RB ( 0 ),
+leaving the implementation little option but to return
+.RB [ ENOSR ].
+.PP
+.B @PACKAGE_TITLE@
+uses a different approach, utilizing the non-standard
+.B BPRI_WAITOK
+flag to
+.BR allocb (9).
+This permits the stream head to block awaiting the availability of message blocks without ever
+failing due to lack of internal
+.I STREAMS
+resources.  Therefore,
+.B @PACKAGE_TITLE@
+will not return
+.RB [ ENOSR ],
+but will block indefinitely awaiting the availability of a message block.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -412,7 +669,8 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR putmsg ()
-is compatible with SVID,
+is compatible with
+SVID,
 .[
 svid
 .]
@@ -424,11 +682,10 @@ SUSv2,
 .[
 susv2
 .]
-SUSv3,
+SUSv3/POSIX,
 .[
 susv3
 .]
-POSIX,
 and implementations based on
 .IR "SVR 4.2" ,
 .[
@@ -437,20 +694,22 @@ svr42cr
 including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
+.IR IRIX \(rg,
 .IR LiS ,
+.IR MacOT \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg,
-.IR UXP/V \(rg.
-.PP
+.IR UXP/V \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
 .BR putmsg ()
 is compatible with LiS
 .[
 LiS
 .]
 with the following exceptions:
-.IP \(em \w'\(em\(em'u
 .B LiS
 .[
 LiS
@@ -461,7 +720,6 @@ instead of
 .RB [ EIO ]
 when the internal head queue pointer points to a structure that is not a queue
 structure, or is mangled.
-.IP \(em
 .B LiS
 .[
 LiS
@@ -471,7 +729,6 @@ does not return
 when
 .B putmsg()
 is called on a closing stream.
-.IP \(em
 .B LiS
 .[
 LiS
@@ -485,7 +742,6 @@ when an
 message causes a signal that interrupts the call to
 .B putmsg()
 before any data is written.
-.IP \(em
 .B LiS
 .[
 LiS
@@ -496,7 +752,6 @@ instead of
 .RB [ ENOSTR ]
 when there is no stream associated with
 .IR fd .
-.IP \(em
 .B LiS
 .[
 LiS
@@ -510,6 +765,23 @@ when
 refers to a device that does not support the
 .B putmsg()
 system call.
+.BR putmsg ()
+is not bug-for-bug compatible with
+.B LiS
+in these and possibly other regards.
+.IP
+Portable
+.I STREAMS
+applications, modules and drivers will expect compatibility with
+.B POSIX
+.[
+susv3
+.]
+and not rely upon
+.BR LiS -specific
+bugs and behaviour.
+.\"
+.\"
 .PP
 .B Linux Fast-STREAMS
 provides system calls for
@@ -540,11 +812,10 @@ SUSv2,
 .[
 susv2
 .]
-SUSv3,
+SUSv3/POSIX.
 .[
 susv3
 .]
-POSIX.
 .\"
 .\"
 .SH HISTORY

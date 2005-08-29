@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:34:43 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/08/29 10:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:43 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -66,8 +66,8 @@ struct spec_sb_info {
 
 extern struct file_operations spec_dev_f_ops;
 
-extern struct vfsmount *specfs_get(void);
-extern void specfs_put(void);
+extern struct vfsmount *FASTCALL(specfs_get(void));
+extern void FASTCALL(specfs_put(void));
 
 #if 0
 /* initialization for main */

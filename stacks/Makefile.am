@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/07/09 21:48:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/08/29 10:31:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:48:21 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:31:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -301,7 +301,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -565,7 +565,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -599,7 +599,7 @@ m3ua_source_FILES		= $(nodist_EXTRA_libSS7m3ua_a_SOURCES)
 nodist_libSS7m3ua_a_SOURCES	= $(m3ua_source_FILES)
 
 libSS7m3ua_a_DEPENDENCIES	= config.h strconf.h
-libSS7m3ua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSS7m3ua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=m3ua $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7m3ua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7m3ua_a_OBJECTS:		$(libSS7m3ua_a_DEPENDENCIES)
 
@@ -635,7 +635,7 @@ sscop_source_FILES		= $(nodist_EXTRA_libSS7sscop_a_SOURCES)
 nodist_libSS7sscop_a_SOURCES	= $(sscop_source_FILES)
 
 libSS7sscop_a_DEPENDENCIES	= config.h strconf.h
-libSS7sscop_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSS7sscop_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=sscop $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7sscop_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sscop_a_OBJECTS:		$(libSS7sscop_a_DEPENDENCIES)
 
@@ -675,7 +675,7 @@ sua_source_FILES		= $(nodist_EXTRA_libSS7sua_a_SOURCES)
 nodist_libSS7sua_a_SOURCES	= $(sua_source_FILES)
 
 libSS7sua_a_DEPENDENCIES	= config.h strconf.h
-libSS7sua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSS7sua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=sua $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7sua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sua_a_OBJECTS:		$(libSS7sua_a_DEPENDENCIES)
 
@@ -702,7 +702,7 @@ tua_source_FILES		= $(nodist_EXTRA_libSS7tua_a_SOURCES)
 nodist_libSS7tua_a_SOURCES	= $(tua_source_FILES)
 
 libSS7tua_a_DEPENDENCIES	= config.h strconf.h
-libSS7tua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSS7tua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=tua $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7tua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tua_a_OBJECTS:		$(libSS7tua_a_DEPENDENCIES)
 
@@ -728,7 +728,7 @@ tali_source_FILES		= $(nodist_EXTRA_libSS7tali_a_SOURCES)
 nodist_libSS7tali_a_SOURCES	= $(tali_source_FILES)
 
 libSS7tali_a_DEPENDENCIES	= config.h strconf.h
-libSS7tali_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSS7tali_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=tali $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7tali_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tali_a_OBJECTS:		$(libSS7tali_a_DEPENDENCIES)
 

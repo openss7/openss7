@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: write.2s.man,v 0.9.2.8 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: write.2s.man,v 0.9.2.9 2005/08/29 10:06:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:30 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -132,100 +132,846 @@ sort-adjacent-labels
 .PP
 .B #include <unistd.h>
 .sp
-.BI "ssize_t write(int " fd ", const void *" buf ", size_t " count );
+.BI "ssize_t write(int " fd ", const void *" buf ", size_t " nbytes );
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'nbytes\(em'u
 .I fd
 The file descriptor to which to write bytes.
+.PD 0
 .TP
 .I buf
 The buffer from which to write bytes.
 .TP
-.I count
+.I nbytes
 The maximum number of bytes to write.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B write
+.BR write ()
 writes up to
-.I count
+.I nbytes
 bytes to the file referenced by the file descriptor
 .I fd
 from the buffer starting at
 .I buf.
-POSIX requires that a \fBread()\fP which can be proved to occur after a
+.I POSIX
+.[
+susv3
+.]
+requires that a \fBread()\fP which can be proved to occur after a
 \fBwrite()\fP has returned returns the new data.  Note that not all file
-systems are POSIX conforming.
+systems are
+.I POSIX
+.[
+susv3
+.]
+conforming.
+.\"
+.\"
+.PP
+If
+.BR write ()
+is interrupted by a signal before it writes any data, it shall return minus one
+.RB ( -1 )
+with
+.IR errno (3)
+set to
+.RB [ EINTR ].
+If
+.BR write ()
+is interrupted by a signal after it successfully writes some data, it shall return the number of
+bytes written.
+.\"
+.\"
+.SS STREAMS character device special files
+.\"
+.\"
+.PP
+If
+.I fd
+refers to a
+.I STREAMS
+character device special file,
+the operation of
+.BR write ()
+is determined by the values of the minimum and maximum
+.I nbytes
+range (\(lqpacket size\(rq) accepted by the
+.I STREAMS
+character device special file.
+These values are determined by the topmost
+.I STREAMS
+module or driver.
+They are contained in the
+.I mi_minpsz
+and
+.I mi_maxpsz
+members of the
+.BR module_info (9)
+structure associated with the topmost module, and are copied into the
+.I q_minpsz
+and
+.I q_maxpsz
+members of the topmost module's
+.BR queue (9)
+structure.
+Unless the user pushes the topmost module, these values cannot be set or examined from user level
+(see
+.BR I_PUSH (7)
+or
+.BR streamio (7)).
+.PP
+If
+.I nbytes
+falls within the packet size range accepted,
+.I nbytes
+bytes will be written.
+If
+.I nbytes
+does not fall within the range and the minimum packet size is zero
+.RB ( 0 ),
+.RB write ()
+will break the buffer into maximum packet size segments prior to sending the data downstream
+(the last segment may contain less than the maximum packet size).  If
+.I nbytes
+does not fall within the range and the minimum value is non-zero,
+.BR write ()
+will fail with
+.IR errno (3)
+set to
+.RB [ ERANGE ].
+.PP
+Writing a zero-length buffer
+.RI ( nbytes
+is zero
+.RB ( 0 ))
+to a
+.I STREAMS
+device sends zero
+.RB ( 0 )
+bytes with zero
+.RB ( 0 )
+returned.  However,
+writing a zero-length buffer
+to a
+.IR STREAMS -based
+pipe or FIFO sends no message and zero
+.RB ( 0 )
+is returned.  The process may issue an
+.BR I_SWROPT (7)
+.BR ioctl (2)
+with the
+.B SNDZERO
+flag set in the argument
+to enable zero-length message to be sent across a pipe or FIFO.
+.\"
+.\"
+.PP
+When writing to a
+.I STREAMS
+character device special file, data messages
+.RB (see " M_DATA " (9))
+are created with a priority band of zero
+.RB ( 0 ).
+.\"
+.\"
+.PP
+To distinguish the situation where a partial write has occurred versus as full write to downstream
+modules and drivers, the stream head uses the
+.BR MSGDELIM
+flag in the
+.I b_flag
+member of the
+.BR msgb (9)
+structure to indicate the delimitation of full writes.  Whenever a partial write is performed by
+the stream head, the
+.BR MSGDELIM
+flag is not set, indicating that the message does not contain a record boundary and that a
+subsequent data message contains more of the same record.
+Whenever a full write is performed by the stream head, the
+.BR MSGDELIM
+flag is set, indicating that the message is the last message in a sequence of messages for the record.
+.\"
+.\"
+.PP
+Also,
+.BR write ()
+and
+.BR writev ()
+will fail if the stream head had processed an asynchronous error before the call.  In this case, the
+value of
+.IR errno (3)
+does not reflect the result of the
+.BR write ()
+or
+.BR writev (),
+but reflects the prior error.
+If the stream head is set for old TTY semantics for
+.BR O_NDELAY ,
+and a portion of the buffer has already been written,
+.BR write ()
+will block awaiting the availability of further message blocks to service the request.
+.\"
+.\"
+.PP
+.I STREAMS
+provides a write option to also send a
+.B SIGPIPE
+signal to the writing process whenever a write side error has been reported in an
+.BR M_ERROR (9)
+message.
+This write option can be enabled by setting the
+.B SNDPIPE
+flag in the STREAM head write options using the
+.BR I_SWROPT (7)
+command to
+.BR ioctl (2)
+as detailed in
+.BR streamio (7).
+The setting of this write option can be examined using the
+.BR I_GWROPT (7)
+command.
+.\"
+.\"
+.PP
+.I STREAMS
+provides a hold feature that improves the performance of
+.I STREAMS
+when the process issues many small writes.  The message hold feature is enabled if the system
+administrator has changed the system control
+.BR sysctl_str_strhold
+to be non-zero and if the stream head flag
+.B STRHOLD
+is set by a module or driver.
+A downstream module or driver sets the STREAM head
+.B STRHOLD
+bit by sending a
+.BR M_SETOPTS (9)
+message upstream with the
+.B SO_STRHOLD
+flag set.
+(The
+.BR ldterm (4)
+tty line discipline module does this.)
+The process may also issue a
+.BR I_SWROPT (7)
+.BR ioctl (2)
+with the
+.B SNDHOLD
+flag set in the argument to enable the hold feature on a particular stream, but this is a
+.B "@PACKAGE_TITLE@"
+extension.
+.PP
+The message hold feature exploits the fact that
+.BR allocb (9)
+allocate a buffer with a data size that is always equal to or greater than
+.BR FASTBUF .
+The buffer is allocated and the data is copied into it.
+.BR strwrite (9)
+then checks to see if another
+.BR write ()
+of the same size will fit into the same buffer.  If it will, the buffer is held temporarily on the
+stream head write queue, a timeout is started (usually 10ms, but settable with the
+.BR sysctl_str_rtime
+system control), and the stream head is linked into the
+.I scanqhead
+list in the master
+.BR strthread (9)
+structure.
+.PP
+One of three things will then happen:
+.IP 1) \w'0)\(em'u
+A second
+.RB write ()
+occurs with a data port that is small enough to fit into the remaining portion of the saved buffer.
+The data is put into the buffer and sent downstream.  Since two writes have been sent downstream in
+one message, the optimization is successful.
+.IP 2)
+A second
+.BR write ()
+occurs with a data portion that is too big to fit into the remaining portion of the
+saved buffer.  The saved message is sent downstream followed by another message holding the data of
+the second
+.BR write ().
+.IP 3)
+No second
+.BR write ()
+occurs so the timeout expires.  The timeout processing performed by
+.BR queuerun (9)
+scans the
+.I scanqhead
+list in the
+.BR strthread (9)
+structure and sends downstream any messages held on the stream head write queues whose timeouts have
+expired.
+.\"
+.\"
+.SH "ASYNCHRONOUS I/O"
+.\"
+.PP
+.I STREAMS
+character device special files can be set for
+.I STREAMS
+semantics for
+.B O_NDELAY
+or the old TTY semantics for
+.B O_NDELAY.
+The semantics can be changed by a module that sends a
+.BR M_SETOPTS (9)
+message to the stream head specifying
+.BR SO_NDELON " or " SO_NDELOFF .
+There is no way for the user process to interrogate whether
+.I STREAMS
+or old TTY
+semantics for
+.B O_NDELAY
+have been applied to a stream without prior knowledge about the behaviour of the modules or driver.
+.\"
+.\"
+.PP
+When writing to a
+.I STREAMS
+character device special file that is neither a
+.IR STREAMS -based
+pipe nor FIFO, and
+the stream is using
+.I STREAMS
+semantics for the
+.B O_NDELAY
+file flag, the following occurs:
+.IP \(bu \w'\(bu\(em'u
+If the
+.B O_NONBLOCK
+(or
+.BR O_NDELAY )
+file flag is clear, and the stream cannot accept data (the stream write queue is full due to
+internal flow control conditions),
+.BR write ()
+blocks until data can be accepted.
+.IP \(bu
+If the
+.B O_NONBLOCK
+(or
+.BR O_NDELAY )
+file flag is set, and the stream cannot accept data (the stream write queue is full due to internal
+flow conditions),
+.BR write ()
+fails, returns minus one
+.RB ( -1 )
+and sets the global error number,
+.IR errno (3)
+to
+.RB [ EAGAIN ].
+.IP \(bu
+If the
+.B O_NONBLOCK
+(or
+.BR O_NDELAY )
+file flag is set and part of the buffer has been written while a condition in which the stream
+cannot accept additional data occurs,
+.BR write ()
+will terminate and return the number of bytes written.
+A subsequent
+.BR write ()
+call under the same conditions will fail, return minus one
+.RB ( -1 )
+and set the global error number,
+.IR errno (3)
+to the appropriate error number.
+.PP
+When writing to a
+.I STREAMS
+character device special file that is neither a
+.IR STREAMS -based
+pipe nor FIFO, and
+the stream is using
+old TTY
+semantics for the
+.BR O_NDELAY
+file flag, the following occurs:
+.IP \(bu \w'\(bu\(em'u
+Regardless of the setting of the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag, when the stream cannot accept data (the stream write queue is full due to internal flow
+conditions),
+.BR write ()
+blocks until data can be accepted.
+.IP \(bu
+Regardless of the setting of the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag, when part of the buffer has been written while a condition in which the stream cannot
+accept additional data due to flow control or the availability of message blocks occurs,
+.BR write ()
+blocks until data can be accepted.
+.PP
+Regardless of the semantics used for
+.B O_NDELAY
+on the stream, or the settings of the
+.BR O_NDELAY " or " O_NONBLOCK
+file flags, in the same manner as
+.BR putmsg (2),
+.BR putpmsg (2s)
+and
+.BR I_FDINSERT (7),
+.BR write ()
+will always block awaiting the availability of the initial message block to service the
+.BR write ()
+request.  If due
+to internal resource limitations, the initial message block cannot be allocated,
+.BR write ()
+fails, returns minus one 
+.RB ( -1 ),
+and sets the global error number,
+.IR errno (3)
+to
+.RB [ ENOSR ].
+.PP
+Once a portion of the buffer has been written, if the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is set, and the stream head is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+and the stream cannot accept further data (the stream head write queue is full due to internal flow
+conditions), or a message block is not available,
+.BR write ()
+will terminate and return the number of bytes written so far.
+.\"
+.\"
+.SS STREAMS-based Pipes and FIFOs
+.\"
+.\"
+.PP
+.BR write ()
+requests to a
+.IR STREAMS -based
+pipe or FIFO shall be handled in the same way as a
+.I STREAMS
+character device special file,
+with the following exceptions:
+.IP \(bu \w'\(bu\(em'u
+There is no file offset associated with a pipe, hence each
+.BR write ()
+shall append to the end of the pipe.
+.IP \(bu
+.BR write ()
+requests of
+.RB { PIPE_BUF }
+bytes or less shall not be interleaved with data from other processes doing writes on the same pipe.
+Writes of greater than
+.RB { PIPE_BUF }
+bytes may have data interleaved, on arbitrary boundaries, with writes by other processes, whether or
+not the
+.B O_NONBLOCK
+flag of the file status flags is set.
+.IP \(bu
+If the
+.B O_NONBLOCK
+flag is clear, a
+.BR write ()
+request may cause the thread to block, but on normal completion it shall return
+.IR nbytes .
+.PP
+If the
+.B O_NONBLOCK
+flag is set,
+.BR write ()
+requests shall be handled differently, in the following ways:
+.IP \(bu \w'\(bu\(em'u
+The
+.BR write ()
+function shall not block the thread.
+.IP \(bu
+A
+.BR write ()
+request for
+.RB { PIPE_BUF }
+or fewer bytes shall have the following effect: if there is sufficient space available in the pipe,
+.BR write ()
+shall transfer all the data and return the number of bytes requested.  Otherwise,
+.BR write ()
+shall transfer no data and return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EAGAIN ].
+.IP \(bu
+A
+.BR write ()
+request for more than
+.RB { PIPE_BUF }
+bytes shall cause one of the following:  When at least one byte can be written, transfer what it can
+and return the number of bytes written.  When all data previously written to the pipe is read, it
+shall transfer at least
+.RB { PIPE_BUF }
+bytes.  When no data can be written, transfer no data, return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EAGAIN ].
+.\"
+.\"
+.PP
+Note that
+.IR STREAMS -based
+pipes and FIFOs will exhibit correct behavior if the following is performed on a normal stream:
+.IP \(bu \w'\(bu\(em'u
+The minimum packet size is set to zero
+.RB ( 0 ).
+.PD 0
+.IP \(bu
+The maximum packet size is set to
+.RB { PIPE_BUF }.
+.IP \(bu
+The write side queue high water mark is set to
+.RB { PIPE_BUF }.
+.IP \(bu
+The write size low water mark is set to zero
+.RB ( 0 ).
+.IP \(bu
+The
+.B SNDZERO
+write option flag is cleared (this is the default for all stream heads anyway).
+.IP \(bu
+The
+.B SNDHOLD
+write option flag is cleared (this is the default for all stream heads anyway).
+.PD
+.\"
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
-On success, the number of bytes written are returned (zero indicates
-nothing was written).  On error, \-1 is returned, and \fIerrno\fP is set
-appropriately.  If \fIcount\fP is zero and the file descriptor refers to
-a regular file, 0 will be returned without causing any other effect.
-For a special file, the results are not portable.
+Upon success,
+.BR write ()
+returns the number of bytes written (normally
+.IR nbytes ).
+.BR write ()
+only returns zero
+.RB ( 0 )
+if
+.I nbytes
+was zero
+.RB ( 0 ).
+Upon failure,
+.BR write ()
+returns minus one
+.RB ( -1 )
+and
+.IR errno (3)
+is set to an apporpriate error number.
+.PP
+If
+.I nbytes
+is zero
+.RB ( 0 )
+and
+.I fd
+refers to a
+regular file, a
+.I STREAMS
+character device special file, or a
+.IR STREAMS -based
+pipe or FIFO,
+.BR write ()
+returns zero
+.RB ( 0 ).
+Whether a zero-length message is sent depends on the setting of
+.BR SNDZERO .
+.B SNDZERO
+can be set or cleared with the
+.B I_SWROPT
+command to
+.BR ioctl (2)
+for a
+.I STREAMS
+character device special file or a
+.IR STREAMS -based
+pipe or FIFO.
+Zero-length messages are never sent for a regular file.
 .\"
 .\"
 .SH ERRORS
 .PP
-.TP
-.B EBADF
+When
+.BR write ()
+fails, it returns minus one
+.RB ( \-1 )
+and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EBADF ]
 .I fd
 is not a valid file descriptor or is not open for writing.
 .TP
-.B EINVAL
+.RB [ EINVAL ]
 .I fd
 is attached to an object which is unsuitable for writing.
 .TP
-.B EFAULT
+.RB [ EFAULT ]
 .I buf
 is outside your accessible address space.
 .TP
-.B EFBIG
-An attempt was made to write a file that exceeds the implementation-defined
-maximum file size or the process' file size limit, or to write at a position
-past than the maximum allowed offset.
+.RB [ EFBIG ]
+An attempt was made to
+.BR write ()
+a file that exceeds the implementation-defined maximum file size or the process' file size limit, or
+to
+.BR write ()
+at a position past than the maximum allowed offset.
 .TP
-.B EPIPE
+.RB [ EPIPE ]
 .I fd
 is connected to a pipe or socket whose reading end is closed.  When this
 happens the writing process will receive a
 .B SIGPIPE
 signal; if it catches, blocks or ignores this the error
-.B EPIPE
+.RB [ EPIPE ]
 is returned.
 .TP
-.B EAGAIN
+.RB [ EAGAIN ]
 Non-blocking I/O has been selected using
 .B O_NONBLOCK
-and the write would block.
+and the
+.BR write ()
+call would block.
 .TP
-.B EINTR
+.RB [ EINTR ]
 The call was interrupted by a signal before any data was written.
 .TP
-.B ENOSPC
+.RB [ ENOSPC ]
 The device containing the file referred to by
 .I fd
 has no room for the data.
 .TP
-.B EIO
+.RB [ EIO ]
 A low-level I/O error occurred while modifying the inode.
+.\"
+.\"
+.PP
+For a
+.I STREAMS
+character device special file, or a
+.IR STREAMS -based
+pipe or FIFO,
+the following additional failure conditions can occur:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ ERANGE ]
+.I nbytes
+describes a message that is larger than the system maximum on the data part of a message
+.RB ( sysctl_str_strmsgsz ), or describes a message that is outside the range provided specified by
+the minimum and maximum packet sizes of the topmost
+.I STREAMS
+module or driver in the stream.
+.TP
+.RB [ ENOSR ]
+Allocation of message blocks to meet the request failed due to internal resource limitations.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked (directly or indirectly) downstream from a multiplexing driver.
+.TP
+.RB [ ETIME ]
+.BR O_NONBLOCK " and " O_NDELAY
+file flags are clear, and the process has blocked for an excessively long period of time.
+.TP
+.RB [ EAGAIN ]
+.BR O_NONBLOCK " or " O_NDELAY
+file flags are set, the stream is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+and the process would otherwise block due to internal flow control conditions.
+.TP
+.RB [ EWOULDBLOCK ]
+Same as
+.RB [ EAGAIN ].
+.TP
+.RB [ EINTR ]
+The process was interrupted by a signal before the
+.BR write ()
+operation could complete, but before data was written.
+.TP
+.RB [ ERESTARTSYS ]
+The process was interrupted by a signal before the
+.BR write ()
+operation could begin.  That is, the process has not yet blocked or written any data.
+.TP
+.RB [ EIO ]
+The stream referred to by
+.I fd
+has closed or is in the process of closing.
+.\"
+.\"
+.PP
+For a
+.I STREAMS
+character device special file,
+the following additional failure conditions can occur:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ ENXIO ]
+.I fd
+refers to a stream
+that has received a hangup.
+.\"
+.\"
+.PP
+Also, if an error message is received by the stream head indicating a write error, the error number
+returned in
+.IR errno (3)
+will be the error number contained in the error message.
+.\"
+.\"
+.PP
+For a
+.IR STREAMS -based
+pipe or FIFO, the following additional failure conditions can occur:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO
+that has received a hangup.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe whose other end has closed or is closing.  A
+.BR SIGPIPE
+signal will also be sent to the calling process.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO or for which there are no readers.
+.\"
+.\"
 .PP
 Other errors may occur, depending on the object connected to
 .IR fd .
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH NOTICES
 .PP
-SVr4, SVID, POSIX, X/OPEN, 4.3BSD.  SVr4 documents additional error
-conditions EDEADLK, ENOLCK, ENOLNK, ENOSR, ENXIO, EPIPE, or ERANGE.
-Under SVr4 a write may be interrupted and return EINTR at any point,
-not just before any data is written. 
+.\"
+.\"
+.SS Multi-Threading
+.PP
+.BR write ()
+is thread safe; however, unless POSIX mandatory file locks (see
+.BR lockf (3))
+are used, multiple partial writes could interfere with one another.
+.\"
+.\"
+.SS Asynchronous I/O
+.PP
+If the file is set for blocking operation (see
+.BR fcntl (2)),
+or old TTY semantics for
+.B O_NDELAY
+are set for the stream head,
+.BR write ()
+will block waiting for the stream to permit sending messages under flow control.
+.\"
+.\"
+.PP
+When the file is set for non-blocking operation, and the stream is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+.BR write ()
+will not block, but will fail, return minus one
+.RB ( -1 ),
+and populate the global error number,
+.IR errno (3),
+with
+.RB [ EAGAIN ].
+.\"
+.\"
+.PP
+When the file is set for non-blocking operation (file flag
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set), and the stream is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+.BR write ()
+will terminate and return the number of bytes written if part of the buffer has already been written
+and a flow control or unavailable buffer condition is encountered.
+When the file is set for blocking operation or the stream head is set for
+old TTY
+semantics for
+.BR O_NDELAY ,
+.BR write ()
+will not return a partial number of bytes written unless a fatal error (such as a closing or hung up
+stream) is encountered.
+.\"
+.\"
+.PP
+Regardless of the stream head semantics for
+.BR O_NDELAY ,
+or the setting of the
+.BR O_NDELAY " and " O_NONBLOCK
+file flags,
+.BR write ()
+will block, unless prevented by lack of internal
+.I STREAMS
+resources, awaiting the availability of message blocks to complete the operation.
+When prevented from blocking due to a lack of internal
+.I STREAMS
+resources,
+.BR write ()
+will fail, return minus one
+.RB ( -1 ),
+and set the global error number,
+.IR errno (3)
+to
+.RB [ ENOSR ].
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+When an implementation returns
+.RB [ ENOSR ]
+is not clear.
+.PP
+An implementation that uses
+.BR bufcall (9)
+to implement waiting for the availability of message blocks might fail allocate a
+.BR bufcall (9)
+callback due to the unavailability of
+.I STREAMS
+resources.  That is, a call to
+.BR bufcall (9)
+to create a buffer callback fails and returns zero
+.RB ( 0 ),
+leaving the implementation little option but to return
+.RB [ ENOSR ].
+.PP
+.B @PACKAGE_TITLE@
+uses a different approach, utilizing the non-standard
+.B BPRI_WAITOK
+flag to
+.BR allocb (9).
+This permits the stream head to block awaiting the availability of message blocks without ever
+failing due to lack of internal
+.I STREAMS
+resources.  Therefore,
+.B @PACKAGE_TITLE@
+will not return
+.RB [ ENOSR ],
+but will block indefinitely awaiting the availability of a message block.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -243,14 +989,208 @@ not just before any data is written.
 .\"
 .SH COMPATIBILITY
 .PP
+.BR write ()
+is compatible with
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3/POSIX,
+.[
+susv3
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42cr
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR LiS ,
+.IR MacOT \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+The
+.B SNDPIPE
+write option is supported by
+.BR "@PACKAGE_TITLE@" .
+This option is not documented in detail, but is present in
+.IR Solaris \(rg,
+.I LiS
+and the GNU C Library header files.
+.I POSIX
+.[
+susv3
+.]
+does not document this write option.
+.IP
+Portable
+.I STREAMS
+modules and drivers will not use the
+.B SNDPIPE
+write option, nor rely on
+.BR I_SWROPT (7)
+or
+.BR I_GWROPT (7)
+setting or returning the option, nor returning an error when it is specified as an argument.
+.IP
+Portable
+.I STREAMS
+applications programs will not rely on being sent a
+.B SIGPIPE
+signal, except for
+.IR STREAMS -based
+pipes, FIFOs and sockets, and then only under
+.I POSIX
+.[
+susv3
+.]
+specified circumstances.
+.IP \(em
+The
+.B SNDHOLD
+write option bit is a
+.B @PACKAGE_TITLE@
+extension.
+The
+.B SO_STRHOLD
+flag for the
+.BR M_SETOPTS (9)
+message is only briefly mentioned in the documentation for
+.IR UXP/V \(rg.
+.[
+uxpdoc
+.]
+The
+.B SO_STRHOLD
+definition appears in
+.IR Solaris \(rg
+header files, however, it is noted as being no longer implemented.
+The
+.B SO_STRHOLD
+definition appears in
+.I LiS
+.[
+lis
+.]
+header files and is implemented per the descriptions in the Magic Garden.
+.[
+magic
+%O Section 7.9.5 \(lqWriting to a stream\(rq,
+%P p. 476
+.]
+.I The Magic Garden
+.[
+magic
+.]
+describes the
+.B STRHOLD
+STREAM head flags bit and the operation of the hold feature, but does not mention the
+.B SO_STRHOLD
+flag.
+.IP
+Portable
+.I STREAMS
+modules and drivers will not require that the STREAM head hold feature be implemented, whether or
+not the
+.B SO_STRHOLD
+STREAM head option or the
+.B STRHOLD
+STREAM head flag are defined.
+When these flags are defined, a portable
+.I STREAMS
+module or driver can attempt to invoke the feature, but cannot require that it be implemented.
+.IP
+Portable
+.I STREAMS
+applications programs will not use the
+.B SNDHOLD
+write option, and will not rely on the positive or negative behavior of 
+.BR I_SWROPT (7)
+with respect to this flag.
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+.B @PACKAGE_TITLE@
+used to recognize the \(lqinvalid\(rq buffer length to
+.BR write ()
+used by
+.I LiS
+to emulate the
+.I __NR_putpmsg
+system call.
+This is no longer the case.
+.B @PACKAGE_TITLE@
+(as with current versions of
+.IR LiS ),
+.[
+lis
+.]
+uses the
+.B I_PUTPMSG
+command to
+.BR ioctl (2)
+to emulate the
+.BR putpmsg (2s)
+system call.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3/POSIX.
+.[
+susv3
+.]
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+SVr4, SVID, POSIX, X/OPEN, 4.3BSD.  SVr4 documents additional error
+conditions EDEADLK, ENOLCK, ENOLNK, ENOSR, ENXIO, EPIPE, or ERANGE.
+Under SVr4 a
+.BR write ()
+may be interrupted and return EINTR at any point, not just before any data is written. 
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR write ()
+for
+.I STREAMS
+first appeared in
+SVR 3.
+.[
+svr3
+.]
 .\"
 .\"
 .[

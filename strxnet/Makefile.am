@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/09 21:48:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/08/29 10:32:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:48:38 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:32:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -160,7 +160,7 @@ mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -264,7 +264,7 @@ mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 

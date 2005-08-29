@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipemod.4.man,v 0.9.2.7 2005/05/14 08:34:14 brian Exp $
+.\" @(#) $Id: pipemod.4.man,v 0.9.2.8 2005/08/29 10:06:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -96,29 +96,47 @@ is a
 .I STREAMS
 module that is pushed over one end of a
 .IR STREAMS -based
-bidirectional pipe, or pushed over a FIFO,
-to reverse the send of the
-.B M_FLUSH
+bidirectional
+.BR pipe (4)
+to reverse the sense of the
+.BR M_FLUSH (9)
 command.  (See the
-.I I_FLUSH
+.IR I_FLUSH (7)
 command to
+.BR ioctl (2)
+as described in
 .BR streamio (7)).
 .PP
-Pipes and FIFOs have a twist in the stream at their midpoints.  At their
-midpoints, the read-side stream becomes the write-side stream and visa versa.
+.IR STREAMS -based
+pipes have a twist in the STREAM at their midpoints.  At their midpoints, the read-side STREAM
+becomes the write-side STREAM and visa versa.
 As an
-.B M_FLUSH
+.BR M_FLUSH (9)
 message traverses the twist, the sense of read-side and write-side must be
 reversed within the message (as indicated by the
 .BR FLUSHW
 and
 .BR FLUSHR
 flags).
+.PP
+The reversal of flush flag sense across the twist is not so problematic for the pipe ends (STREAM
+heads), as described under
+.RI \(lq USAGE ,\(rq
+below; however, when modules are pushed on either pipe end, all
+.BR M_FLUSH (9)
+messages received on the module read-queue will have a flag reversal, causing the module to flush
+the wrong side of the STREAM if only
+.BR FLUSHR " or only " FLUSHW
+are specified.
+.PP
 .B pipemod
-accomplishes this swapping of the read and write side flush flags across the
-twist at the midpoint in a
-.I STREAMS -based
-pipe or FIFO.
+corrects this problem for pushed modules by swapping the read and write side flush flags across the
+module.
+.B pipemod
+should be pushed over one end of the pipe before any other modules are pushed so that the reversal
+is performed accross the twist at the midpoint in a
+.IR STREAMS -based
+.BR pipe (4).
 .\"
 .\"
 .SH USAGE
@@ -126,31 +144,67 @@ pipe or FIFO.
 .B pipemod
 should be pushed over one end of a newly created
 .IR STREAMS -based
-pipe, or pushed over a FIFO, before any other modules are pushed on either end
-of the pipe, or onto the FIFO.  This ensures that
+.BR pipe (4),
+before any other modules are pushed on either end
+of the pipe.  This ensures that
 .B pipemod
-sits at the midpoint of the pipe or FIFO, the necessary position for reversing the
-send of the
-.B M_FLUSH
-message.
+sits at the midpoint of the pipe, the necessary position for reversing the
+sense of the
+.BR M_FLUSH (9)
+message flags.
+.PP
+On a bare
+.IR STREAMS -based
+.BR pipe (4),
+with no modules pushed, issuing the
+.IR I_FLUSH (7)
+command to
+.BR ioctl (2)
+with the
+.BR FLUSHR
+flag will flush the read-side queues at both STREAM heads (pipe ends);
+.BR FLUSHW ,
+the write-side queues.  Because the STREAM head does not queue on the write-side queue,
+.B FLUSHR
+has the same effect as
+.BR FLUSHRW ,
+and
+.B FLUSHW
+has no effect.
+When
+.B pipemod
+is pushed on a bare pipe,
+.B FLUSHR
+flushes only the near read-side queue and
+.B FLUSHW
+flushes only the far read-side queue.  Due to this difference in the STREAM head flushing behaviour
+when
+.BR pipemod (4)
+is pushed or not, it is good practice to always flush pipes with
+.BR FLUSHRW .
 .\"
 .\"
 .SH NOTICES
 .PP
 It is not necessary to use
 .B pipemod
-if all flushes flush both read and write queues at the same time,
-or if the
+if all flushes flush both read and write queues at the same time, or if the
 .I I_FLUSH
-command is never issued on the pipe for one side of the stream,
-or the
-.B M_FLUSH
-command is never send by a pushed module for one side of the stream.
+command is never issued on the pipe for one side of the STREAM, or the
+.BR M_FLUSH (9)
+command is never send by a pushed module for one side of the STREAM.
 .PP
-Note that the stream head normally flushes the stream on final close of the
-stream.  This flush is performed on both the read and write side of the stream
-at the same time, so the stream head does not require
+Note that the STREAM head normally flushes the STREAM on final close of the STREAM.  This flush is
+performed on both the read and write side of the STREAM at the same time, so the STREAM head does
+not require
 .BR pipemod .
+.PP
+Note that proper canonical
+.BR M_FLUSH (9)
+processing must be performed by all modules and drivers.
+See
+.BR M_FLUSH (9)
+for details.
 .\"
 .\"
 .SH EXAMPLES
@@ -194,8 +248,9 @@ module named
 .BR pipe (2),
 .BR spx (4),
 .BR pipe (4),
-.BR sfx (4),
-.BR fifo (4),
+.BR I_FLUSH (7),
+.BR M_FLUSH (9),
+.BR ioctl (2),
 .BR streamio (7).
 .\"
 .\"
@@ -213,13 +268,37 @@ is compatible with
 .[
 svr42
 .]
-.IR UnixWare \(rg,
+and implementations based on
+.IR "SVR 4.2" ,
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR LiS ,
+.IR MacOT \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
-and
-.IR LiS .
-.[
-LiS
-.]
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Not all implementations of
+.I SVR 4.2 STREAMS
+support
+.IR STREAMS -based
+pipes.  Those that do, provide the
+.BR pipemod (4)
+module.
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

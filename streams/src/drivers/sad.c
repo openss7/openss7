@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:21 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:21 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:21 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -72,7 +74,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:21 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/08/29 10:37:03 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -403,6 +405,7 @@ sad_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct sad *sad = q->q_ptr;
 
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	sad->assigned = 0;
 	sad->iocstate = 0;

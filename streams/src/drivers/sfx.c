@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -73,7 +75,7 @@ static char const ident[] =
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -144,78 +146,21 @@ MODULE_ALIAS("/dev/streams/sfx/*");
 static struct module_info sfx_minfo = {
 	mi_idnum:CONFIG_STREAMS_SFX_MODID,
 	mi_idname:CONFIG_STREAMS_SFX_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
+	mi_minpsz:STRMINPSZ,
+	mi_maxpsz:STRMAXPSZ,
 	mi_hiwat:STRHIGH,
 	mi_lowat:STRLOW,
 };
 
-#define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  OPEN and CLOSE
- *
- *  -------------------------------------------------------------------------
- */
-static int
-sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
-{
-	int err;
-
-	if (q->q_ptr != NULL) {
-		/* we walk down the queue chain calling open on each of the modules and the driver */
-		queue_t *wq = WR(q), *wq_next;
-
-		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-		while ((wq = wq_next)) {
-			/* all opens are module opens on fifos, there is no driver */
-			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
-				goto error;
-		}
-		return (0);
-	}
-	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
-		dev_t dev = *devp;
-		struct stdata *sd;
-
-		if ((sd = qstream(q))) {
-			struct cdevsw *sdev = sd->sd_cdevsw;
-
-			/* 1st step: attach the driver and call its open routine */
-			/* we are the driver and this *is* the open routine */
-			/* 2nd step: check for redirected return */
-			/* we are the driver and this *is* the open routine and there is no
-			   redirection. */
-			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sdev, &dev, oflag, MODOPEN, crp)))
-				goto error;
-			/* lastly, attach our privates and return */
-			q->q_ptr = WR(q)->q_ptr = sd;
-			return (0);
-		}
-	}
-	err = -EIO;		/* can't be opened as module or clone */
-      error:
-	return (err <= 0 ? err : -err);
-}
-static int
-sfx_close(queue_t *q, int oflag, cred_t *crp)
-{
-	return (0);
-}
-
 static struct qinit sfx_rqinit = {
 	qi_putp:strrput,
-	qi_qopen:sfx_open,
-	qi_qclose:sfx_close,
+	qi_qopen:str_open,
+	qi_qclose:str_close,
 	qi_minfo:&sfx_minfo,
 };
 
 static struct qinit sfx_wqinit = {
-	qi_putp:NULL,
+	qi_putp:strwput,
 	qi_srvp:strwsrv,
 	qi_minfo:&sfx_minfo,
 };

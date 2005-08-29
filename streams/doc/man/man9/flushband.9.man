@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 0.9.2.20 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 0.9.2.21 2005/08/29 10:06:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -162,8 +162,8 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR flushband ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any non-ISR context, including user context, module procedures, callouts,
+callbacks, soft interrupts (tasklets and bottom halves), but excluding interrupt service routines.
 .PP
 Because
 .BR flushband ()
@@ -342,7 +342,7 @@ those to be flushed.  This is a rather inefficient way to do things, and with
 .I LiS
 running at higher priority than soft interrupts, bottom halves and timeouts, all these are locked
 out until the flush is complete.
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .BR flushband ()
 should have far less of an impact on system latency and performance as that of
 .IR LiS .

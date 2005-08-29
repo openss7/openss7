@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/09 21:48:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/29 10:31:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:48:18 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:31:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -213,7 +213,7 @@ sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)
 nodist_libSCTPmodl_a_SOURCES	= $(sctp_source_FILES)
 
 libSCTPmodl_a_DEPENDENCIES	= $(CONFIG_HEADER)
-libSCTPmodl_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+libSCTPmodl_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=sctp $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION)
 libSCTPmodl_a_CFLAGS		= $(KERNEL_CFLAGS)
 

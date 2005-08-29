@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:08 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:08 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -64,7 +64,16 @@ static char const ident[] =
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
 #endif
-#include <linux/kernel.h>	/* for FASTCALL */
+
+#include <linux/kernel.h>	/* for FASTCALL(), fastcall */
+
+#ifndef fastcall
+# ifndef FASTCALL
+#  define FASTCALL(__x) __x
+# endif
+# define fastcall FASTCALL()
+#endif
+
 #include <linux/sched.h>	/* for current */
 #include <linux/file.h>		/* for fput */
 #include <linux/poll.h>
@@ -83,6 +92,8 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "src/modules/sth.h"	/* for stream operations */
+#include "src/kernel/strsched.h"	/* for sq_alloc */
+#include "src/kernel/strutil.h"	/* for global_syncq */
 #include "src/kernel/strlookup.h"	/* cdevsw_list, etc. */
 #include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
 #include "src/kernel/strreg.h"	/* extern verification */
@@ -94,6 +105,100 @@ static char const ident[] =
  *  -------------------------------------------------------------------------
  */
 
+#if defined CONFIG_STREAMS_SYNCQS
+STATIC int
+register_strsync(struct fmodsw *fmod)
+{
+	int sqlvl = SQLVL_DEFAULT;
+
+	/* propagate flags to f_sqlvl */
+	if (fmod->f_sqlvl == SQLVL_DEFAULT) {
+		if (fmod->f_flag & D_UP)
+			sqlvl = SQLVL_PERSTREAM;
+		else if (fmod->f_flag & D_MP)
+			sqlvl = SQLVL_NOP;
+		else if (fmod->f_flag & D_MTPERQ)
+			sqlvl = SQLVL_QUEUE;
+		else if (fmod->f_flag & D_MTQPAIR)
+			sqlvl = SQLVL_QUEUEPAIR;
+		else if (fmod->f_flag & D_MTPERMOD)
+			sqlvl = SQLVL_MODULE;
+	}
+	/* allocate synchronization queues */
+	if (fmod->f_flag & D_MTOUTPERIM) {
+		switch (sqlvl) {
+		case SQLVL_NOP:
+		case SQLVL_QUEUE:
+		case SQLVL_QUEUEPAIR:
+			break;
+		default:
+			return (-EINVAL);
+		}
+		if (!fmod->f_syncq) {
+			struct syncq *sq;
+
+			if (!(sq = sq_alloc()))
+				return (-ENOMEM);
+			fmod->f_syncq = sq;
+			sq->sq_level = sqlvl;
+			sq->sq_flag = SQ_OUTER | ((fmod->f_flag & D_MTOCEXCL) ? SQ_EXCLUS : 0);
+		}
+	} else {
+		switch (sqlvl) {
+		case SQLVL_DEFAULT:
+		case SQLVL_MODULE:	/* default */
+		case SQLVL_ELSEWHERE:
+			if (!fmod->f_syncq) {
+				struct syncq *sq;
+
+				if (!(sq = sq_alloc()))
+					return (-ENOMEM);
+				fmod->f_syncq = sq;
+				sq->sq_level = sqlvl;
+				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+			}
+			break;
+		case SQLVL_GLOBAL:	/* for testing */
+			if (!fmod->f_syncq) {
+				struct syncq *sq;
+
+				if (!(sq = sq_alloc()))
+					return (-ENOMEM);
+				if ((sq = xchg(&global_syncq, sq)))
+					sq_put(&sq);
+				sq = global_syncq;
+				fmod->f_syncq = sq;
+				sq->sq_level = sqlvl;
+				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+			}
+			break;
+		}
+	}
+	fmod->f_sqlvl = sqlvl;
+	return (0);
+}
+
+STATIC void
+unregister_strsync(struct fmodsw *fmod)
+{
+	switch (fmod->f_sqlvl) {
+		case SQLVL_NOP:
+		case SQLVL_QUEUE:
+		case SQLVL_QUEUEPAIR:
+			if (fmod->f_flag & D_MTOUTPERIM)
+				sq_put(&fmod->f_syncq);
+			break;
+		case SQLVL_DEFAULT:
+		case SQLVL_MODULE:	/* default */
+		case SQLVL_ELSEWHERE:
+		case SQLVL_GLOBAL:	/* for testing */
+			sq_put(&fmod->f_syncq);
+			break;
+	}
+	return;
+}
+#endif
+
 /**
  *  register_strmod: - register STREAMS module
  *  @fmod: STREAMS module structure to register
@@ -101,46 +206,56 @@ static char const ident[] =
 int
 register_strmod(struct fmodsw *fmod)
 {
-	int err = 0;
+	struct module_info *mi;
+	int err;
 
+	if (!fmod || !fmod->f_name || !fmod->f_name[0])
+		return (-EINVAL);
+	else {
+		struct streamtab *st;
+		struct qinit *qi;
+
+		if (!(st = fmod->f_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo))
+			return (-EINVAL);
+	}
+#if defined CONFIG_STREAMS_SYNCQS
+	if ((err = register_strsync(fmod)))
+		return (err);
+#endif
 	write_lock(&fmodsw_lock);
-	do {
+	{
 		modID_t modid;
-		struct module_info *mi;
 
-		err = -EINVAL;
-		if (!fmod || !fmod->f_name || !fmod->f_name[0])
-			break;
-		else {
-			struct streamtab *st;
-			struct qinit *qi;
-
-			err = -EINVAL;
-			if (!(st = fmod->f_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo))
-				break;
-		}
-		err = -EBUSY;
 		/* check name for another module */
 		if (__smod_search(fmod->f_name))
-			break;
+			goto ebusy;
+
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
 			for (modid = (modID_t) (-1UL); modid && __fmod_lookup(modid); modid--) ;
-			err = -ENXIO;
-			if (!modid) {
-				break;
-			}
+			if (!modid)
+				goto enxio;
 			mi->mi_idnum = modid;
 		} else {
-			err = -EBUSY;
 			/* use specified module id */
-			if (__fmod_lookup(modid)) {
-				break;
-			}
+			if (__fmod_lookup(modid))
+				goto ebusy;
 		}
 		fmod_add(fmod, modid);
 		err = modid;
-	} while (0);
+		goto unlock_exit;
+	}
+      enxio:
+	err = -ENXIO;
+	goto unregister_exit;
+      ebusy:
+	err = -EBUSY;
+	goto unregister_exit;
+      unregister_exit:
+#if defined CONFIG_STREAMS_SYNCQS
+	unregister_strsync(fmod);
+#endif
+      unlock_exit:
 	write_unlock(&fmodsw_lock);
 	return (err);
 }
@@ -157,80 +272,103 @@ unregister_strmod(struct fmodsw *fmod)
 	int err = 0;
 
 	write_lock(&fmodsw_lock);
-	do {
-		err = -EINVAL;
-		if (!fmod || !fmod->f_name || !fmod->f_name[0])
-			break;
-		err = -ENXIO;
-		if (!fmod->f_list.next || list_empty(&fmod->f_list))
-			break;
-		fmod_del(fmod);
-	} while (0);
+	if (!fmod || !fmod->f_name || !fmod->f_name[0])
+		goto einval;
+	if (!fmod->f_list.next || list_empty(&fmod->f_list))
+		goto enxio;
+	fmod_del(fmod);
+#if defined CONFIG_STREAMS_SYNCQS
+	unregister_strsync(fmod);
+#endif
+      unlock_exit:
 	write_unlock(&fmodsw_lock);
 	return (err);
+      einval:
+	err = -EINVAL;
+	goto unlock_exit;
+      enxio:
+	err = -ENXIO;
+	goto unlock_exit;
 }
 
 EXPORT_SYMBOL(unregister_strmod);
 
 /**
- *  register_strdrv: - register STREAMS driver
- *  @cdev: STREAMS device structure to register
- *  @mnt: mount point of the Shadow Special Filesystem
+ *  register_strdrv:	- register STREAMS driver to specfs
+ *  @cdev:	STREAMS device structure to register
+ *
+ *  register_strdrv() registers the specified cdevsw(9) structure to the specfs(5).  This results in
+ *  the allocation of a specfs(5) directory node for the driver.  This is probably not the function
+ *  that you want.  See register_strdev(9).
+ *
+ *  For full details, see register_strdrv(9).
  */
 int
 register_strdrv(struct cdevsw *cdev)
 {
+	struct module_info *mi;
+	struct cdevsw *c;
 	int err = 0;
 
+	if (!cdev || !cdev->d_name || !cdev->d_name[0])
+		return (-EINVAL);
+	else {
+		struct streamtab *st;
+		struct qinit *qi;
+
+		if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo))
+			return (-EINVAL);
+	}
+#if defined CONFIG_STREAMS_SYNCQS
+	if ((err = register_strsync((struct fmodsw *) cdev)))
+		return (err);
+#endif
+
 	write_lock(&cdevsw_lock);
-	do {
+	{
 		modID_t modid;
-		struct module_info *mi;
-		struct cdevsw *c;
 
-		err = -EINVAL;
-		if (!cdev || !cdev->d_name || !cdev->d_name[0])
-			break;
-		else {
-			struct streamtab *st;
-			struct qinit *qi;
-
-			err = -EINVAL;
-			if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
-				break;
-			}
-		}
 		/* check name for another module */
 		if ((c = __smod_search(cdev->d_name))) {
-			err = -EPERM;
 			if (c != cdev)
-				break;
-			err = -EBUSY;
-			break;
+				goto eperm;
+			goto ebusy;
 		}
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
 			for (modid = (modID_t) (-1UL); modid && __cdrv_lookup(modid); modid--) ;
-			err = -ENXIO;
 			if (!modid)
-				break;
+				goto enxio;
 			mi->mi_idnum = modid;
 		} else {
 			/* use specified module id */
 			if ((c = __cdrv_lookup(modid))) {
-				if (c != cdev) {
-					err = -EPERM;
-					break;
-				}
+				if (c != cdev)
+					goto eperm;
 				/* already registered to us */
-				err = -EBUSY;
-				break;
+				goto ebusy;
 			}
 		}
 		if ((err = cdev_add(cdev, modid)))
-			break;
+			goto unregister_exit;
 		err = modid;
-	} while (0);
+		goto unlock_exit;
+	}
+      eperm:
+	err = -EPERM;
+	goto unregister_exit;
+      ebusy:
+	err = -EBUSY;
+	goto unregister_exit;
+      enxio:
+	err = -ENXIO;
+	goto unregister_exit;
+      unregister_exit:
+#if defined CONFIG_STREAMS_SYNCQS
+	unregister_strsync((struct fmodsw *) cdev);
+#endif
+	goto unlock_exit;
+      unlock_exit:
 	write_unlock(&cdevsw_lock);
 	return (err);
 }
@@ -238,8 +376,15 @@ register_strdrv(struct cdevsw *cdev)
 EXPORT_SYMBOL(register_strdrv);
 
 /**
- *  unregister_strdrv:
- *  @cdev: STREAMS driver structure to unregister
+ *  unregister_strdrv:	- unregister STREAMS driver from specfs
+ *  @cdev:	STREAMS driver structure to unregister
+ *
+ *  unregister_strdrv() unregisters the specified cdevsw(9) structure from the specfs(5).  @cdev
+ *  must have already been registered with register_strdrv(9).  This results in the deallocation of
+ *  the specfs(5) directory node for the driver.  This is probably not the function that you want.
+ *  See unregister_strdev(9).
+ *
+ *  For full details, see unregister_strdrv(9).
  */
 int
 unregister_strdrv(struct cdevsw *cdev)
@@ -247,35 +392,43 @@ unregister_strdrv(struct cdevsw *cdev)
 	int err = 0;
 
 	write_lock(&cdevsw_lock);
-	do {
-		err = -EINVAL;
-		if (!cdev || !cdev->d_name || !cdev->d_name[0])
-			break;
-		err = -ENXIO;
-		if (!cdev->d_list.next || list_empty(&cdev->d_list))
-			break;
-		err = -EBUSY;
-		if (!list_empty(&cdev->d_majors))
-			break;
-		if (!list_empty(&cdev->d_minors))
-			break;
-		if (!list_empty(&cdev->d_apush))
-			break;
-		if (!list_empty(&cdev->d_stlist))
-			break;
-		cdev_del(cdev);
-	} while (0);
+	if (!cdev || !cdev->d_name || !cdev->d_name[0])
+		goto einval;
+	if (!cdev->d_list.next || list_empty(&cdev->d_list))
+		goto enxio;
+	if (!list_empty(&cdev->d_majors))
+		goto ebusy;
+	if (!list_empty(&cdev->d_minors))
+		goto ebusy;
+	if (!list_empty(&cdev->d_apush))
+		goto ebusy;
+	if (!list_empty(&cdev->d_stlist))
+		goto ebusy;
+#if defined CONFIG_STREAMS_SYNCQS
+	unregister_strsync((struct fmodsw *) cdev);
+#endif
+	cdev_del(cdev);
+      unlock_exit:
 	write_unlock(&cdevsw_lock);
 	return (err);
+      einval:
+	err = -EINVAL;
+	goto unlock_exit;
+      enxio:
+	err = -ENXIO;
+	goto unlock_exit;
+      ebusy:
+	err = -EBUSY;
+	goto unlock_exit;
 }
 
 EXPORT_SYMBOL(unregister_strdrv);
 
 /*
- *  register_xinode: - register a character device inode
- *  @cdev: character device switch structure pointer
- *  @major: major device number
- *  @fops: file operations to apply to external character device nodes
+ *  register_xinode:	- register a character device inode
+ *  @cdev:	character device switch structure pointer
+ *  @major:	the major device number to register
+ *  @fops:	file operations to apply to external character major device nodes
  *
  *  Registers and extenal character special device major number with Linux outside the STREAMS
  *  subsystem.  @fops is the file operations that will be used to open the character device.
@@ -390,6 +543,28 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 	return (err);
 }
 
+/**
+ *  register_cmajor:	- register a major device node
+ *  @cdev:	character device switch structure pointer
+ *  @major:	the major device number to register
+ *  @fops:	the file operations to use for external character major device nodes
+ *
+ *  Registers an internal and external character special major device number.  The internal
+ *  registration is made with the specfs filesystem, the external registration is made as a normal
+ *  Linux character device.  @fops are the file operations to associate with the external character
+ *  special major device. @cdev->d_fop are the file operations to associate with the internal
+ *  character special major device within the specfs filesystem.
+ *
+ *  @major, the major device number, can be specified as zero (0), in which case the major device
+ *  number will be assigned to a free major device number by the Linux register_chrdev() function
+ *  and returned as a positive return value.  Any valid external major device number can be used for
+ *  @major.
+ *
+ *  register_cmajor() can be called multiple times for the same registered @cdev entries to register
+ *  additional external major device numbers for the same entry.  On each call to register_cmajor()
+ *  only one character major device number will be allocated.  If @major is zero on each call, a new
+ *  available external major device number will be allocated on each call.
+ */
 int
 register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 {
@@ -410,6 +585,7 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 	cmaj->n_modid = cdev->d_modid;
 	cmaj->n_count = (atomic_t) ATOMIC_INIT(0);
 	cmaj->n_sqlvl = cdev->d_sqlvl;
+	cmaj->n_syncq = cdev->d_syncq;
 	cmaj->n_kmod = cdev->d_kmod;
 	cmaj->n_major = major;
 	cmaj->n_mode = cdev->d_mode;
@@ -450,10 +626,10 @@ unregister_cmajor(struct cdevsw *cdev, major_t major)
 EXPORT_SYMBOL(unregister_cmajor);
 
 /**
- *  register_strnod: - register a minor device node
- *  @cdev: character device switch structure pointer
- *  @cmin: minor device node structure pointer
- *  @minor: minor device number
+ *  register_strnod:	- register a minor device node
+ *  @cdev:	character device switch structure pointer
+ *  @cmin:	minor device node structure pointer
+ *  @minor:	minor device number
  */
 int
 register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
@@ -696,31 +872,27 @@ EXPORT_SYMBOL(spec_dentry);
 int
 spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 {
-	int err;
-	struct file *file;		/* new file pointer to use */
+	struct file *tmp;		/* temporary file pointer to use */
 	struct dentry *dentry;
 	struct vfsmount *mnt;
 
-	dentry = spec_dentry(dev, &sflag);
-	err = PTR_ERR(dentry);
-	if (IS_ERR(dentry)) {
-		goto exit;
+	if (IS_ERR(dentry = spec_dentry(dev, &sflag)))
+		return PTR_ERR(dentry);
+
+	if ((mnt = specfs_get())) {
+		int oflag = f->f_flags;
+
+		if (sflag == CLONEOPEN)
+			oflag |= O_CLONE;
+		tmp = dentry_open(dentry, mntget(mnt), oflag);
+		specfs_put();
+		if (IS_ERR(tmp))
+			return PTR_ERR(tmp);
+		file_swap_put(f, tmp);
+		return (0);
 	}
-	err = -ENODEV;
-	if (!(mnt = specfs_get()))
-		goto dput_exit;
-	file = dentry_open(dentry, mntget(mnt), f->f_flags | ((sflag == CLONEOPEN) ? O_CLONE : 0));
-	specfs_put();
-	err = PTR_ERR(file);
-	if (IS_ERR(file))
-		goto exit;
-	file_swap_put(f, file);
-	err = 0;
-	goto exit;
-      dput_exit:
 	dput(dentry);
-      exit:
-	return (err);
+	return (-ENODEV);
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \

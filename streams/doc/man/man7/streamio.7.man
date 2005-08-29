@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.16 2005/05/14 08:34:14 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.17 2005/08/29 10:06:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -160,6 +160,51 @@ to an appropriate error number as follows:
 .RB [ EINVAL ]
 .I arg
 is invalid.
+.PP
+.IR Solaris \(rg
+.[
+soldoc
+.]
+also uses the
+.B MSGNEXTMARK
+and
+.B MSGNOTNEXTMARK
+flags on the message blocks; but their use is undocumented.
+.IR AIX \(rg
+.[
+aixdoc
+.]
+indicates that it is permissible for
+.I arg
+to be the inclusive OR of the
+.B ANYMARK
+and
+.B LASTMARK
+flags.
+.IR HP-UX \(rg
+.[
+hpuxdoc
+.]
+indicates that if both
+.B ANYMARK
+and
+.B LASTMARK
+are set,
+.B ANYMARK
+supersedes
+.BR LASTMARK .
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+indicates that the bitwise-OR of
+.B ANYMARK
+and
+.B LASTMARK
+is allowed and that, if both are set,
+.B ANYMARK
+supersedes
+.BR LASTMARK .
 .\"
 .\"
 .SS I_CANPUT
@@ -168,6 +213,7 @@ Checks whether messages can be written to the queue band specified by
 .IR arg .
 .I arg
 is an integer which contains the queue band to test for flow control.
+.PP
 .B Linux Fast-STREAMS
 adds the extension that
 .I arg
@@ -248,7 +294,7 @@ below.)
 .PP
 This command performs similar to
 .BR putmsg (2),
-however, it performs the additional function of inserting the read queue
+however, it performs the additional function of inserting the bottom read queue
 pointer associated with a specified file descriptor in the resulting message.
 This ioctl is often used to accepting incoming connections on
 .BR tpi (7)
@@ -425,6 +471,35 @@ flush the write queues.
 .B FLUSHRW
 flush the read and write queues.
 .PP
+Note that on a bare
+.IR STREAMS -based
+.BR pipe (4),
+specifying
+.B FLUSHR
+will flush the read queues at both ends of the pipe, and
+.B FLUSHW
+will flush the write queues at both ends of the pipe.
+.BR FLUSHRW
+will still flush both queues.  This is expected behaviour for bare
+.IR STREAMS -based
+pipes (that is, pipes that have no modules pushed on either end).  For the
+.B I_FLUSH
+command to flush the proper queues in modules pushed on a
+.IR STREAMS -based
+pipe,
+.BR pipemod (4)
+must be pushed onto one end of the pipe before pushing any other modules.  Pushing
+.BR pipemod (4)
+will also reverse the effect that
+.BR FLUSHR " and " FLUSHW
+have on the opposite STREAM head:
+.B FLUSHR
+flushes the near read queue and the far write queue,
+.B FLUSHW
+flushes the near write queue and the far read queue.  See
+.BR pipemod (4)
+for details.
+.PP
 Upon success,
 .B I_FLUSHBAND
 returns zero (0).
@@ -470,6 +545,35 @@ flush the write queues.
 .TP
 .B FLUSHRW
 flush both the read and write queues.
+.PP
+Note that on a bare
+.IR STREAMS -based
+.BR pipe (4),
+specifying
+.B FLUSHR
+will flush the read queues at both ends of the pipe, and
+.B FLUSHW
+will flush the write queues at both ends of the pipe.
+.BR FLUSHRW
+will still flush both queues.  This is expected behaviour for bare
+.IR STREAMS -based
+pipes (that is, pipes that have no modules pushed on either end).  For the
+.B I_FLUSH
+command to flush the proper queues in modules pushed on a
+.IR STREAMS -based
+pipe,
+.BR pipemod (4)
+must be pushed onto one end of the pipe before pushing any other modules.  Pushing
+.BR pipemod (4)
+will also reverse the effect that
+.BR FLUSHR " and " FLUSHW
+have on the opposite STREAM head:
+.B FLUSHR
+flushes the near read queue and the far write queue,
+.B FLUSHW
+flushes the near write queue and the far read queue.  See
+.BR pipemod (4)
+for details.
 .PP
 Upon success,
 .B I_FLUSH
@@ -1486,6 +1590,9 @@ the stream specified by
 .I fd
 received a hangup.
 .TP
+.RB [ ENXIO ]
+the open procedure of the pushed module failed.
+.TP
 .RB [ EINVAL ]
 the module name pointed to by
 .I arg
@@ -1992,6 +2099,13 @@ refers to a
 pipe and a write operation was attempted with no
 readers at the other end, or a read operation was attempted, the pipe is
 empty, and there are no readers at the other end.
+(This error is returned by
+.BR strread (9)
+and
+.BR strwrite (9)
+internally and should not be exposed to the user.  Instead, a
+.RB [ EPIPE ]
+should be generated.)
 .TP
 .RB [ EINVAL ]
 .I fd

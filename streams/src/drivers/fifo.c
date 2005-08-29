@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -61,6 +61,8 @@ static char const ident[] =
 #include <linux/init.h>
 
 #include <asm/semaphore.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -75,7 +77,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/28 14:13:51 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/29 10:37:03 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -144,35 +146,34 @@ MODULE_ALIAS("/dev/streams/fifo/*");
 #endif
 
 static struct module_info fifo_minfo = {
-	mi_idnum:CONFIG_STREAMS_FIFO_MODID,
-	mi_idname:CONFIG_STREAMS_FIFO_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_FIFO_MODID,
+	.mi_idname = CONFIG_STREAMS_FIFO_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int fifo_qclose(queue_t *q, int oflag, cred_t *crp);
+static int fifo_close(queue_t *q, int oflag, cred_t *crp);
 
 static struct qinit fifo_rinit = {
-	qi_putp:strrput,
-	qi_qopen:fifo_qopen,
-	qi_qclose:fifo_qclose,
-	qi_minfo:&fifo_minfo,
+	.qi_putp = strrput,
+	.qi_qopen = fifo_qopen,
+	.qi_qclose = fifo_close,
+	.qi_minfo = &fifo_minfo,
 };
 
 static struct qinit fifo_winit = {
-	qi_srvp:strwsrv,
-	qi_minfo:&fifo_minfo,
+	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
+	.qi_minfo = &fifo_minfo,
 };
 
 static struct streamtab fifo_info = {
-	st_rdinit:&fifo_rinit,
-	st_wrinit:&fifo_winit,
+	.st_rdinit = &fifo_rinit,
+	.st_wrinit = &fifo_winit,
 };
-
-#define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
 
 /* 
  *  -------------------------------------------------------------------------
@@ -181,124 +182,47 @@ static struct streamtab fifo_info = {
  *
  *  -------------------------------------------------------------------------
  */
-/**
- *  fifo_qopen:	- STREAMS qopen procedure for fifo stream heads
- *  @q:		read queue of stream to open
- *  @devp:	pointer to a dev_t from which to read and into which to return the device number
- *  @oflag:	open flags
- *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
- *  @crp:	pointer to user's credentials structure
- */
+
 static int
 fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct stdata *sd;
-	int err = 0;
 
-	if ((sd = q->q_ptr) != NULL) {
-		/* we walk down the queue chain calling open on each of the modules and the driver */
-		queue_t *wq = WR(q), *wq_next;
+	/* already open */
+	if ((sd = q->q_ptr))
+		return (0);
 
-		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-		while ((wq = wq_next)) {
-			int new_sflag;
+	/* must be opened for at least read or write */
+	if (!(oflag & (FWRITE | FREAD)))
+		return (-EINVAL);
+	/* XXX: does it really?  Are there not any useful STREAMS ioctls? */
 
-			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-			new_sflag = wq_next ? MODOPEN : sflag;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
-				return (err > 0 ? -err : err);
-		}
-		goto done;
-	}
-	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
-		dev_t dev = *devp;
+	if (!(sd = qstream(q)))
+		return (-EIO);
 
-		if ((sd = qstream(q))) {
-			/* 1st step: attach the driver and call its open routine */
-			/* we are the driver and this *is* the open routine */
-			/* start off life as a fifo */
-			WR(q)->q_next = q;
-			/* 2nd step: check for redirected return */
-			/* we are the driver and this *is* the open routine and there is no
-			   redirection. */
-			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp)))
-				return (err > 0 ? -err : err);
-			goto done;
-		}
-	}
-	return (-EIO);		/* can't be opened as module or clone */
-      done:
-	err = 0;
-	switch (oflag & (FNDELAY | FWRITE | FREAD)) {
-	case (0):
-	case (FNDELAY):
-		err = -EINVAL;
-		break;
-	case (FWRITE):
-		if (sd->sd_readers <= 0) {
-			DECLARE_WAITQUEUE(wait, current);
-			add_wait_queue(&sd->sd_waitq, &wait);
-			for (;;) {
-				set_current_state(TASK_INTERRUPTIBLE);
-				err = -ERESTARTSYS;
-				if (signal_pending(current))
-					break;
-				err = 0;
-				if (sd->sd_readers > 0)
-					break;
-				up(&sd->sd_file->f_dentry->d_inode->i_sem);
-				/* FIXME: probably need to release open bit as well... */
-				schedule();
-				down(&sd->sd_file->f_dentry->d_inode->i_sem);
-			}
-			set_current_state(TASK_RUNNING);
-			remove_wait_queue(&sd->sd_waitq, &wait);
-		}
-		break;
-	case (FWRITE | FNDELAY):
-		if (sd->sd_readers > 0)
-			break;
-		err = -ENXIO;
-		break;
-	case (FREAD):
-		if (sd->sd_writers <= 0) {
-			DECLARE_WAITQUEUE(wait, current);
-			add_wait_queue(&sd->sd_waitq, &wait);
-			for (;;) {
-				set_current_state(TASK_INTERRUPTIBLE);
-				err = -ERESTARTSYS;
-				if (signal_pending(current))
-					break;
-				err = 0;
-				if (sd->sd_writers > 0)
-					break;
-				up(&sd->sd_file->f_dentry->d_inode->i_sem);
-				/* FIXME: probably need to release open bit as well... */
-				schedule();
-				down(&sd->sd_file->f_dentry->d_inode->i_sem);
-			}
-		}
-		break;
-	case (FREAD | FNDELAY):
-		break;
-	case (FREAD | FWRITE):
-	case (FREAD | FWRITE | FNDELAY):
-		break;
-	}
-	if (err)
-		return (err);
+	/* first open we don't need to write lock stream head to change sd->sd_wq->q_next because
+	   we are not published to the inode yet and we have exclusive access to the stream. */
+
+	WR(q)->q_next = q;
+
 	/* lastly, attach our privates and return */
-	if (!q->q_ptr)
-		q->q_ptr = WR(q)->q_ptr = sd;
+	q->q_ptr = WR(q)->q_ptr = sd;
+	/* XXX: should we do an sd_get here? */
+
 	return (0);
 }
+
 static int
-fifo_qclose(queue_t *q, int oflag, cred_t *crp)
+fifo_close(queue_t *q, int oflag, cred_t *crp)
 {
-	if (!q->q_ptr || q->q_ptr != qstream(q))
-		return (ENXIO);
+	struct stdata *sd;
+
+	if (!(sd = q->q_ptr))
+		return (-ENXIO);
+
 	q->q_ptr = WR(q)->q_ptr = NULL;
+	/* XXX: should we do an sd_put here? */
+
 	return (0);
 }
 
@@ -311,18 +235,18 @@ fifo_qclose(queue_t *q, int oflag, cred_t *crp)
  */
 
 static struct cdevsw fifo_cdev = {
-	d_name:CONFIG_STREAMS_FIFO_NAME,
-	d_str:&fifo_info,
-	d_flag:0,
-	d_fop:&strm_f_ops,
-	d_mode:S_IFIFO | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_FIFO_NAME,
+	.d_str = &fifo_info,
+	.d_flag = 0,
+	.d_fop = &strm_f_ops,
+	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 /* 
  *  -------------------------------------------------------------------------
  *
- *  Special open for clone devices.
+ *  Special open for fifo devices.
  *
  *  -------------------------------------------------------------------------
  */
@@ -356,8 +280,8 @@ fifo_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:fifo_open,
+	.owner = THIS_MODULE,
+	.open = &fifo_open,
 };
 
 /* 

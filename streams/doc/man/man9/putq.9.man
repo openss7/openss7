@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.15 2005/05/14 08:34:28 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.16 2005/08/29 10:06:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -176,19 +176,24 @@ always succeeds for high priority and normal band zero (0) messages.
 .SH CONTEXT
 .PP
 .BR putq ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any non-ISR context, including user context, module procedures, callouts,
+callbacks, soft interrupts (tasklets, bottom halves), but excluding interrupt service routines.
 .PP
-.BR putq ()
-called on a queue frozen by
-.BR freezestr (9)
-will result in single-party deadlock.
+Interrupt service routines are excluded to avoid suppressing local interrupts, and greatly
+reduce suppressing local bottom halves, during
+.I STREAMS
+processing.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR putq ()
 is MP-safe.
+.PP
+.BR putq ()
+called on a queue frozen by
+.BR freezestr (9)
+will result in single-party deadlock.
 .\"
 .\"
 .SH NOTICES
@@ -293,6 +298,7 @@ prior to
 .BR putq ()
 may be called on a stream frozen with
 .BR freezestr (9).
+.IP ""
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg
 and
@@ -310,6 +316,14 @@ suxspg
 .[
 uw7spg
 .]
+(But strangely, code inspection reveals that
+.IR OpenSolaris \(rg
+permits
+.BR putq ()
+and
+.BR getq (9)
+to be called on a stream frozen with
+.BR freezestr (9).)
 .IP ""
 Portable
 .I STREAMS
@@ -317,6 +331,42 @@ drivers and modules should not call
 .BR putq ()
 on a stream frozen with
 .BR freezestr (9).
+.IP \(em
+.BR putq ()
+cannot be called from an interrupt service routine (hard irq).
+.IP ""
+.B @PACKAGE_TITLE@
+does not permit
+.BR putq ()
+to be called from an interrupt service routine (hard irq) context to remove the need for suppressing
+local interrupts, and greatly reducing the need to suppres local bottom halves, throughout the
+.I STREAMS
+executive.  The only queue utilities that
+.B @PACKAGE_TITLE@
+permits to be called from an interrupt service routine (hard irq) context are
+.BR qwriter (9),
+.BR streams_put (9),
+.BR mp_become_writer (9)
+and
+.BR put (9),
+and these functions defer until the next
+.BR runqueues (9)
+pass.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not call
+.BR putq ()
+from any context outside a
+.I STREAMS
+queue procedure or callback function.  At the STREAM end (STREAM head or driver), from a context
+other than a
+.I STREAMS
+coroutine, only
+.BR put (9)
+will be used by a portable
+.I STREAMS
+driver or module.
 .IP \(em
 Symbol
 .BR lis_putq ()

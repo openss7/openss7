@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 05:11:24 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/08/29 10:37:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 05:11:24 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:10 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -78,8 +78,8 @@ extern void freeqb(struct qband *qb);
 /* ctors and dtors for stream heads */
 extern struct stdata *allocstr(void);
 extern void freestr(struct stdata *sd);
-extern struct stdata *sd_get(struct stdata *sd);
-extern void sd_put(struct stdata *sd);
+extern struct stdata *FASTCALL(sd_get(struct stdata *sd));
+extern void FASTCALL(sd_put(struct stdata **sdp));
 
 /* ctors and dtors for autopush entries */
 extern struct apinfo *ap_alloc(struct strapush *sap);
@@ -112,6 +112,9 @@ extern void sq_put(struct syncq **sqp);
 /* freeing chains of message blocks */
 extern void freechain(mblk_t *mp, mblk_t **mpp);
 
+/* force scheduling queues */
+extern void qschedule(queue_t *q);
+
 #if defined CONFIG_STREAMS_SYNCQS
 /* synq functions */
 extern void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
@@ -131,18 +134,42 @@ typedef enum {
 	CTX_ISR,			/* hard interrupt context */
 } context_t;
 
-__SCHED_EXTERN_INLINE int
-in_streams(void)
-{
-	return (!in_irq() && (this_thread->flags & QUEUEFLAG));
-}
+
+#define in_streams() (!in_irq() && this_thread->lock != 0)
+
+#define can_enter_streams() (this_thread->lock == 0 || !in_interrupt())
+
+#define local_str_disable() \
+do { \
+	struct strthread *t = this_thread; \
+	t->lock++; \
+} while (0)
+
+#define local_str_enable() \
+do { \
+	struct strthread *t = this_thread; \
+	if (--t->lock == 0 && test_and_clear_bit(qwantrun, &t->flags)) \
+		raise_softirq(STREAMS_SOFTIRQ); \
+} while (0)
+
+#define enter_streams() \
+do { \
+	local_bh_disable(); \
+	local_str_disable(); \
+} while (0)
+
+#define leave_streams() \
+do { \
+	local_str_enable(); \
+	local_bh_enable(); \
+} while (0)
 
 __SCHED_EXTERN_INLINE context_t
 current_context(void)
 {
 	if (in_irq())
 		return (CTX_ISR);
-	if (this_thread->flags & QUEUEFLAG)
+	if (in_streams())
 		return (CTX_STREAMS);
 	if (in_interrupt())
 		return (CTX_INT);

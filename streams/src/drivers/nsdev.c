@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:21 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:21 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:21 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -63,6 +63,8 @@ static char const ident[] =
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
 #endif
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -75,7 +77,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:21 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -188,13 +190,18 @@ nsdevopen(struct inode *inode, struct file *file)
 	struct cdevsw *cdev;
 	int err;
 
-	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
-		return (-ENOENT);
-	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
-	err = spec_open(inode, file, makedevice(cdev->d_modid, getminor(inode->i_ino)),
-			(file->f_flags & (O_CREAT | O_EXCL)) ? CLONEOPEN : DRVOPEN);
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	if ((cdev = cdev_match(file->f_dentry->d_name.name))) {
+		major_t major = cdev->d_modid;
+		minor_t minor = getminor(inode->i_ino);
+		dev_t dev = makedevice(major, minor);
+		int sflag = (file->f_flags & O_CLONE) ? CLONEOPEN : DRVOPEN;
+
+		printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
+		err = spec_open(inode, file, dev, sflag);
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+		sdev_put(cdev);
+	} else
+		err = -ENOENT;
 	return (err);
 }
 
@@ -252,6 +259,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	major_t major;
 	minor_t minor;
 	modID_t modid, instance;
+	dev_t dev;
 
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
@@ -273,7 +281,8 @@ nsdev_open(struct inode *inode, struct file *file)
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
 	instance = cdev->d_modid;
-	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
+	dev = makedevice(modid, instance);
+	err = spec_open(inode, file, dev, CLONEOPEN);
       cdev_put_exit:
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	sdev_put(cdev);

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dupmsg.9.man,v 0.9.2.15 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: dupmsg.9.man,v 0.9.2.16 2005/08/29 10:06:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -154,20 +154,18 @@ is MP-safe.
 .\"
 .SH NOTICES
 .PP
-.I LiS
-.[
-LiS
-.]
-implements
 .BR dupmsg ()
-as a looping call to
+is implemented as a looping call to
 .BR dupb (9).
-One call is to
+One call to
 .BR dupb (9)
 is made for each message block.  If
 .BR dupb (9)
 fails, the partially duplicated message is freed using
 .BR freemsg (9).
+.PP
+See notices under
+.BR dupb (9).
 .\"
 .\"
 .SH "SEE ALSO"
@@ -187,18 +185,25 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR dupmsg ()
-is compatible with LiS
+is compatible with
+.IR "SVR 4.2" ,
 .[
-LiS
+svr42
 .]
-with the following exceptions:
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 When
 .BR dupmsg ()
 is passed a
 .B NULL
 .I mp
-pointer, the results are undefined.  When LiS
+pointer, the results are undefined.  When
+.B LiS
+.[
+lis
+.]
 .BR dupmsg ()
 is passed a
 .B NULL
@@ -212,13 +217,15 @@ modules and drivers should not pass
 .B NULL
 or invalid message block pointers to this function.
 .IP \(em
-LiS used to have some problems serializing access to the reference count in
-data blocks which caused inconsistencies in the reference count when duplicate
-messages were freed.
+.B LiS
+used to have some problems serializing access to the reference count in data blocks which caused
+inconsistencies in the reference count when duplicate messages were freed.
 .PP
 Symbol
 .BR lis_dupmsg ()
-is provided for compatibility with LiS.  See
+is provided for compatibility with
+.BR LiS .
+See
 .BR liscompat (9).
 .PP
 See

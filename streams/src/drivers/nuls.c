@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 22:20:09 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 22:20:09 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 22:20:09 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -70,7 +72,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/29 22:20:09 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -296,6 +298,7 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
 	}
+	qprocsoff(q);
 	spin_lock(&nuls_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;

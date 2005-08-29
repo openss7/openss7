@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.14 2005/07/12 14:06:22 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.15 2005/08/29 10:36:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 14:06:22 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/08/29 10:36:57 $"
 
 #ifndef __SYS_STROPTS_H__
 #warn "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -67,6 +67,11 @@
 #include <linux/types.h>	/* for pid_t */
 #else
 #include <sys/types.h>		/* for uid_t */
+#endif
+
+#ifndef t_uscalar_t
+typedef unsigned long int t_uscalar_t;
+#define t_uscalar_t t_uscalar_t
 #endif
 
 #define __SID		('S' << 8)

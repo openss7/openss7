@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strdev.9.man,v 0.9.2.11 2005/05/14 08:34:29 brian Exp $
+.\" @(#) $Id: register_strdev.9.man,v 0.9.2.12 2005/08/29 10:06:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -297,31 +297,31 @@ Administrative Driver (see
 .nf
 \fC\s-2
 static struct module_info sad_minfo = {
-    mi_idnum:0,
-    mi_idname:CONFIG_STREAMS_SAD_NAME,
-    mi_minpsz:0,
-    mi_maxpsz:INFPSZ,
-    mi_hiwat:STRHIGH,
-    mi_lowat:STRLOW,
+    .mi_idnum = 0,
+    .mi_idname = CONFIG_STREAMS_SAD_NAME,
+    .mi_minpsz = 0,
+    .mi_maxpsz = INFPSZ,
+    .mi_hiwat = STRHIGH,
+    .mi_lowat = STRLOW,
 };
 
 static struct qinit sad_qinit = {
-    qi_putp:sad_put,
-    qi_open:sad_open,
-    qi_close:sad_close,
-    qi_minfo:&sad_minfo,
+    .qi_putp = sad_put,
+    .qi_open = sad_open,
+    .qi_close = sad_close,
+    .qi_minfo = &sad_minfo,
 };
 
 static struct streamtab sad_info = {
-    st_rdinit:&sad_qinit,
-    st_wrinit:&sad_qinit,
+    .st_rdinit = &sad_qinit,
+    .st_wrinit = &sad_qinit,
 };
 
 static struct cdevsw sad_cdev = {
-    d_name:CONFIG_STREAMS_SAD_NAME,
-    d_str:&sad_info,
-    d_flag:0,
-    d_kmod:THIS_MODULE,
+    .d_name = CONFIG_STREAMS_SAD_NAME,
+    .d_str = &sad_info,
+    .d_flag = 0,
+    .d_kmod = THIS_MODULE,
 };
 
 static int __init sad_init(void)

@@ -1,1 +1,1195 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: strread.9.man,v 0.9.2.2 2005/08/29 10:06:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRREAD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strread, strreadv
+\- perform a \fBread\fP(2s) operation on a STREAM head
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.BI "ssize_t strread(struct file *" file ", char *" buf ", size_t " nbytes ", loff_t *" ppos );
+.HP
+.BI "ssize_t strreadv(struct file *", file ", const struct iovec *" iov ", unsigned long " count ", loff_t *" ppos );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The arguments for
+.BR strread ()
+are as follows:
+.TP
+.I file
+a file pointer for a
+.I STREAMS
+file.
+.PD 0
+.TP
+.I buf
+a pointer to the user buffer into which to read.
+.TP
+.I nbytes
+the maximum number of bytes to read into the buffer.
+.TP
+.I ppos
+the file position from which to read.
+.PD
+.PP
+The arguments for
+.BR strreadv ()
+are as follows:
+.TP
+.I file
+a file pointer for a
+.I STREAMS
+file.
+.PD 0
+.TP
+.I iov
+a pointer to an array of
+.B iovec
+structures describing multiple user buffers into which to read.
+.TP
+.I count
+the number of
+.B iovec
+structures in the array pointed to by
+.IR iov .
+.TP
+.I ppos
+the file position from which to read.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strread ()
+and
+.BR strreadv ()
+perform
+.BR read (2s)
+functions on a STREAM head.
+.BR strread ()
+is implemented with a call to
+.BR strreadv ().
+.\"
+.\"
+.PP
+.BR strread ()
+and
+.BR strreadv ()
+support several modes of operation.  Three read modes are supported:
+byte-stream mode,
+message-discard mode
+and
+message-nondiscard mode.
+Three read control modes are supported:
+control-normal mode,
+control-data mode
+and
+control-discard mode.
+Two sets of asynchronous I/O semantics are supported:
+.I STREAMS
+semantics and
+.I old TTY
+semantics.
+Two sets of file types are supported:
+.I STREAMS
+character device special files and
+.IR STREAMS -based
+pipes and FIFOs.
+Three features are supported:
+the
+.BR M_READ (9)
+feature,
+the
+.BR I_ATMARK (7)
+feature,
+and the
+.B SO_DELIM
+delimited message feature.
+.\"
+.\"
+.SS Read Modes
+.\"
+.PP
+Three read modes are supported:
+byte-stream mode
+.RB ( RNORM ),
+message-discard mode
+.RB ( RMSGD )
+and
+message-nondiscard mode
+.RB ( RMSGN ).
+These modes can be examined by the user with the
+.BR I_GRDOPT (7)
+command to
+.BR ioctl (2)
+as described in
+.BR streamio (7).
+These modes can also be changed by the user with the
+.BR I_SRDOPT (7)
+command to
+.BR ioctl (2)
+as described in
+.BR streamio (7).
+.\"
+.TP
+.RB { RNORM }
+In byte-stream
+mode,
+.BR strread ()
+and
+.BR strreadv ()
+terminates on error, when the number of bytes requested has been satisfied, a zero-length data
+message is received at the STREAM head, a marked message is received at the STREAM head, or a
+delimited message is received at the STREAM head.  Message boundaries are ignored.
+.IP
+When 
+.BR strread ()
+or
+.BR strreadv ()
+terminates in byte-stream mode, if there are any bytes remaining in the STREAMS message that was
+read, they are placed back on the STREAM head read queue to be read by subsequent calls to
+.BR read (2s),
+.BR getmsg (2)
+or
+.BR getpmsg (2s).
+.\"
+.TP
+.RB { RMSGD }
+The message-discard
+mode,
+terminates on error, when the number of bytes requested has been satisfied, a zero-length data
+message is received at the STREAM head, a marked message is received at the STREAM head, or a
+delimited message is received at the STREAM head.  Message boundaries are preserved.
+.IP
+When 
+.BR strread ()
+or
+.BR strreadv ()
+terminates in message-discard mode, if there are any bytes remaining in the STREAMS message that was
+read, they are discarded along with the partially read message.  This data will not be available to
+a subsequent
+.BR read (2s),
+.BR getmsg (2)
+nor
+.BR getpmsg (2s)
+call.
+.\"
+.TP
+.RB { RMSGN }
+The message-nondiscard
+mode,
+terminates on error, when the number of bytes requested has been satisfied, a zero-length data
+message is received at the STREAM head, a marked message is received at the STREAM head, or a
+delimited message is received at the STREAM head.  Message boundaries are preserved.
+.IP
+When 
+.BR strread ()
+or
+.BR strreadv ()
+terminates in message-nondiscard mode, if there are any bytes remaining in the STREAMS message that
+was read, they are placed back on the STREAM head read queue to be read by subsequent calls to
+.BR read (2s),
+.BR getmsg (2)
+or
+.BR getpmsg (2s).
+.\"
+.\"
+.\"
+.\"
+.\"
+.SS Read Control Modes
+.\"
+.PP
+Three read control modes are supported:
+control-normal mode
+.RB ( RPROTNORM ),
+control-data mode
+.RB ( RPROTDAT )
+and
+control-discard mode
+.RB ( RPROTDIS ).
+These control modes can be examined by the user with the
+.BR I_GRDOPT (7)
+command to
+.BR ioctl (2)
+as described in
+.BR streamio (7).
+These control modes can also be changed by the user with the
+.BR I_SRDOPT (7)
+command to
+.BR ioctl (2)
+as described in
+.BR streamio (7).
+.\"
+.TP
+.RB { RPROTNORM }
+In control-normal
+mode, when a
+.I STREAMS
+message is encountered in the STREAM head read queue that has a control part (that is, an
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+block in the message),
+.BR strread ()
+and
+.BR strreadv ()
+will terminate and either return the number of bytes read so far, or fail, return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EBADMSG ].
+.BR getmsg (2)
+or
+.BR getpmsg (2s)
+must be use to remove the message containing a control part from the STREAM.
+.\"
+.TP
+.RB { RPROTDAT }
+In control-data
+mode,
+when a
+.I STREAMS
+message is encountered in the STREAM head read queue that has a control part,
+.BR strread ()
+and
+.BR strreadv ()
+will convert the
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message blocks to
+.BR M_DATA (9)
+message blocks and process the message with the control part converted to data.
+.\"
+.TP
+.RB { RPROTDIS }
+In control-discard
+mode,
+when a
+.I STREAMS
+message is encountered in the STREAM head read queue that has a control part,
+.BR strread ()
+and
+.BR strreadv ()
+will discard and free the
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message blocks and process the message without the control part.
+.\"
+.\"
+.SS Zero-length Reads
+.\"
+.PP
+When
+.I nbytes
+is zero
+.RB ( 0 )
+in a call to
+.BR strread (),
+or when the total of the lengths of the
+.I iov_len
+members of the input-output vectors passed in
+.I iov
+is zero
+.RB ( 0 )
+in a call to
+.BR strreadv (),
+either function terminates and returns zero
+.RB ( 0 ),
+without taking any other action or affecting the
+.I STREAMS
+character device special file in any way.
+According to POSIX
+.[
+susv3
+.]
+it is at the option of the implementation whether error checking is performed in advance of
+detecting a zero read, or subsequent to detecting a zero length read.
+.\"
+.PP
+All read modes for
+.BR strread ()
+and
+.BR strreadv ()
+terminate when a zero-length data message is encountered on the STREAM head.  In byte-stream mode,
+when data has already been transferred to the user,
+.BR strread ()
+and
+.BR strreadv ()
+return the zero-length data message to the STREAM head to be consumed by a subsequent call, and the
+function returns the number of bytes read so far.
+.\"
+.PP
+When the zero-length data message is the first message encountered on the STREAM head,
+all read modes for
+.BR strread ()
+and
+.BR strreadv ()
+free the zero-length message, terminate, and return zero
+.RB ( 0 ).
+.\"
+.\"
+.SS Asynchronous I/O
+.\"
+.PP
+Two sets of asynchronous input-output semantics are supported:
+.I STREAMS
+semantics for
+.B O_NDELAY
+.RB ( SO_NDELOFF ),
+and
+.I old TTY
+semantics for
+.B O_NDELAY
+.RB ( SO_NDELON ).
+Whether
+.I STREAMS
+or
+.I old TTY
+semantics are used for
+.B O_NDELAY
+can be controlled by a downstream module or driver using the
+.BR M_SETOPTS (9)
+message to the stream head with the
+.BR SO_NDELON " or " SO_NDELOFF
+flags set.
+There is no method for the application program to examine or set the asynchronous input-output
+semantics.  The application program must know from prior knowledge of the modules and driver within
+the stream which set of asyncrhonous input-output semantics to expect.
+The default is
+.I STREAMS
+semantics for
+.BR O_NDELAY " (or " O_NONBLOCK ).
+.\"
+.PP
+When
+.I STREAMS
+semantics are applied for
+.BR O_NDELAY " (or " O_NONBLOCK ),
+which is the default,
+.BR strread ()
+and
+.BR strreadv ()
+exhibit the following behaviour:
+.\"
+.IP \(en \w'\(en\(em'u
+When the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is set, and
+.BR strread ()
+or
+.BR strreadv ()
+encounters an STREAM head read queue that has no data, and no data has yet been transferred to the
+caller,
+.BR strread ()
+and
+.BR strreadv ()
+fail and return the negative error number
+.RB [ EAGAIN ].
+.IP \(en
+When the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is set, and
+.BR strread ()
+or
+.BR strreadv ()
+encounters an STREAM head read queue that has no data, and some data has already been transferred to
+the caller,
+.BR strread ()
+and
+.BR strreadv ()
+terminate and return the amount of data read.
+.IP \(en
+When the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is clear, and
+.BR strread ()
+or
+.BR strreadv ()
+encounters a STREAM head read queue that has no data,
+.BR strread ()
+and
+.BR strreadv ()
+block awaiting the availability of data at the STREAM head read queue.
+.\"
+.PP
+When
+.I old TTY
+semantics are applied for
+.BR O_NDELAY " (or " O_NONBLOCK ),
+.BR strread ()
+and
+.BR strreadv ()
+exhibit the following behaviour:
+.\"
+.IP \(en \w'\(en\(em'u
+When the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is set, and
+.BR strread ()
+or
+.BR strreadv ()
+encounters a STREAM head read queue that has no data, and no data has yet been transferred to the
+caller,
+.BR strread ()
+and
+.BR strreadv ()
+terminate and return zero
+.RB ( 0 ).
+.IP \(en
+When the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is set, and
+.BR strread ()
+or
+.BR strreadv ()
+encounters an STREAM head read queue that has no data, and some data has already been transferred to
+the caller,
+.BR strread ()
+and
+.BR strreadv ()
+terminate and return the amount of data read.
+.IP \(en
+When the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is clear, and
+.BR strread ()
+or
+.BR strreadv ()
+encounters a STREAM head read queue that has no data,
+.BR strread ()
+and
+.BR strreadv ()
+block awaiting the availability of data at the STREAM head read queue.
+.\"
+.\"
+.SS File Types
+.\"
+.PP
+Two file types are supported:
+.I STREAMS
+character device special files
+and
+.IR STREAMS -based
+pipes and FIFOs.
+.\"
+.\"
+.SS FEATURES
+.\"
+.PP
+Three features are supported:
+the read notification feature,
+the marked message feature
+and
+the delimited message feature.
+.\"
+.SS Read Notification Feature
+.PP
+The
+.BR M_READ (9)
+feature is enabled with the
+.B SO_MREADON
+flag in the
+.BR stroptions (9)
+structure passed to the STREAM head in a
+.BR M_SETOPTS (9)
+message.  It is disabled in the same fashion with the
+.B SO_MREADOFF
+flag.
+.PP
+The read notification feature can only be enabled or disabled by a downstream module or driver.  The
+user or application program has no mechanism for activating or deactivating the feature, nor
+for determining whether the feature is activated or not.
+.PP
+When the
+.B M_READ (9)
+feature is activated and
+.BR strread ()
+or
+.BR strreadv ()
+finds that there is no data queued in the STREAM head read queue to satisfy the
+.BR read (2s)
+request, and it is about to block (that is, the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file status flags are clear), it generates an
+.BR M_READ (9)
+message downstream containing the number of bytes requested.  A cooperating downstream module or
+driver then takes the
+.BR M_READ (9)
+message and, if it can satisfy the request, transforms the
+.BR M_READ (9)
+message into a
+.BR M_DATA (9)
+message containing the requested data and passes the message upstream.
+.PP
+The
+.BR M_READ (9)
+feature is used by
+.BR ldterm (4)
+when transferring input in non-canonical (raw) mode.
+.PP
+Proper behaviour of the STREAM head (and therefore
+.BR strread ()
+and
+.BR strreadv ()),
+when the
+.BR M_READ (9)
+feature is activated,
+depends upon the non-blocking semantics used by the STREAM head and cooperating modules and drivers.
+.PP
+When the STREAM head is set for
+.I STREAMS
+semantics for non-blocking operation (the default),
+and the stream is set for blocking operation (the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flag is set),
+.BR strread (),
+.BR strreadv ()
+and cooperating modules and drivers behave as follows:
+.IP \(en \w'\(en\(em'u
+When the STREAM head has no data to service the
+.BR strread ()
+or
+.BR strreadv ()
+request, it issues a
+.BR M_READ (9)
+containing the number of byte,
+.IR nbytes ,
+in the request downstream, and blocks awaiting a reply.
+The
+.BR M_READ (9)
+message is a high priority message requiring a response from the module or driver.
+.IP \(en
+Upon receiving a
+.BR M_READ (9)
+message, the module or driver should service the request, forwarding it downstream or acting upon
+it, directly from its
+.BR qi_putp (9)
+procedure.
+.IP \(en
+To act upon the message, the module or driver determines whether it has sufficient data queued to
+service the request.
+.IP \(en
+If there is sufficient queued data to meet the request, the module or driver transforms the
+.BR M_READ (9)
+message into an
+.BR M_DATA (9)
+message containing the requested data and passes the
+.BR M_DATA (9)
+message upstream.
+.IP \(en
+Upon receiving the
+.BR M_DATA (9)
+message, the STREAM head unblocks the user and transfers the data to satisfy the request.
+.IP \(en
+If there is insufficient data queued to meet the request, the module or driver
+frees the
+.BR M_READ (9)
+message and takes no other action.
+.PP
+When the STREAM head is set for
+.RI non- STREAMS
+tty semantics for non-blocking operation,
+yet regardless of the setting of the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file flags,
+.BR strread (),
+.BR strreadv ()
+and cooperating modules and drivers behave as follows:
+.IP \(en \w'\(en\(em'u
+.IP \(en
+.IP \(en
+.\"
+.\"
+.SS Marked Message Feature
+.PP
+The
+.BR I_ATMARK (7)
+feature is always enabled on a STREAM.  This feature is used by setting the
+.BR MSGMARK
+flag in messages passed upstream to the STREAM head.
+.PP
+.I STREAMS
+messages can be marked by a downstream module or driver in support of TCP's out-of-band data.  Once
+marked, a messages sent to the STREAM head causes the STREAM head to remember the message.  A user
+may check to see if the message on the front of its STREAM head read queue is marked with the
+.BR I_ATMARK (7)
+command to
+.BR ioctl (2).
+If a user is reading data from the STREAM head and there are multiple messages on the STREAM head read queue, and one of those messages is marked,
+.BR strread ()
+and
+.BR strreadv ()
+terminate when they reach the marked message and return the data only up to the marked message.  The
+marked data can then be obtained with successive reads.  A successive read will them consume all marked
+messages on the STREAM head read queue that will fit into the number of requested bytes,
+.IR nbytes .
+.PP
+When
+.BR strread ()
+or
+.BR strreadv ()
+encounters a marked message and data has already been transferred, the read terminates with the
+amount of data read.  It does not matter what the length of the marked message is, and a zero-length
+marked message has the same effect.  The marked message is kept on the STREAM head to be read by a
+subsequent
+.BR strread (),
+.BR strreadv ()
+or
+.BR strgetpmsg ()
+request.  The resulting short read is one indication to the caller that a marked message could exist
+on the STREAM head read queue.  (Short reads can also result from a zero-length data message, or
+from a delimited message.)  When a short read occurs, the user should test for marked messages
+using the
+.BR ANYMARK " or " LASTMARK
+flags of the
+.BR I_ATMARK (7)
+command to
+.BR ioctl (2).
+A subsequent
+.BR strread ()
+will consume all contiguous marked messages that will fit into the
+.I nbytes
+request.  If a marked message exists, there is the possiblity that there is also a marked message
+following the marked message.  This can be checked with the
+.B LASTMARK
+flag of the
+.BR I_ATMARK (7)
+command to
+.BR ioctl (2).
+.\"
+.\"
+.SS Delimited Message Feature
+.PP
+The message delimitation feature is enabled with the
+.B SO_DELIM
+flag in the
+.BR stroptions (9)
+structure passed to the STREAM head in an
+.BR M_SETOPTS (9)
+message.  It is disabled in the same fashion with the
+.B SO_NODELIM
+flag.
+When
+.B SO_DELIM
+flag is sent, the
+.B STRDELIM
+flag is set in the STREAM head.  When the
+.B SO_NODELIM
+flag is sent, the
+.B STRDELIM
+flag is cleared in the STREAM head.
+The default behaviour is to not delimit messages
+.RB ( STRDELIM
+flag is clear).
+.PP
+The delimited message feature can only be enabled or disabled by a downstream module or driver.  The
+user or application program has no mechanism for activating or deactivating the feature, nor
+for determining whether the feature is activated or not.
+.PP
+The message delimitation feature only affects
+.BR strread ()
+and
+.BR strreadv ()
+when the STREAM head is in byte-stream read mode.  Byte-stream read mode normally ignores message
+boundaries, however, when the
+.B STRDELIM
+flag is set in the STREAM head,
+.BR strread ()
+and
+.BR strreadv ()
+will terminate the read in byte-stream read mode when a delimited message has been consumed.
+(Delimited messages are those that have their first
+.BR M_DATA (9)
+message block marked with the
+.BR MSGDELIM
+flag.)
+Also, if the STREAM head is marked for delimited messages
+.RB ( STRDELIM
+set), and a zero-length delimited message arrives (it has
+.BR MSGDELIM
+set), then the zero-length message will cause the read to terminate and the zero-length message will
+be consumed rather than placed back on the read queue.
+.PP
+In this way, it is possible for a downstream module or driver to set
+.B STRDELIM
+on the STREAM head and then send delimited messages upstream (including zero-length messages) that
+will simply terminate the read in byte-stream mode and will not signal an end-of-file for
+zero-length messages.  This permits
+.BR M_READ (9)
+messages to be used in the fashion of
+.IR "SVR 4" ,
+instead of just
+.IR POSIX .
+.PP
+Note that when the delimited message feature is activated, a delimited zero-length message sent to
+the STREAM head could cause
+.BR strread ()
+or
+.BR strreadv ()
+to return zero
+.RB ( 0 )
+before an end-of-file has occurred.  When this feature is activated, it would be advisable to also
+set the
+.RI non- STREAMS
+semantics for non-blocking operation and have the application be cognisant of the fact that it
+could receive zero return values to
+.BR read (2s)
+when an end-of-file has not been reached.
+.PP
+Note that the
+.B STRDELIM
+flag also affects the
+.BR strwrite (9)
+and
+.BR strwritev (9)
+functions supporting the
+.BR write (2s)
+system call.  See those manual pages for details.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR strread ()
+and
+.BR strreadv ()
+return a zero or positive number of bytes read.  This number will not be greater than the number of
+bytes requested,
+.IR nbytes ,
+or the sum of the
+.I iov_len
+fields of the passed in
+.B iovec
+structures.
+.PP
+Upon failure,
+.BR strread ()
+and
+.BR strreadv ()
+return an appropriate negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+Upon failure,
+.BR strread ()
+and
+.BR strreadv ()
+return a negative error number, under the following conditions:
+.TP
+.RB [ EBADF ]
+.I file
+is not open for reading.
+.TP
+.RB [ EINVAL ]
+.I file
+refers to a STREAM head
+.BR stdata (9)
+structure that is for a STREAM that is linked (directly or indirectly) downstream from a
+multiplexing driver.
+(That is, the STREAM head has the
+.B STPLEX
+bit set.)
+.TP
+.RB [ EIO ]
+.I file
+refers to a STREAM head
+.BR stdata (9)
+structure that is for a STREAM that has closed or is closing.  (That is, either there is no longer a
+STREAM head associated with
+.I file
+or the STREAM head has the
+.B STRCLOSE
+bit set.)
+.TP
+.RB [ ERESTARTSYS ]
+A signal arrived before the
+.BR strread ()
+or
+.BR strreadv ()
+call blocked, interrupting completion of the system call.  No action has been taken nor read data
+transferred.
+.TP
+.RB [ EINTR ]
+A signal arrived after the call blocked, interrupting completion of the system call.  No action has
+been taken nor read data transferred.
+.TP
+.RB [ EAGAIN ]
+.I file
+is open for non-blocking operation (i.e. the
+.BR O_NONBLOCK " (or " O_NDELAY )
+file status flag is set), and the read operation would otherwise block awaiting the availability of
+at least one
+.RB ( 1 )
+byte of data to read.
+.TP
+.RB [ EWOULDBLOCK ]
+Same as
+.RB [ EAGAIN ].
+.TP
+.RB [ ETIME ]
+.I file
+is open for blocking operation (i.e. the
+.BR O_NONBLOCK " (and " O_NDELAY )
+file status flag is clear), and the read operation blocked awaiting the availability of at least one
+.BR ( 1 )
+byte of data to read, and the wait timed out.
+.PP
+Also, if the STREAM head referenced by
+.I file
+has received a
+.BR M_ERROR (9)
+message indicating a read side error, then the read error from the message will be returned by
+.BR strread ()
+and
+.BR strreadv ()
+as a negative error number.
+.\"
+.PP
+When the
+.BR STRISFIFO " or " STRISPIPE
+flags are clear in the
+.I sd_flags
+member of the STREAM head
+.BR stdata (9)
+structure associated with
+.IR file ,
+the behaviour of
+.BR strread ()
+and
+.BR strreadv ()
+is appropriate for
+.I STREAMS
+character device special files.  In that case, the following additional error conditions can occur:
+.TP
+.RB [ ENXIO ]
+.I file
+refers to a STREAM head
+.BR stdata (9)
+structure that is for a STREAM that has received a hangup
+.RB ( M_HANGUP (9))
+message.  (That is, the STREAM head has the
+.BR STRHUP
+bit set.)
+.\"
+.PP
+When the
+.BR STRISFIFO " or " STRISPIPE
+flags are set in the
+.I sd_flags
+member of the STREAM head
+.BR stdata (9)
+structure associated with
+.IR file ,
+the behaviour of
+.BR strread ()
+and
+.BR strreadv ()
+is appropriate for
+.IR STREAMS -based
+pipes of FIFOs.  In that case, the following additional error conditions can occur:
+.TP
+.RB [ EPIPE ]
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.IR AIX \(rg
+implements a
+.BR wantio (9)
+capability where a cooperating downstream module or driver can intercept file operations for
+.I STREAMS
+files and
+.IR STREAMS -based
+pipes and FIFOs.  If the
+.BR wantio (9)
+capability is utilized by a downstream module or driver, that module's provided
+.BR strread ()
+or
+.BR strreadv ()
+procedures will be used instead of those described here.  The procedures described here are still
+available to the cooperating module or driver for callout.  Use of the
+.BR wantio (9)
+capability will affect the behaviour of
+.BR read (2s),
+making it potentially incompatible.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR strread ()
+is implemented by creating a single
+.B iovec
+structure describing the buffer specified by
+.IR buf " and " nbytes ,
+and then calling
+.BR strreadv ()
+with a pointer to the
+.B iovec
+structure and a
+.I count
+of one
+.RB ( 1 ).
+While this is perhaps not the most efficient way of implementing
+.BR strrread (),
+the
+.BR read (2s)
+system call is seldomly performed on
+.I STREAMS
+character device special files, the
+.BR getmsg (2)
+and
+.BR getpmsg (2s)
+system calls being used instead.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR read (2s),
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR stdata (9),
+.BR M_ERROR (9),
+.BR M_HANGUP (9),
+.BR M_SETOPTS (9),
+.BR strwrite (9),
+.BR wantio (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strread ()
+and
+.BR strreadv ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.\"
+.PP
+.BR strread ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+Some
+.I STREAMS
+implementations treat the
+.B O_NDELAY
+flag as different from the
+.B O_NONBLOCK
+flag.  Notably,
+.IR AIX \(rg
+makes this distinction.  According to
+.IR AIX \(rg
+documentation,
+.[
+aixdoc
+.]
+setting the
+.B O_NDELAY
+file flag has the same effect as the
+.B SO_NDELON
+STREAM head option on other systems.  Whereas, the
+.B O_NONBLOCK
+file flag has the same effect as the
+.B SO_NDELOFF
+option.
+.IP
+Note that it is not possible for
+.B Linux
+to emulate this behavior on anything but
+.i sparc
+architectures, because on all other architectures the
+.BR O_NDELAY " and " O_NONBLOCK
+flags are identical.
+Because of this,
+.B @PACKAGE_TITLE@
+treats
+.BR O_NDELAY " and " O_NONBLOCK
+semantics as identical and the semantics for both flags are affected by the
+.BR SO_NDELON " and " SO_NDELOFF
+STREAM head options.
+.IP
+Other implementations, such as
+.IR HP-UX \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg,
+document that the
+.BR O_NDELAY " and " O_NONBLOCK
+flags have the same effect, and setting the blocking semantics with
+.BR SO_NDELON " or " SO_NDELOFF
+affect the semantics for both flags.
+.IP
+Yet other implementations only document the STREAM head options
+.BR SO_NDELON " and " SO_NDELOFF
+as affecting the semantics for only the
+.B O_NDELAY
+file flag and not the
+.B O_NONBLOCK
+flag.
+.IP
+Portable
+.I STREAMS
+drivers and modules will not set
+.B SO_NDELON
+and will not use the
+.B O_NDELAY
+flag.
+Portable
+.I STREAMS
+drivers and modules will stick to the
+.I POSIX
+.[
+susv3
+.]
+behavior of the
+.B O_NONBLOCK
+flag and only use the
+.B O_NONBLOCK
+flag and not the
+.B O_NDELAY
+flag.
+.IP \(em
+.IP \(em
+.IP \(em
+.\"
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strread ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR strread ()
+first appeared in 
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

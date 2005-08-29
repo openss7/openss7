@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.14 2005/07/29 22:20:09 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.15 2005/08/29 10:36:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 22:20:09 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/08/29 10:36:57 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warn "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -176,6 +176,18 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STATIC
 #undef INLINE
 #define INLINE
+#undef __inline
+#define __inline
+#undef inline
+#define inline
+#undef __inline__
+#define __inline__
+
+/* for debugging we want a proper stack */
+#undef FASTCALL
+#define FASTCALL(__x) __x
+#undef fastcall
+#define fastcall
 
 #elif defined(CONFIG_STREAMS_TEST)
 

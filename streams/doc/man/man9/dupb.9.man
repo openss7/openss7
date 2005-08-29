@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dupb.9.man,v 0.9.2.14 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: dupb.9.man,v 0.9.2.15 2005/08/29 10:06:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -150,6 +150,15 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 is MP-safe; however, it is the responsibility of the caller to ensure
 exclusive access to the passed in message block.  On return, the caller has
 the only reference to the returned message block.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR dupb ()
+allocates messae blocks with priority
+.BR BPRI_MED .
+See
+.BR allocb (9).
 .\"
 .\"
 .SH "SEE ALSO"

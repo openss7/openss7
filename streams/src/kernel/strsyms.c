@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/18 12:07:02 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/29 10:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:02 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/18 12:07:02 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/29 10:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/18 12:07:02 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/29 10:37:11 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -74,7 +74,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __EXTERN_INLINE inline
+#define __EXTERN_INLINE __inline__
 
 #include <sys/kmem.h>
 #include <sys/cmn_err.h>
@@ -256,9 +256,6 @@ static char const ident[] =
 
 //EXPORT_SYMBOL(alloclk);       /* strsched.h */
 //EXPORT_SYMBOL(freelk);        /* strsched.h */
-
-//EXPORT_SYMBOL(qpop);  /* stream.h */
-//EXPORT_SYMBOL(qpush); /* stream.h */
 
 //EXPORT_SYMBOL(allocstr);      /* strsched.h */
 //EXPORT_SYMBOL(autopush);      /* sth.h */

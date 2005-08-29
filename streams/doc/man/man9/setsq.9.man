@@ -1,0 +1,244 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: setsq.9.man,v 0.9.2.1 2005/08/29 10:00:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:00:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SETSQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B setsq
+\- set synchronization queues, sizes and procedures associated with a \fISTREAMS\fP message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int setsq(queue_t *" q ", struct fmodsw *" fmod ", int " mux );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue for which to set sizes and procedures.
+.TP
+.I fmodsw
+a pointer to the
+.BR fmodsw (9)
+structure associated with the driver or module.
+.TP
+.I mux
+an integer that, when non-zero, indicates to use the lower multiplexer
+.BR qinit (9)
+structures for initialization rather than the upper
+.BR qinit (9)
+structures in the
+.BR streamtab (9)
+structure.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR setsq ()
+establishes syncrhonization queues and sets the queue parameters for the read and write queues of
+the queue pair indicated by the read queue pointer,
+.IR q ,
+to the read and write side initialization information from the
+.BR fmodsw (9)
+structure,
+.IR fmodsw ,
+for the module or driver.
+.\"
+.\"
+.PP
+.BR setsq ()
+first removes any current syncrhonization queues associated with queue,
+.IR q .
+When passed a
+.B NULL
+.I fmodsw
+pointer and a
+.RB non- NULL
+.I q
+pointer,
+.BR setsq ()
+will simply remove any syncrhonization queues currently attached to the queue,
+.IR q .
+.\"
+.\"
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR setsq ()
+returns zero (0) and sets the appropriate synchornization queues, sizes and procedures.  Upon
+failure,
+.BR setsq ()
+returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR setsq ()
+fails, it returns a negative error number.
+.BR setsq ()
+can fail under the following conditions:
+.TP
+.RB [ ENOMEM ]
+Normally
+.BR setsq ()
+will block awaiting the availability of kernel memory for the allocation of synchronization queue,
+.BR syncq (9),
+structures; however, under exceptional circumstances that allocation might fail.  In that event,
+.BR setsq ()
+fails and returns negative
+.RB [ ENOMEM ].
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR setsq ()
+can be called from any blocking context, including user context, qopen or qclose procedures, and
+some uppermost put procedures.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR setsq ()
+is MP-safe; however, the caller is responsible for ensuring exclusive access
+to the queue pair.  A reference on both the
+.BR queue (9)
+and
+.BR fmodsw (9)
+structures should be held across the call.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR setsq ()
+is used internally by the
+.I STREAMS
+scheduler when creating a new queue pair for a driver or module to set the synchronization queues
+and parameters associated with each queue in the queue pair from the driver or module
+.BR streamtab .
+It is also used by the
+.I STREAMS
+stream head when linking streams under a multiplexing driver to set the lower multiplexer queue
+parameters against the stream head queue pair.
+.PP
+.BR setsq ()
+calls
+.BR setq (9)
+internally.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR setq (9),
+.BR qinit (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR setsq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.IP \(em \w'\(em\(em'u
+This function is not exported by SVR 4.2 MP DDI/DKI or
+.IR Solaris \(rg.
+
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR setsq ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+lfs
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

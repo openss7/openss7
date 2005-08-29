@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/29 05:11:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/08/29 10:06:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/29 05:11:23 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:06:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -932,6 +932,43 @@ man_MANS = \
 	man3/pipe.3 \
 	man4/sth.4 \
 	man5/specfs.5 \
+	man7/I_ANCHOR.7 \
+	man7/I_ATMARK.7 \
+	man7/I_CANPUT.7 \
+	man7/I_CKBAND.7 \
+	man7/I_FATTACH.7 \
+	man7/I_FDETACH.7 \
+	man7/I_FDINSERT.7 \
+	man7/I_FIND.7 \
+	man7/I_FLUSH.7 \
+	man7/I_FLUSHBAND.7 \
+	man7/I_GERROPT.7 \
+	man7/I_GETBAND.7 \
+	man7/I_GETCLTIME.7 \
+	man7/I_GETPMSG.7 \
+	man7/I_GETSIG.7 \
+	man7/I_GRDOPT.7 \
+	man7/I_GWROPT.7 \
+	man7/I_LINK.7 \
+	man7/I_LIST.7 \
+	man7/I_LOOK.7 \
+	man7/I_NREAD.7 \
+	man7/I_PEEK.7 \
+	man7/I_PIPE.7 \
+	man7/I_PLINK.7 \
+	man7/I_POP.7 \
+	man7/I_PUNLINK.7 \
+	man7/I_PUSH.7 \
+	man7/I_PUTPMSG.7 \
+	man7/I_RECVFD.7 \
+	man7/I_SENDFD.7 \
+	man7/I_SERROPT.7 \
+	man7/I_SETCLTIME.7 \
+	man7/I_SETSIG.7 \
+	man7/I_SRDOPT.7 \
+	man7/I_STR.7 \
+	man7/I_SWROPT.7 \
+	man7/I_UNLINK.7 \
 	man7/streamio.7 \
 	man8/streams_mknod.8 \
 	man8/test-streams.8 \
@@ -1054,6 +1091,7 @@ man_MANS = \
 	man9/datamsg.9 \
 	man9/dblk_t.9 \
 	man9/delay.9 \
+	man9/devnode.9 \
 	man9/di_alloc.9 \
 	man9/di_put.9 \
 	man9/do_fattach.9 \
@@ -1155,12 +1193,11 @@ man_MANS = \
 	man9/qinit.9 \
 	man9/qinsert.9 \
 	man9/qopen.9 \
-	man9/qpop.9 \
 	man9/qprocsoff.9 \
 	man9/qprocson.9 \
-	man9/qpush.9 \
 	man9/qready.9 \
 	man9/qreply.9 \
+	man9/qscan.9 \
 	man9/qsize.9 \
 	man9/queinfo.9 \
 	man9/queue.9 \
@@ -1181,6 +1218,7 @@ man_MANS = \
 	man9/sealloc.9 \
 	man9/sefree.9 \
 	man9/setq.9 \
+	man9/setsq.9 \
 	man9/setqsched.9 \
 	man9/spec_dentry.9 \
 	man9/spec_open.9 \
@@ -1190,12 +1228,16 @@ man_MANS = \
 	man9/streamtab_t.9 \
 	man9/strgetpmsg.9 \
 	man9/strlog.9 \
+	man9/str_close.9 \
+	man9/str_open.9 \
 	man9/strm_f_ops.9 \
+	man9/stroptions.9 \
 	man9/strputpmsg.9 \
 	man9/strqget.9 \
 	man9/strqset.9 \
 	man9/strrput.9 \
 	man9/strthread.9 \
+	man9/strwput.9 \
 	man9/strwsrv.9 \
 	man9/sysctl_str_strctlsz.9 \
 	man9/sysctl_str_strmsgsz.9 \
@@ -1208,6 +1250,7 @@ man_MANS = \
 	man9/undoc.9 \
 	man9/unfreezestr.9 \
 	man9/unlinkb.9 \
+	man9/unlinkmsg.9 \
 	man9/unregister_clone.9 \
 	man9/unregister_cmajor.9 \
 	man9/unregister_strdev.9 \
@@ -1229,10 +1272,8 @@ man_MANS = \
 	man9/strioctl.9 \
 	man9/strpoll.9 \
 	man9/strread.9 \
-	man9/strreadv.9 \
 	man9/strsendpage.9 \
 	man9/strwrite.9 \
-	man9/strwritev.9 \
 	$(MANS_UNUSED) \
 	$(driver_pages) \
 	$(module_pages) \
@@ -2103,6 +2144,43 @@ dist_noinst_MANS = \
 	man3/s_pipe.3.man \
 	man4/sth.4.man \
 	man5/specfs.5.man \
+	man7/I_ANCHOR.7.man \
+	man7/I_ATMARK.7.man \
+	man7/I_CANPUT.7.man \
+	man7/I_CKBAND.7.man \
+	man7/I_FATTACH.7.man \
+	man7/I_FDETACH.7.man \
+	man7/I_FDINSERT.7.man \
+	man7/I_FIND.7.man \
+	man7/I_FLUSH.7.man \
+	man7/I_FLUSHBAND.7.man \
+	man7/I_GERROPT.7.man \
+	man7/I_GETBAND.7.man \
+	man7/I_GETCLTIME.7.man \
+	man7/I_GETPMSG.7.man \
+	man7/I_GETSIG.7.man \
+	man7/I_GRDOPT.7.man \
+	man7/I_GWROPT.7.man \
+	man7/I_LINK.7.man \
+	man7/I_LIST.7.man \
+	man7/I_LOOK.7.man \
+	man7/I_NREAD.7.man \
+	man7/I_PEEK.7.man \
+	man7/I_PIPE.7.man \
+	man7/I_PLINK.7.man \
+	man7/I_POP.7.man \
+	man7/I_PUNLINK.7.man \
+	man7/I_PUSH.7.man \
+	man7/I_PUTPMSG.7.man \
+	man7/I_RECVFD.7.man \
+	man7/I_SENDFD.7.man \
+	man7/I_SERROPT.7.man \
+	man7/I_SETCLTIME.7.man \
+	man7/I_SETSIG.7.man \
+	man7/I_SRDOPT.7.man \
+	man7/I_STR.7.man \
+	man7/I_SWROPT.7.man \
+	man7/I_UNLINK.7.man \
 	man7/streamio.7.man \
 	man8/streams_mknod.8.man \
 	man8/test-streams.8.man \
@@ -2228,6 +2306,7 @@ dist_noinst_MANS = \
 	man9/datamsg.9.man \
 	man9/dblk_t.9.man \
 	man9/delay.9.man \
+	man9/devnode.9.man \
 	man9/di_alloc.9.man \
 	man9/di_put.9.man \
 	man9/do_fattach.9.man \
@@ -2330,12 +2409,11 @@ dist_noinst_MANS = \
 	man9/qinit.9.man \
 	man9/qinsert.9.man \
 	man9/qopen.9.man \
-	man9/qpop.9.man \
 	man9/qprocsoff.9.man \
 	man9/qprocson.9.man \
-	man9/qpush.9.man \
 	man9/qready.9.man \
 	man9/qreply.9.man \
+	man9/qscan.9.man \
 	man9/qsize.9.man \
 	man9/queinfo.9.man \
 	man9/queue.9.man \
@@ -2356,6 +2434,7 @@ dist_noinst_MANS = \
 	man9/sealloc.9.man \
 	man9/sefree.9.man \
 	man9/setq.9.man \
+	man9/setsq.9.man \
 	man9/setqsched.9.man \
 	man9/spec_dentry.9.man \
 	man9/spec_open.9.man \
@@ -2365,12 +2444,16 @@ dist_noinst_MANS = \
 	man9/streamtab_t.9.man \
 	man9/strgetpmsg.9.man \
 	man9/strlog.9.man \
+	man9/str_close.9.man \
+	man9/str_open.9.man \
 	man9/strm_f_ops.9.man \
+	man9/stroptions.9.man \
 	man9/strputpmsg.9.man \
 	man9/strqget.9.man \
 	man9/strqset.9.man \
 	man9/strrput.9.man \
 	man9/strthread.9.man \
+	man9/strwput.9.man \
 	man9/strwsrv.9.man \
 	man9/sysctl_str_strctlsz.9.man \
 	man9/sysctl_str_strmsgsz.9.man \
@@ -2383,6 +2466,7 @@ dist_noinst_MANS = \
 	man9/undoc.9.man \
 	man9/unfreezestr.9.man \
 	man9/unlinkb.9.man \
+	man9/unlinkmsg.9.man \
 	man9/unregister_clone.9.man \
 	man9/unregister_cmajor.9.man \
 	man9/unregister_strdev.9.man \
@@ -2404,10 +2488,8 @@ dist_noinst_MANS = \
 	man9/strioctl.9.man \
 	man9/strpoll.9.man \
 	man9/strread.9.man \
-	man9/strreadv.9.man \
 	man9/strsendpage.9.man \
 	man9/strwrite.9.man \
-	man9/strwritev.9.man \
 	$(dist_noinst_driver_pages) \
 	$(dist_noinst_module_pages) \
 	$(dist_noinst_util_pages)

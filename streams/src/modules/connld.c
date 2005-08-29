@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:16 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:16 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -65,6 +65,8 @@ static char const ident[] =
 #include <linux/module.h>
 #include <linux/init.h>
 
+#define __EXTERN_INLINE static __inline__
+
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -74,7 +76,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/21 20:47:24 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:16 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"

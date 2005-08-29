@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:43 $
+ @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/08/29 10:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:43 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -66,28 +66,30 @@ enum {
 	STREAMS_LOWAT = 4,
 	STREAMS_CLTIME = 5,
 	STREAMS_RTIME = 6,
-	STREAMS_NSTRPUSH = 7,
-	STREAMS_STRTHRESH = 8,
-	STREAMS_STRHOLD = 9,
-	STREAMS_STRCTLSZ = 10,
-	STREAMS_STRMSGSZ = 11,
-	STREAMS_NSTRMSGS = 12,
-	STREAMS_NBAND = 13,
-	STREAMS_REUSE_FMODSW = 14,
-	STREAMS_MAX_APUSH = 15,
-	STREAMS_MAX_STRAMOD = 16,
-	STREAMS_MAX_STRDEV = 17,
-	STREAMS_MAX_STRMOD = 18,
-	STREAMS_MAX_MBLK = 19,
-	STREAMS_MSG_PRIORITY = 20,
+	STREAMS_IOCTIME = 7,
+	STREAMS_NSTRPUSH = 8,
+	STREAMS_STRTHRESH = 9,
+	STREAMS_STRHOLD = 10,
+	STREAMS_STRCTLSZ = 11,
+	STREAMS_STRMSGSZ = 12,
+	STREAMS_NSTRMSGS = 13,
+	STREAMS_NBAND = 14,
+	STREAMS_REUSE_FMODSW = 15,
+	STREAMS_MAX_APUSH = 16,
+	STREAMS_MAX_STRAMOD = 17,
+	STREAMS_MAX_STRDEV = 18,
+	STREAMS_MAX_STRMOD = 19,
+	STREAMS_MAX_MBLK = 20,
+	STREAMS_MSG_PRIORITY = 21,
 };
 
 extern int sysctl_str_maxpsz;		/* stream head default max packet size */
 extern int sysctl_str_minpsz;		/* stream head default min packet size */
 extern int sysctl_str_hiwat;		/* stream head default hi water mark */
 extern int sysctl_str_lowat;		/* stream head default lo water mark */
-extern int sysctl_str_cltime;		/* close wait time in msec */
-extern int sysctl_str_rtime;		/* HZ to wait to forward held msg */
+extern int sysctl_str_cltime;		/* close wait time in msec (save in HZ) */
+extern int sysctl_str_rtime;		/* msec to wait to forward held msg (save in HZ) */
+extern int sysctl_str_ioctime;		/* msec to wait for ioctl() acknowledgement (save in HZ) */
 extern int sysctl_str_nstrpush;		/* max pushed modules */
 extern int sysctl_str_strthresh;	/* memory limit */
 extern int sysctl_str_strhold;		/* active stream hold feature */

@@ -1,0 +1,803 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: termio.7.man,v 0.9.2.1 2005/08/29 10:00:29 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:00:29 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TERMIO 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.\"
+.\"
+.SH NAME
+.B termio
+\- \fISTREAMS\fR tty ioctl commands
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <sys/termios.h>
+.HP
+.BI "int " retval " = ioctl (int " fd ", int " command ", ... /* " arg " */);"
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I STREAMS
+terminal input-output control commands are ioctl commands that are defined to operat on all
+.I STREAMS
+character special devices.  All of these commands are interpreted by the stream head.  Some commands
+are passed to the
+.I STREAMS
+module or driver.
+.PP
+.I STREAMS
+terminal input-output control commands are invoked using the normal
+.BR ioctl (2)
+system call, but are defined only for
+.I STREAMS
+terminal character special files.
+.TP
+.I fd
+is an open file descriptor for a
+.I STREAMS
+terminal character special file.
+.TP
+.I command
+is the
+.I STREAMS
+terminal input-output control function that the caller requests to be performed.
+.TP
+.I arg
+provides additional information required by the particular I/O
+.IR command .
+Specific
+.IR command " and " arg
+combinations are described below.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.PP
+The following terminal input-output controls have their origin in SVID:
+.SS TCGETX	\" /* SVID */
+.PP
+Get the extension parameters and stores thme in the structure referenced by
+.IR arg .
+.SS TCSETX	\" /* SVID */
+.PP
+Sets the extension parameters from the structure referenced by
+.IR arg .
+.SS TCSETXW	\" /* SVID */
+.PP
+Waits for the output to drain before setting the new parameters.  This form should be used when
+changing parameters that will affect output.
+.SS TCSETXF	\" /* SVID */
+.PP
+Waits for the output to dran and then flushes the input queue and sets the new parameters.
+.SS TCGETS	\" /* struct termios * *//* SVID */
+.I arg
+is a pointer to a
+.B termios
+structure.
+.PP
+Get the parameters associated with the serial device and stores them in the
+.B termios
+structure referenced by
+.IR arg .
+.SS TCSETS	\" /* const struct termios * *//* SVID */
+.I arg
+is a pointer to a
+.B termios
+structure.
+.PP
+Sets the parameters associated with the serial device from the
+.B termios
+structure referenced by
+.IR arg .
+The change is immediate.
+.SS TCSETSW	\" /* const struct termios * *//* SVID */
+.I arg
+is a pointer to a
+.B termios
+structure.
+.PP
+Waits for the output to drain before setting the new parameters.  This form should be used when
+changing parameters that will affect output.
+.SS TCSETSF	\" /* const struct termios * *//* SVID */
+.I arg
+is a pointer to a
+.B termios
+structure.
+.PP
+Waits for the output to dran and then flushes the input queue and sets the new parameters.
+.SS TCGETA	\" /* struct termio * *//* SVID */
+.I arg
+is a pointer to a
+.B termio
+structure.
+.PP
+Gets the parameters associated with the terminal and stores them in the termio structure referenced
+by
+.IR arg .
+.SS TCSETA	\" /* const struct termio * *//* SVID */
+.I arg
+is a pointer to a
+.B termio
+structure.
+.PP
+Sets the parameters associated with the terminal from the structure references by
+.IR arg .
+The change is immediate.
+.SS TCSETAW	\" /* const struct termio * *//* SVID */
+.I arg
+is a pointer to a
+.B termio
+structure.
+.PP
+Waits for the output to drain before setting the new parameters.  This form should be used when
+changing parameters that will affect output.
+.SS TCSETAF	\" /* const struct termio * *//* SVID */
+.I arg
+is a pointer to a
+.B termio
+structure.
+.PP
+Waits for the output to drain and then flushes the input queue and sets the new parameters.
+.SS TCSBRK	\" /* int *//* SVID */
+.I arg
+is an integer value.
+.PP
+Waits for output to drain.  Value is 0 for 250 milliseconds break, otherwise the specified number of
+milliseconds.
+.SS TCXONC	\" /* int *//* SVID */
+.I arg
+is an integer value.
+.PP
+Starts and stops control.  If the value is 0 it suspends output (M_STOP).  If 1, restarts suspended
+output (M_START).  If 2, blocks input (M_STOPI).  If 3, unblocks input (M_STARTI).
+.SS TCFLSH	\" /* int *//* SVID */
+.I arg
+is an integer value.
+.PP
+A value of 0 flushes the input queue (M_FLUSH, FLUSHR), 1 flushes the output queue (M_FLUSH,
+FLUSHW), 2, flushes both queues (M_FLUSH< FLUSHRW).
+.SS TIOCGSID	\" /* pid_t * *//* SVID */
+.I arg
+is a pointer to a
+.BR pid_t .
+.PP
+Gets the session id associated with the controlling session.
+.SS TIOCGPGRP	\" /* pid_t * *//* SVID */
+.I arg
+is a pointer to a
+.BR pid_t .
+.PP
+Gets the process group id associated with the foreground process group.
+.SS TIOCSPGRP	\" /* const pid_t * *//* SVID */
+.I arg
+is a pointer to a
+.BR pid_t .
+.PP
+Sets the process group id associated with the foreground process group.
+.SS TIOCMGET	\" /* int * *//* SVID */
+.I arg
+is a pointer to an
+.BR int.
+.PP
+.SS TIOCMSET	\" /* const int * *//* SVID */
+.I arg
+is a pointer to an
+.BR int.
+.PP
+.SS TIOCMBIS	\" /* const int * *//* SVID */
+.I arg
+is a pointer to an
+.BR int.
+.PP
+.SS TIOCMBIC	\" /* const int * *//* SVID */
+.I arg
+is a pointer to an
+.BR int.
+.PP
+.\"
+.\"
+.PP
+The following terminal input-output controls have their origin in BSD:
+.SS TIOCFLUSH	\" /* int *//* BSD */
+.I arg
+is an integer value.
+.PP
+Flushes the stream: zero, flush both streams (M_FLUSH), otherwise FREAD or FWRITE (for read and
+write M_FLUSH respectively.
+.SS TIOCOUTQ	\" /* int * *//* BSD */
+.I arg
+is an integer value.
+.PP
+Returns,
+in
+.IR retval ,
+the number of characters buffered by line discipline.
+.SS TIOCEXCL	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Set exclusive use mode.  No further opens are permitted until the file has been closed.
+.SS TIOCNXCL	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Turn off exclusive use mode.
+.SS TIOCCONS	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Redirects console output to the terminal.
+.SS TIOCHPCL	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Set hangup on close.
+.SS TIOCSTART	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Starts output (M_START).
+.SS TIOCSTOP	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Stops output (M_STOP).
+.SS TIOCSBRK	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Set break (M_BREAK(1)).
+.SS TIOCCBRK	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+Clear break (M_BREAK(0)).
+.SS TIOCSTI	\" /* const char * *//* BSD */
+.I arg
+is a pointer to a
+.BR char .
+.PP
+Pretends that the character was typed at the terminal.
+.SS TIOCGWINSZ	\" /* struct winsize * *//* BSD */
+.I arg
+is a pointer to a
+.B winsize
+structure.
+.PP
+.SS TIOCSWINSZ	\" /* const struct winsize * */
+.I arg
+is a pointer to a
+.B winsize
+structure.
+.PP
+.SS TIOCPKT	\" /* const int * *//* BSD */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCSETD	\" /* const int * *//* BSD */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+Set the current line discipline type.
+.SS TIOCGETD	\" /* int * *//* BSD */
+.PP
+Gets the current line discipline type.
+.SS TIOCGETP	\" /* struct sgttyb * *//* BSD */
+.I arg
+is a pointer to a
+.B sgttyb
+structure.
+.PP
+.SS TIOCSETN	\" /* const struct sgttyb * *//* BSD */
+.I arg
+is a pointer to a
+.B sgttyb
+structure.
+.PP
+.SS TIOCSETP	\" /* const struct sgttyb * *//* BSD */
+.I arg
+is a pointer to a
+.B sgttyb
+structure.
+.PP
+.SS TIOCGETC	\" /* struct tchars * *//* BSD */
+.I arg
+is a pointer to a
+.B tchars
+structure.
+.PP
+.SS TIOCSETC	\" /* const struct tchars * *//* BSD */
+.I arg
+is a pointer to a
+.B tchars
+structure.
+.PP
+.SS TIOCGLTC	\" /* struct ltchars * *//* BSD */
+.I arg
+is a pointer to a
+.B ltchars
+structure.
+.PP
+.SS TIOCSLTC	\" /* const struct ltchars * *//* BSD */
+.I arg
+is a pointer to a
+.B ltchars
+structure.
+.PP
+.SS TIOCLBIC	\" /* const int * *//* BSD */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCLBIS	\" /* const int * *//* BSD */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCLSET	\" /* const int * *//* BSD */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCLGET	\" /* void *//* BSD */
+.I arg
+is unused.
+.PP
+.SS TIOCSDTR	\" /* BSD */
+.SS TIOCCDTR	\" /* BSD */
+.SS TIOCWINSZ	\" /* BSD */
+.SS TIOCUCNTL	\" /* BSD */
+.\"
+.\"
+.PP Following are other controls of sundry origin.
+.\"
+.\"
+.SS FIONCLEX	\" /* void */
+.I arg
+is unused.
+.PP
+.SS FIOCLEX	\" /* void */
+.I arg
+is unused.
+.PP
+.SS FIONBIO	\" /* const int * */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS FIOASYNC	\" /* const int * */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS FIOQSIZE
+.\"
+.\"
+.SS TIOCGLCKTRMIOS	\" /* struct termios * */
+.I arg
+is a pointer to a
+.B termios
+structure.
+.PP
+.SS TIOCSLCKTRMIOS	\" /* const struct termios * */
+.I arg
+is a pointer to a
+.B termios
+structure.
+.PP
+.SS TIOCSCTTY	\" /* int */
+.I arg
+is an integer value.
+.PP
+.SS TCSBRKP	\" /* int */
+.I arg
+is an integer value.
+.PP
+.SS TIOCNOTTY	\" /* void */
+.I arg
+is unused.
+.PP
+.SS TIOCSERCONFIG	\" /* void */
+.I arg
+is unused.
+.PP
+.SS TIOCLINUX	\" /* const char * and more */
+.SS TIOCGSOFTCAR	\" /* int * */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCSSOFTCAR	\" /* const int * */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCINQ	\" /* int * *//* also FIONREAD */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+Returns,
+in
+.IR retval ,
+the number of immediately readable characters.
+.SS TIOCGPTN	\" /* unsigned int * *//* Get Pty Number (of pty-mux device) */
+.I arg
+is a pointer to an
+.BR "unsigned int" .
+.PP
+.SS TIOCPTLK	\" /* int *//* Lock/unlock Pty */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCSERGWILD	\" /* int * */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCSERSWILD	\" /* const int * */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCSERGETLSR	\" /* int * *//* Get line status register */
+.I arg
+is a pointer to an
+.BR int .
+.PP
+.SS TIOCGSERIAL	\" /* struct serial_struct * */
+.I arg
+is a pointer to a
+.B serial_struct
+structure.
+.PP
+.SS TIOCSSERIAL	\" /* const struct serial_struct * */
+.I arg
+is a pointer to a
+.B serial_struct
+structure.
+.PP
+.SS TIOCTTYGSTRUCT	\" /* struct tty_struct * */
+.I arg
+is a pointer to a
+.B tty_struct
+structure.
+.PP
+.SS TIOCSERGSTRUCT	\" /* struct async_struct * *//* debugging only */
+.I arg
+is a pointer to a
+.B async_struct
+structure.
+.PP
+.SS TIOCSERGETMULTI	\" /* struct serial_multiport_struct * *//* Get multiport config */
+.I arg
+is a pointer to a
+.B serial_multiport_struct
+structure.
+.PP
+.SS TIOCSERSETMULTI	\" /* const struct serial_multiport_struct * *//* Set multiport config */
+.I arg
+is a pointer to a
+.B serial_multiport_struct
+structure.
+.PP
+.SS TIOCMIWAIT	\" /* wait for change on serial input lines */
+.SS TIOCGICOUNT	\" /* read serial port inline interrupt counts */
+.SS TIOGHAYESESP	\" /* Get Hayes ESP config */
+.SS TIOSHAYESESP	\" /* Set Hayes ESP config */
+.SS TCDSET
+.SS TIOCREMOTE	\" /* AT&T */
+.SS TIOCSIGNAL
+.SS LDSETT
+.SS LDSMAP
+.SS DIOCSETP
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.B ioctl()
+returns zero (0) or a positive integer.
+Upon failure,
+.B ioctl()
+returns -1 and sets
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B ioctl()
+fails, it returns -1 and sets
+.IR errno (3)
+to one of the following errors:
+.TP
+.RB [ EFAULT ]
+.I arg
+or a member of
+.IR arg ,
+points to an address that is outside the caller's valid address space.
+.TP
+.RB [ EINVAL ]
+.IR fd ", " command ", " arg " or a member of " arg
+is invalid.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid open file descriptor.
+.TP
+.RB [ ENOSTR ]
+.I fd
+is not a stream special character device.
+.TP
+.RB [ EOPNOTSUPP ]
+.I fd
+does not support the requested operation.
+.TP
+.RB [ EIO ]
+.I fd
+refers to stream that is closing.
+.TP
+.RB [ ENOTTY ]
+.I fd
+does not refer to a
+.I STREAMS
+device that accepts I/O controls.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a
+.I STREAMS
+device that does not support the
+.BR ioctl (2)
+system call.
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to stream that has received a hangup.
+.TP
+.RB [ ENXIO ]
+the I/O control command cannot be performed by this particular sub-device.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a pipe and the other end of the pipe is closed.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe and a write operation was attempted with no
+readers at the other end, or a read operation was attempted, the pipe is
+empty, and there are no readers at the other end.
+(This error is returned by
+.BR strread (9)
+and
+.BR strwrite (9)
+internally and should not be exposed to the user.  Instead, a
+.RB [ EPIPE ]
+should be generated.)
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked under a multiplexing driver.  If a stream is
+linked under a multiplexing driver, all
+.BR ioctl (2)
+commands other than
+.B I_UNLINK
+or
+.B I_PUNLINK
+will return
+.RB [ EINVAL ].
+.TP
+.RB [ ERESTARTSYS ]
+a signal was received before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal was recievied before the operation could complete.
+.TP
+.RB [ EAGAIN "], [" EWOULDBLOCK ]
+the file is set for asynchronous I/O and the operation would block.
+.TP
+.RB [ ETIME ]
+the operation timed out awaiting an acknowledgement or response from the
+driver.
+.TP
+.RB [ ENOSR ]
+a message block could not be allocated during the operation and the operation
+is not permitted to block.
+.PP
+Any error delivered to the stream head in an
+.B M_ERROR
+message can be returned in
+.IR errno (3).
+.PP
+Where the command is passed to the module or driver, or the command results in
+the call to a module or driver open or close procedures, or link or unlink
+procedures, the error number returned by the module or driver open or close
+procedure can be returned in
+.IR errno (3).
+.PP
+Any error returned in an
+.B M_IOCNAK
+message from the driver in response to a
+.I I_STR
+ioctl can be returned in
+.IR errno (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.I STREAMS
+.B ioctl()
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR close (2),
+.BR fcntl (2),
+.BR getmsg (2),
+.BR ioctl (2),
+.BR open (2),
+.BR open (2s),
+.BR poll (2),
+.BR putmsg (2),
+.BR read (2),
+.BR signal (2),
+.BR signal (5),
+.BR write (2).
+.\"
+.\"
+.SH BUGS
+.PP
+.B termio
+has no known bugs.
+.PP
+.I STREAMS
+.B ioctl()
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B termio
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR LiS ,
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ioctl()
+for
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3
+.]
+The terminal subsystem was converted to
+.I STTREAMS
+in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/21 20:47:25 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/08/29 10:19:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/21 20:47:25 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:19:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,18 +113,19 @@ AC_DEFUN([AC_UTIL], [dnl
 	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
     fi
     PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
-    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
-    AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
-    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
+dnl Just check config.log if you want to see these...
+dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+dnl AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
+dnl AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
+dnl AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
+dnl AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+dnl AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+dnl AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+dnl AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+dnl AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
+dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl

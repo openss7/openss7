@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/07/28 14:45:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/08/29 10:18:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/28 14:45:38 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:18:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -110,16 +110,17 @@ AC_DEFUN([AC_LFS], [dnl
 	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
     fi
 dnl PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
-    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
-    AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
+dnl Just check config.log if you want to see these...
+dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+dnl AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
+dnl AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
+dnl AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
+dnl AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+dnl AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+dnl AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+dnl AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+dnl AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
 dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
 dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
@@ -861,6 +862,7 @@ dnl specific information has been put in place instead.  We don't really care
 dnl one way to the other, but this check discovers which way is used.
 dnl 
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
+			  struct task_struct.signal,
 			  struct file_operations.flush,
 			  struct super_operations.drop_inode,
 			  struct task_struct.session,
@@ -893,6 +895,7 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.37 2005/07/29 12:58:39 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.38 2005/08/29 10:36:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 12:58:39 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/07/29 12:58:39 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/29 10:36:57 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -96,6 +96,7 @@ struct strevent {
 		struct {
 			struct task_struct *procp;
 			long events;
+			int fd;
 		} e;			/* stream event */
 		struct {
 			queue_t *queue;
@@ -126,6 +127,7 @@ struct strevent {
 
 #define se_procp    x.e.procp
 #define se_events   x.e.events
+#define se_fd	    x.e.fd
 
 #define se_func	    x.b.func
 #define se_arg	    x.b.arg
@@ -138,7 +140,7 @@ typedef struct syncq {
 	int sq_count;			/* no of threads inside (negative for exclusive) */
 	struct task_struct *sq_owner;	/* exclusive owner */
 	int sq_nest;			/* lock nesting */
-	wait_queue_head_t sq_waitq;     /* qopen/qclose waiters */
+	wait_queue_head_t sq_waitq;	/* qopen/qclose waiters */
 	struct strevent *sq_ehead;	/* head of event queue */
 	struct strevent **sq_etail;	/* tail of event queue */
 	queue_t *sq_qhead;		/* head of service queue */
@@ -164,6 +166,7 @@ enum {
 	SQ_BACKLOG_BIT,
 	SQ_SCHED_BIT,
 };
+
 #define SQ_OUTER	(1<<SQ_OUTER_BIT)	/* this is an outer barrier (for Solaris compat) */
 #define SQ_INNER	(1<<SQ_INNER_BIT)	/* this is an inner barrier */
 #define SQ_EXCLUS	(1<<SQ_EXCLUS_BIT)	/* qopen/qclose excl at outer barrier */
@@ -180,19 +183,21 @@ struct stdata {
 	dev_t sd_dev;			/* device number of driver */
 	mblk_t *sd_iocblk;		/* message to return for ioctl */
 	struct stdata *sd_other;	/* other stream head for pipes */
-	struct streamtab *sd_strtab;	/* driver streamtab */
+//      struct streamtab *sd_strtab;    /* driver streamtab */
 	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
-	struct file *sd_file;		/* back pointer to file */
+	struct file *sd_file;		/* back pointer to (current) file */
 	ulong sd_flag;			/* stream head state */
 	ulong sd_rdopt;			/* read options */
 	ulong sd_wropt;			/* write options */
 	ulong sd_eropt;			/* error options */
 	ulong sd_iocid;			/* sequence id for active ioctl */
 //      ushort sd_iocwait;              /* number of procs awaiting ioctl */
-//      struct task_struct *sd_sidp;    /* controlling session id */
-//      struct task_struct *sd_pgidp;   /* controlling process group */
+	pid_t sd_session;		/* controlling session id */
+	pid_t sd_pgrp;			/* foreground process group */
 	ushort sd_wroff;		/* write offset */
+	ssize_t sd_minpsz;		/* cached sd_wq->q_next->q_minpsz */
+	ssize_t sd_maxpsz;		/* cached sd_wq->q_next->q_maxpsz */
 	int sd_rerror;			/* read error */
 	int sd_werror;			/* write error */
 	int sd_opens;			/* number of successful opens */
@@ -203,13 +208,16 @@ struct stdata {
 	int sd_pushcnt;			/* number of modules pushed */
 	int sd_nanchor;			/* number of modules anchored */
 	unsigned long sd_sigflags;	/* signal flags */
-	struct fasync_struct *sd_siglist;	/* list of procs for SIGPOLL */
+	struct strevent *sd_siglist;	/* list of procs for SIGPOLL */
+	struct fasync_struct *sd_fasync;	/* list of procs for SIGIO */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
 	wait_queue_head_t sd_waitq;	/* waiters */
 //      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
-//      ulong sd_rtime;                 /* time to forward held message */
-	klock_t sd_klock;		/* lock for queues under this stream */
+	ulong sd_rtime;			/* time to forward held message */
+	ulong sd_ioctime;		/* time to wait for ioctl() acknowledgement */
+//	klock_t sd_klock;		/* lock for queues under this stream */
+	rwlock_t sd_lock;		/* lock for queues under this stream */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */
 //      struct semaphore sd_mutex;      /* mutex for system calls */
@@ -218,6 +226,7 @@ struct stdata {
 	struct stdata *sd_link_next;	/* next linked stream */
 	struct linkblk *sd_linkblk;	/* link block for this stream */
 	struct wantio *sd_directio;	/* direct io for this stream head */
+	struct qinit *sd_muxinit;	/* oopy of read side qinit for intercept */
 };
 
 typedef struct stdata stdata_t;
@@ -270,7 +279,7 @@ enum {
 	STRISFIFO_BIT,
 	STRISPIPE_BIT,
 	STRISSOCK_BIT,
-	STFROZEN_BIT,
+	STRMOUNT_BIT,
 };
 
 #define IOCWAIT	    (1<<IOCWAIT_BIT)	/* ioctl in progress */
@@ -293,7 +302,7 @@ enum {
 #define STRISFIFO   (1<<STRISFIFO_BIT)	/* stream is a fifo */
 #define STRISPIPE   (1<<STRISPIPE_BIT)	/* stream is a STREAMS pipe */
 #define STRISSOCK   (1<<STRISSOCK_BIT)	/* stream is a STREAMS socket */
-#define STFROZEN    (1<<STFROZEN_BIT)	/* stream is frozen */
+#define STRMOUNT    (1<<STRMOUNT_BIT)	/* stream head is fattached */
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */
 #if 0				/* AIX compatible flags */
@@ -359,6 +368,7 @@ enum {
 
 struct strthread {
 	volatile unsigned long flags;	/* flags */
+	int lock;			/* thread lock */
 	queue_t *qhead;			/* first queue in scheduled queues */
 	queue_t **qtail;		/* last queue in scheduled queues */
 	queue_t *currentq;		/* current queue being processed */
@@ -366,6 +376,8 @@ struct strthread {
 	syncq_t *sqhead;		/* first syncq in scheduled syncqs */
 	syncq_t **sqtail;		/* last sycnq in scheduled sycnqs */
 #endif
+	mblk_t *strmfuncs_head;		/* head of m_func pending exec */
+	mblk_t **strmfuncs_tail;	/* tail of m_func pending exec */
 	struct strevent *strbcalls_head;	/* head of bufcalls pending exec */
 	struct strevent **strbcalls_tail;	/* tail of bufcalls pending exec */
 	struct strevent *strtimout_head;	/* head of timeouts pending exec */
@@ -385,26 +397,32 @@ struct strthread {
 /* aligned so processors keep out of each other's way */
 
 enum {
-	queueflag,			/* runqueues() is running */
 	qrunflag,			/* at least 1 queue to run */
 	strbcflag,			/* bufcall() functions can be run */
 	strbcwait,			/* bufcall() functions waiting */
 	flushwork,			/* flushq has messages to free */
 	freeblks,			/* fastfreed blocks for the cache */
 	strtimout,			/* timeout() functions can be run */
+	scanqflag,			/* scanqueue list is active */
 	strevents,			/* strevents() functions can be run */
+	strmfuncs,			/* m_func's can be run */
 	qsyncflag,			/* at least 1 syncq to run */
+	qwantrun,			/* runqueues() wanted to run */
 };
 
-#define QUEUEFLAG	(1 << queueflag	)
 #define QRUNFLAG	(1 << qrunflag	)
+#define STRMFUNCS	(1 << strmfuncs )
 #define STRBCFLAG	(1 << strbcflag	)
 #define STRBCWAIT	(1 << strbcwait	)
 #define FLUSHWORK	(1 << flushwork	)
 #define FREEBLKS	(1 << freeblks	)
 #define STRTIMOUT	(1 << strtimout )
+#define SCANQFLAG	(1 << scanqflag )
 #define STREVENTS	(1 << strevents )
 #define QSYNCFLAG	(1 << qsyncflag )
+#define QWANTRUN	(1 << qwantrun  )
+
+#define QRUNFLAGS	(QRUNFLAG|STRMFUNCS|STRBCFLAG|STRBCWAIT|FLUSHWORK|FREEBLKS|STRTIMOUT|SCANQFLAG|STREVENTS)
 
 struct shinfo {
 	struct stdata sh_stdata;
@@ -416,6 +434,7 @@ struct queinfo {
 	queue_t rq;			/* read queue */
 	queue_t wq;			/* write queue */
 	struct stdata *qu_str;		/* stream head for this queue pair */
+	wait_queue_head_t qu_qwait;	/* wait queue for qwait */
 #if 0
 	union {
 		struct fmodsw *fmod;	/* streams module */
@@ -423,11 +442,10 @@ struct queinfo {
 	} qu_u;
 	int qu_flags;			/* queue pair flags */
 #endif
-	atomic_t qu_refs;		/* references to this structure */
-	wait_queue_head_t qu_qwait;	/* wait queue for qwait */
 #if 0
 	klock_t qu_klock;		/* lock for this queue pair */
 #endif
+	atomic_t qu_refs;		/* references to this structure */
 	struct list_head qu_list;
 };
 
@@ -436,7 +454,7 @@ struct queinfo {
 #define qu_dev qu_u.cdev
 #endif
 
-#define qstream(__q) (((struct queinfo *)RD((__q)))->qu_str)
+#define qstream(__q) (((struct queinfo *)RD(__q))->qu_str)
 
 enum {
 	QU_MODULE_BIT,			/* queue pair is for module */
@@ -535,7 +553,8 @@ struct mdbblock {
 
 /* from strsched.c */
 extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
-extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
+			int cpu);
 #if 0
 extern void mdbblock_free(mblk_t *mp);
 extern mblk_t *mdbblock_alloc(uint priority, void *func);
@@ -544,6 +563,9 @@ extern struct qband *allocqb(void);
 extern void freeqb(qband_t *qb);
 #endif
 
+extern int setsq(queue_t *q, struct fmodsw *fmod);
+extern void qscan(queue_t *q);
+
 /* from strlookup.c */
 extern struct list_head cdevsw_list;	/* Drivers go here */
 extern struct list_head fmodsw_list;	/* Modules go here */
@@ -551,30 +573,30 @@ extern struct list_head cminsw_list;	/* Minors go here */
 extern int cdev_count;			/* Driver count */
 extern int fmod_count;			/* Module count */
 extern int cmin_count;			/* Node count */
-extern struct devnode *__cmaj_lookup(major_t major);
-extern struct cdevsw *__cdev_lookup(major_t major);
-extern struct cdevsw *__cdrv_lookup(modID_t modid);
-extern struct devnode *__cmin_lookup(struct cdevsw *cdev, minor_t minor);
-extern struct fmodsw *__fmod_lookup(modID_t modid);
-extern struct cdevsw *__cdev_search(const char *name);
-extern struct fmodsw *__fmod_search(const char *name);
-extern struct devnode *__cmin_search(struct cdevsw *cdev, const char *name);
-extern void *__smod_search(const char *name);
-extern struct fmodsw *fmod_str(const struct streamtab *str);
-extern struct cdevsw *cdev_str(const struct streamtab *str);
-extern struct cdevsw *sdev_get(major_t major);
-extern void sdev_put(struct cdevsw *cdev);
-extern struct cdevsw *cdrv_get(modID_t modid);
-extern void cdrv_put(struct cdevsw *cdev);
-extern struct fmodsw *fmod_get(modID_t modid);
-extern void fmod_put(struct fmodsw *fmod);
-extern struct cdevsw *cdev_find(const char *name);
-extern struct cdevsw *cdev_match(const char *name);
-extern struct fmodsw *fmod_find(const char *name);
-extern struct devnode *cmin_find(const struct cdevsw *cdev, const char *name);
-extern struct devnode *cmin_get(const struct cdevsw *cdev, minor_t minor);
-extern struct devnode *cmaj_get(const struct cdevsw *cdev, major_t major);
-extern minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor);
+extern struct devnode *FASTCALL(__cmaj_lookup(major_t major));
+extern struct cdevsw *FASTCALL(__cdev_lookup(major_t major));
+extern struct cdevsw *FASTCALL(__cdrv_lookup(modID_t modid));
+extern struct devnode *FASTCALL(__cmin_lookup(struct cdevsw *cdev, minor_t minor));
+extern struct fmodsw *FASTCALL(__fmod_lookup(modID_t modid));
+extern struct cdevsw *FASTCALL(__cdev_search(const char *name));
+extern struct fmodsw *FASTCALL(__fmod_search(const char *name));
+extern struct devnode *FASTCALL(__cmin_search(struct cdevsw *cdev, const char *name));
+extern void *FASTCALL(__smod_search(const char *name));
+extern struct fmodsw *FASTCALL(fmod_str(const struct streamtab *str));
+extern struct cdevsw *FASTCALL(cdev_str(const struct streamtab *str));
+extern struct cdevsw *FASTCALL(sdev_get(major_t major));
+extern void FASTCALL(sdev_put(struct cdevsw *cdev));
+extern struct cdevsw *FASTCALL(cdrv_get(modID_t modid));
+extern void FASTCALL(cdrv_put(struct cdevsw *cdev));
+extern struct fmodsw *FASTCALL(fmod_get(modID_t modid));
+extern void FASTCALL(fmod_put(struct fmodsw *fmod));
+extern struct cdevsw *FASTCALL(cdev_find(const char *name));
+extern struct cdevsw *FASTCALL(cdev_match(const char *name));
+extern struct fmodsw *FASTCALL(fmod_find(const char *name));
+extern struct devnode *FASTCALL(cmin_find(const struct cdevsw *cdev, const char *name));
+extern struct devnode *FASTCALL(cmin_get(const struct cdevsw *cdev, minor_t minor));
+extern struct devnode *FASTCALL(cmaj_get(const struct cdevsw *cdev, major_t major));
+extern minor_t FASTCALL(cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor));
 
 /* from strreg.c */
 extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
@@ -601,16 +623,16 @@ extern rwlock_t nodesw_lock;
 
 extern struct dentry *spec_dentry(dev_t dev, int *sflagp);
 extern int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag);
-extern struct vfsmount *specfs_get(void);
-extern void specfs_put(void);
+extern struct vfsmount *FASTCALL(specfs_get(void));
+extern void FASTCALL(specfs_put(void));
 
 extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
 
 extern struct stdata *allocstr(void);
 extern void freestr(struct stdata *sd);
-extern struct stdata *sd_get(struct stdata *sd);
-extern void sd_put(struct stdata *sd);
+extern struct stdata *FASTCALL(sd_get(struct stdata *sd));
+extern void FASTCALL(sd_put(struct stdata **sdp));
 
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
@@ -618,8 +640,8 @@ extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int ofl
 extern struct devinfo *di_alloc(struct cdevsw *cdev);
 extern void di_put(struct devinfo *di);
 
-extern struct strevent *sealloc(void);
-extern int sefree(struct strevent *se);
+extern struct strevent *FASTCALL(sealloc(void));
+extern int FASTCALL(sefree(struct strevent *se));
 
 extern int sysctl_str_strctlsz;
 
@@ -628,16 +650,26 @@ extern int unregister_clone(struct cdevsw *cdev);
 
 extern void runqueues(void);
 
-/* Default stream head functions for use by wantio procedures. */
+/* If you use this structure, you might want to upcall to the stream head functions behind these.
+ * These are them.  Note that the functions above or below are called after acquiring a reference to
+ * the STREAM head but before performing basic access checks.  Note also, that ioctl will be an
+ * unlocked_ioctl on systems that support it.  Take your own big kernel locks if you need to. */
+
 extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
 extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
 extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
+#if 0
 extern ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos);
 extern ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos);
-extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more);
-extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp);
-extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags);
-extern int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
+#endif
+extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
+			   loff_t *ppos, int more);
+extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
+		      int *flagsp);
+extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
+		      int flags);
+extern int strioctl(struct file *file, unsigned int cmd, unsigned long arg);
+
 #if 0
 extern loff_t strllseek(struct file *file, loff_t off, int whence);
 extern int strmmap(struct file *filp, struct vm_area_struct *vma);
@@ -647,9 +679,12 @@ extern int strclose(struct inode *inode, struct file *file);
 extern int strfasync(int fd, struct file *file, int on);
 #endif
 
-/* stream head read put and write service procedures for use by replacement stream heads */
+/* stream head read put and write service procedures, and open/close for use by replacement stream heads */
 extern int strrput(queue_t *q, mblk_t *mp);
+extern int strwput(queue_t *q, mblk_t *mp);
 extern int strwsrv(queue_t *q);
+extern int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+extern int str_close(queue_t *q, int oflag, cred_t *crp);
 
 extern struct file_operations strm_f_ops;
 

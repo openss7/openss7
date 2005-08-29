@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/07/06 03:42:47 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/08/29 10:11:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 03:42:47 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:11:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -336,10 +336,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
 	    linux_cv_k_linkage='loadable'
 	fi
     ])
-    if test :${linux_cv_k_linkage:-loadable} = :loadable
-    then
-	KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
-    fi
+dnl # Pointless now that we rip module flags from the kernel Makefile
+dnl if test :${linux_cv_k_linkage:-loadable} = :loadable
+dnl then
+dnl	KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
+dnl fi
 ])# _LINUX_CHECK_KERNEL_LINKAGE
 # =========================================================================
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 00:58:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/08/29 10:31:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/18 00:58:41 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:31:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -181,7 +181,7 @@ libCOMPATlink_a_SOURCES		+= src/kernel/maccompat.c
 libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/mac/ddi.h src/include/sys/mac/strconf.h src/include/sys/mac/stream.h
 endif
 
-libCOMPATlink_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCOMPATlink_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strcompat $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libCOMPATlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libCOMPATlink_a_OBJECTS):	$(libCOMPATlink_a_SOURCES) $(libCOMPATlink_a_DEPENDENCIES)
@@ -267,7 +267,7 @@ libCOMPATmods_a_SOURCES		+= src/kernel/maccompat.c
 libCOMPATmods_a_SOURCES		+= src/include/sys/mac/ddi.h src/include/sys/mac/strconf.h src/include/sys/mac/stream.h
 endif
 
-libCOMPATmods_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCOMPATmods_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libCOMPATmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+=

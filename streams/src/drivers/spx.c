@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:52 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -71,7 +73,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/22 06:06:52 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/29 10:37:03 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -137,12 +139,12 @@ MODULE_ALIAS("/dev/streams/spx/*");
 #endif
 
 static struct module_info spx_minfo = {
-	mi_idnum:CONFIG_STREAMS_SPX_MODID,
-	mi_idname:CONFIG_STREAMS_SPX_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_SPX_MODID,
+	.mi_idname = CONFIG_STREAMS_SPX_NAME,
+	.mi_minpsz = 0,
+	.mi_maxpsz = INFPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 typedef struct spx {
@@ -326,6 +328,7 @@ spx_close(queue_t *q, int oflag, cred_t *crp)
 
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
+	qprocsoff(q);
 	spin_lock(&spx_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
@@ -341,30 +344,30 @@ spx_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit spx_rqinit = {
-	qi_putp:spx_rput,
-	qi_qopen:spx_open,
-	qi_qclose:spx_close,
-	qi_minfo:&spx_minfo,
+	.qi_putp = spx_rput,
+	.qi_qopen = spx_open,
+	.qi_qclose = spx_close,
+	.qi_minfo = &spx_minfo,
 };
 
 static struct qinit spx_wqinit = {
-	qi_putp:spx_wput,
-	qi_srvp:NULL,
-	qi_minfo:&spx_minfo,
+	.qi_putp = spx_wput,
+	.qi_srvp = NULL,
+	.qi_minfo = &spx_minfo,
 };
 
 static struct streamtab spx_info = {
-	st_rdinit:&spx_rqinit,
-	st_wrinit:&spx_wqinit,
+	.st_rdinit = &spx_rqinit,
+	.st_wrinit = &spx_wqinit,
 };
 
 static struct cdevsw spx_cdev = {
-	d_name:CONFIG_STREAMS_SPX_NAME,
-	d_str:&spx_info,
-	d_flag:D_CLONE,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_SPX_NAME,
+	.d_str = &spx_info,
+	.d_flag = D_CLONE,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_SPX_MODULE

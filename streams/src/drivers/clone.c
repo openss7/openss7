@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -71,7 +73,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/28 14:13:51 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -142,27 +144,30 @@ MODULE_ALIAS("/dev/streams/clone/*");
 #endif
 
 static struct module_info clone_minfo = {
-	mi_idnum:CONFIG_STREAMS_CLONE_MODID,
-	mi_idname:CONFIG_STREAMS_CLONE_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_CLONE_MODID,
+	.mi_idname = CONFIG_STREAMS_CLONE_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 static struct qinit clone_rinit = {
-	// qi_putp:putq,
-	qi_minfo:&clone_minfo,
+	.qi_putp = strrput,
+	.qi_qopen = str_open,
+	.qi_qclose = str_close,
+	.qi_minfo = &clone_minfo,
 };
 
 static struct qinit clone_winit = {
-	// qi_putp:putq,
-	qi_minfo:&clone_minfo,
+	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
+	.qi_minfo = &clone_minfo,
 };
 
 static struct streamtab clone_info = {
-	st_rdinit:&clone_rinit,
-	st_wrinit:&clone_winit,
+	.st_rdinit = &clone_rinit,
+	.st_wrinit = &clone_winit,
 };
 
 /**
@@ -181,27 +186,23 @@ cloneopen(struct inode *inode, struct file *file)
 {
 	struct cdevsw *cdev;
 	dev_t dev = inode->i_ino;
-	int err;
 
-	ptrace(("%s: opening clone device\n", __FUNCTION__));
-	err = -ENOENT;
-	if (!(cdev = cdrv_get(getminor(dev)))) {
-		printd(("%s: no driver for minor %hu\n", __FUNCTION__, getminor(dev)));
-		goto exit;
+	if (file->private_data)
+		/* Darn.  Somebody attached a STREAM head to this file pointer. */
+		return (-EIO);
+
+	if ((cdev = cdrv_get(getminor(dev)))) {
+		int err;
+		err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
+		sdev_put(cdev);
+		return (err);
 	}
-	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-	printd(("%s: opening cloned device internal major %hu, minor %hu\n", __FUNCTION__,
-		cdev->d_modid, 0));
-	err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
-      exit:
-	return (err);
+	return (-ENOENT);
 }
 
 struct file_operations clone_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:cloneopen,
+	.owner = THIS_MODULE,
+	.open = cloneopen,
 };
 
 /* 
@@ -213,12 +214,12 @@ struct file_operations clone_ops ____cacheline_aligned = {
  */
 
 static struct cdevsw clone_cdev = {
-	d_name:"clone",
-	d_str:&clone_info,
-	d_flag:D_CLONE,
-	d_fop:&clone_ops,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = "clone",
+	.d_str = &clone_info,
+	.d_flag = D_CLONE,
+	.d_fop = &clone_ops,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 /* 

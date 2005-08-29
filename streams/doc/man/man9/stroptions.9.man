@@ -1,0 +1,477 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: stroptions.9.man,v 0.9.2.1 2005/08/29 10:00:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:00:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STROPTIONS 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B stroptions
+\- \fISTREAMS\fR stream head options structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.PP
+.nf
+\fC\s-2
+struct stroptions {
+    uint so_flags;              /* options to set */
+    short so_readopt;           /* read option */
+    ushort so_wroff;            /* write offset */
+    ssize_t so_minpsz;          /* minimum read packet size */
+    ssize_t so_maxpsz;          /* maximum read packet size */
+    size_t so_hiwat;            /* read queue hi water mark */
+    size_t so_lowat;            /* read queue lo water mark */
+    unsigned char so_band;      /* band for water marks */
+    unsigned char so_filler[3]; /* padding */
+    ushort so_erropt;           /* Solaris */
+    ssize_t so_maxblk;          /* Solaris */
+    ushort so_copyopt;          /* Solaris */
+};
+\s+2\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The following members correspond to
+SVR 4.2 EFT members:
+.TP
+.I so_flags
+.RS
+.TP \w'SO_MREADOFF\(em'u
+.B SO_ALL
+set all old options
+.RI ( Solaris \(rg
+uses true mask).
+.PD 0
+.TP
+.B SO_READOPT
+Set read options to the contents of the
+.I so_readopt
+member.
+.TP
+.B SO_WROFF
+Set write offset to the contents of the
+.I so_wroff
+member.
+.TP
+.B SO_MINPSZ
+Set minimum packet size on STREAM head read queue to the contents of the
+.I so_minpsz
+member.
+.TP
+.B SO_MAXPSZ
+Set maximum packet size on STREAM head read queue to the contents of the
+.I so_maxpsz
+member.
+.TP
+.B SO_HIWAT
+Set the high water marek on the STREAM head read queue to the contents of the
+.I so_hiwat
+member.
+.TP
+.B SO_LOWAT
+Set the low water marek on the STREAM head read queue to the contents of the
+.I so_lowat
+member.
+.TP
+.B SO_MREADON
+Set read notification option on STREAM head.
+.TP
+.B SO_MREADOFF
+Reset read notification option on STREAM head.
+.TP
+.B SO_NDELON
+Set
+.RI non- STREAMS
+tty semantics for
+.BR O_NDELAY " (or " O_NONBLOCK )
+on STREAM head.
+.TP
+.B SO_NDELOFF
+Set
+.I STREAMS
+semantics for
+.BR O_NDELAY " (or " O_NONBLOCK )
+on STREAM head.
+.TP
+.B SO_ISTTY
+The STREAM will act as a controlling terminal.
+.TP
+.B SO_ISNTTY
+The STREAM will not act as a controlling terminal.
+.TP
+.B SO_TOSTOP
+The STREAM head will stop processes attempting a background write to the STREAM.
+.TP
+.B SO_TONSTOP
+The STREAM head will not stop processes attempting a background write to the STREAM.
+.TP
+.B SO_BAND
+High and low water marks set with
+.BR SO_HIWAT " or " SO_LOWAT
+and members
+.IR so_hiwat " and " so_lowat
+apply to the band specified in member
+.IR so_band .
+.TP
+.B SO_DELIM
+The STREAM head will delimit messages.
+.TP
+.B SO_NODELIM
+The STREAM head will not delimit messages.
+.TP
+.B SO_STRHOLD
+Enable
+.BR strwrite (9)
+message coalescing.
+.IR UXP/V \(rg
+documents this flag.
+.TP
+.B SO_ERROPT
+Set the STREAM head error options to those contained in the
+.I so_erropt
+member.
+.TP
+.B SO_LOOP
+Indicates to the STREAM head that this is a loop around STREAM; that is, the STREAM supports the
+passing of file descriptors.
+.TP
+.B SO_COPYOPT
+Set the STREAM head copy options to those contained in the
+.I so_copyopt
+member.
+.TP
+.B SO_MAXBLK
+Set the
+.I STREAMS
+maximum block size for this STREAM to the value contained in the
+.I so_maxblk
+member.
+.PD
+.RE
+.TP
+.I so_readopt
+When
+.B SO_READOPT
+is set in
+.IR so_flags ,
+the
+.I so_readopt
+member contains two sets of mutually exclusive flags as follows:
+.RS
+.PP
+Mutually exclusive flags indicating the read mode:
+.TP
+.B RNORM
+.TP
+.B RMSGD
+.TP
+.B RMSGN
+.PP
+Mutually exclusive flags indicating the control mode:
+.TP
+.B RPROTNORM
+.TP
+.B RPROTDAT
+.TP
+.B RPROTDIS
+.RE
+.TP
+.I so_wroff
+.TP
+.I so_minpsz
+.TP
+.I so_maxpsz
+.TP
+.I so_hiwat
+.TP
+.I so_lowat
+.TP
+.I so_band
+.TP
+.I so_filler
+.PP
+The following members are
+.B @PACKAGE_TITLE@
+specific members:
+.TP
+.I so_erropt
+.TP
+.I so_maxblk
+.TP
+.I so_copyopt
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+Because the members of the
+.B stroptions
+structure are placed in a
+.BR M_SETOPTS (9)
+message, they can be manipulated directly.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+The
+.BR M_SETOPTS (9)
+method of setting STREAM head options using the
+.B stroptions
+structure provides MP-safe access to the flags and values contained in the STREAM head
+.BR stdata (9)
+structure.
+Flags and members of the
+.BR stdata (9)
+structure should not be manipulated directly by
+.I STREAMS
+modules and drivers.
+See also the
+.BR stdata (9)
+for details on the STREAM head structure.
+User programs can affect some of the STREAM head parameters and flags using the
+.BR streamio (7)
+intput output controls.
+.\"
+.\"
+.SH NOTICES
+.PP
+Members of the
+.BR stdata (9)
+structure should not be access directly by
+.I STREAMS
+modules and drivers.  Portable
+.I STREAMS
+modules and drivers should use the facilities provide by the
+.BR M_SETOPTS (9)
+message containing this
+.B stroptions
+structure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B stroptions
+structure is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2"
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The flags defines for the
+.I so_flags
+member of the
+.B stroptions
+structure are not necessarily binary compatible with any given implementation.
+.IP ""
+.IR AIX \(rg
+.[
+aixdoc
+.]
+defines the additional read mode,
+.BR RFILL ,
+and the additional control mode,
+.BR RPROTCOMPRESS .
+.IP ""
+.IR AIX \(rg
+.[
+aixdoc
+.]
+does not document the
+.BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD ", " SO_ERROPT ", " SO_LOOP ", " SO_COPYOPT " or " SO_MAXBLK
+flags nor the
+.IR so_filler ", " so_erropt ", " so_maxblk " or " so_copyopt
+members.
+.IP ""
+Older versions of
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+such as
+.IR "Solaris 2.3" ,
+do not document the
+.BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD ", " SO_LOOP ", " SO_COPYOPT " or " SO_MAXBLK
+flags nor the
+.IR so_filler ", " so_maxblk " or " so_copyopt
+members.
+.IP ""
+.IR SUPER-UX \(rg
+.[
+suxdoc
+.]
+does not document the
+.BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD ", " SO_LOOP ", " SO_ERROPT ", " SO_COPYOPT " or " SO_MAXBLK
+flags nor the
+.IR so_filler ", " so_erropt ", " so_maxblk " or " so_copyopt
+members.
+.IP ""
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+does not document the
+.BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD ", " SO_ERROPT ", " SO_COPYOPT " or " SO_MAXBLK
+flags nor the
+.IR so_filler ", " so_erropt ", " so_maxblk " or " so_copyopt
+members.
+.IP ""
+.IR UXP/V \(rg
+.[
+uxpdoc
+.]
+does not document the
+.BR SO_LOOP ", " SO_ERROPT ", " SO_COPYOPT " or " SO_MAXBLK
+flags nor the
+.IR so_filler ", " so_erropt ", " so_maxblk " or " so_copyopt
+members.
+.IP ""
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+does not document the
+.BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD ", " SO_LOOP ", " SO_ERROPT ", " SO_COPYOPT " or " SO_MAXBLK
+flags nor the
+.IR so_filler ", " so_erropt ", " so_maxblk " or " so_copyopt
+members.
+.IP ""
+Lack of documentation for the
+.BR SO_DELIM ", " SO_NODELIM " and " SO_STRHOLD
+feature of the STREAM head is peculiar seeing as they are documented for
+.IR "SVR 4" .
+.[
+svr4
+.]
+.[
+magic
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will avoid use of the
+.BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD
+flags and will not use the
+.BR SO_LOOP ", " SO_ERROPT ", " SO_COPYOPT " or " SO_MAXBLK
+flags and the
+.IR so_filler ", " so_erropt ", " so_maxblk " or " so_copyopt
+members.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 EFT MP,
+.[
+svr42
+.]
+.IR Solaris \(rg
+.[
+solspg
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B stroptions
+structure was introduced in SVR 4.
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

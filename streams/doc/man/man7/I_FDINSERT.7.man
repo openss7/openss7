@@ -1,0 +1,872 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: I_FDINSERT.7.man,v 0.9.2.1 2005/08/29 10:00:27 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:00:27 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: I_FDINSERT.7.man,v $
+.\" Revision 0.9.2.1  2005/08/29 10:00:27  brian
+.\" - added manpages
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH I_FDINSERT 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.\"
+.\"
+.SH NAME
+.B I_FDINSERT
+\- insert a stream identifier into a \fISTREAMS\fP message and send it downstream.
+.\"
+.\"
+.SH SYNOPSIS   
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <stropts.h>
+.HP
+.BI "int " retval " = ioctl (int " fd ", I_FDINSERT, ... /* " arg " */);"
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B I_FDINSERT
+command performs similar to
+.BR putmsg (2),
+however, it performs the additional function of inserting the bottom read queue
+pointer associated with a specified file descriptor in the resulting message.
+This ioctl is often used to accepting incoming connections on
+.BR tpi (7)
+based protocols.
+.[
+TPI Revision 2.0.0
+.]
+.PP
+.I arg
+is a pointer to a
+.B strfdinsert
+structure that is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct strfdinsert {
+    struct strbuf ctlbuf;
+    struct strbuf databuf;
+    ulong flags;
+    int fildes;
+    int offset;
+};
+\s+1\fR
+.fi
+.\"
+.TP \w'databuf\(em'u
+.I ctlbuf
+describes the control part of the message, and is formated the same as the
+.B strbuf
+structure pointed to by
+.I ctlptr
+as an argument to
+.BR putmsg (2).
+The
+.I len
+field of this
+.B strbuf
+structure must be large enough to accept the translated file descriptor, plus any additional control
+information that is to be sent.
+Unlike
+.BR putmsg (2)
+this message must contain a control part.
+.\"
+.TP
+.I databuf
+describes the data part of the message, formatted the same as the
+.B strbuf
+structure pointed to by
+.I datptr
+as an argument to
+.BR putmsg (2).
+Unlike
+.BR putmsg (2)
+if the
+.I len
+field of this
+.B strbuf
+structure is zero, it indicates that no data part is to be sent with the
+message.
+(This differs from
+.BR putmsg (2),
+where a
+.I len
+field of zero (0) would indicate to send a zero-length data part message.)
+.\"
+.TP
+.I flags
+provides the options flags formatted the same as the
+.I flags
+argument to
+.BR putmsg (2).
+It can take on the following values:
+.RS
+.TP \w'RS_HIPRI\(em'u
+.B 0
+The resulting message is a normal priority message.
+.PD 0
+.TP \w'RS_HIPRI\(em'u
+.B RS_HIPRI 
+The resulting message is a high priority message.
+.PD
+.RE
+.\"
+.TP
+.I fildes
+is the file descriptor of a stream to be translated to a read queue pointer and
+placed into the control part of the message.
+.\"
+.TP
+.I offset
+is the offset into the control part to place the read queue pointer associated
+with
+.IR fildes .
+This
+.I offset
+must leave sufficient room in the control part of the message to permit a
+.BR t_uscalar_t
+area to be overwritten without exceeding the bounds of the control part.  The
+.I offset
+must also specify a location in the control buffer suitably aligned for a
+.BR t_uscalar_t .
+.PP
+When the stream head is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+.BR I_FDINSERT ,
+in the same fashion as
+.BR putmsg (2),
+exhibits the following behaviour:
+.IP \(bu \w'\(bu\(em'u
+For normal priority messages, the
+.B I_FDINSERT
+command blocks if the stream write queue is full due to internal flow control conditions and neither
+the
+.BR O_NDELAY " nor " O_NONBLOCK
+flags have been set for the file descriptor,
+.IR fd .
+.IP \(bu
+For normal priority messages, the
+.B I_FDINSERT
+command does not block when the write queue is full and the
+.BR O_NDELAY " or " O_NONBLOCK
+flag is set for the file descriptor,
+.IR fd .
+Instead, the command fails and sets the
+.IR errno (3)
+global variable to
+.RB [ EAGAIN ].
+.PP
+When the stream head is set for
+old TTY semantics for
+.BR O_NDELAY ,
+.BR I_FDINSERT ,
+in the same fashion as
+.BR putmsg (2),
+exhibits the following behaviour:
+.IP \(bu \w'\(bu\(em'u
+For normal priority messages, the
+.B I_FDINSERT
+command blocks if the stream write queue is full due to internal flow control conditions regardless
+of the setting of the
+.BR O_NDELAY
+file flag.
+.PP
+The
+.B I_FDINSERT
+command does not block on flow control conditions when the message is a high priority message (that
+is,
+.B RS_HIPRI
+is set in the
+.I flags
+member of the
+.B strfdinsert
+structure).
+.PP
+The
+.B I_FDINSERT
+command also blocks, unless prevented by lack of internal resources, while it is waiting for the
+availability of message blocks in the stream, regardless of the priority or whether the
+.BR O_NDELAY " or " O_NONBLOCK
+flag has been set on the file descriptor,
+.IR fd ,
+or whether the stream head is set for
+.I STREAMS
+or old TTY
+semantics for
+.BR O_NDELAY .
+No partial message is sent.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success, the
+.B I_FDINSERT
+.BR ioctl (2)
+command returns zero (0) or a positive integer.
+Upon failure, the
+.B I_FDINSERT
+.BR ioctl (2)
+command returns -1 and sets
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When the
+.B I_FDINSERT
+.BR ioctl (2)
+command fails, it returns -1 and sets
+.IR errno (3)
+to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EAGAIN ]
+A normal priority message was specified, the
+.B O_NDELAY
+flag is set, and the stream write queue is full due to internal flow control conditions.
+.TP
+.RB [ ENOSR ]
+Buffers could not be allocated for the message that was to be created due to insufficient
+.I STREAMS
+memory resources.
+.TP
+.RB [ EFAULT ]
+The
+.I arg
+argument points to an area that extends outside the caller's allocated address space, or the buffer
+area specified in the
+.I ctlbuf
+or
+.I databuf
+members extend outside the caller's allocated address space.
+.TP
+.RB [ EINVAL ]
+The
+.I fildes
+member in the
+.B strfdinsert
+structure is not a valid, open
+.I STREAMS
+file descriptor.
+.TP
+.RB [ EINVAL ]
+The size of a pointer plus the value of the
+.I offset
+member is greater than the
+.I len
+member for the buffer specified through the
+.I ctlptr
+member.
+.TP
+.RB [ EINVAL ]
+The
+.I offset
+parameter does not specify a properly aligned location in the control buffer.
+.TP
+.RB [ EINVAL ]
+An undefined value is present in the
+.I flags
+member.
+.TP
+.RB [ ENXIO ]
+A hangup was received on the
+.I fd
+argument to the
+.BR ioctl (2)
+call, or the
+.I fildes
+member of the
+.B strfdinsert
+structure.
+.TP
+.RB [ ERANGE ]
+The
+.I len
+member for the buffer specified through the
+.IR databuf
+member does not fall within the range specified by the maximum and minimum packet sizes of the
+topmost
+.I STREAMS
+module or driver; or the
+.I len
+member for th buffer specified through the
+.I databuf
+member is larger than the maximum configured size of the data part of a message; or the
+.I len
+member for the buffer specified through the
+.I ctlbuf
+member is larger than the maximum configured size of the control part of a message.
+.PP
+The
+.B I_FDINSERT
+command is also unsuccessful if an error message is received containing a write error by the stream
+head corresponding to the
+.I fildes
+member of the
+.B strfdinsert
+structure.
+In this case,
+.IR errno (3)
+is set to the error number in the message.
+.PP
+In general, any
+.BR ioctl (2)
+command can fail if:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.IR arg ", " ctlbuf ", " databuf ", " ctlbuf.buf " or " databuf.buf
+points outside the caller's valid address space.
+.TP
+.RB [ ENOSR ]
+a buffer for the resulting message could not be allocated.
+.TP
+.RB [ EINVAL ]
+.I fildes
+is invalid, or
+.I offset
+is invalid, or
+.I flags
+is invalid.
+.PP
+Any of the errors returned by
+.BR putpmsg (2s)
+may be returned in
+.IR errno (3).
+Any error received in an
+.B M_ERROR
+message indicating a write error for the stream will be returned in
+.IR errno (3).
+.PP
+In general, any
+.BR ioctl (2)
+command can fail if:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.I arg
+or a member of
+.IR arg ,
+points to an address that is outside the caller's valid address space.
+.TP
+.RB [ EINVAL ]
+.IR fd ", " command ", " arg " or a member of " arg
+is invalid.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid open file descriptor.
+.TP
+.RB [ ENOSTR ]
+.I fd
+is not a stream special character device.
+.TP
+.RB [ EOPNOTSUPP ]
+.I fd
+does not support the requested operation.
+.TP
+.RB [ EIO ]
+.I fd
+refers to stream that is closing.
+.TP
+.RB [ ENOTTY ]
+.I fd
+does not refer to a
+.I STREAMS
+device that accepts I/O controls.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a
+.I STREAMS
+device that does not support the
+.BR ioctl (2)
+system call.
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to stream that has received a hangup.
+.TP
+.RB [ ENXIO ]
+the I/O control command cannot be performed by this particular sub-device.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a pipe and the other end of the pipe is closed.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe and a write operation was attempted with no
+readers at the other end, or a read operation was attempted, the pipe is
+empty, and there are no readers at the other end.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked under a multiplexing driver.  If a stream is
+linked under a multiplexing driver, all
+.BR ioctl (2)
+commands other than
+.B I_UNLINK
+or
+.B I_PUNLINK
+will return
+.RB [ EINVAL ].
+.TP
+.RB [ ERESTARTSYS ]
+a signal was received before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal was received before the operation could complete.
+.TP
+.RB [ EAGAIN "]
+the file is set for asynchronous I/O and the operation would block.
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ].
+.TP
+.RB [ ETIME ]
+the operation timed out awaiting an acknowledgement or response from the
+driver.
+.TP
+.RB [ ENOSR ]
+a message block could not be allocated during the operation and the operation
+is not permitted to block.
+.PP
+Any error delivered to the stream head in an
+.B M_ERROR
+message can be returned in
+.IR errno (3).
+.PP
+Where the command is passed to the module or driver, or the command results in
+the call to a module or driver open or close procedures, or link or unlink
+procedures, the error number returned by the module or driver open or close
+procedure can be returned in
+.IR errno (3).
+.PP
+Any error returned in an
+.B M_IOCNAK
+message from the driver in response to a
+.I I_STR
+ioctl can be returned in
+.IR errno (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.I STREAMS
+.BR ioctl (2)
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2),
+.BR streamio (7),
+.BR errno (3),
+.\"
+.\"
+.SH BUGS
+.PP
+.B I_FDINSERT
+has no known bugs.
+.PP
+.I STREAMS
+.BR ioctl (2)
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B I_FDINSERT
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.\"
+.\"
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixdoc
+.]
+documentation specifies in one place that the inserted item is a pointer that must be word-aligned,
+and in another place specifies that it must be a suitably aligned
+.BR t_uscalar_t .
+.IR HP-UX \(rg
+.[
+hpuxdoc
+.]
+documentation indicates that the stored value is a pointer and that the
+.I offset
+must be word-aligned.
+.IR Solaris \(rg
+.[
+soldoc
+.]
+documentation indicates that the stored value is a
+.B t_uscalar_t
+and that the alignment of
+.I offset
+must be suitable for a
+.BR t_uscalar_t .
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documentation indicates that the stored value is a pointer and that the
+.I offset
+must be word-aligned.
+.I POSIX
+.[
+susv3
+.]
+indicates that the stored value is a
+.B t_uscalar_t
+and the the alignment of
+.I offset
+must be suitable for a
+.BR t_uscalar_t .
+.\"
+.\"
+.IP \(em
+.B @PACKAGE_TITLE@
+takes the following approach to the inserted value and alignment:
+.\"
+.IP
+The read queue pointer is always stored as a pointer cast to a
+.BR t_uscalar_t .
+This means that if the pointer size is 64 bits and the
+.B t_uscalar_t
+is 32-bits, that a truncated pointer will be placed in the message.  It is then the responsibility
+of the driver to compare the truncated pointer with the full pointer for each queue truncated to 32
+bits to find the appropriate full pointer.
+On machines with 32-bit pointers, this is not an issue.
+.\"
+.IP
+So, on 32-bit machines, the stored value is a pointer and it is word-aligned.
+On 64-bit machines, the stored value is a
+.B t_uscalar_t
+and it is aligned suitably for such a type (word-aligned).
+.\"
+.\"
+.IP \(em
+Portable
+.B STREAMS
+applications,
+modules and drivers will not rely on the size of the inserted value.  This can be accomplished by
+only using structures defined to include the inserted value, such as the
+.BR T_conn_res (7)
+.[
+TPI Revision 2.0.0
+.]
+structure.
+The offset of the member in such a structure is also ensured to be properly aligned.
+If the member in such a structure is too small to contain a full pointer, a mechanism, such as
+.BR T_capability_req (7)
+should be used to obtain a token to be used instead of a read queue pointer and
+.BR putmsg (2)
+or
+.BR putpmsg (2s)
+should be called directly.
+It is the responsibility of the driver receiving the (e.g.
+.BR T_conn_res (7))
+message to translate the token into a pointer to a suitable read queue.  This is accomplished by
+keeping all open queues in a list and traversing the list comparing the token to that of each queue
+until a match is found.
+.\"
+.IP
+So, in effect, all of the documentation is correct.  When a pointer is the same size as a
+.BR t_uscalar_t ,
+then a pointer can be saved in the
+.BR t_uscalar_t .
+Also, proper alignement for such a
+.B t_uscalar_t
+will be word-alignment.
+Where a
+.B t_uscalar_t
+is too small to contain a pointer, the token method should be used in its stead and
+.BR I_FDINSERT
+not used.
+However, when used on 64-bit architectures, the most obvious choice for token (the read queue
+pointer truncated to 32-bits) is used.
+.\"
+.\"
+.IP \(em
+.IR AIX \(rg
+.[
+aixdoc
+.]
+documentation describes in one place the
+.B O_NDELAY
+flag, while describing the
+.B O_NONBLOCK
+flag in another place, and yet the behaviour is only consistent with
+.B O_NONBLOCK
+rather than the older
+.BR O_NDELAY .
+.IR HP-UX \(rg
+.[
+hpuxdoc
+.]
+documentation only mentions the
+.B O_NONBLOCK
+flag.
+.IR Solaris \(rg
+.[
+soldoc
+.]
+documentation describes both
+.BR O_NDELAY " and " O_NONBLOCK
+.BR open (2)
+flags as having the same behaviour.
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documentation describes both
+.BR O_NDELAY " and " O_NONBLOCK
+.BR open (2)
+flags as having the same behaviour.
+.I POSIX
+.[
+susv3
+.]
+describes only the
+.B O_NONBLOCK
+.BR open (2)
+flag.
+None of the existing documentation describes the effect of
+.B SO_NDELON
+or
+.B SO_NDELOFF
+of the behaviour of the
+.BR I_FDINSERT
+command nor the
+.BR putmsg (2)
+or
+.BR putpmsg (2)
+system calls.
+The effect of
+.B SO_NDELON
+and
+.B SO_NDELOFF
+on the
+.BR read (2)
+and
+.BR write (2)
+system calls is described (but not in the
+.BR read (2)
+or
+.BR write (2)
+manpages).
+.\"
+.\"
+.IP \(em
+.B @PACKAGE_TITLE@
+takes the following approach to
+.BR O_NDELAY
+behaviour (closest to the documented
+.IR AIX \(rg
+behaviour):
+.\"
+.IP
+When 
+.B STRNDEL
+is set on the stream head, indicating that old TTY semantics are to be used for
+.BR O_NDELAY ,
+setting
+.B O_NDELAY
+(but not
+.BR O_NONBLOCK )
+will result in
+.B I_FDINSERT
+blocking both on flow control and the availability of message buffers.  Setting
+.BR O_NONBLOCK ,
+regardless of the setting of
+.BR O_NDELAY ,
+will result in the
+.I POSIX
+behaviour: that is,
+.B I_FDINSERT
+will fail on flow control and return minus one (-1) and set
+.IR errno (3)
+to
+.RB [ EAGAIN ];
+.B I_FDINSERT
+will always block on the availability of message buffers regardless of the setting of
+.BR O_NDELAY ", " O_NONBLOCK " or " STRNDEL .
+Unfortunately, most
+.B Linux
+architectures (with the sole exception of sparc) define
+.BR O_NDELAY " and " O_NONBLOCK
+to the same value.  This means that on most architectures, both
+.BR O_NDELAY " and " O_NONBLOCK
+will follow the old TTY semantics.
+.\"
+.IP
+When
+.B STRNDEL
+is not set on the stream head, indicating that
+.I STREAMS
+semantics are to be used for
+.BR O_NDELAY ,
+setting
+.BR O_NDELAY " or " O_NONBLOCK
+will have the same effect and will follow the
+.I POSIX
+behaviour: that is,
+.B I_FDINSERT
+will fail on flow control and return minus one (-1) and set
+.IR errno (3)
+to
+.RB [ EAGAIN ];
+.B I_FDINSERT
+will always block on the availability of message buffers regardless of the setting of
+.BR O_NDELAY ", " O_NONBLOCK " or " STRNDEL .
+.\"
+.IP
+Note that the only way to ensure that one obtains the older TTY semantics is to set
+.B STRNDEL
+on the stream head and use only the
+.B O_NDELAY
+open flag.
+.\"
+.\"
+.IP \(em
+Portable
+.I STREAMS
+applications,
+modules and drivers will not rely on the old TTY semantics
+.RB ( O_NDELAY " and " STRNDEL
+behaviour), but will rather only use
+.B O_NONBLOCK
+and expect the newer
+.I POSIX
+behaviour.
+.\"
+.\"
+.PP
+For general
+.BR ioctl (2)
+compatibility, see
+.BR streamio (7).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ioctl (2)
+for
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

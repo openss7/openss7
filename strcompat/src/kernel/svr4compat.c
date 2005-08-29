@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 14:30:55 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:36:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -96,7 +96,6 @@ MODULE_ALIAS("streams-svr4compat");
 #endif
 #endif
 
-/* don't use these functions, they are way too dangerous */
 #undef MPSTR_QLOCK
 long
 MPSTR_QLOCK(queue_t *q)
@@ -108,11 +107,12 @@ MPSTR_QLOCK(queue_t *q)
 	return (flags);
 #endif
 #if LFS
-
+#if 0
 	if (q->q_klock.kl_owner == current)
 		q->q_klock.kl_nest++;
 	else {
 		unsigned long flags;
+
 		local_irq_save(flags);
 		write_lock(&q->q_klock.kl_lock);
 		q->q_klock.kl_isrflags = flags;
@@ -120,6 +120,12 @@ MPSTR_QLOCK(queue_t *q)
 		q->q_klock.kl_nest = 0;
 	}
 	return (q->q_klock.kl_isrflags);
+#else
+	unsigned long flags;
+
+	write_lock_irqsave(&q->q_lock, flags);
+	return (flags);
+#endif
 #endif
 }
 
@@ -136,6 +142,7 @@ MPSTR_QRELE(queue_t *q, long s)
 	return;
 #endif
 #if LFS
+#if 0
 	if (q->q_klock.kl_nest > 0)
 		q->q_klock.kl_nest--;
 	else {
@@ -149,6 +156,11 @@ MPSTR_QRELE(queue_t *q, long s)
 		local_irq_restore(flags);
 	}
 	return;
+#else
+	unsigned long flags = s;
+
+	write_unlock_irqrestore(&q->q_lock, flags);
+#endif
 #endif
 }
 
@@ -165,6 +177,7 @@ MPSTR_STPLOCK(struct stdata *sd)
 	return (flags);
 #endif
 #if LFS
+#if 0
 	if (sd->sd_klock.kl_owner == current)
 		sd->sd_klock.kl_nest++;
 	else {
@@ -177,6 +190,11 @@ MPSTR_STPLOCK(struct stdata *sd)
 		sd->sd_klock.kl_nest = 0;
 	}
 	return (sd->sd_klock.kl_isrflags);
+#else
+	unsigned long flags;
+	write_lock_irqsave(&sd->sd_lock, flags);
+	return (flags);
+#endif
 #endif
 }
 
@@ -193,6 +211,7 @@ MPSTR_STPRELE(struct stdata *sd, long s)
 	return;
 #endif
 #if LFS
+#if 0
 	if (sd->sd_klock.kl_nest > 0)
 		sd->sd_klock.kl_nest--;
 	else {
@@ -205,6 +224,10 @@ MPSTR_STPRELE(struct stdata *sd, long s)
 		write_unlock(&sd->sd_klock.kl_lock);
 		local_irq_restore(flags);
 	}
+#else
+	unsigned long flags = s;
+	write_unlock_irqrestore(&sd->sd_lock, flags);
+#endif
 #endif
 }
 

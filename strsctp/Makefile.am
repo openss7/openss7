@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/09 21:48:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/29 10:32:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:48:33 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:32:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -215,7 +215,7 @@ nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
 ## WITH_SCTP2
 endif
 libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/sctp_hooks.h
-libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strsctp $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
@@ -383,7 +383,7 @@ nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
 ## WITH_SCTP2
 endif
 libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=strsctp $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)

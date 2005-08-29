@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/28 14:13:51 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
+#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -74,7 +76,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/28 14:13:51 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:03 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -178,64 +180,51 @@ static struct streamtab pipe_info = {
  *
  *  -------------------------------------------------------------------------
  */
-/**
- *  pipe_open:	- STREAMS qopen procedure for pipe stream heads
- *  @q:		read queue of stream to open
- *  @devp:	pointer to a dev_t from which to read and into which to return the device number
- *  @oflag:	open flags
- *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
- *  @crp:	pointer to user's credentials structure
- */
+
 static int
 pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	int err;
+	struct stdata *sd;
 
-	if (q->q_ptr != NULL) {
-		/* we walk down the queue chain calling open on each of the modules and the driver */
-		queue_t *wq = WR(q), *wq_next;
-
-		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-		while ((wq = wq_next)) {
-			int new_sflag;
-
-			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
-			new_sflag = wq_next ? MODOPEN : sflag;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
-				return (err > 0 ? -err : err);
-		}
+	/* already open */
+	if ((sd = q->q_ptr))
 		return (0);
-	}
-	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
-		dev_t dev = *devp;
-		struct stdata *sd;
 
-		if ((sd = qstream(q))) {
-			/* 1st step: attach the driver and call its open routine */
-			/* we are the driver and this *is* the open routine */
-			/* FIXME: create another stream head and attach it to the first */
-			/* FIXME: place a M_PASSFP message on the first stream head */
-			/* start off life as a fifo */
-			WR(q)->q_next = q;
-			/* 2nd step: check for redirected return */
-			/* we are the driver and this *is* the open routine and there is no
-			   redirection. */
-			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp)))
-				return (err > 0 ? -err : err);
-			/* lastly, attach our privates and return */
-			q->q_ptr = WR(q)->q_ptr = sd;
-			return (0);
-		}
-	}
-	return (-EIO);		/* can't be opened as module or clone */
+	/* must be opened for at least read or write */
+	if (!(oflag & (FWRITE | FREAD)))
+		return (-EINVAL);
+	/* XXX: does it really?  Are there not any useful STREAMS ioctls? */
+
+	if (!(sd = qstream(q)))
+		return (-EIO);
+
+	/* first open we don't need to write lock stream head to change sd->sd_wq->q_next because
+	   we are not published to the inode yet and we have exclusive access to the stream. */
+
+	/* start off life like a FIFO */
+	WR(q)->q_next = q;
+
+	/* actually this would be enough for unidirectional pipes, for bidirectional we need to open
+	 * two pipe ends and then attach them together with I_FDINSERT */
+
+	/* lastly, attach our privates and return */
+	q->q_ptr = WR(q)->q_ptr = sd;
+	/* XXX: should we do an sd_get here? */
+
+	return (0);
 }
+
 static int
 pipe_close(queue_t *q, int oflag, cred_t *crp)
 {
-	if (!q->q_ptr || q->q_ptr != qstream(q))
-		return (ENXIO);
+	struct stdata *sd;
+
+	if (!(sd = q->q_ptr))
+		return (-ENXIO);
+
 	q->q_ptr = WR(q)->q_ptr = NULL;
+	/* XXX: should we do an sd_put here? */
+
 	return (0);
 }
 

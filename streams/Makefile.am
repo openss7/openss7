@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/07/21 20:47:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/08/29 10:31:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/21 20:47:18 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 10:31:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -230,7 +230,7 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strargs.h
 
 libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLfS_specfs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libLfS_specfs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=specfs $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libLfS_specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
@@ -300,7 +300,7 @@ libLfS_streams_a_SOURCES	+= src/drivers/spx.c
 endif
 
 libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLfS_streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libLfS_streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=streams $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libLfS_streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_streams_a_OBJECTS): $(libLfS_streams_a_DEPENDENCIES)
@@ -343,7 +343,7 @@ libLfS_drivers_a_SOURCES	+= src/drivers/spx.c
 endif
 
 libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLfS_drivers_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libLfS_drivers_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_drivers_a_OBJECTS): $(libLfS_drivers_a_DEPENDENCIES)
@@ -364,7 +364,7 @@ libLfS_modules_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
 endif
 
 libLfS_modules_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLfS_modules_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libLfS_modules_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_modules_a_OBJECTS): $(libLfS_modules_a_DEPENDENCIES)

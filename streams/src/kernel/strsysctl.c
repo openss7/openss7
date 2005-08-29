@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:23 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:23 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:23 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/21 20:47:23 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,8 +76,9 @@ int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
 int sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
 int sysctl_str_hiwat = STRHIGH;		/* stream head default hi water mark */
 int sysctl_str_lowat = STRLOW;		/* stream head default lo water mark */
-int sysctl_str_cltime = 1500;		/* close wait time in msec (in HZ) */
-int sysctl_str_rtime = 1;		/* HZ to wait to forward held msg */
+int sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in HZ) */
+int sysctl_str_rtime = (10 * HZ) / 1000;/* msec to wait to forward held msg (saved in HZ) */
+int sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved in HZ) */
 int sysctl_str_nstrpush = 64;		/* maximum number of pushed modules */
 int sysctl_str_strthresh = (1 << 20);	/* memory limit */
 int sysctl_str_strhold = 0;		/* active stream hold feature */
@@ -124,6 +125,10 @@ static ctl_table streams_table[] = {
 	/* default hold time maximum */
 	{STREAMS_RTIME, "rtime",
 	 &sysctl_str_rtime, sizeof(ulong), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, NULL, NULL, NULL, NULL},
+	/* default ioctl() acknowledgement time */
+	{STREAMS_IOCTIME, "ioctime",
+	 &sysctl_str_ioctime, sizeof(ulong), 0644, NULL,
 	 &proc_doulongvec_ms_jiffies_minmax, NULL, NULL, NULL, NULL},
 	/* maximum number of pushed modules - system wide */
 	{STREAMS_NSTRPUSH, "nstrpush",

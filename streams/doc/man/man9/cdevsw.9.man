@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdevsw.9.man,v 0.9.2.11 2005/07/29 12:58:36 brian Exp $
+.\" @(#) $Id: cdevsw.9.man,v 0.9.2.12 2005/08/29 10:06:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/29 12:58:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -92,14 +92,16 @@ struct cdevsw {
         const char *d_name;             /* driver name */
         struct streamtab *d_str;        /* pointer to streamtab for driver */
         uint d_flag;                    /* driver flags */
-        uint d_modid;                   /* driver moidule id */
+        uint d_modid;                   /* driver module id */
         atomic_t d_count;               /* open count */
         int d_sqlvl;                    /* q sychronization level */
         struct syncq *d_syncq;          /* synchronization queue */
         struct module *d_kmod;          /* kernel module */
+        /* above matches fmodsw */
         int d_major;                    /* base major device number */
         struct inode *d_inode;          /* specfs inode */
         mode_t d_mode;                  /* inode mode */
+        /* above matches devnode */
         struct file_operations *d_fop;  /* file operations */
         struct list_head d_majors;      /* major device nodes for this device */
         struct list_head d_minors;      /* minor device nodes for this device */
@@ -116,19 +118,61 @@ struct cdevsw {
 The
 .B cdevsw
 structure contains the following members:
+.PP
+The following members are members that the
+.B cdevsw
+structure has in common with the
+.BR devnode (9)
+and
+.BR fmodsw (9)
+structures (permitting a pointer to one to be cast to a pointer to the other):
 .TP \w'\ d_majors\ 'u
 .I d_list
+Provides a list of all
+.B cdevsw
+structures under the control of the
+.I STREAMS
+executive.
+This field must not be populated nor accessed directly by the
+.I STREAMS
+driver.
 .TP
 .I d_hash
+A list of all
+.B cdevsw
+entries in the same hash slot.
+.B cdevsw
+entries are hashed for fast lookup by
+.I d_modid .
+This field must not be populated nor accessed directly by the
+.I STREAMS
+driver.
 .TP
 .I d_name
+The name of the
+.I STREAMS
+driver.  This is the name that will be used for the
+.BR specfs (5)
+directory entry.  If the
+.I STREAMS
+driver is a loadable kernel module, the kernel module name must also be the concatentation of
+.RI \(lq streams- \(rq
+and this name for module demand loading to work correctly.  This name should also appear in the
+.I d_str->st_rdinit->qi_minfo->mi_idname
+member of the
+.BR module_info (9)
+structure.
+.IP ""
+Most registration functions require that this member be populated by the caller:
+it should be set to point to a constant static character string prior to the call to a registration
+function.
 .TP
 .I d_str
 A pointer to a
 .BR streamtab (9)
 structure specifying the
 .I STREAMS
-characteristics for the device driver.  This
+characteristics for the driver.  This
 .BR streamtab (9)
 structure contains the stream head
 .BR qopen (9),
@@ -137,6 +181,15 @@ structure contains the stream head
 and
 .BR srv (9)
 procedures as well as the initial read queue high and low water marks.
+.IP ""
+Most registration functions require that this member be populated by the caller:
+it should be set to point to the
+.BR streamtab (9)
+structure that properly describes the
+.I STREAMS
+driver.  Members (and subtending structures) of the
+.BR streamtab (9)
+structure should not be modified directly while the driver is registered.
 .TP
 .I d_flag
 See
@@ -144,6 +197,9 @@ See
 below.
 .TP
 .I d_modid
+Contains the module id for this driver.  This member is not populated by the caller of a
+registration function, but is set by the registration function at registration time.  After
+registration has been performed, this is the module id that was assigned to the driver.
 .TP
 .I d_count
 The number of opens of this driver.  This value must be set to zero before
@@ -151,108 +207,270 @@ registration.
 .TP
 .I d_sqlvl
 Synchronization queue level, can be one of the following:
-.RS
-.TP
-.B SQLVL_DEFAULT
-.PD 0
-.TP
-.B SQLVL_GLOBAL
-.TP
-.B SQLVL_ELSEWHERE
-.TP
-.B SQLVL_MODULE
-.TP
-.B SQLVL_QUEUEPAIR
-.TP
-.B SQLVL_QUEUE
-.TP
-.B SQLVL_NOP
-.TP
-.B SQLVL_PERSTREAM
-.PD
-.RE
+.BR SQLVL_DEFAULT ,
+.BR SQLVL_GLOBAL ,
+.BR SQLVL_ELSEWHERE ,
+.BR SQLVL_MODULE ,
+.BR SQLVL_QUEUEPAIR ,
+.BR SQLVL_QUEUE ,
+.BR SQLVL_NOP " or "
+.BR SQLVL_PERSTREAM .
+For additional information on these sycnrhonization levels, see
+.BR mp-streams (9).
+.IP ""
+These synchronization levels are not normally populated by the caller of a registration function,
+and this member should be allowed to default to zero
+.RB ( 0 ),
+which is the same as
+.BR SQLVL_DEFAULT .
+Synchronization should, instead, be specified using the
+.I d_flag
+member.
 .TP
 .I d_syncq
+A pointer to a syncrhonization queue,
+.BR syncq (9)
+structure the describes the outer barrier for syncrhonization.  This member is only significant when
+member
+.I d_sqlvl
+is set to
+.BR SQLVL_DEFAULT ", " SQLVL_MODULE " or " SQLVL_ELSEWHERE .
+This member is not set by the caller to a registration function (it is overwritten by the
+registration function).  The registration function is reponsible for locating the outer barrier
+based on other information and populating this pointer.  This member should not be directly
+manipulated by the
+.I STREAMS
+driver.
 .TP
 .I d_kmod
 The loadable kernel module (see
 .BR kmod (9))
 to which this
-.BR cdevsw (9)
+.B cdevsw
 structure belongs.  This kernel module (when non-null) will have its usage
 count incremented when stream heads are opened or other reference is made to
 the
-.BR cdevsw (9)
+.BR cdevsw ()
 entry.  In addition, this kernel module will have its usage count decremented
 when the reference to the
-.BR cdevsw (9)
+.B cdevsw
 structure is released.
-.TP
+When the structure is used to call a registration function by a loadable kernel module, this member
+should be populated with the value of
+.BR THIS_MODULE .
+.PP
+The following members are members that the
+.B cdevsw
+structure has in common with the
+.BR devnode (9)
+structure (permitting a pointer to one to be cast to a pointer to the other):
+.TP \w'\ d_majors\ 'u
 .I d_major
+The base major device number.  This is the first major device number allocated to the driver.
+This member is not populated directly by the caller of a
+.I STREAMS
+registration function.
 .TP
 .I d_inode
+This member is a pointer to the
+.BR specfs (5)
+directory
+.B inode
+that is allocated to the
+.I STREAMS
+driver.
+.BR register_strdrv (9),
+directly or indirectly, during registration.
 .TP
 .I d_mode
-.TP
+Specifies the mode of the driver.
+This member is only populated by the caller of a registration function when writing a STREAM head or
+specialized device or module such as
+.BR clone (4),
+.BR fifo (4),
+.BR nsdev (4),
+.BR connld (4),
+and using the
+.BR register_inode (9)
+registration function,
+in which case, the member has the same interpretation as the mode field of a
+.BR specfs (5)
+.BR inode .
+Normally, the
+.BR register_strdev (9)
+registration function will overwrite this member with
+.BR S_IFCHR ,
+while retaining any permission bits set by the caller.
+.PP
+The following members are specific to the
+.B cdevsw
+structure:
+.TP \w'\ d_majors\ 'u
 .I d_fop
+This member is a
+.B Linux
+.B file_operations
+structure pointer that provides file operations for use by the
+.IR "STREAMS Special Shadow File System" ,
+.BR specfs (5),
+for direct opens of
+.I STREAMS
+files contained in the
+.BR specfs (5)
+when that file system is mounted.  This is distinct from the file operations that are used by
+external file system character, FIFO or socket device nodes.
+This member is only populated by the caller of a registration function when writing a STREAM head or
+specialized device or module such as
+.BR clone (4),
+.BR fifo (4),
+.BR nsdev (4),
+.BR connld (4),
+and using the
+.BR register_inode (9)
+registration function.
 .TP
 .I d_majors
+This is a list of
+.BR devnode (9)
+structures that represent all major device nodes allocated to this driver.  This list is not
+populated by the
+.I STREAMS
+driver, but are allocated with the
+.BR register_xnode (9)
+function.
 .TP
 .I d_minors
+This is a list of
+.BR devnode (9)
+structures that represent all minor device nodes allocated to this driver.  This list is not
+populated by the
+.I STREAMS
+driver, but are allocated with the
+.BR register_strnod (9)
+function.
 .TP
 .I d_apush
+This is a list of
+.BR strapush (9)
+structures that represent all autopush entries allocated to this driver.  This list is not populated
+by the
+.I STREAMS
+driver, but are allocated with the
+.BR autopush_add (9)
+function, or indirectly via the
+.BR sad (4)
+driver.
 .TP
 .I d_plinks
+This is a list of
+.BR linkblk (9)
+structures that represent all
+.BR I_PLINK (7)'ed
+.I STREAMS
+that are linked under a multiplexing driver.  This list is not populated by the
+.I STREAMS
+driver, but are allocated with the
+.BR I_PLINK (7)
+command to
+.BR ioctl (2)
+as described in
+.BR streamio (7).
 .TP
 .I d_stlist
+This is a list of
+.BR stdata (9)
+structure that represent all allocated STREAM heads for the driver.  This list is not populated by
+the
+.I STREAMS
+driver, but are allocated by the
+.I STREAMS
+executive with the
+.BR open (2)
+system call.
 .\"
 .\"
 .SS Flags
 .PP
+The following flags are used in the
+.I d_flag
+member and are expected to be populated by the
+.I STREAMS
+driver prior to a call to a registration function:
 .TP \w'\ D_MTOUTPERIM\ 'u
-.B D_REOPEN
-The driver or module can return a device number other than its own and the stream head must reopen
-that device number.
-.TP
+.\".B D_REOPEN
+.\"The driver or module can return a device number other than its own and the stream head must reopen
+.\"that device number.
+.\".TP
 .B D_CLONE
 The driver is a clone driver.  (The driver will always get a new and unique stream head on each
 open.)
-.TP
-.B D_FIFO
-The driver is a
-.BR fifo (4)
-driver.
-.TP
-.B D_PIPE
-The driver is a
+If
+.I d_mode
+has format
+.BR S_IFIFO ,
+then this flag also indicates that the driver is a
 .BR pipe (4)
-driver.
-.TP
-.B D_SOCK
-The driver is a
-.BR sock (4)
-driver.
-.TP
-.B D_LIS
-Attempt to be LiS compatible with this module.
-.TP
-.B D_HEAD
-The driver is a stream head.
-.TP
-.B D_NSDEV
-The driver is a Named STREAMS device.  (This is similar to a clone driver in that the driver will
-always get a new and unique stream head on each open.)
+driver rather than a
+.BR fifo (4)
+driver (because FIFOs never clone).
+.IP ""
+Drivers that are marked with this flag should never have STREAM heads attached to the external file
+system device inode or internal
+.BR specfs (5)
+file system inode.  The driver
+.BR qopen (9)
+procedures will always be called with
+.I sflag
+set to
+.BR CLONEOPEN .
+.IP ""
+This flag need only be used by specialized clone devices such as
+.BR clone (4),
+.BR nsdev (4),
+that never have STREAM heads attached to inodes.  See also
+.BR stropen (9).
+.\".TP
+.\".B D_FIFO
+.\"The driver is 
+.\".BR fifo (4)
+.\"driver.
+.\".TP
+.\".B D_PIPE
+.\"The driver is a
+.\".BR pipe (4)
+.\"driver.
+.\".TP
+.\".B D_SOCK
+.\"The driver is a
+.\".BR sock (4)
+.\"driver.
+.\".TP
+.\".B D_LIS
+.\"Attempt to be LiS compatible with this module.
+.\".TP
+.\".B D_HEAD
+.\"The driver is a stream head.
+.\".TP
+.\".B D_NSDEV
+.\"The driver is a Named STREAMS device.  (This is similar to a clone driver in that the driver will
+.\"always get a new and unique stream head on each open.)
 .PP
-The following flags are provided for
+The following flags are
 .IR Solaris \(rg
-compatibility:
+compatible:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MP
-specifies that the driver is MP-SAFE.
+specifies that the driver is MP-SAFE.  When this flag is set, all other synchronization flags
+(inner perimeter, outer perimiter,
+.BR D_SAFE " and " D_UP )
+are ignored.
+.IP ""
+For more information on this  flag, or any of the syncrhonization flags, see
+.BR mp-streams (9).
 .PP
-The following inner perimeter flags are provided for
+The following inner perimeter flags are
 .IR Solaris \(rg
-compatibility:
+compatible:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MTPERMOD
 specifies that an inner perimeter exists and that the inner perimeter encircles all queue pairs in the
@@ -265,19 +483,19 @@ Only one of
 .BR D_MTPERMOD " and " D_MTOUTPERIM
 may be set.
 .TP
-.B D_MTWPAIR
+.B D_MTQPAIR
 specifies that an inner perimeter exists and that the inner perimeter encircles each queue pair in the
 module.
 Only one of
 .BR D_MTPERMOD ,
-.BR D_MTWPAIR " and " M_MTPERQ
+.BR D_MTQPAIR " and " M_MTPERQ
 may be set.
 .TP
 .B D_MTPERQ
 specifies that an inner perimeter exists and that the inner perimeter encircles each queue in the module.
 Only one of
 .BR D_MTPERMOD ,
-.BR D_MTWPAIR " and " M_MTPERQ
+.BR D_MTQPAIR " and " M_MTPERQ
 may be set.
 .TP
 .B D_MTPUTSHARED
@@ -287,11 +505,12 @@ procedure will enter the inner perimeter (if it exists) shared instead of
 (the default) exclusive.
 This flag has no effect if none of
 .BR D_MTPERMOD ,
-.BR D_MTAPARI " or " D_MTPERQ
+.BR D_MTQPAIR " or " D_MTPERQ
 are set (i.e. there is no inner perimeter).
 .PP
-The following outer perimeter flags are provided for
-.IR Solaris \(rg:
+The following outer perimeter flags are
+.IR Solaris \(rg
+compatible:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MTOUTPERIM
 specifies that an outer perimeter exists and that the outer perimeter encircles all queue pairs in the module.
@@ -315,10 +534,11 @@ THe following flags are provided for
 compatibility:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_SAFE
-The module requires safe (interrupts disabled) callbacks.
+The module requires safe (local interrupts disabled) callbacks.
 .TP
 .B D_UP
-Per-stream synchronization for uni-processor emulation.
+The driver requests per-stream synchronization for uni-processor emulation.
+(This capability is not yet supported.)
 .PP
 THe following flags are provided for
 .IR OSF \(rg
@@ -326,19 +546,88 @@ compatibility:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_64BIT
 The module handles 64-bit offsets.
+(This capability is not yet supported.)
 .TP
 .B D_NEW
 The module has an SVR4 prototype qopen and qclose procedure instead of SVR3 ones.
-
-
+.B @PACKAGE_TITLE@
+does not support SVR3 opens.  If this flag is not set, it is always implied.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B cdevsw
+structure is allocated by a caller of the
+.B @PACKAGE_TITLE@
+device registration function,
+.BR register_strdev (9).
+The
+.I STREAMS
+driver can call the
+.BR register_strdev (9)
+function as part of its initialization, or can use one of the registration compatibility function
+that will dynamically allocate a
+.B cdevsw
+structure for the caller.
+.PP
+The direct caller of the
+.BR register_strdev (9)
+registration function
+can allocate the structure statically or dynamically, but should ensure that all members
+are zeroed and only populate the
+.IR d_name ", " d_str ", " d_flag ", " d_kmod ", " d_mode " and possibly " d_fop
+members as follows:
+.TP \w'd_kmod\(em'u
+.I d_name
+A pointer to a character string giving the name of the driver.
+.TP
+.I d_str
+A pointer to the
+.BR streamtab (9)
+structure describing the
+.I STREAMS
+driver.
+.TP
+.I d_flag
+Flags specifying the syncrhonization required by the driver.
+.TP
+.I d_kmod
+A pointer to
+.BR THIS_MODULE ,
+to keep kernel modules from unloading while the
+.I STREAMS
+driver is in use.
+.TP
+.I d_mode
+The file mode and permissions for the driver if different from
+.BR S_IFCHR
+and world readable and writable.
+.TP
+.I d_fop
+Special file operations when registering a new STREAM head.
+.PP
+After the registration function has been called, no members of the structure or subtending
+structures should be directly accessed nor manipulated by the
+.I STREAMS
+driver.
+Dynamically allocated structures cannot be freed until after the corresponding unregistration
+function,
+.BR unregister_strdev (9),
+has been called.
+.PP
+See the corresponding registration function manual page for more information.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.B @PACKAGE_TITLE@
+registration functions are called from blocking context and are intended to be called from a
+.I STREAMS
+driver's initialization or termination functions.  These structures must reside in pinned (kernel)
+memory where they are directly accessible by the
+.I STREAMS
+executive.
 .\"
 .\"
 .SH MP-STREAMS
@@ -350,18 +639,134 @@ table is protected by the
 reader-writer lock.  This structure should never be manipulated directly
 after it has been registered with a registration function and before it has
 been unregistered with a unregistration function.
+It is permissible, however, after registration, to read the values of some members (such as
+.IR d_modid ).
 .\"
 .\"
 .SH NOTICES
 .PP
+.PP
+If a
+.I STREAMS
+module or driver wishes to register as both a
+.I STREAMS
+pushable module and a
+.I STREAMS
+device or pseudo-device driver, it should use separate and distinct
+.BR fmodsw "(9) and " cdevsw
+structures that are registered separately.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR devnode (9),
+.BR fmodsw (9),
+.BR specfs (5),
+.BR module_info (9),
+.BR streamtab (9),
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9),
+.BR srv (9),
+.BR mp-streams (9),
+.BR syncq (9),
+.BR kmod (9),
+.BR register_strdrv (9),
+.BR clone (4),
+.BR fifo (4),
+.BR nsdev (4),
+.BR connld (4),
+.BR register_inode (9),
+.BR register_strdev (9),
+.BR register_xnode (9),
+.BR register_strnod (9),
+.BR strapush (9),
+.BR autopush_add (9),
+.BR sad (4),
+.BR linkblk (9),
+.BR I_PLINK (7),
+.BR ioctl (2),
+.BR streamio (7),
+.BR stdata (9),
+.BR open (2),
+.BR pipe (4),
+.BR stropen (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B cdevsw
+structure is compatible with the descriptions of internal structures for
+.IR "SVR 4" ,
+.[
+svr4
+.]
+.[
+magic
+.]
+and implementations based on
+.IR "SVR 4" ,
+including
+.IR AIX \(rg,
+.IR Solaris \(rg,
+and
+.IR LiS ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B cdevsw
+structure is implementation-specific and should not be manipulated directly by portable
+.I STREAMS
+modules and drivers.
+.IP \(em
+While roughly comparable to other implementations, the
+.B cdevsw
+structure contains members not present in other implementations and does not contain members present
+in other implementations.  Members with the same name may have a different function or other subtle
+differences.
+.IP \(em
+Because the
+.B cdevsw
+structure is dependent on
+.B @PACKAGE_TITLE@
+internal implementation specifics, it is not binary compatibile.
+.IP \(em
+Any use supported by the
+.B cdevsw
+structure on other systems for purposes other than
+.I STREAMS
+are explicitly not supported by
+.BR "@PACKAGE_TITLE@" .
+.IP \(em
+.I "SVR 4.2"
+.[
+svr42
+.]
+did not standardize on a registration procedure, and most implementations use different methods.
+A
+.I STREAMS
+module or driver can avoid having directly knowledge of this structure by using on of the
+registration function compatible with another
+.I STREAMS
+implementation.
+.IP ""
+(Registration functions compatible with
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+are provided as part of the
+.I STREAMS
+compatibility package,
+.BR strcompat ).
 .PP
 See
 .BR STREAMS (9)
@@ -370,10 +775,30 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+There are no standards for this structure.
+.B @PACKAGE_TITLE@
+is roughly conformant to
+.I "SVR 4.2"
+.[
+svr42
+.]
+and the descriptions of
+.I "SVR 4"
+internals.
+.[
+magic
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B cdevsw
+table and structure first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[

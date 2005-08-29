@@ -1,0 +1,378 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: I_GWROPT.7.man,v 0.9.2.1 2005/08/29 10:00:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:00:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: I_GWROPT.7.man,v $
+.\" Revision 0.9.2.1  2005/08/29 10:00:28  brian
+.\" - added manpages
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH I_ANCHOR 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.\"
+.\"
+.SH NAME
+.B I_ANCHOR
+\- \fISTREAMS\fP anchor input-output control
+.\"
+.\"
+.SH SYNOPSIS   
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <stropts.h>
+.HP
+.BI "int " retval " = ioctl (int " fd ", I_ANCHOR, ... /* " arg " */);"
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.B ioctl()
+returns zero (0) or a positive integer.
+Upon failure,
+.B ioctl()
+returns -1 and sets
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B ioctl()
+fails, it returns -1 and sets
+.IR errno (3)
+to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.I arg
+or a member of
+.IR arg ,
+points to an address that is outside the caller's valid address space.
+.TP
+.RB [ EINVAL ]
+.IR fd ", " command ", " arg " or a member of " arg
+is invalid.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid open file descriptor.
+.TP
+.RB [ ENOSTR ]
+.I fd
+is not a stream special character device.
+.TP
+.RB [ EOPNOTSUPP ]
+.I fd
+does not support the requested operation.
+.TP
+.RB [ EIO ]
+.I fd
+refers to stream that is closing.
+.TP
+.RB [ ENOTTY ]
+.I fd
+does not refer to a
+.I STREAMS
+device that accepts I/O controls.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a
+.I STREAMS
+device that does not support the
+.BR ioctl (2)
+system call.
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to stream that has received a hangup.
+.TP
+.RB [ ENXIO ]
+the I/O control command cannot be performed by this particular sub-device.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a pipe and the other end of the pipe is closed.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe and a write operation was attempted with no
+readers at the other end, or a read operation was attempted, the pipe is
+empty, and there are no readers at the other end.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked under a multiplexing driver.  If a stream is
+linked under a multiplexing driver, all
+.BR ioctl (2)
+commands other than
+.B I_UNLINK
+or
+.B I_PUNLINK
+will return
+.RB [ EINVAL ].
+.TP
+.RB [ ERESTARTSYS ]
+a signal was received before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal was recievied before the operation could complete.
+.TP
+.RB [ EAGAIN "]
+the file is set for asynchronous I/O and the operation would block.
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ].
+.TP
+.RB [ ETIME ]
+the operation timed out awaiting an acknowledgement or response from the
+driver.
+.TP
+.RB [ ENOSR ]
+a message block could not be allocated during the operation and the operation
+is not permitted to block.
+.PP
+Any error delivered to the stream head in an
+.B M_ERROR
+message can be returned in
+.IR errno (3).
+.PP
+Where the command is passed to the module or driver, or the command results in
+the call to a module or driver open or close procedures, or link or unlink
+procedures, the error number returned by the module or driver open or close
+procedure can be returned in
+.IR errno (3).
+.PP
+Any error returned in an
+.B M_IOCNAK
+message from the driver in response to a
+.I I_STR
+ioctl can be returned in
+.IR errno (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.I STREAMS
+.B ioctl()
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR close (2),
+.BR fcntl (2),
+.BR getmsg (2),
+.BR ioctl (2),
+.BR open (2),
+.BR open (2s),
+.BR poll (2),
+.BR putmsg (2),
+.BR read (2),
+.BR signal (2),
+.BR signal (5),
+.BR write (2),
+.BR qopen (9),
+.BR qclose (9),
+.BR qattach (9),
+.BR qdetach (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B I_ANCHOR
+has no known bugs.
+.PP
+.I STREAMS
+.B ioctl()
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B I_ANCHOR
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR LiS ,
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B Linux Fast-STREAMS
+supports the
+.B RFILL
+read mode.  This read mode is
+.IR AIX \(rg
+.[
+aixcpc
+%O "Differences Between Portable Streams Environment and V.4 STREAMS"
+.]
+specific.
+.IP \(em
+.B Linux Fast-STREAMS
+provides ioctls that are used to implement this system call.
+.IP \(em
+.B Linux Fast-STREAMS
+recognizes some
+.IR Solaris \(rg-specific
+and
+.IR LiS -specific
+IO control numbers for compatibility.
+.IP \(em
+.IR AIX \(rg
+.IR HP-UX \(rg,
+and
+.IR UnixWare \(rg
+document that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a pointer to an integer timeout value.
+.IR Solaris \(rg
+documents that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a long timeout value.
+.I LiS
+follows
+.IR Solaris \(rg.
+.B SUSv2
+.[
+susv2
+.]
+documents that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a pointer to an integer timeout value.
+.IR Solaris \(rg
+can be seen in
+.BR strace (8)
+output to pass a pointer instead of a value.  This means that
+.IR Solaris \(rg
+documentation is erroneous, and
+.I LiS
+implementation is wrong.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ioctl()
+for
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qattach.9.man,v 0.9.2.12 2005/05/14 08:34:28 brian Exp $
+.\" @(#) $Id: qattach.9.man,v 0.9.2.13 2005/08/29 10:06:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -217,10 +217,10 @@ module or driver writer.
 .BR qattach ()
 is not part of the DDI/DKI and should not be called by portable programs.
 .BR qattach ()
-is highly implementation dependent in function an prototype.  Use of this
+is highly implementation dependent in function and prototype.  Use of this
 function by a driver or module will guarantee that it is not portable even between
 releases of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.14 2005/07/29 12:58:36 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.15 2005/08/29 10:06:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/29 12:58:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -133,7 +133,7 @@ module installation or registration function.  For compatibility with other
 registration mechanisms based on
 .I SVR 4 MP
 .IR STREAMS ,
-.B @PAKCAGE_TITLE@
+.B @PACKAGE_TITLE@
 provides the following flags and synchronization levels:
 .\"
 .\"
@@ -570,6 +570,67 @@ qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
 .\"
 .SH MP-STREAMS
 .PP
+.\"
+.\"
+.SS Locking
+.PP
+Following is a discussion of the locking used in
+.BR "@PACKAGE_TITLE@" :
+.PP
+.B @PACKAGE_TITLE@
+performs reference counting on all
+.I STREAMS
+objects.  Reference counting ensures that objects are not destroyed until the last reference to them
+is released.  This means that no reference will be invalidated while it is still being used.  There
+are several primary
+.I STREAMS
+object upon which most other references depend:
+the driver,
+.BR cdevsw (9)
+structure;
+the module
+.BR fmodsw (9)
+structure;
+the STREAM head,
+.BR stdata (9)
+structure; the queue,
+.BR queue (9)
+structure;
+the synchronization queue,
+.BR syncq (9)
+structure.
+.PP
+Of these, the most delicate and complicated references are the reference to the STREAM head,
+.BR stdata (9)
+structure from the
+.B inode
+and
+.B file
+pointer.
+.PP
+To protect the reference to a STREAM head,
+.BR stdata (9)
+structure, from the
+.BR inode ,
+the
+.B inode
+semaphore is acquired before referencing from, or invalidating the reference to, the STREAM head.
+This is also true for the
+.B file
+pointer
+.IR private_data :
+we hold the
+.B inode
+semaphore while acquiring a reference to the STREAM head via the
+.B file
+pointer, and also hold the sempahore while clearing the
+.I private_data
+pointer.
+(This means a fair amount of sempahore taking and releasing when performing system calls.  Perhaps
+the inode spinlock might have been a better idea.)
+.PP
+The STREAM head has associated with it a queue pair.  While the STREAM head reference is valid,
+there always exists a STREAM head queue pair.
 .\"
 .\"
 .SH NOTICES

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/18 11:56:32 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:35:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/18 11:56:32 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/18 11:56:32 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -158,9 +158,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.29 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.30 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/18 11:56:32 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13943,16 +13943,12 @@ sctp_close(struct sock *sk, long timeout)
 		case SCTP_SHUTDOWN_PENDING:
 			if (atomic_read(&sk->wmem_alloc) <= 0)
 				sctp_send_shutdown(sk);
-			else
-				sk->prot->disconnect(sk, 0);
 			break;
 		case SCTP_SHUTDOWN_RECEIVED:
 			sctp_change_state(sk, SCTP_SHUTDOWN_RECVWAIT);
 		case SCTP_SHUTDOWN_RECVWAIT:
 			if (atomic_read(&sk->wmem_alloc) <= 0)
 				sctp_send_shutdown_ack(sk);
-			else
-				sk->prot->disconnect(sk, 0);
 			break;
 		default:
 			swerr();
@@ -13975,6 +13971,23 @@ sctp_close(struct sock *sk, long timeout)
 		} while (!signal_pending(current) && timeout);
 		set_current_state(TASK_RUNNING);
 		remove_wait_queue(sk->sleep, &wait);
+	}
+	if ((1 << sk->state) & ~(SCTPF_CLOSING))
+		goto dead;
+	switch (sk->state) {
+	case SCTP_SHUTDOWN_PENDING:
+		if (atomic_read(&sk->wmem_alloc) <= 0)
+			sctp_send_shutdown(sk);
+		else
+			sk->prot->disconnect(sk, 0);
+		break;
+	case SCTP_SHUTDOWN_RECVWAIT:
+		if (atomic_read(&sk->wmem_alloc) <= 0)
+			sctp_send_shutdown_ack(sk);
+		else
+			sk->prot->disconnect(sk, 0);
+		break;
+
 	}
       dead:
 	release_sock(sk);

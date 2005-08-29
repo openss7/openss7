@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 10:37:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,7 +80,16 @@ static char const ident[] =
 #endif
 #include <linux/major.h>
 #include <asm/atomic.h>
-#include <linux/kernel.h>	/* for simple_strtoul */
+
+#include <linux/kernel.h>	/* for simple_strtoul, FASTCALL(), fastcall */
+
+#ifndef fastcall
+# ifndef FASTCALL
+#  define FASTCALL(__x) __x
+# endif
+# define fastcall FASTCALL()
+#endif
+
 #include <linux/pagemap.h>	/* for PAGE_CACHE_SIZE */
 #include <linux/mount.h>	/* for mntget and friends */
 
@@ -92,7 +101,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/07/29 22:20:09 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1125,9 +1134,10 @@ spec_read_inode2(struct inode *inode, void *opaque)
 STATIC void
 spec_put_inode(struct inode *inode)
 {
+	/* all specfs inodes self destruct when put for the last time */
 	if (inode->i_nlink != 0) {
-		/* We shouldn't have been force deleting for 2.4 anyway.  We should let just let
-		   the inode be forgotten.  I need to think this out a bit more */
+		/* This should not happen because we decrement i_nlink when we remove the STREAM
+		 * head.  The inode should never be able to go away with a STREAM head attached. */
 #if HAVE_KFUNC_FORCE_DELETE
 		force_delete(inode);
 #else
@@ -1191,15 +1201,20 @@ spec_delete_inode(struct inode *inode)
 		   on the inode.  We should never get here with the the sd_inode reference still
 		   held.  Forced deletions might get us here anyway. */
 #if 0
-		if ((sd = (struct stdata *) inode->i_pipe)) {
-			do {
-				inode->i_pipe = (void *) xchg(&sd->sd_clone, NULL);
-				if (sd->sd_inode == inode)
-					sd->sd_inode = NULL;
-				sd_put(sd);
+		/* Never change i_pipe without holding the inode semaphore. */
+		down(&inode->i_sem);
+		{
+			if ((sd = (struct stdata *) inode->i_pipe)) {
+				do {
+					inode->i_pipe = (void *) xchg(&sd->sd_clone, NULL);
+					if (sd->sd_inode == inode)
+						sd->sd_inode = NULL;
+					sd_put(&sd);
+				}
+				while ((sd = (struct stdata *) inode->i_pipe));
 			}
-			while ((sd = (struct stdata *) inode->i_pipe));
 		}
+		up(&inode->i_sem);
 #endif
 		break;
 	}
@@ -1281,12 +1296,15 @@ spec_remount_fs(struct super_block *sb, int *flags, char *data)
 STATIC void
 spec_clear_inode(struct inode *inode)
 {
+	/* Never adjust i_pipe without taking the inode semaphore. */
+	down(&inode->i_sem);
 	if (inode->i_pipe) {
 #if 0
-		sd_put((struct stdata *) inode->i_pipe);
+		sd_put(&((struct stdata *) inode->i_pipe));
 #endif
 		inode->i_pipe = NULL;
 	}
+	up(&inode->i_sem);
 }
 
 STATIC void
@@ -1413,7 +1431,7 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE | FS_
 STATIC struct vfsmount *specfs_mnt = NULL;
 STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
 
-struct vfsmount *
+fastcall struct vfsmount *
 specfs_get(void)
 {
 	spin_lock(&specfs_lock);
@@ -1433,7 +1451,7 @@ EXPORT_SYMBOL(specfs_get);
 #define kern_umount mntput
 #endif
 
-void
+fastcall void
 specfs_put(void)
 {
 	if (specfs_mnt) {

@@ -1,1 +1,505 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: register_strdrv.9.man,v 0.9.2.4 2005/08/29 10:06:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: register_strdrv.9.man,v $
+.\" Revision 0.9.2.4  2005/08/29 10:06:50  brian
+.\" - documentation updates during rework
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH REGISTER_STRDRV 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_strdrv
+\- register a \fISTREAMS\fR device driver to the \fBspecfs\fP(5)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int register_strdrv(struct cdevsw *" cdev );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I cdev
+a pointer to the
+.I STREAMS
+character device switch table entry,
+.BR cdevsw (9),
+to register.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_strdrv ()
+registers the character device switch table entry,
+.IR cdev ,
+into the character device switch table.
+.PP
+Historically, under
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+the character device switch table was a fixed-sized array indexed on major device number.  With
+expanded major device number, a fixed-size array would be to consumptive of pinned memory.
+.B @PACKAGE_TITLE@
+uses a file system directory approach instead.
+Under
+.BR "@PACKAGE_TITLE@" ,
+each
+.I STREAMS
+device driver is allocated a directory entry in the
+.IR "STREAMS Special Shadow File System" ,
+.BR specfs (5).
+Special
+.B inode
+numbering is used in the
+.BR specfs (5),
+where the major component of the
+.B inode
+number is zero
+.RB ( 0 ),
+and the minor component of the
+.B inode
+number is the module id (internal major device number) of the driver.  Each registered
+.I STREAMS
+device driver has a directory
+.B inode
+in the
+.BR specfs (5).
+Lookups are performed by looking up an
+.B inode
+on the
+.BR specfs (5)
+by
+.B inode
+number.
+See
+.BR specfs (5)
+for additional details.
+.PP
+The
+.I cdev
+entry must contain a
+.I d_name
+member and that member must be a unique name, different from any name already registered as a
+.I STREAMS
+driver.  If there already exists a
+.I STREAMS
+driver by the requested name, and the
+.BR cdevsw (9)
+entry does not already belong to
+.IR cdev,
+.BR register_strdrv ()
+will fail with error
+.RB [ EPERM ].
+If the
+.I STREAMS
+driver is already registered,
+.BR register_strdrv ()
+will fail with error
+.RB [ EBUSY ].
+.PP
+The
+.I cdev
+entry must also contain a
+.I d_str
+member that points to a valid allocated
+.BR streamtab (9)
+structure.  That
+.BR streamtab (9)
+structure must have a validly allocated
+.I st_rdinit
+member that points to a valid
+.BR qinit (9)
+structure that has a valid
+.I qi_minfo
+member that points to a valid
+.BR module_info (9)
+structure describing the
+.I STREAMS
+driver or module.
+.PP
+If the
+.I mi_idnum
+is non-zero,
+.BR register_strdrv ()
+will try to use the
+.I mi_idnum
+provided.
+If the
+.I mi_idnum
+is non-zero,
+.BR register_strdrv ()
+will attempt to dynamically select a module id.
+If
+.BR register_strdrv ()
+cannot dynamically select a module id (because all module ids are already used), it fails with error
+.RB [ ENXIO ].
+.PP
+The
+.I mi_idnum
+is the \(lqindex\(rq into the character device switch table.
+The
+.I mi_idnum
+also serves as the internal major device number.
+.PP
+If there is already another
+.I STREAMS
+driver registered to the requested
+.IR mi_idnum ,
+.BR register_strdrv ()
+will fail with error
+.RB [ EPERM ].
+If the
+.I STREAMS
+driver is already registered to the requested
+.IR mi_idnum ,
+.BR register_strdrv ()
+will fail with error
+.RB [ EBUSY ].
+.PP
+Because
+.BR register_strdrv ()
+calls
+.BR cdev_add (9)
+internally to create a directory
+.I inode
+in the
+.BR specfs (5),
+it is possible that it can fail if the
+.BR specfs (5)
+file system is not loaded, or if the allocation of an
+.B inode
+fails due to lack of memory.
+.\"
+.\"
+.SH USAGE
+.PP
+This is probably not the function that you want.  See
+.BR register_strdev (9).
+.PP
+.BR register_strdrv ()
+is normally called from a
+.I STREAMS
+driver initialization routine
+.RB ( __init "() or " module_init "() procedure)
+to publish the driver to the
+.I STREAMS
+executive and the
+.BR specfs (5)
+file system, making the driver available to user space scripts and programs to
+.BR open (2)
+the device driver via the
+.BR specfs (5).
+.PP
+.BR unregister_strdrv (9)
+is normally called from a
+.I STREAMS
+driver termination routine
+.RB ( __exit "() or " module_exit "() procedure)
+to remove the driver from the
+.I STREAMS
+executive and the
+.BR specfs (5)
+file system, making the driver no longer available to user space scripts and programs to
+.BR open (2)
+the device driver via the
+.BR specfs (5).
+.PP
+.BR unregister_strdrv (9)
+is used to unregister a
+.I STREAMS
+device driver.
+.I STREAMS
+device drivers registered with
+.BR register_strdrv ()
+must be unregistered with
+.BR unregister_strdrv (9),
+using the same
+.BR cdevsw (9)
+structure,
+.IR cdev ,
+that was passed to
+.BR register_strdrv ().
+.PP
+In general, the
+.BR cdevsw (9)
+structure that is passed to
+.BR register_strdrv (),
+and its associated
+.I STREAMS
+.BR streamtab (9)
+structure and any file operations should be statically allocated within the module or driver.  These
+structures can be dynamically allocated, however, in any event, they should not be manipulated
+directly after they have been passed to
+.BR register_strdrv ()
+and before they are passed to
+.BR unregister_strdrv (9).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_strdrv ()
+returns a positive module id number.  This is either the requested module id number or a dynamically
+allocated module id number if one was not specified.
+Upon failure,
+.BR register_strdrv ()
+takes no action and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When an error occurs,
+.BR register_strdrv ()
+fails and returns a negative error number.
+.BR register_strdrv ()
+can fail under the following conditions:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EINVAL ]
+The
+.I cdev
+structure or its members are invalid or contain invalid information.  (See text.)
+.TP
+.RB [ EPERM ]
+The
+.I cdev->d_name
+supplied is registered to another
+.I STREAMS
+driver.
+.TP
+.RB [ EPERM ]
+The
+.I cdev->d_str->st_rdinit->qi_minfo->mi_idnum
+supplied is registered to another
+.I STREAMS
+driver.
+.TP
+.RB [ EBUSY ]
+The
+.I cdev->d_name
+supplied is already registered to the
+.I STREAMS
+driver,
+.IR cdev .
+.TP
+.RB [ EBUSY ]
+The
+.I cdev->d_str->st_rdinit->qi_minfo->mi_idnum
+supplied is already registered to the
+.I STREAMS
+driver,
+.IR cdev .
+.TP
+.RB [ ENXIO ]
+The
+.I cdev->d_str->st_rdinit->qi_minfo->mi_idnum
+was specified as zero
+.RB ( 0 )
+an a new unique module id could not be dynamically allocated.
+.PP
+.BR register_strdrv ()
+internally calls
+.BR cdev_add (9)
+and can fail with any of the errors returned by that function, including:
+.TP \w'[ENOMEM]\(em'u
+.RB [ ENODEV ]
+The
+.IR "Special Shadow File System" ,
+.BR specfs (5),
+is not loaded, so it is impossible to allocate a directory
+.B inode
+for the driver.
+.TP
+.RB [ ENOMEM ]
+A directory
+.B inode
+cannot be allocated due to lack of memory.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_strdrv ()
+can be called from any blocking context, including user context, kernel thread context, module
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures, and some top level
+.BR put (9)
+procedures; however, it is only intended to be called from a module or driver
+.BR __init ()
+or
+.BR moddule_init ()
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strdrv ()
+is MP-safe, when called from the correct context.  The caller must ensure exclusive access to the
+passed in
+.BR cdevsw (9)
+structure,
+.IR cdev ,
+and its associated linked structures.
+.\"
+.\"
+.SH NOTICES
+.PP
+.I STREAMS
+device drivers registered with
+.BR register_strdrv ()
+in a module or driver initialization routine, must be unregistered with
+.BR unregister_strdrv (9)
+is a module or driver termination routine.
+.PP
+When
+.I STREAMS
+files are opened within the resulting
+.BR specfs (5)
+directory entry,
+the
+.I cdev->d_fop
+member will be used for the file operations for the
+.BR open (2).
+See
+.BR cdevsw (9)
+for details.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cdevsw (9),
+.BR streamtab (9),
+.BR qinit (9),
+.BR module_info (9),
+.BR open (2),
+.BR specfs (5),
+.BR cdev_add (9),
+.BR unregister_strdrv (9),
+.BR register_strdev (9),
+.IR SPG (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_strdrv (9)
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_strdrv ()
+is an internal
+.B @PACKAGE_TITLE@
+specific registration function that should not be used directly by portable
+.I STREAMS
+drivers.
+See
+.BR register_strdev (9)
+for a function that can be used directly by
+.I STREAMS
+drivers.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strdrv ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+lfs
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: read.2s.man,v 0.9.2.8 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: read.2s.man,v 0.9.2.9 2005/08/29 10:06:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/08/29 10:06:30 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -136,7 +136,7 @@ sort-adjacent-labels
 .nf
 .B #include <unistd.h>
 .sp
-.BI "ssize_t read(int " fd ", void *" buf ", size_t " count );
+.BI "ssize_t read(int " fd ", void *" buf ", size_t " nbytes );
 .fi
 .\"
 .\"
@@ -149,7 +149,7 @@ The file descriptor from which to read.
 .I buf
 The buffer into which to read the bytes.
 .TP
-.I count
+.I nbytes
 The maximum number of bytes to read.
 .\"
 .\"
@@ -157,19 +157,397 @@ The maximum number of bytes to read.
 .PP
 .B read()
 attempts to read up to
-.I count
+.I nbytes
 bytes from file descriptor
 .I fd
 into the buffer starting at
 .IR buf .
 .PP
 If
-.I count
+.I nbytes
 is zero, \fBread()\fP returns zero and has no other results.
 If
-.I count
+.I nbytes
 is greater than SSIZE_MAX, the result is unspecified.
 .PP
+.\"
+.\"
+.PP
+A
+.BR read ()
+request that is interrupted by a signal before any data is transferred to the user fails, returns minus one
+.RB ( -1 ),
+and sets
+.IR errno (3)
+to
+.RB [ EINTR ].
+.PP
+A
+.BR read ()
+request that is interrupted by a signal after data has already been transferred to the user,
+terminates and returns the number of bytes read.
+.\"
+.PP
+A
+.BR read ()
+from a
+.I STREAMS
+file shall return the data in the message at the front of the STREAM head read queue, regardless of
+the priority of the message.
+.\"
+.SS STREAM head Read Modes
+.\"
+.\"
+.PP
+A
+.BR read ()
+from a
+.I STREAMS
+file can read data in three different modes: byte-stream mode, message-nondiscard mode and
+message-discard mode.  The default is byte-stream mode.  The current mode for a particular
+.I STREAMS
+file can be changed using the
+.B I_SRDOPT
+command to
+.BR ioctl (2),
+and can be examined using the
+.BR I_GRDOPT
+command.
+.IP \(bu \w'\(bu\(em'u
+In byte-stream mode,
+.BR read ()
+shall retrieve data from the
+.I STREAMS
+file until as many bytes as were requested are transferred, or until there is no more data to be
+retrieved.  Byte-stream mode ignores message boundaries.
+.IP \(bu
+In
+.I STREAMS
+message non-discard mode,
+.BR read ()
+shall retreive data until as many bytes are were requested are transferred, or until a message
+boundary is reached.  If
+.BR read ()
+does not retreival all the data in a message, the remaining data shall be left on the STREAM, and
+can be retrieved by the next
+.BR read (),
+.BR getmsg (2)
+or
+.BR getpmsg (2s)
+call.
+.IP \(bu
+Message-discard mode also retrieves data until as many bytes as were requested are transferred, or a
+message boundary is reached.  However, unread data remaining in a message after the
+.BR read ()
+call returns shall be discarded, and shall not be available to a subsequent
+.BR read (),
+.BR getmsg ()
+or
+.BR getpsmg ()
+call.
+.\"
+.PP
+How
+.BR read ()
+handles zero-byte
+.I STREAMS
+messages is determined by the current read mode setting:
+.IP \(bu \w'\(bu\(em'u
+In byte-stream mode,
+.BR read ()
+shall accept data until it has read
+.I nbytes
+bytes, or until there is no more data to read, or until a zero-byte message block is encountered.
+The
+.BR read ()
+function shall then return the number of bytes read, and place the zero-byte message back on the
+STREAM to be retrieved by the next
+.BR read (),
+.BR getmsg (2)
+or
+.BR getpmsg (2s)
+call.
+.IP \(bu
+In message-nondiscard mode or message-discard mode, a zero-byte message shall return zero
+.RB ( 0 )
+and the message shall be removed from the STREAM.
+.IP \(bu
+Regardless of the read mode,
+whenever a zero-byte message is read as the first message on a STREAM, the
+message shall be removed from the STREAM and zero
+.RB ( 0 )
+shall be returned.
+.\"
+.\"
+.SS STREAMS Read Control Modes
+.\"
+.\"
+.PP
+A
+.BR read ()
+from a
+.I STREAMS
+file can handle control parts in
+.I STREAMS
+messages in three different modes: control-normal mode, control-data mode and control-discard mode.
+The default is control-normal mode.  (Older versions of
+.I STREAMS
+only supported control-normal mode.)  The current control mode for a particular
+.I STREAMS
+file can be changes using the
+.BR I_SRDOPT (7)
+command to
+.BR ioctl (2),
+and can be examined using the
+.BR I_GRDOPT (7)
+command.
+.\"
+.PP
+How
+.BR read ()
+handles
+.I STREAMS
+message containing control parts depends on the current read control mode setting:
+.IP \(bu \w'\(bu\(em'u
+In control-normal mode, a
+.BR read ()
+from a
+.I STREAMS
+file can only process messages that contain a data part but do not contain a control part.  The
+.BR read ()
+shall fail, return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EBADMSG ],
+if a message containing a control part is encountered at the STREAM head.
+.IP \(bu
+In control-data mode,
+.BR read ()
+shall convert any control part to data and pass it to the application before passing any data part
+originally present in the same message.
+.IP \(bu
+In control-discard mode,
+.BR read ()
+shall discard message control parts but return to the process any data part in the message.
+.\"
+.PP
+Also,
+.BR read ()
+shall fail if the STREAM head had processed an asynchronous error before the call.  In this case,
+the value of
+.IR errno (3)
+shall not reflect the result of
+.BR read (),
+but reflect the prior error.  If a hangup occurs on the STREAM being read,
+.BR read ()
+shall continue to operate normally until the STREAM head read queue is empty.  Thereafter, it shall
+return zero
+.RB ( 0 ).
+.\"
+.\"
+.SS Marked Messages
+.\"
+.PP
+.I STREAMS
+messages can be marked by a downstream module or driver in support of TCP's out-of-band data.
+Once marked, a message sent to the stream head causes the stream head to remember the message.  A
+user may check to see if the message on the front of its stream head read queue is marked with the
+.BR I_ATMARK (7)
+command to
+.BR ioctl (2).
+If a user is reading data from the stream head and there are multiplex messages on the read queue,
+and one of those messages is marked,
+.BR read ()
+terminates when it reaches the marked message and returns the data only up to the marked message.
+The rest of the data can be obtained with successive reads.
+.\"
+.PP
+When
+.BR read ()
+encounters a marked message and data has already been transferred, the read terminates with the
+amount of data already read.  The marked message is kept on the STREAM head to be read by a subsequent
+.BR read (),
+.BR getmsg ()
+or
+.BR getpmsg ()
+call.
+The resulting short read is an indication to the caller that a marked message could exist on the
+STREAM head read queue.  (Short reads can also result from a zero-length data message, or from a
+delimited message.)  When a short read occurs, the user should test for a marked message using the
+.B ANYMARK
+flag of the
+.BR I_ATMARK (7)
+command to
+.BR ioctl (2).
+A subsequent
+.BR read ()
+will consume the marked message.  If a marked message exists, there is the possibility that there is
+also a marked message following the marked message.  This can be checked with the
+.B LASTMARK
+flag of the
+.BR I_ATMARK (7)
+comand to
+.BR ioctl (2).
+.\"
+.\"
+.SS Synchronous and Asynchronous I/O
+.\"
+.\"
+.PP
+How
+.BR read ()
+handles asynchronous input-output using the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file status flags depends on the semantics setting of the STREAM head.  The STREAM head can be set
+for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+or it can be set for old TTY semantics for
+.BR O_NDELAY .
+This setting can only be changed by a downstream module or driver by issuing a
+.BR M_SETOPTS (9)
+message to the STREAM head with the
+.BR SO_NDELON " or " STR_NDELOFF
+flags set.  The application has no method for examining the setting of semantics for the STREAM head
+and must rely on prior knowledge of the behaviour of the modules or driver in a particular STREAM.
+.PP
+Regardless of the semantics used at the STREAM head, when
+.BR O_NDELAY " (or " O_NONBLOCK )
+are clear, a call to
+.BR read ()
+will block awaiting the requested number of bytes,
+.IR nbytes ,
+or a message boundary, or a zero-length message.  The
+.BR read ()
+request might still terminate early and return and error or the number of bytes transferred when a
+signal is received or an error is encountered.
+.PP
+When
+.BR O_NDELAY " (or " O_NONBLOCK )
+file status flags are set on
+.IR fd ,
+the behaviour of
+.BR read ()
+depends on the semantics setting at the STREAM head:
+.IP \(bu \w'\(bu\(em'u
+When the STREAM head is set to
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+and the requested number of bytes are not immediately available to be read from the STREAM head read
+queue,
+.BR read ()
+terminates and returns the number of bytes that could be transferred.  If no bytes could be
+transferred,
+.BR read ()
+fails, returns minus one
+.RB ( -1 ),
+and sets
+.BR errno (3)
+to
+.RB [ EAGAIN ].
+.IP \(bu
+When the stream head is set to old TTY semantics for
+.BR O_NDELAY ,
+and the requested number of bytes are not immediately available to be read from the STREAM head read
+queue,
+.BR read ()
+terminates and returns the number of bytes that could be transferred.  If no bytes could be
+transferred,
+.BR read ()
+terminates and returns zero
+.RB ( 0 ).
+.\"
+.\"
+.PP
+When attempting to read from a
+.I STREAMS
+file that has no data currently available:
+.IP \(bu \w'\(bu\(em'u
+If the STREAM head is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+and
+.BR O_NONBLOCK " (or " O_NDELAY )
+is set,
+.BR read ()
+will fail, return minus one
+.RB ( -1 ),
+and set
+.IR errno (3)
+to
+.RB [ EAGAIN ].
+.IP \(bu
+If the STREAM head is set for
+.I old TTY
+semantics for
+.BR O_NDELAY ,
+and
+.BR O_NDELAY " (or " O_NONBLOCK )
+is set,
+.BR read ()
+will terminate and return zero
+.RB ( 0 ).
+.IP \(bu
+If
+.BR O_NONBLOCK " (or " O_NDELAY )
+is clear,
+.BR read ()
+shall block the calling thread until some data becomes available.
+.IP \(bu
+The use of the
+.BR O_NONBLOCK " (or " O_NDELAY )
+flag has no effect if there is some data available at the time of the call to
+.BR read ().
+.\"
+.\"
+.PP
+When attempting to
+.BR read ()
+from an empty
+.IR STREAMS -based
+pipe or FIFO:
+.IP \(bu \w'\(bu\(em'u
+If no process has the FIFO, or other end of the pipe, open for writing,
+.BR read ()
+shall return zero
+.RB ( 0 )
+to indicate end-of-file.
+.IP
+This is consistent with hangup behaviour for
+.I STREAMS
+files.
+.IP \(bu
+If some process has the FIFO, or the other end of the pipe, open for writing and
+.BR O_NONBLOCK " (or " O_NDELAY )
+is set,
+.BR read ()
+shall return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+to
+.RB [ EAGAIN ].
+.IP
+This is consistent with
+.I STREAMS
+semantics for
+.B O_NDELAY
+behaviour for
+.I STREAMS
+files.
+.IP \(bu
+If some process has the FIFO, or the other end of the pipe, open for writing and
+.BR O_NONBLOCK " (or " O_NDELAY )
+is clear,
+.BR read ()
+shall block the calling thread until some data is written or the FIFO, or the other end of the pipe,
+is closed by all processes that had the FIFO, or the other end of the pipe, open for writing.
+.\"
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -189,37 +567,134 @@ the file position (if any) changes.
 .\"
 .SH ERRORS
 .PP
-.TP
-.B EINTR
+.TP \w'[EWOUDLBLOCK]\(em'u
+.RB [ EINTR ]
 The call was interrupted by a signal before any data was read.
 .TP
-.B EAGAIN 
+.RB [ EAGAIN ]
 Non-blocking I/O has been selected using
 .B O_NONBLOCK
 and no data was immediately available for reading.
 .TP
-.B EIO
+.RB [ EIO ]
 I/O error. This will happen for example when the process is in a
 background process group, tries to read from its controlling tty,
 and either it is ignoring or blocking SIGTTIN or its process group
 is orphaned.  It may also occur when there is a low-level I/O error
 while reading from a disk or tape.
 .TP
-.B EISDIR
+.RB [ EISDIR ]
 .I fd
 refers to a directory.
 .TP
-.B EBADF
+.RB [ EBADF ]
 .I fd
 is not a valid file descriptor or is not open for reading.
 .TP
-.B EINVAL
+.RB [ EINVAL ]
 .I fd
 is attached to an object which is unsuitable for reading.
 .TP
-.B EFAULT
+.RB [ EFAULT ]
 .I buf
 is outside your accessible address space.
+.\"
+.\"
+.PP
+When
+.I fd
+refers to a
+.I STREAMS
+file or a
+.IR STREAMS -based
+pipe or FIFO,
+the following additional error conditions can occur:
+.TP \w'[EWOUDLBLOCK]\(em'u
+.RB [ EBADF ]
+.I fd
+is not a valid open file descriptor, or is not opened for reading.
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a STREAM that is linked (directly or indirectly) downstream from a multiplexing driver.
+.TP
+.RB [ EIO ]
+.I fd
+refers to a STREAM that is closed or closing.
+.TP
+.RB [ EAGAIN ]
+.I fd
+is set for non-blocking operation using the
+.BR O_NDELAY " (or " O_NONBLOCK )
+file status flags, the STREAM head is set for
+.I STREAMS
+semantics for
+.BR O_NDELAY ,
+and no data was immediately available to be read.
+.TP
+.RB [ ETIME ]
+The calling process blocked for an excessive period of time.
+.\"
+.PP
+Also, if the STREAM head receives an asyncrhonous error message
+.RB ( M_ERROR (9))
+indicating a read error, the error returned in
+.IR errno (3)
+will be the error received in the error message.
+.\"
+.\"
+.PP
+When
+.I fd
+refers to a
+.I STREAMS
+file,
+the following additional error conditions can occur:
+.TP \w'[EWOUDLBLOCK]\(em'u
+.RB [ ENXIO ]
+.I fd
+refers to a STREAM that has received a hangup message
+.RB ( M_HANGUP (9)).
+.\"
+.\"
+.PP
+When
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO,
+the following additional error conditions can occur:
+.TP \w'[EWOUDLBLOCK]\(em'u
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe that has received a hangup message
+.RB ( M_HANGUP (9)).
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe and the other end of the pipe has disconnected.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO and the other end of the pipe or FIFO has closed or is closing.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe or FIFO, the other end of the pipe or FIFO has hung up, or is closing, or has closed, or there
+remain no writers and there is no data available to be
+read on the STREAM head read queue.
+.\"
+.\"
+.\"
+.\"
 .PP
 Other errors may occur, depending on the object connected to
 .IR fd .
@@ -231,16 +706,20 @@ to return \-1 (with
 set to EINTR) or to return the number of bytes already read.
 .\"
 .\"
+.SH NOTICES
+.PP
+The behaviour of multiple concurrent reads on the same STREAM, pipe, FIFO, or terminal device is
+unspecified.
+.\"
+.\"
 .SH RESTRICTIONS
 .PP
-On NFS file systems, reading small amounts of data will only update the
-time stamp the first time, subsequent calls may not do so.  This is caused
-by client side attribute caching, because most if not all NFS clients
-leave atime updates to the server and client side reads satisfied from the
-client's cache will not cause atime updates on the server as there are no
-server side reads.  UNIX semantics can be obtained by disabling client
-side attribute caching, but in most situations this will substantially
-increase server load and decrease performance.
+On NFS file systems, reading small amounts of data will only update the time stamp the first time,
+subsequent calls may not do so.  This is caused by client side attribute caching, because most if
+not all NFS clients leave atime updates to the server and client side reads satisfied from the
+client's cache will not cause atime updates on the server as there are no server side reads.  UNIX
+semantics can be obtained by disabling client side attribute caching, but in most situations this
+will substantially increase server load and decrease performance.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -258,6 +737,325 @@ increase server load and decrease performance.
 .\"
 .SH COMPATIBILITY
 .PP
+.BR read ()
+is compatible with
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3/POSIX,
+.[
+susv3
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42cr
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR LiS ,
+.IR MacOT \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+There is some differences between the way that
+.I POSIX
+.[
+susv3
+.]
+describes blocking operation in byte-stream mode and the way that
+.I SVR 4
+.[
+magic
+%O Section 7.9.6 \(lqReading from a stream\(rq,
+%P p. 480.
+.]
+describes blocking operation in byte-stream mode.
+.IP
+.I POSIX
+says that in byte-stream mode the STREAM reads up to
+.I nbytes
+of data, or until there is no more data left on the stream,
+or a zero-length message is encountered,
+(or a signal or error condition interrupts the read).
+.I POSIX
+also says that in byte-stream mode a zero-length message terminates the read but that if data has
+already been transferred that the zero-length message is placed back on the read queue.
+.IP
+.I SVR 4
+ways that in byte-stream mode the STREAM reads up to
+.I nbytes
+of data, or a zero-length message is encountered.
+.I SVR 4
+says that in byte-stream mode a zero-length message terminates the read (a short read) but does not
+say that the zero-length message is placed back on the stream.
+.I SVR 4
+also says that an
+.B M_READ (9)
+message is generated downstream when there is insufficient data at the STREAM head to satisfy the
+.BR read ()
+request, and that, when
+.I VMIN=0
+and
+.IR VTIME=0 ,
+.BR ldterm (4)
+transforms
+.BR M_READ (9)
+messages into zero-length
+.BR M_DATA (9)
+messages to signal the STREAM head to return with a short read.
+.IP
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+provide a special
+.B RFILL
+mode similar to
+.B RNORM
+except that the buffer is completely filled.  This behaviour is somewhere between the
+.I POSIX
+and
+.I SVR 4
+behavior.
+Other implementations, and particularly
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+state that an
+.BR M_READ (9)
+message contains the number of bytes requested by the read and is only sent downstream when there is
+.I no
+data at the STREAM head, and that
+.BR ldterm (4)
+transforms the
+.BR M_READ (9)
+message into a
+.BR M_DATA (9)
+message containing the requeste data if there is a data available.  (Otherwise, it presumably
+discards the
+.BR M_READ (9)
+message!)
+(Note that it is possible to have the STREAM head allocate a buffer associated with the
+.BR M_READ (9)
+message sufficient to hold the number of bytes necessary to allow the
+.BR M_READ (9)
+message to be transformed into an
+.BR M_DATA (9)
+message without having to reallocate a block, allowing the
+.BR M_READ (9)
+to be processed easily within a module or driver
+.BR qi_putp (9)
+procedure.)
+.IP
+.I LiS
+.[
+lis
+.]
+terminates on a zero-length message but does not place a zero-length message back onto the STREAM
+head read queue when data has already been transferred and in byte-stream mode, but it terminates
+after reading data when there is no more data to read.  This seems half
+.I POSIX
+(terminate with short read when data no longer available, generate
+.BR M_READ (9)
+only for no data condition before blocking)
+and half
+.I SVR 4
+(do not requeue zero-length data messages in byte-stream mode)
+behavior.
+.IP
+These are several rather different behaviours for
+.BR read ()
+when in byte-stream mode.
+.I POSIX
+behaviour centers around placing a zero-length message back on the queue in byte-stream mode.
+.I SVR 4
+behaviour centers around not placing the message back.
+.IP
+Under
+.BR "@PACKAGE_TITLE@" ,
+the
+.I POSIX
+behavior for zero-length messages is followed if the STREAM head is not marked for delimited
+messages or the zero-length message is not marked or delimited and follows the
+.I SVR 4
+behavior if the STREAM head is set for delimited messages and the message is delimited, and whenever
+a message is marked.
+This seems to be a good compromise.
+Also, when the
+.B "@PACKAGE_TITLE@"
+STREAM head generates an
+.BR M_READ (9)
+message, it allocates a buffer with sufficient size to hold the requested data so that it can be
+easily transformed into a
+.BR M_DATA (9)
+message without reallocating a message data block.
+.IP
+Portable
+.I STREAMS
+modules and drivers will expect the
+.I POSIX
+behaviour unless the STREAM head has been explicitly set by the downstream module or driver to
+delimited messages by sending an
+.BR M_SETOPTS (9)
+message to the STREAM head with the
+.B SO_DELIMON
+flag set, and send zero-length messages with the
+.B MSGDELIM
+flag set, in which case they will expect the
+.I SVR 4
+behaviour.
+.IP
+Portable
+.I STREAMS
+applications programs must expect that a
+.BR read ()
+might terminate early with a read count less than
+.IR nbytes ,
+and that it might block and be interrupted mid-read.
+.\"
+.\"
+.\"
+.IP \(em
+Although
+.I POSIX
+.[
+susv3
+.]
+specifies that if an interrupt occurs during a read after data has already been transferred, that
+the call terminates and returns the number of bytes read, it is questionable under what conditions
+this could happen.  The
+.I POSIX
+behaviour is to terminate with the number of bytes read when no more data is waiting to be read at
+the STREAM head.  This means that the
+.I POSIX
+implementation would not block after blocking for the initial message, so how can it receive a
+signal subsequently?
+.IP
+.I SVR 4
+.[
+magic
+.]
+specifies that read waits for all requested bytes and therefore an implementation would block each
+time that there is no data waiting to be read and could, therefore, be interrupted in the middle of
+transferring data while waiting for more data.
+.IP
+.I LiS
+.[
+lis
+.]
+follows the
+.I POSIX
+behavior in this regard.
+.IP
+These behaviors are somewhat contradictory too.
+.IP
+When
+.B @PACKAGE_TITLE@
+is following the
+.I POSIX
+behaviour as described above, it will not block mid-read; when following the
+.I SVR 4
+behaviour, it can block mid-read.
+.IP
+Portable
+.I STREAMS
+applications programs must expect that a short read could result from an error on the STREAM in the
+middle of the read, or that the read can be interrupted in the middle as a result of a signal.
+.\"
+.\"
+.IP \(em
+The behaviour of
+.BR read ()
+when restarting signals are used is also confusing.
+.B @PACKAGE_TITLE@
+uses the error number
+.RB [ ERESTARTSYS ]
+as a signal to the C library that the call can be restarted.
+.\"
+.\"
+.IP \(em
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+provides the additional
+.B RFILL
+read mode and the additional
+.B RPROTCOMPRESS
+control mode, but these are incompatible with the
+.IR "i386 ABI" .
+.B RFILL
+requests that the
+.BR read ()
+call block until
+.I nbytes
+is satsified (similar to the
+.I SVR 4
+discussion above).
+.B RPROTCOMPRESS
+compress identical data messages into a compressed result.  Although this might be useful for SS7
+MTP Level 2, it is not portable.
+.IP
+Portable
+.I STREAMS
+modules, drivers and application programs will not use the
+.BR RFILL " or " RPROTCOMPRESS
+read modes.
+.\"
+.\"
+.IP \(em
+.IP \(em
+.PP
+.B @PACKAGE_TITLE@
+used to recognize the \(lqinvalid\(rq buffer length to
+.BR read ()
+used by
+.I LiS
+to emulate the
+.I __NR_getpmsg
+system call.
+This is no longer the case.
+.B @PACKAGE_TITLE@
+(as with current versions of
+.IR LiS ),
+.[
+lis
+.]
+uses the
+.B I_GETPMSG
+command to
+.BR ioctl (2)
+to emulate the
+.BR getpmsg (2s)
+system call.
 .\"
 .\"
 .SH "CONFORMING TO"
