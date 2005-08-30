@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -63,8 +63,6 @@ static char const ident[] =
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
 #endif
-
-#define __EXTERN_INLINE static __inline__
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -77,7 +75,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:37:03 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

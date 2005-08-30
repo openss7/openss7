@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.15 2005/08/29 10:36:57 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.16 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/08/29 10:36:57 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_STROPTS_H__
-#warn "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
+#warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
 #endif
 
 #ifndef HAVE_LINUX_FAST_STREAMS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/29 22:20:09 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/30 03:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/29 22:20:09 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/30 03:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/29 22:20:09 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/30 03:37:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,6 +79,8 @@ static char const ident[] =
 #if HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
+
+#include "sys/strdebug.h"
 
 #include "sys/config.h"
 #include "strattach.h"		/* header verification */

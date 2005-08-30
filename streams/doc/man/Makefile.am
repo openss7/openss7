@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/08/29 10:06:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/30 03:37:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:06:24 $ by $Author: brian $
+# Last Modified $Date: 2005/08/30 03:37:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1237,8 +1237,10 @@ man_MANS = \
 	man9/strqset.9 \
 	man9/strrput.9 \
 	man9/strthread.9 \
+	man9/strthreads.9 \
 	man9/strwput.9 \
 	man9/strwsrv.9 \
+	man9/sysctl_str_nstrpush.9 \
 	man9/sysctl_str_strctlsz.9 \
 	man9/sysctl_str_strmsgsz.9 \
 	man9/testb.9 \
@@ -2453,8 +2455,10 @@ dist_noinst_MANS = \
 	man9/strqset.9.man \
 	man9/strrput.9.man \
 	man9/strthread.9.man \
+	man9/strthreads.9.man \
 	man9/strwput.9.man \
 	man9/strwsrv.9.man \
+	man9/sysctl_str_nstrpush.9.man \
 	man9/sysctl_str_strctlsz.9.man \
 	man9/sysctl_str_strmsgsz.9.man \
 	man9/testb.9.man \

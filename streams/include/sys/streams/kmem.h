@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.11 2005/07/18 12:06:58 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.12 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_KMEM_H__
-#warn "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
+#warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -68,6 +68,9 @@
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
 #endif				/* __EXTERN_INLINE */
+#ifndef __STRSCHD_EXTERN_INLINE
+#define __STRSCHD_EXTERN_INLINE __EXTERN_INLINE
+#endif				/* __STRSCHD_EXTERN_INLINE */
 
 #define KM_SLEEP	0
 #define KM_NOSLEEP	(1<<0)
@@ -78,7 +81,7 @@
 /* typedef unsigned short cnodeid_t; */
 typedef int cnodeid_t;
 
-__EXTERN_INLINE void *
+__STRSCHD_EXTERN_INLINE void *
 kmem_alloc(size_t size, int flags)
 {
 	if (size == 0 || size > 131072)
@@ -95,7 +98,7 @@ kmem_alloc(size_t size, int flags)
 									   GFP_DMA : 0));
 }
 
-__EXTERN_INLINE void *
+__STRSCHD_EXTERN_INLINE void *
 kmem_zalloc(size_t size, int flags)
 {
 	void *mem;
@@ -116,12 +119,12 @@ extern void kmem_free(void *ptr, size_t size);
 #warning kmem_alloc_node and kmem_zalloc_node are not supported on NUMA architectures
 #endif
 
-__EXTERN_INLINE void *
+__STRSCHD_EXTERN_INLINE void *
 kmem_alloc_node(size_t size, int flags, cnodeid_t node)
 {
 	return kmalloc(size, GFP_KERNEL);
 }
-__EXTERN_INLINE void *
+__STRSCHD_EXTERN_INLINE void *
 kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
 {
 	void *mem;

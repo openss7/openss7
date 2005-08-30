@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.18 2005/07/29 12:58:39 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.19 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 12:58:39 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 12:58:39 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_STRCONF_H__
-#warn "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
+#warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -69,10 +69,6 @@
 #ifndef dev_t
 #define dev_t __streams_dev_t
 #endif
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
 
 #define STR_IS_DEVICE   0x00000001	/* device */
 #define STR_IS_MODULE   0x00000002	/* module */

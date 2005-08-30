@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.49 2005/08/29 10:36:57 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.50 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/08/29 10:36:57 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_STREAM_H__
-#warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
+#warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -116,7 +116,13 @@ typedef unsigned long __streams_dev_t;
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
+#endif
+#ifndef __STRUTIL_EXTERN_INLINE
+#define __STRUTIL_EXTERN_INLINE __EXTERN_INLINE
+#endif				/* __STRUTIL_EXTERN_INLINE */
+#ifndef __STRSCHD_EXTERN_INLINE
+#define __STRSCHD_EXTERN_INLINE __EXTERN_INLINE
+#endif				/* __STRSCHD_EXTERN_INLINE */
 
 #ifndef FMNAMESZ
 #define FMNAMESZ    8		/* 16 on OSF, 31 on Mac, 8 on LiS, 8 on UnixWare */
@@ -925,43 +931,43 @@ typedef enum qfields {
 
 /* Message utilities. */
 
-extern int FASTCALL(adjmsg(mblk_t *mp, ssize_t length));
-extern mblk_t *FASTCALL(allocb(size_t size, unsigned int priority));
-extern mblk_t *FASTCALL(copyb(mblk_t *mp));
-extern void FASTCALL(freeb(mblk_t *bp));
-extern void FASTCALL(freemsg(mblk_t *mp));
-extern mblk_t *FASTCALL(copymsg(mblk_t *mp));
-extern int FASTCALL(ctlmsg(unsigned char type));
-extern int FASTCALL(datamsg(unsigned char type));
-extern mblk_t *FASTCALL(dupb(mblk_t *mp));
-extern mblk_t *FASTCALL(dupmsg(mblk_t *mp));
-extern mblk_t *FASTCALL(esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo));
-__EXTERN_INLINE int isdatablk(dblk_t * db);
-__EXTERN_INLINE int isdatamsg(mblk_t *mp);
-__EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
-__EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
-extern size_t FASTCALL(msgdsize(mblk_t *mp));
-extern mblk_t *FASTCALL(msgpullup(mblk_t *mp, ssize_t length));
-extern size_t FASTCALL(msgsize(mblk_t *mp));
-__EXTERN_INLINE int pcmsg(unsigned char type);
-extern int FASTCALL(pullupmsg(mblk_t *mp, ssize_t len));
-extern mblk_t *FASTCALL(rmvb(mblk_t *mp, mblk_t *bp));
-extern int FASTCALL(testb(size_t size, unsigned int priority));
-__EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
-extern size_t FASTCALL(xmsgsize(mblk_t *mp));
+extern int STREAMS_FASTCALL(adjmsg(mblk_t *mp, ssize_t length));
+extern mblk_t *STREAMS_FASTCALL(allocb(size_t size, unsigned int priority));
+extern mblk_t *STREAMS_FASTCALL(copyb(mblk_t *mp));
+extern void STREAMS_FASTCALL(freeb(mblk_t *bp));
+extern void STREAMS_FASTCALL(freemsg(mblk_t *mp));
+extern mblk_t *STREAMS_FASTCALL(copymsg(mblk_t *mp));
+extern int STREAMS_FASTCALL(ctlmsg(unsigned char type));
+extern int STREAMS_FASTCALL(datamsg(unsigned char type));
+extern mblk_t *STREAMS_FASTCALL(dupb(mblk_t *mp));
+extern mblk_t *STREAMS_FASTCALL(dupmsg(mblk_t *mp));
+extern mblk_t *STREAMS_FASTCALL(esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo));
+__STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * db);
+__STRUTIL_EXTERN_INLINE int isdatamsg(mblk_t *mp);
+__STRUTIL_EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
+__STRUTIL_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
+extern size_t STREAMS_FASTCALL(msgdsize(mblk_t *mp));
+extern mblk_t *STREAMS_FASTCALL(msgpullup(mblk_t *mp, ssize_t length));
+extern size_t STREAMS_FASTCALL(msgsize(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE int pcmsg(unsigned char type);
+extern int STREAMS_FASTCALL(pullupmsg(mblk_t *mp, ssize_t len));
+extern mblk_t *STREAMS_FASTCALL(rmvb(mblk_t *mp, mblk_t *bp));
+extern int STREAMS_FASTCALL(testb(size_t size, unsigned int priority));
+__STRUTIL_EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
+extern size_t STREAMS_FASTCALL(xmsgsize(mblk_t *mp));
 
-extern bcid_t FASTCALL(bufcall(unsigned size, int priority, void (*function) (long), long arg));
+extern bcid_t STREAMS_FASTCALL(bufcall(unsigned size, int priority, void (*function) (long), long arg));
 
-extern int FASTCALL(appq(queue_t *q, mblk_t *mp1, mblk_t *mp2));
-extern int FASTCALL(bcanget(queue_t *q, unsigned char band));
-extern int FASTCALL(bcangetany(queue_t *q));
-extern int FASTCALL(bcanput(queue_t *q, unsigned char band));
-extern int FASTCALL(bcanputany(queue_t *q));
-extern int FASTCALL(insq(queue_t *q, mblk_t *emp, mblk_t *mp));
-extern int FASTCALL(putbq(queue_t *q, mblk_t *mp));
-extern int FASTCALL(putq(queue_t *q, mblk_t *mp));
-extern int FASTCALL(qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp));
-extern int FASTCALL(qdetach(queue_t *rq, int oflag, cred_t *crp));
+extern int STREAMS_FASTCALL(appq(queue_t *q, mblk_t *mp1, mblk_t *mp2));
+extern int STREAMS_FASTCALL(bcanget(queue_t *q, unsigned char band));
+extern int STREAMS_FASTCALL(bcangetany(queue_t *q));
+extern int STREAMS_FASTCALL(bcanput(queue_t *q, unsigned char band));
+extern int STREAMS_FASTCALL(bcanputany(queue_t *q));
+extern int STREAMS_FASTCALL(insq(queue_t *q, mblk_t *emp, mblk_t *mp));
+extern int STREAMS_FASTCALL(putbq(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(putq(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp));
+extern int STREAMS_FASTCALL(qdetach(queue_t *rq, int oflag, cred_t *crp));
 extern int qclose(queue_t *q, int oflag, cred_t *credp);
 extern int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp);
 extern int qready(void);
@@ -970,25 +976,25 @@ extern int strqset(queue_t *q, qfields_t what, unsigned char band, long val);
 extern int weldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
 extern int unweldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
 
-extern mblk_t *FASTCALL(getq(queue_t *q));
+extern mblk_t *STREAMS_FASTCALL(getq(queue_t *q));
 
 extern modID_t getmid(const char *name);
 extern qi_qadmin_t getadmin(modID_t modid);
 extern queue_t *allocq(void);
-extern ssize_t FASTCALL(qcountstrm(queue_t *q));
+extern ssize_t STREAMS_FASTCALL(qcountstrm(queue_t *q));
 
-extern void FASTCALL(flushband(queue_t *q, int band, int flag));
-extern void FASTCALL(flushq(queue_t *q, int flag));
+extern void STREAMS_FASTCALL(flushband(queue_t *q, int band, int flag));
+extern void STREAMS_FASTCALL(flushq(queue_t *q, int flag));
 extern void freeq(queue_t *q);
-extern void FASTCALL(put(queue_t *q, mblk_t *mp));
-extern void FASTCALL(qbackenable(queue_t *q));
+extern void STREAMS_FASTCALL(put(queue_t *q, mblk_t *mp));
+extern void STREAMS_FASTCALL(qbackenable(queue_t *q));
 extern void qdelete(queue_t *rq);
-extern void FASTCALL(qenable(queue_t *q));
+extern void STREAMS_FASTCALL(qenable(queue_t *q));
 extern void qinsert(struct stdata *sd, queue_t *rq);
 extern void qprocsoff(queue_t *q);
 extern void qprocson(queue_t *q);
-extern void FASTCALL(unbufcall(bcid_t bcid));
-extern void FASTCALL(rmvq(queue_t *q, mblk_t *mp));
+extern void STREAMS_FASTCALL(unbufcall(bcid_t bcid));
+extern void STREAMS_FASTCALL(rmvq(queue_t *q, mblk_t *mp));
 extern void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 extern void setqsched(void);
 
@@ -1018,19 +1024,19 @@ bcmp(const void *s1, const void *s2, size_t len)
 
 /* Message functions. */
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 isdatablk(dblk_t * db)
 {
 	return datamsg(db->db_type);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 isdatamsg(mblk_t *mp)
 {
 	return isdatablk(mp->b_datap);
 }
 
-__EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE void
 linkb(mblk_t *mp1, mblk_t *mp2)
 {
 	register mblk_t **bp;
@@ -1039,7 +1045,7 @@ linkb(mblk_t *mp1, mblk_t *mp2)
 	*bp = mp2;
 }
 
-__EXTERN_INLINE mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 linkmsg(mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1) {
@@ -1049,19 +1055,19 @@ linkmsg(mblk_t *mp1, mblk_t *mp2)
 	return (mp2);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
 
-__EXTERN_INLINE mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 unlinkb(mblk_t *mp)
 {
 	return (mp ? xchg(&mp->b_cont, NULL) : NULL);
 }
 
-__EXTERN_INLINE mblk_t *
+__STRUTIL_EXTERN_INLINE mblk_t *
 unlinkmsg(mblk_t *mp, mblk_t *bp)
 {
 	if ((mp == bp))
@@ -1073,43 +1079,43 @@ unlinkmsg(mblk_t *mp, mblk_t *bp)
 
 /* Queue functions. */
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 bcanputnext(queue_t *q, unsigned char band)
 {
 	return bcanput(q->q_next, band);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 bcanputnextany(queue_t *q)
 {
 	return bcanputany(q->q_next);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 canget(queue_t *q)
 {
 	return bcanget(q, 0);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 canput(queue_t *q)
 {
 	return bcanput(q, 0);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 canputnext(queue_t *q)
 {
 	return canput(q->q_next);
 }
 
-__EXTERN_INLINE bcid_t
+__STRSCHD_EXTERN_INLINE bcid_t
 esbbcall(int priority, void (*function) (long), long arg)
 {
 	return bufcall(0, priority, function, arg);
 }
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 SAMESTR(queue_t *q)
 {
 	return ((q->q_next != NULL) && ((q->q_flag & QREADR) == (q->q_next->q_flag & QREADR)));
@@ -1118,7 +1124,7 @@ SAMESTR(queue_t *q)
 #ifndef SAMESTR
 #define SAMESTR(__q) SAMESTR(__q)
 #endif
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 canenable(queue_t *q)
 {
 	return (!(q->q_flag & QNOENB));
@@ -1130,7 +1136,7 @@ extern int putctl(queue_t *q, int type);
 extern int putctl1(queue_t *q, int type, int param);
 extern int putctl2(queue_t *q, int type, int param1, int param2);
 
-__EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE void
 putnext(queue_t *q, mblk_t *mp)
 {
 	put(q->q_next, mp);
@@ -1140,7 +1146,7 @@ extern int putnextctl(queue_t *q, int type);
 extern int putnextctl1(queue_t *q, int type, int param);
 extern int putnextctl2(queue_t *q, int type, int param1, int param2);
 
-__EXTERN_INLINE queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 OTHERQ(queue_t *q)
 {
 	return ((q->q_flag & QREADR) ? q + 1 : q - 1);
@@ -1149,7 +1155,7 @@ OTHERQ(queue_t *q)
 #ifndef OTHERQ
 #define OTHERQ(__q) OTHERQ(__q)
 #endif
-__EXTERN_INLINE queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 RD(queue_t *q)
 {
 	return (q->q_flag & QREADR) ? q : q - 1;
@@ -1158,7 +1164,7 @@ RD(queue_t *q)
 #ifndef RD
 #define RD(__q) RD(__q)
 #endif
-__EXTERN_INLINE queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 WR(queue_t *q)
 {
 	return ((q->q_flag & QREADR) ? q + 1 : q);
@@ -1167,7 +1173,7 @@ WR(queue_t *q)
 #ifndef WR
 #define WR(__q) WR(__q)
 #endif
-__EXTERN_INLINE queue_t *
+__STRUTIL_EXTERN_INLINE queue_t *
 backq(queue_t *q)
 {
 	struct queue *bq;
@@ -1175,7 +1181,7 @@ backq(queue_t *q)
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
 }
 
-__EXTERN_INLINE ssize_t
+__STRUTIL_EXTERN_INLINE ssize_t
 qsize(queue_t *q)
 {
 	return q->q_msgs;
@@ -1184,7 +1190,7 @@ qsize(queue_t *q)
 extern void enableok(queue_t *q);
 extern void noenable(queue_t *q);
 
-__EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE void
 qreply(queue_t *q, mblk_t *mp)
 {
 	return putnext(OTHERQ(q), mp);

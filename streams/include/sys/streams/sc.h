@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.8 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.9 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_SC_H__
 #define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_SC_H__
-#warn "Do no include sys/streams/sc.h directly, include sys/sc.h instead."
+#warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."
 #endif
 
 #define SC_IOC_MAGIC 'C'

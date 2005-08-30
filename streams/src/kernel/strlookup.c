@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:08 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:08 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:08 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:08 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -65,14 +65,6 @@ static char const ident[] =
 #include <linux/kmod.h>
 #endif
 #include <linux/kernel.h>	/* for FASTCALL(), fastcall */
-
-#ifndef fastcall
-# ifndef FASTCALL
-#  define FASTCALL(__x) __x
-# endif
-# define fastcall FASTCALL()
-#endif
-
 #include <linux/sched.h>	/* for current */
 #include <linux/file.h>		/* for fput */
 #include <linux/poll.h>
@@ -82,6 +74,8 @@ static char const ident[] =
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 #include <asm/hardirq.h>
+
+#include "sys/strdebug.h"
 
 #include <sys/kmem.h>		/* for kmem_ */
 #include <sys/stream.h>
@@ -221,7 +215,7 @@ init_cmin_hash(void)
  *  hashes without locking or acquisition of the result.  This function can be called multiple times
  *  with the same @major with very little performance impact.
  */
-fastcall struct devnode *
+streams_fastcall struct devnode *
 __cmaj_lookup(major_t major)
 {
 	struct list_head *pos, *slot = strdev_hash_slot(major);
@@ -249,7 +243,7 @@ EXPORT_SYMBOL(__cmaj_lookup);
  *  acquisition of the result.  This function can be called multiple times with the same @major with
  *  very little performance impact.
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 __cdev_lookup(major_t major)
 {
 	struct devnode *cmaj;
@@ -269,7 +263,7 @@ EXPORT_SYMBOL(__cdev_lookup);
  *  acquisition of the result.  This function can be called multiple times with the same @modid with
  *  very little performance impact.
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 __cdrv_lookup(modID_t modid)
 {
 	struct list_head *pos, *slot = strmod_hash_slot(modid);
@@ -294,7 +288,7 @@ EXPORT_SYMBOL(__cdrv_lookup);
  *  @cdev: pointer to character device switch entry
  *  @minor: minor device number
  */
-fastcall struct devnode *
+streams_fastcall struct devnode *
 __cmin_lookup(struct cdevsw *cdev, minor_t minor)
 {
 	struct list_head *pos, *slot = strnod_hash_slot(minor);
@@ -322,7 +316,7 @@ EXPORT_SYMBOL(__cmin_lookup);
  *  acquisition of the result.  This function can be called multiple times with the same @modid with
  *  very little performance impact.
  */
-fastcall struct fmodsw *
+streams_fastcall struct fmodsw *
 __fmod_lookup(modID_t modid)
 {
 	struct list_head *pos, *slot = strmod_hash_slot(modid);
@@ -342,7 +336,7 @@ __fmod_lookup(modID_t modid)
 
 EXPORT_SYMBOL(__fmod_lookup);
 
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 __cdev_search(const char *name)
 {
 	struct list_head *pos, *slot = &cdevsw_list;
@@ -362,7 +356,7 @@ __cdev_search(const char *name)
 
 EXPORT_SYMBOL(__cdev_search);
 
-fastcall struct fmodsw *
+streams_fastcall struct fmodsw *
 __fmod_search(const char *name)
 {
 	struct list_head *pos, *slot = &fmodsw_list;
@@ -382,7 +376,7 @@ __fmod_search(const char *name)
 
 EXPORT_SYMBOL(__fmod_search);
 
-fastcall struct devnode *
+streams_fastcall struct devnode *
 __cmin_search(struct cdevsw *cdev, const char *name)
 {
 	struct list_head *pos, *slot = &cdev->d_minors;
@@ -402,7 +396,7 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 
 EXPORT_SYMBOL(__cmin_search);
 
-fastcall void *
+streams_fastcall void *
 __smod_search(const char *name)
 {
 	void *fmod = NULL;
@@ -758,7 +752,7 @@ cmin_search(const struct cdevsw *cdev, const char *name)
  *  fmod_str:	- look up a fmod by streamtab
  *  @str:	streamtab to look up
  */
-fastcall struct fmodsw *
+streams_fastcall struct fmodsw *
 fmod_str(const struct streamtab *str)
 {
 	struct fmodsw *fmod = NULL;
@@ -782,7 +776,7 @@ EXPORT_SYMBOL(fmod_str);
  *  cdev_str:	- look up a cdev by streamtab
  *  @str:	streamtab to look up
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 cdev_str(const struct streamtab *str)
 {
 	struct cdevsw *cdev = NULL;
@@ -817,7 +811,7 @@ EXPORT_SYMBOL(cdev_str);
  *  Context: When the calling context can block, an attempt will be made to load the driver by major
  *  device number.
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 sdev_get(major_t major)
 {
 	return cdev_lookup(major, !in_interrupt());
@@ -829,7 +823,7 @@ EXPORT_SYMBOL(sdev_get);
  *  sdev_put:	- put a reference to a STREAMS device
  *  @cdev:	STREAMS device structure pointer to put
  */
-fastcall void
+streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
@@ -844,7 +838,7 @@ EXPORT_SYMBOL(sdev_put);
  *  cdrv_get:	- get a reference to a STREAMS driver
  *  @modid:	module id number of the STREAMS driver
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 cdrv_get(modID_t modid)
 {
 	return cdrv_lookup(modid, !in_interrupt());
@@ -856,7 +850,7 @@ EXPORT_SYMBOL(cdrv_get);
  *  cdrv_put:	- put a reference to a STREAMS driver
  *  @cdev:	STREAMS driver structure pointer to put
  */
-fastcall void
+streams_fastcall void
 cdrv_put(struct cdevsw *cdev)
 {
 	sdev_put(cdev);
@@ -873,7 +867,7 @@ EXPORT_SYMBOL(cdrv_put);
  *  Context: When the calling context can block, an attempt will be made to load the module by
  *  module identifier.
  */
-fastcall struct fmodsw *
+streams_fastcall struct fmodsw *
 fmod_get(modID_t modid)
 {
 	return fmod_lookup(modid, !in_interrupt());
@@ -886,7 +880,7 @@ EXPORT_SYMBOL(fmod_get);
  *  @fmod: STREAMS module structure pointer to put
  *
  */
-fastcall void
+streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
@@ -902,7 +896,7 @@ EXPORT_SYMBOL(fmod_put);
  *  @cdev:	cdevsw structure for device
  *  @major:	major device number
  */
-fastcall struct devnode *
+streams_fastcall struct devnode *
 cmaj_get(const struct cdevsw *cdev, major_t major)
 {
 	return cmaj_lookup(cdev, major);
@@ -915,7 +909,7 @@ EXPORT_SYMBOL(cmaj_get);
  *  @cdev:	cdevsw structure for device
  *  @minor:	minor device number
  */
-fastcall struct devnode *
+streams_fastcall struct devnode *
 cmin_get(const struct cdevsw *cdev, minor_t minor)
 {
 	return cmin_lookup(cdev, minor);
@@ -935,7 +929,7 @@ EXPORT_SYMBOL(cmin_get);
  *
  *  Context: When the calling context can block, an attempt will be made to load the driver by name.
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 cdev_find(const char *name)
 {
 	return cdev_search(name, !in_interrupt());
@@ -958,7 +952,7 @@ EXPORT_SYMBOL(cdev_find);
  *
  *  Context: When the calling context can block, an attempt will be made to load the driver by name.
  */
-fastcall struct cdevsw *
+streams_fastcall struct cdevsw *
 cdev_match(const char *name)
 {
 	int i;
@@ -986,7 +980,7 @@ EXPORT_SYMBOL(cdev_match);
  *
  *  Context: When the calling context can block, an attempt will be made to load the module by name.
  */
-fastcall struct fmodsw *
+streams_fastcall struct fmodsw *
 fmod_find(const char *name)
 {
 	return fmod_search(name, !in_interrupt());
@@ -994,7 +988,7 @@ fmod_find(const char *name)
 
 EXPORT_SYMBOL(fmod_find);
 
-fastcall struct devnode *
+streams_fastcall struct devnode *
 cmin_find(const struct cdevsw *cdev, const char *name)
 {
 	return cmin_search(cdev, name);
@@ -1008,7 +1002,7 @@ EXPORT_SYMBOL(cmin_find);
  *  @major: the external major device number
  *  @minor: the external minor device number
  */
-fastcall minor_t
+streams_fastcall minor_t
 cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 {
 	struct list_head *pos;

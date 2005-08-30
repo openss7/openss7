@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 20:28:52 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 20:28:52 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -60,25 +60,25 @@ extern int __rmvq(queue_t *q, mblk_t *mp);
 extern int __flushq(queue_t *q, int flag, mblk_t ***mppp);
 
 /* queue band gets and puts */
-extern qband_t *FASTCALL(bget(qband_t *qb));
-extern void FASTCALL(bput(qband_t **bp));
+extern qband_t *STREAMS_FASTCALL(bget(qband_t *qb));
+extern void STREAMS_FASTCALL(bput(qband_t **bp));
 
 /* queue gets and puts */
-extern queue_t *FASTCALL(qget(queue_t *q));
-extern void FASTCALL(qput(queue_t **qp));
+extern queue_t *STREAMS_FASTCALL(qget(queue_t *q));
+extern void STREAMS_FASTCALL(qput(queue_t **qp));
 
 #if 0
 /* kernel locks */
-extern void FASTCALL(klockinit(klock_t *kl));
-extern void FASTCALL(kwlock(klock_t *kl));
-extern int FASTCALL(kwtrylock(klock_t *kl));
-extern void FASTCALL(kwlock_wait(klock_t *kl));
-extern int FASTCALL(kwlock_wait_sig(klock_t *kl));
-extern void FASTCALL(kwunlock(klock_t *kl));
-extern void FASTCALL(krlock(klock_t *kl));
-extern void FASTCALL(krunlock(klock_t *kl));
-extern void FASTCALL(krlock_irqsave(klock_t *kl, unsigned long *flagsp));
-extern void FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *flagsp));
+extern void STREAMS_FASTCALL(klockinit(klock_t *kl));
+extern void STREAMS_FASTCALL(kwlock(klock_t *kl));
+extern int STREAMS_FASTCALL(kwtrylock(klock_t *kl));
+extern void STREAMS_FASTCALL(kwlock_wait(klock_t *kl));
+extern int STREAMS_FASTCALL(kwlock_wait_sig(klock_t *kl));
+extern void STREAMS_FASTCALL(kwunlock(klock_t *kl));
+extern void STREAMS_FASTCALL(krlock(klock_t *kl));
+extern void STREAMS_FASTCALL(krunlock(klock_t *kl));
+extern void STREAMS_FASTCALL(krlock_irqsave(klock_t *kl, unsigned long *flagsp));
+extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *flagsp));
 
 /* for stream heads */
 #define slockinit(__sd)			klockinit(&(__sd)->sd_klock)

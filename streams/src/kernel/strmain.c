@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:08 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:08 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:08 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:08 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -64,11 +64,10 @@ static char const ident[] =
 #include <linux/kernel.h>
 
 #include "sys/config.h"
-#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 10:37:08 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -90,16 +89,19 @@ MODULE_ALIAS("streams");
 #endif
 #endif
 
+#include "sys/strdebug.h"
+
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
 #include "strprocfs.h"
-#include "src/modules/sth.h"	/* for str_minfo */
+#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
 #include "src/kernel/strsysctl.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strreg.h"
+#include "src/modules/sth.h"	/* for str_minfo */
 
 /* 
  *  We put all our heavily used globals handy.  Hopefully by placing these all

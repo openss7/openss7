@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:08 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:08 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:08 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:11 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:08 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:11 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -66,14 +66,6 @@ static char const ident[] =
 #endif
 
 #include <linux/kernel.h>	/* for FASTCALL(), fastcall */
-
-#ifndef fastcall
-# ifndef FASTCALL
-#  define FASTCALL(__x) __x
-# endif
-# define fastcall FASTCALL()
-#endif
-
 #include <linux/sched.h>	/* for current */
 #include <linux/file.h>		/* for fput */
 #include <linux/poll.h>
@@ -83,6 +75,8 @@ static char const ident[] =
 #include <linux/namei.h>	/* for lookup_hash on 2.6 */
 #endif
 #include <asm/hardirq.h>
+
+#include "sys/strdebug.h"
 
 #include <sys/kmem.h>		/* for kmem_ */
 #include <sys/stream.h>
@@ -162,11 +156,7 @@ register_strsync(struct fmodsw *fmod)
 			if (!fmod->f_syncq) {
 				struct syncq *sq;
 
-				if (!(sq = sq_alloc()))
-					return (-ENOMEM);
-				if ((sq = xchg(&global_syncq, sq)))
-					sq_put(&sq);
-				sq = global_syncq;
+				sq = sq_get(global_syncq);
 				fmod->f_syncq = sq;
 				sq->sq_level = sqlvl;
 				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
@@ -451,25 +441,39 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 	write_lock(&cdevsw_lock);
 	do {
 		err = -EINVAL;
-		if (!cdev || !cdev->d_name || !cdev->d_name[0] || !cmaj)
+		if (!cdev || !cdev->d_name || !cdev->d_name[0] || !cmaj) {
+			trace();
 			break;
+		}
 		err = -EINVAL;
 #ifndef MAX_CHRDEV
 		if (major != MAJOR(MKDEV(major, 0)))
 #else
 		if (major >= MAX_CHRDEV)
 #endif
+		{
+			trace();
 			break;
+		}
+#if 0
+		/* no longer true */
 		err = -EINVAL;
 		/* ensure that the device is registered (as a module) */
-		if (!cdev->d_list.next || list_empty(&cdev->d_list))
+		if (!cdev->d_list.next || list_empty(&cdev->d_list)) {
+			trace();
 			break;
+		}
+#endif
 		err = -EBUSY;
-		if (major && __cmaj_lookup(major))
+		if (major && __cmaj_lookup(major)) {
+			trace();
 			break;
+		}
 		/* register the character device */
-		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0)
+		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0) {
+			trace();
 			break;
+		}
 		if (err > 0 && major == 0)
 			major = err;
 		cmaj_add(cmaj, cdev, major);

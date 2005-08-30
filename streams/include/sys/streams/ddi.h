@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.28 2005/07/29 22:20:09 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.29 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/29 22:20:09 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_DDI_H__
-#warn "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
+#warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -64,7 +64,17 @@
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
+#endif
+
+#ifndef __STREAMS_EXTERN_INLINE
+#define __STREAMS_EXTERN_INLINE __EXTERN_INLINE
+#endif				/* __STREAMS_EXTERN_INLINE */
+#ifndef __STRSCHD_EXTERN_INLINE
+#define __STRSCHD_EXTERN_INLINE __EXTERN_INLINE
+#endif				/* __STRSCHD_EXTERN_INLINE */
+#ifndef __STRUTIL_EXTERN_INLINE
+#define __STRUTIL_EXTERN_INLINE __EXTERN_INLINE
+#endif				/* __STRUTIL_EXTERN_INLINE */
 
 #include <asm/uaccess.h>	/* for copy_[to|from]_user */
 #if 0
@@ -79,7 +89,7 @@
 #include <sys/map.h>		/* for rm map definitions */
 #endif
 
-__EXTERN_INLINE major_t
+__STRUTIL_EXTERN_INLINE major_t
 getmajor(dev_t dev)
 {
 	ulong major = ((dev >> 16) & 0x0000ffff);
@@ -90,7 +100,7 @@ getmajor(dev_t dev)
 #endif
 	return (major);
 }
-__EXTERN_INLINE minor_t
+__STRUTIL_EXTERN_INLINE minor_t
 getminor(dev_t dev)
 {
 	ulong minor = (dev & 0x0000ffff);
@@ -103,7 +113,7 @@ getminor(dev_t dev)
 #endif
 	return (minor);
 }
-__EXTERN_INLINE dev_t
+__STRUTIL_EXTERN_INLINE dev_t
 makedevice(major_t major, minor_t minor)
 {
 	ulong maj = major & 0x0000ffff;
@@ -119,14 +129,14 @@ int umount2(char *pathname, int flags);
 int unlink(char *pathname);
 #endif
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 copyin(const void *from, void *to, size_t len)
 {
 	if (copy_from_user(to, from, len))
 		return (-EFAULT);
 	return (0);
 }
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 copyout(const void *from, void *to, size_t len)
 {
 	if (copy_to_user(to, from, len))
@@ -135,37 +145,37 @@ copyout(const void *from, void *to, size_t len)
 }
 
 /* FIXME: There are faster ways to do these... */
-__EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE unsigned long
 drv_hztousec(unsigned long hz)
 {
 	return ((hz * 1000000) / HZ);
 }
-__EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE unsigned long
 drv_usectohz(unsigned long usec)
 {
 	return (((usec + 999999) * HZ) / 1000000);
 }
 
-__EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE unsigned long
 drv_hztomsec(unsigned long hz)
 {
 	return ((hz * 1000) / HZ);
 }
-__EXTERN_INLINE unsigned long
+__STRUTIL_EXTERN_INLINE unsigned long
 drv_msectohz(unsigned long msec)
 {
 	return (((msec + 999) * HZ) / 1000);
 }
 
 #undef min
-__EXTERN_INLINE int
+__STREAMS_EXTERN_INLINE int
 min(int a, int b)
 {
 	return ((a < b) ? a : b);
 }
 
 #undef max
-__EXTERN_INLINE int
+__STREAMS_EXTERN_INLINE int
 max(int a, int b)
 {
 	return ((a < b) ? b : a);
@@ -188,7 +198,7 @@ max(int a, int b)
 
 extern int sysctl_str_strmsgsz;
 
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 drv_getparm(const unsigned int parm, void *value_p)
 {
 	switch (parm) {
@@ -242,7 +252,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 	}
 	return (-1);
 }
-__EXTERN_INLINE int
+__STRUTIL_EXTERN_INLINE int
 drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
@@ -250,12 +260,12 @@ drv_priv(cred_t *crp)
 		return (0);
 	return (EPERM);
 }
-__EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE void
 drv_usecwait(unsigned long usec)
 {
 	return (udelay(usec));
 }
-__EXTERN_INLINE void
+__STRUTIL_EXTERN_INLINE void
 delay(unsigned long ticks)
 {
 	set_current_state(TASK_INTERRUPTIBLE);
@@ -297,34 +307,34 @@ typedef struct buf {
 		daddr_t un_daddr;
 	} b_priv2;
 } buf_t;
-__EXTERN_INLINE void biodone(buf_t * bp);	/* not implemented */
-__EXTERN_INLINE int biowait(buf_t * bp);	/* not implemented */
-__EXTERN_INLINE void bp_mapin(struct buf_t *bp);	/* not implemented */
-__EXTERN_INLINE void bp_mapout(struct buf_t *bp);	/* not implemented */
-__EXTERN_INLINE void brelse(struct buf_t *bp);	/* not implemented */
-__EXTERN_INLINE void clrbuf(buf_t * bp);	/* not implemented */
-__EXTERN_INLINE void freerbuf(buf_t * bp);	/* not implemented */
-__EXTERN_INLINE void geterror(buf_t * bp);	/* not implemented */
-__EXTERN_INLINE buf_t getrbuf(int flag);	/* not implemented */
+__STREAMS_EXTERN_INLINE void biodone(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE int biowait(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE void bp_mapin(struct buf_t *bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE void bp_mapout(struct buf_t *bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE void brelse(struct buf_t *bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE void clrbuf(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE void freerbuf(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE void geterror(buf_t * bp);	/* not implemented */
+__STREAMS_EXTERN_INLINE buf_t getrbuf(int flag);	/* not implemented */
 
-__EXTERN_INLINE ulong btop(ulong numbytes);	/* not implemented */
-__EXTERN_INLINE ulong btopr(ulong numbytes);	/* not implemented */
+__STREAMS_EXTERN_INLINE ulong btop(ulong numbytes);	/* not implemented */
+__STREAMS_EXTERN_INLINE ulong btopr(ulong numbytes);	/* not implemented */
 
-__EXTERN_INLINE void page_numtopp(void);	/* see uw7ddi.h */
-__EXTERN_INLINE void page_pptonum(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE void page_numtopp(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE void page_pptonum(void);	/* see uw7ddi.h */
 
-__EXTERN_INLINE void sleep(void);	/* see svr4ddi.h */
-__EXTERN_INLINE void wakeup(void);	/* see svr4ddi.h */
-__EXTERN_INLINE void spl(void);		/* see svr4ddi.h */
+__STREAMS_EXTERN_INLINE void sleep(void);	/* see svr4ddi.h */
+__STREAMS_EXTERN_INLINE void wakeup(void);	/* see svr4ddi.h */
+__STREAMS_EXTERN_INLINE void spl(void);		/* see svr4ddi.h */
 
-__EXTERN_INLINE void rmalloc(void);	/* not implemented */
-__EXTERN_INLINE void rmfree(void);	/* not implemented */
-__EXTERN_INLINE void rminit(void);	/* not implemented */
+__STREAMS_EXTERN_INLINE void rmalloc(void);	/* not implemented */
+__STREAMS_EXTERN_INLINE void rmfree(void);	/* not implemented */
+__STREAMS_EXTERN_INLINE void rminit(void);	/* not implemented */
 
-__EXTERN_INLINE void uiomove(void);	/* see uw7ddi.h */
-__EXTERN_INLINE void ureadc(void);	/* see uw7ddi.h */
-__EXTERN_INLINE void useracc(void);	/* see uw7ddi.h */
-__EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE void uiomove(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE void ureadc(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE void useracc(void);	/* see uw7ddi.h */
+__STREAMS_EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 #endif
 
 #endif				/* __SYS_STREAMS_DDI_H__ */

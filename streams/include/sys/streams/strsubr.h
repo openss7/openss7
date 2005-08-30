@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.38 2005/08/29 10:36:57 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.39 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/29 10:36:57 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -394,6 +394,10 @@ struct strthread {
 	struct strevent **freeevnt_tail;	/* tail of free stream events cached */
 } __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
+extern struct strthread strthreads[];
+
+extern void STREAMS_FASTCALL(__raise_streams(void));
+
 /* aligned so processors keep out of each other's way */
 
 enum {
@@ -573,30 +577,30 @@ extern struct list_head cminsw_list;	/* Minors go here */
 extern int cdev_count;			/* Driver count */
 extern int fmod_count;			/* Module count */
 extern int cmin_count;			/* Node count */
-extern struct devnode *FASTCALL(__cmaj_lookup(major_t major));
-extern struct cdevsw *FASTCALL(__cdev_lookup(major_t major));
-extern struct cdevsw *FASTCALL(__cdrv_lookup(modID_t modid));
-extern struct devnode *FASTCALL(__cmin_lookup(struct cdevsw *cdev, minor_t minor));
-extern struct fmodsw *FASTCALL(__fmod_lookup(modID_t modid));
-extern struct cdevsw *FASTCALL(__cdev_search(const char *name));
-extern struct fmodsw *FASTCALL(__fmod_search(const char *name));
-extern struct devnode *FASTCALL(__cmin_search(struct cdevsw *cdev, const char *name));
-extern void *FASTCALL(__smod_search(const char *name));
-extern struct fmodsw *FASTCALL(fmod_str(const struct streamtab *str));
-extern struct cdevsw *FASTCALL(cdev_str(const struct streamtab *str));
-extern struct cdevsw *FASTCALL(sdev_get(major_t major));
-extern void FASTCALL(sdev_put(struct cdevsw *cdev));
-extern struct cdevsw *FASTCALL(cdrv_get(modID_t modid));
-extern void FASTCALL(cdrv_put(struct cdevsw *cdev));
-extern struct fmodsw *FASTCALL(fmod_get(modID_t modid));
-extern void FASTCALL(fmod_put(struct fmodsw *fmod));
-extern struct cdevsw *FASTCALL(cdev_find(const char *name));
-extern struct cdevsw *FASTCALL(cdev_match(const char *name));
-extern struct fmodsw *FASTCALL(fmod_find(const char *name));
-extern struct devnode *FASTCALL(cmin_find(const struct cdevsw *cdev, const char *name));
-extern struct devnode *FASTCALL(cmin_get(const struct cdevsw *cdev, minor_t minor));
-extern struct devnode *FASTCALL(cmaj_get(const struct cdevsw *cdev, major_t major));
-extern minor_t FASTCALL(cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor));
+extern struct devnode *STREAMS_FASTCALL(__cmaj_lookup(major_t major));
+extern struct cdevsw *STREAMS_FASTCALL(__cdev_lookup(major_t major));
+extern struct cdevsw *STREAMS_FASTCALL(__cdrv_lookup(modID_t modid));
+extern struct devnode *STREAMS_FASTCALL(__cmin_lookup(struct cdevsw *cdev, minor_t minor));
+extern struct fmodsw *STREAMS_FASTCALL(__fmod_lookup(modID_t modid));
+extern struct cdevsw *STREAMS_FASTCALL(__cdev_search(const char *name));
+extern struct fmodsw *STREAMS_FASTCALL(__fmod_search(const char *name));
+extern struct devnode *STREAMS_FASTCALL(__cmin_search(struct cdevsw *cdev, const char *name));
+extern void *STREAMS_FASTCALL(__smod_search(const char *name));
+extern struct fmodsw *STREAMS_FASTCALL(fmod_str(const struct streamtab *str));
+extern struct cdevsw *STREAMS_FASTCALL(cdev_str(const struct streamtab *str));
+extern struct cdevsw *STREAMS_FASTCALL(sdev_get(major_t major));
+extern void STREAMS_FASTCALL(sdev_put(struct cdevsw *cdev));
+extern struct cdevsw *STREAMS_FASTCALL(cdrv_get(modID_t modid));
+extern void STREAMS_FASTCALL(cdrv_put(struct cdevsw *cdev));
+extern struct fmodsw *STREAMS_FASTCALL(fmod_get(modID_t modid));
+extern void STREAMS_FASTCALL(fmod_put(struct fmodsw *fmod));
+extern struct cdevsw *STREAMS_FASTCALL(cdev_find(const char *name));
+extern struct cdevsw *STREAMS_FASTCALL(cdev_match(const char *name));
+extern struct fmodsw *STREAMS_FASTCALL(fmod_find(const char *name));
+extern struct devnode *STREAMS_FASTCALL(cmin_find(const struct cdevsw *cdev, const char *name));
+extern struct devnode *STREAMS_FASTCALL(cmin_get(const struct cdevsw *cdev, minor_t minor));
+extern struct devnode *STREAMS_FASTCALL(cmaj_get(const struct cdevsw *cdev, major_t major));
+extern minor_t STREAMS_FASTCALL(cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor));
 
 /* from strreg.c */
 extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
@@ -623,16 +627,16 @@ extern rwlock_t nodesw_lock;
 
 extern struct dentry *spec_dentry(dev_t dev, int *sflagp);
 extern int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag);
-extern struct vfsmount *FASTCALL(specfs_get(void));
-extern void FASTCALL(specfs_put(void));
+extern struct vfsmount *STREAMS_FASTCALL(specfs_get(void));
+extern void STREAMS_FASTCALL(specfs_put(void));
 
 extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
 
 extern struct stdata *allocstr(void);
 extern void freestr(struct stdata *sd);
-extern struct stdata *FASTCALL(sd_get(struct stdata *sd));
-extern void FASTCALL(sd_put(struct stdata **sdp));
+extern struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
+extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
 
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
@@ -640,9 +644,10 @@ extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int ofl
 extern struct devinfo *di_alloc(struct cdevsw *cdev);
 extern void di_put(struct devinfo *di);
 
-extern struct strevent *FASTCALL(sealloc(void));
-extern int FASTCALL(sefree(struct strevent *se));
+extern struct strevent *STREAMS_FASTCALL(sealloc(void));
+extern int STREAMS_FASTCALL(sefree(struct strevent *se));
 
+extern int sysctl_str_nstrpush;
 extern int sysctl_str_strctlsz;
 
 extern int register_clone(struct cdevsw *cdev);

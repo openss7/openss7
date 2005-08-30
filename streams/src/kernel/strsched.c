@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/08/29 20:28:51 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/08/30 03:37:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 20:28:51 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/08/29 20:28:51 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/08/30 03:37:12 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/08/29 20:28:51 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/08/30 03:37:12 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -61,14 +61,6 @@ static char const ident[] =
 #include <linux/init.h>
 
 #include <linux/kernel.h>	/* for FASTCALL(), fastcall */
-
-#ifndef fastcall
-# ifndef FASTCALL
-#  define FASTCALL(__x) __x
-# endif
-# define fastcall FASTCALL()
-#endif
-
 #include <linux/compiler.h>
 #include <linux/spinlock.h>
 #include <linux/slab.h>
@@ -92,6 +84,10 @@ static char const ident[] =
 #endif
 #include <linux/major.h>
 // #include <asm/atomic.h>
+
+#define __STRSCHD_EXTERN_INLINE inline
+
+#include "sys/strdebug.h"
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -124,6 +120,12 @@ raise_softirq(unsigned int nr)
 	local_irq_restore(flags);
 }
 #endif
+
+void streams_fastcall __raise_streams(void)
+{
+	raise_softirq(STREAMS_SOFTIRQ);
+}
+EXPORT_SYMBOL(__raise_streams);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -261,7 +263,7 @@ raise_local_bufcalls(void)
 
 	if (test_bit(strbcwait, &t->flags))
 		if (!test_and_set_bit(strbcflag, &t->flags))
-			raise_softirq(STREAMS_SOFTIRQ);
+			__raise_streams();
 }
 
 #if !defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
@@ -337,7 +339,7 @@ mdbblock_free(mblk_t *mp)
 	bzero(md, sizeof(*md));	/* reset mdbblock */
 	*xchg(&t->freemblk_tail, &mp->b_next) = mp;	/* MP-SAFE */
 	if (!test_and_set_bit(freeblks, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 	raise_local_bufcalls();
 	return;
 }
@@ -1123,7 +1125,7 @@ find_event(int event_id)
 /**
  *  sealloc:	- allocate a stream event structure
  */
-fastcall struct strevent *
+streams_fastcall struct strevent *
 sealloc(void)
 {
 	return event_alloc(SE_STREAM, NULL);
@@ -1135,7 +1137,7 @@ EXPORT_SYMBOL(sealloc);		/* include/sys/streams/strsubr.h */
  *  sefree:	- deallocate a stream event structure
  *  @se:	the stream event structure to deallocate
  */
-fastcall int
+streams_fastcall int
 sefree(struct strevent *se)
 {
 	event_free(se);
@@ -1152,17 +1154,17 @@ EXPORT_SYMBOL(sefree);		/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 strsched_mfunc_fast(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
 
 	*xchg(&t->strmfuncs_tail, &mp->b_next) = mp;
 	if (!test_and_set_bit(strmfuncs, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 }
 
-STATIC fastcall void
+STATIC streams_fastcall void
 strsched_mfunc(mblk_t *mp)
 {
 	strsched_mfunc_fast(mp);
@@ -1203,7 +1205,7 @@ strsched_event(struct strevent *se)
 	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
 	*xchg(&t->strevents_tail, &se->se_next) = se;	/* MP-SAFE */
 	if (!test_and_set_bit(strevents, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 	return (id);
 }
 
@@ -1258,7 +1260,7 @@ timeout_function(unsigned long arg)
 		/* bind timeout back to the CPU that called for it */
 		cpu_raise_softirq(se->x.t.cpu, STREAMS_SOFTIRQ);
 #else
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 #endif
 }
 
@@ -1392,7 +1394,7 @@ EXPORT_SYMBOL(__bufcall);	/* include/sys/streams/strsubr.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-fastcall bcid_t
+streams_fastcall bcid_t
 bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
 	return __bufcall(queue_guess(NULL), size, priority, function, arg);
@@ -1406,7 +1408,7 @@ EXPORT_SYMBOL(bufcall);		/* include/sys/streams/stream.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-__EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
+__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
 
 EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
 
@@ -1415,7 +1417,7 @@ EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
  *  @bcid:	buffer call id returned by bufcall() or esbbcall()
  *  Notices:	Don't ever call this function with an expired bufcall id.
  */
-fastcall void
+streams_fastcall void
 unbufcall(bcid_t bcid)
 {
 	struct strevent *se;
@@ -1636,7 +1638,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
  *  - strfunc() returns void
  *  - strfunc() does not perform any synchronization
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	assert(q);
@@ -1683,7 +1685,7 @@ qwakeup(queue_t *q)
  *  - putp() returns the integer result from the modules put procedure.
  *  - putp() does not perform any synchronization
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 putp_fast(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -1742,7 +1744,7 @@ putp(queue_t *q, mblk_t *mp)
  *  service procedure.  In safe mode, this will cause kernel assertions to fail and will panic the
  *  kernel.
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 srvp_fast(queue_t *q)
 {
 	assert(q);
@@ -2296,7 +2298,7 @@ leave_syncq(struct syncq_cookie *sc)
  *  existing queue.
  *
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2330,7 +2332,7 @@ qstrwrit_slow(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int pe
  *  instead of the queue's put procedure.  qstrfunc() events always need a valid queue reference
  *  against which to synchronize.
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2374,7 +2376,7 @@ qstrfunc_slow(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg
  *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
  *  queue's private structure).
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 qputp(queue_t *q, mblk_t *mp)
 {
 	{
@@ -2426,7 +2428,7 @@ qputp_slow(queue_t *q, mblk_t *mp)
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-STATIC inline fastcall void
+STATIC inline streams_fastcall void
 qsrvp(queue_t *q)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2618,7 +2620,7 @@ EXPORT_SYMBOL(__strfunc);
  *
  *  Note that, because putnext() is just put(q->q_next, mp), this protects putnext() as well.
  */
-fastcall void
+streams_fastcall void
 put(queue_t *q, mblk_t *mp)
 {
 	assert(q);
@@ -3011,7 +3013,7 @@ do_unweldq_event(struct strevent *se)
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-__EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
+__STRSCHD_EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
 
 EXPORT_SYMBOL(kmem_alloc);	/* include/sys/streams/kmem.h */
 
@@ -3020,7 +3022,7 @@ EXPORT_SYMBOL(kmem_alloc);	/* include/sys/streams/kmem.h */
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-__EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
+__STRSCHD_EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
 
 EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/streams/kmem.h */
 
@@ -3049,7 +3051,7 @@ EXPORT_SYMBOL(kmem_free);	/* include/sys/streams/kmem.h */
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  *  @node:
  */
-__EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
+__STRSCHD_EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
 
 EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/streams/kmem.h */
 
@@ -3059,7 +3061,7 @@ EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/streams/kmem.h */
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  *  @node:
  */
-__EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
+__STRSCHD_EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
 
 EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
 
@@ -3125,7 +3127,7 @@ scan_timeout_function(unsigned long arg)
 	struct strthread *t = this_thread;
 
 	if (!test_and_set_bit(scanqflag, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 }
 
 struct timer_list scan_timer;
@@ -3184,7 +3186,7 @@ qscan(queue_t *q)
 	/* put ourselves on scan list */
 	*xchg(&t->scanqtail, &q->q_link) = qget(q);	/* MP-SAFE */
 	if (!test_and_set_bit(scanqflag, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 }
 
 EXPORT_SYMBOL(qscan);		/* for stream head in include/sys/streams/strsubr.h */
@@ -3419,7 +3421,7 @@ setqsched(void)
 	struct strthread *t = this_thread;
 
 	if (!test_and_set_bit(qrunflag, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 }
 
 EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
@@ -3483,7 +3485,7 @@ sqsched(syncq_t *sq)
 		/* put ourselves on the run list */
 		*xchg(&t->sqtail, &sq->sq_link) = sq_get(sq);	/* MP-SAFE */
 		if (!test_and_set_bit(qsyncflag, &t->flags))
-			raise_softirq(STREAMS_SOFTIRQ);
+			__raise_streams();
 	}
 }
 #endif
@@ -3495,7 +3497,7 @@ sqsched(syncq_t *sq)
  *  Another name for qschedule(9), qenable() schedules a queue for service regardless of the setting
  *  of the %QNOENB_BIT, but has to check for the existence of a service procedure.
  */
-fastcall void
+streams_fastcall void
 qenable(queue_t *q)
 {
 	if (q->q_qinfo->qi_srvp)
@@ -3595,7 +3597,7 @@ freechain(mblk_t *mp, mblk_t **mpp)
 
 	*xchg(&t->freemsg_tail, mpp) = mp;	/* MP-SAFE */
 	if (!test_and_set_bit(flushwork, &t->flags))
-		raise_softirq(STREAMS_SOFTIRQ);
+		__raise_streams();
 }
 
 /*
@@ -3757,7 +3759,7 @@ freestr(struct stdata *sd)
 
 EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 
-fastcall struct stdata *
+streams_fastcall struct stdata *
 sd_get(struct stdata *sd)
 {
 	struct shinfo *sh = (struct shinfo *) sd;
@@ -3771,7 +3773,7 @@ sd_get(struct stdata *sd)
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sd_get);		/* include/sys/streams/strsubr.h */
 #endif
-fastcall void
+streams_fastcall void
 sd_put(struct stdata **sdp)
 {
 	struct stdata *sd;
@@ -3935,6 +3937,10 @@ strsched_init(void)
 
 	if ((result = str_init_caches()) < 0)
 		return (result);
+	if (!(global_syncq = sq_alloc())) {
+		str_term_caches();
+		return (-ENOMEM);
+	}
 	for (i = 0; i < NR_CPUS; i++) {
 		struct strthread *t = &strthreads[i];
 
@@ -3977,5 +3983,6 @@ strsched_exit(void)
 {
 	del_timer(&scan_timer);
 	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
+	sq_put(&global_syncq);
 	str_term_caches();
 }

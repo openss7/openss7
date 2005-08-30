@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.10 2005/07/18 12:06:58 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.11 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_CMN_ERR_H__
 #define __SYS_STREAMS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_CMN_ERR_H__
-#warn "Do no include sys/streams/cmn_err.h directly, include sys/cmn_err.h instead."
+#warning "Do no include sys/streams/cmn_err.h directly, include sys/cmn_err.h instead."
 #endif
 
 #ifndef __KERNEL__

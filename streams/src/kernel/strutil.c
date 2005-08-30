@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/08/29 10:37:11 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/08/30 03:37:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/08/29 10:37:11 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/08/30 03:37:13 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/08/29 10:37:11 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/08/30 03:37:13 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -65,14 +65,6 @@ static char const ident[] =
 #include <linux/spinlock.h>	/* for spinlocks */
 
 #include <linux/kernel.h>	/* for vsnprintf, FASTCALL(), fastcall */
-
-#ifndef fastcall
-# ifndef FASTCALL
-#  define FASTCALL(__x) __x
-# endif
-# define fastcall FASTCALL()
-#endif
-
 #include <linux/sched.h>	/* for wakeup functions */
 #include <linux/wait.h>		/* for wait queues */
 #include <linux/types.h>	/* for various types */
@@ -81,6 +73,10 @@ static char const ident[] =
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
+
+#define __STRUTIL_EXTERN_INLINE inline
+
+#include "sys/strdebug.h"
 
 #include <sys/cmn_err.h>	/* for CE_ constants */
 #include <sys/strlog.h>		/* for SL_ constants */
@@ -127,7 +123,7 @@ static char const ident[] =
  *  Write locks are expensive, seldom used and not held for long.
  */
 
-fastcall void
+streams_fastcall void
 klockinit(klock_t *kl)
 {
 //	kl->kl_isrflags = 0;
@@ -136,7 +132,7 @@ klockinit(klock_t *kl)
 	kl->kl_nest = 0;
 	init_waitqueue_head(&kl->kl_waitq);
 }
-fastcall void
+streams_fastcall void
 kwlock(klock_t *kl)
 {
 	if (kl->kl_owner == current)
@@ -153,7 +149,7 @@ kwlock(klock_t *kl)
 		kl->kl_nest = 0;
 	}
 }
-fastcall int
+streams_fastcall int
 kwtrylock(klock_t *kl)
 {
 	int locked = 1;
@@ -179,7 +175,7 @@ kwtrylock(klock_t *kl)
 	}
 	return (locked);
 }
-fastcall void
+streams_fastcall void
 kwlock_wait(klock_t *kl)
 {
 	if (kl->kl_owner == current)
@@ -197,7 +193,7 @@ kwlock_wait(klock_t *kl)
 		remove_wait_queue(&kl->kl_waitq, &wait);
 	}
 }
-fastcall int
+streams_fastcall int
 kwlock_wait_sig(klock_t *kl)
 {
 	int err = 0;
@@ -222,7 +218,7 @@ kwlock_wait_sig(klock_t *kl)
 	}
 	return (err);
 }
-fastcall void
+streams_fastcall void
 kwunlock(klock_t *kl)
 {
 	if (kl->kl_nest > 0)
@@ -240,7 +236,7 @@ kwunlock(klock_t *kl)
 //		local_irq_restore(flags);
 	}
 }
-fastcall void
+streams_fastcall void
 krlock(klock_t *kl)
 {
 	if (kl->kl_owner == current)
@@ -250,7 +246,7 @@ krlock(klock_t *kl)
 		read_lock(&kl->kl_lock);
 	}
 }
-fastcall void
+streams_fastcall void
 krunlock(klock_t *kl)
 {
 	if (kl->kl_nest > 0)
@@ -289,7 +285,7 @@ krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
 #endif
 
 /* queue band gets and puts */
-fastcall qband_t *
+streams_fastcall qband_t *
 bget(qband_t *qb)
 {
 	struct qbinfo *qbi;
@@ -302,7 +298,7 @@ bget(qband_t *qb)
 	}
 	return (qb);
 }
-fastcall void
+streams_fastcall void
 bput(qband_t **bp)
 {
 	qband_t *qb;
@@ -319,7 +315,7 @@ bput(qband_t **bp)
 }
 
 /* queue gets and puts */
-fastcall queue_t *
+streams_fastcall queue_t *
 qget(queue_t *q)
 {
 	struct queinfo *qu;
@@ -332,7 +328,7 @@ qget(queue_t *q)
 	}
 	return (q);
 }
-fastcall void
+streams_fastcall void
 qput(queue_t **qp)
 {
 	queue_t *q;
@@ -427,7 +423,7 @@ mb_to_mdb(mblk_t *mb)
  *
  *  Return Values: (1) - success; (0) - failure
  */
-fastcall int
+streams_fastcall int
 adjmsg(mblk_t *mp, ssize_t length)
 {
 	mblk_t *b, *bp;
@@ -504,7 +500,7 @@ EXPORT_SYMBOL(adjmsg);		/* include/sys/streams/stream.h */
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -543,7 +539,7 @@ EXPORT_SYMBOL(allocb);
  *
  *  Notices: Unlike LiS we do not align the copy.  The driver must me wary of alignment.
  */
-extern fastcall mblk_t *
+extern streams_fastcall mblk_t *
 copyb(mblk_t *mp)
 {
 	mblk_t *b = NULL;
@@ -570,7 +566,7 @@ EXPORT_SYMBOL(copyb);		/* include/sys/streams/stream.h */
  *
  *  Copies all the message blocks in message @msg and returns a pointer to the copied message.
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 copymsg(mblk_t *mp)
 {
 	mblk_t *msg = NULL;
@@ -591,7 +587,7 @@ EXPORT_SYMBOL(copymsg);		/* include/sys/streams/stream.h */
  *  ctlmsg:	- test for control message type
  *  @type:	type to test
  */
-fastcall int
+streams_fastcall int
 ctlmsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
@@ -606,7 +602,7 @@ EXPORT_SYMBOL(ctlmsg);		/* include/sys/streams/stream.h */
  *  datamsg:	- test for data message type
  *  @type:	type to test
  */
-fastcall int
+streams_fastcall int
 datamsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
@@ -623,7 +619,7 @@ EXPORT_SYMBOL(datamsg);
  *  dupb:	- duplicates a message block
  *  @bp:	message block to duplicate
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 dupb(mblk_t *bp)
 {
 	mblk_t *mp;
@@ -651,7 +647,7 @@ EXPORT_SYMBOL(dupb);
  *  Duplicates an entire message using dupb() to duplicate each of the message blocks in the
  *  message.  Returns a pointer to the duplicate message.
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 dupmsg(mblk_t *mp)
 {
 	mblk_t *msg = NULL;
@@ -675,7 +671,7 @@ EXPORT_SYMBOL(dupmsg);		/* include/sys/streams/stream.h */
  *  @priority:	priority of message block header allocation
  *  @freeinfo:	free routine callback
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
 	mblk_t *mp;
@@ -705,7 +701,7 @@ EXPORT_SYMBOL(esballoc);
  *  freeb:	- free a message block
  *  @mp:	message block to free
  */
-fastcall void
+streams_fastcall void
 freeb(mblk_t *mp)
 {
 	dblk_t *dp, *db;
@@ -745,7 +741,7 @@ EXPORT_SYMBOL(freeb);
  *  freemsg:	- free a message
  *  @mp:	the message to free
  */
-fastcall void
+streams_fastcall void
 freemsg(mblk_t *mp)
 {
 	register mblk_t *b, *bp;
@@ -759,7 +755,7 @@ EXPORT_SYMBOL(freemsg);
  *  isdatablk:	- test data block for data type
  *  @dp:	data block to test
  */
-__EXTERN_INLINE int isdatablk(dblk_t * dp);
+__STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * dp);
 
 EXPORT_SYMBOL(isdatablk);
 
@@ -767,7 +763,7 @@ EXPORT_SYMBOL(isdatablk);
  *  isdatamsg:	- test a message block for data type
  *  @mp:	message block to test
  */
-__EXTERN_INLINE int isdatamsg(mblk_t *mp);
+__STRUTIL_EXTERN_INLINE int isdatamsg(mblk_t *mp);
 
 EXPORT_SYMBOL(isdatamsg);
 
@@ -775,7 +771,7 @@ EXPORT_SYMBOL(isdatamsg);
  *  pcmsg:	- data block type for priority
  *  @type:	the type to check
  */
-__EXTERN_INLINE int pcmsg(unsigned char type);
+__STRUTIL_EXTERN_INLINE int pcmsg(unsigned char type);
 
 EXPORT_SYMBOL(pcmsg);
 
@@ -784,7 +780,7 @@ EXPORT_SYMBOL(pcmsg);
  *  @mp1:	message onto which to link
  *  @mp2:	message block to link
  */
-__EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
+__STRUTIL_EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
 
 EXPORT_SYMBOL(linkb);
 
@@ -793,7 +789,7 @@ EXPORT_SYMBOL(linkb);
  *  @mp1:	message onto which to link
  *  @mp2:	message to link
  */
-__EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
+__STRUTIL_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
 
 EXPORT_SYMBOL(linkmsg);
 
@@ -801,7 +797,7 @@ EXPORT_SYMBOL(linkmsg);
  *  msgdsize:	- calculate size of data in message
  *  @mp:	message across which to calculate data bytes
  */
-fastcall size_t
+streams_fastcall size_t
 msgdsize(mblk_t *mp)
 {
 	register mblk_t *b;
@@ -824,7 +820,7 @@ EXPORT_SYMBOL(msgdsize);
  *  Pulls up @length  bytes into the returned message.  This is for handling headers as a contiguous
  *  range of bytes.
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 msgpullup(mblk_t *mp, ssize_t length)
 {
 	mblk_t *msg = NULL, **bp = &msg;
@@ -892,7 +888,7 @@ EXPORT_SYMBOL(msgpullup);
  *  msgsize:	- calculate size of a message
  *  @mp:	message for which to calculate size
  */
-fastcall size_t
+streams_fastcall size_t
 msgsize(mblk_t *mp)
 {
 	register mblk_t *b;
@@ -914,7 +910,7 @@ EXPORT_SYMBOL(msgsize);
  *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling headers
  *  as a contiguous range of bytes.
  */
-fastcall int
+streams_fastcall int
 pullupmsg(mblk_t *mp, ssize_t len)
 {
 	dblk_t *db, *dp;
@@ -1017,7 +1013,7 @@ EXPORT_SYMBOL(pullupmsg);
  *  @mp:    message from which to remove the block
  *  @bp:    the block to remove
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 rmvb(mblk_t *mp, mblk_t *bp)
 {
 	mblk_t **mpp;
@@ -1039,7 +1035,7 @@ EXPORT_SYMBOL(rmvb);
  *  @size:	size of buffer for which to test
  *  @priority:	allocation priority to test
  */
-fastcall int
+streams_fastcall int
 testb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -1056,11 +1052,11 @@ EXPORT_SYMBOL(testb);
  *  unlinkb:	- unlink first block of message
  *  @mp:	message to unlink
  */
-__EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
+__STRUTIL_EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
 
 EXPORT_SYMBOL(unlinkb);
 
-__EXTERN_INLINE mblk_t *unlinkmsg(mblk_t *mp, mblk_t *bp);
+__STRUTIL_EXTERN_INLINE mblk_t *unlinkmsg(mblk_t *mp, mblk_t *bp);
 
 EXPORT_SYMBOL(unlinkmsg);
 
@@ -1073,7 +1069,7 @@ EXPORT_SYMBOL(unlinkmsg);
  *  not.  This implementation does not wrap the size, and skips initial zero-length message blocks.
  *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
-fastcall size_t
+streams_fastcall size_t
 xmsgsize(mblk_t *mp)
 {
 	register mblk_t *bp = mp;
@@ -1117,7 +1113,7 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
  *  Well, that changed.  Now the queue needs to be locked with MPSTR_QLOCK or frozen with
  *  freezestr() or the call will fail under assertions.
  */
-fastcall int
+streams_fastcall int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -1152,7 +1148,7 @@ EXPORT_SYMBOL(appq);
  *  backq:	- find the queue upstream from this one
  *  @q:		this queue
  */
-__EXTERN_INLINE queue_t *backq(queue_t *q);
+__STRUTIL_EXTERN_INLINE queue_t *backq(queue_t *q);
 
 EXPORT_SYMBOL(backq);
 
@@ -1165,7 +1161,7 @@ EXPORT_SYMBOL(backq);
  *  MP-STREAMS: Because qbackenable() can be invoked from outside streams (i.e. from getq()), it
  *  takes a STREAM head read lock.
  */
-fastcall void
+streams_fastcall void
 qbackenable(queue_t *q)
 {
 	struct stdata *sd = qstream(q);
@@ -1191,7 +1187,7 @@ EXPORT_SYMBOL(qbackenable);
  *  IMPLEMENTATION: The current implementation is much faster than the older method of walking the
  *  queue bands, even considering that there were probably few, if any, queue bands.
  */
-fastcall int
+streams_fastcall int
 bcangetany(queue_t *q)
 {
 	int found = 0;
@@ -1227,7 +1223,7 @@ EXPORT_SYMBOL(bcangetany);
  *
  *  LOCKING: No locks are required across the call.
  */
-fastcall int
+streams_fastcall int
 bcanget(queue_t *q, unsigned char band)
 {
 	int found = 0;
@@ -1260,7 +1256,7 @@ EXPORT_SYMBOL(bcanget);		/* include/sys/streams/stream.h */
  *
  *  LOCKING: None.
  */
-fastcall int
+streams_fastcall int
 bcanputany(queue_t *q)
 {
 	assert(q);
@@ -1297,7 +1293,7 @@ EXPORT_SYMBOL(bcanputany);	/* include/sys/streams/stream.h */
  *  CONTEXT: bcanputnextany() can be called from STREAMS scheduler context, or from any context that
  *  holds a stream head read or write lock across the call.
  */
-__EXTERN_INLINE int bcanputnextany(queue_t *q);
+__STRUTIL_EXTERN_INLINE int bcanputnextany(queue_t *q);
 
 EXPORT_SYMBOL(bcanputnextany);	/* include/sys/streams/stream.h */
 
@@ -1322,7 +1318,7 @@ EXPORT_SYMBOL(bcanputnextany);	/* include/sys/streams/stream.h */
  *  to be bottom-half locks, and only allows this function to be called from bottom half and hot
  *  hard interrupt.  That makes more sense.
  */
-fastcall int
+streams_fastcall int
 bcanput(queue_t *q, unsigned char band)
 {
 	assert(q);
@@ -1379,7 +1375,7 @@ EXPORT_SYMBOL(bcanput);
  *
  *  LOCKING: A STREAM head read lock must be held across the call.
  */
-__EXTERN_INLINE int bcanputnext(queue_t *q, unsigned char band);
+__STRUTIL_EXTERN_INLINE int bcanputnext(queue_t *q, unsigned char band);
 
 EXPORT_SYMBOL(bcanputnext);
 
@@ -1387,7 +1383,7 @@ EXPORT_SYMBOL(bcanputnext);
  *  canenable:	- check whether service procedure will run
  *  @q:		queue to check
  */
-__EXTERN_INLINE int canenable(queue_t *q);
+__STRUTIL_EXTERN_INLINE int canenable(queue_t *q);
 
 EXPORT_SYMBOL(canenable);
 
@@ -1399,7 +1395,7 @@ EXPORT_SYMBOL(canenable);
  *
  *  LOCKING: None.
  */
-__EXTERN_INLINE int canget(queue_t *q);
+__STRUTIL_EXTERN_INLINE int canget(queue_t *q);
 
 EXPORT_SYMBOL(canget);		/* include/sys/streams/stream.h */
 
@@ -1413,7 +1409,7 @@ EXPORT_SYMBOL(canget);		/* include/sys/streams/stream.h */
  *
  *  LOCKING: None.
  */
-__EXTERN_INLINE int canput(queue_t *q);
+__STRUTIL_EXTERN_INLINE int canput(queue_t *q);
 
 EXPORT_SYMBOL(canput);		/* include/sys/streams/stream.h */
 
@@ -1427,7 +1423,7 @@ EXPORT_SYMBOL(canput);		/* include/sys/streams/stream.h */
  *
  *  LOCKING: STREAM head read lock when called from !in_streams() context.
  */
-__EXTERN_INLINE int canputnext(queue_t *q);
+__STRUTIL_EXTERN_INLINE int canputnext(queue_t *q);
 
 EXPORT_SYMBOL(canputnext);
 
@@ -1571,7 +1567,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
  *  MP-STREAMS: Note that qbackenable() will take its own STREAM head read lock making this function
  *  safe to be called from outside of STREAMS.
  */
-fastcall void
+streams_fastcall void
 flushband(queue_t *q, int band, int flag)
 {
 	int backenable;
@@ -1673,7 +1669,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp)
  *  MP-STREAMS: Note that qbackenable() will take its own STREAM head read lock making this function
  *  safe to be called from outside of STREAMS.
  */
-fastcall void
+streams_fastcall void
 flushq(queue_t *q, int flag)
 {
 	int backenable;
@@ -1814,7 +1810,7 @@ __getq(queue_t *q, int *be)
  *  MP-STREAMS: Note that qbackenable() will take its own STREAM head read lock making this function
  *  safe to be called from outside of STREAMS.
  */
-fastcall mblk_t *
+streams_fastcall mblk_t *
 getq(queue_t *q)
 {
 	mblk_t *mp;
@@ -1943,7 +1939,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
  *
  *  LOCKING: The caller must lock the queue with MPSTR_QLOCK() or freezestr() across the call.
  */
-fastcall int
+streams_fastcall int
 insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -1977,7 +1973,7 @@ EXPORT_SYMBOL(insq);
  *  OTHERQ:	- find the other queue in a queue pair
  *  @q:		one queue
  */
-__EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
+__STRUTIL_EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
 
 EXPORT_SYMBOL(OTHERQ);
 
@@ -2005,7 +2001,7 @@ EXPORT_SYMBOL(OTHERQ);
  *  hard interrupts enabled.
  *
  */
-__EXTERN_INLINE void putnext(queue_t *q, mblk_t *mp);
+__STRUTIL_EXTERN_INLINE void putnext(queue_t *q, mblk_t *mp);
 
 EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
 
@@ -2078,7 +2074,7 @@ __putbq(queue_t *q, mblk_t *mp)
  *  @q:		queue to place back message
  *  @mp:	message to place back
  */
-fastcall int
+streams_fastcall int
 putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -2333,7 +2329,7 @@ __putq(queue_t *q, mblk_t *mp)
  *  CONTEXT: Any.  It is safe to call this function directly from an ISR to place messages on a
  *  driver's lowest read queue.
  */
-fastcall int
+streams_fastcall int
 putq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -2384,7 +2380,7 @@ static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *
  *  Allocates and initializes a queue pair for use by STREAMS.
  */
-STATIC inline fastcall queue_t *
+STATIC inline streams_fastcall queue_t *
 qalloc(struct stdata *sd, struct fmodsw *fmod)
 {
 	queue_t *q;
@@ -2432,7 +2428,7 @@ void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *  qopen() is not the same as the major number passed, that we need to do a setq on the queue from
  *  the streamtab associated with the new major device number.
  */
-fastcall int
+streams_fastcall int
 qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct streamtab *st;
@@ -2549,7 +2545,7 @@ EXPORT_SYMBOL(qdelete);
  *  be called with no locks held so that the procedure may sleep.
  *
  */
-fastcall int
+streams_fastcall int
 qdetach(queue_t *q, int flags, cred_t *crp)
 {
 	int err;
@@ -2756,7 +2752,7 @@ EXPORT_SYMBOL(qprocson);
  *  @q:		queue from which to reply
  *  @mp:	message reply
  */
-__EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp);
+__STRUTIL_EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp);
 
 EXPORT_SYMBOL(qreply);
 
@@ -2764,7 +2760,7 @@ EXPORT_SYMBOL(qreply);
  *  qsize:	- calculate number of messages on a queue
  *  @q:		queue to count messages
  */
-__EXTERN_INLINE ssize_t qsize(queue_t *q);
+__STRUTIL_EXTERN_INLINE ssize_t qsize(queue_t *q);
 
 EXPORT_SYMBOL(qsize);
 
@@ -2781,7 +2777,7 @@ EXPORT_SYMBOL(qsize);
  *  LOCKING: Loose.  We only take references to queue structures along the way to ensure that they
  *  do not disappear while we are in the middle of checking them.
  */
-fastcall ssize_t
+streams_fastcall ssize_t
 qcountstrm(queue_t *q)
 {
 	ssize_t count = 0;
@@ -2799,7 +2795,7 @@ EXPORT_SYMBOL(qcountstrm);
  *  RD:		- find read queue from write queu
  *  @q:		write queue pointer
  */
-__EXTERN_INLINE queue_t *RD(queue_t *q);
+__STRUTIL_EXTERN_INLINE queue_t *RD(queue_t *q);
 
 EXPORT_SYMBOL(RD);
 
@@ -2880,7 +2876,7 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  NOTICES: rmvq() panics when passed null pointers.  rmvq() panics if a write lock has not been
  *  taken on the queue.  rmvq() panics if the message is not a queue, or not on the specified queue.
  */
-fastcall void
+streams_fastcall void
 rmvq(queue_t *q, mblk_t *mp)
 {
 	int backenable = 0;
@@ -2912,7 +2908,7 @@ EXPORT_SYMBOL(rmvq);
  *  SAMESTR:	- check whether this and next queue have the same stream head
  *  @q:		this queue
  */
-__EXTERN_INLINE int SAMESTR(queue_t *q);
+__STRUTIL_EXTERN_INLINE int SAMESTR(queue_t *q);
 
 EXPORT_SYMBOL(SAMESTR);
 
@@ -3094,16 +3090,8 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 			break;
 		case SQLVL_GLOBAL:	/* for testing */
 			/* use the global syncq */
-			if (!(sqr = sq_get(global_syncq))) {
-				if (!(sqr = sq_alloc())) {
-					sq_put(&sqo);
-					goto enomem;
-				}
-				sqr->sq_level = fmod->f_sqlvl;
-				sqr->sq_flag =
-				    SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
-			}
-			sqw = sq_get(sqr);
+			sqr = sq_get(global_syncq);
+			sqw = sq_get(global_syncq);
 			/* cannot have outer perimeter at this level */
 			sq_put(&sqo);
 			break;
@@ -3413,7 +3401,7 @@ EXPORT_SYMBOL(unfreezestr);
  *  WR:		- get write queue in queue pair
  *  @q:		read queue pointer
  */
-__EXTERN_INLINE queue_t *WR(queue_t *q);
+__STRUTIL_EXTERN_INLINE queue_t *WR(queue_t *q);
 
 EXPORT_SYMBOL(WR);
 
@@ -3479,54 +3467,54 @@ cmn_err(int err_lvl, const char *fmt, ...)
 
 EXPORT_SYMBOL(cmn_err);
 
-__EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
+__STRUTIL_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
 
 EXPORT_SYMBOL(copyin);
 
-__EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
+__STRUTIL_EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
 
 EXPORT_SYMBOL(copyout);
 
-__EXTERN_INLINE void delay(unsigned long ticks);
+__STRUTIL_EXTERN_INLINE void delay(unsigned long ticks);
 
 EXPORT_SYMBOL(delay);
 
-__EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p);
+__STRUTIL_EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p);
 
 EXPORT_SYMBOL(drv_getparm);
 
-__EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
+__STRUTIL_EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
 
 EXPORT_SYMBOL(drv_hztomsec);
 
-__EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
+__STRUTIL_EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
 
 EXPORT_SYMBOL(drv_hztousec);
 
-__EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
+__STRUTIL_EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
 
 EXPORT_SYMBOL(drv_msectohz);
 
-__EXTERN_INLINE int drv_priv(cred_t *crp);
+__STRUTIL_EXTERN_INLINE int drv_priv(cred_t *crp);
 
 EXPORT_SYMBOL(drv_priv);
 
-__EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
+__STRUTIL_EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
 
 EXPORT_SYMBOL(drv_usectohz);
 
-__EXTERN_INLINE void drv_usecwait(unsigned long usec);
+__STRUTIL_EXTERN_INLINE void drv_usecwait(unsigned long usec);
 
 EXPORT_SYMBOL(drv_usecwait);
 
-__EXTERN_INLINE major_t getmajor(dev_t dev);
+__STRUTIL_EXTERN_INLINE major_t getmajor(dev_t dev);
 
 EXPORT_SYMBOL(getmajor);
 
-__EXTERN_INLINE minor_t getminor(dev_t dev);
+__STRUTIL_EXTERN_INLINE minor_t getminor(dev_t dev);
 
 EXPORT_SYMBOL(getminor);
 
-__EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor);
+__STRUTIL_EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor);
 
 EXPORT_SYMBOL(makedevice);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.16 2005/08/29 20:27:29 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.17 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 20:27:29 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/08/29 20:27:29 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_STRDEBUG_H__
-#warn "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
+#warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -150,6 +150,19 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
+#if defined FASTCALL && !defined fastcall
+#define fastcall FASTCALL()
+#endif
+
+#if !defined FASTCALL
+#define FASTCALL(__x) __x
+#define fastcall
+#endif
+
+#if !defined fastcall
+#define fastcall FASTCALL()
+#endif
+
 #if defined(CONFIG_STREAMS_DEBUG)
 
 #define    never()		__never()
@@ -174,20 +187,27 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #undef STATIC
 #define STATIC
+
 #undef INLINE
 #define INLINE
 #undef __inline
 #define __inline
+
+/* can't undef these or it will break linux headers */
 //#undef inline
 //#define inline
 //#undef __inline__
 //#define __inline__
 
 /* for debugging we want a proper stack */
-#undef FASTCALL
-#define FASTCALL(__x) __x
-#undef fastcall
-#define fastcall
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) __x
+#undef streams_fastcall
+#define streams_fastcall
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern inline
+#endif
 
 #elif defined(CONFIG_STREAMS_TEST)
 
@@ -213,6 +233,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #undef STATIC
 #define STATIC static
+
 #undef INLINE
 #if defined __inline
 #define INLINE __inline
@@ -220,6 +241,23 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define INLINE __inline__
 #else
 #define INLINE inline
+#endif
+
+#undef streams_fastcall
+#if defined fastcall
+#define streams_fastcall fastcall
+#else
+#define streams_fastcall
+#endif
+#undef STREAMS_FASTCALL
+#if defined FASTCALL
+#define STREAMS_FASTCALL(__x) FASTCALL(__x)
+#else
+#define STREAMS_FASTCALL(__x) __x
+#endif
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern inline
 #endif
 
 #elif defined(CONFIG_STREAMS_SAFE)
@@ -246,6 +284,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #undef STATIC
 #define STATIC static
+
 #undef INLINE
 #if defined __inline
 #define INLINE __inline
@@ -253,6 +292,23 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define INLINE __inline__
 #else
 #define INLINE inline
+#endif
+
+#undef streams_fastcall
+#if defined fastcall
+#define streams_fastcall fastcall
+#else
+#define streams_fastcall
+#endif
+#undef STREAMS_FASTCALL
+#if defined FASTCALL
+#define STREAMS_FASTCALL(__x) FASTCALL(__x)
+#else
+#define STREAMS_FASTCALL(__x) __x
+#endif
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE static inline
 #endif
 
 #else
@@ -279,6 +335,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #undef STATIC
 #define STATIC static
+
 #undef INLINE
 #if defined __inline
 #define INLINE __inline
@@ -286,6 +343,23 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define INLINE __inline__
 #else
 #define INLINE inline
+#endif
+
+#undef streams_fastcall
+#if defined fastcall
+#define streams_fastcall fastcall
+#else
+#define streams_fastcall
+#endif
+#undef STREAMS_FASTCALL
+#if defined FASTCALL
+#define STREAMS_FASTCALL(__x) FASTCALL(__x)
+#else
+#define STREAMS_FASTCALL(__x) __x
+#endif
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE static inline fastcall
 #endif
 
 #endif

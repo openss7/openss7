@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.13 2005/08/29 10:36:57 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.14 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DKI_H__
 #define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/08/29 10:36:57 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_DKI_H__
-#warn "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
+#warning "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -65,10 +65,6 @@
 #include <linux/config.h>
 #include <linux/types.h>
 #include <linux/kdev_t.h>
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
 
 typedef __kernel_dev_t major_t;
 typedef __kernel_dev_t minor_t;

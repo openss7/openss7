@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.10 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.11 2005/08/30 03:37:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/08/30 03:37:09 $"
 
 #ifndef __SYS_SAD_H__
-#warn "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
+#warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
 #endif
 
 #define SAD_IOC_MAGIC	'D'	/* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */

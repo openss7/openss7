@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/08/29 20:26:44 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/08/30 03:37:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 20:26:44 $ by $Author: brian $
+# Last Modified $Date: 2005/08/30 03:37:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -895,7 +895,7 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
-	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl, session_of_pgrp])
+	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl, send_group_sig_info, session_of_pgrp])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])

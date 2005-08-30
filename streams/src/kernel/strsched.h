@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/08/29 10:37:10 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/08/30 03:37:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:10 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -78,8 +78,8 @@ extern void freeqb(struct qband *qb);
 /* ctors and dtors for stream heads */
 extern struct stdata *allocstr(void);
 extern void freestr(struct stdata *sd);
-extern struct stdata *FASTCALL(sd_get(struct stdata *sd));
-extern void FASTCALL(sd_put(struct stdata **sdp));
+extern struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
+extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
 
 /* ctors and dtors for autopush entries */
 extern struct apinfo *ap_alloc(struct strapush *sap);
@@ -149,7 +149,7 @@ do { \
 do { \
 	struct strthread *t = this_thread; \
 	if (--t->lock == 0 && test_and_clear_bit(qwantrun, &t->flags)) \
-		raise_softirq(STREAMS_SOFTIRQ); \
+		__raise_streams(); \
 } while (0)
 
 #define enter_streams() \

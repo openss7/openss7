@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:10 $ by $Author: brian $
+ Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,14 +82,6 @@ static char const ident[] =
 #include <asm/atomic.h>
 
 #include <linux/kernel.h>	/* for simple_strtoul, FASTCALL(), fastcall */
-
-#ifndef fastcall
-# ifndef FASTCALL
-#  define FASTCALL(__x) __x
-# endif
-# define fastcall FASTCALL()
-#endif
-
 #include <linux/pagemap.h>	/* for PAGE_CACHE_SIZE */
 #include <linux/mount.h>	/* for mntget and friends */
 
@@ -97,11 +89,13 @@ static char const ident[] =
 #include <linux/statfs.h>
 #endif
 
+#include "sys/strdebug.h"
+
 #include "sys/config.h"
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/08/29 10:37:10 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1431,7 +1425,7 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE | FS_
 STATIC struct vfsmount *specfs_mnt = NULL;
 STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
 
-fastcall struct vfsmount *
+streams_fastcall struct vfsmount *
 specfs_get(void)
 {
 	spin_lock(&specfs_lock);
@@ -1451,7 +1445,7 @@ EXPORT_SYMBOL(specfs_get);
 #define kern_umount mntput
 #endif
 
-fastcall void
+streams_fastcall void
 specfs_put(void)
 {
 	if (specfs_mnt) {
