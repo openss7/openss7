@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:11 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 20:28:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 20:28:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:11 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 20:28:52 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:11 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 20:28:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -97,6 +97,7 @@ int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
 EXPORT_SYMBOL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sysctl_str_strctlsz);
+EXPORT_SYMBOL(sysctl_str_nstrpush);
 #endif
 
 static struct ctl_table_header *streams_sysctl_handle;

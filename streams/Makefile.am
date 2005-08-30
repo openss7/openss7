@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/08/29 10:31:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/08/29 20:26:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:31:57 $ by $Author: brian $
+# Last Modified $Date: 2005/08/29 20:26:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -221,8 +221,6 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.h \
 				src/kernel/strlookup.c \
 				src/kernel/strlookup.h \
-				src/kernel/strreg.c \
-				src/kernel/strreg.h \
 				src/kernel/strattach.c \
 				src/kernel/strattach.h \
 				src/kernel/strpipe.c \
@@ -238,6 +236,8 @@ $(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
 
 libLfS_streams_a_SOURCES		= \
 				src/kernel/strmain.c \
+				src/kernel/strreg.c \
+				src/kernel/strreg.h \
 				src/kernel/strprocfs.c \
 				src/kernel/strprocfs.h \
 				src/kernel/strsched.c \

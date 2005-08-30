@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:32 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 16:34:32 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 20:33:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:32 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:32 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/18 16:34:32 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -12137,7 +12137,7 @@ sctp_clear(struct sctp *sp)
 #if 0
 	sp->pmtu = 576;
 #endif
-	ptrace(("Clearing stream sp=%p, state = %d\n", sp, sp->state));
+	ptrace(("Clearing stream sp=%p, state = %lu\n", sp, sp->state));
 	/* purge queues */
 	bufq_purge(&sp->expq);
 	bufq_purge(&sp->rcvq);
@@ -14029,7 +14029,7 @@ n_data_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t t
 	N_qos_sel_data_sctp_t *q;
 
 	if (!((1 << sp->i_state) & (NSF_DATA_XFER))) {
-		printd(("Interace in state %u\n", sp->i_state));
+		printd(("Interace in state %lu\n", sp->i_state));
 		printd(("mblk size is %d\n", msgdsize(dp)));
 	}
 	if ((1 << sp->i_state) & ~(NSF_DATA_XFER))

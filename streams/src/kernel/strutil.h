@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/08/29 10:37:13 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/29 20:28:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 20:28:52 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -194,8 +194,8 @@ extern void FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *flagsp));
 	int result; \
  \
 	local_str_disable(); \
-	if ((result = write_trylock((__q)->q_lock))) \
-		write_unlock((__q)->q_lock); \
+	if ((result = write_trylock(&(__q)->q_lock))) \
+		write_unlock(&(__q)->q_lock); \
 	local_str_enable(); \
 	result; \
 })
@@ -206,8 +206,8 @@ extern void FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *flagsp));
  \
 	local_bh_disable(); \
 	local_str_disable(); \
-	if ((result = write_trylock((__q)->q_lock))) \
-		write_unlock((__q)->q_lock); \
+	if ((result = write_trylock(&(__q)->q_lock))) \
+		write_unlock(&(__q)->q_lock); \
 	local_str_enable(); \
 	local_bh_enable(); \
 	result; \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.15 2005/08/29 10:36:57 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.16 2005/08/29 20:27:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:36:57 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 20:27:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/08/29 10:36:57 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/08/29 20:27:29 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warn "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -76,23 +76,23 @@ do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LIN
 
 #undef  __usual
 #define __usual(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: usual(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
+do { if (!(__exp)) printk(KERN_WARNING "%s: usual(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __normal
 #define __normal(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: normal(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
+do { if (!(__exp)) printk(KERN_WARNING "%s: normal(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __assert
 #define __assert(__exp) \
-do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); *(int *)0 = 0; } } while(0)
+do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); *(int *)0 = 0; } } while(0)
 
 #undef  __assure
 #define __assure(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
+do { if (!(__exp)) printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __ensure
 #define __ensure(__exp,__sta) \
-do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
+do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); __sta; } } while(0)
 
 #undef  __unless
 #define __unless(__exp,__sta) \
@@ -178,10 +178,10 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define INLINE
 #undef __inline
 #define __inline
-#undef inline
-#define inline
-#undef __inline__
-#define __inline__
+//#undef inline
+//#define inline
+//#undef __inline__
+//#define __inline__
 
 /* for debugging we want a proper stack */
 #undef FASTCALL

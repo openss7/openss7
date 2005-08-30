@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/08/29 10:37:09 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/08/29 20:28:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 20:28:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/08/29 10:37:09 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/08/29 20:28:51 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/08/29 10:37:09 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/08/29 20:28:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -108,6 +108,10 @@ static char const ident[] =
 
 struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
+
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
+EXPORT_SYMBOL(strthreads);
+#endif
 
 #if HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! HAVE_RAISE_SOFTIRQ_EXPORT
 void fastcall
@@ -3783,8 +3787,8 @@ sd_put(struct stdata **sdp)
 			assert(sd->sd_clone == NULL);
 			assert(sd->sd_iocblk == NULL);
 			/* these are left valid until last reference released */
+			sd->sd_wq = NULL;
 			qput(&sd->sd_rq);
-			qput(&sd->sd_wq);
 			__freestr(sd);
 		}
 	}

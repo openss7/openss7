@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/29 20:28:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:03 $ by $Author: brian $
+ Last Modified $Date: 2005/08/29 20:28:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/29 20:28:11 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/29 20:28:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:37:03 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/29 20:28:11 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -294,6 +294,73 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
 /* 
  *  -------------------------------------------------------------------------
  *
+ *  Special open for character based streams, fifos and pipes.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  cdev_open: - open a character special device node
+ *  @inode: the character device inode
+ *  @file: the user file pointer
+ *
+ *  cdev_open() is only used to open a stream from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
+ *  spec_dev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or
+ *  sockets.  Those devices provide their own file operations to the main operating system.  The
+ *  character device number from the inode is used to determine the shadow special file system
+ *  (internal) inode and chain the open call.
+ *
+ *  This is the separation point where we convert the external device number to an internal device
+ *  number.  The external device number is contained in inode->i_rdev.
+ */
+STATIC int
+cdev_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct cdevsw *cdev;
+	struct devnode *cmin;
+	major_t major;
+	minor_t minor;
+	modID_t modid;
+	dev_t dev;
+	int sflag;
+
+	if ((err = down_interruptible(&inode->i_sem)))
+		goto exit;
+#if HAVE_KFUNC_TO_KDEV_T
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
+	err = -ENXIO;
+	if (!(cdev = sdev_get(major)))
+		goto up_exit;
+	minor = cdev_minor(cdev, major, minor);
+	major = cdev->d_major;
+	modid = cdev->d_modid;
+	dev = makedevice(modid, minor);
+	sflag = (cmin = cmin_get(cdev, minor)) ?
+	    ((cmin->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN) :
+	    ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
+	err = spec_open(inode, file, dev, sflag);
+	sdev_put(cdev);
+      up_exit:
+	up(&inode->i_sem);
+      exit:
+	return (err);
+}
+
+STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
+	owner:THIS_MODULE,
+	open:cdev_open,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
  *  REGISTRATION
  *
  *  -------------------------------------------------------------------------
@@ -355,6 +422,97 @@ unregister_clone(struct cdevsw *cdev)
 }
 
 EXPORT_SYMBOL(unregister_clone);
+
+/**
+ *  register_strdev: - register a STREAMS device against a device major number
+ *  @cdev: STREAMS character device structure to register
+ *  @major: requested major device number or 0 for automatic major selection
+ *
+ *  register_strdev() registers the device specified by the @cdev to the device major number
+ *  specified by @major.
+ *
+ *  register_strdev() will register the STREAMS character device specified by @cdev against the
+ *  major device number @major.  If the major device number is zero, then it requests that
+ *  register_strdev() allocate an available major device number and assign it to @cdev.
+ *
+ *  CONTEXT: register_strdev() is intended to be called from kernel __init() or module_init()
+ *  routines only.  It cannot be called from in_irq() level.
+ *
+ *  Return Values: Upon success, register_strdev() will return the requested or assigned major
+ *  device number as a positive integer value.  Upon failure, the registration is denied and a
+ *  negative error number is returned.
+ *
+ *  Errors: Upon failure, register_strdev() returns on of the negative error numbers listed below.
+ *
+ *  -[%ENOMEM]	insufficient memory was available to complete the request.
+ *
+ *  -[%EINVAL]	@cdev was NULL
+ *
+ *  -[%EBUSY]	a device was already registered against the requested major device number, or no
+ *	        device numbers were available for automatic major device number assignment.
+ *
+ *  Notes: Linux Fast-STREAMS provides improvements over LiS.
+ *
+ *  LfS uses a small hash instead of a cdevsw[] table and requires that the driver (statically)
+ *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
+ *  cb_ops.
+ */
+int
+register_strdev(struct cdevsw *cdev, major_t major)
+{
+	int err;
+
+	if (!cdev->d_fop)
+		cdev->d_fop = &strm_f_ops;
+	if (!(cdev->d_mode & S_IFMT))
+		cdev->d_mode = (cdev->d_mode & ~S_IFMT) | S_IFCHR;
+	if ((err = register_cmajor(cdev, major, &cdev_f_ops)) < 0)
+		return (err);
+	register_clone(cdev);
+	return (err);
+}
+
+EXPORT_SYMBOL(register_strdev);
+
+/**
+ *  unregister_strdev: - unregister previously registered STREAMS device
+ *  @cdev: STREAMS character device structure to unregister
+ *  @major: major device number to unregister or 0 for all majors
+ *
+ *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
+ *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
+ *  getminor(@dev) component must be coded zero (0).
+ *
+ *  unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
+ *  major device number in getmajor(@dev).  If the major device number is zero, then it requests
+ *  that unregister_strdev() unregister @cdev from any device majors with which it is currently
+ *  registered.
+ *
+ *  CONTEXT: unregister_strdev() is intended to be called from kernel __exit() or module_exit()
+ *  routines only.  It cannot be called from in_irq() level.
+ *
+ *  Return Values: Upon success, unregister_strdev() will return zero (0).  Upon failure, the
+ *  deregistration is denied and a negative error number is returned.
+ *
+ *  Errors: Upon failure, unregister_strdev() returns one of the negative error numbers listed
+ *  below.
+ *
+ *  -[%ENXIO]	The specified device does not exist in the registration tables.
+ *
+ *  -[%EINVAL]	@cdev is NULL, or the @d_name component associated with @cdev has changed since
+ *              registration.
+ *
+ *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
+ *		and permission is therefore denied.
+ */
+int
+unregister_strdev(struct cdevsw *cdev, major_t major)
+{
+	unregister_clone(cdev);
+	return unregister_cmajor(cdev, major);
+}
+
+EXPORT_SYMBOL(unregister_strdev);
 
 /* 
  *  -------------------------------------------------------------------------
