@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/01 03:19:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/01 03:19:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/01 03:19:02 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/01 03:19:02 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/01 03:19:02 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -198,7 +198,7 @@ struct streamtab str_info = {
  *  stri_acquire:   - acquire a reference to a stream head from a file pointer
  *  @file:	file pointer to stream
  */
-STATIC inline struct stdata *
+STATIC INLINE struct stdata *
 stri_acquire(struct file *file)
 {
 	struct stdata *sd;
@@ -219,7 +219,7 @@ stri_acquire(struct file *file)
  *
  *  Same as stri_acquire(), but also remove the reference from the file pointer.
  */
-STATIC inline struct stdata *
+STATIC INLINE struct stdata *
 stri_remove(struct file *file)
 {
 	struct stdata *sd;
@@ -245,19 +245,24 @@ stri_remove(struct file *file)
  *  @sd:	the stream head
  *  @dev:	the original device number that qopen() was called with
  */
-STATIC inline int
+STATIC INLINE int
 strinsert(struct inode *inode, struct file *file, struct stdata *sd)
 {
+	assert(inode);
+	assert(file);
+	assert(sd);
+
 	down(&inode->i_sem);
 	if (!sd->sd_inode) {
 		struct cdevsw *cdev;
 		ptrace(("adding stream %p to inode %p\n", sd, inode));
 		/* don't let the inode go away while we are linked to it */
 		sd->sd_inode = igrab(inode);
-		if ((cdev = sd->sd_cdevsw)) {
-			list_add(&sd->sd_list, &cdev->d_stlist);
-			cdev->d_inode->i_nlink++;
-		}
+		cdev = sd->sd_cdevsw;
+		assert(cdev);
+		list_add(&sd->sd_list, &cdev->d_stlist);
+		assert(cdev->d_inode);
+		cdev->d_inode->i_nlink++;
 		/* should always be successful */
 		assert(sd->sd_inode != NULL);
 		/* link into clone list */
@@ -277,9 +282,12 @@ strinsert(struct inode *inode, struct file *file, struct stdata *sd)
  *  @inode:	inode from which to remove the stream head
  *  @sd:	the stream head
  */
-STATIC inline void
+STATIC INLINE void
 strremove(struct inode *inode, struct stdata *sd)
 {
+	assert(inode);
+	assert(sd);
+
 	/* we need to hold the inode semaphore while doing this */
 	down(&inode->i_sem);
 	if (sd->sd_inode) {
@@ -297,10 +305,11 @@ strremove(struct inode *inode, struct stdata *sd)
 		}
 		/* remove from device list */
 		ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
-		if ((cdev = sd->sd_cdevsw)) {
-			cdev->d_inode->i_nlink--;
-			list_del_init(&sd->sd_list);
-		}
+		cdev = sd->sd_cdevsw;
+		assert(cdev);
+		assert(cdev->d_inode);
+		cdev->d_inode->i_nlink--;
+		list_del_init(&sd->sd_list);
 		sd->sd_inode = NULL;
 		up(&inode->i_sem);
 		iput(inode);	/* to cancel igrab() from strinsert */
@@ -318,7 +327,7 @@ strremove(struct inode *inode, struct stdata *sd)
  *
  *  LOCKING: Caller must hold a stream head write lock (or have a private stream head).
  */
-STATIC inline dev_t
+STATIC INLINE dev_t
 strinccounts(struct file *file, struct stdata *sd, int oflag)
 {
 	sd->sd_opens++;
@@ -330,7 +339,7 @@ strinccounts(struct file *file, struct stdata *sd, int oflag)
 	return (sd->sd_dev);
 }
 
-STATIC inline bool
+STATIC INLINE bool
 strdetached(struct stdata *sd)
 {
 	/* test for detached close needed */

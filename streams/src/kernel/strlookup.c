@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:10 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/01 03:19:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/01 03:19:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:10 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/01 03:19:01 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:10 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/01 03:19:01 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -457,7 +457,7 @@ cdev_lookup(major_t major, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
 				break;
 			}
@@ -504,7 +504,7 @@ cdrv_lookup(modID_t modid, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
 				break;
 			}
@@ -551,7 +551,7 @@ fmod_lookup(modID_t modid, int load)
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
 			if (try_module_get(fmod->f_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
 			}
@@ -669,7 +669,7 @@ cdev_search(const char *name, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
 				break;
 			}
@@ -717,7 +717,7 @@ fmod_search(const char *name, int load)
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
 			if (try_module_get(fmod->f_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
 			}
@@ -845,7 +845,7 @@ streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
-		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
+		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		module_put(cdev->d_kmod);
 	}
 }
@@ -902,7 +902,7 @@ streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
-		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
+		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		module_put(fmod->f_kmod);
 	}
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/01 03:19:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -543,23 +543,23 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 {
 	struct cdevsw *cdev;
 
-	ptrace(("looking up %s\n", new->d_name.name));
+	_ptrace(("looking up %s\n", new->d_name.name));
 	if ((cdev = dir->u.generic_ip)) {
 		struct devnode *cmin;
 
-		ptrace(("found cdev %s\n", cdev->d_name));
+		_ptrace(("found cdev %s\n", cdev->d_name));
 		/* check if the name is registered as a minor device node name */
 		if ((cmin = cmin_find(cdev, new->d_name.name))) {
 			struct inode *inode;
 
-			ptrace(("found cmin %s\n", cmin->n_name));
+			_ptrace(("found cmin %s\n", cmin->n_name));
 			if ((inode = cmin->n_inode)) {
-				ptrace(("found inode for cmin %s\n", cmin->n_name));
+				_ptrace(("found inode for cmin %s\n", cmin->n_name));
 				igrab(inode);
 				d_add(new, inode);
 				return (NULL);	/* success */
 			}
-			ptrace(("no inode for cmin %s\n", cmin->n_name));
+			_ptrace(("no inode for cmin %s\n", cmin->n_name));
 			return ERR_PTR(-EIO);
 		} else {
 			/* check if the name is a valid number */
@@ -570,7 +570,7 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 				if ((minor & ~MINORMASK) == 0) {
 					struct inode *inode;
 					dev_t dev = makedevice(cdev->d_modid, minor);
-					ptrace(("looking up inode for number %s\n",
+					_ptrace(("looking up inode for number %s\n",
 						new->d_name.name));
 #if HAVE_KFUNC_IGET_LOCKED
 					if ((inode = iget_locked(dir->i_sb, dev)))
@@ -585,17 +585,17 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 							unlock_new_inode(inode);
 						}
 #endif
-						ptrace(("found inode for number %s\n",
+						_ptrace(("found inode for number %s\n",
 							new->d_name.name));
 						d_add(new, inode);
 						return (NULL);	/* success */
 					}
-					ptrace(("no inode for number %s\n", new->d_name.name));
+					_ptrace(("no inode for number %s\n", new->d_name.name));
 					return ERR_PTR(-ENOMEM);
 				}
 			}
 		}
-		ptrace(("no inode for %s\n", new->d_name.name));
+		_ptrace(("no inode for %s\n", new->d_name.name));
 	}
 	return ERR_PTR(-ENOENT);
 }
@@ -862,14 +862,14 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 {
 	struct cdevsw *cdev;
 
-	ptrace(("looking up %s\n", new->d_name.name));
+	_ptrace(("looking up %s\n", new->d_name.name));
 	/* this will also attempt to demand load the "streams-%s" module if required */
 	if ((cdev = cdev_find(new->d_name.name))) {
 		struct inode *inode;
 
-		ptrace(("found cdev %s\n", cdev->d_name));
+		_ptrace(("found cdev %s\n", cdev->d_name));
 		if ((inode = cdev->d_inode)) {
-			ptrace(("found inode for cdev %s\n", cdev->d_name));
+			_ptrace(("found inode for cdev %s\n", cdev->d_name));
 			igrab(inode);
 			sdev_put(cdev);
 			d_add(new, inode);
@@ -878,10 +878,10 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		/* It must be a module.  This has the rather unwanted side-effect that searching
 		   directory %s could demand load streams-%s, where streams-%s is not a driver but
 		   a module. */
-		ptrace(("no inode for cdev %s\n", cdev->d_name));
+		_ptrace(("no inode for cdev %s\n", cdev->d_name));
 		sdev_put(cdev);
 	} else
-		ptrace(("no cdev for %s\n", new->d_name.name));
+		_ptrace(("no cdev for %s\n", new->d_name.name));
 	return ERR_PTR(-ENOENT);
 }
 
@@ -1257,7 +1257,7 @@ spec_read_inode(struct inode *inode)
 {
 	struct cdevsw *cdev = inode->u.generic_ip;
 
-	ptrace(("reading inode no %lu\n", inode->i_ino));
+	_ptrace(("reading inode no %lu\n", inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
 	else {
@@ -1292,7 +1292,7 @@ spec_read_inode(struct inode *inode)
 		   external major device number. */
 		/* XXX: Another approach is to make module identifiers to major nodes equal to the
 		 * external major device number and the point would be moot. */
-		ptrace(("reading minor device inode %lu\n", (ulong) getminor(inode->i_ino)));
+		_ptrace(("reading minor device inode %lu\n", (ulong) getminor(inode->i_ino)));
 		/* for device nodes, the major component of the i_ino is the module id */
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
 		inode->i_mode &= ~S_IXUGO;
@@ -1308,7 +1308,7 @@ spec_read_inode(struct inode *inode)
 		inode->i_fop = cdev->d_fop;
 #endif
 	} else {
-		ptrace(("reading major device inode %lu\n", (ulong) getminor(inode->i_ino)));
+		_ptrace(("reading major device inode %lu\n", (ulong) getminor(inode->i_ino)));
 		/* for module nodes, the minor component of the i_ino is the module id */
 		inode->i_mode |= S_IFDIR;
 		inode->i_mode |= ((inode->i_mode & S_IRUGO) >> 2);
@@ -1319,7 +1319,7 @@ spec_read_inode(struct inode *inode)
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 	return;
       bad_inode:
-	ptrace(("bad inode no %lu\n", inode->i_ino));
+	_ptrace(("bad inode no %lu\n", inode->i_ino));
 	make_bad_inode(inode);
 	return;
 }
@@ -1580,6 +1580,7 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	struct spec_sb_info *sbi;
 	int err;
 
+	ptrace(("filling superblock %p\n", sb));
 	sb->s_blocksize = 1024;
 	sb->s_blocksize_bits = 10;
 	sb->s_magic = SPECFS_MAGIC;
@@ -1625,11 +1626,13 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 STATIC struct super_block *
 specfs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
 {
+	ptrace(("reading superblock\n"));
 	return get_sb_single(fs_type, flags, data, specfs_fill_super);
 }
 STATIC void
 specfs_kill_sb(struct super_block *sb)
 {
+	ptrace(("killing superblock %p\n", sb));
 	return kill_anon_super(sb);
 }
 

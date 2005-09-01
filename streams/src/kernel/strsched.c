@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/08/31 19:03:10 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/01 03:19:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/01 03:19:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/08/31 19:03:10 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/01 03:19:01 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/08/31 19:03:10 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/01 03:19:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -967,7 +967,7 @@ sq_alloc(void)
 	/* Note: sq_alloc() is only called by qattach() that is only called by the STREAM head at
 	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
 	if ((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
-		ptrace(("syncq %p is allocated\n", sq));
+		_ptrace(("syncq %p is allocated\n", sq));
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -985,7 +985,7 @@ sq_get(struct syncq *sq)
 		assert(atomic_read(&sq->sq_refs) >= 1);
 		atomic_inc(&sq->sq_refs);
 		
-		ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
+		_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 	return (sq);
 }
@@ -999,7 +999,7 @@ sq_put(struct syncq **sqp)
 		if (atomic_dec_and_test(&sq->sq_refs)) {
 			struct strinfo *si = &Strinfo[DYN_SYNCQ];
 
-			ptrace(("syncq %p is being deleted\n", sq));
+			_ptrace(("syncq %p is being deleted\n", sq));
 
 			write_lock(&si->si_rwlock);
 			list_del_init((struct list_head *) &sq->sq_next);
@@ -1027,7 +1027,7 @@ sq_put(struct syncq **sqp)
 			init_waitqueue_head(&sq->sq_waitq);
 			kmem_cache_free(si->si_cache, sq);
 		} else
-			ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
+			_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 }
 #endif
