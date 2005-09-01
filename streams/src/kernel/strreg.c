@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:10 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:10 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -71,9 +71,6 @@ static char const ident[] =
 #include <linux/poll.h>
 #include <linux/fs.h>
 #include <linux/mount.h>	/* for vfsmount and friends */
-#if HAVE_KINC_LINUX_NAMEI_H
-#include <linux/namei.h>	/* for lookup_hash on 2.6 */
-#endif
 #include <asm/hardirq.h>
 
 #include "sys/strdebug.h"
@@ -171,21 +168,8 @@ register_strsync(struct fmodsw *fmod)
 STATIC void
 unregister_strsync(struct fmodsw *fmod)
 {
-	switch (fmod->f_sqlvl) {
-		case SQLVL_NOP:
-		case SQLVL_QUEUE:
-		case SQLVL_QUEUEPAIR:
-			if (fmod->f_flag & D_MTOUTPERIM)
-				sq_put(&fmod->f_syncq);
-			break;
-		case SQLVL_DEFAULT:
-		case SQLVL_MODULE:	/* default */
-		case SQLVL_ELSEWHERE:
-		case SQLVL_GLOBAL:	/* for testing */
-			sq_put(&fmod->f_syncq);
-			break;
-	}
-	return;
+	/* always delete if it exists */
+	sq_put(&fmod->f_syncq);
 }
 #endif
 
@@ -197,49 +181,75 @@ int
 register_strmod(struct fmodsw *fmod)
 {
 	struct module_info *mi;
+	struct fmodsw *f;
 	int err;
 
-	if (!fmod || !fmod->f_name || !fmod->f_name[0])
+	if (!fmod || !fmod->f_name || !fmod->f_name[0]) {
+		ptrace(("Error path taken!\n"));
 		return (-EINVAL);
-	else {
+	} else {
 		struct streamtab *st;
 		struct qinit *qi;
 
-		if (!(st = fmod->f_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo))
+		if (!(st = fmod->f_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
+			ptrace(("Error path taken!\n"));
 			return (-EINVAL);
+		}
 	}
 #if defined CONFIG_STREAMS_SYNCQS
-	if ((err = register_strsync(fmod)))
+	if ((err = register_strsync(fmod))) {
+		ptrace(("Error path taken!\n"));
 		return (err);
+	}
 #endif
 	write_lock(&fmodsw_lock);
 	{
 		modID_t modid;
 
 		/* check name for another module */
-		if (__smod_search(fmod->f_name))
+		if ((f = __smod_search(fmod->f_name))) {
+			if (f != fmod) {
+				ptrace(("Error path taken!\n"));
+				goto eperm;
+			}
+			ptrace(("Error path taken!\n"));
 			goto ebusy;
+		}
 
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
+			ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __fmod_lookup(modid); modid--) ;
-			if (!modid)
+			if (!modid) {
+				ptrace(("Error path taken!\n"));
 				goto enxio;
+			}
 			mi->mi_idnum = modid;
 		} else {
+			ptrace(("Using module id %hu\n", modid));
 			/* use specified module id */
-			if (__fmod_lookup(modid))
+			if ((f = __fmod_lookup(modid))) {
+				if (f != fmod) {
+					ptrace(("Error path taken!\n"));
+					goto eperm;
+				}
+				ptrace(("Error path taken!\n"));
 				goto ebusy;
+			}
 		}
+		ptrace(("Assigned module id %hu\n", modid));
 		fmod_add(fmod, modid);
 		err = modid;
 		goto unlock_exit;
 	}
-      enxio:
-	err = -ENXIO;
+      eperm:
+	err = -EPERM;
 	goto unregister_exit;
       ebusy:
 	err = -EBUSY;
+	goto unregister_exit;
+      enxio:
+	err = -ENXIO;
 	goto unregister_exit;
       unregister_exit:
 #if defined CONFIG_STREAMS_SYNCQS
@@ -300,47 +310,64 @@ register_strdrv(struct cdevsw *cdev)
 	struct cdevsw *c;
 	int err = 0;
 
-	if (!cdev || !cdev->d_name || !cdev->d_name[0])
+	if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
+		ptrace(("Error path taken!\n"));
 		return (-EINVAL);
-	else {
+	} else {
 		struct streamtab *st;
 		struct qinit *qi;
 
-		if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo))
+		if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo)) {
+			ptrace(("Error path taken!\n"));
 			return (-EINVAL);
+		}
 	}
 #if defined CONFIG_STREAMS_SYNCQS
-	if ((err = register_strsync((struct fmodsw *) cdev)))
+	if ((err = register_strsync((struct fmodsw *) cdev))) {
+		ptrace(("Error path taken!\n"));
 		return (err);
+	}
 #endif
-
 	write_lock(&cdevsw_lock);
 	{
 		modID_t modid;
 
 		/* check name for another module */
 		if ((c = __smod_search(cdev->d_name))) {
-			if (c != cdev)
+			if (c != cdev) {
+				ptrace(("Error path taken!\n"));
 				goto eperm;
+			}
+			ptrace(("Error path taken!\n"));
 			goto ebusy;
 		}
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
+			ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __cdrv_lookup(modid); modid--) ;
-			if (!modid)
+			if (!modid) {
+				ptrace(("Error path taken!\n"));
 				goto enxio;
+			}
 			mi->mi_idnum = modid;
 		} else {
+			ptrace(("Using module id %hu\n", modid));
 			/* use specified module id */
 			if ((c = __cdrv_lookup(modid))) {
-				if (c != cdev)
+				if (c != cdev) {
+					ptrace(("Error path taken!\n"));
 					goto eperm;
+				}
 				/* already registered to us */
+				ptrace(("Error path taken!\n"));
 				goto ebusy;
 			}
 		}
-		if ((err = cdev_add(cdev, modid)))
+		ptrace(("Assigned module id %hu\n", modid));
+		if ((err = sdev_add(cdev, modid))) {
+			ptrace(("Error path taken!\n"));
 			goto unregister_exit;
+		}
 		err = modid;
 		goto unlock_exit;
 	}
@@ -382,22 +409,35 @@ unregister_strdrv(struct cdevsw *cdev)
 	int err = 0;
 
 	write_lock(&cdevsw_lock);
-	if (!cdev || !cdev->d_name || !cdev->d_name[0])
+	if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
+		ptrace(("Error path taken!\n"));
 		goto einval;
-	if (!cdev->d_list.next || list_empty(&cdev->d_list))
+	}
+	/* the cdev is not registered as a module */
+	if (!cdev->d_list.next || list_empty(&cdev->d_list)) {
+		ptrace(("Error path taken!\n"));
 		goto enxio;
-	if (!list_empty(&cdev->d_majors))
+	}
+	if (cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
+		ptrace(("Error path taken!\n"));
 		goto ebusy;
-	if (!list_empty(&cdev->d_minors))
+	}
+	if (cdev->d_minors.next && !list_empty(&cdev->d_minors)) {
+		ptrace(("Error path taken!\n"));
 		goto ebusy;
-	if (!list_empty(&cdev->d_apush))
+	}
+	if (cdev->d_apush.next && !list_empty(&cdev->d_apush)) {
+		ptrace(("Error path taken!\n"));
 		goto ebusy;
-	if (!list_empty(&cdev->d_stlist))
+	}
+	if (cdev->d_stlist.next && !list_empty(&cdev->d_stlist)) {
+		ptrace(("Error path taken!\n"));
 		goto ebusy;
+	}
 #if defined CONFIG_STREAMS_SYNCQS
 	unregister_strsync((struct fmodsw *) cdev);
 #endif
-	cdev_del(cdev);
+	sdev_del(cdev);
       unlock_exit:
 	write_unlock(&cdevsw_lock);
 	return (err);
@@ -442,7 +482,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 	do {
 		err = -EINVAL;
 		if (!cdev || !cdev->d_name || !cdev->d_name[0] || !cmaj) {
-			trace();
+			ptrace(("Error path taken!\n"));
 			break;
 		}
 		err = -EINVAL;
@@ -452,26 +492,23 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 		if (major >= MAX_CHRDEV)
 #endif
 		{
-			trace();
+			ptrace(("Error path taken!\n"));
 			break;
 		}
-#if 0
-		/* no longer true */
 		err = -EINVAL;
 		/* ensure that the device is registered (as a module) */
 		if (!cdev->d_list.next || list_empty(&cdev->d_list)) {
-			trace();
+			ptrace(("Error path taken!\n"));
 			break;
 		}
-#endif
 		err = -EBUSY;
 		if (major && __cmaj_lookup(major)) {
-			trace();
+			ptrace(("Error path taken!\n"));
 			break;
 		}
 		/* register the character device */
 		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0) {
-			trace();
+			ptrace(("Error path taken!\n"));
 			break;
 		}
 		if (err > 0 && major == 0)
@@ -532,6 +569,9 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 			cmaj_del(cmaj, cdev);
 		} else {
 			struct list_head *pos;
+
+			ensure(cdev->d_majors.next,
+				INIT_LIST_HEAD(&cdev->d_majors));
 
 			/* deregister all major device numbers */
 			list_for_each(pos, &cdev->d_majors) {
@@ -615,13 +655,19 @@ unregister_cmajor(struct cdevsw *cdev, major_t major)
 	struct devnode *cmaj;
 
 	err = -ENXIO;
-	if (!(cmaj = cmaj_get(cdev, major)))
+	if (!(cmaj = cmaj_get(cdev, major))) {
+		ptrace(("Error path taken!\n"));
 		goto error;
-	if ((err = unregister_xinode(cdev, cmaj, major)) < 0)
+	}
+	if ((err = unregister_xinode(cdev, cmaj, major)) < 0) {
+		ptrace(("Error path taken!\n"));
 		goto error;
+	}
 	kfree(cmaj);
-	if ((err = unregister_strdrv(cdev)) < 0 && err != -EBUSY)
+	if ((err = unregister_strdrv(cdev)) < 0 && err != -EBUSY) {
+		ptrace(("Error path taken!\n"));
 		goto error;
+	}
 	return (0);
       error:
 	return (err);
@@ -662,9 +708,12 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 		if (!cdev->d_majors.next || list_empty(&cdev->d_majors))
 			break;
 #endif
+		ensure(cdev->d_majors.next,
+			INIT_LIST_HEAD(&cdev->d_majors));
+		ensure(cdev->d_minors.next,
+			INIT_LIST_HEAD(&cdev->d_minors));
+
 		/* check name for another cmin */
-		if (!cdev->d_minors.next)
-			INIT_LIST_HEAD(&cdev->d_minors);
 		if ((n = __cmin_search(cdev, cmin->n_name))) {
 			err = -EPERM;
 			if (n != cmin)
@@ -728,8 +777,8 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 			/* deregister all minor devices */
 			struct list_head *pos;
 
-			if (!cdev->d_minors.next)
-				INIT_LIST_HEAD(&cdev->d_minors);
+			ensure(cdev->d_minors.next,
+				INIT_LIST_HEAD(&cdev->d_minors));
 			/* deregister all minor device numbers */
 			list_for_each(pos, &cdev->d_minors) {
 				cmin = list_entry(pos, struct devnode, n_list);
@@ -746,160 +795,3 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 
 EXPORT_SYMBOL(unregister_strnod);
 
-/*
- *  -------------------------------------------------------------------------
- *  -------------------------------------------------------------------------
- */
-
-#ifndef HAVE_FILE_MOVE_ADDR
-STATIC void
-_file_move(struct file *file, struct list_head *list)
-{
-	if (!list)
-		return;
-	file_list_lock();
-	list_del(&file->f_list);
-	list_add(&file->f_list, list);
-	file_list_unlock();
-}
-#endif
-
-STATIC void
-file_swap_put(struct file *f1, struct file *f2)
-{
-#ifdef HAVE_FILE_MOVE_ADDR
-	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
-#endif
-	f1->f_op = xchg(&f2->f_op, f1->f_op);
-	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
-	f1->f_vfsmnt = xchg(&f2->f_vfsmnt, f1->f_vfsmnt);
-	f1->private_data = xchg(&f2->private_data, f1->private_data);
-	_file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
-	_file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
-	fput(f2);
-}
-
-#ifndef O_CLONE
-#define O_CLONE (O_CREAT|O_EXCL)
-#endif
-
-/**
- *  spec_dentry: - find a dentry in the specfs to open.
- *  @dev: device for which to find a dentry
- *  @sflagp: flags to modify (if any)
- */
-struct dentry *
-spec_dentry(dev_t dev, int *sflagp)
-{
-	struct dentry *dentry;
-	struct cdevsw *cdev;
-
-	{
-		struct qstr name;
-		char buf[32];
-
-		dentry = ERR_PTR(-ENXIO);
-		if (!(cdev = cdrv_get(getmajor(dev))))
-			goto done;
-		if (sflagp && cdev->d_flag & D_CLONE)
-			*sflagp = CLONEOPEN;
-		snprintf(buf, 32, "%s", cdev->d_name);
-		cdrv_put(cdev);
-		name.name = buf;
-		name.len = strnlen(buf, 32 - 1);
-		name.hash = full_name_hash(name.name, name.len);
-		{
-			struct vfsmount *mnt;
-
-			dentry = ERR_PTR(-EIO);
-			if (!(mnt = specfs_get()))
-				goto done;
-			down(&mnt->mnt_root->d_inode->i_sem);
-			dentry = lookup_hash(&name, mnt->mnt_root);
-			up(&mnt->mnt_root->d_inode->i_sem);
-			specfs_put();
-		}
-	}
-	if (IS_ERR(dentry))
-		goto done;
-	if (!dentry->d_inode)
-		goto enoent;
-	{
-		struct qstr name;
-		char buf[32];
-		struct dentry *parent = dentry;
-
-		{
-			struct devnode *cmin;
-
-			if ((cmin = cmin_get(cdev, getminor(dev)))) {
-				if (sflagp && cmin->n_flag & D_CLONE)
-					*sflagp = CLONEOPEN;
-				snprintf(buf, 32, "%s", cmin->n_name);
-			} else {
-				snprintf(buf, 32, "%u", getminor(dev));
-			}
-			name.name = buf;
-			name.len = strnlen(buf, 32 - 1);
-			name.hash = full_name_hash(name.name, name.len);
-		}
-		down(&parent->d_inode->i_sem);
-		dentry = lookup_hash(&name, parent);
-		up(&parent->d_inode->i_sem);
-		dput(parent);
-	}
-	if (IS_ERR(dentry)) {
-		goto done;
-	}
-	if (!dentry->d_inode) {
-		goto enoent;
-	}
-      done:
-	return (dentry);
-      enoent:
-	dput(dentry);
-	dentry = ERR_PTR(-ENOENT);
-	goto done;
-}
-
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(spec_dentry);
-#endif
-
-/**
- *  spec_open:	- chain open to an internal special device.
- *  @i:	external (or chaining) filesystem inode
- *  @f:	external (or chaining) filesystem file pointer (user file pointer)
- *
- *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
- */
-int
-spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
-{
-	struct file *tmp;		/* temporary file pointer to use */
-	struct dentry *dentry;
-	struct vfsmount *mnt;
-
-	if (IS_ERR(dentry = spec_dentry(dev, &sflag)))
-		return PTR_ERR(dentry);
-
-	if ((mnt = specfs_get())) {
-		int oflag = f->f_flags;
-
-		if (sflag == CLONEOPEN)
-			oflag |= O_CLONE;
-		tmp = dentry_open(dentry, mntget(mnt), oflag);
-		specfs_put();
-		if (IS_ERR(tmp))
-			return PTR_ERR(tmp);
-		file_swap_put(f, tmp);
-		return (0);
-	}
-	dput(dentry);
-	return (-ENODEV);
-}
-
-#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
-         || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
-EXPORT_SYMBOL(spec_open);
-#endif

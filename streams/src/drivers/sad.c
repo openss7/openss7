@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:11 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -423,12 +423,12 @@ static struct streamtab sad_info = {
 };
 
 static struct cdevsw sad_cdev = {
-	d_name:"sad",
-	d_str:&sad_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = "sad",
+	.d_str = &sad_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 static struct devnode sad_node_admin = {

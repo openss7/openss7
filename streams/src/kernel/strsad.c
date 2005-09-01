@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/30 03:37:12 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/31 19:03:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/30 03:37:12 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/31 19:03:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/30 03:37:12 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/31 19:03:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,8 +80,8 @@ __autopush_find(struct cdevsw *cdev, unsigned char minor)
 	struct list_head *pos;
 	struct apinfo *api = NULL;
 
-	if (!cdev->d_apush.next)
-		INIT_LIST_HEAD(&cdev->d_apush);
+	ensure(cdev->d_apush.next,
+		INIT_LIST_HEAD(&cdev->d_apush));
 	list_for_each(pos, &cdev->d_apush) {
 		api = list_entry(pos, struct apinfo, api_more);
 
@@ -104,8 +104,8 @@ __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 	err = -ENOSR;
 	if ((api = ap_alloc(sap)) == NULL)
 		goto error;
-	if (!cdev->d_apush.next)
-		INIT_LIST_HEAD(&cdev->d_apush);
+	ensure(cdev->d_apush.next,
+		INIT_LIST_HEAD(&cdev->d_apush));
 	list_add_tail(&api->api_more, &cdev->d_apush);
 	return (0);
       error:

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/30 03:37:11 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -253,16 +253,20 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		spin_lock(&nuls_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
 			minor_t dminor = getminor((*pp)->dev);
 
 			if (cminor < dminor)
 				break;
-			if (cminor == dminor && sflag != CLONEOPEN) {
-				spin_unlock(&nuls_lock);
-				kmem_free(p, sizeof(*p));
-				pswerr(("%s: stream already open!\n", __FUNCTION__));
-				return (EIO);	/* bad error */
+			if (cminor == dminor) {
+				if (sflag == CLONEOPEN)
+					cminor++;
+				else {
+					spin_unlock(&nuls_lock);
+					kmem_free(p, sizeof(*p));
+					pswerr(("%s: stream already open!\n", __FUNCTION__));
+					return (EIO);	/* bad error */
+				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
@@ -327,12 +331,12 @@ static struct streamtab nuls_info = {
 };
 
 static struct cdevsw nuls_cdev = {
-	d_name:CONFIG_STREAMS_NULS_NAME,
-	d_str:&nuls_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_NULS_NAME,
+	.d_str = &nuls_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_NULS_MODULE

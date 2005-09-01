@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -475,14 +475,18 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		spin_lock_bh(&log_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
 			dminor = getminor((*pp)->dev);
 			if (cminor < dminor)
 				break;
-			if (cminor == dminor && sflag != CLONEOPEN) {
-				spin_unlock_bh(&log_lock);
-				kmem_free(p, sizeof(*p));
-				return (EIO);	/* bad error */
+			if (cminor == dminor) {
+				if (sflag == CLONEOPEN)
+					cminor++;
+				else {
+					spin_unlock_bh(&log_lock);
+					kmem_free(p, sizeof(*p));
+					return (EIO);	/* bad error */
+				}
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
@@ -538,12 +542,12 @@ static struct streamtab log_info = {
 };
 
 static struct cdevsw log_cdev = {
-	d_name:CONFIG_STREAMS_LOG_NAME,
-	d_str:&log_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_LOG_NAME,
+	.d_str = &log_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 /*

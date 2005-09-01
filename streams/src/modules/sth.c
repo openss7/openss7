@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/08/30 03:37:13 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/08/30 03:37:13 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/08/30 03:37:13 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/08/30 03:37:13 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/31 19:03:14 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -228,7 +228,7 @@ stri_remove(struct file *file)
 	/* always hold the inode spinlock while lookup up the STREAM head */
 	down(&inode->i_sem);
 	// spin_lock(&inode->i_lock);
-	sd = stri_lookup(file);
+	sd = sd_get(stri_lookup(file));
 	stri_lookup(file) = NULL;
 	// spin_unlock(&inode->i_lock);
 	up(&inode->i_sem);
@@ -250,13 +250,18 @@ strinsert(struct inode *inode, struct file *file, struct stdata *sd)
 {
 	down(&inode->i_sem);
 	if (!sd->sd_inode) {
+		struct cdevsw *cdev;
+		ptrace(("adding stream %p to inode %p\n", sd, inode));
 		/* don't let the inode go away while we are linked to it */
 		sd->sd_inode = igrab(inode);
+		if ((cdev = sd->sd_cdevsw)) {
+			list_add(&sd->sd_list, &cdev->d_stlist);
+			cdev->d_inode->i_nlink++;
+		}
 		/* should always be successful */
 		assert(sd->sd_inode != NULL);
 		/* link into clone list */
-		if ((sd->sd_clone = (void *) inode->i_pipe))
-			inode->i_nlink++;
+		sd->sd_clone = (void  *) inode->i_pipe;
 		inode->i_pipe = (void *) sd;
 		// spin_lock(&inode->i_lock);
 		assert(stri_lookup(file) == NULL);
@@ -278,8 +283,10 @@ strremove(struct inode *inode, struct stdata *sd)
 	/* we need to hold the inode semaphore while doing this */
 	down(&inode->i_sem);
 	if (sd->sd_inode) {
+		struct cdevsw *cdev;
 		struct stdata **sdp;
 
+		ptrace(("removing stream %p from inode %p\n", sd, inode));
 		assert(inode == sd->sd_inode);
 		for (sdp = (struct stdata **) &(inode->i_pipe); *sdp && *sdp != sd;
 		     sdp = &((*sdp)->sd_clone)) ;
@@ -288,11 +295,13 @@ strremove(struct inode *inode, struct stdata *sd)
 			*sdp = sd->sd_clone;
 			sd->sd_clone = NULL;
 		}
+		/* remove from device list */
+		ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
+		if ((cdev = sd->sd_cdevsw)) {
+			cdev->d_inode->i_nlink--;
+			list_del_init(&sd->sd_list);
+		}
 		sd->sd_inode = NULL;
-		inode->i_nlink--;
-		/* i_nlink should fall to zero when the last STREAM head is removed */
-		assert(inode->i_pipe != NULL || inode->i_nlink == 0);
-		/* this tells iput() to delete the inode */
 		up(&inode->i_sem);
 		iput(inode);	/* to cancel igrab() from strinsert */
 	} else
@@ -816,6 +825,7 @@ strevent_unregister(const struct file *file, struct stdata *sd)
 	return strevent_register(file, sd, 0);
 }
 
+
 /**
  *  strevent:	- signal events to requesting processes
  *  @sd:	the stream head
@@ -878,10 +888,16 @@ strevent(struct stdata *sd, const int events, unsigned char band)
 
 			pid = se->se_procp->pid;
 
-			/* kill_proc_info will do the right thing visa vi thread groups */
-
-			if (kill_proc_info(sig, &si, pid))
-				kill_proc(pid, sig, 1);	/* force */
+			{
+#if HAVE_KILL_PROC_INFO_ADDR
+				static int (*kill_proc_info) (int sig, struct siginfo * sip,
+							      pid_t pid) =
+				    (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
+#endif
+				/* kill_proc_info will do the right thing visa vi thread groups */
+				if (kill_proc_info(sig, &si, pid))
+					kill_proc(pid, sig, 1);	/* force */
+			}
 		}
 	}
 	/* do the BSD O_ASYNC list too */
@@ -2426,6 +2442,7 @@ strunlink(struct stdata *stp)
 STATIC void
 strlastclose(struct inode *inode, struct stdata *sd, int oflag)
 {
+	ptrace(("last close of stream %p\n", sd));
 	/* First order of business is to wake everybody up.  We have already set the STRCLOSE bit
 	   by this point and when the waiters wake up, straccess() will kick them out with an
 	   appropriate error. */
@@ -2567,7 +2584,6 @@ STATIC struct stdata *
 stralloc(dev_t dev)
 {
 	struct stdata *sd;
-	queue_t *q;
 	struct cdevsw *cdev;
 
 	/* Note: for pipes, FIFOs and sockets the device returned is a STREAM head rather than a
@@ -2575,18 +2591,13 @@ stralloc(dev_t dev)
 	if (!(cdev = cdrv_get(getmajor(dev))))
 		return ERR_PTR(-ENXIO);
 	/* we don't have a stream yet (or want a new one), so allocate one */
-	if (!(q = allocq()))
-		goto no_q;
-	/* noenable() the write queue so the STRHOLD function works correctly */
-	_WR(q)->q_flag |= QNOENB;
 	if (!(sd = allocstr()))
 		goto no_sd;
+	/* noenable() the write queue so the STRHOLD function works correctly */
+	sd->sd_wq->q_flag |= QNOENB;
 	/* initialization of the stream head */
 	sd->sd_dev = dev;
 	sd->sd_flag = STWOPEN;
-	sd->sd_rq = q;
-	sd->sd_wq = _WR(q);
-	qstream(q) = sd;
 	sd->sd_cdevsw = cdev;
 	/* I think I had the send options for pipes and regular streams backwards: according to
 	   POSIX write(2p) manpage, pipes are supposed to ignore zero-length messages by default
@@ -2595,38 +2606,32 @@ stralloc(dev_t dev)
 	case S_IFIFO:
 		sd->sd_flag |= (cdev->d_flag & D_CLONE) ? STRISPIPE : STRISFIFO;
 		sd->sd_wropt = SNDPIPE;	/* special write ops */
-		setq(q, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
+		setq(sd->sd_rq, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
 		break;
 	case S_IFSOCK:
 		sd->sd_flag |= STRISSOCK;
 		sd->sd_wropt = SNDPIPE;	/* special write ops */
-		setq(q, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
+		setq(sd->sd_rq, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
 		/* cache minpsz and maxpsz */
 		break;
 	default:
 	case S_IFCHR:
 		sd->sd_wropt = SNDZERO;	/* default write ops */
-		setq(q, &str_rinit, &str_winit);
+		setq(sd->sd_rq, &str_rinit, &str_winit);
 		/* cache minpsz and maxpsz */
 		break;
 	}
 	/* cache minpsz and maxpsz */
-	sd->sd_minpsz = _WR(q)->q_minpsz;
-	sd->sd_maxpsz = _WR(q)->q_maxpsz;
+	sd->sd_minpsz = sd->sd_wq->q_minpsz;
+	sd->sd_maxpsz = sd->sd_wq->q_maxpsz;
 	/* don't graft onto inode just yet */
 	sd->sd_inode = NULL;
 	/* done setup, do the open */
 	cdrv_put(cdev);
 	return (sd);
-      no_q:
-	rare();			/* this is highly unlikely as we block allocating queue pairs */
-	cdrv_put(cdev);
-	goto enosr;
       no_sd:
 	rare();			/* this is highly unlikely as we block allocating stream heads */
 	cdrv_put(cdev);
-	freeq(q);
-      enosr:
 	/* POSIX open() reference page also allows [ENOMEM] here. */
 	return ERR_PTR(-ENOSR);
 }
@@ -2666,32 +2671,40 @@ stropen(struct inode *inode, struct file *file)
 	struct stdata *sd;
 	cred_t *crp = current_creds;
 
+	ptrace(("opening a stream\n"));
 	oflag = make_oflag(file);
 	sflag = ((oflag & O_CLONE) == O_CLONE) ? CLONEOPEN : DRVOPEN;
 
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
+		ptrace(("driver open in effect\n"));
 		if ((err = down_interruptible(&inode->i_sem)))
 			goto error;
 		sd = sd_get((struct stdata *) inode->i_pipe);
 		up(&inode->i_sem);
-	} else
+	} else {
+		ptrace(("clone open in effect\n"));
 		sd = NULL;
+	}
 
 	if (!sd) {
 		dev_t dev;
 
 		/* need new STREAM head */
 		dev = file->private_data ? *((dev_t *) file->private_data) : inode->i_ino;
+		ptrace(("no stream head, allocating stream for dev %hu:%hu\n", getmajor(dev), getminor(dev)));
 		if (IS_ERR(sd = stralloc(dev))) {
 			err = PTR_ERR(sd);
 			goto error;
 		}
 		/* if we just allocated stream head we already hold the STWOPEN bit */
 		dev = strinccounts(file, sd, oflag);
+		ptrace(("performing qopen() on sd %p\n", sd));
 		/* 1st step: attach the driver and call its open routine */
-		if ((err = qopen(sd->sd_rq, &dev, oflag, sflag, crp)))
+		if ((err = qopen(sd->sd_rq, &dev, oflag, sflag, crp))) {
+			ptrace(("Error path taken for sd %p\n", sd));
 			goto put_error;	/* will destroy new stream head */
+		}
 		/* 2nd step: check for redirected return */
 		if (dev != sd->sd_dev) {
 			/* This only occurs if we allocated a new STREAM head and the device number
@@ -2700,10 +2713,12 @@ stropen(struct inode *inode, struct file *file)
 			   inode rather than the initial inode. */
 			struct dentry *dentry;
 
+			ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev), getminor(dev)));
 			sd->sd_dev = dev;
 			/* we need a new dentry and inode in the device shadow directory */
 			if (IS_ERR(dentry = spec_dentry(dev, NULL))) {
 				err = PTR_ERR(dentry);
+				ptrace(("Error path taken for sd %p\n", sd));
 				qdetach(sd->sd_rq, oflag, crp);
 				goto put_error;
 			}
@@ -2716,17 +2731,23 @@ stropen(struct inode *inode, struct file *file)
 				dput(xchg(&file->f_dentry, dget(dentry)));
 			}
 		}
-		strinsert(inode, file, sd);	/* publish to inode and file pointer */
+		ptrace(("publishing sd %p\n", sd));
+		strinsert(inode, file, sd);	/* publish to inode, file pointer, device */
+		ptrace(("performing autopush() on sd %p\n", sd));
 		/* 3rd step: autopush modules and call their open routines */
-		if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp)))
+		if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp))) {
+			ptrace(("Error path taken for sd %p\n", sd));
 			goto wake_error;
+		}
 	} else {
 		queue_t *wq, *wq_next;
 		dev_t dev;
 
 		/* already have STREAM head */
-		if ((err = strwaitopen(sd, FCREAT)))
+		if ((err = strwaitopen(sd, FCREAT))) {
+			ptrace(("Error path taken for sd %p\n", sd));
 			goto put_error;
+		}
 		dev = strinccounts(file, sd, oflag);
 		swunlock(sd);
 		/* already open: we walk down the queue chain calling open on each of the modules
@@ -2739,19 +2760,24 @@ stropen(struct inode *inode, struct file *file)
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			new_sflag = wq_next ? MODOPEN : sflag;
 			/* calling qopen for module/driver */
-			if ((err = qopen(_RD(wq), &dev, oflag, new_sflag, crp)))
+			if ((err = qopen(_RD(wq), &dev, oflag, new_sflag, crp))) {
+				ptrace(("Error path taken for sd %p\n", sd));
 				break;
+			}
 		}
 	}
       wake_error:
+	ptrace(("performing strwakeopen() on sd %p\n", sd));
 	strwakeopen(sd);
 	if (!err) {
 		/* do this if no error and FIFO *after* releasing open bit */
 		if (sd->sd_flag & STRISFIFO)
 			/* POSIX blocking semantics for FIFOS */
 			strwaitfifo(sd, oflag);
-	} else
+	} else {
+		ptrace(("performing strclose() on sd %p\n", sd));
 		strclose(inode, file);
+	}
       put_error:
 	sd_put(&sd);
       error:
@@ -2864,6 +2890,7 @@ strclose(struct inode *inode, struct file *file)
 	if (likely((sd = stri_remove(file)) != NULL)) {
 		int oflag = make_oflag(file);
 
+		ptrace(("closing stream %p\n", sd));
 		/* Always deregister STREAMS events */
 		strevent_unregister(file, sd);
 
@@ -6431,7 +6458,7 @@ EXPORT_SYMBOL(strwsrv);
 
 #if !HAVE_KILL_SL_EXPORT
 #if HAVE_KILL_SL_ADDR
-static (typeof(&kill_sl)) kill_sl_func = (typeof(&kill_sl)) HAVE_KILL_SL_ADDR;
+static int (*kill_sl_func)(pid_t, int, int) = (typeof(kill_sl_func)) HAVE_KILL_SL_ADDR;
 #define kill_sl kill_sl_func
 #else
 STATIC int

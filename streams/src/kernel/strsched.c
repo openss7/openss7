@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/08/30 03:37:12 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/08/31 19:03:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/08/30 03:37:12 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/08/31 19:03:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/08/30 03:37:12 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/08/31 19:03:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -967,6 +967,7 @@ sq_alloc(void)
 	/* Note: sq_alloc() is only called by qattach() that is only called by the STREAM head at
 	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
 	if ((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+		ptrace(("syncq %p is allocated\n", sq));
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
 		write_unlock(&si->si_rwlock);
@@ -983,6 +984,8 @@ sq_get(struct syncq *sq)
 	if (sq) {
 		assert(atomic_read(&sq->sq_refs) >= 1);
 		atomic_inc(&sq->sq_refs);
+		
+		ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 	return (sq);
 }
@@ -995,6 +998,8 @@ sq_put(struct syncq **sqp)
 	if ((sq = xchg(sqp, NULL))) {
 		if (atomic_dec_and_test(&sq->sq_refs)) {
 			struct strinfo *si = &Strinfo[DYN_SYNCQ];
+
+			ptrace(("syncq %p is being deleted\n", sq));
 
 			write_lock(&si->si_rwlock);
 			list_del_init((struct list_head *) &sq->sq_next);
@@ -1021,7 +1026,8 @@ sq_put(struct syncq **sqp)
 			wake_up_all(&sq->sq_waitq);
 			init_waitqueue_head(&sq->sq_waitq);
 			kmem_cache_free(si->si_cache, sq);
-		}
+		} else
+			ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 }
 #endif
@@ -3695,6 +3701,7 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds */
 	init_waitqueue_head(&sd->sd_waitq);
 	slockinit(sd);
+	INIT_LIST_HEAD(&sd->sd_list); /* doesn't matter really */
 //      init_MUTEX(&sd->sd_mutex);
 }
 STATIC void
@@ -3710,23 +3717,30 @@ allocstr(void)
 	   never allocate stream heads without first allocating a queue pair, or, perhaps we should 
 	   embed the queue pair allocation inside the stream head allocation.  Think about this. */
 	struct strinfo *si = &Strinfo[DYN_STREAM];
-	struct stdata *sd;
+	struct stdata *sd = NULL;
+	queue_t *q;
 
-	/* Note: we only allocate stream heads in stropen which is called in user context without
-	   any locks held.  This allocation can sleep.  We now use SLAB_KERNEL instead of
-	   SLAB_ATOMIC. */
-	if ((sd = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
-		struct shinfo *sh = (struct shinfo *) sd;
+	if ((q = allocq())) {
+		/* Note: we only allocate stream heads in stropen which is called in user context
+		   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL
+		   instead of SLAB_ATOMIC. */
+		if ((sd = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+			struct shinfo *sh = (struct shinfo *) sd;
 
-		atomic_set(&sh->sh_refs, 1);
+			atomic_set(&sh->sh_refs, 1);
 #if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
-		write_lock(&si->si_rwlock);
-		list_add_tail(&sh->sh_list, &si->si_head);
-		write_unlock(&si->si_rwlock);
+			write_lock(&si->si_rwlock);
+			list_add_tail(&sh->sh_list, &si->si_head);
+			write_unlock(&si->si_rwlock);
 #endif
-		atomic_inc(&si->si_cnt);
-		if (atomic_read(&si->si_cnt) > si->si_hwl)
-			si->si_hwl = atomic_read(&si->si_cnt);
+			atomic_inc(&si->si_cnt);
+			if (atomic_read(&si->si_cnt) > si->si_hwl)
+				si->si_hwl = atomic_read(&si->si_cnt);
+			sd->sd_rq = qget(q + 0);
+			sd->sd_wq = qget(q + 1);
+			qstream(q) = sd; /* don't do double get */
+		} else
+			__freeq(q);
 	}
 	return (sd);
 }
@@ -3762,11 +3776,12 @@ EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 streams_fastcall struct stdata *
 sd_get(struct stdata *sd)
 {
-	struct shinfo *sh = (struct shinfo *) sd;
+	if (sd) {
+		struct shinfo *sh = (struct shinfo *) sd;
 
-	assert(sd != NULL);
-	assert(atomic_read(&sh->sh_refs) > 0);
-	atomic_inc(&sh->sh_refs);
+		assert(atomic_read(&sh->sh_refs) > 0);
+		atomic_inc(&sh->sh_refs);
+	}
 	return (sd);
 }
 
@@ -3788,9 +3803,12 @@ sd_put(struct stdata **sdp)
 			assert(sd->sd_inode == NULL);
 			assert(sd->sd_clone == NULL);
 			assert(sd->sd_iocblk == NULL);
+			/* zero stream reference on queue pair to avoid double put on sd */
+			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */
-			sd->sd_wq = NULL;
-			qput(&sd->sd_rq);
+			qput(&sd->sd_wq);
+			qput(&sd->sd_rq); /* should be last put */
+			/* initial qget is balanced in qdetach()/qdelete() */
 			__freestr(sd);
 		}
 	}
@@ -3937,10 +3955,12 @@ strsched_init(void)
 
 	if ((result = str_init_caches()) < 0)
 		return (result);
+#if defined CONFIG_STREAMS_SYNCQS
 	if (!(global_syncq = sq_alloc())) {
 		str_term_caches();
 		return (-ENOMEM);
 	}
+#endif
 	for (i = 0; i < NR_CPUS; i++) {
 		struct strthread *t = &strthreads[i];
 
@@ -3983,6 +4003,8 @@ strsched_exit(void)
 {
 	del_timer(&scan_timer);
 	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
+#if defined CONFIG_STREAMS_SYNCQS
 	sq_put(&global_syncq);
+#endif
 	str_term_caches();
 }

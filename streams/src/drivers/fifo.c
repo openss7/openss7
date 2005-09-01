@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:11 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -235,7 +235,7 @@ fifo_close(queue_t *q, int oflag, cred_t *crp)
 static struct cdevsw fifo_cdev = {
 	.d_name = CONFIG_STREAMS_FIFO_NAME,
 	.d_str = &fifo_info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = &strm_f_ops,
 	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,

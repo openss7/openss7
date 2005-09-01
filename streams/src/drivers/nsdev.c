@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/30 03:37:11 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -217,12 +217,12 @@ struct file_operations nsdev_ops ____cacheline_aligned = {
  */
 
 static struct cdevsw nsdev_cdev = {
-	d_name:CONFIG_STREAMS_NSDEV_NAME,
-	d_str:&nsdev_info,
-	d_flag:0,
-	d_fop:&nsdev_ops,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_NSDEV_NAME,
+	.d_str = &nsdev_info,
+	.d_flag = D_MP,
+	.d_fop = &nsdev_ops,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 /* 

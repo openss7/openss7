@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -227,12 +227,12 @@ pipe_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct cdevsw pipe_cdev = {
-	d_name:CONFIG_STREAMS_PIPE_NAME,
-	d_str:&pipe_info,
-	d_flag:D_CLONE,
-	d_fop:&strm_f_ops,
-	d_mode:S_IFIFO | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_PIPE_NAME,
+	.d_str = &pipe_info,
+	.d_flag = D_CLONE | D_MP,
+	.d_fop = &strm_f_ops,
+	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_PIPE_MODULE

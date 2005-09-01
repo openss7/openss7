@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:10 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:10 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -381,6 +381,9 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 {
 	struct list_head *pos, *slot = &cdev->d_minors;
 
+	ensure(cdev->d_minors.next,
+		INIT_LIST_HEAD(&cdev->d_minors));
+
 	list_for_each(pos, slot) {
 		struct devnode *cmin = list_entry(pos, struct devnode, n_list);
 
@@ -573,8 +576,11 @@ cmaj_lookup(const struct cdevsw *cdev, major_t major)
 {
 	struct devnode *cmaj = NULL;
 
+	ensure(cdev->d_majors.next,
+		return (cmaj));
+
 	read_lock(&cdevsw_lock);
-	if (cdev && cdev->d_majors.next) {
+	if (cdev) {
 		register struct list_head *pos;
 
 		list_for_each(pos, &cdev->d_majors) {
@@ -600,8 +606,11 @@ cmin_lookup(const struct cdevsw *cdev, minor_t minor)
 {
 	struct devnode *cmin = NULL;
 
+	ensure(cdev->d_minors.next,
+		return (cmin));
+
 	read_lock(&cdevsw_lock);
-	if (cdev && cdev->d_minors.next) {
+	if (cdev) {
 		register struct list_head *pos;
 
 		list_for_each(pos, &cdev->d_minors) {
@@ -731,8 +740,11 @@ cmin_search(const struct cdevsw *cdev, const char *name)
 {
 	struct devnode *cmin = NULL;
 
+	ensure(cdev->d_minors.next,
+		return (cmin));
+
 	read_lock(&cdevsw_lock);
-	if (cdev && cdev->d_minors.next) {
+	if (cdev) {
 		register struct list_head *pos;
 
 		list_for_each(pos, &cdev->d_minors) {
@@ -810,6 +822,9 @@ EXPORT_SYMBOL(cdev_str);
  *
  *  Context: When the calling context can block, an attempt will be made to load the driver by major
  *  device number.
+ *
+ *  Notices: sdev_get() and sdev_put() had to be renamed from cdev_get() and cdev_put() because
+ *  later 2.6 kernels use those names for character devices.
  */
 streams_fastcall struct cdevsw *
 sdev_get(major_t major)
@@ -822,6 +837,9 @@ EXPORT_SYMBOL(sdev_get);
 /**
  *  sdev_put:	- put a reference to a STREAMS device
  *  @cdev:	STREAMS device structure pointer to put
+ *
+ *  Notices: sdev_get() and sdev_put() had to be renamed from cdev_get() and cdev_put() because
+ *  later 2.6 kernels use those names for character devices.
  */
 streams_fastcall void
 sdev_put(struct cdevsw *cdev)
@@ -1007,7 +1025,8 @@ cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 {
 	struct list_head *pos;
 
-	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next,
+		INIT_LIST_HEAD(&cdev->d_majors));
 
 	list_for_each(pos, &cdev->d_majors) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
@@ -1024,6 +1043,14 @@ EXPORT_SYMBOL(cdev_minor);
 void
 fmod_add(struct fmodsw *fmod, modID_t modid)
 {
+	/* These are statically allocated and therefore need to be initialized, however, the module
+	 * must not already be on a list. */
+
+	assert(!fmod->f_list.next || list_empty(&fmod->f_list));
+	INIT_LIST_HEAD(&fmod->f_list);
+	assert(!fmod->f_hash.next || list_empty(&fmod->f_hash));
+	INIT_LIST_HEAD(&fmod->f_hash);
+
 	fmod->f_modid = modid;
 	list_add(&fmod->f_list, &fmodsw_list);
 	list_add(&fmod->f_hash, strmod_hash_slot(modid));
@@ -1042,18 +1069,44 @@ fmod_del(struct fmodsw *fmod)
 
 EXPORT_SYMBOL(fmod_del);
 
+/**
+ *  sdev_add:	- add a STREAMS device to the registration list
+ *  @cdev:	STREAMS device structure to add
+ *  @modid:	assigned module identifier
+ *
+ *  Notices: sdev_add() and sdev_del() had to be renamed from cdev_add() and cdev_put() because
+ *  later 2.6 kernels use those names for character devices.
+ */
 int
-cdev_add(struct cdevsw *cdev, modID_t modid)
+sdev_add(struct cdevsw *cdev, modID_t modid)
 {
 	struct inode *inode;
 	struct super_block *sb;
+
+	/* These are statically allocated and therefore need to be initialized, however, the module
+	 * must not already be on a list. */
+
+	assert(!cdev->d_list.next || list_empty(&cdev->d_list));
+	INIT_LIST_HEAD(&cdev->d_list);
+	assert(!cdev->d_hash.next || list_empty(&cdev->d_hash));
+	INIT_LIST_HEAD(&cdev->d_hash);
+	assert(!cdev->d_majors.next || list_empty(&cdev->d_majors));
+	INIT_LIST_HEAD(&cdev->d_majors);
+	assert(!cdev->d_minors.next || list_empty(&cdev->d_minors));
+	INIT_LIST_HEAD(&cdev->d_minors);
+	assert(!cdev->d_apush.next || list_empty(&cdev->d_apush));
+	INIT_LIST_HEAD(&cdev->d_apush);
+	assert(!cdev->d_stlist.next || list_empty(&cdev->d_stlist));
+	INIT_LIST_HEAD(&cdev->d_stlist);
 
 	{
 		dev_t dev = makedevice(0, modid);
 		struct vfsmount *mnt;
 
-		if (!(mnt = specfs_get()))
+		if (!(mnt = specfs_get())) {
+			ptrace(("couldn't get specfs mount point\n"));
 			return (-ENODEV);
+		}
 		sb = mnt->mnt_sb;
 #if HAVE_KFUNC_IGET_LOCKED
 		inode = iget_locked(sb, dev);
@@ -1070,31 +1123,34 @@ cdev_add(struct cdevsw *cdev, modID_t modid)
 	if (inode->i_state & I_NEW) {
 		inode->u.generic_ip = cdev;
 		sb->s_op->read_inode(inode);
-		inode->i_nlink++;
 		unlock_new_inode(inode);
 	}
 #endif
+	inode->i_sb->s_root->d_inode->i_nlink++;
 	cdev->d_inode = inode;
 	cdev->d_modid = modid;
 	list_add(&cdev->d_list, &cdevsw_list);
 	list_add(&cdev->d_hash, strmod_hash_slot(modid));
-	if (!cdev->d_majors.next)
-		INIT_LIST_HEAD(&cdev->d_majors);
-	if (!cdev->d_minors.next)
-		INIT_LIST_HEAD(&cdev->d_minors);
-	if (!cdev->d_apush.next)
-		INIT_LIST_HEAD(&cdev->d_apush);
-	if (!cdev->d_stlist.next)
-		INIT_LIST_HEAD(&cdev->d_stlist);
+
+	assert(cdev->d_list.next && !list_empty(&cdev->d_list));
+
 	cdev_count++;
 	return (0);
 }
 
-EXPORT_SYMBOL(cdev_add);
+EXPORT_SYMBOL(sdev_add);
 
+/**
+ *  sdev_del:	- delete a streams device from the registration list
+ *  @cdev:	STREAMS device structure to delete
+ *
+ *  Notices: sdev_add() and sdev_del() had to be renamed from cdev_add() and cdev_put() because
+ *  later 2.6 kernels use those names for character devices.
+ */
 void
-cdev_del(struct cdevsw *cdev)
+sdev_del(struct cdevsw *cdev)
 {
+	cdev->d_inode->i_sb->s_root->d_inode->i_nlink--;
 	/* put away dentry if necessary */
 	iput(xchg(&cdev->d_inode, NULL));
 	/* remove from list and hash */
@@ -1104,7 +1160,7 @@ cdev_del(struct cdevsw *cdev)
 	specfs_put();
 }
 
-EXPORT_SYMBOL(cdev_del);
+EXPORT_SYMBOL(sdev_del);
 
 void
 cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
@@ -1112,7 +1168,8 @@ cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 	cmaj->n_major = major;
 	cmaj->n_minor = 0;	/* FIXME */
 
-	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next,
+		INIT_LIST_HEAD(&cdev->d_majors));
 
 	/* add to list and hash */
 	if (list_empty(&cdev->d_majors))
@@ -1126,7 +1183,8 @@ EXPORT_SYMBOL(cmaj_add);
 void
 cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
-	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next,
+		INIT_LIST_HEAD(&cdev->d_majors));
 
 	list_del_init(&cmaj->n_list);
 	list_del_init(&cmaj->n_hash);
@@ -1165,10 +1223,10 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	if (inode->i_state & I_NEW) {
 		inode->u.generic_ip = cdev;
 		sb->s_op->read_inode(inode);
-		inode->i_nlink++;
 		unlock_new_inode(inode);
 	}
 #endif
+	cdev->d_inode->i_nlink++;
 	cmin->n_inode = inode;
 	cmin->n_dev = cdev;
 	cmin->n_modid = cdev->d_modid;
@@ -1180,7 +1238,8 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	if (!(cmin->n_mode & S_IFMT))
 		cmin->n_mode = S_IFCHR | S_IRUGO | S_IWUGO;
 
-	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next,
+		INIT_LIST_HEAD(&cdev->d_minors));
 
 	/* add to list and hash */
 	list_add(&cmin->n_list, &cdev->d_minors);
@@ -1194,13 +1253,15 @@ EXPORT_SYMBOL(cmin_add);
 void
 cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
-	/* put away dentry if required */
+	cdev->d_inode->i_nlink--;
+	/* put away inode if required */
 	iput(xchg(&cmin->n_inode, NULL));
 	cmin->n_dev = NULL;
 	cmin->n_modid = -1;
 	cmin->n_minor = -1;
 
-	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next,
+		INIT_LIST_HEAD(&cdev->d_minors));
 
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);

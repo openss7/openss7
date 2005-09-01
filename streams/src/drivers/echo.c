@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:10 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:10 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:10 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:10 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/08/30 03:37:10 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -250,16 +250,20 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		spin_lock(&echo_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     getminor(makedevice(0, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
 			minor_t dminor = getminor((*pp)->dev);
 
 			if (cminor < dminor)
 				break;
-			if (cminor == dminor && sflag != CLONEOPEN) {
-				spin_unlock(&echo_lock);
-				kmem_free(p, sizeof(*p));
-				pswerr(("%s: stream already open!\n", __FUNCTION__));
-				return (EIO);	/* bad error */
+			if (cminor == dminor) {
+				if (sflag == CLONEOPEN)
+					cminor++;
+				else {
+					spin_unlock(&echo_lock);
+					kmem_free(p, sizeof(*p));
+					pswerr(("%s: stream already open!\n", __FUNCTION__));
+					return (EIO);	/* bad error */
+				}
 			}
 		}
 		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
@@ -321,12 +325,12 @@ static struct streamtab echo_info = {
 };
 
 static struct cdevsw echo_cdev = {
-	d_name:CONFIG_STREAMS_ECHO_NAME,
-	d_str:&echo_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_ECHO_NAME,
+	.d_str = &echo_info,
+	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE

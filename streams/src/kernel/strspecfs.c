@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -83,6 +83,9 @@ static char const ident[] =
 
 #include <linux/kernel.h>	/* for simple_strtoul, FASTCALL(), fastcall */
 #include <linux/pagemap.h>	/* for PAGE_CACHE_SIZE */
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>	/* for lookup_hash on 2.6 */
+#endif
 #include <linux/mount.h>	/* for mntget and friends */
 
 #if HAVE_KINC_LINUX_STATFS_H
@@ -95,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/08/30 03:37:12 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:11 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -258,6 +261,163 @@ MODULE_ALIAS("/dev/streams/*");
 #undef makedevice
 #define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
 
+/*
+ *  -------------------------------------------------------------------------
+ *  -------------------------------------------------------------------------
+ */
+
+#ifndef HAVE_FILE_MOVE_ADDR
+STATIC void
+_file_move(struct file *file, struct list_head *list)
+{
+	if (!list)
+		return;
+	file_list_lock();
+	list_del(&file->f_list);
+	list_add(&file->f_list, list);
+	file_list_unlock();
+}
+#endif
+
+STATIC void
+file_swap_put(struct file *f1, struct file *f2)
+{
+#ifdef HAVE_FILE_MOVE_ADDR
+	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+#endif
+	f1->f_op = xchg(&f2->f_op, f1->f_op);
+	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
+	f1->f_vfsmnt = xchg(&f2->f_vfsmnt, f1->f_vfsmnt);
+	f1->private_data = xchg(&f2->private_data, f1->private_data);
+	_file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
+	_file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
+	fput(f2);
+}
+
+#ifndef O_CLONE
+#define O_CLONE (O_CREAT|O_EXCL)
+#endif
+
+/**
+ *  spec_dentry: - find a dentry in the specfs to open.
+ *  @dev: device for which to find a dentry
+ *  @sflagp: flags to modify (if any)
+ */
+struct dentry *
+spec_dentry(dev_t dev, int *sflagp)
+{
+	struct dentry *dentry;
+	struct cdevsw *cdev;
+
+	{
+		struct qstr name;
+		char buf[32];
+
+		dentry = ERR_PTR(-ENXIO);
+		if (!(cdev = cdrv_get(getmajor(dev))))
+			goto done;
+		if (sflagp && cdev->d_flag & D_CLONE)
+			*sflagp = CLONEOPEN;
+		snprintf(buf, 32, "%s", cdev->d_name);
+		cdrv_put(cdev);
+		name.name = buf;
+		name.len = strnlen(buf, 32 - 1);
+		name.hash = full_name_hash(name.name, name.len);
+		{
+			struct vfsmount *mnt;
+
+			dentry = ERR_PTR(-EIO);
+			if (!(mnt = specfs_get()))
+				goto done;
+			down(&mnt->mnt_root->d_inode->i_sem);
+			dentry = lookup_hash(&name, mnt->mnt_root);
+			up(&mnt->mnt_root->d_inode->i_sem);
+			specfs_put();
+		}
+	}
+	if (IS_ERR(dentry))
+		goto done;
+	if (!dentry->d_inode)
+		goto enoent;
+	{
+		struct qstr name;
+		char buf[32];
+		struct dentry *parent = dentry;
+
+		{
+			struct devnode *cmin;
+
+			if ((cmin = cmin_get(cdev, getminor(dev)))) {
+				if (sflagp && cmin->n_flag & D_CLONE)
+					*sflagp = CLONEOPEN;
+				snprintf(buf, 32, "%s", cmin->n_name);
+			} else {
+				snprintf(buf, 32, "%lu", getminor(dev));
+			}
+			name.name = buf;
+			name.len = strnlen(buf, 32 - 1);
+			name.hash = full_name_hash(name.name, name.len);
+		}
+		down(&parent->d_inode->i_sem);
+		dentry = lookup_hash(&name, parent);
+		up(&parent->d_inode->i_sem);
+		dput(parent);
+	}
+	if (IS_ERR(dentry)) {
+		goto done;
+	}
+	if (!dentry->d_inode) {
+		goto enoent;
+	}
+      done:
+	return (dentry);
+      enoent:
+	dput(dentry);
+	dentry = ERR_PTR(-ENOENT);
+	goto done;
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
+EXPORT_SYMBOL(spec_dentry);
+#endif
+
+/**
+ *  spec_open:	- chain open to an internal special device.
+ *  @i:	external (or chaining) filesystem inode
+ *  @f:	external (or chaining) filesystem file pointer (user file pointer)
+ *
+ *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
+ */
+int
+spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
+{
+	struct file *tmp;		/* temporary file pointer to use */
+	struct dentry *dentry;
+	struct vfsmount *mnt;
+
+	if (IS_ERR(dentry = spec_dentry(dev, &sflag)))
+		return PTR_ERR(dentry);
+
+	if ((mnt = specfs_get())) {
+		int oflag = f->f_flags;
+
+		if (sflag == CLONEOPEN)
+			oflag |= O_CLONE;
+		tmp = dentry_open(dentry, mntget(mnt), oflag);
+		specfs_put();
+		if (IS_ERR(tmp))
+			return PTR_ERR(tmp);
+		file_swap_put(f, tmp);
+		return (0);
+	}
+	dput(dentry);
+	return (-ENODEV);
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
+         || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
+EXPORT_SYMBOL(spec_open);
+#endif
 /* 
  *  =========================================================================
  *
@@ -269,7 +429,6 @@ MODULE_ALIAS("/dev/streams/*");
  *  Shadow Special Filesystem Device node file operations.
  *  -------------------------------------------------------------------------
  */
-#if 0
 /**
  *  spec_dev_open: - open a stream from an internal character special device, fifo or socket
  *  @inode:	internal shadow special filesystem inode
@@ -280,6 +439,8 @@ MODULE_ALIAS("/dev/streams/*");
  *  shadow special filesystem has been performed on the mounted filesystem.  We need to establish
  *  our streams arguments and nest into the devices open procedure.
  */
+#if 0
+#if 0
 STATIC int
 spec_dev_open(struct inode *inode, struct file *file)
 {
@@ -304,6 +465,39 @@ spec_dev_open(struct inode *inode, struct file *file)
       exit:
 	return (err);
 }
+#else
+/* like cdev_open() but, uses internal modid and instance numbers */
+STATIC int
+spec_dev_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct cdevsw *cdev;
+	struct devnode *cmin;
+	minor_t minor;
+	modID_t modid;
+	dev_t dev;
+	int sflag;
+
+	if ((err = down_interruptible(&inode->i_sem)))
+		goto exit;
+	dev = inode->i_ino;
+	modid = getmajor(dev);
+	err = -ENXIO;
+	if (!(cdev = cdrv_get(dev)))
+		goto up_exit;
+	minor = getminor(dev);
+	cmin = cmin_get(cdev, minor);
+	sflag = (cmin)
+	    ? ((cmin->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN)
+	    : ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
+	err = spec_open(inode, file, dev, sflag);
+	sdev_put(cdev);
+      up_exit:
+	up(&inode->i_sem);
+      exit:
+	return (err);
+}
+#endif
 
 struct file_operations spec_dev_f_ops = {
 	owner:THIS_MODULE,
@@ -349,29 +543,35 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 {
 	struct cdevsw *cdev;
 
+	ptrace(("looking up %s\n", new->d_name.name));
 	if ((cdev = dir->u.generic_ip)) {
 		struct devnode *cmin;
 
+		ptrace(("found cdev %s\n", cdev->d_name));
 		/* check if the name is registered as a minor device node name */
 		if ((cmin = cmin_find(cdev, new->d_name.name))) {
 			struct inode *inode;
 
+			ptrace(("found cmin %s\n", cmin->n_name));
 			if ((inode = cmin->n_inode)) {
+				ptrace(("found inode for cmin %s\n", cmin->n_name));
 				igrab(inode);
 				d_add(new, inode);
 				return (NULL);	/* success */
 			}
+			ptrace(("no inode for cmin %s\n", cmin->n_name));
 			return ERR_PTR(-EIO);
 		} else {
 			/* check if the name is a valid number */
 			char *tail = (char *) new->d_name.name;
-			minor_t minor = simple_strtoul(tail, &tail, 0);
+			minor_t minor = simple_strtoul(tail, &tail, 10); /* base 10 only! */
 
 			if (*tail == '\0') {
 				if ((minor & ~MINORMASK) == 0) {
 					struct inode *inode;
 					dev_t dev = makedevice(cdev->d_modid, minor);
-
+					ptrace(("looking up inode for number %s\n",
+						new->d_name.name));
 #if HAVE_KFUNC_IGET_LOCKED
 					if ((inode = iget_locked(dir->i_sb, dev)))
 #else
@@ -385,13 +585,17 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 							unlock_new_inode(inode);
 						}
 #endif
+						ptrace(("found inode for number %s\n",
+							new->d_name.name));
 						d_add(new, inode);
 						return (NULL);	/* success */
 					}
+					ptrace(("no inode for number %s\n", new->d_name.name));
 					return ERR_PTR(-ENOMEM);
 				}
 			}
 		}
+		ptrace(("no inode for %s\n", new->d_name.name));
 	}
 	return ERR_PTR(-ENOENT);
 }
@@ -443,49 +647,61 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		/* fall through */
 	default:
 		read_lock(&cdevsw_lock);
-		if ((cdev = dentry->d_inode->u.generic_ip) && cdev->d_minors.next) {
-			struct list_head *pos;
+		if ((cdev = dentry->d_inode->u.generic_ip)) {
 			int i = nr - 2, err = 0;
 
-			/* skip to position */
-			for (pos = cdev->d_minors.next; pos != &cdev->d_minors && i;
-			     pos = pos->next, i--) ;
-			/* start writing */
-			for (; err >= 0 && pos != &cdev->d_minors;
-			     pos = pos->next, nr++, file->f_pos++) {
-				struct devnode *cmin = list_entry(pos, struct devnode, n_list);
+			if (cdev->d_minors.next && !list_empty(&cdev->d_minors)) {
+				struct list_head *pos;
 
-				if (cmin->n_inode) {
-					read_unlock(&cdevsw_lock);
+				/* skip to position */
+				for (pos = cdev->d_minors.next; pos != &cdev->d_minors && i;
+				     pos = pos->next, i--) ;
+				/* start writing */
+				for (; err >= 0 && pos != &cdev->d_minors;
+				     pos = pos->next, nr++, file->f_pos++) {
+					struct devnode *cmin =
+					    list_entry(pos, struct devnode, n_list);
+
+					if (cmin->n_inode == NULL)
+						continue;
+
+					read_unlock(&cdevsw_lock);	/* Not safe */
 					err = filldir(dirent, cmin->n_name,
-						      strnlen(cmin->n_name, FMNAMESZ), file->f_pos,
-						      cmin->n_inode->i_ino,
+						      strnlen(cmin->n_name, FMNAMESZ),
+						      file->f_pos, cmin->n_inode->i_ino,
 						      cmin->n_inode->i_mode >> 12);
+					read_lock(&cdevsw_lock);
+				}
+			}
+			/* walk the active stream head list */
+			if (cdev->d_stlist.next && !list_empty(&cdev->d_stlist)) {
+				struct list_head *pos;
+
+				/* skil to position */
+				for (pos = cdev->d_stlist.next; pos != &cdev->d_stlist && i;
+				     pos = pos->next, i--) ;
+				for (; err >= 0 && pos != &cdev->d_stlist;
+				     pos = pos->next, nr++, file->f_pos++) {
+					struct stdata *sd = list_entry(pos, struct stdata, sd_list);
+					char numstr[24];
+					int len;
+
+					if (sd->sd_inode == NULL)
+						continue;
+
+					len = snprintf(numstr, sizeof(numstr),
+						       "%lu", getminor(sd->sd_inode->i_ino));
+
+					read_unlock(&cdevsw_lock);	/* Not safe */
+					err = filldir(dirent, numstr, len,
+						      file->f_pos,
+						      sd->sd_inode->i_ino,
+						      sd->sd_inode->i_mode >> 12);
 					read_lock(&cdevsw_lock);
 				}
 			}
 		}
 		read_unlock(&cdevsw_lock);
-#if 0
-		/* TODO: do this later */
-		/* this would be a fairly big security breach */
-		/* walk the active stream head list */
-		list_for_each_safe(pos, tmp, &cdev->d_stlist) {
-			struct stdata *sd = list_entry(pos, struct stdata, sd_list);
-			struct file *file;
-
-			if (!(file = sd->sd_file) || !(dentry = file->f_dentry)
-			    || !(inode = dentry->d_inode))
-				continue;
-			err = filldir(dirent, dentry->d_name.name, dentry->d_name.len, file->f_pos,
-				      inode->i_ino, inode->i_mode >> 12);
-			if (err == -EINVAL)
-				break;
-			if (err < 0)
-				return (err);
-			file->f_pos = ++nr;
-		}
-#endif
 		break;
 	}
 	return (0);
@@ -646,11 +862,14 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 {
 	struct cdevsw *cdev;
 
+	ptrace(("looking up %s\n", new->d_name.name));
 	/* this will also attempt to demand load the "streams-%s" module if required */
 	if ((cdev = cdev_find(new->d_name.name))) {
 		struct inode *inode;
 
+		ptrace(("found cdev %s\n", cdev->d_name));
 		if ((inode = cdev->d_inode)) {
+			ptrace(("found inode for cdev %s\n", cdev->d_name));
 			igrab(inode);
 			sdev_put(cdev);
 			d_add(new, inode);
@@ -659,8 +878,10 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		/* It must be a module.  This has the rather unwanted side-effect that searching
 		   directory %s could demand load streams-%s, where streams-%s is not a driver but
 		   a module. */
+		ptrace(("no inode for cdev %s\n", cdev->d_name));
 		sdev_put(cdev);
-	}
+	} else
+		ptrace(("no cdev for %s\n", new->d_name.name));
 	return ERR_PTR(-ENOENT);
 }
 
@@ -1036,6 +1257,7 @@ spec_read_inode(struct inode *inode)
 {
 	struct cdevsw *cdev = inode->u.generic_ip;
 
+	ptrace(("reading inode no %lu\n", inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
 	else {
@@ -1061,28 +1283,43 @@ spec_read_inode(struct inode *inode)
 	if (getmajor(inode->i_ino)) {
 		dev_t dev = MKDEV(cdev->d_major, getminor(inode->i_ino) & MINORMASK);
 
+		/* XXX: To handle the special case of clone devices, where the minor component of
+		   the internal device number is the module identifier of the major device to open,
+		   check if cdev has a minor device with a (non-zero) module id the same as the
+		   minor device component.  If one exists, use the n_minor component of that device.
+		   What is done right now is to simply use the external major device number as the
+		   internal minor number.  Unfortunately, this means that all clone drivers need an
+		   external major device number. */
+		/* XXX: Another approach is to make module identifiers to major nodes equal to the
+		 * external major device number and the point would be moot. */
+		ptrace(("reading minor device inode %lu\n", (ulong) getminor(inode->i_ino)));
 		/* for device nodes, the major component of the i_ino is the module id */
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
 		inode->i_mode &= ~S_IXUGO;
-		inode->i_op = NULL;
-		inode->i_fop = cdev->d_fop;
 #if HAVE_KFUNC_TO_KDEV_T
 		inode->i_rdev = to_kdev_t(dev);
 #else
 		inode->i_rdev = dev;
 #endif
-		// inode->i_op = &spec_dev_i_ops; /* leave at empty_iops */
-		// inode->i_fop = &spec_dev_f_ops;
+		inode->i_op = inode->i_op;	/* leave at empty_iops */
+#if 0
+		inode->i_fop = &spec_dev_f_ops;
+#else
+		inode->i_fop = cdev->d_fop;
+#endif
 	} else {
+		ptrace(("reading major device inode %lu\n", (ulong) getminor(inode->i_ino)));
 		/* for module nodes, the minor component of the i_ino is the module id */
 		inode->i_mode |= S_IFDIR;
 		inode->i_mode |= ((inode->i_mode & S_IRUGO) >> 2);
 		inode->i_op = &spec_dir_i_ops;
 		inode->i_fop = &spec_dir_f_ops;
+		inode->i_nlink = 2;
 	}
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 	return;
       bad_inode:
+	ptrace(("bad inode no %lu\n", inode->i_ino));
 	make_bad_inode(inode);
 	return;
 }
@@ -1414,10 +1651,15 @@ struct file_system_type spec_fs_type = {
 STATIC struct super_block *
 specfs_read_super(struct super_block *sb, void *data, int silent)
 {
+	ptrace(("reading superblock %p\n", sb));
 	return (specfs_fill_super(sb, data, silent) ? NULL : sb);
 }
 
+#if 0
 STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE | FS_LITTER);
+#else
+STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE); /* XXX: don't need FS_LITTER? */
+#endif
 #else
 #error HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB or HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_READ_SUPER must be defined.
 #endif

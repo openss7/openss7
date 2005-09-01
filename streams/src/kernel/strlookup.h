@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlookup.h,v 0.9.2.10 2005/08/30 03:37:11 brian Exp $
+ @(#) $Id: strlookup.h,v 0.9.2.11 2005/08/31 19:03:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -63,8 +63,8 @@ extern struct list_head fmodsw_list;
 
 extern void fmod_add(struct fmodsw *fmod, modID_t modid);
 extern void fmod_del(struct fmodsw *fmod);
-extern int cdev_add(struct cdevsw *cdev, modID_t modid);
-extern void cdev_del(struct cdevsw *cdev);
+extern int sdev_add(struct cdevsw *cdev, modID_t modid);
+extern void sdev_del(struct cdevsw *cdev);
 extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
 extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
 extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);

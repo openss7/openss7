@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/08/30 03:37:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/08/31 19:02:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/30 03:37:08 $ by $Author: brian $
+# Last Modified $Date: 2005/08/31 19:02:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1057,9 +1057,7 @@ man_MANS = \
 	man9/canget.9 \
 	man9/canput.9 \
 	man9/canputnext.9 \
-	man9/cdev_add.9 \
 	man9/cdev_count.9 \
-	man9/cdev_del.9 \
 	man9/cdev_find.9 \
 	man9/cdev_match.9 \
 	man9/cdev_minor.9 \
@@ -1213,6 +1211,8 @@ man_MANS = \
 	man9/runqueues.9 \
 	man9/sd_get.9 \
 	man9/sd_put.9 \
+	man9/sdev_add.9 \
+	man9/sdev_del.9 \
 	man9/sdev_get.9 \
 	man9/sdev_put.9 \
 	man9/sealloc.9 \
@@ -2274,9 +2274,7 @@ dist_noinst_MANS = \
 	man9/canget.9.man \
 	man9/canput.9.man \
 	man9/canputnext.9.man \
-	man9/cdev_add.9.man \
 	man9/cdev_count.9.man \
-	man9/cdev_del.9.man \
 	man9/cdev_find.9.man \
 	man9/cdev_match.9.man \
 	man9/cdev_minor.9.man \
@@ -2431,6 +2429,8 @@ dist_noinst_MANS = \
 	man9/runqueues.9.man \
 	man9/sd_get.9.man \
 	man9/sd_put.9.man \
+	man9/sdev_add.9.man \
+	man9/sdev_del.9.man \
 	man9/sdev_get.9.man \
 	man9/sdev_put.9.man \
 	man9/sealloc.9.man \

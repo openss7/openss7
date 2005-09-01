@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/30 03:37:10 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:10 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/30 03:37:10 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/30 03:37:10 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/30 03:37:10 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -189,7 +189,12 @@ cloneopen(struct inode *inode, struct file *file)
 		/* Darn.  Somebody attached a STREAM head to this file pointer. */
 		return (-EIO);
 
-	if ((cdev = cdrv_get(getminor(dev)))) {
+#if 0
+	if ((cdev = cdrv_get(getminor(dev))))
+#else
+	if ((cdev = sdev_get(getminor(dev))))
+#endif
+	{
 		int err;
 		err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
 		sdev_put(cdev);
@@ -214,7 +219,7 @@ struct file_operations clone_ops ____cacheline_aligned = {
 static struct cdevsw clone_cdev = {
 	.d_name = "clone",
 	.d_str = &clone_info,
-	.d_flag = D_CLONE,
+	.d_flag = D_CLONE | D_MP,
 	.d_fop = &clone_ops,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
@@ -297,6 +302,75 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
+#if 0
+STATIC inode *
+spec_iget(struct super_block *sb, dev_t dev, struct cdevsw *cdev)
+{
+	struct inode *inode;
+
+#if HAVE_KFUNC_IGET_LOCKED
+	inode = iget_locked(sb, dev);
+#else
+	inode = iget4(sb, dev, NULL, cdev);
+#endif
+	if (!inode) {
+		ptrace(("couldn't allocate inode\n"));
+		return ERR_PTR(-ENOMEM);
+	}
+#if HAVE_KFUNC_IGET_LOCKED
+	if (inode->i_state & I_NEW) {
+		inode->u.generic_ip = cdev;
+		sb->s_op->read_inode(inode);
+		inode->i_nlink++;
+		unlock_new_inode(inode);
+	}
+#else
+	inode->i_nlink++;
+#endif
+	return (inode);
+}
+
+STATIC struct inode *
+spec_iget(dev_t dev, struct cdevsw *cdev)
+{
+	struct inode *inode;
+	struct vfsmount *mnt;
+
+	if (!(mnt = specfs_get()))
+		return ERR_PTR(-ENODEV);
+	inode = spec_iget_sb(mnt->mnt_sb, dev, cdev);
+	specfs_put();
+}
+
+STATIC int
+spec_graft(struct file *file, dev_t dev, cdevsw *cdev)
+{
+	struct inode *inode;
+	struct dentry *dentry;
+	struct vfsmount *mnt;
+	struct qstr name;
+
+	name.name = cdev->d_name;
+	name.len = strnlen(cdev->d_name, FMNAMESZ);
+	name.hash = dev;
+
+	if (IS_ERR((inode = spec_iget(dev, cdev))))
+		return PTR_ERR(inode);
+
+	if ((dentry = d_alloc(NULL, &name))) {
+		dentry->d_parent = dentry; /* make it a IS_ROOT() dentry */
+		dentry->d_sb = inode->i_sb;
+		d_instantiate(dentry, inode);
+		/* no, don't hash it */
+	} else {
+		iput(inode);
+		return (-ENOMEM);
+	}
+
+
+}
+#endif
+
 /**
  *  cdev_open: - open a character special device node
  *  @inode: the character device inode
@@ -311,6 +385,17 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
  *
  *  This is the separation point where we convert the external device number to an internal device
  *  number.  The external device number is contained in inode->i_rdev.
+ *
+ *  @inode is the inode in the external filesystem.
+ *
+ *  @file->f_op is the external file operations (character device, fifo) and must be replaced with
+ *	our file operations.
+ *
+ *  @file->f_dentry is the external filesystem dentry for the device node.
+ *  @file->f_vfsmnt is the external filesystem vfsmnt for the device node.
+ *
+ *  What we should be doing here is get a fresh new dentry.  Find our inode from the device number,
+ *  add it to the dentry.  Do a do_add_mount operation
  */
 STATIC int
 cdev_open(struct inode *inode, struct file *file)
@@ -385,12 +470,18 @@ register_clone(struct cdevsw *cdev)
 	cmin->n_modid = cdev->d_modid;
 	cmin->n_count = (atomic_t) ATOMIC_INIT(0);
 	cmin->n_sqlvl = cdev->d_sqlvl;
+	cmin->n_syncq = cdev->d_syncq;
 	cmin->n_kmod = cdev->d_kmod;
 	cmin->n_major = clone_cdev.d_major;
 	cmin->n_mode = clone_cdev.d_mode;
 	cmin->n_minor = cdev->d_major;
 	cmin->n_dev = &clone_cdev;
-	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0) {
+#if 0
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0)
+#else
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_major)) < 0)
+#endif
+	{
 		printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
 			cdev->d_name, -err));
 		kfree(cmin);
@@ -547,7 +638,8 @@ static
 void __exit
 clone_exit(void)
 {
-	unregister_cmajor(&clone_cdev, major);
+	if (unregister_cmajor(&clone_cdev, major) != 0)
+		swerr();
 };
 
 #ifdef CONFIG_STREAMS_CLONE_MODULE

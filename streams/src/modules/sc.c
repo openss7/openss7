@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:13 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:13 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:13 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/30 03:37:13 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -126,12 +126,12 @@ MODULE_ALIAS("streams-module-sc");
 #endif
 
 static struct module_info sc_minfo = {
-	mi_idnum:CONFIG_STREAMS_SC_MODID,
-	mi_idname:CONFIG_STREAMS_SC_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_SC_MODID,
+	.mi_idname = CONFIG_STREAMS_SC_NAME,
+	.mi_minpsz = 0,
+	.mi_maxpsz = INFPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 /* 
@@ -372,27 +372,27 @@ sc_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 static struct qinit sc_rqinit = {
-	qi_putp:sc_rput,
-	qi_qopen:sc_open,
-	qi_qclose:sc_close,
-	qi_minfo:&sc_minfo,
+	.qi_putp = sc_rput,
+	.qi_qopen = sc_open,
+	.qi_qclose = sc_close,
+	.qi_minfo = &sc_minfo,
 };
 
 static struct qinit sc_wqinit = {
-	qi_putp:sc_wput,
-	qi_minfo:&sc_minfo,
+	.qi_putp = sc_wput,
+	.qi_minfo = &sc_minfo,
 };
 
 static struct streamtab sc_info = {
-	st_rdinit:&sc_rqinit,
-	st_wrinit:&sc_wqinit,
+	.st_rdinit = &sc_rqinit,
+	.st_wrinit = &sc_wqinit,
 };
 
 static struct fmodsw sc_fmod = {
-	f_name:CONFIG_STREAMS_SC_NAME,
-	f_str:&sc_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+	.f_name = CONFIG_STREAMS_SC_NAME,
+	.f_str = &sc_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_SC_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:03:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -126,12 +126,12 @@ MODULE_ALIAS("streams-module-pipemod");
 #endif
 
 static struct module_info pipemod_minfo = {
-	mi_idnum:CONFIG_STREAMS_PIPEMOD_MODID,
-	mi_idname:CONFIG_STREAMS_PIPEMOD_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_PIPEMOD_MODID,
+	.mi_idname = CONFIG_STREAMS_PIPEMOD_NAME,
+	.mi_minpsz = 0,
+	.mi_maxpsz = INFPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 /* 
@@ -205,22 +205,22 @@ pipemod_close(queue_t *q, int oflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 static struct qinit pipemod_qinit = {
-	qi_putp:pipemod_put,
-	qi_qopen:pipemod_open,
-	qi_qclose:pipemod_close,
-	qi_minfo:&pipemod_minfo,
+	.qi_putp = pipemod_put,
+	.qi_qopen = pipemod_open,
+	.qi_qclose = pipemod_close,
+	.qi_minfo = &pipemod_minfo,
 };
 
 static struct streamtab pipemod_info = {
-	st_rdinit:&pipemod_qinit,
-	st_wrinit:&pipemod_qinit,
+	.st_rdinit = &pipemod_qinit,
+	.st_wrinit = &pipemod_qinit,
 };
 
 static struct fmodsw pipemod_fmod = {
-	f_name:CONFIG_STREAMS_PIPEMOD_NAME,
-	f_str:&pipemod_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+	.f_name = CONFIG_STREAMS_PIPEMOD_NAME,
+	.f_str = &pipemod_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
 };
 
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE

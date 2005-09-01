@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.39 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.40 2005/08/31 19:02:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/08/31 19:02:52 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/31 19:02:52 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -607,8 +607,8 @@ extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_opera
 extern int unregister_cmajor(struct cdevsw *cdev, major_t major);
 
 /* other internals */
-extern int cdev_add(struct cdevsw *cdev, modID_t modid);
-extern void cdev_del(struct cdevsw *cdev);
+extern int sdev_add(struct cdevsw *cdev, modID_t modid);
+extern void sdev_del(struct cdevsw *cdev);
 extern rwlock_t cdevsw_lock;
 extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
 extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);

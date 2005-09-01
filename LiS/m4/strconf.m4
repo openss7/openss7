@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/04 19:57:40 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/31 19:02:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:40 $ by $Author: brian $
+# Last Modified $Date: 2005/08/31 19:02:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -87,7 +87,7 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
     STRCONF_CONFIGS=
     for strconf_tmp in `find $srcdir -name "$STRCONF_STEM" -o -name "$STRCONF_STEM.in"` ; do
 	if test -f "$strconf_tmp" ; then
-	    STRCONF_CONFIGS="${STRCONF_CONFIGS}${STRCONF_CONFIGS:+ }$strconf_tmp"
+	    STRCONF_CONFIGS="$strconf_tmp${STRCONF_CONFIGS:+ }${STRCONF_CONFIGS}"
 	fi
     done
     AC_MSG_RESULT([$STRCONF_CONFIGS])
@@ -176,7 +176,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    ("$ac_abs_builddir"*/"$PACKAGE-bin-$VERSION"/*) continue ;;
 	esac
 	if test -r "$strconf_tmp" ; then
-	    strconf_configs="${strconf_configs}${strconf_configs:+ }$strconf_tmp"
+	    strconf_configs="$strconf_tmp${strconf_configs:+ }${strconf_configs}"
 	fi
     done
     if test -n "${strconf_configs}" -a -n "${STRCONF_INPUT}"; then
