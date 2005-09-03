@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/02 19:22:31 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 02:03:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 02:03:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/02 19:22:31 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 02:03:52 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/02 19:22:31 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 02:03:52 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -412,6 +412,48 @@ __smod_search(const char *name)
 
 EXPORT_SYMBOL(__smod_search);
 
+STATIC struct cdevsw *
+cdev_grab(struct cdevsw *cdev)
+{
+	if (cdev) {
+		if (cdev->d_str) {
+			if (try_module_get(cdev->d_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					cdev->d_name));
+				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+					cdev->d_name, cdev->d_kmod->name,
+					module_refcount(cdev->d_kmod)));
+				return (cdev);
+			}
+		}
+		cdev = NULL;
+	}
+	return (cdev);
+}
+
+EXPORT_SYMBOL(cdev_grab);
+
+STATIC struct fmodsw *
+fmod_grab(struct fmodsw *fmod)
+{
+	if (fmod) {
+		if (fmod->f_str) {
+			if (try_module_get(fmod->f_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					fmod->f_name));
+				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+					fmod->f_name, fmod->f_kmod->name,
+					module_refcount(fmod->f_kmod)));
+				return (fmod);
+			}
+		}
+		fmod = NULL;
+	}
+	return (fmod);
+}
+
+EXPORT_SYMBOL(fmod_grab);
+
 /*
  *  cdev_lookup: - look up a cdev by major device number in cdev hashes
  *  @major: major device number to look up
@@ -454,16 +496,8 @@ cdev_lookup(major_t major, int load)
 #endif				/* CONFIG_DEVFS */
 		} while (0);
 		/* try to acquire the module */
-		if (cdev && cdev->d_str)
-			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					cdev->d_name));
-				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
-					cdev->d_name, cdev->d_kmod->name,
-					module_refcount(cdev->d_kmod)));
-				break;
-			}
-		cdev = NULL;
+		if ((cdev = cdev_grab(cdev)))
+			break;
 	}
 	read_unlock(&cdevsw_lock);
 #else
@@ -504,16 +538,8 @@ cdrv_lookup(modID_t modid, int load)
 				break;
 		} while (0);
 		/* try to acquire the module */
-		if (cdev && cdev->d_str)
-			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					cdev->d_name));
-				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
-					cdev->d_name, cdev->d_kmod->name,
-					module_refcount(cdev->d_kmod)));
-				break;
-			}
-		cdev = NULL;
+		if ((cdev = cdev_grab(cdev)))
+			break;
 	}
 	read_unlock(&fmodsw_lock);
 #else
@@ -554,13 +580,8 @@ fmod_lookup(modID_t modid, int load)
 				break;
 		} while (0);
 		/* try to acquire the module */
-		if (fmod && fmod->f_str)
-			if (try_module_get(fmod->f_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
-					fmod->f_name));
-				break;
-			}
-		fmod = NULL;
+		if ((fmod = fmod_grab(fmod)))
+			break;
 	}
 	read_unlock(&fmodsw_lock);
 #else

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/02 19:22:31 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/03 02:03:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 02:03:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/02 19:22:31 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/03 02:03:52 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/02 19:22:31 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/03 02:03:52 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -505,11 +505,25 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 			ptrace(("Error path taken!\n"));
 			break;
 		}
+#ifdef CONFIG_STREAMS_DEBUG
+		if (fops->owner)
+			printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+				fops->owner->name, module_refcount(fops->owner)));
+		else
+			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+#endif
 		/* register the character device */
 		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0) {
 			ptrace(("Error path taken!\n"));
 			break;
 		}
+#ifdef CONFIG_STREAMS_DEBUG
+		if (fops->owner)
+			printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+				fops->owner->name, module_refcount(fops->owner)));
+		else
+			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+#endif
 		if (err > 0 && major == 0)
 			major = err;
 		cmaj_add(cmaj, cdev, major);

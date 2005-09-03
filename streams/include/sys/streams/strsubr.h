@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.41 2005/09/02 19:22:25 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.42 2005/09/03 02:03:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:25 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 02:03:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/02 19:22:25 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/03 02:03:46 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -692,5 +692,6 @@ extern int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 extern int str_close(queue_t *q, int oflag, cred_t *crp);
 
 extern struct file_operations strm_f_ops;
+extern struct file_operations cdev_f_ops;
 
 #endif				/* __SYS_STREAMS_STRSUBR_H__ */

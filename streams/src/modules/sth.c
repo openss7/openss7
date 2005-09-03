@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/02 19:22:43 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:43 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 02:03:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/02 19:22:43 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/02 19:22:43 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/02 19:22:43 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2508,6 +2508,10 @@ strlastclose(struct stdata *sd, int oflag)
 	/* remove from the inode clone list */
 	strremove(sd);
 
+	/* this balances holding the module in stralloc() and stropen() */
+	cdrv_put(sd->sd_cdevsw);
+	sd->sd_cdevsw = NULL;
+
 	/* this sd_put() balances the original allocation of the stream */
 	sd_put(&sd);		/* not last put */
 }
@@ -2664,7 +2668,6 @@ stralloc(dev_t dev)
 	/* don't graft onto inode just yet */
 	sd->sd_inode = NULL;
 	/* done setup, do the open */
-	cdrv_put(cdev);
 	return (sd);
       no_sd:
 	rare();			/* this is highly unlikely as we block allocating stream heads */
@@ -2771,9 +2774,9 @@ stropen(struct inode *inode, struct file *file)
 				goto put_error;
 			}
 			sd->sd_dev = dev;
+			cdrv_put(sd->sd_cdevsw);
 			sd->sd_cdevsw = cdev;
 			/* FIXME: pull stuff out of qattach here. */
-			cdrv_put(cdev);
 			inode = file->f_dentry->d_inode;
 		}
 		ptrace(("publishing sd %p\n", sd));
@@ -6393,24 +6396,24 @@ _strioctl_locked(struct inode *inode, struct file *file, unsigned int cmd, unsig
  *  -------------------------------------------------------------------------
  */
 struct file_operations strm_f_ops ____cacheline_aligned = {
-	owner:NULL,
-	llseek:strllseek,
-	read:_strread,
-	write:_strwrite,
-	poll:_strpoll,
+	.owner = THIS_MODULE,
+	.llseek = strllseek,
+	.read = _strread,
+	.write = _strwrite,
+	.poll = _strpoll,
 #if HAVE_UNLOCKED_IOCTL
-	unlocked_ioctl:_strioctl,
+	.unlocked_ioctl = _strioctl,
 #endif
-	ioctl:_strioctl_locked,
-	mmap:strmmap,
-	open:stropen,
-	flush:strflush,
-	release:strclose,
-	fasync:strfasync,
-	sendpage:_strsendpage,
+	.ioctl = _strioctl_locked,
+	.mmap = strmmap,
+	.open = stropen,
+	.flush = strflush,
+	.release = strclose,
+	.fasync = strfasync,
+	.sendpage = _strsendpage,
 #ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
-	getpmsg:_strgetpmsg,
-	putpmsg:_strputpmsg,
+	.getpmsg = _strgetpmsg,
+	.putpmsg = _strputpmsg,
 #endif
 };
 
@@ -7154,6 +7157,90 @@ put_filesystem(struct file_system_type *fs)
 #endif
 }
 #endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for character based streams, fifos and pipes.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  cdev_open: - open a character special device node
+ *  @inode: the character device inode
+ *  @file: the user file pointer
+ *
+ *  cdev_open() is only used to open a stream from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
+ *  spec_dev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or
+ *  sockets.  Those devices provide their own file operations to the main operating system.  The
+ *  character device number from the inode is used to determine the shadow special file system
+ *  (internal) inode and chain the open call.
+ *
+ *  This is the separation point where we convert the external device number to an internal device
+ *  number.  The external device number is contained in inode->i_rdev.
+ *
+ *  @inode is the inode in the external filesystem.
+ *
+ *  @file->f_op is the external file operations (character device, fifo) and must be replaced with
+ *	our file operations.
+ *
+ *  @file->f_dentry is the external filesystem dentry for the device node.
+ *  @file->f_vfsmnt is the external filesystem vfsmnt for the device node.
+ *  @file exists on the file->f_dentry->d_inode->i_sb->s_files list.
+ *
+ *  What we should be doing here is get a fresh new dentry.  Find our inode from the device number,
+ *  add it to the dentry.  Set the dentry->d_sb to the specfs super block, set dentry->d_parent =
+ *  dget(file->f_dentry->d_parent), but do not add the dentry to the child list on the parent
+ *  directory, nor do we hash the dentry.  Next we do a dentry open on the on the dentry and a file
+ *  pointer swap on return.
+ *
+ *  Instead of farting around with dentries and such, just lookup the inode in the specfs replace
+ *  the file->f_ops and chain the open with the specfs inode passed to the new open procedure.  For
+ *  FIFOs we pass the external filesystem inode instead.
+ */
+STATIC int
+cdev_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct cdevsw *cdev;
+	struct devnode *cmin;
+	major_t major;
+	minor_t minor;
+	modID_t modid;
+	dev_t dev;
+	int sflag;
+
+#if HAVE_KFUNC_TO_KDEV_T
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
+	if (!(cdev = sdev_get(major)))
+		return (-ENXIO);
+	minor = cdev_minor(cdev, major, minor);
+	major = cdev->d_major;
+	modid = cdev->d_modid;
+	dev = makedevice(modid, minor);
+	sflag = DRVOPEN;
+	if (cdev->d_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	else if ((cmin = cmin_get(cdev, minor)) && cmin->n_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	err = spec_open(file, cdev, dev, sflag);
+	sdev_put(cdev);
+	return (err);
+}
+
+struct file_operations cdev_f_ops ____cacheline_aligned = {
+	.owner = NULL, /* yes NULL */
+	.open = cdev_open,
+};
+
+EXPORT_SYMBOL(cdev_f_ops);
 
 #ifdef CONFIG_STREAMS_STH_MODULE
 STATIC

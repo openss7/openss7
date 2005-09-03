@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:32 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 02:03:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -393,14 +393,17 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 {
 	struct inode *snode;
 	struct dentry *dentry;
-	struct vfsmount *mnt = specfs_mnt;
+	struct vfsmount *mnt;
 	int err;
 
 #ifdef HAVE_FILE_MOVE_ADDR
 	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
 #define file_move(__f, __l) _file_move(__f, __l)
 #endif
-
+	if (!(mnt = mntget(specfs_mnt))) {
+		ptrace(("Error path taken!\n"));
+		return (-ENODEV);
+	}
 	{
 		struct devnode *cmin;
 		struct qstr name;
@@ -408,15 +411,16 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 
 		name.name = buf;
 		if ((cmin = cmin_get(cdev, getminor(dev))))
-			name.len = snprintf(buf, sizeof(buf), "STR/%8s/%8s",
+			name.len = snprintf(buf, sizeof(buf), "STR %s/%s",
 					    cdev->d_name, cmin->n_name);
 		else
-			name.len = snprintf(buf, sizeof(buf), "STR/%8s/%lu",
+			name.len = snprintf(buf, sizeof(buf), "STR %s/%lu",
 					    cdev->d_name, getminor(dev));
 
 		if (!(dentry = d_alloc(NULL, &name))) {
 			ptrace(("Error path taken!\n"));
-			return (-ENOMEM);
+			err = -ENOMEM;
+			goto mnt_error;
 		}
 		dentry->d_sb = mnt->mnt_sb;
 		dentry->d_parent = dentry;
@@ -435,11 +439,6 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		goto put_error;
 	}
 
-#ifdef CONFIG_STREAMS_DEBUG
-	if (file->f_op->owner)
-		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
-			file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
-#endif
 	{
 		struct file_operations *f_op;
 
@@ -447,23 +446,34 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 			ptrace(("Error path taken!\n"));
 			goto put_error;
 		}
+#ifdef CONFIG_STREAMS_DEBUG
+		if (f_op->owner)
+			printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
+				f_op->owner->name, module_refcount(f_op->owner)));
+		else
+			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+#endif
+#ifdef CONFIG_STREAMS_DEBUG
+		if (file->f_op->owner)
+			printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
+				file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
+		else
+			printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
+#endif
 		fops_put(file->f_op);
 		file->f_op = f_op;
 	}
-#ifdef CONFIG_STREAMS_DEBUG
-	if (file->f_op->owner)
-		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
-			file->f_op->owner->name, module_refcount(file->f_op->owner)));
-#endif
 	dput(file->f_dentry);
 	file->f_dentry = dentry;
 	mntput(file->f_vfsmnt);
-	file->f_vfsmnt = mntget(mnt);
+	file->f_vfsmnt = mnt;
 	file_move(file, &mnt->mnt_sb->s_files);
 	return (0);
 
       put_error:
 	dput(dentry);
+      mnt_error:
+	mntput(mnt);
 	return (err);
 }
 #endif
@@ -591,8 +601,8 @@ spec_dev_open(struct inode *inode, struct file *file)
 #endif
 
 struct file_operations spec_dev_f_ops = {
-	owner:THIS_MODULE,
-	open:&spec_dev_open,
+	.owner = THIS_MODULE,
+	.open = &spec_dev_open,
 };
 #endif
 
@@ -623,6 +633,9 @@ struct file_operations spec_dev_f_ops = {
  *  name and the second string is the minor device name.  We also do a similar thing on the root
  *  directory for autoloading devices.  Then we just repeat the lookup and echo back whatever
  *  appeared (or didn't).
+ *
+ *  Directory inodes can exist after the module has been unloaded, so we cannot use the u.generic_ip
+ *  pointer, we need to get the cdev entry from the inode number again.
  */
 #if HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
 STATIC struct dentry *
@@ -635,7 +648,7 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 	struct cdevsw *cdev;
 
 	_ptrace(("looking up %s\n", new->d_name.name));
-	if ((cdev = dir->u.generic_ip)) {
+	if ((cdev = cdrv_get(getminor(dir->i_ino)))) {
 		struct devnode *cmin;
 
 		_ptrace(("found cdev %s\n", cdev->d_name));
@@ -650,9 +663,11 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 				ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 					atomic_read(&inode->i_count)));
 				d_add(new, inode);
+				cdrv_put(cdev);
 				return (NULL);	/* success */
 			}
 			_ptrace(("no inode for cmin %s\n", cmin->n_name));
+			cdrv_put(cdev);
 			return ERR_PTR(-EIO);
 		} else {
 			/* check if the name is a valid number */
@@ -669,16 +684,19 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 					if (IS_ERR((inode = spec_snode(dev, cdev)))) {
 						_ptrace(("no inode for number %s\n",
 							 new->d_name.name));
+						cdrv_put(cdev);
 						return ((struct dentry *) inode);
 						/* already contains error */
 					}
 					_ptrace(("found inode for number %s\n", new->d_name.name));
 					d_add(new, inode);
+					cdrv_put(cdev);
 					return (NULL);	/* success */
 				}
 			}
 		}
 		_ptrace(("no inode for %s\n", new->d_name.name));
+		cdrv_put(cdev);
 	}
 	return ERR_PTR(-ENOENT);
 }
@@ -729,10 +747,13 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		file->f_pos++;
 		/* fall through */
 	default:
-		read_lock(&cdevsw_lock);
-		if ((cdev = dentry->d_inode->u.generic_ip)) {
+		/* Cannot take cdevsw structure pointer from u.generic_ip because the directory
+		   inode might exist even though the module is unloaded.  So we need to look it up
+		   again, but without locks... */
+		if ((cdev = cdrv_get(getminor(dentry->d_inode->i_ino)))) {
 			int i = nr - 2, err = 0;
 
+			read_lock(&cdevsw_lock);
 			if (cdev->d_minors.next && !list_empty(&cdev->d_minors)) {
 				struct list_head *pos;
 
@@ -783,8 +804,9 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 					read_lock(&cdevsw_lock);
 				}
 			}
+			read_unlock(&cdevsw_lock);
+			cdrv_put(cdev);
 		}
-		read_unlock(&cdevsw_lock);
 		break;
 	}
 	return (0);
@@ -792,9 +814,9 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 #endif
 
 STATIC struct file_operations spec_dir_f_ops = {
-	owner:THIS_MODULE,
-	read:generic_read_dir,
-	readdir:spec_dir_readdir,
+	.owner = THIS_MODULE,
+	.read = generic_read_dir,
+	.readdir = spec_dir_readdir,
 };
 
 /*
@@ -1041,12 +1063,12 @@ spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 #endif
 
 STATIC struct file_operations spec_root_f_ops = {
-	owner:THIS_MODULE,
-	read:generic_read_dir,
+	.owner = THIS_MODULE,
+	.read = generic_read_dir,
 #if 1
-	readdir:spec_root_readdir,
+	.readdir = spec_root_readdir,
 #else
-	readdir:dcache_readdir,
+	.readdir = dcache_readdir,
 #endif
 };
 
@@ -1342,6 +1364,7 @@ spec_read_inode(struct inode *inode)
 {
 	struct cdevsw *cdev = inode->u.generic_ip;
 
+	/* generic_ip is just another way of passing another argument to iget() */
 	printd(("%s: reading inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
@@ -1404,6 +1427,7 @@ spec_read_inode(struct inode *inode)
 		inode->i_nlink = 2;
 	}
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
+	inode->u.generic_ip = NULL;	/* done with it */
 	return;
       bad_inode:
 	ptrace(("bad inode no %lu\n", inode->i_ino));
@@ -1463,7 +1487,8 @@ spec_put_inode(struct inode *inode)
 		force_delete(inode);
 #else
 		if (atomic_read(&inode->i_count) == 1) {
-			printd(("%s: final put of inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
+			printd(("%s: final put of inode %p no %lu\n", __FUNCTION__, inode,
+				inode->i_ino));
 			inode->i_nlink = 0;
 		}
 #endif
@@ -1497,18 +1522,22 @@ spec_delete_inode(struct inode *inode)
 		   inode from the module structure, we hold a reference count on the inode.  We
 		   should never get here with either the u.generic_ip pointer set or the d_inode
 		   reference still held.  Forced deletions might get us here anyway. */
-		if (inode->u.generic_ip)
+		if (inode->u.generic_ip) {
+			swerr();
 			inode->u.generic_ip = NULL;
+		}
 		break;
 	case S_IFCHR:
 		/* character special device inodes potentially have a minor devnode structure
 		   hanging off of the u.generic_ip pointer and stream heads hanging off of the
-		   i_pipe pointer. When we referemce the inode from the devnode structure, we hold
+		   i_pipe pointer. When we reference the inode from the devnode structure, we hold
 		   a reference count on the inode.  We should never get here with either the
 		   u.generic_ip pointer set or the n_inode reference still held.  Forced deletions
 		   might get us here anyway. */
-		if (inode->u.generic_ip)
+		if (inode->u.generic_ip) {
+			swerr();
 			inode->u.generic_ip = NULL;
+		}
 		/* fall through */
 	default:
 //#ifdef CONFIG_STREAMS_FIFO
