@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/02 19:22:31 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/03 08:12:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/02 19:22:31 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/03 08:12:11 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/02 19:22:31 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/03 08:12:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -2508,6 +2508,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 
 	assert(q);
 	assert(q->q_qinfo);
+	assert(q->q_qinfo->qi_qclose);
 
 	if (unlikely((q_close = q->q_qinfo->qi_qclose) == NULL))
 		return (-ENXIO);
@@ -3808,6 +3809,7 @@ sd_put(struct stdata **sdp)
 			assert(sd->sd_inode == NULL);
 			assert(sd->sd_clone == NULL);
 			assert(sd->sd_iocblk == NULL);
+			assert(sd->sd_rq);
 			/* zero stream reference on queue pair to avoid double put on sd */
 			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $";
 
 #define _LFS_SOURCE
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/21 20:47:26 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -187,20 +187,25 @@ nsdevopen(struct inode *inode, struct file *file)
 	struct cdevsw *cdev;
 	int err;
 
-	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
-		return (-ENOENT);
-	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
-	err = spec_open(inode, file, makedevice(cdev->d_modid, getminor(inode->i_ino)),
-			(file->f_flags & (O_CREAT | O_EXCL)) ? CLONEOPEN : DRVOPEN);
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	if ((cdev = cdev_match(file->f_dentry->d_name.name))) {
+		major_t major = cdev->d_modid;
+		minor_t minor = getminor(inode->i_ino);
+		dev_t dev = makedevice(major, minor);
+		int sflag = (file->f_flags & O_CLONE) ? CLONEOPEN : DRVOPEN;
+
+		printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
+		err = spec_open(file, cdev, dev, sflag);
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+		sdev_put(cdev);
+	} else
+		err = -ENOENT;
 	return (err);
 #endif
 }
 
 struct file_operations nsdev_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:nsdevopen,
+	.owner = NULL, /* yes NULL */
+	.open = nsdevopen,
 };
 
 /* 
@@ -212,12 +217,12 @@ struct file_operations nsdev_ops ____cacheline_aligned = {
  */
 
 LFSSTATIC struct cdevsw nsdev_cdev = {
-	d_name:CONFIG_STREAMS_NSDEV_NAME,
-	d_str:&nsdev_info,
-	d_flag:0,
-	d_fop:&nsdev_ops,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+	.d_name = CONFIG_STREAMS_NSDEV_NAME,
+	.d_str = &nsdev_info,
+	.d_flag = D_MP,
+	.d_fop = &nsdev_ops,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
 
 /* 
@@ -255,9 +260,8 @@ nsdev_open(struct inode *inode, struct file *file)
 	major_t major;
 	minor_t minor;
 	modID_t modid, instance;
+	dev_t dev;
 
-	if ((err = down_interruptible(&inode->i_sem)))
-		goto exit;
 #if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
@@ -270,26 +274,25 @@ nsdev_open(struct inode *inode, struct file *file)
 	modid = nsdev_cdev.d_modid;
 	err = -ENXIO;
 	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
-		goto up_exit;
+		goto exit;
 	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
 	instance = cdev->d_modid;
-	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
+	dev = makedevice(modid, instance);
+	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	sdev_put(cdev);
-      up_exit:
-	up(&inode->i_sem);
       exit:
 	return (err);
 #endif
 }
 
 LFSSTATIC struct file_operations nsdev_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:nsdev_open,
+	.owner = THIS_MODULE,
+	.open = nsdev_open,
 };
 
 /* 

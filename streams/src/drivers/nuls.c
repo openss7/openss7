@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:02 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -136,12 +136,12 @@ MODULE_ALIAS("/dev/streams/nuls/*");
 #endif
 
 static struct module_info nuls_minfo = {
-	mi_idnum:CONFIG_STREAMS_NULS_MODID,
-	mi_idname:CONFIG_STREAMS_NULS_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_NULS_MODID,
+	.mi_idname = CONFIG_STREAMS_NULS_NAME,
+	.mi_minpsz = 0,
+	.mi_maxpsz = INFPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 static int
@@ -179,6 +179,7 @@ nuls_put(queue_t *q, mblk_t *mp)
 	case M_READ:
 		mp->b_wptr = mp->b_rptr;
 		mp->b_datap->db_type = M_DATA;
+		mp->b_flag |= MSGDELIM;
 		qreply(q, mp);
 		return (0);
 	default:
@@ -269,7 +270,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				}
 			}
 		}
-		if (getminor(makedevice(cmajor, cminor)) == 0) {
+		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&nuls_lock);
 			kmem_free(p, sizeof(*p));
 			printd(("%s: no minor devices left\n", __FUNCTION__));
@@ -313,21 +314,21 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit nuls_rqinit = {
-	qi_putp:NULL,
-	qi_qopen:nuls_open,
-	qi_qclose:nuls_close,
-	qi_minfo:&nuls_minfo,
+	.qi_putp = NULL,
+	.qi_qopen = nuls_open,
+	.qi_qclose = nuls_close,
+	.qi_minfo = &nuls_minfo,
 };
 
 static struct qinit nuls_wqinit = {
-	qi_putp:nuls_put,
-	qi_srvp:NULL,
-	qi_minfo:&nuls_minfo,
+	.qi_putp = nuls_put,
+	.qi_srvp = NULL,
+	.qi_minfo = &nuls_minfo,
 };
 
 static struct streamtab nuls_info = {
-	st_rdinit:&nuls_rqinit,
-	st_wrinit:&nuls_wqinit,
+	.st_rdinit = &nuls_rqinit,
+	.st_wrinit = &nuls_wqinit,
 };
 
 static struct cdevsw nuls_cdev = {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/08/30 03:37:13 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/03 08:12:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/08/30 03:37:13 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/03 08:12:12 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/08/30 03:37:13 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/03 08:12:12 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2508,6 +2508,10 @@ qdelete(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
+	assert(sd);
+
+	ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
+
 	swlock(sd);
 	qput(&rq->q_next);
 	qput(&wq->q_next);
@@ -2549,6 +2553,10 @@ streams_fastcall int
 qdetach(queue_t *q, int flags, cred_t *crp)
 {
 	int err;
+
+	assert(q);
+
+	ptrace(("detaching stream %p queue pair %p\n",  qstream(q), q));
 
 	err = qclose(q, flags, crp);
 	qprocsoff(q);		/* in case qclose forgot */
@@ -2648,6 +2656,10 @@ qprocsoff(queue_t *q)
 
 		set_bit(QHLIST_BIT, &rq->q_flag);
 		set_bit(QHLIST_BIT, &wq->q_flag);
+
+		assert(sd);
+
+		ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
 		/* spin here waiting for queue procedures to exit */
 		swlock(sd);

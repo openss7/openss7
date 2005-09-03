@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 02:03:53 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 02:03:53 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -293,7 +293,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 		return ERR_PTR(-ENOMEM);
 	}
 #endif
-	ptrace(("inode %p no %lu refcount now %d\n", snode, snode->i_ino,
+	_ptrace(("inode %p no %lu refcount now %d\n", snode, snode->i_ino,
 		atomic_read(&snode->i_count)));
 	return (snode);
 }
@@ -317,7 +317,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	struct inode *snode = ERR_PTR(-ENXIO);
 
 	if (file->f_dentry->d_sb != cdev->d_inode->i_sb) {
-		ptrace(("reparent not necessary\n"));
+		_ptrace(("reparent not necessary\n"));
 		snode = spec_snode(dev, cdev);
 		if (IS_ERR(snode)) {
 			ptrace(("Error path taken!\n"));
@@ -329,7 +329,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		char buf[24];
 
 		/* prune two levels */
-		ptrace(("reparenting internal dentry\n"));
+		_ptrace(("reparenting internal dentry\n"));
 		dentry = file->f_dentry;
 		file->f_dentry = dget(dentry->d_parent->d_parent);
 		dput(dentry);
@@ -362,12 +362,12 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		}
 		file->f_dentry = dentry;
 		snode = igrab(dentry->d_inode);
-		ptrace(("inode %p no %lu refcount now %d\n", snode, snode->i_ino,
+		_ptrace(("inode %p no %lu refcount now %d\n", snode, snode->i_ino,
 			atomic_read(&snode->i_count)));
 	}
 #ifdef CONFIG_STREAMS_DEBUG
 	if (file->f_op->owner)
-		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+		_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 			file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
 #endif
 	{
@@ -382,7 +382,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	}
 #ifdef CONFIG_STREAMS_DEBUG
 	if (file->f_op->owner)
-		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+		_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 			file->f_op->owner->name, module_refcount(file->f_op->owner)));
 #endif
 	return (snode);
@@ -448,17 +448,17 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		}
 #ifdef CONFIG_STREAMS_DEBUG
 		if (f_op->owner)
-			printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
+			_printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
 				f_op->owner->name, module_refcount(f_op->owner)));
 		else
-			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
 #ifdef CONFIG_STREAMS_DEBUG
 		if (file->f_op->owner)
-			printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
+			_printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
 				file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
 		else
-			printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
+			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
 #endif
 		fops_put(file->f_op);
 		file->f_op = f_op;
@@ -660,7 +660,7 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 			if ((inode = cmin->n_inode)) {
 				_ptrace(("found inode for cmin %s\n", cmin->n_name));
 				igrab(inode);
-				ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+				_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 					atomic_read(&inode->i_count)));
 				d_add(new, inode);
 				cdrv_put(cdev);
@@ -976,7 +976,7 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		if ((inode = cdev->d_inode)) {
 			_ptrace(("found inode for cdev %s\n", cdev->d_name));
 			igrab(inode);
-			ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 				atomic_read(&inode->i_count)));
 			sdev_put(cdev);
 			d_add(new, inode);
@@ -1365,7 +1365,7 @@ spec_read_inode(struct inode *inode)
 	struct cdevsw *cdev = inode->u.generic_ip;
 
 	/* generic_ip is just another way of passing another argument to iget() */
-	printd(("%s: reading inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
+	_printd(("%s: reading inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
 	else {
@@ -1400,7 +1400,7 @@ spec_read_inode(struct inode *inode)
 		   external major device number. */
 		/* XXX: Another approach is to make module identifiers to major nodes equal to the
 		   external major device number and the point would be moot. */
-		printd(("%s: reading minor device inode %lu\n", __FUNCTION__,
+		_printd(("%s: reading minor device inode %lu\n", __FUNCTION__,
 			(ulong) getminor(inode->i_ino)));
 		/* for device nodes, the major component of the i_ino is the module id */
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
@@ -1417,7 +1417,7 @@ spec_read_inode(struct inode *inode)
 		inode->i_fop = cdev->d_fop;
 #endif
 	} else {
-		printd(("%s: reading major device inode %lu\n", __FUNCTION__,
+		_printd(("%s: reading major device inode %lu\n", __FUNCTION__,
 			(ulong) getminor(inode->i_ino)));
 		/* for module nodes, the minor component of the i_ino is the module id */
 		inode->i_mode |= S_IFDIR;
@@ -1477,8 +1477,8 @@ STATIC void
 spec_put_inode(struct inode *inode)
 {
 	/* all specfs inodes self destruct when put for the last time */
-	printd(("%s: put of inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
-	printd(("%s: inode %p no %lu refcount now %d\n", __FUNCTION__, inode, inode->i_ino,
+	_printd(("%s: put of inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
+	_printd(("%s: inode %p no %lu refcount now %d\n", __FUNCTION__, inode, inode->i_ino,
 		atomic_read(&inode->i_count) - 1));
 	if (inode->i_nlink != 0) {
 		/* This should not happen because we decrement i_nlink when we remove the STREAM
@@ -1487,7 +1487,7 @@ spec_put_inode(struct inode *inode)
 		force_delete(inode);
 #else
 		if (atomic_read(&inode->i_count) == 1) {
-			printd(("%s: final put of inode %p no %lu\n", __FUNCTION__, inode,
+			_printd(("%s: final put of inode %p no %lu\n", __FUNCTION__, inode,
 				inode->i_ino));
 			inode->i_nlink = 0;
 		}
@@ -1512,7 +1512,7 @@ spec_put_inode(struct inode *inode)
 STATIC void
 spec_delete_inode(struct inode *inode)
 {
-	printd(("%s: deleting inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
+	_printd(("%s: deleting inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 	switch (inode->i_mode & S_IFMT) {
 		// struct cdevsw *cdev;
 		// struct devnode *cmin;
@@ -1702,7 +1702,7 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	struct spec_sb_info *sbi;
 	int err;
 
-	ptrace(("filling superblock %p\n", sb));
+	_ptrace(("filling superblock %p\n", sb));
 	sb->s_blocksize = 1024;
 	sb->s_blocksize_bits = 10;
 	sb->s_magic = SPECFS_MAGIC;
@@ -1737,7 +1737,7 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 #endif
 	return (0);
       iput_error:
-	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 		atomic_read(&inode->i_count) - 1));
 	iput(inode);
       free_error:
@@ -1750,13 +1750,13 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 STATIC struct super_block *
 specfs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
 {
-	ptrace(("reading superblock\n"));
+	_ptrace(("reading superblock\n"));
 	return get_sb_single(fs_type, flags, data, specfs_fill_super);
 }
 STATIC void
 specfs_kill_sb(struct super_block *sb)
 {
-	ptrace(("killing superblock %p\n", sb));
+	_ptrace(("killing superblock %p\n", sb));
 	return kill_anon_super(sb);
 }
 
@@ -1778,7 +1778,7 @@ struct file_system_type spec_fs_type = {
 STATIC struct super_block *
 specfs_read_super(struct super_block *sb, void *data, int silent)
 {
-	ptrace(("reading superblock %p\n", sb));
+	_ptrace(("reading superblock %p\n", sb));
 	return (specfs_fill_super(sb, data, silent) ? NULL : sb);
 }
 

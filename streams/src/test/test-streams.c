@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:07:06 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/09/03 08:12:19 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:06 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.18  2005/09/03 08:12:19  brian
+ - updates from testing
+
  Revision 0.9.2.17  2005/07/18 12:07:06  brian
  - standard indentation
 
@@ -120,9 +123,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:07:06 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/09/03 08:12:19 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:07:06 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/09/03 08:12:19 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2014,7 +2017,7 @@ test_case_2_4(int child)
 {
 	char buf[FMNAMESZ + 1];
 
-	if (test_ioctl(child, I_LOOK, (intptr_t) buf) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_LOOK, (intptr_t) buf) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
@@ -2060,12 +2063,14 @@ struct test_stream test_2_5 = { &preamble_0, &test_case_2_5, &postamble_0 };
 #define sref_case_2_6_1 "(none)"
 #define desc_case_2_6_1 "\
 Checks that I_SRDOPT can be performed on a stream.  This case is performed with\n\
-a zero argument and should return EINVAL."
+and invalid argument (RMSGD|RMSGN) and should return EINVAL.  Note that zero (0)\n\
+is valid for compatibility with older versions that did not support protocol\n\
+options."
 
 int
 test_case_2_6_1(int child)
 {
-	if (test_ioctl(child, I_SRDOPT, 0) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_SRDOPT, (RMSGD|RMSGN)) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);

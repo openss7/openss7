@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 02:03:52 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/03 08:12:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 02:03:52 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 02:03:52 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/03 08:12:10 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 02:03:52 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/03 08:12:10 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -418,9 +418,9 @@ cdev_grab(struct cdevsw *cdev)
 	if (cdev) {
 		if (cdev->d_str) {
 			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
-				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+				_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
 					cdev->d_name, cdev->d_kmod->name,
 					module_refcount(cdev->d_kmod)));
 				return (cdev);
@@ -431,17 +431,15 @@ cdev_grab(struct cdevsw *cdev)
 	return (cdev);
 }
 
-EXPORT_SYMBOL(cdev_grab);
-
 STATIC struct fmodsw *
 fmod_grab(struct fmodsw *fmod)
 {
 	if (fmod) {
 		if (fmod->f_str) {
 			if (try_module_get(fmod->f_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
-				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+				_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
 					fmod->f_name, fmod->f_kmod->name,
 					module_refcount(fmod->f_kmod)));
 				return (fmod);
@@ -451,8 +449,6 @@ fmod_grab(struct fmodsw *fmod)
 	}
 	return (fmod);
 }
-
-EXPORT_SYMBOL(fmod_grab);
 
 /*
  *  cdev_lookup: - look up a cdev by major device number in cdev hashes
@@ -693,9 +689,9 @@ cdev_search(const char *name, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
-				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+				_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
 					cdev->d_name, cdev->d_kmod->name,
 					module_refcount(cdev->d_kmod)));
 				break;
@@ -744,7 +740,7 @@ fmod_search(const char *name, int load)
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
 			if (try_module_get(fmod->f_kmod)) {
-				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
 			}
@@ -871,9 +867,9 @@ streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
-		printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
+		_printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		module_put(cdev->d_kmod);
-		printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, cdev->d_name,
+		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, cdev->d_name,
 			cdev->d_kmod->name, module_refcount(cdev->d_kmod)));
 	}
 }
@@ -930,7 +926,7 @@ streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
-		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
+		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		module_put(fmod->f_kmod);
 	}
 }
@@ -1162,7 +1158,7 @@ sdev_del(struct cdevsw *cdev)
 	cdev->d_inode->i_sb->s_root->d_inode->i_nlink--;
 	inode = cdev->d_inode;
 	/* put away dentry if necessary */
-	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 		atomic_read(&inode->i_count) - 1));
 	iput(inode);
 	cdev->d_inode = NULL;
@@ -1247,7 +1243,7 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 	cdev->d_inode->i_nlink--;
 	inode = cmin->n_inode;
 	/* put away inode if required */
-	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+	_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 		atomic_read(&inode->i_count) - 1));
 	iput(inode);
 	cmin->n_inode = NULL;

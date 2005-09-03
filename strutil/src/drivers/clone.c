@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $";
 
 #define _LFS_SOURCE
 
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -186,28 +186,31 @@ cloneopen(struct inode *inode, struct file *file)
 #else
 	struct cdevsw *cdev;
 	dev_t dev = inode->i_ino;
-	int err;
 
-	ptrace(("%s: opening clone device\n", __FUNCTION__));
-	err = -ENOENT;
-	if (!(cdev = cdrv_get(getminor(dev)))) {
-		printd(("%s: no driver for minor %hu\n", __FUNCTION__, getminor(dev)));
-		goto exit;
+	if (file->private_data)
+		/* Darn.  Somebody passed us a FIFO inode. */
+		return (-EIO);
+
+#if 0
+	if ((cdev = cdrv_get(getminor(dev))))
+#else
+	if ((cdev = sdev_get(getminor(dev))))
+#endif
+	{
+		int err;
+
+		dev = makedevice(cdev->d_modid, 0);
+		err = spec_open(file, cdev, dev, CLONEOPEN);
+		sdev_put(cdev);
+		return (err);
 	}
-	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-	printd(("%s: opening cloned device internal major %hu, minor %hu\n", __FUNCTION__,
-		cdev->d_modid, 0));
-	err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
-	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
-      exit:
-	return (err);
+	return (-ENOENT);
 #endif
 }
 
 struct file_operations clone_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:cloneopen,
+	.owner = THIS_MODULE,
+	.open = cloneopen,
 };
 
 /* 
@@ -218,14 +221,88 @@ struct file_operations clone_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-LFSSTATIC struct cdevsw clone_cdev = {
-	d_name:"clone",
-	d_str:&clone_info,
-	d_flag:D_CLONE,
-	d_fop:&clone_ops,
-	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
-	d_kmod:THIS_MODULE,
+static struct cdevsw clone_cdev = {
+	.d_name = "clone",
+	.d_str = &clone_info,
+	.d_flag = D_CLONE | D_MP,
+	.d_fop = &clone_ops,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
 };
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  REGISTRATION
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#if LFS
+int
+register_clone(struct cdevsw *cdev)
+{
+	int err;
+	struct devnode *cmin;
+
+	ptrace(("%s: registering clone minor for %s\n", __FUNCTION__, cdev->d_name));
+	err = -ENOMEM;
+	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC))) {
+		printd(("could not allocate minor devnode structure\n"));
+		goto error;
+	}
+	memset(cmin, 0, sizeof(*cmin));
+	INIT_LIST_HEAD(&cmin->n_list);
+	INIT_LIST_HEAD(&cmin->n_hash);
+	cmin->n_name = cdev->d_name;
+	cmin->n_str = cdev->d_str;
+	cmin->n_flag = clone_cdev.d_flag;
+	cmin->n_modid = cdev->d_modid;
+	cmin->n_count = (atomic_t) ATOMIC_INIT(0);
+	cmin->n_sqlvl = cdev->d_sqlvl;
+	cmin->n_syncq = cdev->d_syncq;
+	cmin->n_kmod = cdev->d_kmod;
+	cmin->n_major = clone_cdev.d_major;
+	cmin->n_mode = clone_cdev.d_mode;
+	cmin->n_minor = cdev->d_major;
+	cmin->n_dev = &clone_cdev;
+#if 0
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0)
+#else
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_major)) < 0)
+#endif
+	{
+		printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
+			cdev->d_name, -err));
+		kfree(cmin);
+		goto error;
+	}
+	printd(("%s: registered clone minor for %s\n", __FUNCTION__, cdev->d_name));
+      error:
+	return (err);
+}
+
+EXPORT_SYMBOL(register_clone);
+
+int
+unregister_clone(struct cdevsw *cdev)
+{
+	int err;
+	struct devnode *cmin;
+
+	err = -ENXIO;
+	if (!(cmin = cmin_get(&clone_cdev, cdev->d_modid)))
+		goto error;
+	if ((err = unregister_strnod(&clone_cdev, cdev->d_modid)))
+		goto error;
+	kfree(cmin);
+      error:
+	return (err);
+}
+
+EXPORT_SYMBOL(unregister_clone);
+#endif
+
 
 /* 
  *  -------------------------------------------------------------------------
@@ -285,7 +362,7 @@ clone_open(struct inode *inode, struct file *file)
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	instance = cdev->d_modid;
 	printd(("%s: opening driver %s\n", __FUNCTION__, cdev->d_name));
-	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
+	err = spec_open(file, cdev, makedevice(modid, instance), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	sdev_put(cdev);
       up_exit:
@@ -296,73 +373,9 @@ clone_open(struct inode *inode, struct file *file)
 }
 
 LFSSTATIC struct file_operations clone_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:clone_open,
+	.owner = NULL, /* yes NULL */
+	.open = clone_open,
 };
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  REGISTRATION
- *
- *  -------------------------------------------------------------------------
- */
-
-#if LFS
-int
-register_clone(struct cdevsw *cdev)
-{
-	int err;
-	struct devnode *cmin;
-
-	ptrace(("%s: registering clone minor for %s\n", __FUNCTION__, cdev->d_name));
-	err = -ENOMEM;
-	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC))) {
-		printd(("could not allocate minor devnode structure\n"));
-		goto error;
-	}
-	memset(cmin, 0, sizeof(*cmin));
-	INIT_LIST_HEAD(&cmin->n_list);
-	INIT_LIST_HEAD(&cmin->n_hash);
-	cmin->n_name = cdev->d_name;
-	cmin->n_str = cdev->d_str;
-	cmin->n_flag = clone_cdev.d_flag;
-	cmin->n_modid = cdev->d_modid;
-	cmin->n_major = clone_cdev.d_major;
-	cmin->n_mode = clone_cdev.d_mode;
-	cmin->n_minor = cdev->d_major;
-	cmin->n_dev = &clone_cdev;
-	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0) {
-		printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
-			cdev->d_name, -err));
-		kfree(cmin);
-		goto error;
-	}
-	printd(("%s: registered clone minor for %s\n", __FUNCTION__, cdev->d_name));
-      error:
-	return (err);
-}
-
-EXPORT_SYMBOL(register_clone);
-
-int
-unregister_clone(struct cdevsw *cdev)
-{
-	int err;
-	struct devnode *cmin;
-
-	err = -ENXIO;
-	if (!(cmin = cmin_get(&clone_cdev, cdev->d_modid)))
-		goto error;
-	if ((err = unregister_strnod(&clone_cdev, cdev->d_modid)))
-		goto error;
-	kfree(cmin);
-      error:
-	return (err);
-}
-
-EXPORT_SYMBOL(unregister_clone);
-#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -402,7 +415,8 @@ void __exit
 clone_exit(void)
 {
 #if LFS
-	unregister_cmajor(&clone_cdev, major);
+	if (unregister_cmajor(&clone_cdev, major) != 0)
+		swerr();
 #endif
 };
 

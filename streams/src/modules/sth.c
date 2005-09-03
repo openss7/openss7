@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 02:03:56 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:54:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/03 02:03:56 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -209,10 +209,12 @@ stri_insert(struct file *file, struct stdata *sd)
 	   filesystem inode, but that's ok to because its locked at this point too. */
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
+	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	down(&inode->i_sem);
 	// spin_lock(&inode->i_lock);
 	stri_lookup(file) = sd_get(sd);
 	// spin_unlock(&inode->i_lock);
+	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	up(&inode->i_sem);
 }
 
@@ -227,10 +229,12 @@ stri_acquire(struct file *file)
 	struct inode *inode = file->f_dentry->d_inode;
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
+	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	down(&inode->i_sem);
 	// spin_lock(&inode->i_lock);
 	sd = sd_get(stri_lookup(file));
 	// spin_unlock(&inode->i_lock);
+	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	up(&inode->i_sem);
 	return (sd);
 }
@@ -241,23 +245,27 @@ stri_acquire(struct file *file)
  *
  *  Same as stri_acquire(), but also remove the reference from the file pointer.
  *
- *  FIXME: file->f_dentry->d_inode could be the wrong inode in the case of an external inode unless
- *  we reparent external inodes, but note that it is the same inode semaphore that we use for
- *  stri_acquire and stri_insert.
+ *  Call this with the inode sempahore already held.
  */
 STATIC INLINE struct stdata *
 stri_remove(struct file *file)
 {
 	struct stdata *sd;
-	struct inode *inode = file->f_dentry->d_inode;
 
+	assert(file);
+#if 0
 	/* always hold the inode spinlock while lookup up the STREAM head */
+	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	down(&inode->i_sem);
 	// spin_lock(&inode->i_lock);
+#endif
 	sd = stri_lookup(file);
 	stri_lookup(file) = NULL;
+#if 0				/* leave locked */
 	// spin_unlock(&inode->i_lock);
+	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	up(&inode->i_sem);
+#endif
 	return (sd);
 }
 
@@ -265,21 +273,19 @@ stri_remove(struct file *file)
 #define verify_area(__x,__y,__z) (access_ok((__x),(__y),(__z)) ? 0 : -EFAULT)
 
 /**
- *  strinsert:	- insert a stream head to an inode and file pointer
+ *  strinsert:	- insert a stream head to an inode
  *  @inode:	inode to which to attach the stream head
- *  @file:	file pointer for the stream head
  *  @sd:	the stream head
  *  @dev:	the original device number that qopen() was called with
+ *
+ *  Hold the inode semaphore while calling this function.
  */
 STATIC INLINE int
-strinsert(struct inode *inode, struct file *file, struct stdata *sd)
+strinsert(struct inode *inode, struct stdata *sd)
 {
 	assert(inode);
-	assert(file);
 	assert(sd);
 	assert(!sd->sd_inode);
-
-	down(&inode->i_sem);
 	{
 		struct cdevsw *cdev;
 
@@ -298,7 +304,6 @@ strinsert(struct inode *inode, struct file *file, struct stdata *sd)
 		sd->sd_clone = (void *) inode->i_pipe;
 		inode->i_pipe = (void *) sd;
 	}
-	up(&inode->i_sem);
 	return (0);
 }
 
@@ -306,18 +311,17 @@ strinsert(struct inode *inode, struct file *file, struct stdata *sd)
  *  strremove:	- remove a stream head from an inode
  *  @inode:	inode from which to remove the stream head
  *  @sd:	the stream head
+ *
+ *  Hold the inode semaphore while calling this function.  Don't forget to put the inode once the
+ *  semaphore is released.
  */
 STATIC INLINE void
-strremove(struct stdata *sd)
+strremove(struct inode *inode, struct stdata *sd)
 {
-	struct inode *inode;
-
 	assert(sd);
-	inode = sd->sd_inode;
 	assert(inode);
 
 	/* we need to hold the inode semaphore while doing this */
-	down(&inode->i_sem);
 	{
 		struct cdevsw *cdev;
 		struct stdata **sdp;
@@ -338,11 +342,6 @@ strremove(struct stdata *sd)
 		list_del_init(&sd->sd_list);
 		sd->sd_inode = NULL;
 	}
-	up(&inode->i_sem);
-	ptrace(("putting inode %p\n", inode));
-	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-		atomic_read(&inode->i_count) - 1));
-	iput(inode);		/* to cancel igrab() from strinsert */
 }
 
 /**
@@ -396,7 +395,7 @@ strdetached(struct stdata * sd)
  *  that the link/unlink code knows what is going on. Another open in the meantime might boost the
  *  count.
  */
-STATIC bool
+STATIC INLINE bool
 strdeccounts(struct stdata * sd, int oflag)
 {
 	bool last = false;
@@ -790,7 +789,7 @@ __strevent_find(const struct stdata *sd)
  *
  *  [EAGAIN] A &strevent structure could not be allocated.
  */
-streams_fastcall STATIC int
+STATIC streams_fastcall int
 __strevent_register(const struct file *file, struct stdata *sd, const unsigned long events)
 {
 	struct task_struct *p, *c = current;
@@ -847,7 +846,7 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
  *  POSIX says that if the argument (events) is zero it means to remove the calling process from the
  *  list.  If the calling process is not on the list, return [EINVAL].
  */
-STATIC inline int
+STATIC INLINE int
 strevent_register(const struct file *file, struct stdata *sd, const unsigned long events)
 {
 	int err;
@@ -857,7 +856,7 @@ strevent_register(const struct file *file, struct stdata *sd, const unsigned lon
 	swunlock(sd);
 	return (err);
 }
-STATIC inline int
+STATIC INLINE int
 strevent_unregister(const struct file *file, struct stdata *sd)
 {
 	return strevent_register(file, sd, 0);
@@ -1456,32 +1455,6 @@ __strwaitqueue(struct stdata *sd, queue_t *q)
 }
 
 /**
- *  __strwaitclose:   - wait for queues to drain on close
- *  @sd:	STREAM head that is closing
- *
- *  If STRHOLD is set, then be sure to release any messages held on the stream head's write queue,
- *  so, start with the stream head write queue instead of the stream below the stream head write
- *  queue.
- */
-STATIC void
-__strwaitclose(struct stdata *sd, int oflag)
-{
-	cred_t *crp = current_creds;
-	queue_t *q = sd->sd_wq;
-
-	/* STREAM head first */
-	if (q->q_first)
-		__strwaitqueue(sd, q);
-	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
-		if (q->q_first)
-			__strwaitqueue(sd, q);
-		qdetach(_RD(q), oflag, crp);
-	}
-	/* STREAM head last */
-	qdetach(sd->sd_rq, oflag, crp);
-}
-
-/**
  *  strwaitclose:   - wait for queues to drain on close
  *  @sd:	STREAM head that is closing
  *  @oflag:	open flags for the last file pointer (closing file pointer)
@@ -1490,17 +1463,24 @@ __strwaitclose(struct stdata *sd, int oflag)
  *  so, start with the stream head write queue instead of the stream below the stream head write
  *  queue.
  */
-STATIC inline streams_fastcall void
+STATIC INLINE streams_fastcall void
 strwaitclose(struct stdata *sd, int oflag)
 {
+	cred_t *crp = current_creds;
+	queue_t *q = sd->sd_wq;
+	bool wait = (!(oflag & FNDELAY) && (sd->sd_closetime != 0) && !signal_pending(current));
+
 	/* POSIX close() semantics for STREAMS */
-	if (oflag & FNDELAY)
-		return;
-	if (sd->sd_closetime == 0)
-		return;
-	if (signal_pending(current))
-		return;
-	__strwaitclose(sd, oflag);
+	/* STREAM head first */
+	if (wait && q->q_first)
+		__strwaitqueue(sd, q);
+	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
+		if (wait && q->q_first)
+			__strwaitqueue(sd, q);
+		qdetach(_RD(q), oflag, crp);
+	}
+	/* STREAM head last */
+	qdetach(sd->sd_rq, oflag, crp);
 }
 
 /**
@@ -2505,9 +2485,6 @@ strlastclose(struct stdata *sd, int oflag)
 	/* 3rd step: call the close routine of the driver and qdetach the driver */
 	strwaitclose(sd, oflag);
 
-	/* remove from the inode clone list */
-	strremove(sd);
-
 	/* this balances holding the module in stralloc() and stropen() */
 	cdrv_put(sd->sd_cdevsw);
 	sd->sd_cdevsw = NULL;
@@ -2715,13 +2692,14 @@ stropen(struct inode *inode, struct file *file)
 	oflag = make_oflag(file);
 	sflag = ((oflag & O_CLONE) == O_CLONE) ? CLONEOPEN : DRVOPEN;
 
+	/* always lock inode */
+	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	if ((err = down_interruptible(&inode->i_sem)))
+		goto error;
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
 		ptrace(("driver open in effect\n"));
-		if ((err = down_interruptible(&inode->i_sem)))
-			goto error;
 		sd = sd_get((struct stdata *) inode->i_pipe);
-		up(&inode->i_sem);
 	} else {
 		ptrace(("clone open in effect\n"));
 		sd = NULL;
@@ -2736,7 +2714,7 @@ stropen(struct inode *inode, struct file *file)
 			getminor(dev)));
 		if (IS_ERR(sd = stralloc(dev))) {
 			err = PTR_ERR(sd);
-			goto error;
+			goto up_error;
 		}
 		/* if we just allocated stream head we already hold the STWOPEN bit */
 		dev = strinccounts(file, sd, oflag);
@@ -2744,7 +2722,7 @@ stropen(struct inode *inode, struct file *file)
 		/* 1st step: attach the driver and call its open routine */
 		if ((err = qopen(sd->sd_rq, &dev, oflag, sflag, crp))) {
 			ptrace(("Error path taken for sd %p\n", sd));
-			goto put_error;	/* will destroy new stream head */
+			goto up_put_error;	/* will destroy new stream head */
 		}
 		/* 2nd step: check for redirected return */
 		if (dev != sd->sd_dev) {
@@ -2756,12 +2734,14 @@ stropen(struct inode *inode, struct file *file)
 
 			ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev),
 				getminor(dev)));
+			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+			up(&inode->i_sem);
 			if (!(cdev = cdrv_get(getmajor(dev)))) {
 				err = -ENODEV;
 				ptrace(("Error path taken for sd %p\n", sd));
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
-				goto put_error;
+				goto up_put_error;
 			}
 			/* we need a new snode (inode in the device shadow directory) */
 			/* qattach() should have already cleaned up the stream head and queue pairs 
@@ -2771,28 +2751,34 @@ stropen(struct inode *inode, struct file *file)
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
 				cdrv_put(cdev);
-				goto put_error;
+				goto up_put_error;
 			}
 			sd->sd_dev = dev;
 			cdrv_put(sd->sd_cdevsw);
 			sd->sd_cdevsw = cdev;
 			/* FIXME: pull stuff out of qattach here. */
 			inode = file->f_dentry->d_inode;
+			printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+			down(&inode->i_sem);
 		}
 		ptrace(("publishing sd %p\n", sd));
-		strinsert(inode, file, sd);	/* publish to inode, device */
+		strinsert(inode, sd);	/* publish to inode, device */
+		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+		up(&inode->i_sem);
 		ptrace(("performing autopush() on sd %p\n", sd));
 		/* 3rd step: autopush modules and call their open routines */
 		if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp))) {
 			ptrace(("Error path taken for sd %p\n", sd));
 			goto wake_error;
 		}
-		sd_get(sd); /* to balance sd_put() after put_error, below. */
+		sd_get(sd);	/* to balance sd_put() after put_error, below. */
 	} else {
 		/* FIXME: Push existing stream open stuff down to str_open() (again). */
 		queue_t *wq, *wq_next;
 		dev_t dev;
 
+		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+		up(&inode->i_sem);
 		/* already have STREAM head */
 		if ((err = strwaitopen(sd, FCREAT))) {
 			ptrace(("Error path taken for sd %p\n", sd));
@@ -2820,7 +2806,7 @@ stropen(struct inode *inode, struct file *file)
 	ptrace(("performing strwakeopen() on sd %p\n", sd));
 	strwakeopen(sd);
 	if (!err) {
-		stri_insert(file, sd); /* publish to file pointer */
+		stri_insert(file, sd);	/* publish to file pointer */
 		/* do this if no error and FIFO *after* releasing open bit */
 		if (sd->sd_flag & STRISFIFO)
 			/* POSIX blocking semantics for FIFOS */
@@ -2833,6 +2819,15 @@ stropen(struct inode *inode, struct file *file)
 	sd_put(&sd);
       error:
 	return ((err < 0) ? err : -err);
+      up_error:
+	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	up(&inode->i_sem);
+	goto error;
+      up_put_error:
+	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+	up(&inode->i_sem);
+	sd_put(&sd);
+	goto error;
 }
 
 /**
@@ -2931,6 +2926,13 @@ strflush(struct file *file)
  *
  *  Note: @inode could be an extenal filesystem inode instead of the snode.
  *
+ *  Notes: I ran into some problems where one process was opening a clone device and getting a
+ *  reference to the stream head from the inode (in stropen()) while it was in strlastclose().  This
+ *  is the classical STREAMS open/close race.  Here we take and hold the inode semaphore until we
+ *  know whether it is the last close or not, and, if it is, we remove the STREAM head from the
+ *  inode before releasing the semaphore.  That way, when stropen() acquires the semaphore, any
+ *  stream head attached to the inode is valid.
+ *
  */
 STATIC int
 strclose(struct inode *inode, struct file *file)
@@ -2938,6 +2940,13 @@ strclose(struct inode *inode, struct file *file)
 	struct stdata *sd;
 	int err = 0;
 
+	assert(inode);
+	assert(file);
+
+	ptrace(("closing stream on inode %p\n", inode));
+	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
+	down(&inode->i_sem);
+	// spin_lock(&inode->i_lock);
 	if (likely((sd = stri_remove(file)) != NULL)) {
 		int oflag = make_oflag(file);
 
@@ -2945,14 +2954,34 @@ strclose(struct inode *inode, struct file *file)
 		/* Always deregister STREAMS events */
 		strevent_unregister(file, sd);
 
-		/* closing stream head */
-		if (strdeccounts(sd, oflag))
+		/* don't want any opens of this stream from the inode until we know whether it is
+		   the last close or not.  If it is the last close remove the stream head from the
+		   inode before releasing the semaphore. */
+		if (strdeccounts(sd, oflag)) {
+			ptrace(("last close of stream %p\n", sd));
+			/* remove from the inode clone list */
+			strremove(inode, sd);
+			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+			up(&inode->i_sem);
+			ptrace(("putting inode %p\n", inode));
+			ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+				atomic_read(&inode->i_count) - 1));
+			iput(inode);	/* to cancel igrab() from strinsert */
+			/* closing stream head */
 			strlastclose(sd, oflag);
+		} else {
+			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+			up(&inode->i_sem);
+		}
 
 		/* this put balances the sd_get() in stri_insert() */
 		sd_put(&sd);	/* could be final */
-	} else
+	} else {
 		err = -EIO;
+		// spin_unlock(&inode->i_lock);
+		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
+		up(&inode->i_sem);
+	}
 	return (err);
 }
 
@@ -4235,7 +4264,7 @@ tty_fiosetown(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 
 STATIC int
-STREAMS_FASTCALL(str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg));
+ STREAMS_FASTCALL(str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg));
 
 /**
  *  sock_siocatmark:	- process %SIOCATMARK ioctl
@@ -4683,7 +4712,7 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 	int closetime;
 	int err;
 
-	if (!(err = copyin(&closetime, (int *) arg, sizeof(closetime)))) {
+	if (!(err = copyin((int *) arg, &closetime, sizeof(closetime)))) {
 		if (0 > closetime || closetime >= 300000)
 			return (-EINVAL);
 		if (!(err = straccess_unlocked(sd, FEXCL)))
@@ -5328,13 +5357,14 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (!(err = straccess_rlock(sd, 0))) {
-		if ((q = q->q_next))
+		if (SAMESTR(q) && (q = q->q_next))
 			snprintf(fmname, FMNAMESZ + 1, _RD(q)->q_qinfo->qi_minfo->mi_idname);
 		else
 			err = -EINVAL;
 		srunlock(sd);
-		err = copyout(fmname, (char *) arg, FMNAMESZ);
 	}
+	if (!err)
+		err = copyout(fmname, (char *) arg, FMNAMESZ + 1);
 	return (err);
 }
 
@@ -5486,7 +5516,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 	struct fmodsw *fmod;
 	int err;
 
-	if (!(err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)))
+	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)))
 		return (err);
 
 	/* MG also says to check STREAMS memory limit. */
@@ -7157,90 +7187,6 @@ put_filesystem(struct file_system_type *fs)
 #endif
 }
 #endif
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  Special open for character based streams, fifos and pipes.
- *
- *  -------------------------------------------------------------------------
- */
-
-/**
- *  cdev_open: - open a character special device node
- *  @inode: the character device inode
- *  @file: the user file pointer
- *
- *  cdev_open() is only used to open a stream from a character device node in an external
- *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
- *  spec_dev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or
- *  sockets.  Those devices provide their own file operations to the main operating system.  The
- *  character device number from the inode is used to determine the shadow special file system
- *  (internal) inode and chain the open call.
- *
- *  This is the separation point where we convert the external device number to an internal device
- *  number.  The external device number is contained in inode->i_rdev.
- *
- *  @inode is the inode in the external filesystem.
- *
- *  @file->f_op is the external file operations (character device, fifo) and must be replaced with
- *	our file operations.
- *
- *  @file->f_dentry is the external filesystem dentry for the device node.
- *  @file->f_vfsmnt is the external filesystem vfsmnt for the device node.
- *  @file exists on the file->f_dentry->d_inode->i_sb->s_files list.
- *
- *  What we should be doing here is get a fresh new dentry.  Find our inode from the device number,
- *  add it to the dentry.  Set the dentry->d_sb to the specfs super block, set dentry->d_parent =
- *  dget(file->f_dentry->d_parent), but do not add the dentry to the child list on the parent
- *  directory, nor do we hash the dentry.  Next we do a dentry open on the on the dentry and a file
- *  pointer swap on return.
- *
- *  Instead of farting around with dentries and such, just lookup the inode in the specfs replace
- *  the file->f_ops and chain the open with the specfs inode passed to the new open procedure.  For
- *  FIFOs we pass the external filesystem inode instead.
- */
-STATIC int
-cdev_open(struct inode *inode, struct file *file)
-{
-	int err;
-	struct cdevsw *cdev;
-	struct devnode *cmin;
-	major_t major;
-	minor_t minor;
-	modID_t modid;
-	dev_t dev;
-	int sflag;
-
-#if HAVE_KFUNC_TO_KDEV_T
-	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
-	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
-#else
-	minor = MINOR(inode->i_rdev);
-	major = MAJOR(inode->i_rdev);
-#endif
-	if (!(cdev = sdev_get(major)))
-		return (-ENXIO);
-	minor = cdev_minor(cdev, major, minor);
-	major = cdev->d_major;
-	modid = cdev->d_modid;
-	dev = makedevice(modid, minor);
-	sflag = DRVOPEN;
-	if (cdev->d_flag & D_CLONE)
-		sflag = CLONEOPEN;
-	else if ((cmin = cmin_get(cdev, minor)) && cmin->n_flag & D_CLONE)
-		sflag = CLONEOPEN;
-	err = spec_open(file, cdev, dev, sflag);
-	sdev_put(cdev);
-	return (err);
-}
-
-struct file_operations cdev_f_ops ____cacheline_aligned = {
-	.owner = NULL, /* yes NULL */
-	.open = cdev_open,
-};
-
-EXPORT_SYMBOL(cdev_f_ops);
 
 #ifdef CONFIG_STREAMS_STH_MODULE
 STATIC

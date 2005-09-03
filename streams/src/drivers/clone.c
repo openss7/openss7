@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/03 02:03:49 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 02:03:49 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:49:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/03 02:03:49 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/03 02:03:49 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/03 02:03:49 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -224,6 +224,88 @@ static struct cdevsw clone_cdev = {
 	.d_fop = &clone_ops,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for character based streams, fifos and pipes.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  cdev_open: - open a character special device node
+ *  @inode: the character device inode
+ *  @file: the user file pointer
+ *
+ *  cdev_open() is only used to open a stream from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
+ *  spec_dev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or
+ *  sockets.  Those devices provide their own file operations to the main operating system.  The
+ *  character device number from the inode is used to determine the shadow special file system
+ *  (internal) inode and chain the open call.
+ *
+ *  This is the separation point where we convert the external device number to an internal device
+ *  number.  The external device number is contained in inode->i_rdev.
+ *
+ *  @inode is the inode in the external filesystem.
+ *
+ *  @file->f_op is the external file operations (character device, fifo) and must be replaced with
+ *	our file operations.
+ *
+ *  @file->f_dentry is the external filesystem dentry for the device node.
+ *  @file->f_vfsmnt is the external filesystem vfsmnt for the device node.
+ *  @file exists on the file->f_dentry->d_inode->i_sb->s_files list.
+ *
+ *  What we should be doing here is get a fresh new dentry.  Find our inode from the device number,
+ *  add it to the dentry.  Set the dentry->d_sb to the specfs super block, set dentry->d_parent =
+ *  dget(file->f_dentry->d_parent), but do not add the dentry to the child list on the parent
+ *  directory, nor do we hash the dentry.  Next we do a dentry open on the on the dentry and a file
+ *  pointer swap on return.
+ *
+ *  Instead of farting around with dentries and such, just lookup the inode in the specfs replace
+ *  the file->f_ops and chain the open with the specfs inode passed to the new open procedure.  For
+ *  FIFOs we pass the external filesystem inode instead.
+ */
+STATIC int
+cdev_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct cdevsw *cdev;
+	struct devnode *cmin;
+	major_t major;
+	minor_t minor;
+	modID_t modid;
+	dev_t dev;
+	int sflag;
+
+#if HAVE_KFUNC_TO_KDEV_T
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
+	if (!(cdev = sdev_get(major)))
+		return (-ENXIO);
+	minor = cdev_minor(cdev, major, minor);
+	major = cdev->d_major;
+	modid = cdev->d_modid;
+	dev = makedevice(modid, minor);
+	sflag = DRVOPEN;
+	if (cdev->d_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	else if ((cmin = cmin_get(cdev, minor)) && cmin->n_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	err = spec_open(file, cdev, dev, sflag);
+	sdev_put(cdev);
+	return (err);
+}
+
+STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
+	.owner = NULL, /* yes NULL */
+	.open = cdev_open,
 };
 
 /* 
@@ -419,8 +501,6 @@ clone_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 
 	ptrace(("%s: opening clone device\n", __FUNCTION__));
-	if ((err = down_interruptible(&inode->i_sem)))
-		goto exit;
 #if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
@@ -438,7 +518,7 @@ clone_open(struct inode *inode, struct file *file)
 	printd(("%s: device maps to internal major %hu, minor %hu\n", __FUNCTION__, modid, 0));
 	if (!(cdev = sdev_get(minor))) {
 		printd(("%s: could not find driver for minor %hu\n", __FUNCTION__, minor));
-		goto up_exit;
+		goto exit;
 	}
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	instance = cdev->d_modid;
@@ -446,8 +526,6 @@ clone_open(struct inode *inode, struct file *file)
 	err = spec_open(file, cdev, makedevice(modid, instance), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	sdev_put(cdev);
-      up_exit:
-	up(&inode->i_sem);
       exit:
 	return (err);
 }

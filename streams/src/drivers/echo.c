@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/03 08:12:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/03 08:12:07 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/03 08:12:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:02 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/03 08:12:07 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -136,12 +136,12 @@ MODULE_ALIAS("/dev/streams/echo/*");
 #endif
 
 static struct module_info echo_minfo = {
-	mi_idnum:CONFIG_STREAMS_ECHO_MODID,
-	mi_idname:CONFIG_STREAMS_ECHO_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_ECHO_MODID,
+	.mi_idname = CONFIG_STREAMS_ECHO_NAME,
+	.mi_minpsz = 0,
+	.mi_maxpsz = INFPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 static int
@@ -176,6 +176,12 @@ echo_put(queue_t *q, mblk_t *mp)
 	case M_IOCDATA:
 		err = -EINVAL;
 		goto nak;
+	case M_READ:
+		mp->b_wptr = mp->b_rptr;
+		mp->b_datap->db_type = M_DATA;
+		mp->b_flag |= MSGDELIM;
+		qreply(q, mp);
+		return (0);
 	case M_DATA:
 	case M_PROTO:
 	case M_PCPROTO:
@@ -211,6 +217,13 @@ typedef struct echo {
 static spinlock_t echo_lock = SPIN_LOCK_UNLOCKED;
 static struct echo *echo_list = NULL;
 
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  OPEN and CLOSE
+ *
+ *  -------------------------------------------------------------------------
+ */
 static int
 echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
@@ -266,7 +279,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				}
 			}
 		}
-		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
+		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&echo_lock);
 			kmem_free(p, sizeof(*p));
 			printd(("%s: no minor devices left\n", __FUNCTION__));
@@ -286,6 +299,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
+
 static int
 echo_close(queue_t *q, int oflag, cred_t *crp)
 {
@@ -309,19 +323,21 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit echo_rqinit = {
-	qi_qopen:echo_open,
-	qi_qclose:echo_close,
-	qi_minfo:&echo_minfo,
+	.qi_putp = NULL,
+	.qi_qopen = echo_open,
+	.qi_qclose = echo_close,
+	.qi_minfo = &echo_minfo,
 };
 
 static struct qinit echo_wqinit = {
-	qi_putp:echo_put,
-	qi_minfo:&echo_minfo,
+	.qi_putp = echo_put,
+	.qi_srvp = NULL,
+	.qi_minfo = &echo_minfo,
 };
 
 static struct streamtab echo_info = {
-	st_rdinit:&echo_rqinit,
-	st_wrinit:&echo_wqinit,
+	.st_rdinit = &echo_rqinit,
+	.st_wrinit = &echo_wqinit,
 };
 
 static struct cdevsw echo_cdev = {

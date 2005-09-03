@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/03 02:03:52 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 08:12:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 02:03:52 $ by $Author: brian $
+ Last Modified $Date: 2005/09/03 08:12:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/03 02:03:52 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 08:12:11 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/03 02:03:52 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 08:12:11 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -217,7 +217,7 @@ register_strmod(struct fmodsw *fmod)
 
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
-			ptrace(("Finding a free module id\n"));
+			_ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __fmod_lookup(modid); modid--) ;
 			if (!modid) {
 				ptrace(("Error path taken!\n"));
@@ -225,7 +225,7 @@ register_strmod(struct fmodsw *fmod)
 			}
 			mi->mi_idnum = modid;
 		} else {
-			ptrace(("Using module id %hu\n", modid));
+			_ptrace(("Using module id %hu\n", modid));
 			/* use specified module id */
 			if ((f = __fmod_lookup(modid))) {
 				if (f != fmod) {
@@ -236,7 +236,7 @@ register_strmod(struct fmodsw *fmod)
 				goto ebusy;
 			}
 		}
-		ptrace(("Assigned module id %hu\n", modid));
+		_ptrace(("Assigned module id %hu\n", modid));
 		fmod_add(fmod, modid);
 		err = modid;
 		goto unlock_exit;
@@ -342,7 +342,7 @@ register_strdrv(struct cdevsw *cdev)
 		}
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
-			ptrace(("Finding a free module id\n"));
+			_ptrace(("Finding a free module id\n"));
 			for (modid = (modID_t) (-1UL); modid && __cdrv_lookup(modid); modid--) ;
 			if (!modid) {
 				ptrace(("Error path taken!\n"));
@@ -350,7 +350,7 @@ register_strdrv(struct cdevsw *cdev)
 			}
 			mi->mi_idnum = modid;
 		} else {
-			ptrace(("Using module id %hu\n", modid));
+			_ptrace(("Using module id %hu\n", modid));
 			/* use specified module id */
 			if ((c = __cdrv_lookup(modid))) {
 				if (c != cdev) {
@@ -362,7 +362,7 @@ register_strdrv(struct cdevsw *cdev)
 				goto ebusy;
 			}
 		}
-		ptrace(("Assigned module id %hu\n", modid));
+		_ptrace(("Assigned module id %hu\n", modid));
 		if ((err = sdev_add(cdev, modid))) {
 			ptrace(("Error path taken!\n"));
 			goto unregister_exit;
@@ -507,10 +507,10 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 		}
 #ifdef CONFIG_STREAMS_DEBUG
 		if (fops->owner)
-			printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 				fops->owner->name, module_refcount(fops->owner)));
 		else
-			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
 		/* register the character device */
 		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0) {
@@ -519,10 +519,10 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 		}
 #ifdef CONFIG_STREAMS_DEBUG
 		if (fops->owner)
-			printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 				fops->owner->name, module_refcount(fops->owner)));
 		else
-			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
 		if (err > 0 && major == 0)
 			major = err;
