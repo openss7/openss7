@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/30 03:37:12 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/02 19:22:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/30 03:37:12 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/02 19:22:32 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/30 03:37:12 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/02 19:22:32 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -234,6 +234,7 @@ static char const ident[] =
 
 //EXPORT_SYMBOL(specfs_mnt);/* strspecfs.h */
 //EXPORT_SYMBOL(spec_open);     /* strspecfs.h */
+//EXPORT_SYMBOL(spec_reparent);     /* strspecfs.h */
 
 #if	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
 	defined(CONFIG_STREAMS_SC_MODULE)

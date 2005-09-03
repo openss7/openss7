@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/02 19:22:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/02 19:22:28 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/02 19:22:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,12 +70,11 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/kernel/strreg.h"	/* for spec_open() */
 #include "src/modules/sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/31 19:03:02 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/02 19:22:28 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -195,7 +194,7 @@ nsdevopen(struct inode *inode, struct file *file)
 		int sflag = (file->f_flags & O_CLONE) ? CLONEOPEN : DRVOPEN;
 
 		printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
-		err = spec_open(inode, file, dev, sflag);
+		err = spec_open(file, cdev, dev, sflag);
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 		sdev_put(cdev);
 	} else
@@ -259,8 +258,6 @@ nsdev_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 	dev_t dev;
 
-	if ((err = down_interruptible(&inode->i_sem)))
-		goto exit;
 #if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
@@ -273,19 +270,17 @@ nsdev_open(struct inode *inode, struct file *file)
 	modid = nsdev_cdev.d_modid;
 	err = -ENXIO;
 	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
-		goto up_exit;
+		goto exit;
 	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
 	instance = cdev->d_modid;
 	dev = makedevice(modid, instance);
-	err = spec_open(inode, file, dev, CLONEOPEN);
+	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	sdev_put(cdev);
-      up_exit:
-	up(&inode->i_sem);
       exit:
 	return (err);
 }

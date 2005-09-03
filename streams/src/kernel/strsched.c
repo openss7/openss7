@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/01 03:19:01 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/02 19:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/01 03:19:01 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/01 03:19:01 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/02 19:22:31 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/01 03:19:01 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/02 19:22:31 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3739,6 +3739,8 @@ allocstr(void)
 			sd->sd_rq = qget(q + 0);
 			sd->sd_wq = qget(q + 1);
 			qstream(q) = sd; /* don't do double get */
+
+			printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd, atomic_read(&sh->sh_refs)));
 		} else
 			__freeq(q);
 	}
@@ -3781,6 +3783,7 @@ sd_get(struct stdata *sd)
 
 		assert(atomic_read(&sh->sh_refs) > 0);
 		atomic_inc(&sh->sh_refs);
+		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd, atomic_read(&sh->sh_refs)));
 	}
 	return (sd);
 }
@@ -3795,6 +3798,8 @@ sd_put(struct stdata **sdp)
 
 	if ((sd = xchg(sdp, NULL))) {
 		struct shinfo *sh = (struct shinfo *) sd;
+
+		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd, atomic_read(&sh->sh_refs) - 1));
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
 		if (atomic_dec_and_test(&sh->sh_refs)) {

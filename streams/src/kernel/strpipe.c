@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/02 19:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/02 19:22:31 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/02 19:22:31 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 #endif
 
 /*
- *  This is a variation on the theme of spec_open.
+ *  This is a variation on the theme of the old spec_open.
  */
 STATIC struct file *
 pipe_file_open(void)
@@ -114,13 +114,13 @@ pipe_file_open(void)
 		name.hash = full_name_hash(name.name, name.len);
 		{
 			file = ERR_PTR(-ENXIO);
-			if (!(mnt = specfs_get()))
+			if (!(mnt = specfs_mount()))
 				goto done;
 			printd(("%s: got mount point\n", __FUNCTION__));
 			down(&mnt->mnt_root->d_inode->i_sem);
 			dentry = lookup_hash(&name, mnt->mnt_root);
 			up(&mnt->mnt_root->d_inode->i_sem);
-			specfs_put();
+			specfs_umount();
 		}
 	}
 	if (IS_ERR((file = (void *) dentry))) {

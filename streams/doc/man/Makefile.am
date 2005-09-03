@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/08/31 19:02:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/02 19:22:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/31 19:02:49 $ by $Author: brian $
+# Last Modified $Date: 2005/09/02 19:22:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1220,10 +1220,10 @@ man_MANS = \
 	man9/setq.9 \
 	man9/setsq.9 \
 	man9/setqsched.9 \
-	man9/spec_dentry.9 \
 	man9/spec_open.9 \
-	man9/specfs_get.9 \
-	man9/specfs_put.9 \
+	man9/spec_reparent.9 \
+	man9/specfs_mount.9 \
+	man9/specfs_umount.9 \
 	man9/streamtab.9 \
 	man9/streamtab_t.9 \
 	man9/strgetpmsg.9 \
@@ -2438,10 +2438,10 @@ dist_noinst_MANS = \
 	man9/setq.9.man \
 	man9/setsq.9.man \
 	man9/setqsched.9.man \
-	man9/spec_dentry.9.man \
 	man9/spec_open.9.man \
-	man9/specfs_get.9.man \
-	man9/specfs_put.9.man \
+	man9/spec_reparent.9.man \
+	man9/specfs_mount.9.man \
+	man9/specfs_umount.9.man \
 	man9/streamtab.9.man \
 	man9/streamtab_t.9.man \
 	man9/strgetpmsg.9.man \

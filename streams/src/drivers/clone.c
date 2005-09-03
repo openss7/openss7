@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/02 19:22:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/02 19:22:28 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/02 19:22:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -66,12 +66,11 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/kernel/strreg.h"	/* for spec_open() */
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/08/31 19:03:02 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/02 19:22:28 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -186,7 +185,7 @@ cloneopen(struct inode *inode, struct file *file)
 	dev_t dev = inode->i_ino;
 
 	if (file->private_data)
-		/* Darn.  Somebody attached a STREAM head to this file pointer. */
+		/* Darn.  Somebody passed us a FIFO inode. */
 		return (-EIO);
 
 #if 0
@@ -196,7 +195,9 @@ cloneopen(struct inode *inode, struct file *file)
 #endif
 	{
 		int err;
-		err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
+
+		dev = makedevice(cdev->d_modid, 0);
+		err = spec_open(file, cdev, dev, CLONEOPEN);
 		sdev_put(cdev);
 		return (err);
 	}
@@ -280,7 +281,7 @@ clone_open(struct inode *inode, struct file *file)
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	instance = cdev->d_modid;
 	printd(("%s: opening driver %s\n", __FUNCTION__, cdev->d_name));
-	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
+	err = spec_open(file, cdev, makedevice(modid, instance), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	sdev_put(cdev);
       up_exit:
@@ -301,75 +302,6 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
  *
  *  -------------------------------------------------------------------------
  */
-
-#if 0
-STATIC inode *
-spec_iget(struct super_block *sb, dev_t dev, struct cdevsw *cdev)
-{
-	struct inode *inode;
-
-#if HAVE_KFUNC_IGET_LOCKED
-	inode = iget_locked(sb, dev);
-#else
-	inode = iget4(sb, dev, NULL, cdev);
-#endif
-	if (!inode) {
-		ptrace(("couldn't allocate inode\n"));
-		return ERR_PTR(-ENOMEM);
-	}
-#if HAVE_KFUNC_IGET_LOCKED
-	if (inode->i_state & I_NEW) {
-		inode->u.generic_ip = cdev;
-		sb->s_op->read_inode(inode);
-		inode->i_nlink++;
-		unlock_new_inode(inode);
-	}
-#else
-	inode->i_nlink++;
-#endif
-	return (inode);
-}
-
-STATIC struct inode *
-spec_iget(dev_t dev, struct cdevsw *cdev)
-{
-	struct inode *inode;
-	struct vfsmount *mnt;
-
-	if (!(mnt = specfs_get()))
-		return ERR_PTR(-ENODEV);
-	inode = spec_iget_sb(mnt->mnt_sb, dev, cdev);
-	specfs_put();
-}
-
-STATIC int
-spec_graft(struct file *file, dev_t dev, cdevsw *cdev)
-{
-	struct inode *inode;
-	struct dentry *dentry;
-	struct vfsmount *mnt;
-	struct qstr name;
-
-	name.name = cdev->d_name;
-	name.len = strnlen(cdev->d_name, FMNAMESZ);
-	name.hash = dev;
-
-	if (IS_ERR((inode = spec_iget(dev, cdev))))
-		return PTR_ERR(inode);
-
-	if ((dentry = d_alloc(NULL, &name))) {
-		dentry->d_parent = dentry; /* make it a IS_ROOT() dentry */
-		dentry->d_sb = inode->i_sb;
-		d_instantiate(dentry, inode);
-		/* no, don't hash it */
-	} else {
-		iput(inode);
-		return (-ENOMEM);
-	}
-
-
-}
-#endif
 
 /**
  *  cdev_open: - open a character special device node
@@ -393,9 +325,17 @@ spec_graft(struct file *file, dev_t dev, cdevsw *cdev)
  *
  *  @file->f_dentry is the external filesystem dentry for the device node.
  *  @file->f_vfsmnt is the external filesystem vfsmnt for the device node.
+ *  @file exists on the file->f_dentry->d_inode->i_sb->s_files list.
  *
  *  What we should be doing here is get a fresh new dentry.  Find our inode from the device number,
- *  add it to the dentry.  Do a do_add_mount operation
+ *  add it to the dentry.  Set the dentry->d_sb to the specfs super block, set dentry->d_parent =
+ *  dget(file->f_dentry->d_parent), but do not add the dentry to the child list on the parent
+ *  directory, nor do we hash the dentry.  Next we do a dentry open on the on the dentry and a file
+ *  pointer swap on return.
+ *
+ *  Instead of farting around with dentries and such, just lookup the inode in the specfs replace
+ *  the file->f_ops and chain the open with the specfs inode passed to the new open procedure.  For
+ *  FIFOs we pass the external filesystem inode instead.
  */
 STATIC int
 cdev_open(struct inode *inode, struct file *file)
@@ -409,8 +349,6 @@ cdev_open(struct inode *inode, struct file *file)
 	dev_t dev;
 	int sflag;
 
-	if ((err = down_interruptible(&inode->i_sem)))
-		goto exit;
 #if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
@@ -418,21 +356,19 @@ cdev_open(struct inode *inode, struct file *file)
 	minor = MINOR(inode->i_rdev);
 	major = MAJOR(inode->i_rdev);
 #endif
-	err = -ENXIO;
 	if (!(cdev = sdev_get(major)))
-		goto up_exit;
+		return (-ENXIO);
 	minor = cdev_minor(cdev, major, minor);
 	major = cdev->d_major;
 	modid = cdev->d_modid;
 	dev = makedevice(modid, minor);
-	sflag = (cmin = cmin_get(cdev, minor)) ?
-	    ((cmin->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN) :
-	    ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
-	err = spec_open(inode, file, dev, sflag);
+	sflag = DRVOPEN;
+	if (cdev->d_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	else if ((cmin = cmin_get(cdev, minor)) && cmin->n_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	err = spec_open(file, cdev, dev, sflag);
 	sdev_put(cdev);
-      up_exit:
-	up(&inode->i_sem);
-      exit:
 	return (err);
 }
 

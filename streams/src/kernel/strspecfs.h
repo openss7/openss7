@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/08/30 03:37:12 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/09/02 19:22:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:32 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -64,10 +64,14 @@ struct spec_sb_info {
 	umode_t sbi_mode;
 };
 
-extern struct file_operations spec_dev_f_ops;
+// extern struct file_operations spec_dev_f_ops;
 
-extern struct vfsmount *STREAMS_FASTCALL(specfs_get(void));
-extern void STREAMS_FASTCALL(specfs_put(void));
+extern struct vfsmount *STREAMS_FASTCALL(specfs_mount(void));
+extern void STREAMS_FASTCALL(specfs_umount(void));
+
+extern int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
+extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
+extern struct inode *spec_snode(dev_t dev, struct cdevsw *cdev);
 
 #if 0
 /* initialization for main */

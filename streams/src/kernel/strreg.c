@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:10 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/02 19:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:10 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/02 19:22:31 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/08/31 19:03:10 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/02 19:22:31 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -86,7 +86,6 @@ static char const ident[] =
 #include "src/kernel/strsched.h"	/* for sq_alloc */
 #include "src/kernel/strutil.h"	/* for global_syncq */
 #include "src/kernel/strlookup.h"	/* cdevsw_list, etc. */
-#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
 #include "src/kernel/strreg.h"	/* extern verification */
 /* 
  *  -------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/08/29 10:37:09 $
+ @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/09/02 19:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRREG_H__
 #define __LOCAL_STRREG_H__
-
-extern struct dentry *spec_dentry(dev_t dev, int *sflagp);
-extern int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag);
 
 #endif				/* __LOCAL_STRREG_H__ */

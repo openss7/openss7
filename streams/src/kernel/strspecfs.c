@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/01 03:19:01 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/01 03:19:01 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/02 19:22:32 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -261,163 +261,254 @@ MODULE_ALIAS("/dev/streams/*");
 #undef makedevice
 #define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
 
+STATIC struct vfsmount *specfs_mnt = NULL;
+
 /*
  *  -------------------------------------------------------------------------
  *  -------------------------------------------------------------------------
  */
 
-#ifndef HAVE_FILE_MOVE_ADDR
-STATIC void
-_file_move(struct file *file, struct list_head *list)
+struct inode *
+spec_snode(dev_t dev, struct cdevsw *cdev)
 {
-	if (!list)
-		return;
-	file_list_lock();
-	list_del(&file->f_list);
-	list_add(&file->f_list, list);
-	file_list_unlock();
+	struct inode *snode;
+	struct super_block *sb;
+
+	assert(specfs_mnt);
+	sb = specfs_mnt->mnt_sb;
+
+#if HAVE_KFUNC_IGET_LOCKED
+	if (!(snode = iget_locked(sb, dev))) {
+		ptrace(("couldn't allocate inode\n"));
+		return ERR_PTR(-ENOMEM);
+	}
+	if (snode->i_state & I_NEW) {
+		snode->u.generic_ip = cdev;
+		sb->s_op->read_inode(snode);
+		unlock_new_inode(snode);
+	}
+#else
+	if (!(snode = iget4(sb, dev, NULL, cdev))) {
+		ptrace(("couldn't allocate inode\n"));
+		return ERR_PTR(-ENOMEM);
+	}
+#endif
+	ptrace(("inode %p no %lu refcount now %d\n", snode, snode->i_ino,
+		atomic_read(&snode->i_count)));
+	return (snode);
 }
-#endif
 
-STATIC void
-file_swap_put(struct file *f1, struct file *f2)
-{
-#ifdef HAVE_FILE_MOVE_ADDR
-	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
-#endif
-	f1->f_op = xchg(&f2->f_op, f1->f_op);
-	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
-	f1->f_vfsmnt = xchg(&f2->f_vfsmnt, f1->f_vfsmnt);
-	f1->private_data = xchg(&f2->private_data, f1->private_data);
-	_file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
-	_file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
-	fput(f2);
-}
-
-#ifndef O_CLONE
-#define O_CLONE (O_CREAT|O_EXCL)
-#endif
-
-/**
- *  spec_dentry: - find a dentry in the specfs to open.
- *  @dev: device for which to find a dentry
- *  @sflagp: flags to modify (if any)
- */
-struct dentry *
-spec_dentry(dev_t dev, int *sflagp)
+STATIC struct dentry *
+spec_lookup(struct dentry *base, struct qstr *name)
 {
 	struct dentry *dentry;
-	struct cdevsw *cdev;
 
-	{
-		struct qstr name;
-		char buf[32];
+	down(&base->d_inode->i_sem);
+	dentry = lookup_hash(name, base);
+	up(&base->d_inode->i_sem);
+	return (dentry);
+}
 
-		dentry = ERR_PTR(-ENXIO);
-		if (!(cdev = cdrv_get(getmajor(dev))))
-			goto done;
-		if (sflagp && cdev->d_flag & D_CLONE)
-			*sflagp = CLONEOPEN;
-		snprintf(buf, 32, "%s", cdev->d_name);
-		cdrv_put(cdev);
-		name.name = buf;
-		name.len = strnlen(buf, 32 - 1);
-		name.hash = full_name_hash(name.name, name.len);
-		{
-			struct vfsmount *mnt;
+#if 0
+struct inode *
+spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
+{
+	/* specfs inode, reparent the dentry - for clone and nsdev */
+	struct inode *snode = ERR_PTR(-ENXIO);
 
-			dentry = ERR_PTR(-EIO);
-			if (!(mnt = specfs_get()))
-				goto done;
-			down(&mnt->mnt_root->d_inode->i_sem);
-			dentry = lookup_hash(&name, mnt->mnt_root);
-			up(&mnt->mnt_root->d_inode->i_sem);
-			specfs_put();
+	if (file->f_dentry->d_sb != cdev->d_inode->i_sb) {
+		ptrace(("reparent not necessary\n"));
+		snode = spec_snode(dev, cdev);
+		if (IS_ERR(snode)) {
+			ptrace(("Error path taken!\n"));
+			return (snode);
 		}
-	}
-	if (IS_ERR(dentry))
-		goto done;
-	if (!dentry->d_inode)
-		goto enoent;
-	{
+	} else {
+		struct dentry *dentry;
 		struct qstr name;
-		char buf[32];
-		struct dentry *parent = dentry;
+		char buf[24];
 
+		/* prune two levels */
+		ptrace(("reparenting internal dentry\n"));
+		dentry = file->f_dentry;
+		file->f_dentry = dget(dentry->d_parent->d_parent);
+		dput(dentry);
+		name.name = cdev->d_name;
+		name.len = strnlen(cdev->d_name, FMNAMESZ);
+		name.hash = full_name_hash(name.name, name.len);
+		if (!(dentry = spec_lookup(file->f_dentry, &name)) || IS_ERR(dentry)
+		    || !dentry->d_inode) {
+			ptrace(("Error path taken!\n"));
+			return (snode);
+		}
+		file->f_dentry = dentry;
 		{
 			struct devnode *cmin;
+			minor_t minor = getminor(dev);
 
-			if ((cmin = cmin_get(cdev, getminor(dev)))) {
-				if (sflagp && cmin->n_flag & D_CLONE)
-					*sflagp = CLONEOPEN;
-				snprintf(buf, 32, "%s", cmin->n_name);
+			if ((cmin = cmin_get(cdev, minor))) {
+				name.name = cmin->n_name;
+				name.len = strnlen(cmin->n_name, FMNAMESZ);
 			} else {
-				snprintf(buf, 32, "%lu", getminor(dev));
+				name.name = buf;
+				name.len = snprintf(buf, sizeof(buf), "%hu", minor);
 			}
-			name.name = buf;
-			name.len = strnlen(buf, 32 - 1);
-			name.hash = full_name_hash(name.name, name.len);
 		}
-		down(&parent->d_inode->i_sem);
-		dentry = lookup_hash(&name, parent);
-		up(&parent->d_inode->i_sem);
-		dput(parent);
+		name.hash = full_name_hash(name.name, name.len);
+		if (!(dentry = spec_lookup(file->f_dentry, &name)) || IS_ERR(dentry)
+		    || !dentry->d_inode) {
+			ptrace(("Error path taken!\n"));
+			return (snode);
+		}
+		file->f_dentry = dentry;
+		snode = igrab(dentry->d_inode);
+		ptrace(("inode %p no %lu refcount now %d\n", snode, snode->i_ino,
+			atomic_read(&snode->i_count)));
 	}
-	if (IS_ERR(dentry)) {
-		goto done;
-	}
-	if (!dentry->d_inode) {
-		goto enoent;
-	}
-      done:
-	return (dentry);
-      enoent:
-	dput(dentry);
-	dentry = ERR_PTR(-ENOENT);
-	goto done;
-}
+#ifdef CONFIG_STREAMS_DEBUG
+	if (file->f_op->owner)
+		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+			file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
+#endif
+	{
+		struct file_operations *f_op;
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(spec_dentry);
+		/* somebody's brilliant idead to make fops_put a macro that re-evaluates its
+		   argument */
+		f_op = file->f_op;
+		fops_get(snode->i_fop);
+		file->f_op = snode->i_fop;
+		fops_put(f_op);
+	}
+#ifdef CONFIG_STREAMS_DEBUG
+	if (file->f_op->owner)
+		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+			file->f_op->owner->name, module_refcount(file->f_op->owner)));
+#endif
+	return (snode);
+}
+#else
+int
+spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
+{
+	struct inode *snode;
+	struct dentry *dentry;
+	struct vfsmount *mnt = specfs_mnt;
+	int err;
+
+#ifdef HAVE_FILE_MOVE_ADDR
+	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+#define file_move(__f, __l) _file_move(__f, __l)
 #endif
 
-/**
- *  spec_open:	- chain open to an internal special device.
- *  @i:	external (or chaining) filesystem inode
- *  @f:	external (or chaining) filesystem file pointer (user file pointer)
- *
- *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
- */
+	{
+		struct devnode *cmin;
+		struct qstr name;
+		char buf[25];
+
+		name.name = buf;
+		if ((cmin = cmin_get(cdev, getminor(dev))))
+			name.len = snprintf(buf, sizeof(buf), "STR/%8s/%8s",
+					    cdev->d_name, cmin->n_name);
+		else
+			name.len = snprintf(buf, sizeof(buf), "STR/%8s/%lu",
+					    cdev->d_name, getminor(dev));
+
+		if (!(dentry = d_alloc(NULL, &name))) {
+			ptrace(("Error path taken!\n"));
+			return (-ENOMEM);
+		}
+		dentry->d_sb = mnt->mnt_sb;
+		dentry->d_parent = dentry;
+	}
+
+	if (IS_ERR((snode = spec_snode(dev, cdev)))) {
+		ptrace(("Error path taken!\n"));
+		err = PTR_ERR(snode);
+		goto put_error;
+	}
+	d_instantiate(dentry, snode);
+
+	err = -ENXIO;
+	if (!snode->i_fop || !snode->i_fop->open) {
+		ptrace(("Error path taken!\n"));
+		goto put_error;
+	}
+
+#ifdef CONFIG_STREAMS_DEBUG
+	if (file->f_op->owner)
+		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+			file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
+#endif
+	{
+		struct file_operations *f_op;
+
+		if (!(f_op = fops_get(snode->i_fop))) {
+			ptrace(("Error path taken!\n"));
+			goto put_error;
+		}
+		fops_put(file->f_op);
+		file->f_op = f_op;
+	}
+#ifdef CONFIG_STREAMS_DEBUG
+	if (file->f_op->owner)
+		printd(("%s: [%s] count is now %d\n", __FUNCTION__,
+			file->f_op->owner->name, module_refcount(file->f_op->owner)));
+#endif
+	dput(file->f_dentry);
+	file->f_dentry = dentry;
+	mntput(file->f_vfsmnt);
+	file->f_vfsmnt = mntget(mnt);
+	file_move(file, &mnt->mnt_sb->s_files);
+	return (0);
+
+      put_error:
+	dput(dentry);
+	return (err);
+}
+#endif
+
+#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
+         || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
+EXPORT_SYMBOL(spec_reparent);
+#endif
+
 int
-spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
+spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 {
-	struct file *tmp;		/* temporary file pointer to use */
 	struct dentry *dentry;
 	struct vfsmount *mnt;
+	int err;
 
-	if (IS_ERR(dentry = spec_dentry(dev, &sflag)))
-		return PTR_ERR(dentry);
+	/* I wish dentry_open() would use what's in the file pointer instead of what it has in
+	   local variables */
+	dentry = dget(file->f_dentry);
+	mnt = mntget(file->f_vfsmnt);
 
-	if ((mnt = specfs_get())) {
-		int oflag = f->f_flags;
+	if (!(err = spec_reparent(file, cdev, dev))) {
+		file->f_flags =
+		    (sflag == CLONEOPEN) ? (file->f_flags | O_CLONE) : (file->f_flags & ~O_CLONE);
 
-		if (sflag == CLONEOPEN)
-			oflag |= O_CLONE;
-		tmp = dentry_open(dentry, mntget(mnt), oflag);
-		specfs_put();
-		if (IS_ERR(tmp))
-			return PTR_ERR(tmp);
-		file_swap_put(f, tmp);
-		return (0);
-	}
-	dput(dentry);
-	return (-ENODEV);
+		if (!(err = file->f_op->open(file->f_dentry->d_inode, file))) {
+			dput(dentry);
+			mntput(mnt);
+			return (0);
+
+		} else
+			ptrace(("Error path taken!\n"));
+	} else
+		ptrace(("Error path taken!\n"));
+
+	dput(file->f_dentry);
+	mntput(file->f_vfsmnt);
+	return (err > 0 ? -err : err);
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
          || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
 EXPORT_SYMBOL(spec_open);
 #endif
+
 /* 
  *  =========================================================================
  *
@@ -556,6 +647,8 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 			if ((inode = cmin->n_inode)) {
 				_ptrace(("found inode for cmin %s\n", cmin->n_name));
 				igrab(inode);
+				ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+					atomic_read(&inode->i_count)));
 				d_add(new, inode);
 				return (NULL);	/* success */
 			}
@@ -564,34 +657,24 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 		} else {
 			/* check if the name is a valid number */
 			char *tail = (char *) new->d_name.name;
-			minor_t minor = simple_strtoul(tail, &tail, 10); /* base 10 only! */
+			minor_t minor = simple_strtoul(tail, &tail, 10);	/* base 10 only! */
 
 			if (*tail == '\0') {
 				if ((minor & ~MINORMASK) == 0) {
 					struct inode *inode;
 					dev_t dev = makedevice(cdev->d_modid, minor);
+
 					_ptrace(("looking up inode for number %s\n",
-						new->d_name.name));
-#if HAVE_KFUNC_IGET_LOCKED
-					if ((inode = iget_locked(dir->i_sb, dev)))
-#else
-					if ((inode = iget4(dir->i_sb, dev, NULL, cdev)))
-#endif
-					{
-#if HAVE_KFUNC_IGET_LOCKED
-						if ((inode->i_state & I_NEW)) {
-							inode->u.generic_ip = cdev;
-							dir->i_sb->s_op->read_inode(inode);
-							unlock_new_inode(inode);
-						}
-#endif
-						_ptrace(("found inode for number %s\n",
-							new->d_name.name));
-						d_add(new, inode);
-						return (NULL);	/* success */
+						 new->d_name.name));
+					if (IS_ERR((inode = spec_snode(dev, cdev)))) {
+						_ptrace(("no inode for number %s\n",
+							 new->d_name.name));
+						return ((struct dentry *) inode);
+						/* already contains error */
 					}
-					_ptrace(("no inode for number %s\n", new->d_name.name));
-					return ERR_PTR(-ENOMEM);
+					_ptrace(("found inode for number %s\n", new->d_name.name));
+					d_add(new, inode);
+					return (NULL);	/* success */
 				}
 			}
 		}
@@ -871,6 +954,8 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		if ((inode = cdev->d_inode)) {
 			_ptrace(("found inode for cdev %s\n", cdev->d_name));
 			igrab(inode);
+			ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+				atomic_read(&inode->i_count)));
 			sdev_put(cdev);
 			d_add(new, inode);
 			return (NULL);	/* success */
@@ -1257,7 +1342,7 @@ spec_read_inode(struct inode *inode)
 {
 	struct cdevsw *cdev = inode->u.generic_ip;
 
-	_ptrace(("reading inode no %lu\n", inode->i_ino));
+	printd(("%s: reading inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 	if (!cdev)
 		goto bad_inode;
 	else {
@@ -1291,8 +1376,9 @@ spec_read_inode(struct inode *inode)
 		   internal minor number.  Unfortunately, this means that all clone drivers need an
 		   external major device number. */
 		/* XXX: Another approach is to make module identifiers to major nodes equal to the
-		 * external major device number and the point would be moot. */
-		_ptrace(("reading minor device inode %lu\n", (ulong) getminor(inode->i_ino)));
+		   external major device number and the point would be moot. */
+		printd(("%s: reading minor device inode %lu\n", __FUNCTION__,
+			(ulong) getminor(inode->i_ino)));
 		/* for device nodes, the major component of the i_ino is the module id */
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
 		inode->i_mode &= ~S_IXUGO;
@@ -1308,7 +1394,8 @@ spec_read_inode(struct inode *inode)
 		inode->i_fop = cdev->d_fop;
 #endif
 	} else {
-		_ptrace(("reading major device inode %lu\n", (ulong) getminor(inode->i_ino)));
+		printd(("%s: reading major device inode %lu\n", __FUNCTION__,
+			(ulong) getminor(inode->i_ino)));
 		/* for module nodes, the minor component of the i_ino is the module id */
 		inode->i_mode |= S_IFDIR;
 		inode->i_mode |= ((inode->i_mode & S_IRUGO) >> 2);
@@ -1319,7 +1406,7 @@ spec_read_inode(struct inode *inode)
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 	return;
       bad_inode:
-	_ptrace(("bad inode no %lu\n", inode->i_ino));
+	ptrace(("bad inode no %lu\n", inode->i_ino));
 	make_bad_inode(inode);
 	return;
 }
@@ -1366,14 +1453,19 @@ STATIC void
 spec_put_inode(struct inode *inode)
 {
 	/* all specfs inodes self destruct when put for the last time */
+	printd(("%s: put of inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
+	printd(("%s: inode %p no %lu refcount now %d\n", __FUNCTION__, inode, inode->i_ino,
+		atomic_read(&inode->i_count) - 1));
 	if (inode->i_nlink != 0) {
 		/* This should not happen because we decrement i_nlink when we remove the STREAM
-		 * head.  The inode should never be able to go away with a STREAM head attached. */
+		   head.  The inode should never be able to go away with a STREAM head attached. */
 #if HAVE_KFUNC_FORCE_DELETE
 		force_delete(inode);
 #else
-		if (atomic_read(&inode->i_count) == 1)
+		if (atomic_read(&inode->i_count) == 1) {
+			printd(("%s: final put of inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 			inode->i_nlink = 0;
+		}
 #endif
 	}
 }
@@ -1395,6 +1487,7 @@ spec_put_inode(struct inode *inode)
 STATIC void
 spec_delete_inode(struct inode *inode)
 {
+	printd(("%s: deleting inode %p no %lu\n", __FUNCTION__, inode, inode->i_ino));
 	switch (inode->i_mode & S_IFMT) {
 		// struct cdevsw *cdev;
 		// struct devnode *cmin;
@@ -1615,6 +1708,8 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 #endif
 	return (0);
       iput_error:
+	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+		atomic_read(&inode->i_count) - 1));
 	iput(inode);
       free_error:
 	spec_sbi_free(sbi);
@@ -1661,17 +1756,17 @@ specfs_read_super(struct super_block *sb, void *data, int silent)
 #if 0
 STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE | FS_LITTER);
 #else
-STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE); /* XXX: don't need FS_LITTER? */
+STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);	/* XXX: don't need
+										   FS_LITTER? */
 #endif
 #else
 #error HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB or HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_READ_SUPER must be defined.
 #endif
 
-STATIC struct vfsmount *specfs_mnt = NULL;
 STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
 
 streams_fastcall struct vfsmount *
-specfs_get(void)
+specfs_mount(void)
 {
 	spin_lock(&specfs_lock);
 	if (!specfs_mnt) {
@@ -1683,7 +1778,7 @@ specfs_get(void)
 	return (mntget(specfs_mnt));
 }
 
-EXPORT_SYMBOL(specfs_get);
+EXPORT_SYMBOL(specfs_mount);
 
 #if ! HAVE_KFUNC_KERN_UMOUNT
 #undef kern_umount
@@ -1691,7 +1786,7 @@ EXPORT_SYMBOL(specfs_get);
 #endif
 
 streams_fastcall void
-specfs_put(void)
+specfs_umount(void)
 {
 	if (specfs_mnt) {
 		mntput(specfs_mnt);
@@ -1703,7 +1798,7 @@ specfs_put(void)
 	}
 }
 
-EXPORT_SYMBOL(specfs_put);
+EXPORT_SYMBOL(specfs_umount);
 
 /**
  *  strspecfs_init: - initialize the shadow special filesystem

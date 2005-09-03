@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/02 19:22:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/02 19:22:28 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/02 19:22:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/02 19:22:28 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -265,15 +265,12 @@ fifo_open(struct inode *inode, struct file *file)
 	int err;
 	dev_t dev = makedevice(fifo_cdev.d_modid, 0);
 
-	if ((err = down_interruptible(&inode->i_sem)))
-		goto exit;
 	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
 	printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
-	fops_put(xchg(&file->f_op, fops_get(fifo_cdev.d_fop)));
-	file->private_data = &dev;
+	file->f_op = fifo_cdev.d_fop;
+	file->private_data = &dev; /* use this device number instead of inode number */
+	file->f_flags &= ~O_CLONE; /* FIFOs never clone */
 	err = file->f_op->open(inode, file);
-	up(&inode->i_sem);
-      exit:
 	return (err);
 }
 

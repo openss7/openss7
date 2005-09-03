@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/01 03:19:01 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/02 19:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/01 03:19:01 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/01 03:19:01 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/02 19:22:31 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/01 03:19:01 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/02 19:22:31 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "src/modules/sth.h"	/* for stream operations */
-#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
+#include "src/kernel/strspecfs.h"	/* for spec_snode */
 #include "src/kernel/strlookup.h"	/* extern verification */
 
 /* we want macro versions of these */
@@ -381,8 +381,7 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 {
 	struct list_head *pos, *slot = &cdev->d_minors;
 
-	ensure(cdev->d_minors.next,
-		INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 	list_for_each(pos, slot) {
 		struct devnode *cmin = list_entry(pos, struct devnode, n_list);
@@ -457,8 +456,11 @@ cdev_lookup(major_t major, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
+				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+					cdev->d_name, cdev->d_kmod->name,
+					module_refcount(cdev->d_kmod)));
 				break;
 			}
 		cdev = NULL;
@@ -504,8 +506,11 @@ cdrv_lookup(modID_t modid, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
+				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+					cdev->d_name, cdev->d_kmod->name,
+					module_refcount(cdev->d_kmod)));
 				break;
 			}
 		cdev = NULL;
@@ -551,7 +556,7 @@ fmod_lookup(modID_t modid, int load)
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
 			if (try_module_get(fmod->f_kmod)) {
-				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
 			}
@@ -576,8 +581,7 @@ cmaj_lookup(const struct cdevsw *cdev, major_t major)
 {
 	struct devnode *cmaj = NULL;
 
-	ensure(cdev->d_majors.next,
-		return (cmaj));
+	ensure(cdev->d_majors.next, return (cmaj));
 
 	read_lock(&cdevsw_lock);
 	if (cdev) {
@@ -606,8 +610,7 @@ cmin_lookup(const struct cdevsw *cdev, minor_t minor)
 {
 	struct devnode *cmin = NULL;
 
-	ensure(cdev->d_minors.next,
-		return (cmin));
+	ensure(cdev->d_minors.next, return (cmin));
 
 	read_lock(&cdevsw_lock);
 	if (cdev) {
@@ -669,8 +672,11 @@ cdev_search(const char *name, int load)
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
 			if (try_module_get(cdev->d_kmod)) {
-				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
+				printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__,
+					cdev->d_name, cdev->d_kmod->name,
+					module_refcount(cdev->d_kmod)));
 				break;
 			}
 		cdev = NULL;
@@ -717,7 +723,7 @@ fmod_search(const char *name, int load)
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
 			if (try_module_get(fmod->f_kmod)) {
-				_ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
 			}
@@ -740,8 +746,7 @@ cmin_search(const struct cdevsw *cdev, const char *name)
 {
 	struct devnode *cmin = NULL;
 
-	ensure(cdev->d_minors.next,
-		return (cmin));
+	ensure(cdev->d_minors.next, return (cmin));
 
 	read_lock(&cdevsw_lock);
 	if (cdev) {
@@ -845,8 +850,10 @@ streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
-		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
+		printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		module_put(cdev->d_kmod);
+		printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, cdev->d_name,
+			cdev->d_kmod->name, module_refcount(cdev->d_kmod)));
 	}
 }
 
@@ -902,7 +909,7 @@ streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
-		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
+		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		module_put(fmod->f_kmod);
 	}
 }
@@ -1025,8 +1032,7 @@ cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 {
 	struct list_head *pos;
 
-	ensure(cdev->d_majors.next,
-		INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 	list_for_each(pos, &cdev->d_majors) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
@@ -1044,7 +1050,7 @@ void
 fmod_add(struct fmodsw *fmod, modID_t modid)
 {
 	/* These are statically allocated and therefore need to be initialized, however, the module
-	 * must not already be on a list. */
+	   must not already be on a list. */
 
 	assert(!fmod->f_list.next || list_empty(&fmod->f_list));
 	INIT_LIST_HEAD(&fmod->f_list);
@@ -1081,10 +1087,10 @@ int
 sdev_add(struct cdevsw *cdev, modID_t modid)
 {
 	struct inode *inode;
-	struct super_block *sb;
+	dev_t dev;
 
 	/* These are statically allocated and therefore need to be initialized, however, the module
-	 * must not already be on a list. */
+	   must not already be on a list. */
 
 	assert(!cdev->d_list.next || list_empty(&cdev->d_list));
 	INIT_LIST_HEAD(&cdev->d_list);
@@ -1099,33 +1105,13 @@ sdev_add(struct cdevsw *cdev, modID_t modid)
 	assert(!cdev->d_stlist.next || list_empty(&cdev->d_stlist));
 	INIT_LIST_HEAD(&cdev->d_stlist);
 
-	{
-		dev_t dev = makedevice(0, modid);
-		struct vfsmount *mnt;
+	dev = makedevice(0, modid);
 
-		if (!(mnt = specfs_get())) {
-			ptrace(("couldn't get specfs mount point\n"));
-			return (-ENODEV);
-		}
-		sb = mnt->mnt_sb;
-#if HAVE_KFUNC_IGET_LOCKED
-		inode = iget_locked(sb, dev);
-#else
-		inode = iget4(sb, dev, NULL, cdev);
-#endif
-		specfs_put();
+	if (IS_ERR((inode = spec_snode(dev, cdev)))) {
+		ptrace(("couldn't get specfs inode\n"));
+		return PTR_ERR(inode);
 	}
-	if (!inode) {
-		ptrace(("couldn't allocate inode\n"));
-		return (-ENOMEM);
-	}
-#if HAVE_KFUNC_IGET_LOCKED
-	if (inode->i_state & I_NEW) {
-		inode->u.generic_ip = cdev;
-		sb->s_op->read_inode(inode);
-		unlock_new_inode(inode);
-	}
-#endif
+
 	inode->i_sb->s_root->d_inode->i_nlink++;
 	cdev->d_inode = inode;
 	cdev->d_modid = modid;
@@ -1150,14 +1136,19 @@ EXPORT_SYMBOL(sdev_add);
 void
 sdev_del(struct cdevsw *cdev)
 {
+	struct inode *inode;
+
 	cdev->d_inode->i_sb->s_root->d_inode->i_nlink--;
+	inode = cdev->d_inode;
 	/* put away dentry if necessary */
-	iput(xchg(&cdev->d_inode, NULL));
+	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+		atomic_read(&inode->i_count) - 1));
+	iput(inode);
+	cdev->d_inode = NULL;
 	/* remove from list and hash */
 	list_del_init(&cdev->d_list);
 	list_del_init(&cdev->d_hash);
 	cdev_count--;
-	specfs_put();
 }
 
 EXPORT_SYMBOL(sdev_del);
@@ -1168,8 +1159,7 @@ cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 	cmaj->n_major = major;
 	cmaj->n_minor = 0;	/* FIXME */
 
-	ensure(cdev->d_majors.next,
-		INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 	/* add to list and hash */
 	if (list_empty(&cdev->d_majors))
@@ -1183,8 +1173,7 @@ EXPORT_SYMBOL(cmaj_add);
 void
 cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
-	ensure(cdev->d_majors.next,
-		INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 	list_del_init(&cmaj->n_list);
 	list_del_init(&cmaj->n_hash);
@@ -1198,34 +1187,14 @@ int
 cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 {
 	struct inode *inode;
-	struct super_block *sb;
+	dev_t dev;
 
-	{
-		dev_t dev = makedevice(cdev->d_modid, minor);
-		struct vfsmount *mnt;
+	dev = makedevice(cdev->d_modid, minor);
 
-		if (!(mnt = specfs_get()))
-			return (-ENODEV);
-		sb = mnt->mnt_sb;
-		/* get dentry if required */
-#if HAVE_KFUNC_IGET_LOCKED
-		inode = iget_locked(sb, dev);
-#else
-		inode = iget4(sb, dev, NULL, cdev);
-#endif
-		specfs_put();
+	if (IS_ERR(inode = spec_snode(dev, cdev))) {
+		ptrace(("couldn't get specfs inode\n"));
+		return PTR_ERR(inode);
 	}
-	if (!inode) {
-		ptrace(("couldn't allocate inode\n"));
-		return (-ENOMEM);
-	}
-#if HAVE_KFUNC_IGET_LOCKED
-	if (inode->i_state & I_NEW) {
-		inode->u.generic_ip = cdev;
-		sb->s_op->read_inode(inode);
-		unlock_new_inode(inode);
-	}
-#endif
 	cdev->d_inode->i_nlink++;
 	cmin->n_inode = inode;
 	cmin->n_dev = cdev;
@@ -1238,8 +1207,7 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	if (!(cmin->n_mode & S_IFMT))
 		cmin->n_mode = S_IFCHR | S_IRUGO | S_IWUGO;
 
-	ensure(cdev->d_minors.next,
-		INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 	/* add to list and hash */
 	list_add(&cmin->n_list, &cdev->d_minors);
@@ -1253,15 +1221,20 @@ EXPORT_SYMBOL(cmin_add);
 void
 cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
+	struct inode *inode;
+
 	cdev->d_inode->i_nlink--;
+	inode = cmin->n_inode;
 	/* put away inode if required */
-	iput(xchg(&cmin->n_inode, NULL));
+	ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
+		atomic_read(&inode->i_count) - 1));
+	iput(inode);
+	cmin->n_inode = NULL;
 	cmin->n_dev = NULL;
 	cmin->n_modid = -1;
 	cmin->n_minor = -1;
 
-	ensure(cdev->d_minors.next,
-		INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);

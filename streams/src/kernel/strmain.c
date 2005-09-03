@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/02 19:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/02 19:22:31 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/02 19:22:31 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:11 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/02 19:22:31 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -97,7 +97,7 @@ MODULE_ALIAS("streams");
 #include <sys/ddi.h>
 
 #include "strprocfs.h"
-#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
+#include "src/kernel/strspecfs.h"	/* for specfs_mount and specfs_umount */
 #include "src/kernel/strsysctl.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strreg.h"
@@ -332,7 +332,7 @@ streams_init(void)
 #else
 	printk(KERN_INFO STREAMS_SPLASH);	/* console splash */
 #endif
-	if (!specfs_get())
+	if (!specfs_mount())
 		goto no_specfs;
 	if ((result = strprocfs_init()))
 		goto no_procfs;
@@ -347,7 +347,7 @@ streams_init(void)
       no_strsysctl:
 	strprocfs_exit();
       no_procfs:
-	specfs_put();
+	specfs_umount();
       no_specfs:
 	return (result);
 }
@@ -362,7 +362,7 @@ streams_exit(void)
 	strsched_exit();
 	strsysctl_exit();
 	strprocfs_exit();
-	specfs_put();
+	specfs_umount();
 }
 
 #ifdef CONFIG_STREAMS_MODULE

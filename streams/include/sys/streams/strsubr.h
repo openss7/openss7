@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.40 2005/08/31 19:02:52 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.41 2005/09/02 19:22:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:02:52 $ by $Author: brian $
+ Last Modified $Date: 2005/09/02 19:22:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/31 19:02:52 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/02 19:22:25 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -625,10 +625,10 @@ extern rwlock_t fmodsw_lock;
 
 extern rwlock_t nodesw_lock;
 
-extern struct dentry *spec_dentry(dev_t dev, int *sflagp);
-extern int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag);
-extern struct vfsmount *STREAMS_FASTCALL(specfs_get(void));
-extern void STREAMS_FASTCALL(specfs_put(void));
+extern int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
+extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
+extern struct vfsmount *STREAMS_FASTCALL(specfs_mount(void));
+extern void STREAMS_FASTCALL(specfs_umount(void));
 
 extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
