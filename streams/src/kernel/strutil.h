@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/03 08:12:12 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/08 05:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -164,7 +164,7 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
  *
  *  Also, getq() and putbq() must only be used from with a queue service procedure.
  */
-#if 0
+#ifdef CONFIG_STREAMS_DEBUG
 /* loosen locks for debugging */
 #define write_lock_str(__l)	do { local_str_disable(); write_lock(__l);  } while (0)
 #define write_unlock_str(__l)	do { write_unlock(__l); local_str_enable(); } while (0)
@@ -187,7 +187,7 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define qrlock(__q)	read_lock_str(&(__q)->q_lock)
 #define qrunlock(__q)	read_unlock_str(&(__q)->q_lock)
 
-#if 0
+#ifdef CONFIG_STREAMS_DEBUG
 /* loosen locks for debugging */
 #define qisunlocked(__q) \
 (int)({ \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/03 08:12:11 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/08 05:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/03 08:12:11 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/08 05:52:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/03 08:12:11 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/08 05:52:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,10 +121,12 @@ raise_softirq(unsigned int nr)
 }
 #endif
 
-void streams_fastcall __raise_streams(void)
+void streams_fastcall
+__raise_streams(void)
 {
 	raise_softirq(STREAMS_SOFTIRQ);
 }
+
 EXPORT_SYMBOL(__raise_streams);
 
 /* 
@@ -201,6 +203,7 @@ mdbblock_alloc(uint priority, void *func)
 	mblk_t *mp = NULL;
 	int slab_flags;
 
+	trace();
 	if (atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs)
 		goto fail;
 	switch (priority) {
@@ -229,6 +232,7 @@ mdbblock_alloc(uint priority, void *func)
 		slab_flags = SLAB_KERNEL;
 		break;
 	}
+	trace();
 	if ((mp = kmem_cache_alloc(sdi->si_cache, slab_flags))) {
 #if defined CONFIG_STREAMS_DEBUG
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
@@ -330,13 +334,14 @@ mdbblock_free(mblk_t *mp)
 	struct strthread *t = this_thread;
 	struct mdbblock *md = (typeof(md)) mp;
 
+	trace();
 	/* don't zero hidden list structures */
 	bzero(&md->datablk.d_dblock, sizeof(md->datablk.d_dblock));
 	bzero(&md->msgblk.m_mblock, sizeof(md->msgblk.m_mblock));
 	md->msgblk.m_func = NULL;
 	md->msgblk.m_queue = NULL;
 	md->msgblk.m_private = NULL;
-	bzero(md, sizeof(*md));	/* reset mdbblock */
+//      bzero(md, sizeof(*md)); /* reset mdbblock */
 	*xchg(&t->freemblk_tail, &mp->b_next) = mp;	/* MP-SAFE */
 	if (!test_and_set_bit(freeblks, &t->flags))
 		__raise_streams();
@@ -984,7 +989,7 @@ sq_get(struct syncq *sq)
 	if (sq) {
 		assert(atomic_read(&sq->sq_refs) >= 1);
 		atomic_inc(&sq->sq_refs);
-		
+
 		_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 	return (sq);
@@ -1615,10 +1620,12 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
 STATIC void
 strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 {
+	queue_t *qold;
+
 	assert(q);
 	assert(func);
 
-	this_thread->currentq = qget(q);
+	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
 	if (!test_bit(QHLIST_BIT, &q->q_flag))
 		func(q, mp);
@@ -1628,7 +1635,8 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 		freemsg(mp);
 	}
 	srunlock(qstream(q));
-	qput(&this_thread->currentq);
+	this_thread->currentq = qold;
+	qput(&q);
 }
 
 /*
@@ -1647,10 +1655,12 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 STATIC inline streams_fastcall void
 strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
+	queue_t *qold;
+
 	assert(q);
 	assert(func);
 
-	this_thread->currentq = qget(q);
+	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
 	if (!test_bit(QHLIST_BIT, &q->q_flag))
 		func(arg, mp);
@@ -1660,7 +1670,8 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 		freemsg(mp);
 	}
 	srunlock(qstream(q));
-	qput(&this_thread->currentq);
+	this_thread->currentq = qold;
+	qput(&q);
 }
 STATIC void
 strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
@@ -1694,13 +1705,16 @@ qwakeup(queue_t *q)
 STATIC inline streams_fastcall void
 putp_fast(queue_t *q, mblk_t *mp)
 {
+	queue_t *qold;
+
 	assert(q);
 	assert(q->q_qinfo);
 	assert(q->q_qinfo->qi_putp);
 
-	this_thread->currentq = qget(q);
+	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
 	if (!test_bit(QHLIST_BIT, &q->q_flag)) {
+		ptrace(("calling put procedure\n"));
 		(void) q->q_qinfo->qi_putp(q, mp);
 		qwakeup(q);
 	} else {
@@ -1709,7 +1723,8 @@ putp_fast(queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	}
 	srunlock(qstream(q));
-	qput(&this_thread->currentq);
+	this_thread->currentq = qold;
+	qput(&q);
 }
 STATIC void
 putp(queue_t *q, mblk_t *mp)
@@ -1755,10 +1770,11 @@ srvp_fast(queue_t *q)
 {
 	assert(q);
 	if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
+		queue_t *qold;
 
 		assert(q->q_qinfo);
 
-		this_thread->currentq = q;
+		qold = xchg(&this_thread->currentq, q);
 		srlock(qstream(q));
 		/* check if procs are turned off */
 		if (!test_bit(QHLIST_BIT, &q->q_flag)) {
@@ -1810,7 +1826,7 @@ srvp_fast(queue_t *q)
 #endif
 		}
 		srunlock(qstream(q));
-		this_thread->currentq = NULL;
+		this_thread->currentq = qold;
 		qwakeup(q);
 	}
 	qput(&q);		/* cancel qget from qschedule */
@@ -2222,7 +2238,7 @@ void runsyncq(struct syncq *);
 STATIC void
 clear_backlog(syncq_t *sq)
 {
-#if 0 /* only called from within streams now */
+#if 0				/* only called from within streams now */
 	/* using current_context() is faster that rechecking in_irq and others repeatedly */
 	switch (current_context()) {
 	case CTX_PROC:
@@ -2386,20 +2402,21 @@ STATIC inline streams_fastcall void
 qputp(queue_t *q, mblk_t *mp)
 {
 	{
-		queue_t *newq, *q_next;
+		queue_t *newq;
 
+		trace();
 		srlock(qstream(q));
-		for (newq = qget(q); newq && (!newq->q_ftmsg || !newq->q_ftmsg(mp));
-		     q_next = qget(newq->q_next), qput(&newq), newq = q_next) ;
+		for (newq = q; newq && newq->q_ftmsg && !newq->q_ftmsg(mp); newq = newq->q_next) ;
 		if (!newq) {
+			ptrace(("message filtered, discarding\n"));
 			srunlock(qstream(q));
 			/* no queue wants the message - throw it away */
 			freemsg(mp);
 			return;
 		}
 		srunlock(qstream(q));
+		/* FIXME: this is not safe. */
 		q = newq;
-		qput(&newq);
 	}
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
@@ -2634,6 +2651,7 @@ put(queue_t *q, mblk_t *mp)
 	assert(q->q_qinfo);
 	assert(q->q_qinfo->qi_putp);
 
+	trace();
 	if (!in_irq())
 		qputp(q, mp);
 	else {
@@ -2721,15 +2739,16 @@ do_bufcall_synced(struct strevent *se)
 		struct strthread *t = this_thread;
 		unsigned long flags = 0;
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
+		queue_t *qold;
 
 		if (unlikely(safe))
 			local_irq_save(flags);
 		if (likely(q != NULL))
 			srlock(qstream(q));
 
-		t->currentq = q;
+		qold = xchg(&t->currentq, q);
 		func(se->x.b.arg);
-		t->currentq = NULL;
+		t->currentq = qold;
 
 		if (likely(q != NULL))
 			srunlock(qstream(q));
@@ -2773,15 +2792,16 @@ do_timeout_synced(struct strevent *se)
 		struct strthread *t = this_thread;
 		unsigned long flags = 0;
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
+		queue_t *qold;
 
 		if (unlikely(safe))
 			local_irq_save(flags);
 		if (likely(q != NULL))
 			srlock(qstream(q));
 
-		t->currentq = q;
+		qold = xchg(&t->currentq, q);
 		func(se->x.t.arg);
-		t->currentq = NULL;
+		t->currentq = qold;
 
 		if (likely(q != NULL))
 			srunlock(qstream(q));
@@ -2850,8 +2870,9 @@ do_weldq_synced(struct strevent *se)
 	if (se->x.w.func) {
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 		struct strthread *t = this_thread;
+		queue_t *qold;
 
-		t->currentq = q;
+		qold = xchg(&t->currentq, q);
 		if (safe)
 			local_irq_save(flags);
 
@@ -2859,7 +2880,7 @@ do_weldq_synced(struct strevent *se)
 
 		if (safe)
 			local_irq_restore(flags);
-		t->currentq = NULL;
+		t->currentq = qold;
 	}
 	qput(&q);
 }
@@ -3160,6 +3181,7 @@ scanqueues(struct strthread *t)
 				mblk_t *b;
 
 				sd = (struct stdata *) q->q_ptr;
+				/* FIXME: sd_rtime doesn't work this way. */
 				if ((sd->sd_rtime > jiffies)) {
 					mod_timer(&scan_timer, sd->sd_rtime);
 					break;
@@ -3697,12 +3719,13 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_rdopt = RNORM | RPROTNORM;
 	sd->sd_wropt = 0;
 	sd->sd_eropt = RERRNORM | WERRNORM;
-	sd->sd_closetime = sysctl_str_cltime;	/* typically 15 seconds */
-	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds */
-	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds */
+	sd->sd_closetime = sysctl_str_cltime;	/* typically 15 seconds (saved in ticks) */
+	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
+	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
+						   in ticks) */
 	init_waitqueue_head(&sd->sd_waitq);
 	slockinit(sd);
-	INIT_LIST_HEAD(&sd->sd_list); /* doesn't matter really */
+	INIT_LIST_HEAD(&sd->sd_list);	/* doesn't matter really */
 //      init_MUTEX(&sd->sd_mutex);
 }
 STATIC void
@@ -3739,9 +3762,10 @@ allocstr(void)
 				si->si_hwl = atomic_read(&si->si_cnt);
 			sd->sd_rq = qget(q + 0);
 			sd->sd_wq = qget(q + 1);
-			qstream(q) = sd; /* don't do double get */
+			qstream(q) = sd;	/* don't do double get */
 
-			printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd, atomic_read(&sh->sh_refs)));
+			printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+				atomic_read(&sh->sh_refs)));
 		} else
 			__freeq(q);
 	}
@@ -3784,7 +3808,8 @@ sd_get(struct stdata *sd)
 
 		assert(atomic_read(&sh->sh_refs) > 0);
 		atomic_inc(&sh->sh_refs);
-		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd, atomic_read(&sh->sh_refs)));
+		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+			atomic_read(&sh->sh_refs)));
 	}
 	return (sd);
 }
@@ -3800,7 +3825,8 @@ sd_put(struct stdata **sdp)
 	if ((sd = xchg(sdp, NULL))) {
 		struct shinfo *sh = (struct shinfo *) sd;
 
-		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd, atomic_read(&sh->sh_refs) - 1));
+		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+			atomic_read(&sh->sh_refs) - 1));
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
 		if (atomic_dec_and_test(&sh->sh_refs)) {
@@ -3814,7 +3840,7 @@ sd_put(struct stdata **sdp)
 			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */
 			qput(&sd->sd_wq);
-			qput(&sd->sd_rq); /* should be last put */
+			qput(&sd->sd_rq);	/* should be last put */
 			/* initial qget is balanced in qdetach()/qdelete() */
 			__freestr(sd);
 		}

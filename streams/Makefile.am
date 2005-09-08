@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/08/29 20:26:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/09/08 05:52:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 20:26:22 $ by $Author: brian $
+# Last Modified $Date: 2005/09/08 05:52:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -159,6 +159,12 @@ endif
 if CONFIG_STREAMS_LOG_MODULE
 libexec_PROGRAMS		+= test-log
 endif
+if CONFIG_STREAMS_LOOP
+libexec_PROGRAMS		+= test-loop
+endif
+if CONFIG_STREAMS_LOOP_MODULE
+libexec_PROGRAMS		+= test-loop
+endif
 if CONFIG_STREAMS_NSDEV
 libexec_PROGRAMS		+= test-nsdev
 endif
@@ -254,6 +260,9 @@ libLfS_streams_a_SOURCES		= \
 if CONFIG_STREAMS_STH
 libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
 endif
+if CONFIG_STREAMS_NULLMOD
+libLfS_streams_a_SOURCES	+= src/modules/nullmod.c
+endif
 if CONFIG_STREAMS_PIPEMOD
 libLfS_streams_a_SOURCES	+= src/modules/pipemod.c
 endif
@@ -269,9 +278,6 @@ libLfS_streams_a_SOURCES	+= src/drivers/clone.c src/drivers/clone.h
 endif
 if CONFIG_STREAMS_FIFO
 libLfS_streams_a_SOURCES	+= src/drivers/fifo.c src/drivers/fifo.h
-endif
-if CONFIG_STREAMS_LOOP
-libLfS_streams_a_SOURCES	+=
 endif
 if CONFIG_STREAMS_SAD
 libLfS_streams_a_SOURCES	+= src/drivers/sad.c include/sys/sad.h
@@ -291,6 +297,9 @@ endif
 if CONFIG_STREAMS_LOG
 libLfS_streams_a_SOURCES	+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
 				   src/drivers/log.h src/drivers/log.c
+endif
+if CONFIG_STREAMS_LOOP
+libLfS_streams_a_SOURCES	+= src/drivers/loop.c include/sys/loop.h
 endif
 if CONFIG_STREAMS_SFX
 libLfS_streams_a_SOURCES	+= src/drivers/sfx.c
@@ -313,9 +322,6 @@ endif
 if CONFIG_STREAMS_FIFO_MODULE
 libLfS_drivers_a_SOURCES	+= src/drivers/fifo.c src/drivers/fifo.h
 endif
-if CONFIG_STREAMS_LOOP_MODULE
-libLfS_drivers_a_SOURCES	+=
-endif
 if CONFIG_STREAMS_SAD_MODULE
 libLfS_drivers_a_SOURCES	+= src/drivers/sad.c include/sys/sad.h
 endif
@@ -335,6 +341,9 @@ if CONFIG_STREAMS_LOG_MODULE
 libLfS_drivers_a_SOURCES	+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
 				   src/drivers/log.h src/drivers/log.c
 endif
+if CONFIG_STREAMS_LOOP_MODULE
+libLfS_drivers_a_SOURCES	+= src/drivers/loop.c include/sys/loop.h
+endif
 if CONFIG_STREAMS_SFX_MODULE
 libLfS_drivers_a_SOURCES	+= src/drivers/sfx.c
 endif
@@ -352,6 +361,9 @@ libLfS_modules_a_SOURCES	=
 
 if CONFIG_STREAMS_STH_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
+endif
+if CONFIG_STREAMS_NULLMOD_MODULE
+libLfS_modules_a_SOURCES	+= src/modules/nullmod.c
 endif
 if CONFIG_STREAMS_PIPEMOD_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/pipemod.c
@@ -594,6 +606,11 @@ test_log_SOURCES		= src/test/test-log.c
 test_log_LDFLAGS		= -static libstreams.la
 test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS)
+
+test_loop_SOURCES		= src/test/test-loop.c
+test_loop_LDFLAGS		= -static libstreams.la
+test_loop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_loop_CFLAGS		= $(LFS_CFLAGS)
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_LDFLAGS		= -static libstreams.la

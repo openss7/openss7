@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $
 
  -----------------------------------------------------------------------------
 
@@ -50,11 +50,18 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $";
 
+/*
+ *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
+ *  purpose STREAMS-based pipe-like driver that can be used for connecting two upper-level STREAMS
+ *  together to form a structure similar to a STREAMS-based Pipe, but which has an additional driver
+ *  module beneath each STREAM head.  Upper level STREAMS are linked together using ioctl()
+ *  commands contained in <sys/loop.h>.
+ */
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
@@ -65,159 +72,210 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#include <sys/loop.h>
 
 #include "sys/config.h"
 
-#define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $"
-#define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
-#define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ECHO_LICENSE	"GPL"
-#define ECHO_BANNER	ECHO_DESCRIP	"\n" \
-			ECHO_COPYRIGHT	"\n" \
-			ECHO_REVISION	"\n" \
-			ECHO_DEVICE	"\n" \
-			ECHO_CONTACT	"\n"
-#define ECHO_SPLASH	ECHO_DEVICE	" - " \
-			ECHO_REVISION	"\n"
+#define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $"
+#define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
+#define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define LOOP_LICENSE	"GPL"
+#define LOOP_BANNER	LOOP_DESCRIP	"\n" \
+			LOOP_COPYRIGHT	"\n" \
+			LOOP_REVISION	"\n" \
+			LOOP_DEVICE	"\n" \
+			LOOP_CONTACT	"\n"
+#define LOOP_SPLASH	LOOP_DEVICE	" - " \
+			LOOP_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
-MODULE_AUTHOR(ECHO_CONTACT);
-MODULE_DESCRIPTION(ECHO_DESCRIP);
-MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
-MODULE_LICENSE(ECHO_LICENSE);
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+MODULE_AUTHOR(LOOP_CONTACT);
+MODULE_DESCRIPTION(LOOP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(LOOP_DEVICE);
+MODULE_LICENSE(LOOP_LICENSE);
 #if defined MODULE_ALIAS
-MODULE_ALIAS("streams-echo");
+MODULE_ALIAS("streams-loop");
 #endif
 #endif
 
-#ifndef CONFIG_STREAMS_ECHO_NAME
-#define CONFIG_STREAMS_ECHO_NAME "echo"
+#ifndef CONFIG_STREAMS_LOOP_NAME
+#define CONFIG_STREAMS_LOOP_NAME "loop"
 #endif
-#ifndef CONFIG_STREAMS_ECHO_MODID
-#error CONFIG_STREAMS_ECHO_MODID must be defined.
+#ifndef CONFIG_STREAMS_LOOP_MODID
+#error CONFIG_STREAMS_LOOP_MODID must be defined.
 #endif
-#ifndef CONFIG_STREAMS_ECHO_MAJOR
-#error CONFIG_STREAMS_ECHO_MAJOR must be defined.
+#ifndef CONFIG_STREAMS_LOOP_MAJOR
+#error CONFIG_STREAMS_LOOP_MAJOR must be defined.
 #endif
 
-modID_t modid = CONFIG_STREAMS_ECHO_MODID;
+modID_t modid = CONFIG_STREAMS_LOOP_MODID;
 
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module id number for ECHO driver. (0 for auto allocation)");
+MODULE_PARM_DESC(modid, "Module id number for LOOP driver. (0 for auto allocation)");
 
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_ECHO_MODID));
-MODULE_ALIAS("streams-driver-echo");
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LOOP_MODID));
+MODULE_ALIAS("streams-driver-loop");
 #endif
 
-major_t major = CONFIG_STREAMS_ECHO_MAJOR;
+major_t major = CONFIG_STREAMS_LOOP_MAJOR;
 
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0);
 #endif
-MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto allocation)");
+MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto allocation)");
 
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR) "-*");
-MODULE_ALIAS("/dev/echo");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR) "-*");
+MODULE_ALIAS("/dev/loop");
 #if LFS
-MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
-MODULE_ALIAS("/dev/streams/echo");
-MODULE_ALIAS("/dev/streams/echo/*");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
+MODULE_ALIAS("/dev/streams/loop");
+MODULE_ALIAS("/dev/streams/loop/*");
 #endif
 #endif
 
-static struct module_info echo_minfo = {
-	.mi_idnum = CONFIG_STREAMS_ECHO_MODID,
-	.mi_idname = CONFIG_STREAMS_ECHO_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+STATIC struct module_info loop_minfo = {
+	.mi_idnum = CONFIG_STREAMS_LOOP_MODID,
+	.mi_idname = CONFIG_STREAMS_LOOP_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
 
-static int
-echo_put(queue_t *q, mblk_t *mp)
+typedef struct loop {
+	struct loop *next;		/* list linkage */
+	struct loop **prev;		/* list linkage */
+	dev_t dev;			/* device number */
+	queue_t *q;			/* this rd queue */
+} loop_t;
+
+STATIC struct loop *loop_list = NULL;
+STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
+
+STATIC int
+loop_wput(queue_t *q, mblk_t *mp)
 {
-	int err = 0;
-
-	trace();
 	switch (mp->b_datap->db_type) {
-	case M_FLUSH:
-		if (mp->b_rptr[0] & FLUSHW) {
-			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
-			else
-				flushq(q, FLUSHALL);
-			mp->b_rptr[0] &= ~FLUSHW;
-		}
-		if (mp->b_rptr[0] & FLUSHR) {
-			queue_t *rq = RD(q);
-
-			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
-			else
-				flushq(rq, FLUSHALL);
-			qreply(q, mp);
-			return (0);
-		}
-		break;
 	case M_IOCTL:
-		ptrace(("received M_IOCTL, naking it\n"));
-		err = -EOPNOTSUPP;
-		goto nak;
-	case M_IOCDATA:
-		ptrace(("received M_IOCDATA, naking it\n"));
-		err = -EINVAL;
-		goto nak;
-	case M_READ:
-		mp->b_wptr = mp->b_rptr;
-		mp->b_datap->db_type = M_DATA;
-		mp->b_flag |= MSGDELIM;
-		qreply(q, mp);
-		return (0);
-	case M_DATA:
-	case M_PROTO:
-	case M_PCPROTO:
-	case M_CTL:
-	case M_PCCTL:
-	case M_RSE:
-	case M_PCRSE:
-		qreply(q, mp);
-		return (0);
-	default:
-		freemsg(mp);
-		return (0);
-	}
-      nak:
 	{
 		union ioctypes *ioc;
+		int err;
 
-		mp->b_datap->db_type = M_IOCNAK;
 		ioc = (typeof(ioc)) mp->b_rptr;
+		if (ioc->iocblk.ioc_cmd == LOOP_SET) {
+			dev_t dev;
+			if (ioc->iocblk.ioc_count == sizeof(dev_t)) {
+				struct loop *po;
+
+				dev = *(dev_t *) mp->b_cont->b_rptr;
+				spin_lock(&loop_lock);
+				for (po = loop_list; po; po = po->next)
+					if (po->dev == dev)
+						break;
+				if (po) {
+					if (!q->q_next && !WR(po->q)->q_next) {
+						/* FIXME: should use weldq */
+						q->q_next = po->q;
+						WR(po->q)->q_next = RD(q);
+						spin_unlock(&loop_lock);
+						mp->b_datap->db_type = M_IOCACK;
+						ioc->iocblk.ioc_rval = 0;
+						ioc->iocblk.ioc_count = 0;
+						qreply(q, mp);
+						return (0);
+					} else {
+						spin_unlock(&loop_lock);
+						err = -EBUSY;
+					}
+				} else {
+					spin_unlock(&loop_lock);
+					err = -ENXIO;
+				}
+			} else {
+				err = -EINVAL;
+			}
+		} else {
+			err = -EINVAL;
+			if (q->q_next) {
+				putnext(q, mp);
+				return (0);
+			}
+		}
+		mp->b_datap->db_type = M_IOCNAK;
 		ioc->iocblk.ioc_rval = -1;
 		ioc->iocblk.ioc_error = -err;
 		qreply(q, mp);
 		return (0);
 	}
+	case M_FLUSH:
+	{
+		int flush;
+
+		flush = mp->b_rptr[0] & ~(FLUSHW | FLUSHR);
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHALL);
+			else
+				flushq(q, FLUSHALL);
+			flush |= FLUSHR;
+		}
+		if (mp->b_rptr[0] & FLUSHR)
+			flush |= FLUSHW;
+		if (q->q_next) {
+			mp->b_rptr[0] = flush;
+			putnext(q, mp);
+		} else {
+			if (mp->b_rptr[0] & FLUSHW)
+				mp->b_rptr[0] &= ~FLUSHW;
+			if (mp->b_rptr[0] & FLUSHR) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				else
+					flushq(RD(q), FLUSHALL);
+			}
+			qreply(q, mp);
+		}
+		return (0);
+	}
+	default:
+		if (q->q_next) {
+			putnext(q, mp);
+			return (0);
+		}
+		freemsg(mp);
+		putnextctl2(RD(q), M_ERROR, ENXIO, ENXIO);
+		return (0);
+	}
 }
 
-typedef struct echo {
-	struct echo *next;
-	struct echo **prev;
-	dev_t dev;
-} echo_t;
-
-static spinlock_t echo_lock = SPIN_LOCK_UNLOCKED;
-static struct echo *echo_list = NULL;
+STATIC int
+loop_rput(queue_t *q, mblk_t *mp)
+{
+	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+	{
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHALL);
+			else
+				flushq(q, FLUSHALL);
+		}
+	}
+	default:
+		putnext(q, mp);
+		return (0);
+	}
+}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -226,10 +284,10 @@ static struct echo *echo_list = NULL;
  *
  *  -------------------------------------------------------------------------
  */
-static int
-echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+STATIC int
+loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	struct echo *p, **pp = &echo_list;
+	struct loop *p, **pp = &loop_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 
@@ -262,7 +320,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
-		spin_lock(&echo_lock);
+		spin_lock(&loop_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
@@ -274,7 +332,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock(&echo_lock);
+					spin_unlock(&loop_lock);
 					kmem_free(p, sizeof(*p));
 					pswerr(("%s: stream already open!\n", __FUNCTION__));
 					return (EIO);	/* bad error */
@@ -282,18 +340,19 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
-			spin_unlock(&echo_lock);
+			spin_unlock(&loop_lock);
 			kmem_free(p, sizeof(*p));
 			printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
+		p->q = q;
 		if ((p->next = *pp))
 			p->next->prev = &p->next;
 		p->prev = pp;
 		*pp = p;
-		q->q_ptr = OTHERQ(q)->q_ptr = p;
-		spin_unlock(&echo_lock);
+		q->q_ptr = WR(q)->q_ptr = p;
+		spin_unlock(&loop_lock);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
@@ -302,10 +361,10 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int
-echo_close(queue_t *q, int oflag, cred_t *crp)
+STATIC int
+loop_close(queue_t *q, int oflag, cred_t *crp)
 {
-	struct echo *p;
+	struct loop *p;
 
 	trace();
 	if ((p = q->q_ptr) == NULL) {
@@ -313,75 +372,76 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 		return (0);	/* already closed */
 	}
 	qprocsoff(q);
-	spin_lock(&echo_lock);
+	if (WR(q)->q_next)
+		putnextctl(WR(q), M_HANGUP);
+	spin_lock(&loop_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
-	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-	spin_unlock(&echo_lock);
+	q->q_ptr = WR(q)->q_ptr = NULL;
+	spin_unlock(&loop_lock);
 	printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 
-static struct qinit echo_rqinit = {
-	.qi_putp = NULL,
-	.qi_qopen = echo_open,
-	.qi_qclose = echo_close,
-	.qi_minfo = &echo_minfo,
+STATIC struct qinit loop_rqinit = {
+	.qi_putp = loop_rput,
+	.qi_qopen = loop_open,
+	.qi_qclose = loop_close,
+	.qi_minfo = &loop_minfo,
 };
 
-static struct qinit echo_wqinit = {
-	.qi_putp = echo_put,
-	.qi_srvp = NULL,
-	.qi_minfo = &echo_minfo,
+STATIC struct qinit loop_wqinit = {
+	.qi_putp = loop_wput,
+	.qi_minfo = &loop_minfo,
 };
 
-static struct streamtab echo_info = {
-	.st_rdinit = &echo_rqinit,
-	.st_wrinit = &echo_wqinit,
+STATIC struct streamtab loop_info = {
+	.st_rdinit = &loop_rqinit,
+	.st_wrinit = &loop_wqinit,
 };
 
-static struct cdevsw echo_cdev = {
-	.d_name = CONFIG_STREAMS_ECHO_NAME,
-	.d_str = &echo_info,
+STATIC struct cdevsw loop_cdev = {
+	.d_name = CONFIG_STREAMS_LOOP_NAME,
+	.d_str = &loop_info,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
-static
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+STATIC
 #endif
 int __init
-echo_init(void)
+loop_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
-	printk(KERN_INFO ECHO_BANNER);
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+	printk(KERN_INFO LOOP_BANNER);
 #else
-	printk(KERN_INFO ECHO_SPLASH);
+	printk(KERN_INFO LOOP_SPLASH);
 #endif
-	echo_minfo.mi_idnum = modid;
-	if ((err = register_strdev(&echo_cdev, major)) < 0)
+	loop_minfo.mi_idnum = modid;
+	if ((err = register_strdev(&loop_cdev, major)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
-static
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+STATIC
 #endif
 void __exit
-echo_exit(void)
+loop_exit(void)
 {
-	unregister_strdev(&echo_cdev, major);
+	unregister_strdev(&loop_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
-module_init(echo_init);
-module_exit(echo_exit);
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+module_init(loop_init);
+module_exit(loop_exit);
 #endif

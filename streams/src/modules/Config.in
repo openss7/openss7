@@ -11,6 +11,7 @@
 #
 #	name		prefix
 @CONFIG_STREAMS_STH_TRUE@	module	sth		sth
+@CONFIG_STREAMS_NULLMOD_TRUE@	module	nullmod		nullmod
 @CONFIG_STREAMS_PIPEMOD_TRUE@	module	pipemod		pipemod
 @CONFIG_STREAMS_CONNLD_TRUE@	module	connld		connld
 @CONFIG_STREAMS_SC_TRUE@	module	sc		sc
@@ -18,6 +19,7 @@
 #@CONFIG_STREAMS_TIRDWR_TRUE@	module	tirdwr		tirdwr
 #@CONFIG_STREAMS_SOCKMOD_TRUE@	module	sockmod		sockmod
 @CONFIG_STREAMS_STH_MODULE_TRUE@	module	sth		sth
+@CONFIG_STREAMS_NULLMOD_MODULE_TRUE@	module	nullmod		nullmod
 @CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@	module	pipemod		pipemod
 @CONFIG_STREAMS_CONNLD_MODULE_TRUE@	module	connld		connld
 @CONFIG_STREAMS_SC_MODULE_TRUE@		module	sc		sc
@@ -30,6 +32,7 @@
 #
 #	type	name		object name
 @CONFIG_STREAMS_STH_TRUE@	objname module	sth		sth
+@CONFIG_STREAMS_NULLMOD_TRUE@	objname module	nullmod		nullmod
 @CONFIG_STREAMS_PIPEMOD_TRUE@	objname module	pipemod		pipemod
 @CONFIG_STREAMS_CONNLD_TRUE@	objname module	connld		connld
 @CONFIG_STREAMS_SC_TRUE@	objname	module	sc		sc
@@ -37,6 +40,7 @@
 #@CONFIG_STREAMS_TIRDWR_TRUE@	objname module	tirdwr		tirdwr
 #@CONFIG_STREAMS_SOCKMOD_TRUE@	objname module	sockmod		sockmod
 @CONFIG_STREAMS_STH_MODULE_TRUE@	objname module	sth		sth
+@CONFIG_STREAMS_NULLMOD_MODULE_TRUE@	objname module	nullmod		nullmod
 @CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@	objname module	pipemod		pipemod
 @CONFIG_STREAMS_CONNLD_MODULE_TRUE@	objname module	connld		connld
 @CONFIG_STREAMS_SC_MODULE_TRUE@		objname	module	sc		sc
@@ -55,6 +59,7 @@
 # into streams.o.
 #
 @CONFIG_STREAMS_STH_MODULE_TRUE@	loadable sth
+@CONFIG_STREAMS_NULLMOD_MODULE_TRUE@	loadable nullmod
 @CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@	loadable pipemod
 @CONFIG_STREAMS_CONNLD_MODULE_TRUE@	loadable connld
 @CONFIG_STREAMS_SC_MODULE_TRUE@		loadable sc

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/08/29 10:37:11 $
+ @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/09/08 05:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -87,9 +87,9 @@ extern int sysctl_str_maxpsz;		/* stream head default max packet size */
 extern int sysctl_str_minpsz;		/* stream head default min packet size */
 extern int sysctl_str_hiwat;		/* stream head default hi water mark */
 extern int sysctl_str_lowat;		/* stream head default lo water mark */
-extern int sysctl_str_cltime;		/* close wait time in msec (save in HZ) */
-extern int sysctl_str_rtime;		/* msec to wait to forward held msg (save in HZ) */
-extern int sysctl_str_ioctime;		/* msec to wait for ioctl() acknowledgement (save in HZ) */
+extern int sysctl_str_cltime;		/* close wait time in msec (save in ticks) */
+extern int sysctl_str_rtime;		/* msec to wait to forward held msg (save in ticks) */
+extern int sysctl_str_ioctime;		/* msec to wait for ioctl() acknowledgement (save in ticks) */
 extern int sysctl_str_nstrpush;		/* max pushed modules */
 extern int sysctl_str_strthresh;	/* memory limit */
 extern int sysctl_str_strhold;		/* active stream hold feature */

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/02 19:22:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/08 05:52:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/02 19:22:18 $ by $Author: brian $
+# Last Modified $Date: 2005/09/08 05:52:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -787,11 +787,17 @@ driver_pages += \
 endif
 if CONFIG_STREAMS_LOOP
 driver_pages += \
-	man4/loop.4
+	man4/loop.4 \
+	man4/loop_clone.4 \
+	man4/sloop.4 \
+	man8/test-loop.8
 endif
 if CONFIG_STREAMS_LOOP_MODULE
 driver_pages += \
-	man4/loop.4
+	man4/loop.4 \
+	man4/loop_clone.4 \
+	man4/sloop.4 \
+	man8/test-loop.8
 endif
 if CONFIG_STREAMS_NSDEV
 driver_pages += \
@@ -866,6 +872,14 @@ if CONFIG_STREAMS_CONNLD_MODULE
 module_pages += \
 	man4/connld.4 \
 	man8/test-connld.8
+endif
+if CONFIG_STREAMS_NULLMOD
+module_pages += \
+	man4/nullmod.4
+endif
+if CONFIG_STREAMS_NULLMOD_MODULE
+module_pages += \
+	man4/nullmod.4
 endif
 if CONFIG_STREAMS_PIPEMOD
 module_pages += \
@@ -2008,11 +2022,17 @@ dist_noinst_driver_pages += \
 endif
 if CONFIG_STREAMS_LOOP
 dist_noinst_driver_pages += \
-	man4/loop.4.man
+	man4/loop.4.man \
+	man4/loop_clone.4.man \
+	man4/sloop.4.man \
+	man8/test-loop.8.man
 endif
 if CONFIG_STREAMS_LOOP_MODULE
 dist_noinst_driver_pages += \
-	man4/loop.4.man
+	man4/loop.4.man \
+	man4/loop_clone.4.man \
+	man4/sloop.4.man \
+	man8/test-loop.8.man
 endif
 if CONFIG_STREAMS_NSDEV
 dist_noinst_driver_pages += \
@@ -2087,6 +2107,14 @@ if CONFIG_STREAMS_CONNLD_MODULE
 dist_noinst_module_pages += \
 	man4/connld.4.man \
 	man8/test-connld.8.man
+endif
+if CONFIG_STREAMS_NULLMOD
+dist_noinst_module_pages += \
+	man4/nullmod.4.man
+endif
+if CONFIG_STREAMS_NULLMOD_MODULE
+dist_noinst_module_pages += \
+	man4/nullmod.4.man
 endif
 if CONFIG_STREAMS_PIPEMOD
 dist_noinst_module_pages += \

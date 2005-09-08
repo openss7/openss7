@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/08/31 19:02:45 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/09/08 05:52:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/31 19:02:45 $ by $Author: brian $
+# Last Modified $Date: 2005/09/08 05:52:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -234,6 +234,12 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_module_sth="$enableval"],
 	    [enable_module_sth='module'])
+    AC_ARG_ENABLE([module-nullmod],
+	AS_HELP_STRING([--enable-module-nullmod],
+	    [enable nullmod module for linkage with STREAMS.
+	    @<:@default=module@:>@]),
+	    [enable_module_nullmod="$enableval"],
+	    [enable_module_nullmod='module'])
     AC_ARG_ENABLE([module-pipemod],
 	AS_HELP_STRING([--enable-module-pipemod],
 	    [enable pipemod module for linkage with STREAMS.
@@ -256,6 +262,11 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	lfs_module_sth="${enable_module_sth:-module}"
 	if test :$lfs_module_sth = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_module_sth='yes'
+	fi])
+    AC_CACHE_CHECK([for STREAMS module nullmod], [lfs_module_nullmod], [dnl
+	lfs_module_nullmod="${enable_module_nullmod:-module}"
+	if test :$lfs_module_nullmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_module_nullmod='yes'
 	fi])
     AC_CACHE_CHECK([for STREAMS module pipemod], [lfs_module_pipemod], [dnl
 	lfs_module_pipemod="${enable_module_pipemod:-module}"
@@ -286,6 +297,19 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    ;;
     esac
 dnl --------------------------------------
+    case ${lfs_module_nullmod:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULLMOD], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the nullmod module for linkage with STREAMS.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the nullmod module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULLMOD_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the nullmod module as a standalone loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the nullmod module as a standalone loadable kernel
+	    module.])
+	    ;;
+    esac
     case ${lfs_module_pipemod:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD], [], [When defined,] AC_PACKAGE_TITLE [
@@ -328,6 +352,8 @@ dnl --------------------------------------
     AM_CONDITIONAL([CONFIG_STREAMS_STH],		[test :${lfs_module_sth:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE],		[test :${lfs_module_sth:-module}	= :module])
 dnl ===========================
+    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD],		[test :${lfs_module_nullmod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD_MODULE],	[test :${lfs_module_nullmod:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],		[test :${lfs_module_pipemod:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE],	[test :${lfs_module_pipemod:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],		[test :${lfs_module_connld:-module}	= :yes])

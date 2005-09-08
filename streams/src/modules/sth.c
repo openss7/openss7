@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:54:33 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/03 08:54:33 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -796,14 +796,18 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 	struct strevent *se, **sep;
 	int err = 0;
 
+	printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
 	for (sep = &sd->sd_siglist;
 	     (se = *sep) && ((p = se->se_procp) != c) && (p->tgid != c->tgid); sep = &se->se_next) ;
 	if (se) {
+		printd(("%s: found existing registration se = %p\n", __FUNCTION__, se));
 		if (events) {
 			/* update */
+			printd(("%s: updating events se = %p\n", __FUNCTION__, se));
 			se->se_events = events;
 		} else {
 			/* delete */
+			printd(("%s: deleting events se = %p\n", __FUNCTION__, se));
 			*sep = se->se_next;
 			sefree(se);
 		}
@@ -811,15 +815,19 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 			unsigned long new_events = 0;
 
 			/* recalc sig flags */
+			printd(("%s: recalculating events se = %p\n", __FUNCTION__, se));
 			for (se = sd->sd_siglist; se; se = se->se_next)
 				new_events |= se->se_events;
 			sd->sd_sigflags = new_events;
+			printd(("%s: new overall events %lu\n", __FUNCTION__, new_events));
 		}
-	} else if (!events)
+	} else if (!events) {
+		ptrace(("Error path taken!\n"));
 		err = -EINVAL;	/* POSIX not on list */
-	else if (!(se = sealloc()))
+	} else if (!(se = sealloc())) {
+		ptrace(("Error path taken!\n"));
 		err = -EAGAIN;	/* POSIX says EAGAIN not ENOSR */
-	else {
+	} else {
 		struct task_struct *procp;
 		int fd;
 
@@ -831,8 +839,14 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		fd = str_find_file_descriptor(procp, file);
 		se->se_procp = procp;
 		se->se_events = events;
+		se->se_fd = fd;
+		printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events, procp, fd));
 		/* calc sig flags */
 		sd->sd_sigflags |= events;
+		ptrace(("%s: new events %lu\n", __FUNCTION__, sd->sd_sigflags));
+		/* link it in */
+		se->se_next = sd->sd_siglist;
+		sd->sd_siglist = se;
 	}
 	return (err);
 }
@@ -851,6 +865,7 @@ strevent_register(const struct file *file, struct stdata *sd, const unsigned lon
 {
 	int err;
 
+	printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
 	swlock(sd);
 	err = __strevent_register(file, sd, events);
 	swunlock(sd);
@@ -859,6 +874,7 @@ strevent_register(const struct file *file, struct stdata *sd, const unsigned lon
 STATIC INLINE int
 strevent_unregister(const struct file *file, struct stdata *sd)
 {
+	printd(("%s: unregistering streams events\n", __FUNCTION__));
 	return strevent_register(file, sd, 0);
 }
 
@@ -1593,6 +1609,7 @@ strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 {
 	mblk_t *mp;
 
+	/* might already have a response */
 	if ((mp = xchg(&sd->sd_iocblk, NULL)))
 		return (mp);
 
@@ -1602,17 +1619,20 @@ strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 STATIC streams_fastcall int
 strwakeiocack(struct stdata *sd, mblk_t *mp)
 {
+	ptrace(("%s: received ioctl response\n", __FUNCTION__));
 	if (!sd->sd_iocblk && test_bit(IOCWAIT_BIT, &sd->sd_flag)) {
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 		if (ioc->iocblk.ioc_id == sd->sd_iocid) {
-			assert(waitqueue_active(&sd->sd_waitq));
-
 			sd->sd_iocblk = mp;
-			wake_up_all(&sd->sd_waitq);
+			/* might not be sleeping yet */
+			if (waitqueue_active(&sd->sd_waitq))
+				wake_up_all(&sd->sd_waitq);
 			return (true);
-		}
-	}
+		} else
+			ptrace(("%s: ioctl response has wrong iocid\n", __FUNCTION__));
+	} else
+		ptrace(("%s: not expecting ioctl response\n", __FUNCTION__));
 	return (false);
 }
 
@@ -1722,12 +1742,16 @@ strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 }
 
 STATIC int
-strdoioctl_str(struct stdata *sd, const struct strioctl *ic, const int access, const bool user)
+strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const bool user)
 {
 	union ioctypes *ioc;
 	mblk_t *mb;
 	long timeo;
 	int err = 0;
+
+	if (ic->ic_len < 0 || ic->ic_len > sysctl_str_strmsgsz)
+		/* POSIX less than zero or larger than maximum data part. */
+		return (-EINVAL);
 
 	if (!access_ok(VERIFY_WRITE, ic->ic_dp, ic->ic_len))
 		return (-EFAULT);
@@ -1749,7 +1773,17 @@ strdoioctl_str(struct stdata *sd, const struct strioctl *ic, const int access, c
 		return (err);
 	}
 
-	timeo = (ic->ic_timout == -1UL) ? MAX_SCHEDULE_TIMEOUT : ic->ic_timout * HZ;
+	if (ic->ic_timout == INFTIM) {
+		timeo = MAX_SCHEDULE_TIMEOUT;
+	} else if (ic->ic_timout == 0) {
+		timeo = sd->sd_ioctime;
+	} else if (ic->ic_timout < INFTIM) {
+		/* POSIX says if ic_timout < -1 return EINVAL */
+		freemsg(mb);
+		return (-EINVAL);
+	} else {
+		timeo = ic->ic_timout * HZ;
+	}
 
 	if ((err = strwaitioctl(sd, &timeo, access))) {
 		freemsg(mb);
@@ -1762,26 +1796,39 @@ strdoioctl_str(struct stdata *sd, const struct strioctl *ic, const int access, c
 	do {
 		put(sd->sd_wq, mb);
 
+		ptrace(("waiting for response\n"));
 		mb = strwaitiocack(sd, &timeo, access);
 
 		if (IS_ERR(mb)) {
 			err = PTR_ERR(mb);
+			ptrace(("Error path taken! err = %d\n", err));
 			break;
 		}
 
+		assert(mb);
+
 		ioc = (typeof(ioc)) mb->b_rptr;
+
+		assert(ioc);
+
 		switch (mb->b_datap->db_type) {
 		case M_IOCACK:
 		case M_IOCNAK:
 			err = ioc->iocblk.ioc_error;
 			err = err > 0 ? -err : err;
-			if (err)
+			if (err) {
+				ptrace(("Error path taken! err = %d\n", err));
 				break;
+			}
 			err = ioc->iocblk.ioc_rval;
-			if (ioc->iocblk.ioc_count > 0)
+			if (ioc->iocblk.ioc_count > 0) {
 				if (!(err = strcopyoutb(mb->b_cont, ic->ic_dp,
-							ioc->iocblk.ioc_count, user)))
+							ioc->iocblk.ioc_count, user))) {
+					ic->ic_len = ioc->iocblk.ioc_count;
 					err = ioc->iocblk.ioc_rval;
+				} else
+					ptrace(("Error path taken! err = %d\n", err));
+			}
 			break;
 		case M_COPYIN:
 			mb->b_datap->db_type = M_IOCDATA;
@@ -4568,12 +4615,19 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	const char *name = (typeof(name)) arg;
+	char name[FMNAMESZ + 1];
 	queue_t *wq = sd->sd_wq;
-	int err = 0;
+	int err;
 
-	if (strnlen_user(name, FMNAMESZ + 1))
-		return (-EFAULT);
+	printd(("%s: copying string from user\n", __FUNCTION__));
+	if ((err = strncpy_from_user(name, (const char *)arg, FMNAMESZ + 1)) < 0) {
+		ptrace(("Error path taken! err = %d\n", err));
+		return (err);
+	}
+	if (err < 1 || err > FMNAMESZ) {
+		ptrace(("Error path taken! strnlen = %d\n", err));
+		return (-EINVAL);
+	}
 
 	if (!(err = straccess_rlock(sd, 0))) {
 		for (wq = sd->sd_wq; wq; wq = SAMESTR(wq) ? wq->q_next : NULL)
@@ -4593,18 +4647,25 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC inline streams_fastcall int
 str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	struct bandinfo bi, *valp = (struct bandinfo *) arg;
+	struct bandinfo bi;
 	mblk_t *mp;
 	int err;
 
-	if ((err = copyin(&bi, valp, sizeof(bi))))
+	if ((err = copyin((typeof(&bi)) arg, &bi, sizeof(bi)))) {
+		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
+	}
 
-	if ((bi.bi_flag & ~(FLUSHR | FLUSHW | FLUSHRW)))
+	if ((bi.bi_flag & ~(FLUSHR | FLUSHW | FLUSHRW))
+	    || !(bi.bi_flag & (FLUSHR | FLUSHW | FLUSHRW))) {
+		ptrace(("Error path taken!\n"));
 		return (-EINVAL);
+	}
 
-	if (!(mp = allocb(2, BPRI_WAITOK)))
+	if (!(mp = allocb(2, BPRI_WAITOK))) {
+		ptrace(("Error path taken!\n"));
 		return (-ENOSR);
+	}
 
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = bi.bi_flag | FLUSHBAND;
@@ -4613,8 +4674,10 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!(err = straccess_rlock(sd, 0))) {
 		put(sd->sd_wq, mp);
 		srunlock(sd);
-	} else
+	} else {
+		ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);
+	}
 
 	return (err);
 }
@@ -4640,20 +4703,28 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	mblk_t *mp;
 	int err = 0;
 
-	if (((arg & ~(FLUSHR | FLUSHW | FLUSHRW))) || !((arg & (FLUSHR | FLUSHW | FLUSHRW))))
+	if (((arg & ~(FLUSHR | FLUSHW | FLUSHRW))) || !((arg & (FLUSHR | FLUSHW | FLUSHRW)))) {
+		ptrace(("Error path taken!\n"));
 		return (-EINVAL);
+	}
 
-	if (!(mp = allocb(1, BPRI_WAITOK)))
+	if (!(mp = allocb(1, BPRI_WAITOK))) {
+		ptrace(("Error path taken!\n"));
 		return (-ENOSR);
+	}
+	ptrace(("message block %p allocated\n", mp));
 
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = arg;
 
 	if (!(err = straccess_rlock(sd, 0))) {
+		ptrace(("putting message %p\n", mp));
 		put(sd->sd_wq, mp);
 		srunlock(sd);
-	} else
+	} else {
+		ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);
+	}
 
 	return (err);
 }
@@ -4671,12 +4742,19 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 	int band = -1;
 	int err;
 
+	if (!access_ok(VERIFY_WRITE, arg, sizeof(band))) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
+
 	if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
 		qrlock(q);
 		if (q->q_first)
 			band = q->q_first->b_band;
-		else
+		else {
+			ptrace(("Error path taken!\n"));
 			err = -ENODATA;
+		}
 		qrunlock(q);
 		srunlock(sd);
 	}
@@ -4713,8 +4791,10 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (!(err = copyin((int *) arg, &closetime, sizeof(closetime)))) {
-		if (0 > closetime || closetime >= 300000)
+		if (0 > closetime || closetime >= 300000) {
+			ptrace(("Error path taken!\n"));
 			return (-EINVAL);
+		}
 		if (!(err = straccess_unlocked(sd, FEXCL)))
 			sd->sd_closetime = drv_msectohz(closetime);
 	}
@@ -4735,13 +4815,20 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 	int flags;
 	int err;
 
+	if (!access_ok(VERIFY_WRITE, arg, sizeof(int))) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
+	ptrace(("**** Access ok!\n"));
 	if (!(err = straccess_rlock(sd, 0))) {
 		struct strevent *se;
 
 		if ((se = __strevent_find(sd)))
 			flags = se->se_events;
-		else
+		else {
+			ptrace(("Error path taken!\n"));
 			err = -EINVAL;
+		}
 		srunlock(sd);
 	}
 	if (!err)
@@ -4762,15 +4849,17 @@ str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
 
-	if (!(arg & ~S_ALL))
+	if ((arg & ~S_ALL))
 		return (-EINVAL);
 
 	if (!(err = straccess_wlock(sd, FEXCL))) {
 		/* quick check */
 		if (arg || (sd->sd_sigflags & S_ALL))
 			err = __strevent_register(file, sd, arg);
-		else
+		else {
+			ptrace(("Error path taken!\n"));
 			err = -EINVAL;
+		}
 		swunlock(sd);
 	}
 
@@ -4786,7 +4875,13 @@ str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_grdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int rdopt = sd->sd_rdopt & (RMODEMASK | RPROTMASK);
+	int rdopt;
+
+	if (!access_ok(VERIFY_WRITE, arg, sizeof(rdopt))) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
+	rdopt = sd->sd_rdopt & (RMODEMASK | RPROTMASK);
 
 	return copyout(&rdopt, (typeof(&rdopt)) arg, sizeof(rdopt));
 }
@@ -4873,7 +4968,13 @@ str_i_srdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD);
+	int wropt;
+	
+	if (!access_ok(VERIFY_WRITE, arg, sizeof(wropt))) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
+	wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD);
 
 	return copyout(&wropt, (typeof(&wropt)) arg, sizeof(wropt));
 }
@@ -5406,15 +5507,13 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC inline streams_fastcall int
 str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err, rtn = 0;
-	struct strpeek sp, *valp = (struct strpeek *) arg;
+	int err = 0, rtn = 0;
+	struct strpeek sp;
 	queue_t *q = sd->sd_rq;
 
-	if (!valp)
+	if (!arg)
 		return (-EINVAL);
-	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
-		return (err);
-	if (copyin(&sp, valp, sizeof(sp)))
+	if (copyin((typeof(&sp)) arg, &sp, sizeof(sp)))
 		return (-EFAULT);
 	if (sp.ctlbuf.maxlen < 0 || sp.databuf.maxlen < 0 || (sp.ctlbuf.maxlen && !sp.ctlbuf.buf)
 	    || (sp.databuf.maxlen && !sp.databuf.buf))
@@ -5516,8 +5615,15 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 	struct fmodsw *fmod;
 	int err;
 
-	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)))
+	printd(("%s: copying string from user\n", __FUNCTION__));
+	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0) {
+		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
+	}
+	if (err < 1 || err > FMNAMESZ) {
+		ptrace(("Error path taken! strnlen = %d\n", err));
+		return (-EINVAL);
+	}
 
 	/* MG also says to check STREAMS memory limit. */
 
@@ -5554,15 +5660,22 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 					   error: drivers can return more informative errors.) It
 					   is a question here whether to leave modules on their
 					   honor or to set the error number for them. */
+					ptrace(("Error path taken! err = %d\n", err));
 					assure(err == -ENXIO);
 				}
-			} else
+			} else {
+				ptrace(("Error path taken!\n"));
 				err = -ENOSR;
+			}
 			strwakeopen(sd);
+		} else {
+			ptrace(("Error path taken! err = %d\n", err));
 		}
 		fmod_put(fmod);
-	} else
+	} else {
+		ptrace(("Error path taken!\n"));
 		err = -EINVAL;
+	}
 
 	return (err);
 }
@@ -5599,11 +5712,15 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 				cred_t *crp = current_creds;
 
 				sd->sd_pushcnt--;
-				qdetach(sd->sd_rq, oflag, crp);
-			} else
+				qdetach(_RD(sd->sd_wq->q_next), oflag, crp);
+			} else {
+				ptrace(("Error path taken!\n"));
 				err = -EPERM;
-		} else
+			}
+		} else {
+			ptrace(("Error path taken!\n"));
 			err = -EINVAL;
+		}
 		strwakeopen(sd);
 	}
 	return (err);
@@ -5793,12 +5910,22 @@ STATIC int
 str_i_str(const struct file *file, struct stdata *sd, unsigned long arg, int access)
 {
 	struct strioctl ic;
-	int err;
+	int err, rval;
 
-	if ((err = copyin((typeof(&ic)) arg, &ic, sizeof(ic))))
+	if ((err = copyin((typeof(&ic)) arg, &ic, sizeof(ic)))) {
+		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
-
-	return strdoioctl_str(sd, &ic, access, 1);
+	}
+	if ((rval = err = strdoioctl_str(sd, &ic, access, 1)) < 0) {
+		ptrace(("Error path taken! err = %d\n", err));
+		return (err);
+	}
+	/* POSIX says to copy out the ic_len member upon success. */
+	if ((err = copyout(&ic.ic_len, &((typeof(&ic)) arg)->ic_len, sizeof(ic.ic_len)))) {
+		ptrace(("Error path taken! err = %d\n", err));
+		return (err);
+	}
+	return (rval);
 }
 
 /**
@@ -5810,7 +5937,13 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg, int acc
 STATIC int
 str_i_gerropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int eropt = sd->sd_eropt & (RERRNONPERSIST | WERRNONPERSIST);
+	int eropt;
+	
+	if (!access_ok(VERIFY_WRITE, arg, sizeof(eropt))) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
+	eropt = sd->sd_eropt & (RERRNONPERSIST | WERRNONPERSIST);
 
 	return copyout(&eropt, (typeof(&eropt)) arg, sizeof(eropt));
 }
@@ -5985,7 +6118,7 @@ str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsi
 		struct strioctl ic;
 
 		ic.ic_cmd = cmd;
-		ic.ic_timout = sd->sd_ioctime;
+		ic.ic_timout = 0;
 		ic.ic_len = len;
 		ic.ic_dp = (caddr_t) arg;
 
@@ -6905,7 +7038,6 @@ str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!strwakeiocack(sd, mp))
 		freemsg(mp);
-	freemsg(mp);
 	return (0);
 }
 

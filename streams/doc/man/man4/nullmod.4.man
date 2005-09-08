@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: connld.4.man,v 0.9.2.9 2005/09/08 05:52:35 brian Exp $
+.\" @(#) $Id: nullmod.4.man,v 0.9.2.1 2005/09/08 05:52:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/08 05:52:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/08 05:52:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,192 +71,132 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CONNLD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.TH NULLMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
 .\"
 .\"
 .SH NAME
-.B connld
-\- incomplete man page
+.B nullmod
+\- \fISTREAMS\fR null module
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
-.BI "int " pfds[2] ;
-.HP 12
-.BI "int s_pipe(" pfds );
-.HP 12
-.BI "int ioctl(" pfds[0] ", " I_PUSH ", " \*(lqconnld\*(rq );
-.HP 12
-.BI "int fattach(" pfds[0] ", " \*(lq/tmp/server\*(rq );
-.HP 12
-.BI "int ioctl(" pfds[1] ", " I_RECVFD ", struct strfdinsert *" fdi );
+.HP 8
+.BI "int " fd ;
+.HP 8
+.BI "int open(" \*(lq\fR/dev/nuls\fP\*(rq ", " \fR0\fP );
+.HP 8
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqnullmod\*(rq );
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B connld
+.B nullmod
 is a
 .I STREAMS
-module that can be pushed over a
+module that is pushed over any
+.IR STREAM ,
 .IR STREAMS -based
-bi-drectional software pipe (see
-.BR spx (4))
-to provide automatic generation of new
+.BR pipe (4)
+or
 .IR STREAMS -based
-bi-drectional software pipes between a client and server process.
+.BR fifo (4).
 .PP
-When
-.BR open (2)
-is called on the end of a pipe upon which
-.B connld
-has been pushed (see
-.BR streamio (7))
-a new software pipe is created.  The file descriptor for the far end of the
-newly created pipe is sent to the other end of the existing pipe in the same
-fashion as an
-.I I_SENDFD
-IO control (see
-.BR streamio (7))
-and can be received at the other end of the existing pipe with
-.IR I_RECVFD .
-The file descriptor returned by the
-.BR open (2)
-call will be the near end of the newly created pipe.
+Aside from being a
+.I STREAMS
+module,
+.B nullmod
+performs no actions.  All messages passed from the
+.I STREAM
+head towards the
+.B nullmod
+module are passed on downstream from the
+.B nullmod
+write-side put procedure; all messages received from the driver,
+are passed on upstream from the
+read-side put procedure.  The
+.B nullmod
+module has no write- or read-side service procedure.
 .\"
 .\"
 .SH USAGE
 .PP
-The normal usage of
-.B connld
-is as follows:
-.IP (1) \w'(000)'u
-A server process creates a software pipe using
-.BR pipe (2)
-or
-.BR spx (4).
-.IP (2)
-The server process pushes the
-.B connld
-module on the client end of the pipe using the
-.I I_PUSH
-command of
-.BR streamio (7).
-.IP (3)
-The server process names the client end of the pipe using
-.BR fattach (3).
-.IP (4)
-The server process uses
-.BR poll (2)
-to listen for received file descriptors on the server end of the pipe.
-.IP (5)
-When a client process performs an
-.BR open (2)
-on the file to which the client end of the pipe has been named with
-.BR fattach (3),
-.B connld
-creates a new pipe, sends the server side file descriptor to the server with
-the
-.I I_SENDFD
-command of
-.BR streamio (7)
-and returns the file descriptor of the client end of the new pipe in return to
-the
-.BR open (2)
-call.
-.IP (6)
-The server receives the file descriptor with the
-.I I_RECVFD
-command of
-.BR streamio (7)
-resulting in a unique per-client bi-directional
-.IR STREAMS -based
-pipe for each connecting client.
+The primary purpose of
+.B nullmod
+is as a test module for use with the
+.BR test-streams (8)
+conformance test program.  The other purpose of
+.B nullmod
+is as an example skeleton for a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR nullmod
+is specific to the
+.B @PACKAGE_TITLE@
+package.
 .\"
 .\"
 .SH EXAMPLES
 .PP
-A description and a client-server example for the
-.B connld
-module appears in
-.IR "\*(lqAdvanced Programming in the UNIX\(rg Environment\*(rq" .
-.[
-advprog
-%P 498
-.]
+The source code for
+.B nullmod
+serves as an example skeleton for a
+.I STREAMS
+pushable module.
 .\"
 .\"
 .SH MODULES
 .PP
-.B connld
+.B nullmod
 is a
 .I STREAMS
 module named
-.IR \*(lqconnld\*(rq .
+.IR \*(lqnullmod\*(rq .
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR spx (4)),
-.BR open (2),
-.BR streamio (7),
-.BR fattach (3),
-.BR poll (2).
+.BR open (2s),
+.BR ioctl (2),
+.BR streamio (7).
 .\"
 .\"
 .SH BUGS
 .PP
-.B connld
+.B nullmod
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B connld
-is compatible with
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-.BR SVR 4.2
-.[
-svr42
-.]
-and
-.BR LiS .
-.[
-LiS
-.]
+.B nullmod
+is specific to
+.BR "@PACKAGE_TITLE@" ,
+and will not be used by portable
+.I STREAMS
+modules, drivers and applications programs.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2,
-.[
-svr42
-.]
-SVID,
-.[
-svid
-.]
-XID,
-.[
-xbd5
-.]
-SUSv2,
-.[
-susv2
-.]
-SUSv3.
-.[
-susv3
-.]
+None.
 .\"
 .\"
 .SH HISTORY
 .PP
-.B connld
-first appeared in SVR 4.
+.B nullmod
+first appeared in
+.BR "@PACKAGE_TITLE@" .
 .[
-svr4
+lfs
 .]
 .\"
 .\"

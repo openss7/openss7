@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/12 20:58:48 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 05:52:44 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -106,7 +106,7 @@ remove_modules() {
 	modules="${modules}${modules:+ }${module[0]}"
     done
     if [ -n "$modules" ] ; then
-	action $"Removing STREAMS modules: " \
+	action $"Removing SPECFS modules: " \
 		rmmod $modules
 	RETVAL=$?
     fi
@@ -231,7 +231,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/12 20:58:48 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 05:52:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -277,7 +277,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/12 20:58:48 $ by $Author: brian $
+# Last Modified $Date: 2005/09/08 05:52:44 $ by $Author: brian $
 #
 # =============================================================================
 

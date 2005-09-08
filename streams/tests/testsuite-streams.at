@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/06/24 16:58:49 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/08 05:52:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,16 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/24 16:58:49 $ by $Author: brian $
+dnl Last Modified $Date: 2005/09/08 05:52:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.5  2005/09/08 05:52:46  brian
+dnl - added nullmod module and loop driver
+dnl - corrections during testing
+dnl - many ioctl(2p) test cases work very well now
+dnl
 dnl Revision 0.9.2.4  2005/06/24 16:58:49  brian
 dnl - testsuite as always verbose internally
 dnl
@@ -154,11 +159,59 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.3])
+AT_SETUP([streams test 2.2.4])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.3
+    test-streams $options -e -o 2.2.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.2.5])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.2.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.2.6])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.2.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.2.7])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.2.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.3.1])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.3.2])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.3.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.3.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -170,11 +223,43 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.5])
+AT_SETUP([streams test 2.5.1])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.5
+    test-streams $options -e -o 2.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.2])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.5.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.4])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.5.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.5])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.5.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -354,19 +439,59 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.8])
+AT_SETUP([streams test 2.8.1])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.8
+    test-streams $options -e -o 2.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.9])
+AT_SETUP([streams test 2.8.2])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.9
+    test-streams $options -e -o 2.8.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.8.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.8.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.8.4])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.8.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.8.5])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.8.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.9.1])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.9.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.9.2])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.9.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -386,11 +511,51 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.11])
+AT_SETUP([streams test 2.10.3])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.11
+    test-streams $options -e -o 2.10.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.11.1])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.11.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.11.2])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.11.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.11.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.11.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.11.4])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.11.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.11.5])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.11.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -402,11 +567,27 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.13])
+AT_SETUP([streams test 2.13.1])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.13
+    test-streams $options -e -o 2.13.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.13.2])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.13.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.13.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.13.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -610,19 +791,99 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.22])
+AT_SETUP([streams test 2.22.1])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.22
+    test-streams $options -e -o 2.22.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.23])
+AT_SETUP([streams test 2.22.2])
 AT_KEYWORDS([streams])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o 2.23
+    test-streams $options -e -o 2.22.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.22.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.22.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.1])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.2])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.3])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.4])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.5])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.6])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.7])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.8])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.9])
+AT_KEYWORDS([streams])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='-vvv' ; fi
+    test-streams $options -e -o 2.23.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/08 05:52:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/21 20:47:25 $ by $Author: brian $
+# Last Modified $Date: 2005/09/08 05:52:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.25  2005/09/08 05:52:45  brian
+# - added nullmod module and loop driver
+# - corrections during testing
+# - many ioctl(2p) test cases work very well now
+#
 # Revision 0.9.2.24  2005/07/21 20:47:25  brian
 # - sync with notebook
 #
@@ -156,6 +161,12 @@ TESTSUITE_DEPS		+= $(TESTSUITE)-log.at
 endif
 if CONFIG_STREAMS_LOG_MODULE
 TESTSUITE_DEPS		+= $(TESTSUITE)-log.at
+endif
+if CONFIG_STREAMS_LOOP
+TESTSUITE_DEPS		+= $(TESTSUITE)-loop.at
+endif
+if CONFIG_STREAMS_LOOP_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-loop.at
 endif
 if CONFIG_STREAMS_NSDEV
 TESTSUITE_DEPS		+= $(TESTSUITE)-nsdev.at

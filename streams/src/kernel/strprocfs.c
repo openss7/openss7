@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:10 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/08 05:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:10 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/08 05:52:40 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/08/31 19:03:10 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/08 05:52:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -654,6 +654,7 @@ get_streams_stdata_hdr(char *page, ssize_t maxlen)
 //      len += snprintf(page + len, maxlen - len, ", sd_mark");
 	len += snprintf(page + len, maxlen - len, ", sd_closetime");
 	len += snprintf(page + len, maxlen - len, ", sd_rtime");
+	len += snprintf(page + len, maxlen - len, ", sd_ioctime");
 //      len += snprintf(page + len, maxlen - len, ", sd_qlock");
 // 	len += snprintf(page + len, maxlen - len, ", sd_owner");
 // 	len += snprintf(page + len, maxlen - len, ", sd_nest");
@@ -702,6 +703,7 @@ get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mark);
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_closetime);
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_rtime);
+	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_ioctime);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_qlock);
 // 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_owner);
 // 	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_nest);

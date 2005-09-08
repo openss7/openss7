@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:07:05 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:11 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:07:05 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 09:37:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.11  2005/09/08 09:37:11  brian
+ - corrected error output
+
+ Revision 0.9.2.10  2005/09/08 05:52:43  brian
+ - added nullmod module and loop driver
+ - corrections during testing
+ - many ioctl(2p) test cases work very well now
+
  Revision 0.9.2.9  2005/07/18 12:07:05  brian
  - standard indentation
 
@@ -99,9 +107,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:07:05 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:11 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:07:05 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:11 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -142,9 +150,10 @@ static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2
  */
 
 static const char *lpkgname = "Linux Fast-STREAMS";
-static const char *spkgname = "LfS";
+
+/* static const char *spkgname = "LfS"; */
 static const char *lstdname = "UNIX 98/SUS Version 2";
-static const char *sstdname = "XSI";
+static const char *sstdname = "XSI/XSR";
 static const char *shortname = "SAD";
 static char devname[256] = "/dev/sad/admin";
 
@@ -168,10 +177,12 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 100		// 10
-#define NORMAL_WAIT 500		// 100
-#define LONG_WAIT 5000		// 500
-#define LONGER_WAIT 10000	// 5000
+#define SHORT_WAIT	  20	// 100 // 10
+#define NORMAL_WAIT	 100	// 500 // 100
+#define LONG_WAIT	 500	// 5000 // 500
+#define LONGER_WAIT	1000	// 10000 // 5000
+#define INFINITE_WAIT	-1UL
+#define TEST_DURATION	20000
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -188,6 +199,8 @@ struct strfdinsert fdi = {
 };
 int flags = 0;
 
+int dummy = 0;
+
 struct timeval when;
 
 /*
@@ -198,9 +211,10 @@ struct timeval when;
  *  -------------------------------------------------------------------------
  */
 enum {
-	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__EVENT_EOF = -7, __EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
 	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
+	__RESULT_NOTAPPL = 3, __RESULT_SKIPPED = 77,
 };
 
 /*
@@ -252,11 +266,11 @@ now(void)
 
 	if (gettimeofday(&now, NULL)) {
 		last_errno = errno;
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
 		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		return (0);
 	}
 	if (!test_start)	/* avoid blowing over precision */
@@ -269,12 +283,12 @@ static long
 milliseconds(char *t)
 {
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    .               :               .  .                    \n");
 		fprintf(stdout, "                    .             %6s            .  .                    <%d>\n", t, state);
 		fprintf(stdout, "                    .               :               .  .                    \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return now();
 }
@@ -282,12 +296,12 @@ static long
 milliseconds_2nd(char *t)
 {
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    .               :   :           .  .                    \n");
 		fprintf(stdout, "                    .               : %6s        .  .                    <%d>\n", t, state);
 		fprintf(stdout, "                    .               :   :           .  .                    \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return now();
 }
@@ -312,10 +326,10 @@ check_time(const char *t, long i, long lo, long hi)
 	dhi = dhi / 1000;
 	tol = tol / 1000;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n", dlo - tol, itv, dhi + tol, t, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	if (dlo - tol <= itv && itv <= dhi + tol)
 		return __RESULT_SUCCESS;
@@ -324,7 +338,7 @@ check_time(const char *t, long i, long lo, long hi)
 }
 
 static int
-time_event(int event)
+time_event(int child, int event)
 {
 	if (verbose > 4) {
 		float t, m;
@@ -337,10 +351,10 @@ time_event(int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                   <%d>\n", t, state);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return (event);
 }
@@ -369,6 +383,7 @@ timer_sethandler(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -390,6 +405,8 @@ start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+
+#if 0
 static int
 start_st(long duration)
 {
@@ -397,6 +414,7 @@ start_st(long duration)
 
 	return start_tt(sdur);
 }
+#endif
 
 static int
 stop_tt(void)
@@ -691,6 +709,8 @@ const char *
 event_string(int event)
 {
 	switch (event) {
+	case __EVENT_EOF:
+		return ("END OF FILE");
 	case __EVENT_NO_MSG:
 		return ("NO MESSAGE");
 	case __EVENT_TIMEOUT:
@@ -824,26 +844,26 @@ print_less(int child)
 {
 	if (verbose < 1 || !show)
 		return;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	switch (child) {
 	case 0:
 		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                    [%d]\n", state);
+		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
 		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
 		break;
 	case 1:
 		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .   [%d]\n", state);
+		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
 		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
 		break;
 	case 2:
 		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .   [%d]\n", state);
+		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
 		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
 		break;
 	}
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	show = 0;
 	return;
 }
@@ -857,37 +877,46 @@ print_more(void)
 void
 print_simple(int child, const char *msgs[])
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child]);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
 print_simple_int(int child, const char *msgs[], int val)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
 print_double_int(int child, const char *msgs[], int val, int val2)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val, val2);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_int(int child, const char *msgs[], int val, int val2, int val3)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], val, val2, val3);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
 print_simple_string(int child, const char *msgs[], const char *string)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
@@ -946,17 +975,45 @@ print_preamble(int child)
 }
 
 void
-print_inconclusive(int child)
+print_notapplicable(int child)
 {
 	static const char *msgs[] = {
-		"????????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
-		"  ??????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
-		"    ????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
-		"????????????????????|?????????? INCONCLUSIVE ????????|??|???????????????????[%d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
+		"  X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
+		"    X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|                    [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-X-X-X-X NOT APPLICABLE -X-X-X-|X-|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
+}
+
+void
+print_skipped(int child)
+{
+	static const char *msgs[] = {
+		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
+		"  ::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
+		"    ::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|                    [%d:%03d]\n",
+		"::::::::::::::::::::|:::::::::::: SKIPPED :::::::::::|::|::::::::::::::::::: [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+}
+
+void
+print_inconclusive(int child)
+{
+	static const char *msgs[] = {
+		"????????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
+		"  ??????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
+		"    ????????????????|?????????? INCONCLUSIVE ????????|??|                    [%d:%03d]\n",
+		"????????????????????|?????????? INCONCLUSIVE ????????|??|??????????????????? [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
 }
 
 void
@@ -977,10 +1034,10 @@ void
 print_failed(int child)
 {
 	static const char *msgs[] = {
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
-		"  XXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
-		"    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
-		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXXX[%d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|                    [%d:%03d]\n",
+		"  XXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|                    [%d:%03d]\n",
+		"    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|                    [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -991,10 +1048,10 @@ void
 print_script_error(int child)
 {
 	static const char *msgs[] = {
-		"####################|########### SCRIPT ERROR ######|##|                    [%d]\n",
-		"  ##################|########### SCRIPT ERROR ######|##|                    [%d]\n",
-		"    ################|########### SCRIPT ERROR ######|##|                    [%d]\n",
-		"####################|########### SCRIPT ERROR ######|##|####################[%d]\n",
+		"####################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
+		"  ##################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
+		"    ################|########### SCRIPT ERROR #######|##|                    [%d:%03d]\n",
+		"####################|########### SCRIPT ERROR #######|##|################### [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -1005,10 +1062,10 @@ void
 print_passed(int child)
 {
 	static const char *msgs[] = {
-		"********************|************* PASSED ***********|**|                   [%d]\n",
-		"  ******************|************* PASSED ***********|**|                   [%d]\n",
-		"    ****************|************* PASSED ***********|**|                   [%d]\n",
-		"********************|************* PASSED ***********|**|*******************[%d]\n",
+		"********************|************* PASSED ***********|**|                    [%d:%03d]\n",
+		"  ******************|************* PASSED ***********|**|                    [%d:%03d]\n",
+		"    ****************|************* PASSED ***********|**|                    [%d:%03d]\n",
+		"********************|************* PASSED ***********|**|******************* [%d:%03d]\n",
 	};
 
 	if (verbose > 2)
@@ -1047,42 +1104,42 @@ void
 print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
-		"  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
-		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d:%03d}\n",
+		"  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d:%03d}\n",
+		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 	};
 
 	if (verbose > 0)
-		print_simple_int(child, msgs, signal);
+		print_double_int(child, msgs, child, signal);
 }
 
 void
 print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
-		"  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
-		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d:%03d}\n",
+		"  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d:%03d}\n",
+		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 	};
 
 	if (verbose > 0)
-		print_simple_int(child, msgs, signal);
+		print_double_int(child, msgs, child, signal);
 }
 
 void
 print_timeout(int child)
 {
 	static const char *msgs[] = {
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
-		"  ++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
-		"    ++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
-		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++[%d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"  ++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"    ++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
 	if (show_timeout || verbose > 0) {
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
 }
@@ -1091,33 +1148,33 @@ void
 print_nothing(int child)
 {
 	static const char *msgs[] = {
-		"- - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
-		"  - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
-		"    - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
-		"- - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|- - - - - - - - - -[%d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|                    [%d:%03d]\n",
+		"  - - - - - - - - - |- - - - - - -nothing! - - - - - | -|                    [%d:%03d]\n",
+		"    - - - - - - - - |- - - - - - -nothing! - - - - - | -|                    [%d:%03d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
 	if (verbose > 1)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void
 print_string_state(int child, const char *msgs[], const char *string)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, state);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
 print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                   [%d]\n",
-		"  %-14s<--/|                                |  |                   [%d]\n",
-		"    %-14s</|                                |  |                   [%d]\n",
-		"                    |          %-14s        |  |                   [%d]\n",
+		"%-14s<----/|                                |  |                    [%d:%03d]\n",
+		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
+		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 0)
@@ -1128,10 +1185,10 @@ void
 print_command(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                   [%d]\n",
-		"  %-14s<--/|                                |  |                   [%d]\n",
-		"    %-14s</|                                |  |                   [%d]\n",
-		"                    |          %-14s        |  |                   [%d]\n",
+		"%-14s<----/|                                |  |                    [%d:%03d]\n",
+		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
+		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 3)
@@ -1141,20 +1198,20 @@ print_command(int child, const char *command)
 void
 print_string_int_state(int child, const char *msgs[], const char *string, int val)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, val, state);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, val, child, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
 print_errno(int child, long error)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                   [%d]\n",
-		"  %-14s<--/|                                |  |                   [%d]\n",
-		"    %-14s</|                                |  |                   [%d]\n",
-		"                    |          %-14s        |  |                   [%d]\n",
+		"%-14s<----/|                                |  |                    [%d:%03d]\n",
+		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
+		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"                    |          [%14s]      |  |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 3)
@@ -1165,38 +1222,38 @@ void
 print_success(int child)
 {
 	static const char *msgs[] = {
-		"ok            <----/|                                |  |                   [%d]\n",
-		"  ok          <----/|                                |  |                   [%d]\n",
-		"    ok        <----/|                                |  |                   [%d]\n",
-		"                    |                ok              |  |                   [%d]\n",
+		"ok            <----/|                                |  |                    [%d:%03d]\n",
+		"  ok          <----/|                                |  |                    [%d:%03d]\n",
+		"    ok        <----/|                                |  |                    [%d:%03d]\n",
+		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 4)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void
 print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
-		"%10d<--------/|                                |  |                   [%d]\n",
-		"  %10d<------/|                                |  |                   [%d]\n",
-		"    %10d<----/|                                |  |                   [%d]\n",
-		"                    |            [%10d]        |  |                   [%d]\n",
+		"%10d<--------/|                                |  |                    [%d:%03d]\n",
+		"  %10d<------/|                                |  |                    [%d:%03d]\n",
+		"    %10d<----/|                                |  |                    [%d:%03d]\n",
+		"                    |            [%10d]        |  |                    [%d:%03d]\n",
 	};
 
 	if (verbose)
-		print_double_int(child, msgs, value, state);
+		print_triple_int(child, msgs, value, child, state);
 }
 
 void
 print_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
-		"ioctl(2)----------->|       %16s         |  |                   [%d]\n",
-		"  ioctl(2)--------->|       %16s         |  |                   [%d]\n",
-		"    ioctl(2)------->|       %16s         |  |                   [%d]\n",
-		"                    |       %16s ioctl(2)|  |                   [%d]\n",
+		"ioctl(2)----------->|       %16s         |  |                    [%d:%03d]\n",
+		"  ioctl(2)--------->|       %16s         |  |                    [%d:%03d]\n",
+		"    ioctl(2)------->|       %16s         |  |                    [%d:%03d]\n",
+		"                    |       %16s ioctl(2)|  |                    [%d:%03d]\n",
 	};
 
 	if (verbose > 3)
@@ -1207,10 +1264,10 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"%1$14s- - ->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
-		"  %1$14s- ->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
-		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
-		"                    |< + %2$4d bytes  %1$14s  |  |                   [%3$d]\n",
+		"%1$14s- - ->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"  %1$14s- ->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
 	if ((verbose && show_data) || verbose > 1)
@@ -1221,10 +1278,10 @@ void
 print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		"(%-14s)    |- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
-		"  (%-14s)  |- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
-		"    (%-14s)|- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
-		"                    |- - -[Expected %-14s] -|- |                    [%d]\n",
+		"(%-14s)    |- - - - - -[Expected]- - - - - -|- |                     [%d:%03d]\n",
+		"  (%-14s)  |- - - - - -[Expected]- - - - - -|- |                     [%d:%03d]\n",
+		"    (%-14s)|- - - - - -[Expected]- - - - - -|- |                     [%d:%03d]\n",
+		"                    |- - -[Expected %-14s] -|- |                     [%d:%03d]\n",
 	};
 
 	if (verbose > 1 && show)
@@ -1248,24 +1305,53 @@ print_string(int child, const char *string)
 void
 print_time_state(int child, const char *msgs[], ulong time)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], time, state);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, child, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
 print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
-		"  / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
-		"    / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / / [%d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                    [%d:%03d]\n",
+		"  / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                    [%d:%03d]\n",
+		"    / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                    [%d:%03d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
 	};
 
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
+}
+
+void
+print_float_state(int child, const char *msgs[], float time)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_mwaiting(int child, struct timespec *time)
+{
+	static const char *msgs[] = {
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
+		"  / / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
+		"    / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
+		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
+	};
+
+	if (verbose > 0 && show) {
+		float delay;
+
+		delay = time->tv_nsec;
+		delay = delay / 1000000000;
+		delay = delay + time->tv_sec;
+		print_float_state(child, msgs, delay);
+	}
 }
 
 /*
@@ -1328,9 +1414,9 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 {
 	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
@@ -1348,9 +1434,9 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 		}
 	} else {
 		if (verbose > 3) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
@@ -1607,7 +1693,7 @@ stream_start(int child, int index)
 #if 0
 		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
-		if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
+		if (test_ioctl(0, I_PUSH, (intptr_t) "dummymod") != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 #endif
 		return __RESULT_SUCCESS;
@@ -1644,7 +1730,7 @@ stream_stop(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  Test initialization and termination.
+ *  Test harness initialization and termination.
  *
  *  -------------------------------------------------------------------------
  */
@@ -1658,7 +1744,7 @@ begin_tests(int index)
 }
 
 static int
-end_tests(void)
+end_tests(int index)
 {
 	show_acks = 0;
 	return (__RESULT_SUCCESS);
@@ -1704,13 +1790,14 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
-#define test_group_1 "Open and close streams"
 /*
  *  Open and Close 1 stream.
  */
-#define numb_case_1_1 "1.1"
+#define test_group_1 "Open and close streams"
 #define tgrp_case_1_1 test_group_1
+#define numb_case_1_1 "1.1"
 #define name_case_1_1 "Open and close 1 stream."
+#define sref_case_1_1 "(none)"
 #define desc_case_1_1 "\
 Checks that one stream can be opened and closed."
 
@@ -1723,29 +1810,19 @@ test_case_1_1(int child)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
+struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 
-#define preamble_1_1_0 NULL
-#define preamble_1_1_1 NULL
-#define preamble_1_1_2 NULL
-
-#define postamble_1_1_0 NULL
-#define postamble_1_1_1 NULL
-#define postamble_1_1_2 NULL
-
-#define test_case_1_1_0 &test_case_1_1
-#define test_case_1_1_1 NULL
-#define test_case_1_1_2 NULL
-
-struct test_stream test_1_1_0 = { preamble_1_1_0, test_case_1_1_0, postamble_1_1_0 };
-struct test_stream test_1_1_1 = { preamble_1_1_1, test_case_1_1_1, postamble_1_1_1 };
-struct test_stream test_1_1_2 = { preamble_1_1_2, test_case_1_1_2, postamble_1_1_2 };
+#define test_case_1_1_stream_0 (&test_1_1)
+#define test_case_1_1_stream_1 (NULL)
+#define test_case_1_1_stream_2 (NULL)
 
 /*
  *  Open and Close 3 streams.
  */
-#define numb_case_1_2 "1.2"
 #define tgrp_case_1_2 test_group_1
+#define numb_case_1_2 "1.2"
 #define name_case_1_2 "Open and close 3 streams."
+#define sref_case_1_2 "(none)"
 #define desc_case_1_2 "\
 Checks that three streams can be opened and closed."
 
@@ -1758,22 +1835,11 @@ test_case_1_2(int child)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
+struct test_stream test_1_2 = { NULL, &test_case_1_2, NULL };
 
-#define test_case_1_2_0 &test_case_1_2
-#define test_case_1_2_1 &test_case_1_2
-#define test_case_1_2_2 &test_case_1_2
-
-#define preamble_1_2_0 NULL
-#define preamble_1_2_1 NULL
-#define preamble_1_2_2 NULL
-
-#define postamble_1_2_0 NULL
-#define postamble_1_2_1 NULL
-#define postamble_1_2_2 NULL
-
-struct test_stream test_1_2_0 = { preamble_1_2_0, test_case_1_2_0, postamble_1_2_0 };
-struct test_stream test_1_2_1 = { preamble_1_2_1, test_case_1_2_1, postamble_1_2_1 };
-struct test_stream test_1_2_2 = { preamble_1_2_2, test_case_1_2_2, postamble_1_2_2 };
+#define test_case_1_2_stream_0 (&test_1_2)
+#define test_case_1_2_stream_1 (&test_1_2)
+#define test_case_1_2_stream_2 (&test_1_2)
 
 /*
  *  -------------------------------------------------------------------------
@@ -1786,12 +1852,26 @@ int
 run_stream(int child, struct test_stream *stream)
 {
 	int result = __RESULT_SCRIPT_ERROR;
+	int pre_result = __RESULT_SCRIPT_ERROR;
+	int post_result = __RESULT_SCRIPT_ERROR;
 
 	print_preamble(child);
 	state = 100;
-	if (stream->preamble && stream->preamble(child) != __RESULT_SUCCESS) {
-		print_inconclusive(child);
-		result = __RESULT_INCONCLUSIVE;
+	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
+		switch (pre_result) {
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
+			break;
+		default:
+			print_inconclusive(child);
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		}
 	} else {
 		print_test(child);
 		state = 200;
@@ -1800,6 +1880,14 @@ run_stream(int child, struct test_stream *stream)
 		case __RESULT_INCONCLUSIVE:
 			print_inconclusive(child);
 			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
 			break;
 		case __RESULT_FAILURE:
 			print_failed(child);
@@ -1816,10 +1904,22 @@ run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
-		if (stream->postamble && stream->postamble(child) != __RESULT_SUCCESS) {
-			print_inconclusive(child);
-			if (result == __RESULT_SUCCESS)
-				result = __RESULT_INCONCLUSIVE;
+		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
+			switch (post_result) {
+			case __RESULT_NOTAPPL:
+				print_notapplicable(child);
+				result = __RESULT_NOTAPPL;
+				break;
+			case __RESULT_SKIPPED:
+				print_skipped(child);
+				result = __RESULT_SKIPPED;
+				break;
+			default:
+				print_inconclusive(child);
+				if (result == __RESULT_SUCCESS)
+					result = __RESULT_INCONCLUSIVE;
+				break;
+			}
 		}
 	}
 	print_test_end(child);
@@ -1837,33 +1937,8 @@ test_run(struct test_stream *stream[])
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	start_tt(5000);
-	if (stream[0]) {
-		switch ((child[0] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
-		case -1:	/* error */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[0] = __RESULT_SUCCESS;
-	if (stream[1]) {
-		switch ((child[1] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
-		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[1] = __RESULT_SUCCESS;
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -1880,7 +1955,34 @@ test_run(struct test_stream *stream[])
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
+	if (stream[1]) {
+		switch ((child[1] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[1] = __RESULT_SUCCESS;
+	if (stream[0]) {
+		switch ((child[0] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
+	      waitagain:
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
 				if (this_child == child[0]) {
@@ -1981,31 +2083,27 @@ test_run(struct test_stream *stream[])
 			if (timer_timeout) {
 				timer_timeout = 0;
 				print_timeout(3);
-				last_event = __EVENT_TIMEOUT;
 			}
-			if (child[0]) {
+			if (child[0])
 				kill(child[0], SIGKILL);
-				status[0] = __RESULT_INCONCLUSIVE;
-				child[0] = 0;
-			}
-			if (child[1]) {
+			if (child[1])
 				kill(child[1], SIGKILL);
-				status[1] = __RESULT_INCONCLUSIVE;
-				child[1] = 0;
-			}
-			if (child[2]) {
+			if (child[2])
 				kill(child[2], SIGKILL);
-				status[2] = __RESULT_INCONCLUSIVE;
-				child[2] = 0;
-			}
-			break;
+			goto waitagain;
 		}
 	}
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
+	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+		return (__RESULT_NOTAPPL);
+	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+		return (__RESULT_SKIPPED);
 	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
 		return (__RESULT_FAILURE);
 	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
+      inconclusive:
 	return (__RESULT_INCONCLUSIVE);
 }
 
@@ -2022,17 +2120,18 @@ struct test_case {
 	const char *tgrp;		/* test case group */
 	const char *name;		/* test case name */
 	const char *desc;		/* test case description */
+	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
+	int (*start) (int);		/* start function */
+	int (*stop) (int);		/* stop function */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
 } tests[] = {
 	{
-		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, {
-	&test_1_1_0, &test_1_1_1, &test_1_1_2}, 0, 0}
-	, {
-		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, {
-	&test_1_2_0, &test_1_2_1, &test_1_2_2}, 0, 0}
-	, {
+		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
+	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
+	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0} , {
 	NULL,}
 };
 
@@ -2043,40 +2142,41 @@ print_header(void)
 {
 	if (verbose <= 0)
 		return;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "\n%s - %s - %s - Conformance Test Suite\n", lstdname, lpkgname, shortname);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 int
-do_tests(void)
+do_tests(int num_tests)
 {
 	int i;
 	int result = __RESULT_INCONCLUSIVE;
+	int notapplicable = 0;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
 	int skipped = 0;
+	int notselected = 0;
 	int aborted = 0;
 
 	print_header();
 	show = 0;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\nUsing device %s\n\n", devname);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests(0) == __RESULT_SUCCESS) {
-		end_tests();
+	if (num_tests == 1 || begin_tests(0) == __RESULT_SUCCESS) {
+		if (num_tests != 1)
+			end_tests(0);
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (tests[i].result)
-				continue;
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
-				skipped++;
+				notselected++;
 				continue;
 			}
 			if (aborted) {
@@ -2085,40 +2185,90 @@ do_tests(void)
 				continue;
 			}
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				if (verbose > 1)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
 				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
 				if (verbose > 1)
+					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
+				if (verbose > 1)
 					fprintf(stdout, "%s\n", tests[i].desc);
+				fprintf(stdout, "\n");
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
-				goto inconclusive;
-			result = test_run(tests[i].stream);
-			end_tests();
+			if ((result = tests[i].result) == 0) {
+				if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
+					goto inconclusive;
+				result = test_run(tests[i].stream);
+				(*tests[i].stop) (i);
+			} else {
+				switch (result) {
+				case __RESULT_SUCCESS:
+					print_passed(3);
+					break;
+				case __RESULT_FAILURE:
+					print_failed(3);
+					break;
+				case __RESULT_NOTAPPL:
+					print_notapplicable(3);
+					break;
+				case __RESULT_SKIPPED:
+					print_skipped(3);
+					break;
+				default:
+				case __RESULT_INCONCLUSIVE:
+					print_inconclusive(3);
+					break;
+				}
+			}
 			switch (result) {
 			case __RESULT_SUCCESS:
 				successes++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
 					fprintf(stdout, "*********\n");
 					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
 					fprintf(stdout, "*********\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			case __RESULT_FAILURE:
 				failures++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
 					fprintf(stdout, "XXXXXXXXX\n");
 					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
 					fprintf(stdout, "XXXXXXXXX\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_NOTAPPL:
+				notapplicable++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case NOT APPLICABLE\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_SKIPPED:
+				skipped++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case SKIPPED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			default:
@@ -2126,95 +2276,122 @@ do_tests(void)
 			      inconclusive:
 				inconclusive++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
 					fprintf(stdout, "?????????\n");
 					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
 					fprintf(stdout, "?????????\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			}
 			tests[i].result = result;
-			if (exit_on_failure && result != __RESULT_SUCCESS)
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
 				aborted = 1;
 		}
 		if (summary && verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
 				if (tests[i].run) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "Test Case %s-%s/%-10s ", sstdname, shortname, tests[i].numb);
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					switch (tests[i].result) {
 					case __RESULT_SUCCESS:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "SUCCESS\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					case __RESULT_FAILURE:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "FAILURE\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_NOTAPPL:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "NOT APPLICABLE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_SKIPPED:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SKIPPED\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					default:
 					case __RESULT_INCONCLUSIVE:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "INCONCLUSIVE\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					}
 				}
 			}
 		}
-		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+		if (verbose > 0 && num_tests > 1) {
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n");
-			fprintf(stdout, "========= %3d successes   \n", successes);
-			fprintf(stdout, "========= %3d failures    \n", failures);
-			fprintf(stdout, "========= %3d inconclusive\n", inconclusive);
-			fprintf(stdout, "========= %3d skipped     \n", skipped);
-			fprintf(stdout, "==========================\n");
-			fprintf(stdout, "========= %3d total       \n", successes + failures + inconclusive + skipped);
+			fprintf(stdout, "========= %3d successes     \n", successes);
+			fprintf(stdout, "========= %3d failures      \n", failures);
+			fprintf(stdout, "========= %3d inconclusive  \n", inconclusive);
+			fprintf(stdout, "========= %3d not applicable\n", notapplicable);
+			fprintf(stdout, "========= %3d skipped       \n", skipped);
+			fprintf(stdout, "========= %3d not selected  \n", notselected);
+			fprintf(stdout, "============================\n");
+			fprintf(stdout, "========= %3d total         \n", successes + failures + inconclusive + notapplicable + skipped + notselected);
 			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (aborted) {
-			lockf(fileno(stderr), F_LOCK, 0);
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fprintf(stderr, "Test Suite aborted due to failure.\n");
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fflush(stderr);
-			lockf(fileno(stderr), F_ULOCK, 0);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		} else if (failures) {
-			lockf(fileno(stderr), F_LOCK, 0);
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fprintf(stderr, "Test Suite failed.\n");
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fflush(stderr);
-			lockf(fileno(stderr), F_ULOCK, 0);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
+		}
+		if (num_tests == 1) {
+			if (successes)
+				return (0);
+			if (failures)
+				return (1);
+			if (inconclusive)
+				return (1);
+			if (notapplicable)
+				return (0);
+			if (skipped)
+				return (77);
 		}
 		return (aborted);
 	} else {
-		end_tests();
+		end_tests(0);
 		show = 1;
-		lockf(fileno(stderr), F_LOCK, 0);
+		dummy = lockf(fileno(stderr), F_LOCK, 0);
 		fprintf(stderr, "Test Suite setup failed!\n");
 		fflush(stderr);
-		lockf(fileno(stderr), F_ULOCK, 0);
+		dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		return (2);
 	}
 }
@@ -2417,6 +2594,8 @@ main(int argc, char *argv[])
 						if (verbose > 2)
 							fprintf(stdout, "Test Group: %s\n", t->tgrp);
 						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (verbose > 2)
+							fprintf(stdout, "Test Reference: %s\n", t->sref);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
@@ -2437,6 +2616,8 @@ main(int argc, char *argv[])
 					if (verbose > 2)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
 					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (verbose > 2)
+						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1)
 						fprintf(stdout, "%s\n\n", t->desc);
 					fflush(stdout);
@@ -2467,11 +2648,11 @@ main(int argc, char *argv[])
 				range = 1;
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, 16)) {
-						if (!t->result) {
-							t->run = 1;
-							n++;
-							tests_to_run++;
-						}
+						// if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+						// }
 					}
 				if (!n) {
 					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
@@ -2503,11 +2684,11 @@ main(int argc, char *argv[])
 			range = 1;
 			for (n = 0, t = tests; t->numb; t++)
 				if (!strncmp(t->numb, optarg, l)) {
-					if (!t->result) {
-						t->run = 1;
-						n++;
-						tests_to_run++;
-					}
+					// if (!t->result) {
+					t->run = 1;
+					n++;
+					tests_to_run++;
+					// }
 				}
 			if (!n) {
 				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
@@ -2563,6 +2744,5 @@ main(int argc, char *argv[])
 	default:
 		copying(argc, argv);
 	}
-	do_tests();
-	exit(0);
+	exit(do_tests(tests_to_run));
 }

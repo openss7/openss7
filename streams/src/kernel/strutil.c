@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/03 08:12:12 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/08 05:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/03 08:12:12 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/08 05:52:40 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/03 08:12:12 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/08 05:52:40 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -325,6 +325,8 @@ qget(queue_t *q)
 		if (atomic_read(&qu->qu_refs) < 1)
 			swerr();
 		atomic_inc(&qu->qu_refs);
+		printd(("%s: queue pair %p ref count is now %d\n",
+			__FUNCTION__, qu, atomic_read(&qu->qu_refs)));
 	}
 	return (q);
 }
@@ -333,11 +335,14 @@ qput(queue_t **qp)
 {
 	queue_t *q;
 
+	trace();
 	if ((q = xchg(qp, NULL))) {
 		queue_t *rq = RD(q);
 		struct queinfo *qu = (typeof(qu)) rq;
 
 		assert(atomic_read(&qu->qu_refs) >= 1);
+		printd(("%s: queue pair %p ref count is now %d\n",
+			__FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
 		if (atomic_dec_and_test(&qu->qu_refs))
 			freeq(rq);
 	}
@@ -383,7 +388,7 @@ db_dec_and_test(dblk_t * db)
 #define datablk_offset \
 	(((unsigned char *)&((struct mdbblock *)0)->datablk) - ((unsigned char *)0))
 #define databuf_offset \
-	(((unsigned char *)&((struct mdbblock *)0)->databuf) - ((unsigned char *)0))
+	(((unsigned char *)&((struct mdbblock *)0)->databuf[0]) - ((unsigned char *)0))
 
 static mblk_t *
 db_to_mb(dblk_t * db)
@@ -505,6 +510,7 @@ allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
 
+	trace();
 	if ((mp = mdbblock_alloc(priority, &allocb))) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		unsigned char *base = md->databuf;
@@ -706,9 +712,16 @@ freeb(mblk_t *mp)
 {
 	dblk_t *dp, *db;
 
-	/* check null ptr, message still on queue, double free */
-	if (!mp || mp->b_queue || !(db = xchg(&mp->b_datap, NULL)))
-		goto bug;
+	trace();
+	/* check null ptr, message still on queue */
+	assert(mp);
+	assert(!mp->b_queue);
+
+	db = xchg(&mp->b_datap, NULL);
+
+	/* check double free */
+	assert(db);
+
 	/* message block marked free above */
 	if (db_dec_and_test(db)) {
 		/* free data block */
@@ -730,8 +743,6 @@ freeb(mblk_t *mp)
 	   unused */
 	if (db != (dp = mb_to_db(mp)) && !db_ref(dp))
 		mdbblock_free(mp);
-	return;
-      bug:
 	return;
 }
 
@@ -1901,7 +1912,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		nmp->b_prev->b_next = nmp;
 	nmp->b_next = emp;
 	emp->b_prev = nmp;
-	nmp->b_queue = qget(q);
+	nmp->b_queue = ctrace(qget(q));
 	/* some adding to do */
 	q->q_msgs++;
 	size = msgsize(nmp);
@@ -2043,7 +2054,7 @@ __putbq(queue_t *q, mblk_t *mp)
 				b_next->b_prev = mp;
 			if ((mp->b_prev = b_prev))
 				b_prev->b_next = mp;
-			mp->b_queue = qget(q);
+			mp->b_queue = ctrace(qget(q));
 			return (1 + enable);
 		} else {
 			struct qband *qb;
@@ -2285,7 +2296,7 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next->b_prev = mp;
 		if ((mp->b_prev = b_prev))
 			b_prev->b_next = mp;
-		mp->b_queue = qget(q);
+		mp->b_queue = ctrace(qget(q));
 		return (1 + enable);	/* success */
 	}
 	/* find position of priority messages */
@@ -2398,7 +2409,7 @@ qalloc(struct stdata *sd, struct fmodsw *fmod)
 		} else {
 			(q + 0)->q_flag = QUSE | QREADR;
 			(q + 1)->q_flag = QUSE;
-			qput(&q);
+			ctrace(qput(&q));
 			assert(q == NULL);
 		}
 	}
@@ -2474,7 +2485,7 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
       qerror:
 	qprocsoff(q);		/* in case qopen called qprocson, yet returned an error */
 	qdelete(q);		/* half delete */
-	qput(&q);
+	ctrace(qput(&q));
       error:
 	return (err);
 }
@@ -2503,8 +2514,7 @@ EXPORT_SYMBOL(qattach);
 void
 qdelete(queue_t *q)
 {
-	struct queinfo *qu = (typeof(qu)) q;
-	struct stdata *sd = qu->qu_str;
+	struct stdata *sd = qstream(q);
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
@@ -2513,12 +2523,11 @@ qdelete(queue_t *q)
 	ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
 	swlock(sd);
-	qput(&rq->q_next);
-	qput(&wq->q_next);
-	qu->qu_str = NULL;
+	ctrace(qput(&rq->q_next));
+	ctrace(qput(&wq->q_next));
 	swunlock(sd);
-	qput(&q);
-	sd_put(&sd);		/* balances sd_get() in qalloc() */
+	printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
+	ctrace(qput(&q)); /* cancel initial allocation reference */
 }
 
 EXPORT_SYMBOL(qdelete);
@@ -2597,20 +2606,18 @@ void
 qinsert(struct stdata *sd, queue_t *irq)
 {
 	queue_t *iwq, *srq, *swq;
-	struct queinfo *iqu, *squ;
+
+	ptrace(("initial  half-insert of stream %p queue pair %p\n", sd, irq));
 
 	srlock(sd);
 	srq = sd->sd_rq;
-	iqu = (typeof(iqu)) irq;
 	iwq = OTHERQ(irq);
-	squ = (typeof(squ)) srq;
 	swq = OTHERQ(srq);
-	iqu->qu_str = sd_get(sd);
-	irq->q_next = qget(srq);
+	irq->q_next = ctrace(qget(srq));
 	if (swq->q_next != srq) {	/* not a fifo */
-		iwq->q_next = qget(swq->q_next);
+		iwq->q_next = ctrace(qget(swq->q_next));
 	} else {		/* is a fifo */
-		iwq->q_next = qget(irq);
+		iwq->q_next = ctrace(qget(irq));
 	}
 	srunlock(sd);
 }
@@ -2666,18 +2673,12 @@ qprocsoff(queue_t *q)
 
 		/* bypass this module: works for pipe, FIFO and other STREAM heads queues too */
 		if ((bq = backq(rq))) {
-			queue_t *qn = bq->q_next;
-
-			bq->q_next = NULL;
-			bq->q_next = qget(rq->q_next);
-			qput(&qn);
+			ctrace(qput(&bq->q_next));
+			bq->q_next = ctrace(qget(rq->q_next));
 		}
 		if ((bq = backq(wq))) {
-			queue_t *qn = bq->q_next;
-
-			bq->q_next = NULL;
-			bq->q_next = qget(wq->q_next);
-			qput(&qn);
+			ctrace(qput(&bq->q_next));
+			bq->q_next = ctrace(qget(wq->q_next));
 		}
 		/* cache new packet sizes (next module or stream head) */
 		if ((wq = sd->sd_wq->q_next) || (wq = sd->sd_wq)) {
@@ -2739,16 +2740,12 @@ qprocson(queue_t *q)
 		swlock(sd);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
-			queue_t *qn = xchg(&bq->q_next, NULL);
-
-			bq->q_next = qget(rq);
-			qput(&qn);
+			ctrace(qput(&bq->q_next));
+			bq->q_next = ctrace(qget(rq));
 		}
 		if ((bq = backq(wq))) {
-			queue_t *qn = xchg(&bq->q_next, NULL);
-
-			bq->q_next = qget(wq);
-			qput(&qn);
+			ctrace(qput(&bq->q_next));
+			bq->q_next = ctrace(qget(wq));
 		}
 		/* cache new packet sizes (this module) */
 		sd->sd_minpsz = wq->q_minpsz;
@@ -2795,8 +2792,8 @@ qcountstrm(queue_t *q)
 	ssize_t count = 0;
 	queue_t *q_next;
 
-	if ((q_next = qget(q)))
-		for (; (q = q_next) && SAMESTR(q); q_next = qget(q->q_next), qput(&q))
+	if ((q_next = ctrace(qget(q))))
+		for (; (q = q_next) && SAMESTR(q); q_next = ctrace(qget(q->q_next)), ctrace(qput(&q)))
 			count += q->q_count;
 	return (count);
 }
@@ -2867,7 +2864,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 		if (qb->qb_count <= qb->qb_lowat && test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 			backenable = 1;
 	}
-	qput(&mp->b_queue);
+	ctrace(qput(&mp->b_queue));
 	return (backenable);
 }
 

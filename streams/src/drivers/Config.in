@@ -95,10 +95,10 @@
 #
 # These are just stupid examples
 #
-#         driver          minor lastminor  modules
-#autopush clone-drvr          1         0  relay
-#autopush clone-drvr          2         5  relay2
-#autopush link-drvr          -1         0  relay relay2
+#         driver		minor	lastminor	modules
+#autopush clone			 1	0		relay
+#autopush clone			 2	5		relay2
+#autopush link-drvr		-1	0		relay relay2
 
 #
 # Loadable specifications
@@ -122,16 +122,16 @@
 #
 # Initialization specifications
 #
-#initialize clone-drvr
+#initialize clone
 #initialize fifo
 #initialize link-drvr
-#initialize loop-around
+#initialize loop
 
 #
 # Termination specifications
 #
 #terminate fifo
-#terminate loop-around
+#terminate loop
 
 #
 # Node specifications
@@ -145,10 +145,11 @@
 @CONFIG_STREAMS_FIFO_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
 @CONFIG_STREAMS_LOG_TRUE@	node	/dev/strlog	     c	*	clone		log
 @CONFIG_STREAMS_LOG_TRUE@	node	/dev/conslog	     c	*	log		1
-@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.1	     c	0644	loop-around	1
-@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.2	     c	*	loop-around	2
-@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop_clone	     c	*	clone-drvr	loop-around
-@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.1	     c	0644	loop		1
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop.2	     c	*	loop		2
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop_clone	     c	*	clone		loop
+#@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/sloop	     c  0666    clone		loop
 @CONFIG_STREAMS_NSDEV_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
 @CONFIG_STREAMS_NULS_TRUE@	node	/dev/nuls	     c	*	clone		nuls
 @CONFIG_STREAMS_PIPE_TRUE@	node	/dev/pipe	     c	*	pipe		0
@@ -197,10 +198,11 @@
 @CONFIG_STREAMS_FIFO_MODULE_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/strlog	     c	*	clone		log
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/conslog	     c	*	log		1
-@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.1	     c	0644	loop-around	1
-@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.2	     c	*	loop-around	2
-@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop_clone	     c	*	clone-drvr	loop-around
-@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.1	     c	0644	loop		1
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.2	     c	*	loop		2
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop_clone	     c	*	clone		loop
+#@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop	     c  0666    clone		loop
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/sloop	     c  0666    clone		loop
 @CONFIG_STREAMS_NSDEV_MODULE_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
 @CONFIG_STREAMS_NULS_MODULE_TRUE@	node	/dev/nuls	     c	*	clone		nuls
 @CONFIG_STREAMS_PIPE_MODULE_TRUE@	node	/dev/pipe	     c	*	pipe		0

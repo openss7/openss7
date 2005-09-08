@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/08 05:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/08 05:52:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/30 03:37:13 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/08 05:52:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,9 +78,9 @@ int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
 int sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
 int sysctl_str_hiwat = STRHIGH;		/* stream head default hi water mark */
 int sysctl_str_lowat = STRLOW;		/* stream head default lo water mark */
-int sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in HZ) */
-int sysctl_str_rtime = (10 * HZ) / 1000;/* msec to wait to forward held msg (saved in HZ) */
-int sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved in HZ) */
+int sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in ticks) */
+int sysctl_str_rtime = (10 * HZ) / 1000;/* msec to wait to forward held msg (saved in ticks) */
+int sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved in ticks) */
 int sysctl_str_nstrpush = 64;		/* maximum number of pushed modules */
 int sysctl_str_strthresh = (1 << 20);	/* memory limit */
 int sysctl_str_strhold = 0;		/* active stream hold feature */

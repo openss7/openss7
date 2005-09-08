@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:09 $
+ @(#) $RCSfile: test-loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/08 09:37:10 $
 
  -----------------------------------------------------------------------------
 
@@ -59,15 +59,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 09:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/09/08 09:37:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log: test-clone.c,v $
- Revision 0.9.2.11  2005/09/08 09:37:09  brian
+ $Log: test-loop.c,v $
+ Revision 0.9.2.2  2005/09/08 09:37:10  brian
  - corrected error output
 
- Revision 0.9.2.10  2005/09/08 05:52:42  brian
+ Revision 0.9.2.1  2005/09/08 05:52:42  brian
  - added nullmod module and loop driver
  - corrections during testing
  - many ioctl(2p) test cases work very well now
@@ -87,16 +87,16 @@
  Revision 0.9.2.4  2005/05/14 08:39:36  brian
  - updated copyright headers
 
- Revision 0.9.2.3  2005/05/14 08:34:44  brian
+ Revision 0.9.2.3  2005/05/14 08:34:45  brian
  - copyright header correction
 
- Revision 0.9.2.2  2005/01/16 23:09:05  brian
+ Revision 0.9.2.2  2005/01/16 23:09:06  brian
  - Added --copying options.
 
  Revision 0.9.2.1  2004/08/22 06:17:55  brian
  - Checkin on new working branch.
 
- Revision 1.2  2004/06/09 08:32:57  brian
+ Revision 1.2  2004/06/09 08:32:58  brian
  - Open works fine but don't want to hold dentries in cache.
 
  Revision 1.2  2004/06/08 02:27:36  brian
@@ -107,9 +107,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:09 $"
+#ident "@(#) $RCSfile: test-loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/08 09:37:10 $"
 
-static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:09 $";
+static char const ident[] = "$RCSfile: test-loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/08 09:37:10 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -154,8 +154,8 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 /* static const char *spkgname = "LfS"; */
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
-static const char *shortname = "CLONE";
-static char devname[256] = "/dev/nuls";
+static const char *shortname = "LOOP";
+static char devname[256] = "/dev/loop";
 
 static int exit_on_failure = 0;
 
