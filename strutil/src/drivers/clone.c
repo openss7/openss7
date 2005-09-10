@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:23 $ by $Author: brian $
+ Last Modified $Date: 2005/09/09 20:28:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $";
 
 #define _LFS_SOURCE
 
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:23 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -208,10 +208,12 @@ cloneopen(struct inode *inode, struct file *file)
 #endif
 }
 
+#if LFS
 struct file_operations clone_ops ____cacheline_aligned = {
 	.owner = THIS_MODULE,
 	.open = cloneopen,
 };
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -221,6 +223,7 @@ struct file_operations clone_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
+#if LFS
 static struct cdevsw clone_cdev = {
 	.d_name = "clone",
 	.d_str = &clone_info,
@@ -229,6 +232,7 @@ static struct cdevsw clone_cdev = {
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
 };
+#endif
 
 /* 
  *  -------------------------------------------------------------------------

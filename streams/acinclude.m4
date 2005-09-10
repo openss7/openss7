@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/09/08 05:52:30 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/09/09 20:27:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/08 05:52:30 $ by $Author: brian $
+# Last Modified $Date: 2005/09/09 20:27:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -403,6 +403,12 @@ AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_driver_nsdev="$enableval"],
 	    [enable_driver_nsdev='module'])
+    AC_ARG_ENABLE([driver-mux],
+	AS_HELP_STRING([--enable-driver-mux],
+	    [enable mux driver for linkage with STREAMS.
+	    @<:@default=module@:>@]),
+	    [enable_driver_mux="$enableval"],
+	    [enable_driver_mux='module'])
     AC_ARG_ENABLE([driver-nuls],
 	AS_HELP_STRING([--enable-driver-nuls],
 	    [enable nuls driver for linkage with STREAMS.
@@ -462,6 +468,11 @@ AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
 	lfs_driver_nsdev="${enable_driver_nsdev:-module}"
 	if test :$lfs_driver_nsdev = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_driver_nsdev='yes'
+	fi])
+    AC_CACHE_CHECK([for STREAMS driver mux],  [lfs_driver_mux], [dnl
+	lfs_driver_mux="${enable_driver_mux:-module}"
+	if test :$lfs_driver_mux = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_driver_mux='yes'
 	fi])
     AC_CACHE_CHECK([for STREAMS driver nuls],  [lfs_driver_nuls], [dnl
 	lfs_driver_nuls="${enable_driver_nuls:-module}"
@@ -567,6 +578,19 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
+    case ${lfs_driver_mux:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MUX], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the mux driver for linkage with STREAMS.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the mux driver for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MUX_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the mux driver as a standalone loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the mux driver as a standalone loadable kernel
+	    module.])
+	    ;;
+    esac
     case ${lfs_driver_nuls:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS], [], [When defined,] AC_PACKAGE_TITLE [
@@ -645,6 +669,8 @@ dnl =================================
     AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],	[test :${lfs_driver_loop:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],		[test :${lfs_driver_nsdev:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],	[test :${lfs_driver_nsdev:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_MUX],		[test :${lfs_driver_mux:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_MUX_MODULE],		[test :${lfs_driver_mux:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_NULS],		[test :${lfs_driver_nuls:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],	[test :${lfs_driver_nuls:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_PIPE],		[test :${lfs_driver_pipe:-module}	= :yes])

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/08 05:52:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/09/09 20:27:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/08 05:52:45 $ by $Author: brian $
+# Last Modified $Date: 2005/09/09 20:27:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.26  2005/09/09 20:27:26  brian
+# - added mux driver
+#
 # Revision 0.9.2.25  2005/09/08 05:52:45  brian
 # - added nullmod module and loop driver
 # - corrections during testing
@@ -173,6 +176,12 @@ TESTSUITE_DEPS		+= $(TESTSUITE)-nsdev.at
 endif
 if CONFIG_STREAMS_NSDEV_MODULE
 TESTSUITE_DEPS		+= $(TESTSUITE)-nsdev.at
+endif
+if CONFIG_STREAMS_MUX
+TESTSUITE_DEPS		+= $(TESTSUITE)-mux.at
+endif
+if CONFIG_STREAMS_MUX_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-mux.at
 endif
 if CONFIG_STREAMS_NULS
 TESTSUITE_DEPS		+= $(TESTSUITE)-nuls.at

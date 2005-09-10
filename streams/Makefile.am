@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/09/08 05:52:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/09/09 20:27:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/08 05:52:30 $ by $Author: brian $
+# Last Modified $Date: 2005/09/09 20:27:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -171,6 +171,12 @@ endif
 if CONFIG_STREAMS_NSDEV_MODULE
 libexec_PROGRAMS		+= test-nsdev
 endif
+if CONFIG_STREAMS_MUX
+libexec_PROGRAMS		+= test-mux
+endif
+if CONFIG_STREAMS_MUX_MODULE
+libexec_PROGRAMS		+= test-mux
+endif
 if CONFIG_STREAMS_NULS
 libexec_PROGRAMS		+= test-nuls
 endif
@@ -288,6 +294,9 @@ endif
 if CONFIG_STREAMS_ECHO
 libLfS_streams_a_SOURCES	+= src/drivers/echo.c
 endif
+if CONFIG_STREAMS_MUX
+libLfS_streams_a_SOURCES	+= src/drivers/mux.c
+endif
 if CONFIG_STREAMS_NULS
 libLfS_streams_a_SOURCES	+= src/drivers/nuls.c
 endif
@@ -330,6 +339,9 @@ libLfS_drivers_a_SOURCES	+= src/drivers/nsdev.c
 endif
 if CONFIG_STREAMS_ECHO_MODULE
 libLfS_drivers_a_SOURCES	+= src/drivers/echo.c
+endif
+if CONFIG_STREAMS_MUX_MODULE
+libLfS_drivers_a_SOURCES	+= src/drivers/mux.c
 endif
 if CONFIG_STREAMS_NULS_MODULE
 libLfS_drivers_a_SOURCES	+= src/drivers/nuls.c
@@ -616,6 +628,11 @@ test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_LDFLAGS		= -static libstreams.la
 test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS)
+
+test_mux_SOURCES		= src/test/test-mux.c
+test_mux_LDFLAGS		= -static libstreams.la
+test_mux_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_mux_CFLAGS			= $(LFS_CFLAGS)
 
 test_nuls_SOURCES		= src/test/test-nuls.c
 test_nuls_LDFLAGS		= -static libstreams.la

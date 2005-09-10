@@ -22,6 +22,7 @@
 @CONFIG_STREAMS_LOG_TRUE@	driver	log		log	*
 @CONFIG_STREAMS_LOOP_TRUE@	driver	loop		loop	*
 @CONFIG_STREAMS_NSDEV_TRUE@	driver	nsdev		nsdev	*
+@CONFIG_STREAMS_MUX_TRUE@	driver	mux		mux	*
 @CONFIG_STREAMS_NULS_TRUE@	driver	nuls		nuls	*
 @CONFIG_STREAMS_PIPE_TRUE@	driver	pipe		pipe	*
 @CONFIG_STREAMS_SAD_TRUE@	driver	sad		sad	*
@@ -41,6 +42,7 @@
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	driver	log		log	*
 @CONFIG_STREAMS_LOOP_MODULE_TRUE@	driver	loop		loop	*
 @CONFIG_STREAMS_NSDEV_MODULE_TRUE@	driver	nsdev		nsdev	*
+@CONFIG_STREAMS_MUX_MODULE_TRUE@	driver	mux		mux	*
 @CONFIG_STREAMS_NULS_MODULE_TRUE@	driver	nuls		nuls	*
 @CONFIG_STREAMS_PIPE_MODULE_TRUE@	driver	pipe		pipe	*
 @CONFIG_STREAMS_SAD_MODULE_TRUE@	driver	sad		sad	*
@@ -64,6 +66,7 @@
 @CONFIG_STREAMS_LOG_TRUE@	objname driver	log		log
 @CONFIG_STREAMS_LOOP_TRUE@	objname driver	loop		loop
 @CONFIG_STREAMS_NSDEV_TRUE@	objname	driver	nsdev		nsdev
+@CONFIG_STREAMS_MUX_TRUE@	objname	driver	mux		mux
 @CONFIG_STREAMS_NULS_TRUE@	objname	driver	nuls		nuls
 @CONFIG_STREAMS_PIPE_TRUE@	objname	driver	pipe		pipe
 @CONFIG_STREAMS_SAD_TRUE@	objname driver	sad		sad
@@ -80,6 +83,7 @@
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	objname driver	log		log
 @CONFIG_STREAMS_LOOP_MODULE_TRUE@	objname driver	loop		loop
 @CONFIG_STREAMS_NSDEV_MODULE_TRUE@	objname	driver	nsdev		nsdev
+@CONFIG_STREAMS_MUX_MODULE_TRUE@	objname	driver	mux		mux
 @CONFIG_STREAMS_NULS_MODULE_TRUE@	objname	driver	nuls		nuls
 @CONFIG_STREAMS_PIPE_MODULE_TRUE@	objname	driver	pipe		pipe
 @CONFIG_STREAMS_SAD_MODULE_TRUE@	objname driver	sad		sad
@@ -109,6 +113,7 @@
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	loadable log
 @CONFIG_STREAMS_LOOP_MODULE_TRUE@	loadable loop
 @CONFIG_STREAMS_NSDEV_MODULE_TRUE@	loadable nsdev
+@CONFIG_STREAMS_MUX_MODULE_TRUE@	loadable mux
 @CONFIG_STREAMS_NULS_MODULE_TRUE@	loadable nuls
 @CONFIG_STREAMS_PIPE_MODULE_TRUE@	loadable pipe
 @CONFIG_STREAMS_SAD_MODULE_TRUE@	loadable sad
@@ -151,6 +156,7 @@
 #@CONFIG_STREAMS_LOOP_TRUE@	node	/dev/loop	     c  0666    clone		loop
 @CONFIG_STREAMS_LOOP_TRUE@	node	/dev/sloop	     c  0666    clone		loop
 @CONFIG_STREAMS_NSDEV_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
+@CONFIG_STREAMS_MUX_TRUE@	node	/dev/mux	     c	*	clone		mux
 @CONFIG_STREAMS_NULS_TRUE@	node	/dev/nuls	     c	*	clone		nuls
 @CONFIG_STREAMS_PIPE_TRUE@	node	/dev/pipe	     c	*	pipe		0
 @CONFIG_STREAMS_SAD_TRUE@	node	/dev/sad	     c	*	clone		sad
@@ -204,6 +210,7 @@
 #@CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop	     c  0666    clone		loop
 @CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/sloop	     c  0666    clone		loop
 @CONFIG_STREAMS_NSDEV_MODULE_TRUE@	node	/dev/nsdev	     c	*	nsdev		0
+@CONFIG_STREAMS_MUX_MODULE_TRUE@	node	/dev/mux	     c	*	clone		mux
 @CONFIG_STREAMS_NULS_MODULE_TRUE@	node	/dev/nuls	     c	*	clone		nuls
 @CONFIG_STREAMS_PIPE_MODULE_TRUE@	node	/dev/pipe	     c	*	pipe		0
 @CONFIG_STREAMS_SAD_MODULE_TRUE@	node	/dev/sad	     c	*	clone		sad
