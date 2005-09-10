@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 15:52:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/09/10 02:11:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/18 15:52:07 $ by $Author: brian $
+# Last Modified $Date: 2005/09/10 02:11:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -697,6 +697,7 @@ lfs_compat_pages = \
 	man9/register_strdrv.9 \
 	man9/register_strmod.9 \
 	man9/register_strnod.9 \
+	man9/setq.9 \
 	man9/strlog.9 \
 	man9/unregister_strdev.9 \
 	man9/unregister_strdrv.9 \
@@ -1499,6 +1500,7 @@ dist_noinst_lfs_compat_pages = \
 	man9/register_strdrv.9.man \
 	man9/register_strmod.9.man \
 	man9/register_strnod.9.man \
+	man9/setq.9.man \
 	man9/strlog.9.man \
 	man9/unregister_strdev.9.man \
 	man9/unregister_strdrv.9.man \
