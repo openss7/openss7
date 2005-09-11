@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/08 05:52:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/11 02:39:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/08 05:52:35 $ by $Author: brian $
+# Last Modified $Date: 2005/09/11 02:39:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -798,6 +798,16 @@ driver_pages += \
 	man4/loop_clone.4 \
 	man4/sloop.4 \
 	man8/test-loop.8
+endif
+if CONFIG_STREAMS_MUX
+driver_pages += \
+	man4/mux.4 \
+	man8/test-mux.8
+endif
+if CONFIG_STREAMS_MUX_MODULE
+driver_pages += \
+	man4/mux.4 \
+	man8/test-mux.8
 endif
 if CONFIG_STREAMS_NSDEV
 driver_pages += \
@@ -2033,6 +2043,16 @@ dist_noinst_driver_pages += \
 	man4/loop_clone.4.man \
 	man4/sloop.4.man \
 	man8/test-loop.8.man
+endif
+if CONFIG_STREAMS_MUX
+dist_noinst_driver_pages += \
+	man4/mux.4.man \
+	man8/test-mux.8.man
+endif
+if CONFIG_STREAMS_MUX_MODULE
+dist_noinst_driver_pages += \
+	man4/mux.4.man \
+	man8/test-mux.8.man
 endif
 if CONFIG_STREAMS_NSDEV
 dist_noinst_driver_pages += \

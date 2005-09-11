@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: loop.4.man,v 0.9.2.2 2005/09/08 05:52:35 brian Exp $
+.\" @(#) $Id: loop.4.man,v 0.9.2.3 2005/09/11 02:39:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/08 05:52:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/11 02:39:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,252 +76,136 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B loop
-\- \fISTREAMS\fR bi-directional pipe-like multiplexing device
+\- \fISTREAMS\fP loop-around pseudo-device driver
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-The software pipes obtained by the system call
-.BR pipe (2)
-are not necessarily bidirectional.
-.[
-xbd5
-.]
-.[
-susv2
-.]
-.[
-susv3
-.]
 The
 .B loop
-.I STREAMS
-pseudo-device driver provide a mechanism for obtaining
-.IR STREAMS -based
-pipe-like devices that are bidirectional in nature.
+psuedo-device multiplexing driver is an implementation of the loop-around driver described in the
+.RI \(lq "UNIX\(rg System V Release 4 \- STREAMS Programmer's Guide" ,\(rq
+.[
+svr4spg
+.]
+with a number of exceptions and enhancments.  The primary purposes of the
+.B loop
+pseudo-device driver are: to provide a capability to the
+.BR test-streams (8)
+conformance and verification test program, for testing passing of STREAMS file descriptors across a
+pipe-like driver;
+and to provide an example of a pipe-like driver for the STREAM programmer.
+To avoid complications for testing, and to serve as a basic example, the driver is as simplistic as
+possible.
 .PP
 The
 .B loop
-pseudo-device driver is a regular
+pseudo-device driver has the following behaviour:
+.TP 3n
+.B "open\fR(2s)"
+When a
+.B loop
+STREAM is opened using
+.BR open (2s)
+a new
+.B loop
+STREAM is created.  The newly created STREAM is not associated with any other STREAM.
+Issuing the
+.B LOOP_SET
+input-output control is necessary, to associate the loop STREAM with another one,
+before data can be written to or read from the STREAM.  Any attempt to send data on the STREAM
+before it is associated with another will result in an
+.BR M_ERROR (9)
+message being sent upstream causing all further read, write or control operations on the stream to
+fail with error
+.RB [ ENXIO ].
+.TP
+.B LOOP_SET
+The
+.BR LOOP_SET
+input-output control described under
+.RI \(lq IOCTLS ,\(rq
+below, is used to connect the upstream and downstream flow between the requesting STREAM and a
+specified STREAM.  Once connected in this fashion, data can be passed in either direction.
+.TP
+.B "putpmsg\fR(2s), \fPgetpmsg\fR(2s)"
+Data is passed in either direction using the
+.BR putpmsg (2s)
+or
+.BR getpmsg (2s)
+calls as normal.  The
+.B loop
+driver coordinates
 .I STREAMS
-device driver.
-.PP
-Because the
-.BR open (2)
-system call only returns one file descriptor, the following procedure is used
-to create two file descriptors with a connected
-.IR STREAMS -based
-pipe-like device between them:
-.IP (1) \w'(000)'u
-Open
-.B /dev/sloop
-an obtain a first file descriptor.  At this point there is only half of the
-pipe-like device available.
-This step obtains
-.IR fd [0].
-.IP (2)
-Open
-.B /dev/sloop
-again to obtain a second file descriptor.  At this point there are two
-unconnected stream heads.
-This step obtains
-.IR fd [2].
-.IP (2)
-Call
-.BR ioctl (2)
-with the
-.B I_FDINSERT
-command (see
-.BR streamio (7))
-to associate
-.IR fd [0]
-with
-.IR fd [1].
-This can either be accomplished by performing an
-.B I_FDINSERT
-with
-.IR fd [1]
-on the stream returned as
-.IR fd [0];
-or, with
-.IR fd [0]
-on
-.IR fd [1].
-The data part of the
-.B I_FDINSERT
-command is ignored, and the control part of the
-.B I_FDINSERT
-command contains only the file descriptor translated to a queue pointer.
-This step connects
-.IR fd [0]
-to
-.IR fd [1]
-for a fully connected,
-.IR STREAMS -based,
-bi-directional pipe-like device
+flow control across the driver by explicitly enabling service procedures of the feeding side when
+the accepting side is back-enabled.
+.TP
+.B "close\fR(2s)"
+When an STREAM is closed using the
+.BR close (2s)
+system call, the STREAM is dismantled.
+If the upper STREAM remains connected to another STREAM (due to a previous call to
+.BR LOOP_SET ),
+the connection will be broken and a
+.BR M_HANGUP (9)
+message will be sent to the other STREAM.
 .\"
 .\"
 .SH USAGE
 .PP
-The characteristics of bi-directional
-.IR STREAMS -based
-pipes
-.RB ( spipes )
-by comparison to
-SVR 3
+The
+.B loop
+pseudo-device loop-around driver is an implementation of the loop-around driver described in the
+.RI \(lq "UNIX\(rg System V Release 4 \- STREAMS Programmer's Guide" ,\(rq
 .[
-svr3
+svr4spg
 .]
-style pipes is as follows:
-.IP \(bu 2
-.B spipes
-are bi-directional.  Both sides are opened for both read and write.  Data
-written to one end of the pipe can be read by the other.  Both ends of the
-pipe can have data written and read.
-.IP \(bu 2
-.B spipes
-can have modules pushed and popped from either side of the pipe.  (See also
-.BR pipemod (4).)
-.IP \(bu 2
-.B spipes
-can have the
-.BR connld (4)
-module can be pushed onto one end of the pipe.
-.IP \(bu 2
-.B spipes
-have controllable flow control and minimum and maximum packet size characteristics.
-.IP \(bu 2
-.B spipes
-permit the use of the
-.BR getmsg (2),
-.BR getpmsg (2s),
-.BR putmsg (2)
-and
-.BR putpmsg (2s)
-system calls on the pipe ends.
-.IP \(bu 2
-.B spipes
-permit the use of
-.I STREAMS
-IO controls on either pipe end.  See
-.BR streamio (7).
+with a number of considerations as follows:
+.IP \(bu \w'\(bu\(em'u
+The
+.I SVR4
+driver does not implement input-output controls other than
+.BR LOOP_SET .
+In contrast,
+.B loop
+implements a set of input-output controls compatible with the
+.I LiS
+.[
+lis
+.]
+loop-around driver for use in testing.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.TP
+.B LOOP_SET
 .\"
 .\"
 .SH NOTICES
 .PP
-Although an
-.BR stat (2)
-on the
-.B /dev/sloop
-device node will show the node as being a character special device with a
-device number corresponding to the
+The
 .B loop
-driver, an
-.BR fstat (2)
-on the file descriptor resulting from an
-.BR open (2)
-call on
-.B /dev/sloop
-will indicate that the file is a fifo.  This is rather normal
-.IR UNIX \(rg
-behaviour.
-.PP
-Depending on
-.IR Linux \(rg
-kernel configuration parameters, it might not be necessary to go to this
-extent to create a
-.IR STREAMS -based
-bidirectional pipe-like device.  When kernel
-configuration parameter
-.B CONFIG_STREAMS_PIPES_REPLACE
-is set, then the SVR 3
-.[
-svr3
-.]
-pipe approach used by
-.IR Linux \(rg
-will be replaced with a bi-directional
-.IR STREAMS -based
-pipe.  Then, a simple
-call to
-.BR pipe (2)
-will return a bidirectional pipe and it is not necessary to open the
-.B loop
-driver to obtain one.
-.PP
-When first opened, a
-.B loop
-device behaves similar to an Null Stream device,
-.BR nuls (4).
+driver is used by the
+.BR test-streams (8)
+conformance and verification test program to test passing of file descriptors across a
+pipe-like driver.  Much of its behaviour is specific to testing and cannot be altered without
+impacting the ability of the
+.BR test-streams (8)
+conformance and verification test program results.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
 .B loop
-is not implemented as a normal
-.I STREAMS
-driver: it is implemented as a shadow special device node under
-.BR "@PACKAGE_TITLE@" .
+is implemented as described in the
+.IR "SVR4 SPG" .
 .[
-lfs
-.]
-.B @PACKAGE_TITLE@
-shadow special devices nodes call
-.BR pipe_open ()
-from
-.BR cdev_open ()
-instead of
-.BR spec_open ()
-permitting the
-.B pipe
-device to intercept and redirect the open call to the appropriate device.
-This is consistent with the descriptions for the internal
-.BR pipe_open ()
-under
-.IR "SVR 4" .
-.[
-magic
+svr4spg
 .]
 .\"
 .\"
 .SH EXAMPLES
-.PP
-Following is an example of how to open a
-.IR STREAMS -based
-pipe:
-.sp
-.nf
-\fC\s-1\
-int
-spipe(int *fd)
-{
-    int fds[2];
-    long ptr;
-    struct strfdinsert fdi;
-    if ((fds[0] = open("/dev/sloop", O_RDWR)) < 0)
-        return (-1);
-    if ((fds[1] = open("/dev/sloop", O_RDWR)) < 0) {
-        close(fds[0]);
-        return (-1);
-    }
-    fdi.ctlbuf.maxlen = fdi.ctlbuf.len = sizeof(ptr);
-    fdi.ctlbuf.buf = (caddr_t) &ptr;
-    fdi.databuf.maxlen = fdi.databuf.len = -1;
-    fdi.databuf.buf = NULL;
-    fdi.filedes = fds[0];
-    fdi.offset = 0;
-    fdi.flags = RS_NORM;
-    if (ioctl(fds[0], I_FDINSERT, &fdi) < 0) {
-        close(fds[0]);
-        close(fds[1]);
-        return (-1);
-    }
-    fd[0] = fds[0];
-    fd[1] = fds[1];
-    return (0);
-}
-\s+1\fP
-.fi
 .\"
 .\"
 .SH DEVICES
@@ -330,31 +214,21 @@ spipe(int *fd)
 .B /dev/sloop
 The external filesystem
 .I STREAMS
-pipe device.
+loop device.
 .TP
 .BR /dev/streams/loop ", " /devices/loop
 The
 .BR specfs (5)
 shadow special filesystem
 .I STREAMS
-pipe deivce.
+loop device.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR pipe (2),
-.BR open (2),
-.BR ioctl (2),
-.BR streamio (7),
-.BR pipemod (4),
-.BR connld (4),
-.BR nuls (4),
-.BR getmsg (2),
-.BR getpmsg (2s),
-.BR putmsg (2),
-.BR putpmsg (2s),
-.BR stat (2),
-.BR fstat (2).
+.BR mux (4),
+.BR nullmod (4),
+.BR test-streams (8).
 .\"
 .\"
 .SH BUGS
@@ -371,75 +245,54 @@ lfs
 .]
 provides the
 .B loop
-device for compatibility with
-.IR UnixWare \(rg
-7 and
-.IR AIX \(rg.
-.IR Solaris \(rg
-and
-.I LiS
+pseudo-device driver for testing and compatibility with
+.IR LiS ,
 .[
 LiS
 .]
-do not provide an
-.B loop
-driver.
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IR AIX \(rg
-provides a
-.B loop
-driver.
-The use of the
-.B loop
-driver under
-.IR AIX \(rg
-is not well documented.
-.IP \(em
-.IR UnixWare \(rg
-provides a
-.B loop
-driver.
-The use of the
-.B loop
-driver under
-.IR UnixWare \(rg
-is not well documented.
-.IP \(em
-.I LiS
-.IP \(em
-.IR UnixWare \(rg
-documentation
+Although this driver is described in the SVR4 SPG
 .[
-uw7doc
+svr4spg
 .]
-describes naming an unnamed pipe by making a device node with the device
-number returned by a call to
-.BR stat (2)
-on one end of the pipe.
-Although this technique also works with
-.BR "@PACKAGE_TITLE@" ,
-we recommend using
-.BR fattach (2)
-instead.
+as a driver example, most
+.I STREAMS
+implementations do not actually provide such a driver.
+.IP \(em
+.B loop
+is provided primarily for use by the
+.BR test-streams (8)
+conformance and verification test program, and as an example of a pipe-like driver with flow
+control supported across the driver.  It should not be used by portable
+.I STREAMS
+modules, driver or applications programs.
+.PP
+See
+.IR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR AIX \(rg
-and
-.IR UnixWare \(rg
-7.1.1
+SVR4
+.[
+svr4spg
+.]
+and LiS
+.[
+lis
+.]
 documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .B loop
-appears in
-.IR AIX \(rg
-and
-.IR UnixWare \(rg
-7.1.1.
+is described as an example loop-around driver in the SVR4 SPG.
+.[
+svr4spg
+.]
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.27 2005/07/08 13:16:10 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.28 2005/09/11 02:41:00 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/07/08 13:16:10 $ by $Author: brian $
+% Last Modified $Date: 2005/09/11 02:41:00 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -517,7 +517,7 @@ manipulating voice channels associated with telephone call or other telecommunic
 These are the reasons why the @url{http://www.openss7.org/, OpenSS7 Project}
 @cindex OpenSS7 Project
 originally embarked on using @cite{STREAMS}.  You will find that a large number of @cite{SS7} stack
-vendors also delivery @cite{UNIX} and even @cite{RTOS} products on @cite{STREAMS}.
+vendors also deliver @cite{UNIX} and even @cite{RTOS} products on @cite{STREAMS}.
 
 Although the BSD Sockets framework was established to permit arbitrary protocols to be implemented
 within the framework, it is seldom that BSD Sockets is actually used in this fashion.
@@ -623,7 +623,7 @@ machine boundaries.  In addition, sockets allow limited control information as w
 
 Streams are more general still, with extensive control information passing capabilities.
 
-One most @cite{UNIX} systems, messages (if available) have the lowest overhead and highest
+On most @cite{UNIX} systems, messages (if available) have the lowest overhead and highest
 bandwidth, with pipes following close behind.  Because they support complex networking facilities,
 sockets are probably less efficient than streams, but because they rarely appear on the same machine
 as streams, the question is somewhat academic.  They certainly have much lower bandwidth than pipes
@@ -726,18 +726,18 @@ Stream's user process since the module is nearest the Stream head.
 @subsection Criticism of STREAMS
 @cindex Criticism of STREAMS
 
-Following are some excepts from Dennis M. Ritchie's original (1984) Bell Technical Journal paper on
+Following are some excerpts from Dennis M. Ritchie's original (1984) Bell Technical Journal paper on
 the stream I/O system.  These excerpts are the limitations of the system as were perceived by Dennis
 M. Ritchie at the time.  Strangely enough, although every limitation listed by Dennis was fixed even
 as early as @cite{UNIX System V Release 3.0} and even in the @cite{UNIX Eighth Edition}, some BSD
-advocates with use these limitations as a reason for not using @dfn{STREAMS} in BSD.  Also, note
+advocates will use these limitations as a reason for not using @dfn{STREAMS} in BSD.  Also, note
 that BSD'ers will also say that @dfn{STREAMS} was a @cite{UNIX Eighth Edition} (Bell Laboratories
 Research version of UNIX) thing; however, Dennis' paper clearly states that the base system for the
 initial @cite{Stream Input-Output System} was @cite{4.1BSD}.  Also note that @cite{4.1BSD} already
-had @dfn{sockets} and that it is take that some of Ritchie's work was taken from @dfn{sockets}.  It
-took until @cite{4.2BSD} for @cite{BBN} to add the @dfn{DARPANET} protocol stack to sockets.
+had @dfn{sockets} and that some of Ritchie's work was taken from @dfn{sockets}.  It took until
+@cite{4.2BSD} for @cite{BBN} to add the @dfn{DARPANET} protocol stack to sockets.
 
-Perhaps it is not so surprising why BSD'er hark back to Ritchie's original problem list for
+Perhaps it is not so surprising why BSD'ers hark back to Ritchie's original problem list for
 @dfn{STREAMS}: because it was at that point that BSD decided to not follow the @cite{STREAMS} work
 too closely, except as regards IPC, and UNIX domain mechanisms.  It is likely that BSD would have
 used @dfn{STREAMS}, however, it was included in @cite{UNIX System V Release 3.0} and this was the
@@ -761,7 +761,7 @@ This problem was never really fixed I suppose because most @dfn{STREAMS} specifi
 only one @command{ioctl} can be outstanding for a given stream.  Nevertheless, an @command{ioctl}
 identifier was added to the @var{M_IOCTL}
 @vindex M_IOCTL
-message that uniquely identifies the @command{ioctl}.  Nevertheless, a timer is still used.  With
+message that uniquely identifies the @command{ioctl}; but, a timer is still used.  With
 the @var{I_STR}
 @vindex I_STR
 @command{ioctl}, however, the caller has control over the duration of the timeout.
@@ -951,7 +951,7 @@ debugging facilities (both compile-time options as well as run-time options).
 @item SVR 4.2 MP Compatibility
 @cindex SVR 4.2 MP
 
-@cite{LiS} only provide @cite{SVR 4} uniprocessor capabilities.  @dfn{@value{PACKAGE_TITLE}} provides
+@cite{LiS} only provides @cite{SVR 4} uniprocessor capabilities.  @dfn{@value{PACKAGE_TITLE}} provides
 @cite{SVR 4.2 MP}
 @cindex SVR 4.2 MP
 capabilities.
@@ -974,7 +974,7 @@ major implementations of @dfn{STREAMS} as well as providing a rich DDI based on 
 
 @cite{LiS} avoids use of high-performance @b{Linux}-specific facilities because of its aims at
 portability.  @dfn{@value{PACKAGE_TITLE}} being aimed at only @b{Linux} uses the highest-performance
-techniques available in the @b{Linux} kernel form implementation.  This includes kernel memory
+techniques available in the @b{Linux} kernel for implementation.  This includes kernel memory
 caches and other techniques.
 
 @item Maintainability

@@ -1,0 +1,476 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: mux.4.man,v 0.9.2.1 2005/09/11 02:39:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/09/11 02:39:50 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mux.4.man,v $
+.\" Revision 0.9.2.1  2005/09/11 02:39:50  brian
+.\" - added missin manpages
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MUX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B mux
+\- \fISTREAMS\fP multiplexing pseudo-device driver
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B mux
+psuedo-device multiplexing driver is an implementation of the multplexing driver described in the
+.RI \(lq "UNIX\(rg System V Release 4 \- STREAMS Programmer's Guide" ,\(rq
+.[
+svr4spg
+.]
+with a number of exceptions and enhancments.  The primary purposes of the
+.B mux
+pseudo-device driver are: to provide a capability to the
+.BR test-streams (8)
+conformance and verification test program, for testing linking and unlinking of STREAMS across a
+multiplexing driver;
+and to provide an example of a multiplexing driver for the STREAMS programmer.
+To avoid complications for testing, and to serve as a basic example, the driver is as simplistic as
+possible.
+.PP
+The
+.B mux
+pseudo-device driver has the following behaviour:
+.TP 3n
+.B "open\fR(2s)"
+When a
+.B mux
+STREAM is opened using
+.BR open (2s)
+a new
+.B mux
+STREAM is created.  The newly created STREAM is not associated with any lower multiplex STREAM.
+Issuing the
+.BR MUX_UP " and " MUX_DOWN
+input-output controls are necessary, to associate the upper multiplex STREAM with a lower one,
+before data can be written to or read from the STREAM.  Any attempt to send data on the STREAM
+before it is associated with a lower STREAM will result in an
+.BR M_ERROR (9)
+message being sent upstream causing all further read, write or control operations on the stream to
+fail with error
+.RB [ ENXIO ].
+.TP
+.B "I_LINK\fR(7), \fPI_PLINK\fR(7)"
+When a STREAM is linked under the
+.B mux
+driver, a new lower multiplex STREAM is instantiated.  This newly instantiated lower STREAM is not
+associated with an upper multiplex STREAM.  Issuing the
+.B MUX_UP
+and
+.B MUX_DOWN
+input-output controls are necessary, to associate an upper multiplex STREAM with the lower one.
+If data is received on the linked STREAM, it will be accumulated in the read-side queue pending a
+.B MUX_UP
+or
+.BR I_UNLINK "(7), or " I_PUNLINK (7)
+operation.
+.TP
+.B "MUX_UP\fR, \fPMUX_DOWN"
+The
+.BR MUX_UP " and " MUX_DOWN
+input-output controls described under
+.RI \(lq IOCTLS ,\(rq
+below, are used to connect the upstream or downstream flow (respectively) between the requesting
+upper multiplex STREAM and a specified (by link id) lower multiplex STREAM.  Once connected in this
+fashion, data can be passed in either direction.
+.IP
+Each upstream or downstream multiplex connection is independent of all others.
+.B MUX_DOWN
+establishes fan-in in the downstream direction.  Multiple upper multiplex STREAMS can be connected
+to the same lower multiplex STREAM using separate calls to
+.BR MUX_DOWN .
+.B MUX_UP
+establishes fan-in in the upstream direction.  Multiple lower multiplex STREAM can be connected to
+the same upper multiplex STREAM using separate calls to
+.BR MUX_UP .
+.TP
+.B "putpmsg\fR(2s), \fPgetpmsg\fR(2s)"
+Data is passed in either direction using the
+.BR putpmsg (2s)
+or
+.BR getpmsg (2s)
+calls as normal.  The
+.B mux
+driver coordinates
+.I STREAMS
+flow control across the multiplexing driver by explicitly enabling service procedures of the feeding
+side when the accepting side is back-enabled.
+.TP
+.B "I_UNLINK\fR(7), \fPI_PUNLINK\fR(7)"
+When a lower multiplex STREAM is removed using
+.BR I_UNLINK "(7) or " I_PUNLINK (7),
+the lower multiplex STREAM is no longer availble for data transfer and returns to its original
+STREAM head.  If the unlinked STREAM is connected to an upper multiplex STREAM (with
+.BR MUX_DOWN ),
+the connection is broken and an
+.BR M_HANGUP (9)
+message is sent to the upper STREAM.
+.TP
+.B "close\fR(2s)"
+When an upper multiplex STREAM is closed using the
+.BR close (2s)
+system call, the STREAM is dismantled.  An lower multiplex STREAMS that were previously linked under
+the closing STREAM with
+.BR I_LINK (7)
+will be unlinked automatically by the STREAM head before the upper multiplex STREAM is closed.
+If the upper STREAM remains connected to a lower multiplex STREAM (due to a previous call to
+.BR MUX_UP ),
+the connection will be broken and the lower multiplex STREAM will begin queuing read data pending a
+subsequent connection or unlink operation.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B mux
+pseudo-device multiplexing driver is an implementation of the multplexing driver described in the
+.RI \(lq "UNIX\(rg System V Release 4 \- STREAMS Programmer's Guide" ,\(rq
+.[
+svr4spg
+.]
+with a number of considerations as follows:
+.IP \(bu \w'\(bu\(em'u
+The
+.I SVR4
+driver is only a fan-in driver; that is, it only supports multiple upper STREAMS fanning into a
+single
+.BR I_LINK (7)'ed
+lower STREAM.
+In contrast,
+.B mux
+supports fan-in and fan-out arrangements, as well as multiple linked lower STREAMS.
+.IP \(bu
+The
+.I SVR4
+driver does not support
+.BR I_PLINK (7).
+In contrast,
+.B mux
+supports both
+.BR I_LINK (7)
+and
+.BR I_PLINK (7).
+.\"
+.\"
+.SH IOCTLS
+.PP
+.SS I_LINK
+.PP
+The
+.B mux
+driver responds to the
+.BR I_LINK (7)
+.I STREAMS
+input-output control.
+The lower multiplex STREAM is instantiated and made available as a target of the
+.BR MUX_UP " or " MUX_DOWN
+input-output controls.
+The link will be removed once the upper control STREAM (the one that performed the
+.BR I_LINK (7)
+operation) is closed.
+.PP
+.I arg
+is a pointer to a
+.BR linkblk (9)
+structure describing the lower multiplexed STREAM to be linked.
+.SS I_PLINK
+.PP
+The
+.B mux
+driver responds to the
+.BR I_PLINK (7)
+.I STREAMS
+input-output control.
+The lower multiplex STREAM is instantiated and made available as a target of the
+.BR MUX_UP " or " MUX_DOWN
+input-output controls.
+The link will persist, even if all STREAMS are closed.  An explicit
+.BR I_PUNLINK (7)
+operation is necessary to unlink the STREAM.
+.PP
+.I arg
+is a pointer to a
+.BR linkblk (9)
+structure describing the lower multiplexed STREAM to be linked.
+.SS I_UNLINK
+.PP
+The
+.B mux
+driver responds to the
+.BR I_UNLINK (7)
+.I STREAMS
+input-output control.
+The specified linked STREAM is disconnected from all feeding upper multiplex STREAMS, and an
+.BR M_HANGUP (9)
+message is sent to each.  The linked STREAM is then removed from the lower side of the driver.
+.PP
+.I arg
+is a pointer to a
+.BR linkblk (9)
+structure describing the lower multiplexed STREAM to be unlinked.
+.SS I_PUNLINK
+.PP
+The
+.B mux
+driver responds to the
+.BR I_PUNLINK (7)
+.I STREAMS
+input-output control.
+The specified linked STREAM is disconnected from all feeding upper multiplex STREAMS, and an
+.BR M_HANGUP (9)
+message is sent to each.  The linked STREAM is then removed from the lower side of the driver.
+.PP
+.I arg
+is a pointer to a
+.BR linkblk (9)
+structure describing the lower multiplexed STREAM to be unlinked.
+.SS MUX_UP
+.PP
+Requests that the driver connect the requesting STREAM upstream from the specified linked STREAM.
+This only connects the read-side direction of flow.  See
+.RB \(lq MUX_DOWN ,\(rq
+below, for the write-side connection.
+.PP
+.I arg
+is an integer value specifying the lower multiplexed STREAM to be used for the connection.
+.SS MUX_DOWN
+.PP
+Requests that the driver connect the specified linked STREAM downstream from the requesting STREAM.
+This only connects the write-side direction of flow.  See
+.RB \(lq MUX_UP ,\(rq
+above, for the read-side connection.
+.PP
+.I arg
+is an integer value specifying the lower multiplexed STREAM to be used for the connection.
+.SS MINIMUX_UP
+.PP
+Requests that the driver connect the requesting STREAM upstream from the specified linked STREAM.
+This only connects the read-side direction of flow.  See
+.RB \(lq MINIMUX_DOWN ,\(rq
+below, for the write-side connection.
+.PP
+.I arg
+is a pointer to an integer value specifying the lower multiplexed STREAM to be use for the
+connection.
+.PP
+This input-output control is provided for compatibility with the
+.I LiS
+.[
+lis
+.]
+.B minimux
+driver.
+.SS MINIMUX_DOWN
+.PP
+Requests that the driver connect the specified linked STREAM downstream from the requesting STREAM.
+This only connects the write-side direction of flow.  See
+.RB \(lq MINIMUX_UP ,\(rq
+above, for the read-side connection.
+.PP
+.I arg
+is a pointer to an integer value specifying the lower multiplexed STREAM to be use for the
+connection.
+.PP
+This input-output control is provided for compatibility with the
+.I LiS
+.[
+lis
+.]
+.B minimux
+driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B mux
+driver is used by the
+.BR test-streams (8)
+conformance and verification test program to test linking and unlinking of STREAMS across a
+multiplexing driver.  Much of its behaviour is specific to testing and cannot be altered without
+impacting the ability of the
+.BR test-streams (8)
+conformance and verification test program results.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B mux
+is implemented as described in the
+.IR "SVR4 SPG" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.SH EXAMPLES
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/mux
+The external filesystem
+.I STREAMS
+mux device.
+.TP
+.BR /dev/streams/mux ", " /devices/mux
+The
+.BR specfs (5)
+shadow special filesystem
+.I STREAMS
+mux device.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR loop (4),
+.BR nullmod (4),
+.BR test-streams (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B mux
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+provides the
+.B mux
+pseudo-device driver for testing and compatibility with
+.IR LiS ,
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Although this driver is described in the SVR4 SPG
+.[
+svr4spg
+.]
+as a driver example, most
+.I STREAMS
+implementations do not actually provide such a driver.
+.IP \(em
+.B mux
+is provided primarily for use by the
+.BR test-streams (8)
+conformance and verification test program, and as an example of a multiplexing driver with flow
+control supported across the driver.  It should not be used by portable
+.I STREAMS
+modules, driver or applications programs.
+.PP
+See
+.IR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR4
+.[
+svr4spg
+.]
+and LiS
+.[
+lis
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B mux
+is described as an example multiplexing driver in the SVR4 SPG.
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

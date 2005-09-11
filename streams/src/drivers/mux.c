@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/09/11 02:40:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
+ Last Modified $Date: 2005/09/11 02:40:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/09/11 02:40:36 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/09/11 02:40:36 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/09/11 02:40:36 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -180,7 +180,7 @@ STATIC struct mux no_mux = {
 	.other = NULL,
 	.rq = NULL,
 	.wq = NULL,
-	.dev = NODEV,
+	.dev = 0,
 };
 
 STATIC spinlock_t mux_lock = SPIN_LOCK_UNLOCKED;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/10 18:16:42 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/09/11 02:40:36 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:42 $ by $Author: brian $
+ Last Modified $Date: 2005/09/11 02:40:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.22  2005/09/11 02:40:36  brian
+ - preparing for mux tests
+
  Revision 0.9.2.21  2005/09/10 18:16:42  brian
  - more test build
 
@@ -134,9 +137,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/10 18:16:42 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/09/11 02:40:36 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/10 18:16:42 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/09/11 02:40:36 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -183,6 +186,7 @@ static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "STREAMS";
 static char devname[256] = "/dev/echo";
+static char muxname[256] = "/dev/mux";
 
 static int exit_on_failure = 0;
 
@@ -1796,6 +1800,15 @@ int
 postamble_0(int child)
 {
 	if (test_fd[child] && test_close(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+preamble_1(int child)
+{
+	if (!test_fd[child] && test_open(child, muxname) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -5705,7 +5718,7 @@ do_tests(int num_tests)
 	show = 0;
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "\nUsing device %s\n\n", devname);
+		fprintf(stdout, "\nUsing device %s, %s\n\n", devname, muxname);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
