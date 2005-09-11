@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/09 19:59:44 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/09 19:59:44 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/09 19:59:44 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/09 19:59:44 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/09 19:59:44 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -173,6 +173,16 @@ struct mux {
 	dev_t dev;			/* device number */
 };
 
+/* blank structure for use by I_UNLINK/I_PUNLINK */
+STATIC struct mux no_mux = {
+	.next = NULL,
+	.prev = &no_mux.next,
+	.other = NULL,
+	.rq = NULL,
+	.wq = NULL,
+	.dev = NODEV,
+};
+
 STATIC spinlock_t mux_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct mux *mux_opens = NULL;
 STATIC struct mux *mux_links = NULL;
@@ -233,7 +243,15 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			if (bot) {
 				struct mux *top;
 
-				l->l_qtop->q_ptr = RD(l->l_qtop)->q_ptr = NULL;
+				/* Note that lower multiplex driver put and service procedures must
+				   be prepared to be invoked even after the M_IOCACK for the
+				   I_UNLINK or I_PUNLINK ioctl has been returned.  This is because
+				   the setq(9) back to the STREAM head is not performed until after
+				   the acknowledgement has been received.  We set q->q_ptr to a null
+				   multiplex struture to keep the lower STREAM functioning until the
+				   setq(9) is performed. */
+
+				l->l_qtop->q_ptr = RD(l->l_qtop)->q_ptr = &no_mux;
 				if ((*(bot->prev) = bot->next)) {
 					bot->next = NULL;
 					bot->prev = &bot->next;
@@ -316,12 +334,15 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			goto nak;
 		      nak:
 			mp->b_datap->db_type = M_IOCNAK;
+			ioc->iocblk.ioc_count = 0;
 			ioc->iocblk.ioc_error = -err;
+			ioc->iocblk.ioc_rval = -1;
 			qreply(q, mp);
 			break;
 		      ack:
 			mp->b_datap->db_type = M_IOCACK;
 			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_error = 0;
 			ioc->iocblk.ioc_rval = 0;
 			qreply(q, mp);
 			break;
@@ -329,52 +350,62 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		break;
 	}
 	case M_FLUSH:
+	{
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(q, FLUSHALL);
 		}
+
 		spin_lock_bh(&mux_lock);
 		if (mux->other) {
 			queue_t *wq;
 
-			wq = mux->other->wq;
-			spin_unlock_bh(&mux_lock);
-			putnext(wq, mp);
-		} else {
-			spin_unlock_bh(&mux_lock);
-			if (mp->b_rptr[0] & FLUSHR) {
-				if (mp->b_rptr[0] & FLUSHBAND)
-					flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-				else
-					flushq(RD(q), FLUSHALL);
-				mp->b_rptr[0] &= ~FLUSHW;
-				qreply(q, mp);
+			if ((wq = mux->other->wq)) {
+				putnext(wq, mp);
+				spin_unlock_bh(&mux_lock);
 				break;
 			}
-			freemsg(mp);
 		}
+		spin_unlock_bh(&mux_lock);
+
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+			else
+				flushq(RD(q), FLUSHALL);
+			mp->b_rptr[0] &= ~FLUSHW;
+			qreply(q, mp);
+			break;
+		}
+		freemsg(mp);
 		break;
+	}
 	default:
 	      passmsg:
 		spin_lock_bh(&mux_lock);
 		if (mux->other) {
-			queue_t *wq = mux->other->wq;
+			queue_t *wq;
 
-			if (!q->q_first
-			    && (mp->b_datap->db_type >= QPCTL || bcanputnext(wq, mp->b_band))) {
-				spin_unlock_bh(&mux_lock);
-				putnext(wq, mp);
-			} else {
+			if ((wq = mux->other->wq)) {
+				if (!q->q_first) {
+					if (mp->b_datap->db_type >= QPCTL
+					    || bcanputnext(wq, mp->b_band)) {
+						putnext(wq, mp);
+						spin_unlock_bh(&mux_lock);
+						break;
+					}
+				}
 				spin_unlock_bh(&mux_lock);
 				putq(q, mp);
+				break;
 			}
-			break;
 		}
 		spin_unlock_bh(&mux_lock);
+
 		freemsg(mp);
-		putnextctl2(OTHERQ(q), M_ERROR, EPROTO, EPROTO);
+		putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
 		break;
 	}
 	return (0);
@@ -387,49 +418,58 @@ mux_lrput(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
+	{
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(q, FLUSHALL);
 		}
+
 		spin_lock_bh(&mux_lock);
 		if (mux->other) {
 			queue_t *rq;
 
-			rq = mux->other->rq;
-			spin_unlock_bh(&mux_lock);
-			putnext(rq, mp);
-		} else {
-			spin_unlock_bh(&mux_lock);
-			if (!(mp->b_flag & MSGNOLOOP)) {
-				if (mp->b_rptr[0] & FLUSHW) {
-					if (mp->b_rptr[0] & FLUSHBAND)
-						flushband(WR(q), mp->b_rptr[1], FLUSHALL);
-					else
-						flushq(WR(q), FLUSHALL);
-					mp->b_rptr[0] &= ~FLUSHR;
-					mp->b_flag |= MSGNOLOOP;
-					qreply(q, mp);
-					break;
-				}
-			}
-			freemsg(mp);
-		}
-		break;
-	default:
-		spin_lock_bh(&mux_lock);
-		if (mux->other) {
-			queue_t *rq = mux->other->rq;
-
-			if (!q->q_first
-			    && (mp->b_datap->db_type >= QPCTL || bcanputnext(rq, mp->b_band))) {
-				spin_unlock_bh(&mux_lock);
+			if ((rq = mux->other->rq)) {
 				putnext(rq, mp);
+				spin_unlock_bh(&mux_lock);
 				break;
 			}
 		}
 		spin_unlock_bh(&mux_lock);
+
+		if (!(mp->b_flag & MSGNOLOOP)) {
+			if (mp->b_rptr[0] & FLUSHW) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+				else
+					flushq(WR(q), FLUSHALL);
+				mp->b_rptr[0] &= ~FLUSHR;
+				/* pretend to be STREAM head */
+				mp->b_flag |= MSGNOLOOP;
+				qreply(q, mp);
+				break;
+			}
+		}
+		freemsg(mp);
+		break;
+	}
+	default:
+		if (!q->q_first) {
+			spin_lock_bh(&mux_lock);
+			if (mux->other) {
+				queue_t *rq;
+
+				if ((rq = mux->other->rq)
+				    && (mp->b_datap->db_type >= QPCTL
+					|| bcanputnext(rq, mp->b_band))) {
+					putnext(rq, mp);
+					spin_unlock_bh(&mux_lock);
+					break;
+				}
+			}
+			spin_unlock_bh(&mux_lock);
+		}
 		putq(q, mp);
 		break;
 	}
@@ -442,6 +482,9 @@ mux_lrput(queue_t *q, mblk_t *mp)
  *  the lower write queue.  When a bcanput fails on the next queue to the lower write queue, a back
  *  enable will invoke the lower write queue service procedure which can then be used to explicitly
  *  enable the upper write queue(s) feeding the lower write queue.
+ *
+ *  Note: This would be more efficient if we kept a separate list of feeding STREAMS instead of
+ *  walking the entire list of upper STREAMS.
  */
 STATIC int
 mux_lwsrv(queue_t *q)
@@ -474,20 +517,20 @@ STATIC int
 mux_uwsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
+	queue_t *wq = NULL;
 	mblk_t *mp;
 
 	spin_lock_bh(&mux_lock);
-	if (mux->other) {
-		queue_t *wq = mux->other->wq;
-
+	if (mux->other)
+		wq = mux->other->wq;
+	if (wq) {
 		while ((mp = getq(q))) {
 			if (mp->b_datap->db_type >= QPCTL || bcanputnext(wq, mp->b_band)) {
 				putnext(wq, mp);
 				continue;
-			} else {
-				putbq(q, mp);
-				break;
 			}
+			putbq(q, mp);
+			break;
 		}
 	} else
 		flushq(q, FLUSHALL);
@@ -495,6 +538,15 @@ mux_uwsrv(queue_t *q)
 	return (0);
 }
 
+/*
+ *  The upper read service procedure is invoked only by back enabling (because we do not ever place
+ *  any messages on the upper read queue but always put them to the next read queue).  When invoked,
+ *  we need to find all of the lower multiplexed STREAMS that feed into this STREAM and manually
+ *  enable them.  This permits flow control to work across the multiplexing driver.
+ *
+ *  Note: This would be more efficient if we kept a separate list of feeding STREAMS instead of
+ *  walking the entire list of upper STREAMS.
+ */
 STATIC int
 mux_ursrv(queue_t *q)
 {
@@ -524,22 +576,23 @@ STATIC int
 mux_lrsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
+	queue_t *rq = NULL;
 	mblk_t *mp;
 
 	spin_lock_bh(&mux_lock);
-	if (mux->other) {
-		queue_t *rq = mux->other->rq;
-
+	if (mux->other)
+		rq = mux->other->rq;
+	if (rq) {
 		while ((mp = getq(q))) {
 			if (mp->b_datap->db_type >= QPCTL || bcanputnext(rq, mp->b_band)) {
 				putnext(rq, mp);
 				continue;
-			} else {
-				putbq(q, mp);
-				break;
 			}
+			putbq(q, mp);
+			break;
 		}
-	}
+	} else
+		noenable(q);
 	spin_unlock_bh(&mux_lock);
 	return (0);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:39 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -66,6 +66,7 @@ static char const ident[] =
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/interrupt.h>
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -78,7 +79,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:39 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -155,126 +156,195 @@ STATIC struct module_info loop_minfo = {
 typedef struct loop {
 	struct loop *next;		/* list linkage */
 	struct loop **prev;		/* list linkage */
+	struct loop *other;		/* other stream */
 	dev_t dev;			/* device number */
-	queue_t *q;			/* this rd queue */
+	queue_t *rq;			/* this rd queue */
+	queue_t *wq;			/* this wr queue */
 } loop_t;
 
-STATIC struct loop *loop_list = NULL;
+STATIC struct loop *loop_opens = NULL;
 STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
 
 STATIC int
 loop_wput(queue_t *q, mblk_t *mp)
 {
+	struct loop *p = q->q_ptr, *o;
+	int err;
+
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
-		union ioctypes *ioc;
-		int err;
+		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
-		ioc = (typeof(ioc)) mp->b_rptr;
-		if (ioc->iocblk.ioc_cmd == LOOP_SET) {
+		switch (ioc->iocblk.ioc_cmd) {
+		case LOOP_SET:
+		{
 			dev_t dev;
-			if (ioc->iocblk.ioc_count == sizeof(dev_t)) {
-				struct loop *po;
 
-				dev = *(dev_t *) mp->b_cont->b_rptr;
-				spin_lock(&loop_lock);
-				for (po = loop_list; po; po = po->next)
-					if (po->dev == dev)
-						break;
-				if (po) {
-					if (!q->q_next && !WR(po->q)->q_next) {
-						/* FIXME: should use weldq */
-						q->q_next = po->q;
-						WR(po->q)->q_next = RD(q);
-						spin_unlock(&loop_lock);
-						mp->b_datap->db_type = M_IOCACK;
-						ioc->iocblk.ioc_rval = 0;
-						ioc->iocblk.ioc_count = 0;
-						qreply(q, mp);
-						return (0);
-					} else {
-						spin_unlock(&loop_lock);
-						err = -EBUSY;
-					}
-				} else {
-					spin_unlock(&loop_lock);
-					err = -ENXIO;
-				}
-			} else {
+			if (ioc->iocblk.ioc_count != sizeof(dev)) {
 				err = -EINVAL;
+				break;
 			}
-		} else {
-			err = -EINVAL;
-			if (q->q_next) {
-				putnext(q, mp);
-				return (0);
+			if (mp->b_cont == NULL) {
+				err = -EINVAL;
+				break;
 			}
+			dev = *(dev_t *) mp->b_cont->b_rptr;
+			spin_lock_bh(&loop_lock);
+			for (o = loop_opens; o; o = o->next)
+				if (o->dev == dev)
+					break;
+			if (o == NULL) {
+				spin_unlock_bh(&loop_lock);
+				err = -ENXIO;
+				break;
+			}
+			if (p->other || o->other) {
+				spin_unlock_bh(&loop_lock);
+				err = -EBUSY;
+				break;
+			}
+			p->other = o;
+			o->other = p;
+			enableok(o->wq);
+			enableok(p->wq);
+			qenable(o->wq);
+			qenable(p->wq);
+			spin_unlock_bh(&loop_lock);
+			err = 0;
+			break;
 		}
-		mp->b_datap->db_type = M_IOCNAK;
-		ioc->iocblk.ioc_rval = -1;
-		ioc->iocblk.ioc_error = -err;
+		default:
+			err = -EINVAL;
+			break;
+		}
+		if (err == 0) {
+			mp->b_datap->db_type = M_IOCACK;
+			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_rval = 0;
+			ioc->iocblk.ioc_error = 0;
+		} else {
+			mp->b_datap->db_type = M_IOCNAK;
+			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_rval = -1;
+			ioc->iocblk.ioc_error = -err;
+		}
 		qreply(q, mp);
-		return (0);
+		break;
 	}
 	case M_FLUSH:
-	{
-		int flush;
-
-		flush = mp->b_rptr[0] & ~(FLUSHW | FLUSHR);
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(q, FLUSHALL);
-			flush |= FLUSHR;
 		}
-		if (mp->b_rptr[0] & FLUSHR)
-			flush |= FLUSHW;
-		if (q->q_next) {
-			mp->b_rptr[0] = flush;
-			putnext(q, mp);
+		spin_lock_bh(&loop_lock);
+		if (p->other) {
+			queue_t *rq;
+
+			rq = p->other->rq;
+			spin_unlock_bh(&loop_lock);
+			/* switch sense of flush flags */
+			switch (mp->b_rptr[0] & (FLUSHW | FLUSHR | FLUSHRW)) {
+			case FLUSHR:
+				mp->b_rptr[0] = (mp->b_rptr[0] & ~FLUSHR) | FLUSHW;
+				break;
+			case FLUSHW:
+				mp->b_rptr[0] = (mp->b_rptr[0] & ~FLUSHW) | FLUSHR;
+				break;
+			}
+			putnext(rq, mp);
 		} else {
-			if (mp->b_rptr[0] & FLUSHW)
-				mp->b_rptr[0] &= ~FLUSHW;
+			spin_unlock_bh(&loop_lock);
 			if (mp->b_rptr[0] & FLUSHR) {
 				if (mp->b_rptr[0] & FLUSHBAND)
 					flushband(RD(q), mp->b_rptr[1], FLUSHALL);
 				else
 					flushq(RD(q), FLUSHALL);
+				mp->b_rptr[0] &= ~FLUSHW;
+				qreply(q, mp);
+			} else {
+				freemsg(mp);
 			}
-			qreply(q, mp);
 		}
-		return (0);
-	}
+		break;
 	default:
-		if (q->q_next) {
-			putnext(q, mp);
-			return (0);
+		spin_lock_bh(&loop_lock);
+		if (p->other) {
+			if (!q->q_first) {
+				queue_t *rq;
+
+				rq = p->other->rq;
+				spin_unlock_bh(&loop_lock);
+				if (rq) {
+					if (mp->b_datap->db_type >= QPCTL
+					    || bcanputnext(rq, mp->b_band)) {
+						putnext(rq, mp);
+						break;
+					}
+				}
+			} else
+				spin_unlock_bh(&loop_lock);
+			putq(q, mp);
+		} else {
+			spin_unlock_bh(&loop_lock);
+			freemsg(mp);
+			putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
 		}
-		freemsg(mp);
-		putnextctl2(RD(q), M_ERROR, ENXIO, ENXIO);
-		return (0);
+		break;
 	}
+	return (0);
 }
 
+/*
+ *  The driver only puts messages on its write queue when they fail flow control on the queue beyond
+ *  the other read queue.  When flow control subsides, the read service procedure on the othe STREAM
+ *  will explicitly enable us.
+ */
 STATIC int
-loop_rput(queue_t *q, mblk_t *mp)
+loop_wsrv(queue_t *q)
 {
-	switch (mp->b_datap->db_type) {
-	case M_FLUSH:
-	{
-		if (mp->b_rptr[0] & FLUSHR) {
-			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
-			else
-				flushq(q, FLUSHALL);
+	struct loop *p = q->q_ptr;
+	queue_t *rq = NULL;
+	mblk_t *mp;
+
+	spin_lock_bh(&loop_lock);
+	if (p->other)
+		rq = p->other->rq;
+	spin_unlock_bh(&loop_lock);
+
+	if (rq) {
+		while ((mp = getq(q))) {
+			if (mp->b_datap->db_type >= QPCTL || bcanputnext(rq, mp->b_band)) {
+				putnext(rq, mp);
+				continue;
+			}
+			putbq(q, mp);
+			break;
 		}
-	}
-	default:
-		putnext(q, mp);
-		return (0);
-	}
+	} else
+		flushq(q, FLUSHALL);
+
+	return (0);
+}
+
+/*
+ *  The driver never places messages on the read queue, therefore, the read service procedure is
+ *  only invoked when backenabled from upstream.  Back enabling is due to flow control that caused a
+ *  message to tbe put (back) to the other STREAM's write queue so the driver needs to explicitly
+ *  enable that write queue now.
+ */
+STATIC int
+loop_rsrv(queue_t *q)
+{
+	struct loop *p = q->q_ptr;
+
+	spin_lock_bh(&loop_lock);
+	if (p->other && p->other->wq)
+		qenable(p->other->wq);
+	spin_unlock_bh(&loop_lock);
+	return (0);
 }
 
 /* 
@@ -287,7 +357,7 @@ loop_rput(queue_t *q, mblk_t *mp)
 STATIC int
 loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	struct loop *p, **pp = &loop_list;
+	struct loop *p, **pp = &loop_opens;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 
@@ -320,7 +390,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
-		spin_lock(&loop_lock);
+		spin_lock_bh(&loop_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
 		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next) {
@@ -332,7 +402,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				if (sflag == CLONEOPEN)
 					cminor++;
 				else {
-					spin_unlock(&loop_lock);
+					spin_unlock_bh(&loop_lock);
 					kmem_free(p, sizeof(*p));
 					pswerr(("%s: stream already open!\n", __FUNCTION__));
 					return (EIO);	/* bad error */
@@ -340,19 +410,21 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
-			spin_unlock(&loop_lock);
+			spin_unlock_bh(&loop_lock);
 			kmem_free(p, sizeof(*p));
 			printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
-		p->q = q;
+		p->rq = q;
+		p->wq = WR(q);
+		noenable(p->wq);
 		if ((p->next = *pp))
 			p->next->prev = &p->next;
 		p->prev = pp;
 		*pp = p;
 		q->q_ptr = WR(q)->q_ptr = p;
-		spin_unlock(&loop_lock);
+		spin_unlock_bh(&loop_lock);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
@@ -372,21 +444,25 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 		return (0);	/* already closed */
 	}
 	qprocsoff(q);
-	if (WR(q)->q_next)
-		putnextctl(WR(q), M_HANGUP);
-	spin_lock(&loop_lock);
+	spin_lock_bh(&loop_lock);
+	if (p->other && p->other->rq)
+		putnextctl(p->other->rq, M_HANGUP);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
 	p->next = NULL;
 	p->prev = &p->next;
+	p->other = NULL;
+	p->dev = 0;
+	p->rq = NULL;
+	p->wq = NULL;
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	spin_unlock(&loop_lock);
+	spin_unlock_bh(&loop_lock);
 	printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 
 STATIC struct qinit loop_rqinit = {
-	.qi_putp = loop_rput,
+	.qi_srvp = loop_rsrv,
 	.qi_qopen = loop_open,
 	.qi_qclose = loop_close,
 	.qi_minfo = &loop_minfo,
@@ -394,6 +470,7 @@ STATIC struct qinit loop_rqinit = {
 
 STATIC struct qinit loop_wqinit = {
 	.qi_putp = loop_wput,
+	.qi_srvp = loop_wsrv,
 	.qi_minfo = &loop_minfo,
 };
 

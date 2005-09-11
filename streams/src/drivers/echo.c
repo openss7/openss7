@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:39 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/08 05:52:39 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -172,7 +172,7 @@ echo_put(queue_t *q, mblk_t *mp)
 		break;
 	case M_IOCTL:
 		ptrace(("received M_IOCTL, naking it\n"));
-		err = -EOPNOTSUPP;
+		err = -EINVAL;
 		goto nak;
 	case M_IOCDATA:
 		ptrace(("received M_IOCDATA, naking it\n"));
@@ -203,6 +203,7 @@ echo_put(queue_t *q, mblk_t *mp)
 
 		mp->b_datap->db_type = M_IOCNAK;
 		ioc = (typeof(ioc)) mp->b_rptr;
+		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = -1;
 		ioc->iocblk.ioc_error = -err;
 		qreply(q, mp);

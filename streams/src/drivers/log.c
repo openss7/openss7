@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:02 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -334,7 +334,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
-			err = -EOPNOTSUPP;
+			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
 			err = -EFAULT;
@@ -349,7 +349,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
-			err = -EOPNOTSUPP;
+			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
 			err = -EFAULT;
@@ -364,7 +364,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
-			err = -EOPNOTSUPP;
+			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
 			err = -EFAULT;
@@ -384,7 +384,7 @@ log_put(queue_t *q, mblk_t *mp)
 			log_trcq = RD(q);
 			goto ack;
 		}
-		err = -EOPNOTSUPP;
+		err = -EINVAL;
 		goto nak;
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
@@ -432,12 +432,14 @@ log_put(queue_t *q, mblk_t *mp)
 	return (0);
       nak:
 	mp->b_datap->db_type = M_IOCNAK;
+	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = -1;
 	ioc->iocblk.ioc_error = -err;
 	qreply(q, mp);
 	return (0);
       ack:
 	mp->b_datap->db_type = M_IOCACK;
+	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = rval;
 	ioc->iocblk.ioc_error = 0;
 	qreply(q, mp);

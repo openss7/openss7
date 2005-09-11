@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:41 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:41 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.2  2005/09/10 18:16:35  brian
+ - more test build
+
  Revision 0.9.2.1  2005/09/08 05:52:41  brian
  - added nullmod module and loop driver
  - corrections during testing
@@ -58,9 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:41 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $"
 
-static char const ident[] = "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:41 $";
+static char const ident[] =
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $";
 
 /* 
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -68,6 +72,9 @@ static char const ident[] = "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.
  *  a STREAMS module.
  *
  *  This is an absurdly simple module.
+ *
+ *  In addition, this module provide a specialized set of input-output controls for testing and
+ *  verifying various internal STREAMS functions.
  */
 
 #include <linux/config.h>
@@ -85,7 +92,7 @@ static char const ident[] = "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/08 05:52:41 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -132,7 +139,7 @@ MODULE_ALIAS("streams-module-nullmod");
 #endif
 #endif
 
-static struct module_info nullmod_minfo = {
+STATIC struct module_info nullmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULLMOD_MODID,
 	.mi_idname = CONFIG_STREAMS_NULLMOD_NAME,
 	.mi_minpsz = 0,
@@ -144,13 +151,177 @@ static struct module_info nullmod_minfo = {
 /* 
  *  -------------------------------------------------------------------------
  *
+ *  Test and Verification Cases
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  Test Case 1: allocb()  Test allocation and freeing of message blocks.
+ */
+STATIC int
+testcase_1(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_2(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_3(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_4(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_5(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_6(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_7(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_8(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_9(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+STATIC int
+testcase_10(union ioctypes *ioc, mblk_t *dp)
+{
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
+	return (0);
+}
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
  *  PUT routines
  *
  *  -------------------------------------------------------------------------
  */
 
-static int
-nullmod_put(queue_t *q, mblk_t *mp)
+STATIC int
+nullmod_wput(queue_t *q, mblk_t *mp)
+{
+	switch (mp->b_datap->db_type) {
+	case M_IOCTL:
+	{
+		int err = 0;
+		union ioctypes *ioc;
+
+		ioc = (typeof(ioc)) mp->b_rptr;
+		if (_IOC_TYPE(ioc->iocblk.ioc_cmd) != 'V')
+			break;
+		switch (_IOC_NR(ioc->iocblk.ioc_cmd)) {
+		case 1:
+			err = testcase_1(ioc, mp->b_cont);
+			break;
+		case 2:
+			err = testcase_2(ioc, mp->b_cont);
+			break;
+		case 3:
+			err = testcase_3(ioc, mp->b_cont);
+			break;
+		case 4:
+			err = testcase_4(ioc, mp->b_cont);
+			break;
+		case 5:
+			err = testcase_5(ioc, mp->b_cont);
+			break;
+		case 6:
+			err = testcase_6(ioc, mp->b_cont);
+			break;
+		case 7:
+			err = testcase_7(ioc, mp->b_cont);
+			break;
+		case 8:
+			err = testcase_8(ioc, mp->b_cont);
+			break;
+		case 9:
+			err = testcase_9(ioc, mp->b_cont);
+			break;
+		case 10:
+			err = testcase_10(ioc, mp->b_cont);
+			break;
+		default:
+			err = -EINVAL;
+			break;
+		}
+		if (err) {
+			mp->b_datap->db_type = M_IOCNAK;
+			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_error = -err;
+			ioc->iocblk.ioc_rval = -1;
+		} else {
+			mp->b_datap->db_type = M_IOCACK;
+		}
+		qreply(q, mp);
+		return (0);
+	}
+	}
+	putnext(q, mp);
+	return (0);
+}
+
+STATIC int
+nullmod_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
 	return (0);
@@ -163,7 +334,7 @@ nullmod_put(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -181,7 +352,7 @@ nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-static int
+STATIC int
 nullmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
@@ -199,19 +370,24 @@ nullmod_close(queue_t *q, int oflag, cred_t *crp)
  *
  *  -------------------------------------------------------------------------
  */
-static struct qinit nullmod_qinit = {
-	.qi_putp = nullmod_put,
+STATIC struct qinit nullmod_rinit = {
+	.qi_putp = nullmod_rput,
 	.qi_qopen = nullmod_open,
 	.qi_qclose = nullmod_close,
 	.qi_minfo = &nullmod_minfo,
 };
 
-static struct streamtab nullmod_info = {
-	.st_rdinit = &nullmod_qinit,
-	.st_wrinit = &nullmod_qinit,
+STATIC struct qinit nullmod_winit = {
+	.qi_putp = nullmod_wput,
+	.qi_minfo = &nullmod_minfo,
 };
 
-static struct fmodsw nullmod_fmod = {
+STATIC struct streamtab nullmod_info = {
+	.st_rdinit = &nullmod_rinit,
+	.st_wrinit = &nullmod_winit,
+};
+
+STATIC struct fmodsw nullmod_fmod = {
 	.f_name = CONFIG_STREAMS_NULLMOD_NAME,
 	.f_str = &nullmod_info,
 	.f_flag = D_MP,
@@ -219,7 +395,7 @@ static struct fmodsw nullmod_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
-static
+STATIC
 #endif
 int __init
 nullmod_init(void)
@@ -240,7 +416,7 @@ nullmod_init(void)
 };
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
-static
+STATIC
 #endif
 void __exit
 nullmod_exit(void)

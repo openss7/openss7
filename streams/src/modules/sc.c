@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:35 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:35 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/31 19:03:14 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:35 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -299,6 +299,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 	      nak:
 		sc->iocstate = 0;
 		mp->b_datap->db_type = M_IOCNAK;
+		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = -1;
 		ioc->iocblk.ioc_error = -err;
 		qreply(q, mp);
@@ -306,6 +307,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 	      ack:
 		sc->iocstate = 0;
 		mp->b_datap->db_type = M_IOCNAK;
+		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = rval;
 		ioc->iocblk.ioc_error = 0;
 		qreply(q, mp);

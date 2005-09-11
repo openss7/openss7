@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:41 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/09/08 05:52:41 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -7055,7 +7055,8 @@ str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 		mp->b_datap->db_type = M_IOCNAK;
-		ioc->iocblk.ioc_error = EOPNOTSUPP;
+		ioc->iocblk.ioc_count = 0;
+		ioc->iocblk.ioc_error = EINVAL;
 		ioc->iocblk.ioc_rval = -1;
 		qreply(q, mp);
 		return (0);

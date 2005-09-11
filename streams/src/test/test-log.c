@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:09 $
+ @(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/09/10 18:16:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 09:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-log.c,v $
+ Revision 0.9.2.12  2005/09/10 18:16:40  brian
+ - more test build
+
  Revision 0.9.2.11  2005/09/08 09:37:09  brian
  - corrected error output
 
@@ -107,9 +110,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:09 $"
+#ident "@(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/09/10 18:16:40 $"
 
-static char const ident[] = "$RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/08 09:37:09 $";
+static char const ident[] = "$RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/09/10 18:16:40 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -737,102 +740,100 @@ ioctl_string(int cmd, intptr_t arg)
 {
 	switch (cmd) {
 	case I_NREAD:
-		return ("I_NREAD");
+		return ("I_NREAD");	/* 2.1 */
 	case I_PUSH:
-		return ("I_PUSH");
+		return ("I_PUSH");	/* 2.2 */
 	case I_POP:
-		return ("I_POP");
+		return ("I_POP");	/* 2.3 */
 	case I_LOOK:
-		return ("I_LOOK");
+		return ("I_LOOK");	/* 2.4 */
 	case I_FLUSH:
-		return ("I_FLUSH");
+		return ("I_FLUSH");	/* 2.5 */
 	case I_SRDOPT:
-		return ("I_SRDOPT");
+		return ("I_SRDOPT");	/* 2.6 */
 	case I_GRDOPT:
-		return ("I_GRDOPT");
+		return ("I_GRDOPT");	/* 2.7 */
 	case I_STR:
-		return ("I_STR");
+		return ("I_STR");	/* 2.8 */
 	case I_SETSIG:
-		return ("I_SETSIG");
+		return ("I_SETSIG");	/* 2.9 */
 	case I_GETSIG:
-		return ("I_GETSIG");
+		return ("I_GETSIG");	/* 2.10 */
 	case I_FIND:
-		return ("I_FIND");
+		return ("I_FIND");	/* 2.11 */
 	case I_LINK:
-		return ("I_LINK");
+		return ("I_LINK");	/* 2.12 */
 	case I_UNLINK:
-		return ("I_UNLINK");
+		return ("I_UNLINK");	/* 2.13 */
 	case I_RECVFD:
-		return ("I_RECVFD");
+		return ("I_RECVFD");	/* 2.14 */
 	case I_PEEK:
-		return ("I_PEEK");
+		return ("I_PEEK");	/* 2.15 */
 	case I_FDINSERT:
-		return ("I_FDINSERT");
+		return ("I_FDINSERT");	/* 2.16 */
 	case I_SENDFD:
-		return ("I_SENDFD");
+		return ("I_SENDFD");	/* 2.17 */
 #if 0
 	case I_E_RECVFD:
-		return ("I_E_RECVFD");
+		return ("I_E_RECVFD");	/* 2.18 */
 #endif
 	case I_SWROPT:
-		return ("I_SWROPT");
+		return ("I_SWROPT");	/* 2.19 */
 	case I_GWROPT:
-		return ("I_GWROPT");
+		return ("I_GWROPT");	/* 2.20 */
 	case I_LIST:
-		return ("I_LIST");
+		return ("I_LIST");	/* 2.21 */
 	case I_PLINK:
-		return ("I_PLINK");
+		return ("I_PLINK");	/* 2.22 */
 	case I_PUNLINK:
-		return ("I_PUNLINK");
+		return ("I_PUNLINK");	/* 2.23 */
 	case I_FLUSHBAND:
-		return ("I_FLUSHBAND");
+		return ("I_FLUSHBAND");	/* 2.24 */
 	case I_CKBAND:
-		return ("I_CKBAND");
+		return ("I_CKBAND");	/* 2.25 */
 	case I_GETBAND:
-		return ("I_GETBAND");
+		return ("I_GETBAND");	/* 2.26 */
 	case I_ATMARK:
-		return ("I_ATMARK");
+		return ("I_ATMARK");	/* 2.27 */
 	case I_SETCLTIME:
-		return ("I_SETCLTIME");
+		return ("I_SETCLTIME");	/* 2.28 */
 	case I_GETCLTIME:
-		return ("I_GETCLTIME");
+		return ("I_GETCLTIME");	/* 2.29 */
 	case I_CANPUT:
-		return ("I_CANPUT");
-#if 0
+		return ("I_CANPUT");	/* 2.30 */
 	case I_SERROPT:
-		return ("I_SERROPT");
+		return ("I_SERROPT");	/* 2.31 */
 	case I_GERROPT:
-		return ("I_GERROPT");
+		return ("I_GERROPT");	/* 2.32 */
 	case I_ANCHOR:
-		return ("I_ANCHOR");
-#endif
+		return ("I_ANCHOR");	/* 2.33 */
 #if 0
 	case I_S_RECVFD:
-		return ("I_S_RECVFD");
+		return ("I_S_RECVFD");	/* 2.34 */
 	case I_STATS:
-		return ("I_STATS");
+		return ("I_STATS");	/* 2.35 */
 	case I_BIGPIPE:
-		return ("I_BIGPIPE");
+		return ("I_BIGPIPE");	/* 2.36 */
 #endif
 #if 0
 	case I_GETTP:
-		return ("I_GETTP");
+		return ("I_GETTP");	/* 2.37 */
 	case I_AUTOPUSH:
-		return ("I_AUTOPUSH");
+		return ("I_AUTOPUSH");	/* 2.38 */
 	case I_HEAP_REPORT:
-		return ("I_HEAP_REPORT");
+		return ("I_HEAP_REPORT");	/* 2.39 */
 	case I_FIFO:
-		return ("I_FIFO");
+		return ("I_FIFO");	/* 2.40 */
 	case I_PUTPMSG:
-		return ("I_PUTPMSG");
+		return ("I_PUTPMSG");	/* 2.41 */
 	case I_GETPMSG:
-		return ("I_GETPMSG");
+		return ("I_GETPMSG");	/* 2.42 */
 	case I_FATTACH:
-		return ("I_FATTACH");
+		return ("I_FATTACH");	/* 2.43 */
 	case I_FDETACH:
-		return ("I_FDETACH");
+		return ("I_FDETACH");	/* 2.44 */
 	case I_PIPE:
-		return ("I_PIPE");
+		return ("I_PIPE");	/* 2.45 */
 #endif
 	default:
 		return ("(unexpected)");
@@ -933,17 +934,17 @@ print_pipe(int child)
 }
 
 void
-print_open(int child)
+print_open(int child, const char* name)
 {
 	static const char *msgs[] = {
-		"open()        ----->v                                |  |                   \n",
-		"  open()      ----->v                                |  |                   \n",
-		"    open()    ----->v                                |  |                   \n",
-		"                    .                                .  .                   \n",
+		"open()        ----->v %-30s |  |                   \n",
+		"  open()      ----->v %-30s |  |                   \n",
+		"    open()    ----->v %-30s |  |                   \n",
+		"                    . %-30s .  .                   \n",
 	};
 
 	if (verbose > 3)
-		print_simple(child, msgs);
+		print_simple_string(child, msgs, name);
 }
 
 void
@@ -1635,7 +1636,7 @@ test_open(int child, const char *name)
 	int fd;
 
 	for (;;) {
-		print_open(child);
+		print_open(child, name);
 		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
 			test_fd[child] = fd;
 			print_success(child);
@@ -1790,14 +1791,17 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
+static const char sref_none[] = "(none)";
+
 /*
  *  Open and Close 1 stream.
  */
-#define test_group_1 "Open and close streams"
+static const char test_group_1[] = "Open and close streams";
+
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
 #define name_case_1_1 "Open and close 1 stream."
-#define sref_case_1_1 "(none)"
+#define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
 Checks that one stream can be opened and closed."
 
@@ -1822,7 +1826,7 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 #define tgrp_case_1_2 test_group_1
 #define numb_case_1_2 "1.2"
 #define name_case_1_2 "Open and close 3 streams."
-#define sref_case_1_2 "(none)"
+#define sref_case_1_2 sref_none
 #define desc_case_1_2 "\
 Checks that three streams can be opened and closed."
 

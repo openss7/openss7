@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/10 18:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:07 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/10 18:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/10 18:16:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/03 08:12:07 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/10 18:16:32 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -171,7 +171,7 @@ nuls_put(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case M_IOCTL:
-		err = -EOPNOTSUPP;
+		err = -EINVAL;
 		goto nak;
 	case M_IOCDATA:
 		err = -EINVAL;
@@ -192,6 +192,7 @@ nuls_put(queue_t *q, mblk_t *mp)
 
 		mp->b_datap->db_type = M_IOCNAK;
 		ioc = (typeof(ioc)) mp->b_rptr;
+		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = -1;
 		ioc->iocblk.ioc_error = -err;
 		qreply(q, mp);

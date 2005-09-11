@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:03 $ by $Author: brian $
+ Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/08/31 19:03:03 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -236,7 +236,7 @@ sad_put(queue_t *q, mblk_t *mp)
 			sad->iocstate = 1;
 			goto sad_vml_state1;
 		}
-		err = -EOPNOTSUPP;
+		err = -EINVAL;
 		goto nak;
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
@@ -357,6 +357,7 @@ sad_put(queue_t *q, mblk_t *mp)
       nak:
 	sad->iocstate = 0;
 	mp->b_datap->db_type = M_IOCNAK;
+	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = -1;
 	ioc->iocblk.ioc_error = -err;
 	qreply(q, mp);
@@ -364,6 +365,7 @@ sad_put(queue_t *q, mblk_t *mp)
       ack:
 	sad->iocstate = 0;
 	mp->b_datap->db_type = M_IOCACK;
+	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = rval;
 	ioc->iocblk.ioc_error = 0;
 	qreply(q, mp);
