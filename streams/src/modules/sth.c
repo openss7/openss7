@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:35 $ by $Author: brian $
+ Last Modified $Date: 2005/09/12 13:12:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/10 18:16:35 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -840,7 +840,8 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		se->se_procp = procp;
 		se->se_events = events;
 		se->se_fd = fd;
-		printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events, procp, fd));
+		printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events,
+			procp, fd));
 		/* calc sig flags */
 		sd->sd_sigflags |= events;
 		ptrace(("%s: new events %lu\n", __FUNCTION__, sd->sd_sigflags));
@@ -1812,15 +1813,16 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		assert(ioc);
 
 		switch (mb->b_datap->db_type) {
-		case M_IOCACK:
 		case M_IOCNAK:
 			err = ioc->iocblk.ioc_error;
+			/* SVR 4 SPG says if error is zero return EINVAL */
+			if (err == 0)
+				err = EINVAL;
+			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			if (err) {
-				ptrace(("Error path taken! err = %d\n", err));
-				break;
-			}
-			err = ioc->iocblk.ioc_rval;
+			ptrace(("Error path taken! err = %d\n", err));
+			break;
+		case M_IOCACK:
 			if (ioc->iocblk.ioc_count > 0) {
 				if (!(err = strcopyoutb(mb->b_cont, ic->ic_dp,
 							ioc->iocblk.ioc_count, user))) {
@@ -1828,7 +1830,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 					err = ioc->iocblk.ioc_rval;
 				} else
 					ptrace(("Error path taken! err = %d\n", err));
-			}
+			} else
+				err = ioc->iocblk.ioc_rval;
 			break;
 		case M_COPYIN:
 			mb->b_datap->db_type = M_IOCDATA;
@@ -1906,17 +1909,24 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 
 		ioc = (typeof(ioc)) mb->b_rptr;
 		switch (mb->b_datap->db_type) {
-		case M_IOCACK:
 		case M_IOCNAK:
 			err = ioc->iocblk.ioc_error;
+			/* SVR 4 SPG says if error is zero return EINVAL */
+			if (err == 0)
+				err = EINVAL;
+			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			if (err)
-				break;
-			if (ioc->iocblk.ioc_count > 0)
+			ptrace(("Error path taken! err = %d\n", err));
+			break;
+		case M_IOCACK:
+			if (ioc->iocblk.ioc_count > 0) {
 				if (!(err = strcopyoutb(db->b_cont, (caddr_t) arg,
 							ioc->iocblk.ioc_count, user)))
 					err = ioc->iocblk.ioc_rval;
-			err = ioc->iocblk.ioc_rval;
+				else
+					ptrace(("Error path taken! err = %d\n", err));
+			} else
+				err = ioc->iocblk.ioc_rval;
 			break;
 		case M_COPYIN:
 			mb->b_datap->db_type = M_IOCDATA;
@@ -2006,15 +2016,18 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 		mb = strwaitiocack(sd, NULL, access);
 
 		switch (mb->b_datap->db_type) {
-		case M_IOCACK:
-			err = 0;
-			break;
 		case M_IOCNAK:
 			ioc = (typeof(ioc)) mb->b_rptr;
 			err = ioc->iocblk.ioc_error;
+			/* SVR 4 SPG says return EINVAL, but for I_LINK return ENXIO */
+			if (err == 0)
+				err = ENXIO;
+			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			if (!err)
-				err = -ENXIO;
+			ptrace(("Error path taken! err = %d\n", err));
+			break;
+		case M_IOCACK:
+			err = 0;
 			break;
 		case M_COPYIN:
 		case M_COPYOUT:
@@ -4620,7 +4633,7 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	printd(("%s: copying string from user\n", __FUNCTION__));
-	if ((err = strncpy_from_user(name, (const char *)arg, FMNAMESZ + 1)) < 0) {
+	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0) {
 		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
@@ -4969,7 +4982,7 @@ STATIC int
 str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int wropt;
-	
+
 	if (!access_ok(VERIFY_WRITE, arg, sizeof(wropt))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);
@@ -5938,7 +5951,7 @@ STATIC int
 str_i_gerropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int eropt;
-	
+
 	if (!access_ok(VERIFY_WRITE, arg, sizeof(eropt))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);

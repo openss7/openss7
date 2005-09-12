@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/08 05:52:40 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/12 13:12:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
+ Last Modified $Date: 2005/09/12 13:12:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/08 05:52:40 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/12 13:12:16 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/08 05:52:40 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/12 13:12:16 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1627,7 +1627,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
-	if (!test_bit(QHLIST_BIT, &q->q_flag))
+	if (!test_bit(QPROCS_BIT, &q->q_flag))
 		func(q, mp);
 	else {
 		/* procs have been turned off */
@@ -1662,7 +1662,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
-	if (!test_bit(QHLIST_BIT, &q->q_flag))
+	if (!test_bit(QPROCS_BIT, &q->q_flag))
 		func(arg, mp);
 	else {
 		/* procs have been turned off */
@@ -1713,7 +1713,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
-	if (!test_bit(QHLIST_BIT, &q->q_flag)) {
+	if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 		ptrace(("calling put procedure\n"));
 		(void) q->q_qinfo->qi_putp(q, mp);
 		qwakeup(q);
@@ -1777,7 +1777,7 @@ srvp_fast(queue_t *q)
 		qold = xchg(&this_thread->currentq, q);
 		srlock(qstream(q));
 		/* check if procs are turned off */
-		if (!test_bit(QHLIST_BIT, &q->q_flag)) {
+		if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 #if 0
 			{
 				mblk_t *b, *b_next;

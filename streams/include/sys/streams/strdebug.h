@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.18 2005/08/31 19:02:52 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.19 2005/09/12 13:12:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:02:52 $ by $Author: brian $
+ Last Modified $Date: 2005/09/12 13:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/08/31 19:02:52 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/12 13:12:10 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -186,7 +186,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define   pswerr(__pks)		__pswerr(__pks)
 
 #undef STATIC
-#define STATIC
+#define STATIC static
 
 #undef INLINE
 #define INLINE

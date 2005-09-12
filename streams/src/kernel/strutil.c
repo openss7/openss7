@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/08 05:52:40 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
+ Last Modified $Date: 2005/09/12 13:12:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/08 05:52:40 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:17 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/09/08 05:52:40 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:17 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2398,8 +2398,8 @@ qalloc(struct stdata *sd, struct fmodsw *fmod)
 
 	if ((q = allocq())) {
 		/* start life qprocsoff() */
-		(q + 0)->q_flag |= QHLIST | QNOENB;
-		(q + 1)->q_flag |= QHLIST | QNOENB;
+		(q + 0)->q_flag |= QPROCS | QNOENB;
+		(q + 1)->q_flag |= QPROCS | QNOENB;
 		if (!__setsq(q, fmod)) {
 			struct streamtab *st = fmod->f_str;
 			struct queinfo *qu = (typeof(qu)) q;
@@ -2542,7 +2542,7 @@ EXPORT_SYMBOL(qdelete);
  *  the stream.
  *
  *  It is the responsibility of the module qi_qclose() procedure to call qprocsoff() before
- *  returning; however, many modules do not, so we use the QHLIST flag in the queue pairs to
+ *  returning; however, many modules do not, so we use the QPROCS flag in the queue pairs to
  *  determine whether a qprocsoff() has been called.  qprocsoff() half-deletes the queue pair from
  *  the STREAM under STREAM head write lock.  The call to qdelete() completes this operation and
  *  destroys the queue pair.
@@ -2657,12 +2657,12 @@ qprocsoff(queue_t *q)
 
 	assert(current_context() <= CTX_STREAMS);
 	/* only one qprocsoff() happens at a time */
-	if (!test_bit(QHLIST_BIT, &rq->q_flag)) {
+	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct queinfo *qu = ((typeof(qu)) rq);
 		struct stdata *sd = qu->qu_str;
 
-		set_bit(QHLIST_BIT, &rq->q_flag);
-		set_bit(QHLIST_BIT, &wq->q_flag);
+		set_bit(QPROCS_BIT, &rq->q_flag);
+		set_bit(QPROCS_BIT, &wq->q_flag);
 
 		assert(sd);
 
@@ -2687,8 +2687,8 @@ qprocsoff(queue_t *q)
 		}
 
 		swunlock(sd);
-		/* XXX: put procs must check QHLIST bit after acquiring srlock */
-		/* XXX: srv procs must check QHLIST bit after acquiring srlock */
+		/* XXX: put procs must check QPROCS bit after acquiring srlock */
+		/* XXX: srv procs must check QPROCS bit after acquiring srlock */
 	}
 }
 
@@ -2727,12 +2727,12 @@ qprocson(queue_t *q)
 
 	assert(current_context() <= CTX_STREAMS);
 	/* only one qprocson() happens at a time */
-	if (test_bit(QHLIST_BIT, &rq->q_flag)) {
+	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct queinfo *qu = ((typeof(qu)) rq);
 		struct stdata *sd = qu->qu_str;
 
-		clear_bit(QHLIST_BIT, &rq->q_flag);
-		clear_bit(QHLIST_BIT, &wq->q_flag);
+		clear_bit(QPROCS_BIT, &rq->q_flag);
+		clear_bit(QPROCS_BIT, &wq->q_flag);
 		clear_bit(QNOENB_BIT, &rq->q_flag);
 		clear_bit(QNOENB_BIT, &wq->q_flag);
 

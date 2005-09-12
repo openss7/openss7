@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/12 13:12:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/03 08:12:11 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -298,6 +298,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 	return (snode);
 }
 
+#if 0
 STATIC struct dentry *
 spec_lookup(struct dentry *base, struct qstr *name)
 {
@@ -309,7 +310,6 @@ spec_lookup(struct dentry *base, struct qstr *name)
 	return (dentry);
 }
 
-#if 0
 struct inode *
 spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 {
@@ -1522,10 +1522,13 @@ spec_delete_inode(struct inode *inode)
 		   inode from the module structure, we hold a reference count on the inode.  We
 		   should never get here with either the u.generic_ip pointer set or the d_inode
 		   reference still held.  Forced deletions might get us here anyway. */
+#if 0
 		if (inode->u.generic_ip) {
 			swerr();
 			inode->u.generic_ip = NULL;
 		}
+#endif
+		assert(inode->u.generic_ip == NULL);
 		break;
 	case S_IFCHR:
 		/* character special device inodes potentially have a minor devnode structure
@@ -1534,10 +1537,13 @@ spec_delete_inode(struct inode *inode)
 		   a reference count on the inode.  We should never get here with either the
 		   u.generic_ip pointer set or the n_inode reference still held.  Forced deletions
 		   might get us here anyway. */
+#if 0
 		if (inode->u.generic_ip) {
 			swerr();
 			inode->u.generic_ip = NULL;
 		}
+#endif
+		assert(inode->u.generic_ip == NULL);
 		/* fall through */
 	default:
 //#ifdef CONFIG_STREAMS_FIFO
@@ -1553,6 +1559,9 @@ spec_delete_inode(struct inode *inode)
 		/* When we referemce the inode from the stdata structure, we hold a reference count 
 		   on the inode.  We should never get here with the the sd_inode reference still
 		   held.  Forced deletions might get us here anyway. */
+
+		/* otherwise bad things will happen in clear_inode() */
+		assert(inode->i_pipe == NULL);
 #if 0
 		/* Never change i_pipe without holding the inode semaphore. */
 		down(&inode->i_sem);

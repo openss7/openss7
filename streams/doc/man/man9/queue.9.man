@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.16 2005/08/29 10:06:49 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.17 2005/09/12 13:10:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/12 13:10:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -188,7 +188,7 @@ the queue has been back enabled
 module supports old style open/close
 .TP
 .B QHLIST
-stream head is using queue
+stream head is on the scan list
 .TP
 .B QTOENAB
 to be enabled
@@ -207,6 +207,9 @@ service procedure running
 .TP
 .B QWCLOSE
 q in close wait
+.TP
+.B QPROCS
+q has procs turned off
 .PD
 .RE
 .TP
@@ -691,7 +694,7 @@ not supported by
 as follows:
 .BR none .
 .IR UXP/V \(rg
-does no document the
+does not document the
 .BR QUP ", " QBACK ", " QOLD ", " QHLIST ", " QTOENAB ", " QSAFE ", " QWELDED ", " QSVCBUSY " or " QWCLOSE
 flags.
 .IP ""
@@ -700,7 +703,7 @@ is sometimes called
 .BR QBLKING " or " QUPMODE .
 .BR QHLIST
 is sometimes called
-.BR QPROCSON " or " QPROCSOFF .
+.BR QSCAN .
 .BR QSYNCH
 is sometimes called
 .BR QFREEZE " or " QLOCK .
@@ -710,6 +713,9 @@ is sometimes called
 .BR QWCLOSE
 is sometimes called
 .BR QCLOSEWT " or " QCLOSING .
+.BR QPROCS
+is sometimes called
+.BR QPROCSON " or " QPROCSOFF .
 .IP \(em
 .IP \(em
 .IP \(em
