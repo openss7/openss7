@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/12 13:12:20 $ by $Author: brian $
+ Last Modified $Date: 2005/09/13 11:55:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:20 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -5764,32 +5764,43 @@ STATIC inline streams_fastcall int
 str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct file *f2;
+	struct stdata *s2;
 	int err;
 
 	if (!(err = straccess_rlock(sd, (FWRITE | FNDELAY)))) {
-		if ((f2 = fget(arg))) {
-			queue_t *q = sd->sd_wq;
+		if (!(s2 = sd->sd_other)) {
+			if (!(err = straccess_rlock(s2, (FWRITE | FNDELAY)))) {
+				if ((f2 = fget(arg))) {
+					queue_t *q = s2->sd_rq;
 
-			if (canputnext(q)) {
-				mblk_t *mp;
-				frtn_t freefd = { freefd_func, (caddr_t) f2 };
+					/* SVR 4 SPG says that this message is placed directly on
+					   the read queue of the target stream head. */
+					if (canput(q)) {
+						mblk_t *mp;
+						frtn_t freefd = { freefd_func, (caddr_t) f2 };
 
-				if ((mp = esballoc((void *) f2, sizeof(f2), BPRI_MED, &freefd))) {
-					mp->b_datap->db_type = M_PASSFP;
-					mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
-					*((typeof(f2) *) mp->b_wptr) = f2;
-					mp->b_wptr += sizeof(f2);
-					putq(q, mp);
-				} else {
-					err = -ENOSR;
-					fput(f2);
-				}
-			} else {
-				err = -EAGAIN;
-				fput(f2);
+						if ((mp = esballoc((void *) f2, sizeof(f2),
+								   BPRI_MED, &freefd))) {
+							mp->b_datap->db_type = M_PASSFP;
+							mp->b_rptr = mp->b_wptr =
+							    mp->b_datap->db_base;
+							*((typeof(f2) *) mp->b_wptr) = f2;
+							mp->b_wptr += sizeof(f2);
+							putq(q, mp);
+						} else {
+							err = -ENOSR;
+							fput(f2);
+						}
+					} else {
+						err = -EAGAIN;
+						fput(f2);
+					}
+				} else
+					err = -EBADF;
+				srunlock(s2);
 			}
 		} else
-			err = -EBADF;
+			err = -ENXIO;	/* XXX: EINVAL? ENXIO? */
 		srunlock(sd);
 	}
 	return (err);
