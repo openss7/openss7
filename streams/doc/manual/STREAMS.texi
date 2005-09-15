@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.22 2005/07/08 13:16:11 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.23 2005/09/15 13:03:08 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/07/08 13:16:11 $ by $Author: brian $
+% Last Modified $Date: 2005/09/15 13:03:08 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -283,7 +283,7 @@ General Public License}).  Please note, however, that there are different licens
 manual pages and some of the documentation (derived from X/Open publications and other sources).
 Consult the permission notices contained in the documentation for more information.
 
-This document, is released under the @cite{GNU Free Documentation License} (@pxref{Documentation
+This guide, is released under the @cite{GNU Free Documentation License} (@pxref{Documentation
 License}) with all sections invariant.
 
 @node Overview
@@ -294,10 +294,10 @@ This manual documents the design, implementation, installation, operation and fu
 the @value{PACKAGE_TITLE} package.
 
 @node Organization
-@section Organization of this Document
+@section Organization of this Guide
 @cindex organization
 
-This document is organized (loosely) into several sections as follows:
+This guide is organized (loosely) into several sections as follows:
 
 @ifnottex
 @menu
@@ -720,7 +720,7 @@ For additional details,
 @chapter Troubleshooting
 @cindex troubleshooting
 
-@include testsuite.texi
+@include texi/testsuite.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

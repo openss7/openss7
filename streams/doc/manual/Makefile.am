@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/14 09:01:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/15 13:02:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/14 09:01:12 $ by $Author: brian $
+# Last Modified $Date: 2005/09/15 13:02:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,7 +116,16 @@ FIG_FIGS		= \
 			  SPG_fig43.fig \
 			  SPG_fig44.fig \
 			  SPG_fig45.fig \
-			  SPG_fig46.fig
+			  SPG_fig46.fig \
+			  SPG_fig47.fig \
+			  SPG_fig48.fig \
+			  SPG_fig49.fig \
+			  SPG_fig50.fig \
+			  SPG_fig51.fig \
+			  SPG_fig52.fig \
+			  SPG_fig53.fig \
+			  SPG_fig54.fig \
+			  SPG_fig55.fig
 
 ## PKG_BUILD_INDEP
 endif
