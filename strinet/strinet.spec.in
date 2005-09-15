@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/07/08 13:14:32 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/09/14 23:41:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 13:14:32 $ by $Author: brian $
+# Last Modified $Date: 2005/09/14 23:41:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -302,6 +302,7 @@ ExclusiveOs:    Linux
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 %if %{BUILD_modules}
+# TODO: FC4 wants kernel-devel not kernel-source
 BuildRequires:  kernel-source = %{kernel_source}
 BuildRequires:  modutils >= 2.4.12
 %endif
@@ -1543,9 +1544,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.88  2005/07/08 13:14:32  brian
-# - corrections to versioning
+# Revision 0.9.2.89  2005/09/14 23:41:35  brian
+# - bumped release numbers and change logs
 #
+
+* Fri Jul  8 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.88  2005/07/08 13:14:32  brian
+- corrections to versioning
 
 * Fri Jul  8 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.87  2005/07/08 12:42:30  brian

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.34 $) $Date: 2005/07/07 20:28:31 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.35 $) $Date: 2005/09/14 23:40:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:28:31 $ by $Author: brian $
+# Last Modified $Date: 2005/09/14 23:40:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -276,6 +276,7 @@ ExclusiveOs:    Linux
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 %if %{BUILD_modules}
+# TODO: FC4 wants kernel-devel not kernel-source
 BuildRequires:  kernel-source = %{kernel_source}
 BuildRequires:  modutils >= 2.4.12
 %endif
@@ -1560,12 +1561,18 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.34  2005/07/07 20:28:31  brian
-# - changes for release
+# Revision 1.1.6.35  2005/09/14 23:40:51  brian
+# - bumped release numbers and change logs
 #
-# Revision 1.1.6.33  2005/07/06 04:14:25  brian
-# - added requirement for strcompat package
-#
+
+* Thu Jul  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.34  2005/07/07 20:28:31  brian
+- changes for release
+
+* Wed Jul  6 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.33  2005/07/06 04:14:25  brian
+- added requirement for strcompat package
+
 
 * Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.32  2005/06/25 07:01:47  brian

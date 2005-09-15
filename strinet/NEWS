@@ -3,6 +3,10 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes for strinet-0.9.2.2
+
+  This is primarily a bug fix release.
+
 * Initial release strinet-0.9.2.1
 
   With this release version numbers were changed to reflect an upstream version

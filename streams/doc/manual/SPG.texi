@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.31 2005/09/14 09:01:20 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.32 2005/09/14 23:47:52 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/14 09:01:20 $ by $Author: brian $
+% Last Modified $Date: 2005/09/14 23:47:52 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -355,6 +355,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @menu
 * Acknowledgements::
 * Introduction::
+* Basics::
 * Overview::
 * Mechanism::
 * Processing::
@@ -396,6 +397,14 @@ Introduction
 * Why Fast?::			STREAMS Implementation
 * Why Linux?::			STREAMS for Linux
 * Why Compatibility?::		STREAMS Compatibility
+
+Basics
+
+* What is STREAMS?::		STREAMS Description
+* Basic Streams Operations::	STREAMS Basic Operations
+* STREAMS Components::		STREAMS Components
+* Multiplexing::		STREAMS Multiplexing
+* Benefits of STREAMS::		STREAMS Benefits
 
 Overview
 
@@ -627,18 +636,20 @@ compatible @cite{STREAMS} implementation for @b{Linux}
 2.4 and 2.6 series kernels.
 
 @menu
-* What is STREAMS?::		STRAEMS Overview
-* Does Linux have STREAMS?::	STREAMS and Linux
-* Why STREAMS?::		STREAMS Justification
-* Why Fast?::			STREAMS Implementation
-* Why Linux?::			STREAMS for Linux
-* Why Compatibility?::		STREAMS Compatibility
+* What is STREAMS?::		STREAMS Overview
 @end menu
 
 @node What is STREAMS?
 @section What is @cite{STREAMS}?
 @cindex what is @cite{STREAMS}?
 @cindex @cite{STREAMS}, what is it?
+@menu
+* Does Linux have STREAMS?::	STREAMS and Linux
+* Why STREAMS?::		STREAMS Justification
+* Why Fast?::			STREAMS Implementation
+* Why Linux?::			STREAMS for Linux
+* Why Compatibility?::		STREAMS Compatibility
+@end menu
 
 @cite{STREAMS} is a facility first presented by Dennis M. Ritchie in 1984,@footnote{@cite{A Stream
 Input-Output System, AT&T Bell Laboratories Technical Journal 63, No. 8 Part 2 (October, 1984), pp.
@@ -675,7 +686,7 @@ many do not support @dfn{STREAMS}-based pipe and FIFOs@footnote{For example, AIX
 input-output.@footnote{For example, HP-UX}.
 
 @node Does Linux have STREAMS?
-@section Does Linux have STREAMS?
+@subsection Does Linux have STREAMS?
 @cindex Does Linux have STREAMS?
 
 No, not as part of the kernel.  That is rather peculiar, particularly since Linux normally follows
@@ -698,7 +709,7 @@ technical argument.  This is discussed more in the next section (@pxref{Why STRE
 @subsection OpenSTREAMS?
 
 @node Why STREAMS?
-@section Why STREAMS?
+@subsection Why STREAMS?
 @cindex Why STREAMS?
 
 @menu
@@ -709,7 +720,7 @@ technical argument.  This is discussed more in the next section (@pxref{Why STRE
 @end menu
 
 @node STREAMS versus Sockets
-@subsection STREAMS versus Sockets
+@subsubsection STREAMS versus Sockets
 @cindex STREAMS versus Sockets
 
 The basic question that is always asked is: "Why use @cite{STREAMS} when you can just use
@@ -844,7 +855,7 @@ in comparison to @dfn{Sockets}.  It will also be possible to compare the perform
 @b{Linux} pipes and FIFOs with @dfn{STREAMS}-based pipes and FIFOs.
 
 @node Benefits of STREAMS
-@subsection Benefits of @cite{STREAMS}
+@subsubsection Benefits of @cite{STREAMS}
 @cindex benefits of @cite{STREAMS}
 @cindex @cite{STREAMS}, benefits
 
@@ -870,12 +881,9 @@ preceding sequence of messages.
 
 In general, any two modules can be connected anywhere in a @dfn{Stream}.  However, rational sequences are
 generally constructed by connecting modules with compatible protocol service interfaces.  For
-example, a module that implements an X.25 protocol layer, as shown in
-@c @figref{13},
-Figure 13,
-presents a protocol service interface at its input and output sides.  In this case, other modules
-should only be connected to the input and output side if they have the compatible X.25 service
-interface.
+example, a module that implements an X.25 protocol layer, as shown in @figref{13}, presents a
+protocol service interface at its input and output sides.  In this case, other modules should only
+be connected to the input and output side if they have the compatible X.25 service interface.
 
 @subsubsection Manipulating Modules
 @cindex Manipulating Modules
@@ -896,11 +904,9 @@ protocols.
 
 @subsubsection Protocol Portability
 
-@c @figref{13}
-Figure 13,
-shows how the same X.25 protocol module can be used with different drivers on different machines by
-implementing compatible service interfaces.  The X.25 protocol module interfaces are Connection
-Oriented Network Service (CONS) and Link Access Protocol - Balanced (LAPB).
+@figref{13} shows how the same X.25 protocol module can be used with different drivers on different
+machines by implementing compatible service interfaces.  The X.25 protocol module interfaces are
+Connection Oriented Network Service (CONS) and Link Access Protocol - Balanced (LAPB).
 
 @subsubsection Protocol Substitution
 
@@ -909,12 +915,10 @@ implemented to an equivalent service interface.
 
 @subsubsection Protocol Migration
 
-@c @figref{14}
-Figure 14
-illustrates how @cite{STREAMS} can move functions between kernel software and front end firmware.  A
-common downstream service interface allows the transport protocol module to be independent of the
-number or type of modules below.  The same transport module will connect without modification to
-either an X.25 module or X.25 driver that has the same service interface.
+@figref{14} illustrates how @cite{STREAMS} can move functions between kernel software and front end
+firmware.  A common downstream service interface allows the transport protocol module to be
+independent of the number or type of modules below.  The same transport module will connect without
+modification to either an X.25 module or X.25 driver that has the same service interface.
 
 By shifting functions between software and firmware, you can produce cost-effective, functionally
 equivalent systems over a wide range of configurations.  They can rapidly incorporate technological
@@ -924,15 +928,13 @@ front-end is economically justified.
 
 @subsubsection Module Reusability
 
-@c @figref{15}
-Figure 15
-shows the same canonical module (for example, one that provide delete and kill processing on
-character strings) reused in two different Streams.  This module would typically be implemented as a
-filter, with no downstream service interface.  In both cases, a @dfn{tty} interface is presented to the
-@dfn{Stream}'s user process since the module is nearest the @dfn{Stream head}.
+@figref{15} shows the same canonical module (for example, one that provide delete and kill
+processing on character strings) reused in two different Streams.  This module would typically be
+implemented as a filter, with no downstream service interface.  In both cases, a @dfn{tty} interface
+is presented to the @dfn{Stream}'s user process since the module is nearest the @dfn{Stream head}.
 
 @node Criticism of STREAMS
-@subsection Criticism of STREAMS
+@subsubsection Criticism of STREAMS
 @cindex Criticism of STREAMS
 
 Following are some excerpts from Dennis M. Ritchie's original (1984) Bell Technical Journal paper on
@@ -1066,7 +1068,7 @@ to allow the implementation of the @cite{ISO} networking protocols.
 @end quotation
 
 @node Realities of STREAMS
-@subsection Realities of STREAMS
+@subsubsection Realities of STREAMS
 @cindex Realities of STREAMS
 
 The realities of @dfn{STREAMS} are as follows:
@@ -1115,7 +1117,7 @@ communications networking suites.
 @end itemize
 
 @node Why Fast?
-@section Why Fast?
+@subsection Why Fast?
 @cindex Why Fast?
 
 @dfn{@value{PACKAGE_TITLE}} includes the word @cite{fast} in the name because of the original roots of
@@ -1184,7 +1186,7 @@ caches and other techniques.
 @end itemize
 
 @node Why Linux?
-@section Why Linux?
+@subsection Why Linux?
 @cindex Why Linux?
 
 Well, @b{Linux} is the only @cite{SVR 4}
@@ -1197,7 +1199,7 @@ Without @cite{STREAMS}, @b{Linux} is just another @cite{BSD},
 and perhaps a bad one.
 
 @node Why Compatibility?
-@section Why Compatibility?
+@subsection Why Compatibility?
 @cindex Why Compatibility?
 
 @dfn{@value{PACKAGE_TITLE}} is designed and implemented to be compatible with as many
@@ -1311,6 +1313,560 @@ user-space facilities and system calls are completely defined and described.
 
 @subsection Device Driver Interface (DDI)
 @cindex DDI
+
+@node Basics
+@chapter Basics of STREAMS
+@cindex STREAMS basics
+@menu
+* What is STREAMS?::		STREAMS Description
+* Basic Streams Operations::	STREAMS Basic Operations
+* STREAMS Components::		STREAMS Components
+* Multiplexing::		STREAMS Multiplexing
+* Benefits of STREAMS::		STREAMS Benefits
+@end menu
+
+@node What is STREAMS?
+@section What is STREAMS?
+
+@dfn{STREAMS} is a general, flexible facility and a set of tools for development of @cite{UNIX}
+system communication services.  It supports the implementation of services ranging from complete
+networking protocol suites to individual device drivers.  @dfn{STREAMS} defines standard interfaces
+for character input/output within the kernel, and between the kernel and the rest of the @cite{UNIX}
+system.  The associated mechanism is simple and open-ended.  It consists of a set of system calls,
+kernel resources, and kernel routines.
+
+The standard interface and mechanism enable modular, portable development and easy integration of
+high performance network services and their components.  @dfn{STREAMS} does not impose any specific
+network architecture.  The @dfn{STREAMS} user interface is upwardly compatible with the character
+I/O user level functions such as @manref{open(2)}, @manref{close(2)}, @manref{read(2)},
+@manref{write(2)}, and @manref{ioctl(2)}.  Benefits of @dfn{STREAMS} are discussed in more detail
+later in this chapter.
+
+A @dfn{Stream} is a full-duplex processing and data transfer path between a @dfn{STREAMS} driver in
+kernel space and a process in user space (see [6]Figure:1.1 [7]Simple @dfn{Stream} ).  In the
+kernel, a @dfn{Stream} is constructed by linking a @dfn{Stream head}, a driver, and zero or more
+modules between the @dfn{Stream head} and driver.  The @dfn{Stream head} is the end of the
+@dfn{Stream} nearest to the user process.  All system calls made by a user level process on a
+@dfn{Stream} are processed by the @dfn{Stream head}.
+
+Pipes are also @dfn{STREAMS}-based.  A @dfn{STREAMS}-based pipe (see [8]Figure:1.2
+[9]@dfn{STREAMS}-based Pipe ) is a full-duplex (bidirectional) data transfer path in the kernel.  It
+implements a connection between the kernel and one or more user processes and also shares properties
+of @dfn{STREAMS}-based devices.
+
+A @dfn{STREAMS} driver may be a device driver that provides the services of an external I/O device,
+or a software driver, commonly referred to as a @dfn{pseudo-device driver}.  The driver typically
+handles data transfer between the kernel and the device and does little or no processing of data
+other than conversion between data structures used by the @dfn{STREAMS} mechanism and data
+structures that the device understands.
+
+A @dfn{STREAMS} module represents processing functions to be performed on data flowing on the
+@dfn{Stream}.  The module is a defined set of kernel-level routines and data structures used to
+process data, status, and control information.  Data processing may involve changing the way the
+data are represented, adding/deleting header and trailer information to data, and/or
+packetizing/depacketizing data.  Status and control information includes signals and input/output
+control information.  Each module is self-contained and functionally isolated from any other
+component in the @dfn{Stream} except its two neighboring components.  The module communicates with
+its neighbors by passing messages.  The module is not a required component in @dfn{STREAMS}, whereas
+the driver is, except in a @dfn{STREAMS}-based pipe where only the @dfn{Stream head} is required.
+
+ [Figure:1.1 Simple @dfn{Stream}]
+
+ [strm.stmexap.gif]
+
+One or more modules may be inserted into a @dfn{Stream} between the @dfn{Stream head} and driver to
+perform intermediate processing of messages as they pass between the @dfn{Stream head} and driver.
+@dfn{STREAMS} modules are dynamically interconnected in a @dfn{Stream} by a user process.  No kernel
+programming, assembly, or link editing is required to create the interconnection.
+
+ [Figure:1.2 @dfn{STREAMS}-based Pipe]
+
+ [strm.stmpipe.gif]
+
+@dfn{STREAMS} uses queue structures to keep information about given instances of a pushed module or
+opened @dfn{STREAMS} device.  A queue is a data structure that contains status information, a
+pointer to routines processing messages, and pointers for administering the @dfn{Stream}.  Queues
+are always allocated in pairs; one queue for the read-side and other for the write-side.  There is
+one queue pair for each driver and module, and the @dfn{Stream head}.  The pair of queues is
+allocated whenever the @dfn{Stream} is opened or the module is pushed (added) onto the @dfn{Stream}.
+
+Data are passed between a driver and the @dfn{Stream head} and between modules in the form of
+messages.  A message is a set of data structures used to pass data, status, and control information
+between user processes, modules, and drivers.  Messages that are passed from the @dfn{Stream head}
+toward the driver or from the process to the device, are said to travel downstream (also called
+write-side).  Similarly, messages passed in the other direction, from the device to the process or
+from the driver to the @dfn{Stream head}, travel upstream (also called read-side).
+
+A @dfn{STREAMS} message is made up of one or more message blocks.  Each block is a 3-tuple
+consisting of a header, a data block, and a data buffer.  The @dfn{Stream head} transfers data
+between the data space of a user process and @dfn{STREAMS} kernel data space.  Data to be sent to a
+driver from a user process are packaged into @dfn{STREAMS} messages and passed downstream.  When a
+message containing data arrives at the @dfn{Stream head} from downstream, the message is processed
+by the @dfn{Stream head}, which copies the data into user buffers.
+
+Within a @dfn{Stream}, messages are distinguished by a type indicator.  Certain message types sent
+upstream may cause the @dfn{Stream head} to perform specific actions, such as sending a signal to a
+user process.  Other message types are intended to carry information within a @dfn{Stream} and are
+not directly seen by a user process.
+
+@c =================================================
+
+@node Basic Streams Operations
+@section Basic Streams Operations
+
+This section describes the basic set of operations for manipulating @dfn{STREAMS} entities.
+
+A @dfn{STREAMS} driver is similar to a traditional character I/O driver in that it has one or more
+nodes associated with it in the file system and it is accessed using the open system call.
+Typically, each file system node corresponds to a separate minor device for that driver.  Opening
+different minor devices of a driver will cause separate @dfn{Streams} to be connected between a user
+process and the driver.  The file descriptor returned by the open call is used for further access to
+the Stream.  If the same minor device is opened more than once, only one Stream will be created; the
+first open call will create the Stream, and subsequent open calls will return a file descriptor that
+references that Stream.  Each process that opens the same minor device will share the same Stream to
+the device driver.
+
+Once a device is opened, a user process can send data to the device using the write system call and
+receive data from the device using the read system call.  Access to STREAMS drivers using read and
+write is compatible with the traditional character I/O mechanism.
+
+The close system call will close a device and dismantle the associated Stream when the last open
+reference to the Stream is given up.
+
+The following example shows how a simple Stream is used.  In the example, the user program interacts
+with a communications device that provides point-to-point data transfer between two computers.  Data
+written to the device are transmitted over the communications line, and data arriving on the line
+can be retrieved by reading from the device.
+
+@smallexample
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+main()
+@{
+        char buf[1024]
+        int fd, count;
+
+        if ((fd = open("/dev/comm/01", O_RDWR)) < 0) @{
+                perror("open failed");
+                exit(1);
+        @}
+
+        while ((count = read(fd, buf, 1024)) > 0) @{
+                if (write(fd, buf, count) != count) @{
+                        perror("write failed");
+                        break;
+                @}
+        @}
+        exit(0);
+@}
+@end smallexample
+
+In the example, /dev/comm/01 identifies a minor device of the communications device driver.  When
+this file is opened, the system recognizes the device as a STREAMS device and connects a Stream to
+the driver.  [6]Figure:1.3 [7]Stream to Communication Driver shows the state of the Stream following
+the call to open.
+
+[Figure:1.3 Stream to Communications Driver]
+
+[strm.stmdvi.gif]
+
+This example illustrates a user reading data from the communications device and then writing the
+input back out to the same device.  In short, this program echoes all input back over the
+communications line.  The example assumes that a user is sending data from the other side of the
+communications line.  The program reads up to 1024 bytes at a time, and then writes the number of
+bytes just read.
+
+The read call returns the available data, which may contain fewer than 1024 bytes.  If no data are
+currently available at the Stream head, the read call blocks until data arrive.
+
+Similarly, the write call attempts to send count bytes to /dev/comm/01.  However, STREAMS implements
+a flow control mechanism that prevents a user from exhausting system resources by flooding a device
+driver with data.
+
+Flow control is a STREAMS mechanism that controls the rate of message transfer among the modules,
+drivers, Stream head, and processes.  Flow control is local to each Stream and advisory (voluntary).
+It limits the number of characters that can be queued for processing at any queue in a Stream.  This
+mechanism limits buffers and related processing at any queue and in any one Stream, but does not
+consider buffer pool levels or buffer usage in other @dfn{Streams}.  Flow control is not applied to
+high priority messages (message priority will be discussed later).
+
+If the Stream exerts flow control on the user, the write call blocks until flow control has been
+relieved.  The call will not return until it has sent count bytes to the device.  exit is called to
+terminate the user process.  This system call also closes all open files, thereby dismantling the
+Stream in this example.
+
+@node STREAMS Components
+@section STREAMS Components
+@menu
+* Queues::
+* Messages::
+* Modules::
+* Drivers::
+@end menu
+
+This section gives an overview of the STREAMS components and discusses how these components interact
+with each other.  A more detailed description of each STREAMS component is given in the later
+chapters.
+
+@node Queues
+@subsection Queues
+
+A queue is an interface between a STREAMS driver or module and the rest of the Stream.  Queues are
+always allocated as an adjacent pair.  The queue with the lower address in the pair is a read queue,
+and the queue with the higher address is used for the write queue.
+
+A queue's service routine is invoked to process messages on the queue.  It usually removes
+successive messages from the queue, processes them, and calls the put routine of the next module in
+the Stream to give the processed message to the next queue.
+
+A queue's put routine is invoked by the preceding queue's put and/or service routine to add a
+message to the current queue.  If a module does not need to enqueue messages, its put routine can
+call the neighboring queue's put routine.  (STREAMS Processing Routines discusses the service and
+put routines in more detail.)
+
+Each queue also has a pointer to an open and close routine.  The open routine of a driver is called
+when the driver is first opened and on every successive open of the Stream.  The open routine of a
+module is called when the module is first pushed on the Stream and on every successive open of the
+Stream.  The close routine of the module is called when the module is popped (removed) off the
+Stream.  The close routine of the driver is called when the last reference to the Stream is given up
+and the Stream is dismantled.
+
+@node Messages
+@subsection Messages
+
+All input and output under STREAMS is based on messages.  The objects passed between STREAMS modules
+are pointers to messages.  All STREAMS messages use two data structures (msgb and datab) to refer to
+the message data.  These data structures describe the type of the message and contain pointers to
+the data of the message, as well as other information.  Messages are sent through a Stream by
+successive calls to the put procedure of each module or driver in the Stream.
+
+@subsubsection Message Types
+
+All STREAMS messages are assigned message types to indicate their intended use by modules and
+drivers and to determine their handling by the Stream head.  A driver or module can assign most
+types to a message it generates, and a module can modify a message type during processing.  The
+Stream head will convert certain system calls to specified message types and send them downstream,
+and it will respond to other calls by copying the contents of certain message types that were sent
+upstream.
+
+Most message types are internal to STREAMS and can only be passed from one STREAMS component to
+another.  A few message types, for example M_DATA, M_PROTO, and M_PCPROTO, can also be passed
+between a Stream and user processes.  M_DATA messages carry data within a Stream and between a
+Stream and a user process.  M_PROTO or M_PCPROTO messages carry both data and control information.
+
+As shown in [8]Figure:1.4 [9]A Message , a STREAMS message consists of one or more linked message
+blocks that are attached to the first message block of the same message.
+
+[Figure:1.4 A Message]
+
+[strm.strmsg.gif]
+
+Messages can exist stand-alone, as in [10]Figure:1.4 [11]A Message , when the message is being
+processed by a procedure.  Alternately, a message can await processing on a linked list of messages,
+called a message queue.  In [12]Figure:1.5 [13]Message on a Message Queue , Message 2 is linked to
+Message 1.
+
+[Figure:1.5 Messages on a Message Queue]
+
+[strm.msgque.gif]
+
+When a message is on a queue, the first block of the message contains links to preceding and
+succeeding messages on the same message queue, in addition to the link to the second block of the
+message (if present).  The message queue head and tail are contained in the queue.
+
+STREAMS utility routines enable developers to manipulate messages and message queues.
+
+@subsubsection Message Queueing Priority
+
+In certain cases, messages containing urgent information (such as a break or alarm conditions) must
+pass through the Stream quickly.  To accommodate these cases, STREAMS provides multiple classes of
+message queuing priority.  All messages have an associated priority field.  Normal (ordinary)
+messages have a priority of zero.  Priority messages have a priority greater than zero.  High
+priority messages are high priority by virtue of their message type.  The priority field in high
+priority messages is unused and should always be set to zero.  STREAMS prevents high priority
+messages from being blocked by flow control and causes a service procedure to process them ahead of
+all ordinary messages on the queue.  This results in the high priority message transiting each
+module with minimal delay.
+
+Non-priority, ordinary messages are placed at the end of the queue following all other messages in
+the queue.  Priority messages can be either high priority or priority band messages.  High priority
+messages are placed at the head of the queue but after any other high priority messages already in
+the queue.  Priority band messages that enable support of urgent, expedited data are placed in the
+queue after high priority messages but before ordinary messages.
+
+Message priority is defined by the message type; once a message is created, its priority cannot be
+changed.  Certain message types come in equivalent high priority/ordinary pairs (for example,
+M_PCPROTO and M_PROTO), so that a module or device driver can choose between the two priorities when
+sending information.
+
+
+
+@node Modules
+@subsection Modules
+
+A module performs intermediate transformations on messages passing between a Stream head and a
+driver.  There may be zero or more modules in a Stream (zero when the driver performs all the
+required character and device processing).
+
+Each module is constructed from a pair of queue structures (see "Au/Ad" and "Bu/Bd" in [7]Figure:1.6
+[8]A Stream in More Detail ).  One queue performs functions on messages passing upstream through the
+module ("Au" and "Bu" in [9]Figure:1.6 [10]A Stream in More Detail ).  The other set ("Ad" and "Bd")
+performs another set of functions on downstream messages.
+
+Each of the two queues in a module will generally have distinct functions, that is, unrelated
+processing procedures and data.  The queues operate independently and "Au" will not know if a
+message passes through "Ad" unless "Ad" is programmed to inform it.  Messages and data can be shared
+only if the developer specifically programs the module functions to perform the sharing.
+
+Each queue can directly access the adjacent queue in the direction of message flow (for example,
+"Au" to "Bu" or "Bd" to "Ad").  In addition, within a module, a queue can readily locate its mate
+and access its messages and data.
+
+[Figure:1.6 A Stream in More Detail]
+
+[strm.strfig.gif]
+
+Each queue in a module points to messages, processing procedures, and data:
+
+@table @dfn
+
+@item Messages
+These are dynamically attached to the queue on a linked list ("message queue", see "Ad" and "Bu" in
+[11]Figure:1.6 [12]A Stream in More Detail ) as they pass through the module.
+
+@item Processing procedures
+A put procedure processes messages and must be incorporated in each queue.  An optional service
+procedure can also be incorporated.  According to their function, the procedures can send messages
+upstream and/or downstream, and they can also modify the private data in their module.
+
+@item Data
+Developers may use a private field in the queue to reference private data structures (for example,
+state information and translation tables).
+
+@end table
+
+In general, each of the two queues in a module has a distinct set of all of these elements.
+
+@node Drivers
+@subsection Drivers
+
+STREAMS device drivers are an initial part of a Stream.  They are structurally similar to STREAMS
+modules.  The call interfaces to driver routines are identical to the interfaces used for modules.
+
+There are three significant differences between modules and drivers.  A driver must be able to
+handle interrupts from the device, a driver can have multiple Streams connected to it, and a driver
+is initialized/deinitialized via open and close.  A module is initialized/deinitialized via the
+I_PUSH ioctl and I_POP ioctl.
+
+Drivers and modules can pass signals, error codes, and return values to processes via message types
+provided for that purpose.
+
+@node Multiplexing
+@section Multiplexing
+
+Earlier, Streams were described as linear connections of modules, where each invocation of a module
+is connected to at most one upstream module and one downstream module.  While this configuration is
+suitable for many applications, others require the ability to multiplex Streams in a variety of
+configurations.  Typical examples are terminal window facilities, and internetworking protocols
+(which might route data over several subnetworks).
+
+An example of a multiplexor is one that multiplexes data from several upper Streams over a single
+lower Stream, as shown in [6]Figure:1.7 [7]Many-to-one Multiplexor .  An upper Stream is one that is
+upstream from a multiplexor, and a lower Stream is one that is downstream from a multiplexor.  A
+terminal windowing facility might be implemented in this fashion, where each upper Stream is
+associated with a separate window.
+
+[Figure:1.7 Many-to-one Multiplexor]
+
+[strm.mltprx1.gif]
+
+A second type of multiplexor might route data from a single upper Stream to one of several lower
+Streams, as shown in [8]Figure:1.8 [9]One-to-many Multiplexor .  An internetworking protocol could
+take this form, where each lower Stream links the protocol to a different physical network.
+
+[Figure:1.8 One-to-many Multiplexor]
+
+[strm.mltprx2.gif]
+
+A third type of multiplexor might route data from one of many upper Streams to one of many lower
+Streams, as shown in [10]Figure:1.9 [11]Many-to-many Mulitiplexor .
+
+[Figure:1.9 Many-to-many Multiplexor]
+
+[strm.mltprx3.gif]
+
+The STREAMS mechanism supports the multiplexing of Streams through special pseudo-device drivers.
+Using a linking facility, users can dynamically build, maintain, and dismantle multiplexed Stream
+configurations.  Simple configurations like the ones shown in three previous figures can be further
+combined to form complex, multi-level multiplexed Stream configurations.
+
+STREAMS multiplexing configurations are created in the kernel by interconnecting multiple Streams.
+Conceptually, there are two kinds of multiplexors: upper and lower multiplexors.  Lower multiplexors
+have multiple lower Streams between device drivers and the multiplexor, and upper multiplexors have
+multiple upper Streams between user processes and the multiplexor.
+
+[Figure:1.10 Internet Multiplexing Stream]
+
+[strm.netmlt.gif]
+
+[12]Figure:1.10 [13]Internet Multiplexing Stream is an example of the multiplexor configuration that
+would typically occur where internetworking functions were included in the system.  This
+configuration contains three hardware device drivers.  The IP (Internet Protocol) is a multiplexor.
+
+The IP multiplexor switches messages among the lower Streams or sends them upstream to user
+processes in the system.  In this example, the multiplexor expects to see the same interface
+downstream to Module 1, Module 2, and Driver 3.
+
+[14]Figure:1.10 [15]Internet Multiplexing Stream depicts the IP multiplexor as part of a larger
+configuration.  The multiplexor configuration, as shown in the dashed rectangle, would generally
+have an upper multiplexor and additional modules.  Multiplexors could also be cascaded below the IP
+multiplexor driver if the device drivers were replaced by multiplexor drivers.
+
+[Figure:1.11 Multiplexing Stream]
+
+[strm.mltstm.gif]
+
+[16]Figure:1.11 [17]Multiplexing Stream shows a multiplexor configuration where the multiplexor (or
+multiplexing driver) routes messages between the lower Stream and one of the upper Streams.  This
+Stream performs X.25 multiplexing to multiple independent SVC (Switched Virtual Circuit) and PVC
+(Permanent Virtual Circuit) user processes.  Upper multiplexors are a specific application of
+standard STREAMS facilities that support multiple minor devices in a device driver.  This figure
+also shows that more complex configurations can be built by having one or more multiplexed drivers
+below and multiple modules above an upper multiplexor.
+
+Developers can choose either upper or lower multiplexing, or both, when designing their
+applications.  For example, a window multiplexor would have a similar configuration to the X.25
+configuration of [18]Figure:1.11 [19]Multiplexing Stream , with a window driver replacing Packet
+Layer, a tty driver replacing the driver XYZ, and the child processes of the terminal process
+replacing the user processes.  Although the X.25 and window multiplexing Streams have similar
+configurations, their multiplexor drivers would differ significantly.  The IP multiplexor of
+[20]Figure:1.10 [21]Internet Multiplexing Stream has a different configuration than the X.25
+multiplexor, and the driver would implement its own set of processing and routing requirements in
+each configuration.
+
+In addition to upper and lower multiplexors, more complex configurations can be created by
+connecting Streams containing multiplexors to other multiplexor drivers.  With such a diversity of
+needs for multiplexors, it is not possible to provide general purpose multiplexor drivers.  Rather,
+STREAMS provides a general purpose multiplexing facility.  The facility allows users to set up the
+inter-module/driver plumbing to create multiplexor configurations of generally unlimited
+interconnection.
+
+@node Benefits of STREAMS
+@section Benefits of STREAMS
+@menu
+* Standardized Service Interfaces::
+* Manipulating Modules::
+@end menu
+
+STREAMS provides a flexible, portable, and reusable set of tools for development of UNIX system
+communication services.  STREAMS allows an easy creation of modules that offer standard data
+communications services and the ability to manipulate those modules on a Stream.  From user level,
+modules can be dynamically selected and interconnected; kernel programming, assembly, and link
+editing are not required to create the interconnection.
+
+STREAMS also greatly simplifies the user interface for languages that have complex input and output
+requirements.  This is discussed in STREAMS-Based Terminal Subsystem.
+
+@node Standardized Service Interfaces
+@subsection Standardized Service Interfaces
+
+STREAMS simplifies the creation of modules that present a service interface to any neighboring
+application program, module, or device driver.  A service interface is defined at the boundary
+between two neighbors.  In STREAMS, a service interface is a specified set of messages and the rules
+that allow passage of these messages across the boundary.  A module that implements a service
+interface will receive a message from a neighbor and respond with an appropriate action (for
+example, send back a request to retransmit) based on the specific message received and the preceding
+sequence of messages.
+
+In general, any two modules can be connected anywhere in a Stream.  However, rational sequences are
+generally constructed by connecting modules with compatible protocol service interfaces.  For
+example, a module that implements an X.25 protocol layer, as shown in [7]Figure:1.12 [8]Protocol
+Module Portability , presents a protocol service interface at its input and output sides.  In this
+case, other modules should only be connected to the input and output side if they have the
+compatible X.25 service interface.
+
+@node Manipulating Modules
+@subsection Manipulating Modules
+@menu
+* Protocol Portability::
+* Protocol Substitution::
+* Protocol Migration::
+* Module Reusability::
+@end menu
+
+STREAMS provides the capabilities to manipulate modules from user level, to interchange modules with
+common service interfaces, and to change the service interface to a STREAMS user process.  These
+capabilities yield further benefits when implementing networking services and protocols, including:
+
+@itemize @bullet
+@item User level programs can be independent of underlying protocols and physical communication
+media.
+
+@item Network architectures and higher level protocols can be independent of underlying protocols,
+drivers, and physical communication media.
+
+@item Higher level services can be created by selecting and connecting lower level services and
+protocols.
+
+@end itemize
+
+The following examples show the benefits of STREAMS capabilities for creating service interfaces and
+manipulating modules.  These examples are only illustrations and do not necessarily reflect real
+situations.
+
+@node Protocol Portability
+@subsubsection Protocol Portability
+
+[8]Figure:1.12 [9]Protocol Module Portability , shows how the same X.25 protocol module can be used
+with different drivers on different machines by implementing compatible service interfaces.  The
+X.25 protocol module interfaces are Connection Oriented Network Service (CONS) and Link Access
+Protocol-Balanced (LAPB).
+
+[Figure:1.12 Protocol Module Portability]
+
+[strm.ptcmjl.gif]
+
+@node Protocol Substitution
+@subsubsection Protocol Substitution
+
+Alternate protocol modules (and device drivers) can be interchanged on the same machine if they are
+implemented to an equivalent service interface.
+
+@node Protocol Migration
+@subsubsection Protocol Migration
+
+[8]Figure:1.13 [9]Protocol Migration illustrates how STREAMS can move functions between kernel
+software and front end firmware.  A common downstream service interface allows the transport
+protocol module to be independent of the number or type of modules below.  The same transport module
+will connect without modification to either an X.25 module or X.25 driver that has the same service
+interface.
+
+By shifting functions between software and firmware, developers can produce cost effective,
+functionally equivalent systems over a wide range of configurations.  They can rapidly incorporate
+technological advances.  The same transport protocol module can be used on a lower capacity machine,
+where economics may preclude the use of front-end hardware, and also on a larger scale system where
+a front-end is economically justified.
+
+[Figure:1.13 Protocol Migration]
+
+[strm.ptcmove.gif]
+
+@node Module Reusability
+@subsubsection Module Reusability
+
+[8]Figure:1.14 [9]Module Reusability shows the same canonical module (for example, one that
+provides delete and kill processing on character strings) reused in two different Streams.
+This module would typically be implemented as a filter, with no downstream service interface.
+In both cases, a tty interface is presented to the Stream's user process since the module is nearest
+the Stream head.
+
+[Figure:1.14 Module Reusability]
+
+[strm.mjlrep.gif]
 
 @node Overview
 @chapter Overview of @value{PACKAGE_TITLE}
@@ -2528,11 +3084,10 @@ destinations towards which messages are sent.
 @subsection Opening a STREAMS Device File
 
 One way to construct a @dfn{Stream} is to open [see open(2)] a @dfn{STREAMS}-based driver file (see
-[7]Figure:2.3 [8]Opened @dfn{STREAMS}-based Driver).  All entry points into the driver are defined by the
-@mantype{streamtab(9)}
-structure for that driver.  The @type{streamtab}
-structure has a format as follows:
+@figref{15}).  All entry points into the driver are defined by the @mantype{streamtab(9)} structure
+for that driver.  The @type{streamtab} structure has a format as follows:
 
+@cartouche
 @smallexample
 struct streamtab @{
     struct qinit *st_rdinit;
@@ -2541,6 +3096,7 @@ struct streamtab @{
     struct qinit *st_muxwinit;
 @};
 @end smallexample
+@end cartouche
 
 The @type{streamtab}
 structure defines a module or driver.  @var{st_rdinit} points to the read @code{qinit} structure for
@@ -2924,10 +3480,12 @@ queue to allow deferred processing of messages.  If a queue has both a @command{
 The @command{put} procedure is always called first, from a preceding queue.  After completing its
 part of the message processing, it arranges for the @command{service} procedure to be called by
 passing the message to the @manpage{putq(9)} routine.  @manpage{putq(9)} does two things: it places
-the message on the message queue of the queue (see Figure Messages on a Message Queue) and links the
-queue to the end of the @dfn{STREAMS} scheduling queue.  When @manpage{putq(9)} returns to the
-@command{put} procedure, the procedure can return or continue to process the message.  Some time
-later, the @command{service} procedure will be automatically called by the @dfn{STREAMS} scheduler.
+the message on the message queue of the queue (see
+Figure Messages on a Message Queue)
+and links the queue to the end of the @dfn{STREAMS} scheduling queue.  When @manpage{putq(9)}
+returns to the @command{put} procedure, the procedure can return or continue to process the message.
+Some time later, the @command{service} procedure will be automatically called by the @dfn{STREAMS}
+scheduler.
 
 The @dfn{STREAMS} scheduler is separate and distinct from the @cite{UNIX} system process scheduler.
 It is concerned only with queues linked on the @dfn{STREAMS} scheduling queue.  The scheduler calls

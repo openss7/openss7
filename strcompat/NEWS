@@ -3,6 +3,10 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in strcompat-0.9.2.2
+
+  This is primarily a bug fix release.
+
 * Initial release strcompat-0.9.2.1
 
   This is the initial release of the OpenSS7 STREAMS Compatibility package for

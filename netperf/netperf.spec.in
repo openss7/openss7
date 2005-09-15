@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.36 $) $Date: 2005/07/07 20:28:43 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.37 $) $Date: 2005/09/14 23:41:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:28:43 $ by $Author: brian $
+# Last Modified $Date: 2005/09/14 23:41:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -636,12 +636,17 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.36  2005/07/07 20:28:43  brian
-# - changes for release
+# Revision 1.1.2.37  2005/09/14 23:41:00  brian
+# - bumped release numbers and change logs
 #
-# Revision 1.1.2.35  2005/06/25 07:01:48  brian
-# - more efficient dependency checking
-#
+
+* Thu Jul  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.36  2005/07/07 20:28:43  brian
+- changes for release
+
+* Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.35  2005/06/25 07:01:48  brian
+- more efficient dependency checking
 
 * Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.34  2005/06/24 13:40:40  brian

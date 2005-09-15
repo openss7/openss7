@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/07/07 20:28:45 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/14 23:41:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:28:45 $ by $Author: brian $
+# Last Modified $Date: 2005/09/14 23:41:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -240,6 +240,7 @@ Obsoletes:      sctp
 Provides:       sctp
 #BuildRequires:  sctp-devel >= 0.2.20
 %if %{BUILD_modules}
+# TODO: FC4 wants kernel-devel not kernel-source
 BuildRequires:  kernel-source = %{kernel_source}
 BuildRequires:  modutils >= 2.4.12
 %endif
@@ -1338,15 +1339,21 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.64  2005/07/07 20:28:45  brian
-# - changes for release
+# Revision 0.9.2.65  2005/09/14 23:41:11  brian
+# - bumped release numbers and change logs
 #
-# Revision 1.64  2005/07/07 20:28:45  brian
-# - changes for release
-#
-# Revision 1.63  2005/06/25 07:01:48  brian
-# - more efficient dependency checking
-#
+
+* Thu Jul  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.64  2005/07/07 20:28:45  brian
+- changes for release
+
+* Thu Jul  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.64  2005/07/07 20:28:45  brian
+- changes for release
+
+* Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.63  2005/06/25 07:01:48  brian
+- more efficient dependency checking
 
 * Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.62  2005/06/24 13:40:41  brian

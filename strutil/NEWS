@@ -3,6 +3,13 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in strutil-0.9.2.2
+
+  The previous release was experimental and was an Alpha release.  This package
+  represent a stripping off of utilities from Linux Fast-STREAMS that could also
+  be used for Linux STREAMS (LiS).  This release is the result of further
+  development and testing on this utilities package.
+
 * Initial release strutil-0.9.2.1
 
   This is the initial release of the OpenSS7 STREAMS Utilities package for

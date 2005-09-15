@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.2.3 2005/06/29 20:01:07 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.2.4 2005/09/14 23:41:07 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/06/29 20:01:07 $ by $Author: brian $
+@c Last Modified $Date: 2005/09/14 23:41:07 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -165,20 +165,29 @@ distributions against which the current maintainer creates and tests builds.
 @subsection Kernel
 @cindex Kernel
 
-@dfn{@value{PACKAGE_TITLE}} compiles as a @dfn{Linux} kernel module.  It is not ncessary to patch the
-@dfn{Linux} kernel to use the package.  At a later date, it is possible to move this package into the
-kernel.
-
-@dfn{@value{PACKAGE_TITLE}} is compatible with 2.4 kernel series after 2.4.10.  It has been tested
-up to and including 2.6.10.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10.  It has
+been tested up to and including 2.6.11.
 
 @node Linux STREAMS
 @subsection Linux STREAMS
 @cindex Linux STREAMS
 
+The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux STREAMS (LiS)},
+however, to use the @cite{@value{PACKAGE_TITLE}} package with @cite{LiS} requires use of the OpenSS7
+release packages of @cite{LiS}.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{LiS-2.18.2} release that
+is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
+Page}.
+
 @node Linux Fast-STREAMS
 @subsection Linux Fast-STREAMS
 @cindex Linux Fast-STREAMS
+
+The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
+(LfS)}.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-0.7a.4} release
+that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
+Page}.
 
 @node HP Netperf
 @subsection HP Netperf
@@ -233,6 +242,7 @@ Hewlett-Packard Company releases.
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release netperf-2.3.1::		Release 1
 @end menu
 @end ifnothtml
 @end ifnotplaintext
@@ -243,39 +253,41 @@ Hewlett-Packard Company releases.
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.  It is
-based on the Hewlett-Packard Company @cite{netperf-2.3} release.
+This is primarily a bug fixes release.  What remains to be done is to merge in the latest upstream
+release of netperf into this package.
 
-This release provides modifications to support the Stream Control Transmission
-Protocol (SCTP) and provides tests for the Sockets API for the OpenSS7 Linux
-Native Kernel version of SCTP as well as tests for the XTI API for the OpenSS7
-STREAMS version of SCTP.  In addition, use of the XTI API for TCP and UDP tests
-is supported using the OpenSS7 STREAMS INET package.
+@node Release netperf-2.3.1
+@subsection Release netperf-2.3.1
+@cindex release netperf-2.3.1
 
-SCTP Sockets API tests depend upon the availability of an the OpenSS7 Sockets
-implementation of SCTP in an OpenSS7 patched kernel.  Some binary kernels and
-prepatched kernel source for popular architectures are provided as RPMs from
-@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.
+Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.  It is based on the
+Hewlett-Packard Company @cite{netperf-2.3} release.
 
-SCTP XTI API tests depend upon the availability of the OpenSS7 STREAMS
-implementation of SCTP.  Some binary and source packages for @cite{LiS STREAMS},
-@cite{Linux Fast-STREAMS}, the @cite{strxnet} XTI/TLI library and the
-@cite{strsctp} package are available from
-@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.
-@ref{Top, Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library
-Reference Manual}.
+This release provides modifications to support the Stream Control Transmission Protocol (SCTP) and
+provides tests for the Sockets API for the OpenSS7 Linux Native Kernel version of SCTP as well as
+tests for the XTI API for the OpenSS7 STREAMS version of SCTP.  In addition, use of the XTI API for
+TCP and UDP tests is supported using the OpenSS7 STREAMS INET package.
 
-Under Linux, the TCP and UDP XTI API tests depend upon the availability of the
-OpenSS7 INET driver.  Some binary and source packages for @cite{LiS STREAMS},
-@cite{Linux Fast-STREAMS}, the @cite{strxnet} XTI/TLI library and the
-@cite{strinet} package (@pxref{Top, Introduction, Introduction, strinet, OpenSS7
-STREAMS INET Driver}) are available from
-@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.
-@ref{Top, Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library
-Reference Manual}.
+SCTP Sockets API tests depend upon the availability of an the OpenSS7 Sockets implementation of SCTP
+in an OpenSS7 patched kernel.  Some binary kernels and prepatched kernel source for popular
+architectures are provided as RPMs from @uref{http://www.openss7.org/download.html, the OpenSS7
+Project download page}.
 
-This release also provides updates to the antiquated @cite{netperf-2.1} release
-documentation distributed with @cite{netperf-2.3}.
+SCTP XTI API tests depend upon the availability of the OpenSS7 STREAMS implementation of SCTP.  Some
+binary and source packages for @cite{LiS STREAMS}, @cite{Linux Fast-STREAMS}, the @cite{strxnet}
+XTI/TLI library and the @cite{strsctp} package are available from
+@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.  @ref{Top,
+Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library Reference Manual}.
+
+Under Linux, the TCP and UDP XTI API tests depend upon the availability of the OpenSS7 INET driver.
+Some binary and source packages for @cite{LiS STREAMS}, @cite{Linux Fast-STREAMS}, the
+@cite{strxnet} XTI/TLI library and the @cite{strinet} package (@pxref{Top, Introduction,
+Introduction, strinet, OpenSS7 STREAMS INET Driver}) are available from
+@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.  @ref{Top,
+Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library Reference Manual}.
+
+This release also provides updates to the antiquated @cite{netperf-2.1} release documentation
+distributed with @cite{netperf-2.3}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.12 2005/06/29 20:01:07 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.13 2005/09/14 23:40:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/06/29 20:01:07 $ by $Author: brian $
+@c Last Modified $Date: 2005/09/14 23:40:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -416,6 +416,9 @@ Interface documentation, (@pxref{Development}).
 @subsection Linux Fast-STREAMS
 @cindex Linux Fast-STREAMS
 
+The @cite{@value{PACKAGE_TITLE}} package is no longer receiving active development or support.
+@cite{Linux Fast-STREAMS} is the preferred replacement for @cite{@value{PACKAGE_TITLE}}.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -430,6 +433,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release LiS-2.18.1::          Release 1
 * Release LiS-2.16.19::		Release 19
 * Release LiS-2.16.18-22::	Release 22
 * Release LiS-2.16.18-21::	Release 21
@@ -463,6 +467,12 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is primarily a bug fixes release.
+
+@node Release LiS-2.18.1
+@subsection Release LiS-2.18.1
+@cindex release LiS-2.18.1
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
 

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.1 2005/07/09 21:59:46 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.2 2005/09/14 23:41:52 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/07/09 21:59:46 $ by $Author: brian $
+@c Last Modified $Date: 2005/09/14 23:41:52 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -69,7 +69,7 @@ use with both @cite{Linux STREAMS} and @cite{Linux Fast-STREAMS} in preparation 
 the former by the later.
 
 The following sections provide information on @value{PACKAGE_TITLE} releases as well as
-compatibility information of OpenSS7 release to the original GCOM releases of these modules and
+compatibility information of OpenSS7 release to mainstream UNIX releases of the core, modules and
 drivers, as well as Linux kernel compatibility.
 
 @menu
@@ -162,20 +162,40 @@ distributions against which the current maintainer creates and tests builds.
 @subsection Kernel
 @cindex Kernel
 
-@dfn{@value{PACKAGE_TITLE}} compiles as a @dfn{Linux} kernel module.  It is not ncessary to patch the
-@dfn{Linux} kernel to use the package.  At a later date, it is possible to move this package into the
-kernel.
+The @cite{@value{PACKAGE_TITLE}} package compiles as a @dfn{Linux} kernel module.  It is not
+necessary to patch the @dfn{Linux} kernel to build or use the package.@footnote{At a later date, it
+is possible to move this package into the kernel, however, with continued resistance to STREAMS from
+within the @dfn{Linux} developer community, this is currently unlikely.} Nor do you have to
+recompile your kernel to build or use the package.  OpenSS7 packages use @command{autoconf} scripts
+to adapt the package source to your existing kernel.  The package builds and runs nicely against
+production kernels from the distributions listed above.  Rather than relying on kernel versions, the
+@command{autoconf} scripts interrogate the kernel for specific features and variants to better adapt
+to distribution production kernels that have had patches applied over the official
+@url{http://www.kernel.org/, kernel.org} sources.
 
-@dfn{@value{PACKAGE_TITLE}} is compatible with 2.4 kernel series after 2.4.10.  It has been tested
-up to and including 2.6.10.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10.  It has
+been tested up to and including 2.6.11.
 
 @node Linux STREAMS
 @subsection Linux STREAMS
 @cindex Linux STREAMS
 
+The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux STREAMS (LiS)},
+however, to use the @cite{@value{PACKAGE_TITLE}} package with @cite{LiS} requires use of the OpenSS7
+release packages of @cite{LiS}.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{LiS-2.18.2} release that
+is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
+Page}.
+
 @node Linux Fast-STREAMS
 @subsection Linux Fast-STREAMS
 @cindex Linux Fast-STREAMS
+
+The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
+(LfS)}.
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-0.7a.4} release
+that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
+Page}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -191,6 +211,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9.2.1::		Release 1
 @end menu
 @end ifnothtml
 @end ifnotplaintext
@@ -200,6 +221,14 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is primarily a bug fixes release.
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.1
+@subsection Release @value{PACKAGE}-0.9.2.1
+@cindex release @value{PACKAGE}-0.9.2.1
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
 

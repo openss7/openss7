@@ -3,6 +3,10 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes for streams-0.7a.4
+
+  This is primarily a bug fix release.
+
 * Major changes for streams-0.7a.3
 
   With this release version numbers were changed to reflect an upstream version

@@ -3,6 +3,11 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in iperf-2.0.3
+
+  Minor changes and bug fixes.  Still remaining to do is merge in the latest
+  upstream release of iperf.
+
 * Initial release iperf-2.0.2
 
   With this release version numbers were changed to reflect an upstream version
