@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:17 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/17 00:45:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/12 13:12:17 $ by $Author: brian $
+ Last Modified $Date: 2005/09/17 00:45:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:17 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/17 00:45:53 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/09/12 13:12:17 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/17 00:45:53 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -440,10 +440,10 @@ adjmsg(mblk_t *mp, ssize_t length)
 	type = mp->b_datap->db_type;
 	if (length == 0)
 		return (1);	/* success */
-	else if (length < 0) {
+	else if (length > 0) {
 		/* trim from head of message */
 		/* check if we can do the trim */
-		for (size = -length, b = mp; b; b = b->b_cont) {
+		for (size = length, b = mp; b; b = b->b_cont) {
 			if (b->b_datap->db_type != type)
 				goto error;
 			if ((blen = b->b_wptr - b->b_rptr) <= 0)
@@ -454,7 +454,7 @@ adjmsg(mblk_t *mp, ssize_t length)
 		goto error;
 	      trim_head:
 		/* do the trimming */
-		for (size = -length, b = mp; b; b = b->b_cont) {
+		for (size = length, b = mp; b; b = b->b_cont) {
 			if ((blen = b->b_wptr - b->b_rptr) <= 0)
 				continue;
 			if ((size -= blen) < 0) {
@@ -464,7 +464,7 @@ adjmsg(mblk_t *mp, ssize_t length)
 			}
 			b->b_rptr += blen;
 		}
-	} else if (length > 0) {
+	} else if (length < 0) {
 		/* trim from tail of message */
 		/* check if we can do the trim */
 		for (size = 0, bp = NULL, b = mp; b; b = b->b_cont) {
@@ -477,7 +477,7 @@ adjmsg(mblk_t *mp, ssize_t length)
 				continue;
 			size += blen;
 		}
-		if (size >= length)
+		if (size >= -length)
 			goto trim_tail;
 		goto error;
 	      trim_tail:
@@ -485,13 +485,13 @@ adjmsg(mblk_t *mp, ssize_t length)
 		for (b = bp; b; b = b->b_cont) {
 			if ((blen = b->b_wptr - b->b_rptr) <= 0)
 				continue;
-			if (size < length) {
+			if (size < -length) {
 				size -= blen;
 				b->b_wptr = b->b_rptr;
 				continue;
 			}
-			if ((size -= blen) < length)
-				b->b_wptr -= (length - size);
+			if ((size -= blen) < -length)
+				b->b_wptr += length + size;
 		}
 	}
       error:
@@ -1138,8 +1138,11 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 //	qwunlock(q);
 	/* do enabling outside the locks */
 	switch (result) {
-	case 3:		/* success - priority enable */
+	case 4:		/* success - high priority enable */
 		qenable(q);
+		return (1);
+	case 3:		/* success - priority band enable */
+		enableq(q);
 		return (1);
 	case 2:		/* success - normal enable */
 		if (test_bit(QWANTR_BIT, &q->q_flag))
@@ -1641,6 +1644,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp)
 			q->q_msgs = 0;
 			clear_bit(QFULL_BIT, &q->q_flag);
 			clear_bit(QWANTW_BIT, &q->q_flag);
+			set_bit(QWANTR_BIT, &q->q_flag);
 			for (qb = q->q_bandp; qb; qb = qb->qb_next) {
 				qb->qb_first = qb->qb_last = NULL;
 				qb->qb_count = 0;
@@ -1843,7 +1847,20 @@ EXPORT_SYMBOL(getq);
 /*
  *  __get_qband:
  *
- *  Find or create a queue band.  This must be called with the queue write locked.
+ *  Find or create a queue band.  This must be called with the queue write locked.  This function is
+ *  used by putq(9), putbq(9), insq(9), strqget(9) and strqset(9).  Unforntunately this function
+ *  does not operate as described in the SVR 4 STREAMS Programmer's Guide: the SVR 4 SPG says that
+ *  "[i]f a messages is passed to putq() with a b_band value that is greater than the number of
+ *  qband structures associated with the queue, putq() tries to alloctate a new qband structure for
+ *  each band up to and including the band of the message."  Also, SVR 4 SPG describs the q_nband
+ *  member that holds the highest allocated qband structure according to this approach.
+ *
+ *  Unfortunately, the qbinfo structure is about 50 bytes (on 32-bit architecture), 64 bytes cache
+ *  aligned, and allocating 255 of them would take 16,320 bytes or 4 kmem cache pages per queue!
+ *  The technique would allow a module put procedure to examine the q_nband member and determine whether
+ *  a putq() will be succesful, however, that is undocumented too.  So, we simply allocate the
+ *  necessary qband structure and leave the rest unallocated.  This needs to be documented in
+ *  putq(9), putbq(9), insq(9), strqset(9) and strqget(9).
  */
 static struct qband *
 __get_qband(queue_t *q, unsigned char band)
@@ -1888,7 +1905,8 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
 			goto out_of_order;
-		enable = 2;	/* always enable on high priority */
+		enable = 3;	/* always enable on high priority */
+		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 		nmp->b_band = 0;
 	} else {
 		if (emp->b_datap->db_type >= QPCTL || emp->b_band < nmp->b_band)
@@ -1900,6 +1918,8 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (unlikely(nmp->b_band)) {
 			if (!(nmp->b_bandp = qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
+			/* enable on priority band message hitting empty band */
+			enable = qb->qb_first ? 0 : 2;
 			if (!qb->qb_last)
 				qb->qb_first = qb->qb_last = nmp;
 			else if (qb->qb_first == emp)
@@ -1963,8 +1983,11 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	result = __insq(q, emp, nmp);
 //	qwunlock(q);
 	switch (result) {
-	case 3:		/* success - priority enable */
+	case 4:		/* success - high priority enable */
 		qenable(q);
+		return (1);
+	case 3:		/* suscess - priority band enable */
+		enableq(q);
 		return (1);
 	case 2:		/* success - normal enable */
 		if (test_bit(QWANTR_BIT, &q->q_flag))
@@ -2040,6 +2063,7 @@ __putbq(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 		if (likely(mp->b_band == 0)) {
+			// enable = q->q_first ? 0 : 1;
 		      hipri:
 			if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
@@ -2061,6 +2085,7 @@ __putbq(queue_t *q, mblk_t *mp)
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
+			// enable = qb->qb_first ? 0 : 2;
 			if (qb->qb_last == b_prev)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next)
@@ -2075,7 +2100,9 @@ __putbq(queue_t *q, mblk_t *mp)
 		b_prev = NULL;
 		b_next = q->q_first;
 		/* modules should never put priority messages back on a queue */
-		enable = 2;	/* and this is why */
+		enable = 3;	/* and this is why */
+		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
+		mp->b_band = 0;
 		goto hipri;
 	}
 }
@@ -2094,8 +2121,12 @@ putbq(queue_t *q, mblk_t *mp)
 	result = __putbq(q, mp);
 	qwunlock(q);
 	switch (result) {
-	case 3:		/* success - priority enable */
+	case 4:		/* success - high priority enable */
 		qenable(q);
+		return (1);
+	case 3:		/* success - priority band enable */
+		assert(0);
+		enableq(q);
 		return (1);
 	case 2:		/* success - normal enable */
 		assert(0);
@@ -2307,7 +2338,9 @@ __putq(queue_t *q, mblk_t *mp)
 		b_next = b_prev->b_next;
 	}
 	if (likely(mp->b_datap->db_type >= QPCTL)) {
-		enable = 2;
+		enable = 3;	/* always enable on high priority */
+		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
+		mp->b_band = 0;
 		goto hipri;
 	} else {
 		struct qband *qb;
@@ -2319,7 +2352,8 @@ __putq(queue_t *q, mblk_t *mp)
 			b_prev = b_next;
 			b_next = b_prev->b_next;
 		}
-		enable = q->q_first ? 0 : 1;
+		/* enable on priority banded messages queued in empty band */
+		enable = qb->qb_first ? 0 : 2;
 		if (qb->qb_last == b_prev)
 			qb->qb_last = mp;
 		if (qb->qb_first == b_next)
@@ -2359,8 +2393,11 @@ putq(queue_t *q, mblk_t *mp)
 	result = __putq(q, mp);
 	qwunlock(q);
 	switch (result) {
-	case 3:		/* success - priority enable */
+	case 4:		/* success - high priority enable */
 		qenable(q);
+		return (1);
+	case 3:		/* success - priority band enable */
+		enableq(q);
 		return (1);
 	case 2:		/* success - normal enable */
 		if (test_bit(QWANTR_BIT, &q->q_flag))
@@ -2663,6 +2700,15 @@ qprocsoff(queue_t *q)
 
 		set_bit(QPROCS_BIT, &rq->q_flag);
 		set_bit(QPROCS_BIT, &wq->q_flag);
+		/* disable queue enabling */
+		set_bit(QNOENB_BIT, &rq->q_flag);
+		set_bit(QNOENB_BIT, &wq->q_flag);
+		/* clear queue putq enable bit */
+		clear_bit(QWANTR_BIT, &rq->q_flag);
+		clear_bit(QWANTR_BIT, &wq->q_flag);
+		/* clear queue back enable bit */
+		clear_bit(QWANTW_BIT, &rq->q_flag);
+		clear_bit(QWANTW_BIT, &wq->q_flag);
 
 		assert(sd);
 
@@ -2733,8 +2779,12 @@ qprocson(queue_t *q)
 
 		clear_bit(QPROCS_BIT, &rq->q_flag);
 		clear_bit(QPROCS_BIT, &wq->q_flag);
+		/* allow queues to be enabled */
 		clear_bit(QNOENB_BIT, &rq->q_flag);
 		clear_bit(QNOENB_BIT, &wq->q_flag);
+		/* schedule service procedure on first message */
+		set_bit(QWANTR_BIT, &rq->q_flag);
+		set_bit(QWANTR_BIT, &wq->q_flag);
 
 		/* spin here waiting for queue procedures to exit */
 		swlock(sd);

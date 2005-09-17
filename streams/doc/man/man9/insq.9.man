@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.20 2005/08/29 10:06:48 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.21 2005/09/17 00:45:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -282,6 +282,140 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+When a banded message (a priority message, with a non-zero
+.IR b_band )
+is placed on a queue with
+.BR insq (),
+and a
+.BR qband (9)
+structure does not exist for the band corresponding to
+.IR b_band ,
+.BR insq ()
+allocates the required
+.BR qband (9)
+structure and performs a reverse sorted insert into the
+.I q_qbandp
+list on the
+.BR queue (9).
+.IP ""
+This is not consistent with the description in the
+.IR "SVR 4 STREAMS Programmer's Guide" ,
+which states:
+\(lqIf a mesages is passed to
+.BR insq ()
+with a
+.I b_band
+value that is greater than the number of
+.BR qband (9)
+structures associated with the queue [member
+.I q_nband
+in the
+.BR queue (9)
+structure],
+.BR insq ()
+tries to allocate a new
+.BR qband (9)
+structure for each band up to and including the band of the message.\(rq
+.[
+svr4spg
+.]
+.IP ""
+.IR Solaris \(rg
+allocates
+.BR qband (9)
+structures up to an including
+.IR b_band ,
+and maintains the
+.I q_nband
+member of the
+.BR queue (9)
+structure.
+It is safe to assume that other
+.IR UNIX \(rg
+implementations based on
+.I SVR 4
+follow
+.I SVR 4
+as does
+.IR Solaris \(rg.
+.IP ""
+.I LiS
+allocates
+.BR qband (9)
+structures on demand in a fashion similar to
+.BR "@PACKAGE_TITLE@" ,
+but will also reuse
+.BR qband (9)
+structures that were previously allocated for bands that are currently empty.  This is not a good
+approach because user established band high- and low-water marks will be reset to those of the
+.BR queue (9)
+structure when a subsequent message is place on the reused band.  This
+.I LiS
+bug is not perpetuated in
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely on the fact that intermediate band strutures will be allocated
+when a priority message is placed on a queue using
+.BR insq (),
+and will not attempt to examine the
+.I q_nband
+member of the
+.BR queue (9)
+structure.
+.IP \(em
+.BR insq ()
+orders the
+.BR qband (9)
+structures in the list pointed to by the
+.I q_bandp
+member of the
+.BR queue (9)
+structure from highest band number to lowest band number.  This ensures that, during non-exhaustive
+linear searches, higher priority
+.BR qband (9)
+structures are located faster than lower priority
+.BR qband (9)
+structures.
+.IR Solaris \(rg
+.[
+soldoc
+.]
+lists
+.BR qband (9)
+structures from lowest to highest priority, without gaps (see consideration of allocation above).
+.I LiS
+.[
+lis
+.]
+lists
+.BR qband (9)
+structures from most recently allocated/reused to least recently allocated/reused.
+Neither the
+.IR Solaris \(rg
+nor the
+.I LiS
+approach is very efficient.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not depend on the ordering of
+.BR qband (9)
+structures within the
+.I q_qbandp
+list on the
+.BR queue (9)
+structure, and, will not access
+.BR qband (9)
+or
+.BR queue (9)
+members directly, but will use the more portable
+.BR strqget (9)
+and
+.BR strqset (9)
+utilities instead.
+.IP \(em
 .BR insq ()
 is a very problematic function for portability: many implementations document subtle differences in
 the treatment of ordering of messages and enabling of queues under flow control rules.  Read
@@ -858,7 +992,7 @@ modules and drivers will not call
 .BR insq ()
 from any context outside a
 .I STREAMS
-queue procedure or callback function.  At the STREAM end (STREAM head or driver), from a context
+queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
 other than a
 .I STREAMS
 coroutine, only

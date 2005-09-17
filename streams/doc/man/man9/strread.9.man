@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strread.9.man,v 0.9.2.2 2005/08/29 10:06:50 brian Exp $
+.\" @(#) $Id: strread.9.man,v 0.9.2.3 2005/09/17 00:45:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B strread, strreadv
-\- perform a \fBread\fP(2s) operation on a STREAM head
+\- perform a \fBread\fP(2s) operation on a Stream head
 .\"
 .\"
 .SH SYNOPSIS
@@ -145,7 +145,7 @@ and
 .BR strreadv ()
 perform
 .BR read (2s)
-functions on a STREAM head.
+functions on a Stream head.
 .BR strread ()
 is implemented with a call to
 .BR strreadv ().
@@ -219,15 +219,15 @@ mode,
 and
 .BR strreadv ()
 terminates on error, when the number of bytes requested has been satisfied, a zero-length data
-message is received at the STREAM head, a marked message is received at the STREAM head, or a
-delimited message is received at the STREAM head.  Message boundaries are ignored.
+message is received at the Stream head, a marked message is received at the Stream head, or a
+delimited message is received at the Stream head.  Message boundaries are ignored.
 .IP
 When 
 .BR strread ()
 or
 .BR strreadv ()
 terminates in byte-stream mode, if there are any bytes remaining in the STREAMS message that was
-read, they are placed back on the STREAM head read queue to be read by subsequent calls to
+read, they are placed back on the Stream head read queue to be read by subsequent calls to
 .BR read (2s),
 .BR getmsg (2)
 or
@@ -238,8 +238,8 @@ or
 The message-discard
 mode,
 terminates on error, when the number of bytes requested has been satisfied, a zero-length data
-message is received at the STREAM head, a marked message is received at the STREAM head, or a
-delimited message is received at the STREAM head.  Message boundaries are preserved.
+message is received at the Stream head, a marked message is received at the Stream head, or a
+delimited message is received at the Stream head.  Message boundaries are preserved.
 .IP
 When 
 .BR strread ()
@@ -259,15 +259,15 @@ call.
 The message-nondiscard
 mode,
 terminates on error, when the number of bytes requested has been satisfied, a zero-length data
-message is received at the STREAM head, a marked message is received at the STREAM head, or a
-delimited message is received at the STREAM head.  Message boundaries are preserved.
+message is received at the Stream head, a marked message is received at the Stream head, or a
+delimited message is received at the Stream head.  Message boundaries are preserved.
 .IP
 When 
 .BR strread ()
 or
 .BR strreadv ()
 terminates in message-nondiscard mode, if there are any bytes remaining in the STREAMS message that
-was read, they are placed back on the STREAM head read queue to be read by subsequent calls to
+was read, they are placed back on the Stream head read queue to be read by subsequent calls to
 .BR read (2s),
 .BR getmsg (2)
 or
@@ -306,7 +306,7 @@ as described in
 In control-normal
 mode, when a
 .I STREAMS
-message is encountered in the STREAM head read queue that has a control part (that is, an
+message is encountered in the Stream head read queue that has a control part (that is, an
 .BR M_PROTO (9)
 or
 .BR M_PCPROTO (9)
@@ -323,7 +323,7 @@ to
 .BR getmsg (2)
 or
 .BR getpmsg (2s)
-must be use to remove the message containing a control part from the STREAM.
+must be use to remove the message containing a control part from the Stream.
 .\"
 .TP
 .RB { RPROTDAT }
@@ -331,7 +331,7 @@ In control-data
 mode,
 when a
 .I STREAMS
-message is encountered in the STREAM head read queue that has a control part,
+message is encountered in the Stream head read queue that has a control part,
 .BR strread ()
 and
 .BR strreadv ()
@@ -347,7 +347,7 @@ In control-discard
 mode,
 when a
 .I STREAMS
-message is encountered in the STREAM head read queue that has a control part,
+message is encountered in the Stream head read queue that has a control part,
 .BR strread ()
 and
 .BR strreadv ()
@@ -390,16 +390,16 @@ All read modes for
 .BR strread ()
 and
 .BR strreadv ()
-terminate when a zero-length data message is encountered on the STREAM head.  In byte-stream mode,
+terminate when a zero-length data message is encountered on the Stream head.  In byte-stream mode,
 when data has already been transferred to the user,
 .BR strread ()
 and
 .BR strreadv ()
-return the zero-length data message to the STREAM head to be consumed by a subsequent call, and the
+return the zero-length data message to the Stream head to be consumed by a subsequent call, and the
 function returns the number of bytes read so far.
 .\"
 .PP
-When the zero-length data message is the first message encountered on the STREAM head,
+When the zero-length data message is the first message encountered on the Stream head,
 all read modes for
 .BR strread ()
 and
@@ -458,7 +458,7 @@ file flag is set, and
 .BR strread ()
 or
 .BR strreadv ()
-encounters an STREAM head read queue that has no data, and no data has yet been transferred to the
+encounters an Stream head read queue that has no data, and no data has yet been transferred to the
 caller,
 .BR strread ()
 and
@@ -472,7 +472,7 @@ file flag is set, and
 .BR strread ()
 or
 .BR strreadv ()
-encounters an STREAM head read queue that has no data, and some data has already been transferred to
+encounters an Stream head read queue that has no data, and some data has already been transferred to
 the caller,
 .BR strread ()
 and
@@ -485,11 +485,11 @@ file flag is clear, and
 .BR strread ()
 or
 .BR strreadv ()
-encounters a STREAM head read queue that has no data,
+encounters a Stream head read queue that has no data,
 .BR strread ()
 and
 .BR strreadv ()
-block awaiting the availability of data at the STREAM head read queue.
+block awaiting the availability of data at the Stream head read queue.
 .\"
 .PP
 When
@@ -508,7 +508,7 @@ file flag is set, and
 .BR strread ()
 or
 .BR strreadv ()
-encounters a STREAM head read queue that has no data, and no data has yet been transferred to the
+encounters a Stream head read queue that has no data, and no data has yet been transferred to the
 caller,
 .BR strread ()
 and
@@ -522,7 +522,7 @@ file flag is set, and
 .BR strread ()
 or
 .BR strreadv ()
-encounters an STREAM head read queue that has no data, and some data has already been transferred to
+encounters an Stream head read queue that has no data, and some data has already been transferred to
 the caller,
 .BR strread ()
 and
@@ -535,11 +535,11 @@ file flag is clear, and
 .BR strread ()
 or
 .BR strreadv ()
-encounters a STREAM head read queue that has no data,
+encounters a Stream head read queue that has no data,
 .BR strread ()
 and
 .BR strreadv ()
-block awaiting the availability of data at the STREAM head read queue.
+block awaiting the availability of data at the Stream head read queue.
 .\"
 .\"
 .SS File Types
@@ -570,7 +570,7 @@ feature is enabled with the
 .B SO_MREADON
 flag in the
 .BR stroptions (9)
-structure passed to the STREAM head in a
+structure passed to the Stream head in a
 .BR M_SETOPTS (9)
 message.  It is disabled in the same fashion with the
 .B SO_MREADOFF
@@ -586,7 +586,7 @@ feature is activated and
 .BR strread ()
 or
 .BR strreadv ()
-finds that there is no data queued in the STREAM head read queue to satisfy the
+finds that there is no data queued in the Stream head read queue to satisfy the
 .BR read (2s)
 request, and it is about to block (that is, the
 .BR O_NDELAY " (or " O_NONBLOCK )
@@ -607,16 +607,16 @@ feature is used by
 .BR ldterm (4)
 when transferring input in non-canonical (raw) mode.
 .PP
-Proper behaviour of the STREAM head (and therefore
+Proper behaviour of the Stream head (and therefore
 .BR strread ()
 and
 .BR strreadv ()),
 when the
 .BR M_READ (9)
 feature is activated,
-depends upon the non-blocking semantics used by the STREAM head and cooperating modules and drivers.
+depends upon the non-blocking semantics used by the Stream head and cooperating modules and drivers.
 .PP
-When the STREAM head is set for
+When the Stream head is set for
 .I STREAMS
 semantics for non-blocking operation (the default),
 and the stream is set for blocking operation (the
@@ -626,7 +626,7 @@ file flag is set),
 .BR strreadv ()
 and cooperating modules and drivers behave as follows:
 .IP \(en \w'\(en\(em'u
-When the STREAM head has no data to service the
+When the Stream head has no data to service the
 .BR strread ()
 or
 .BR strreadv ()
@@ -659,14 +659,14 @@ message upstream.
 .IP \(en
 Upon receiving the
 .BR M_DATA (9)
-message, the STREAM head unblocks the user and transfers the data to satisfy the request.
+message, the Stream head unblocks the user and transfers the data to satisfy the request.
 .IP \(en
 If there is insufficient data queued to meet the request, the module or driver
 frees the
 .BR M_READ (9)
 message and takes no other action.
 .PP
-When the STREAM head is set for
+When the Stream head is set for
 .RI non- STREAMS
 tty semantics for non-blocking operation,
 yet regardless of the setting of the
@@ -684,24 +684,24 @@ and cooperating modules and drivers behave as follows:
 .PP
 The
 .BR I_ATMARK (7)
-feature is always enabled on a STREAM.  This feature is used by setting the
+feature is always enabled on a Stream.  This feature is used by setting the
 .BR MSGMARK
-flag in messages passed upstream to the STREAM head.
+flag in messages passed upstream to the Stream head.
 .PP
 .I STREAMS
 messages can be marked by a downstream module or driver in support of TCP's out-of-band data.  Once
-marked, a messages sent to the STREAM head causes the STREAM head to remember the message.  A user
-may check to see if the message on the front of its STREAM head read queue is marked with the
+marked, a messages sent to the Stream head causes the Stream head to remember the message.  A user
+may check to see if the message on the front of its Stream head read queue is marked with the
 .BR I_ATMARK (7)
 command to
 .BR ioctl (2).
-If a user is reading data from the STREAM head and there are multiple messages on the STREAM head read queue, and one of those messages is marked,
+If a user is reading data from the Stream head and there are multiple messages on the Stream head read queue, and one of those messages is marked,
 .BR strread ()
 and
 .BR strreadv ()
 terminate when they reach the marked message and return the data only up to the marked message.  The
 marked data can then be obtained with successive reads.  A successive read will them consume all marked
-messages on the STREAM head read queue that will fit into the number of requested bytes,
+messages on the Stream head read queue that will fit into the number of requested bytes,
 .IR nbytes .
 .PP
 When
@@ -710,14 +710,14 @@ or
 .BR strreadv ()
 encounters a marked message and data has already been transferred, the read terminates with the
 amount of data read.  It does not matter what the length of the marked message is, and a zero-length
-marked message has the same effect.  The marked message is kept on the STREAM head to be read by a
+marked message has the same effect.  The marked message is kept on the Stream head to be read by a
 subsequent
 .BR strread (),
 .BR strreadv ()
 or
 .BR strgetpmsg ()
 request.  The resulting short read is one indication to the caller that a marked message could exist
-on the STREAM head read queue.  (Short reads can also result from a zero-length data message, or
+on the Stream head read queue.  (Short reads can also result from a zero-length data message, or
 from a delimited message.)  When a short read occurs, the user should test for marked messages
 using the
 .BR ANYMARK " or " LASTMARK
@@ -744,7 +744,7 @@ The message delimitation feature is enabled with the
 .B SO_DELIM
 flag in the
 .BR stroptions (9)
-structure passed to the STREAM head in an
+structure passed to the Stream head in an
 .BR M_SETOPTS (9)
 message.  It is disabled in the same fashion with the
 .B SO_NODELIM
@@ -753,11 +753,11 @@ When
 .B SO_DELIM
 flag is sent, the
 .B STRDELIM
-flag is set in the STREAM head.  When the
+flag is set in the Stream head.  When the
 .B SO_NODELIM
 flag is sent, the
 .B STRDELIM
-flag is cleared in the STREAM head.
+flag is cleared in the Stream head.
 The default behaviour is to not delimit messages
 .RB ( STRDELIM
 flag is clear).
@@ -770,10 +770,10 @@ The message delimitation feature only affects
 .BR strread ()
 and
 .BR strreadv ()
-when the STREAM head is in byte-stream read mode.  Byte-stream read mode normally ignores message
+when the Stream head is in byte-stream read mode.  Byte-stream read mode normally ignores message
 boundaries, however, when the
 .B STRDELIM
-flag is set in the STREAM head,
+flag is set in the Stream head,
 .BR strread ()
 and
 .BR strreadv ()
@@ -783,7 +783,7 @@ will terminate the read in byte-stream read mode when a delimited message has be
 message block marked with the
 .BR MSGDELIM
 flag.)
-Also, if the STREAM head is marked for delimited messages
+Also, if the Stream head is marked for delimited messages
 .RB ( STRDELIM
 set), and a zero-length delimited message arrives (it has
 .BR MSGDELIM
@@ -792,7 +792,7 @@ be consumed rather than placed back on the read queue.
 .PP
 In this way, it is possible for a downstream module or driver to set
 .B STRDELIM
-on the STREAM head and then send delimited messages upstream (including zero-length messages) that
+on the Stream head and then send delimited messages upstream (including zero-length messages) that
 will simply terminate the read in byte-stream mode and will not signal an end-of-file for
 zero-length messages.  This permits
 .BR M_READ (9)
@@ -802,7 +802,7 @@ instead of just
 .IR POSIX .
 .PP
 Note that when the delimited message feature is activated, a delimited zero-length message sent to
-the STREAM head could cause
+the Stream head could cause
 .BR strread ()
 or
 .BR strreadv ()
@@ -875,22 +875,22 @@ is not open for reading.
 .TP
 .RB [ EINVAL ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that is linked (directly or indirectly) downstream from a
+structure that is for a Stream that is linked (directly or indirectly) downstream from a
 multiplexing driver.
-(That is, the STREAM head has the
+(That is, the Stream head has the
 .B STPLEX
 bit set.)
 .TP
 .RB [ EIO ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that has closed or is closing.  (That is, either there is no longer a
-STREAM head associated with
+structure that is for a Stream that has closed or is closing.  (That is, either there is no longer a
+Stream head associated with
 .I file
-or the STREAM head has the
+or the Stream head has the
 .B STRCLOSE
 bit set.)
 .TP
@@ -927,7 +927,7 @@ file status flag is clear), and the read operation blocked awaiting the availabi
 .BR ( 1 )
 byte of data to read, and the wait timed out.
 .PP
-Also, if the STREAM head referenced by
+Also, if the Stream head referenced by
 .I file
 has received a
 .BR M_ERROR (9)
@@ -942,7 +942,7 @@ When the
 .BR STRISFIFO " or " STRISPIPE
 flags are clear in the
 .I sd_flags
-member of the STREAM head
+member of the Stream head
 .BR stdata (9)
 structure associated with
 .IR file ,
@@ -956,11 +956,11 @@ character device special files.  In that case, the following additional error co
 .TP
 .RB [ ENXIO ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that has received a hangup
+structure that is for a Stream that has received a hangup
 .RB ( M_HANGUP (9))
-message.  (That is, the STREAM head has the
+message.  (That is, the Stream head has the
 .BR STRHUP
 bit set.)
 .\"
@@ -969,7 +969,7 @@ When the
 .BR STRISFIFO " or " STRISPIPE
 flags are set in the
 .I sd_flags
-member of the STREAM head
+member of the Stream head
 .BR stdata (9)
 structure associated with
 .IR file ,
@@ -1093,7 +1093,7 @@ setting the
 .B O_NDELAY
 file flag has the same effect as the
 .B SO_NDELON
-STREAM head option on other systems.  Whereas, the
+Stream head option on other systems.  Whereas, the
 .B O_NONBLOCK
 file flag has the same effect as the
 .B SO_NDELOFF
@@ -1112,7 +1112,7 @@ treats
 .BR O_NDELAY " and " O_NONBLOCK
 semantics as identical and the semantics for both flags are affected by the
 .BR SO_NDELON " and " SO_NDELOFF
-STREAM head options.
+Stream head options.
 .IP
 Other implementations, such as
 .IR HP-UX \(rg,
@@ -1125,7 +1125,7 @@ flags have the same effect, and setting the blocking semantics with
 .BR SO_NDELON " or " SO_NDELOFF
 affect the semantics for both flags.
 .IP
-Yet other implementations only document the STREAM head options
+Yet other implementations only document the Stream head options
 .BR SO_NDELON " and " SO_NDELOFF
 as affecting the semantics for only the
 .B O_NDELAY

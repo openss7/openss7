@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: adjmsg.9.man,v 0.9.2.15 2005/05/14 08:34:19 brian Exp $
+.\" @(#) $Id: adjmsg.9.man,v 0.9.2.16 2005/09/17 00:45:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,6 +101,41 @@ the number of bytes to trim and the direction from which to trim.
 .\"
 .\"
 .SH DESCRIPTION
+.\".PP
+.\".BR adjmsg ()
+.\"trims bytes from either the head or tail of the message specified by
+.\".IR mp .
+.\"If
+.\".I len
+.\"is greater than zero, it removes
+.\".I len
+.\"bytes from the beginning of
+.\".IR mp .
+.\"If
+.\".I len
+.\"is less than zero, it removes
+.\".I -len
+.\"bytes from the end of
+.\".IR mp .
+.\"If
+.\".I len
+.\"is zero,
+.\".BR adjmsg ()
+.\"does nothing.
+.\".PP
+.\".BR adjmsg ()
+.\"only trims bytes across message blocks of the same type.  It fails if
+.\".I mp
+.\"points to a message containing fewer than
+.\".I len
+.\"bytes of similar type at the message position indicated.
+.\".PP
+.\".BR adjmsg ()
+.\"returns
+.\".RB "true (" 1 )
+.\"on success and
+.\".RB "false (" 0 )
+.\"on failure.
 .PP
 .BR adjmsg ()
 trims
@@ -112,13 +147,13 @@ message pointed to by
 .PP
 If
 .I len
-is less than zero,
+is greater than zero,
 .BR adjmsg ()
 will trim bytes from the head of the message.
 .PP
 If
 .I len
-is greater than zero,
+is less than zero,
 .BR adjmsg ()
 will trim bytes from the tail of the message.
 .PP
@@ -131,11 +166,11 @@ succeeds but does nothing.
 During the trimming process, blocks are trimmed by advancing the
 .I b_rptr
 for head trims
-.RI ( len "> 0),
+.RI ( len " > 0),
 or decreasing the
 .I b_wptr
 for tail trims
-.RI ( len "< 0),
+.RI ( len " < 0),
 by the number of bytes trimmed from the block.  If an entire block is trimmed
 (its
 .I b_rptr
@@ -170,6 +205,7 @@ and the passed in message remains unchanged.
 If
 .I mp
 is a null pointer,
+the absolute value of
 .I len
 is greater that the message size, or if the bytes to trim crosses message blocks of
 differing types,
@@ -187,7 +223,7 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 .SH MP-STREAMS
 .PP
 .BR adjmsg ()
-is MP-safe; however, the caller must ensure exclusive access to the passed in
+is MP-SAFE; however, the caller must ensure exclusive access to the passed in
 message,
 .IR mp .
 .\"
@@ -311,7 +347,8 @@ LiS
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not be affected if message blocks are freed interior to the message.
+modules and drivers should be designed so that they will not be affected if message blocks are
+freed, or left as zero-length message blocks, interior to the message.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

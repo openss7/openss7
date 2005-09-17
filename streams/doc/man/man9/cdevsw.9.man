@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdevsw.9.man,v 0.9.2.12 2005/08/29 10:06:48 brian Exp $
+.\" @(#) $Id: cdevsw.9.man,v 0.9.2.13 2005/09/17 00:45:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -284,7 +284,7 @@ directly or indirectly, during registration.
 .TP
 .I d_mode
 Specifies the mode of the driver.
-This member is only populated by the caller of a registration function when writing a STREAM head or
+This member is only populated by the caller of a registration function when writing a Stream head or
 specialized device or module such as
 .BR clone (4),
 .BR fifo (4),
@@ -319,7 +319,7 @@ files contained in the
 .BR specfs (5)
 when that file system is mounted.  This is distinct from the file operations that are used by
 external file system character, FIFO or socket device nodes.
-This member is only populated by the caller of a registration function when writing a STREAM head or
+This member is only populated by the caller of a registration function when writing a Stream head or
 specialized device or module such as
 .BR clone (4),
 .BR fifo (4),
@@ -379,7 +379,7 @@ as described in
 .I d_stlist
 This is a list of
 .BR stdata (9)
-structure that represent all allocated STREAM heads for the driver.  This list is not populated by
+structure that represent all allocated Stream heads for the driver.  This list is not populated by
 the
 .I STREAMS
 driver, but are allocated by the
@@ -414,7 +414,7 @@ driver rather than a
 .BR fifo (4)
 driver (because FIFOs never clone).
 .IP ""
-Drivers that are marked with this flag should never have STREAM heads attached to the external file
+Drivers that are marked with this flag should never have Stream heads attached to the external file
 system device inode or internal
 .BR specfs (5)
 file system inode.  The driver
@@ -427,7 +427,7 @@ set to
 This flag need only be used by specialized clone devices such as
 .BR clone (4),
 .BR nsdev (4),
-that never have STREAM heads attached to inodes.  See also
+that never have Stream heads attached to inodes.  See also
 .BR stropen (9).
 .\".TP
 .\".B D_FIFO
@@ -605,7 +605,7 @@ The file mode and permissions for the driver if different from
 and world readable and writable.
 .TP
 .I d_fop
-Special file operations when registering a new STREAM head.
+Special file operations when registering a new Stream head.
 .PP
 After the registration function has been called, no members of the structure or subtending
 structures should be directly accessed nor manipulated by the

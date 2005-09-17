@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.34 2005/09/16 03:06:02 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.35 2005/09/17 00:46:12 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/16 03:06:02 $ by $Author: brian $
+% Last Modified $Date: 2005/09/17 00:46:12 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -390,8 +390,8 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 Acknowledgements
 
-* Sponsors::			Sponsors of Linux Fast-STREAMS
-* Contributors::		Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors
+* Contributors::		Contributors
 
 Preface
 
@@ -615,31 +615,6 @@ Copying
 
 @include texi/funding.texi
 
-@ignore 
-
-@menu
-* Sponsors::			Sponsors of Linux Fast-STREAMS
-* Contributors::		Contributors to Linux Fast-STREAMS
-@end menu
-
-@node Sponsors
-@unnumberedsec Sponsors of @value{PACKAGE_TITLE}
-@cindex sponsors
-
-Funding for completion of @value{PACKAGE_TITLE} was provided by:
-
-OpenSS7 Corporation
-
-Additional funding for The OpenSS7 Project was provided by:
-
-@node Contributors
-@unnumberedsec Contributors to @value{PACKAGE_TITLE}
-@cindex contributors
-
-The primary contributor to @value{PACKAGE_TITLE} is Brian F. G. Bidulock.
-
-@end ignore
-
 @node Preface
 @unnumbered Preface
 
@@ -717,6 +692,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.35  2005/09/17 00:46:12  brian
+- document updates
+
 Revision 0.9.2.34  2005/09/16 03:06:02  brian
 - added glossary
 
@@ -3225,7 +3203,7 @@ user commands.
 Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
 
 By default, pipes created on @b{Linux} by the @manpage{pipe(2)} system call are not
-@cite{STREAMS}-based.  To get @cite{STREAMS}-based pipes, configure @dfn{Linux Fast-STREAMS} with
+@cite{STREAMS}-based.  To get @cite{STREAMS}-based pipes, configure @cite{@value{PACKAGE_TITLE}} with
 configuration parameter @code{--enable-streams-fifos}.
 
 @dfn{@value{PACKAGE_TITLE}} also provides a character device based pipe facility using the
@@ -3246,8 +3224,7 @@ Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
 By default, FIFOs created on @b{Linux} with the
 @manpage{mknod(8)}
 @pgindex mknod(8)
-utility are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based FIFOs, configure @dfn{Linux
-Fast-STREAMS} with configuration parameter @code{--enable-streams-fifos}.
+utility are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based FIFOs, configure @cite{@value{PACKAGE_TITLE}} with configuration parameter @code{--enable-streams-fifos}.
 @footnote{I am considering taking pipes and FIFOs out of the base
 @code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.7a.1}
 package.}
@@ -4929,12 +4906,13 @@ different message.
 
 @manpage{putq(9)} only looks at the priority band in the first message.  If a high priority message
 is passed to @command{putq()} with a non-zero @var{b_band} value, @var{b_band} is reset to 0 before
-placing the message on the queue.@footnote{Check that @value{PACKAGE_TITLE} actually performs this
-action.} If the message is passed to @command{putq()} with a @var{b_band} value that is greater than
-the number of @code{qband} structures associated with the queue, @command{putq()} tries to allocate
-a new @code{qband} structure for each band up to and including the band of the
-message.@footnote{@value{PACKAGE_TITLE} currently only allocated the band in question and does not
-allocate intermediate queue band structures as described.}
+placing the message on the queue.@footnote{Under @cite{@value{PACKAGE_TITLE}}, this is performed by
+@manref{putq(9)}, @manref{putbq(9)} and @manref{insq(9)}.} If the message is passed to
+@command{putq()} with a @var{b_band} value that is greater than the number of @code{qband}
+structures associated with the queue, @command{putq()} tries to allocate a new @code{qband}
+structure for each band up to and including the band of the message.@footnote{@value{PACKAGE_TITLE}
+currently only allocated the band in question and does not allocate intermediate queue band
+structures as described.}
 
 The above also applies to @manpage{putbq(9)} and @manpage{insq(9)}.  If an attempt is made to insert
 a message out of order in a queue via @command{insq()}, the message is not inserted and the routine
@@ -13251,7 +13229,7 @@ There are a number of extensions to @cite{SVR 4.2 MP}
 @cindex SVR 4.2 MP
 @cite{STREAMS} that have been applied by implementations over the years.  Some of these extensions
 are common enough across multiple implementations to be considered part of the @i{ipso facto}
-standard for @cite{STREAMS}.  @b{Linux Fast-STREAMS} implements these functions are part of the core
+standard for @cite{STREAMS}.  @cite{@value{PACKAGE_TITLE}} implements these functions are part of the core
 set of @cite{STREAMS} functions.
 
 @subsection Common Extensions
@@ -13523,8 +13501,8 @@ The following functions are provided by @dfn{@value{PACKAGE_TITLE}} for compatib
 @cindex AIX, core functions
 @cindex AIX
 
-The functions in this section are provided as part of the core functions provided in the @b{Linux
-Fast-STREASM} @cite{STREAMS} subsystem:
+The functions in this section are provided as part of the core functions provided in the
+@cite{@value{PACKAGE_TITLE}} @cite{STREAMS} subsystem:
 
 @multitable @columnfractions .30 .70
 @item @manpage{putctl2(9)} @tab Put a 2 byte control message on a @cite{STREAMS} message queue.
@@ -16163,10 +16141,7 @@ appendix.
 @appendixsubsec adjmsg-trim bytes in a message
 
 @smallexample
-int
-adjmsg(mp, len)
-        mblk_t *mp;
-        register int len;
+int adjmsg(mblk_t *mp, register int len);
 @end smallexample
 
 @manpage{adjmsg(9)} trims bytes from either the head or tail of the message specified by @var{mp}.
@@ -16183,10 +16158,7 @@ indicated.
 @appendixsubsec allocb-allocate a message and data block
 
 @smallexample
-struct msgb *
-allocb(size, pri)
-        int size;
-        uint pri;
+struct msgb *allocb(int size, uint pri);
 @end smallexample
 
 @manpage{allocb(9)} returns a pointer to a message block of type @msg{M_DATA}, in which the data
@@ -16204,9 +16176,7 @@ is initially set to zero.  Modules and drivers may set this field if so desired.
 @appendixsubsec backq-get pointer to the queue behind a given queue
 
 @smallexample
-queue_t *
-backq(q)
-        register queue_t *q;
+queue_t *backq(register queue_t *q);
 @end smallexample
 
 @manpage{backq(9)} returns a pointer to the queue behind a given queue.  That is, it returns a
@@ -16219,10 +16189,7 @@ pointer is @var{q}.  If no such queue exists (as when @var{q} is at a @dfn{Strea
 @appendixsubsec bcanput-test for flow control in the given priority band
 
 @smallexample
-int
-bcanput(q, pri)
-        register queue_t *q;
-        unsigned char pri;
+int bcanput(register queue_t *q, unsigned char pri);
 @end smallexample
 
 @manpage{bcanput(9)} provides modules and drivers with a way to test flow control in the given
@@ -16237,10 +16204,7 @@ The call @samp{bcanput(q, 0)} is equivalent to the call @samp{canput(q)}.
 @appendixsubsec bcanputnext-test for flow control in the given priority band
 
 @smallexample
-int
-bcanputnext(q, pri)
-        register queue_t *q;
-        unsigned char pri;
+int bcanputnext(register queue_t *q, unsigned char pri);
 @end smallexample
 
 @manpage{bacnputnext(9)} provides modules and drivers with a way to test flow control in a given
@@ -16253,12 +16217,7 @@ If the band does not yet exist ont he queue in question, 1 is returned.
 @appendixsubsec bufcall-recover from failure of allocb
 
 @smallexample
-int
-bufcall(size, pri, func, arg)
-        uint size;
-        int pri;
-        void (*func) ();
-        long arg;
+int bufcall(uint size, int pri, void (*func)(long), long arg);
 @end smallexample
 
 @manpage{bufcall(9)} is provided to assist in the event of a block allocation failure.  If
@@ -16280,9 +16239,7 @@ indicates a (temporary) inability to allocate required internal data structures.
 @appendixsubsec canput-test for room in a queue
 
 @smallexample
-int
-canput(q)
-        register queue_t *q;
+int canput(regsiter queue_t *q);
 @end smallexample
 
 @manpage{canput(9)} determines if there is room left in a message queue.  If @var{q} does not have a
@@ -16300,9 +16257,7 @@ blocked.
 @appendixsubsec canputnext-test for room in the next queue
 
 @smallexample
-int
-canputnext(q)
-        register queue_t *q;
+int canputnext(register queue_t *q);
 @end smallexample
 
 @manpage{canputnext(9)} determines if there is room left in a message queue, pointed to by
@@ -16319,9 +16274,7 @@ returns 0.  In this case, the caller is generally referred to as @dfn{blocked}.
 @appendixsubsec copyb-copy a message block
 
 @smallexample
-mblk_t *
-copyb(bp)
-        register mblk_t *bp;
+mblk_t *copyb(register mblk_t *bp);
 @end smallexample
 
 @manpage{copyb(9)} copies the contents of the message block pointed at by @var{bp} into a
@@ -16337,9 +16290,7 @@ boundary.
 @appendixsubsec copymsg-copy a message
 
 @smallexample
-mblk_t *
-copymsg(bp)
-        register mblk_t *bp;
+mblk_t *copymsg(register mblk_t *bp);
 @end smallexample
 
 @manpage{copymsg(9)} uses @manref{copyb(9)} to copy the message blocks contained in the message
@@ -16352,21 +16303,24 @@ returns a @samp{NULL} pointer.
 @appendixsubsec datamsg-test whether message is a data message
 
 @smallexample
+int datamsg(unsigned char type);
+
 #define datamsg(type) ((type) == M_DATA||(type) == M_PROTO \
         || (type) == M_PCPROTO ||(type) == M_DELAY)
 @end smallexample
 
-The @manpage{datamsg(9)} macro returns @constant{TRUE} if @samp{mp->b_datap->db_type} (where
-@code{mp} is declared as @samp{mblk_t *mp}) is a data type message (that is, not a control message).
-In this case, a data type is @msg{M_DATA}, @msg{M_PROTO}, @msg{M_PCPROTO}, or @msg{M_DELAY}.  If
-@samp{mp->b_datap->db_type} is any other message type, @manpage{datamsg(9)} returns @constant{FALSE}.
+The @manpage{datamsg(9)} function
+(or macro)@footnote{Note that in @cite{UNIX@registeredsymbol{} System V Release 4}
+@manpage{datamsg(9)} was defined as a macro instead of a function call.}
+returns @constant{TRUE} if @samp{mp->b_datap->db_type} (where @code{mp} is declared as @samp{mblk_t
+*mp}) is a data type message (that is, not a control message).  In this case, a data type is
+@msg{M_DATA}, @msg{M_PROTO}, @msg{M_PCPROTO}, or @msg{M_DELAY}.  If @samp{mp->b_datap->db_type} is
+any other message type, @manpage{datamsg(9)} returns @constant{FALSE}.
 
 @appendixsubsec dupb-duplicate a message block descriptor
 
 @smallexample
-mblk_t *
-dupb(bp)
-        mblk_t *bp;
+mblk_t *dupb(mblk_t *bp);
 @end smallexample
 
 @manpage{dupb(9)} duplicates the message block descriptor (@type{mblk_t}) pointed at by @var{bp} by
@@ -16387,9 +16341,7 @@ are not invalidated by unwanted changes.
 @appendixsubsec dupmsg-duplicate a message
 
 @smallexample
-mblk_t *
-dupmsg(bp)
-        mblk_t *bp;
+mblk_t *dupmsg(mblk_t *bp);
 @end smallexample
 
 @manpage{dupmsg(9)} calls @manref{dupb(9)} to duplicate the message pointed at by @var{bp}, by
@@ -16402,9 +16354,7 @@ returns @samp{NULL}.
 @appendixsubsec enableok-re-allow a queue to be scheduled for service
 
 @smallexample
-void
-enableok(q)
-        queue_t *q;
+void enableok(queue_t *q);
 @end smallexample
 
 @manpage{enableok(9)} cancels the effect of an earlier @manref{noenable(9)} on the same queue
@@ -16414,11 +16364,7 @@ service by a call to @manpage{noenable(9)}.
 @appendixsubsec esballoc-allocate message and data blocks
 
 @smallexample
-mblk_t *
-esballoc(base, size, pri, fr_rtn)
-        unsigned char *base;
-        int size, pri;
-        frtn_t *fr_rtn;
+mblk_t *esballoc(unsigned char *base, int size, int pri, frtn_t *fr_rtn);
 @end smallexample
 
 @manpage{esballoc(9)} allocates message and data blocks that point directly to a client-supplied
@@ -16448,10 +16394,7 @@ module reference counting.
 @appendixsubsec esbbcall - call function when buffer is available
 
 @smallexample
-int esbbcall(pri, func, arg)
-        int pri;
-        void (*func)();
-        long arg;
+int esbbcall(int pri, void (*func)(long), long arg);
 @end smallexample
 
 @manpage{esbbcall(9)}, like @manref{bufcall(9)}, serves as a @manref{timeout(9)} call of
@@ -16462,11 +16405,7 @@ the routine @var{func}, to be called with the argument @var{arg} when a buffer b
 @appendixsubsec flushband-flush the messages in a given priority band
 
 @smallexample
-void
-flushband(q, pri, flag)
-        register queue_t *q;
-        unsigned char pri;
-        int flag;
+void flushband(register queue_t *q, unsigned char pri, int flag);
 @end smallexample
 
 @manpage{flushband(9)} provides modules and drivers with the capability to flush the messages
@@ -16477,10 +16416,7 @@ band specified by @var{pri} according to the value of @var{flag}.
 @appendixsubsec flushq-flush a queue
 
 @smallexample
-void
-flushq(q, flag)
-        register queue_t *q;
-        int flag;
+void flushq(register queue_t *q, int flag);
 @end smallexample
 
 @manpage{flushq(9)} removes messages from the message queue in queue @var{q} and frees them, using
@@ -16496,9 +16432,7 @@ in @manref{putq(9)}.
 @appendixsubsec freeb-free a single message block
 
 @smallexample
-void
-freeb(bp)
-        struct msgb *bp;
+void freeb(struct msgb *bp);
 @end smallexample
 
 @manpage{freeb(9)} will free (deallocate) the message block descriptor pointed at by @var{bp}, and
@@ -16518,9 +16452,7 @@ One should always check that pointer is non-@dfn{NULL} before using @manpage{fre
 @appendixsubsec freemsg-free all message blocks in a message
 
 @smallexample
-void
-freemsg(bp)
-        mblk_t *bp;
+void freemsg(mblk_t *bp);
 @end smallexample
 
 @manpage{freemsg(9)} uses @manref{freeb(9)} to free all message blocks and their corresponding data
@@ -16529,8 +16461,7 @@ blocks for the message pointed at by @var{bp}.
 @appendixsubsec freezestr-freeze a stream
 
 @smallexample
-void freezestr(q)
-        queue_t *q;
+void freezestr(queue_t *q);
 @end smallexample
 
 @manpage{freezestr(9)} freezes the state of the entire @dfn{STREAM} containing the queue @var{q}.  A
@@ -16544,9 +16475,7 @@ blocked by this mechanism remain so until the @dfn{Stream} is thawed by a call t
 @appendixsubsec getadmin-return the pointer to the module
 
 @smallexample
-int
- (*getadmin(mid)) ()
-        ushort mid;
+int (*getadmin(ushort mid)) (void);
 @end smallexample
 
 @manpage{getadmin(9)} returns the @member{qadmin} pointer to the module identified by @var{mid}.  It
@@ -16555,9 +16484,7 @@ returns @samp{NULL} on error.
 @appendixsubsec getmid-return a module id
 
 @smallexample
-ushort
-getmid(name)
-        char *name;
+ushort getmid(char *name);
 @end smallexample
 
 @manpage{getmid(9)} returns the module id for the module identified by name.  It returns @samp{0} on
@@ -16566,9 +16493,7 @@ error.
 @appendixsubsec getq-get a message from a queue
 
 @smallexample
-mblk_t *
-getq(q)
-        register queue_t *q;
+mblk_t *getq(register queue_t *q);
 @end smallexample
 
 @manpage{getq(9)} gets the next available message from the queue pointed at by @var{q}.
@@ -16594,11 +16519,7 @@ messages in the normal band of flow.
 @appendixsubsec insq-put a message at a specific place in a queue
 
 @smallexample
-int
-insq(q, emp, mp)
-        register queue_t *q;
-        register mblk_t *emp;
-        register mblk_t *mp;
+int insq(register queue_t *q, register mblk_t *emp, register mblk_t *mp);
 @end smallexample
 
 @manpage{insq(9)} places the message pointed at by @var{mp} in the message queue contained in the
@@ -16624,10 +16545,7 @@ The @dfn{Stream} must be frozen by the caller when calling @manpage{insq(9)}.
 @appendixsubsec linkb-concatenate two messages into one
 
 @smallexample
-void
-linkb(mp, bp)
-        register mblk_t *mp;
-        register mblk_t *bp;
+void linkb(register mblk_t *mp, register mblk_t *bp);
 @end smallexample
 
 @manpage{linkb(9)} puts the message pointed at by @var{bp} at the tail of the message pointed at by
@@ -16636,9 +16554,7 @@ linkb(mp, bp)
 @appendixsubsec msgdsize-get the number of data byptes in a message
 
 @smallexample
-int
-msgdsize(bp)
-        register mblk_t *bp;
+int msgdsize(register mblk_t *bp);
 @end smallexample
 
 @manpage{msgdsize(9)} returns the number of bytes of data in the message pointed at by @var{bp}.
@@ -16647,10 +16563,7 @@ Only bytes included in data blocks of type @msg{M_DATA} are included in the tota
 @appendixsubsec msgpullup-concatentate bytes in a message
 
 @smallexample
-int
-msgpullup(mp, len)
-        mblk_t *mp;
-        int len;
+int msgpullup(mblk_t *mp, int len);
 @end smallexample
 
 @manpage{msgpullup(9)} concatenates and aligns the first @var{len} data bytes of the message pointed
@@ -16660,9 +16573,7 @@ blocks will be copied and linked onto the new message.  The original message is 
 @appendixsubsec noenable-prevent a queue from being scheduled
 
 @smallexample
-void
-noenable(q)
-        queue_t *q;
+void noenable(queue_t *q);
 @end smallexample
 
 @manpage{noenable(9)} prevents the queue @var{q} from being scheduled for service by
@@ -16674,10 +16585,15 @@ scheduling of queues when a high priority message is enqueued, unless it is enqu
 @appendixsubsec OTHERQ-get pointer to the mate queue
 
 @smallexample
+queue_t *OTHERQ(queue_t *q);
+
 #define OTHERQ(q) ((q)->q_flag & QREADR ? (q)+1 : (q)-1)
 @end smallexample
 
-The @manpage{OTHERQ(9)} macro returns a pointer to the mate queue of @var{q}.
+The @manpage{OTHERQ(9)} function
+(or macro)@footnote{Note that in @cite{UNIX@registeredsymbol{} System V Release 4}
+@manpage{OTHERQ(9)} was implemented as a macro instead of a function call.}
+returns a pointer to the mate queue of @var{q}.
 
 If @var{q} is the read queue for the module, it returns a pointer to the module's write queue.  If
 @var{q} is the write queue for the module, it returns a pointer to the read queue.
@@ -16685,10 +16601,7 @@ If @var{q} is the read queue for the module, it returns a pointer to the module'
 @appendixsubsec pullupmsg-concatenate and align bytes in a message
 
 @smallexample
-int
-pullupmsg(mp, len)
-        struct msgb *mp;
-        register int len;
+int pullupmsg(struct msgb *mp, register int len);
 @end smallexample
 
 @manpage{pullupmsg(9)} concatenates and aligns the first @var{len} data bytes of the passed message
@@ -16704,9 +16617,7 @@ have altered the contents of the message pointed to by @var{mp}.  On failure, it
 @appendixsubsec put-call a @dfn{STREAMS} put procedure
 
 @smallexample
-void put(q, mp)
-        queue_t *q;
-        mblk_t *mp;
+void put(queue_t *q, mblk_t *mp);
 @end smallexample
 
 @manpage{put(9)} calls the @command{put} procedure for the @dfn{STREAMS} queue specified by @var{q},
@@ -16716,10 +16627,7 @@ call its own @command{put} procedure.
 @appendixsubsec putbq-return a message to the beginning of a queue
 
 @smallexample
-int
-putbq(q, bp)
-        register queue_t *q;
-        register mblk_t *bp;
+int putbq(register queue_t *q, register mblk_t *bp);
 @end smallexample
 
 @manpage{putbq(9)} puts the message pointed at by @var{bp} at the beginning of the queue pointed at
@@ -16738,9 +16646,7 @@ would result in an infinitive loop.
 @appendixsubsec putctl-put a control message
 
 @smallexample
-int
-putctl(q, type)
-        queue_t *q;
+int putctl(queue_t *q, int type);
 @end smallexample
 
 On @manpage{putctl(9)} creates a control message of type type, and calls the put procedure of the
@@ -16754,9 +16660,7 @@ was specified.
 @appendixsubsec putctl1-put a control message with a one-byte parameter
 
 @smallexample
-int
-putctl1(q, type, param)
-        queue_t *q;
+int putctl1(queue_t *q, int type, int param);
 @end smallexample
 
 @manpage{putctl1(9)} creates a control message of type type with a one-byte parameter @var{param},
@@ -16771,20 +16675,23 @@ as though @msg{M_DELAY} is acceptable for @manref{putctl1(9)} but not for @manre
 @appendixsubsec putnext-put a message to the next queue
 
 @smallexample
+int putnext(queue_t *q, mblk_t *mp);
+
 #define putnext(q, mp) ((*(q)->q_next->q_qinfo->qi_putq)((q)->q_next, (mp)))
 @end smallexample
 
-The @manpage{putnext(9)} macro calls the @command{put} procedure of the next queue in a @dfn{Stream}
-and passes it a message pointer as an argument.  @var{q} is the calling queue (not the next queue)
-and @var{mp} is the message to be passed.  @manpage{putnext(9)} is the typical means of passing
-messages to the next queue in a @dfn{Stream}.
+The @manpage{putnext(9)} function
+(or macro)@footnote{Note that in @cite{UNIX@registeredsymbol{} System V Release 4}
+@manpage{putnext(9)} was implemented as a macro instead of a function call.}
+calls the @command{put}
+procedure of the next queue in a @dfn{Stream} and passes it a message pointer as an argument.
+@var{q} is the calling queue (not the next queue) and @var{mp} is the message to be passed.
+@manpage{putnext(9)} is the typical means of passing messages to the next queue in a @dfn{Stream}.
 
 @appendixsubsec putnextctl-put a control message
 
 @smallexample
-int putnextctl(q, type)
-        queue_t *q;
-        int type;
+int putnextctl(queue_t *q, int type);
 @end smallexample
 
 @manpage{putnextctl(9)} calls @manref{putctl(9)}, passing the queue pointed to by @samp{q->q_next},
@@ -16793,10 +16700,7 @@ and the message type @var{type}.
 @appendixsubsec putnextctl1-put a control message
 
 @smallexample
-int putnextctl1(q, type, param)
-        queue_t q;
-        int type;
-        int param;
+int putnextctl1(queue_t *q, int type, int param);
 @end smallexample
 
 @manpage{putnextctl1(9)} call @manref{putctl1(9)}, passing the queue pointex to by @samp{q->q_next},
@@ -16805,10 +16709,7 @@ the message type @var{type} and the one byte parameter @var{param}.
 @appendixsubsec putq-put a message on a queue
 
 @smallexample
-int
-putq(q, bp)
-        register queue_t *q;
-        register mblk_t *bp;
+int putq(register queue_t *q, register mblk_t *bp);
 @end smallexample
 
 @manpage{putq(9)} puts the message pointed at by @var{bp} on the message queue contained in the
@@ -16851,9 +16752,7 @@ value in either or both of a module's @mantype{qinit(9)} structures.  This effec
 @appendixsubsec qenable-enable a queue
 
 @smallexample
-void
-qenable(q)
-        register queue_t *q;
+void qenable(register queue_t *q);
 @end smallexample
 
 @manpage{qenable(9)} places the queue pointed at by @var{q} on the linked list of queues that are
@@ -16862,8 +16761,7 @@ ready to be called by the @dfn{STREAMS} scheduler.
 @appendixsubsec qprocsoff-disable the put and service routines of a driver or module
 
 @smallexample
-void qprocsoff(q)
-        queue_t *q;
+void qprocsoff(queue_t *q);
 @end smallexample
 
 @manpage{qprocsoff(9)} disables the @command{put} and @command{service} routines of the
@@ -16878,8 +16776,7 @@ any concurrent @command{put} or @command{service} routines are finished.
 @appendixsubsec qprocson-enable the put and service routines of a driver or module
 
 @smallexample
-void qprocson(q)
-        queue_t *q;
+void qprocson(queue_t *q);
 @end smallexample
 
 @manpage{qprocson(9)} enables the @command{put} and @command{service} routines of the @dfn{STREAMS}
@@ -16893,10 +16790,7 @@ routines depend.
 @appendixsubsec qreply-send a message on a @dfn{Stream} in the reverse direction
 
 @smallexample
-void
-qreply(q, bp)
-        register queue_t *q;
-        mblk_t *bp;
+void qreply(register queue_t *q, mblk_t *bp);
 @end smallexample
 
 @manpage{qreply(9)} sends the message pointed at by @var{bp} up (or down) the @dfn{Stream} in the
@@ -16908,9 +16802,7 @@ neighbor [as in @manref{putnext(9)}].  @manpage{qreply(9)} is typically used to 
 @appendixsubsec qsize-find the number of messages on a queue
 
 @smallexample
-int
-qsize(qp)
-        register queue_t *qp;
+int qsize(register queue_t *qp);
 @end smallexample
 
 @manpage{qsize(9)} returns the number of messages present in queue @var{qp}.  If there are no
@@ -16919,19 +16811,21 @@ messages on the queue, @manpage{qsize(9)} returns @samp{0}.
 @appendixsubsec RD-get pointer to the read queue
 
 @smallexample
+queue_t *RD(queue_t *q);
+
 #define RD(q) ((q)-1)
 @end smallexample
 
-The @manpage{RD(9)} macro accepts a write queue pointer, @var{q}, as an argument and returns a
+The @manpage{RD(9)} function
+(or macro)@footnote{Note that in @cite{UNIX@registeredsymbol{} System V Release 4}
+@manpage{RD(9)} was implemented as a macro instead of a function call.}
+accepts a write queue pointer, @var{q}, as an argument and returns a
 pointer to the read queue for the same module.
 
 @appendixsubsec rmvb-remove a message block from a message
 
 @smallexample
-mblk_t *
-rmvb(mp, bp)
-        register mblk_t *mp;
-        register mblk_t *bp;
+mblk_t *rmvb(register mblk_t *mp, register mblk_t *bp);
 @end smallexample
 
 @manpage{rmvb(9)} removes the message block pointed at by @var{bp} from the message pointed at by
@@ -16944,10 +16838,7 @@ returns a @samp{NULL} pointer.
 @appendixsubsec rmvq-remove a message from a queue
 
 @smallexample
-void
-rmvq(q, mp)
-        register queue_t *q;
-        register mblk_t *mp;
+void rmvq(register queue_t *q, register mblk_t *mp);
 @end smallexample
 
 @manpage{rmvq(9)} removes the message pointed at by @var{mp} from the message queue in the queue
@@ -16970,13 +16861,7 @@ use on @dfn{MP} system.  Use basic locks instead.}
 @appendixsubsec strlog-submit messages for logging
 
 @smallexample
-int
-strlog(mid, sid, level, flags, fmt, arg1, ...)
-        short mid, sid;
-        char level;
-        unsigned short flags;
-        char *fmt;
-        unsigned arg1;
+int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, unsigned arg1, ...);
 @end smallexample
 
 @manpage{strlog(9)} submits messages containing specified information to the @manref{log(7)} driver.
@@ -17003,12 +16888,7 @@ is an internal sub-id number usually used to identify a particular minor device 
 @appendixsubsec strqget-obtain information about a queue or band of the queue
 
 @smallexample
-int
-strqget(q, what, pri, valp)
-        register queue_t *q;
-        qfields_t what;
-        register unsigned char pri;
-        long *valp;
+int strqget(register queue_t *q, qfields_t what, register unsigned char pri, long *valp);
 @end smallexample
 
 @manpage{strqget(9)} allows modules and drivers to get information about a queue or particular band
@@ -17036,12 +16916,7 @@ The @dfn{Stream} must be frozen by the caller when calling @manpage{strqget(9)}.
 @appendixsubsec strqset-change information about a queue or band of the queue
 
 @smallexample
-int
-strqset(q, what, pri, val)
-        register queue_t *q;
-        qfields_t what;
-        register unsigned char pri;
-        long val;
+int strqset(register queue_t *q, qfields_t what, register unsigned char pri, long val);
 @end smallexample
 
 @manpage{strqset(9)} allows modules and drivers to change information about a queue or particular
@@ -17054,10 +16929,7 @@ The @dfn{Stream} must be frozen by the caller when calling @manpage{strqset(9)}.
 @appendixsubsec testb-check for an available buffer
 
 @smallexample
-int
-testb(size, pri)
-        register size;
-        unit pri;
+int testb(register size, uint pri);
 @end smallexample
 
 @manpage{testb(9)} checks for the availability of a message buffer of size @var{size} without
@@ -17071,9 +16943,7 @@ routine taking buffers).
 @appendixsubsec unbufcall-cancel a bufcall request
 
 @smallexample
-void
-unbufcall(id)
-        register int id;
+void unbufcall(register int id);
 @end smallexample
 
 @manpage{unbufcall(9)} cancels a @manref{bufcall(9)} request.  @var{id} identifies an event returned
@@ -17086,8 +16956,7 @@ Otherwise a system crash may occur.
 @appendixsubsec unfreezestr-unfreeze a stream
 
 @smallexample
-void unfreezestr(q)
-        queue_t *q;
+void unfreezestr(queue_t *q);
 @end smallexample
 
 Unfreeze the entire @dfn{Stream} pointed to by the queue @var{q}.
@@ -17095,9 +16964,7 @@ Unfreeze the entire @dfn{Stream} pointed to by the queue @var{q}.
 @appendixsubsec unlinkb-remove a message block from the head of a message
 
 @smallexample
-mblk_t *
-unlinkb(bp)
-        register mblk_t *bp;
+mblk_t *unlinkb(register mblk_t *bp);
 @end smallexample
 
 @manpage{unlinkb(9)} removes the first message block pointed at by @var{bp} and returns a pointer to
@@ -17107,10 +16974,15 @@ no more message blocks in the message.
 @appendixsubsec WR-get pointer to the write queue
 
 @smallexample
+queue_t *WR(queue_t *q);
+
 #define WR(q) ((q)+1)
 @end smallexample
 
-The @manpage{WR(9)} macro accepts a read queue pointer, @var{q}, as an argument and returns a
+The @manpage{WR(9)} function
+(or macro)@footnote{Note that in @cite{UNIX@registeredsymbol{} System V Release 4}
+@manpage{WR(9)} was implemented as a macro instead of a function call.}
+accepts a read queue pointer, @var{q}, as an argument and returns a
 pointer to the write queue for the same module.
 
 @node DKI Interface
@@ -17130,8 +17002,10 @@ must be included after @header{sys/stream.h} to get function definitions instead
 @item @command{allocb} @tab allocate a message block
 @item @command{backq} @tab get pointer to the queue behind a given queue
 @item @command{bcanput} @tab test for flow control in a given priority band
+@item @command{bcanputnext} @tab test for flow control in the given priority band
 @item @command{bufcall} @tab recover from failure of allocb
 @item @command{canput} @tab test for room in a queue
+@item @command{canputnext} @tab test for room in the next queue
 @item @command{copyb} @tab copy a message block
 @item @command{copymsg} @tab copy a message
 @item @command{datamsg} @tab test whether message is a data message
@@ -17139,25 +17013,33 @@ must be included after @header{sys/stream.h} to get function definitions instead
 @item @command{dupmsg} @tab duplicate a message
 @item @command{enableok} @tab re-allow a queue to be scheduled for service
 @item @command{esballoc} @tab allocate message and data blocks
+@item @command{esbbcall} @tab call function when buffer is available
 @item @command{flushband} @tab flush messages in a given priority band
 @item @command{flushq} @tab flush a queue
 @item @command{freeb} @tab free a message block
 @item @command{freemsg} @tab free all message blocks in a message
+@item @command{freezestr} @tab freeze a stream
 @item @command{getadmin} @tab return a pointer to a module
 @item @command{getmid} @tab return the module id
 @item @command{getq} @tab get a message from a queue
 @item @command{insq} @tab put a message at a specific place in a queue
 @item @command{linkb} @tab concatenate two messages into one
 @item @command{msgdsize} @tab get the number of data bytes in a message
+@item @command{msgpullup} @tab concatentate bytes in a message
 @item @command{noenable} @tab prevent a queue from being scheduled
 @item @command{OTHERQ} @tab get pointer to the mate queue
 @item @command{pullupmsg} @tab concatenate and align bytes in a message
+@item @command{put} @tab call a @dfn{Stream}'s @command{put} procedure
 @item @command{putbq} @tab return a message to the beginning of a queue
 @item @command{putctl} @tab put a control message
 @item @command{putctl1} @tab put a control message with a one-byte parameter
 @item @command{putnext} @tab put a message to the next queue
+@item @command{putnextctl} @tab put a control message
+@item @command{putnextctl1} @tab put a control message
 @item @command{putq} @tab put a message on a queue
 @item @command{qenable} @tab enable a queue
+@item @command{qprocsoff} @tab disable the put and service routines of a driver or module
+@item @command{qprocson} @tab enable the put and service routines of a driver or module
 @item @command{qreply} @tab send a message on a @dfn{Stream} in the reverse direction
 @item @command{qsize} @tab find the number of messages on a queue
 @item @command{RD} @tab get pointer to the read queue
@@ -17169,6 +17051,7 @@ must be included after @header{sys/stream.h} to get function definitions instead
 @item @command{strqset} @tab change information on a queue or a band of the queue
 @item @command{testb} @tab check for an available buffer
 @item @command{unbufcall} @tab cancel bufcall request
+@item @command{unfreezestr} @tab unfreeze a stream
 @item @command{unlinkb} @tab remove a message block from the head of a message
 @item @command{WR} @tab get pointer to the write queue
 @end multitable

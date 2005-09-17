@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.16 2005/08/29 10:06:49 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.17 2005/09/17 00:45:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -112,23 +112,58 @@ After placing the message on queue
 adjusts the queue's flags and byte counts appropriately and schedules the
 queue service procedure when necessary.
 .PP
-If a priority message is placed onto the queue, the queue will always be enabled, as with
-.BR qenable (9);
-that is, the queue's service procedure will be scheduled if it exists.
+.BR putq ()
+queues messages based on message queueing priority.  There are three priority classes for messages:
 .PP
-If a normal message is placed onto the queue and the
-.B QWANTR
-flag is set for the queue, then the queue will be enabled, as with
-.BR enableq (9);
-that is, the queue's service procedure will be scheduled if it exists and the
-.B QNOENB
-flag has not been set for the queue with
-.BR noenable (9).
+.TS
+tab(:);
+lllsss.
+1.:\fIHigh Priority\fP:(\fBdb_type >= QPCTL\fP)
+2.:\fIPriority\fP:(\fBdb_type < QPCTL && b_band > 0\fP)
+3.:\fINormal\fP:(\fBdb_type < QPCTL && b_band == 0\fP)
+.TE
 .PP
-The message will always be placed in order in the queue.  If the message is a high priority message,
-it will be placed on the queue immediately following other high priority messages and ahead of
-normal messages.  If the message is a normal message, it is placed after other messages in the queue
+.BR putq ()
+only examines the message class and priority band of the first message block of a message.  If a
+.I High Priority
+message is passed to
+.BR putq ()
+with a non-zero
+.I b_band
+value,
+.I b_band
+is reset to zero
+.RB ( 0 )
+before placing the message on the queue.  If the message is passed to
+.BR putq ()
+with
+.I b_band
+value greater than the number of
+.BR qband (9)
+structures associated with the queue,
+.BR putq ()
+attempts to allocate a new
+.BR qband (9)
+structure for each band up to and including the band of the message.
+(But, see
+.RI \(lq COMPATIBILTY \(rq,
+below.)
+.PP
+The message will always be placed in order in the queue.  If the message is a
+.I High Priority
+message, it will be placed on the queue immediately following other
+.I High Priority
+messages and ahead of
+.I Priority
+and
+.I Normal
+messages.  If the message is a
+.I Priority
+message, it is placed after other messages in the queue
 band.
+If the message is a
+.I Normal
+message, it is place after all other messages.
 .PP
 Placing the first message for a queue band onto the queue can result in the allocation of a
 .BR qband (9)
@@ -144,6 +179,150 @@ using
 .BR strqget (9)
 or
 .BR strqset (9).
+.\"
+.\"
+.SS "Flow Control"
+.PP
+If a
+.I High Priority
+message is placed onto the queue, the queue will always be enabled, as with
+.BR qenable (9);
+that is, the queue's service procedure will be scheduled if it exists.
+This is also true for
+.BR insq (9)
+and
+.BR putbq (9).
+Because this is true, a
+.I High Priority
+message should never be placed back on a queue by the queue's
+.B service
+procedure with
+.BR putbq (9),
+otherwise and infinite loop could result.
+.PP
+.BR putq ()
+is allowed to enable the queue
+.RB ( QNOENB
+is not set) if the message is a
+.I Priority
+message, or the
+.B QWANTR
+flag is set indicating that the
+.B service
+procedure is reary to read the queue.
+.PP
+If a
+.I Normal
+message is placed onto an empty queue and the
+.B QWANTR
+flag is set for the queue, then the queue will be enabled, as with
+.BR enableq (9);
+that is, the queue's service procedure will be scheduled if it exists and the
+.B QNOENB
+flag has not been set for the queue with
+.BR noenable (9).
+Another way of putting this is that
+.BR putq ()
+will enable the queue if the queue is not inhibited with
+.BR noenable (9)
+and one of the following conditions also holds true:
+.IP \(bu \w'\(bu\(em'u
+The module or driver has just been opened for the first time: that is, the queue is empty and has
+always been empty.
+.IP \(bu
+.BR getq (9)
+found no message queued on its last call and no message has been queued since.
+.PP
+When an ordinary message is enqueued by
+.BR putq (),
+.BR putq ()
+will cause the
+.B service
+procedure to be scheduled only if the queue was previously empty, and a previous
+.BR getq (9)
+call returns
+.B NULL
+(that is, the
+.B QWANTR
+flag is set).  If there are messages on the queue,
+.BR putq ()
+presumes that the
+.B service
+procedure is blocked by flow control and the procedure will be rescheduled by
+.I STREAMS
+when the block is removed.
+.PP
+.BR putq ()
+only looks at the priority band of the first message block.  If a high priority message is passed to
+.BR putq ()
+with a non-zero
+.I b_band
+value,
+.I b_band
+is reset to zero
+.RB ( 0 )
+before placing the messge on the queue.  If the message is passed to
+.BR putq ()
+with a
+.I b_band
+value that is greater than the number of
+.BR qband (9)
+structures associated with the queue,
+.BR putq ()
+tries to allocate a new
+.BR qband (9)
+structure for each band up to and including the band of the message.
+.PP
+The above rules also apply to
+.BR putbq (9)
+and
+.BR insq (9).
+.PP
+.BR putq ()
+will not schedule a queue if
+.BR noenable (9)
+has been previously called for this queue.
+.BR noenable ()
+instructs
+.BR putq ()
+to enqueue the message when called by this queue, but not to schedule the
+.B service
+procedure.
+.BR noenable (9)
+doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
+.BR noenable (9)
+is
+.BR enableok (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR putq ()
+is intended to be used from the
+.B put
+procedure in the same queue in which the message will be queued.  A module should not call
+.BR putq ()
+directly to pass messages to a neighboring module.
+.BR put ()
+may be used as the
+.I qi_putp
+.b put
+procedure value in either or both of a module's
+.BR qinit (9)
+structures.  This effectively bypasses any
+.B put
+procedure processing and uses only the module's
+.B service
+procedure(s).
+.PP
+.BR putq ()
+should not be called from outside the
+.I STREAMS
+framework.  Drivers that need to put messages to their own queues from outside the
+.I STREAMS
+framework (asyncrhonously) must use
+.BR put (9)
+instead.
 .\"
 .\"
 .SH RETURN
@@ -262,6 +441,140 @@ svr4dk
 .]
 with the following porting considerations:
 .IP \(em \w'\(em\(em'u
+When a banded message (a priority message, with a non-zero
+.IR b_band )
+is placed on a queue with
+.BR putq (),
+and a
+.BR qband (9)
+structure does not exist for the band corresponding to
+.IR b_band ,
+.BR putq ()
+allocates the required
+.BR qband (9)
+structure and performs a reverse sorted insert into the
+.I q_qbandp
+list on the
+.BR queue (9).
+.IP ""
+This is not consistent with the description in the
+.IR "SVR 4 STREAMS Programmer's Guide" ,
+which states:
+\(lqIf a mesages is passed to
+.BR putq ()
+with a
+.I b_band
+value that is greater than the number of
+.BR qband (9)
+structures associated with the queue [member
+.I q_nband
+in the
+.BR queue (9)
+structure],
+.BR putq ()
+tries to allocate a new
+.BR qband (9)
+structure for each band up to and including the band of the message.\(rq
+.[
+svr4spg
+.]
+.IP ""
+.IR Solaris \(rg
+allocates
+.BR qband (9)
+structures up to an including
+.IR b_band ,
+and maintains the
+.I q_nband
+member of the
+.BR queue (9)
+structure.
+It is safe to assume that other
+.IR UNIX \(rg
+implementations based on
+.I SVR 4
+follow
+.I SVR 4
+as does
+.IR Solaris \(rg.
+.IP ""
+.I LiS
+allocates
+.BR qband (9)
+structures on demand in a fashion similar to
+.BR "@PACKAGE_TITLE@" ,
+but will also reuse
+.BR qband (9)
+structures that were previously allocated for bands that are currently empty.  This is not a good
+approach because user established band high- and low-water marks will be reset to those of the
+.BR queue (9)
+structure when a subsequent message is place on the reused band.  This
+.I LiS
+bug is not perpetuated in
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely on the fact that intermediate band strutures will be allocated
+when a priority message is placed on a queue using
+.BR putq (),
+and will not attempt to examine the
+.I q_nband
+member of the
+.BR queue (9)
+structure.
+.IP \(em
+.BR putq ()
+orders the
+.BR qband (9)
+structures in the list pointed to by the
+.I q_bandp
+member of the
+.BR queue (9)
+structure from highest band number to lowest band number.  This ensures that, during non-exhaustive
+linear searches, higher priority
+.BR qband (9)
+structures are located faster than lower priority
+.BR qband (9)
+structures.
+.IR Solaris \(rg
+.[
+soldoc
+.]
+lists
+.BR qband (9)
+structures from lowest to highest priority, without gaps (see consideration of allocation above).
+.I LiS
+.[
+lis
+.]
+lists
+.BR qband (9)
+structures from most recently allocated/reused to least recently allocated/reused.
+Neither the
+.IR Solaris \(rg
+nor the
+.I LiS
+approach is very efficient.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not depend on the ordering of
+.BR qband (9)
+structures within the
+.I q_qbandp
+list on the
+.BR queue (9)
+structure, and, will not access
+.BR qband (9)
+or
+.BR queue (9)
+members directly, but will use the more portable
+.BR strqget (9)
+and
+.BR strqset (9)
+utilities instead.
+.IP \(em
 .BR putq ()
 is not bug for bug compatible with 
 .IR LiS .
@@ -359,7 +672,7 @@ modules and drivers will not call
 .BR putq ()
 from any context outside a
 .I STREAMS
-queue procedure or callback function.  At the STREAM end (STREAM head or driver), from a context
+queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
 other than a
 .I STREAMS
 coroutine, only

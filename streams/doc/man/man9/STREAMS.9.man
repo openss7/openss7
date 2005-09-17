@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.26 2005/07/08 13:16:06 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.27 2005/09/17 00:45:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/08 13:16:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -277,9 +277,9 @@ an existing pipe end
 .HP
 .BR register_inode "(9)\ \-\ register a \fISTREAMS\fP special filesystem node
 .HP
-.BR register_inode_major "(9)\ \-\ register a STREAM head to a major device number
+.BR register_inode_major "(9)\ \-\ register a Stream head to a major device number
 .HP
-.BR register_inode_minor "(9)\ \-\ register a STREAM head to a minor device number
+.BR register_inode_minor "(9)\ \-\ register a Stream head to a minor device number
 .HP
 .BR register_strdev "(9)\ \-\ register a \fISTREAMS\fP device
 .HP
@@ -291,9 +291,9 @@ an existing pipe end
 .HP
 .BR unregister_inode "(9)\ \-\ unregister a \fISTREAMS\fP special filesystem node
 .HP
-.BR unregister_inode_major "(9)\ \-\ unregister a STREAM head from a major device number
+.BR unregister_inode_major "(9)\ \-\ unregister a Stream head from a major device number
 .HP
-.BR unregister_inode_minor "(9)\ \-\ unregister a STREAM head from a minor device number
+.BR unregister_inode_minor "(9)\ \-\ unregister a Stream head from a minor device number
 .HP
 .BR unregister_strdev "(9)\ \-\ unregister a \fISTREAMS\fP device
 .HP

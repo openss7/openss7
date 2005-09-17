@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: stroptions.9.man,v 0.9.2.1 2005/08/29 10:00:34 brian Exp $
+.\" @(#) $Id: stroptions.9.man,v 0.9.2.2 2005/09/17 00:45:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:00:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -128,56 +128,56 @@ Set write offset to the contents of the
 member.
 .TP
 .B SO_MINPSZ
-Set minimum packet size on STREAM head read queue to the contents of the
+Set minimum packet size on Stream head read queue to the contents of the
 .I so_minpsz
 member.
 .TP
 .B SO_MAXPSZ
-Set maximum packet size on STREAM head read queue to the contents of the
+Set maximum packet size on Stream head read queue to the contents of the
 .I so_maxpsz
 member.
 .TP
 .B SO_HIWAT
-Set the high water marek on the STREAM head read queue to the contents of the
+Set the high water marek on the Stream head read queue to the contents of the
 .I so_hiwat
 member.
 .TP
 .B SO_LOWAT
-Set the low water marek on the STREAM head read queue to the contents of the
+Set the low water marek on the Stream head read queue to the contents of the
 .I so_lowat
 member.
 .TP
 .B SO_MREADON
-Set read notification option on STREAM head.
+Set read notification option on Stream head.
 .TP
 .B SO_MREADOFF
-Reset read notification option on STREAM head.
+Reset read notification option on Stream head.
 .TP
 .B SO_NDELON
 Set
 .RI non- STREAMS
 tty semantics for
 .BR O_NDELAY " (or " O_NONBLOCK )
-on STREAM head.
+on Stream head.
 .TP
 .B SO_NDELOFF
 Set
 .I STREAMS
 semantics for
 .BR O_NDELAY " (or " O_NONBLOCK )
-on STREAM head.
+on Stream head.
 .TP
 .B SO_ISTTY
-The STREAM will act as a controlling terminal.
+The Stream will act as a controlling terminal.
 .TP
 .B SO_ISNTTY
-The STREAM will not act as a controlling terminal.
+The Stream will not act as a controlling terminal.
 .TP
 .B SO_TOSTOP
-The STREAM head will stop processes attempting a background write to the STREAM.
+The Stream head will stop processes attempting a background write to the Stream.
 .TP
 .B SO_TONSTOP
-The STREAM head will not stop processes attempting a background write to the STREAM.
+The Stream head will not stop processes attempting a background write to the Stream.
 .TP
 .B SO_BAND
 High and low water marks set with
@@ -188,10 +188,10 @@ apply to the band specified in member
 .IR so_band .
 .TP
 .B SO_DELIM
-The STREAM head will delimit messages.
+The Stream head will delimit messages.
 .TP
 .B SO_NODELIM
-The STREAM head will not delimit messages.
+The Stream head will not delimit messages.
 .TP
 .B SO_STRHOLD
 Enable
@@ -201,23 +201,23 @@ message coalescing.
 documents this flag.
 .TP
 .B SO_ERROPT
-Set the STREAM head error options to those contained in the
+Set the Stream head error options to those contained in the
 .I so_erropt
 member.
 .TP
 .B SO_LOOP
-Indicates to the STREAM head that this is a loop around STREAM; that is, the STREAM supports the
+Indicates to the Stream head that this is a loop around Stream; that is, the Stream supports the
 passing of file descriptors.
 .TP
 .B SO_COPYOPT
-Set the STREAM head copy options to those contained in the
+Set the Stream head copy options to those contained in the
 .I so_copyopt
 member.
 .TP
 .B SO_MAXBLK
 Set the
 .I STREAMS
-maximum block size for this STREAM to the value contained in the
+maximum block size for this Stream to the value contained in the
 .I so_maxblk
 member.
 .PD
@@ -292,9 +292,9 @@ message, they can be manipulated directly.
 .PP
 The
 .BR M_SETOPTS (9)
-method of setting STREAM head options using the
+method of setting Stream head options using the
 .B stroptions
-structure provides MP-safe access to the flags and values contained in the STREAM head
+structure provides MP-safe access to the flags and values contained in the Stream head
 .BR stdata (9)
 structure.
 Flags and members of the
@@ -304,8 +304,8 @@ structure should not be manipulated directly by
 modules and drivers.
 See also the
 .BR stdata (9)
-for details on the STREAM head structure.
-User programs can affect some of the STREAM head parameters and flags using the
+for details on the Stream head structure.
+User programs can affect some of the Stream head parameters and flags using the
 .BR streamio (7)
 intput output controls.
 .\"
@@ -422,7 +422,7 @@ members.
 .IP ""
 Lack of documentation for the
 .BR SO_DELIM ", " SO_NODELIM " and " SO_STRHOLD
-feature of the STREAM head is peculiar seeing as they are documented for
+feature of the Stream head is peculiar seeing as they are documented for
 .IR "SVR 4" .
 .[
 svr4

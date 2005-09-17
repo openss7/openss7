@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strwrite.9.man,v 0.9.2.2 2005/08/29 10:06:50 brian Exp $
+.\" @(#) $Id: strwrite.9.man,v 0.9.2.3 2005/09/17 00:45:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 00:45:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B strwrite, strwritev
-\- perform a \fBwrite\fP(2s) operation on a STREAM head
+\- perform a \fBwrite\fP(2s) operation on a Stream head
 .\"
 .\"
 .SH SYNOPSIS
@@ -112,7 +112,7 @@ and
 .BR strwritev ()
 perform
 .BR write (2s)
-functions on a STREAM head.
+functions on a Stream head.
 .BR strwrite ()
 is implemented with a call to
 .BR strwritev ().
@@ -158,22 +158,22 @@ is not open for writing.
 .TP
 .RB [ EINVAL ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that is linked (directly or indirectly) downstream from a
+structure that is for a Stream that is linked (directly or indirectly) downstream from a
 multiplexing driver.
-(That is, the STREAM had has the
+(That is, the Stream had has the
 .B STPLEX
 bit set.)
 .TP
 .RB [ EIO ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that has closed or is closing.  (That is, eith there is no longer a
-STREAM head associated with
+structure that is for a Stream that has closed or is closing.  (That is, eith there is no longer a
+Stream head associated with
 .I file
-or the STREAM head has the
+or the Stream head has the
 .B STRCLOSE
 bit set.)
 .TP
@@ -210,7 +210,7 @@ on priority band zero
 .BR ( 0 ),
 and the wait timed out.
 .PP
-Also, if the STREAM head referenced by
+Also, if the Stream head referenced by
 .I file
 has received a
 .BR M_ERROR (9)
@@ -225,7 +225,7 @@ When the
 .BR STRISFIFO " or " STRISPIPE
 flags are clear in the
 .I sd_flags
-member of the STREAM head
+member of the Stream head
 .BR stdata (9)
 structure associated with
 .IR file ,
@@ -239,11 +239,11 @@ character device special files.  In that case, the following additional error co
 .TP
 .RB [ ENXIO ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that has received a hangup
+structure that is for a Stream that has received a hangup
 .RB ( M_HANGUP (9))
-message.  (That is, the STREAM head has the
+message.  (That is, the Stream head has the
 .BR STRHUP
 bit set.)
 .\"
@@ -252,7 +252,7 @@ When the
 .BR STRISFIFO " or " STRISPIPE
 flags are set in the
 .I sd_flags
-member of the STREAM head
+member of the Stream head
 .BR stdata (9)
 structure associated with
 .IR file ,
@@ -266,11 +266,11 @@ pipes and FIFOs.  In that case, the following additional error conditions can oc
 .TP
 .RB [ EPIPE ]
 .I file
-refers to a STREAM head
+refers to a Stream head
 .BR stdata (9)
-structure that is for a STREAM that has received a hangup
+structure that is for a Stream that has received a hangup
 .RB ( M_HANGUP (9))
-message.  (That is, the STREAM head has the
+message.  (That is, the Stream head has the
 .BR STRHUP
 bit set.)
 It is a typical implementation of

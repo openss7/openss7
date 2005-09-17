@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.51 2005/09/12 13:12:11 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.52 2005/09/17 00:45:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/12 13:12:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/17 00:45:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/09/12 13:12:11 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/09/17 00:45:50 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -355,13 +355,11 @@ enum {
 	QB_FULL_BIT,			/* band full flow control */
 	QB_WANTW_BIT,			/* back enable required */
 	QB_BACK_BIT,			/* UnixWare/Solaris/UXP/V */
-	QB_WANTR_BIT,			/* this is mine */
 };
 
 #define QB_FULL	    (1 << QB_FULL_BIT	)
 #define QB_WANTW    (1 << QB_WANTW_BIT	)
 #define QB_BACK	    (1 << QB_BACK_BIT	)	/* UnixWare/Solaris */
-#define QB_WANTR    (1 << QB_WANTR_BIT	)
 
 #define NBAND	    256		/* UnixWare/Solaris */
 
