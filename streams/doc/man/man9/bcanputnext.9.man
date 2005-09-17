@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.20 2005/05/14 08:34:21 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.21 2005/09/17 11:52:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 11:52:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,7 +99,9 @@ the priority band within which to test for flow control.
 .SH DESCRIPTION
 .PP
 .BR bcanputnext ()
-checks whether the stream is flow controlled starting at the specified queue,
+checks whether the
+.I Stream
+is flow controlled starting at the specified queue,
 .IR q ,
 and for the specified
 .IR band .
@@ -156,7 +158,11 @@ module is only required to check for flow control if it has a
 .BR srv (9)
 procedure for the specified queue: otherwise, it was the responsibility of a previous
 .I STREAMS
-module, stream head or stream end to check flow control.
+module,
+.I Stream head
+or
+.I Stream end
+to check flow control.
 .\"
 .\"
 .SH RETURN
@@ -191,7 +197,9 @@ is an MP-safe version of
 .PP
 It is possible, due to race conditions in a multiprocessor (MP) system, that
 .BR bcanputnext ()
-can be called for a queue and return true (1) and yet the stream becomes flow controlled before a
+can be called for a queue and return true (1) and yet the
+.I Stream
+becomes flow controlled before a
 call to
 .BR putnext (9).
 The caller to
@@ -283,7 +291,9 @@ is
 .BR bcanputnext ()
 protects dereferences of the
 .I q->q_next
-pointer with a stream head lock.
+pointer with a
+.I Stream head
+lock.
 Under LiS,
 .BR bcanputnext ()
 is simply a macro that calls
@@ -302,7 +312,9 @@ simply calls
 directly.
 .IP \(em
 .BR bcanputnext ()
-may be called on a stream frozen with
+may be called on a
+.I Stream
+frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -323,14 +335,63 @@ uw7spg
 .]
 do not permit
 .BR bcanputnext ()
-to be called on a stream frozen with
+to be called on a
+.I Stream
+frozen with
 .BR freezestr (9).
+.IP ""
 Portable
 .I STREAMS
 drivers and modules should not call
 .BR bcanputnext ()
-on a stream frozen with
+on a
+.I Stream
+frozen with
 .BR freezestr (9).
+.IP \(em
+.IR SUPER-UX \(rg
+documentation
+.[
+suxspg
+.]
+states that if the
+.I Stream end
+has no service procedure that
+.BR bcanputnext ()
+will return (1).
+This is incorrect behaviour to that described in the
+.IR "SVR 4 SPG" .
+.[
+svr4spg
+.]
+For example, the
+.I Stream head
+does not normally have a read
+.B service
+procedure, but uses wakeups from the read side
+.B put
+procedure to schedule servicing of the queue.  It is still necessary for
+.BR bcanputnext ()
+to fail when the read queue passes its high water mark.
+.IR SUPER-UX \(rg
+will not fail in such a circumstance, making its behaviour inconsistent with other
+.IR UNIX \(rg
+impelemntations of
+.IR STREAMS .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should not rely on the behaviour of
+.BR bcanputnext ()
+on drivers that have no write side service procedure, but which enqueue messages on their write
+queues (to be collected using
+.BR getq (9)
+outside the
+.I STREAMS
+framework).
+Such drivers should provide a dummy
+.B service
+procedure.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

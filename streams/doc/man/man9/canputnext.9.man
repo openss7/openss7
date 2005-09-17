@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canputnext.9.man,v 0.9.2.19 2005/05/14 08:34:21 brian Exp $
+.\" @(#) $Id: canputnext.9.man,v 0.9.2.20 2005/09/17 11:52:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 11:52:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -105,7 +105,9 @@ before placing a message on the queue with
 .BR putnext (9).
 .PP
 .BR canputnext ()
-checks whether the stream is flow controlled starting at the
+checks whether the
+.I Stream
+is flow controlled starting at the
 queue next from the specified queue,
 .IR q .
 Starting at the queue next from the
@@ -149,9 +151,12 @@ normal (band 0) message (e.g.
 or
 .BR M_PROTO (9))
 .I STREAMS
-message on a stream.
+message on a
+.IR Stream .
 Each module with a service procedure is responsible for checking flow control before passing a
-message along on a stream using
+message along on a
+.I Stream
+using
 .BR putnext (q).
 Flow control is checked using
 .BR canputnext ()
@@ -193,7 +198,9 @@ for the
 form, the dereference of the
 .I q->q_next
 pointer is not protected on MP architectures and may change as a result of a
-concurrent reconfiguration of the stream (e.g. an
+concurrent reconfiguration of the
+.I Stream
+(e.g. an
 .BR I_PUSH " or " I_POP
 .BR streamio (7)
 operation).
@@ -274,8 +281,11 @@ with the following portability considerations:
 .BR canputnext ()
 explicitly protects dereferencing of the
 .I q->q_next
-pointer with the stream head read lock that prevents reconfiguration of the
-stream during the call.
+pointer with the
+.I Stream head
+read lock that prevents reconfiguration of the
+.I Stream
+during the call.
 LiS does not explicitly protect this dereference.
 .IP \(em
 .BR canputnext ()
@@ -300,7 +310,9 @@ scheduler via
 (as is normal) will not encounter this problem.
 .IP \(em
 .BR canputnext ()
-may be called on a stream frozen with
+may be called on a
+.I Stream
+frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -321,13 +333,17 @@ uw7spg
 .]
 do not permit
 .BR canputnext ()
-to be called on a stream frozen with
+to be called on a
+.I Stream
+frozen with
 .BR freezestr (9).
 Portable
 .I STREAMS
 drivers and modules should not call
 .BR canputnext ()
-on a stream frozen with
+on a
+.I Stream
+frozen with
 .BR freezestr (9).
 .IP \(em
 Under LiS, if
@@ -351,6 +367,50 @@ pointer will not be protected under LiS binary compatibility because LiS calls
 .BI lis_bcanput( q->q_next ", " 0 )
 instead of
 .BR canputnext ().
+.IP \(em
+.IR SUPER-UX \(rg
+documentation
+.[
+suxspg
+.]
+states that if the
+.I Stream end
+has no service procedure that
+.BR canputnext ()
+will return (1).
+This is incorrect behaviour to that described in the
+.IR "SVR 4 SPG" .
+.[
+svr4spg
+.]
+For example, the
+.I Stream head
+does not normally have a read
+.B service
+procedure, but uses wakeups from the read side
+.B put
+procedure to schedule servicing of the queue.  It is still necessary for
+.BR canputnext ()
+to fail when the read queue passes its high water mark.
+.IR SUPER-UX \(rg
+will not fail in such a circumstance, making its behaviour inconsistent with other
+.IR UNIX \(rg
+impelemntations of
+.IR STREAMS .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should not rely on the behaviour of
+.BR canputnext ()
+on drivers that have no write side service procedure, but which enqueue messages on their write
+queues (to be collected using
+.BR getq (9)
+outside the
+.I STREAMS
+framework).
+Such drivers should provide a dummy
+.B service
+procedure.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

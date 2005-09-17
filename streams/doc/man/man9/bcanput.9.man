@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.19 2005/08/29 10:06:48 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.20 2005/09/17 11:52:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 11:52:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,7 +99,9 @@ the priority band within which to test for flow control.
 .SH DESCRIPTION
 .PP
 .BR bcanput ()
-checks whether the stream is flow controlled starting at the specified queue,
+checks whether the
+.I Stream
+is flow controlled starting at the specified queue,
 .IR q ,
 and for the specified 
 .IR band .
@@ -200,7 +202,9 @@ should always be called in preference to
 .PP
 It is possible, due to race conditions in a multiprocessor (MP) system, that
 .BR bcanput ()
-can be called for a queue and return true (1) and yet the stream becomes flow controlled before a
+can be called for a queue and return true (1) and yet the
+.I Stream
+becomes flow controlled before a
 call to
 .BR put (9)
 or
@@ -400,7 +404,11 @@ implementation.
 currently has no such restriction; however, based on nuances in the implementation, it is wise not
 to pass a queue pointer to
 .BR bcanput ()
-that does not belong to same stream as the stream from which the
+that does not belong to same
+.I Stream
+as the
+.I Stream
+from which the
 .BR put (9)
 or
 .BR srv (9)
@@ -414,7 +422,9 @@ service routines.
 .[
 suxdoc
 .]
-indicates that the stream cannot be frozen when calling
+indicates that the
+.I Stream
+cannot be frozen when calling
 .BR bcanput (9)
 and that private locks cannot be held across the call.
 .IP \(em
@@ -466,7 +476,9 @@ simply call
 directly.
 .IP \(em
 .BR bcanput ()
-may be called on a stream frozen with
+may be called on a
+.I Stream
+frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -487,14 +499,62 @@ uw7spg
 .]
 do not permit
 .BR bcanput ()
-to be called on a stream frozen with
+to be called on a
+.I Stream
+frozen with
 .BR freezestr (9).
 Portable
 .I STREAMS
 drivers and modules should not call
 .BR bcanput ()
-on a stream frozen with
+on a
+.I Stream
+frozen with
 .BR freezestr (9).
+.IP \(em
+.IR SUPER-UX \(rg
+documentation
+.[
+suxspg
+.]
+states that if the
+.I Stream end
+has no service procedure that
+.BR bcanput ()
+will return (1).
+This is incorrect behaviour to that described in the
+.IR "SVR 4 SPG" .
+.[
+svr4spg
+.]
+For example, the
+.I Stream head
+does not normally have a read
+.B service
+procedure, but uses wakeups from the read side
+.B put
+procedure to schedule servicing of the queue.  It is still necessary for
+.BR bcanput ()
+to fail when the read queue passes its high water mark.
+.IR SUPER-UX \(rg
+will not fail in such a circumstance, making its behaviour inconsistent with other
+.IR UNIX \(rg
+impelemntations of
+.IR STREAMS .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should not rely on the behaviour of
+.BR bcanput ()
+on drivers that have no write side service procedure, but which enqueue messages on their write
+queues (to be collected using
+.BR getq (9)
+outside the
+.I STREAMS
+framework).
+Such drivers should provide a dummy
+.B service
+procedure.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

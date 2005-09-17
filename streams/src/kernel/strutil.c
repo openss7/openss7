@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/17 00:45:53 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/17 11:51:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/17 00:45:53 $ by $Author: brian $
+ Last Modified $Date: 2005/09/17 11:51:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/17 00:45:53 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/17 11:51:38 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/17 00:45:53 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/17 11:51:38 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1133,21 +1133,20 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	assert(!qisunlocked(q));
 
-//	qwlock(q);
+//      qwlock(q);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
-//	qwunlock(q);
+//      qwunlock(q);
 	/* do enabling outside the locks */
 	switch (result) {
-	case 4:		/* success - high priority enable */
-		qenable(q);
-		return (1);
+	case 1:		/* success - normal arrived at non-empty queue */
+		if (!test_bit(QWANTR_BIT, &q->q_flag))
+			return (1);
+	case 2:		/* success - normal arrived at empty queue */
 	case 3:		/* success - priority band enable */
 		enableq(q);
 		return (1);
-	case 2:		/* success - normal enable */
-		if (test_bit(QWANTR_BIT, &q->q_flag))
-			enableq(q);
-	case 1:		/* success */
+	case 4:		/* success - high priority enable */
+		qenable(q);
 		return (1);
 	default:
 		never();
@@ -1901,11 +1900,11 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		goto putq;
 	if (q != emp->b_queue)
 		goto bug;
+	enable = q->q_first ? 0 : 1; /* ingnore message class for insq() */
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
 			goto out_of_order;
-		enable = 3;	/* always enable on high priority */
 		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 		nmp->b_band = 0;
 	} else {
@@ -1914,12 +1913,11 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL
 		    && emp->b_prev->b_band > nmp->b_band)
 			goto out_of_order;
-		enable = q->q_first ? 0 : 1;	/* on empty queue */
 		if (unlikely(nmp->b_band)) {
 			if (!(nmp->b_bandp = qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
-			/* enable on priority band message hitting empty band */
-			enable = qb->qb_first ? 0 : 2;
+			/* enable on priority band message */
+			enable = 2;
 			if (!qb->qb_last)
 				qb->qb_first = qb->qb_last = nmp;
 			else if (qb->qb_first == emp)
@@ -1979,20 +1977,20 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	assert(!qisunlocked(q));
 
-//	qwlock(q);
+//      qwlock(q);
 	result = __insq(q, emp, nmp);
-//	qwunlock(q);
+//      qwunlock(q);
 	switch (result) {
-	case 4:		/* success - high priority enable */
-		qenable(q);
-		return (1);
+	case 1:		/* success - normal priority arrived on non-empty queue */
+		if (!test_bit(QWANTR_BIT, &q->q_flag))
+			return (1);
+	case 2:		/* success - normal priority arrived on empty queue */
 	case 3:		/* suscess - priority band enable */
-		enableq(q);
+		enable(q);
 		return (1);
-	case 2:		/* success - normal enable */
-		if (test_bit(QWANTR_BIT, &q->q_flag))
-			enableq(q);
-	case 1:		/* success */
+	case 4:		/* success - high priority enable */
+		assert(0);
+		qenable(q);
 		return (1);
 	default:
 		never();
@@ -2063,7 +2061,7 @@ __putbq(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 		if (likely(mp->b_band == 0)) {
-			// enable = q->q_first ? 0 : 1;
+			enable = q->q_first ? 0 : 1;
 		      hipri:
 			if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
@@ -2085,7 +2083,7 @@ __putbq(queue_t *q, mblk_t *mp)
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
-			// enable = qb->qb_first ? 0 : 2;
+			enable = 2;
 			if (qb->qb_last == b_prev)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next)
@@ -2121,18 +2119,17 @@ putbq(queue_t *q, mblk_t *mp)
 	result = __putbq(q, mp);
 	qwunlock(q);
 	switch (result) {
-	case 4:		/* success - high priority enable */
-		qenable(q);
-		return (1);
-	case 3:		/* success - priority band enable */
-		assert(0);
-		enableq(q);
-		return (1);
-	case 2:		/* success - normal enable */
-		assert(0);
+	case 1:		/* success - normal arrived at non-empty queue */
 		if (test_bit(QWANTR_BIT, &q->q_flag))
 			enableq(q);
-	case 1:		/* success */
+		return (1);
+	case 2:		/* success - normal arrived at empty queue */
+	case 3:		/* success - priority band enable */
+		/* normal blocked condition - do not enable queue */
+		// enableq(q);
+		return (1);
+	case 4:		/* success - high priority enable */
+		qenable(q);
 		return (1);
 	default:
 		assert(result == 0);
@@ -2352,8 +2349,8 @@ __putq(queue_t *q, mblk_t *mp)
 			b_prev = b_next;
 			b_next = b_prev->b_next;
 		}
-		/* enable on priority banded messages queued in empty band */
-		enable = qb->qb_first ? 0 : 2;
+		/* enable on priority banded messages */
+		enable = 2;
 		if (qb->qb_last == b_prev)
 			qb->qb_last = mp;
 		if (qb->qb_first == b_next)
@@ -2393,16 +2390,15 @@ putq(queue_t *q, mblk_t *mp)
 	result = __putq(q, mp);
 	qwunlock(q);
 	switch (result) {
-	case 4:		/* success - high priority enable */
-		qenable(q);
-		return (1);
+	case 1:		/* success - normal arrived at non-empty queue */
+		if (!test_bit(QWANTR_BIT, &q->q_flag))
+			return (1);
+	case 2:		/* success - normal arrived at empty queue */
 	case 3:		/* success - priority band enable */
 		enableq(q);
 		return (1);
-	case 2:		/* success - normal enable */
-		if (test_bit(QWANTR_BIT, &q->q_flag))
-			enableq(q);
-	case 1:		/* success */
+	case 4:		/* success - high priority enable */
+		qenable(q);
 		return (1);
 	default:
 		assert(result == 0);

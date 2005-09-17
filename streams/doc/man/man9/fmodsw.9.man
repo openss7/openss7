@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fmodsw.9.man,v 0.9.2.9 2005/08/29 10:06:48 brian Exp $
+.\" @(#) $Id: fmodsw.9.man,v 0.9.2.10 2005/09/17 11:52:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 11:52:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -275,7 +275,7 @@ The following flags are
 compatible:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MP
-specifies that the module is MP-SAFE.  When this flag is set, all other synchronization flags
+specifies that the module is MP-safe.  When this flag is set, all other synchronization flags
 (inner perimeter, outer perimiter,
 .BR D_SAFE " and " D_UP )
 are ignored.
