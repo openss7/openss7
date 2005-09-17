@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.17 2005/09/17 00:45:21 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.18 2005/09/17 08:20:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/17 08:20:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -119,7 +119,7 @@ queues messages based on message queueing priority.  There are three priority cl
 tab(:);
 lllsss.
 1.:\fIHigh Priority\fP:(\fBdb_type >= QPCTL\fP)
-2.:\fIPriority\fP:(\fBdb_type < QPCTL && b_band > 0\fP)
+2.:\fIPriority Band\fP:(\fBdb_type < QPCTL && b_band > 0\fP)
 3.:\fINormal\fP:(\fBdb_type < QPCTL && b_band == 0\fP)
 .TE
 .PP
@@ -154,11 +154,11 @@ The message will always be placed in order in the queue.  If the message is a
 message, it will be placed on the queue immediately following other
 .I High Priority
 messages and ahead of
-.I Priority
+.I Priority Band
 and
 .I Normal
 messages.  If the message is a
-.I Priority
+.I Priority Band
 message, it is placed after other messages in the queue
 band.
 If the message is a
@@ -204,12 +204,21 @@ otherwise and infinite loop could result.
 is allowed to enable the queue
 .RB ( QNOENB
 is not set) if the message is a
-.I Priority
+.I Priority Band
 message, or the
 .B QWANTR
 flag is set indicating that the
 .B service
-procedure is reary to read the queue.
+procedure is ready to read the queue.
+.PP
+If a
+.I Priority Band
+message is placed onto ane empty queue band, the queue will be enabled, as with
+.BR enableq (9);
+that is, the queue's service procedure will be scheduled if it exists and the
+.B QNOENB
+flag has not been set for the queue with
+.BR noenable (9).
 .PP
 If a
 .I Normal
@@ -323,6 +332,129 @@ framework.  Drivers that need to put messages to their own queues from outside t
 framework (asyncrhonously) must use
 .BR put (9)
 instead.
+.PP
+.BR putq ()
+is generally used in a module
+.B put
+proceduce and is used in conjunction with
+.BR getq (9)
+and
+.BR putbq (9)
+called from a module's
+.B service
+procedure.
+.PP
+Normally, a module's
+.B service
+procedure reads message from a queue using
+.BR getq (9)
+until there are no messages left on the queue
+.RB ( getq (9)
+returns
+.BR NULL ),
+or
+.BR canput (9)
+or
+.BR bcanput (9)
+fails when attempting to pass a message along the
+.IR Stream .
+.PP
+When
+.BR canput (9)
+or
+.BR bcanput (9)
+fails (returns
+.BR false ),
+the module
+.B service
+procedure places the message that it was processing back on its queue using
+.BR putbq (9).
+At this point the
+.B service
+procedure is blocked.  When
+.BR canput (9)
+or
+.BR bcanput (9)
+failed, it set the
+.B QWANTW
+or
+.B QB_WANTW
+flag on the queue or queue band that was full, indicating to
+.BR getq (9)
+and
+.BR rmvq (9)
+that backenabling is required when the queue falls to its low water mark.
+.PP
+When
+.BR getq (9)
+fails to retrieve a message from an empty queue, it sets the
+.B QWANTR
+flag on the queue to indicate to
+.BR putq ()
+and
+.BR insq (9)
+that it is blocked awaiting messages.
+.PP
+Because each priority band has separate high- and low-water marks and queue band counts, just
+because there are messages in the queue does not mean that a
+.B service
+procedure is blocked on flow control for all bands.
+.PP
+In general, the condition in which
+.BR putq ()
+can find the queue, and the causes of the conditions, and the action to be taken by
+.BR putq ()
+can be summarized as follows:
+.PP
+.TS
+tab(:);
+lblblblbssss
+lblblblbssss
+lilllssss.
+Queuing Priority:QWANTR:q_first:Description
+::qb_first:
+_
+High Priority:X:X:T{
+When a \fIHigh Priority\fP message is queued, it always enables the queue and schedules the queue's
+\fBservice\fP procedure, if one exists.
+T}
+
+Priority Band:X:\fBNULL\fP:T{
+When a \fIPriority Band\fP message is queued to an empty queue band, it is possible that the queue's
+\fBservice\fP procedure might be able to process the expedited message immediately, and the queue is
+enabled if it has not been previously inhibited with \fBnoenable\fP(9); that is, the \fBQNOENB\fP is
+clear and the queue has a \fBservice\fP procedure (\fIqi_srvp\fP is non-\fBNULL\fP).  The
+ramification of this action is that if the module is not aware of priority bands, it will be enabled
+more often than in the SVR3 case.
+T}
+
+::non-\fBNULL\fR:T{
+When a \fIPriority Band\fP message is queued to a queue band that already has messages queued, the
+queue could be blocked by flow control on the band in question, and \fBputq\fR() should not enable
+the queue.  However, the SVR4 SPG says that \fBputq\fP() is allowed to enable the queue in this
+circumstance, provided that the queue is not inhibited by \fBnoenable\fRP(9) (\fBQNOENB\fR is clear)
+and the queue has a \fBservice\fP procedure (\fIqi_srvp\fP is non-\fBNULL\fP).
+T}
+
+Normal:1:\fBNULL\fP:T{
+When a \fINormal\fR message is queued to an empty queue and \fBQWANTW\fP is set, the queue's
+\fBservice\fP procedure is ready to read messages from the queue and the queue's \fBservice\fR
+procedure is enabled, if it has not already been enabled, it has not been previously inhibited with
+\fBnoenable\fP(9); the is, the \fBQNOENB\fP is clear and the queue has a \fBservice\fP procedure
+(\fIqu_srvp\fP is non\fBNULL\fP).
+T}
+
+::non-\fBNULL\fP:T{
+T}
+
+:0:\fBNULL\fP:T{
+When a \fINormal\fP messae is queued to a queue that has messages queued and \fBQWANTW\fR is
+T}
+
+::non-\fBNULL\fP:T{
+T}
+_
+.TE
 .\"
 .\"
 .SH RETURN

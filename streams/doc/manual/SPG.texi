@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.35 2005/09/17 00:46:12 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.37 2005/09/17 11:52:08 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/17 00:46:12 $ by $Author: brian $
+% Last Modified $Date: 2005/09/17 11:52:08 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -197,7 +197,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @macro tabfig {image, number, caption}
 @cartouche
-@float Table, Table \number\
+@float Table,Table \number\
 @image{\image\}
 @caption{@emph{\caption\}}
 @end float
@@ -206,7 +206,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @macro tabfigsized {image, number, caption, size}
 @cartouche
-@float Table, Table \number\
+@float Table,Table \number\
 @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
@@ -215,7 +215,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @macro figure {image, number, caption}
 @cartouche
-@float Figure, Figure \number\
+@float Figure,Figure \number\
 @image{\image\}
 @caption{@emph{\caption\}}
 @end float
@@ -224,7 +224,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @macro figuresized {image, number, caption, size}
 @cartouche
-@float Figure, Figure \number\
+@float Figure,Figure \number\
 @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
@@ -692,6 +692,12 @@ Project} website for a current version.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.37  2005/09/17 11:52:08  brian
+- documentation updates
+
+Revision 0.9.2.36  2005/09/17 08:20:57  brian
+- more doc updates
+
 Revision 0.9.2.35  2005/09/17 00:46:12  brian
 - document updates
 
@@ -4130,6 +4136,15 @@ The field @var{b_band} determines where the message is placed when it is enqueue
 zero for these messages.  When a message is allocated via @manpage{allocb(9)}, the @var{b_band}
 field will be initially set to zero.  Modules and drivers may set this field if so desired.
 
+Note that in @cite{System V Release 4.0}, certain data structures fundamental to the kernel (for
+example, device numbers, user IDs) were enlarged to enable them to hold more information.  This
+feature was referred to as Expanded Fundamental Types (EFT).  Since some of this information was
+passed in @dfn{STREAMS} messages, there was a binary compatibility issue for pre-System V Release 4
+drivers and modules.  @code{#ifdef}'s were added to the kernel to provide a transition period for
+these drivers and modules to be recompiled, and to allow it to be built to use the pre-System V
+Release 4 short data types or the System V Release 4 long data types.  Support for short data types
+will be dropped in some future releases.
+
 @subsection Message Linkage
 
 The message block is used to link messages on a message queue, link message blocks to form a
@@ -4955,6 +4970,131 @@ read-side receives a transmit window from the remote end of the network.
 interrupt priority of the interrupting device.  Service routines are called with interrupts enabled
 (hence @command{service} routines for @dfn{STREAMS} drivers can be interrupted by their own
 interrupt routines).  Put routines are generally called at @var{str} priority.
+
+@subsection Scheduling
+
+Flow control and scheduling mechanisms are closely related.  They are also influenced by other parts
+fo the kernel such as the memory management routines and the system call mechanism.  The following
+subsections describ how the variables and data structures for flow control and scheduling are used,
+and how the individual procedures work together.
+
+@subsubsection Flow Control Variables
+
+The flow control mechanism uses the @member{q_flag} bitmask in the @mantype{queue(9)} structure to
+hold state information.  The flag values are described as follows:
+
+@multitable @columnfractions .20 .80
+
+@item @constant{QENAB} @tab
+This flag is set by @manref{qenable(9)} and cleared when the @command{service} procedure is run by
+@manref{runqueues(9)}.
+
+@item @constant{QWANTR} @tab
+This flag is set by @manref{getq(9)} (or @manref{rmvq(9)}) when it tries to take a message from the
+queue but finds the queue empty, indicating that a @command{service} procedure wants to read from
+the queue.  The flag is cleared when @manref{getq(9)} successfully takes a message from the queue.
+
+@item @constant{QWANTW} @tab
+This flag is set by @manref{canput(9)} (or @manref{bcanput(9)}) when it detects that the queue being
+tested is above its high water mark.  It indicates that a function is trying to put data into the
+queue.  The flag is cleared by @manref{getq(9)} (or @manref{rmvq(9)}) when the quantity of data in
+the queue falls below the low-water mark.
+
+@item @constant{QFULL} @tab
+This flag is set when @manref{putq(9)} (or @manref{putbq(9)} or @manref{insq(9)}) make the queued
+data count exceed the high water mark by putting a message on the queue.  The flag is cleared by
+@manref{getq(9)} (or @manref{insq(9)}) when the data count falls below the high water mark.
+
+@item @constant{QNOENB} @tab
+This flag is set by @manref{noenable(9)} and is cleared by @manref{enableok(9)}.
+
+@end multitable
+
+Several variables are used by the scheduling and flow control mechanisms.  They fall in two
+categories: boolean variables and list variables.  The boolean variables prevent the kernel from
+trying to do two things at the same time.  The list variables link together items that are waiting
+for something to happen.
+
+@cartouche
+@float Table,Table 100
+@multitable @columnfractions .30 .70
+@item char @var{qrunflag} @tab There is at least 1 enabled queue.
+@item char @var{queueflag} @tab The function @manref{queuerun(9)} is running.
+@item char @var{strbcflag} @tab There is enough free memory, so the @manref{bufcall(9)} functions must be run.
+@item char @var{strbcwiat} @tab Someone has called @manref{bufcall(9)}, but there is not yet enough free memory to let the function execute.
+@end multitable
+@caption{@emph{Boolean Scheduling Variables}}
+@end float
+@end cartouche
+
+@cartouche
+@float Table,Table 101
+@multitable @columnfractions .30 .70
+@item struct queue *@var{qhead} @tab Pointer to the first queue in list of scheduled queues.
+@item struct queue *@var{qtail} @tab Pointer to last queue in list of scheduled queues.
+@item struct bclist @var{strbcalls} @tab List of @manref{bufcall(9)} functions pending execution.
+@item struct queue *@var{scanqhead} @tab Head of @dfn{STREAMS} scan queue.
+@item struct queue *@var{scanqtail} @tab Tail of @dfn{STREAMS} scan queue.
+@item struct sefino *@var{sefreelist} @tab List of free Stream events use for scheduling @manref{bufcall(9)} and @manref{poll(2)}.
+@item struct sefino *@var{secachep} @tab Pointer to secret store of Stream events for when times get hard and memory is low.
+@item struct strinfo @var{Strinfo[]} @tab Keeps track of allocated Stream events.
+@end multitable
+@caption{@emph{List Scheduling Variables}}
+@end float
+@end cartouche
+
+@subsubsection Flow Control Procedures
+
+There are seven procedures that a @dfn{STREAMS} module or driver uses to manage queue flow control.
+They are described as follows:
+
+@subsubheading qenable(9)
+
+@manref{qenable(9)} performs the following tasks:
+
+@itemize @bullet
+@item Checks whether the queue to be enabled has a @command{service} procedure; if not, it returns
+to the caller.
+@item Checks the @constant{QNOENB} bit in @member{q_flag}.  If it is set, the queue cannot be
+enabled, so it returns to the caller.
+@item Checks the @constant{QENAB} bit in @member{q_flag}.  If it is set, the queue has already been
+enabled, so it returns to the caller.
+@item Sets the @constant{QENAB} bit in @member{q_flag}.
+@item Links the queue into the tail of the list of scheduled queues (@member{qtail}).
+@item Sets @member{qrunflag} by calling the macro @manref{setqsched(9)}.
+@end itemize
+
+@subsubheading getq(9)
+
+A back enable is done in two situations; when the current queue become empty, or if another module
+or driver found the queue full previously, but now it has drained below its low water mark.
+
+@subsubheading putq(9), putbq(9)
+
+@manref{putq(9)} and @manref{putbq(9)} are similar.  They both put a message at the correction
+position in the queue.  @manref{putq(9)} puts the message at the tail of the queue, whereas
+@manref{putbq(9)} puts it at the head of the queue.  The correct position within the queue depends
+on the message type and the message priority band.  Given a priority message, @manref{putq(9)} puts
+it after the last priority message but before the ordinary messages in the queue.  Similarly,
+@manref{putbq(9)} puts an ordinary message back into the queue after all the priority messages but
+before the ordinary messages.
+
+Note the circumstances in which the queue is enabled.  When the queue receives its first message
+after being empty, it is enabled; this is a good policy because a @command{service} procedure
+generally passes a batch of messages to the next queue.  That queue is then enabled and runs after
+the current @command{service} procedure exists.
+
+A queue is @emph{always} enabled when a priority message is placed on to it so that it can be
+processed more quickly.  However, a deadlock condition could occur if a module puts a priority
+message back on its own queue.  If the @command{service} procedure puts the priority message back on
+its queue because it cannot pass it along, the @command{service} procedure exits; but putting the
+priority message back on the queue makes it enabled again.  The @dfn{STREAMS} scheduler finds this
+queue in its run queue list, so it calls the @command{service} procedure again.  The
+@command{service} procedure gets the same message, but since the conditions have not changed the
+message is put back.  This cycle continues indefinitely, giving the appearance that the system is
+hung.  This problem does not occur when normal priority messages are put back.
+
+@subsubsection The STREAMS Scheduler 
 
 @node Service Interfaces
 @section STREAMS Service Interfaces
@@ -16208,11 +16348,18 @@ int bcanputnext(register queue_t *q, unsigned char pri);
 @end smallexample
 
 @manpage{bacnputnext(9)} provides modules and drivers with a way to test flow control in a given
-priority band for the queue pointed to by @samp{q->q_next}.  It returns 1 if the mssage of priority
+priority band for the queue pointed to by @samp{q->q_next}.  It returns 1 if the message of priority
 @var{pri} can be placed in the queue.  It returns 0 if the priority band is flow controlled and sets
 the @constant{QWANTQ} flag for band zero (@constant{QB_WANTW} for a non-zero band).
 
-If the band does not yet exist ont he queue in question, 1 is returned.
+@manpage{bcanputnext(9)} searches through the @dfn{Stream} (starting at @samp{q->q_next}) until it
+finds a queue containing a @command{service} routine, or until it reaches the end of the
+@dfn{Stream}.  If found, the queue containing the @command{service} routine is tested to see if a
+message in priority band @var{pri} can be enqueued.  If the band is full, @manpage{bcanputnext(9)}
+marks the queue to automatically back-enable the caller's service routine when the amount of data in
+messages on the queue has reached its low water mark.
+
+If the band does not yet exist on the queue in question, 1 is returned.
 
 @appendixsubsec bufcall-recover from failure of allocb
 
@@ -16471,6 +16618,11 @@ blocks any thread currently within the @dfn{Stream} if it attempts to put messag
 messages off of any queue within the @dfn{Stream} (with the sole exception of the caller).  Threads
 blocked by this mechanism remain so until the @dfn{Stream} is thawed by a call to
 @manref{unfreezestr(9)}.
+
+Freezing the @dfn{Stream} does not automatically stop all functions that are running within the
+@dfn{Stream}; functions will continue to run until they attempt to perform some operation which
+changes the state of the @dfn{Stream}, at which point they will be forced to wait for the
+@dfn{Stream} to be unfrozen by a call to @manref{unfreezestr(9)}.
 
 @appendixsubsec getadmin-return the pointer to the module
 
@@ -16766,12 +16918,22 @@ void qprocsoff(queue_t *q);
 
 @manpage{qprocsoff(9)} disables the @command{put} and @command{service} routines of the
 @dfn{STREAMS} driver or module.  When the routines are disabled in a module, messages flow around
-the module as if it were not present in the @dfn{Stream}.  @manpage{qprocsoff(9)} must be called by
-the @command{close} routine of an @dfn{MP-SAFE} driver or module before releasing any resources on
-which the driver/module's @command{put} and @command{service} routines depend.
-@manpage{qprocsoff(9)} will remove the queue's @command{service} routines from the list of service
-routines to be run,@footnote{Check whether @cite{@value{PACKAGE_TITLE}} does this.} and waits until
-any concurrent @command{put} or @command{service} routines are finished.
+the module as if it were not present in the @dfn{Stream}.
+
+@manpage{qprocsoff(9)} must be called by the @command{close} routine of an @dfn{MP-SAFE} driver or
+module before releasing any resources on which the driver/module's @command{put} and
+@command{service} routines depend.  @manpage{qprocsoff(9)} will remove the queue's @command{service}
+routines from the list of service routines to be run,@footnote{Check whether
+@cite{@value{PACKAGE_TITLE}} does this.} and waits until any concurrent @command{put} or
+@command{service} routines are finished.
+
+@dfn{STREAMS} drivers and modules should call @manpage{qprocsoff(9)} exactly once to disable
+@command{put} and @command{service} procedures.  An additional effect of calling
+@manpage{qprocsoff(9)} is that both read and write queues are flushed.@footnote{Flushing of queues
+is only mentioned in @cite{SUPER-UX} documentation.}
+
+The caller cannot have the @dfn{Stream} frozen with @manref{freezestr(9)} when calling this
+function.
 
 @appendixsubsec qprocson-enable the put and service routines of a driver or module
 
@@ -16786,6 +16948,13 @@ module, messages flow around it as if it were not present in the @dfn{Stream}.
 @manpage{qproceson(9)} must be called by the first open of an @dfn{MP-SAFE} module or driver after
 allocation and initialization of any resource on which the @command{put} and @command{service}
 routines depend.
+
+@dfn{STREAMS} drivers and modules should call @manpage{qprocson(9)} exactly once to enable
+@command{put} and @command{service} procedures.  @manref{qprocsoff(9)} is called (also exactly once)
+to disable these @command{put} and @command{service} procedures.
+
+The caller cannot have the @dfn{Stream} frozen with @manref{freezestr(9)} when calling this
+function.
 
 @appendixsubsec qreply-send a message on a @dfn{Stream} in the reverse direction
 
