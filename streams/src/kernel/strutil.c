@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/17 11:51:38 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/18 07:35:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/17 11:51:38 $ by $Author: brian $
+ Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/17 11:51:38 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/18 07:35:54 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/17 11:51:38 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/18 07:35:54 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -73,6 +73,8 @@ static char const ident[] =
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
+
+#include <stdbool.h>		/* for bool, true and false */
 
 #define __STRUTIL_EXTERN_INLINE inline
 
@@ -1138,15 +1140,13 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 //      qwunlock(q);
 	/* do enabling outside the locks */
 	switch (result) {
-	case 1:		/* success - normal arrived at non-empty queue */
-		if (!test_bit(QWANTR_BIT, &q->q_flag))
-			return (1);
-	case 2:		/* success - normal arrived at empty queue */
-	case 3:		/* success - priority band enable */
-		enableq(q);
-		return (1);
-	case 4:		/* success - high priority enable */
+	case 3:		/* success - high priority enable */
+		assert(0);
 		qenable(q);
+		return (1);
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+	case 1:		/* success - don't enable */
 		return (1);
 	default:
 		never();
@@ -1194,7 +1194,7 @@ EXPORT_SYMBOL(qbackenable);
  *
  *  bcangetany() operates like bcanget(); however, it checks for messages in any (non-zero)  band,
  *  not just in a specified band.  This is needed by strpoll() processing in the stream head to know
- *  when to set the POLLRDBAND flags.  Also, bcanputany() returns the band number of the highest
+ *  when to set the POLLRDBAND flags.  Also, bcangetany() returns the band number of the highest
  *  priority band with messages.
  *
  *  IMPLEMENTATION: The current implementation is much faster than the older method of walking the
@@ -1274,18 +1274,28 @@ bcanputany(queue_t *q)
 {
 	assert(q);
 	{
-		struct qband *qb;
 		struct stdata *sd = qstream(q);
+		bool result;
 
 		srlock(sd);
 		/* find first queue with service procedure or no q_next pointer */
 		for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
 		qrlock(q);
-		for (qb = q->q_bandp; qb && test_bit(QB_FULL_BIT, &qb->qb_flag); qb = qb->qb_next) ;
+#if 0
+		{
+			struct qband *qb;
+
+			for (qb = q->q_bandp; qb && test_bit(QB_FULL_BIT, &qb->qb_flag);
+			     qb = qb->qb_next) ;
+			result = (qb != NULL);
+		}
+#else
+		result = (q->q_blocked < q->q_nband);
+#endif
 		qrunlock(q);
 		srunlock(sd);
 		/* a non-existent band is considered unwritable */
-		return (qb ? 1 : 0);
+		return (result);
 	}
 }
 
@@ -1309,6 +1319,102 @@ EXPORT_SYMBOL(bcanputany);	/* include/sys/streams/stream.h */
 __STRUTIL_EXTERN_INLINE int bcanputnextany(queue_t *q);
 
 EXPORT_SYMBOL(bcanputnextany);	/* include/sys/streams/stream.h */
+
+/*
+ *  __find_qband:
+ *
+ * Find a queue band.  This must be called with the queue read or write locked.
+ */
+#if 0
+static struct qband *
+__find_qband(queue_t *q, unsigned char band)
+{
+	struct qband *qb;
+
+	/* bands are sorted in decending priority so that we can quit the search
+	   early for higher priority bands */
+	for (qb = q->q_bandp; qb && qb->qb_band > band; qb = qb->qb_next) ;
+	if (qb && qb->qb_band == band)
+		return (qb);
+	return (NULL);
+}
+#else
+static struct qband *
+__find_qband(queue_t *q, unsigned char band)
+{
+	struct qband *qb;
+	unsigned char q_nband;
+
+	for (q_nband = q->q_nband, qb = q->q_bandp; qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
+	return (qb);
+}
+#endif
+
+/*
+ *  __get_qband:
+ *
+ *  Find or create a queue band.  This must be called with the queue write locked.  This function is
+ *  used by putq(9), putbq(9), insq(9), strqget(9) and strqset(9).  Unforntunately this function
+ *  does not operate as described in the SVR 4 STREAMS Programmer's Guide: the SVR 4 SPG says that
+ *  "[i]f a messages is passed to putq() with a b_band value that is greater than the number of
+ *  qband structures associated with the queue, putq() tries to alloctate a new qband structure for
+ *  each band up to and including the band of the message."  Also, SVR 4 SPG describs the q_nband
+ *  member that holds the highest allocated qband structure according to this approach.
+ *
+ *  Unfortunately, the qbinfo structure is about 50 bytes (on 32-bit architecture), 64 bytes cache
+ *  aligned, and allocating 255 of them would take 16,320 bytes or 4 kmem cache pages per queue!
+ *  The technique would allow a module put procedure to examine the q_nband member and determine whether
+ *  a putq() will be succesful, however, that is undocumented too.  So, we simply allocate the
+ *  necessary qband structure and leave the rest unallocated.  This needs to be documented in
+ *  putq(9), putbq(9), insq(9), strqset(9) and strqget(9).
+ */
+#if 0
+static struct qband *
+__get_qband(queue_t *q, unsigned char band)
+{
+	struct qband *qb, *qp, **qbp;
+
+	/* find insertion point for band */
+	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band;
+	     qp = *qbp, qbp = &(*qbp)->qb_next) ;
+	if (!(qb = *qbp) || qb->qb_band < band) {
+		/* not found, create one */
+		if ((qb = allocqb())) {
+			if ((qb->qb_next = xchg(qbp, qb)))
+				qb->qb_next->qb_prev = qb;
+			if ((qb->qb_prev = qp))
+				qp->qb_next = qb;
+			qb->qb_hiwat = q->q_qinfo->qi_minfo->mi_hiwat;
+			qb->qb_lowat = q->q_qinfo->qi_minfo->mi_lowat;
+			qb->qb_band = band;
+		}
+	}
+	return (qb);
+}
+#else
+static struct qband *
+__get_qband(queue_t *q, unsigned char band)
+{
+	struct qband *qb;
+
+	if (band <= q->q_nband) {
+		qb = __find_qband(q, band);
+		assert(qb);
+	} else {
+		unsigned char q_nband = q->q_nband;
+		do {
+			if (!(qb = allocqb()))
+				break;
+			qb->qb_next = xchg(&q->q_bandp, qb);
+			qb->qb_hiwat = q->q_hiwat;
+			qb->qb_lowat = q->q_lowat;
+			qb->qb_flag = QB_WANTR;
+			++q->q_nband;
+		} while (band > q_nband);
+	}
+	return (qb);
+}
+#endif
 
 /**
  *  bcanput:		- check whether message of a given band can be put to a queue
@@ -1352,12 +1458,11 @@ bcanput(queue_t *q, unsigned char band)
 			struct qband *qb;
 
 			qrlock(q);
-			/* bands are sorted in decending priority so that we can quit the search
-			   early for higher priority bands */
-			for (qb = q->q_bandp; qb && (qb->qb_band > band); qb = qb->qb_next) ;
-			if (qb && qb->qb_band == band && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
-				set_bit(QB_WANTW_BIT, &qb->qb_flag);
-				result = 0;
+			if (band <= q->q_nband && q->q_blocked > 0) {
+				if ((qb = __find_qband(q, band)) && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
+					set_bit(QB_WANTW_BIT, &qb->qb_flag);
+					result = 0;
+				}
 			}
 			/* Note: a non-existent band is considered empty */
 			qrunlock(q);
@@ -1441,22 +1546,6 @@ __STRUTIL_EXTERN_INLINE int canputnext(queue_t *q);
 EXPORT_SYMBOL(canputnext);
 
 /*
- *  __find_qband:
- *
- * Find a queue band.  This must be called with the queue read or write locked.
- */
-static struct qband *
-__find_qband(queue_t *q, unsigned char band)
-{
-	struct qband *qb;
-
-	for (qb = q->q_bandp; qb && qb->qb_band > band; qb = qb->qb_next) ;
-	if (qb && qb->qb_band == band)
-		return (qb);
-	return (NULL);
-}
-
-/*
  *  __flushband: - flush messages from a queue band
  *  @q:		the queue to flush
  *  @band:	the band to flush
@@ -1470,10 +1559,10 @@ __find_qband(queue_t *q, unsigned char band)
  *  freechains() task under the STREAMS scheduler.  Flushing of long chains is more efficient for
  *  %FLUSHALL than for %FLUSHDATA.
  */
-static int
+static bool
 __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 {
-	int backenable = 0;
+	bool backenable = false;
 
 	if (likely(flag == FLUSHALL)) {
 		if (likely(band == 0)) {
@@ -1498,7 +1587,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 				q->q_msgs = 0;
 				clear_bit(QFULL_BIT, &q->q_flag);
 				clear_bit(QWANTW_BIT, &q->q_flag);
-				backenable = 1;	/* always backenable when band empty */
+				backenable = true;	/* always backenable when band empty */
 			}
 		} else {
 			struct qband *qb;
@@ -1524,9 +1613,10 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 				q->q_msgs -= qb->qb_msgs;
 				qb->qb_msgs = 0;
 				qb->qb_first = qb->qb_last = NULL;
-				clear_bit(QB_FULL_BIT, &qb->qb_flag);
+				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
+					--q->q_blocked;
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
-				backenable = 1;	/* always backenable when band empty */
+				backenable = true;	/* always backenable when band empty */
 			}
 		}
 	} else if (likely(flag == FLUSHDATA)) {
@@ -1583,7 +1673,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 streams_fastcall void
 flushband(queue_t *q, int band, int flag)
 {
-	int backenable;
+	bool backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
 
 	assert(q);
@@ -1625,10 +1715,10 @@ EXPORT_SYMBOL(flushband);
  *
  *  Note that the putq() deferral chain is flushed as well.
  */
-int
+bool
 __flushq(queue_t *q, int flag, mblk_t ***mppp)
 {
-	int backenable = 0;
+	bool backenable = false;
 
 	if (likely(flag == FLUSHALL)) {
 		/* This is fast! For flushall, we link the whole chain onto the free list and null
@@ -1648,10 +1738,13 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp)
 				qb->qb_first = qb->qb_last = NULL;
 				qb->qb_count = 0;
 				qb->qb_msgs = 0;
-				clear_bit(QB_FULL_BIT, &qb->qb_flag);
+				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
+					--q->q_blocked;
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
+				set_bit(QB_WANTR_BIT, &qb->qb_flag);
 			}
-			backenable = 1;	/* always backenable when queue empty */
+			q->q_blocked = 0;
+			backenable = true;	/* always backenable when queue empty */
 		}
 	} else if (likely(flag == FLUSHDATA)) {
 		mblk_t *b, *b_next;
@@ -1686,7 +1779,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp)
 streams_fastcall void
 flushq(queue_t *q, int flag)
 {
-	int backenable;
+	bool backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
 
 	assert(q);
@@ -1803,15 +1896,12 @@ EXPORT_SYMBOL(getmid);
  *  no message on the queue.
  */
 static mblk_t *
-__getq(queue_t *q, int *be)
+__getq(queue_t *q, bool *be)
 {
 	mblk_t *mp;
 
-	if ((mp = q->q_first)) {
-		clear_bit(QWANTR_BIT, &q->q_flag);
-		*be = __rmvq(q, mp);
-	} else if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
-		*be = 1;
+	mp = q->q_first;
+	*be = __rmvq(q, mp);
 	return (mp);
 }
 
@@ -1828,7 +1918,7 @@ streams_fastcall mblk_t *
 getq(queue_t *q)
 {
 	mblk_t *mp;
-	int backenable = 0;
+	bool backenable = false;
 
 	assert(!in_irq());
 	assert(q);
@@ -1842,47 +1932,6 @@ getq(queue_t *q)
 }
 
 EXPORT_SYMBOL(getq);
-
-/*
- *  __get_qband:
- *
- *  Find or create a queue band.  This must be called with the queue write locked.  This function is
- *  used by putq(9), putbq(9), insq(9), strqget(9) and strqset(9).  Unforntunately this function
- *  does not operate as described in the SVR 4 STREAMS Programmer's Guide: the SVR 4 SPG says that
- *  "[i]f a messages is passed to putq() with a b_band value that is greater than the number of
- *  qband structures associated with the queue, putq() tries to alloctate a new qband structure for
- *  each band up to and including the band of the message."  Also, SVR 4 SPG describs the q_nband
- *  member that holds the highest allocated qband structure according to this approach.
- *
- *  Unfortunately, the qbinfo structure is about 50 bytes (on 32-bit architecture), 64 bytes cache
- *  aligned, and allocating 255 of them would take 16,320 bytes or 4 kmem cache pages per queue!
- *  The technique would allow a module put procedure to examine the q_nband member and determine whether
- *  a putq() will be succesful, however, that is undocumented too.  So, we simply allocate the
- *  necessary qband structure and leave the rest unallocated.  This needs to be documented in
- *  putq(9), putbq(9), insq(9), strqset(9) and strqget(9).
- */
-static struct qband *
-__get_qband(queue_t *q, unsigned char band)
-{
-	struct qband *qb, *qp, **qbp;
-
-	/* find insertion point for band */
-	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band;
-	     qp = *qbp, qbp = &(*qbp)->qb_next) ;
-	if (!(qb = *qbp) || qb->qb_band < band) {
-		/* not found, create one */
-		if ((qb = allocqb())) {
-			if ((qb->qb_next = xchg(qbp, qb)))
-				qb->qb_next->qb_prev = qb;
-			if ((qb->qb_prev = qp))
-				qp->qb_next = qb;
-			qb->qb_hiwat = q->q_qinfo->qi_minfo->mi_hiwat;
-			qb->qb_lowat = q->q_qinfo->qi_minfo->mi_lowat;
-			qb->qb_band = band;
-		}
-	}
-	return (qb);
-}
 
 static int __putq(queue_t *q, mblk_t *mp);
 
@@ -1900,7 +1949,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		goto putq;
 	if (q != emp->b_queue)
 		goto bug;
-	enable = q->q_first ? 0 : 1; /* ingnore message class for insq() */
+	enable = q->q_first ? (test_bit(QWANTR_BIT, &q->q_flag) != 0) : 1; /* ingnore message class for insq() */
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
@@ -1914,10 +1963,11 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		    && emp->b_prev->b_band > nmp->b_band)
 			goto out_of_order;
 		if (unlikely(nmp->b_band)) {
-			if (!(nmp->b_bandp = qb = __get_qband(q, nmp->b_band)))
+			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
+			// nmp->b_bandp = qb;
 			/* enable on priority band message */
-			enable = 2;
+			enable = qb->qb_first ? (test_bit(QB_WANTR_BIT, &qb->qb_flag) != 0) : 1;
 			if (!qb->qb_last)
 				qb->qb_first = qb->qb_last = nmp;
 			else if (qb->qb_first == emp)
@@ -1939,8 +1989,10 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 			set_bit(QFULL_BIT, &q->q_flag);
 	} else {
 		qb->qb_msgs++;
-		if ((qb->qb_count += size) > qb->qb_hiwat)
-			set_bit(QB_FULL_BIT, &qb->qb_flag);
+		if ((qb->qb_count += size) > qb->qb_hiwat) {
+			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
+				++q->q_blocked;
+		}
 	}
 	nmp->b_size = size;
 	return (1 + enable);	/* success */
@@ -1981,16 +2033,13 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	result = __insq(q, emp, nmp);
 //      qwunlock(q);
 	switch (result) {
-	case 1:		/* success - normal priority arrived on non-empty queue */
-		if (!test_bit(QWANTR_BIT, &q->q_flag))
-			return (1);
-	case 2:		/* success - normal priority arrived on empty queue */
-	case 3:		/* suscess - priority band enable */
-		enable(q);
-		return (1);
-	case 4:		/* success - high priority enable */
+	case 3:		/* success - high priority enable */
 		assert(0);
 		qenable(q);
+		return (1);
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+	case 1:		/* success - don't enable */
 		return (1);
 	default:
 		never();
@@ -2061,11 +2110,11 @@ __putbq(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 		if (likely(mp->b_band == 0)) {
-			enable = q->q_first ? 0 : 1;
+			enable = test_bit(QWANTR_BIT, &q->q_flag) ? 1 : 0;
 		      hipri:
 			if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
-			mp->b_bandp = NULL;
+			// mp->b_bandp = NULL;
 		      banded:
 			if (q->q_last == b_prev)
 				q->q_last = mp;
@@ -2083,22 +2132,23 @@ __putbq(queue_t *q, mblk_t *mp)
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
-			enable = 2;
+			enable = test_bit(QB_WANTR_BIT, &qb->qb_flag) ? 1 : 0;
 			if (qb->qb_last == b_prev)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next)
 				qb->qb_first = mp;
 			qb->qb_msgs++;
 			if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
-				set_bit(QB_FULL_BIT, &qb->qb_flag);
-			mp->b_bandp = bget(qb);
+				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
+					++q->q_blocked;
+			// mp->b_bandp = bget(qb);
 			goto banded;
 		}
 	} else {
 		b_prev = NULL;
 		b_next = q->q_first;
 		/* modules should never put priority messages back on a queue */
-		enable = 3;	/* and this is why */
+		enable = 2;	/* and this is why */
 		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 		mp->b_band = 0;
 		goto hipri;
@@ -2119,17 +2169,12 @@ putbq(queue_t *q, mblk_t *mp)
 	result = __putbq(q, mp);
 	qwunlock(q);
 	switch (result) {
-	case 1:		/* success - normal arrived at non-empty queue */
-		if (test_bit(QWANTR_BIT, &q->q_flag))
-			enableq(q);
-		return (1);
-	case 2:		/* success - normal arrived at empty queue */
-	case 3:		/* success - priority band enable */
-		/* normal blocked condition - do not enable queue */
-		// enableq(q);
-		return (1);
-	case 4:		/* success - high priority enable */
+	case 3:		/* success - high priority enable */
 		qenable(q);
+		return (1);
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+	case 1:		/* success - don't enable */
 		return (1);
 	default:
 		assert(result == 0);
@@ -2309,11 +2354,11 @@ __putq(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_datap->db_type < QPCTL && mp->b_band == 0)) {
 		b_prev = q->q_last;
 		b_next = NULL;
-		enable = b_prev ? 0 : 1;
+		enable = b_prev ? (test_bit(QWANTR_BIT, &q->q_flag) != 0) : 1;
 	      hipri:
 		if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 			set_bit(QFULL_BIT, &q->q_flag);
-		mp->b_bandp = NULL;
+		// mp->b_bandp = NULL;
 	      banded:
 		if (q->q_last == b_prev)
 			q->q_last = mp;
@@ -2335,7 +2380,7 @@ __putq(queue_t *q, mblk_t *mp)
 		b_next = b_prev->b_next;
 	}
 	if (likely(mp->b_datap->db_type >= QPCTL)) {
-		enable = 3;	/* always enable on high priority */
+		enable = 2;	/* always enable on high priority */
 		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 		mp->b_band = 0;
 		goto hipri;
@@ -2350,15 +2395,16 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 		/* enable on priority banded messages */
-		enable = 2;
+		enable = qb->qb_first ? (test_bit(QB_WANTR_BIT, &qb->qb_flag) != 0) : 1;
 		if (qb->qb_last == b_prev)
 			qb->qb_last = mp;
 		if (qb->qb_first == b_next)
 			qb->qb_first = mp;
 		qb->qb_msgs++;
 		if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
-			set_bit(QB_FULL_BIT, &qb->qb_flag);
-		mp->b_bandp = bget(qb);
+			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
+				++q->q_blocked;
+		// mp->b_bandp = bget(qb);
 		goto banded;
 	}
 }
@@ -2390,15 +2436,12 @@ putq(queue_t *q, mblk_t *mp)
 	result = __putq(q, mp);
 	qwunlock(q);
 	switch (result) {
-	case 1:		/* success - normal arrived at non-empty queue */
-		if (!test_bit(QWANTR_BIT, &q->q_flag))
-			return (1);
-	case 2:		/* success - normal arrived at empty queue */
-	case 3:		/* success - priority band enable */
-		enableq(q);
-		return (1);
-	case 4:		/* success - high priority enable */
+	case 3:		/* success - high priority enable */
 		qenable(q);
+		return (1);
+	case 2:		/* success - enable if not noenabled */
+		enableq(q);
+	case 1:		/* success - don't enable */
 		return (1);
 	default:
 		assert(result == 0);
@@ -2699,12 +2742,26 @@ qprocsoff(queue_t *q)
 		/* disable queue enabling */
 		set_bit(QNOENB_BIT, &rq->q_flag);
 		set_bit(QNOENB_BIT, &wq->q_flag);
+		/* cancel queue service calls */
+		clear_bit(QENAB_BIT, &rq->q_flag);
+		clear_bit(QENAB_BIT, &wq->q_flag);
 		/* clear queue putq enable bit */
 		clear_bit(QWANTR_BIT, &rq->q_flag);
 		clear_bit(QWANTR_BIT, &wq->q_flag);
 		/* clear queue back enable bit */
 		clear_bit(QWANTW_BIT, &rq->q_flag);
 		clear_bit(QWANTW_BIT, &wq->q_flag);
+		{
+			struct qband *qb;
+			for (qb = rq->q_bandp; qb; qb = qb->qb_next) {
+				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
+				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
+			}
+			for (qb = wq->q_bandp; qb; qb = qb->qb_next) {
+				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
+				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
+			}
+		}
 
 		assert(sd);
 
@@ -2781,6 +2838,13 @@ qprocson(queue_t *q)
 		/* schedule service procedure on first message */
 		set_bit(QWANTR_BIT, &rq->q_flag);
 		set_bit(QWANTR_BIT, &wq->q_flag);
+		{
+			struct qband *qb;
+			for (qb = rq->q_bandp; qb; qb = qb->qb_next)
+				set_bit(QB_WANTR_BIT, &qb->qb_flag);
+			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
+				set_bit(QB_WANTR_BIT, &qb->qb_flag);
+		}
 
 		/* spin here waiting for queue procedures to exit */
 		swlock(sd);
@@ -2868,12 +2932,22 @@ EXPORT_SYMBOL(RD);
  *  value of zero (0) indicates that back enabling is not necessary.  A return value of one (1)
  *  indicates that back enabling of queues is required.
  */
-int
+bool
 __rmvq(queue_t *q, mblk_t *mp)
 {
-	int backenable = 0;
+	bool backenable = false;
 	mblk_t *b_next, *b_prev;
 
+	if (mp == NULL) {
+		struct qband *qb;
+		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
+			backenable = true;
+		/* wanted to read all bands */
+		for (qb = q->q_bandp; qb; qb = qb->qb_next)
+		     if (!test_and_set_bit(QB_WANTR_BIT, &qb->qb_flag))
+			     backenable = true;
+		return (backenable);
+	}
 	assert(q == mp->b_queue);
 	/* We know which queue the message belongs too, make sure its still there. */
 
@@ -2889,16 +2963,39 @@ __rmvq(queue_t *q, mblk_t *mp)
 	if (q->q_last == mp)
 		q->q_last = b_prev;
 	q->q_msgs--;
-	if (likely(mp->b_bandp == NULL)) {
+	if (likely(mp->b_band == 0)) {
+		if (mp->b_datap->db_type < QPCTL) {
+			struct qband *qb;
+
+			/* wanted to read all bands other than band zero */
+			for (qb = q->q_bandp; qb;
+			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next) ;
+		}
 		q->q_count -= mp->b_size;
 		if (q->q_count < q->q_hiwat)
 			clear_bit(QFULL_BIT, &q->q_flag);
 		if (q->q_count <= q->q_lowat && test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-			backenable = 1;
+			backenable = true;
+		/* no longer want to read band zero */
+		clear_bit(QWANTR_BIT, &q->q_flag);
 	} else {
+#if 0
 		struct qband *qb = mp->b_bandp;
 
 		bput(&mp->b_bandp);
+#else
+		struct qband *qb;
+
+		{
+			unsigned char q_nband, band;
+
+			/* wanted to read all bands of higher priority than this */
+			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
+			     qb && q_nband > band;
+			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next, --q_nband) ;
+		}
+#endif
+		assert(qb);
 		if (qb->qb_first == mp)
 			qb->qb_first = b_next;
 		if (qb->qb_last == mp)
@@ -2906,9 +3003,15 @@ __rmvq(queue_t *q, mblk_t *mp)
 		qb->qb_msgs--;
 		qb->qb_count -= mp->b_size;
 		if (qb->qb_count < qb->qb_hiwat)
-			clear_bit(QB_FULL_BIT, &qb->qb_flag);
+			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
+				--q->q_blocked;
 		if (qb->qb_count <= qb->qb_lowat && test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
-			backenable = 1;
+			backenable = true;
+		/* no longer want to read this or lower bands */
+		for (; qb; qb = qb->qb_next)
+			clear_bit(QB_WANTR_BIT, &qb->qb_flag);
+		/* including band zero */
+		clear_bit(QWANTR_BIT, &q->q_flag);
 	}
 	ctrace(qput(&mp->b_queue));
 	return (backenable);
@@ -2934,7 +3037,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 streams_fastcall void
 rmvq(queue_t *q, mblk_t *mp)
 {
-	int backenable = 0;
+	bool backenable;
 
 	assert(!in_irq());
 	assert(q);

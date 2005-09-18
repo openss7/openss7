@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.37 2005/09/17 11:52:08 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.38 2005/09/18 07:38:35 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/17 11:52:08 $ by $Author: brian $
+% Last Modified $Date: 2005/09/18 07:38:35 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -692,6 +692,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.38  2005/09/18 07:38:35  brian
+- more doc updates
+
 Revision 0.9.2.37  2005/09/17 11:52:08  brian
 - documentation updates
 
@@ -794,7 +797,9 @@ Presents an overview and the benefits of STREAMS.
 A brief overview of @dfn{STREAMS}.
 @item @ref{Mechanism}
 A description of the @dfn{STREAMS} framework.
-Describes the basic operations for constructing, using, and dismantling Streams.  These operations are performed using open(2), close(2), read(2), write(2), and ioctl(2).
+Describes the basic operations for constructing, using, and dismantling Streams.  These operations
+are performed using @manpage{open(2)}, @manpage{close(2)}, @manpage{read(2)}, @manpage{write(2)}, and
+@manpage{ioctl(2)}.
 @item @ref{Processing}
 Processing and procedures within the @dfn{STREAMS} framework.
 Gives an overview of the STREAMS put and service routines.
@@ -899,7 +904,7 @@ cite references to other documents and commands.
 Though the @cite{Programmer's Guide: STREAMS} is a principal tool to aid in developing @dfn{STREAMS}
 applications, readers are encouraged to obtain more information on system calls used by
 @dfn{STREAMS} (section 2), and @dfn{STREAMS} utilities from section 1M.  @dfn{STREAMS} specific
-input output control (ioctl) calls are provided in streamio(7).  @dfn{STREAMS} modules and drivers
+input output control (ioctl) calls are provided in @manref{streamio(7)}.  @dfn{STREAMS} modules and drivers
 are described on section 7.  @dfn{STREAMS} is also described to some extent in the @cite{System V
 Interface Definition, Third Edition}.
 
@@ -2269,10 +2274,8 @@ been opened.
 
 @dfn{STREAMS} modules are not created by calling @manref{open(2)}:
 they are pushed onto an open stream with the @ioctlref{I_PUSH} @manref{ioctl(2)}.
-@cindex streamio(7)
 Modules are pushed by name.  Modules can be popped from a stream using the @ioctlref{I_POP}
 @manref{ioctl(2)}.
-@cindex streamio(7)
 Several modules can be pushed on a stream.  A module's open procedure is called when it is pushed
 and whenever the stream is reopened, and its close procedure is called whenever it is popped, or
 when the stream is closed for the last time and is being dismantled.
@@ -2286,18 +2289,15 @@ pairs are opened when a character special device is opened as with a driver.  Lo
 linked when another stream is linked under the @dfn{Multiplexer} by executing the @ioctlref{I_LINK} or
 @ioctlref{I_PLINK}
 @manpage{ioctl(2)} command
-@cindex streamio(7)
 on a control stream associated with the @dfn{Multiplexer}.
 
 @streamio{I_LINK}'ed
 streams can by unlinked with the @ioctlref{I_UNLINK}
 @manpage{ioctl(2)}
-@cindex streamio(7)
 command.
 @streamio{I_PLINK}'ed
 streams can by unlinked with the @ioctlref{I_PUNLINK}
 @manpage{ioctl(2)}
-@cindex streamio(7)
 command.
 When the control stream is closed, all @streamio{I_LINK}'ed
 streams are automatically unlinked.  @streamio{I_PLINK}'ed
@@ -2539,12 +2539,9 @@ is considered available to process messages again.  Only queues that have a serv
 become flow controlled.  Only queues that have service procedures need check for flow control
 downstream.
 
-It is the responsibility of a module performing a @manpage{putq(9)},
-a @manpage{putnext(9)}
-or a @manpage{qreply(9)}
-to a queue to check for flow control with @manpage{canput(9)},
-@manpage{canputnext(9)},
-@manpage{bcanput(9)}
+It is the responsibility of a module performing a @manpage{putq(9)}, a @manpage{putnext(9)} or a
+@manpage{qreply(9)} to a queue to check for flow control with @manpage{canput(9)},
+@manpage{canputnext(9)}, @manpage{bcanput(9)}
 or
 @manpage{bcanputnext(9)}
 before placing the message on a queue.
@@ -3124,24 +3121,18 @@ These are @cite{BSD}-style loggers.  @dfn{@value{PACKAGE_TITLE}} provides a @dfn
 well.  The advantage of a @dfn{STREAMS}-based logger is for trace and error logging @dfn{STREAMS}
 drivers and modules using the @command{strlog} facility.  This facility includes a device driver
 (the @dfn{STREAMS} log device, @manpage{log(4)}),
-@pgindex log(4)
 a kernel function (@manpage{strlog(9)}),
 and two user space daemon processes (@manpage{strace(8)}
-@pgindex strace(8)
 and @manpage{strerr(8)}).
-@pgindex strerr(8)
 The @dfn{STREAMS} logger has the unique capability that it can filter trace messages and only incur
 the cost of tracing and logging those messages that are filtered out (at the kernel level).  This
 allows a large degree of trace logging to be available, yet, only a small proportion of the
 available trace messages generated to logs.
 
 The @dfn{STREAMS} logger @manpage{log(4)},
-@pgindex log(4)
 @manpage{strlog(9)}
 command, and @manpage{strace(8)}
-@pgindex strace(8)
 and @manpage{strerr(8)}
-@pgindex strerr(8)
 loggers are all available in the base @code{@value{PACKAGE}-@value{VERSION}} package.@footnote{I
 have been considering removing these facilities into a common @code{strutil-0.7a.1} package that
 could work with @cite{LiS} as well, perhaps.}
@@ -3153,23 +3144,16 @@ could work with @cite{LiS} as well, perhaps.}
 
 @dfn{@value{PACKAGE_TITLE}} provides a @dfn{STREAMS} administration facility.  This facility
 consists of a driver (the @dfn{STREAMS Administrative Driver}, @manpage{sad(4)}),
-@pgindex sad(4)
 several autopush kernel functions (@manpage{autopush_add(9)},
 @manpage{autopush_del(9)},
 @manpage{autopush_find(9)},
 @manpage{autopush_vml(9)}),
 and the @manpage{autopush(8)},
-@pgindex autopush(8)
 @manpage{insf(8)},
-@pgindex insf(8)
 @manpage{strload(8)},
-@pgindex strload(8)
 @manpage{strsetup(8)},
-@pgindex strsetup(8)
 @manpage{strinfo(8)},
-@pgindex strinfo(8)
 @manpage{scls(8)}
-@pgindex scls(8)
 and other administrative commands.
 
 @node Terminal I/O
@@ -3191,12 +3175,9 @@ package is not yet avilable.  I will work on it someday when it is necessary.}
 There are three user commands available in the @dfn{@value{PACKAGE_TITLE}} package that are useful
 for terminal input-output: these are the
 @manpage{strchg(1)}
-@pgindex strchg(1)
 @manpage{strconf(1)}
-@pgindex strconf(1)
 and
 @manpage{strreset(1)}
-@pgindex strreset(1)
 user commands.
 
 @node Pipes
@@ -3229,7 +3210,6 @@ Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
 
 By default, FIFOs created on @b{Linux} with the
 @manpage{mknod(8)}
-@pgindex mknod(8)
 utility are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based FIFOs, configure @cite{@value{PACKAGE_TITLE}} with configuration parameter @code{--enable-streams-fifos}.
 @footnote{I am considering taking pipes and FIFOs out of the base
 @code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.7a.1}
@@ -3368,7 +3348,7 @@ destinations towards which messages are sent.
 @page
 @subsection Opening a STREAMS Device File
 
-One way to construct a @dfn{Stream} is to open [see open(2)] a @dfn{STREAMS}-based driver file (see
+One way to construct a @dfn{Stream} is to open [see @manref{open(2)}] a @dfn{STREAMS}-based driver file (see
 @figref{15}).  All entry points into the driver are defined by the @mantype{streamtab(9)} structure
 for that driver.  The @type{streamtab} structure has a format as follows:
 
@@ -3933,7 +3913,7 @@ user process from the @manpage{getmsg(2)} call and passes it the contents of the
 The write-side of this Stream carries two kinds of messages from the user process: @command{ioctl}
 messages for @constant{CHARPROC}, and @msg{M_DATA} messages to be output to the terminal.
 
-@command{ioctl} messages are sent downstream as a result of an @command{ioctl}(2) system call.  When
+@command{ioctl} messages are sent downstream as a result of an @manpage{ioctl(2)} system call.  When
 @constant{CHARPROC} receives an @command{ioctl} message type, it processes the message contents to modify
 internal flags and then uses a utility routine to send an acknowledgement message upstream to the
 @dfn{Stream head}.  The @dfn{Stream head} acts on the acknowledgement message by unblocking the user
@@ -4269,11 +4249,11 @@ int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
 The arguments to @command{getmsg} are the same as those of @command{putmsg} except that the
 @var{flagsp} parameter is a pointer to an @code{int}.
 
-@command{putpmsg()} and @command{getpmsg()} [see @manpage{putpmsg(2)} and @manpage{getpmsg(2)}]
-support multiple bands of data flow.  They are analogous to the system calls @command{putmsg} and
-@command{getmsg}.  The extra parameter is the priority band of the message.
+@manpage{putpmsg(2)} and @manpage{getpmsg(2)} [see @manref{putpmsg(2)} and @manref{getpmsg(2)}]
+support multiple bands of data flow.  They are analogous to the system calls @manpage{putmsg(2)} and
+@manpage{getmsg(2)}.  The extra parameter is the priority band of the message.
 
-@command{putpmsg()} has the following interface:
+@manpage{putpmsg(2)} has the following interface:
 
 @smallexample
 int
@@ -4313,9 +4293,9 @@ is equivalent to the system call
 putmsg(fd, ctlptr, dataptr, RS_HIPRI)
 @end smallexample
 
-If @constant{MSG_HIPRI} is set and band is non-zero, @command{putpmsg()} fails with @errno{EINVAL}.
+If @constant{MSG_HIPRI} is set and band is non-zero, @manpage{putpmsg(2)} fails with @errno{EINVAL}.
 
-@command{getpmsg()} has the following format:
+@manpage{getpmsg(2)} has the following format:
 
 @smallexample
 int
@@ -4325,8 +4305,8 @@ getpmsg(fd, ctlptr, dataptr, bandp, flagsp)
 @end smallexample
 
 @var{bandp} is the priority band of the message.  This system call retrieves a message from the
-@dfn{Stream}.  If @samp{*flagsp} is set to @constant{MSG_HIPRI}, @command{getpmsg()} attempts to retrieve
-a high priority message.  If @constant{MSG_BAND} is set, @command{getpmsg()} tries to retrieve a message
+@dfn{Stream}.  If @samp{*flagsp} is set to @constant{MSG_HIPRI}, @manpage{getpmsg(2)} attempts to retrieve
+a high priority message.  If @constant{MSG_BAND} is set, @manpage{getpmsg(2)} tries to retrieve a message
 from priority band @samp{*bandp} or higher.  If @constant{MSG_ANY} is set, the first message on the
 @dfn{Stream head} read queue is retrieved.  These three flags (@constant{MSG_HIPRI}, @constant{MSG_BAND}, and
 @constant{MSG_ANY}) are mutually exclusive.  On return, if a high priority message was retrieved,
@@ -4349,7 +4329,7 @@ int flags = 0;
 getmsg(fd, ctlptr, dataptr, &flags);
 @end smallexample
 
-If @constant{MSG_HIPRI} is set and @samp{*bandp} is non-zero, @command{getpmsg()} fails with
+If @constant{MSG_HIPRI} is set and @samp{*bandp} is non-zero, @manpage{getpmsg(2)} fails with
 @errno{EINVAL}.
 
 @subsection Control of Stream Head Processing
@@ -4464,12 +4444,12 @@ originating and destination components in the @dfn{Stream}.
 
 Several routines are provided to aid users in controlling each priority band of data flow.  These
 routines are @manpage{flushband(9)}, @manpage{bcanput(9)}, @manpage{strqget(9)}, and
-@manpage{strqset(9)}.  The @command{flushband()} routine is discussed in @ref{Flush Handling}, the
-@command{bcanput()} routine is discussed under @ref{Flow Control}, later in this chapter, and the
+@manpage{strqset(9)}.  The @manpage{flushband(9)} routine is discussed in @ref{Flush Handling}, the
+@manpage{bcanput(9)} routine is discussed under @ref{Flow Control}, later in this chapter, and the
 other two routines are described next.  @ref{STREAMS Utilities}, also has a description of these
 routines.
 
-The @command{strqget()} routine allows modules and drivers to obtain information about a queue or
+The @manpage{strqget(9)} routine allows modules and drivers to obtain information about a queue or
 particular band of the queue.  This provides a way to insulate the @dfn{STREAMS} data structures
 from the modules and drivers.  The format of the routine is:
 
@@ -4501,7 +4481,7 @@ typedef enum qfields @{
 
 This routine returns @samp{0} on success and an error number on failure.
 
-The routine @command{strqset()} allows modules and drivers to change information about a queue or
+The routine @manpage{strqset(2)} allows modules and drivers to change information about a queue or
 particular band of the queue.  This also insulates the @dfn{STREAMS} data structures from the
 modules and drivers.  Its format is:
 
@@ -4514,7 +4494,7 @@ strqset(q, what, pri, val)
         long val;
 @end smallexample
 
-The updated information is provided by @var{val}.  @command{strqset()} returns @samp{0} on success
+The updated information is provided by @var{val}.  @manpage{strqset(2)} returns @samp{0} on success
 and an error number on failure.  If the field is intended to be read-only, then the error
 @errno{EPERM} is returned and the field is left unchanged.  The following fields are currently
 read-only: @constant{QCOUNT}, @constant{QFIRST}, @constant{QLAST}, and @constant{QFLAG}.
@@ -4899,16 +4879,16 @@ A @command{service} procedure must process all messages on its queue unless flow
 this.
 
 A @command{service} procedure continues processing messages form its queue until @manpage{getq(9)}
-returns @samp{NULL}.  When an ordinary message is enqueued by @manpage{putq(9)}, @command{putq()}
+returns @samp{NULL}.  When an ordinary message is enqueued by @manpage{putq(9)}, @manpage{putq(9)}
 will cause the @command{service} procedure to be scheduled only if the queue was previously empty,
-and a previous @command{getq()} call returns @samp{NULL} (that is, the @constant{QWANTR} flag is set).  If
-there are messages on the queue, @command{putq()} presumes the @command{service} procedure is
+and a previous @manpage{getq(9)} call returns @samp{NULL} (that is, the @constant{QWANTR} flag is set).  If
+there are messages on the queue, @manpage{putq(9)} presumes the @command{service} procedure is
 blocked by flow control and the procedure will be automatically rescheduled by @dfn{STREAMS} when
 the block is removed.  If the @command{service} procedure cannot complete processing as a result of
 conditions other than flow control (e.g., no buffers), it must ensure it will return later [e.g., by
 use of @manpage{bufcall(9)} utility routine] or it must discard all messages on the queue.  If this
 is not done, @dfn{STREAMS} will never schedule the @command{service} procedure to be run unless the
-queue's @command{put} procedure enqueues a priority message with @command{putq()}.
+queue's @command{put} procedure enqueues a priority message with @manpage{putq(9)}.
 
 High priority messages are discarded only if there is already a high priority message on the
 @dfn{Stream head} read queue.  That is, there can be only one high priority message present on the
@@ -4916,28 +4896,28 @@ High priority messages are discarded only if there is already a high priority me
 
 @manpage{putbq(9)} replaces messages at the beginning of the appropriate section of the message
 queue in accordance with their priority.  This might not be the same position at which the message
-was retrieved by the preceding @manpage{getq(9)}.  A subsequent @command{getq()} might return a
+was retrieved by the preceding @manpage{getq(9)}.  A subsequent @manpage{getq(9)} might return a
 different message.
 
 @manpage{putq(9)} only looks at the priority band in the first message.  If a high priority message
-is passed to @command{putq()} with a non-zero @var{b_band} value, @var{b_band} is reset to 0 before
+is passed to @manpage{putq(9)} with a non-zero @var{b_band} value, @var{b_band} is reset to 0 before
 placing the message on the queue.@footnote{Under @cite{@value{PACKAGE_TITLE}}, this is performed by
 @manref{putq(9)}, @manref{putbq(9)} and @manref{insq(9)}.} If the message is passed to
-@command{putq()} with a @var{b_band} value that is greater than the number of @code{qband}
-structures associated with the queue, @command{putq()} tries to allocate a new @code{qband}
+@manpage{putq(9)} with a @var{b_band} value that is greater than the number of @code{qband}
+structures associated with the queue, @manpage{putq(9)} tries to allocate a new @code{qband}
 structure for each band up to and including the band of the message.@footnote{@value{PACKAGE_TITLE}
 currently only allocated the band in question and does not allocate intermediate queue band
 structures as described.}
 
 The above also applies to @manpage{putbq(9)} and @manpage{insq(9)}.  If an attempt is made to insert
-a message out of order in a queue via @command{insq()}, the message is not inserted and the routine
+a message out of order in a queue via @manpage{insq(9)}, the message is not inserted and the routine
 fails.
 
 @manpage{putq(9)} will not schedule a queue if @manpage{noenable(9)} had been previously called for
-this queue.  @command{noenable()} instructs @command{putq()} to enqueue the message when called by
-this queue, but not to schedule the @command{service} procedure.  @command{noenable()} does not
+this queue.  @manpage{noenable(9)} instructs @manpage{putq(9)} to enqueue the message when called by
+this queue, but not to schedule the @command{service} procedure.  @manpage{noenable(9)} does not
 prevent the queue from being scheduled by a flow control back-enable.  The inverse of
-@command{noenable()} is @manpage{enableok(9)}.
+@command{manpage(9)} is @manpage{enableok(9)}.
 
 Driver upstream flow control is explained next as an example.  Although device drivers typically
 discard input when unable to send it to a user process, @dfn{STREAMS} allows driver read-side flow
@@ -4954,7 +4934,7 @@ becomes unblocked.  When the blockage abates, @dfn{STREAMS} back-enables the dri
 only for flow control.
 
 @manpage{qenable(9)}, another flow control utility, allows a module or driver to cause one of its
-queues, or another module's queues, to be scheduled.  @command{qenable()} might also be used when a
+queues, or another module's queues, to be scheduled.  @manpage{qenable(9)} might also be used when a
 module or driver wants to delay message processing for some reason.  An example of this is a buffer
 module that gathers messages in its message queue and forwards them as a single, larger message.
 This module uses @manpage{noenable(9)} to inhibit its @command{service} procedure and queues
@@ -5792,17 +5772,17 @@ is a multiplexor.  The algorithm is simple: The data part of the message is prep
 The @manpage{allocb(9)} utility routine is used to allocate a message and the space to hold the data
 for the message.  @manpage{allocb(9)} returns a pointer to a message block containing a data buffer
 of at least the size requested, providing there is enough memory available.  It returns null on
-failure.  Note that @command{allocb()} always returns a message of type @msg{M_DATA}.  The type may
+failure.  Note that @manpage{allocb(9)} always returns a message of type @msg{M_DATA}.  The type may
 then be changed if required.  @var{b_rptr} and @var{b_wptr} are set to @var{db_base} (see
 @manpage{msgb(9)} and @manpage{datab(9)}) which is the start of the memory location for the data.
 
-@command{allocb()} may return a buffer larger than the size requested.  If @command{allocb()}
-indicates buffers are not available [@command{allocb()} fails], the @command{put}/@command{service}
+@manpage{allocb(9)} may return a buffer larger than the size requested.  If @manpage{allocb(9)}
+indicates buffers are not available [@manpage{allocb(9)} fails], the @command{put}/@command{service}
 procedure may not call @manpage{sleep(9)} to wait for a buffer to become available.  Instead, the
 @manpage{bufcall(9)} utility can be used to defer processing in the module or the driver until a
 buffer becomes available.
 
-If message space allocation is done by the @command{put} procedure and @command{allocb()} fails, the
+If message space allocation is done by the @command{put} procedure and @manpage{allocb(9)} fails, the
 message is usually discarded.  If the allocation fails in the @command{service} routine, the message
 is returned to the queue.  @manpage{bufcall(9)} is called to enable to the @command{service} routine
 when a message buffer becomes available, and the @command{service} routine returns.
@@ -5812,9 +5792,9 @@ corresponding data block, if the reference count (see datab structure) is equal 
 reference counter exceeds @samp{1}, the data block is not released.
 
 The @manpage{freemsg(9)} utility routine releases all message blocks in a message.  It uses
-@command{freeb()} to free all message blocks and corresponding data blocks.
+@manpage{freeb(9)} to free all message blocks and corresponding data blocks.
 
-In the following example, @command{allocb()} is used by the @code{bappend} subroutine that appends a
+In the following example, @manpage{allocb(9)} is used by the @code{bappend} subroutine that appends a
 character to a message block:
 
 @smallexample
@@ -5846,15 +5826,15 @@ bappend(bpp, ch)
 @code{bappend} receives a pointer to a message block pointer and a character as arguments.  If a
 message block is supplied @samp{(*bpp != NULL)}, @code{bappend} checks if there is room for more data in
 the block.  If not, it fails.  If there is no message block, a block of at least @constant{MODBLKSZ} is
-allocated through @command{allocb()}.
+allocated through @manpage{allocb(9)}.
 
-If the @command{allocb()} fails, @code{bappend} returns success, silently discarding the character.
+If the @manpage{allocb(9)} fails, @code{bappend} returns success, silently discarding the character.
 This may or may not be acceptable.  For @dfn{TTY}-type devices, it is generally accepted.  If the
-original message block is not full or the @command{allocb()} is successful, @code{bappend} stores
+original message block is not full or the @manpage{allocb(9)} is successful, @code{bappend} stores
 the character in the block.
 
 The next example, subroutine @code{modwput} processes all the message blocks in any downstream data
-(type @msg{M_DATA}) messages.  @command{freemsg()} deallocates messages.
+(type @msg{M_DATA}) messages.  @manpage{freemsg(9)} deallocates messages.
 
 @smallexample
 /* Write side put procedure */
@@ -5928,17 +5908,17 @@ bufcall()(size, pri, func.arg);
     long arg;
 @end smallexample
 
-@command{bufcall()} calls @samp{(*func)(arg)} when a buffer of size bytes is available.  When
+@manpage{bufcall(9)} calls @samp{(*func)(arg)} when a buffer of size bytes is available.  When
 @var{func} is called, it has no user context and must return without sleeping.  Also, because of
 interrupt processing, there is no guarantee that when @var{func} is called, a buffer will actually
 be available (someone else may steal it).
 
-On success, @command{bufcall()} returns a nonzero identifier that can be used as a parameter to
+On success, @manpage{bufcall(9)} returns a nonzero identifier that can be used as a parameter to
 @manpage{unbufcall(9)} to cancel the request later.  On failure, @samp{0} is returned and the
 requested function will never be called.
 
-Care must be taken to avoid deadlock when holding resources while waiting for @command{bufcall()} to
-call @samp{(*func)(arg)}.  @command{bufcall()} should be used sparingly.
+Care must be taken to avoid deadlock when holding resources while waiting for @manpage{bufcall(9)} to
+call @samp{(*func)(arg)}.  @manpage{bufcall(9)} should be used sparingly.
 
 Two examples are provided.  The first example is a device receive interrupt handler:
 
@@ -5976,12 +5956,12 @@ dev_re_load(dev)
 
 @code{dev_rintr} is called when the device has posted a receive interrupt.  The code retrieves the
 data from the device (not shown).  @code{dev_rintr} must then give the device another buffer to fill
-by a call to @code{dev_re_load}, which calls @manpage{allocb(9)}.  If @command{allocb()} fails,
+by a call to @code{dev_re_load}, which calls @manpage{allocb(9)}.  If @manpage{allocb(9)} fails,
 @code{dev_re_load} uses @manpage{bufcall(9)} to call itself when @dfn{STREAMS} determines a buffer
 is available.
 
-Since @command{bufcall()} may fail, there is still a chance that the device may hang.  A better
-strategy, in the event @command{bufcall()} fails, would be to discard the current input message and
+Since @manpage{bufcall(9)} may fail, there is still a chance that the device may hang.  A better
+strategy, in the event @manpage{bufcall(9)} fails, would be to discard the current input message and
 resubmit that buffer to the device.  Losing input data is generally better than hanging.
 
 The second example is a write @command{service} procedure, @code{mod_wsrv}, which needs to prepend
@@ -6015,13 +5995,13 @@ mod_wsrv(q)
 @end smallexample
 
 However, if @manpage{allocb(9)} fails, @code{mod_wsrv} wants to recover without loss of data and
-calls @manpage{bufcall(9)}.  In this case, the routine passed to @command{bufcall()} is
+calls @manpage{bufcall(9)}.  In this case, the routine passed to @manpage{bufcall(9)} is
 @manpage{qenable(9)}.  When a buffer is available, the @command{service} procedure will be
 automatically re-enabled.  Before exiting, the current message is put back on the queue.  This
-example deals with @command{bufcall()} failure by resorting to the @manpage{timeout(9)} operating
-system utility routine.  @command{timeout()} will schedule the given function to be run with the
+example deals with @manpage{bufcall(9)} failure by resorting to the @manpage{timeout(9)} operating
+system utility routine.  @manpage{timeout(9)} will schedule the given function to be run with the
 given argument in the given number of clock ticks (there are @constant{HZ} ticks per second).  In this
-example, if @command{bufcall()} fails, the system will run @manpage{qenable(9)} after two seconds
+example, if @manpage{bufcall(9)} fails, the system will run @manpage{qenable(9)} after two seconds
 have passed.@footnote{Under @value{PACKAGE_TITLE}, it is not a good strategy to call
 @manpage{timeout(9)} when @manpage{bufcall(9)} fails.  This is because if @manpage{bufcall(9)} fails
 to allocate resource for the buffer callback, @manpage{timeout(9)} is also likely to fail to
@@ -6445,7 +6425,7 @@ An overview of @dfn{Job Control} is provided here for completeness and because i
 the following manual pages: @manpage{exit(2)}, @manpage{getpgid(2)}, @manpage{getpgrp(2)},
 @manpage{getsid(2)}, @manpage{kill(2)}, @manpage{setpgid(2)}, @manpage{setpgrp(2)},
 @manpage{setsid(2)}, @manpage{sigaction(2)}, @manpage{signal(2)}, @manpage{sigsend(2)},
-@manpage{termios(2)}, @manpage{waitid(2)}, @manpage{waitpid(3C)}, and @manpage{signal(5)}, and
+@manpage{termios(2)}, @manpage{waitid(2)}, @manpage{waitpid(3)}, and @manpage{signal(5)}, and
 @manpage{termio(7)}.
 
 @dfn{Job Control} is a feature supported by the @cite{BSD UNIX} operating system.  It is also an
@@ -6893,8 +6873,8 @@ associated with the character special file on which the call is sent.  All @comm
 sent to the driver, which is expected to perform all validation and processing other than file
 descriptor validity checking.  The operation of any specific @command{ioctl} is dependent on the
 device driver.  If the driver requires data to be transferred in from user space, it will use the
-kernel copyin() function.  It may also use copyout() to transfer out any data results back to user
-space.
+kernel @manpage{copyin(9)} function.  It may also use @manpage{copyout(9)} to transfer out any data
+results back to user space.
 
 With @dfn{STREAMS}, there are a number of differences from the @dfn{character I/O mechanism} that
 impact @command{ioctl} processing.
@@ -8324,9 +8304,9 @@ they may be modified subsequently.
 Drivers and modules are allowed to change the qb_hiwat and qb_lowat fields of the qband structure.
 They may only read the qb_count, qb_first, qb_last, and qb_flag fields.
 
-The routines strqget() and strqset() can be used to get and set the fields associated with the
-queue.  They insulate modules and drivers from changes in the queue structure and also enforce the
-previous rules.
+The routines @manpage{strqget(9)} and @manpage{strqset(9)} can be used to get and set the fields
+associated with the queue.  They insulate modules and drivers from changes in the queue structure
+and also enforce the previous rules.
 
 @subsubsection Dynamic Allocation of Data Structures
 
@@ -8802,14 +8782,11 @@ write queue.  modwsrv processes only one high priority message, @msg{M_FLUSH}.  
 messages should reach modwsrv.
 
 For an @msg{M_FLUSH} message, modwsrv checks the first data byte.  If @constant{FLUSHW} (defined in
-@header{sys/stropts.h}) is set, the write queue is flushed by use of the flushq() utility (see
-@dfn{STREAMS} Utilities).  flushq() takes two arguments, the queue pointer and a flag.  The flag
-indicates what should be flushed, data messages (@constant{FLUSHDATA}) or everything
-(@constant{FLUSHALL}).  In the
-example, data includes
-@msg{M_DATA},
-@msg{M_DELAY}, @msg{M_PROTO}, and @msg{M_PCPROTO} messages.  The choice of what types of messages to flush is module
-specific.
+@header{sys/stropts.h}) is set, the write queue is flushed by use of the @manpage{flushq(9)} utility
+(see @dfn{STREAMS} Utilities).  @manpage{flushq(9)} takes two arguments, the queue pointer and a
+flag.  The flag indicates what should be flushed, data messages (@constant{FLUSHDATA}) or everything
+(@constant{FLUSHALL}).  In the example, data includes @msg{M_DATA}, @msg{M_DELAY}, @msg{M_PROTO},
+and @msg{M_PCPROTO} messages.  The choice of what types of messages to flush is module specific.
 
 Ordinary messages will be returned to the queue if
 
@@ -8898,23 +8875,24 @@ implemented by using the @manpage{canput(9)}, @manpage{getq(9)}, @manpage{putq(9
 The following scenario takes place normally in flow control when a module and driver are in sync:
 
 @itemize @bullet
-@item  A driver sends data to a module using the @manpage{putnext(9)} routine, and the module's @command{put}
-procedure queues data using putq().  The putq() routine then increments the module's q_count by the
-number of bytes in the message and enables the @command{service} procedure.  When @dfn{STREAMS}
-scheduling runs the @command{service} procedure, the @command{service} procedure then retrieves the
-data by calling the @manpage{getq(9)} utility, and @manpage{getq(9)} decrements q_count by an appropriate value.
+@item  A driver sends data to a module using the @manpage{putnext(9)} routine, and the module's
+@command{put} procedure queues data using @manpage{putq(9)}.  The @manpage{putq(9)} routine then
+increments the module's q_count by the number of bytes in the message and enables the
+@command{service} procedure.  When @dfn{STREAMS} scheduling runs the @command{service} procedure,
+the @command{service} procedure then retrieves the data by calling the @manpage{getq(9)} utility,
+and @manpage{getq(9)} decrements q_count by an appropriate value.
 @end itemize
 
 If the module cannot process data at the rate at which the driver is sending the data, the following
 happens:
 
 @itemize
-@item The module's q_count goes above its high water mark, and the @constant{QFULL} flag is set by putq().  The
-driver's @manpage{canput(9)} fails, and @manpage{canput(9)} sets @constant{QWANTW} flag in the module's queue.  The driver may send a
-command to the device to stop input, queue the data in its own queue, or drop the data.  In the
-meanwhile, the module's q_count falls below its low water mark [by @manpage{getq(9)}] and
-@manpage{getq(9)} finds the nearest back queue with a @command{service} procedure and enables it.
-The scheduler then runs the
+@item The module's q_count goes above its high water mark, and the @constant{QFULL} flag is set by
+@manpage{putq(9)}.  The driver's @manpage{canput(9)} fails, and @manpage{canput(9)} sets
+@constant{QWANTW} flag in the module's queue.  The driver may send a command to the device to stop
+input, queue the data in its own queue, or drop the data.  In the meanwhile, the module's q_count
+falls below its low water mark [by @manpage{getq(9)}] and @manpage{getq(9)} finds the nearest back
+queue with a @command{service} procedure and enables it.  The scheduler then runs the
 @command{service} procedure.
 @end itemize
 
@@ -9223,10 +9201,11 @@ The @dfn{MAJOR} and @dfn{MINOR} tables map external major and minor numbers to t
 switch tables will have only as many entries as required to support the drivers installed on the
 system.  Switch table entry points are activated by system calls that reference a special device
 file that supplies the external major number and instructions on whether to use bdevsw or cdevsw.
-By mapping the external major number to the corresponding internal major number in the @dfn{MAJOR} table,
-the system knows which driver routine to activate.  The routines getmajor() and getminor() return an
-internal major and minor number for the device.  The routines getemajor() and geteminor() return an
-external major and minor number for the device.
+By mapping the external major number to the corresponding internal major number in the @dfn{MAJOR}
+table, the system knows which driver routine to activate.  The routines @manpage{getmajor(9)} and
+@manpage{getminor(9)} return an internal major and minor number for the device.  The routines
+@manpage{getemajor(9)} and @manpage{geteminor(9)} return an external major and minor number for the
+device.
 
 @subsection Drivers
 
@@ -9422,7 +9401,7 @@ lpopen(q, devp, flag, sflag, credp)
 
 The @dfn{Stream} flag, sflag, must have the value 0, indicating a normal driver open.  devp is a
 pointer to the major/minor device number for this port.  After checking sflag, the @dfn{STREAMS}
-open flag, lpopen extracts the minor device pointed to by devp, using the getminor() function.
+open flag, lpopen extracts the minor device pointed to by devp, using the @manpage{getminor(9)} function.
 credp is a pointer to a credentials structure.
 
 The minor device number selects a printer.  The device number pointed to by devp must be less than
@@ -9451,7 +9430,8 @@ interrupts at level 5.
 
 Normally, if @constant{FLUSHR} is set, the read queue would be flushed.  However, in this example, no messages
 are ever placed on the read queue, so it is not necessary to flush it.  The @constant{FLUSHW} bit is cleared
-and the message is sent upstream using qreply().  If @constant{FLUSHR} is not set, the message is discarded.
+and the message is sent upstream using @manpage{qreply(9)}.  If @constant{FLUSHR} is not set, the
+message is discarded.
 
 The @dfn{Stream head} always performs the following actions on flush requests received on the
 read-side from downstream.  If @constant{FLUSHR} is set, messages waiting to be sent to user space are flushed.
@@ -9605,25 +9585,26 @@ lpclose(q, flag, credp)
 
 @subsubsection Driver Flow Control
 
-The same utilities (described in Modules) and mechanisms used for module flow control are used by
-drivers.
+The same utilities (described in @ref{STREAMS Modules}) and mechanisms used for module flow control
+are used by drivers.
 
-When the message is queued, putq() increments the value of q_count by the size of the message and
-compares the result against the driver's write high water limit (q_hiwat) value.  If the count
-exceeds q_hiwat, the putq() utility routine will set the internal @constant{FULL} indicator for the driver
-write queue.  This will cause messages from upstream to be halted [@manpage{canput(9)} returns
-@constant{FALSE}] until the
-write queue count reaches q_lowat.  The driver messages waiting to be output are dequeued by the
-driver output interrupt routine with @manpage{getq(9)}, which decrements the count.  If the resulting count is
-below q_lowat, the @manpage{getq(9)} routine will back-enable any upstream queue that had been blocked.
+When the message is queued, @manpage{putq(9)} increments the value of @member{q_count} by the size
+of the message and compares the result against the driver's write high water limit
+(@member{q_hiwat}) value.  If the count exceeds @member{q_hiwat}, the @manpage{putq(9)} utility
+routine will set the internal @constant{QFULL} indicator for the driver write queue.  This will
+cause messages from upstream to be halted [@manpage{canput(9)} returns @constant{FALSE}] until the
+write queue count reaches @member{q_lowat}.  The driver messages waiting to be output are dequeued
+by the driver output interrupt routine with @manpage{getq(9)}, which decrements the count.  If the
+resulting count is below @member{q_lowat}, the @manpage{getq(9)} routine will back-enable any
+upstream queue that had been blocked.
 
 Device drivers typically discard input when unable to send it to a user process.  However,
 @dfn{STREAMS} allows flow control to be used on the driver read-side to handle temporary upstream
 blocks.
 
 To some extent, a driver or a module can control when its upstream transmission will become blocked.
-Control is available through the @msg{M_SETOPTS} message (@pxref{Message Types}) to modify the @dfn{Stream
-head} read-side flow control limits.
+Control is available through the @msg{M_SETOPTS} message (@pxref{Message Types}) to modify the
+@dfn{Stream head} read-side flow control limits.
 
 @node Cloning
 @section Cloning
@@ -9944,8 +9925,9 @@ state of the @dfn{Stream head}:
 
 @item M_ERROR
 Causes the @dfn{Stream head} to lock up.  Message transmission between @dfn{Stream} and user
-processes is terminated.  All subsequent system calls except close(2) and poll(2) will fail.  Also
-causes an @msg{M_FLUSH} clearing all message queues to be sent downstream by the @dfn{Stream head}.
+processes is terminated.  All subsequent system calls except @manpage{close(2)} and
+@manpage{poll(2)} will fail.  Also causes an @msg{M_FLUSH} clearing all message queues to be sent
+downstream by the @dfn{Stream head}.
 
 @item M_HANGUP
 Terminates input from a user process to the @dfn{Stream}.  All subsequent system calls that would
@@ -9959,7 +9941,7 @@ Causes a specified signal to be sent to a process.
 
 @end table
 
-putctl1() and putctl() are utilities that allocate a non-data (i.e., not @msg{M_DATA},
+@manpage{putctl1(9)} and @manpage{putctl(9)} are utilities that allocate a non-data (i.e., not @msg{M_DATA},
 @msg{M_DELAY},
 @msg{M_PROTO},
 or @msg{M_PCPROTO}) type message, place one byte in the message (for putctl1) and call the @command{put}
@@ -10023,7 +10005,7 @@ blockage.  The purpose of the procedure is to re-enable the writer (loopwsrv) by
 the related queue.  loopwsrv can not be directly back-enabled by @dfn{STREAMS} because there is no
 direct queue linkage between the two @dfn{Streams}.  Note that no message ever gets queued to the
 read @command{service} procedure.  Messages are kept on the write-side so that flow control can
-propagate up to the @dfn{Stream head}.  The qenable() routine schedules the write-side
+propagate up to the @dfn{Stream head}.  The @manpage{qenable(9)} routine schedules the write-side
 @command{service} procedure of the other @dfn{Stream}.
 
 loopclose breaks the connection between the @dfn{Streams}:
@@ -10115,14 +10097,14 @@ type of connection is referred to as a 1-to-M, or lower, multiplexor configurati
 configuration must always contain a multiplexing driver, which is recognized by @dfn{STREAMS} as
 having special characteristics.
 
-Multiple @dfn{Streams} can be connected above a driver by use of open(2) calls.  This was done for
+Multiple @dfn{Streams} can be connected above a driver by use of @manpage{open(2)} calls.  This was done for
 the loop around driver and for the driver handling multiple minor devices in Drivers.  There is no
 difference between the connections to these drivers, only the functions performed by the driver are
 different.  In the multiplexing case, the driver routes data between multiple @dfn{Streams}.  In the
 device driver case, the driver routes data between user processes and associated physical ports.
 Multiplexing with @dfn{Streams} connected above is referred to as an N-to-1, or upper, multiplexor.
-@dfn{STREAMS} does not provide any facilities beyond open(2) and close(2) to connect or disconnect
-upper @dfn{Streams} for multiplexing purposes.
+@dfn{STREAMS} does not provide any facilities beyond @manpage{open(2)} and @manpage{close(2)} to
+connect or disconnect upper @dfn{Streams} for multiplexing purposes.
 
 From the driver's perspective, upper and lower configurations differ only in the way they are
 initially connected to the driver.  The implementation requirements are the same: route the data and
@@ -10366,10 +10348,10 @@ multi-level configuration.  Because the multiplexing program relied on closing t
 @streamio{I_UNLINK} calls, the muxid values returned by @ioctlref{I_LINK} could be ignored.
 
 An important side effect of automatic dismantling on the close is that it is not possible for a
-process to build a multiplexing configuration with @streamio{I_LINK} and then exit.  That is because exit(2)
-will close all files associated with the process, including the controlling @dfn{Stream}.  To keep
-the configuration intact, the process must exist for the life of that multiplexor.  That is the
-motivation for implementing the example as a daemon process.
+process to build a multiplexing configuration with @streamio{I_LINK} and then exit.  That is because
+@manpage{exit(2)} will close all files associated with the process, including the controlling
+@dfn{Stream}.  To keep the configuration intact, the process must exist for the life of that
+multiplexor.  That is the motivation for implementing the example as a daemon process.
 
 However, if the process uses persistent links via the @streamio{I_PLINK} @command{ioctl} call, the multiplexor
 configuration would remain intact after the process exits.  Persistent links are described later in
@@ -10431,35 +10413,36 @@ no distinguishing characteristics.  It can include any driver compatible with th
 modules required on the lower @dfn{Stream} must be pushed onto it now.
 
 Next, this lower @dfn{Stream} is connected below the multiplexing driver with an @ioctlref{I_LINK}
-@command{ioctl} call [see streamio(7)].  The @dfn{Stream head} points to the @dfn{Stream head}
-routines as its procedures (known via its queue).  An @streamio{I_LINK} to the upper @dfn{Stream}, referencing
-the lower @dfn{Stream}, causes @dfn{STREAMS} to modify the contents of the @dfn{Stream head}'s
-queues in the lower @dfn{Stream}.  The pointers to the @dfn{Stream head} routines, and other values,
-in the @dfn{Stream head}'s queues are replaced with those contained in the mux fields of the
-multiplexing driver's @type{streamtab}.  Changing the @dfn{Stream head} routines on the lower @dfn{Stream}
-means that all subsequent messages sent upstream by the lower @dfn{Stream}'s driver will,
-ultimately, be passed to the @command{put} procedure designated in st_muxrinit, the multiplexing
-driver.  The @streamio{I_LINK} also establishes this upper @dfn{Stream} as the control @dfn{Stream} for this
-lower @dfn{Stream}.  @dfn{STREAMS} remembers the relationship between these two @dfn{Streams} until
-the upper @dfn{Stream} is closed, or the lower @dfn{Stream} is unlinked.
+@command{ioctl} call [see @manref{streamio(7)}].  The @dfn{Stream head} points to the @dfn{Stream
+head} routines as its procedures (known via its queue).  An @streamio{I_LINK} to the upper
+@dfn{Stream}, referencing the lower @dfn{Stream}, causes @dfn{STREAMS} to modify the contents of the
+@dfn{Stream head}'s queues in the lower @dfn{Stream}.  The pointers to the @dfn{Stream head}
+routines, and other values, in the @dfn{Stream head}'s queues are replaced with those contained in
+the mux fields of the multiplexing driver's @type{streamtab}.  Changing the @dfn{Stream head}
+routines on the lower @dfn{Stream} means that all subsequent messages sent upstream by the lower
+@dfn{Stream}'s driver will, ultimately, be passed to the @command{put} procedure designated in
+st_muxrinit, the multiplexing driver.  The @streamio{I_LINK} also establishes this upper
+@dfn{Stream} as the control @dfn{Stream} for this lower @dfn{Stream}.  @dfn{STREAMS} remembers the
+relationship between these two @dfn{Streams} until the upper @dfn{Stream} is closed, or the lower
+@dfn{Stream} is unlinked.
 
-Finally, the @dfn{Stream head} sends an @msg{M_IOCTL} message with ioc_cmd set to @streamio{I_LINK} to the
-multiplexing driver.  The @msg{M_DATA} part of the @msg{M_IOCTL} contains a linkblk structure.  The multiplexing
-driver stores information from the linkblk structure in private storage and returns an
-@msg{M_IOCACK}
-message (acknowledgement).  @member{l_index} is returned to the process requesting the @streamio{I_LINK}.  This value
-can be used later by the process to disconnect this @dfn{Stream}.
+Finally, the @dfn{Stream head} sends an @msg{M_IOCTL} message with ioc_cmd set to @streamio{I_LINK}
+to the multiplexing driver.  The @msg{M_DATA} part of the @msg{M_IOCTL} contains a linkblk
+structure.  The multiplexing driver stores information from the linkblk structure in private storage
+and returns an @msg{M_IOCACK} message (acknowledgement).  @member{l_index} is returned to the
+process requesting the @streamio{I_LINK}.  This value can be used later by the process to disconnect
+this @dfn{Stream}.
 
-An @streamio{I_LINK} is required for each lower @dfn{Stream} connected to the driver.  Additional upper
-@dfn{Streams} can be connected to the multiplexing driver by open calls.  Any message type can be
-sent from a lower @dfn{Stream} to user processes along any of the upper @dfn{Streams}.  The upper
+An @streamio{I_LINK} is required for each lower @dfn{Stream} connected to the driver.  Additional
+upper @dfn{Streams} can be connected to the multiplexing driver by open calls.  Any message type can
+be sent from a lower @dfn{Stream} to user processes along any of the upper @dfn{Streams}.  The upper
 @dfn{Streams} provide the only interface between the user processes and the multiplexor.
 
 Note that no direct data structure linkage is established for the linked @dfn{Streams}.  The read
-queue's q_next will be @samp{NULL} and the write queue's q_next will point to the first entity on the lower
-@dfn{Stream}.  Messages flowing upstream from a lower driver (a device driver or another
-multiplexor) will enter the multiplexing driver @command{put} procedure with @member{l_qbot} as the queue
-value.  The multiplexing driver has to route the messages to the appropriate upper (or lower)
+queue's q_next will be @samp{NULL} and the write queue's q_next will point to the first entity on
+the lower @dfn{Stream}.  Messages flowing upstream from a lower driver (a device driver or another
+multiplexor) will enter the multiplexing driver @command{put} procedure with @member{l_qbot} as the
+queue value.  The multiplexing driver has to route the messages to the appropriate upper (or lower)
 @dfn{Stream}.  Similarly, a message coming downstream from user space on any upper Stream has to be
 processed and routed, if required, by the driver.
 
@@ -10548,9 +10531,9 @@ device handling functions are performed by a separate driver, connected as a low
 the device information (i.e., relevant user process) is contained in the input data rather than in
 an interrupt call.
 
-Each upper @dfn{Stream} is created by open(2).  A single lower @dfn{Stream} is opened and then it is
-linked by use of the multiplexing facility.  This lower @dfn{Stream} might connect to the @dfn{tty}
-driver.  The implementation of this example is a foundation for an M-to-N multiplexor.
+Each upper @dfn{Stream} is created by @manpage{open(2)}.  A single lower @dfn{Stream} is opened and
+then it is linked by use of the multiplexing facility.  This lower @dfn{Stream} might connect to the
+@dfn{tty} driver.  The implementation of this example is a foundation for an M-to-N multiplexor.
 
 As in the loop-around driver (in Drivers), flow control requires the use of standard and special
 code, since physical connectivity among the @dfn{Streams} is broken at the driver.  Different
@@ -11015,7 +10998,7 @@ together.  After the multiplexor has been set up, the process may close all file
 exit, and the multiplexor will remain intact.
 
 Two ioctls, @streamio{I_PLINK} and @streamio{I_PUNLINK}, are used to create and remove persistent
-links that are associated with the @dfn{Stream} above the multiplexor.  close(2) and
+links that are associated with the @dfn{Stream} above the multiplexor.  @manpage{close(2)} and
 @streamio{I_UNLINK} are not able to disconnect the persistent links.
 
 The format of @streamio{I_PLINK} is:
@@ -11038,7 +11021,7 @@ multiplexor.  The persistent link can be created in the following way:
     exit(0);
 @end smallexample
 
-@figref{37} shows how open(2) establishes a @dfn{Stream} between the device and the @dfn{Stream
+@figref{37} shows how @manpage{open(2)} establishes a @dfn{Stream} between the device and the @dfn{Stream
 head}.
 
 @figuresized{SPG_fig37,37,open() of MUXdriver and Driver1,4in}
@@ -11151,7 +11134,7 @@ by the writer could then be read by the reader.
 To provide greater support and development flexibility for applications using a network, pipes and
 FIFOs have become @dfn{STREAMS}-based in @cite{UNIX System V Release 4.0}.  The basic interface
 remains the same but the underlying implementation has changed.  Pipes now provide a bi-directional
-mechanism for process communication.  When a pipe is created via the pipe(2) system call, two
+mechanism for process communication.  When a pipe is created via the @manpage{pipe(2)} system call, two
 @dfn{Streams} are opened and connected together, thus providing a full-duplex mechanism.  Data flow
 is on First-In-First-Out basis.  Previously pipes were associated with character devices and the
 creation of a pipe was limited to the capacity and configuration of the device.  @dfn{STREAMS}-based
@@ -11164,17 +11147,17 @@ The remainder of this chapter uses the terms pipe and @dfn{STREAMS}-based pipe i
 
 @subsection Creating and Opening Pipes and FIFOs
 
-FIFOs are created via mknod(2) or mkfifo(3C).  FIFOs behave like regular file system nodes but are
+FIFOs are created via @manref{mknod(2)} or @manref{mkfifo(3)}.  FIFOs behave like regular file system nodes but are
 distinguished from other file system nodes by the p in the first column when the ls -l command is
 executed.  Data written to the @dfn{FIFO} or read from the @dfn{FIFO} flow up and down the
 @dfn{Stream} in @dfn{STREAMS} buffers.  Data written by one process can be read by another process.
 
-FIFOs are opened in the same manner as other file system nodes via the open(2) system call.  Any
+FIFOs are opened in the same manner as other file system nodes via the @manpage{open(2)} system call.  Any
 data written to the @dfn{FIFO} can be read from the same file descriptor in the First-In-First-Out
-manner.  Modules can also be pushed on the @dfn{FIFO}.  See open(2) for the restrictions that apply
-when opening a @dfn{FIFO}.
+manner.  Modules can also be pushed on the @dfn{FIFO}.  See @manref{open(2)}, for the restrictions
+that apply when opening a @dfn{FIFO}.
 
-A @dfn{STREAMS}-based pipe is created via the pipe(2) system call that returns two file descriptors,
+A @dfn{STREAMS}-based pipe is created via the @manpage{pipe(2)} system call that returns two file descriptors,
 fd[0] and fd[1].  Both file descriptors are opened for reading and writing.  Data written to fd[0]
 becomes data read from fd[1] and vice versa.
 
@@ -11183,8 +11166,8 @@ reads, writes, and closes are aware of if the other end of the pipe is open or c
 of the pipe is closed, the internal data structures provide a way to access the @dfn{Stream} for the
 other end so that an @msg{M_HANGUP} message can be sent to its @dfn{Stream head}.
 
-After successful creation of a @dfn{STREAMS}-based pipe, 0 is returned.  If pipe(2) is unable to
-create and open a @dfn{STREAMS}-based pipe, it will fail with errno set as follows:
+After successful creation of a @dfn{STREAMS}-based pipe, 0 is returned.  If @manpage{pipe(2)} is
+unable to create and open a @dfn{STREAMS}-based pipe, it will fail with errno set as follows:
 
 @itemize @bullet
 @item @errno{ENOMEM} could not allocate two vnodes.
@@ -11203,13 +11186,13 @@ the pipe, that module cannot be popped from the other end.
 
 @subsection Accessing Pipes and FIFOs
 
-@dfn{STREAMS}-based pipes and FIFOs can be accessed through the operating system routines read(2),
-write(2), @manpage{ioctl(2)}, close(2), putmsg(2), getmsg(2), and poll(2).  In case of FIFOs open(2)
-is also used.
+@dfn{STREAMS}-based pipes and FIFOs can be accessed through the operating system routines
+@manpage{read(2)}, @manpage{write(2)}, @manpage{ioctl(2)}, @manpage{close(2)}, @manpage{putmsg(2)},
+@manpage{getmsg(2)}, and @manpage{poll(2)}.  In case of FIFOs open(2) is also used.
 
 @subsubsection Reading from a Pipe or FIFO
 
-The read(2) [or getmsg(2)] system call is used to read from a pipe or @dfn{FIFO}.  A user reads data
+The @manpage{read(2)} [or @manpage{getmsg(2)}] system call is used to read from a pipe or @dfn{FIFO}.  A user reads data
 from a @dfn{Stream} (not from a data buffer as was done prior to Release 4.0).  Data can be read
 from either end of a pipe.
 
@@ -11222,14 +11205,14 @@ When a user process attempts to read from an empty pipe (or @dfn{FIFO}), the fol
 
 @item If one end of the pipe is closed, 0 is returned indicating the end of the file.
 
-@item If no process has the @dfn{FIFO} open for writing, read(2) returns 0 to indicate the end of
+@item If no process has the @dfn{FIFO} open for writing, @manpage{read(2)} returns 0 to indicate the end of
 the file.
 
 @item If some process has the @dfn{FIFO} open for writing, or both ends of the pipe are open, and
-@constant{O_NDELAY} is set, read(2) returns 0.
+@constant{O_NDELAY} is set, @manpage{read(2)} returns 0.
 
 @item If some process has the @dfn{FIFO} open for writing, or both ends of the pipe are open, and
-@constant{O_NONBLOCK} is set, read(2) returns -1 and set errno to @errno{EAGAIN}.
+@constant{O_NONBLOCK} is set, @manpage{read(2)} returns -1 and set errno to @errno{EAGAIN}.
 
 @item If @constant{O_NDELAY} and @constant{O_NONBLOCK} are not set, the read call will block until
 data are written to the pipe, until one end of the pipe is closed, or the @dfn{FIFO} is no longer
@@ -11239,7 +11222,7 @@ open for writing.
 
 @subsubsection Writing to a Pipe or FIFO
 
-When a user process calls the write(2) system call, data are sent down the associated @dfn{Stream}.
+When a user process calls the @manpage{write(2)} system call, data are sent down the associated @dfn{Stream}.
 If the pipe or @dfn{FIFO} is empty (no modules pushed), data written are placed on the read queue of
 the other @dfn{Stream} for @dfn{STREAMS}-based pipes, and on the read queue of the same @dfn{Stream}
 for FIFOs.  Since the size of a pipe is the number of unread data bytes, the written data are
@@ -11247,13 +11230,13 @@ reflected in the size of the other end of the pipe.
 
 @subsubheading Zero Length Writes 
 
-If a user process issues write(2) with 0 as the number of bytes to send down a @dfn{STREAMS}-based
-pipe or @dfn{FIFO}, 0 is returned, and by default no message is sent down the @dfn{Stream}.
-However, if a user requires that a 0-length message be sent downstream, an @command{ioctl} call may
-be used to change this default behavior.  The flag @constant{SNDZERO} supports this.  If
-@constant{SNDZERO} is set in the @dfn{Stream head}, write(2) requests of 0 bytes will generate a
-0-length message and send the message down the @dfn{Stream}.  If @constant{SNDZERO} is not set, no
-message is generated and 0 is returned to the user.
+If a user process issues @manpage{write(2)} with 0 as the number of bytes to send down a
+@dfn{STREAMS}-based pipe or @dfn{FIFO}, 0 is returned, and by default no message is sent down the
+@dfn{Stream}.  However, if a user requires that a 0-length message be sent downstream, an
+@command{ioctl} call may be used to change this default behavior.  The flag @constant{SNDZERO}
+supports this.  If @constant{SNDZERO} is set in the @dfn{Stream head}, @manpage{write(2)} requests
+of 0 bytes will generate a 0-length message and send the message down the @dfn{Stream}.  If
+@constant{SNDZERO} is not set, no message is generated and 0 is returned to the user.
 
 To toggle the @constant{SNDZERO} bit, the @command{ioctl} @streamio{I_SWROPT} is used.  If arg in
 the @command{ioctl} call is set to @constant{SNDZERO} and the @constant{SNDZERO} bit is off, the bit
@@ -11285,21 +11268,22 @@ pipe cannot be guaranteed.
 
 @subsubsection Closing a Pipe or FIFO
 
-The close(2) system call closes a pipe or @dfn{FIFO} and dismantles its associated @dfn{Streams}.
-On the last close of one end of a pipe, an @msg{M_HANGUP} message is sent upstream to the other end
-of the pipe.  Subsequent read(2) or getmsg(2) calls on that @dfn{Stream head} will return the number
-of bytes read and zero when there are no more data.  Subsequent write(2) or putmsg(2) requests will
-fail with @errno{ENXIO}.  If the pipe has been mounted via fattach() the pipe must be unmounted
-prior to calling close, otherwise the @dfn{Stream} will not be dismantled.  If the other end of the
-pipe is mounted, the last close of the pipe will force it to be unmounted.
+The @manpage{close(2)} system call closes a pipe or @dfn{FIFO} and dismantles its associated
+@dfn{Streams}.  On the last close of one end of a pipe, an @msg{M_HANGUP} message is sent upstream
+to the other end of the pipe.  Subsequent @manpage{read(2)} or @manpage{getmsg(2)} calls on that
+@dfn{Stream head} will return the number of bytes read and zero when there are no more data.
+Subsequent @manpage{write(2)} or @manpage{putmsg(2)} requests will fail with @errno{ENXIO}.  If the
+pipe has been mounted via @manpage{fattach(3)} the pipe must be unmounted prior to calling close,
+otherwise the @dfn{Stream} will not be dismantled.  If the other end of the pipe is mounted, the
+last close of the pipe will force it to be unmounted.
 
 @node Flushing Pipes and FIFOs
 @section Flushing Pipes and FIFOs
 
-When the flush request is initiated from a user @command{ioctl} or from a flushq() routine, the
-@constant{FLUSHR} and/or @constant{FLUSHW} bits of an @msg{M_FLUSH} message will have to be
-switched.  The point of switching the bits is the point where the @msg{M_FLUSH} message is passed
-from a write queue to a read queue.  This point is also known as the mid-point of the pipe.
+When the flush request is initiated from a user @command{ioctl} or from a @manpage{flushq(9)}
+routine, the @constant{FLUSHR} and/or @constant{FLUSHW} bits of an @msg{M_FLUSH} message will have
+to be switched.  The point of switching the bits is the point where the @msg{M_FLUSH} message is
+passed from a write queue to a read queue.  This point is also known as the mid-point of the pipe.
 
 The mid-point of a pipe is not always easily detectable, especially if there are numerous modules
 pushed on either end of the pipe.  In that case, there needs to be a mechanism to intercept all
@@ -11335,8 +11319,8 @@ of the pipe, and allow unrelated processes to communicate with it over that name
 @subsection fattach
 
 A @dfn{STREAMS} file descriptor can be named by attaching that file descriptor to a node in the file
-system name space.  The routine fattach() [see also fattach(3C)] is used to name a @dfn{STREAMS}
-file descriptor.  @dfn{Stream}, fattach(3C) Its format is:
+system name space.  The routine @manpage{fattach(3)} [see also @manref{fattach(3)}] is used to name a
+@dfn{STREAMS} file descriptor.  @dfn{Stream}, @manpage{fattach(3)} Its format is:
 
 @smallexample
 int fattach (int fildes, char *path)
@@ -11350,26 +11334,26 @@ The path cannot have a @dfn{Stream} already attached to it.  It cannot be a moun
 system nor the root of a file system.  A user must be an owner of the path with write permission or
 a user with the appropriate privileges in order to attach the file descriptor.
 
-If the path is in use when the routine fattach() is executed, those processes accessing the path
-will not be interrupted and any data associated with the path before the call to the fattach()
-routine will continue to be accessible by those processes.
+If the path is in use when the routine @manpage{fattach(3)} is executed, those processes accessing
+the path will not be interrupted and any data associated with the path before the call to the
+@manpage{fattach(3)} routine will continue to be accessible by those processes.
 
-After a @dfn{Stream} is named, all subsequent operations [for example, open(2)] on the path will
-operate on the named @dfn{Stream}.  Thus, it is possible that a user process has one file descriptor
-pointing to the data originally associated with the path and another file descriptor pointing to a
-named @dfn{Stream}.
+After a @dfn{Stream} is named, all subsequent operations [for example, @manpage{open(2)}] on the
+path will operate on the named @dfn{Stream}.  Thus, it is possible that a user process has one file
+descriptor pointing to the data originally associated with the path and another file descriptor
+pointing to a named @dfn{Stream}.
 
-Once the Stream has been named, the stat(2) system call on path will show information for the
-@dfn{Stream}.  If the named @dfn{Stream} is a pipe, the stat(2) information will show that path is a
-pipe.  If the @dfn{Stream} is a device driver or a pseudo device driver, path appears as a device.
-The initial modes, permissions, and ownership of the named @dfn{Stream} are taken from the
-attributes of the path.  The user can issue the system calls chmod(2) and chown(2) to alter the
-attributes of the named @dfn{Stream} and not affect the original attributes of the path nor the
-original attributes of the @dfn{STREAMS} file.
+Once the Stream has been named, the @manpage{stat(2)} system call on path will show information for
+the @dfn{Stream}.  If the named @dfn{Stream} is a pipe, the @manpage{stat(2)} information will show
+that path is a pipe.  If the @dfn{Stream} is a device driver or a pseudo device driver, path appears
+as a device.  The initial modes, permissions, and ownership of the named @dfn{Stream} are taken from
+the attributes of the path.  The user can issue the system calls @manpage{chmod(2)} and
+@manpage{chown(2)} to alter the attributes of the named @dfn{Stream} and not affect the original
+attributes of the path nor the original attributes of the @dfn{STREAMS} file.
 
-The size represented in the stat(2) information will reflect the number of unread bytes of data
-currently at the @dfn{Stream head}.  This size is not necessarily the number of bytes written to the
-@dfn{Stream}.
+The size represented in the @manpage{stat(2)} information will reflect the number of unread bytes of
+data currently at the @dfn{Stream head}.  This size is not necessarily the number of bytes written
+to the @dfn{Stream}.
 
 A @dfn{STREAMS}-based file descriptor can be attached to many different paths at the same time
 (i.e., a @dfn{Stream} can have many names attached to it).  The modes, ownership, and permissions of
@@ -11380,8 +11364,8 @@ be used for any other @dfn{STREAMS} operation.
 
 @subsection fdetach
 
-A named @dfn{Stream} can be disassociated from a file name with the fdetach() routine [see also
-fdetach(3C)] that has the following format:
+A named @dfn{Stream} can be disassociated from a file name with the @manpage{fdetach(3)} routine
+[see also @manpage{fdetach(3)}] that has the following format:
 
 @smallexample
 int fdetach (char *path)
@@ -11390,17 +11374,17 @@ int fdetach (char *path)
 where path is the name of the previously named @dfn{Stream}.  Only the owner of path or the user
 with the appropriate privileges may disassociate the @dfn{Stream} from its name.  The @dfn{Stream}
 may be disassociated from its name while processes are accessing it.  If these processes have the
-named @dfn{Stream} open at the time of the fdetach() call, the processes will not get an error, and
-will continue to access the @dfn{Stream}.  However, after the disassociation, subsequent operations
-on path access the underlying file rather than the named @dfn{Stream}.
+named @dfn{Stream} open at the time of the @manpage{fdetach(3)} call, the processes will not get an
+error, and will continue to access the @dfn{Stream}.  However, after the disassociation, subsequent
+operations on path access the underlying file rather than the named @dfn{Stream}.
 
 If only one end of the pipe is named, the last close of the other end will cause the named end to be
 automatically detached.  If the named @dfn{Stream} is a device and not a pipe, the last close will
 not cause the @dfn{Stream} to be detached.
 
 If there is no named @dfn{Stream} or the user does not have access permissions on path or on the
-named @dfn{Stream}, fdetach() returns -1 with errno set to @errno{EINVAL}.  Otherwise, fdetach()
-returns 0 for success.
+named @dfn{Stream}, @manpage{fdetach(3)} returns -1 with errno set to @errno{EINVAL}.  Otherwise,
+@manpage{fdetach(3)} returns 0 for success.
 
 A @dfn{Stream} will remain attached with or without an active server process.  If a server aborted,
 the only way a named @dfn{Stream} is cleaned up is if the server executed a clean up routine that
@@ -11413,7 +11397,7 @@ cleaned up.  Thus, a forced detach of a pipe end will occur when the server is a
 
 If the both ends of the pipe are named, the pipe remains attached even after all processes have
 exited.  In order for the pipe to become detached, a server process would have to explicitly invoke
-a program that executed the fdetach() routine.
+a program that executed the @manpage{fdetach(3)} routine.
 
 To eliminate the need for the server process to invoke the program, the fdetach(1M) command can be
 used.  This command accepts a path name that is a path to a named @dfn{Stream}.  When the command is
@@ -11425,15 +11409,16 @@ the appropriate permissions.
 
 @subsection isastream
 
-The function isastream() [see also isastream(3C)] may be used to determine if a file descriptor is
-associated with a @dfn{STREAMS} device.  Its format is:
+The function @manpage{isastream(3)} [see also @manref{isastream(3)}] may be used to determine if a
+file descriptor is associated with a @dfn{STREAMS} device.  Its format is:
 
 @smallexample
 int isastream (int fildes)
 @end smallexample
 
-where fildes refers to an open file.  isastream() returns 1 if fildes represents a @dfn{STREAMS}
-file, and 0 if not.  On failure, isastream() returns -1 with errno set to @errno{EBADF}.
+where fildes refers to an open file.  @manpage{isastream(3)} returns 1 if fildes represents a
+@dfn{STREAMS} file, and 0 if not.  On failure, @manpage{isastream(3)} returns -1 with errno set to
+@errno{EBADF}.
 
 This function is useful for client processes communicating with a server process over a named Stream
 to check whether the file has been overlaid by a @dfn{Stream} before sending any data over the file.
@@ -11483,15 +11468,15 @@ With named pipes, client processes may communicate with a server process via a m
 that enables a client process to gain a unique, non-multiplexed connection to a server.  The connld
 module can be pushed onto the named end of the pipe.  If connld is pushed on the named end of the
 pipe and that end is opened by a client, a new pipe will be created.  One file descriptor for the
-new pipe is passed back to a client (named @dfn{Stream}) as the file descriptor from the open(2)
-system call and the other file descriptor is passed to the server.  The server and the client may
-now communicate through a new pipe.
+new pipe is passed back to a client (named @dfn{Stream}) as the file descriptor from the
+@manpage{open(2)} system call and the other file descriptor is passed to the server.  The server and
+the client may now communicate through a new pipe.
 
 @figuresized{SPG_fig41,41,Server Sets Up a Pipe,4in}
 
 @figref{41} illustrates a server process that has created a pipe and
-pushed the connld module on the other end.  The server then invokes the fattach() routine to name
-the other end /usr/toserv.
+pushed the connld module on the other end.  The server then invokes the @manpage{fattach(3)} routine
+to name the other end @file{/usr/toserv}.
 
 @figuresized{SPG_fig42,42,Processes X and Y Open /usr/toserv,4in}
 
@@ -11574,16 +11559,16 @@ The initial setup of the @dfn{STREAMS}-based terminal subsystem is handled with 
 command within the framework of the Service Access Facility or the autopush feature.  The autopush
 facility is discussed in @ref{STREAMS Configuration}.
 
-The @dfn{STREAMS}-based terminal subsystem supports termio(7), the termios(2) specification of the
+The @dfn{STREAMS}-based terminal subsystem supports @manpage{termio(7)}, the @manpage{termios(2)} specification of the
 POSIX standard, multiple byte characters for internationalization, the interface to asynchronous
-hardware flow control [see termiox(7)], and peripheral controllers for asynchronous terminals.
+hardware flow control [see @manref{termiox(7)}], and peripheral controllers for asynchronous terminals.
 XENIX@registeredsymbol{} and @cite{BSD} compatibility can also be provided by pushing the ttcompat
 module.  UNIX@registeredsymbol{} and @cite{BSD} compatibility can also be provided by pushing the
 ttcompat module.
 
 @subsection Line Discipline Module
 
-A @dfn{STREAMS} line discipline module called ldterm [see ldterm(7)] is a key part of the
+A @dfn{STREAMS} line discipline module called ldterm [see @manref{ldterm(7)}] is a key part of the
 @dfn{STREAMS}-based terminal subsystem.  Throughout this chapter, the terms line discipline and
 ldterm are used interchangeably and refer to the @dfn{STREAMS} version of the standard line
 discipline and not the traditional character version.  ldterm performs the standard terminal I/O
@@ -11615,7 +11600,7 @@ flags.  The default settings are:
 @end table
 
 In canonical mode (@constant{ICANON} flag in c_lflag is turned on), read from the terminal file
-descriptor is in message non-discard (@constant{RMSGN}) mode [see streamio(7)].  This implies that
+descriptor is in message non-discard (@constant{RMSGN}) mode [@manref{see streamio(7)}].  This implies that
 in canonical mode, read on the terminal file descriptor always returns at most one line regardless
 how many characters have been requested.  In non-canonical mode, read is in byte-stream
 (@constant{RNORM}) mode.
@@ -11695,7 +11680,7 @@ and low water marks for the read queue are 512 and 200 respectively.
 
 ldterm can send the following messages upstream:
 
-ldterm(7) messages
+@manref{ldterm(7)} messages
 
 @msg{M_DATA}, @msg{M_BREAK}, @msg{M_PCSIG}, @msg{M_SIG}, @msg{M_FLUSH}, @msg{M_ERROR},
 @msg{M_IOCACK},
@@ -11711,7 +11696,7 @@ generating characters, and after (possible) transformation of the message, queue
 the @command{service} procedure.  Echoing is handled completely by the @command{service} procedure.
 
 In canonical mode if the @constant{ICANON} flag is on in c_lflag, canonical processing is performed.
-If the @constant{ICANON} flag is off, non-canonical processing is performed [see termio(7) for more
+If the @constant{ICANON} flag is off, non-canonical processing is performed [see @manref{termio(7)}, for more
 details].  Handling of @constant{VMIN}/@constant{VTIME} in the @dfn{STREAMS} environment is somewhat
 complicated, because read needs to activate a timer in the ldterm module in some cases; hence, read
 notification becomes necessary.  When a user issues an @command{ioctl} to @command{put} ldterm in
@@ -11750,7 +11735,7 @@ The ldterm module supports the following ioctls:
 @termio{TIOCSWINSZ}, @termio{TIOCGWINSZ}, and @termio{JWINSIZE}.
 
 All ioctls not recognized by the ldterm module are passed downstream to the neighboring module or
-driver.  @cite{BSD} functionality is turned off by @constant{IEXTEN} [see termio(7) for more details].
+driver.  @cite{BSD} functionality is turned off by @constant{IEXTEN} [see @manref{termio(7)}, for more details].
 
 The following messages can be received on the write-side:
 
@@ -11767,7 +11752,7 @@ An @msg{M_CTL} message is generated by ldterm as a query to the driver for an in
 and to decide on the functional split for termio processing.  If all or part of termio processing is
 done by the intelligent peripheral, ldterm can turn off this processing to avoid computational
 overhead.  This is done by sending an appropriate response to the @msg{M_CTL} message, as follows:
-[see also ldterm(7)].
+[see also @manref{ldterm(7)}].
 
 @itemize @bullet
 
@@ -11930,13 +11915,13 @@ those interested in internationalization applications in UXP/V.  More detailed d
 obtained from product-related documents, for example, UXP/V Programmer's Guide:
 Internationalization.
 
-UXP/V includes the extended general terminal interface [see termiox(7)] that supplements the
-termio(7) general terminal interface by adding for asynchronous hardware flow control, isochronous
+UXP/V includes the extended general terminal interface [see @manref{termiox(7)}] that supplements the
+@manpage{termio(7)} general terminal interface by adding for asynchronous hardware flow control, isochronous
 flow control and clock modes, and local implementations of additional asynchronous features.
-termiox(7) is handled by hardware drivers if the board (e.g., EPORTS) supports it.
+@manpage{termiox(7)} is handled by hardware drivers if the board (e.g., EPORTS) supports it.
 
-Hardware flow control supplements the termio(7) @constant{IXON}, @constant{IXOFF}, and
-@constant{IXANY} character flow control.  The termiox(7) interface allows for both unidirectional
+Hardware flow control supplements the @manpage{termio(7)} @constant{IXON}, @constant{IXOFF}, and
+@constant{IXANY} character flow control.  The @manpage{termiox(7)} interface allows for both unidirectional
 and bidirectional hardware flow control.  Isochronous communication is a variation of asynchronous
 communication where two communicating devices provide transmit and/or receive clock to each other.
 Incoming clock signals can be taken from the baud rate generator on the local isochronous port
@@ -12028,7 +12013,7 @@ device is given to the slave as an input and anything written on the slave devic
 input on the master side.
 
 @figref{44} illustrates the architecture of the @dfn{STREAMS}-based pseudo-terminal subsystem.  The
-master driver called ptm is accessed through the clone driver [see clone(7)] and is the controlling
+master driver called ptm is accessed through the clone driver [see @manref{clone(7)}] and is the controlling
 part of the system.  The slave driver called pts works with the line discipline module and the
 hardware emulation module to provide a terminal interface to the user process.  An optional
 packetizing module called pckt is also provided.  It can be pushed on the master side to support
@@ -12214,7 +12199,7 @@ to it: @msg{M_DATA}, @msg{M_IOCTL}, @msg{M_PROTO}/@msg{M_PCPROTO}, @msg{M_FLUSH}
 @msg{M_START}/@msg{M_STOP}, @msg{M_STARTI}/@msg{M_STOPI}, and @msg{M_READ}.
 
 All other messages are passed through.  The @msg{M_PROTO} message is passed upstream and retrieved
-when the user issues getmsg(2).
+when the user issues @manpage{getmsg(2)}.
 
 @item If the message is an @msg{M_FLUSH} message, pckt does the following: If the flag is
 @constant{FLUSHW}, it is changed to @constant{FLUSHR} (because @constant{FLUSHR} was the original
@@ -12237,11 +12222,11 @@ In order to use the @dfn{pseudo-tty} subsystem, a node for the master side drive
 number of slave drivers (N is determined at installation time) must be installed.  The names of the
 slave devices are /dev/pts/M where M has the values 0 through N-1.  A user accesses a
 @dfn{pseudo-tty} device through the master device (called ptm) that in turn is accessed through the
-clone driver [see clone(7)].  The master device is set up as a clone device where its major device
+clone driver [see @manref{clone(7)}].  The master device is set up as a clone device where its major device
 number is the major for the clone device and its minor device number is the major for the ptm
 driver.
 
-The master pseudo driver is opened via the open(2) system call with /dev/ptmx as the device to be
+The master pseudo driver is opened via the @manref{open(2)} system call with /dev/ptmx as the device to be
 opened.  The clone open finds the next available minor device for that major device; a master device
 is available only if it and its corresponding slave device are not already open.  There are no nodes
 in the file system for master devices.
@@ -12314,12 +12299,12 @@ returns with errno set to @errno{EAGAIN} if no data are available, and write ret
 set to @errno{EAGAIN} if there is internal flow control.
 
 The master driver supports the @termio{ISPTM} and @termio{UNLKPT} ioctls that are used by the
-functions grantpt, unlockpt, and ptsname [see grantpt(3C), unlockpt(3C), ptsname(3C)].  The
-@command{ioctl} @termio{ISPTM} determines whether the file descriptor is that of an open master
-device.  On success, it returns the major/minor number (type dev_t) of the master device which can
-be used to determine the name of the corresponding slave device.  The @command{ioctl}
-@termio{UNLKPT} unlocks the master and slave devices.  It returns 0 on success.  On failure, the
-errno is set to @errno{EINVAL} indicating that the master device is not open.
+functions grantpt, unlockpt, and ptsname [see @manref{grantpt(3)}, @manref{unlockpt(3)},
+@manref{ptsname(3)}].  The @command{ioctl} @termio{ISPTM} determines whether the file descriptor is
+that of an open master device.  On success, it returns the major/minor number (type dev_t) of the
+master device which can be used to determine the name of the corresponding slave device.  The
+@command{ioctl} @termio{UNLKPT} unlocks the master and slave devices.  It returns 0 on success.  On
+failure, the errno is set to @errno{EINVAL} indicating that the master device is not open.
 
 The format of these commands is:
 
@@ -12879,7 +12864,6 @@ is defined.
 
 @node Stream Head Module ("sth")
 @subsection Stream Head Module ("sth")
-@pgindex sth(4)
 @cindex sth, module
 @cindex modules, sth
 @cindex Stream Head, module
@@ -12887,13 +12871,11 @@ is defined.
 
 @node Connect Line Discipline Module ("connld")
 @subsection Connect Line Discipline Module ("connld")
-@pgindex connld(4)
 @cindex connld, module
 @cindex modules, connld
 
 @node Pipe Module ("pipemod")
 @subsection Pipe Module ("pipemod")
-@pgindex pipemod(4)
 @cindex pipemod, module
 @cindex modules, pipemod
 @cindex Pipe Module, module
@@ -12901,7 +12883,6 @@ is defined.
 
 @node STREAMS Configuration Module ("sc")
 @subsection STREAMS Configuration Module ("sc")
-@pgindex sc(4)
 @cindex sc, module
 @cindex modules, sc
 @cindex STREAMS Configuration, module
@@ -12927,7 +12908,6 @@ is defined.
 
 @node Clone Driver ("clone")
 @subsection Clone Driver ("clone")
-@pgindex clone(4)
 @cindex clone, driver
 @cindex drivers, clone
 @cindex Clone, driver
@@ -12935,7 +12915,6 @@ is defined.
 
 @node Echo Driver ("echo")
 @subsection Echo Driver ("echo")
-@pgindex echo(4)
 @cindex echo, driver
 @cindex drivers, echo
 @cindex Echo, driver
@@ -12943,7 +12922,6 @@ is defined.
 
 @node FIFO Driver ("fifo")
 @subsection FIFO Driver ("fifo")
-@pgindex fifo(4)
 @cindex fifo, driver
 @cindex drivers, fifo
 @cindex FIFO, driver
@@ -12951,7 +12929,6 @@ is defined.
 
 @node Log Driver ("log")
 @subsection Log Driver ("log")
-@pgindex log(4)
 @cindex log, driver
 @cindex drivers, log
 @cindex Log, driver
@@ -12959,7 +12936,6 @@ is defined.
 
 @node Named STREAMS Device Driver ("nsdev")
 @subsection Named STREAMS Device Driver ("nsdev")
-@pgindex nsdev(4)
 @cindex nsdev, driver
 @cindex drivers, nsdev
 @cindex Named STREAMS Device, driver
@@ -12967,7 +12943,6 @@ is defined.
 
 @node Null STREAM Driver ("nuls")
 @subsection Null STREAM Driver ("nuls")
-@pgindex nuls(4)
 @cindex nuls, driver
 @cindex drivers, nuls
 @cindex Null STREAM, driver
@@ -12975,7 +12950,6 @@ is defined.
 
 @node Pipe Driver ("pipe")
 @subsection Pipe Driver ("pipe")
-@pgindex pipe(4)
 @cindex pipe, driver
 @cindex drivers, pipe
 @cindex Pipe, driver
@@ -12983,7 +12957,6 @@ is defined.
 
 @node STREAMS Administrative Driver ("sad")
 @subsection STREAMS Administrative Driver ("sad")
-@pgindex sad(4)
 @cindex sad, driver
 @cindex drivers, sad
 @cindex STREAMS Administrative Driver, driver
@@ -14254,7 +14227,6 @@ numbers and makes it harder for boot and configuration scripts to properly creat
 @subsection Traditional Cloning
 
 The @manpage{clone(4)}
-@pgindex clone(4)
 driver supports traditional clone devices.  Traditional clone devices work by
 assigning the clone major device number and a unique minor device number to a ``clone'' device.
 When this device is opened, the minor device number of the device is used as the new major device
@@ -14273,7 +14245,6 @@ still function as normal on the resulting @var{devp}
 argument passed to the ultimate driver's @manpage{qopen(9)}
 procedure.  This is true both for base and extended major device numbers.  The following table
 illustrates the situation (assuming that the major device number assigned to the @manpage{clone(4)}
-@pgindex clone(4)
 device is 72):
 
 @multitable @columnfractions .25 .25 .25 .25
@@ -14288,7 +14259,6 @@ it should use @manpage{makedevice(9)}
 with the major device number obtained with @manpage{getmajor(9)}
 and an extended minor device number assigned by the driver.  In this way, extended minor device
 numbers are transparent to the operation of the @manpage{clone(4)}
-@pgindex clone(4)
 driver and @samp{CLONEOPEN}.
 
 @subsection New Cloning
@@ -14317,22 +14287,16 @@ often easier to use.
 @cindex named streams device
 
 The @manpage{nsdev(4)}
-@pgindex nsdev(4)
 driver provides for a @dfn{Named STREAMS Device}.  This is a device numbering approach unique to
 @dfn{@value{PACKAGE_TITLE}}.  The @manpage{nsdev(4)}
-@pgindex nsdev(4)
 driver operates in a similar manner to the @manpage{clone(4)}
-@pgindex clone(4)
 driver, however, the major number is derived from the prefix name of the device and the minor number
 is taken directly from the minor number of the @manpage{nsdev(4)}
-@pgindex nsdev(4)
 device.
 
 The following table summarizes the approach (assuming that the major device numbers assigned to the
 @manpage{nsdev(4)}
-@pgindex nsdev(4)
 device are 74, 75, 76 and 77 and the major device numbers assigned to the @manpage{inet(4)}
-@pgindex inet(4)
 driver are 32, 35 and 37):
 
 @multitable @columnfractions .2 .2 .2 .2 .2
@@ -14344,13 +14308,10 @@ driver are 32, 35 and 37):
 @end multitable
 
 The @manpage{nsdev(4)}
-@pgindex nsdev(4)
 device also has the characteristic that if a device name with a major device number of the
 @manpage{nsdev(4)}
-@pgindex nsdev(4)
 device is opened and there is no device loaded that corresponds to the prefix name of the device
 from which to obtain a major device number, the @manpage{nsdev(4)}
-@pgindex nsdev(4)
 will attempt to load the `@t{@b{streams-}@i{prefix}}' kernel module using @manpage{request_module(9)}
 and try again: where, @samp{prefix} is the prefix of the device name up to the first point character
 (corresponding to a digit @kbd{.}).  So, in the example above, if the @samp{inet} driver was not
@@ -14363,27 +14324,21 @@ well as device numbering and makes it easier for boot scripts to initialize devi
 @cindex spec file system
 
 Another approach to creation and assignment of device numbers is the mountable @manpage{specfs(5)}
-@pgindex specfs(5)
 file system.  The @manpage{specfs(5)}
-@pgindex specfs(5)
 file system can be mounted to provide an in-kernel device directory similar to the @b{Linux}
 @file{devfs} file system and the @dfn{Solaris} devices file system.  The @manpage{spefs(5)}
-@pgindex specfs(5)
 file system should normally be mounted on the @file{/dev/streams} subdirectory by system
 initialization scripts using a command such as: @command{mount -t specfs none /dev/streams}.  See
 @manpage{mount(8)}
-@pgindex mount(8)
 for more information.  Once mounted over the @file{/dev/streams} subdirectory, subdirectories of
 @file{/dev/streams} corresponding to each loaded driver will appear.  So, for example, when the
 @manpage{inet(4)}
-@pgindex inet(4)
 driver is loaded, the ``inet'' subdirectory will appear at @file{/dev/streams/inet}.  Within each
 device subdirectory @file{/dev/streams/@i{devicename}/}, each instance of the device will appear as
 a character device named with the instance number of the device and having the eternal (real) major
 and external (real) minor device number.
 
 The mounted @manpage{specfs(5)}
-@pgindex specfs(5)
 file system also has the characteristic that if a device subdirectory
 @file{/dev/streams/@i{devname}/} does not exist, but an attempt is made to read such a directory,
 @dfn{@value{PACKAGE_TITLE}} will attempt to load kernel module @file{streams-@i{devname}} into the
@@ -14409,13 +14364,11 @@ the table below:
 
 In fact, it does not matter what the character device major or minor device number is on the node in
 the @manpage{specfs(5)}
-@pgindex specfs(5)
 file system.  This is because the inode in the file system is directly associated with the
 @mantype{streamtab(9)}
 structure and instance number without using the normal @b{Linux} character device mechanisms.  When
 a device instance exceeds the extended minor device numbering space assigned to a device driver in
 the @manpage{specfs(5)}
-@pgindex specfs(5)
 file system, device number displayed by @manpage{stat(2)},
 @manpage{lstat(2)}
 or @manpage{fstat(2)}
@@ -14712,6 +14665,7 @@ are the basic @cite{UNIX System V Release 4.2} callbacks.
 @page
 @node autopush(8)
 @subsection autopush(8)
+@pgindex autopush(8)
 @subsubheading NAME
 @subsubheading SYNOPSIS
 @subsubheading DESCRIPTION
@@ -14964,7 +14918,6 @@ Only one of @samp{-l}, @samp{-q} and @samp{-u} are permitted.
 @dfn{@value{PACKAGE_TITLE}} provides and supports a number of system controls that can be accessed
 using the /proc/sys/streams/* files, with the @manpage{sysctl(2)}
 interface, or using @manpage{sysctl(8)}.
-@pgindex sysctl(8)
 
 The following @dfn{STREAMS} specific system controls are provided by @dfn{@value{PACKAGE_TITLE}}:
 
@@ -15538,8 +15491,7 @@ struct stroptions @{
 #define   SO_NDELOFF   0x0200   /* STREAMS semantics for NDELAY
                                    reads/writes */
 #define   SO_ISTTY     0x0400   /* Stream is acting as terminal */
-#define   SO_ISNTTY    0x0800   /* Stream is not acting as a terminal 
-                                 */
+#define   SO_ISNTTY    0x0800   /* Stream is not acting as a terminal */
 #define   SO_TOSTOP    0x1000   /* stop on background writes to
                                    Stream */
 #define   SO_TONSTOP   0x2000   /* don't stop on background jobs to
@@ -15547,8 +15499,7 @@ struct stroptions @{
 #define   SO_BAND      0x4000   /* water marks that affect band */
 #define   SO_DELIM     0x8000   /* messages are delimited */
 #define   SO_NODELIM   0x010000 /* turn off delimiters */
-#define   SO_STRHOLD   0x020000 /* enable strwrite message coalescing 
-                                 */
+#define   SO_STRHOLD   0x020000 /* enable strwrite message coalescing */
 @end smallexample
 
 @node STREAMS Message Types
@@ -15600,7 +15551,7 @@ cannot be generated by a user-level process and is always discarded if passed to
 head}.
 
 @item M_DATA
-Intended to contain ordinary data.  Messages allocated by the allocb() routine (see @dfn{STREAMS}
+Intended to contain ordinary data.  Messages allocated by the @manpage{allocb(9)} routine (see @dfn{STREAMS}
 Utilities) are type @msg{M_DATA} by default.  @msg{M_DATA} messages are generally sent
 bidirectionally on a @dfn{Stream} and their contents can be passed between a process and the
 @dfn{Stream head}.  In the @manpage{getmsg(2)} and @manpage{putmsg(2)} system calls, the contents of
@@ -15856,13 +15807,18 @@ in the @code{qband} structure) on the @dfn{Stream head} read queue to the value 
 
 @item SO_MREADON
 Enable the @dfn{Stream head} to generate @msg{M_READ} messages when processing a @manpage{read(2)}
-system call.  If both @stropt{SO_MREADON} and @stropt{SO_MREADOFF} are set in @var{so_flags},
-@stropt{SO_MREADOFF} will have precedence.
+system call.  The message contains the number of bytes the reader is expecting as a @type{long}
+value stored in four data bytes.
+
+If both @stropt{SO_MREADON} and @stropt{SO_MREADOFF} are set in @var{so_flags}, @stropt{SO_MREADOFF}
+will have precedence.
 
 @item SO_MREADOFF
 Disable the @dfn{Stream head} generation of @msg{M_READ} messages when processing a
-@manpage{read(2)} system call.  This is the default.  If both @stropt{SO_MREADON} and @stropt{SO_MREADOFF}
-are set in @var{so_flags}, @stropt{SO_MREADOFF} will have precedence.
+@manpage{read(2)} system call and there is no data to be read.
+
+This is the default.  If both @stropt{SO_MREADON} and @stropt{SO_MREADOFF} are set in
+@var{so_flags}, @stropt{SO_MREADOFF} will have precedence.
 
 @item SO_NDELON
 Set non-@dfn{STREAMS} @dfn{tty} semantics for @constant{O_NDELAY} (or @constant{O_NONBLOCK}) processing on
@@ -15881,38 +15837,27 @@ use the @constant{O_NONBLOCK} flag whose behavior is the same as that of @consta
 noted.
 
 @item SO_NDELOFF
-Set @dfn{STREAMS} semantics for @constant{O_NDELAY} (or @constant{O_NONBLOCK}) processing on read(2) and write(2)
-system calls.  If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set, a read(2) will return -1 and set
-@errno{EAGAIN} in
-errno if no data are waiting to be read at the @dfn{Stream head}.  If @constant{O_NDELAY} (or
-@constant{O_NONBLOCK}) is
-clear, a read(2) will block until data become available at the @dfn{Stream head}.  (See note above)
+Set @dfn{STREAMS} semantics for @constant{O_NDELAY} (or @constant{O_NONBLOCK}) processing on
+@manpage{read(2)} and @manpage{write(2)} system calls.  If @constant{O_NDELAY} (or
+@constant{O_NONBLOCK}) is set, a @manpage{read(2)} will return -1 and set @errno{EAGAIN} in errno if
+no data are waiting to be read at the @dfn{Stream head}.  If @constant{O_NDELAY} (or
+@constant{O_NONBLOCK}) is clear, a @manpage{read(2)} will block until data become available at the
+@dfn{Stream head}.  (See note above)
 
-If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set, a write(2) will return -1 and set
-@errno{EAGAIN} in errno if flow
-control is in effect when the call is received.  It will block if buffers are not available.  If
-@constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set and part of the buffer has been written and a flow control or
-buffers not available condition is encountered, write(2) will terminate and return the number of
-bytes written.
+If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set, a @manpage{write(2)} will return -1 and
+set @errno{EAGAIN} in errno if flow control is in effect when the call is received.  It will block
+if buffers are not available.  If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set and part of
+the buffer has been written and a flow control or buffers not available condition is encountered,
+@manpage{write(2)} will terminate and return the number of bytes written.
 
-If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is clear, a write(2) will block on flow control and will block if
-buffers are not available.  This is the default.  If both @stropt{SO_NDELON} and @stropt{SO_NDELOFF} are set in
-so_flags, @stropt{SO_NDELOFF} will have precedence.
+If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is clear, a @manpage{write(2)} will block on flow
+control and will block if buffers are not available.  This is the default.  If both
+@stropt{SO_NDELON} and @stropt{SO_NDELOFF} are set in so_flags, @stropt{SO_NDELOFF} will have
+precedence.
 
-In the @dfn{STREAMS}-based pipe mechanism, the behavior of read(2) and write(2) is different for the
-@constant{O_NDELAY} and @constant{O_NONBLOCK} flags.  See read(2) and write(2) for details.
-
-@item SO_BAND
-Set water marks in a band.  If the @stropt{SO_BAND} flag is set with the @stropt{SO_HIWAT} or
-@stropt{SO_LOWAT} flag, the
-so_band field contains the priority band number the so_hiwat and so_lowat fields pertain to.
-
-If the @stropt{SO_BAND} flag is not set and the @stropt{SO_HIWAT} and @stropt{SO_LOWAT} flags are on, the normal high
-and low water marks are affected.  The @stropt{SO_BAND} flag has no effect if @stropt{SO_HIWAT} and
-@stropt{SO_LOWAT}
-flags are off.
-
-Only one band's water marks can be updated with a single @msg{M_SETOPTS} message.
+In the @dfn{STREAMS}-based pipe mechanism, the behavior of @manpage{read(2)} and @manpage{write(2)}
+is different for the @constant{O_NDELAY} and @constant{O_NONBLOCK} flags.  See @manpage{read(2)} and
+@manpage{write(2)} for details.
 
 @item SO_ISTTY
 Inform the @dfn{Stream head} that the @dfn{Stream} is acting like a controlling terminal.
@@ -15932,6 +15877,44 @@ Stop on background writes to the @dfn{Stream}.
 Do not stop on background writes to the @dfn{Stream}.  @stropt{SO_TOSTOP} and @stropt{SO_TONSTOP} are used in
 conjunction with job control.
 
+@item SO_BAND
+Set water marks in a band.  If the @stropt{SO_BAND} flag is set with the @stropt{SO_HIWAT} or
+@stropt{SO_LOWAT} flag, the
+so_band field contains the priority band number the so_hiwat and so_lowat fields pertain to.
+
+If the @stropt{SO_BAND} flag is not set and the @stropt{SO_HIWAT} and @stropt{SO_LOWAT} flags are
+on, the normal high and low water marks are affected.  The @stropt{SO_BAND} flag has no effect if
+@stropt{SO_HIWAT} and @stropt{SO_LOWAT} flags are off.
+
+Only one band's water marks can be updated with a single @msg{M_SETOPTS} message.
+
+@item SO_DELIM
+Messages are delimited.@footnote{Although the @constant{SO_DELIM} flag occurs in the @cite{SVR 4
+STREAMS Programmer's Guide}, there is no description for the flag.}
+
+@item SO_NODELIM
+Turn off message delimiters.@footnote{Although the @constant{SO_NODELIM} flag occurs in the
+@cite{SVR 4 STREAMS Programmer's Guide}, there is no description for the flag.}
+
+@item SO_STRHOLD
+Enable @command{strwrite()} message coalescing.@footnote{Although the @constant{SO_STRHOLD} flag
+occurs in the @cite{SVR 4 STREAMS Programmer's Guide}, there is no description for the flag.}
+
+@item SO_ERROPT
+@cite{Solaris@registeredsymbol{}} specific.
+
+@item SO_LOOP
+@cite{UnixWare@registeredsymbol{}} specific.  Indicates to the @dfn{Stream head} that this is a
+looparound @dfn{Stream} (i.e. it supports passing of file descriptors).
+
+@item SO_COPYOPT
+@cite{Solaris@registeredsymbol{}} specific.
+User input-output copy options.
+
+@item SO_MAXBLK
+@cite{Solaris@registeredsymbol{}} specific.
+Maximum block size.
+
 @end table
 
 @item M_SIG
@@ -15942,11 +15925,11 @@ reaches the front of the @dfn{Stream head} read queue.) The associated signal wi
 under the following conditions:
 
 If the signal is @signal{SIGPOLL}, it will be sent only to those processes that have explicitly
-registered to receive the signal [see @streamio{I_SETSIG} in streamio(7)].
+registered to receive the signal [see @streamio{I_SETSIG} in @manref{streamio(7)}].
 
 If the signal is not @signal{SIGPOLL} and the @dfn{Stream} containing the sending module or driver is a
 controlling @dfn{tty}, the signal is sent to the associated process group.  A @dfn{Stream} becomes the
-controlling @dfn{tty} for its process group if, on open(2), a module or driver sends an @msg{M_SETOPTS}
+controlling @dfn{tty} for its process group if, on @manpage{open(2)}, a module or driver sends an @msg{M_SETOPTS}
 message to the @dfn{Stream head} with the @stropt{SO_ISTTY} flag set.
 
 If the signal is not @signal{SIGPOLL} and the @dfn{Stream} is not a controlling @dfn{tty}, no signal is sent,
@@ -15962,7 +15945,7 @@ except in case of @sockio{SIOCSPGRP} and @termio{TIOCSPGRP}.  These two ioctls s
 
 @item M_COPYIN
 Generated by a module or driver and sent upstream to request that the @dfn{Stream head} perform a
-copyin() on behalf of the module or driver.  It is valid only after receiving an @msg{M_IOCTL} message and
+@manpage{copyin(9)} on behalf of the module or driver.  It is valid only after receiving an @msg{M_IOCTL} message and
 before an @msg{M_IOCACK} or @msg{M_IOCNAK}.
 
 The message format is one @msg{M_COPYIN} message block containing a copyreq structure, defined in
@@ -15998,7 +15981,7 @@ the @command{ioctl}.
 
 @item M_COPYOUT
 Generated by a module or driver and sent upstream to request that the @dfn{Stream head} perform a
-copyout() on behalf of the module or driver.  It is valid only after receiving an @msg{M_IOCTL} message
+@manpage{copyout(9)} on behalf of the module or driver.  It is valid only after receiving an @msg{M_IOCTL} message
 and before an @msg{M_IOCACK} or @msg{M_IOCNAK}.
 
 The message format is one @msg{M_COPYOUT} message block followed by one or more @msg{M_DATA} blocks.  The
@@ -16013,10 +15996,11 @@ the @command{ioctl} in some way.
 
 @item M_ERROR
 Sent upstream by modules or drivers to report some downstream error condition.  When the message
-reaches the @dfn{Stream head}, the @dfn{Stream} is marked so that all subsequent system calls issued to the
-@dfn{Stream}, excluding close(2) and poll(2), will fail with errno set to the first data byte of the
-message.  @constant{POLLERR} is set if the @dfn{Stream} is being polled [see poll(2)].  All processes sleeping on
-a system call to the @dfn{Stream} are awakened.  An @msg{M_FLUSH} message with @constant{FLUSHRW} is sent downstream.
+reaches the @dfn{Stream head}, the @dfn{Stream} is marked so that all subsequent system calls issued
+to the @dfn{Stream}, excluding @manpage{close(2)} and @manpage{poll(2)}, will fail with errno set to
+the first data byte of the message.  @constant{POLLERR} is set if the @dfn{Stream} is being polled
+[see @manref{poll(2)}].  All processes sleeping on a system call to the @dfn{Stream} are awakened.
+An @msg{M_FLUSH} message with @constant{FLUSHRW} is sent downstream.
 
 The @dfn{Stream head} maintains two error fields, one for the read-side and one for the
 write-side.  The one-byte format @msg{M_ERROR} message sets both of these fields to the error
@@ -16071,16 +16055,17 @@ flush.
 @item M_HANGUP
 Sent upstream by a driver to report that it can no longer send data upstream.  As example, this
 might be due to an error, or to a remote line connection being dropped.  When the message
-reaches the @dfn{Stream head}, the @dfn{Stream} is marked so that all subsequent write(2) and putmsg(2)
+reaches the @dfn{Stream head}, the @dfn{Stream} is marked so that all subsequent @manpage{write(2)}
+and @manpage{putmsg(2)}
 system calls issued to the @dfn{Stream} will fail and return an @errno{ENXIO} error.  Those ioctls that cause
 messages to be sent downstream are also failed.  @constant{POLLHUP} is set if the @dfn{Stream} is being polled [see
-poll(2)].
+@manpage{poll(2)}].
 
-However, subsequent read(2) or getmsg(2) calls to the @dfn{Stream} will not generate an error.
-These calls will return any messages (according to their function) that were on, or in
-transit to, the @dfn{Stream head} read queue before the @msg{M_HANGUP} message was received.  When all
-such messages have been read, read(2) will return 0 and getmsg(2) will set each of its two length
-fields to 0.
+However, subsequent @manpage{read(2)} or @manpage{getmsg(2)} calls to the @dfn{Stream} will not
+generate an error.  These calls will return any messages (according to their function) that were on,
+or in transit to, the @dfn{Stream head} read queue before the @msg{M_HANGUP} message was received.
+When all such messages have been read, @manpage{read(2)} will return 0 and @manpage{getmsg(2)} will
+set each of its two length fields to 0.
 
 This message also causes a @signal{SIGHUP} signal to be sent to the controlling process instead of
 the foreground process group, since the allocation and deallocation of controlling terminals to a
@@ -16092,7 +16077,7 @@ Signals the positive acknowledgement of a previous @msg{M_IOCTL} message.  The m
 blocks.  The iocblk data structure may contain a value in ioc_rval to be returned to the user
 process.  It may also contain a value in ioc_error to be returned to the user process in errno.
 
-If this message is responding to an @streamio{I_STR} ioctl [see streamio(7)], it may contain data
+If this message is responding to an @streamio{I_STR} ioctl [see @manref{streamio(7)}], it may contain data
 from the receiving module or driver to be sent to the user process.  In this case, message format
 is one @msg{M_IOCACK} block followed by one or more @msg{M_DATA} blocks containing the user data.  The
 @dfn{Stream head} returns the data to the user if there is a corresponding outstanding
@@ -16168,7 +16153,7 @@ discarded and its message blocks freed.
 This message is intended to allow data and control information to be sent outside the normal flow
 control constraints.
 
-The getmsg(2) and putmsg(2) system calls refer to @msg{M_PCPROTO} messages as high priority messages.
+The @manpage{getmsg(2)} and @manpage{putmsg(2)} system calls refer to @msg{M_PCPROTO} messages as high priority messages.
 
 @item M_PCRSE
 Reserved for internal use.  Modules that do not recognize this message must pass it on.  Drivers
@@ -16185,11 +16170,11 @@ the @msg{M_SIG} message becomes queued and the user doesn't get the call until i
 impossible to kill or interrupt a process by hitting a delete key.
 
 @item M_READ
-Generated by the @dfn{Stream head} and sent downstream for a read(2) system call if no messages are
+Generated by the @dfn{Stream head} and sent downstream for a @manpage{read(2)} system call if no messages are
 waiting to be read at the @dfn{Stream head} and if read notification has been enabled.  Read
 notification is enabled with the @stropt{SO_MREADON} flag of the @msg{M_SETOPTS} message and disabled by
 use of the @stropt{SO_MREADOFF} flag.  The message content is set to the value of the nbyte parameter (the
-number of bytes to be read) in the read(2) call.
+number of bytes to be read) in the @manpage{read(2)} call.
 
 @msg{M_READ} is intended to notify modules and drivers of the occurrence of a read.  It is
 also intended to support communication between Streams that reside in separate
@@ -18149,12 +18134,12 @@ are:
 Maximum number (should be at least 8) of modules that may be pushed onto a single Stream.
 @item STRMSGSZ
 Maximum number of bytes of information that a single system call can pass to a Stream to be placed
-into the data part of a message (in M_DATA blocks). Any write(2) exceeding this size will be broken
-into multiple messages. A putmsg(2) with a data part exceeding this size will fail with ERANGE.  If
+into the data part of a message (in M_DATA blocks). Any @manpage{write(2)} exceeding this size will be broken
+into multiple messages. A @manpage{putmsg(2)} with a data part exceeding this size will fail with ERANGE.  If
 STRMSGSZ is set to 0, then the number of bytes passed to a Stream is effectively infinitive.
 @item STRCTLSZ
 Maximum number of bytes of information that a single system call can pass to a Stream to be placed
-into the control part of a message (in an M_PROTO or M_PCPROTO block). A putmsg(2) with a control
+into the control part of a message (in an M_PROTO or M_PCPROTO block). A @manpage{putmsg(2)} with a control
 part exceeding this size will fail with ERANGE.
 @end table
 
@@ -18164,7 +18149,7 @@ The Autopush facility [see autopush(1M)] is a general mechanism that configures 
 for a @dfn{STREAMS} device. It automatically pushes a pre-specified list of modules onto the Stream
 when the @dfn{STREAMS} device is opened and the device is not already open.
 
-The @dfn{STREAMS} Administrative Driver (SAD) [see sad(7)] provides an interface to the autopush
+The @dfn{STREAMS} Administrative Driver (SAD) [see @manref{sad(7)}] provides an interface to the autopush
 mechanism. System administrators can open the SAD driver and set or get autopush information on
 other drivers.  The SAD driver caches the list of modules to push for each driver.  When the driver
 is opened, if not already open, the Stream head checks the SAD's cache to see if the device opened
@@ -18191,7 +18176,7 @@ open the SAD driver, read a configuration file to find out what modules are need
 for which devices, format the information into strapush structures, and perform the necessary
 SAD_SAP ioctls.
 
-All autopush operations are performed through an ioctl(2) command to set or get autopush
+All autopush operations are performed through an @manpage{ioctl(2)} command to set or get autopush
 information. Only the superuser may set autopush information, but any user may get the autopush
 information for a device.
 
@@ -19412,7 +19397,7 @@ Additional eligible allocators are:
 @appendixsubsec Disabling and Enabling Queue Procedures
 
 Portable @cite{STREAMS} modules and drivers will always call @manpage{qprocson(9)} before returning
-from its queue open procedure (see @manpage{qopen(9))}.
+from its queue open procedure (see @manpage{qopen(9)}.
 
 Portable @cite{STREAMS} modules and drivers will always call @manpage{qprocsoff(9)} upon entering
 its queue close procedure (see @manpage{qclose(9)}).
@@ -19481,7 +19466,7 @@ numbers (the external major device number) but they all mapped to the same devic
 the device switch tables (the internal device number).  Even under this scheme, each major device
 could only support 256 minor devices, but the driver could support many more.  This has been
 recognized in @cite{UNIX System V Release 4}, and functions are provided to do this mapping; for
-example, the function @command{etoimajor}() and so on, give a machine independent interface to the
+example, the function @manref{etoimajor(9)} and so on, give a machine independent interface to the
 device number mapping.@footnote{@cite{The Magic Garden Explained}}
 @end quotation
 

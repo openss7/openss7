@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/08 05:52:40 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/18 07:35:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
+ Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/08 05:52:40 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/18 07:35:54 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/08 05:52:40 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/18 07:35:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -922,7 +922,7 @@ get_streams_msgb_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", b_band");
 	len += snprintf(page + len, maxlen - len, ", b_flag");
 	len += snprintf(page + len, maxlen - len, ", b_queue");
-	len += snprintf(page + len, maxlen - len, ", b_bandp");
+	// len += snprintf(page + len, maxlen - len, ", b_bandp");
 	len += snprintf(page + len, maxlen - len, ", b_size");
 	return (len);
 }
@@ -943,7 +943,7 @@ get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
 	len += snprintf(page + len, maxlen - len, ", %hhu", b->b_band);
 	len += snprintf(page + len, maxlen - len, ", %hu", b->b_flag);
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_queue);
-	len += snprintf(page + len, maxlen - len, ", %p", b->b_bandp);
+	// len += snprintf(page + len, maxlen - len, ", %p", b->b_bandp);
 	len += snprintf(page + len, maxlen - len, ", %d", b->b_size);
       done:
 	return (len);
@@ -1327,8 +1327,8 @@ get_streams_qband_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", qb_hiwat");
 	len += snprintf(page + len, maxlen - len, ", qb_lowat");
 	len += snprintf(page + len, maxlen - len, ", qb_msgs");
-	len += snprintf(page + len, maxlen - len, ", qb_prev");
-	len += snprintf(page + len, maxlen - len, ", qb_band");
+	// len += snprintf(page + len, maxlen - len, ", qb_prev");
+	// len += snprintf(page + len, maxlen - len, ", qb_band");
 	return (len);
 }
 static int
@@ -1345,9 +1345,9 @@ get_streams_qband(char *page, ssize_t maxlen, struct qband *qb)
 	len += snprintf(page + len, maxlen - len, ", %p", qb->qb_last);
 	len += snprintf(page + len, maxlen - len, ", %d", qb->qb_hiwat);
 	len += snprintf(page + len, maxlen - len, ", %d", qb->qb_lowat);
-	len += snprintf(page + len, maxlen - len, ", %d", qb->qb_msgs);
-	len += snprintf(page + len, maxlen - len, ", %p", qb->qb_prev);
-	len += snprintf(page + len, maxlen - len, ", %hhu", qb->qb_band);
+	len += snprintf(page + len, maxlen - len, ", %ld", qb->qb_msgs);
+	// len += snprintf(page + len, maxlen - len, ", %p", qb->qb_prev);
+	// len += snprintf(page + len, maxlen - len, ", %hhu", qb->qb_band);
       done:
 	return (len);
 }

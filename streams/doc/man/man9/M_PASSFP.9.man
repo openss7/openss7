@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PASSFP.9.man,v 0.9.2.1 2005/04/28 11:36:34 brian Exp $
+.\" @(#) $Id: M_PASSFP.9.man,v 0.9.2.2 2005/09/18 07:38:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 07:38:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,41 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Used by
+.I STREAMS
+to pass a file pointer from the
+.I Stream head
+at one end of a
+.I Stream
+pipe to the
+.I Stream head
+at the other end of the same
+.I Stream
+pipe.  The message is generated as a result of an
+.BR I_SENDFD (7)
+.BR ioctl (2)
+[see
+.BR streamio (7)]
+issued by a process to the sending
+.IR "Stream head" .
+.I STREAMS
+places the
+.B M_PASSFP
+message directly on the destination
+.IR "Stream head" 's
+read queue to be retreived by an
+.BR I_RECVFD (7)
+.BR ioctl (2)
+[see
+.BR streamio (7)].
+The message is placed without passing it through the
+.I Stream
+(i.e., it is not seen by any modules or drivers in the
+.IR Stream ).
+This message should never be present on any queue except the read queue of a
+.IR "Stream head" .
+Consequently, modules and drivers do not need to recognize this message, and it can be ignored by
+module and driver developers.
 .\"
 .\"
 .SH "SEE ALSO"

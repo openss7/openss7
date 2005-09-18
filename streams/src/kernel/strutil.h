@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/09/08 05:52:40 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/18 07:35:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
+ Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
 
+#include <stdbool.h>
+
 /* global synchq */
 extern struct syncq *global_syncq;
 
-extern int __rmvq(queue_t *q, mblk_t *mp);
-extern int __flushq(queue_t *q, int flag, mblk_t ***mppp);
+extern bool __rmvq(queue_t *q, mblk_t *mp);
+extern bool __flushq(queue_t *q, int flag, mblk_t ***mppp);
 
 /* queue band gets and puts */
 extern qband_t *STREAMS_FASTCALL(bget(qband_t *qb));

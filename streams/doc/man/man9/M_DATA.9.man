@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_DATA.9.man,v 0.9.2.1 2005/04/28 11:36:33 brian Exp $
+.\" @(#) $Id: M_DATA.9.man,v 0.9.2.2 2005/09/18 07:38:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 07:38:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,10 +90,33 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Intended to contain ordinary data.  Messages allocated by the
+.BR allocb (9)
+utility are type
+.B M_DATA
+by default.
+.B M_DATA
+messages are generally send bidirectionally on a
+.I Stream
+and their contents can be passed between a process and the
+.IR "Stream head" .
+In the
+.BR getmsg (2)
+and
+.BR putmsg (2)
+system calls, the contents of the
+.B M_DATA
+message blocks are referred to as the
+.IR "data part" .
+Messages composed of multiple message blocks will typically have
+.B M_DATA
+as the message type for all message blocks following the first.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR getmsg (2),
+.BR putmsg (2),
 .BR datab (9),
 .BR msgb (9).
 .\"

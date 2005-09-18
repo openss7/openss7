@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_SIG.9.man,v 0.9.2.1 2005/04/28 11:36:35 brian Exp $
+.\" @(#) $Id: M_SIG.9.man,v 0.9.2.2 2005/09/18 07:38:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 07:38:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,58 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Sent upstream by modules or drivers to post a signal to a process.  When the message reaches the
+front of the
+.I Stream head
+read queue, it evaluates the first data byte of the message as a signal number, defined in
+.BR <sys/signal.h> .
+(Note that the signal is not generated until it reaches the front of the
+.I Stream head
+read queue.)  The associated signal will be sent to process(es) under the following conditions:
+.PP
+If the signal is a
+.RB { SIGPOLL },
+it will be sent only to those processes that have explicitly registered to receive the signal [see
+.BR I_SETSIG (7)
+in
+.BR streamio (7)].
+.PP
+If the signal is not
+.RB { SIGPOLL }
+and the
+.I Stream
+containing the sending module or driver is a
+.IR "controlling tty" ,
+the signal is sent to the associated process group.  A
+.I Stream
+becomes the
+.I controlling tty
+for its process group if, on
+.BR open (2),
+a module or driver sends an
+.BR M_SETOPTS (9)
+message to the
+.I Stream head
+with the
+.B SO_ISTTY
+flag set.
+.PP
+If the signal is not
+.RB { SIGPOLL }
+and the
+.I Stream
+is not a
+.IR "controlling tty" ,
+no signal is sent, except in the case of
+.B SIOCSPGRP
+and
+.BR TIOCSPGRP .
+These two ioctls set the process group field in the
+.I Stream head
+so the
+.I Stream
+can generate signal even if it is not a
+.IR "controlling tty" .
 .\"
 .\"
 .SH "SEE ALSO"

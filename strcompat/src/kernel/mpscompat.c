@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/18 07:36:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 22:20:02 $ by $Author: brian $
+ Last Modified $Date: 2005/09/18 07:36:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.19  2005/09/18 07:36:19  brian
+ - M_IOCDATA bug fix
+
  Revision 0.9.2.18  2005/07/29 22:20:02  brian
  - corrections for debug compile
  - some size optimizations
@@ -108,10 +111,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/18 07:36:19 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/18 07:36:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -139,7 +142,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 22:20:02 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/18 07:36:19 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -235,7 +238,8 @@ struct mi_comm {
  *  MI_OPEN_ALLOC
  *  -------------------------------------------------------------------------
  */
-caddr_t mi_open_alloc(size_t size)
+caddr_t
+mi_open_alloc(size_t size)
 {
 	struct mi_comm *mi;
 	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP))) {
@@ -251,7 +255,8 @@ EXPORT_SYMBOL(mi_open_alloc);	/* mps/ddi.h */
  *  MI_OPEN_ALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
-caddr_t mi_open_alloc_sleep(size_t size)
+caddr_t
+mi_open_alloc_sleep(size_t size)
 {
 	struct mi_comm *mi;
 	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP))) {
@@ -270,7 +275,8 @@ EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mps/ddi.h */
  * documentation for mi_open_comm for both AIX and MacOT says that we use a
  * "static pointer" initialized to NULL.
  */
-caddr_t mi_first_ptr(caddr_t *mi_head)
+caddr_t
+mi_first_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
 
@@ -286,7 +292,8 @@ EXPORT_SYMBOL(mi_first_ptr);	/* mps/ddi.h */
  *  primarily because AIX and MacOT don't document it that way.  If you have a
  *  STREAMS driver that can also be pushed as a module, use two separate lists.
  */
-caddr_t mi_first_dev_ptr(caddr_t *mi_head)
+caddr_t
+mi_first_dev_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
 
@@ -300,7 +307,8 @@ EXPORT_SYMBOL(mi_first_dev_ptr);	/* mps/ddi.h */
  *  MI_NEXT_PTR
  *  -------------------------------------------------------------------------
  */
-caddr_t mi_next_ptr(caddr_t ptr)
+caddr_t
+mi_next_ptr(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1)->mi_next : NULL;
 
@@ -316,7 +324,8 @@ EXPORT_SYMBOL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
  *  primarily because AIX and MacOT don't document it that way.  If you have a
  *  STREAMS driver that can also be pushed as a module, use two separate lists.
  */
-caddr_t mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
+caddr_t
+mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
 
@@ -331,7 +340,8 @@ EXPORT_SYMBOL(mi_next_dev_ptr);	/* mps/ddi.h */
  *  -------------------------------------------------------------------------
  *  Linux Fast-STREAMS embellishment.
  */
-caddr_t mi_prev_ptr(caddr_t ptr)
+caddr_t
+mi_prev_ptr(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
 
@@ -348,7 +358,8 @@ static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
  *  MI_OPEN_LINK
  *  -------------------------------------------------------------------------
  */
-int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
+int
+mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1, **mip = (struct mi_comm **) mi_head;
 	major_t cmajor = devp ? getmajor(*devp) : 0;
@@ -439,7 +450,8 @@ EXPORT_SYMBOL(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
  *  MI_CLOSE_UNLINK
  *  -------------------------------------------------------------------------
  */
-void mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
+void
+mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 {
 	if (ptr) {
 		struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
@@ -462,7 +474,8 @@ EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
  *  MI_CLOSE_FREE
  *  -------------------------------------------------------------------------
  */
-void mi_close_free(caddr_t ptr)
+void
+mi_close_free(caddr_t ptr)
 {
 	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
 
@@ -521,7 +534,8 @@ EXPORT_SYMBOL(mi_bufcall);
  *  =========================================================================
  */
 
-mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
+mblk_t *
+mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 {
 	if (unlikely(mp == NULL || (size > FASTBUF && mp->b_datap->db_lim - mp->b_rptr < size)
 		     || mp->b_datap->db_ref > 1 || mp->b_datap->db_frtnp != NULL)) {
@@ -536,7 +550,8 @@ mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 
 EXPORT_SYMBOL(mi_reuse_proto);
 
-mblk_t *mi_reallocb(mblk_t *mp, size_t size)
+mblk_t *
+mi_reallocb(mblk_t *mp, size_t size)
 {
 	if (unlikely(mp == NULL ||
 		     (size > FASTBUF && mp->b_datap->db_lim - mp->b_datap->db_base < size) ||
@@ -587,7 +602,8 @@ EXPORT_SYMBOL(mi_reallocb);
  *  MI_COPY_DONE
  *  -------------------------------------------------------------------------
  */
-void mi_copy_done(queue_t *q, mblk_t *mp, int err)
+void
+mi_copy_done(queue_t *q, mblk_t *mp, int err)
 {
 	union ioctypes *ioc;
 
@@ -600,13 +616,36 @@ void mi_copy_done(queue_t *q, mblk_t *mp, int err)
 	case M_IOCDATA:
 		if (ioc->copyresp.cp_private)
 			freemsg(xchg(&ioc->copyresp.cp_private, NULL));
+#ifdef LIS
+		/* Almost all versions of LiS have a pretty nasty bug with regard to M_IOCDATA.
+		   According to SVR 4 STREAMS Programmer's Guide and all major UNIX implementations 
+		   of STREAMS, when M_IOCDATA returns an error (cp_rval != NULL), the module or
+		   driver is supposed to clean up and abort the M_IOCTL.  The Stream head has
+		   already returned an error to the user and does not expect an M_IOCACK or
+		   M_IOCNAK.  LiS makes the error of sleeping again and expecting a negative
+		   acknowledgement, so, for LiS (and not Linux Fast-STREAMS) we return an M_IOCNAK
+		   with what will be the ultimate error code.  Modules and drivers ported to LiS
+		   that don't know about this will hang until timeout or signal (SIGKILL, SIGTERM), 
+		   possibly indefinitely when an M_IOCDATA error is sent.  Even if LiS is fixed,
+		   this code will still work, it will just send an extraneous M_IOCNAK to the
+		   Stream head that will be discarded because no M_IOCTL will be in progress
+		   anymore.  */
 		break;
+#else
+		if (ioc->copyresp.cp_rval == (caddr_t) 0)
+			break;
+		/* SVR 4 SPG says don't return ACK/NAK on M_IOCDATA error */
+		freemsg(mp);
+		return;
+#endif
 	case M_IOCTL:
 		break;
 	default:
 		swerr();
+		goto abort;
+	      abort:
 		freemsg(mp);
-		break;
+		return;
 	}
 	mp->b_datap->db_type = err ? M_IOCNAK : M_IOCACK;
 	ioc->iocblk.ioc_error = (err < 0) ? -err : err;
@@ -620,7 +659,8 @@ EXPORT_SYMBOL(mi_copy_done);	/* mps/ddi.h */
  *  MI_COPYIN
  *  -------------------------------------------------------------------------
  */
-void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
+void
+mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
@@ -689,7 +729,8 @@ EXPORT_SYMBOL(mi_copyin);	/* mps/ddi.h */
  *  MI_COPYIN_N
  *  -------------------------------------------------------------------------
  */
-void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
+void
+mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
@@ -723,7 +764,8 @@ EXPORT_SYMBOL(mi_copyin_n);	/* mps/ddi.h */
  *  MI_COPYOUT_ALLOC
  *  -------------------------------------------------------------------------
  */
-mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error)
+mblk_t *
+mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
@@ -773,7 +815,8 @@ EXPORT_SYMBOL(mi_copyout_alloc);	/* mps/ddi.h */
  *  MI_COPYOUT
  *  -------------------------------------------------------------------------
  */
-void mi_copyout(queue_t *q, mblk_t *mp)
+void
+mi_copyout(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
@@ -781,6 +824,7 @@ void mi_copyout(queue_t *q, mblk_t *mp)
 
 	if (mp->b_datap->db_type != M_IOCDATA || !mp->b_cont || !(bp = ioc->copyresp.cp_private))
 		return mi_copy_done(q, mp, EPROTO);
+	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if (ioc->copyresp.cp_rval || !(db = bp->b_cont))
 		return mi_copy_done(q, mp, (int) (intptr_t) ioc->copyresp.cp_rval);
 	bp->b_cont = xchg(&db->b_cont, NULL);
@@ -804,7 +848,8 @@ EXPORT_SYMBOL(mi_copyout);	/* mps/ddi.h */
  *  MI_COPY_STATE
  *  -------------------------------------------------------------------------
  */
-int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
+int
+mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mip;
@@ -814,6 +859,7 @@ int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	if (mp->b_datap->db_type != M_IOCDATA || !(db = mp->b_cont)
 	    || !(bp = ioc->copyresp.cp_private))
 		goto error;
+	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if ((err = (int) (intptr_t) ioc->copyresp.cp_rval))
 		goto error;
 	switch (mp->b_datap->db_type) {
@@ -840,7 +886,8 @@ EXPORT_SYMBOL(mi_copy_state);	/* mps/ddi.h */
  *  MI_COPY_SET_RVAL
  *  -------------------------------------------------------------------------
  */
-void mi_copy_set_rval(mblk_t *mp, int rval)
+void
+mi_copy_set_rval(mblk_t *mp, int rval)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
@@ -875,7 +922,8 @@ typedef struct mi_timeb {
 #undef mi_timer_alloc
 #undef mi_timer
 
-static void mi_timer_expiry(caddr_t data)
+static void
+mi_timer_expiry(caddr_t data)
 {
 	tblk_t *tb = (typeof(tb)) data;
 	toid_t tid;
@@ -895,7 +943,8 @@ static void mi_timer_expiry(caddr_t data)
  *  MI_TIMER_ALLOC (MacOT variety)
  *  -------------------------------------------------------------------------
  */
-mblk_t *mi_timer_alloc_MAC(queue_t *q, size_t size)
+mblk_t *
+mi_timer_alloc_MAC(queue_t *q, size_t size)
 {
 	mblk_t *mp;
 	tblk_t *tb;
@@ -921,7 +970,8 @@ EXPORT_SYMBOL(mi_timer_alloc_MAC);
  *  -------------------------------------------------------------------------
  */
 void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
-void mi_timer_MAC(mblk_t *mp, clock_t msec)
+void
+mi_timer_MAC(mblk_t *mp, clock_t msec)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 
@@ -934,7 +984,8 @@ EXPORT_SYMBOL(mi_timer_MAC);
  *  MI_TIMER_CANCEL (MacOT variety)
  *  -------------------------------------------------------------------------
  */
-int mi_timer_cancel(mblk_t *mp)
+int
+mi_timer_cancel(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
@@ -972,7 +1023,8 @@ EXPORT_SYMBOL(mi_timer_cancel);
  *  MI_TIMER_Q_SWITCH (MacOT variety)
  *  -------------------------------------------------------------------------
  */
-mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
+mblk_t *
+mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	tblk_t *t2 = (typeof(t2)) new_mp->b_datap->db_base;
@@ -995,7 +1047,8 @@ EXPORT_SYMBOL(mi_timer_q_switch);
  *  MI_TIMER_ALLOC (OpenSolaris variety)
  *  -------------------------------------------------------------------------
  */
-mblk_t *mi_timer_alloc_SUN(size_t size)
+mblk_t *
+mi_timer_alloc_SUN(size_t size)
 {
 	return mi_timer_alloc_MAC(NULL, size);
 }
@@ -1006,7 +1059,8 @@ EXPORT_SYMBOL(mi_timer_alloc_SUN);
  *  MI_TIMER (OpenSolaris variety)
  *  -------------------------------------------------------------------------
  */
-void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
+void
+mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 
@@ -1081,7 +1135,8 @@ EXPORT_SYMBOL(mi_timer_SUN);
  *  MI_TIMER_STOP (OpenSolaris variety)
  *  -------------------------------------------------------------------------
  */
-void mi_timer_stop(mblk_t *mp)
+void
+mi_timer_stop(mblk_t *mp)
 {
 	mi_timer_cancel(mp);
 }
@@ -1092,7 +1147,8 @@ EXPORT_SYMBOL(mi_timer_stop);
  *  MI_TIMER_MOVE (OpenSolaris variety)
  *  -------------------------------------------------------------------------
  */
-void mi_timer_move(queue_t *q, mblk_t *mp)
+void
+mi_timer_move(queue_t *q, mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
@@ -1157,7 +1213,8 @@ EXPORT_SYMBOL(mi_timer_move);
  *  MI_TIMER_VALID (Common)
  *  -------------------------------------------------------------------------
  */
-int mi_timer_valid(mblk_t *mp)
+int
+mi_timer_valid(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
@@ -1197,7 +1254,8 @@ EXPORT_SYMBOL(mi_timer_valid);
  *  MI_TIMER_FREE (Common)
  *  -------------------------------------------------------------------------
  */
-void mi_timer_free(mblk_t *mp)
+void
+mi_timer_free(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	long state;
@@ -1223,7 +1281,8 @@ void mi_timer_free(mblk_t *mp)
 
 EXPORT_SYMBOL(mi_timer_free);
 
-queue_t *mi_allocq(struct streamtab *st)
+queue_t *
+mi_allocq(struct streamtab *st)
 {
 #if LIS
 	return lis_allocq(st->st_rdinit->qi_minfo->mi_idname);
@@ -1239,7 +1298,8 @@ queue_t *mi_allocq(struct streamtab *st)
 
 EXPORT_SYMBOL(mi_allocq);
 
-void mi_freeq(queue_t *q)
+void
+mi_freeq(queue_t *q)
 {
 #if LIS
 	lis_freeq(q);
@@ -1251,7 +1311,8 @@ void mi_freeq(queue_t *q)
 
 EXPORT_SYMBOL(mi_freeq);
 
-int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
+int
+mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
 	int result = 0;
 
@@ -1277,7 +1338,8 @@ EXPORT_SYMBOL(mi_strlog);
 #define _MI_FLAG_SPECIAL	(1<<5)
 #define _MI_FLAG_LARGE		(1<<6)
 
-static int mi_putc(char c, mblk_t **mpp)
+static int
+mi_putc(char c, mblk_t **mpp)
 {
 	if (unlikely((*mpp)->b_wptr >= (*mpp)->b_datap->db_lim)) {
 		mblk_t *mp;
@@ -1294,7 +1356,8 @@ static int mi_putc(char c, mblk_t **mpp)
 	return (0);
 }
 
-static int mi_number(mblk_t **mpp, long long num, int base, int width, int decimal, int flags)
+static int
+mi_number(mblk_t **mpp, long long num, int base, int width, int decimal, int flags)
 {
 	char sign;
 	int i, count = 0, rval = 0;
@@ -1400,7 +1463,8 @@ static int mi_number(mblk_t **mpp, long long num, int base, int width, int decim
 	return (rval);
 }
 
-static int mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
+static int
+mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
 {
 	char type;
 	int count = 0, rval = -1, flags = 0, width = -1, decimal = -1, base = 10;
@@ -1652,7 +1716,8 @@ static int mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
 	return (rval);
 }
 
-int mi_mpprintf(mblk_t *mp, char *fmt, ...)
+int
+mi_mpprintf(mblk_t *mp, char *fmt, ...)
 {
 	va_list args;
 	int count = -1;
@@ -1666,7 +1731,8 @@ int mi_mpprintf(mblk_t *mp, char *fmt, ...)
 
 EXPORT_SYMBOL(mi_mpprintf);
 
-int mi_mpprintf_nr(mblk_t *mp, char *fmt, ...)
+int
+mi_mpprintf_nr(mblk_t *mp, char *fmt, ...)
 {
 	va_list args;
 	int count = -1;
@@ -1693,7 +1759,8 @@ EXPORT_SYMBOL(mi_mpprintf_nr);
  *  MI_SET_STH_HIWAT
  *  -------------------------------------------------------------------------
  */
-int mi_set_sth_hiwat(queue_t *q, size_t size)
+int
+mi_set_sth_hiwat(queue_t *q, size_t size)
 {
 	struct stroptions *so;
 	mblk_t *mp;
@@ -1718,7 +1785,8 @@ EXPORT_SYMBOL(mi_set_sth_hiwat);
  *  MI_SET_STH_LOWAT
  *  -------------------------------------------------------------------------
  */
-int mi_set_sth_lowat(queue_t *q, size_t size)
+int
+mi_set_sth_lowat(queue_t *q, size_t size)
 {
 	struct stroptions *so;
 	mblk_t *mp;
@@ -1743,7 +1811,8 @@ EXPORT_SYMBOL(mi_set_sth_lowat);
  *  MI_SET_STH_MAXBLK
  *  -------------------------------------------------------------------------
  */
-int mi_set_sth_maxblk(queue_t *q, ssize_t size)
+int
+mi_set_sth_maxblk(queue_t *q, ssize_t size)
 {
 #ifdef SO_MAXBLK
 	struct stroptions *so;
@@ -1769,7 +1838,8 @@ EXPORT_SYMBOL(mi_set_sth_maxblk);
  *  MI_SET_STH_COPYOPT
  *  -------------------------------------------------------------------------
  */
-int mi_set_sth_copyopt(queue_t *q, int copyopt)
+int
+mi_set_sth_copyopt(queue_t *q, int copyopt)
 {
 #ifdef SO_COPYOPT
 	struct stroptions *so;
@@ -1795,7 +1865,8 @@ EXPORT_SYMBOL(mi_set_sth_copyopt);
  *  MI_SET_STH_WROFF
  *  -------------------------------------------------------------------------
  */
-int mi_set_sth_wroff(queue_t *q, size_t size)
+int
+mi_set_sth_wroff(queue_t *q, size_t size)
 {
 	struct stroptions *so;
 	mblk_t *mp;
@@ -1822,7 +1893,8 @@ EXPORT_SYMBOL(mi_set_sth_wroff);
  *
  *  =========================================================================
  */
-int mi_sprintf(char *buf, char *fmt, ...)
+int
+mi_sprintf(char *buf, char *fmt, ...)
 {
 	int result;
 	va_list args;
@@ -1835,21 +1907,24 @@ int mi_sprintf(char *buf, char *fmt, ...)
 
 EXPORT_SYMBOL(mi_sprintf);
 
-int mi_strcmp(const caddr_t cp1, const caddr_t cp2)
+int
+mi_strcmp(const caddr_t cp1, const caddr_t cp2)
 {
 	return strcmp(cp1, cp2);
 }
 
 EXPORT_SYMBOL(mi_strcmp);
 
-int mi_strlen(const caddr_t str)
+int
+mi_strlen(const caddr_t str)
 {
 	return strlen(str);
 }
 
 EXPORT_SYMBOL(mi_strlen);
 
-long mi_strtol(const caddr_t str, caddr_t *ptr, int base)
+long
+mi_strtol(const caddr_t str, caddr_t *ptr, int base)
 {
 	return simple_strtol(str, ptr, base);
 }
@@ -1867,7 +1942,8 @@ EXPORT_SYMBOL(mi_strtol);
  *  MI_OFFSET_PARAM
  *  -------------------------------------------------------------------------
  */
-uint8_t *mi_offset_param(mblk_t *mp, size_t offset, size_t len)
+uint8_t *
+mi_offset_param(mblk_t *mp, size_t offset, size_t len)
 {
 	if (mp || len == 0) {
 		size_t blen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
@@ -1884,7 +1960,8 @@ EXPORT_SYMBOL(mi_offset_param);
  *  MI_OFFSET_PARAMC
  *  -------------------------------------------------------------------------
  */
-uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len)
+uint8_t *
+mi_offset_paramc(mblk_t *mp, size_t offset, size_t len)
 {
 	uint8_t *result = NULL;
 
@@ -1918,7 +1995,8 @@ EXPORT_SYMBOL(mi_offset_paramc);
  *  MPS_BECOME_WRITER
  *  -------------------------------------------------------------------------
  */
-void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
+void
+mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 {
 #if LIS
 	lis_flags_t flags;
@@ -1928,8 +2006,9 @@ void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 	LIS_QISRUNLOCK(q, &flags);
 #endif
 #if LFS
-	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func)(queue_t *, mblk_t *), int perim);
-	__strwrit(q, mp, proc, PERIM_INNER|PERIM_OUTER);
+	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *),
+			      int perim);
+	__strwrit(q, mp, proc, PERIM_INNER | PERIM_OUTER);
 #endif
 }
 
@@ -1939,7 +2018,8 @@ EXPORT_SYMBOL(mps_become_writer);
  *  MPS_INTR_DISABLE
  *  -------------------------------------------------------------------------
  */
-void mps_intr_disable(pl_t * plp)
+void
+mps_intr_disable(pl_t * plp)
 {
 	unsigned long flags = *plp;
 
@@ -1953,7 +2033,8 @@ EXPORT_SYMBOL(mps_intr_disable);
  *  MPS_INTR_ENABLE
  *  -------------------------------------------------------------------------
  */
-void mps_intr_enable(pl_t pl)
+void
+mps_intr_enable(pl_t pl)
 {
 	unsigned long flags = pl;
 
@@ -1965,7 +2046,8 @@ EXPORT_SYMBOL(mps_intr_enable);
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 static
 #endif
-int __init mpscomp_init(void)
+    int __init
+mpscomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 	printk(KERN_INFO MPSCOMP_BANNER);
@@ -1978,7 +2060,8 @@ int __init mpscomp_init(void)
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 static
 #endif
-void __exit mpscomp_exit(void)
+    void __exit
+mpscomp_exit(void)
 {
 	return;
 }

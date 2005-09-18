@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/12 13:12:16 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/18 07:35:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/12 13:12:16 $ by $Author: brian $
+ Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/12 13:12:16 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/18 07:35:54 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/12 13:12:16 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/18 07:35:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -460,6 +460,8 @@ __freebands(queue_t *q)
 			qb_next = qb->qb_next;
 			freeqb(qb);
 		}
+		q->q_nband = 0;
+		q->q_blocked = 0;
 	}
 }
 
@@ -3603,7 +3605,7 @@ freechains(struct strthread *t)
 			mp_next = xchg(&mp->b_next, NULL);
 			/* fake out freeb */
 			qput(&mp->b_queue);
-			bput(&mp->b_bandp);
+			// bput(&mp->b_bandp);
 			mp->b_next = mp->b_prev = NULL;
 			freemsg(mp);
 		}

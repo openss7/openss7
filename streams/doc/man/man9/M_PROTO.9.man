@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PROTO.9.man,v 0.9.2.1 2005/04/28 11:36:35 brian Exp $
+.\" @(#) $Id: M_PROTO.9.man,v 0.9.2.2 2005/09/18 07:38:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 07:38:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,55 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Intented to contain control information and associated data.  The message format is one or more
+.B M_PROTO
+message blocks followed by zero or more
+.BR M_DATA (9)
+message blocks.  The semantics of the
+.BR M_DATA (9)
+and
+.B M_PROTO
+message blocks are determined by the
+.I STREAMS
+module that receives the message.
+.PP
+(Note that on the write-side, the user can only generate
+.B M_PROTO
+messages containing one
+.B M_PROTO
+message block.)
+.PP
+The
+.B M_PROTO
+message block will typically contain implementation dependent control information.
+.B M_PROTO
+messages are generally send bidirectionally on a
+.IR Stream ,
+and their contents can be passed between a process and the
+.IR "Stream head" .
+The contents of the first message block of an
+.B M_PROTO
+message is generally referred to as the control part, and the contents of any following
+.BR M_DATA (9)
+message blocks are referred to as the data part.  In the
+.BR getmsg (2)
+and
+.BR putmsg (2)
+system calls, the control and data parts are passed separately.
+.PP
+Although its use is not recommended, the format of
+.B M_PROTO
+and
+.BR M_PCPROTO
+(generically
+.IR PROTO )
+message sent upstream to the
+.I Stream head
+allows multiple
+.I PROTO
+blocks at the beginning of the message.
+.BR getmsg (2)
+will compact the blocks into a single control part when passing them to the user process.
 .\"
 .\"
 .SH "SEE ALSO"

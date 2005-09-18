@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.1 2005/04/28 11:36:34 brian Exp $
+.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.2 2005/09/18 07:38:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 07:38:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,343 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Generate by the
+.I Stream head
+in response to
+.BR I_STR (7),
+.BR I_LINK (7),
+.BR I_UNLINK (7),
+and
+.BR I_PUNLINK (7)
+.RB [ ioctl (2)
+.I STREAMS
+system calls, see
+.BR streamio (7)],
+and in response to
+.BR ioctl (2)
+calls that contain a command argument value not defined in
+.BR streamio (7).
+When one of these
+.BR ioctl (2)
+commands is received from a user process, the
+.I Stream head
+uses values supplied in the call and values from the process to create an
+.B M_IOCTL
+message containing them, and sends the message downstream.
+.B M_IOCTL
+messages are intended to perform the general
+.BR ioctl (2)
+functions of character device drivers.
+.PP
+For an
+.BR I_STR (7)
+.BR ioctl (2),
+the user values are supplied in a structure of the following form, provided as an argument to the
+.BR ioctl (2)
+call [see
+.BR I_STR (7)
+in
+.BR streamio (7)]:
+.PP
+.nf
+\fC\s-1\
+struct strioctl {
+        int ic_cmd;                     /* downstream request */
+        int ic_timout;                  /* ACK/NAK timeout */
+        int ic_len;                     /* length of data arg */
+        caddr_t ic_dp;                  /* ptr to data arg */
+};
+\s+1\fP
+.fi
+where
+.I ic_cmd
+is the request (or command) defined by a downstream module or driver,
+.I ic_timout
+is the time the
+.I Stream head
+will wait for acknowledgement to the
+.B M_IOCTL
+message before timing out, and
+.I ic_dp
+is a pointer to an optional data buffer.  On input,
+.I ic_len
+contains the length of the data in the buffer passed in and,
+on return from the call,
+it contains the length of the data, if any, being returned to the user in the same buffer.
+.PP
+The
+.B M_IOCTL
+message format is one
+.B M_IOCTL
+message block followed by zero or more
+.B M_DATA
+message blocks.
+.I STREAMS
+constructs an
+.B M_IOCTL
+message block by placing an
+.BR iocblk (9)
+structure, defined in
+.BR sys/stream.h ,
+in its data buffer:
+.PP
+.nf
+\fC\s-1\
+struct iocblk {
+        int ioc_cmd;                    /* ioctl command type */
+        cred_t *ioc_cr;                 /* full credentials */
+        uint ioc_id;                    /* ioctl identifier */
+        uint ioc_count;                 /* byte count for ioctl data */
+        int ioc_error;                  /* error code for M_IOCACK or M_IOCNAK */
+        int ioc_rval;                   /* return value for M_IOCACK */
+        long ioc_filler[4];             /* reserved for future use */
+};
+\s+1\fP
+.fi
+.PP
+For an
+.BR I_STR (7)
+.BR ioctl (2),
+.I ioc_cmd
+corresponds to
+.I ic_cmd
+of the
+.BR strioctl (5)
+structure.
+.I ioc_cr
+points to the credentials structure defining the user process' permissions (see
+.BR cred.h ).
+Its contents can be tested to determine if the user issuing the
+.BR ioctl (2)
+call is authorized to do so.  For an
+.BR I_STR (7)
+.BR ioctl (2),
+.I ioc_count
+is the number of data bytes, if any, contained in the message and corresponds to
+.IR ic_len .
+.I ioc_id
+is an identifier generated internally, and is used by the
+.I Stream head
+to match each
+.B M_IOCTL
+message sent downstream with response messages sent upstream to the
+.IR "Stream head" .
+The response message which completes the
+.I Stream head
+for processing for the
+.BR ioctl (2)
+is an
+.BR M_IOCACK (9)
+(positive acknowledgement) or an
+.BR M_IOCNAK (9)
+(negative acknowledgement) message.
+.PP
+For an
+.BR I_STR (7)
+.BR ioctl (2),
+if a user supplies data to be sent downstream, the
+.I Stream head
+copies data, pointed to by
+.I ic_dp
+in the
+.BR strioctl (5)
+structure, into
+.BR M_DATA (9)
+message blocks and links the blocks to the initial
+.B M_IOCTL
+message block.
+.I ioc_count
+is copied from
+.IR ic_len .
+If there are no data,
+.I ioc_count
+is zero.
+.PP
+If the
+.I Stream head
+does not recognize the command argument of an
+.BR ioctl (2),
+it creates a tranparent
+.B M_IOCTL
+message.  The format of a tranparent
+.B M_IOCTL
+message is one
+.B M_IOCTL
+message block followed by one
+.B M_DATA
+block.  The form of the
+.BR iocblk (9)
+structure is the same as above.  However,
+.I ioc_cmd
+is set to the value of the command argument in the
+.BR ioctl (2)
+system call and
+.I ioc_count
+is set to
+.RB \(lq TRANSPARENT \(rq,
+defined in
+.BR sys/stream.h .
+.RB \(lq TRANSPARENT \(rq
+distinguishes the case where an
+.BR I_STR (7)
+.BR ioctl (2),
+this action generally includes an immediate upstream transmission of an
+.BR M_IOCACK (9)
+message.  For transparent
+.BR M_IOCTL s,
+this action generally includes the upstream transmission of an
+.BR M_COPYIN (9)
+and
+.BR M_COPYOUT (9)
+message.
+.PP
+Intermediate modules that do not recognize a particular request must pass the message on.  If a
+driver does not recognize the request, or the receiving module can not acknowledge it, an
+.BR M_IOCNAK (9)
+message must be returned.
+.PP
+.BR M_IOCACK (9)
+and
+.BR M_IOCNAK (9)
+message types have the same format as an
+.BR M_IOCTL
+message and contain an
+.BR iocblk (9)
+structure in the first block.  An
+.BR M_IOCACK (9)
+block may be linked to following
+.BR M_DATA (9)
+blocks.  If one of these messages reaches the
+.I Stream head
+with an identifier which does not match that of the currently outstanding
+.B M_IOCTL
+message, the response message is discarded.  A common means of assuring that the correct identifier
+is returned is for the replying module to convert the
+.B M_IOCTL
+message into the appropriate response type and set
+.I ioc_count
+to zero
+.RB ( 0 ),
+if no data are returned.  Then the
+.BR qreply (9)
+utility is used to send the response to the
+.IR "Stream head" .
+.PP
+In an
+.BR M_IOCACK (9)
+and
+.BR M_IOCNAK (9)
+message,
+.I ioc_error
+holds any return error condition set by a downstream module.  If this value is non-zero, it is
+returned to the user in
+.BR errno (3).
+Note that both an
+.BR M_IOCNAK
+and an
+.BR M_IOCACK
+may return an error.
+(See
+.RI \(lq NOTICES \(rq,
+below.)
+However, only an
+.BR M_IOCACK (9)
+can have a return value.  For an
+.BR M_IOCACK (9),
+.I ioc_rval
+holds any return value set by a responding module.  For an
+.BR M_IOCNAK (9),
+.I ioc_rval
+is ignored by the
+.IR "Stream head" .
+If a module processing an
+.BR I_STR (7)
+.BR ioctl (2)
+wants to send data to a user process, it must use the
+.BR M_IOCACK (9)
+message which it constructs such that the
+.BR M_IOCACK (9)
+block is linked to one or more following
+.BR M_DATA (9)
+blocks containing the user data.  The module must set
+.I ioc_count
+to the number of data bytes sent.  The
+.I Stream head
+places the data in the address pointed to by
+.I ic_dp
+in the user
+.BR I_STR (7)
+.BR strioctl (5)
+structure.
+.PP
+If a module processing a transparent
+.BR ioctl (2)
+(i.e., it is received as transparent
+.BR M_IOCTL )
+wants to sent data to a user process, it can use only an
+.BR M_COPYOUT (9)
+message.  For a transparent
+.BR ioctl (2),
+no data can be sent to the user process in an
+.BR M_IOCACK (9)
+message.  The
+.I Stream head
+will ignore any data contained in an
+.BR M_IOCACK (9)
+message (in
+.BR M_DATA (9)
+blocks) and will free the blocks.  No data can be sent with an
+.BR M_IOCNAK (9)
+message for any type of
+.BR M_IOCTL .
+The
+.I Stream head
+will ignore and will free any
+.BR M_DATA (9)
+blocks.
+.PP
+The
+.I Stream head
+blocks the user process until an
+.BR M_IOCACK (9)
+or
+.BR M_IOCNAK (9)
+response to the
+.B M_IOCTL
+(same
+.IR ioc_id )
+is received.  For an
+.B M_IOCTL
+generated from an
+.BR I_STR (7)
+.BR ioctl (2),
+the
+.I Stream head
+will \(lqtime out\(rq if no response is received in
+.I ic_timout
+interval (the user may specify an explicit interval or specify use of the default interval).  For
+.B M_IOCTL
+messages generated from all other
+.BR ioctl (2)s,
+the default (infinite) is used.
+(See
+.RI \(lq NOTICES \(rq,
+below.)
+.\"
+.\"
+.SH NOTICES
+.PP
+.B @PACKAGE_TITLE@
+implementation cannot permit
+.BR M_IOCACK (9)
+to return an error number and a return value simultaneously.  This is because
+.B Linux
+encodes the error number into the return value.
+.PP
+.B @PACKAGE_TITLE@
+uses a default of
+.B 15
+seconds, in accordance with common practice.
 .\"
 .\"
 .SH "SEE ALSO"

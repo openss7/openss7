@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/13 11:55:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/09/13 11:55:12 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1834,23 +1834,29 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 				err = ioc->iocblk.ioc_rval;
 			break;
 		case M_COPYIN:
-			mb->b_datap->db_type = M_IOCDATA;
-			err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
-					 ioc->copyreq.cq_size, user);
-			ioc->copyresp.cp_rval = (caddr_t) -err;
-			continue;
 		case M_COPYOUT:
+			if (mb->b_datap->db_type == M_COPYIN)
+				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
+						 ioc->copyreq.cq_size, user);
+			else
+				err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
+						  ioc->copyreq.cq_size, user);
 			mb->b_datap->db_type = M_IOCDATA;
-			err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
-					  ioc->copyreq.cq_size, user);
+			if (!err) {
+				ioc->copyresp.cp_rval = (caddr_t) 0;
+				continue;
+			}
 			ioc->copyresp.cp_rval = (caddr_t) -err;
-			continue;
+			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			put(sd->sd_wq, mb);
+			goto abort;
 		default:
 			never();
 			err = -EIO;
 			break;
 		}
 		freemsg(mb);
+	      abort:
 		break;
 	} while (1);
 	strwakeioctl(sd);
@@ -1929,17 +1935,22 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 				err = ioc->iocblk.ioc_rval;
 			break;
 		case M_COPYIN:
-			mb->b_datap->db_type = M_IOCDATA;
-			err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
-					 ioc->copyreq.cq_size, user);
-			ioc->copyresp.cp_rval = (caddr_t) -err;
-			continue;
 		case M_COPYOUT:
+			if (mb->b_datap->db_type == M_COPYIN)
+				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
+						 ioc->copyreq.cq_size, user);
+			else
+				err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
+						  ioc->copyreq.cq_size, user);
 			mb->b_datap->db_type = M_IOCDATA;
-			err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
-					  ioc->copyreq.cq_size, user);
-			ioc->copyresp.cp_rval = (caddr_t) -err;
-			continue;
+			if (!err) {
+				ioc->copyresp.cp_rval = (caddr_t) 0;
+				continue;
+			}
+			ioc->copyresp.cp_rval = (caddr_t) 1;
+			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			put(sd->sd_wq, mb);
+			goto abort;
 		default:
 			never();
 			err = -EIO;
@@ -1948,6 +1959,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 		freemsg(mb);
 		break;
 	} while (1);
+      abort:
 	strwakeioctl(sd);
 	return (err);
 
@@ -2034,9 +2046,10 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			/* wrong response */
 			ioc = (typeof(ioc)) mb->b_rptr;
 			mb->b_datap->db_type = M_IOCDATA;
-			ioc->copyresp.cp_rval = (caddr_t) EPERM;
-			/* reply and wait for M_IOCNAK */
-			continue;
+			ioc->copyresp.cp_rval = (caddr_t) 1;
+			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			put(sd->sd_wq, mb);
+			goto abort;
 		default:
 			never();
 			err = -EIO;
@@ -2045,6 +2058,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 		freemsg(mb);
 		break;
 	} while (1);
+      abort:
 	strwakeioctl(sd);
 	return (err);
 }
@@ -2149,23 +2163,19 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 
 		ioc = (typeof(ioc)) mb->b_rptr;
 		switch (mb->b_datap->db_type) {
-			int err;
-
 		case M_IOCACK:
+			break;
 		case M_IOCNAK:
+			swerr();
 			break;
 		case M_COPYIN:
-			mb->b_datap->db_type = M_IOCDATA;
-			err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
-					 ioc->copyreq.cq_size, 1);
-			ioc->copyresp.cp_rval = (caddr_t) -err;
-			continue;
 		case M_COPYOUT:
+			swerr();
 			mb->b_datap->db_type = M_IOCDATA;
-			err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
-					  ioc->copyreq.cq_size, 1);
-			ioc->copyresp.cp_rval = (caddr_t) -err;
-			continue;
+			ioc->copyresp.cp_rval = (caddr_t) 1;
+			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			put(sd->sd_wq, mb);
+			goto abort;
 		default:
 			never();
 			break;
@@ -2173,15 +2183,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 		freemsg(mb);
 		break;
 	} while (1);
-
+      abort:
 	sd->sd_rq->q_qinfo = qi_old;
-
-	/* wakeup routine made sure it was the right type */
-
-	if (mb->b_datap->db_type != M_IOCACK)
-		swerr();
-
-	freemsg(mb);
 	strwakeioctl(sd);
 	return;
 }
@@ -7047,9 +7050,10 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 		if (_WR(q)->q_next) {
 			union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
+			/* allow module or driver to free cp_private */
 			mp->b_datap->db_type = M_IOCDATA;
 			mp->b_wptr = mp->b_rptr + sizeof(ioc->copyresp);
-			ioc->copyresp.cp_rval = (caddr_t) EPERM;
+			ioc->copyresp.cp_rval = (caddr_t) 1;
 			qreply(q, mp);
 		} else
 			freemsg(mp);
