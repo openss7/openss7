@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/19 04:23:47 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/19 10:27:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/19 04:23:47 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/19 10:27:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/19 04:23:47 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/19 10:27:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1704,10 +1704,6 @@ qwakeup(queue_t *q)
  *  tests if the Stream is frozen, and if it is, acquires and releases a freeze read lock.  If the
  *  caller is the freezing thread, zrlock() will always be successful.  If the caller is another
  *  thread, the thread will spin on zrlock() until the Stream is thawed.
- *
- *  The put() procedure is the only place that we test this this way.  open() and close() procedures
- *  will sleep on the STRFROZEN_BIT, and service() procedures will not enable while a Stream is
- *  frozen, but will be enabled when it is thawed.
  */
 STATIC inline streams_fastcall void
 freezechk(queue_t *q)
@@ -1715,11 +1711,9 @@ freezechk(queue_t *q)
 	struct stdata *sd;
 
 	sd = qstream(q);
-	if (test_bit(STRFROZEN_BIT, &sd->sd_flag)) {
-		/* spin here until stream unfrozen */
-		zrlock(sd);
-		zrunlock(sd);
-	}
+	/* spin here until stream unfrozen */
+	zrlock(sd);
+	zrunlock(sd);
 }
 
 /*
@@ -1742,7 +1736,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 	assert(q->q_qinfo->qi_putp);
 
 	/* spin here if Stream frozen by other than caller */
-	freezechk(q);
+	freeze_barrier(q);
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
@@ -1794,11 +1788,6 @@ putp(queue_t *q, mblk_t *mp)
  *  NOTICES: This call to the service procedure bypasses all sychronization.  Any syncrhonization
  *  required of the queue service procedure must be performed across the call to this function.
  *
- *  Frozen Streams do not permit any service procedures to be run once they are frozen.  If we hit
- *  the STRFROZEN bit here, it can only be because we are running on a different processor from the
- *  freezing thread, in which case, rescheduling the queue is better than spinning: the processor
- *  might have some other useful work to do during the loop.
- *
  *  Do not pass this function null or invalid queue pointers, or pointers to queues that have no
  *  service procedure.  In safe mode, this will cause kernel assertions to fail and will panic the
  *  kernel.
@@ -1810,14 +1799,8 @@ srvp_fast(queue_t *q)
 	if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
 		queue_t *qold;
 
-		if (unlikely(test_bit(STRFROZEN_BIT, &qstream(q)->sd_flag) != 0)) {
-			/* if assertion fails we would loop indefinitely */
-			assert(qstream(q)->sd_freezer != current);
-			/* reschedule ourselves */
-			qschedule(q);
-			qput(q);	/* cancel get from previous qschedule */
-			return;
-		}
+		/* spin here if Stream frozen by other than caller */
+		freeze_barrier(q);
 
 		assert(q->q_qinfo);
 

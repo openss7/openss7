@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/19 04:23:48 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/19 10:27:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 04:23:48 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -168,68 +168,65 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
  */
 #ifdef CONFIG_STREAMS_DEBUG
 /* loosen locks for debugging */
-#define write_lock_str(__l)	do { local_str_disable(); write_lock(__l);  } while (0)
-#define write_unlock_str(__l)	do { write_unlock(__l); local_str_enable(); } while (0)
-#else
-#define write_lock_str(__l)	do { local_bh_disable(); local_str_disable(); write_lock(__l); } while (0)
-#define write_unlock_str(__l)	do { write_unlock(__l); local_str_enable(); local_bh_enable(); } while (0)
-#endif
-#define read_lock_str(__l)	do { local_str_disable();  read_lock(__l); } while (0)
-#define read_unlock_str(__l)	do { read_unlock(__l); local_str_enable(); } while (0)
+#define write_str_disable()	do { local_str_disable(); } while (0)
+#define write_str_enable()	do { local_str_enable(); } while (0)
+#else				/* CONFIG_STREAMS_DEBUG */
+#define write_str_disable()	do { local_bh_disable(); local_str_disable(); } while (0)
+#define write_str_enable()	do { local_str_enable(); local_bh_enable(); } while (0)
+#endif				/* CONFIG_STREAMS_DEBUG */
+#define read_str_disable()	do { local_str_disable(); } while (0)
+#define read_str_enable()	do { local_str_enable(); } while (0)
+
+#define write_lock_str(__l)	do { write_str_disable(); write_lock(__l);  } while (0)
+#define write_unlock_str(__l)	do { write_unlock(__l); write_str_enable(); } while (0)
+#define read_lock_str(__l)	do { read_str_disable();  read_lock(__l); } while (0)
+#define read_unlock_str(__l)	do { read_unlock(__l); read_str_enable(); } while (0)
+#define zread_lock_str(__l)	do { write_str_disable();  read_lock(__l); } while (0)
+#define zread_unlock_str(__l)	do { read_unlock(__l); write_str_enable(); } while (0)
 
 /*
  *  Just a little bit of nesting on freeze locks, if the caller holds a write lock on the freeze
  *  lock, it can take a read lock on the freeze lock without deadlocking.  This allows the freezer
  *  to do things that others are not permitted to do.
  */
+#ifdef CONFIG_SMP
+
+#define frozen_by_caller(__q)		(qstream(__q)->sd_freezer == current)
+#define not_frozen_by_caller(__q)	(qstream(__q)->sd_freezer != current)
+
 #define zlockinit(__sd)	rwlock_init(&(__sd)->sd_freeze)
-#define zwlock(__sd)	do { write_lock_str(&(__sd)->sd_freeze); sd->sd_freezer = current; } while (0)
-#define zwunlock(__sd)	do { sd->sd_freezer = NULL; write_unlock_str(&(__sd)->sd_freeze); } while (0)
-#define zrlock(__sd)	do { if ((__sd)->sd_freezer != current) read_lock_str(&(__sd)->sd_freeze); } while (0)
-#define zrunlock(__sd)	do { if ((__sd)->sd_freezer != current) read_unlock_str(&(__sd)->sd_freeze); } while (0)
+#define zwlock(__sd)	do { write_lock_str(&(__sd)->sd_freeze); (__sd)->sd_freezer = current; } while (0)
+#define zwunlock(__sd)	do { (__sd)->sd_freezer = NULL; write_unlock_str(&(__sd)->sd_freeze); } while (0)
+#define zrlock(__sd)	do { if ((__sd)->sd_freezer != current) zread_lock_str(&(__sd)->sd_freeze); } while (0)
+#define zrunlock(__sd)	do { if ((__sd)->sd_freezer != current) zread_unlock_str(&(__sd)->sd_freeze); } while (0)
+
+#else				/* CONFIG_SMP */
+
+#define frozen_by_caller(__q)		(1)
+#define not_frozen_by_caller(__q)	(1)
+
+#define zlockinit(__sd)	rwlock_init(&(__sd)->sd_freeze)
+#define zwlock(__sd)	write_lock_str(&(__sd)->sd_freeze);
+#define zwunlock(__sd)	write_unlock_str(&(__sd)->sd_freeze);
+#define zrlock(__sd)	zread_lock_str(&(__sd)->sd_freeze);
+#define zrunlock(__sd)	zread_unlock_str(&(__sd)->sd_freeze);
+
+#endif				/* CONFIG_SMP */
+
+#define freeze_barrier(__q)	do { struct stdata *__sd = qstream(__q); zrlock(__sd); zrunlock(__sd); } while (0)
 
 #define slockinit(__sd)	rwlock_init(&(__sd)->sd_lock)
-#define swlock(__sd)	write_lock_str(&(__sd)->sd_lock)
-#define swunlock(__sd)	write_unlock_str(&(__sd)->sd_lock)
+#define swlock(__sd)	do { zrlock(__sd); write_lock(&(__sd)->sd_lock); } while (0)
+#define swunlock(__sd)	do { write_unlock(&(__sd)->sd_lock); zrunlock(__sd); } while (0)
 #define srlock(__sd)	read_lock_str(&(__sd)->sd_lock)
 #define srunlock(__sd)	read_unlock_str(&(__sd)->sd_lock)
 
 #define qlockinit(__q)	rwlock_init(&(__q)->q_lock)
-#define qwlock(__q)	do { zrlock(qstream(__q)); write_lock_str(&(__q)->q_lock); } while (0)
-#define qwunlock(__q)	do { write_unlock_str(&(__q)->q_lock); zrunlock(qstream(__q)); } while (0)
+#define qwlock(__q)	do { zrlock(qstream(__q)); write_lock(&(__q)->q_lock); } while (0)
+#define qwunlock(__q)	do { write_unlock(&(__q)->q_lock); zrunlock(qstream(__q)); } while (0)
 #define qrlock(__q)	read_lock_str(&(__q)->q_lock)
 #define qrunlock(__q)	read_unlock_str(&(__q)->q_lock)
 
-#ifdef CONFIG_STREAMS_DEBUG
-/* loosen locks for debugging */
-#define qisunlocked(__q) \
-(int)({ \
-	int result; \
- \
-	local_str_disable(); \
-	if ((result = write_trylock(&(__q)->q_lock))) \
-		write_unlock(&(__q)->q_lock); \
-	local_str_enable(); \
-	result; \
-})
-#else
-#define qisunlocked(__q) \
-(int)({ \
-	int result; \
- \
-	local_bh_disable(); \
-	local_str_disable(); \
-	if ((result = write_trylock(&(__q)->q_lock))) \
-		write_unlock(&(__q)->q_lock); \
-	local_str_enable(); \
-	local_bh_enable(); \
-	result; \
-})
 #endif
-	
-
-
-#endif
-
 
 #endif				/* __LOCAL_STRUTIL_H__ */

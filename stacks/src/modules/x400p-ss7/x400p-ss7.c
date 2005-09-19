@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:46 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/09/19 10:27:00 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:46 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:46 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/09/19 10:27:00 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:46 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/09/19 10:27:00 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -88,7 +88,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:46 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2005/09/19 10:27:00 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -484,6 +484,7 @@ sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 	return (-EBUSY);
 }
 
+#if 0
 /*
  *  SDL_DISCONNECT_IND
  *  -----------------------------------
@@ -505,6 +506,7 @@ sdl_disconnect_ind(queue_t *q, struct xp *xp)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  LMI_INFO_ACK
@@ -627,6 +629,7 @@ lmi_disable_con(queue_t *q, struct xp *xp)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
@@ -729,6 +732,7 @@ lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 	rare();
 	return (-EBUSY);
 }
+#endif
 
 /*
  *  =========================================================================

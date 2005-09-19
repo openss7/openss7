@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2005/07/18 12:40:29 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -3193,6 +3193,7 @@ ws_phys_addr(struct dl *dl, mblk_t *mp)
 	}
 }
 
+#if 0 /* never used */
 STATIC INLINE int
 ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 {
@@ -3256,6 +3257,7 @@ ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 
 	return DONE;
 }
+#endif
 
 STATIC INLINE int
 ws_attach(struct dl *dl, mblk_t *mp)

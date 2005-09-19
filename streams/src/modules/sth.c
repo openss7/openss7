@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/19 10:27:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/19 10:27:48 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/19 10:27:48 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/09/18 07:35:54 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/19 10:27:48 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -5648,7 +5648,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 		if (!(err = strwaitopen(sd, 0))) {
 			swunlock(sd);
 
-			/* Note sd->sd_pushcnt and sd->sd_file are protected by STRWOPEN bit. */
+			/* Note sd->sd_pushcnt and sd->sd_file are protected by STWOPEN bit. */
 
 			if (sd->sd_pushcnt < sysctl_str_nstrpush) {
 

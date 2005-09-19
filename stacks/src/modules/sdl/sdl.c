@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:26:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:58 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:58 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:58 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -241,6 +241,7 @@ m_error(queue_t *q, struct sdl *s, int err)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  M_HANGUP
  *  -----------------------------------
@@ -261,6 +262,7 @@ m_hangup(queue_t *q, struct sdl *s, int err)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  LMI_INFO_ACK
@@ -428,6 +430,7 @@ lmi_disable_con(queue_t *q, struct sdl *s)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
@@ -573,6 +576,7 @@ sdl_disconnect_ind(queue_t *q, struct sdl *s)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  =========================================================================

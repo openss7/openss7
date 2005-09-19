@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:26:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:38 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.12 $
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:38 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -362,7 +362,6 @@ m_error(queue_t *q, int err)
 	rare();
 	return (-ENOBUFS);
 }
-#endif
 
 /*
  *  SDL_RECEIVED_BITS_IND
@@ -376,6 +375,7 @@ sdl_received_bits_ind(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (QR_ABSORBED);
 }
+#endif
 
 /*
  *  SDL_DISCONNECT_IND
@@ -535,7 +535,6 @@ lmi_optmgmt_ack(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 	rare();
 	return (-ENOBUFS);
 }
-#endif
 
 /*
  *  LMI_ERROR_IND
@@ -609,6 +608,7 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level, caddr_t inf_ptr, size_t inf_le
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  ========================================================================

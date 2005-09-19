@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.44 2005/09/19 04:23:47 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.45 2005/09/19 10:27:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/19 04:23:47 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/09/19 10:27:47 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -282,7 +282,6 @@ enum {
 	STRISPIPE_BIT,
 	STRISSOCK_BIT,
 	STRMOUNT_BIT,
-	STRFROZEN_BIT,
 };
 
 #define IOCWAIT	    (1<<IOCWAIT_BIT)	/* ioctl in progress */
@@ -306,7 +305,6 @@ enum {
 #define STRISPIPE   (1<<STRISPIPE_BIT)	/* stream is a STREAMS pipe */
 #define STRISSOCK   (1<<STRISSOCK_BIT)	/* stream is a STREAMS socket */
 #define STRMOUNT    (1<<STRMOUNT_BIT)	/* stream head is fattached */
-#define STRFROZEN   (1<<STRFROZEN_BIT)	/* stream is frozen */
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */
 #if 0				/* AIX compatible flags */

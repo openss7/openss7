@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -510,7 +510,6 @@ lmi_stats_ind(queue_t *q, struct sdt *s)
 	rare();
 	return (-ENOBUFS);
 }
-#endif
 
 /*
  *  LMI_EVENT_IND
@@ -538,6 +537,7 @@ lmi_event_ind(queue_t *q, struct sdt *s, ulong oid, ulong level, caddr_t inf_ptr
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  SDT_RC_SIGNAL_UNIT_IND
@@ -594,6 +594,7 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct sdt *s)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  SDT_RC_CONGESTION_DISCARD_IND
  *  -----------------------------------
@@ -615,6 +616,7 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct sdt *s)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  SDT_RC_NO_CONGESTION_IND
@@ -1251,7 +1253,7 @@ typedef uint16_t bc_entry_t;
 STATIC bc_entry_t *bc_table = NULL;
 STATIC tx_entry_t *tx_table = NULL;
 STATIC rx_entry_t *rx_table = NULL;
-STATIC rx_entry_t *rx_table7 = NULL;
+// STATIC rx_entry_t *rx_table7 = NULL;
 
 STATIC size_t bc_order = 0;
 STATIC size_t tx_order = 0;
@@ -1262,11 +1264,13 @@ tx_index8(uint j, uint k)
 {
 	return &tx_table[(j << 8) | k];
 }
+#if 0
 STATIC INLINE rx_entry_t *
 rx_index7(uint j, uint k)
 {
 	return &rx_table7[(j << 8) | k];
 }
+#endif
 STATIC INLINE rx_entry_t *
 rx_index8(uint j, uint k)
 {
@@ -1274,6 +1278,7 @@ rx_index8(uint j, uint k)
 }
 
 #ifdef _DEBUG
+#if 0
 STATIC INLINE void
 printb(uint8_t byte)
 {
@@ -1310,6 +1315,7 @@ printt(tx_entry_t * t)
 	printbs(t->bit_string, t->bit_length + 8);
 	printd(("\n"));
 }
+#endif
 #else
 STATIC INLINE void
 printb(uint8_t byte)
@@ -1552,6 +1558,7 @@ sdt_tx_block(queue_t *q, struct sdt *s)
 	}
 }
 
+#if 0
 /*
  *  RX COMPRESS
  *  ----------------------------------------
@@ -1585,6 +1592,7 @@ sdt_rx_compress(queue_t *q, struct sdt *s, mblk_t *mp)
       failure:
 	return (0);
 }
+#endif
 
 /*
  *  RX LINKB

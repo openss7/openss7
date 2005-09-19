@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/19 10:27:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 20:33:31 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/19 10:27:01 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/19 10:27:01 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/08/29 20:33:31 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/19 10:27:01 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2000,6 +2000,7 @@ STATIC int sctp_recv_err(struct sctp *sp, mblk_t *mp);
  *
  *  =========================================================================
  */
+#if SOCKETS
 STATIC INLINE uint32_t
 nocsum_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
@@ -2011,6 +2012,7 @@ nocsum_and_copy_from_user(const char *src, char *dst, int len, int sum, int *err
 		*errp = -EFAULT;
 	return sum;
 }
+#endif
 
 #if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
 /*
@@ -2101,6 +2103,7 @@ adler32_and_copy_from_user(const char *src, char *dst, int len, int sum, int *er
  *  -------------------------------------------------------------------------
  */
 #include "sctp_crc32c.h"
+#if 0
 /*
  *  Partial checksumming a CCITT checksum relies on the fact that the result of the checksum is a
  *  long division.  If there are two partial checksums on *  two strings of length `l' bits, then
@@ -2142,7 +2145,9 @@ __final_crc32c(uint32_t csum)
 {
 	return csum;
 }
+#endif
 
+#if SOCKETS
 #define CPCRC1(i)   {crc=(crc>>8)^crc_table[(crc^(dst[i]=src[i]))&0xff];}
 #define CPCRC2(i)   CPCRC1(i); CPCRC1(i+1);
 #define CPCRC4(i)   CPCRC2(i); CPCRC2(i+2);
@@ -2178,6 +2183,7 @@ crc32c_and_copy_from_user(const char *src, char *dst, int len, int sum, int *err
 		*errp = -EFAULT;
 	return sum;
 }
+#endif
 #endif				/* SCTP_CONFIG_CRC_32C */
 /*
  *  -------------------------------------------------------------------------
@@ -2201,6 +2207,7 @@ cksum(struct sctp *sp, void *buf, size_t len)
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
 	}
 }
+#if 0 /* never used */
 STATIC INLINE uint32_t
 __add_cksum(struct sctp *sp, uint32_t csum1, uint32_t csum2, uint16_t l2)
 {
@@ -2231,6 +2238,8 @@ __final_cksum(struct sctp *sp, uint32_t csum)
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
 	}
 }
+#endif
+#if SOCKETS
 STATIC INLINE uint32_t
 cksum_and_copy_from_user(struct sctp *sp, const char *src, char *dst, int len, int sum, int *errp)
 {
@@ -2246,6 +2255,7 @@ cksum_and_copy_from_user(struct sctp *sp, const char *src, char *dst, int len, i
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
 	}
 }
+#endif
 STATIC INLINE int
 cksum_verify(uint32_t csum, void *buf, size_t len)
 {
@@ -6519,6 +6529,7 @@ sctp_data_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
  *
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC INLINE int
 sctp_datack_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t tsn)
 {
@@ -6531,6 +6542,7 @@ sctp_datack_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint3
 	swerr();
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -6631,6 +6643,7 @@ sctp_reset_con(struct sctp *sp)
  *
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC INLINE int
 sctp_retr_ind(struct sctp *sp, mblk_t *dp)
 {
@@ -6643,6 +6656,7 @@ sctp_retr_ind(struct sctp *sp, mblk_t *dp)
 	swerr();
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -6651,6 +6665,7 @@ sctp_retr_ind(struct sctp *sp, mblk_t *dp)
  *
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC INLINE int
 sctp_retr_con(struct sctp *sp)
 {
@@ -6663,6 +6678,7 @@ sctp_retr_con(struct sctp *sp)
 	swerr();
 	return (-EFAULT);
 }
+#endif
 
 #ifdef SCTP_CONFIG_ECN
 /*

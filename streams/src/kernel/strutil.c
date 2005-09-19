@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/19 04:23:47 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/19 10:27:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/19 04:23:47 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/19 10:27:47 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/19 04:23:47 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/19 10:27:47 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1133,11 +1133,11 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	assert(!in_irq());
 
-	assert(!qisunlocked(q));
+	assert(frozen_by_caller(q));
 
-//      qwlock(q);
+	qwlock(q);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
-//      qwunlock(q);
+	qwunlock(q);
 	/* do enabling outside the locks */
 	switch (result) {
 	case 3:		/* success - high priority enable */
@@ -1449,6 +1449,9 @@ bcanput(queue_t *q, unsigned char band)
 		srlock(sd);
 		/* find first queue with service procedure or no q_next pointer */
 		for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
+
+		qwlock(q);
+
 		if (band == 0) {
 			if (test_bit(QFULL_BIT, &q->q_flag)) {
 				set_bit(QWANTW_BIT, &q->q_flag);
@@ -1457,7 +1460,6 @@ bcanput(queue_t *q, unsigned char band)
 		} else {
 			struct qband *qb;
 
-			qrlock(q);
 			if (band <= q->q_nband && q->q_blocked > 0) {
 				if ((qb = __find_qband(q, band)) && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 					set_bit(QB_WANTW_BIT, &qb->qb_flag);
@@ -1465,8 +1467,10 @@ bcanput(queue_t *q, unsigned char band)
 				}
 			}
 			/* Note: a non-existent band is considered empty */
-			qrunlock(q);
 		}
+
+		qwunlock(q);
+
 		srunlock(sd);
 		return (result);
 	}
@@ -1669,6 +1673,8 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
  *
  *  MP-STREAMS: Note that qbackenable() will take its own STREAM head read lock making this function
  *  safe to be called from outside of STREAMS.
+ *
+ *  This function is not supposed to be called on a Stream that is frozen by the calling thread.
  */
 streams_fastcall void
 flushband(queue_t *q, int band, int flag)
@@ -1678,6 +1684,8 @@ flushband(queue_t *q, int band, int flag)
 
 	assert(q);
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
+
+	assert(not_frozen_by_caller(q));
 
 	qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
@@ -1785,6 +1793,8 @@ flushq(queue_t *q, int flag)
 	assert(q);
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
+	assert(not_frozen_by_caller(q));
+
 	qwlock(q);
 	backenable = __flushq(q, flag, &mpp);
 	qwunlock(q);
@@ -1802,17 +1812,23 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
  *  freezestr:	- freeze a stream for direct queue access
  *  @q:		queue to freeze
  *
- *  MP-STREAMS: What should really be done here is upgrade any existing STREAM head read lock to a
- *  STREAM head write lock, but the purpose of this function is only to protect the queue members
- *  and block put and service procedures from manipulating the queue so that rmvq and insq functions
- *  can be called.
+ *  Any function that wants to alter queue state (that is takes a write lock on the Stream head or a
+ *  write lock on a queue in the stream), first takes a read lock on the Stream freeze lock.
+ *  Because of this, taking a write lock on the Stream freeze lock probihits any other thread from
+ *  putting message on or taking message off of any queue in the Stream.  This meets the purposes of
+ *  STREAMS functions that need to be protected by freezestr() (insq(9), rmvq(9), appq(9),
+ *  strqget(9), and strqset(9)).
+ *
+ *  The purpose of this function is only to protect the queue members and block put and service
+ *  procedures from manipulating the queue so that rmvq and insq functions can be called.
  */
 unsigned long
 freezestr(queue_t *q)
 {
-	qwlock(q);
+	struct stdata *sd = qstream(q);
+
+	zwlock(sd);
 	return (5);
-//      return (q->q_klock.kl_isrflags);
 }
 
 EXPORT_SYMBOL(freezestr);
@@ -1938,6 +1954,8 @@ getq(queue_t *q)
 	assert(!in_irq());
 	assert(q);
 
+	assert(not_frozen_by_caller(q));
+
 	qwlock(q);
 	mp = __getq(q, &backenable);
 	qwunlock(q);
@@ -2045,11 +2063,11 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	assert(!in_irq());
 
-	assert(!qisunlocked(q));
+	assert(frozen_by_caller(q));
 
-//      qwlock(q);
+	qwlock(q);
 	result = __insq(q, emp, nmp);
-//      qwunlock(q);
+	qwunlock(q);
 	switch (result) {
 	case 3:		/* success - high priority enable */
 		assert(0);
@@ -2183,6 +2201,8 @@ streams_fastcall int
 putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
+
+	assert(not_frozen_by_caller(q));
 
 	qwlock(q);
 	result = __putbq(q, mp);
@@ -2454,6 +2474,8 @@ putq(queue_t *q, mblk_t *mp)
 #endif
 
 	assert(!in_irq());
+
+	assert(not_frozen_by_caller(q));
 
 	qwlock(q);
 	result = __putq(q, mp);
@@ -2760,6 +2782,9 @@ qprocsoff(queue_t *q)
 		struct queinfo *qu = ((typeof(qu)) rq);
 		struct stdata *sd = qu->qu_str;
 
+		qwlock(rq);
+		qwlock(wq);
+
 		set_bit(QPROCS_BIT, &rq->q_flag);
 		set_bit(QPROCS_BIT, &wq->q_flag);
 		/* disable queue enabling */
@@ -2785,6 +2810,9 @@ qprocsoff(queue_t *q)
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 			}
 		}
+
+		qwunlock(wq);
+		qwunlock(rq);
 
 		assert(sd);
 
@@ -2853,6 +2881,9 @@ qprocson(queue_t *q)
 		struct queinfo *qu = ((typeof(qu)) rq);
 		struct stdata *sd = qu->qu_str;
 
+		qwlock(rq);
+		qwlock(wq);
+
 		clear_bit(QPROCS_BIT, &rq->q_flag);
 		clear_bit(QPROCS_BIT, &wq->q_flag);
 		/* allow queues to be enabled */
@@ -2868,6 +2899,9 @@ qprocson(queue_t *q)
 			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
 				set_bit(QB_WANTR_BIT, &qb->qb_flag);
 		}
+
+		qwunlock(wq);
+		qwunlock(rq);
 
 		/* spin here waiting for queue procedures to exit */
 		swlock(sd);
@@ -3068,18 +3102,17 @@ rmvq(queue_t *q, mblk_t *mp)
 	assert(!in_irq());
 	assert(q);
 	assert(mp);
-	assert(!qisunlocked(q));
 
-//	qwlock(q);
-//	{
-//		assert(q->q_klock.kl_owner == current);
-//		assert(q->q_klock.kl_nest >= 1);
-		assert(mp->b_queue);
-		assert(q == mp->b_queue);
+	assert(frozen_by_caller(q));
 
-		backenable = __rmvq(q, mp);
-//	}
-//	qwunlock(q);
+	qwlock(q);
+
+	assert(mp->b_queue);
+	assert(q == mp->b_queue);
+
+	backenable = __rmvq(q, mp);
+
+	qwunlock(q);
 
 	/* Backenabling under locks is not so severe now that write locks only suppress soft irq. */
 	if (backenable)
@@ -3140,7 +3173,9 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	queue_t *rq = q;
 	queue_t *wq = q + 1;
 
-	/* always take read lock before write lock */
+	assert(not_frozen_by_caller(q));
+
+	/* always take read-side queue lock before write-side queue lock */
 	/* nobody else takes two locks */
 	qwlock(rq);
 	qwlock(wq);
@@ -3310,7 +3345,9 @@ setsq(queue_t *q, struct fmodsw *fmod)
 	queue_t *rq = q;
 	queue_t *wq = q + 1;
 
-	/* always take read lock before write lock */
+	assert(not_frozen_by_caller(q));
+
+	/* always take read-size queue lock before write-side queue lock */
 	/* nobody else takes two locks */
 	qwlock(rq);
 	qwlock(wq);
@@ -3334,6 +3371,8 @@ int
 strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
 	int err = 0;
+
+	assert(frozen_by_caller(q));
 
 	if (!band) {
 		switch (what) {
@@ -3419,11 +3458,17 @@ EXPORT_SYMBOL(strqget);
  *  @what:	what characteristic to set
  *  @band:	to which queue band
  *  @val:	value to set
+ *
+ *  MP-STREAMS: The caller must freeze the Stream with freezestr(9) across the call to this
+ *  function.  On UP it is not necessary unless strqset(9) is to be called from outside of the
+ *  STREAMS context.
  */
 int
 strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
 	int err = 0;
+
+	assert(frozen_by_caller(q));
 
 	if (!band) {
 		switch (what) {
@@ -3575,8 +3620,10 @@ EXPORT_SYMBOL(strlog);
 void
 unfreezestr(queue_t *q, unsigned long flags)
 {
+	struct stdata *sd = qstream(q);
+
 	(void) flags;
-	qwunlock(q);
+	zwunlock(sd);
 }
 
 EXPORT_SYMBOL(unfreezestr);

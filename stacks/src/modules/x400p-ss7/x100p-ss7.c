@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 12:01:46 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:46 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:27:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 12:01:46 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 12:01:46 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2005/07/13 12:01:46 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -485,6 +485,7 @@ m_error(queue_t *q, struct xp *xp, int err)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  SL_PDU_IND
  *  -----------------------------------
@@ -507,6 +508,7 @@ sl_pdu_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  SL_LINK_CONGESTED_IND
@@ -750,6 +752,7 @@ sl_rtb_cleared_ind(queue_t *q, struct xp *xp)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  SL_RETRIEVAL_NOT_POSSIBLE_IND
  *  -----------------------------------
@@ -793,7 +796,6 @@ sl_bsnt_not_retrievable_ind(queue_t *q, struct xp *xp, ulong bsnt)
 	return (-ENOBUFS);
 }
 
-#if 0
 /*
  *  SL_OPTMGMT_ACK
  *  -----------------------------------
@@ -912,6 +914,7 @@ sdt_rc_signal_unit_ind(queue_t *q, struct xp *xp, mblk_t *dp, ulong count)
 	return (-EFAULT);
 }
 
+#if 0
 /*
  *  SDT_RC_CONGESTION_ACCEPT_IND
  *  -----------------------------------
@@ -1062,6 +1065,7 @@ sdt_txc_transmission_request_ind(queue_t *q, struct xp *xp)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  SDL_RECEIVED_BITS_IND
@@ -1081,6 +1085,7 @@ sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 	return (-EBUSY);
 }
 
+#if 0
 /*
  *  SDL_DISCONNECT_IND
  *  -----------------------------------
@@ -1102,6 +1107,7 @@ sdl_disconnect_ind(queue_t *q, struct xp *xp)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  LMI_OK_ACK
@@ -1195,6 +1201,7 @@ lmi_disable_con(queue_t *q, struct xp *xp)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
@@ -1297,6 +1304,7 @@ lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 	rare();
 	return (-EBUSY);
 }
+#endif
 
 /*
  *  =========================================================================
@@ -3442,6 +3450,7 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 	return (QR_DONE);
 }
 
+#if 0
 STATIC INLINE void
 sl_lsc_continue(queue_t *q, struct xp *xp, mblk_t *mp)
 {
@@ -3455,6 +3464,7 @@ sl_lsc_continue(queue_t *q, struct xp *xp, mblk_t *mp)
 		xp->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
 }
+#endif
 
 STATIC INLINE void
 sl_poc_local_processor_recovered(queue_t *q, struct xp *xp)
@@ -4378,6 +4388,7 @@ rx_index8(uint j, uint k)
 }
 
 #ifdef _DEBUG
+#if 0
 STATIC INLINE void
 printb(uint8_t byte)
 {
@@ -4414,6 +4425,7 @@ printt(tx_entry_t * t)
 	printbs(t->bit_string, t->bit_length + 8);
 	printd(("\n"));
 }
+#endif
 #else
 STATIC INLINE void
 printb(uint8_t byte)

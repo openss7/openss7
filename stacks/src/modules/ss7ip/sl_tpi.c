@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:39 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/19 10:26:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:39 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:39 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/19 10:26:59 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:39 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/19 10:26:59 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -374,6 +374,7 @@ sl_allocb(queue_t *q, size_t size, int prior)
 	}
 }
 
+#if 0
 /*
  *  ESBALLOC
  *  -------------------------------------------------------------------------
@@ -405,6 +406,7 @@ sl_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frt
 		return (NULL);
 	}
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -461,6 +463,7 @@ sl_fast_freemsg(mblk_t *mp)
 	}
 }
 
+#if 0
 /*
  *  FAST DUPB
  *  -------------------------------------------------------------------------
@@ -476,6 +479,7 @@ sl_fast_dupb(mblk_t *mp)
 	}
 	return (dp);
 }
+#endif
 
 /*
  *  FAST INIT and TERM
@@ -751,6 +755,7 @@ lmi_disable_con(queue_t *q)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
@@ -831,6 +836,7 @@ lmi_stats_ind(queue_t *q, ulong interval)
 	rare();
 	return (-EBUSY);
 }
+#endif
 
 /*
  *  LMI_EVENT_IND
@@ -862,6 +868,7 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level)
 	return (-EBUSY);
 }
 
+#if 0
 /*
  *  SL_PDU_IND
  *  -----------------------------------
@@ -886,6 +893,7 @@ sl_pdu_ind(queue_t *q, mblk_t *dp)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  SL_LINK_CONGESTED_IND
@@ -1151,6 +1159,7 @@ sl_rtb_cleared_ind(queue_t *q)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  SL_RETRIEVAL_NOT_POSSIBLE_IND
  *  -----------------------------------
@@ -1198,7 +1207,6 @@ sl_bsnt_not_retrievable_ind(queue_t *q, ulong bsnt)
 	return (-ENOBUFS);
 }
 
-#if 0
 /*
  *  SL_OPTMGMT_ACK
  *  -----------------------------------
@@ -1427,6 +1435,7 @@ sdt_lsc_link_failure_ind(queue_t *q)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  SDT_TXC_TRANSMISSION_REQUEST_IND
  *  -----------------------------------
@@ -1449,6 +1458,7 @@ sdt_txc_transmission_request_ind(queue_t *q)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  ------------------------------------------------------------------------
@@ -1604,6 +1614,7 @@ t_data_req(queue_t *q)
 	return (mp);
 }
 
+#if 0
 /*
  *  T_EXDATA_REQ
  *  ------------------------------------------------------------------------
@@ -1627,6 +1638,7 @@ t_exdata_req(queue_t *q)
 	}
 	return (mp);
 }
+#endif
 
 /*
  *  T_INFO_REQ
@@ -1762,6 +1774,7 @@ t_unitdata_req(queue_t *q)
 	return (mp);
 }
 
+#if 0
 /*
  *  T_OPTMGMT_REQ
  *  ------------------------------------------------------------------------
@@ -1795,6 +1808,7 @@ t_optmgmt_req(queue_t *q, caddr_t opt_ptr, size_t opt_len, ulong flags)
 	rare();
 	return (-EBUSY);
 }
+#endif
 
 /*
  *  T_ORDREL_REQ
@@ -1826,6 +1840,7 @@ t_ordrel_req(queue_t *q)
 	return (-EBUSY);
 }
 
+#if 0
 /*
  *  T_OPTDATA_REQ
  *  ------------------------------------------------------------------------
@@ -1889,6 +1904,7 @@ t_addr_req(queue_t *q)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  =========================================================================
@@ -3963,6 +3979,7 @@ sl_lsc_clear_buffers(queue_t *q)
 	return (QR_DONE);
 }
 
+#if 0
 STATIC INLINE void
 sl_lsc_continue(queue_t *q, mblk_t *mp)
 {
@@ -3977,6 +3994,7 @@ sl_lsc_continue(queue_t *q, mblk_t *mp)
 		sl->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
 }
+#endif
 
 STATIC INLINE void
 sl_poc_local_processor_recovered(queue_t *q)

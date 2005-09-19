@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -71,7 +71,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2962,6 +2962,7 @@ sl_lsc_clear_buffers(queue_t *q, struct sl *sl)
 	return (QR_DONE);
 }
 
+#if 0
 STATIC INLINE void
 sl_lsc_continue(queue_t *q, struct sl *sl, mblk_t *mp)
 {
@@ -2975,6 +2976,7 @@ sl_lsc_continue(queue_t *q, struct sl *sl, mblk_t *mp)
 		sl->statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
 }
+#endif
 
 STATIC INLINE void
 sl_poc_local_processor_recovered(queue_t *q, struct sl *sl)

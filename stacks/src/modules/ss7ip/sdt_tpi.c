@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:39 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -284,6 +284,7 @@ struct sdt_config sdt_default = {
  *
  *  ------------------------------------------------------------------------
  */
+#if 0
 /*
  *  M_ERROR
  *  -----------------------------------
@@ -305,6 +306,7 @@ m_error(queue_t *q, struct sdt *sdt, int err)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  M_HANGUP
@@ -485,6 +487,7 @@ lmi_disable_con(queue_t *q, struct sdt *sdt)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
@@ -591,6 +594,7 @@ lmi_event_ind(queue_t *q, struct sdt *sdt, ulong oid, ulong level)
 	rare();
 	return (-EBUSY);
 }
+#endif
 
 /*
  *  SDT_RC_SIGNAL_UNIT_IND
@@ -630,6 +634,7 @@ sdt_rc_signal_unit_ind(queue_t *q, struct sdt *sdt, mblk_t *dp, ulong count)
 	return (-EFAULT);
 }
 
+#if 0
 /*
  *  SDT_RC_CONGESTION_ACCEPT_IND
  *  -----------------------------------
@@ -695,6 +700,7 @@ sdt_rc_no_congestion_ind(queue_t *q, struct sdt *sdt)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  SDT_IAC_CORRECT_SU_IND
@@ -766,6 +772,7 @@ sdt_lsc_link_failure_ind(queue_t *q, struct sdt *sdt)
 	return (-ENOBUFS);
 }
 
+#if 0
 /*
  *  SDT_TXC_TRANSMISSION_REQUEST_IND
  *  -----------------------------------
@@ -787,6 +794,7 @@ sdt_txc_transmission_request_ind(queue_t *q, struct sdt *sdt)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  ------------------------------------------------------------------------
@@ -939,6 +947,7 @@ t_data_req(queue_t *q, struct sdt *sdt)
 	return (mp);
 }
 
+#if 0
 /*
  *  T_EXDATA_REQ
  *  ------------------------------------------------------------------------
@@ -962,6 +971,7 @@ t_exdata_req(queue_t *q, struct sdt *sdt)
 	}
 	return (mp);
 }
+#endif
 
 /*
  *  T_INFO_REQ
@@ -1093,6 +1103,7 @@ t_unitdata_req(queue_t *q, struct sdt *sdt)
 	return (mp);
 }
 
+#if 0
 /*
  *  T_OPTMGMT_REQ
  *  ------------------------------------------------------------------------
@@ -1125,6 +1136,7 @@ t_optmgmt_req(queue_t *q, struct sdt *sdt, caddr_t opt_ptr, size_t opt_len, ulon
 	rare();
 	return (-EBUSY);
 }
+#endif
 
 /*
  *  T_ORDREL_REQ
@@ -1155,6 +1167,7 @@ t_ordrel_req(queue_t *q, struct sdt *sdt)
 	return (-EBUSY);
 }
 
+#if 0
 /*
  *  T_OPTDATA_REQ
  *  ------------------------------------------------------------------------
@@ -1216,6 +1229,7 @@ t_addr_req(queue_t *q, struct sdt *sdt)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  =========================================================================
