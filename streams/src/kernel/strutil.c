@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/18 07:35:54 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/19 04:23:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/18 07:35:54 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/19 04:23:47 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/09/18 07:35:54 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/19 04:23:47 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1892,16 +1892,31 @@ EXPORT_SYMBOL(getmid);
  *
  *  CONTEXT:	This function must be called with the queue write locked.
  *
+ *  IMPLEMENTATION: A slight variation on the SVR 4 QWANTR theme: getq() sets QB_WANTR flag in bands
+ *  as well when it did not find a message of a higher priority band.  This indicates to putq(),
+ *  putbq() and insq() finer control of enabling on priority band messages.
+ *
  *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
  *  no message on the queue.
  */
 static mblk_t *
-__getq(queue_t *q, bool *be)
+__getq(queue_t *q, bool * be)
 {
 	mblk_t *mp;
 
-	mp = q->q_first;
-	*be = __rmvq(q, mp);
+	if ((mp = q->q_first))
+		*be = __rmvq(q, mp);
+	else {
+		struct qband *qb;
+
+		*be = false;
+		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
+			*be = true;
+		/* wanted to read all bands */
+		for (qb = q->q_bandp; qb; qb = qb->qb_next)
+			if (!test_and_set_bit(QB_WANTR_BIT, &qb->qb_flag))
+				*be = true;
+	}
 	return (mp);
 }
 
@@ -1949,7 +1964,9 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		goto putq;
 	if (q != emp->b_queue)
 		goto bug;
-	enable = q->q_first ? (test_bit(QWANTR_BIT, &q->q_flag) != 0) : 1; /* ingnore message class for insq() */
+	/* ingnore message class for insq() */
+	enable = ((q->q_first == emp)
+		  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
@@ -1966,8 +1983,9 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
 			// nmp->b_bandp = qb;
-			/* enable on priority band message */
-			enable = qb->qb_first ? (test_bit(QB_WANTR_BIT, &qb->qb_flag) != 0) : 1;
+			enable = ((q->q_first == emp)
+				  || test_bit(QWANTR_BIT, &q->q_flag)
+				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
 			if (!qb->qb_last)
 				qb->qb_first = qb->qb_last = nmp;
 			else if (qb->qb_first == emp)
@@ -2132,7 +2150,8 @@ __putbq(queue_t *q, mblk_t *mp)
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
-			enable = test_bit(QB_WANTR_BIT, &qb->qb_flag) ? 1 : 0;
+			enable = (test_bit(QWANTR_BIT, &q->q_flag)
+				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
 			if (qb->qb_last == b_prev)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next)
@@ -2354,7 +2373,9 @@ __putq(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_datap->db_type < QPCTL && mp->b_band == 0)) {
 		b_prev = q->q_last;
 		b_next = NULL;
-		enable = b_prev ? (test_bit(QWANTR_BIT, &q->q_flag) != 0) : 1;
+		/* enable if will be first message in queue, or requested by getq() */
+		enable = ((q->q_first == b_next)
+			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 	      hipri:
 		if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 			set_bit(QFULL_BIT, &q->q_flag);
@@ -2394,8 +2415,10 @@ __putq(queue_t *q, mblk_t *mp)
 			b_prev = b_next;
 			b_next = b_prev->b_next;
 		}
-		/* enable on priority banded messages */
-		enable = qb->qb_first ? (test_bit(QB_WANTR_BIT, &qb->qb_flag) != 0) : 1;
+		/* enable if will be first message in queue, or requested by getq() */
+		enable = ((q->q_first == b_next)
+			  || test_bit(QWANTR_BIT, &q->q_flag)
+			  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
 		if (qb->qb_last == b_prev)
 			qb->qb_last = mp;
 		if (qb->qb_first == b_next)
@@ -2931,6 +2954,16 @@ EXPORT_SYMBOL(RD);
  *  RETURN VALUE: Returns an integer indicating whether back enabling should be performed.  A return
  *  value of zero (0) indicates that back enabling is not necessary.  A return value of one (1)
  *  indicates that back enabling of queues is required.
+ *
+ *  IMPLEMENTATION: A slight variation on the them of SVR QWANTR, we also set and clear QB_WANTR for
+ *  queue bands.  When a message is removed from the queue, the QWANTR flag is reset, and the
+ *  QB_WANTR flag is reset for the band retrieved and all lower priority bands.  The QB_WANTR flag
+ *  is set for all the priority bands higher than the message retrieved.  This indicates to putq(),
+ *  putbq() and insq() when to enable the queue on priority band messages being added to the queue.
+ *
+ *  This way, if a priority band message is placed back on the queue with putbq() due to flow
+ *  control restrictions, another priority band message of the same or lower priority being enqueued
+ *  will not enable the queue, however, a higher priority message will.
  */
 bool
 __rmvq(queue_t *q, mblk_t *mp)
@@ -2938,18 +2971,11 @@ __rmvq(queue_t *q, mblk_t *mp)
 	bool backenable = false;
 	mblk_t *b_next, *b_prev;
 
-	if (mp == NULL) {
-		struct qband *qb;
-		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
-			backenable = true;
-		/* wanted to read all bands */
-		for (qb = q->q_bandp; qb; qb = qb->qb_next)
-		     if (!test_and_set_bit(QB_WANTR_BIT, &qb->qb_flag))
-			     backenable = true;
-		return (backenable);
-	}
-	assert(q == mp->b_queue);
+	assert(q);
+	assert(mp);
+
 	/* We know which queue the message belongs too, make sure its still there. */
+	assert(q == mp->b_queue);
 
 	b_prev = mp->b_prev;
 	b_next = mp->b_next;

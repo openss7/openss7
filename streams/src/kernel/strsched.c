@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/18 07:35:54 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/19 04:23:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/18 07:35:54 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/19 04:23:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/18 07:35:54 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/19 04:23:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1695,6 +1695,34 @@ qwakeup(queue_t *q)
 }
 
 /*
+ *  freezechk: - check if put procedure can run
+ *  @q:		the queue to check
+ *
+ *  freezestr(9) blocks all threads from enetering open(), close(), put() and service() procedures
+ *  on the Stream.  It does not, however, block threads already in these procedures, and in
+ *  particular, it does not block the freezing thread from entering put procedures.  freezechk()
+ *  tests if the Stream is frozen, and if it is, acquires and releases a freeze read lock.  If the
+ *  caller is the freezing thread, zrlock() will always be successful.  If the caller is another
+ *  thread, the thread will spin on zrlock() until the Stream is thawed.
+ *
+ *  The put() procedure is the only place that we test this this way.  open() and close() procedures
+ *  will sleep on the STRFROZEN_BIT, and service() procedures will not enable while a Stream is
+ *  frozen, but will be enabled when it is thawed.
+ */
+STATIC inline streams_fastcall void
+freezechk(queue_t *q)
+{
+	struct stdata *sd;
+
+	sd = qstream(q);
+	if (test_bit(STRFROZEN_BIT, &sd->sd_flag)) {
+		/* spin here until stream unfrozen */
+		zrlock(sd);
+		zrunlock(sd);
+	}
+}
+
+/*
  *  putp:	- execute a queue's put procedure
  *  @q:		the queue onto which to put the message
  *  @mp:	the message to put
@@ -1712,6 +1740,9 @@ putp_fast(queue_t *q, mblk_t *mp)
 	assert(q);
 	assert(q->q_qinfo);
 	assert(q->q_qinfo->qi_putp);
+
+	/* spin here if Stream frozen by other than caller */
+	freezechk(q);
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	srlock(qstream(q));
@@ -1763,6 +1794,11 @@ putp(queue_t *q, mblk_t *mp)
  *  NOTICES: This call to the service procedure bypasses all sychronization.  Any syncrhonization
  *  required of the queue service procedure must be performed across the call to this function.
  *
+ *  Frozen Streams do not permit any service procedures to be run once they are frozen.  If we hit
+ *  the STRFROZEN bit here, it can only be because we are running on a different processor from the
+ *  freezing thread, in which case, rescheduling the queue is better than spinning: the processor
+ *  might have some other useful work to do during the loop.
+ *
  *  Do not pass this function null or invalid queue pointers, or pointers to queues that have no
  *  service procedure.  In safe mode, this will cause kernel assertions to fail and will panic the
  *  kernel.
@@ -1773,6 +1809,15 @@ srvp_fast(queue_t *q)
 	assert(q);
 	if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
 		queue_t *qold;
+
+		if (unlikely(test_bit(STRFROZEN_BIT, &qstream(q)->sd_flag) != 0)) {
+			/* if assertion fails we would loop indefinitely */
+			assert(qstream(q)->sd_freezer != current);
+			/* reschedule ourselves */
+			qschedule(q);
+			qput(q);	/* cancel get from previous qschedule */
+			return;
+		}
 
 		assert(q->q_qinfo);
 
@@ -3470,16 +3515,10 @@ qready(void)
 
 EXPORT_SYMBOL(qready);		/* include/sys/streams/stream.h */
 
-/*
+/**
  *  qschedule:	- schedule a queue for service
  *  @q:		queue to schedule for service
  *
- *  NOTICES: Note that, for MP safety, queues are always scheduled against the same CPU that enabled
- *  the queue.  This means that the service procedure will not run until after the caller exits or
- *  hits a pre-emption point.
- *
- *  MP-STREAMS: Note that because we are just pushing the tail, the atomic exchange takes care of
- *  concurrency and other exclusion measures are not necessary here.
  */
 void
 qschedule(queue_t *q)
@@ -3726,7 +3765,8 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
 	init_waitqueue_head(&sd->sd_waitq);
-	slockinit(sd);
+	slockinit(sd); /* stream head read/write lock */
+	zlockinit(sd); /* stream head freeze read/write lock */
 	INIT_LIST_HEAD(&sd->sd_list);	/* doesn't matter really */
 //      init_MUTEX(&sd->sd_mutex);
 }

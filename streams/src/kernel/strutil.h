@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/18 07:35:54 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/19 04:23:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/18 07:35:54 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 04:23:48 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -177,6 +177,17 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define read_lock_str(__l)	do { local_str_disable();  read_lock(__l); } while (0)
 #define read_unlock_str(__l)	do { read_unlock(__l); local_str_enable(); } while (0)
 
+/*
+ *  Just a little bit of nesting on freeze locks, if the caller holds a write lock on the freeze
+ *  lock, it can take a read lock on the freeze lock without deadlocking.  This allows the freezer
+ *  to do things that others are not permitted to do.
+ */
+#define zlockinit(__sd)	rwlock_init(&(__sd)->sd_freeze)
+#define zwlock(__sd)	do { write_lock_str(&(__sd)->sd_freeze); sd->sd_freezer = current; } while (0)
+#define zwunlock(__sd)	do { sd->sd_freezer = NULL; write_unlock_str(&(__sd)->sd_freeze); } while (0)
+#define zrlock(__sd)	do { if ((__sd)->sd_freezer != current) read_lock_str(&(__sd)->sd_freeze); } while (0)
+#define zrunlock(__sd)	do { if ((__sd)->sd_freezer != current) read_unlock_str(&(__sd)->sd_freeze); } while (0)
+
 #define slockinit(__sd)	rwlock_init(&(__sd)->sd_lock)
 #define swlock(__sd)	write_lock_str(&(__sd)->sd_lock)
 #define swunlock(__sd)	write_unlock_str(&(__sd)->sd_lock)
@@ -184,8 +195,8 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define srunlock(__sd)	read_unlock_str(&(__sd)->sd_lock)
 
 #define qlockinit(__q)	rwlock_init(&(__q)->q_lock)
-#define qwlock(__q)	write_lock_str(&(__q)->q_lock)
-#define qwunlock(__q)	write_unlock_str(&(__q)->q_lock)
+#define qwlock(__q)	do { zrlock(qstream(__q)); write_lock_str(&(__q)->q_lock); } while (0)
+#define qwunlock(__q)	do { write_unlock_str(&(__q)->q_lock); zrunlock(qstream(__q)); } while (0)
 #define qrlock(__q)	read_lock_str(&(__q)->q_lock)
 #define qrunlock(__q)	read_unlock_str(&(__q)->q_lock)
 

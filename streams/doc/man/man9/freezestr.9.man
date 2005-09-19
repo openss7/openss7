@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.19 2005/08/29 10:06:48 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.20 2005/09/19 04:23:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -116,6 +116,37 @@ freezes the state of the queue,
 .IR q,
 and the stream containing
 .IR q .
+A frozen
+.I Stream
+blocks any thread attempting to enter any
+.BR open ,
+.BR close ,
+.BR put ,
+or
+.B service
+procedure belonging to any queue instance in the
+.IR Stream ,
+and blocks any thread currently within the
+.I Stream
+if it attempts to put messages onto or take messages off of any queue within the
+.I Stream
+(with the sole exception of the caller).  Threads blocked by this mechanism remain so until the
+.I Stream
+is thawed by a call to
+.BR unfreezestr (9).
+.PP
+Freezing a
+.I Stream
+does not automatically stop all functions that are running within the
+.IR Stream ;
+functions will continue to run until they attempt to perform some operation that would change the
+state of the
+.IR Stream ,
+at which point they will be forced to wait for the
+.I Stream
+to be unfrozen by a call to
+.BR unfreezestr (9).
+.PP
 A queue cannot be altered while frozen.
 The purpose of
 .BR freezestr ()
@@ -374,6 +405,76 @@ frozen queue.
 .\"
 .\"
 .SH IMPLEMENTATION
+.PP
+.BR freezestr ()
+is implemented by setting the
+.B STRFROZEN
+bit on the
+.I Stream head
+(see
+.BR stdata (9)).
+Holding this bit will prevent any other thread from entering a
+.IR qi_qopen ()
+or
+.IR qi_qclose ()
+procedure on the
+.IR Stream .
+Threads wishing to enter
+.B open
+or
+.B close
+procedures will sleep on
+.IR sd_waitq ,
+awaiting release of the bit.
+The
+.I STREAMS
+scheduler will not execute a
+.B service
+procedure for a queue belonging to a
+.I Stream
+that has the
+.B STRFROZEN
+bit set on the
+.IR "Stream head" .
+.PP
+.BR freezestr ()
+also acquires the
+.I sd_freeze
+read-write lock as a writer which prevents threads on other processors from entering
+.B put
+procedures,
+and also prevents threads on other processors from changing the state of any queue in the
+.IR Stream .
+.BR put (9)
+procedures acquire and release the
+.I sd_freeze
+lock in read mode when they execute.  They will spin on the lock if the
+.I Stream
+is frozen.
+Whenever a queue write lock is taken to alter the state of a queue, a read lock is first taken on the
+.I sd_freeze
+lock.  When the queue write lock is released, the read lock on
+.I sd_freeze
+is also released.  This ensures that the state of any queue in the
+.I Stream
+cannot change while the
+.I Stream
+is frozen.
+.PP
+Read locks on the
+.I sd_freeze
+lock are recursive in the sense that a thread that holds a write lock will always be given a read
+lock.  This permits functions that alter queue state (such as
+.BR putq (9),
+.BR insq (9),
+.BR putbq (9),
+.BR rmvq (9),
+.BR getq (9),
+.BR appq (9),
+to be called while the
+.I Stream
+is frozen with
+.BR freezestr ().
 .PP
 .BR freezestr ()
 is implemented by taking a recursive write lock on the stream head with

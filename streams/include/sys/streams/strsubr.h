@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.43 2005/09/03 08:12:01 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.44 2005/09/19 04:23:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:01 $ by $Author: brian $
+ Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:12:01 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/19 04:23:47 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -218,6 +218,8 @@ struct stdata {
 	ulong sd_ioctime;		/* time to wait for ioctl() acknowledgement */
 //	klock_t sd_klock;		/* lock for queues under this stream */
 	rwlock_t sd_lock;		/* lock for queues under this stream */
+	rwlock_t sd_freeze;		/* lock for freezing streams */
+	struct task_struct *sd_freezer;	/* thread holding freeze lock */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */
 //      struct semaphore sd_mutex;      /* mutex for system calls */
@@ -280,6 +282,7 @@ enum {
 	STRISPIPE_BIT,
 	STRISSOCK_BIT,
 	STRMOUNT_BIT,
+	STRFROZEN_BIT,
 };
 
 #define IOCWAIT	    (1<<IOCWAIT_BIT)	/* ioctl in progress */
@@ -303,6 +306,7 @@ enum {
 #define STRISPIPE   (1<<STRISPIPE_BIT)	/* stream is a STREAMS pipe */
 #define STRISSOCK   (1<<STRISSOCK_BIT)	/* stream is a STREAMS socket */
 #define STRMOUNT    (1<<STRMOUNT_BIT)	/* stream head is fattached */
+#define STRFROZEN   (1<<STRFROZEN_BIT)	/* stream is frozen */
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */
 #if 0				/* AIX compatible flags */
