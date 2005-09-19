@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCACK.9.man,v 0.9.2.1 2005/04/28 11:36:34 brian Exp $
+.\" @(#) $Id: M_IOCACK.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,68 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Signals the positive acknowledgement of a previous
+.BR M_IOCTL (9)
+message.  The message format is one
+.B M_IOCACK
+block (containing an
+.BR iocblk (9)
+structure, see
+.BR M_IOCTL (9))
+followed by zero or more
+.BR M_DATA (9)
+blocks.  The
+.BR iocblk (9)
+data structure may contain a value in
+.I ioc_rval
+to be returned to the user process.  It may also contain a value in
+.I ioc_error
+to be returned to the user process in
+.BR errno (3).
+.PP
+If this message is responding to an
+.BR I_STR (7)
+.BR ioctl (2)
+[see
+.BR streamio (7)],
+it may contain data from the receiving module or driver to be sent to the user process.  In this
+case, message format is one
+.B M_IOCACK
+block followed by one or more
+.BR M_DATA (9)
+blocks containing the user data.  The
+.I Stream head
+returns the data to the user if there is a corresponding outstanding
+.BR M_IOCTL (9)
+request.  Otherwise, the
+.B M_IOCACK
+message is ignored and all blocks in the message are freed.
+.PP
+Data can not be returned in an
+.B M_IOCACK
+message responding to a transparent
+.BR M_IOCTL (9).
+The data must have been sent with preceding
+.BR M_COPYOUT (9)
+message(s).  If any
+.BR M_DATA (9)
+blocks follow the
+.B M_IOCACK
+block, the
+.I Stream head
+will ignore and free them.
+.PP
+The format and use of this message type is described further under
+.BR M_IOCTL (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+Under
+.B @PACKAGE_TITLE@
+it is not possible to return an error and a return value at the same time.  This is due to a
+.B Linux
+limitation in this regard.
 .\"
 .\"
 .SH "SEE ALSO"

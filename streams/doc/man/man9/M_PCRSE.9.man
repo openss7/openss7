@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.1 2005/04/28 11:36:35 brian Exp $
+.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,8 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Reserved for internal use.  Modules that do not recognize this message must pass it on.  Drivers
+that do not recognize it must free it.
 .\"
 .\"
 .SH "SEE ALSO"

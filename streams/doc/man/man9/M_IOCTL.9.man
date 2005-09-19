@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.2 2005/09/18 07:38:31 brian Exp $
+.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.3 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 07:38:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -131,10 +131,10 @@ in
 .nf
 \fC\s-1\
 struct strioctl {
-        int ic_cmd;                     /* downstream request */
-        int ic_timout;                  /* ACK/NAK timeout */
-        int ic_len;                     /* length of data arg */
-        caddr_t ic_dp;                  /* ptr to data arg */
+    int ic_cmd;         /* downstream request */
+    int ic_timout;      /* ACK/NAK timeout */
+    int ic_len;         /* length of data arg */
+    caddr_t ic_dp;      /* ptr to data arg */
 };
 \s+1\fP
 .fi
@@ -173,13 +173,14 @@ in its data buffer:
 .nf
 \fC\s-1\
 struct iocblk {
-        int ioc_cmd;                    /* ioctl command type */
-        cred_t *ioc_cr;                 /* full credentials */
-        uint ioc_id;                    /* ioctl identifier */
-        uint ioc_count;                 /* byte count for ioctl data */
-        int ioc_error;                  /* error code for M_IOCACK or M_IOCNAK */
-        int ioc_rval;                   /* return value for M_IOCACK */
-        long ioc_filler[4];             /* reserved for future use */
+    int ioc_cmd;        /* ioctl command type */
+    cred_t *ioc_cr;     /* full credentials */
+    uint ioc_id;        /* ioctl identifier */
+    uint ioc_count;     /* byte count for ioctl data */
+    int ioc_error;      /* error code for M_IOCACK or
+                           M_IOCNAK */
+    int ioc_rval;       /* return value for M_IOCACK */
+    long ioc_filler[4]; /* reserved for future use */
 };
 \s+1\fP
 .fi

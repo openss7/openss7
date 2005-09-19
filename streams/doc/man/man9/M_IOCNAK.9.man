@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCNAK.9.man,v 0.9.2.1 2005/04/28 11:36:34 brian Exp $
+.\" @(#) $Id: M_IOCNAK.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,36 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+Signals the negative acknowledgement (failure) of a previous
+.BR M_IOCTL (9)
+message.  Its form is one
+.B M_IOCNAK
+block containing an
+.BR iocblk (9)
+data structure (see
+.BR M_IOCTL (9)).
+The
+.BR iocblk (9)
+structure may contain a value in
+.I ioc_error
+to be returned to the user process in
+.BR errno (3).
+Unlike
+.BR M_IOCACK (9),
+no user data or return value can be sent with this message.  If any
+.BR M_DATA (9)
+blocks follow the
+.B M_IOCNAK
+block, the
+.I Stream head
+will ignore them and free them.  When the
+.I Stream head
+receives an
+.BR M_IOCNAK ,
+the outstanding
+.BR ioctl (2)
+request, if any, will fail.  The format and usage of this message type is described further under
+.BR M_IOCTL (9).
 .\"
 .\"
 .SH "SEE ALSO"

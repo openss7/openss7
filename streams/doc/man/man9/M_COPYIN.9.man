@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_COPYIN.9.man,v 0.9.2.2 2005/09/18 07:38:31 brian Exp $
+.\" @(#) $Id: M_COPYIN.9.man,v 0.9.2.3 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 07:38:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,14 +111,14 @@ structure, defined in
 .nf
 \fC\s-1\
 struct copyreq {
-        int cq_cmd;                     /* ioctl command (from ioc_cmd) */
-        cred_t *cq_cr;                  /* full credentials */
-        uint cq_id;                     /* ioctl id (from ioc_id) */
-        caddr_t cq_addr;                /* addres top copy data to/from */
-        uint cq_size;                   /* number of bytes to copy */
-        int cq_flag;
-        mblk_t *cq_private;             /* private state information */
-        long cq_filer[4];               /* reserved for future use */
+    int cq_cmd;         /* ioctl command (from ioc_cmd) */
+    cred_t *cq_cr;      /* full credentials */
+    uint cq_id;         /* ioctl id (from ioc_id) */
+    caddr_t cq_addr;    /* addres top copy data to/from */
+    uint cq_size;       /* number of bytes to copy */
+    int cq_flag;
+    mblk_t *cq_private; /* private state information */
+    long cq_filer[4];   /* reserved for future use */
 };
 \s+1\fP
 .fi

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCSIG.9.man,v 0.9.2.1 2005/04/28 11:36:35 brian Exp $
+.\" @(#) $Id: M_PCSIG.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,26 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+As the
+.BR M_SIG (9)
+message, except for the priority.
+.PP
+.B M_PCSIG
+is often preferable to the
+.BR M_SIG (9)
+message, especially in
+.I tty
+applications, because
+.BR M_SIG (9)
+may be queued while
+.B M_PCSIG
+is more guaranteed to get through quickly.  For example, if one generates an
+.BR M_SIG (9)
+message when the
+delete-key is hit on the terminal and one has already typed ahead, the
+.BR M_SIG (9)
+message becomes queued and the user doesn't get the call until it's too late; it becomes impossible
+to kill or interrupt a process by hitting a delete-key.
 .\"
 .\"
 .SH "SEE ALSO"

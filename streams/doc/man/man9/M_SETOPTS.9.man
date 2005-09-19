@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.4 2005/09/18 07:38:32 brian Exp $
+.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.5 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 07:38:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,14 +99,15 @@ The data buffer of the message has the following structure:
 .nf
 \fC\s-1\
 struct stroptions {
-        ulong so_flags;                 /* options to set */
-        short so_readopt;               /* read options */
-        ushort so_wroff;                /* write offset */
-        long so_minpsz;                 /* minimum read packet size */
-        long so_maxpsz;                 /* maximum read packet size */
-        ulong so_hiwat;                 /* read queue high water mark */
-        ulong so_lowat;                 /* read queue low water mark */
-        unsigned char so_band;          /* update water marks for this band */
+    ulong so_flags;     /* options to set */
+    short so_readopt;   /* read options */
+    ushort so_wroff;    /* write offset */
+    long so_minpsz;     /* minimum read packet size */
+    long so_maxpsz;     /* maximum read packet size */
+    ulong so_hiwat;     /* read queue high water mark */
+    ulong so_lowat;     /* read queue low water mark */
+    unsigned char so_band;      /* update water marks for 
+                                   this band */
 };
 \s+1\fP
 .fi

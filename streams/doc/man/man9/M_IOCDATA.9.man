@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.2 2005/09/18 07:38:31 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.3 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 07:38:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -113,16 +113,20 @@ struct copyresp {
     int cp_cmd;         /* ioctl command (from ioc_cmd) */
     cred_t *cp_cr;      /* full credentials */
     uint cp_id;         /* ioctl id (from ioc_id) */
-    caddr_t cp_rval;    /* status of request: 0-success, !0-failure */
+    caddr_t cp_rval;    /* status of request: 0-success,
+                           !0-failure */
     uint cp_pad1;       /* reserved */
     int cp_pad2;        /* reserved */
-    mblk_t *cp_private; /* private state info (from cq_private) */
+    mblk_t *cp_private; /* private state info (from
+                           cq_private) */
     long cp_filler[4];  /* reserved for future use */
 };
 \s+1\fP
 .fi
 .PP
-The first three members of the structure correspond to those of the
+The first three members of the structure
+.RI ( cp_cmd ", " cp_cr ", " cp_id )
+correspond to those of the
 .BR iocblk (9)
 structure in the
 .BR M_IOCTL (9)
@@ -206,7 +210,67 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Alignment of
+.BR iocblk (9),
+.BR copyreq (9),
+and
+.BR copyresp (9),
+structures to each other and which members are overlaid over which other members, and what the
+differences are between the 32-bit architecture structures and the 64-bit architecture structures,
+is complicated and problematic amoungst
+.IR UNIX \(rg
+implementations of
+.IR STREAMS .
 .IP \(em
+When a module or driver receives an
+.B M_IOCDATA
+indicating an error
+.RI ( cp_rval
+is non-zero), it is supposed to free any private resources associated with the
+.BR ioctl (2),
+abort the 
+.BR ioctl (2)
+operation, free the message, and return.
+When the
+.I Stream head
+sends such a message, it aborts the current
+.BR M_IOCTL (9)
+operation and returns the error number to the user in
+.BR errno (3)
+indicating the cause of failure of the operation.
+In the error case, the
+.I Stream head
+does not block awaiting any further
+.BR ioctl (2)
+message blocks, and release the
+.B STRIOWAIT
+bit in the
+.IR "Stream head" .
+.IP ""
+.I LiS
+.[
+lis
+.]
+has the bug that it waits for a subsequent
+.BR M_IOCACK (9)
+or
+.BR M_IOCNAK (9)
+block.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

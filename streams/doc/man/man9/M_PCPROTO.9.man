@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCPROTO.9.man,v 0.9.2.1 2005/04/28 11:36:35 brian Exp $
+.\" @(#) $Id: M_PCPROTO.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,35 @@ structure and associated data buffer that contains unstructured data.
 .\"
 .SH DESCRIPTION
 .PP
+As the
+.BR M_PROTO (9)
+message type, except for the priority and the following additional attributes.
+.PP
+When an
+.B M_PCPROTO
+message is placed on a queue, its
+.B service
+procedure is always enabled.  The
+.I Stream head
+will allow only one
+.B M_PCPROTO
+message to be placed in its read queue at a time.  If an
+.B M_PCPROTO
+message is already in the queue when another arrives, the second message is silently discarded and
+its message blocks freed.
+.PP
+This message is intended to allow data and control information to be sent outside the normal flow
+control constraints.
+.PP
+The
+.BR getmsg (2)
+and
+.BR putmsg (2)
+system calls refer to
+.BR M_PCPROTO
+messages as
+.I high priority
+messages.
 .\"
 .\"
 .SH "SEE ALSO"
