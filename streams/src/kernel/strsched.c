@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/19 10:27:47 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/20 05:10:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/20 05:10:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/19 10:27:47 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/20 05:10:05 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/19 10:27:47 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/20 05:10:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3584,12 +3584,20 @@ EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
  *  @q:		queue to permit service procedure scheduling
  *
  *  This function simply clears the %QNOENB flag on the queue.  It does not schedule the queue.
- *  That must be done with a separate call to enableq() or qenable().
+ *  That must be done with a separate call to enableq() or qenable().  It is not supposed to be
+ *  called by a thread that froze the Stream with freezestr(9); but, it will still work.
  */
 void
 enableok(queue_t *q)
 {
+	struct stdata *sd = qstream(q);
+
+	assure(not_frozen_by_caller(q));
+
+	/* block on frozen stream unless stream frozen by caller */
+	zrlock(sd);
 	clear_bit(QNOENB_BIT, &q->q_flag);
+	zrunlock(sd);
 }
 
 EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
@@ -3598,12 +3606,20 @@ EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
  *  noenable:	- defer scheduling of a queue service procedure
  *  @q:		queue to defer service procedure scheduling
  *
- *  This function simply sets the %QNOENB flag on the queue.
+ *  This function simply sets the %QNOENB flag on the queue.  It is not supposed to be called by a
+ *  thread that froze the Stream with freezestr(9); but, it will still work.
  */
 void
 noenable(queue_t *q)
 {
+	struct stdata *sd = qstream(q);
+
+	assure(not_frozen_by_caller(q));
+
+	/* block on frozen stream unless stream frozen by caller */
+	zrlock(sd);
 	set_bit(QNOENB_BIT, &q->q_flag);
+	zrunlock(sd);
 }
 
 EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.19 2005/09/17 00:45:21 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.20 2005/09/20 05:10:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/20 05:10:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -167,11 +167,37 @@ callouts, callbacks, soft interrupts, but excluding interrupt service routines.
 .PP
 .BR putbq ()
 is MP-safe.
+The caller is responsible for the validity of the passed in
+.IR q .
+.I q
+is valid from all procedures syncrhonous on
+.IR q ,
+including
+.BR open ,
+.BR close ,
+.BR put ,
+and
+.BR service ,
+procedures and synchronous callback functions.  For asyncrhonous callback functions, soft interrupts
+and interrupt service routines, and in general,
+.I q
+is valid from the moment that
+.BR qprocson (9)
+returns until the moment that
+.BR qprocsoff (9)
+is called.
 .PP
 .BR putbq ()
-called on a queue frozen by
-.BR freezestr (9)
-will result in single-party deadlock.
+takes a recursive freeze lock that can be acquired by the caller when the
+.I Stream
+is frozen.  If another thread has the
+.I Stream
+frozen with
+.BR freezestr (9),
+the calling processor will spin until the
+.I Stream
+is thawed by the other thread with
+.BR unfreezestr (9).
 .\"
 .\"
 .SH NOTICES
@@ -211,7 +237,8 @@ possible indefinite looping.
 .BR getqstr (9),
 .BR setqstr (9),
 .BR qprocsoff (9),
-.BR freezestr (9).
+.BR freezestr (9),
+.BR unfreezestr (9).
 .\"
 .\"
 .SH BUGS
@@ -328,7 +355,14 @@ in place of
 .IP \(em
 .BR putbq ()
 may be called on a stream frozen with
-.BR freezestr (9).
+.BR freezestr (9),
+but it is not recommended.
+.BR putbq ()
+uses a recursive freeze lock permitting it to be called while the
+.I Stream
+is frozen with
+.BR freezestr (9)
+by the caller.
 .IP ""
 .IR "SVR 4.2 MP DDI/DKI" ,
 .IR Solaris \(rg,
@@ -356,8 +390,10 @@ Portable
 .I STREAMS
 modules and drivers will not call
 .BR putbq ()
-on a stream frozen with
+on a stream currently frozen by the caller with
 .BR freezestr (9).
+.RB ( "@PACKAGE_TITLE@"
+includes an assertion to enforce this in the SMP environment.)
 .IP \(em
 .BR putbq ()
 cannot be called from an interrupt service routine.
