@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.11 2005/05/14 08:34:28 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.12 2005/09/20 12:53:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/20 12:53:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -144,9 +144,11 @@ flags:
 .RS
 .TP \w'\ QB_WANTW\ 'u
 .B QB_FULL
-This bit is set when the queue band is full
+This bit is set when the queue band was full
 .RI ( qb_count " > " qb_hiwat )
-and subject to flow control.
+but has not yet dropped to the low water mark
+.RI ( qb_count == 0 || qb_count < qb_lowat )
+and is subject to flow control.
 .TP
 .B QB_WANTW
 This bit is set when the queue band requires a back enable.

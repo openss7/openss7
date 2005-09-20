@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqget.9.man,v 0.9.2.19 2005/09/12 13:10:51 brian Exp $
+.\" @(#) $Id: strqget.9.man,v 0.9.2.20 2005/09/20 12:53:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/12 13:10:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/20 12:53:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -300,9 +300,9 @@ set when the previous queue wants to read.
 set when the previous queue wants to write.
 .TP
 .B QFULL
-set when the queue is full.  The queue is full when the count of
-bytes in the queue is greater than the high water mark for the
-queue.
+set when the queue is full.  The queue is full when the count of bytes in the queue was greater than
+the high water mark for the queue, yet has not subsided to less than or equal to the low water marke
+for the queue.
 .TP
 .B QREADR
 set when the queue is the reader.
@@ -385,8 +385,8 @@ can contain the following flags:
 .TP \w'QB_WANTW\(em'u
 .B QB_FULL
 set when the queue band is full.  The queue band is full when the count of the
-bytes in the queue band is greater than the high water mark for the queue
-band.
+bytes in the queue band was greater than the high water mark for the queue
+band, and has not yet dropped to zero or below the low water mark for the queue.
 .PD 0
 .TP
 .B QB_WANTW

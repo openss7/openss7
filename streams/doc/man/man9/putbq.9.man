@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.20 2005/09/20 05:10:20 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.21 2005/09/20 12:53:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/20 05:10:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/20 12:53:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -126,6 +126,144 @@ When
 is executed following
 .BR getq (9)
 for the same queue, it is guaranteed to succeed.
+.\"
+.SS Flow Control
+.PP
+.BR putbq ()
+enables the queue
+.I q
+under the following circumstances:
+.IP \- \w'\-\(em'u
+the message
+.I mp
+is a high priority message;
+.PD 0
+.IP \-
+the
+.B QWANTR
+flag is set; or
+.IP \-
+.I mp
+is a priority band message and the
+.B QB_WANTR
+flag is set for band
+.IR mp->b_band .
+.PD
+.PP
+Because
+.I mp
+was typically removed from the queue with
+.BR getq (9),
+both the
+.BR QWANTR
+flag will be clear (because a message was retrieved)
+and the
+.BR QB_WANTR
+for band
+.I mp->b_band
+will be clear (because the message was just retrieved from that band).
+The only event that will cause these flags to become set is if the current or another thread removes
+a message from the queue with
+.BR getq (9)
+or
+.BR rmvq (9).
+.PP
+So, usually,
+.I q
+is only enabled if a high priority message is placed back on the queue with
+.BR putbq ().
+Because normal flow control procedures from the
+.B service
+procedure prohibit placing a high priority message back on the queue, it is unlikely that placing
+any message back on a queue with
+.BR putbq (9)
+will result in the queue being enabled.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR putbq ()
+is intended to be used from within a
+.I STREAMS
+driver or module
+.B service
+procedure.
+.PP
+The basic steps taken by a
+.B service
+procedure are as follows:
+.IP (1) \w'(0)\(em'u
+Remove a message from the queue with
+.BR getq (9).
+.PD 0
+.IP (2)
+If
+.BR getq (9)
+returns
+.BR NULL ,
+return from the procedure.
+.IP (3)
+If
+.BR getq (9)
+retreives a message, check if the message is a high priority
+.RB ( "db_type >= QPCTL" )
+message.  If it is, process the message and possibly pass it to the next queue with
+.BR putnext (9).
+.IP (4)
+If the message is a normal priority
+.RB ( "db_type < QPCTL" )
+message, test if the message can be passed along with
+.BR bcanputnext (9),
+for the band
+.I b_band .
+.IP (5)
+If
+.BR bcanputnext (9)
+returns true, process the message and pass the message along with
+.BR putnext (9).
+.IP (6)
+If
+.BR bcanputnext (9)
+returns false, place the message back on the queue with
+.BR putbq ()
+and return.
+.IP (7)
+Repeat at step (1).
+.PD
+.PP
+Queues that have messages placed back with
+.BR putbq ()
+from the module
+.B service
+procedure will not normally be enabled again by
+.BR putq (9),
+or
+.BR insq (9).
+Therefore,
+when a message is placed back on a queue with
+.BR putbq (),
+the
+.B service
+procedure is considered blocked.  Some event is required to re-enabled the queue when it is possible
+to resume processing messages.
+.PP
+In the typical flow control case (see
+.RI \(lq "Example 1" ,\(rq below),
+a back-enable is scheduled by a forward queue when
+.BR bcanputnext (9)
+fails; however, this is not the only mechanism possible.
+Another example (see
+.RI \(lq "Example 2" ,\(rq below)
+would be when a buffer cannot be allocated to perform processing (i.e.,
+.BR allocb (9)
+fails), an explicit call to
+.BR qenable (9)
+could be scheduled with
+.BR bufcall (9),
+and the message placed back on the queue with
+.BR putbq ().
+When the buffer can be allocated, the queue will be enabled and another attempt will be made to
+allocated the buffer necessary for processing.
 .\"
 .\"
 .SH RETURN
@@ -205,18 +343,25 @@ is thawed by the other thread with
 .BR putbq ()
 only fails if a queue band for
 .BR mp->b_band
-does not yet exist and one could not be allocated.  It can be ensured that
+does not yet exist and the necessary queue band structures could not be allocated.  It can be
+ensured that
 .BR putbq ()
 will not fail for the same
 .I q
 for which the message was obtained with
 .BR getq (9).
 Otherwise, it can be ensured that the queue band exists by calling
-.BR getqstr (9)
+.BR strqget (9)
 or
-.BR setqstr (9)
+.BR strqset (9)
 for the band in question before calling
 .BR putbq ().
+Whether a band is allocated for a queue can also be tested by examining the
+.I q_nband
+member of the queue structure.  This member indicates the highest priority allocated band.  If the
+band in question is less than or equal to
+.I q_nband
+then the band has already been allocated.
 .PP
 Care should be taken not to return with
 .BR putbq ()
@@ -225,6 +370,146 @@ a priority message taken off of a queue in a service procedure with
 This is because placing the priority message back on the queue will cause the
 service procedure to re-execute at the earliest opportunity resulting in
 possible indefinite looping.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B @PACKAGE_TITLE@
+implements a
+.RB per- qband (9)
+structure
+.B QB_WANTR
+flag for finder control over enabling for priority band messages while maintaining compatibility
+with
+.I SVR 4.2
+flow control.  For a description of this mechanism, see
+.BR getq (9).
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following are two examples of the use of
+.BR putbq ().
+The first is an example of
+.BR putbq ()
+where enabling of the queue is scheduled by
+.BR bcanputnext (9).
+The second is an example of
+.BR putbq ()
+where enabling of the queue is scheduled by
+.BR bufcall (9).
+.\"
+.SS Example 1
+.PP
+Following is a stereotypical example of a null module service procedure that simply passes messages
+along to the next queue without processing:
+.sp
+.nf
+\fC\s-2\
+     1  static int
+     2  xxxsrv(queue_t *q)
+     3  {
+     4      mblk_t *mp;
+     5  
+     6      while ((mp = getq(q))) {
+     7          if (mp->b_datap->db_type >= QPCTL)
+     8              putnext(q, mp);
+     9          else {
+    10              if (bcanputnext(q, mp->b_band))
+    11                  putnext(q, mp);
+    12              else {
+    13                  putbq(q, mp);
+    14                  break;
+    15              }
+    16          }
+    17      }
+    18      return (0);
+    19  }
+\s+1\fP
+.fi
+.PP
+Notice that at
+.IR "line 13" ,
+the return value from
+.BR putbq ()
+is not examined.  This is because the message was removed from the queue using
+.BR getq (9)
+and it is guaranteed that a band structure exists for the band of the message, and therefore
+.BR putbq ()
+cannot fail.
+.PP
+Unless another thread intervenes with a call to
+.BR getq (9)
+or (more likely)
+.BR rmvq (9),
+placing the message back on the queue will not enable the queue.  Also, messages enqueued with
+.BR putq (9)
+from the
+.B put
+procedure will not normally enable the queue in this situation.  The queue will usually remain
+blocked on flow control until it is back-enabled by the forward queue that failed
+.BR bcanput (9).
+.\"
+.SS Example 2
+.PP
+Following is an example of how to handle a buffer allocation failure using
+.BR bufcall (9)
+and
+.BR putbq ():
+.sp
+.nf
+\fC\s-2\
+     1  static int
+     2  xxxsrv(queue_t *q)
+     3  {
+     4      mblk_t *mp;
+     5  
+     6      while ((mp = getq(q))) {
+     7          if (mp->b_datap->db_type >= QPCTL)
+     8              putnext(q, mp);
+     9          else {
+    10              if (bcanputnext(q, mp->b_band)) {
+    11                  mblk_t *db;
+    12  
+    13                  if ((db = allocb(64, BPRI_MED)) == NULL) {
+    14                      priv_t *p = (priv_t *) q->q_ptr;
+    15  
+    16                      putbq(q, mp);
+    17                      p->bcid = bufcall(64, BPRI_MED,
+    18                                        (void (*)(long))
+    19                                        &qenable, (long) q);
+    20                      break;
+    21                  }
+    22                  /* process mp with db */
+    23                  linkb(mp, db);
+    24                  putnext(q, mp);
+    25              } else {
+    26                  putbq(q, mp);
+    27                  break;
+    28              }
+    29          }
+    30      }
+    31      return (0);
+    32  }
+\s+2\fP
+.fi
+.PP
+If the allocation using
+.BR allocb (9)
+fails at
+.IR "line 13" ,
+then the message is placed back on the queue using
+.BR putbq ()
+at
+.IR "line 16" ,
+and a buffer call is issued to enable the queue when a buffer becomes available using
+.BR bufcall (9)
+at
+.IR "line 17" .
+.PP
+When the buffer callback is called, the queue will be enabled with
+.BR qenable (9),
+and the service procedure will execute again and attempt to allocate a buffer once more.
 .\"
 .\"
 .SH "SEE ALSO"

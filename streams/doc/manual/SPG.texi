@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.38 2005/09/18 07:38:35 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.39 2005/09/20 12:53:07 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/18 07:38:35 $ by $Author: brian $
+% Last Modified $Date: 2005/09/20 12:53:07 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -692,6 +692,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.39  2005/09/20 12:53:07  brian
+- more doc updates, corrected QFULL handling
+
 Revision 0.9.2.38  2005/09/18 07:38:35  brian
 - more doc updates
 
@@ -4776,7 +4779,7 @@ to the following algorithm:
 while ((bp = getq(q)) != NULL) @{
     if (bp->b_datap->db_type >= QPCTL) @{
         putnext(q, bp);
-    @} else if (bcanput(q, bp->b_band)) @{
+    @} else if (bcanputnext(q, bp->b_band)) @{
         putnext(q, bp);
     @} else @{
         putbq(q, bp);
@@ -4835,7 +4838,7 @@ type of the first block in the message, (@samp{mp->b_datap->db_type >= QPCTL}), 
 flow control.  They are processed immediately and forwarded, as appropriate.
 
 For ordinary messages, flow control must be tested before any processing is performed.  The
-@manpage{canput(9)} utility determines if the forward path from the queue is blocked by flow
+@manpage{canputnext(9)} utility determines if the forward path from the queue is blocked by flow
 control.
 
 This is the general flow control processing of ordinary messages:
@@ -4844,7 +4847,7 @@ This is the general flow control processing of ordinary messages:
 @item  Retrieve the message at the head of the queue with @manpage{getq(9)}.
 @item  Determine if the message type is high priority and not to be processed here.
 @item  If so, pass the message to the @command{put} procedure of the following queue with @manpage{putnext(9)}.
-@item  Use @manpage{canput(9)} to determine if messages can be sent onward.
+@item  Use @manpage{canputnext(9)} to determine if messages can be sent onward.
 @item  If messages should not be forwarded, put the message back on the queue with
 @manpage{putbq(9)} and return from the procedure.
 @item  Otherwise, process the message.
@@ -4854,7 +4857,7 @@ The canonical representation of this processing within a service procedure is as
 
 @smallexample
 while (qetq != NULL)
-    if (high priority message||canput)
+    if (high priority message||canputnext)
          process message
          putnext
     else
@@ -4863,7 +4866,7 @@ while (qetq != NULL)
 @end smallexample
 
 Expedited data have their own flow control with the same general processing as that of ordinary
-messages.  @manpage{bcanput(9)} is used to provide modules and drivers with a way to test flow
+messages.  @manpage{bcanputnext(9)} is used to provide modules and drivers with a way to test flow
 control in the given priority band.  It returns @samp{1} if a message of the given priority can be
 placed on the queue.  It returns @samp{0} if the priority band is flow controlled.  If the band does
 not yet exist on the queue in question, the routine returns @samp{1}.
@@ -4873,7 +4876,7 @@ for lower bands.  The lower bands are also stopped from sending messages.  If th
 the possibility would exist where lower priority messages would be passed along ahead of the flow
 controlled higher priority ones.
 
-The call @samp{bcanput(q, 0);} is equivalent to the call @samp{canput(q);}.
+The call @samp{bcanputnext(q, 0);} is equivalent to the call @samp{canputnext(q);}.
 
 A @command{service} procedure must process all messages on its queue unless flow control prevents
 this.
@@ -4917,19 +4920,19 @@ fails.
 this queue.  @manpage{noenable(9)} instructs @manpage{putq(9)} to enqueue the message when called by
 this queue, but not to schedule the @command{service} procedure.  @manpage{noenable(9)} does not
 prevent the queue from being scheduled by a flow control back-enable.  The inverse of
-@command{manpage(9)} is @manpage{enableok(9)}.
+@manpage{noenable(9)} is @manpage{enableok(9)}.
 
 Driver upstream flow control is explained next as an example.  Although device drivers typically
 discard input when unable to send it to a user process, @dfn{STREAMS} allows driver read-side flow
 control, possibly for handling temporary upstream blockages.  This is done through a driver read
 @command{service} procedure which is disabled during the driver open with @manpage{noenable(9)}.  If
 the driver input interrupt routine determines messages can be sent upstream (from
-@manpage{canput(9)}), it sends the message with @manpage{putnext(9)}.  Otherwise, it calls
+@manpage{canputnext(9)}), it sends the message with @manpage{putnext(9)}.  Otherwise, it calls
 @manpage{putq(9)} to queue the message.  The message waits on the message queue (possibly with queue
 length checked when new messages are enqueued by the interrupt routine) until the upstream queue
 becomes unblocked.  When the blockage abates, @dfn{STREAMS} back-enables the driver read
 @command{service} procedure.  The @command{service} procedure sends the messages upstream using
-@manpage{getq(9)} and @manpage{canput(9)}, as described previously.  This is similar to
+@manpage{getq(9)} and @manpage{canputnext(9)}, as described previously.  This is similar to
 @command{looprsrv()} (@pxref{Loop-Around Driver}) where the @command{service} procedure is present
 only for flow control.
 

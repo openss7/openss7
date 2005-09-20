@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/19 10:27:47 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/20 12:53:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/20 12:53:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/19 10:27:47 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/20 12:53:17 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/09/19 10:27:47 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/20 12:53:17 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -3032,10 +3032,15 @@ __rmvq(queue_t *q, mblk_t *mp)
 			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next) ;
 		}
 		q->q_count -= mp->b_size;
-		if (q->q_count < q->q_hiwat)
+		if (q->q_count == 0) {
 			clear_bit(QFULL_BIT, &q->q_flag);
-		if (q->q_count <= q->q_lowat && test_and_clear_bit(QWANTW_BIT, &q->q_flag))
+			clear_bit(QWANTW_BIT, &q->q_flag);
 			backenable = true;
+		} else if (q->q_count < q->q_lowat) {
+			clear_bit(QFULL_BIT, &q->q_flag);
+			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
+				backenable = true;
+		}
 		/* no longer want to read band zero */
 		clear_bit(QWANTR_BIT, &q->q_flag);
 	} else {
@@ -3062,11 +3067,12 @@ __rmvq(queue_t *q, mblk_t *mp)
 			qb->qb_last = b_prev;
 		qb->qb_msgs--;
 		qb->qb_count -= mp->b_size;
-		if (qb->qb_count < qb->qb_hiwat)
+		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 				--q->q_blocked;
-		if (qb->qb_count <= qb->qb_lowat && test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
-			backenable = true;
+			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
+				backenable = true;
+		}
 		/* no longer want to read this or lower bands */
 		for (; qb; qb = qb->qb_next)
 			clear_bit(QB_WANTR_BIT, &qb->qb_flag);
