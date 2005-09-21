@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.21 2005/09/17 11:52:02 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.22 2005/09/21 12:49:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 11:52:02 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/21 12:49:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -97,6 +97,44 @@ the priority band within which to test for flow control.
 .\"
 .\"
 .SH DESCRIPTION
+.\".PP
+.\".BR bcanputnext ()
+.\"provides modules and drivers with a way to test flow control in a given priority band for the queue
+.\"pointed to by
+.\".IR q->q_next .
+.\"It returns
+.\".B 1
+.\"if the message of priority 
+.\".I pri
+.\"can be placed on the queue.  It returns
+.\".B 0
+.\"if the priority band is flow controlled and sets the
+.\".B QWANTW
+.\"flag for band zero
+.\".RB ( QB_WANTW
+.\"for non-zero band).
+.\".PP
+.\".BR bcanputnext ()
+.\"searches through the
+.\".I Stream
+.\"(starting at
+.\".IR q->q_next )
+.\"until it finds a queue containing a
+.\".B service
+.\"routine, or until it reaches the end of the
+.\".IR Stream .
+.\"If found, the queue containing the
+.\".B service
+.\"routine is tested to see if a message in priority band
+.\".I pri
+.\"can be enqueued.  If the band is full,
+.\".BR bcanputnext ()
+.\"marks the queue to automatically back-enable the caller's service routine when the amount of data in
+.\"messages on the queue has reached its low water mark.
+.\".PP
+.\"If the band does not yet exist on the queue in question,
+.\".B 1
+.\"is returned.
 .PP
 .BR bcanputnext ()
 checks whether the

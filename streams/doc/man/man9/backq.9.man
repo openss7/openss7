@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: backq.9.man,v 0.9.2.15 2005/05/14 08:34:20 brian Exp $
+.\" @(#) $Id: backq.9.man,v 0.9.2.16 2005/09/21 12:49:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/21 12:49:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,6 +93,20 @@ the queue for which to find the previous queue.
 .\"
 .\"
 .SH DESCRIPTION
+.\".PP
+.\".BR backq ()
+.\"returns a pointer to the queue behind a given queue.  That is, it returns a pointer to the queue
+.\"whose
+.\".I q_next
+.\"pointer is
+.\".IR q .
+.\"If no such queue exists (as when
+.\".I q
+.\"is at a
+.\".IR "Stream head" ),
+.\".BR backq ()
+.\"returns
+.\".BR NULL .
 .PP
 .BR backq ()
 returns a pointer to the queue

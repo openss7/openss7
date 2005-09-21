@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.19 2005/09/17 00:45:21 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.20 2005/09/21 12:49:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/21 12:49:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -96,6 +96,37 @@ the priority of the requested message buffer.
 .\"
 .\"
 .SH DESCRIPTION
+.\".PP
+.\".BR allocb ()
+.\"returns a pointer to a message block of type
+.\".BR M_DATA (9),
+.\"in which the data buffer contains at least
+.\".I bsize
+.\"bytes.
+.\".I pri
+.\"is one of
+.\".BR BPRI_LO ,
+.\".BR BPRI_MED ,
+.\"or
+.\".BR BPRI_HI ,
+.\"and indicates how criticlaly the module needs the buffer.
+.\".I pri
+.\"is currently unused and is maintained only for compatiblity with applications developed under prior
+.\"to
+.\".IR UNIX "\(rg " "System V Release 4.0" .
+.\"If a block cannot be allocated as requested,
+.\".BR allocb ()
+.\"returns a
+.\".B NULL
+.\"pointer.
+.\".PP
+.\"When a message is allocated via
+.\".BR allocb ()
+.\"the
+.\".I b_band
+.\"field of the
+.\".BR mblk_t (9)
+.\"is initially set to zero.  Modules and drivers may set this field if so desired.
 .PP
 .BR allocb ()
 allocates a message block and a data block of the requested
