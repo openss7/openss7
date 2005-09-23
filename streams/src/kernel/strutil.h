@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/19 10:27:47 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/23 05:49:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -133,17 +133,19 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #else
 
 /*
- *  Simple locks, no nesting (not required).  Write locks suppress bottom halves and suppresses the
- *  STREAMS softirq, read locks only suppress the STREAMS softirq.  This allows read locks to be
- *  taken in all contexts except in_irq(), and write locks to be taken in all contexts except
- *  in_interrupt() (but allowed when in STREAMS softirq).
+ *  Simple locks, no nesting (not required).  Write locks suppress interrupts; read locks only
+ *  suppress the STREAMS softirq for stream heads, but also suppresses local interrupts for freeze
+ *  and queue read locks.  This allows read locks to be taken on the stream head in all contexts,
+ *  and write locks to be taken in process context and STREAMS softirq.
  *
- *  This means that it is inherently unsafe to call any queue handling functions from in_irq().
- *  Don't do that.  There are a couple of exceptions: putq() can be called from in_irq() but it will
- *  defer putting the message to the queue until STREAMS next executes (at bottom half).  Any
- *  failure to put the message (failure to allocate a queue band) will cause it to be discarded.
- *  put() can be called from in_irq(), but it will defer calling the put() procedure until STREAMS
- *  next executes (at bottom half).
+ *  Freeze write locks can be taken from hard irq context, so both freeze read and write locks
+ *  suppress hard interrupts, but read locks are only taken for a later write lock on a queue, and
+ *  queue write locks can be taken from hard irq.  This also means tha queue read locks need to
+ *  suppress interrupts.
+ *
+ *  This means that it is safe to call any queue handling functions from in_irq().  There are a
+ *  couple of notes: putq() can be called from in_irq().  put() can be called from in_irq(), but it
+ *  might defer calling the put() procedure until STREAMS next executes (at bottom half).
  *
  *  It is safe to call queue handling utilities (and a host of other queue specific utilities) from
  *  bottom half, atomic or process context (!in_streams() && !in_irq)).  None of the xxxnext
@@ -166,23 +168,23 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
  *
  *  Also, getq() and putbq() must only be used from with a queue service procedure.
  */
-#ifdef CONFIG_STREAMS_DEBUG
+//#ifdef CONFIG_STREAMS_DEBUG
 /* loosen locks for debugging */
-#define write_str_disable()	do { local_str_disable(); } while (0)
-#define write_str_enable()	do { local_str_enable(); } while (0)
-#else				/* CONFIG_STREAMS_DEBUG */
-#define write_str_disable()	do { local_bh_disable(); local_str_disable(); } while (0)
-#define write_str_enable()	do { local_str_enable(); local_bh_enable(); } while (0)
-#endif				/* CONFIG_STREAMS_DEBUG */
+//#define write_str_disable()	do { local_str_disable(); } while (0)
+//#define write_str_enable()	do { local_str_enable(); } while (0)
+//#else				/* CONFIG_STREAMS_DEBUG */
+//#define write_str_disable()	do { local_bh_disable(); local_str_disable(); } while (0)
+//#define write_str_enable()	do { local_str_enable(); local_bh_enable(); } while (0)
+//#endif				/* CONFIG_STREAMS_DEBUG */
 #define read_str_disable()	do { local_str_disable(); } while (0)
 #define read_str_enable()	do { local_str_enable(); } while (0)
 
-#define write_lock_str(__l)	do { write_str_disable(); write_lock(__l);  } while (0)
-#define write_unlock_str(__l)	do { write_unlock(__l); write_str_enable(); } while (0)
+//#define write_lock_str(__l)	do { write_str_disable(); write_lock(__l);  } while (0)
+//#define write_unlock_str(__l)	do { write_unlock(__l); write_str_enable(); } while (0)
 #define read_lock_str(__l)	do { read_str_disable();  read_lock(__l); } while (0)
 #define read_unlock_str(__l)	do { read_unlock(__l); read_str_enable(); } while (0)
-#define zread_lock_str(__l)	do { write_str_disable();  read_lock(__l); } while (0)
-#define zread_unlock_str(__l)	do { read_unlock(__l); write_str_enable(); } while (0)
+//#define zread_lock_str(__l)	do { write_str_disable();  read_lock(__l); } while (0)
+//#define zread_unlock_str(__l)	do { read_unlock(__l); write_str_enable(); } while (0)
 
 /*
  *  Just a little bit of nesting on freeze locks, if the caller holds a write lock on the freeze
@@ -194,38 +196,68 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define frozen_by_caller(__q)		(qstream(__q)->sd_freezer == current)
 #define not_frozen_by_caller(__q)	(qstream(__q)->sd_freezer != current)
 
-#define zlockinit(__sd)	rwlock_init(&(__sd)->sd_freeze)
-#define zwlock(__sd)	do { write_lock_str(&(__sd)->sd_freeze); (__sd)->sd_freezer = current; } while (0)
-#define zwunlock(__sd)	do { (__sd)->sd_freezer = NULL; write_unlock_str(&(__sd)->sd_freeze); } while (0)
-#define zrlock(__sd)	do { if ((__sd)->sd_freezer != current) zread_lock_str(&(__sd)->sd_freeze); } while (0)
-#define zrunlock(__sd)	do { if ((__sd)->sd_freezer != current) zread_unlock_str(&(__sd)->sd_freeze); } while (0)
+#define zlockinit(__sd)		rwlock_init(&(__sd)->sd_freeze)
+#define zwlock(__sd)		(unsigned long) ({ struct stdata *_z_sd = (__sd); unsigned long pl; write_lock_irqsave(&_z_sd->sd_freeze, pl); _z_sd->sd_freezer = current; pl; })
+#define zwunlock(__sd, __pl)	(void) ({ struct stdata *_z_sd = (__sd); _z_sd->sd_freezer = NULL; write_unlock_irqrestore(&_z_sd->sd_freeze, (__pl)); })
+#define zrlock(__sd)		(unsigned long) ({ struct stdata *_z_sd = (__sd); unsigned long pl; local_irq_save(pl); if (_z_sd->sd_freezer != current) read_lock(&_z_sd->sd_freeze, pl); pl; })
+#define zrunlock(__sd, __pl)	(void) ({ stuct stdata *_z_sd = (__sd); if (_z_sd->sd_freezer != current) read_unlock(&_z_sd->sd_freeze); local_irq_restore(__pl); })
 
 #else				/* CONFIG_SMP */
 
 #define frozen_by_caller(__q)		(1)
 #define not_frozen_by_caller(__q)	(1)
 
-#define zlockinit(__sd)	rwlock_init(&(__sd)->sd_freeze)
-#define zwlock(__sd)	write_lock_str(&(__sd)->sd_freeze);
-#define zwunlock(__sd)	write_unlock_str(&(__sd)->sd_freeze);
-#define zrlock(__sd)	zread_lock_str(&(__sd)->sd_freeze);
-#define zrunlock(__sd)	zread_unlock_str(&(__sd)->sd_freeze);
+#define zlockinit(__sd)		rwlock_init(&(__sd)->sd_freeze)
+#define zwlock(__sd)		(unsigned long) ({ unsigned long pl; write_lock_irqsave(&(__sd)->sd_freeze, pl); pl; })
+#define zwunlock(__sd, __pl)	(void) ({ write_unlock_irqrestore(&(__sd)->sd_freeze, (__pl)); })
+#define zrlock(__sd)		(unsigned long) ({ unsigned long pl; read_lock_irqsave(&(__sd)->sd_freeze, pl); pl; })
+#define zrunlock(__sd, __pl)	(void) ({ read_unlock_irqrestore(&(__sd)->sd_freeze, (__pl)); })
 
 #endif				/* CONFIG_SMP */
 
-#define freeze_barrier(__q)	do { struct stdata *__sd = qstream(__q); zrlock(__sd); zrunlock(__sd); } while (0)
+#define stream_barrier(__sd)	do { struct stdata *_b_sd = (__sd); unsigned long pl; pl = zrlock(_b_sd); zrunlock((_b_sd), pl); } while (0)
+#define freeze_barrier(__q)	do { struct stdata *_f_sd = qstream(__q); stream_barrier(_f_sd); } while (0)
 
-#define slockinit(__sd)	rwlock_init(&(__sd)->sd_lock)
-#define swlock(__sd)	do { zrlock(__sd); write_lock(&(__sd)->sd_lock); } while (0)
-#define swunlock(__sd)	do { write_unlock(&(__sd)->sd_lock); zrunlock(__sd); } while (0)
-#define srlock(__sd)	read_lock_str(&(__sd)->sd_lock)
-#define srunlock(__sd)	read_unlock_str(&(__sd)->sd_lock)
+/*
+ *  Plumbing locks.
+ *
+ *  A write plumb lock suppresses local interrupts, spins on a stream frozen by the another
+ *  processor until it thaws, and spins waiting for put and service procedures on another processor
+ *  to exit.  Plumb write locks are used by the Stream head and by STREAMS to provide exclusive
+ *  access to the Stream exclusive of put and service procedures, and permits exclusive access to
+ *  the sd->sd_rq, sd->sd_wq and all q->q_next pointers in the Stream (thus the name plumb lock).
+ *  Write plumb locks can be acquired only by process or STREAMS (scheduler) context.
+ *
+ *  Read plumb locks are used to provide shared access to the q->q_next pointers in the stream and
+ *  are taken on entry to and released on exit from syncrhonous procedures and callback functions.
+ *  Read locks only suppress STREAMS (scheduler) execution from process context.  Read plumb locks
+ *  can be acquired by all contexts.
+ */
+#define plockinit(__sd)		rwlock_init(&(__sd)->sd_plumb)
+#define pwlock(__sd)		(unsigned long) ({ struct stdata *_p_sd = (__sd); unsigned long pl; pl = zrlock(_p_sd); write_lock(&_p_sd->sd_plumb); pl; })
+#define pwunlock(__sd, __pl)	(void) ({ struct stdata *_p_sd = (__sd); write_unlock(&_p_sd->sd_plumb); zrunlock(_p_sd, (__pl)); })
+#define prlock(__sd)		read_lock_str(&(__sd)->sd_plumb)
+#define prunlock(__sd)		read_unlock_str(&(__sd)->sd_plumb)
 
-#define qlockinit(__q)	rwlock_init(&(__q)->q_lock)
-#define qwlock(__q)	do { zrlock(qstream(__q)); write_lock(&(__q)->q_lock); } while (0)
-#define qwunlock(__q)	do { write_unlock(&(__q)->q_lock); zrunlock(qstream(__q)); } while (0)
-#define qrlock(__q)	read_lock_str(&(__q)->q_lock)
-#define qrunlock(__q)	read_unlock_str(&(__q)->q_lock)
+/*
+ *  Stream head structure lock.
+ *
+ *  A structure lock protecting shared and exclusive access to other members of the Stream head
+ *  structure that need protection.  A write lock suppresses no interrupts.  These are simple spins.
+ *  A read lock suppresses no interrupts.  A write lock can be taken by the Stream head at process
+ *  context.  A read lock can be taken by any context.
+ */
+#define slockinit(__sd)		rwlock_init(&(__sd)->sd_lock)
+#define swlock(__sd)		write_lock(&(__sd)->sd_lock)
+#define swunlock(__sd)		write_unlock(&(__sd)->sd_lock)
+#define srlock(__sd)		read_lock(&(__sd)->sd_lock)
+#define srunlock(__sd)		read_unlock(&(__sd)->sd_lock)
+
+#define qlockinit(__q)		rwlock_init(&(__q)->q_lock)
+#define qwlock(__q)		(unsigned long) ({ queue_t *_q = (__q); unsigned long pl; pl = zrlock(qstream(_q)); write_lock(&_q->q_lock); pl; })
+#define qwunlock(__q, __pl)	(void) ({ write_unlock(&(__q)->q_lock); zrunlock(qstream(__q), (__pl)); })
+#define qrlock(__q)		(unsigned long) ({ unsigned long pl; read_lock_irqsave(&(__q)->q_lock, pl); pl; })
+#define qrunlock(__q, __pl)	do { read_unlock_irqrestore(&(__q)->q_lock, (__pl)); } while (0)
 
 #endif
 

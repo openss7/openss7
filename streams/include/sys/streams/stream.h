@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.53 2005/09/18 07:35:53 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.54 2005/09/23 05:49:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/18 07:35:53 $ by $Author: brian $
+ Last Modified $Date: 2005/09/23 05:49:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/09/18 07:35:53 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/23 05:49:43 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -970,7 +970,9 @@ extern int STREAMS_FASTCALL(appq(queue_t *q, mblk_t *mp1, mblk_t *mp2));
 extern int STREAMS_FASTCALL(bcanget(queue_t *q, unsigned char band));
 extern int STREAMS_FASTCALL(bcangetany(queue_t *q));
 extern int STREAMS_FASTCALL(bcanput(queue_t *q, unsigned char band));
+extern int STREAMS_FASTCALL(bcanputnext(queue_t *q, unsigned char band));
 extern int STREAMS_FASTCALL(bcanputany(queue_t *q));
+extern int STREAMS_FASTCALL(bcanputnextany(queue_t *q));
 extern int STREAMS_FASTCALL(insq(queue_t *q, mblk_t *emp, mblk_t *mp));
 extern int STREAMS_FASTCALL(putbq(queue_t *q, mblk_t *mp));
 extern int STREAMS_FASTCALL(putq(queue_t *q, mblk_t *mp));
@@ -995,6 +997,7 @@ extern void STREAMS_FASTCALL(flushband(queue_t *q, int band, int flag));
 extern void STREAMS_FASTCALL(flushq(queue_t *q, int flag));
 extern void freeq(queue_t *q);
 extern void STREAMS_FASTCALL(put(queue_t *q, mblk_t *mp));
+extern void STREAMS_FASTCALL(putnext(queue_t *q, mblk_t *mp));
 extern void STREAMS_FASTCALL(qbackenable(queue_t *q));
 extern void qdelete(queue_t *rq);
 extern void STREAMS_FASTCALL(qenable(queue_t *q));
@@ -1088,18 +1091,6 @@ unlinkmsg(mblk_t *mp, mblk_t *bp)
 /* Queue functions. */
 
 __STRUTIL_EXTERN_INLINE int
-bcanputnext(queue_t *q, unsigned char band)
-{
-	return bcanput(q->q_next, band);
-}
-
-__STRUTIL_EXTERN_INLINE int
-bcanputnextany(queue_t *q)
-{
-	return bcanputany(q->q_next);
-}
-
-__STRUTIL_EXTERN_INLINE int
 canget(queue_t *q)
 {
 	return bcanget(q, 0);
@@ -1114,7 +1105,7 @@ canput(queue_t *q)
 __STRUTIL_EXTERN_INLINE int
 canputnext(queue_t *q)
 {
-	return canput(q->q_next);
+	return bcanputnext(q, 0);
 }
 
 __STRSCHD_EXTERN_INLINE bcid_t
@@ -1143,12 +1134,6 @@ extern int enableq(queue_t *q);
 extern int putctl(queue_t *q, int type);
 extern int putctl1(queue_t *q, int type, int param);
 extern int putctl2(queue_t *q, int type, int param1, int param2);
-
-__STRUTIL_EXTERN_INLINE void
-putnext(queue_t *q, mblk_t *mp)
-{
-	put(q->q_next, mp);
-}
 
 extern int putnextctl(queue_t *q, int type);
 extern int putnextctl1(queue_t *q, int type, int param);
@@ -1181,6 +1166,7 @@ WR(queue_t *q)
 #ifndef WR
 #define WR(__q) WR(__q)
 #endif
+
 __STRUTIL_EXTERN_INLINE queue_t *
 backq(queue_t *q)
 {

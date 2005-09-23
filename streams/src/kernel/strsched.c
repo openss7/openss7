@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/20 05:10:05 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/23 05:49:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/20 05:10:05 $ by $Author: brian $
+ Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/20 05:10:05 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/23 05:49:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/20 05:10:05 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/23 05:49:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1623,12 +1623,14 @@ STATIC void
 strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 {
 	queue_t *qold;
+	struct stdata *sd;
 
 	assert(q);
 	assert(func);
 
 	qold = xchg(&this_thread->currentq, qget(q));
-	srlock(qstream(q));
+	sd = qstream(q);
+	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag))
 		func(q, mp);
 	else {
@@ -1636,7 +1638,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 		swerr();
 		freemsg(mp);
 	}
-	srunlock(qstream(q));
+	prunlock(sd);
 	this_thread->currentq = qold;
 	qput(&q);
 }
@@ -1658,12 +1660,14 @@ STATIC inline streams_fastcall void
 strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	queue_t *qold;
+	struct stdata *sd;
 
 	assert(q);
 	assert(func);
 
 	qold = xchg(&this_thread->currentq, qget(q));
-	srlock(qstream(q));
+	sd = qstream(q);
+	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag))
 		func(arg, mp);
 	else {
@@ -1671,7 +1675,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 		swerr();
 		freemsg(mp);
 	}
-	srunlock(qstream(q));
+	prunlock(sd);
 	this_thread->currentq = qold;
 	qput(&q);
 }
@@ -1708,12 +1712,8 @@ qwakeup(queue_t *q)
 STATIC inline streams_fastcall void
 freezechk(queue_t *q)
 {
-	struct stdata *sd;
-
-	sd = qstream(q);
 	/* spin here until stream unfrozen */
-	zrlock(sd);
-	zrunlock(sd);
+	freeze_barrier(q);
 }
 
 /*
@@ -1730,6 +1730,7 @@ STATIC inline streams_fastcall void
 putp_fast(queue_t *q, mblk_t *mp)
 {
 	queue_t *qold;
+	struct stdata *sd;
 
 	assert(q);
 	assert(q->q_qinfo);
@@ -1739,7 +1740,8 @@ putp_fast(queue_t *q, mblk_t *mp)
 	freeze_barrier(q);
 
 	qold = xchg(&this_thread->currentq, qget(q));
-	srlock(qstream(q));
+	sd = qstream(q);
+	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 		ptrace(("calling put procedure\n"));
 		(void) q->q_qinfo->qi_putp(q, mp);
@@ -1749,7 +1751,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 		swerr();
 		freemsg(mp);
 	}
-	srunlock(qstream(q));
+	prunlock(sd);
 	this_thread->currentq = qold;
 	qput(&q);
 }
@@ -1798,6 +1800,7 @@ srvp_fast(queue_t *q)
 	assert(q);
 	if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
 		queue_t *qold;
+		struct stdata *sd;
 
 		/* spin here if Stream frozen by other than caller */
 		freeze_barrier(q);
@@ -1805,7 +1808,8 @@ srvp_fast(queue_t *q)
 		assert(q->q_qinfo);
 
 		qold = xchg(&this_thread->currentq, q);
-		srlock(qstream(q));
+		sd = qstream(q);
+		prlock(sd);
 		/* check if procs are turned off */
 		if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 #if 0
@@ -1855,7 +1859,7 @@ srvp_fast(queue_t *q)
 			}
 #endif
 		}
-		srunlock(qstream(q));
+		prunlock(sd);
 		this_thread->currentq = qold;
 		qwakeup(q);
 	}
@@ -2433,18 +2437,20 @@ qputp(queue_t *q, mblk_t *mp)
 {
 	{
 		queue_t *newq;
+		struct stdata *sd;
 
 		trace();
-		srlock(qstream(q));
+		sd = qstream(q);
+		prlock(sd);
 		for (newq = q; newq && newq->q_ftmsg && !newq->q_ftmsg(mp); newq = newq->q_next) ;
 		if (!newq) {
 			ptrace(("message filtered, discarding\n"));
-			srunlock(qstream(q));
+			prunlock(sd);
 			/* no queue wants the message - throw it away */
 			freemsg(mp);
 			return;
 		}
-		srunlock(qstream(q));
+		prunlock(sd);
 		/* FIXME: this is not safe. */
 		q = newq;
 	}
@@ -2770,18 +2776,19 @@ do_bufcall_synced(struct strevent *se)
 		unsigned long flags = 0;
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 		queue_t *qold;
+		struct stdata *sd = qstream(q);
 
 		if (unlikely(safe))
 			local_irq_save(flags);
 		if (likely(q != NULL))
-			srlock(qstream(q));
+			prlock(sd);
 
 		qold = xchg(&t->currentq, q);
 		func(se->x.b.arg);
 		t->currentq = qold;
 
 		if (likely(q != NULL))
-			srunlock(qstream(q));
+			prunlock(sd);
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
@@ -2823,18 +2830,19 @@ do_timeout_synced(struct strevent *se)
 		unsigned long flags = 0;
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
 		queue_t *qold;
+		struct stdata *sd = qstream(q);
 
 		if (unlikely(safe))
 			local_irq_save(flags);
 		if (likely(q != NULL))
-			srlock(qstream(q));
+			prlock(sd);
 
 		qold = xchg(&t->currentq, q);
 		func(se->x.t.arg);
 		t->currentq = qold;
 
 		if (likely(q != NULL))
-			srunlock(qstream(q));
+			prunlock(sd);
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
@@ -2879,17 +2887,17 @@ do_weldq_synced(struct strevent *se)
 	q = se->x.w.queue;
 	local_irq_save(flags);
 	if (sd1)
-		swlock(sd1);
+		write_lock(&sd1->sd_plumb);
 	if (sd3)
-		swlock(sd3);
+		write_lock(&sd3->sd_plumb);
 	if (q1)
 		qn1 = xchg(&q1->q_next, qget(q2));
 	if (q3)
 		qn3 = xchg(&q3->q_next, qget(q4));
 	if (sd3)
-		swunlock(sd3);
+		write_unlock(&sd3->sd_plumb);
 	if (sd1)
-		swunlock(sd1);
+		write_unlock(&sd1->sd_plumb);
 	local_irq_restore(flags);
 	qput(&q1);
 	qput(&q2);
@@ -2903,13 +2911,21 @@ do_weldq_synced(struct strevent *se)
 		queue_t *qold;
 
 		qold = xchg(&t->currentq, q);
-		if (safe)
-			local_irq_save(flags);
+		if (safe) {
+			struct stdata *sd;
+
+			sd = qstream(q);
+			flags = zwlock(sd);
+		}
 
 		se->x.w.func(se->x.w.arg);
 
-		if (safe)
-			local_irq_restore(flags);
+		if (safe) {
+			struct stdata *sd;
+
+			sd = qstream(q);
+			zwunlock(sd, flags);
+		}
 		t->currentq = qold;
 	}
 	qput(&q);
@@ -3226,9 +3242,9 @@ scanqueues(struct strthread *t)
 					q_link = xchg(&q->q_link, NULL);
 				/* let the message go */
 				if ((b = getq(q))) {
-					srlock(sd);
+					prlock(sd);
 					putnext(q, b);
-					srunlock(sd);
+					prunlock(sd);
 				}
 			}
 			if (q)
@@ -3591,13 +3607,14 @@ void
 enableok(queue_t *q)
 {
 	struct stdata *sd = qstream(q);
+	unsigned long pl;
 
 	assure(not_frozen_by_caller(q));
 
 	/* block on frozen stream unless stream frozen by caller */
-	zrlock(sd);
+	pl = zrlock(sd);
 	clear_bit(QNOENB_BIT, &q->q_flag);
-	zrunlock(sd);
+	zrunlock(sd, pl);
 }
 
 EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
@@ -3613,13 +3630,14 @@ void
 noenable(queue_t *q)
 {
 	struct stdata *sd = qstream(q);
+	unsigned long pl;
 
 	assure(not_frozen_by_caller(q));
 
 	/* block on frozen stream unless stream frozen by caller */
-	zrlock(sd);
+	pl = zrlock(sd);
 	set_bit(QNOENB_BIT, &q->q_flag);
-	zrunlock(sd);
+	zrunlock(sd, pl);
 }
 
 EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
@@ -3764,8 +3782,9 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
 	init_waitqueue_head(&sd->sd_waitq);
-	slockinit(sd); /* stream head read/write lock */
-	zlockinit(sd); /* stream head freeze read/write lock */
+	slockinit(sd);		/* stream head read/write lock */
+	plockinit(sd);		/* stream plumbing read/write lock */
+	zlockinit(sd);		/* stream freeze read/write lock */
 	INIT_LIST_HEAD(&sd->sd_list);	/* doesn't matter really */
 //      init_MUTEX(&sd->sd_mutex);
 }

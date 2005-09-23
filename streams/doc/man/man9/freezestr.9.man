@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.22 2005/09/20 05:10:19 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.23 2005/09/23 05:49:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/20 05:10:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/23 05:49:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -613,14 +613,15 @@ Following is an example (but not a terribly useful one) of the use of
 .nf
 \fC\s-2\
 ...
-freezestr(q);
-{
-   if ((mp = q->q_first) &&
-       mp->b_datap->db_type == M_PCPROTO &&
-       *((ulong *) mp->b_rptr) == T_INFO_ACK && !mp->b_next)
-      qenable(q);
-}
-unfreezestr(q);
+     1  freezestr(q);
+     2  {
+     3      if ((mp = q->q_first) &&
+     4          mp->b_datap->db_type == M_PCPROTO &&
+     5          *((ulong *) mp->b_rptr) == T_INFO_ACK
+     6          && !mp->b_next)
+     7          qenable(q);
+     8  }
+     9  unfreezestr(q);
 ...
 \s+2\fP
 .fi
@@ -657,31 +658,30 @@ that performs the check actions required of
 .sp
 .nf
 \fC\s-2\
-static int
-tirdwr_push(queue_t *q)
-{
-	int err = 0;
-	mblk_t *b;
-	pl_t pl;
-
-	pl = freezestr(q);
-	b = q->q_next->q_first;
-	while (b && !err) {
-		switch (b->b_datap->db_type) {
-		case M_PROTO:
-		case M_PCPROTO:
-			err = EPROTO;
-			break;
-		default:
-			b = b->b_next;
-			continue;
-		}
-		break;
-	}
-	unfreezestr(q, pl);
-	return (err);
-}
-...
+     1  static int
+     2  tirdwr_push(queue_t *q)
+     3  {
+     4      int err = 0;
+     5      mblk_t *b;
+     6      pl_t pl;
+     7  
+     8      pl = freezestr(q);
+     9      b = q->q_next->q_first;
+    10      while (b && !err) {
+    11          switch (b->b_datap->db_type) {
+    12          case M_PROTO:
+    13          case M_PCPROTO:
+    14              err = EPROTO;
+    15              break;
+    16          default:
+    17              b = b->b_next;
+    18              continue;
+    19          }
+    20          break;
+    21      }
+    22      unfreezestr(q, pl);
+    23      return (err);
+    24  }
 \s+2\fP
 .fi
 .PP

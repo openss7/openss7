@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.45 2005/09/19 10:27:47 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.46 2005/09/23 05:49:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:27:47 $ by $Author: brian $
+ Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/09/19 10:27:47 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/09/23 05:49:44 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -217,7 +217,8 @@ struct stdata {
 	ulong sd_rtime;			/* time to forward held message */
 	ulong sd_ioctime;		/* time to wait for ioctl() acknowledgement */
 //	klock_t sd_klock;		/* lock for queues under this stream */
-	rwlock_t sd_lock;		/* lock for queues under this stream */
+	rwlock_t sd_lock;		/* structure lock for this stream */
+	rwlock_t sd_plumb;		/* plumbing and procedure lock for this stream */
 	rwlock_t sd_freeze;		/* lock for freezing streams */
 	struct task_struct *sd_freezer;	/* thread holding freeze lock */
 	struct cdevsw *sd_cdevsw;	/* device entry */
