@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.54 2005/09/23 05:49:43 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.55 2005/09/24 01:14:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/23 05:49:43 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 01:14:10 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/09/23 05:49:43 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/09/24 01:14:10 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1144,25 +1144,24 @@ OTHERQ(queue_t *q)
 {
 	return ((q->q_flag & QREADR) ? q + 1 : q - 1);
 }
-
 #ifndef OTHERQ
 #define OTHERQ(__q) OTHERQ(__q)
 #endif
+
 __STRUTIL_EXTERN_INLINE queue_t *
 RD(queue_t *q)
 {
 	return (q->q_flag & QREADR) ? q : q - 1;
 }
-
 #ifndef RD
 #define RD(__q) RD(__q)
 #endif
+
 __STRUTIL_EXTERN_INLINE queue_t *
 WR(queue_t *q)
 {
 	return ((q->q_flag & QREADR) ? q + 1 : q);
 }
-
 #ifndef WR
 #define WR(__q) WR(__q)
 #endif
@@ -1170,7 +1169,7 @@ WR(queue_t *q)
 __STRUTIL_EXTERN_INLINE queue_t *
 backq(queue_t *q)
 {
-	struct queue *bq;
+	queue_t *bq;
 
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
 }

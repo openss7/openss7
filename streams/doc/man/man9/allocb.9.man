@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.20 2005/09/21 12:49:50 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.21 2005/09/24 01:12:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/21 12:49:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/24 01:12:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,9 +90,11 @@ sort-adjacent-labels
 .TP
 .I bsize
 the size of the message buffer to allocate.
+.PD 0
 .TP
 .I pri
 the priority of the requested message buffer.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -129,7 +131,11 @@ the priority of the requested message buffer.
 .\"is initially set to zero.  Modules and drivers may set this field if so desired.
 .PP
 .BR allocb ()
-allocates a message block and a data block of the requested
+allocates a message block,
+.BR msgb (9),
+and a data block,
+.BR datab (9),
+ of the requested
 .IR bsize " and " pri .
 .PP
 If the requested
@@ -138,7 +144,9 @@ is less than the
 .I STREAMS
 constant
 .B FASTBUF
-then a data block with an internal data buffer of size
+then a data block,
+.BR datab (9),
+with an internal data buffer of size
 .B FASTBUF
 will be created.
 If the requested
@@ -147,9 +155,11 @@ is larger than the
 .I STREAMS
 constant
 .B FASTBUF
-then a data block with an external data buffer of size
+then a data block,
+.BR datab (9),
+with an external data buffer of size
 .I bsize
-will be created.
+will be allocated.
 .PP
 The
 .I pri
@@ -192,26 +202,48 @@ is added for
 .[
 osfspg
 .]
-compatibility and should not be used by portable
-.I STREAMS
-drivers or modules.
+compatibility.
+.B BPRI_WAITOK
+is used primarily by the
+.I Stream head
+under conditions when it is acceptable to sleep awaiting the allocation of a message block.
 .PP
-Portable
+Non-portable
 .I STREAMS
-drivers and modules should not rely on any setting of priority and should
-assume that the implementation ignores the
-.I pri
-argument.
+modules and drivers must only use
+.BR BPRI_WAITOK
+from a blocking context; that is, it is acceptable to use this priority from within a module or
+driver
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure.
+An example of a situation where
+.B BPRI_WAITOK
+would be used from a module or driver
+.B open
+procedure would be when the module needs to pre-allocate message blocks for use by
+.B put
+or
+.B service
+procedures, and if allocation failed would otherwise have to return an error from the
+.B open
+procedure.
+.PP
+For consistency with past implementations of
+.IR STREAMS ,
+it is common practise for a module or driver to specify
+.B BPRI_MED
+for all message allocations with
+.BR allocb ().
 .\"
 .\"
 .SH RETURN
 .PP
 Upon success,
 .BR allocb ()
-will
-return an
-.BR mblk_t (9)
-pointer to the allocated message block.
+will return a pointer to the allocated message block,
+.BR msgb (9).
 The allocated message block will have a data block type of
 .BR M_DATA (9).
 All bands and flags will be cleared.
@@ -219,6 +251,12 @@ All bands and flags will be cleared.
 and
 .I b_wptr
 will be set to the beginning of the data block buffer area.
+The allocated data block,
+.BR datab (9),
+will have a reference count
+.RI ( db_ref )
+of one
+.RB ( 1 ).
 .PP
 Upon failure,
 .BR allocb ()
@@ -226,6 +264,13 @@ will
 return a
 .B NULL
 pointer.
+.PP
+If priority
+.BR BPRI_WAITOK
+is specified for
+.IR pri ,
+.BR allocb ()
+always succeeds.
 .\"
 .\"
 .SH ERRORS
@@ -237,9 +282,12 @@ will return a
 message pointer.
 .PP
 .BR allocb ()
-will only fail if there is insufficient memory to allocate the necessary
-data structures for the message block, data block or data buffer, for the given
-value of
+will only fail if
+.I pri
+is other than
+.B BPRI_WAITOK
+and there is insufficient memory to allocate the necessary data structures for the message block,
+data block or data buffer, for the given value of
 .I bsize
 and
 .IR pri .
@@ -250,9 +298,23 @@ Failure to allocate a message block is typically followed by a call to
 .\"
 .SH CONTEXT
 .PP
+When
+.I pri
+is other than
+.BR BPRI_WAITOK ,
 .BR allocb ()
-can be called from any context, including user context, module procedures,
-call outs, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, call outs, callbacks,
+soft interrupts and interrupt service routines.
+When
+.I pri
+is
+.BR BPRI_WAITOK ,
+.BR allocb ()
+can only be called from a blocking context (process context, module
+.B open
+and
+.B close
+procedures).
 .\"
 .\"
 .SH MP-STREAMS
@@ -317,8 +379,8 @@ memory cache.
 .BR kmem_cache_alloc (9)
 will not be permitted to grow the
 .BR mdbblock (9)
-memory cache to meet the request.  When speed is not critical and a longer
-wait for success is acceptable, use
+memory cache to meet the request.  When speed is not critical and a lower probability of success is
+acceptable, use
 .BR BPRI_LO .
 .TP
 .B BPRI_MED
@@ -329,22 +391,22 @@ memory cache.
 .BR kmem_cache_alloc (9)
 will be permitted to grow the
 .BR mdbblock (9)
-memory cache as necessary to meet the request.  Where speed is not so
-critical, but a shorter wait for success is needed, use
+memory cache as necessary to meet the request.  Where speed is not so critical, but a higher
+probability of success is needed, use
 .BR BPRI_MED .
 .TP
 .B BPRI_HI
 The message block will be allocated from the per-CPU
 .I STREAMS
-scheduler fast free chain, or if there is no message block in the fast free
-chain, it will be allocated from the
+scheduler fast free chain, or if there is no message block in the fast free chain, it will be
+allocated from the
 .BR mdbblock (9)
 memory cache.
 .BR kmem_cache_alloc (9)
 will be permitted to grow the
 .BR mdbblock (9)
-memory cache as necessary to meet the request.  Where speed is critical, and a
-low latency for success is also needed, use
+memory cache as necessary to meet the request.  Where speed is critical, and a high probability of
+success is also needed, use
 .BR BPRI_HI .
 When
 .BR allocb ()
@@ -352,26 +414,27 @@ is called immediately following
 .BR freeb (9)
 or
 .BR freemsg (9),
-use
 .BR BPRI_HI
-to obtain the same block that was freed.
+will often (always on UP, likely on MP) obtain the same block that was freed.
 .TP
 .B BPRI_WAITOK
 The buffer allocation will be treated as
 .BR BPRI_LO ,
-but the caller will block waiting to obtain a buffer.
+but the caller will block waiting to obtain a buffer.  Where sleeping is acceptable, and a
+guarantee of success is also needed, use
+.BR BPRI_WAITOK .
+.\".PP
+.\"In this way, the
+.\".I pri
+.\"argument determines the delay in satisfying the request rather than the
+.\"ultimate probability of success, permitting low latency tasks to specify
+.\".BR BPRI_HI ,
+.\"high-latency and blocking tasks to specify
+.\".BR BPRI_LO " or " BPRI_WAITOK ,
+.\"and somewhere in between to specify
+.\".BR BPRI_MED .
 .PP
-In this way, the
-.I pri
-argument determines the delay in satisfying the request rather than the
-ultimate probability of success, permitting low latency tasks to specify
-.BR BPRI_HI ,
-high-latency and blocking tasks to specify
-.BR BPRI_LO " or " BPRI_WAITOK ,
-and somewhere in between to specify
-.BR BPRI_MED .
-.PP
-In addition,
+In addition to memory exhaustion,
 .BR allocb ()
 will fail to allocate a combined message data block if the number of message
 blocks allocated by
@@ -462,7 +525,6 @@ a low fraction above which requests of priority
 will be refused, a medium fraction above which requests of priority
 .B BPRI_MED
 will be refused, and \*(lqthewall\*(rq at which all requests are refused.
-.IP \(em
 .IR MacOT \(rg,
 .[
 macspg
@@ -493,6 +555,27 @@ and
 lis
 .]
 only fail allocation when the system is out of memory.
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+documentation
+says that some implementations may fail based on priority,
+.IR pri ,
+but
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+doesn't.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should not rely on any setting of priority, should always specify
+.B BPRI_MED
+in accordance with common practise, and should assume that the implementation ignores the
+.I pri
+argument.
 .IP \(em
 .IR OSF/1 \(rg
 .[
@@ -512,21 +595,13 @@ is normally only used by stream heads and in the
 .BR qopen (9)
 or
 .BR qclose (9)
-procedure (which run in user context).
-.IP \(em
-.IR UnixWare \(rg
-.[
-uw7spg
-.]
-documentation
-says that some implementations may fail based on priority,
-.IR pri ,
-but
-.IR UnixWare \(rg
-.[
-uw7spg
-.]
-doesn't.
+procedure (which run in user context and may sleep).
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR BPRI_WAITOK
+priority.
 .IP \(em
 .BR allocb ()
 uses the priority mechanism described above under
@@ -585,6 +660,14 @@ hpuxspg
 .]
 uses thresholds and denies buffers on the basis of priority,
 .IR pri .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should not rely on any setting of priority, should always specify
+.B BPRI_MED
+in accordance with common practise, and should assume that the implementation ignores the
+.I pri
+argument.
 .IP \(em
 .IR MacOT \(rg
 .[

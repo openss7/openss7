@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/23 05:49:44 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/24 01:14:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 01:14:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/23 05:49:44 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/24 01:14:52 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/23 05:49:44 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/24 01:14:52 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1158,10 +1158,7 @@ EXPORT_SYMBOL(appq);
  *  backq:	- find the queue upstream from this one
  *  @q:		this queue
  *
- *  NOTICES: backq() must not be called from outside of STREAMS context (i.e., without being under a
- *  Stream head plumb read lock).  STREAMS procedures have this lock.  MPSTR_STPLOCK() and
- *  MPSTR_STPRELE() can be used from outside Streams to acquire the necessary lock to use this
- *  function.  freezestr() and unfreezestr() are not sufficient.
+ *  CONTEXT: STREAMS only.
  */
 __STRUTIL_EXTERN_INLINE queue_t *backq(queue_t *q);
 
@@ -1338,6 +1335,7 @@ bcanputnextany(queue_t *q)
 	int result;
 	struct stdata *sd;
 
+	sd = qstream(q);
 	prlock(sd);
 	result = _bcanputany(q->q_next);
 	prunlock(sd);
@@ -2194,6 +2192,7 @@ putnext(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
 
+	assert(q->q_next);
 	sd = qstream(q);
 	prlock(sd);
 	put(q->q_next, mp);
@@ -2865,9 +2864,12 @@ qprocsoff(queue_t *q)
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct queinfo *qu = ((typeof(qu)) rq);
 		struct stdata *sd = qu->qu_str;
-		unsigned long pl, pl2;
+		unsigned long pl;
 
-		pl = zrlock(sd);
+		assert(sd);
+
+		/* spin here waiting for queue procedures to exit */
+		pl = pwlock(sd);
 
 		set_bit(QPROCS_BIT, &rq->q_flag);
 		set_bit(QPROCS_BIT, &wq->q_flag);
@@ -2895,12 +2897,7 @@ qprocsoff(queue_t *q)
 			}
 		}
 
-		assert(sd);
-
 		ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
-
-		/* spin here waiting for queue procedures to exit */
-		pl2 = pwlock(sd);
 
 		/* bypass this module: works for pipe, FIFO and other STREAM heads queues too */
 		if ((bq = backq(rq))) {
@@ -2917,10 +2914,10 @@ qprocsoff(queue_t *q)
 			sd->sd_maxpsz = wq->q_maxpsz;
 		}
 
-		pwunlock(sd, pl2);
+		pwunlock(sd, pl);
+
 		/* XXX: put procs must check QPROCS bit after acquiring prlock */
 		/* XXX: srv procs must check QPROCS bit after acquiring prlock */
-		zrunlock(sd, pl);
 	}
 }
 
@@ -2962,9 +2959,11 @@ qprocson(queue_t *q)
 	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct queinfo *qu = ((typeof(qu)) rq);
 		struct stdata *sd = qu->qu_str;
-		unsigned long pl, pl2;
+		unsigned long pl;
 
-		pl = zrlock(sd);
+		/* spin here waiting for queue procedures to exit */
+		pl = pwlock(sd);
+
 		clear_bit(QPROCS_BIT, &rq->q_flag);
 		clear_bit(QPROCS_BIT, &wq->q_flag);
 		/* allow queues to be enabled */
@@ -2981,8 +2980,6 @@ qprocson(queue_t *q)
 				set_bit(QB_WANTR_BIT, &qb->qb_flag);
 		}
 
-		/* spin here waiting for queue procedures to exit */
-		pl2 = pwlock(sd);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			ctrace(qput(&bq->q_next));
@@ -2995,8 +2992,8 @@ qprocson(queue_t *q)
 		/* cache new packet sizes (this module) */
 		sd->sd_minpsz = wq->q_minpsz;
 		sd->sd_maxpsz = wq->q_maxpsz;
-		pwunlock(sd, pl2);
-		zrunlock(sd, pl);
+
+		pwunlock(sd, pl);
 	}
 }
 

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.20 2005/09/19 04:23:47 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.21 2005/09/24 01:12:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/19 04:23:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/24 01:12:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -558,24 +558,87 @@ always succeeds for high priority and normal band zero (0) messages.
 .SH CONTEXT
 .PP
 .BR putq ()
-can be called from any non-ISR context, including user context, module procedures, callouts,
-callbacks, soft interrupts (tasklets, bottom halves), but excluding interrupt service routines.
-.PP
-Interrupt service routines are excluded to avoid suppressing local interrupts, and greatly
-reduce suppressing local bottom halves, during
-.I STREAMS
-processing.
+can be called from any context, including process context, module procedures, callouts, callbacks,
+soft interrupts, and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR putq ()
 is MP-safe.
+The caller is responsible for the validity of the passed in
+.IR q .
+.I q
+is valid from all procedures synchronous on
+.IR q ,
+including
+.BR open ,
+.BR close ,
+.BR put ,
+and
+.BR service ,
+procedures and synchronous callback functions.
 .PP
+For process context, asynchronous callback functions, soft interrupts and interrupt service
+routines, that is, when calling
 .BR putq ()
-called on a queue frozen by
+from a
+.RI non- STREAMS
+context, any valid queue pointer,
+.IR q ,
+can be passed to
+.BR putq ();
+however, the caller must ensure that the queue pointer remains valid across the call.
+In general,
+.I q
+is valid from the moment that
+.BR qprocson (9)
+returns until the moment that
+.BR qprocsoff (9)
+is called, so, if the
+.RI non- STREAMS
+code sections are passed a pointer from
+.IR q 's
+.IR qi_qopen ()
+procedure and invalidated by its
+.IR qi_qclose ()
+procedure, validity can be ensured.  (This is the case with
+.BR timeout (9)
+and
+.BR bufcall (9)
+asynchronous callbacks.  These callbacks are passed a queue pointer only after
+.I qi_qopen
+and must be cancelled before
+.I qi_qclose
+returns.)
+.PP
+Otherwise, it is possible to derive a queue pointer from a validated queue pointer, provided that
+the
+.I Stream 
+is frozen with a call to
+.BR freezestr (9).
+Under
+.BR "@PACKAGE_TITLE@",
+it is permissible to call
+.BR putq ()
+on a
+.I Stream
+that is frozen with
+.BR freezestr (9),
+and
 .BR freezestr (9)
-will result in single-party deadlock.
+can be called from any context.
+.BR putq ()
+takes a recursive freeze lock that can be acquired by the caller when the
+.I Stream
+is frozen.  If another thread has the
+.I Stream
+frozen with
+.BR freezestr (9),
+the calling processor will spin until the
+.I Stream
+is thawed by the other thread with
+.BR unfreezestr (9).
 .\"
 .\"
 .SH NOTICES
@@ -614,13 +677,37 @@ or
 .BR strqset (9)
 to set the high and low water marks and packet sizes for all bands used by the
 driver or module.
+It is also possible to examine the
+.I q_nband
+member of the
+.BR queue (9)
+structure to determine if a
+.BR qband (9)
+structure has been allocated for the given priority band message.  If
+.I q_nband
+is greater than or equal to the
+.I b_band
+priority of the message, a
+.BR qband (9)
+structure has already been allocated; otherwise,
+.BR putq ()
+will attempt to allocate all of the
+.BR qband (9)
+structures between
+.I q_nband
+and
+.I b_band
+(excluding
+.IR q_nband
+and including
+.IR b_band ).
 .PP
 When
 .BR putq ()
 fails and returns zero (0), it is the callers responsibility to address the
 disposition of the passed in message,
 .IR mp .
-A typical response would be to free the message using
+One response would be to free the message using
 .BR freemsg (9).
 Because the caller is responsible for the message upon failure, the return value from
 .BR putq ()
@@ -887,42 +974,42 @@ drivers and modules should not call
 .BR putq ()
 on a stream frozen with
 .BR freezestr (9).
-.IP \(em
-.BR putq ()
-cannot be called from an interrupt service routine (hard irq).
-.IP ""
-.B @PACKAGE_TITLE@
-does not permit
-.BR putq ()
-to be called from an interrupt service routine (hard irq) context to remove the need for suppressing
-local interrupts, and greatly reducing the need to suppres local bottom halves, throughout the
-.I STREAMS
-executive.  The only queue utilities that
-.B @PACKAGE_TITLE@
-permits to be called from an interrupt service routine (hard irq) context are
-.BR qwriter (9),
-.BR streams_put (9),
-.BR mp_become_writer (9)
-and
-.BR put (9),
-and these functions defer until the next
-.BR runqueues (9)
-pass.
-.IP ""
-Portable
-.I STREAMS
-modules and drivers will not call
-.BR putq ()
-from any context outside a
-.I STREAMS
-queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
-other than a
-.I STREAMS
-coroutine, only
-.BR put (9)
-will be used by a portable
-.I STREAMS
-driver or module.
+.\".IP \(em
+.\".BR putq ()
+.\"cannot be called from an interrupt service routine (hard irq).
+.\".IP ""
+.\".B @PACKAGE_TITLE@
+.\"does not permit
+.\".BR putq ()
+.\"to be called from an interrupt service routine (hard irq) context to remove the need for suppressing
+.\"local interrupts, and greatly reducing the need to suppress local bottom halves, throughout the
+.\".I STREAMS
+.\"executive.  The only queue utilities that
+.\".B @PACKAGE_TITLE@
+.\"permits to be called from an interrupt service routine (hard irq) context are
+.\".BR qwriter (9),
+.\".BR streams_put (9),
+.\".BR mp_become_writer (9)
+.\"and
+.\".BR put (9),
+.\"and these functions defer until the next
+.\".BR runqueues (9)
+.\"pass.
+.\".IP ""
+.\"Portable
+.\".I STREAMS
+.\"modules and drivers will not call
+.\".BR putq ()
+.\"from any context outside a
+.\".I STREAMS
+.\"queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
+.\"other than a
+.\".I STREAMS
+.\"coroutine, only
+.\".BR put (9)
+.\"will be used by a portable
+.\".I STREAMS
+.\"driver or module.
 .IP \(em
 Symbol
 .BR lis_putq ()

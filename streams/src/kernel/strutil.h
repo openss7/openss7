@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/23 05:49:44 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/24 01:14:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 01:14:53 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -199,8 +199,8 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define zlockinit(__sd)		rwlock_init(&(__sd)->sd_freeze)
 #define zwlock(__sd)		(unsigned long) ({ struct stdata *_z_sd = (__sd); unsigned long pl; write_lock_irqsave(&_z_sd->sd_freeze, pl); _z_sd->sd_freezer = current; pl; })
 #define zwunlock(__sd, __pl)	(void) ({ struct stdata *_z_sd = (__sd); _z_sd->sd_freezer = NULL; write_unlock_irqrestore(&_z_sd->sd_freeze, (__pl)); })
-#define zrlock(__sd)		(unsigned long) ({ struct stdata *_z_sd = (__sd); unsigned long pl; local_irq_save(pl); if (_z_sd->sd_freezer != current) read_lock(&_z_sd->sd_freeze, pl); pl; })
-#define zrunlock(__sd, __pl)	(void) ({ stuct stdata *_z_sd = (__sd); if (_z_sd->sd_freezer != current) read_unlock(&_z_sd->sd_freeze); local_irq_restore(__pl); })
+#define zrlock(__sd)		(unsigned long) ({ struct stdata *_z_sd = (__sd); unsigned long pl; local_irq_save(pl); if (_z_sd->sd_freezer != current) read_lock(&_z_sd->sd_freeze); pl; })
+#define zrunlock(__sd, __pl)	(void) ({ struct stdata *_z_sd = (__sd); if (_z_sd->sd_freezer != current) read_unlock(&_z_sd->sd_freeze); local_irq_restore(__pl); })
 
 #else				/* CONFIG_SMP */
 

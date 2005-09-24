@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:35:08 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 01:19:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -158,9 +158,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.30 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.31 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/08/29 10:35:08 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4246,7 +4246,7 @@ sctp_choose_best(sctp_t * sp)
  *  addresses and IP routing and establish new routes as required and set the (primary) and
  *  (secondary) destination addresses.
  */
-#if defined(SCTP_CONFIG_DEBUG) && defined(SCTP_CONFIG_ERROR_GENERATOR)
+#if (defined(SCTP_CONFIG_DEBUG)||defined(SCTP_CONFIG_TEST)) && defined(SCTP_CONFIG_ERROR_GENERATOR)
 #define SCTP_CONFIG_ERROR_GENERATOR_LEVEL  8
 #define SCTP_CONFIG_ERROR_GENERATOR_LIMIT 13
 #define SCTP_CONFIG_BREAK_GENERATOR_LEVEL 50
@@ -4436,7 +4436,7 @@ sctp_update_routes(struct sock *sk, int force_reselect)
 	}
 	/* if we have made or need changes then we want to reanalyze routes */
 	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr) {
-#if defined(SCTP_CONFIG_DEBUG) && defined(SCTP_CONFIG_ERROR_GENERATOR)
+#if (defined(SCTP_CONFIG_DEBUG) || defined(SCTP_CONFIG_TEST)) && defined(SCTP_CONFIG_ERROR_GENERATOR)
 		int bad_choice = 0;
 #endif				/* defined(SCTP_CONFIG_DEBUG) &&
 				   defined(SCTP_CONFIG_ERROR_GENERATOR) */

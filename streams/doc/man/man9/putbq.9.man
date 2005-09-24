@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.21 2005/09/20 12:53:04 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.22 2005/09/24 01:12:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/20 12:53:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/24 01:12:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -297,8 +297,8 @@ if the caller so desires.
 .SH CONTEXT
 .PP
 .BR putbq ()
-can be called from any non-ISR context, including user context, module procedures,
-callouts, callbacks, soft interrupts, but excluding interrupt service routines.
+can be called from any context, including process context, module procedures, callouts, callbacks,
+soft interrupts, and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -308,7 +308,7 @@ is MP-safe.
 The caller is responsible for the validity of the passed in
 .IR q .
 .I q
-is valid from all procedures syncrhonous on
+is valid from all procedures synchronous on
 .IR q ,
 including
 .BR open ,
@@ -316,15 +316,57 @@ including
 .BR put ,
 and
 .BR service ,
-procedures and synchronous callback functions.  For asyncrhonous callback functions, soft interrupts
-and interrupt service routines, and in general,
+procedures and synchronous callback functions.
+.PP
+For process context, asynchronous callback functions, soft interrupts and interrupt service
+routines, that is, when calling
+.BR putbq ()
+from a
+.RI non- STREAMS
+context, any valid queue pointer,
+.IR q ,
+can be passed to
+.BR putbq ();
+however, the caller must ensure that the queue pointer remains valid across the call.
+In general,
 .I q
 is valid from the moment that
 .BR qprocson (9)
 returns until the moment that
 .BR qprocsoff (9)
-is called.
+is called, so, if the
+.RI non- STREAMS
+code sections are passed a pointer from
+.IR q 's
+.IR qi_qopen ()
+procedure and invalidated by its
+.IR qi_qclose ()
+procedure, validity can be ensured.  (This is the case with
+.BR timeout (9)
+and
+.BR bufcall (9)
+asynchronous callbacks.  These callbacks are passed a queue pointer only after
+.I qi_qopen
+and must be cancelled before
+.I qi_qclose
+returns.)
 .PP
+Otherwise, it is possible to derive a queue pointer from a validated queue pointer, provided that
+the
+.I Stream 
+is frozen with a call to
+.BR freezestr (9).
+Under
+.BR "@PACKAGE_TITLE@",
+it is permissible to call
+.BR putbq ()
+on a
+.I Stream
+that is frozen with
+.BR freezestr (9),
+and
+.BR freezestr (9)
+can be called from any context.
 .BR putbq ()
 takes a recursive freeze lock that can be acquired by the caller when the
 .I Stream

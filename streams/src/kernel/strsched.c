@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/23 05:49:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/24 01:14:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 01:14:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/23 05:49:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/24 01:14:51 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/23 05:49:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/24 01:14:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1679,11 +1679,13 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 	this_thread->currentq = qold;
 	qput(&q);
 }
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	strfunc_fast(func, q, mp, arg);
 }
+#endif
 
 /*
  *  qwakeup:	- wake waiters on a queue pair
@@ -1865,11 +1867,13 @@ srvp_fast(queue_t *q)
 	}
 	qput(&q);		/* cancel qget from qschedule */
 }
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 srvp(queue_t *q)
 {
 	srvp_fast(q);
 }
+#endif
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /*
@@ -2707,6 +2711,7 @@ put(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL(put);
 
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 sq_doput_synced(mblk_t *mp)
 {
@@ -2735,8 +2740,6 @@ sq_dosrv_synced(queue_t *q)
 /*
  *  Synchronized event processing.
  */
-
-#ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 do_stream_synced(struct strevent *se)
 {

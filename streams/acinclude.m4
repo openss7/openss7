@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/09/09 20:27:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/09/24 01:13:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/09 20:27:17 $ by $Author: brian $
+# Last Modified $Date: 2005/09/24 01:13:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -186,9 +186,9 @@ AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
 	    [enable STREAMS synchronization queues.
 	    @<:@default=disabled@:>@]),
 	    [enable_streams_syncqs="$enableval"],
-	    [enable_streams_syncqs='yes'])
+	    [enable_streams_syncqs='no'])
     AC_CACHE_CHECK([for STREAMS synchronization], [lfs_streams_syncqs], [dnl
-	lfs_streams_syncqs="${enable_streams_utils:-yes}"
+	lfs_streams_syncqs="${enable_streams_syncqs:-no}"
 	])
     case ${lfs_streams_syncqs:-yes} in
 	(yes)

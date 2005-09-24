@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/23 05:49:45 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/23 05:49:45 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 04:13:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/23 05:49:45 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/23 05:49:45 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/09/23 05:49:45 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1192,7 +1192,7 @@ strsendmread(struct stdata *sd, const unsigned long len, unsigned long *plp)
 		*((unsigned long *) b->b_rptr) = len;
 		b->b_wptr = b->b_rptr + sizeof(&len);
 		if (!(err = straccess_rlock(sd, FREAD)))
-			put(sd->sd_wq, b);
+			ctrace(put(sd->sd_wq, b));
 		else
 			freemsg(b);
 	} else if (!(err = straccess_rlock(sd, FNDELAY)))	/* XXX: why FNDELAY? */
@@ -1847,7 +1847,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		put(sd->sd_wq, mb);
+		ctrace(put(sd->sd_wq, mb));
 
 		ptrace(("waiting for response\n"));
 		mb = strwaitiocack(sd, &timeo, access);
@@ -1900,7 +1900,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			}
 			ioc->copyresp.cp_rval = (caddr_t) -err;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			put(sd->sd_wq, mb);
+			ctrace(put(sd->sd_wq, mb));
 			goto abort;
 		default:
 			never();
@@ -1956,7 +1956,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		put(sd->sd_wq, mb);
+		ctrace(put(sd->sd_wq, mb));
 
 		mb = strwaitiocack(sd, &timeo, access);
 
@@ -2001,7 +2001,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			}
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			put(sd->sd_wq, mb);
+			ctrace(put(sd->sd_wq, mb));
 			goto abort;
 		default:
 			never();
@@ -2075,7 +2075,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		put(l->l_qtop, mb);
+		ctrace(put(l->l_qtop, mb));
 
 		mb = strwaitiocack(sd, NULL, access);
 
@@ -2100,7 +2100,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			put(sd->sd_wq, mb);
+			ctrace(put(sd->sd_wq, mb));
 			goto abort;
 		default:
 			never();
@@ -2209,7 +2209,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	}
 
 	do {
-		put(l->l_qtop, mb);
+		ctrace(put(l->l_qtop, mb));
 
 		mb = strwaitiocack(sd, NULL, FCREAT);
 
@@ -2226,7 +2226,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			put(sd->sd_wq, mb);
+			ctrace(put(sd->sd_wq, mb));
 			goto abort;
 		default:
 			never();
@@ -2590,7 +2590,7 @@ strlastclose(struct stdata *sd, int oflag)
 
 		b->b_datap->db_type = M_HANGUP;
 
-		put(sd->sd_wq, b);
+		ctrace(put(sd->sd_wq, b));
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -3655,7 +3655,7 @@ strwrite(struct file *file, const char *buf, size_t nbytes, loff_t *ppos)
 			/* possibly wait for message band */
 			if (!err && !(err = strwaitband(sd, file->f_flags, 0, MSG_BAND)))
 				/* We don't really queue these, see strwput(). */
-				put(sd->sd_wq, b);
+				ctrace(put(sd->sd_wq, b));
 
 		}
 		srunlock(sd);
@@ -3845,7 +3845,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		if (!more)
 			mp->b_flag |= MSGDELIM;
 		/* use put instead of putnext because of STRHOLD feature */
-		put(sd->sd_wq, mp);
+		ctrace(put(sd->sd_wq, mp));
 		/* We want to give the driver queues an opportunity to run. */
 		runqueues();
 		return (size);
@@ -3951,7 +3951,7 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 	}
 	if (!IS_ERR(mp = strputpmsg_common(file, &ctl, &dat, band, flags))) {
 		/* use put instead of putnext because of STRHOLD feature */
-		put(sd->sd_wq, mp);
+		ctrace(put(sd->sd_wq, mp));
 		return (0);
 	}
 	return PTR_ERR(mp);
@@ -4775,7 +4775,7 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!IS_ERR(mp = strputpmsg_common(file, &fdi.ctlbuf, &fdi.databuf, 0, fdi.flags))) {
 		bcopy(&token, mp->b_rptr + fdi.offset, sizeof(token));
 		/* use put instead of putnext because of STRHOLD feature */
-		put(sd->sd_wq, mp);
+		ctrace(put(sd->sd_wq, mp));
 		return (0);
 	}
 	return PTR_ERR(mp);
@@ -4849,7 +4849,7 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_pri;
 
 	if (!(err = straccess_rlock(sd, 0))) {
-		put(sd->sd_wq, mp);
+		ctrace(put(sd->sd_wq, mp));
 		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -4896,7 +4896,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = straccess_rlock(sd, 0))) {
 		ptrace(("putting message %p\n", mp));
-		put(sd->sd_wq, mp);
+		ctrace(put(sd->sd_wq, mp));
 		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -6370,80 +6370,117 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	case _IOC_TYPE(I_STR):
 		switch (_IOC_NR(cmd)) {
 		case _IOC_NR(I_ATMARK):
+			printd(("%s: got I_ATMARK\n", __FUNCTION__));
 			return str_i_atmark(file, sd, arg);
 		case _IOC_NR(I_CANPUT):
+			printd(("%s: got I_CANPUT\n", __FUNCTION__));
 			return str_i_canput(file, sd, arg);
 		case _IOC_NR(I_CKBAND):
+			printd(("%s: got I_CKBAND\n", __FUNCTION__));
 			return str_i_ckband(file, sd, arg);
 		case _IOC_NR(I_FDINSERT):
+			printd(("%s: got I_FDINSERT\n", __FUNCTION__));
 			return str_i_fdinsert(file, sd, arg);
 		case _IOC_NR(I_FIND):
+			printd(("%s: got I_FIND\n", __FUNCTION__));
 			return str_i_find(file, sd, arg);
 		case _IOC_NR(I_FLUSHBAND):
+			printd(("%s: got I_FLUSHBAND\n", __FUNCTION__));
 			return str_i_flushband(file, sd, arg);
 		case _IOC_NR(I_FLUSH):
+			printd(("%s: got I_FLUSH\n", __FUNCTION__));
 			return str_i_flush(file, sd, arg);
 		case _IOC_NR(I_GETBAND):
+			printd(("%s: got I_GETBAND\n", __FUNCTION__));
 			return str_i_getband(file, sd, arg);
 		case _IOC_NR(I_GETCLTIME):
+			printd(("%s: got I_GETCLTIME\n", __FUNCTION__));
 			return str_i_getcltime(file, sd, arg);
 		case _IOC_NR(I_GETSIG):
+			printd(("%s: got I_GETSIG\n", __FUNCTION__));
 			return str_i_getsig(file, sd, arg);
 		case _IOC_NR(I_GRDOPT):
+			printd(("%s: got I_GRDOPT\n", __FUNCTION__));
 			return str_i_grdopt(file, sd, arg);
 		case _IOC_NR(I_GWROPT):
+			printd(("%s: got I_GWROPT\n", __FUNCTION__));
 			return str_i_gwropt(file, sd, arg);
 		case _IOC_NR(I_LINK):
+			printd(("%s: got I_LINK\n", __FUNCTION__));
 			return str_i_link(file, sd, arg);
 		case _IOC_NR(I_LIST):
+			printd(("%s: got I_LIST\n", __FUNCTION__));
 			return str_i_list(file, sd, arg);
 		case _IOC_NR(I_LOOK):
+			printd(("%s: got I_LOOK\n", __FUNCTION__));
 			return str_i_look(file, sd, arg);
 		case _IOC_NR(I_NREAD):
+			printd(("%s: got I_NREAD\n", __FUNCTION__));
 			return str_i_nread(file, sd, arg);
 		case _IOC_NR(I_PEEK):
+			printd(("%s: got I_PEEK\n", __FUNCTION__));
 			return str_i_peek(file, sd, arg);
 		case _IOC_NR(I_PLINK):
+			printd(("%s: got I_PLINK\n", __FUNCTION__));
 			return str_i_plink(file, sd, arg);
 		case _IOC_NR(I_POP):
+			printd(("%s: got I_POP\n", __FUNCTION__));
 			return str_i_pop(file, sd, arg);
 		case _IOC_NR(I_PUNLINK):
+			printd(("%s: got I_PUNLINK\n", __FUNCTION__));
 			return str_i_punlink(file, sd, arg);
 		case _IOC_NR(I_PUSH):
+			printd(("%s: got I_PUSH\n", __FUNCTION__));
 			return str_i_push(file, sd, arg);
 		case _IOC_NR(I_RECVFD):
+			printd(("%s: got I_RECVFD\n", __FUNCTION__));
 			return str_i_recvfd(file, sd, arg);
 		case _IOC_NR(I_SENDFD):
+			printd(("%s: got I_SENDFD\n", __FUNCTION__));
 			return str_i_sendfd(file, sd, arg);
 		case _IOC_NR(I_SETCLTIME):
+			printd(("%s: got I_SETCLTIME\n", __FUNCTION__));
 			return str_i_setcltime(file, sd, arg);
 		case _IOC_NR(I_SETSIG):
+			printd(("%s: got I_SETSIG\n", __FUNCTION__));
 			return str_i_setsig(file, sd, arg);
 		case _IOC_NR(I_SRDOPT):
+			printd(("%s: got I_SRDOPT\n", __FUNCTION__));
 			return str_i_srdopt(file, sd, arg);
 		case _IOC_NR(I_STR):
+			printd(("%s: got I_STR\n", __FUNCTION__));
 			return str_i_str(file, sd, arg, access);
 		case _IOC_NR(I_SWROPT):
+			printd(("%s: got I_SWROPT\n", __FUNCTION__));
 			return str_i_swropt(file, sd, arg);
 		case _IOC_NR(I_UNLINK):
+			printd(("%s: got I_UNLINK\n", __FUNCTION__));
 			return str_i_unlink(file, sd, arg);
 			/* are these Solaris specific? */
 		case _IOC_NR(I_SERROPT):
+			printd(("%s: got I_SERROPT\n", __FUNCTION__));
 			return str_i_serropt(file, sd, arg);
 		case _IOC_NR(I_GERROPT):
+			printd(("%s: got I_GERROPT\n", __FUNCTION__));
 			return str_i_gerropt(file, sd, arg);
 		case _IOC_NR(I_ANCHOR):
+			printd(("%s: got I_ANCHOR\n", __FUNCTION__));
 			return str_i_anchor(file, sd, arg);
 			/* Linux Fast-STREAMS special ioctls */
 		case _IOC_NR(I_PUTPMSG):	/* putpmsg syscall emulation */
+			printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
 			return str_i_putpmsg(file, sd, cmd, arg);
 		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
+			printd(("%s: got I_GETPMSG\n", __FUNCTION__));
 			return str_i_getpmsg(file, sd, cmd, arg);
 		case _IOC_NR(I_FATTACH):	/* fattach syscall emulation */
+			printd(("%s: got I_FATTACH\n", __FUNCTION__));
 			return str_i_fattach(file, sd, cmd, arg);
 		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
+			printd(("%s: got I_FDETACH\n", __FUNCTION__));
 			return str_i_fdetach(file, sd, cmd, arg);
 		case _IOC_NR(I_PIPE):	/* pipe syscall emulation */
+			printd(("%s: got I_PIPE\n", __FUNCTION__));
 			return str_i_pipe(file, sd, cmd, arg);
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCGETS))
 		}
@@ -6545,10 +6582,13 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			length = 0;	/* no argument - simple return */
 			break;
 		case _IOC_NR(TIOCGSID):	/* pid_t * *//* SVID *//* XXX */
+			printd(("%s: got TIOCGSID\n", __FUNCTION__));
 			return tty_tiocgsid(file, sd, arg);
 		case _IOC_NR(TIOCGPGRP):	/* pid_t * *//* SVID *//* XXX */
+			printd(("%s: got TIOCGPGRP\n", __FUNCTION__));
 			return tty_tiocgpgrp(file, sd, arg);
 		case _IOC_NR(TIOCSPGRP):	/* const pid_t * *//* SVID *//* XXX */
+			printd(("%s: got TIOCSPGRP\n", __FUNCTION__));
 			return tty_tiocspgrp(file, sd, arg);
 		case _IOC_NR(TIOCSTI):	/* const char * *//* BSD *//* XXX */
 			access |= FEXCL;
@@ -6656,9 +6696,11 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 		case _IOC_NR(FIOGETOWN):	/* pid_t * */
+			printd(("%s: got FIOGETOWN\n", __FUNCTION__));
 			return file_fiogetown(file, sd, arg);
 			break;
 		case _IOC_NR(FIOSETOWN):	/* const pid_t * */
+			printd(("%s: got FIOSETOWN\n", __FUNCTION__));
 			return file_fiosetown(file, sd, arg);
 #if 0
 		case _IOC_NR(FIOCLEX):	/* void *//* XXX */
@@ -6695,13 +6737,16 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		switch (_IOC_NR(cmd)) {
 #endif
 		case _IOC_NR(SIOCATMARK):	/* int * */
+			printd(("%s: got SIOCATMARK\n", __FUNCTION__));
 			access |= FREAD;
 			return sock_siocatmark(file, sd, arg);
 		case _IOC_NR(SIOCSPGRP):	/* const pid_t * */
+			printd(("%s: got SIOCSPGRP\n", __FUNCTION__));
 			access |= FEXCL;
 			length = sizeof(pid_t);
 			return sock_siocspgrp(file, sd, arg);
 		case _IOC_NR(SIOCGPGRP):	/* pid_t * */
+			printd(("%s: got SIOCGPGRP\n", __FUNCTION__));
 			length = sizeof(pid_t);
 			return sock_siocgpgrp(file, sd, arg);
 		}
@@ -6796,9 +6841,14 @@ EXPORT_SYMBOL(strm_f_ops);
 int
 strwput(queue_t *q, mblk_t *mp)
 {
-	struct stdata *sd = qstream(q);
-	msg_type_t type = mp->b_datap->db_type;
-	mblk_t *bp;
+	struct stdata *sd;
+
+	assert(q);
+	assert(mp);
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	if (!q->q_next) {
 		/* nothing we can do */
@@ -6806,6 +6856,7 @@ strwput(queue_t *q, mblk_t *mp)
 		swerr();
 	} else {
 		unsigned long pl;
+		mblk_t *bp;
 
 		pl = zwlock(sd);
 		if ((bp = q->q_first)) {
@@ -6813,12 +6864,13 @@ strwput(queue_t *q, mblk_t *mp)
 			zwunlock(sd, pl);
 			/* delayed one has to go - can't delay the other */
 			prlock(sd);
-			putnext(q, bp);
+			ctrace(putnext(q, bp));
+			ctrace(putnext(q, mp));
 			prunlock(sd);
 		} else if (test_bit(STRDELIM_BIT, &sd->sd_flag)
 			   || !test_bit(STRHOLD_BIT, &sd->sd_flag)
 			   || bp == mp
-			   || type != M_DATA
+			   || mp->b_datap->db_type != M_DATA
 			   || mp->b_flag & MSGDELIM
 			   || mp->b_cont
 			   || mp->b_wptr == mp->b_rptr
@@ -6827,19 +6879,14 @@ strwput(queue_t *q, mblk_t *mp)
 			   delimited, or longer than one block or a zero-length message, or can't
 			   hold another write same size. */
 			zwunlock(sd, pl);
+			prlock(sd);
+			ctrace(putnext(q, mp));
+			prunlock(sd);
 		} else {
 			/* new M_DATA message with more room */
 			insq(q, NULL, mp);	/* putq without locks */
 			zwunlock(sd, pl);
-			mp = NULL;
 			/* TODO: need to handle 10ms timeout */
-		}
-		if (mp) {
-			/* watch out for M_FLUSH */
-			/* actually, M_FLUSH will release the held message */
-			prlock(sd);
-			putnext(q, mp);
-			prunlock(sd);
 		}
 	}
 	return (0);
@@ -7290,7 +7337,7 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	} else {
 		mp->b_datap->db_type = M_DONTPLAY;
-		put(lp->lp_queue, mp);
+		ctrace(put(lp->lp_queue, mp));
 	}
 	return (0);
 }
@@ -7334,50 +7381,64 @@ strrput(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_PCPROTO:	/* bi - protocol info */
+		printd(("%s: got M_PCPROTO\n", __FUNCTION__));
 		err = str_m_pcproto(sd, q, mp);
 		break;
 	case M_DATA:		/* bi - data */
 	case M_PROTO:		/* bi - protocol info */
 	case M_PASSFP:		/* bi - pass file pointer */
+		printd(("%s: got M_DATA, M_PROTO or M_PASSFP\n", __FUNCTION__));
 		err = str_m_data(sd, q, mp);
 		break;
 	case M_FLUSH:		/* bi - flush queues */
+		printd(("%s: got M_FLUSH\n", __FUNCTION__));
 		err = str_m_flush(sd, q, mp);
 		break;
 	case M_SETOPTS:	/* up - set stream head options */
 	case M_PCSETOPTS:	/* up - set stream head options */
+		printd(("%s: got M_SETOPTS, M_PCSETOPTS\n", __FUNCTION__));
 		err = str_m_setopts(sd, q, mp);
 		break;
 	case M_SIG:		/* up - signal */
+		printd(("%s: got M_SIG\n", __FUNCTION__));
 		err = str_m_sig(sd, q, mp);
 		break;
 	case M_PCSIG:		/* up - signal */
+		printd(("%s: got M_PCSIG\n", __FUNCTION__));
 		err = str_m_pcsig(sd, q, mp);
 		break;
 	case M_ERROR:		/* up - report error */
+		printd(("%s: got M_ERROR\n", __FUNCTION__));
 		err = str_m_error(sd, q, mp);
 		break;
 	case M_HANGUP:		/* up - report hangup */
+		printd(("%s: got M_HANGUP\n", __FUNCTION__));
 		err = str_m_hangup(sd, q, mp);
 		break;
 	case M_UNHANGUP:	/* up - report recovery */
+		printd(("%s: got M_UNHANGUP\n", __FUNCTION__));
 		err = str_m_unhangup(sd, q, mp);
 		break;
 	case M_COPYIN:		/* up - copy data from user */
 	case M_COPYOUT:	/* up - copy data to user */
+		printd(("%s: got M_COPYIN or M_COPYOUT\n", __FUNCTION__));
 		err = str_m_copy(sd, q, mp);
 		break;
 	case M_IOCACK:		/* up - acknolwedge ioctl */
 	case M_IOCNAK:		/* up - refuse ioctl */
+		printd(("%s: got M_IOCACK or M_IOCNAK\n", __FUNCTION__));
 		err = str_m_ioc(sd, q, mp);
 		break;
 	case M_IOCTL:		/* dn - io control */
+		printd(("%s: got M_IOCTL\n", __FUNCTION__));
 		err = str_m_ioctl(sd, q, mp);
 		break;
 	case M_LETSPLAY:	/* up - AIX only */
+		printd(("%s: got M_LETSPLAY\n", __FUNCTION__));
 		err = str_m_letsplay(sd, q, mp);
 		break;
 	default:
+		printd(("%s: got other message\n", __FUNCTION__));
 #if 0
 	case M_BREAK:		/* dn - request to send "break" */
 	case M_DELAY:		/* dn - request delay on output */
