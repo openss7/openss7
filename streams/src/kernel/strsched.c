@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/24 01:14:51 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/24 20:11:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 01:14:51 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/24 01:14:51 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/24 20:11:18 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/24 01:14:51 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/24 20:11:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ raise_softirq(unsigned int nr)
 }
 #endif
 
-void streams_fastcall
+streams_fastcall void
 __raise_streams(void)
 {
 	raise_softirq(STREAMS_SOFTIRQ);
@@ -234,21 +234,23 @@ mdbblock_alloc(uint priority, void *func)
 	}
 	trace();
 	if ((mp = kmem_cache_alloc(sdi->si_cache, slab_flags))) {
-#if defined CONFIG_STREAMS_DEBUG
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
+#if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
+#endif
 
 		md->msgblk.m_func = func;
 		md->msgblk.m_queue = qget(queue_guess(NULL));
+#if defined CONFIG_STREAMS_DEBUG
 		write_lock_irqsave(&smi->si_rwlock, flags);
 		list_add_tail(&md->msgblk.m_list, &smi->si_head);
 		list_add_tail(&md->datablk.db_list, &sdi->si_head);
 		write_unlock_irqrestore(&smi->si_rwlock, flags);
+#endif
 		atomic_inc(&smi->si_cnt);
 		if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 			smi->si_hwl = atomic_read(&smi->si_cnt);
-#endif
 		atomic_inc(&sdi->si_cnt);
 		if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 			sdi->si_hwl = atomic_read(&sdi->si_cnt);
@@ -368,9 +370,9 @@ freeblocks(struct strthread *t)
 		t->freemblk_tail = &t->freemblk_head;
 		while ((mp = mp_next)) {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
+			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 
 #if defined CONFIG_STREAMS_DEBUG
-			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 			unsigned long flags;
 			struct mdbblock *md = (struct mdbblock *) mp;
 
@@ -378,8 +380,8 @@ freeblocks(struct strthread *t)
 			list_del_init(&md->msgblk.m_list);
 			list_del_init(&md->datablk.db_list);
 			write_unlock_irqrestore(&smi->si_rwlock, flags);
-			atomic_dec(&smi->si_cnt);
 #endif
+			atomic_dec(&smi->si_cnt);
 			mp_next = xchg(&mp->b_next, NULL);
 			mp->b_prev = NULL;
 			kmem_cache_free(sdi->si_cache, mp);
@@ -1746,7 +1748,12 @@ putp_fast(queue_t *q, mblk_t *mp)
 	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 		ptrace(("calling put procedure\n"));
-		(void) q->q_qinfo->qi_putp(q, mp);
+#if 0
+		__ctrace((void) q->q_qinfo->qi_putp(q, mp));
+#else
+		__ctrace(q->q_qinfo->qi_putp(q, mp));
+#endif
+		__trace();
 		qwakeup(q);
 	} else {
 		/* procs have been turned off */
@@ -1839,12 +1846,14 @@ srvp_fast(queue_t *q)
 			   false enables. */
 #endif
 			{
-				int (*qi_srvp) (queue_t *);
-
-				if ((qi_srvp = q->q_qinfo->qi_srvp)) {
+				if (q->q_qinfo->qi_srvp) {
 					/* just for compatibilty, this bit is not actually used */
 					set_bit(QSVCBUSY_BIT, &q->q_flag);
+#if 0
 					(void) q->q_qinfo->qi_srvp(q);
+#else
+					q->q_qinfo->qi_srvp(q);
+#endif
 					clear_bit(QSVCBUSY_BIT, &q->q_flag);
 				}
 			}
@@ -2443,7 +2452,7 @@ qputp(queue_t *q, mblk_t *mp)
 		queue_t *newq;
 		struct stdata *sd;
 
-		trace();
+		__trace();
 		sd = qstream(q);
 		prlock(sd);
 		for (newq = q; newq && newq->q_ftmsg && !newq->q_ftmsg(mp); newq = newq->q_next) ;
@@ -2469,7 +2478,8 @@ qputp(queue_t *q, mblk_t *mp)
 		return;
 	}
 #endif
-	putp_fast(q, mp);
+	__ctrace(putp_fast(q, mp));
+	__trace();
 }
 
 STATIC void
@@ -2692,9 +2702,10 @@ put(queue_t *q, mblk_t *mp)
 	assert(q->q_qinfo->qi_putp);
 
 	trace();
-	if (!in_irq())
-		qputp(q, mp);
-	else {
+	if (!in_irq()) {
+		__ctrace(qputp(q, mp));
+		__trace();
+	} else {
 		/* defer for execution inside STREAMS */
 		struct mbinfo *m = (typeof(m)) mp;
 

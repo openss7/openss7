@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/24 01:14:53 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/24 20:11:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 01:14:53 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:19 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -168,23 +168,25 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
  *
  *  Also, getq() and putbq() must only be used from with a queue service procedure.
  */
+
+#if 0				/* make these all functions now */
 //#ifdef CONFIG_STREAMS_DEBUG
 /* loosen locks for debugging */
-//#define write_str_disable()	do { local_str_disable(); } while (0)
-//#define write_str_enable()	do { local_str_enable(); } while (0)
-//#else				/* CONFIG_STREAMS_DEBUG */
-//#define write_str_disable()	do { local_bh_disable(); local_str_disable(); } while (0)
-//#define write_str_enable()	do { local_str_enable(); local_bh_enable(); } while (0)
-//#endif				/* CONFIG_STREAMS_DEBUG */
-#define read_str_disable()	do { local_str_disable(); } while (0)
-#define read_str_enable()	do { local_str_enable(); } while (0)
+//#define write_str_disable()   do { local_str_disable(); } while (0)
+//#define write_str_enable()    do { local_str_enable(); } while (0)
+//#else                         /* CONFIG_STREAMS_DEBUG */
+//#define write_str_disable()   do { local_bh_disable(); local_str_disable(); } while (0)
+//#define write_str_enable()    do { local_str_enable(); local_bh_enable(); } while (0)
+//#endif                                /* CONFIG_STREAMS_DEBUG */
+#define read_str_disable()	do { local_bh_disable(); } while (0)
+#define read_str_enable()	do { local_bh_enable(); } while (0)
 
-//#define write_lock_str(__l)	do { write_str_disable(); write_lock(__l);  } while (0)
-//#define write_unlock_str(__l)	do { write_unlock(__l); write_str_enable(); } while (0)
+//#define write_lock_str(__l)   do { write_str_disable(); write_lock(__l);  } while (0)
+//#define write_unlock_str(__l) do { write_unlock(__l); write_str_enable(); } while (0)
 #define read_lock_str(__l)	do { read_str_disable();  read_lock(__l); } while (0)
 #define read_unlock_str(__l)	do { read_unlock(__l); read_str_enable(); } while (0)
-//#define zread_lock_str(__l)	do { write_str_disable();  read_lock(__l); } while (0)
-//#define zread_unlock_str(__l)	do { read_unlock(__l); write_str_enable(); } while (0)
+//#define zread_lock_str(__l)   do { write_str_disable();  read_lock(__l); } while (0)
+//#define zread_unlock_str(__l) do { read_unlock(__l); write_str_enable(); } while (0)
 
 /*
  *  Just a little bit of nesting on freeze locks, if the caller holds a write lock on the freeze
@@ -258,6 +260,202 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define qwunlock(__q, __pl)	(void) ({ write_unlock(&(__q)->q_lock); zrunlock(qstream(__q), (__pl)); })
 #define qrlock(__q)		(unsigned long) ({ unsigned long pl; read_lock_irqsave(&(__q)->q_lock, pl); pl; })
 #define qrunlock(__q, __pl)	do { read_unlock_irqrestore(&(__q)->q_lock, (__pl)); } while (0)
+
+#else
+
+static inline void
+read_str_disable(void)
+{
+	local_str_disable();
+}
+static inline void
+read_str_enable(void)
+{
+	local_str_enable();
+}
+
+static inline void
+read_lock_str(rwlock_t *lk)
+{
+	read_str_disable();
+	read_lock(lk);
+}
+static inline void
+read_unlock_str(rwlock_t *lk)
+{
+	read_unlock(lk);
+	read_str_enable();
+}
+
+static inline int
+frozen_by_caller(queue_t *q)
+{
+	struct stdata *sd;
+
+	sd = qstream(q);
+	return (sd->sd_freezer == current);
+}
+static inline int
+not_frozen_by_caller(queue_t *q)
+{
+	struct stdata *sd;
+
+	sd = qstream(q);
+	return (sd->sd_freezer != current);
+}
+
+static inline void
+zlockinit(struct stdata *sd)
+{
+	rwlock_init(&sd->sd_freeze);
+}
+static inline unsigned long
+zwlock(struct stdata *sd)
+{
+	unsigned long pl;
+
+	write_lock_irqsave(&sd->sd_freeze, pl);
+	sd->sd_freezer = current;
+	return (pl);
+}
+static inline void
+zwunlock(struct stdata *sd, unsigned long pl)
+{
+	sd->sd_freezer = NULL;
+	write_unlock_irqrestore(&sd->sd_freeze, pl);
+}
+static inline unsigned long
+zrlock(struct stdata *sd)
+{
+	unsigned long pl;
+
+	local_irq_save(pl);
+	if (sd->sd_freezer != current)
+		read_lock(&sd->sd_freeze);
+	return (pl);
+}
+static inline void
+zrunlock(struct stdata *sd, unsigned long pl)
+{
+	if (sd->sd_freezer != current)
+		read_unlock(&sd->sd_freeze);
+	local_irq_restore(pl);
+}
+
+static inline void
+stream_barrier(struct stdata *sd)
+{
+	unsigned long pl;
+
+	pl = zrlock(sd);
+	zrunlock(sd, pl);
+}
+static inline void
+freeze_barrier(queue_t *q)
+{
+	struct stdata *sd;
+
+	sd = qstream(q);
+	stream_barrier(sd);
+}
+
+static inline void
+plockinit(struct stdata *sd)
+{
+	rwlock_init(&sd->sd_plumb);
+}
+static inline unsigned long
+pwlock(struct stdata *sd)
+{
+	unsigned long pl;
+
+	pl = zrlock(sd);
+	write_lock(&sd->sd_plumb);
+	return (pl);
+}
+static inline void
+pwunlock(struct stdata *sd, unsigned long pl)
+{
+	write_unlock(&sd->sd_plumb);
+	zrunlock(sd, pl);
+}
+static inline void
+prlock(struct stdata *sd)
+{
+	read_lock_str(&sd->sd_plumb);
+}
+static inline void
+prunlock(struct stdata *sd)
+{
+	read_unlock_str(&sd->sd_plumb);
+}
+
+static inline void
+slockinit(struct stdata *sd)
+{
+	rwlock_init(&sd->sd_lock);
+}
+static inline void
+swlock(struct stdata *sd)
+{
+	write_lock(&sd->sd_lock);
+}
+static inline void
+swunlock(struct stdata *sd)
+{
+	write_unlock(&sd->sd_lock);
+}
+static inline void
+srlock(struct stdata *sd)
+{
+	read_lock(&sd->sd_lock);
+}
+static inline void
+srunlock(struct stdata *sd)
+{
+	read_unlock(&sd->sd_lock);
+}
+
+static inline void
+qlockinit(queue_t *q)
+{
+	rwlock_init(&q->q_lock);
+}
+static inline unsigned long
+qwlock(queue_t *q)
+{
+	unsigned long pl;
+	struct stdata *sd;
+
+	sd = qstream(q);
+	pl = zrlock(sd);
+	write_lock(&q->q_lock);
+	return (pl);
+}
+static inline void
+qwunlock(queue_t *q, unsigned long pl)
+{
+	struct stdata *sd;
+
+	sd = qstream(q);
+	write_unlock(&q->q_lock);
+	zrunlock(sd, pl);
+}
+static inline unsigned long
+qrlock(queue_t *q)
+{
+	unsigned long pl;
+
+	read_lock_irqsave(&q->q_lock, pl);
+	return (pl);
+}
+static inline void
+qrunlock(queue_t *q, unsigned long pl)
+{
+	read_unlock_irqrestore(&q->q_lock, pl);
+}
+
+#endif
 
 #endif
 

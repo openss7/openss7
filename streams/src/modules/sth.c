@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 04:13:22 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/09/24 04:13:22 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -338,7 +338,7 @@ strremove(struct inode *inode, struct stdata *sd)
 		assert(cdev);
 		assert(cdev->d_inode);
 		cdev->d_inode->i_nlink--;
-		ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
+		__ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
 		list_del_init(&sd->sd_list);
 		sd->sd_inode = NULL;
 	}
@@ -1191,9 +1191,10 @@ strsendmread(struct stdata *sd, const unsigned long len, unsigned long *plp)
 		b->b_datap->db_type = M_READ;
 		*((unsigned long *) b->b_rptr) = len;
 		b->b_wptr = b->b_rptr + sizeof(&len);
-		if (!(err = straccess_rlock(sd, FREAD)))
-			ctrace(put(sd->sd_wq, b));
-		else
+		if (!(err = straccess_rlock(sd, FREAD))) {
+			__ctrace(put(sd->sd_wq, b));
+			__trace();
+		} else
 			freemsg(b);
 	} else if (!(err = straccess_rlock(sd, FNDELAY)))	/* XXX: why FNDELAY? */
 		err = -ENOSR;
@@ -1847,7 +1848,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		ctrace(put(sd->sd_wq, mb));
+		__ctrace(put(sd->sd_wq, mb));
+		__trace();
 
 		ptrace(("waiting for response\n"));
 		mb = strwaitiocack(sd, &timeo, access);
@@ -1900,7 +1902,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			}
 			ioc->copyresp.cp_rval = (caddr_t) -err;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			ctrace(put(sd->sd_wq, mb));
+			__ctrace(put(sd->sd_wq, mb));
+			__trace();
 			goto abort;
 		default:
 			never();
@@ -1956,7 +1959,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		ctrace(put(sd->sd_wq, mb));
+		__ctrace(put(sd->sd_wq, mb));
+		__trace();
 
 		mb = strwaitiocack(sd, &timeo, access);
 
@@ -2001,7 +2005,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			}
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			ctrace(put(sd->sd_wq, mb));
+			__ctrace(put(sd->sd_wq, mb));
+			__trace();
 			goto abort;
 		default:
 			never();
@@ -2075,7 +2080,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		ctrace(put(l->l_qtop, mb));
+		__ctrace(put(l->l_qtop, mb));
+		__trace();
 
 		mb = strwaitiocack(sd, NULL, access);
 
@@ -2100,7 +2106,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			ctrace(put(sd->sd_wq, mb));
+			__ctrace(put(sd->sd_wq, mb));
+			__trace();
 			goto abort;
 		default:
 			never();
@@ -2209,7 +2216,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	}
 
 	do {
-		ctrace(put(l->l_qtop, mb));
+		__ctrace(put(l->l_qtop, mb));
+		__trace();
 
 		mb = strwaitiocack(sd, NULL, FCREAT);
 
@@ -2226,7 +2234,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			ctrace(put(sd->sd_wq, mb));
+			__ctrace(put(sd->sd_wq, mb));
+			__trace();
 			goto abort;
 		default:
 			never();
@@ -2590,7 +2599,8 @@ strlastclose(struct stdata *sd, int oflag)
 
 		b->b_datap->db_type = M_HANGUP;
 
-		ctrace(put(sd->sd_wq, b));
+		__ctrace(put(sd->sd_wq, b));
+		__trace();
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -3653,9 +3663,11 @@ strwrite(struct file *file, const char *buf, size_t nbytes, loff_t *ppos)
 				err = straccess(sd, (FWRITE | FNDELAY));
 
 			/* possibly wait for message band */
-			if (!err && !(err = strwaitband(sd, file->f_flags, 0, MSG_BAND)))
+			if (!err && !(err = strwaitband(sd, file->f_flags, 0, MSG_BAND))) {
 				/* We don't really queue these, see strwput(). */
-				ctrace(put(sd->sd_wq, b));
+				__ctrace(put(sd->sd_wq, b));
+				__trace();
+			}
 
 		}
 		srunlock(sd);
@@ -3845,7 +3857,8 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		if (!more)
 			mp->b_flag |= MSGDELIM;
 		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(put(sd->sd_wq, mp));
+		__ctrace(put(sd->sd_wq, mp));
+		__trace();
 		/* We want to give the driver queues an opportunity to run. */
 		runqueues();
 		return (size);
@@ -3951,7 +3964,8 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 	}
 	if (!IS_ERR(mp = strputpmsg_common(file, &ctl, &dat, band, flags))) {
 		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(put(sd->sd_wq, mp));
+		__ctrace(put(sd->sd_wq, mp));
+		__trace();
 		return (0);
 	}
 	return PTR_ERR(mp);
@@ -4775,7 +4789,8 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!IS_ERR(mp = strputpmsg_common(file, &fdi.ctlbuf, &fdi.databuf, 0, fdi.flags))) {
 		bcopy(&token, mp->b_rptr + fdi.offset, sizeof(token));
 		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(put(sd->sd_wq, mp));
+		__ctrace(put(sd->sd_wq, mp));
+		__trace();
 		return (0);
 	}
 	return PTR_ERR(mp);
@@ -4849,7 +4864,8 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_pri;
 
 	if (!(err = straccess_rlock(sd, 0))) {
-		ctrace(put(sd->sd_wq, mp));
+		__ctrace(put(sd->sd_wq, mp));
+		__trace();
 		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -4896,7 +4912,8 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = straccess_rlock(sd, 0))) {
 		ptrace(("putting message %p\n", mp));
-		ctrace(put(sd->sd_wq, mp));
+		__ctrace(put(sd->sd_wq, mp));
+		__trace();
 		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -6880,7 +6897,8 @@ strwput(queue_t *q, mblk_t *mp)
 			   hold another write same size. */
 			zwunlock(sd, pl);
 			prlock(sd);
-			ctrace(putnext(q, mp));
+			__ctrace(putnext(q, mp));
+			__trace();
 			prunlock(sd);
 		} else {
 			/* new M_DATA message with more room */
@@ -7017,7 +7035,9 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   ensures that there is only one M_PCPROTO message on the STREAM head read queue, if one
 	   exists, it is first on the queue.  It would be easy enough to hold onto it, but I don't
 	   see the need. */
+	__trace();
 	if (mp->b_rptr[0] & FLUSHR) {
+		__trace();
 		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHALL);
 		else {
@@ -7041,18 +7061,24 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 	}
 	/* We set MSGNOLOOP on flush messages returned downstream that if echoed back up in error
 	   are freed at the stream head. */
+	__trace();
 	if (!(mp->b_flag & MSGNOLOOP) && _WR(q)->q_next) {
+		__trace();
 		if (mp->b_rptr[0] & FLUSHW) {
+			__trace();
 			if (mp->b_rptr[1] & FLUSHBAND)
 				flushband(_WR(q), mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(_WR(q), FLUSHALL);
 			mp->b_flag |= MSGNOLOOP;
-			qreply(q, mp);
+			__ctrace(qreply(q, mp));
+			__trace();
 			return (0);
 		}
 	}
+	__trace();
 	freemsg(mp);
+	__trace();
 	return (0);
 }
 
@@ -7337,7 +7363,8 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	} else {
 		mp->b_datap->db_type = M_DONTPLAY;
-		ctrace(put(lp->lp_queue, mp));
+		__ctrace(put(lp->lp_queue, mp));
+		__trace();
 	}
 	return (0);
 }

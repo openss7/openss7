@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.46 2005/09/23 05:49:44 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.47 2005/09/24 20:11:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/23 05:49:44 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/09/23 05:49:44 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/09/24 20:11:14 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -434,7 +434,9 @@ enum {
 struct shinfo {
 	struct stdata sh_stdata;
 	atomic_t sh_refs;		/* references to this structure */
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head sh_list;
+#endif
 };
 
 struct queinfo {
@@ -453,7 +455,9 @@ struct queinfo {
 	klock_t qu_klock;		/* lock for this queue pair */
 #endif
 	atomic_t qu_refs;		/* references to this structure */
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head qu_list;
+#endif
 };
 
 #if 0
@@ -480,17 +484,22 @@ struct mbinfo {
 	void (*m_func) (void);		/* allocating function SVR4 compatible */
 	queue_t *m_queue;		/* last queue for this block */
 	void *m_private;		/* private information for deferral */
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head m_list;
+#endif
 };
 struct dbinfo {
 	dblk_t d_dblock;
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head db_list;
+#endif
 };
 
-/* I don't know why, we never allocate these, we place them in message blocks */
 struct linkinfo {
 	struct linkblk li_linkblk;
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head li_list;
+#endif
 };
 
 #define SE_STREAM	0
@@ -503,20 +512,26 @@ struct seinfo {
 	struct strevent s_strevent;
 	unsigned int s_type;
 	queue_t *s_queue;		/* queue guess for this strevent */
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head s_list;
+#endif
 };
 
 struct qbinfo {
 	struct qband qbi_qband;
 	atomic_t qbi_refs;		/* references to this structure */
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head qbi_list;
+#endif
 };
 
 struct apinfo {
 	struct strapush api_sap;
 	struct list_head api_more;
 	atomic_t api_refs;
+#if defined CONFIG_STREAMS_DEBUG
 	struct list_head api_list;
+#endif
 };
 
 struct devinfo {
@@ -528,8 +543,10 @@ struct devinfo {
 	atomic_t di_count;		/* open count */
 	major_t major;			/* major device number */
 	minor_t minor;			/* minor device number */
+#if defined CONFIG_STREAMS_DEBUG
 	struct devinfo *di_next;	/* Strinfo list linkage */
 	struct devinfo *di_prev;	/* Strinfo list linkage */
+#endif
 };
 
 struct mdlinfo {
@@ -540,8 +557,10 @@ struct mdlinfo {
 	atomic_t mi_refs;		/* structure references */
 	atomic_t mi_count;		/* open count */
 	modID_t modid;			/* module id number */
+#if defined CONFIG_STREAMS_DEBUG
 	struct mdlinfo *mi_next;	/* Strinfo list linkage */
 	struct mdlinfo *mi_prev;	/* Strinfo list linkage */
+#endif
 };
 
 #define was128	(32*sizeof(ulong))

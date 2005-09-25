@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/09/10 18:16:32 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -145,14 +145,25 @@ static struct module_info echo_minfo = {
 };
 
 static int
-echo_put(queue_t *q, mblk_t *mp)
+echo_rput(queue_t *q, mblk_t *mp)
+{
+	swerr();
+	if (!putq(q, mp))
+		freemsg(mp);
+	return (0);
+}
+
+static int
+echo_wput(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	trace();
+	__trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
+		__trace();
 		if (mp->b_rptr[0] & FLUSHW) {
+			__trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
@@ -160,24 +171,33 @@ echo_put(queue_t *q, mblk_t *mp)
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
-			queue_t *rq = RD(q);
-
+			__trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
 			else
-				flushq(rq, FLUSHALL);
-			qreply(q, mp);
+				flushq(RD(q), FLUSHALL);
+			__ctrace(qreply(q, mp));
+			__trace();
 			return (0);
 		}
+		__trace();
 		break;
 	case M_IOCTL:
-		ptrace(("received M_IOCTL, naking it\n"));
-		err = -EINVAL;
-		goto nak;
 	case M_IOCDATA:
-		ptrace(("received M_IOCDATA, naking it\n"));
+	{
+		union ioctypes *ioc;
+
+		ptrace(("received M_IOCTL or M_IOCDATA, naking it\n"));
 		err = -EINVAL;
-		goto nak;
+
+		mp->b_datap->db_type = M_IOCNAK;
+		ioc = (typeof(ioc)) mp->b_rptr;
+		ioc->iocblk.ioc_count = 0;
+		ioc->iocblk.ioc_rval = -1;
+		ioc->iocblk.ioc_error = -err;
+		qreply(q, mp);
+		return (0);
+	}
 	case M_READ:
 		mp->b_wptr = mp->b_rptr;
 		mp->b_datap->db_type = M_DATA;
@@ -193,22 +213,9 @@ echo_put(queue_t *q, mblk_t *mp)
 	case M_PCRSE:
 		qreply(q, mp);
 		return (0);
-	default:
-		freemsg(mp);
-		return (0);
 	}
-      nak:
-	{
-		union ioctypes *ioc;
-
-		mp->b_datap->db_type = M_IOCNAK;
-		ioc = (typeof(ioc)) mp->b_rptr;
-		ioc->iocblk.ioc_count = 0;
-		ioc->iocblk.ioc_rval = -1;
-		ioc->iocblk.ioc_error = -err;
-		qreply(q, mp);
-		return (0);
-	}
+	freemsg(mp);
+	return (0);
 }
 
 typedef struct echo {
@@ -326,15 +333,14 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit echo_rqinit = {
-	.qi_putp = NULL,
+	.qi_putp = echo_rput,
 	.qi_qopen = echo_open,
 	.qi_qclose = echo_close,
 	.qi_minfo = &echo_minfo,
 };
 
 static struct qinit echo_wqinit = {
-	.qi_putp = echo_put,
-	.qi_srvp = NULL,
+	.qi_putp = echo_wput,
 	.qi_minfo = &echo_minfo,
 };
 

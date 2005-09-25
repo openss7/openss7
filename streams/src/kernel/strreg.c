@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 08:12:11 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/24 20:11:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 08:12:11 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/24 20:11:18 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/03 08:12:11 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/24 20:11:18 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -583,8 +583,7 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 		} else {
 			struct list_head *pos;
 
-			ensure(cdev->d_majors.next,
-				INIT_LIST_HEAD(&cdev->d_majors));
+			__ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 			/* deregister all major device numbers */
 			list_for_each(pos, &cdev->d_majors) {
@@ -721,10 +720,8 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 		if (!cdev->d_majors.next || list_empty(&cdev->d_majors))
 			break;
 #endif
-		ensure(cdev->d_majors.next,
-			INIT_LIST_HEAD(&cdev->d_majors));
-		ensure(cdev->d_minors.next,
-			INIT_LIST_HEAD(&cdev->d_minors));
+		__ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+		__ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 		/* check name for another cmin */
 		if ((n = __cmin_search(cdev, cmin->n_name))) {
@@ -790,8 +787,7 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 			/* deregister all minor devices */
 			struct list_head *pos;
 
-			ensure(cdev->d_minors.next,
-				INIT_LIST_HEAD(&cdev->d_minors));
+			__ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 			/* deregister all minor device numbers */
 			list_for_each(pos, &cdev->d_minors) {
 				cmin = list_entry(pos, struct devnode, n_list);

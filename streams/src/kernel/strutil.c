@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/24 01:14:52 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/24 20:11:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 01:14:52 $ by $Author: brian $
+ Last Modified $Date: 2005/09/24 20:11:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/24 01:14:52 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/24 20:11:19 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/24 01:14:52 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/24 20:11:19 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -69,8 +69,10 @@ static char const ident[] =
 #include <linux/wait.h>		/* for wait queues */
 #include <linux/types.h>	/* for various types */
 #include <linux/interrupt.h>	/* for in_interrupt() */
+#if 0
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 #endif
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
 
@@ -128,7 +130,7 @@ static char const ident[] =
 streams_fastcall void
 klockinit(klock_t *kl)
 {
-//	kl->kl_isrflags = 0;
+//      kl->kl_isrflags = 0;
 	rwlock_init(&kl->kl_lock);
 	kl->kl_owner = NULL;
 	kl->kl_nest = 0;
@@ -140,13 +142,13 @@ kwlock(klock_t *kl)
 	if (kl->kl_owner == current)
 		kl->kl_nest++;
 	else {
-//		unsigned long flags;
+//              unsigned long flags;
 
-//		local_irq_save(flags);
+//              local_irq_save(flags);
 		local_bh_disable();
-//		local_str_disable();
+//              local_str_disable();
 		write_lock(&kl->kl_lock);
-//		kl->kl_isrflags = flags;
+//              kl->kl_isrflags = flags;
 		kl->kl_owner = current;
 		kl->kl_nest = 0;
 	}
@@ -159,18 +161,18 @@ kwtrylock(klock_t *kl)
 	if (kl->kl_owner == current)
 		kl->kl_nest++;
 	else {
-//		unsigned long flags;
+//              unsigned long flags;
 
-//		local_irq_save(flags);
+//              local_irq_save(flags);
 		local_bh_disable();
-//		local_str_disable();
+//              local_str_disable();
 		if (write_trylock(&kl->kl_lock)) {
-//			kl->kl_isrflags = flags;
+//                      kl->kl_isrflags = flags;
 			kl->kl_owner = current;
 			kl->kl_nest = 0;
 		} else {
-//			local_irq_restore(flags);
-//			local_str_enable();
+//                      local_irq_restore(flags);
+//                      local_str_enable();
 			local_bh_enable();
 			locked = 0;
 		}
@@ -226,16 +228,16 @@ kwunlock(klock_t *kl)
 	if (kl->kl_nest > 0)
 		kl->kl_nest--;
 	else {
-//		unsigned long flags = kl->kl_isrflags;
+//              unsigned long flags = kl->kl_isrflags;
 
 		kl->kl_owner = NULL;
 		kl->kl_nest = 0;
 		if (waitqueue_active(&kl->kl_waitq))
 			wake_up(&kl->kl_waitq);
 		write_unlock(&kl->kl_lock);
-//		local_str_enable();
+//              local_str_enable();
 		local_bh_enable();
-//		local_irq_restore(flags);
+//              local_irq_restore(flags);
 	}
 }
 streams_fastcall void
@@ -1115,9 +1117,9 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
  *  @emp:	existing message on queue
  *  @nmp:	the message to append
  *
- *  CONTEXT: appq() can be called from any context other than in_irq(); however, the caller is
- *  responsibile for exclusive access to and validity of the passed in message pointers.  This
- *  requires freezing the stream or otherwise locking the queue (e.g. MPSTR_QLOCK) in advance.
+ *  CONTEXT: appq() can be called from any context; however, the caller is responsibile for
+ *  exclusive access to and validity of the passed in message pointers.  This requires freezing the
+ *  stream or otherwise locking the queue (e.g. MPSTR_QLOCK) in advance.
  *
  *  MP-STREAMS: The Stream needs to be frozen by the caller with freezestr() or the call will fail
  *  under assertions.
@@ -1128,9 +1130,10 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	int result;
 	unsigned long pl;
 
-	assert(!in_irq());
+	assert(q);
+	assert(nmp);
 
-	assert(frozen_by_caller(q));
+	assure(frozen_by_caller(q));
 
 	pl = qwlock(q);
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
@@ -1177,9 +1180,11 @@ streams_fastcall void
 qbackenable(queue_t *q)
 {
 	struct stdata *sd = qstream(q);
+	queue_t *q_back;
 
 	prlock(sd);
-	for (q = backq(q); q && !q->q_qinfo->qi_srvp && backq(q); q = backq(q)) ;
+	q_back = backq(q);
+	while ((q = q_back) && !q->q_qinfo->qi_srvp && (q_back = backq(q))) ;
 	if (q)
 		enableq(q);	/* normal enable */
 	prunlock(sd);
@@ -1232,7 +1237,7 @@ EXPORT_SYMBOL(bcangetany);
  *
  *  NOTICES: The caller is responsible for the validity of the passed in queue pointer.
  *
- *  CONTEXT: !in_irq()
+ *  CONTEXT: Any.
  *
  *  LOCKING: No locks are required across the call.
  */
@@ -1243,6 +1248,7 @@ bcanget(queue_t *q, unsigned char band)
 	unsigned long pl;
 
 	assert(q);
+
 	pl = qrlock(q);
 	{
 		mblk_t *b;
@@ -1356,8 +1362,8 @@ __find_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
 
-	/* bands are sorted in decending priority so that we can quit the search
-	   early for higher priority bands */
+	/* bands are sorted in decending priority so that we can quit the search early for higher
+	   priority bands */
 	for (qb = q->q_bandp; qb && qb->qb_band > band; qb = qb->qb_next) ;
 	if (qb && qb->qb_band == band)
 		return (qb);
@@ -1370,7 +1376,8 @@ __find_qband(queue_t *q, unsigned char band)
 	struct qband *qb;
 	unsigned char q_nband;
 
-	for (q_nband = q->q_nband, qb = q->q_bandp; qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
+	for (q_nband = q->q_nband, qb = q->q_bandp; qb && q_nband > band;
+	     qb = qb->qb_next, --q_nband) ;
 	return (qb);
 }
 #endif
@@ -1427,6 +1434,7 @@ __get_qband(queue_t *q, unsigned char band)
 		assert(qb);
 	} else {
 		unsigned char q_nband = q->q_nband;
+
 		do {
 			if (!(qb = allocqb()))
 				break;
@@ -1482,7 +1490,7 @@ _bcanput(queue_t *q, unsigned char band)
  *  @q:			the queue to check
  *  @band:		the band to check
  *
- *  CONTEXT: !in_irq()
+ *  CONTEXT: Any.
  *
  *  LOCKING: Takes a Stream head plumb read lock to permit this function to be called from outside a
  *  queue procedure belonging to @q and from process context.  The Stream head plumb read lock
@@ -1524,7 +1532,7 @@ EXPORT_SYMBOL(bcanput);
  *  @q:		this queue
  *  @band:	band to check
  *
- *  CONTEXT: !in_irq()
+ *  CONTEXT: Any.
  *
  *  NOTICES: The caller is responsible for ensuring that q->q_next is not NULL across the call.  A
  *  module can be sure that both its q->q_next pointers are non-NULL, a driver can be sure that its
@@ -1554,6 +1562,7 @@ bcanputnext(queue_t *q, unsigned char band)
 
 	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	prlock(sd);
 	result = _bcanput(q->q_next, band);
 	prunlock(sd);
@@ -1588,7 +1597,7 @@ EXPORT_SYMBOL(canget);		/* include/sys/streams/stream.h */
  *
  *  Simply implemented as bcanput(q, 0).  See bcanput() for details.
  *
- *  CONTEXT: !in_irq()
+ *  CONTEXT: Any.
  *
  *  LOCKING: None.
  */
@@ -1602,7 +1611,7 @@ EXPORT_SYMBOL(canput);		/* include/sys/streams/stream.h */
  *
  *  Simply implemented as bcanputnext(q, 0).  See bcanputnext() for details.
  *
- *  CONTEXT: !in_irq()
+ *  CONTEXT: Any.
  *
  *  LOCKING: STREAM head read lock when called from !in_streams() context.
  */
@@ -1749,15 +1758,21 @@ flushband(queue_t *q, int band, int flag)
 
 	assert(not_frozen_by_caller(q));
 
+	__trace();
 	pl = qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
 	qwunlock(q, pl);
-	if (backenable)
+	__trace();
+	if (backenable) {
+		__trace();
 		qbackenable(q);
+	}
+	__trace();
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
 	freechain(mp, mpp);
+	__trace();
 }
 
 EXPORT_SYMBOL(flushband);
@@ -1858,15 +1873,21 @@ flushq(queue_t *q, int flag)
 
 	assert(not_frozen_by_caller(q));
 
+	__trace();
 	pl = qwlock(q);
 	backenable = __flushq(q, flag, &mpp);
 	qwunlock(q, pl);
-	if (backenable)
+	__trace();
+	if (backenable) {
+		__trace();
 		qbackenable(q);
+	}
+	__trace();
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
 	freechain(mp, mpp);
+	__trace();
 }
 
 EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
@@ -2002,7 +2023,7 @@ __getq(queue_t *q, bool * be)
  *  getq:	- get messags from a queue
  *  @q:		the queue from which to get messages
  *
- *  CONTEXT: Any except in_irq().
+ *  CONTEXT: Any, but should not be frozen by caller.
  *
  *  MP-STREAMS: Note that qbackenable() will take its own STREAM head read lock making this function
  *  safe to be called from outside of STREAMS.
@@ -2014,10 +2035,9 @@ getq(queue_t *q)
 	bool backenable = false;
 	unsigned long pl;
 
-	assert(!in_irq());
 	assert(q);
 
-	assert(not_frozen_by_caller(q));
+	assure(not_frozen_by_caller(q));
 
 	pl = qwlock(q);
 	mp = __getq(q, &backenable);
@@ -2115,7 +2135,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
  *  @emp:	the existing message before which to insert
  *  @nmp:	the new message to insert
  *
- *  CONTEXT: Any except in_irq().
+ *  CONTEXT: Any, but frozen by the caller.
  *
  *  LOCKING: The caller must lock the queue with MPSTR_QLOCK() or freezestr() across the call.
  */
@@ -2125,7 +2145,8 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	int result;
 	unsigned long pl;
 
-	assert(!in_irq());
+	assert(q);
+	assert(nmp);
 
 	assert(frozen_by_caller(q));
 
@@ -2192,11 +2213,18 @@ putnext(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
 
+	assert(q);
 	assert(q->q_next);
+
 	sd = qstream(q);
+
+	assert(sd);
+
 	prlock(sd);
-	put(q->q_next, mp);
+	__ctrace(put(q->q_next, mp));
+	__trace();
 	prunlock(sd);
+	__trace();
 }
 
 EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
@@ -2282,6 +2310,9 @@ putbq(queue_t *q, mblk_t *mp)
 	int result;
 	unsigned long pl;
 
+	assert(q);
+	assert(mp);
+
 	assert(not_frozen_by_caller(q));
 
 	pl = qwlock(q);
@@ -2322,6 +2353,7 @@ putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
 
+	assert(q);
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		put(q, mp);
@@ -2343,6 +2375,7 @@ putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
 
+	assert(q);
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
@@ -2366,6 +2399,7 @@ putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
 
+	assert(q);
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
@@ -2388,6 +2422,8 @@ putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
 
+	assert(q);
+	assert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
@@ -2409,6 +2445,8 @@ putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
 
+	assert(q);
+	assert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
@@ -2432,6 +2470,8 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
 
+	assert(q);
+	assert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
@@ -2538,7 +2578,7 @@ __putq(queue_t *q, mblk_t *mp)
  *  @mp:	message to put
  *
  *  CONTEXT: Any.  It is safe to call this function directly from an ISR to place messages on a
- *  driver's lowest read queue.
+ *  driver's lowest read queue.  Should not be frozen by the caller.
  */
 streams_fastcall int
 putq(queue_t *q, mblk_t *mp)
@@ -2546,17 +2586,10 @@ putq(queue_t *q, mblk_t *mp)
 	int result;
 	unsigned long pl;
 
-#if 0
-	if (in_irq()) {
-		mp->b_next = NULL;
-		*xchg(&q->q_putq_tail, &mp->b_next) = mp;
-		return (1);
-	}
-#endif
+	assert(q);
+	assert(mp);
 
-	assert(!in_irq());
-
-	assert(not_frozen_by_caller(q));
+	assure(not_frozen_by_caller(q));
 
 	pl = qwlock(q);
 	result = __putq(q, mp);
@@ -2731,7 +2764,7 @@ qdelete(queue_t *q)
 	pwunlock(sd, pl);
 
 	printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
-	ctrace(qput(&q)); /* cancel initial allocation reference */
+	ctrace(qput(&q));	/* cancel initial allocation reference */
 }
 
 EXPORT_SYMBOL(qdelete);
@@ -2769,7 +2802,7 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 
 	assert(q);
 
-	ptrace(("detaching stream %p queue pair %p\n",  qstream(q), q));
+	ptrace(("detaching stream %p queue pair %p\n", qstream(q), q));
 
 	err = qclose(q, flags, crp);
 	qprocsoff(q);		/* in case qclose forgot */
@@ -2887,6 +2920,7 @@ qprocsoff(queue_t *q)
 		clear_bit(QWANTW_BIT, &wq->q_flag);
 		{
 			struct qband *qb;
+
 			for (qb = rq->q_bandp; qb; qb = qb->qb_next) {
 				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
@@ -2974,6 +3008,7 @@ qprocson(queue_t *q)
 		set_bit(QWANTR_BIT, &wq->q_flag);
 		{
 			struct qband *qb;
+
 			for (qb = rq->q_bandp; qb; qb = qb->qb_next)
 				set_bit(QB_WANTR_BIT, &qb->qb_flag);
 			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
@@ -3170,9 +3205,8 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  @q:		queue from which to remove message
  *  @mp:	message to remove
  *
- *  CONTEXT: rmvq() can be called from any context except in_irq().  rmvq() must be called with the
- *  queue write locked (e.g. using freezestr(9) or MPSTR_QLOCK(9)), or some other mutual exclusion
- *  mechanism.
+ *  CONTEXT: rmvq() can be called from any context.  rmvq() must be called with the queue write
+ *  locked (e.g. using freezestr(9) or MPSTR_QLOCK(9)), or some other mutual exclusion mechanism.
  *
  *  MP-STREAMS: Note that qbackenable() will take its own STREAM head read lock making this function
  *  safe to be called from outside of STREAMS.
@@ -3188,11 +3222,10 @@ rmvq(queue_t *q, mblk_t *mp)
 	bool backenable;
 	unsigned long pl;
 
-	assert(!in_irq());
 	assert(q);
 	assert(mp);
 
-	assert(frozen_by_caller(q));
+	assure(frozen_by_caller(q));
 
 	pl = qwlock(q);
 
