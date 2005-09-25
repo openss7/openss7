@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.56 2005/09/24 20:11:14 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.57 2005/09/25 06:27:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/09/24 20:11:14 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/09/25 06:27:25 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1196,9 +1196,19 @@ extern void noenable(queue_t *q);
 __STRUTIL_EXTERN_INLINE void
 qreply(queue_t *q, mblk_t *mp)
 {
-	assert(q);
+	queue_t *oq;
+
 	assert(mp);
-	return putnext(OTHERQ(q), mp);
+	assert(q);
+
+	oq = OTHERQ(q);
+
+	assert(oq);
+
+	trace();
+	putnext(oq, mp);
+	trace();
+	return;
 }
 
 #undef timo_fcn_t

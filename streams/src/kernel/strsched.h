@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/08/30 03:37:12 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/25 06:27:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -135,20 +135,20 @@ typedef enum {
 } context_t;
 
 
-#define in_streams() (!in_irq() && this_thread->lock != 0)
+#define in_streams() (!in_irq() && atomic_read(&this_thread->lock) != 0)
 
-#define can_enter_streams() (this_thread->lock == 0 || !in_interrupt())
+#define can_enter_streams() (atomic_read(&this_thread->lock) == 0 || !in_interrupt())
 
 #define local_str_disable() \
 do { \
 	struct strthread *t = this_thread; \
-	t->lock++; \
+	atomic_inc(&t->lock); \
 } while (0)
 
 #define local_str_enable() \
 do { \
 	struct strthread *t = this_thread; \
-	if (--t->lock == 0 && test_and_clear_bit(qwantrun, &t->flags)) \
+	if (atomic_dec_and_test(&t->lock) && test_and_clear_bit(qwantrun, &t->flags)) \
 		__raise_streams(); \
 } while (0)
 

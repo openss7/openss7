@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.20 2005/09/24 20:11:14 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.21 2005/09/25 06:27:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/09/24 20:11:14 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/25 06:27:25 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -139,8 +139,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define _abnormal(__exp)	do { } while(0)
 #define   _assert(__exp)	do { } while(0)
 #define   _assure(__exp)	do { } while(0)
-#define   _ensure(__exp,__sta)	do { } while(0)
-#define   _unless(__exp,__sta)	do { } while(0)
+#define   _ensure(__exp,__sta)	do { if (!(__exp)) { __sta; } } while(0)
+#define   _unless(__exp,__sta)	do { if ((__exp)) { __sta; } } while(0)
 #define    _trace()		do { } while(0)
 #define   _ptrace(__pks)	do { } while(0)
 #define   _ctrace(__fnc)	(__fnc)

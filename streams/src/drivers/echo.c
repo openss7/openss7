@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/25 06:27:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:16 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/25 06:27:27 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/25 06:27:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/09/24 20:11:16 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/09/25 06:27:27 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -158,12 +158,12 @@ echo_wput(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	__trace();
+	trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		__trace();
+		trace();
 		if (mp->b_rptr[0] & FLUSHW) {
-			__trace();
+			trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHALL);
 			else
@@ -171,16 +171,17 @@ echo_wput(queue_t *q, mblk_t *mp)
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
-			__trace();
+			trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(RD(q), FLUSHALL);
-			__ctrace(qreply(q, mp));
-			__trace();
+			ctrace(qreply(q, mp));
+			/* never makes it here */
+			trace();
 			return (0);
 		}
-		__trace();
+		trace();
 		break;
 	case M_IOCTL:
 	case M_IOCDATA:

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:21 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/09/24 20:11:21 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -338,7 +338,7 @@ strremove(struct inode *inode, struct stdata *sd)
 		assert(cdev);
 		assert(cdev->d_inode);
 		cdev->d_inode->i_nlink--;
-		__ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
+		ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
 		list_del_init(&sd->sd_list);
 		sd->sd_inode = NULL;
 	}
@@ -1192,8 +1192,8 @@ strsendmread(struct stdata *sd, const unsigned long len, unsigned long *plp)
 		*((unsigned long *) b->b_rptr) = len;
 		b->b_wptr = b->b_rptr + sizeof(&len);
 		if (!(err = straccess_rlock(sd, FREAD))) {
-			__ctrace(put(sd->sd_wq, b));
-			__trace();
+			ctrace(put(sd->sd_wq, b));
+			trace();
 		} else
 			freemsg(b);
 	} else if (!(err = straccess_rlock(sd, FNDELAY)))	/* XXX: why FNDELAY? */
@@ -1536,21 +1536,30 @@ strwaitqueue(struct stdata *sd, queue_t *q)
 STATIC INLINE streams_fastcall void
 strwaitclose(struct stdata *sd, int oflag)
 {
-	cred_t *crp = current_creds;
-	queue_t *q = sd->sd_wq;
-	bool wait = (!(oflag & FNDELAY) && (sd->sd_closetime != 0) && !signal_pending(current));
+	cred_t *crp;
+	queue_t *q;
+	bool wait;
+
+	assert(sd);
+	q = sd->sd_wq;
+	assert(q);
 
 	/* POSIX close() semantics for STREAMS */
+	wait = (!(oflag & FNDELAY) && (sd->sd_closetime != 0) && !signal_pending(current));
+
 	/* STREAM head first */
 	if (wait && q->q_first)
-		strwaitqueue(sd, q);
+		ctrace(strwaitqueue(sd, q));
+	crp = current_creds;
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
 		if (wait && q->q_first)
-			strwaitqueue(sd, q);
-		qdetach(_RD(q), oflag, crp);
+			ctrace(strwaitqueue(sd, q));
+		ctrace(qdetach(_RD(q), oflag, crp));
+		trace();
 	}
 	/* STREAM head last */
-	qdetach(sd->sd_rq, oflag, crp);
+	ctrace(qdetach(sd->sd_rq, oflag, crp));
+	trace();
 }
 
 /**
@@ -1848,8 +1857,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		__ctrace(put(sd->sd_wq, mb));
-		__trace();
+		ctrace(put(sd->sd_wq, mb));
+		trace();
 
 		ptrace(("waiting for response\n"));
 		mb = strwaitiocack(sd, &timeo, access);
@@ -1902,8 +1911,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			}
 			ioc->copyresp.cp_rval = (caddr_t) -err;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			__ctrace(put(sd->sd_wq, mb));
-			__trace();
+			ctrace(put(sd->sd_wq, mb));
+			trace();
 			goto abort;
 		default:
 			never();
@@ -1959,8 +1968,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		__ctrace(put(sd->sd_wq, mb));
-		__trace();
+		ctrace(put(sd->sd_wq, mb));
+		trace();
 
 		mb = strwaitiocack(sd, &timeo, access);
 
@@ -2005,8 +2014,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			}
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			__ctrace(put(sd->sd_wq, mb));
-			__trace();
+			ctrace(put(sd->sd_wq, mb));
+			trace();
 			goto abort;
 		default:
 			never();
@@ -2080,8 +2089,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		__ctrace(put(l->l_qtop, mb));
-		__trace();
+		ctrace(put(l->l_qtop, mb));
+		trace();
 
 		mb = strwaitiocack(sd, NULL, access);
 
@@ -2106,8 +2115,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			__ctrace(put(sd->sd_wq, mb));
-			__trace();
+			ctrace(put(sd->sd_wq, mb));
+			trace();
 			goto abort;
 		default:
 			never();
@@ -2134,7 +2143,14 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 STATIC int
 strirput(queue_t *q, mblk_t *mp)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
+	
+	assert(q);
+	assert(mp);
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	switch (mp->b_datap->db_type) {
 	case M_IOCACK:
@@ -2216,8 +2232,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	}
 
 	do {
-		__ctrace(put(l->l_qtop, mb));
-		__trace();
+		ctrace(put(l->l_qtop, mb));
+		trace();
 
 		mb = strwaitiocack(sd, NULL, FCREAT);
 
@@ -2234,8 +2250,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
-			__ctrace(put(sd->sd_wq, mb));
-			__trace();
+			ctrace(put(sd->sd_wq, mb));
+			trace();
 			goto abort;
 		default:
 			never();
@@ -2590,32 +2606,34 @@ strlastclose(struct stdata *sd, int oflag)
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_all(&sd->sd_waitq);
 
+	trace();
 	if (sd->sd_other) {
 		mblk_t *b;
 
+		trace();
 		/* Perhaps strlastclose() should first send a M_HANGUP message downstream in the
 		   same fashion as needs to be done for pipes and master pseudo-terminals. */
 		while (!(b = allocb(0, BPRI_WAITOK))) ;
 
 		b->b_datap->db_type = M_HANGUP;
 
-		__ctrace(put(sd->sd_wq, b));
-		__trace();
+		ctrace(put(sd->sd_wq, b));
+		trace();
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
-	strunlink(sd);
+	ctrace(strunlink(sd));
 
 	/* 2nd step: call the close routine of each module and pop the module. */
 	/* 3rd step: call the close routine of the driver and qdetach the driver */
-	strwaitclose(sd, oflag);
+	ctrace(strwaitclose(sd, oflag));
 
 	/* this balances holding the module in stralloc() and stropen() */
-	cdrv_put(sd->sd_cdevsw);
+	ctrace(cdrv_put(sd->sd_cdevsw));
 	sd->sd_cdevsw = NULL;
 
 	/* this sd_put() balances the original allocation of the stream */
-	sd_put(&sd);		/* not last put */
+	ctrace(sd_put(&sd));		/* not last put */
 }
 
 /* 
@@ -3093,7 +3111,7 @@ strclose(struct inode *inode, struct file *file)
 				atomic_read(&inode->i_count) - 1));
 			iput(inode);	/* to cancel igrab() from strinsert */
 			/* closing stream head */
-			strlastclose(sd, oflag);
+			ctrace(strlastclose(sd, oflag));
 		} else {
 			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 			up(&inode->i_sem);
@@ -3665,8 +3683,8 @@ strwrite(struct file *file, const char *buf, size_t nbytes, loff_t *ppos)
 			/* possibly wait for message band */
 			if (!err && !(err = strwaitband(sd, file->f_flags, 0, MSG_BAND))) {
 				/* We don't really queue these, see strwput(). */
-				__ctrace(put(sd->sd_wq, b));
-				__trace();
+				ctrace(put(sd->sd_wq, b));
+				trace();
 			}
 
 		}
@@ -3857,8 +3875,8 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		if (!more)
 			mp->b_flag |= MSGDELIM;
 		/* use put instead of putnext because of STRHOLD feature */
-		__ctrace(put(sd->sd_wq, mp));
-		__trace();
+		ctrace(put(sd->sd_wq, mp));
+		trace();
 		/* We want to give the driver queues an opportunity to run. */
 		runqueues();
 		return (size);
@@ -3964,8 +3982,8 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 	}
 	if (!IS_ERR(mp = strputpmsg_common(file, &ctl, &dat, band, flags))) {
 		/* use put instead of putnext because of STRHOLD feature */
-		__ctrace(put(sd->sd_wq, mp));
-		__trace();
+		ctrace(put(sd->sd_wq, mp));
+		trace();
 		return (0);
 	}
 	return PTR_ERR(mp);
@@ -4789,8 +4807,8 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!IS_ERR(mp = strputpmsg_common(file, &fdi.ctlbuf, &fdi.databuf, 0, fdi.flags))) {
 		bcopy(&token, mp->b_rptr + fdi.offset, sizeof(token));
 		/* use put instead of putnext because of STRHOLD feature */
-		__ctrace(put(sd->sd_wq, mp));
-		__trace();
+		ctrace(put(sd->sd_wq, mp));
+		trace();
 		return (0);
 	}
 	return PTR_ERR(mp);
@@ -4864,8 +4882,8 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_pri;
 
 	if (!(err = straccess_rlock(sd, 0))) {
-		__ctrace(put(sd->sd_wq, mp));
-		__trace();
+		ctrace(put(sd->sd_wq, mp));
+		trace();
 		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -4912,8 +4930,8 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = straccess_rlock(sd, 0))) {
 		ptrace(("putting message %p\n", mp));
-		__ctrace(put(sd->sd_wq, mp));
-		__trace();
+		ctrace(put(sd->sd_wq, mp));
+		trace();
 		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -6897,8 +6915,8 @@ strwput(queue_t *q, mblk_t *mp)
 			   hold another write same size. */
 			zwunlock(sd, pl);
 			prlock(sd);
-			__ctrace(putnext(q, mp));
-			__trace();
+			ctrace(putnext(q, mp));
+			trace();
 			prunlock(sd);
 		} else {
 			/* new M_DATA message with more room */
@@ -6926,7 +6944,13 @@ EXPORT_SYMBOL(strwput);
 int
 strwsrv(queue_t *q)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
+	
+	assert(q);
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_interruptible(&sd->sd_waitq);
@@ -7035,9 +7059,9 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   ensures that there is only one M_PCPROTO message on the STREAM head read queue, if one
 	   exists, it is first on the queue.  It would be easy enough to hold onto it, but I don't
 	   see the need. */
-	__trace();
+	trace();
 	if (mp->b_rptr[0] & FLUSHR) {
-		__trace();
+		trace();
 		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHALL);
 		else {
@@ -7061,24 +7085,24 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 	}
 	/* We set MSGNOLOOP on flush messages returned downstream that if echoed back up in error
 	   are freed at the stream head. */
-	__trace();
+	trace();
 	if (!(mp->b_flag & MSGNOLOOP) && _WR(q)->q_next) {
-		__trace();
+		trace();
 		if (mp->b_rptr[0] & FLUSHW) {
-			__trace();
+			trace();
 			if (mp->b_rptr[1] & FLUSHBAND)
 				flushband(_WR(q), mp->b_rptr[1], FLUSHALL);
 			else
 				flushq(_WR(q), FLUSHALL);
 			mp->b_flag |= MSGNOLOOP;
-			__ctrace(qreply(q, mp));
-			__trace();
+			ctrace(qreply(q, mp));
+			trace();
 			return (0);
 		}
 	}
-	__trace();
+	trace();
 	freemsg(mp);
-	__trace();
+	trace();
 	return (0);
 }
 
@@ -7363,8 +7387,8 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	} else {
 		mp->b_datap->db_type = M_DONTPLAY;
-		__ctrace(put(lp->lp_queue, mp));
-		__trace();
+		ctrace(put(lp->lp_queue, mp));
+		trace();
 	}
 	return (0);
 }
@@ -7403,8 +7427,15 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
 int
 strrput(queue_t *q, mblk_t *mp)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
 	int err;
+
+	assert(q);
+	assert(mp);
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	switch (mp->b_datap->db_type) {
 	case M_PCPROTO:	/* bi - protocol info */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/24 20:11:19 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/25 06:27:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:19 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/24 20:11:19 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/25 06:27:29 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/24 20:11:19 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/25 06:27:29 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1179,8 +1179,14 @@ EXPORT_SYMBOL(backq);
 streams_fastcall void
 qbackenable(queue_t *q)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
 	queue_t *q_back;
+
+	assert(q);
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	prlock(sd);
 	q_back = backq(q);
@@ -1210,6 +1216,8 @@ bcangetany(queue_t *q)
 	int found = 0;
 	mblk_t *b;
 	unsigned long pl;
+
+	assert(q);
 
 	pl = qrlock(q);
 	b = q->q_first;
@@ -1310,6 +1318,7 @@ bcanputany(queue_t *q)
 
 	assert(q);
 	sd = qstream(q);
+	assert(sd);
 
 	prlock(sd);
 	result = _bcanputany(q);
@@ -1341,7 +1350,9 @@ bcanputnextany(queue_t *q)
 	int result;
 	struct stdata *sd;
 
+	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	prlock(sd);
 	result = _bcanputany(q->q_next);
 	prunlock(sd);
@@ -1519,6 +1530,7 @@ bcanput(queue_t *q, unsigned char band)
 
 	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	prlock(sd);
 	result = _bcanput(q, band);
 	prunlock(sd);
@@ -1758,21 +1770,22 @@ flushband(queue_t *q, int band, int flag)
 
 	assert(not_frozen_by_caller(q));
 
-	__trace();
+	trace();
 	pl = qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
 	qwunlock(q, pl);
-	__trace();
+	trace();
 	if (backenable) {
-		__trace();
+		trace();
 		qbackenable(q);
 	}
-	__trace();
+	trace();
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
-	freechain(mp, mpp);
-	__trace();
+	if (mp)
+		freechain(mp, mpp);
+	trace();
 }
 
 EXPORT_SYMBOL(flushband);
@@ -1873,21 +1886,22 @@ flushq(queue_t *q, int flag)
 
 	assert(not_frozen_by_caller(q));
 
-	__trace();
+	trace();
 	pl = qwlock(q);
 	backenable = __flushq(q, flag, &mpp);
 	qwunlock(q, pl);
-	__trace();
+	trace();
 	if (backenable) {
-		__trace();
+		trace();
 		qbackenable(q);
 	}
-	__trace();
+	trace();
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
-	freechain(mp, mpp);
-	__trace();
+	if (mp)
+		freechain(mp, mpp);
+	trace();
 }
 
 EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
@@ -1909,7 +1923,11 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
 unsigned long
 freezestr(queue_t *q)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
+	
+	assert(q);
+	sd = qstream(q);
+	assert(sd);
 
 	return zwlock(sd);
 }
@@ -2212,7 +2230,9 @@ streams_fastcall void
 putnext(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
+	queue_t *q_next;
 
+	assert(mp);
 	assert(q);
 	assert(q->q_next);
 
@@ -2221,10 +2241,16 @@ putnext(queue_t *q, mblk_t *mp)
 	assert(sd);
 
 	prlock(sd);
-	__ctrace(put(q->q_next, mp));
-	__trace();
+	q_next = q->q_next;
+
+	assert(q_next);
+
+	ctrace(put(q->q_next, mp));
+	trace();
+
 	prunlock(sd);
-	__trace();
+
+	trace();
 }
 
 EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
@@ -2749,10 +2775,17 @@ EXPORT_SYMBOL(qattach);
 void
 qdelete(queue_t *q)
 {
-	struct stdata *sd = qstream(q);
-	queue_t *rq = (q + 0);
-	queue_t *wq = (q + 1);
+	struct stdata *sd;
+	queue_t *rq;
+	queue_t *wq;
 	unsigned long pl;
+
+	assert(q);
+
+	rq = (q + 0);
+	wq = (q + 1);
+
+	sd = qstream(q);
 
 	assert(sd);
 
@@ -2761,10 +2794,11 @@ qdelete(queue_t *q)
 	pl = pwlock(sd);
 	ctrace(qput(&rq->q_next));
 	ctrace(qput(&wq->q_next));
-	pwunlock(sd, pl);
+	ctrace(pwunlock(sd, pl));
 
 	printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
 	ctrace(qput(&q));	/* cancel initial allocation reference */
+	trace();
 }
 
 EXPORT_SYMBOL(qdelete);
@@ -2804,9 +2838,10 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 
 	ptrace(("detaching stream %p queue pair %p\n", qstream(q), q));
 
-	err = qclose(q, flags, crp);
-	qprocsoff(q);		/* in case qclose forgot */
-	qdelete(q);		/* half delete */
+	err = ctrace(qclose(q, flags, crp));
+	ctrace(qprocsoff(q));		/* in case qclose forgot */
+	ctrace(qdelete(q));		/* half delete */
+	trace();
 	return (err);
 }
 
@@ -3070,8 +3105,10 @@ qcountstrm(queue_t *q)
 	ssize_t count = 0;
 
 	if (q) {
-		struct stdata *sd = qstream(q);
-
+		struct stdata *sd;
+		
+		sd = qstream(q);
+		assert(sd);
 		prlock(sd);
 
 		for (; q && SAMESTR(q); q = q->q_next)
@@ -3297,10 +3334,15 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 void
 setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
 	unsigned long pl;
 
+	assert(q);
 	assert(not_frozen_by_caller(q));
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	pl = zwlock(sd);
 	__setq(q, rinit, winit);
@@ -3465,10 +3507,15 @@ int
 setsq(queue_t *q, struct fmodsw *fmod)
 {
 	int result;
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
 	unsigned long pl;
 
+	assert(q);
 	assert(not_frozen_by_caller(q));
+
+	sd = qstream(q);
+
+	assert(sd);
 
 	pl = zwlock(sd);
 	result = __setsq(q, fmod);
@@ -3740,7 +3787,11 @@ EXPORT_SYMBOL(strlog);
 void
 unfreezestr(queue_t *q, unsigned long flags)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
+	
+	assert(q);
+	sd = qstream(q);
+	assert(sd);
 
 	(void) flags;
 	zwunlock(sd, flags);

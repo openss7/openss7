@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/24 20:11:18 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/25 06:27:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:18 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/24 20:11:18 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/25 06:27:28 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/09/24 20:11:18 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/25 06:27:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -360,7 +360,7 @@ get_streams_strapush_list(char *page, ssize_t maxlen, struct list_head *list)
 	int len = 0;
 	struct list_head *cur, *tmp;
 
-	__ensure(list->next, INIT_LIST_HEAD(list));
+	ensure(list->next, INIT_LIST_HEAD(list));
 
 	list_for_each_safe(cur, tmp, list) {
 		struct strapush *sap = (struct strapush *) list_entry(cur, struct apinfo, api_more);

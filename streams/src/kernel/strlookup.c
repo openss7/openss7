@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 20:11:18 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 06:27:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:18 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 20:11:18 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 06:27:28 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 20:11:18 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 06:27:28 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -381,7 +381,7 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 {
 	struct list_head *pos, *slot = &cdev->d_minors;
 
-	__ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 	list_for_each(pos, slot) {
 		struct devnode *cmin = list_entry(pos, struct devnode, n_list);
@@ -598,7 +598,7 @@ cmaj_lookup(const struct cdevsw *cdev, major_t major)
 {
 	struct devnode *cmaj = NULL;
 
-	__ensure(cdev->d_majors.next, return (cmaj));
+	ensure(cdev->d_majors.next, return (cmaj));
 
 	read_lock(&cdevsw_lock);
 	if (cdev) {
@@ -627,7 +627,7 @@ cmin_lookup(const struct cdevsw *cdev, minor_t minor)
 {
 	struct devnode *cmin = NULL;
 
-	__ensure(cdev->d_minors.next, return (cmin));
+	ensure(cdev->d_minors.next, return (cmin));
 
 	read_lock(&cdevsw_lock);
 	if (cdev) {
@@ -763,7 +763,7 @@ cmin_search(const struct cdevsw *cdev, const char *name)
 {
 	struct devnode *cmin = NULL;
 
-	__ensure(cdev->d_minors.next, return (cmin));
+	ensure(cdev->d_minors.next, return (cmin));
 
 	read_lock(&cdevsw_lock);
 	if (cdev) {
@@ -1049,7 +1049,7 @@ cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 {
 	struct list_head *pos;
 
-	__ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 	list_for_each(pos, &cdev->d_majors) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
@@ -1176,7 +1176,7 @@ cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 	cmaj->n_major = major;
 	cmaj->n_minor = 0;	/* FIXME */
 
-	__ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 	/* add to list and hash */
 	if (list_empty(&cdev->d_majors))
@@ -1190,7 +1190,7 @@ EXPORT_SYMBOL(cmaj_add);
 void
 cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
-	__ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 
 	list_del_init(&cmaj->n_list);
 	list_del_init(&cmaj->n_hash);
@@ -1224,7 +1224,7 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	if (!(cmin->n_mode & S_IFMT))
 		cmin->n_mode = S_IFCHR | S_IRUGO | S_IWUGO;
 
-	__ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 	/* add to list and hash */
 	list_add(&cmin->n_list, &cdev->d_minors);
@@ -1251,7 +1251,7 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 	cmin->n_modid = -1;
 	cmin->n_minor = -1;
 
-	__ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);

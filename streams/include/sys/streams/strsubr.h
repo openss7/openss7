@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.47 2005/09/24 20:11:14 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.48 2005/09/25 06:27:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/09/24 20:11:14 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/09/25 06:27:25 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -371,7 +371,7 @@ enum {
 
 struct strthread {
 	volatile unsigned long flags;	/* flags */
-	int lock;			/* thread lock */
+	atomic_t lock;			/* thread lock */
 	queue_t *qhead;			/* first queue in scheduled queues */
 	queue_t **qtail;		/* last queue in scheduled queues */
 	queue_t *currentq;		/* current queue being processed */

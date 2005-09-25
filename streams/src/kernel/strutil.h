@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/24 20:11:19 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/25 06:27:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:19 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:30 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -292,7 +292,9 @@ frozen_by_caller(queue_t *q)
 {
 	struct stdata *sd;
 
+	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	return (sd->sd_freezer == current);
 }
 static inline int
@@ -300,13 +302,16 @@ not_frozen_by_caller(queue_t *q)
 {
 	struct stdata *sd;
 
+	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	return (sd->sd_freezer != current);
 }
 
 static inline void
 zlockinit(struct stdata *sd)
 {
+	assert(sd);
 	rwlock_init(&sd->sd_freeze);
 }
 static inline unsigned long
@@ -314,6 +319,7 @@ zwlock(struct stdata *sd)
 {
 	unsigned long pl;
 
+	assert(sd);
 	write_lock_irqsave(&sd->sd_freeze, pl);
 	sd->sd_freezer = current;
 	return (pl);
@@ -321,6 +327,7 @@ zwlock(struct stdata *sd)
 static inline void
 zwunlock(struct stdata *sd, unsigned long pl)
 {
+	assert(sd);
 	sd->sd_freezer = NULL;
 	write_unlock_irqrestore(&sd->sd_freeze, pl);
 }
@@ -329,6 +336,7 @@ zrlock(struct stdata *sd)
 {
 	unsigned long pl;
 
+	assert(sd);
 	local_irq_save(pl);
 	if (sd->sd_freezer != current)
 		read_lock(&sd->sd_freeze);
@@ -337,6 +345,7 @@ zrlock(struct stdata *sd)
 static inline void
 zrunlock(struct stdata *sd, unsigned long pl)
 {
+	assert(sd);
 	if (sd->sd_freezer != current)
 		read_unlock(&sd->sd_freeze);
 	local_irq_restore(pl);
@@ -347,6 +356,7 @@ stream_barrier(struct stdata *sd)
 {
 	unsigned long pl;
 
+	assert(sd);
 	pl = zrlock(sd);
 	zrunlock(sd, pl);
 }
@@ -355,13 +365,16 @@ freeze_barrier(queue_t *q)
 {
 	struct stdata *sd;
 
+	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	stream_barrier(sd);
 }
 
 static inline void
 plockinit(struct stdata *sd)
 {
+	assert(sd);
 	rwlock_init(&sd->sd_plumb);
 }
 static inline unsigned long
@@ -369,6 +382,7 @@ pwlock(struct stdata *sd)
 {
 	unsigned long pl;
 
+	assert(sd);
 	pl = zrlock(sd);
 	write_lock(&sd->sd_plumb);
 	return (pl);
@@ -376,49 +390,58 @@ pwlock(struct stdata *sd)
 static inline void
 pwunlock(struct stdata *sd, unsigned long pl)
 {
+	assert(sd);
 	write_unlock(&sd->sd_plumb);
 	zrunlock(sd, pl);
 }
 static inline void
 prlock(struct stdata *sd)
 {
+	assert(sd);
 	read_lock_str(&sd->sd_plumb);
 }
 static inline void
 prunlock(struct stdata *sd)
 {
+	assert(sd);
 	read_unlock_str(&sd->sd_plumb);
 }
 
 static inline void
 slockinit(struct stdata *sd)
 {
+	assert(sd);
 	rwlock_init(&sd->sd_lock);
 }
 static inline void
 swlock(struct stdata *sd)
 {
+	assert(sd);
 	write_lock(&sd->sd_lock);
 }
 static inline void
 swunlock(struct stdata *sd)
 {
+	assert(sd);
 	write_unlock(&sd->sd_lock);
 }
 static inline void
 srlock(struct stdata *sd)
 {
+	assert(sd);
 	read_lock(&sd->sd_lock);
 }
 static inline void
 srunlock(struct stdata *sd)
 {
+	assert(sd);
 	read_unlock(&sd->sd_lock);
 }
 
 static inline void
 qlockinit(queue_t *q)
 {
+	assert(q);
 	rwlock_init(&q->q_lock);
 }
 static inline unsigned long
@@ -427,7 +450,9 @@ qwlock(queue_t *q)
 	unsigned long pl;
 	struct stdata *sd;
 
+	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	pl = zrlock(sd);
 	write_lock(&q->q_lock);
 	return (pl);
@@ -437,7 +462,9 @@ qwunlock(queue_t *q, unsigned long pl)
 {
 	struct stdata *sd;
 
+	assert(q);
 	sd = qstream(q);
+	assert(sd);
 	write_unlock(&q->q_lock);
 	zrunlock(sd, pl);
 }
@@ -446,12 +473,14 @@ qrlock(queue_t *q)
 {
 	unsigned long pl;
 
+	assert(q);
 	read_lock_irqsave(&q->q_lock, pl);
 	return (pl);
 }
 static inline void
 qrunlock(queue_t *q, unsigned long pl)
 {
+	assert(q);
 	read_unlock_irqrestore(&q->q_lock, pl);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/24 20:11:18 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/25 06:27:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 20:11:18 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/24 20:11:18 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/25 06:27:29 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/24 20:11:18 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/25 06:27:29 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -846,7 +846,8 @@ freeq(queue_t *rq)
 	__freebands(rq);
 	__freebands(wq);
 	__freeq(rq);
-	freechain(mp, mpp);
+	if (mp)
+		freechain(mp, mpp);
 }
 
 EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
@@ -1632,6 +1633,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	sd = qstream(q);
+	assert(sd);
 	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag))
 		func(q, mp);
@@ -1669,6 +1671,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	sd = qstream(q);
+	assert(sd);
 	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag))
 		func(arg, mp);
@@ -1745,15 +1748,16 @@ putp_fast(queue_t *q, mblk_t *mp)
 
 	qold = xchg(&this_thread->currentq, qget(q));
 	sd = qstream(q);
+	assert(sd);
 	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 		ptrace(("calling put procedure\n"));
 #if 0
-		__ctrace((void) q->q_qinfo->qi_putp(q, mp));
+		ctrace((void) q->q_qinfo->qi_putp(q, mp));
 #else
-		__ctrace(q->q_qinfo->qi_putp(q, mp));
+		ctrace(q->q_qinfo->qi_putp(q, mp));
 #endif
-		__trace();
+		trace();
 		qwakeup(q);
 	} else {
 		/* procs have been turned off */
@@ -1818,6 +1822,7 @@ srvp_fast(queue_t *q)
 
 		qold = xchg(&this_thread->currentq, q);
 		sd = qstream(q);
+		assert(sd);
 		prlock(sd);
 		/* check if procs are turned off */
 		if (!test_bit(QPROCS_BIT, &q->q_flag)) {
@@ -1849,11 +1854,7 @@ srvp_fast(queue_t *q)
 				if (q->q_qinfo->qi_srvp) {
 					/* just for compatibilty, this bit is not actually used */
 					set_bit(QSVCBUSY_BIT, &q->q_flag);
-#if 0
 					(void) q->q_qinfo->qi_srvp(q);
-#else
-					q->q_qinfo->qi_srvp(q);
-#endif
 					clear_bit(QSVCBUSY_BIT, &q->q_flag);
 				}
 			}
@@ -1923,6 +1924,7 @@ defer_syncq(struct syncq_cookie *sc, int exclus)
 
 			set_current_state(TASK_INTERRUPTIBLE);
 			sd = qstream(q);
+			assert(sd);
 			if (!sd) {
 				rval = -ENOSTR;
 				break;
@@ -2452,8 +2454,10 @@ qputp(queue_t *q, mblk_t *mp)
 		queue_t *newq;
 		struct stdata *sd;
 
-		__trace();
+		trace();
+		assert(q);
 		sd = qstream(q);
+		assert(sd);
 		prlock(sd);
 		for (newq = q; newq && newq->q_ftmsg && !newq->q_ftmsg(mp); newq = newq->q_next) ;
 		if (!newq) {
@@ -2478,8 +2482,8 @@ qputp(queue_t *q, mblk_t *mp)
 		return;
 	}
 #endif
-	__ctrace(putp_fast(q, mp));
-	__trace();
+	ctrace(putp_fast(q, mp));
+	trace();
 }
 
 STATIC void
@@ -2577,7 +2581,8 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 	assert(q->q_qinfo);
 	assert(q->q_qinfo->qi_qclose);
 
-	if (unlikely((q_close = q->q_qinfo->qi_qclose) == NULL))
+	q_close = q->q_qinfo->qi_qclose;
+	if (unlikely(q_close == NULL))
 		return (-ENXIO);
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2592,7 +2597,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 		return (err);
 	}
 #endif
-	return q_close(q, oflag, crp);
+	return ctrace(q_close(q, oflag, crp));
 }
 
 EXPORT_SYMBOL(qclose);
@@ -2697,14 +2702,18 @@ EXPORT_SYMBOL(__strfunc);
 streams_fastcall void
 put(queue_t *q, mblk_t *mp)
 {
+	assert(mp);
 	assert(q);
 	assert(q->q_qinfo);
 	assert(q->q_qinfo->qi_putp);
 
 	trace();
 	if (!in_irq()) {
-		__ctrace(qputp(q, mp));
-		__trace();
+		ctrace(qputp(q, mp));
+		trace();
+		trace();
+		trace();
+		trace();
 	} else {
 		/* defer for execution inside STREAMS */
 		struct mbinfo *m = (typeof(m)) mp;
@@ -2790,7 +2799,11 @@ do_bufcall_synced(struct strevent *se)
 		unsigned long flags = 0;
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 		queue_t *qold;
-		struct stdata *sd = qstream(q);
+		struct stdata *sd;
+		
+		assert(q);
+		sd = qstream(q);
+		assert(sd);
 
 		if (unlikely(safe))
 			local_irq_save(flags);
@@ -2844,7 +2857,11 @@ do_timeout_synced(struct strevent *se)
 		unsigned long flags = 0;
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
 		queue_t *qold;
-		struct stdata *sd = qstream(q);
+		struct stdata *sd;
+		
+		assert(q);
+		sd = qstream(q);
+		assert(sd);
 
 		if (unlikely(safe))
 			local_irq_save(flags);
@@ -2928,7 +2945,9 @@ do_weldq_synced(struct strevent *se)
 		if (safe) {
 			struct stdata *sd;
 
+			assert(q);
 			sd = qstream(q);
+			assert(sd);
 			flags = zwlock(sd);
 		}
 
@@ -2937,7 +2956,9 @@ do_weldq_synced(struct strevent *se)
 		if (safe) {
 			struct stdata *sd;
 
+			assert(q);
 			sd = qstream(q);
+			assert(sd);
 			zwunlock(sd, flags);
 		}
 		t->currentq = qold;
@@ -3620,10 +3641,13 @@ EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
 void
 enableok(queue_t *q)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
 	unsigned long pl;
 
+	assert(q);
 	assure(not_frozen_by_caller(q));
+	sd = qstream(q);
+	assert(sd);
 
 	/* block on frozen stream unless stream frozen by caller */
 	pl = zrlock(sd);
@@ -3643,10 +3667,13 @@ EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
 void
 noenable(queue_t *q)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd;
 	unsigned long pl;
 
+	assert(q);
 	assure(not_frozen_by_caller(q));
+	sd = qstream(q);
+	assert(sd);
 
 	/* block on frozen stream unless stream frozen by caller */
 	pl = zrlock(sd);
@@ -3694,8 +3721,12 @@ freechains(struct strthread *t)
 void
 freechain(mblk_t *mp, mblk_t **mpp)
 {
-	struct strthread *t = this_thread;
+	struct strthread *t;
+	
+	assert(mp);
+	assert(mpp != &mp);
 
+	t = this_thread;
 	*xchg(&t->freemsg_tail, mpp) = mp;	/* MP-SAFE */
 	if (!test_and_set_bit(flushwork, &t->flags))
 		__raise_streams();
@@ -3710,44 +3741,46 @@ freechain(mblk_t *mp, mblk_t **mpp)
 STATIC void
 _runqueues(struct softirq_action *unused)
 {
-	struct strthread *t = this_thread;
+	struct strthread *t;
 
-	if (t->lock != 0)
+	trace();
+	t = this_thread;
+	if (atomic_read(&t->lock) != 0)
 		return set_bit(qwantrun, &t->flags);
 
-	t->lock++;
+	atomic_inc(&t->lock);
 
 	/* do deferred m_func's first */
 	if (test_bit(strmfuncs, &t->flags))
-		domfuncs(t);
+		ctrace(domfuncs(t));
 #if defined CONFIG_STREAMS_SYNCQS
 	/* catch up on backlog first */
 	if (test_bit(qsyncflag, &t->flags))
-		backlog(t);
+		ctrace(backlog(t));
 #endif
 	/* do timeouts */
 	if (test_bit(strtimout, &t->flags))
-		timeouts(t);
+		ctrace(timeouts(t));
 	/* do stream head write queue scanning */
 	if (test_bit(scanqflag, &t->flags))
-		scanqueues(t);
+		ctrace(scanqueues(t));
 	/* do pending events */
 	if (test_bit(strevents, &t->flags))
-		doevents(t);
+		ctrace(doevents(t));
 	/* do buffer calls if necessary */
 	if (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags))
-		bufcalls(t);
+		ctrace(bufcalls(t));
 	/* run queue service procedures if necessary */
 	if (test_bit(qrunflag, &t->flags))
-		queuerun(t);
+		ctrace(queuerun(t));
 	/* free flush chains if necessary */
 	if (test_bit(flushwork, &t->flags))
-		freechains(t);
+		ctrace(freechains(t));
 	/* free mdbblocks to cache, if memory needed */
 	if (test_bit(freeblks, &t->flags))
-		freeblocks(t);
+		ctrace(freeblocks(t));
 
-	t->lock--;
+	atomic_dec(&t->lock);
 }
 
 /**
@@ -3763,7 +3796,7 @@ runqueues(void)
 {
 	if (this_thread->flags & (QRUNFLAGS)) {
 		local_bh_disable();	/* simulates softirq context */
-		_runqueues(NULL);
+		ctrace(_runqueues(NULL));
 		local_bh_enable();	/* go back to user context */
 	}
 }
@@ -4071,7 +4104,7 @@ strsched_init(void)
 	for (i = 0; i < NR_CPUS; i++) {
 		struct strthread *t = &strthreads[i];
 
-		t->lock = 0;
+		atomic_set(&t->lock, 0);
 		/* initialize all the lists */
 		t->qhead = NULL;
 		t->qtail = &t->qhead;
