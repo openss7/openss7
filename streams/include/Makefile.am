@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/08 05:52:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 22:52:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/08 05:52:38 $ by $Author: brian $
+# Last Modified $Date: 2005/09/25 22:52:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -118,6 +118,14 @@ endif
 if CONFIG_STREAMS_SC_MODULE
 nobase_pkginclude_HEADERS += sys/sc.h
 nobase_pkginclude_HEADERS += sys/streams/sc.h
+endif
+if CONFIG_STREAMS_TESTMOD
+nobase_pkginclude_HEADERS += sys/testmod.h
+nobase_pkginclude_HEADERS += sys/streams/testmod.h
+endif
+if CONFIG_STREAMS_TESTMOD_MODULE
+nobase_pkginclude_HEADERS += sys/testmod.h
+nobase_pkginclude_HEADERS += sys/streams/testmod.h
 endif
 
 ##nobase_pkginclude_HEADERS += \

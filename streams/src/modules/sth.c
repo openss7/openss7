@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:32 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 22:52:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/09/25 06:27:32 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -470,8 +470,9 @@ pgrp_session(pid_t pgrp)
  *  @flag takes the following:
  *      %FREAD		- perform read checks
  *      %FWRITE		- perform write checks
- *      %FEXLC		- perform tty setting io checks
+ *      %FEXCL		- perform tty setting io checks
  *      %FCREAT		- perform open checks only
+ *      %FTRUNC		- perform close checks only
  *      %FNDELAY	- don't return -ESTRPIPE with FREAD or FWRITE
  *
  *      If no flags are set, simple io checks are performed.  Simple checks include I_PUSH, I_POP,
@@ -516,9 +517,9 @@ straccess(struct stdata *sd, const int access)
 	register int flags = sd->sd_flag;
 
 	if (flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP)) {
-		if (!(access & FCREAT) && (flags & STPLEX))
+		if (!(access & (FCREAT|FTRUNC)) && (flags & STPLEX))
 			return (-EINVAL);
-		if (flags & STRCLOSE) {
+		if (!(access & FTRUNC) && (flags & STRCLOSE)) {
 			if (!(flags & STRISTTY))
 				return (-EIO);
 			return (-ENOTTY);
@@ -539,7 +540,7 @@ straccess(struct stdata *sd, const int access)
 		   error occured during the open()." */
 		if ((access & FCREAT) && (flags & (STRHUP | STRDERR | STWRERR)))
 			return (-EIO);
-		if (flags & STRHUP) {
+		if (!(access & FTRUNC) && (flags & STRHUP)) {
 			if ((access & FWRITE) && !(flags & (STRISFIFO | STRISPIPE)))
 				return (-ENXIO);	/* for TTY's too? */
 			if ((access & (FREAD | FWRITE)))
@@ -2993,7 +2994,7 @@ strflush(struct file *file)
 	struct stdata *sd;
 
 	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (!(err = straccess_rlock(sd, FCREAT)))
+		if (!(err = straccess_rlock(sd, FTRUNC)))
 			srunlock(sd);
 		sd_put(&sd);
 	}
@@ -5261,10 +5262,16 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	struct linkblk *l;
 	struct file *f;
 	struct stdata *sd;
+	struct streamtab *st;
 	int err;
 
 	err = -EINVAL;
 	if (mux->sd_flag & (STRISFIFO | STRISPIPE))
+		goto error;
+	if (!mux->sd_cdevsw || !mux->sd_cdevsw->d_str)
+		goto error;
+	st = mux->sd_cdevsw->d_str;
+	if (!st->st_muxrinit || !st->st_muxwinit)
 		goto error;
 
 	err = -ENOSR;
@@ -5279,6 +5286,8 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 		goto unlock_error;
 
 	err = -EINVAL;
+	if (!f->f_op || f->f_op->release != &strclose) /* not a stream */
+		goto fput_error;
 	if (!(sd = stri_acquire(f)) || (sd == mux))
 		goto fput_error;
 
@@ -5306,7 +5315,6 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 
 	if (!err) {
 		struct stdata **sdp;
-		struct streamtab *st = mux->sd_cdevsw->d_str;
 
 		/* protected by STWOPEN bits */
 		sdp = (cmd == I_LINK) ? &mux->sd_links : &mux->sd_cdevsw->d_plinks;
@@ -5495,16 +5503,16 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 		do {
 			struct linkblk *l;
 
-			/* FCREAT ignores STPLEX */
-			if ((err = strwaitopen(sd, FCREAT)))
+			/* FTRUNC ignores STPLEX, STRCLOSE, STRDERR, STWRERR */
+			if ((err = strwaitopen(sd, FTRUNC)))
 				goto wait_error;
 			swunlock(sd);
 
 			/* protected by STWOPEN bit */
 			l = sd->sd_linkblk;
 
-			/* no locks held -- FCREAT ignores STPLEX */
-			if ((err = strdoioctl_link(file, mux, l, cmd, FCREAT)))
+			/* no locks held -- FTRUNC ignores STPLEX, STRCLOSE, STRDERR, STWRERR */
+			if ((err = strdoioctl_link(file, mux, l, cmd, FTRUNC)))
 				goto ioctl_error;
 
 			/* protected by STWOPEN bit */

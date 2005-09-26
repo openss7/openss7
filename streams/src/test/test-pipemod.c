@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/09/10 18:16:41 $
+ @(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/25 22:52:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:41 $ by $Author: brian $
+ Last Modified $Date: 2005/09/25 22:52:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipemod.c,v $
+ Revision 0.9.2.13  2005/09/25 22:52:12  brian
+ - added test module and continuing with testing
+
  Revision 0.9.2.12  2005/09/10 18:16:41  brian
  - more test build
 
@@ -110,9 +113,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/09/10 18:16:41 $"
+#ident "@(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/25 22:52:12 $"
 
-static char const ident[] = "$RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/09/10 18:16:41 $";
+static char const ident[] = "$RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/25 22:52:12 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1631,30 +1634,26 @@ test_pipe(int child)
 }
 
 int
-test_open(int child, const char *name)
+test_fopen(int child, const char *name)
 {
 	int fd;
 
 	for (;;) {
 		print_open(child, name);
 		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
-			test_fd[child] = fd;
 			print_success(child);
-			return (__RESULT_SUCCESS);
+			return (fd);
 		}
 		print_errno(child, (last_errno = errno));
 		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
 			continue;
-		return (__RESULT_FAILURE);
+		return (fd);
 	}
 }
 
 int
-test_close(int child)
+test_fclose(int child, int fd)
 {
-	int fd = test_fd[child];
-
-	test_fd[child] = 0;
 	for (;;) {
 		print_close(child);
 		if (close(fd) >= 0) {
@@ -1666,6 +1665,27 @@ test_close(int child)
 			continue;
 		return __RESULT_FAILURE;
 	}
+}
+
+int
+test_open(int child, const char *name)
+{
+	int fd;
+
+	if ((fd = test_fopen(child, name)) >= 0) {
+		test_fd[child] = fd;
+		return (__RESULT_SUCCESS);
+	}
+	return (__RESULT_FAILURE);
+}
+
+int
+test_close(int child)
+{
+	int fd = test_fd[child];
+
+	test_fd[child] = 0;
+	return test_fclose(child, fd);
 }
 
 /*

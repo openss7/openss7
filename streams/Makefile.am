@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/09/09 20:27:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/09/25 22:52:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/09 20:27:16 $ by $Author: brian $
+# Last Modified $Date: 2005/09/25 22:52:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -385,6 +385,9 @@ libLfS_modules_a_SOURCES	+= src/modules/connld.c
 endif
 if CONFIG_STREAMS_SC_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
+endif
+if CONFIG_STREAMS_TESTMOD_MODULE
+libLfS_modules_a_SOURCES	+= src/modules/testmod.c include/sys/testmod.h
 endif
 
 libLfS_modules_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)

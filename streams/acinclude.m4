@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/09/24 01:13:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/09/25 22:52:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/24 01:13:16 $ by $Author: brian $
+# Last Modified $Date: 2005/09/25 22:52:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -258,6 +258,12 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_module_sc="$enableval"],
 	    [enable_module_sc='module'])
+    AC_ARG_ENABLE([module-testmod],
+	AS_HELP_STRING([--enable-module-testmod],
+	    [enable testmod module for linkage with STREAMS.
+	    @<:@default=module@:>@]),
+	    [enable_module_testmod="$enableval"],
+	    [enable_module_testmod='module'])
     AC_CACHE_CHECK([for STREAMS module sth], [lfs_module_sth], [dnl
 	lfs_module_sth="${enable_module_sth:-module}"
 	if test :$lfs_module_sth = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -282,6 +288,11 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	lfs_module_sc="${enable_module_sc:-module}"
 	if test :$lfs_module_sc = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_module_sc='yes'
+	fi])
+    AC_CACHE_CHECK([for STREAMS module testmod], [lfs_module_testmod], [dnl
+	lfs_module_testmod="${enable_module_testmod:-module}"
+	if test :$lfs_module_testmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_module_testmod='yes'
 	fi])
     case ${lfs_module_sth:-module} in
 	(yes)
@@ -349,6 +360,19 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
+    case ${lfs_module_testmod:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TESTMOD], [], [When defined,] AC_PACKAGE_TITLE [
+	    will include the testmod module for linkage with STREAMS.  When undefined,]
+	    AC_PACKAGE_TITLE [will not include the testmod module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TESTMOD_MODULE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will include the testmod module as a standalone loadable kernel module.  When
+	    undefined,] AC_PACKAGE_TITLE [will not include the testmod module as a standalone loadable kernel
+	    module.])
+	    ;;
+    esac
     AM_CONDITIONAL([CONFIG_STREAMS_STH],		[test :${lfs_module_sth:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE],		[test :${lfs_module_sth:-module}	= :module])
 dnl ===========================
@@ -360,6 +384,8 @@ dnl ===========================
     AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],	[test :${lfs_module_connld:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_SC],			[test :${lfs_module_sc:-module}		= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],		[test :${lfs_module_sc:-module}		= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD],		[test :${lfs_module_testmod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD_MODULE],	[test :${lfs_module_testmod:-module}	= :module])
 ])# _LFS_SETUP_MODULES
 # =============================================================================
 
