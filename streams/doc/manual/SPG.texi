@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.39 2005/09/20 12:53:07 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.40 2005/09/26 10:56:41 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/20 12:53:07 $ by $Author: brian $
+% Last Modified $Date: 2005/09/26 10:56:41 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -692,6 +692,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.40  2005/09/26 10:56:41  brian
+- doc updates
+
 Revision 0.9.2.39  2005/09/20 12:53:07  brian
 - more doc updates, corrected QFULL handling
 
@@ -1977,23 +1980,23 @@ configuration is suitable for many applications, others require the ability to m
 @dfn{Streams} in a variety of configurations.  Typical examples are terminal window facilities, and
 internetworking protocols (which might route data over several subnetworks).
 
-An example of a multiplexor is one that multiplexes data from several upper @dfn{Streams} over a
+An example of a multiplexer is one that multiplexes data from several upper @dfn{Streams} over a
 single lower @dfn{Stream}, as shown in @figref{49}.  An upper @dfn{Stream} is one that is upstream
-from a multiplexor, and a lower @dfn{Stream} is one that is downstream from a multiplexor.  A
+from a multiplexer, and a lower @dfn{Stream} is one that is downstream from a multiplexer.  A
 terminal windowing facility might be implemented in this fashion, where each upper @dfn{Stream} is
 associated with a separate window.
 
 @figuresized{SPG_fig49,49,Many-to-one Multiplexor,1.5in}
 @c [strm.mltprx1.gif]
 
-A second type of multiplexor might route data from a single upper @dfn{Stream} to one of several
+A second type of multiplexer might route data from a single upper @dfn{Stream} to one of several
 lower @dfn{Streams}, as shown in @figref{50}.  An internetworking protocol could take this form,
 where each lower @dfn{Stream} links the protocol to a different physical network.
 
 @figuresized{SPG_fig50,50,One-to-many Multiplexor,1.5in}
 @c [strm.mltprx2.gif]
 
-A third type of multiplexor might route data from one of many upper @dfn{Streams} to one of many
+A third type of multiplexer might route data from one of many upper @dfn{Streams} to one of many
 lower @dfn{Streams}, as shown in @figref{51}.
 
 @figuresized{SPG_fig51,51,Many-to-many Multiplexor,1.5in}
@@ -2006,50 +2009,50 @@ can be further combined to form complex, multi-level multiplexed @dfn{Stream} co
 
 @dfn{STREAMS} multiplexing configurations are created in the kernel by interconnecting multiple
 @dfn{Streams}.  Conceptually, there are two kinds of multiplexors: upper and lower multiplexors.
-Lower multiplexors have multiple lower @dfn{Streams} between device drivers and the multiplexor, and
-upper multiplexors have multiple upper @dfn{Streams} between user processes and the multiplexor.
+Lower multiplexors have multiple lower @dfn{Streams} between device drivers and the multiplexer, and
+upper multiplexors have multiple upper @dfn{Streams} between user processes and the multiplexer.
 
 @figuresized{SPG_fig47,47,Internet Multiplexing @dfn{Stream},5in}
 @c [strm.netmlt.gif]
 
-@figref{47} is an example of the multiplexor configuration that would typically occur where
+@figref{47} is an example of the multiplexer configuration that would typically occur where
 internetworking functions were included in the system.  This configuration contains three hardware
-device drivers.  The @dfn{IP (Internet Protocol)} is a multiplexor.
+device drivers.  The @dfn{IP (Internet Protocol)} is a multiplexer.
 
-The @dfn{IP} multiplexor switches messages among the lower @dfn{Streams} or sends them upstream to
-user processes in the system.  In this example, the multiplexor expects to see the same interface
+The @dfn{IP} multiplexer switches messages among the lower @dfn{Streams} or sends them upstream to
+user processes in the system.  In this example, the multiplexer expects to see the same interface
 downstream to @samp{Module 1}, @samp{Module 2}, and @samp{Driver 3}.
 
-@figref{47} depicts the @dfn{IP} multiplexor as part of a larger configuration.  The multiplexor
-configuration, as shown in the dashed rectangle, would generally have an upper multiplexor and
-additional modules.  Multiplexors could also be cascaded below the @dfn{IP} multiplexor driver if
-the device drivers were replaced by multiplexor drivers.
+@figref{47} depicts the @dfn{IP} multiplexer as part of a larger configuration.  The multiplexer
+configuration, as shown in the dashed rectangle, would generally have an upper multiplexer and
+additional modules.  Multiplexors could also be cascaded below the @dfn{IP} multiplexer driver if
+the device drivers were replaced by multiplexer drivers.
 
 @figuresized{SPG_fig52,52,Multiplexing @dfn{Stream},4in}
 @c [strm.mltstm.gif]
 
-@figref{52} shows a multiplexor configuration where the multiplexor (or multiplexing driver) routes
+@figref{52} shows a multiplexer configuration where the multiplexer (or multiplexing driver) routes
 messages between the lower @dfn{Stream} and one of the upper @dfn{Streams}.  This @dfn{Stream}
 performs X.25 multiplexing to multiple independent SVC (Switched Virtual Circuit) and PVC (Permanent
 Virtual Circuit) user processes.  Upper multiplexors are a specific application of standard
 @dfn{STREAMS} facilities that support multiple minor devices in a device driver.  This figure also
 shows that more complex configurations can be built by having one or more multiplexed drivers below
-and multiple modules above an upper multiplexor.
+and multiple modules above an upper multiplexer.
 
 Developers can choose either upper or lower multiplexing, or both, when designing their
-applications.  For example, a window multiplexor would have a similar configuration to the X.25
+applications.  For example, a window multiplexer would have a similar configuration to the X.25
 configuration of @figref{52}, with a window driver replacing Packet Layer, a tty driver replacing
 the driver XYZ, and the child processes of the terminal process replacing the user processes.
 Although the X.25 and window multiplexing @dfn{Streams} have similar configurations, their
-multiplexor drivers would differ significantly.  The @dfn{IP} multiplexor of @figref{47} has a
-different configuration than the X.25 multiplexor, and the driver would implement its own set of
+multiplexer drivers would differ significantly.  The @dfn{IP} multiplexer of @figref{47} has a
+different configuration than the X.25 multiplexer, and the driver would implement its own set of
 processing and routing requirements in each configuration.
 
 In addition to upper and lower multiplexors, more complex configurations can be created by
-connecting @dfn{Streams} containing multiplexors to other multiplexor drivers.  With such a
-diversity of needs for multiplexors, it is not possible to provide general purpose multiplexor
+connecting @dfn{Streams} containing multiplexors to other multiplexer drivers.  With such a
+diversity of needs for multiplexors, it is not possible to provide general purpose multiplexer
 drivers.  Rather, @dfn{STREAMS} provides a general purpose multiplexing facility.  The facility
-allows users to set up the inter-module/driver plumbing to create multiplexor configurations of
+allows users to set up the inter-module/driver plumbing to create multiplexer configurations of
 generally unlimited interconnection.
 
 @node Benefits of STREAMS
@@ -3370,7 +3373,7 @@ The @type{streamtab}
 structure defines a module or driver.  @var{st_rdinit} points to the read @code{qinit} structure for
 the driver and @var{st_wdinit} points to the driver's write @code{qinit} structure.
 @var{st_muxrinit} and @var{st_muxwinit} point to the lower read and write @code{qinit} structures if
-the driver is a multiplexor driver.
+the driver is a multiplexer driver.
 
 If the @command{open} call is the initial file open, a @dfn{Stream} is created.  (There is one
 @dfn{Stream} per major/minor device pair.)  First, an entry is allocated in the user's file table
@@ -3429,7 +3432,7 @@ structure for each end of the pipe.  As with modules and drivers, the @type{stre
 structure defines the pipe.  The @var{st_rdinit}, however, points to the read @code{qinit} structure
 for the @dfn{Stream head} and not for a driver.  Similarly, the @var{st_wdinit} points to the
 @dfn{Stream head's} write @code{qinit} structure and not to a driver.  The @var{st_muxrinit} and
-@var{st_muxwinit} are initialized to null since a pipe cannot be a multiplexor driver.
+@var{st_muxwinit} are initialized to null since a pipe cannot be a multiplexer driver.
 
 When the pipe system call is executed, two @dfn{Streams} are created.  @dfn{STREAMS} follows the
 procedures similar to those of opening a driver; however, duplicate data structures are created.
@@ -5765,7 +5768,7 @@ bad @samp{b_datap->db_type} or bad @samp{proto->type}, the message is converted 
 
 The generation of @constant{UNITDATA_IND} messages (not shown in the example) would normally occur in the
 device interrupt if this is a hardware driver or in the lower read @command{put} procedure if this
-is a multiplexor.  The algorithm is simple: The data part of the message is prepended by an
+is a multiplexer.  The algorithm is simple: The data part of the message is prepended by an
 @msg{M_PROTO} message block that contains a @code{unitdata_ind} structure and sent upstream.
 
 @node Message Allocation
@@ -6317,7 +6320,7 @@ count.  For simplicity, the example ignores the data if the @dfn{Stream} becomes
 is printed to @dfn{stderr}.
 
 For conformance with the @dfn{IEEE} operating system interface standard, @dfn{POSIX}, it is
-recommended that new applications use the @constant{O_NONBLOCK} flag, whose behavior is the same as that
+recommended that new applications use the @constant{O_NONBLOCK} flag, whose behaviour is the same as that
 of @constant{O_NDELAY} unless otherwise noted.
 
 This program continues until an error occurs on a @dfn{Stream}, or until the process is interrupted.
@@ -7749,7 +7752,7 @@ commands will not recognize any modules below that driver.
 The @command{ioctl} @streamio{I_LIST} performs two functions.  When the third argument of the
 @command{ioctl} call is set to @samp{NULL}, the return value of the call indicates the number of
 modules, including the driver, present on the @dfn{Stream}.  For example, if there are two modules
-above the driver, 3 is returned.  On failure, errno may be set to a value specified in
+above the driver, 3 is returned.  On failure, @manpage{errno(3)} may be set to a value specified in
 @manpage{streamio(7)}.  The second function of the @streamio{I_LIST} @command{ioctl} is to copy the
 module names found on the @dfn{Stream} to the user supplied buffer.  The address of the buffer in
 user space and the size of the buffer are passed to the @command{ioctl} through a structure
@@ -7774,7 +7777,7 @@ with arg set to @samp{NULL}.  The @streamio{I_LIST} call with @var{arg} pointing
 structure returns the number of entries that have been filled into the @var{sl_modlist} array (the
 number includes the number of modules including the driver).  If there is not enough space in the
 @var{sl_modlist} array (see note) or @var{sl_nmods} is less than 1, the @streamio{I_LIST} call will fail
-and errno is set to @errno{EINVAL}.  If @var{arg} or the @var{sl_modlist} array points outside the
+and @manpage{errno(3)} is set to @errno{EINVAL}.  If @var{arg} or the @var{sl_modlist} array points outside the
 allocated address space, @errno{EFAULT} is returned.
 
 It is possible, but unlikely, that another module was pushed on the @dfn{Stream} after the user
@@ -9660,7 +9663,7 @@ instead of makedevice.
 
 The loop-around driver is a pseudo driver that loops data from one open @dfn{Stream} to another open
 @dfn{Stream}.  The user processes see the associated files almost like a full-duplex pipe.  The
-@dfn{Streams} are not physically linked.  The driver is a simple multiplexor that passes messages
+@dfn{Streams} are not physically linked.  The driver is a simple multiplexer that passes messages
 from one @dfn{Stream}'s write queue to the other @dfn{Stream}'s read queue.
 
 To create a connection, a process opens two @dfn{Streams}, obtains the minor device number
@@ -10089,14 +10092,14 @@ Also see [6]6.5 " [7]Design Guidelines " in [8]Chapter 6 [9]Overview of Modules 
 @section Multiplexing
 
 This chapter describes how @dfn{STREAMS} multiplexing configurations are created and also discusses
-multiplexing drivers.  A @dfn{STREAMS} multiplexor is a driver with multiple @dfn{Streams} connected
+multiplexing drivers.  A @dfn{STREAMS} multiplexer is a driver with multiple @dfn{Streams} connected
 to it.  The primary function of the multiplexing driver is to switch messages among the connected
 @dfn{Streams}.  Multiplexor configurations are created from user level by system calls.
 
 @dfn{STREAMS} related system calls are used to set up the "plumbing," or @dfn{Stream}
 interconnections, for multiplexing drivers.  The subset of these calls that allows a user to connect
 (and disconnect) @dfn{Streams} below a driver is referred to as the multiplexing facility.  This
-type of connection is referred to as a 1-to-M, or lower, multiplexor configuration.  This
+type of connection is referred to as a 1-to-M, or lower, multiplexer configuration.  This
 configuration must always contain a multiplexing driver, which is recognized by @dfn{STREAMS} as
 having special characteristics.
 
@@ -10105,13 +10108,13 @@ the loop around driver and for the driver handling multiple minor devices in Dri
 difference between the connections to these drivers, only the functions performed by the driver are
 different.  In the multiplexing case, the driver routes data between multiple @dfn{Streams}.  In the
 device driver case, the driver routes data between user processes and associated physical ports.
-Multiplexing with @dfn{Streams} connected above is referred to as an N-to-1, or upper, multiplexor.
+Multiplexing with @dfn{Streams} connected above is referred to as an N-to-1, or upper, multiplexer.
 @dfn{STREAMS} does not provide any facilities beyond @manpage{open(2)} and @manpage{close(2)} to
 connect or disconnect upper @dfn{Streams} for multiplexing purposes.
 
 From the driver's perspective, upper and lower configurations differ only in the way they are
 initially connected to the driver.  The implementation requirements are the same: route the data and
-handle flow control.  All multiplexor drivers require special developer-provided software to perform
+handle flow control.  All multiplexer drivers require special developer-provided software to perform
 the multiplexing data routing and to handle flow control.  @dfn{STREAMS} does not directly support
 flow control among multiplexed @dfn{Streams}.
 
@@ -10125,15 +10128,15 @@ true for @dfn{STREAMS} multiplexors of any configuration.  The multiplexed @dfn{
 distinct and the driver must be implemented to do most of the work.
 
 In addition to upper and lower multiplexors, more complex configurations can be created by
-connecting @dfn{Streams} containing multiplexors to other multiplexor drivers.  With such a
-diversity of needs for multiplexors, it is not possible to provide general purpose multiplexor
+connecting @dfn{Streams} containing multiplexors to other multiplexer drivers.  With such a
+diversity of needs for multiplexors, it is not possible to provide general purpose multiplexer
 drivers.  Rather, @dfn{STREAMS} provides a general purpose multiplexing facility.  The facility
-allows users to set up the inter-module/driver plumbing to create multiplexor configurations of
+allows users to set up the inter-module/driver plumbing to create multiplexer configurations of
 generally unlimited interconnection.
 
 @subsection Building a Multiplexor
 
-This section builds a protocol multiplexor with the multiplexing configuration shown in @figref{30}.
+This section builds a protocol multiplexer with the multiplexing configuration shown in @figref{30}.
 To free users from the need to know about the underlying protocol structure, a user-level daemon
 process will be built to maintain the multiplexing configuration.  Users can then access the
 transport protocol directly by opening the transport protocol (TP) driver device node.
@@ -10146,7 +10149,7 @@ other to the @cite{IEEE 802.4} standard via the 802.4 driver.  The TP driver mul
 
 @figuresized{SPG_fig30,30,Protocol Multiplexor,5in}
 
-The following example shows how this daemon process sets up the protocol multiplexor.  The necessary
+The following example shows how this daemon process sets up the protocol multiplexer.  The necessary
 declarations and initialization for the daemon program are as follows:
 
 @smallexample
@@ -10176,7 +10179,7 @@ main()
 @end smallexample
 
 This multi-level multiplexed @dfn{Stream} configuration will be built from the bottom up.
-Therefore, the example begins by first constructing the Internel Protocol (IP) multiplexor.  This
+Therefore, the example begins by first constructing the Internel Protocol (IP) multiplexer.  This
 multiplexing device driver is treated like any other software driver.  It owns a node in the
 @cite{UNIX} file system and is opened just like any other @dfn{STREAMS} device driver.
 
@@ -10210,20 +10213,20 @@ The sequence of instructions to this point is:
 
 I_LINK takes two file descriptors as arguments.  The first file descriptor, fd_ip, must reference
 the @dfn{Stream} connected to the multiplexing driver, and the second file descriptor, fd_802_4,
-must reference the @dfn{Stream} to be connected below the multiplexor.  @figref{32} shows the state
+must reference the @dfn{Stream} to be connected below the multiplexer.  @figref{32} shows the state
 of these @dfn{Streams} following the @ioctlref{I_LINK} call.  The complete @dfn{Stream} to the 802.4
 driver has been connected below the IP driver.  The @dfn{Stream head}'s queues of the 802.4 driver
-will be used by the IP driver to manage the lower half of the multiplexor.
+will be used by the IP driver to manage the lower half of the multiplexer.
 
 @figuresized{SPG_fig32,32,IP Multiplexor After First Link,4in}
 
 I_LINK will return an integer value, called muxid, which is used by the multiplexing driver to
 identify the @dfn{Stream} just connected below it.  This muxid is ignored in the example, but it is
-useful for dismantling a multiplexor or routing data through the multiplexor.  Its significance is
+useful for dismantling a multiplexer or routing data through the multiplexer.  Its significance is
 discussed later.
 
 The following sequence of system calls is used to continue building the internetworking protocol
-multiplexor (IP):
+multiplexer (IP):
 
 @smallexample
     if ((fd_802_3 = open("/dev/802_3", O_RDWR)) < 0) @{
@@ -10244,15 +10247,15 @@ All links below the IP driver have now been established, giving the configuratio
 The @dfn{Stream} above the multiplexing driver used to establish the lower connections is the
 controlling @dfn{Stream} and has special significance when dismantling the multiplexing
 configuration.  This will be illustrated later in this chapter.  The @dfn{Stream} referenced by
-fd_ip is the controlling @dfn{Stream} for the IP multiplexor.
+fd_ip is the controlling @dfn{Stream} for the IP multiplexer.
 
 The order in which the @dfn{Streams} in the multiplexing configuration are opened is unimportant.
 If it is necessary to have intermediate modules in the @dfn{Stream} between the IP driver and media
 drivers, these modules must be added to the @dfn{Streams} associated with the media drivers (using
-@ioctlref{I_PUSH}) before the media drivers are attached below the multiplexor.
+@ioctlref{I_PUSH}) before the media drivers are attached below the multiplexer.
 
-The number of @dfn{Streams} that can be linked to a multiplexor is restricted by the design of the
-particular multiplexor.  The manual page describing each driver describes such restrictions.
+The number of @dfn{Streams} that can be linked to a multiplexer is restricted by the design of the
+particular multiplexer.  The manual page describing each driver describes such restrictions.
 However, only one @ioctlref{I_LINK} operation is allowed for each lower @dfn{Stream}; a single @dfn{Stream}
 cannot be linked below two multiplexors simultaneously.
 
@@ -10276,14 +10279,14 @@ The multi-level multiplexing configuration shown in @figref{34} has now been cre
 
 @figuresized{SPG_fig34,34,TP Multipexor,4in}
 
-Because the controlling @dfn{Stream} of the IP multiplexor has been linked below the TP multiplexor, the
-controlling @dfn{Stream} for the new multi-level multiplexor configuration is the @dfn{Stream} above the TP
-multiplexor.
+Because the controlling @dfn{Stream} of the IP multiplexer has been linked below the TP multiplexer, the
+controlling @dfn{Stream} for the new multi-level multiplexer configuration is the @dfn{Stream} above the TP
+multiplexer.
 
 At this point the file descriptors associated with the lower drivers can be closed without affecting
-the operation of the multiplexor.  If these file descriptors are not closed, all subsequent read,
+the operation of the multiplexer.  If these file descriptors are not closed, all subsequent read,
 write, @command{ioctl}, poll, getmsg, and putmsg system calls issued to them will fail.  That is because
-I_LINK associates the @dfn{Stream head} of each linked @dfn{Stream} with the multiplexor, so the user may not
+I_LINK associates the @dfn{Stream head} of each linked @dfn{Stream} with the multiplexer, so the user may not
 access that @dfn{Stream} directly for the duration of the link.
 
 The following sequence of system calls completes the daemon example:
@@ -10293,15 +10296,15 @@ The following sequence of system calls completes the daemon example:
     close(fd_802_3);
     close(fd_ip);
 
-    /* Hold multiplexor open forever */
+    /* Hold multiplexer open forever */
     pause();
 @}
 @end smallexample
 
-To summarize, @figref{34} shows the multi-level protocol multiplexor.  The transport driver supports
+To summarize, @figref{34} shows the multi-level protocol multiplexer.  The transport driver supports
 several simultaneous @dfn{Streams}.  These @dfn{Streams} are multiplexed over the single
-@dfn{Stream} connected to the IP multiplexor.  The mechanism for establishing multiple @dfn{Streams}
-above the transport multiplexor is actually a by-product of the way in which @dfn{Streams} are
+@dfn{Stream} connected to the IP multiplexer.  The mechanism for establishing multiple @dfn{Streams}
+above the transport multiplexer is actually a by-product of the way in which @dfn{Streams} are
 created between a user process and a driver.  By opening different minor devices of a @dfn{STREAMS}
 driver, separate @dfn{Streams} will be connected to that driver.  Of course, the driver must be
 designed with the intelligence to route data from the single lower @dfn{Stream} to the appropriate
@@ -10314,7 +10317,7 @@ freed from the need for any unnecessary knowledge of the underlying protocol con
 sub-networks that support the transport service.
 
 Multi-level multiplexing configurations should be assembled from the bottom up.  That is because the
-passing of ioctls through the multiplexor is determined by the nature of the multiplexing driver and
+passing of ioctls through the multiplexer is determined by the nature of the multiplexing driver and
 cannot generally be relied on.
 
 @subsection Dismantling a Multiplexor
@@ -10323,7 +10326,7 @@ cannot generally be relied on.
 each @dfn{Stream} with close.  The mechanism for dismantling @dfn{Streams} that have been linked
 below a multiplexing driver is less obvious, and is described below.
 
-The @ioctlref{I_UNLINK} @command{ioctl} call is used to disconnect each multiplexor link below a multiplexing
+The @ioctlref{I_UNLINK} @command{ioctl} call is used to disconnect each multiplexer link below a multiplexing
 driver individually.  This command has the form:
 
 @smallexample
@@ -10332,19 +10335,19 @@ ioctl(fd, I_UNLINK, muxid);
 
 where fd is a file descriptor associated with a @dfn{Stream} connected to the multiplexing driver
 from above, and muxid is the identifier that was returned by @streamio{I_UNLINK} when a driver was linked below
-the multiplexor.  Each lower driver may be disconnected individually in this way, or a special muxid
-value of -1 may be used to disconnect all drivers from the multiplexor simultaneously.
+the multiplexer.  Each lower driver may be disconnected individually in this way, or a special muxid
+value of -1 may be used to disconnect all drivers from the multiplexer simultaneously.
 
-In the multiplexing daemon program presented earlier, the multiplexor is never explicitly
+In the multiplexing daemon program presented earlier, the multiplexer is never explicitly
 dismantled.  That is because all links associated with a multiplexing driver are automatically
-dismantled when the controlling @dfn{Stream} associated with that multiplexor is closed.  Because
+dismantled when the controlling @dfn{Stream} associated with that multiplexer is closed.  Because
 the controlling @dfn{Stream} is open to a driver, only the final call of close for that @dfn{Stream}
 will close it.  In this case, the daemon is the only process that has opened the controlling
 @dfn{Stream}, so the multiplexing configuration will be dismantled when the daemon exits.
 
 For the automatic dismantling mechanism to work in the multi-level, multiplexed Stream
-configuration, the controlling @dfn{Stream} for each multiplexor at each level must be linked under
-the next higher level multiplexor.  In the example, the controlling @dfn{Stream} for the IP driver
+configuration, the controlling @dfn{Stream} for each multiplexer at each level must be linked under
+the next higher level multiplexer.  In the example, the controlling @dfn{Stream} for the IP driver
 was linked under the TP driver.  This resulted in a single controlling @dfn{Stream} for the full,
 multi-level configuration.  Because the multiplexing program relied on closing the controlling
 @dfn{Stream} to dismantle the multiplexed @dfn{Stream} configuration instead of using explicit
@@ -10354,54 +10357,54 @@ An important side effect of automatic dismantling on the close is that it is not
 process to build a multiplexing configuration with @streamio{I_LINK} and then exit.  That is because
 @manpage{exit(2)} will close all files associated with the process, including the controlling
 @dfn{Stream}.  To keep the configuration intact, the process must exist for the life of that
-multiplexor.  That is the motivation for implementing the example as a daemon process.
+multiplexer.  That is the motivation for implementing the example as a daemon process.
 
-However, if the process uses persistent links via the @streamio{I_PLINK} @command{ioctl} call, the multiplexor
+However, if the process uses persistent links via the @streamio{I_PLINK} @command{ioctl} call, the multiplexer
 configuration would remain intact after the process exits.  Persistent links are described later in
 this chapter.
 
 @subsection Routing Data Through a Multiplexor
 
 As demonstrated, @dfn{STREAMS} provides a mechanism for building multiplexed @dfn{Stream}
-configurations.  However, the criteria on which a multiplexor routes data is driver dependent.  For
-example, the protocol multiplexor shown before might use address information found in a protocol
+configurations.  However, the criteria on which a multiplexer routes data is driver dependent.  For
+example, the protocol multiplexer shown before might use address information found in a protocol
 header to determine over which sub-network data should be routed.  It is the multiplexing driver's
 responsibility to define its routing criteria.
 
-One routing option available to the multiplexor is to use the muxid value to determine to which
-@dfn{Stream} data should be routed (remember that each multiplexor link is associated with a muxid).
+One routing option available to the multiplexer is to use the muxid value to determine to which
+@dfn{Stream} data should be routed (remember that each multiplexer link is associated with a muxid).
 @streamio{I_LINK} passes the muxid value to the driver and returns this value to the user.  The driver can
 therefore specify that the muxid value must accompany data routed through it.  For example, if a
-multiplexor routed data from a single upper @dfn{Stream} to one of several lower @dfn{Streams} (as
-did the IP driver), the multiplexor could require the user to insert the muxid of the desired lower
+multiplexer routed data from a single upper @dfn{Stream} to one of several lower @dfn{Streams} (as
+did the IP driver), the multiplexer could require the user to insert the muxid of the desired lower
 @dfn{Stream} into the first four bytes of each message passed to it.  The driver could then match
 the muxid in each message with the muxid of each lower @dfn{Stream}, and route the data accordingly.
 
 @node Connecting and Disconnecting Lower Stream
 @section Connecting and Disconnecting Lower Stream
 
-Multiple @dfn{Streams} are created above a driver/multiplexor by use of the open system call on
+Multiple @dfn{Streams} are created above a driver/multiplexer by use of the open system call on
 either different minor devices, or on a cloneable device file.  Note that any driver that handles
-more than one minor device is considered an upper multiplexor.
+more than one minor device is considered an upper multiplexer.
 
-To connect @dfn{Streams} below a multiplexor requires additional software within the multiplexor.
+To connect @dfn{Streams} below a multiplexer requires additional software within the multiplexer.
 The main difference between @dfn{STREAMS} lower multiplexors and @dfn{STREAMS} device drivers are
 that multiplexors are pseudo-devices and that multiplexors have two additional qinit structures,
 pointed to by fields in the @type{streamtab} structure: the lower half read-side qinit and the lower half
 write-side qinit.
 
-The multiplexor is conceptually divided into two parts: the lower half (bottom) and the upper half
-(top).  The multiplexor queue structures that have been allocated when the multiplexor was opened,
-use the usual qinit entries from the multiplexor's @type{streamtab}.  This is the same as any open of the
-@dfn{STREAMS} device.  When a lower @dfn{Stream} is linked beneath the multiplexor, the qinit
+The multiplexer is conceptually divided into two parts: the lower half (bottom) and the upper half
+(top).  The multiplexer queue structures that have been allocated when the multiplexer was opened,
+use the usual qinit entries from the multiplexer's @type{streamtab}.  This is the same as any open of the
+@dfn{STREAMS} device.  When a lower @dfn{Stream} is linked beneath the multiplexer, the qinit
 structures at the @dfn{Stream head} are substituted by the bottom half qinit structures of the
-multiplexors.  Once the linkage is made, the multiplexor switches messages between upper and lower
+multiplexors.  Once the linkage is made, the multiplexer switches messages between upper and lower
 @dfn{Streams}.  When messages reach the top of the lower @dfn{Stream}, they are handled by
-@command{put} and @command{service} routines specified in the bottom half of the multiplexor.
+@command{put} and @command{service} routines specified in the bottom half of the multiplexer.
 
 @subsection Connecting Lower Streams
 
-A lower multiplexor is connected as follows: the initial open to a multiplexing driver creates a
+A lower multiplexer is connected as follows: the initial open to a multiplexing driver creates a
 @dfn{Stream}, as in any other driver.  open uses the first two @type{streamtab} structure entries to create
 the driver queues.  At this point, the only distinguishing characteristic of this @dfn{Stream} are
 non-@samp{NULL} entries in the @type{streamtab} st_muxrinit and st_muxwinit fields.
@@ -10412,7 +10415,7 @@ same mux fields.
 
 Next, another file is opened to create a (soon to be) lower @dfn{Stream}.  The driver for the lower
 Stream is typically a device driver (see the leftmost @dfn{Stream} in @figref{35}).  This Stream has
-no distinguishing characteristics.  It can include any driver compatible with the multiplexor.  Any
+no distinguishing characteristics.  It can include any driver compatible with the multiplexer.  Any
 modules required on the lower @dfn{Stream} must be pushed onto it now.
 
 Next, this lower @dfn{Stream} is connected below the multiplexing driver with an @ioctlref{I_LINK}
@@ -10439,12 +10442,12 @@ this @dfn{Stream}.
 An @streamio{I_LINK} is required for each lower @dfn{Stream} connected to the driver.  Additional
 upper @dfn{Streams} can be connected to the multiplexing driver by open calls.  Any message type can
 be sent from a lower @dfn{Stream} to user processes along any of the upper @dfn{Streams}.  The upper
-@dfn{Streams} provide the only interface between the user processes and the multiplexor.
+@dfn{Streams} provide the only interface between the user processes and the multiplexer.
 
 Note that no direct data structure linkage is established for the linked @dfn{Streams}.  The read
 queue's q_next will be @samp{NULL} and the write queue's q_next will point to the first entity on
 the lower @dfn{Stream}.  Messages flowing upstream from a lower driver (a device driver or another
-multiplexor) will enter the multiplexing driver @command{put} procedure with @member{l_qbot} as the
+multiplexer) will enter the multiplexing driver @command{put} procedure with @member{l_qbot} as the
 queue value.  The multiplexing driver has to route the messages to the appropriate upper (or lower)
 @dfn{Stream}.  Similarly, a message coming downstream from user space on any upper Stream has to be
 processed and routed, if required, by the driver.
@@ -10460,12 +10463,12 @@ flow control mechanism cannot see across the driver.
 
 In general, multiplexing drivers should be implemented so that new @dfn{Streams} can be dynamically
 connected to (and existing @dfn{Streams} disconnected from) the driver without interfering with its
-ongoing operation.  The number of @dfn{Streams} that can be connected to a multiplexor is developer
+ongoing operation.  The number of @dfn{Streams} that can be connected to a multiplexer is developer
 dependent.
 
 @subsection Disconnection Lower Streams
 
-Dismantling a lower multiplexor is accomplished by disconnecting (unlinking) the lower
+Dismantling a lower multiplexer is accomplished by disconnecting (unlinking) the lower
 @dfn{Streams}.  Unlinking can be initiated in three ways: an @streamio{I_UNLINK} @command{ioctl} referencing a
 specific @dfn{Stream}, an @streamio{I_UNLINK} indicating all lower @dfn{Streams}, or the last close of the
 control @dfn{Stream}.  As in the link, an unlink sends a linkblk structure to the driver in an
@@ -10484,30 +10487,30 @@ multiplexing @dfn{Streams} intact unless the @dfn{Stream} file descriptor was pr
 @node Multiplexor Construction Example
 @section Multiplexor Construction Example
 
-This section describes an example of multiplexor construction and usage.  @figref{35} shows the
+This section describes an example of multiplexer construction and usage.  @figref{35} shows the
 @dfn{Streams} before their connection to create the multiplexing configuration of @figref{36}.
-Multiple upper and lower @dfn{Streams} interface to the multiplexor driver.  The user processes of
+Multiple upper and lower @dfn{Streams} interface to the multiplexer driver.  The user processes of
 @figref{36} are not shown in @figref{35}.
 
 @figuresized{SPG_fig35,35,Internet Multiplexor Before Connecting,5in}
 
-The Ethernet, @dfn{LAPB} and @cite{IEEE 802.2} device drivers terminate links to other nodes.  The multiplexor
-driver is an Internet Protocol (IP) multiplexor that switches data among the various nodes or sends
+The Ethernet, @dfn{LAPB} and @cite{IEEE 802.2} device drivers terminate links to other nodes.  The multiplexer
+driver is an Internet Protocol (IP) multiplexer that switches data among the various nodes or sends
 data upstream to a user(s) in the system.  The Net modules would typically provide a convergence
-function which matches the multiplexor driver and device driver interface.
+function which matches the multiplexer driver and device driver interface.
 
 @figref{35} depicts only a portion of the full, larger
-@dfn{Stream}.  In the dotted rectangle above the IP multiplexor, there generally would be an upper
-transport control protocol (@dfn{TCP}) multiplexor, additional modules and, possibly, additional
+@dfn{Stream}.  In the dotted rectangle above the IP multiplexer, there generally would be an upper
+transport control protocol (@dfn{TCP}) multiplexer, additional modules and, possibly, additional
 multiplexors in the @dfn{Stream}.  Multiplexors could also be cascaded below the IP driver if the
-device drivers were replaced by multiplexor drivers.
+device drivers were replaced by multiplexer drivers.
 
 @figuresized{SPG_fig36,36,Internet Multiplexor After Connecting,5.5in}
 
 @dfn{Streams} A, B, and C are opened by the process, and modules are pushed as needed.  Two upper
-@dfn{Streams} are opened to the IP multiplexor.  The rightmost @dfn{Stream} represents multiple
+@dfn{Streams} are opened to the IP multiplexer.  The rightmost @dfn{Stream} represents multiple
 @dfn{Streams}, each connected to a process using the network.  The @dfn{Stream} second from the
-right provides a direct path to the multiplexor for supervisory functions.  It is the control
+right provides a direct path to the multiplexer for supervisory functions.  It is the control
 @dfn{Stream}, leading to a process which sets up and supervises this configuration.  It is always
 directly connected to the IP driver.  Although not shown, modules can be pushed on the control
 @dfn{Stream}.
@@ -10515,14 +10518,14 @@ directly connected to the IP driver.  Although not shown, modules can be pushed 
 After the @dfn{Streams} are opened, the supervisory process typically transfers routing information
 to the IP drivers (and any other multiplexors above the IP), and initializes the links.  As each
 link becomes operational, its @dfn{Stream} is connected below the IP driver.  If a more complex
-multiplexing configuration is required, the IP multiplexor @dfn{Stream} with all its connected links
-can be connected below another multiplexor driver.
+multiplexing configuration is required, the IP multiplexer @dfn{Stream} with all its connected links
+can be connected below another multiplexer driver.
 
 @figref{36} shows that the file descriptors for the lower device driver @dfn{Streams} are left
 dangling.  The primary purpose in creating these @dfn{Streams} was to provide parts for the
-multiplexor.  Those not used for control and not required for error recovery (by reconnecting them
+multiplexer.  Those not used for control and not required for error recovery (by reconnecting them
 through an @streamio{I_UNLINK} @command{ioctl}) have no further function.  These lower @dfn{Streams}
-can be closed to free the file descriptor without any effect on the multiplexor.
+can be closed to free the file descriptor without any effect on the multiplexer.
 
 @node Multiplexing Driver
 @section Multiplexing Driver
@@ -10536,7 +10539,7 @@ an interrupt call.
 
 Each upper @dfn{Stream} is created by @manpage{open(2)}.  A single lower @dfn{Stream} is opened and
 then it is linked by use of the multiplexing facility.  This lower @dfn{Stream} might connect to the
-@dfn{tty} driver.  The implementation of this example is a foundation for an M-to-N multiplexor.
+@dfn{tty} driver.  The implementation of this example is a foundation for an M-to-N multiplexer.
 
 As in the loop-around driver (in Drivers), flow control requires the use of standard and special
 code, since physical connectivity among the @dfn{Streams} is broken at the driver.  Different
@@ -10544,7 +10547,7 @@ approaches are used for flow control on the lower @dfn{Stream}, for messages com
 the device driver, and on the upper @dfn{Streams}, for messages coming downstream from the user
 processes.
 
-The multiplexor declarations are:
+The multiplexer declarations are:
 
 @smallexample
 #include <sys/types.h>
@@ -10604,8 +10607,8 @@ following queue.
 
 In the example, the upper read-side procedures are not used.  The lower @dfn{Stream} read queue
 @command{put} procedure transfers the message directly to the read queue upstream from the
-multiplexor.  There is no lower write @command{put} procedure because the upper write @command{put}
-procedure directly feeds the lower write queue downstream from the multiplexor.
+multiplexer.  There is no lower write @command{put} procedure because the upper write @command{put}
+procedure directly feeds the lower write queue downstream from the multiplexer.
 
 The driver uses a private data structure, mux.  mux_mux[dev] points back to the opened upper read
 queue.  This is used to route messages coming upstream from the driver to the appropriate upper
@@ -10648,7 +10651,7 @@ muxopen(q, devp, flag, sflag, credp)
 @code{muxopen} checks for a clone or ordinary open call.  It initializes q_ptr to point at the
 mux_mux[t] structure.
 
-The core multiplexor processing is the following: downstream data written to an upper @dfn{Stream}
+The core multiplexer processing is the following: downstream data written to an upper @dfn{Stream}
 is queued on the corresponding upper write message queue if the lower @dfn{Stream} is flow
 controlled.  This allows flow control to propagate towards the @dfn{Stream head} for each upper
 @dfn{Stream}.  A lower write @command{service} procedure, rather than a write @command{put}
@@ -10749,7 +10752,7 @@ The upper write queue from which the @command{ioctl} is coming.  It should alway
 
 @item l_qbot
 The new lower write queue.  It is the former @dfn{Stream head} write queue.  It is of most interest
-since that is where the multiplexor gets and puts its data.
+since that is where the multiplexer gets and puts its data.
 
 @item l_index
 A unique (system wide) identifier for the link.  It can be used for routing or during selective
@@ -10766,7 +10769,7 @@ to an @streamio{I_LINK} will cause the lower @dfn{Stream} to be disconnected.
 
 The @streamio{I_UNLINK} handling code nulls out muxbot and generates a positive acknowledgment.  A
 negative acknowledgment should not be returned to an @streamio{I_UNLINK}.  The @dfn{Stream head}
-assures that the lower Stream is connected to a multiplexor before sending an @streamio{I_UNLINK}
+assures that the lower Stream is connected to a multiplexer before sending an @streamio{I_UNLINK}
 @msg{M_IOCTL}.
 
 @code{muxuwput} handles @msg{M_FLUSH} messages as a normal driver would:
@@ -10823,7 +10826,7 @@ starting output on a device driver.
 
 @subsection Upper Write Service Procedure
 
-The following example shows the code for the upper multiplexor write @command{service} procedure:
+The following example shows the code for the upper multiplexer write @command{service} procedure:
 
 @smallexample
 static int
@@ -10854,7 +10857,7 @@ muxuwsrv(q)
 @}
 @end smallexample
 
-As long as there is a @dfn{Stream} still linked under the multiplexor and there are no errors, the
+As long as there is a @dfn{Stream} still linked under the multiplexer and there are no errors, the
 @command{service} procedure will take a message off the queue and send it downstream, if flow
 control allows.
 
@@ -10964,7 +10967,7 @@ locks-up the upper @dfn{Streams} by setting muxerr.
 contains the minor device of the upper @dfn{Stream}.  Several sanity checks are made: Is the device
 in range? Is the upper @dfn{Stream} open? Is the upper @dfn{Stream} not full?
 
-This multiplexor does not support flow control on the read-side.  It is merely a router.  If
+This multiplexer does not support flow control on the read-side.  It is merely a router.  If
 everything checks out, the message is put to the proper upper queue.  Otherwise, the message is
 discarded.
 
@@ -10991,17 +10994,17 @@ muxclose(q, flag, credp)
 @section Persistent Links
 
 With @streamio{I_LINK} and @streamio{I_UNLINK} ioctls the file descriptor associated with the
-@dfn{Stream} above the multiplexor used to set up the lower multiplexor connections must remain open
+@dfn{Stream} above the multiplexer used to set up the lower multiplexer connections must remain open
 for the duration of the configuration.  Closing the file descriptor associated with the controlling
 @dfn{Stream} will dismantle the whole multiplexing configuration.  Some applications may not want to
-keep a process running merely to hold the multiplexor configuration together.  Therefore,
-"free-standing" links below a multiplexor are needed.  A persistent link is such a link.  It is
-similar to a @dfn{STREAMS} multiplexor link, except that a process is not needed to hold the links
-together.  After the multiplexor has been set up, the process may close all file descriptors and
-exit, and the multiplexor will remain intact.
+keep a process running merely to hold the multiplexer configuration together.  Therefore,
+"free-standing" links below a multiplexer are needed.  A persistent link is such a link.  It is
+similar to a @dfn{STREAMS} multiplexer link, except that a process is not needed to hold the links
+together.  After the multiplexer has been set up, the process may close all file descriptors and
+exit, and the multiplexer will remain intact.
 
 Two ioctls, @streamio{I_PLINK} and @streamio{I_PUNLINK}, are used to create and remove persistent
-links that are associated with the @dfn{Stream} above the multiplexor.  @manpage{close(2)} and
+links that are associated with the @dfn{Stream} above the multiplexer.  @manpage{close(2)} and
 @streamio{I_UNLINK} are not able to disconnect the persistent links.
 
 The format of @streamio{I_PLINK} is:
@@ -11012,7 +11015,7 @@ ioctl(fd0, I_PLINK, fd1)
 
 The first file descriptor, fd0, must reference the @dfn{Stream} connected to the multiplexing driver
 and the second file descriptor, fd1, must reference the @dfn{Stream} to be connected below the
-multiplexor.  The persistent link can be created in the following way:
+multiplexer.  The persistent link can be created in the following way:
 
 @smallexample
     upper_stream_fd = open("/dev/mux", O_RDWR);
@@ -11034,7 +11037,7 @@ The persistent link can still exist even if the file descriptor associated with 
 an integer value, muxid, that can be used for dismantling the multiplexing configuration.  If the
 process that created the persistent link still exists, it may pass the muxid value to some other
 process to dismantle the link, if the dismantling is desired, or it can leave the muxid value in a
-file so that other processes may find it later.  @figref{38} shows a multiplexor after
+file so that other processes may find it later.  @figref{38} shows a multiplexer after
 @streamio{I_PLINK}.
 
 
@@ -11053,8 +11056,8 @@ ioctl(fd0, I_PUNLINK, muxid)
 
 where the @var{fd0} is the file descriptor associated with @dfn{Stream} connected to the
 multiplexing driver from above.  The muxid is returned by the @command{ioctl} @streamio{I_PLINK} for
-the @dfn{Stream} that was connected below the multiplexor.  The @streamio{I_PUNLINK} removes the
-persistent link between the multiplexor referenced by the @var{fd0} and the @dfn{Stream} to the
+the @dfn{Stream} that was connected below the multiplexer.  The @streamio{I_PUNLINK} removes the
+persistent link between the multiplexer referenced by the @var{fd0} and the @dfn{Stream} to the
 driver designated by the muxid.  Each of the bottom persistent links can be disconnected
 individually.  An @streamio{I_PUNLINK} @command{ioctl} with the muxid value of MUXID_ALL will remove
 all persistent links below the multiplexing driver referenced by the @var{fd0}.
@@ -11076,37 +11079,37 @@ The use of the ioctls @streamio{I_PLINK} and @streamio{I_PUNLINK} should not be 
 cause the errno value of @errno{EINVAL} to be returned.
 
 Since multi-level multiplexing configurations are allowed in @dfn{STREAMS}, it is possible to have a
-situation where persistent links exist below a multiplexor whose @dfn{Stream} is connected to the
-above multiplexor by regular links.  Closing the file descriptor associated with the controlling
+situation where persistent links exist below a multiplexer whose @dfn{Stream} is connected to the
+above multiplexer by regular links.  Closing the file descriptor associated with the controlling
 Stream will remove the regular link but not the persistent links below it.  On the other hand,
-regular links are allowed to exist below a multiplexor whose @dfn{Stream} is connected to the above
-multiplexor via persistent links.  In this case, the regular links will be removed if the persistent
+regular links are allowed to exist below a multiplexer whose @dfn{Stream} is connected to the above
+multiplexer via persistent links.  In this case, the regular links will be removed if the persistent
 link above is removed and no other references to the lower @dfn{Streams} exist.
 
 The construction of cycles is not allowed when creating links.  A cycle could be constructed by
-creating a persistent link of multiplexor 2 below multiplexor 1 and then closing the controlling
-file descriptor associated with the multiplexor 2 and reopening it again and then linking the
-multiplexor 1 below the multiplexor 2.  This is not allowed.  The operating system prevents a
-multiplexor configuration from containing a cycle to ensure that messages can not be routed
+creating a persistent link of multiplexer 2 below multiplexer 1 and then closing the controlling
+file descriptor associated with the multiplexer 2 and reopening it again and then linking the
+multiplexer 1 below the multiplexer 2.  This is not allowed.  The operating system prevents a
+multiplexer configuration from containing a cycle to ensure that messages can not be routed
 infinitely, thus creating an infinite loop or overflowing the kernel stack.
 
 @node Multiplexing Driver Design Guidelines
 @section Multiplexing Driver Design Guidelines
 
-The following lists general multiplexor design guidelines:
+The following lists general multiplexer design guidelines:
 
 @itemize @bullet
 
-@item The upper half of the multiplexor acts like the end of the upper @dfn{Stream}.
+@item The upper half of the multiplexer acts like the end of the upper @dfn{Stream}.
 
-@item The lower half of the multiplexor acts like the head of the lower @dfn{Stream}.
+@item The lower half of the multiplexer acts like the head of the lower @dfn{Stream}.
 
 @item Service procedures are used for flow control.
 
-@item Message routing is based on multiplexor specific criteria.
+@item Message routing is based on multiplexer specific criteria.
 
 @item When one @dfn{Stream} is being fed by many @dfn{Streams}, flow control may have to take place.
-Then all feeding @dfn{Streams} on the other end of the multiplexor will have to be enabled when the
+Then all feeding @dfn{Streams} on the other end of the multiplexer will have to be enabled when the
 flow control is relieved.
 
 @item When one @dfn{Stream} is feeding many @dfn{Streams}, flow control may also have to take place.
@@ -11236,7 +11239,7 @@ reflected in the size of the other end of the pipe.
 If a user process issues @manpage{write(2)} with 0 as the number of bytes to send down a
 @dfn{STREAMS}-based pipe or @dfn{FIFO}, 0 is returned, and by default no message is sent down the
 @dfn{Stream}.  However, if a user requires that a 0-length message be sent downstream, an
-@command{ioctl} call may be used to change this default behavior.  The flag @constant{SNDZERO}
+@command{ioctl} call may be used to change this default behaviour.  The flag @constant{SNDZERO}
 supports this.  If @constant{SNDZERO} is set in the @dfn{Stream head}, @manpage{write(2)} requests
 of 0 bytes will generate a 0-length message and send the message down the @dfn{Stream}.  If
 @constant{SNDZERO} is not set, no message is generated and 0 is returned to the user.
@@ -12467,7 +12470,7 @@ facilities.
 
 The @member{q_next} and @member{q_ptr} files of the @mantype{queue(9)} structure will not be
 modified by the system while a thread is actively executing within a synchronous entry point.  The
-@member{q_next} field fo the @mantype{queue(9)} structure could change while a thread is executing
+@member{q_next} field of the @mantype{queue(9)} structure could change while a thread is executing
 within an asynchronous entry point.
 
 A @dfn{STREAMS} module or driver must not call another module's @command{put} or @command{service}
@@ -12478,7 +12481,7 @@ another @dfn{STREAMS} module or driver directly circumvents the @dfn{MP-STREAMS}
 To make a @dfn{STREAMS} module or driver @dfn{MP-SAFE} requires that the integrity of private module
 data structures be protected by the module itself.  The integrity of private module data structures
 can be maintained either by using the @dfn{MP-STREAMS} framework to control concurrency and
-sychronize access to private data structures, or by the use of private locks within the module, or a
+synchronize access to private data structures, or by the use of private locks within the module, or a
 combination of the two.
 
 
@@ -12490,12 +12493,12 @@ combination of the two.
 @dfn{Stream} preserve message ordering internally.  This ordering guarantee only applies to message
 that are sent along the same @dfn{Stream} and produced by the same source.
 
-@dfn{STREAMS} does not gurantee that a message has been seen by the next @command{put} procedure
+@dfn{STREAMS} does not guarantee that a message has been seen by the next @command{put} procedure
 by the time that @manref{putnext(9)} or @manref{qreply(9)} return.  Under some circumstances,
 invocation of the next module's @command{put} procedure might be deferred until after an exclusive
-thread leaves a syncrhonization boundary.
+thread leaves a synchronization boundary.
 
-Regardless of @dfn{STREAMS} integrity protection, or the presence of syncrhonization barriers, at
+Regardless of @dfn{STREAMS} integrity protection, or the presence of synchronization barriers, at
 most one thread will be executing a given module's @command{service} procedure.
 
 @node MP-UNSAFE Modules
@@ -12507,17 +12510,17 @@ environment.
 By default, all @dfn{STREAMS} modules and drivers are considered @dfn{MP-UNSAFE} unless configured
 into the system as @dfn{MP-SAFE}.
 
-Unsafe drivers run with only the minimum of modification.  Unsafe drivers are syncrhonized at the
+Unsafe drivers run with only the minimum of modification.  Unsafe drivers are synchronized at the
 level @constant{SQLVL_MODULE}, which implies that, at any time, only one processor in the entire
 system is executing the module's @dfn{STREAMS} code.  @dfn{MP-UNSAFE} modules might not gain any
 performance advantage by being run in a multiprocessor environment.
 
 @dfn{MP-UNSAFE} modules that access data structures private to other @dfn{STREAMS} modules must be
-sycnhronized at a broader level of syncrhonization.  All such cooperating modules must be run with
-sycnrhonization at the level @constant{SQLVL_ELSEWHERE}, with a sychronization queue that is shared
+synchronized at a broader level of synchronization.  All such cooperating modules must be run with
+synchronization at the level @constant{SQLVL_ELSEWHERE}, with a synchronization queue that is shared
 across all the pertinent modules.
 
-@dfn{MP-UNSAFE} modules are still responsible for cancelling all outstanding callbacks in thier
+@dfn{MP-UNSAFE} modules are still responsible for cancelling all outstanding callbacks in their
 @member{qi_qclose} procedure.
 
 @subsection MP-UNSAFE Interrupt Service Routines
@@ -12526,7 +12529,7 @@ across all the pertinent modules.
 @constant{SQLVL_ELSEWHERE}, or @constant{SQLVL_GLOBAL} are singly threaded within the @dfn{STREAMS}
 framework.  However, interrupt service routines exist outside the @dfn{STREAMS} framework.
 Interrupt service routines that invoke @dfn{STREAMS} utilities will have execution of those
-utilities deferred until after all threads have left the syncrhonization barrier.
+utilities deferred until after all threads have left the synchronization barrier.
 
 @subsection MP-UNSAFE Shared Data Structures
 
@@ -12536,8 +12539,8 @@ must be configured at the same level of synchronization.
 @subsection MP-UNSAFE Sleeping
 
 An @dfn{MP-UNSAFE} module that must wait in its @command{open} or @command{close} procedure for a
-message from another @dfn{STREAMS} module must wait outside of all sycnchronization barriers;
-otherwise the responding thread might never be allowed to enter the sychronization barrier to invoke
+message from another @dfn{STREAMS} module must wait outside of all synchronization barriers;
+otherwise the responding thread might never be allowed to enter the synchronization barrier to invoke
 the module's @command{put} or @command{service} procedure.  Sleeping outside the synchronization
 barriers is accomplished by using @manref{qwait(9)} or @manref{qwait_sig(9)}.
 
@@ -12573,25 +12576,49 @@ private data structure and invalidating the @member{q_ptr} pointers.
 @node MP Timeout and Buffer Callbacks
 @section MP Timeout and Buffer Callbacks
 
-The @manref{timeout(9)} and @manref{bufcall(9)} callbacks are asynchronous when invoked from outside
-the @dfn{STREAMS} framework.  The means that the @manref{timeout(9)} or @manref{bufcall(9)} callback
-functions might execute concurrent with module proceedures.  To provide for syncrhonous callbacks
-that can be invoked from outside the @dfn{STREAMS} framework, the @manref{qtimeout(9)} and
-@manref{quntimeout(9)} @dfn{STREAMS} utilities are provided.  When using these utilities, the
-callback function is executed inside any syncrhonization barrier associated with the queue that is
-passed to the function.
+The @manref{timeout(9)}, @manref{bufcall(9)} and @manref{esbbcall(9)} callbacks are asynchronous
+when invoked from outside the @dfn{STREAMS} framework.  The means that the @manref{timeout(9)},
+@manref{bufcall(9)}, or @manref{esbbcall(9)} callback functions might execute concurrent with module
+procedures.
+
+In contrast, under @cite{@value{PACKAGE_TITLE}}, when @manref{timeout(9)}, @manref{bufcall(9)}, and
+@manref{esbbcall(9)} are invoked from within the @dfn{STREAMS} framework,@footnote{That is, they are
+invoked from a module's @command{put} or @command{service} procedure, or from within another
+synchronous callback, but not within a module's @command{open} or @command{close} procedures.} they
+are equivalent to a call to @manref{qtimeout(9)}, @manref{qbufcall(9)} with the current
+synchronization queue used as the @var{q} argument.  This is possible because @dfn{STREAMS} always
+knows what queue's synchronous
+procedures or callbacks it is running.
+
+To provide for synchronous callbacks that can be invoked from outside the @dfn{STREAMS} framework,
+the @manref{qtimeout(9)}, @manref{quntimeout(9)} @manref{qbufcall(9)}, and @manref{qunbufcall(9)}
+@dfn{STREAMS} utilities are provided.  When using these utilities, the callback function is executed
+inside any synchronization barrier associated with the queue that is passed to the function.
+
+There are some restrictions on which queue pointer the @manref{qtimeout(9)} and @manref{qbufcall(9)}
+can be passed when called from a module's @command{open} or @command{close} procedure, or when
+called from outside @dfn{STREAMS} (at soft or hard interrupt).  The caller is responsible for the
+validity of the queue pointer.  That is, the queue must be allocated and have procedures enabled
+across the call.  The queue pointer argument of a module's @command{open}, @command{close},
+@command{put}, or @command{service} procedure can always be passed as an argument to these functions
+without any special consideration.  They should not be passed a @var{q->q_next} pointer, unless the
+@dfn{Stream} is first frozen by the caller with @manref{freezestr(9)}.  They may be passed a
+driver's read-side queue pointer, or a lower multiplexed @dfn{Stream}'s write-side queue pointer,
+provided that the caller can ensure that the driver is not closed and the multiplexed @dfn{Stream}
+is not unlinked across the call.  Reference to interior queue pairs must not be performed unless the
+@dfn{Stream} has first been frozen by the caller with @manref{freezestre(9)}.
 
 @node MP Open and Close Procedures
 @section MP Open and Close Procedures
 
 @dfn{STREAMS} modules are permitted to sleep in their @member{qi_qopen} and @member{qi_qclose}
 procedures.  However, a module that uses synchronization of these procedures against @command{put}
-and @command{service} procedures must leave the sycnrhonization barrier before sleeping.  This is
+and @command{service} procedures must leave the synchronization barrier before sleeping.  This is
 accomplished by using the @manref{qwait(9)} and @manref{qwait_sig(9)} @dfn{STREAMS} utilities.
-These utilities are similar to @manref{sleep(9)}, however, they release the sycnchronization barrier
+These utilities are similar to @manref{sleep(9)}, however, they release the synchronization barrier
 before sleeping.
 
-Because callback functions can be asyncrhonous with respect to the @dfn{STREAMS} framework, they
+Because callback functions can be asynchronous with respect to the @dfn{STREAMS} framework, they
 might execute concurrent with a module's @command{close} procedure.  It is the responsibility of the
 module to cancel all outstanding callbacks before deallocating data structure upon which those
 callbacks depend, and before returning from the @command{close} procedure.
@@ -12618,13 +12645,13 @@ decrementing them when the @member{free_rtn} function exits.
 @section MP Locking
 
 Basic spin locks or reader/writer locks can be used by @dfn{MP-SAFE} modules to protect module
-private data structures.  When using locks, however, the folowing guidelines should be followed:
+private data structures.  When using locks, however, the following guidelines should be followed:
 
 @itemize @bullet
 
 @item Avoid holding module private locks across calls to @manref{putnext(9)}, @manref{qreply(9)}, or
-other @dfn{STREAMS} utilities that invoke a @command{put} procedure, unless reentrancy is provided.
-Otherwize, the calling thread might reenter the same queue procedure and attempt to take the same
+other @dfn{STREAMS} utilities that invoke a @command{put} procedure, unless re-entrancy is provided.
+Otherwise, the calling thread might reenter the same queue procedure and attempt to take the same
 lock twice, causing a single-party deadlock scenario.
 
 @item Do no hold module private locks, acquired in @command{put} or @command{service} procedures,
@@ -12641,16 +12668,17 @@ waiting for the callback function to exit, causing a single-party deadlock scena
 @node Asynchronous Callbacks
 @section Asynchronous Callbacks
 
-Interrupt service routines and other asyncrhonous callback functions require special care by the
+Interrupt service routines and other asynchronous callback functions require special care by the
 @dfn{STREAMS} driver writer, because they can execute asynchronous to threads executing within the
 @dfn{STREAMS} framework.
 
-Modules using perimeters can use the @manref{qtimeout(9)} and @manref{qbufcall(9)} callbacks that
-are synchronous with respect to the @dfn{STREAMS} framework.  Under @cite{@value{PACKAGE_TITLE}},
-even @manref{timeout(9)} and @manref{bufcall(9)} utilities are syncrhonous with respect to the
-@dfn{STREAMS} framework when invoked from within a @member{qi_qopen}, @member{qi_qclose},
-@member{qi_putp} or @member{qi_srvp} procedure.  However, when invoked from outside a @dfn{STREAMS}
-module procedure, these functions generate asyncrhonous callbacks.
+MP-SAFE modules, or modules using synchronization barriers can use the @manref{qtimeout(9)} and
+@manref{qbufcall(9)} callbacks that are synchronous with respect to the @dfn{STREAMS} framework.
+Under @cite{@value{PACKAGE_TITLE}}, even @manref{timeout(9)} and @manref{bufcall(9)} utilities are
+synchronous with respect to the @dfn{STREAMS} framework when invoked from within a @member{qi_putp}
+procedure, @member{qi_srvp} procedure, or a synchronous callback.  However, when invoked from
+outside a @dfn{STREAMS} module procedure (or from within @member{qi_qopen} or @member{qi_qclose}
+procedures, these functions generate asynchronous callbacks.
 
 Because an asynchronous thread from outside of @dfn{STREAMS}can enter the driver at any time, the
 driver writer is responsible for ensuring that the asynchronous callback function acquires the
@@ -12669,7 +12697,7 @@ is accessing shared data structures with the callback function.
 @item Outstanding callbacks from @manref{timeout(9)} and @manref{bufcall(9)} must be cancelled with
 a call to @manref{untimeout(9)} or @manref{unbufcall(9)}.
 
-@item Outstanding callbacks from @manref{esballoc(9)}, must be allosed to complete before the kernel
+@item Outstanding callbacks from @manref{esballoc(9)}, must be allowed to complete before the kernel
 module is permitted to be unloaded.
 
 @end itemize
@@ -12678,8 +12706,8 @@ module is permitted to be unloaded.
 @section Stream Integrity
 
 The @member{q_next} field of the @mantype{queue(9)} structure can be dereferenced in that queue's
-@member{qi_qopen}, @member{qi_qclose}, @member{qi_putp}, and @member{qi_srvp} p[rocedures as well as
-within any other syncrhonous procedure or callback (such as @manref{qtimeout(9)},
+@member{qi_qopen}, @member{qi_qclose}, @member{qi_putp}, and @member{qi_srvp} procedures as well as
+within any other synchronous procedure or callback (such as @manref{qtimeout(9)},
 @manref{qbufcall(9)}, @manref{qwriter(9)}) predicated on a queue in the same @dfn{Stream}.
 
 All code executing outside the @dfn{STREAMS} framework, such as interrupt service routines,
@@ -14182,7 +14210,7 @@ and number and are useful in boot scripts: (@pxref{Administrative Utilities})
 @item @manpage{insf(8)} @tab -- install special device files
 @item @manpage{scls(8)} @tab -- list @dfn{STREAMS} drivers
 @item @manpage{strinfo(8)} @tab -- provide information on @dfn{STREAMS} drivers and modules
-@item @manpage{strload(8)} @tab -- load or unload @dfn{STREAMS} drviers and modules
+@item @manpage{strload(8)} @tab -- load or unload @dfn{STREAMS} drivers and modules
 @item @manpage{strsetup(8)} @tab -- create @dfn{STREAMS} devices
 @end multitable
 
@@ -14412,7 +14440,7 @@ subsystem:
 @enumerate
 
 @item @emph{Synchronous.}
-These entry points, callbacks and callouts are referenced against a @dfn{STREAMS} queue structure.
+These entry points (callouts) and callbacks are referenced against a @dfn{STREAMS} queue structure.
 That is, they were invoked using a @dfn{STREAMS} queue structure as an argument.  These procedures
 are as follows:
 
@@ -14431,9 +14459,9 @@ are as follows:
 @end multitable
 
 @item @emph{Asynchronous.}
-These entry points, callbacks and callouts are @emph{not} referenced against a @dfn{STREAMS} queue
-structure.  That is, they were invoked without a specific @dfn{STREAMS} queue structure as an
-argument.  These procedures are as follows:
+These callbacks are @emph{not} referenced against a @dfn{STREAMS} queue structure.  That is, they
+were invoked without a specific @dfn{STREAMS} queue structure as an argument (known to
+@dfn{STREAMS}).  These procedures are as follows:
 
 @multitable @columnfractions .30 .70
 @item @manpage{bufcall(9)} @tab --
@@ -14554,12 +14582,12 @@ postponed until the thread currently in the synchronization level exits.
 @item @manpage{qopen(9)} @tab @emph{Queue open procedure.}
 The queue open procedure is synchronous and exclusive before the call to @manpage{qprocson(9)},
 or in any event, until return from the procedure.  If the module has synchronization level of
-global, elsewhere or per-module; the call to the qopen procedure is exclusive.
+global, elsewhere or per-module; the call to the @manref{qopen(9)} procedure is exclusive.
 
 @item @manpage{qclose(9)} @tab @emph{Queue close procedure.}
 The queue close procedure is synchronous and exclusive after the call to @manpage{qprocsoff(9)},
 or in any event, after return from the procedure.  If the module has synchronization level of
-global, elsewhere or per-module; the call to the qclose procedure is exclusive.
+global, elsewhere or per-module; the call to the @manref{qclose(9)} procedure is exclusive.
 
 @item @manpage{qprocson(9)} @tab @emph{Queue procedures on.}
 @item @manpage{qprocsoff(9)} @tab @emph{Queue procedures off.}
@@ -14855,12 +14883,12 @@ when loading drivers or modules by providing user-specified nodes and arguments.
 @item [-l]
 Loads the referenced drivers and modules.  (This is the default if the @samp{-q} and @samp{-u} flags
 are not specified.)  If no configuration file, driver or modules are listed in the command options,
-only the @cite{STREAMS} exeuctive is loaded;
+only the @cite{STREAMS} executive is loaded;
 @item -u, --unload
 Unloads the referenced drivers and modules.  If no configuration file, drivers or modules are listed
 in the command options, the entire @cite{STREAMS} executive is unloaded;
 @item -q, --query
-Queries the referenced drivers and moduels.  If no configuration file, drivers or modules are listed
+Queries the referenced drivers and modules.  If no configuration file, drivers or modules are listed
 in the command options, only the @cite{STREAMS} executive is queried;
 @item -f, --file @i{file}
 Specifies the file to use as the configuration file.  If @samp{-f} is not specified, the default
@@ -15325,7 +15353,7 @@ struct datab @{
     unsigned char db_iswhat;    /* status of message/data/buffer
                                    triplet */
     unsigned int db_size;       /* used internally */
-    caddr_t db_msgaddr;         /* triplet message header pointingto
+    caddr_t db_msgaddr;         /* triplet message header pointing to
                                    datab */
     long db_filler;             /* reserved for future use */
 @};
@@ -15403,7 +15431,7 @@ struct copyresp @{
     cred_t *cp_cr;              /* full credentials */
     uint cp_id;                 /* ioctl id (from ioc_id) */
     cadd_t cp_rval;             /* status of request: 0 for
-                                   successnon-zero for failure */
+                                   success, non-zero for failure */
     uint cp_pad1;               /* reserved */
     int cp_pad2;                /* reserved */
     mblk_t *cp_private;         /* private state information */
@@ -15438,10 +15466,10 @@ struct strioctl @{
 @node linkblk
 @appendixsubsec linkblk
 
-This structure is used in the lower multiplexor drivers to indicate a link.
+This structure is used in the lower multiplexer drivers to indicate a link.
 
 @smallexample
-/* this is used in lower multiplexor drivers to indicate a link */
+/* this is used in lower multiplexer drivers to indicate a link */
 
 struct linkblk @{
     queue_t *l_qtop;            /* lowest level write queue of upper
@@ -15836,19 +15864,19 @@ If both @stropt{SO_NDELON} and @stropt{SO_NDELOFF} are set in @var{so_flags}, @s
 have precedence.
 
 NOTE: For conformance with the @cite{POSIX} standard, it is recommended that new applications
-use the @constant{O_NONBLOCK} flag whose behavior is the same as that of @constant{O_NDELAY} unless otherwise
+use the @constant{O_NONBLOCK} flag whose behaviour is the same as that of @constant{O_NDELAY} unless otherwise
 noted.
 
 @item SO_NDELOFF
 Set @dfn{STREAMS} semantics for @constant{O_NDELAY} (or @constant{O_NONBLOCK}) processing on
 @manpage{read(2)} and @manpage{write(2)} system calls.  If @constant{O_NDELAY} (or
-@constant{O_NONBLOCK}) is set, a @manpage{read(2)} will return -1 and set @errno{EAGAIN} in errno if
+@constant{O_NONBLOCK}) is set, a @manpage{read(2)} will return -1 and set @errno{EAGAIN} in @var{errno} if
 no data are waiting to be read at the @dfn{Stream head}.  If @constant{O_NDELAY} (or
 @constant{O_NONBLOCK}) is clear, a @manpage{read(2)} will block until data become available at the
 @dfn{Stream head}.  (See note above)
 
 If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set, a @manpage{write(2)} will return -1 and
-set @errno{EAGAIN} in errno if flow control is in effect when the call is received.  It will block
+set @errno{EAGAIN} in @var{errno} if flow control is in effect when the call is received.  It will block
 if buffers are not available.  If @constant{O_NDELAY} (or @constant{O_NONBLOCK}) is set and part of
 the buffer has been written and a flow control or buffers not available condition is encountered,
 @manpage{write(2)} will terminate and return the number of bytes written.
@@ -15858,7 +15886,7 @@ control and will block if buffers are not available.  This is the default.  If b
 @stropt{SO_NDELON} and @stropt{SO_NDELOFF} are set in so_flags, @stropt{SO_NDELOFF} will have
 precedence.
 
-In the @dfn{STREAMS}-based pipe mechanism, the behavior of @manpage{read(2)} and @manpage{write(2)}
+In the @dfn{STREAMS}-based pipe mechanism, the behaviour of @manpage{read(2)} and @manpage{write(2)}
 is different for the @constant{O_NDELAY} and @constant{O_NONBLOCK} flags.  See @manpage{read(2)} and
 @manpage{write(2)} for details.
 
@@ -15908,7 +15936,7 @@ occurs in the @cite{SVR 4 STREAMS Programmer's Guide}, there is no description f
 
 @item SO_LOOP
 @cite{UnixWare@registeredsymbol{}} specific.  Indicates to the @dfn{Stream head} that this is a
-looparound @dfn{Stream} (i.e. it supports passing of file descriptors).
+loop-around @dfn{Stream} (i.e. it supports passing of file descriptors).
 
 @item SO_COPYOPT
 @cite{Solaris@registeredsymbol{}} specific.
@@ -16000,7 +16028,7 @@ the @command{ioctl} in some way.
 @item M_ERROR
 Sent upstream by modules or drivers to report some downstream error condition.  When the message
 reaches the @dfn{Stream head}, the @dfn{Stream} is marked so that all subsequent system calls issued
-to the @dfn{Stream}, excluding @manpage{close(2)} and @manpage{poll(2)}, will fail with errno set to
+to the @dfn{Stream}, excluding @manpage{close(2)} and @manpage{poll(2)}, will fail with @var{errno} set to
 the first data byte of the message.  @constant{POLLERR} is set if the @dfn{Stream} is being polled
 [see @manref{poll(2)}].  All processes sleeping on a system call to the @dfn{Stream} are awakened.
 An @msg{M_FLUSH} message with @constant{FLUSHRW} is sent downstream.
@@ -16078,7 +16106,7 @@ session is the responsibility of the controlling process.
 Signals the positive acknowledgement of a previous @msg{M_IOCTL} message.  The message format is one
 @msg{M_IOCACK} block (containing an iocblk structure, see @msg{M_IOCTL}) followed by zero or more @msg{M_DATA}
 blocks.  The iocblk data structure may contain a value in ioc_rval to be returned to the user
-process.  It may also contain a value in ioc_error to be returned to the user process in errno.
+process.  It may also contain a value in ioc_error to be returned to the user process in @var{errno}.
 
 If this message is responding to an @streamio{I_STR} ioctl [see @manref{streamio(7)}], it may contain data
 from the receiving module or driver to be sent to the user process.  In this case, message format
@@ -16139,7 +16167,7 @@ the ioctl in some way.
 @item M_IOCNAK
 Signals the negative acknowledgement (failure) of a previous @msg{M_IOCTL} message.  Its form is one
 @msg{M_IOCNAK} block containing an iocblk data structure ( see @msg{M_IOCTL}).  The iocblk structure may contain
-a value in ioc_error to be returned to the user process in errno.  Unlike the @msg{M_IOCACK}, no user data
+a value in ioc_error to be returned to the user process in @var{errno}.  Unlike the @msg{M_IOCACK}, no user data
 or return value can be sent with this message.  If any @msg{M_DATA} blocks follow the M_IOCNAK block,
 the @dfn{Stream head} will ignore and free them.  When the @dfn{Stream head} receives an M_IOCNAK, the
 outstanding ioctl request, if any, will fail.  The format and usage of this message type is
@@ -19557,7 +19585,7 @@ administrative purposes.
 @item @dfn{back-enable} @tab
 @cindex back-enable
 To enable (by @dfn{STREAMS}) a preceding blocked queue's @command{service} procedure when
-@dfn{STREAMS} determines that a succeeeding queue has reached its low-water mark.
+@dfn{STREAMS} determines that a succeeding queue has reached its low-water mark.
 
 @item @dfn{blocked} @tab
 @cindex blocked
@@ -19576,7 +19604,7 @@ structure associated with the read side of the module's queue pair.
 
 @item @dfn{control Stream} @tab
 @cindex control Stream
-A @dfn{Stream} above a multiplexing driver used to establish lower multiplexor connections.
+A @dfn{Stream} above a multiplexing driver used to establish lower multiplexer connections.
 Multiplexed @dfn{Stream} configurations are maintained through the controlling @dfn{Stream} to a
 multiplexing driver.
 
@@ -19586,7 +19614,7 @@ An interface that facilitates driver portability across different @cite{UNIX} sy
 
 @item @dfn{device driver} @tab
 @cindex device driver
-A @dfn{Stream} component whose principle functions are handling an associated phsyical device and
+A @dfn{Stream} component whose principle functions are handling an associated physical device and
 transforming data and information between the external interface and the @dfn{Stream}.
 
 @item @dfn{Driver Kernel Interface} @tab
@@ -19634,7 +19662,7 @@ A direction of data flow going from a driver toward the @dfn{Stream head}.  Also
 
 @item @dfn{line discipline} @tab
 @cindex line discipline
-A @dfn{STREAMS} module that performs @manref{termio(7)} canoncial and non-canoncial processing.  It
+A @dfn{STREAMS} module that performs @manref{termio(7)} canonical and non-canonical processing.  It
 shares some @manref{termio(7)} processing with a driver in a @dfn{STREAMS} terminal subsystem.
 
 @item @dfn{lower Stream} @tab

@@ -3,7 +3,7 @@ dnl vim: ft=config sw=4
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:07:56 $
+# @(#) $RCSfile: kernel.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/26 10:56:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,11 +62,14 @@ dnl vim: ft=config sw=4
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:07:56 $ by $Author: brian $
+# Last Modified $Date: 2005/09/26 10:56:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: kernel.at,v $
+# Revision 0.9.2.5  2005/09/26 10:56:55  brian
+# - factoring
+#
 # Revision 0.9.2.4  2005/07/04 20:07:56  brian
 # - fixed spelling of CVS keyword
 #

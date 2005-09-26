@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.16 2005/09/17 00:45:21 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.17 2005/09/26 10:56:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/26 10:56:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -566,10 +566,186 @@ qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
 .\"
 .SH CONTEXT
 .PP
+
+.SS "Queue Handling Functions"
+.PP
+.TS
+tab(:);
+ltbctbltbsss
+ltbctltsss.
+_
+Macros:State:Notes
+_
+RD\fR(9):either:T{
+These macros can be called from any context.  It does not matter whether the
+.I Stream
+is frozen by the caller or not.  The caller is responsible for the validity of the passed in
+queue pointer
+.I q
+across the call.
+T}
+WR\fR(9):\^:\^
+OTHERQ\fR(9):\^:\^
+SAMESTR\fR(9):\^:\^
+_
+.T&
+ltbctbltbsss
+ltbctltsss.
+UP Functions:State:Notes
+_
+appq\fR(9):frozen:T{
+The caller is responsible for the validity of the passed in
+queue pointer
+.I q
+when called from a
+.RI non- STREAMS
+environment, or
+.I q
+does not belong to the same
+.I Stream
+as the
+.I STREAMS
+procedure from which it is called (e.g, when passing messages from an upper multiplexor
+.I Stream
+to a lower multiplexor
+.IR Stream ),
+and validity and exclusivity of the passed in
+message pointer
+.IR mp .
+T}
+insq\fR(9):\^:\^
+rmvq\fR(9):\^:\^
+.T&
+ltbctltsss.
+backq\fR(9):thawed:
+bcanput\fR(9):thawed:
+canenable\fR(9):thawed:
+canput\fR(9):thawed:
+enableok\fR(9):thawed:
+flushband\fR(9):thawed:
+flushq\fR(9):thawed:
+getq\fR(9):thawed:
+noenable\fR(9):thawed:
+putbq\fR(9):thawed:
+putctl\fR(9):thawed:
+putctl1\fR(9):thawed:
+putctl2\fR(9):thawed:
+putq\fR(9):thawed:
+qcountstrm\fR(9):thawed:
+qenable\fR(9):thawed:
+qreply\fR(9):thawed:
+qsize\fR(9):either:
+_
+.T&
+ltbctbltbsss
+ltbctltsss.
+MP Functions:State:Notes
+_
+bcanputnext\fR(9):thawed:
+canputnext\fR(9):thawed:
+freezestr\fR(9):thawed:
+put\fR(9):thawed:
+putnext\fR(9):thawed:
+putnextctl\fR(9):thawed:
+putnextctl1\fR(9):thawed:
+putnextctl2\fR(9):thawed:
+qprocsoff\fR(9):thawed:
+qprocson\fR(9):thawed:
+strqset\fR(9):frozen:
+strqget\fR(9):frozen:
+unfreezestr\fR(9):frozen:
+.TE
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.\"
+.\"
+.SS Freezing
+.PP
+In the Uni-Processor (UP) environment, it was sufficient to raise the system priority level
+to ensure that no other queue procedures or thread were accessing the
+.IR Stream .
+This was performed with
+.BR splstr (9)
+and
+.BR splx (9).
+.PP
+In the Symetric Multi-Processor (SMP) environment, it is also necessary to hold a lock to block
+other processors from entering the criticial section.
+This is acheived by freezing the
+.I Stream
+with
+.BR freezestr (9)
+and thawing it with
+.BR unfreezestr (9).
+.RS
+.PP
+.B Note:
+when
+.BR freezestr (9)
+is called in a Uni-Processor (UP) environment, it is equivalent to
+.BR splstr (9);
+when
+.BR unfreezestr (9)
+is called,
+.BR splx (9).
+.RE
+.\"
+.\"
+.SS Queue Pointers
+.PP
+In the Uni-Processor (UP) environment, calling
+.BR splstr (9)
+is sufficient to ensure that a valid queue pointer
+.I q
+will not invalidate across a call to any function until
+.BR splx (9)
+was called.  This is not the case in the Symetric Multi-Processor (SMP) environment.
+.PP
+In the SMP environment, another processor may be executing
+.B put
+or
+.B service
+proceedures, or sychronous callbacks, concurrent with
+.B open
+or
+.B close
+procedures.
+Utilities called from the
+.RI non- STREAMS
+context (process context, asynchronous callbacks, soft interrupts, and interrupt service routines)
+can execute concurrent with any procedures within the
+.I STREAMS
+environment (open, close, put, service, syncrhonous callbacks, buffer free routines).
+.B open
+and
+.B close
+procedures, in particular, can cause
+.I q_next
+pointers to change, and
+.B close
+procedures can also result in the deallocation of queues.
+The only
+.I STREAMS
+utilities that are provided that permit blocking of plumbing changes to the
+.I Stream
+are
+.BR freezestr "(9), " unfreezestr (9)
+and
+.BR MPSTR_STPLOCK "(9), " MPSTR_STPRELE (9).
+
+.\"
+.\"
+.SS Message Pointers
+.PP
+In both the UP and SMP environments, it is the responsibility of the caller to ensure exclusive
+access to any message pointer
+.I mp
+passed to any message handling or queue handing function.  Exclusive access does not have to be
+ensured to the data blocks associated with the messages, and in particular the
+.I db_ref
+member.
 .\"
 .\"
 .SS Locking
