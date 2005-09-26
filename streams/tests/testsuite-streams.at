@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/09/25 22:52:37 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/09/26 10:08:40 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/09/25 22:52:37 $ by $Author: brian $
+dnl Last Modified $Date: 2005/09/26 10:08:40 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.8  2005/09/26 10:08:40  brian
+dnl - another round of testing, fixed m_queue bug
+dnl
 dnl Revision 0.9.2.7  2005/09/25 22:52:37  brian
 dnl - added test module and continuing with testing
 dnl
@@ -107,8 +110,24 @@ dnl if test `id -u` -ne 0 ; then exit 77 ; fi
 
 m4_divert_push([DEFAULTS])
 function test_streams() {
-    if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-streams $options -e -o $1
+    if test $at_verbose = echo
+    then
+	options='-vvv'
+    else
+	options=
+    fi
+    if test-streams $options -e -o $1
+    then
+	if (cat /proc/streams/strinfo | cut -f2 '-d:' | cut -f2 '-d ' | grep -qv '000000000000')
+	then
+	    cat /proc/streams/strinfo >&2
+	    return 1
+	else
+	    return 0
+	fi
+    else
+	return $?
+    fi
 }
 m4_divert_pop([DEFAULTS])
 
@@ -118,18 +137,12 @@ AT_BANNER([STREAMS Test])
 
 AT_SETUP([streams test 1.1])
 AT_KEYWORDS([streams])
-AT_CHECK([
-    options='--verbose=5'
-    test-streams $options -e -o 1.1
-    ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 1.2])
 AT_KEYWORDS([streams])
-AT_CHECK([
-    options='--verbose=5'
-    test-streams $options -e -o 1.2
-    ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.1.1])

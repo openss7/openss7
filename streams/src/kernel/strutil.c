@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/25 06:27:29 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/26 10:08:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/25 06:27:29 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/26 10:08:39 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/25 06:27:29 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/26 10:08:39 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -69,11 +69,7 @@ static char const ident[] =
 #include <linux/wait.h>		/* for wait queues */
 #include <linux/types.h>	/* for various types */
 #include <linux/interrupt.h>	/* for in_interrupt() */
-#if 0
-#if HAVE_KINC_LINUX_HARDIRQ_H
-#include <linux/hardirq.h>	/* for in_irq() and friends */
-#endif
-#endif
+
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
 
 #include <stdbool.h>		/* for bool, true and false */
@@ -1286,17 +1282,7 @@ _bcanputany(queue_t *q)
 	for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
 
 	pl = qrlock(q);
-#if 0
-	{
-		struct qband *qb;
-
-		for (qb = q->q_bandp; qb && test_bit(QB_FULL_BIT, &qb->qb_flag); qb = qb->qb_next) ;
-		/* a non-existent band is considered unwritable */
-		result = (qb != NULL);
-	}
-#else
 	result = (q->q_blocked < q->q_nband);
-#endif
 	qrunlock(q, pl);
 
 	return (result);
@@ -1367,20 +1353,6 @@ EXPORT_SYMBOL(bcanputnextany);	/* include/sys/streams/stream.h */
  *
  * Find a queue band.  This must be called with the queue read or write locked.
  */
-#if 0
-static struct qband *
-__find_qband(queue_t *q, unsigned char band)
-{
-	struct qband *qb;
-
-	/* bands are sorted in decending priority so that we can quit the search early for higher
-	   priority bands */
-	for (qb = q->q_bandp; qb && qb->qb_band > band; qb = qb->qb_next) ;
-	if (qb && qb->qb_band == band)
-		return (qb);
-	return (NULL);
-}
-#else
 static struct qband *
 __find_qband(queue_t *q, unsigned char band)
 {
@@ -1391,7 +1363,6 @@ __find_qband(queue_t *q, unsigned char band)
 	     qb = qb->qb_next, --q_nband) ;
 	return (qb);
 }
-#endif
 
 /*
  *  __get_qband:
@@ -1411,30 +1382,6 @@ __find_qband(queue_t *q, unsigned char band)
  *  necessary qband structure and leave the rest unallocated.  This needs to be documented in
  *  putq(9), putbq(9), insq(9), strqset(9) and strqget(9).
  */
-#if 0
-static struct qband *
-__get_qband(queue_t *q, unsigned char band)
-{
-	struct qband *qb, *qp, **qbp;
-
-	/* find insertion point for band */
-	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band;
-	     qp = *qbp, qbp = &(*qbp)->qb_next) ;
-	if (!(qb = *qbp) || qb->qb_band < band) {
-		/* not found, create one */
-		if ((qb = allocqb())) {
-			if ((qb->qb_next = xchg(qbp, qb)))
-				qb->qb_next->qb_prev = qb;
-			if ((qb->qb_prev = qp))
-				qp->qb_next = qb;
-			qb->qb_hiwat = q->q_qinfo->qi_minfo->mi_hiwat;
-			qb->qb_lowat = q->q_qinfo->qi_minfo->mi_lowat;
-			qb->qb_band = band;
-		}
-	}
-	return (qb);
-}
-#else
 static struct qband *
 __get_qband(queue_t *q, unsigned char band)
 {
@@ -1458,7 +1405,6 @@ __get_qband(queue_t *q, unsigned char band)
 	}
 	return (qb);
 }
-#endif
 
 /*
  *  Version without locks.
@@ -2117,7 +2063,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		nmp->b_prev->b_next = nmp;
 	nmp->b_next = emp;
 	emp->b_prev = nmp;
-	nmp->b_queue = ctrace(qget(q));
+	ctrace(nmp->b_queue = qget(q));
 	/* some adding to do */
 	q->q_msgs++;
 	size = msgsize(nmp);
@@ -2294,7 +2240,7 @@ __putbq(queue_t *q, mblk_t *mp)
 				b_next->b_prev = mp;
 			if ((mp->b_prev = b_prev))
 				b_prev->b_next = mp;
-			mp->b_queue = ctrace(qget(q));
+			ctrace(mp->b_queue = qget(q));
 			return (1 + enable);
 		} else {
 			struct qband *qb;
@@ -2556,7 +2502,7 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next->b_prev = mp;
 		if ((mp->b_prev = b_prev))
 			b_prev->b_next = mp;
-		mp->b_queue = ctrace(qget(q));
+		ctrace(mp->b_queue = qget(q));
 		return (1 + enable);	/* success */
 	}
 	/* find position of priority messages */
@@ -2666,7 +2612,7 @@ qalloc(struct stdata *sd, struct fmodsw *fmod)
 			struct queinfo *qu = (typeof(qu)) q;
 
 			__setq(q, st->st_rdinit, st->st_wrinit);
-			qu->qu_str = sd_get(sd);
+			ctrace(qu->qu_str = sd_get(sd));
 		} else {
 			(q + 0)->q_flag = QUSE | QREADR;
 			(q + 1)->q_flag = QUSE;
@@ -2746,7 +2692,6 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
       qerror:
 	qprocsoff(q);		/* in case qopen called qprocson, yet returned an error */
 	qdelete(q);		/* half delete */
-	ctrace(qput(&q));
       error:
 	return (err);
 }
@@ -2776,24 +2721,19 @@ void
 qdelete(queue_t *q)
 {
 	struct stdata *sd;
-	queue_t *rq;
-	queue_t *wq;
 	unsigned long pl;
 
 	assert(q);
-
-	rq = (q + 0);
-	wq = (q + 1);
-
 	sd = qstream(q);
-
 	assert(sd);
 
 	ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
 	pl = pwlock(sd);
-	ctrace(qput(&rq->q_next));
-	ctrace(qput(&wq->q_next));
+
+	(q+0)->q_next = NULL;
+	(q+1)->q_next = NULL;
+
 	ctrace(pwunlock(sd, pl));
 
 	printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
@@ -2885,12 +2825,8 @@ qinsert(struct stdata *sd, queue_t *irq)
 	srq = sd->sd_rq;
 	iwq = OTHERQ(irq);
 	swq = OTHERQ(srq);
-	irq->q_next = ctrace(qget(srq));
-	if (swq->q_next != srq) {	/* not a fifo */
-		iwq->q_next = ctrace(qget(swq->q_next));
-	} else {		/* is a fifo */
-		iwq->q_next = ctrace(qget(irq));
-	}
+	irq->q_next = srq;
+	iwq->q_next = (swq->q_next != srq) ? swq->q_next : irq;
 	prunlock(sd);
 }
 
@@ -2969,14 +2905,10 @@ qprocsoff(queue_t *q)
 		ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
 		/* bypass this module: works for pipe, FIFO and other STREAM heads queues too */
-		if ((bq = backq(rq))) {
-			ctrace(qput(&bq->q_next));
-			bq->q_next = ctrace(qget(rq->q_next));
-		}
-		if ((bq = backq(wq))) {
-			ctrace(qput(&bq->q_next));
-			bq->q_next = ctrace(qget(wq->q_next));
-		}
+		if ((bq = backq(rq)))
+			bq->q_next = rq->q_next;
+		if ((bq = backq(wq)))
+			bq->q_next = wq->q_next;
 		/* cache new packet sizes (next module or stream head) */
 		if ((wq = sd->sd_wq->q_next) || (wq = sd->sd_wq)) {
 			sd->sd_minpsz = wq->q_minpsz;
@@ -3051,14 +2983,11 @@ qprocson(queue_t *q)
 		}
 
 		/* join this module: works for FIFOs and PIPEs too */
-		if ((bq = backq(rq))) {
-			ctrace(qput(&bq->q_next));
-			bq->q_next = ctrace(qget(rq));
-		}
-		if ((bq = backq(wq))) {
-			ctrace(qput(&bq->q_next));
-			bq->q_next = ctrace(qget(wq));
-		}
+		if ((bq = backq(rq)))
+			bq->q_next = rq;
+		if ((bq = backq(wq)))
+			bq->q_next = wq;
+
 		/* cache new packet sizes (this module) */
 		sd->sd_minpsz = wq->q_minpsz;
 		sd->sd_maxpsz = wq->q_maxpsz;
@@ -3198,11 +3127,6 @@ __rmvq(queue_t *q, mblk_t *mp)
 		/* no longer want to read band zero */
 		clear_bit(QWANTR_BIT, &q->q_flag);
 	} else {
-#if 0
-		struct qband *qb = mp->b_bandp;
-
-		bput(&mp->b_bandp);
-#else
 		struct qband *qb;
 
 		{
@@ -3213,7 +3137,6 @@ __rmvq(queue_t *q, mblk_t *mp)
 			     qb && q_nband > band;
 			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next, --q_nband) ;
 		}
-#endif
 		assert(qb);
 		if (qb->qb_first == mp)
 			qb->qb_first = b_next;

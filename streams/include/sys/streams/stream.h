@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.58 2005/09/25 22:52:10 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.59 2005/09/26 10:08:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 22:52:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/25 22:52:10 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:38 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -271,9 +271,6 @@ typedef struct msgb {
 	long b_pad2;			/* padding */
 	/* private Linux Fast-STREAMS specific members */
 	struct queue *b_queue;		/* queue for this message */
-#if 0
-	struct qband *b_bandp;		/* band for this message */
-#endif
 	size_t b_size;			/* size of this message on queue */
 } mblk_t;
 
@@ -349,13 +346,6 @@ typedef struct qband {
 	size_t qb_lowat;		/* lo water mark for flow control */
 	unsigned long qb_flag;		/* flags */
 	long qb_pad1;			/* OSF: reserved */
-#if 0
-	/* Linux fast-STREAMS specific members */
-	ssize_t qb_msgs;		/* messages in band */
-	struct qband *qb_prev;		/* prev (higher) priority band */
-	unsigned char qb_band;		/* band */
-	unsigned char __pad[sizeof(long) - 1];	/* padding */
-#endif
 } qband_t;
 
 #define qb_msgs qb_pad1
@@ -397,13 +387,8 @@ typedef struct queue {
 	unsigned char qpad1[2];		/* padding */
 	/* Linux fast-STREAMS specific members */
 	ssize_t q_msgs;			/* messages on queue, Solaris counts mblks, we count msgs */
-//	klock_t q_klock;		/* lock for this queue structure */
 	rwlock_t q_lock;		/* lock for this queue structure */
 	int (*q_ftmsg) (mblk_t *);	/* message filter ala AIX */
-#if 0
-	mblk_t *q_putq_head;		/* deferred putq message block head */
-	mblk_t **q_putq_tail;		/* deferred putq message block tail */
-#endif
 #if 0
 	/* these are just a waste of space */
 	struct queue *q_other;		/* LiS, OSF */

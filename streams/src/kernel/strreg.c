@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/25 06:27:29 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/25 06:27:29 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/25 06:27:29 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -712,14 +712,7 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 		/* ensure that the device is regsitered (as a module) */
 		if (!cdev->d_list.next || list_empty(&cdev->d_list))
 			break;
-#if 0
-		/* well, no, it doesn't have to be registered with an external character major
-		   device; we can assign minor nodes internal to the specfs. */
-		err = -EINVAL;
-		/* ensure that the device is regsitered (as a driver) */
-		if (!cdev->d_majors.next || list_empty(&cdev->d_majors))
-			break;
-#endif
+
 		ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 		ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 

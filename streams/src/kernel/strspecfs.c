@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/12 13:12:17 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/09/12 13:12:17 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1571,7 +1571,7 @@ spec_delete_inode(struct inode *inode)
 					inode->i_pipe = (void *) xchg(&sd->sd_clone, NULL);
 					if (sd->sd_inode == inode)
 						sd->sd_inode = NULL;
-					sd_put(&sd);
+					ctrace(sd_put(&sd));
 				}
 				while ((sd = (struct stdata *) inode->i_pipe));
 			}
@@ -1662,7 +1662,7 @@ spec_clear_inode(struct inode *inode)
 	down(&inode->i_sem);
 	if (inode->i_pipe) {
 #if 0
-		sd_put(&((struct stdata *) inode->i_pipe));
+		ctrace(sd_put(&((struct stdata *) inode->i_pipe)));
 #endif
 		inode->i_pipe = NULL;
 	}

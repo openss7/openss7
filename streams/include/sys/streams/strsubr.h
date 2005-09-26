@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.48 2005/09/25 06:27:25 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.49 2005/09/26 10:08:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:25 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/09/25 06:27:25 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/09/26 10:08:38 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -444,26 +444,11 @@ struct queinfo {
 	queue_t wq;			/* write queue */
 	struct stdata *qu_str;		/* stream head for this queue pair */
 	wait_queue_head_t qu_qwait;	/* wait queue for qwait */
-#if 0
-	union {
-		struct fmodsw *fmod;	/* streams module */
-		struct cdevsw *cdev;	/* streams driver */
-	} qu_u;
-	int qu_flags;			/* queue pair flags */
-#endif
-#if 0
-	klock_t qu_klock;		/* lock for this queue pair */
-#endif
 	atomic_t qu_refs;		/* references to this structure */
 #if defined CONFIG_STREAMS_DEBUG
 	struct list_head qu_list;
 #endif
 };
-
-#if 0
-#define qu_mod qu_u.fmod
-#define qu_dev qu_u.cdev
-#endif
 
 #define qstream(__q) (((struct queinfo *)RD(__q))->qu_str)
 
@@ -581,13 +566,6 @@ struct mdbblock {
 extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
 extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
 			int cpu);
-#if 0
-extern void mdbblock_free(mblk_t *mp);
-extern mblk_t *mdbblock_alloc(uint priority, void *func);
-extern void freechain(mblk_t *mp, mblk_t **mpp);
-extern struct qband *allocqb(void);
-extern void freeqb(qband_t *qb);
-#endif
 
 extern int setsq(queue_t *q, struct fmodsw *fmod);
 extern void qscan(queue_t *q);
@@ -685,10 +663,6 @@ extern void runqueues(void);
 extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
 extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
 extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
-#if 0
-extern ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos);
-extern ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos);
-#endif
 extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
 			   loff_t *ppos, int more);
 extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
@@ -696,15 +670,6 @@ extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
 		      int flags);
 extern int strioctl(struct file *file, unsigned int cmd, unsigned long arg);
-
-#if 0
-extern loff_t strllseek(struct file *file, loff_t off, int whence);
-extern int strmmap(struct file *filp, struct vm_area_struct *vma);
-extern int stropen(struct inode *inode, struct file *file);
-extern int strflush(struct file *file);
-extern int strclose(struct inode *inode, struct file *file);
-extern int strfasync(int fd, struct file *file, int on);
-#endif
 
 /* stream head read put and write service procedures, and open/close for use by replacement stream heads */
 extern int strrput(queue_t *q, mblk_t *mp);

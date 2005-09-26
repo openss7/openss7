@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.21 2005/09/25 06:27:25 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.22 2005/09/26 10:08:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:25 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/25 06:27:25 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/09/26 10:08:37 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -237,7 +237,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #undef INLINE
 #define INLINE inline
 
-#if 0
 #undef streams_fastcall
 #if defined fastcall
 #define streams_fastcall fastcall
@@ -249,12 +248,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STREAMS_FASTCALL(__x) FASTCALL(__x)
 #else
 #define STREAMS_FASTCALL(__x) __x
-#endif
-#else
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) __x
-#undef streams_fastcall
-#define streams_fastcall
 #endif
 
 #ifndef __EXTERN_INLINE

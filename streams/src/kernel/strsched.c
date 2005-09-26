@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/25 06:27:29 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/26 10:08:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/25 06:27:29 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/26 10:08:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/25 06:27:29 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/26 10:08:39 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -241,7 +241,7 @@ mdbblock_alloc(uint priority, void *func)
 #endif
 
 		md->msgblk.m_func = func;
-		md->msgblk.m_queue = qget(queue_guess(NULL));
+		ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock_irqsave(&smi->si_rwlock, flags);
 		list_add_tail(&md->msgblk.m_list, &smi->si_head);
@@ -341,7 +341,7 @@ mdbblock_free(mblk_t *mp)
 	bzero(&md->datablk.d_dblock, sizeof(md->datablk.d_dblock));
 	bzero(&md->msgblk.m_mblock, sizeof(md->msgblk.m_mblock));
 	md->msgblk.m_func = NULL;
-	md->msgblk.m_queue = NULL;
+	ctrace(qput(&md->msgblk.m_queue));
 	md->msgblk.m_private = NULL;
 //      bzero(md, sizeof(*md)); /* reset mdbblock */
 	*xchg(&t->freemblk_tail, &mp->b_next) = mp;	/* MP-SAFE */
@@ -737,20 +737,11 @@ queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 
 		bzero(qu, sizeof(*qu));
 		/* initialize queue locks */
-#if 0
-		qplockinit((queue_t *) qu);
-#endif
 		qlockinit(&qu->rq);
 		qlockinit(&qu->wq);
 		qu->rq.q_flag = QREADR;
 		qu->wq.q_flag = 0;
 		init_waitqueue_head(&qu->qu_qwait);
-#if 0
-		qu->rq.q_putq_head = NULL;
-		qu->rq.q_putq_tail = &qu->rq.q_putq.head;
-		qu->wq.q_putq_head = NULL;
-		qu->wq.q_putq_tail = &qu->wq.q_putq.head;
-#endif
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&qu->qu_list);
 #endif
@@ -813,7 +804,7 @@ __freeq(queue_t *rq)
 	atomic_dec(&si->si_cnt);
 	assert(!waitqueue_active(&qu->qu_qwait));
 	/* put STREAM head - if not already */
-	sd_put(&qu->qu_str);
+	ctrace(sd_put(&qu->qu_str));
 	/* clear flags */
 	rq->q_flag = QREADR;
 	wq->q_flag = 0;
@@ -865,10 +856,6 @@ linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		static spinlock_t link_index_lock = SPIN_LOCK_UNLOCKED;
-
-#if 0
-		static int link_index = 0;
-#endif
 		struct linkinfo *li = obj;
 		struct linkblk *l = &li->li_linkblk;
 
@@ -877,18 +864,12 @@ linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		INIT_LIST_HEAD(&li->li_list);
 #endif
 		spin_lock(&link_index_lock);
-#if 0
-		l->l_index = ++link_index;
-		if (++link_index < 1)
-			link_index = 1;
-#else
 		/* must be non-zero */
 		if ((l->l_index = (int) l) == 0)
 			l->l_index++;	/* bite me */
 		/* must be positive */
 		if (l->l_index < 0)
 			l->l_index = -l->l_index;
-#endif
 		spin_unlock(&link_index_lock);
 	}
 }
@@ -1093,7 +1074,7 @@ event_alloc(int type, queue_t *q)
 
 			s->s_type = type;
 #if defined CONFIG_STREAMS_DEBUG
-			s->s_queue = qget(queue_guess(q));
+			ctrace(s->s_queue = qget(queue_guess(q)));
 			write_lock(&si->si_rwlock);
 			list_add_tail(&s->s_list, &si->si_head);
 			write_unlock(&si->si_rwlock);
@@ -1113,7 +1094,7 @@ event_free(struct strevent *se)
 #if defined CONFIG_STREAMS_DEBUG
 	struct seinfo *s = (struct seinfo *) se;
 
-	qput(&s->s_queue);
+	ctrace(qput(&s->s_queue));
 	write_lock(&si->si_rwlock);
 	list_del_init(&s->s_list);
 	write_unlock(&si->si_rwlock);
@@ -1318,7 +1299,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long)
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_BUFCALL, q))) {
-		se->x.b.queue = qget(q);
+		ctrace(se->x.b.queue = qget(q));
 		se->x.b.func = func;
 		se->x.b.arg = arg;
 		se->x.b.size = size;
@@ -1334,7 +1315,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_TIMEOUT, q))) {
-		se->x.t.queue = qget(q);
+		ctrace(se->x.t.queue = qget(q));
 		se->x.t.func = func;
 		se->x.t.arg = arg;
 		se->x.t.pl = pl;
@@ -1352,13 +1333,13 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_WELDQ, q))) {
-		se->x.w.queue = qget(q);
+		ctrace(se->x.w.queue = qget(q));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		se->x.w.q1 = qget(q1);
-		se->x.w.q2 = qget(q2);
-		se->x.w.q3 = qget(q3);
-		se->x.w.q4 = qget(q4);
+		ctrace(se->x.w.q1 = qget(q1));
+		ctrace(se->x.w.q2 = qget(q2));
+		ctrace(se->x.w.q3 = qget(q3));
+		ctrace(se->x.w.q4 = qget(q4));
 		id = strsched_event(se);
 	}
 	return (id);
@@ -1371,13 +1352,13 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_UNWELDQ, q))) {
-		se->x.w.queue = qget(q);
+		ctrace(se->x.w.queue = qget(q));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		se->x.w.q1 = qget(q1);
-		se->x.w.q2 = qget(q2);
-		se->x.w.q3 = qget(q3);
-		se->x.w.q4 = qget(q4);
+		ctrace(se->x.w.q1 = qget(q1));
+		ctrace(se->x.w.q2 = qget(q2));
+		ctrace(se->x.w.q3 = qget(q3));
+		ctrace(se->x.w.q4 = qget(q4));
 		id = strsched_event(se);
 	}
 	return (id);
@@ -1480,7 +1461,7 @@ untimeout(toid_t toid)
 
 	if ((se = find_event(toid))) {
 		xchg(&se->x.t.func, NULL);
-		qput(&se->x.t.queue);
+		ctrace(qput(&se->x.t.queue));
 		rem = se->x.t.timer.expires - jiffies;
 		if (rem < 0)
 			rem = 0;
@@ -1631,7 +1612,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 	assert(q);
 	assert(func);
 
-	qold = xchg(&this_thread->currentq, qget(q));
+	ctrace(qold = xchg(&this_thread->currentq, qget(q)));
 	sd = qstream(q);
 	assert(sd);
 	prlock(sd);
@@ -1644,7 +1625,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 	}
 	prunlock(sd);
 	this_thread->currentq = qold;
-	qput(&q);
+	ctrace(qput(&q));
 }
 
 /*
@@ -1669,7 +1650,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 	assert(q);
 	assert(func);
 
-	qold = xchg(&this_thread->currentq, qget(q));
+	ctrace(qold = xchg(&this_thread->currentq, qget(q)));
 	sd = qstream(q);
 	assert(sd);
 	prlock(sd);
@@ -1682,7 +1663,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 	}
 	prunlock(sd);
 	this_thread->currentq = qold;
-	qput(&q);
+	ctrace(qput(&q));
 }
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -1746,17 +1727,13 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
 
-	qold = xchg(&this_thread->currentq, qget(q));
+	ctrace(qold = xchg(&this_thread->currentq, qget(q)));
 	sd = qstream(q);
 	assert(sd);
 	prlock(sd);
 	if (!test_bit(QPROCS_BIT, &q->q_flag)) {
 		ptrace(("calling put procedure\n"));
-#if 0
 		ctrace((void) q->q_qinfo->qi_putp(q, mp));
-#else
-		ctrace(q->q_qinfo->qi_putp(q, mp));
-#endif
 		trace();
 		qwakeup(q);
 	} else {
@@ -1766,7 +1743,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 	}
 	prunlock(sd);
 	this_thread->currentq = qold;
-	qput(&q);
+	ctrace(qput(&q));
 }
 STATIC void
 putp(queue_t *q, mblk_t *mp)
@@ -1875,7 +1852,7 @@ srvp_fast(queue_t *q)
 		this_thread->currentq = qold;
 		qwakeup(q);
 	}
-	qput(&q);		/* cancel qget from qschedule */
+	ctrace(qput(&q));		/* cancel qget from qschedule */
 }
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -2160,13 +2137,6 @@ enter_inner_syncq_shared(struct syncq_cookie *sc)
 STATIC int
 enter_inner_syncq_asputp(struct syncq_cookie *sc)
 {
-	/* already done by caller */
-#if 0
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-#endif
-
 	if (find_syncqs(sc)) {
 		if ((sc->sc_sq = sc->sc_osq)) {
 			int rval;
@@ -2217,7 +2187,7 @@ enter_syncq_writer(struct syncq_cookie *sc, void (*func) (queue_t *, mblk_t *), 
 		return (1);
 
 	m->m_func = (void *) &strwrit;
-	m->m_queue = qget(sc->sc_q);
+	ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = (void *) func;
 
 	assert(perim == PERIM_OUTER || perim == PERIM_INNER);
@@ -2239,7 +2209,7 @@ enter_inner_syncq_func(struct syncq_cookie *sc, void (*func) (void *, mblk_t *),
 		return (1);
 
 	m->m_func = (void *) func;
-	m->m_queue = qget(sc->sc_q);
+	ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = arg;
 
 	return enter_inner_syncq_asputp(sc);
@@ -2255,7 +2225,7 @@ enter_inner_syncq_putp(struct syncq_cookie *sc)
 		return (1);
 
 	m->m_func = (void *) &putp;
-	m->m_queue = qget(sc->sc_q);
+	ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = NULL;
 
 	return enter_inner_syncq_asputp(sc);
@@ -2623,7 +2593,7 @@ __strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 		struct mbinfo *m = (typeof(m)) mp;
 
 		m->m_func = (void *) &strwrit;
-		m->m_queue = qget(q);	/* don't let it get away */
+		ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = (void *) func;
 		/* schedule for execution inside STREAMS */
 		strsched_mfunc(mp);
@@ -2658,7 +2628,7 @@ __strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 		struct mbinfo *m = (typeof(m)) mp;
 
 		m->m_func = (void *) func;
-		m->m_queue = qget(q);	/* don't let it get away */
+		ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = arg;
 		/* schedule for execution inside STREAMS */
 		strsched_mfunc(mp);
@@ -2722,7 +2692,7 @@ put(queue_t *q, mblk_t *mp)
 		   at the bottom of the softirq stack, deferring at this point will execute at the
 		   earliest opportunity anyway. */
 		m->m_func = (void *) &putp;
-		m->m_queue = qget(q);	/* don't let it get away */
+		ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = NULL;
 		/* schedule for execution inside STREAMS */
 		strsched_mfunc_fast(mp);
@@ -2748,7 +2718,7 @@ sq_doput_synced(mblk_t *mp)
 	else
 		/* deferred function is a qstrfunc function */
 		strfunc(m_func, m_queue, mp, xchg(&m->m_private, NULL));
-	qput(&m_queue);
+	ctrace(qput(&m_queue));
 }
 
 STATIC void
@@ -2819,7 +2789,7 @@ do_bufcall_synced(struct strevent *se)
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
-	qput(&q);
+	ctrace(qput(&q));
 }
 
 /**
@@ -2877,7 +2847,7 @@ do_timeout_synced(struct strevent *se)
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
-	qput(&q);
+	ctrace(qput(&q));
 }
 
 /**
@@ -2922,20 +2892,20 @@ do_weldq_synced(struct strevent *se)
 	if (sd3)
 		write_lock(&sd3->sd_plumb);
 	if (q1)
-		qn1 = xchg(&q1->q_next, qget(q2));
+		ctrace(qn1 = xchg(&q1->q_next, qget(q2)));
 	if (q3)
-		qn3 = xchg(&q3->q_next, qget(q4));
+		ctrace(qn3 = xchg(&q3->q_next, qget(q4)));
 	if (sd3)
 		write_unlock(&sd3->sd_plumb);
 	if (sd1)
 		write_unlock(&sd1->sd_plumb);
 	local_irq_restore(flags);
-	qput(&q1);
-	qput(&q2);
-	qput(&q3);
-	qput(&q4);
-	qput(&qn1);
-	qput(&qn3);
+	ctrace(qput(&q1));
+	ctrace(qput(&q2));
+	ctrace(qput(&q3));
+	ctrace(qput(&q4));
+	ctrace(qput(&qn1));
+	ctrace(qput(&qn3));
 	if (se->x.w.func) {
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 		struct strthread *t = this_thread;
@@ -2963,7 +2933,7 @@ do_weldq_synced(struct strevent *se)
 		}
 		t->currentq = qold;
 	}
-	qput(&q);
+	ctrace(qput(&q));
 }
 
 STATIC void
@@ -3013,7 +2983,7 @@ do_mblk_func(mblk_t *b)
 	else
 		/* deferred function is a qstrfunc function */
 		(void) qstrfunc_slow(m_func, m_queue, b, xchg(&m->m_private, NULL));
-	qput(&m_queue);
+	ctrace(qput(&m_queue));
 }
 
 STATIC void
@@ -3294,7 +3264,7 @@ qscan(queue_t *q)
 	struct strthread *t = this_thread;
 
 	/* put ourselves on scan list */
-	*xchg(&t->scanqtail, &q->q_link) = qget(q);	/* MP-SAFE */
+	ctrace(*xchg(&t->scanqtail, &q->q_link) = qget(q));	/* MP-SAFE */
 	if (!test_and_set_bit(scanqflag, &t->flags))
 		__raise_streams();
 }
@@ -3561,7 +3531,7 @@ qschedule(queue_t *q)
 		struct strthread *t = this_thread;
 
 		/* put ourselves on the run list */
-		*xchg(&t->qtail, &q->q_link) = qget(q);	/* MP-SAFE */
+		ctrace(*xchg(&t->qtail, &q->q_link) = qget(q));	/* MP-SAFE */
 		setqsched();
 	}
 }
@@ -3701,7 +3671,7 @@ freechains(struct strthread *t)
 		while ((mp = mp_next)) {
 			mp_next = xchg(&mp->b_next, NULL);
 			/* fake out freeb */
-			qput(&mp->b_queue);
+			ctrace(qput(&mp->b_queue));
 			// bput(&mp->b_bandp);
 			mp->b_next = mp->b_prev = NULL;
 			freemsg(mp);
@@ -3867,8 +3837,8 @@ allocstr(void)
 			atomic_inc(&si->si_cnt);
 			if (atomic_read(&si->si_cnt) > si->si_hwl)
 				si->si_hwl = atomic_read(&si->si_cnt);
-			sd->sd_rq = qget(q + 0);
-			sd->sd_wq = qget(q + 1);
+			ctrace(sd->sd_rq = qget(q + 0));
+			ctrace(sd->sd_wq = qget(q + 1));
 			qstream(q) = sd;	/* don't do double get */
 
 			printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
@@ -3902,7 +3872,7 @@ void
 freestr(struct stdata *sd)
 {
 	/* FIXME: need to deallocate anything attached to the stream head */
-	sd_put(&sd);
+	ctrace(sd_put(&sd));
 }
 
 EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
@@ -3937,6 +3907,7 @@ sd_put(struct stdata **sdp)
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
 		if (atomic_dec_and_test(&sh->sh_refs)) {
+			queue_t *q  = sd->sd_rq;
 			/* the last reference is gone, there should be nothing left (but a queue
 			   pair) */
 			assert(sd->sd_inode == NULL);
@@ -3946,8 +3917,9 @@ sd_put(struct stdata **sdp)
 			/* zero stream reference on queue pair to avoid double put on sd */
 			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */
-			qput(&sd->sd_wq);
-			qput(&sd->sd_rq);	/* should be last put */
+			assure(atomic_read(&((struct queinfo *)q)->qu_refs) == 2);
+			ctrace(qput(&sd->sd_wq));
+			ctrace(qput(&sd->sd_rq));	/* should be last put */
 			/* initial qget is balanced in qdetach()/qdelete() */
 			__freestr(sd);
 		}

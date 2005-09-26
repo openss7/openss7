@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 22:52:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/09/25 22:52:10 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -212,7 +212,7 @@ stri_insert(struct file *file, struct stdata *sd)
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	down(&inode->i_sem);
 	// spin_lock(&inode->i_lock);
-	stri_lookup(file) = sd_get(sd);
+	ctrace(stri_lookup(file) = sd_get(sd));
 	// spin_unlock(&inode->i_lock);
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	up(&inode->i_sem);
@@ -232,7 +232,7 @@ stri_acquire(struct file *file)
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	down(&inode->i_sem);
 	// spin_lock(&inode->i_lock);
-	sd = sd_get(stri_lookup(file));
+	ctrace(sd = sd_get(stri_lookup(file)));
 	// spin_unlock(&inode->i_lock);
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	up(&inode->i_sem);
@@ -2520,7 +2520,7 @@ strunlink(struct stdata *stp)
 {
 	struct stdata *sd;
 
-	while ((sd = sd_get(stp->sd_links))) {
+	while (ctrace(sd = sd_get(stp->sd_links))) {
 		bool detached;
 
 		{
@@ -2543,7 +2543,7 @@ strunlink(struct stdata *stp)
 		if (detached)
 			strlastclose(sd, 0);
 
-		sd_put(&sd);	/* could be final put */
+		ctrace(sd_put(&sd));	/* could be final put */
 	}
 }
 
@@ -2633,6 +2633,9 @@ strlastclose(struct stdata *sd, int oflag)
 	ctrace(cdrv_put(sd->sd_cdevsw));
 	sd->sd_cdevsw = NULL;
 
+	/* not last put, but it had better be the next to last */
+	assure(atomic_read(&((struct shinfo *)sd)->sh_refs) == 2);
+
 	/* this sd_put() balances the original allocation of the stream */
 	ctrace(sd_put(&sd));		/* not last put */
 }
@@ -2715,7 +2718,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 			srunlock(sd);
 		} else
 			mask = POLLERR;
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	} else
 		mask = POLLERR;
 	runqueues();
@@ -2843,7 +2846,7 @@ stropen(struct inode *inode, struct file *file)
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
 		ptrace(("driver open in effect\n"));
-		sd = sd_get((struct stdata *) inode->i_pipe);
+		ctrace(sd = sd_get((struct stdata *) inode->i_pipe));
 	} else {
 		ptrace(("clone open in effect\n"));
 		sd = NULL;
@@ -2915,7 +2918,7 @@ stropen(struct inode *inode, struct file *file)
 			ptrace(("Error path taken for sd %p\n", sd));
 			goto wake_error;
 		}
-		sd_get(sd);	/* to balance sd_put() after put_error, below. */
+		ctrace(sd_get(sd));	/* to balance sd_put() after put_error, below. */
 	} else {
 		/* FIXME: Push existing stream open stuff down to str_open() (again). */
 		queue_t *wq, *wq_next;
@@ -2960,7 +2963,7 @@ stropen(struct inode *inode, struct file *file)
 		strclose(inode, file);
 	}
       put_error:
-	sd_put(&sd);
+	ctrace(sd_put(&sd));
       error:
 	return ((err < 0) ? err : -err);
       up_error:
@@ -2970,7 +2973,7 @@ stropen(struct inode *inode, struct file *file)
       up_put_error:
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	up(&inode->i_sem);
-	sd_put(&sd);
+	ctrace(sd_put(&sd));
 	goto error;
 }
 
@@ -2996,7 +2999,7 @@ strflush(struct file *file)
 	if (likely((sd = stri_acquire(file)) != NULL)) {
 		if (!(err = straccess_rlock(sd, FTRUNC)))
 			srunlock(sd);
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	}
 	/* Not a separate system call, only called before strclose. */
 	return (err);
@@ -3119,7 +3122,7 @@ strclose(struct inode *inode, struct file *file)
 		}
 
 		/* this put balances the sd_get() in stri_insert() */
-		sd_put(&sd);	/* could be final */
+		ctrace(sd_put(&sd));	/* could be final */
 	} else {
 		err = -EIO;
 		// spin_unlock(&inode->i_lock);
@@ -3157,7 +3160,7 @@ strfasync(int fd, struct file *file, int on)
 			}
 			srunlock(sd);
 		}
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	runqueues();
@@ -3521,7 +3524,7 @@ _strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 				err = sd->sd_directio->read(file, buf, len, ppos);
 			srunlock(sd);
 		}
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
@@ -3751,7 +3754,7 @@ _strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 				err = sd->sd_directio->write(file, buf, len, ppos);
 			srunlock(sd);
 		}
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
@@ -3901,7 +3904,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 			err = strsendpage(file, page, offset, size, ppos, more);
 		else
 			err = sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	}
 	return (err);
 }
@@ -4009,7 +4012,7 @@ _strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int ban
 				err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
 			srunlock(sd);
 		}
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
@@ -4294,7 +4297,7 @@ _strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ba
 			err = strgetpmsg(file, ctlp, datp, bandp, flagsp);
 		else
 			err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
@@ -4775,7 +4778,7 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 		if ((f2 = fget(fdi.fildes))) {
 			struct stdata *sd2;
 
-			if ((sd2 = sd_get(stri_lookup(f2)))) {
+			if (ctrace(sd2 = sd_get(stri_lookup(f2)))) {
 				/* POSIX says to return ENXIO when the passed in stream is hung up. 
 				   Note that we should not care if the stream is linked under a
 				   multiplexing driver or not, we can still pass its queue pointer, 
@@ -4795,7 +4798,7 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 					token = (typeof(token)) _RD(qbot);
 					srunlock(sd2);
 				}
-				sd_put(&sd2);
+				ctrace(sd_put(&sd2));
 			} else
 				err = -EIO;
 			fput(f2);
@@ -5333,7 +5336,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	}
 	strwakeopen(mux);
 
-	sd_put(&sd);		/* could be last put */
+	ctrace(sd_put(&sd));		/* could be last put */
 	fput(f);
 	if (err < 0)
 		freelk(l);
@@ -5343,7 +5346,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	swunlock(sd);
       sdput_error:
-	sd_put(&sd);
+	ctrace(sd_put(&sd));
       fput_error:
 	fput(f);
       unlock_error:
@@ -5499,7 +5502,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 	swunlock(mux);
 
 	err = 0;
-	if ((sd = sd_get(*sdp))) {
+	if (ctrace(sd = sd_get(*sdp))) {
 		do {
 			struct linkblk *l;
 
@@ -5524,7 +5527,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 			setq(sd->sd_rq, &str_rinit, &str_winit);
 			clear_bit(STPLEX_BIT, &sd->sd_flag);
 			strwakeopen_swunlock(sd);
-			sd_put(&sd);
+			ctrace(sd_put(&sd));
 
 		} while (index == MUXID_ALL && (sd = *sdp));
 	}
@@ -5534,7 +5537,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
       ioctl_error:
 	strwakeopen(sd);
       wait_error:
-	sd_put(&sd);
+	ctrace(sd_put(&sd));
 	goto wakemux_exit;
       unlock_error:
 	clear_bit(STWOPEN_BIT, &mux->sd_flag);
@@ -6823,7 +6826,7 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			err = strioctl(file, cmd, arg);
 		else
 			err = sd->sd_directio->ioctl(file, cmd, arg);
-		sd_put(&sd);
+		ctrace(sd_put(&sd));
 	}
 	return (err);
 }

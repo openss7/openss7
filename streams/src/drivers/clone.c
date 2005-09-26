@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/26 10:08:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:49:35 $ by $Author: brian $
+ Last Modified $Date: 2005/09/26 10:08:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/26 10:08:38 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/26 10:08:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/03 08:49:35 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/26 10:08:38 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -188,12 +188,7 @@ cloneopen(struct inode *inode, struct file *file)
 		/* Darn.  Somebody passed us a FIFO inode. */
 		return (-EIO);
 
-#if 0
-	if ((cdev = cdrv_get(getminor(dev))))
-#else
-	if ((cdev = sdev_get(getminor(dev))))
-#endif
-	{
+	if ((cdev = sdev_get(getminor(dev)))) {
 		int err;
 
 		dev = makedevice(cdev->d_modid, 0);
@@ -343,12 +338,7 @@ register_clone(struct cdevsw *cdev)
 	cmin->n_mode = clone_cdev.d_mode;
 	cmin->n_minor = cdev->d_major;
 	cmin->n_dev = &clone_cdev;
-#if 0
-	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0)
-#else
-	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_major)) < 0)
-#endif
-	{
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_major)) < 0) {
 		printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
 			cdev->d_name, -err));
 		kfree(cmin);
