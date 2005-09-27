@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/09/26 10:08:40 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/09/27 03:15:57 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/09/26 10:08:40 $ by $Author: brian $
+dnl Last Modified $Date: 2005/09/27 03:15:57 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.9  2005/09/27 03:15:57  brian
+dnl - added ENXIO tests
+dnl
 dnl Revision 0.9.2.8  2005/09/26 10:08:40  brian
 dnl - another round of testing, fixed m_queue bug
 dnl
@@ -151,7 +154,7 @@ AT_CHECK([test_streams 2.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.1.2])
-AT_KEYWORDS([streams ioctl I_NREAD])
+AT_KEYWORDS([streams ioctl I_NREAD EFAULT])
 AT_CHECK([test_streams 2.1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -161,681 +164,716 @@ AT_CHECK([test_streams 2.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.2])
-AT_KEYWORDS([streams ioctl I_PUSH])
+AT_KEYWORDS([streams ioctl I_PUSH EINVAL])
 AT_CHECK([test_streams 2.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.3])
-AT_KEYWORDS([streams ioctl I_PUSH])
-AT_CHECK([test_streams 2.2.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUSH EFAULT])
+AT_CHECK([test_streams 2.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.4])
-AT_KEYWORDS([streams ioctl I_PUSH])
-AT_CHECK([test_streams 2.2.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUSH EINVAL])
+AT_CHECK([test_streams 2.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.5])
-AT_KEYWORDS([streams ioctl I_PUSH])
-AT_CHECK([test_streams 2.2.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUSH EINVAL])
+AT_CHECK([test_streams 2.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.6])
-AT_KEYWORDS([streams ioctl I_PUSH])
-AT_CHECK([test_streams 2.2.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUSH ENOSR])
+AT_CHECK([test_streams 2.2.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.7])
-AT_KEYWORDS([streams ioctl I_PUSH])
-AT_CHECK([test_streams 2.2.7 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUSH EINVAL])
+AT_CHECK([test_streams 2.2.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.2.8])
-AT_KEYWORDS([streams ioctl I_PUSH])
-AT_CHECK([test_streams 2.2.8 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUSH ENXIO])
+AT_CHECK([test_streams 2.2.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.3.1])
-AT_KEYWORDS([streams ioctl I_POP])
-AT_CHECK([test_streams 2.3.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_POP EINVAL])
+AT_CHECK([test_streams 2.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.3.2])
 AT_KEYWORDS([streams ioctl I_POP])
-AT_CHECK([test_streams 2.3.2 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.3.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.3.3])
-AT_KEYWORDS([streams ioctl I_POP])
-AT_CHECK([test_streams 2.3.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_POP EINVAL])
+AT_CHECK([test_streams 2.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.3.4])
-AT_KEYWORDS([streams ioctl I_POP])
-AT_CHECK([test_streams 2.3.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_POP ENXIO])
+AT_CHECK([test_streams 2.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.4.1])
 AT_KEYWORDS([streams ioctl I_LOOK])
-AT_CHECK([test_streams 2.4.1 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.4.2])
-AT_KEYWORDS([streams ioctl I_LOOK])
-AT_CHECK([test_streams 2.4.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_LOOK EINVAL])
+AT_CHECK([test_streams 2.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.5.1])
-AT_KEYWORDS([streams ioctl I_FLUSH])
-AT_CHECK([test_streams 2.5.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSH EINVAL])
+AT_CHECK([test_streams 2.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.5.2])
-AT_KEYWORDS([streams ioctl I_FLUSH])
-AT_CHECK([test_streams 2.5.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSH EINVAL])
+AT_CHECK([test_streams 2.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.5.3])
-AT_KEYWORDS([streams ioctl I_FLUSH])
-AT_CHECK([test_streams 2.5.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSH FLUSHR])
+AT_CHECK([test_streams 2.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.5.4])
-AT_KEYWORDS([streams ioctl I_FLUSH])
-AT_CHECK([test_streams 2.5.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSH FLUSHW])
+AT_CHECK([test_streams 2.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.5.5])
-AT_KEYWORDS([streams ioctl I_FLUSH])
-AT_CHECK([test_streams 2.5.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSH FLUSHRW])
+AT_CHECK([test_streams 2.5.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.6])
+AT_KEYWORDS([streams ioctl I_FLUSH ENXIO])
+AT_CHECK([test_streams 2.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.1])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT EINVAL])
+AT_CHECK([test_streams 2.6.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.2])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RNORM RPROTNORM])
+AT_CHECK([test_streams 2.6.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.3])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RNORM RPROTDAT])
+AT_CHECK([test_streams 2.6.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.4])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RNORM RPROTDIS])
+AT_CHECK([test_streams 2.6.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.5])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RMSGN RPROTNORM])
+AT_CHECK([test_streams 2.6.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.6])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RMSGN RPROTDAT])
+AT_CHECK([test_streams 2.6.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.7])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.7 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RMSGN RPROTDIS])
+AT_CHECK([test_streams 2.6.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.8])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.8 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RMSGD RPROTNORM])
+AT_CHECK([test_streams 2.6.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.9])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.9 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RMSGD RPROTDAT])
+AT_CHECK([test_streams 2.6.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.10])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.10 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT RMSGD RPROTDIS])
+AT_CHECK([test_streams 2.6.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.11])
-AT_KEYWORDS([streams ioctl I_SRDOPT])
-AT_CHECK([test_streams 2.6.11 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SRDOPT EINVAL])
+AT_CHECK([test_streams 2.6.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.1])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT default])
+AT_CHECK([test_streams 2.7.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.2])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RNORM RPROTNORM])
+AT_CHECK([test_streams 2.7.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.3])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RNORM RPROTDAT])
+AT_CHECK([test_streams 2.7.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.4])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RNORM RPROTDIS])
+AT_CHECK([test_streams 2.7.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.5])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RMSGD RPROTNORM])
+AT_CHECK([test_streams 2.7.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.6])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RMSGD RPROTDAT])
+AT_CHECK([test_streams 2.7.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.7])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.7 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RMSGD RPROTDIS])
+AT_CHECK([test_streams 2.7.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.8])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.8 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RMSGN RPROTNORM])
+AT_CHECK([test_streams 2.7.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.9])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.9 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RMSGN RPROTDAT])
+AT_CHECK([test_streams 2.7.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.10])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.10 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT RMSGN RPROTDIS])
+AT_CHECK([test_streams 2.7.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.11])
-AT_KEYWORDS([streams ioctl I_GRDOPT])
-AT_CHECK([test_streams 2.7.11 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GRDOPT EFAULT])
+AT_CHECK([test_streams 2.7.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.8.1])
-AT_KEYWORDS([streams ioctl I_STR])
-AT_CHECK([test_streams 2.8.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_STR EFAULT])
+AT_CHECK([test_streams 2.8.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.8.2])
-AT_KEYWORDS([streams ioctl I_STR])
-AT_CHECK([test_streams 2.8.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_STR EINVAL])
+AT_CHECK([test_streams 2.8.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.8.3])
-AT_KEYWORDS([streams ioctl I_STR])
-AT_CHECK([test_streams 2.8.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_STR EINVAL])
+AT_CHECK([test_streams 2.8.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.8.4])
-AT_KEYWORDS([streams ioctl I_STR])
-AT_CHECK([test_streams 2.8.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_STR EINVAL])
+AT_CHECK([test_streams 2.8.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.8.5])
 AT_KEYWORDS([streams ioctl I_STR])
-AT_CHECK([test_streams 2.8.5 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.8.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.9.1])
-AT_KEYWORDS([streams ioctl I_SETSIG])
-AT_CHECK([test_streams 2.9.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SETSIG EINVAL])
+AT_CHECK([test_streams 2.9.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.9.2])
 AT_KEYWORDS([streams ioctl I_SETSIG])
-AT_CHECK([test_streams 2.9.2 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.9.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.10.1])
-AT_KEYWORDS([streams ioctl I_GETSIG])
-AT_CHECK([test_streams 2.10.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GETSIG EINVAL])
+AT_CHECK([test_streams 2.10.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.10.2])
-AT_KEYWORDS([streams ioctl I_GETSIG])
-AT_CHECK([test_streams 2.10.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GETSIG EFAULT])
+AT_CHECK([test_streams 2.10.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.10.3])
 AT_KEYWORDS([streams ioctl I_GETSIG])
-AT_CHECK([test_streams 2.10.3 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.10.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.11.1])
-AT_KEYWORDS([streams ioctl I_FIND])
-AT_CHECK([test_streams 2.11.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FIND false])
+AT_CHECK([test_streams 2.11.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.11.2])
-AT_KEYWORDS([streams ioctl I_FIND])
-AT_CHECK([test_streams 2.11.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FIND true])
+AT_CHECK([test_streams 2.11.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.11.3])
-AT_KEYWORDS([streams ioctl I_FIND])
-AT_CHECK([test_streams 2.11.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FIND EINVAL])
+AT_CHECK([test_streams 2.11.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.11.4])
-AT_KEYWORDS([streams ioctl I_FIND])
-AT_CHECK([test_streams 2.11.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FIND EINVAL])
+AT_CHECK([test_streams 2.11.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.11.5])
-AT_KEYWORDS([streams ioctl I_FIND])
-AT_CHECK([test_streams 2.11.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FIND true])
+AT_CHECK([test_streams 2.11.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.1])
 AT_KEYWORDS([streams ioctl I_LINK EINVAL])
-AT_CHECK([test_streams 2.12.1 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.2])
 AT_KEYWORDS([streams ioctl I_LINK EINVAL])
-AT_CHECK([test_streams 2.12.2 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.3])
 AT_KEYWORDS([streams ioctl I_LINK EBADF])
-AT_CHECK([test_streams 2.12.3 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.4])
 AT_KEYWORDS([streams ioctl I_LINK ENXIO])
-AT_CHECK([test_streams 2.12.4 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.5])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_CHECK([test_streams 2.12.5 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.6])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_CHECK([test_streams 2.12.6 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.7])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_CHECK([test_streams 2.12.7 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.8])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_CHECK([test_streams 2.12.8 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.12.9])
 AT_KEYWORDS([streams ioctl I_LINK])
-AT_CHECK([test_streams 2.12.9 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.12.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.13.1])
-AT_KEYWORDS([streams ioctl I_UNLINK])
-AT_CHECK([test_streams 2.13.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_UNLINK EINVAL])
+AT_CHECK([test_streams 2.13.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.13.2])
-AT_KEYWORDS([streams ioctl I_UNLINK])
-AT_CHECK([test_streams 2.13.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_UNLINK MUXID_ALL])
+AT_CHECK([test_streams 2.13.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.13.3])
-AT_KEYWORDS([streams ioctl I_UNLINK])
-AT_CHECK([test_streams 2.13.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_UNLINK ENXIO])
+AT_CHECK([test_streams 2.13.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.14])
-AT_KEYWORDS([streams ioctl I_RECVFD])
-AT_CHECK([test_streams 2.14 ], [], [ignore], [], [], [])
+AT_SETUP([streams test 2.13.4])
+AT_KEYWORDS([streams ioctl I_UNLINK])
+AT_CHECK([test_streams 2.13.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.14.1])
+AT_KEYWORDS([streams ioctl I_RECVFD EAGAIN])
+AT_CHECK([test_streams 2.14.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.14.2])
+AT_KEYWORDS([streams ioctl I_RECVFD ENXIO])
+AT_CHECK([test_streams 2.14.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.15])
 AT_KEYWORDS([streams ioctl I_PEEK])
-AT_CHECK([test_streams 2.15 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.16])
+AT_SETUP([streams test 2.16.1])
 AT_KEYWORDS([streams ioctl I_FDINSERT])
-AT_CHECK([test_streams 2.16 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.16.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 2.17])
+AT_SETUP([streams test 2.16.2])
+AT_KEYWORDS([streams ioctl I_FDINSERT ENXIO])
+AT_CHECK([test_streams 2.16.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.17.1])
 AT_KEYWORDS([streams ioctl I_SENDFD])
-AT_CHECK([test_streams 2.17 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.17.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.17.2])
+AT_KEYWORDS([streams ioctl I_SENDFD ENXIO])
+AT_CHECK([test_streams 2.17.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.18])
 AT_KEYWORDS([streams ioctl I_E_RECVFD])
-AT_CHECK([test_streams 2.18 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.1])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT default])
+AT_CHECK([test_streams 2.19.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.2])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDZERO])
+AT_CHECK([test_streams 2.19.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.3])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDPIPE])
+AT_CHECK([test_streams 2.19.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.4])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDHOLD])
+AT_CHECK([test_streams 2.19.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.5])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDZERO SNDPIPE])
+AT_CHECK([test_streams 2.19.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.6])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDZERO SNDHOLD])
+AT_CHECK([test_streams 2.19.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.7])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.7 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDPIPE SNDHOLD])
+AT_CHECK([test_streams 2.19.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.8])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.8 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT SNDZERO SNDPIPE SNDHOLD])
+AT_CHECK([test_streams 2.19.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.19.9])
-AT_KEYWORDS([streams ioctl I_SWROPT])
-AT_CHECK([test_streams 2.19.9 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SWROPT EINVAL])
+AT_CHECK([test_streams 2.19.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.1])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT default])
+AT_CHECK([test_streams 2.20.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.2])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT none])
+AT_CHECK([test_streams 2.20.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.3])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDZERO])
+AT_CHECK([test_streams 2.20.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.4])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDPIPE])
+AT_CHECK([test_streams 2.20.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.5])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDHOLD])
+AT_CHECK([test_streams 2.20.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.6])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDZERO SNDPIPE])
+AT_CHECK([test_streams 2.20.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.7])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.7 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDZERO SNDHOLD])
+AT_CHECK([test_streams 2.20.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.8])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.8 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDPIPE SNDHOLD])
+AT_CHECK([test_streams 2.20.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.9])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.9 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT SNDZERO SNDPIPE SNDHOLD])
+AT_CHECK([test_streams 2.20.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.20.10])
-AT_KEYWORDS([streams ioctl I_GWROPT])
-AT_CHECK([test_streams 2.20.10 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GWROPT EFAULT])
+AT_CHECK([test_streams 2.20.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.21])
 AT_KEYWORDS([streams ioctl I_LIST])
-AT_CHECK([test_streams 2.21 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.1])
 AT_KEYWORDS([streams ioctl I_PLINK EINVAL])
-AT_CHECK([test_streams 2.22.1 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.2])
 AT_KEYWORDS([streams ioctl I_PLINK EINVAL])
-AT_CHECK([test_streams 2.22.2 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.3])
 AT_KEYWORDS([streams ioctl I_PLINK EBADF])
-AT_CHECK([test_streams 2.22.3 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.4])
 AT_KEYWORDS([streams ioctl I_PLINK ENXIO])
-AT_CHECK([test_streams 2.22.4 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.5])
 AT_KEYWORDS([streams ioctl I_PLINK])
-AT_CHECK([test_streams 2.22.5 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.6])
 AT_KEYWORDS([streams ioctl I_PLINK])
-AT_CHECK([test_streams 2.22.6 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.7])
 AT_KEYWORDS([streams ioctl I_PLINK])
-AT_CHECK([test_streams 2.22.7 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.8])
 AT_KEYWORDS([streams ioctl I_PLINK])
-AT_CHECK([test_streams 2.22.8 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.22.9])
 AT_KEYWORDS([streams ioctl I_PLINK])
-AT_CHECK([test_streams 2.22.9 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.22.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.23.1])
-AT_KEYWORDS([streams ioctl I_PUNLINK])
-AT_CHECK([test_streams 2.23.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUNLINK EINVAL])
+AT_CHECK([test_streams 2.23.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.23.2])
-AT_KEYWORDS([streams ioctl I_PUNLINK])
-AT_CHECK([test_streams 2.23.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_PUNLINK MUXID_ALL])
+AT_CHECK([test_streams 2.23.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.23.3])
+AT_KEYWORDS([streams ioctl I_PUNLINK ENXIO])
+AT_CHECK([test_streams 2.23.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.23.4])
 AT_KEYWORDS([streams ioctl I_PUNLINK])
-AT_CHECK([test_streams 2.23.3 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.23.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.1])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND EINVAL])
+AT_CHECK([test_streams 2.24.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.2])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND EINVAL])
+AT_CHECK([test_streams 2.24.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.3])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND EFAULT])
+AT_CHECK([test_streams 2.24.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.4])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND normal FLUSHR])
+AT_CHECK([test_streams 2.24.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.5])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND normal FLUSHW])
+AT_CHECK([test_streams 2.24.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.6])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND normal FLUSHRW])
+AT_CHECK([test_streams 2.24.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.7])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.7 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND band FLUSHR])
+AT_CHECK([test_streams 2.24.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.8])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.8 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND band FLUSHW])
+AT_CHECK([test_streams 2.24.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.24.9])
-AT_KEYWORDS([streams ioctl I_FLUSHBAND])
-AT_CHECK([test_streams 2.24.9 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND band FLUSHRW])
+AT_CHECK([test_streams 2.24.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.24.10])
+AT_KEYWORDS([streams ioctl I_FLUSHBAND ENXIO])
+AT_CHECK([test_streams 2.24.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.25])
-AT_KEYWORDS([streams ioctl I_CKBAND])
-AT_CHECK([test_streams 2.25 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_CKBAND false])
+AT_CHECK([test_streams 2.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.26])
-AT_KEYWORDS([streams ioctl I_GETBAND])
-AT_CHECK([test_streams 2.26 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GETBAND ENODATA])
+AT_CHECK([test_streams 2.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.27])
-AT_KEYWORDS([streams ioctl I_ATMARK])
-AT_CHECK([test_streams 2.27 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_ATMARK false])
+AT_CHECK([test_streams 2.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.28.1])
-AT_KEYWORDS([streams ioctl I_SETCLTIME])
-AT_CHECK([test_streams 2.28.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SETCLTIME zero])
+AT_CHECK([test_streams 2.28.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.28.2])
-AT_KEYWORDS([streams ioctl I_SETCLTIME])
-AT_CHECK([test_streams 2.28.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SETCLTIME EFAULT])
+AT_CHECK([test_streams 2.28.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.29.1])
-AT_KEYWORDS([streams ioctl I_GETCLTIME])
-AT_CHECK([test_streams 2.29.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GETCLTIME default])
+AT_CHECK([test_streams 2.29.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.29.2])
-AT_KEYWORDS([streams ioctl I_GETCLTIME])
-AT_CHECK([test_streams 2.29.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GETCLTIME EFAULT])
+AT_CHECK([test_streams 2.29.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.30.1])
-AT_KEYWORDS([streams ioctl I_CANPUT])
-AT_CHECK([test_streams 2.30.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_CANPUT normal true])
+AT_CHECK([test_streams 2.30.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.30.2])
-AT_KEYWORDS([streams ioctl I_CANPUT])
-AT_CHECK([test_streams 2.30.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_CANPUT band true])
+AT_CHECK([test_streams 2.30.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.30.3])
-AT_KEYWORDS([streams ioctl I_CANPUT])
-AT_CHECK([test_streams 2.30.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_CANPUT EINVAL])
+AT_CHECK([test_streams 2.30.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.30.4])
-AT_KEYWORDS([streams ioctl I_CANPUT])
-AT_CHECK([test_streams 2.30.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_CANPUT ANYBAND false])
+AT_CHECK([test_streams 2.30.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.31.1])
-AT_KEYWORDS([streams ioctl I_SERROPT])
-AT_CHECK([test_streams 2.31.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SERROPT default])
+AT_CHECK([test_streams 2.31.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.31.2])
-AT_KEYWORDS([streams ioctl I_SERROPT])
-AT_CHECK([test_streams 2.31.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SERROPT RERRNONPERSIST])
+AT_CHECK([test_streams 2.31.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.31.3])
-AT_KEYWORDS([streams ioctl I_SERROPT])
-AT_CHECK([test_streams 2.31.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SERROPT WERRNONPERSIST])
+AT_CHECK([test_streams 2.31.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.31.4])
-AT_KEYWORDS([streams ioctl I_SERROPT])
-AT_CHECK([test_streams 2.31.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SERROPT RERRNONPERSIST WERRNONPERSIST])
+AT_CHECK([test_streams 2.31.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.31.5])
-AT_KEYWORDS([streams ioctl I_SERROPT])
-AT_CHECK([test_streams 2.31.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_SERROPT EINVAL])
+AT_CHECK([test_streams 2.31.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.32.1])
-AT_KEYWORDS([streams ioctl I_GERROPT])
-AT_CHECK([test_streams 2.32.1 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GERROPT default])
+AT_CHECK([test_streams 2.32.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.32.2])
-AT_KEYWORDS([streams ioctl I_GERROPT])
-AT_CHECK([test_streams 2.32.2 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GERROPT RERRNORM WERRNORM])
+AT_CHECK([test_streams 2.32.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.32.3])
-AT_KEYWORDS([streams ioctl I_GERROPT])
-AT_CHECK([test_streams 2.32.3 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GERROPT RERRNONPERSIST WERRNORM])
+AT_CHECK([test_streams 2.32.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.32.4])
-AT_KEYWORDS([streams ioctl I_GERROPT])
-AT_CHECK([test_streams 2.32.4 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GERROPT RERRNORM WERRNONPERSIST])
+AT_CHECK([test_streams 2.32.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.32.5])
-AT_KEYWORDS([streams ioctl I_GERROPT])
-AT_CHECK([test_streams 2.32.5 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GERROPT RERRNONPERSIST WERRNONPERSIST])
+AT_CHECK([test_streams 2.32.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.32.6])
-AT_KEYWORDS([streams ioctl I_GERROPT])
-AT_CHECK([test_streams 2.32.6 ], [], [ignore], [], [], [])
+AT_KEYWORDS([streams ioctl I_GERROPT EFAULT])
+AT_CHECK([test_streams 2.32.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.33])
 AT_KEYWORDS([streams ioctl I_ANCHOR])
-AT_CHECK([test_streams 2.33 ], [], [ignore], [], [], [])
+AT_CHECK([test_streams 2.33], [], [ignore], [], [], [])
 AT_CLEANUP

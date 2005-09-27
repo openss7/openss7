@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/26 10:08:40 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 03:15:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/09/26 10:08:40 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4750,10 +4750,11 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strfdinsert fdi, *valp = (typeof(valp)) arg;
 	t_uscalar_t token = 0;
-	mblk_t *mp;
 	int err;
 
-	if ((err = copyin(&fdi, valp, sizeof(fdi))))
+	if (!(file->f_mode & FWRITE))
+		return (-EBADF);
+	if ((err = copyin(valp, &fdi, sizeof(fdi))))
 		return (err);
 
 	/* POSIX ioctl(2) manpage says that the offset must also be properly aligned in the buffer
@@ -4769,13 +4770,11 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (fdi.databuf.len <= 0)
 		fdi.databuf.len = -1;
 
-	/* Note that we do not take any locks on sd at this point: first we want to find the queue
-	   pointer for the referenced stream. */
-	{
+	if ((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0) {
 		struct file *f2;
 
 		/* This is how we find the queue pointer to use in the message. */
-		if ((f2 = fget(fdi.fildes))) {
+		if ((f2 = fget(fdi.fildes)) && f2->f_op && f2->f_op->release == &strclose) {
 			struct stdata *sd2;
 
 			if (ctrace(sd2 = sd_get(stri_lookup(f2)))) {
@@ -4804,18 +4803,23 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 			fput(f2);
 		} else
 			err = -EINVAL;
-		if (err)
-			return (err);
-	}
+		if (!err) {
+			mblk_t *mp;
 
-	if (!IS_ERR(mp = strputpmsg_common(file, &fdi.ctlbuf, &fdi.databuf, 0, fdi.flags))) {
-		bcopy(&token, mp->b_rptr + fdi.offset, sizeof(token));
-		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(put(sd->sd_wq, mp));
-		trace();
-		return (0);
+			mp = strputpmsg_common(file, &fdi.ctlbuf, &fdi.databuf, 0, fdi.flags);
+			if (!IS_ERR(mp)) {
+				bcopy(&token, mp->b_rptr + fdi.offset, sizeof(token));
+				srunlock(sd);
+				/* use put instead of putnext because of STRHOLD feature */
+				ctrace(put(sd->sd_wq, mp));
+				trace();
+				return (0);
+			} else
+				err = PTR_ERR(mp);
+		}
+		srunlock(sd);
 	}
-	return PTR_ERR(mp);
+	return (err);
 }
 
 /**
