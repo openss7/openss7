@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/09/27 03:15:57 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/27 10:04:20 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 03:15:57 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 10:04:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.25  2005/09/27 10:04:20  brian
+ - more test cases, runqueues bug
+
  Revision 0.9.2.24  2005/09/27 03:15:57  brian
  - added ENXIO tests
 
@@ -143,9 +146,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/09/27 03:15:57 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/27 10:04:20 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/09/27 03:15:57 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/27 10:04:20 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1724,7 +1727,7 @@ test_close(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  STREAM Initialization
+ *  Stream Initialization
  *
  *  -------------------------------------------------------------------------
  */
@@ -1871,7 +1874,7 @@ preamble_2_2(int child)
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
-	if (test_ioctl(child, TM_IOC_RDERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EPROTO)
+	if (test_ioctl(child, TM_IOC_RDERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -1887,7 +1890,7 @@ preamble_2_3(int child)
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
-	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EPROTO)
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -1903,7 +1906,7 @@ preamble_2_4(int child)
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
-	if (test_ioctl(child, TM_IOC_RWERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EPROTO)
+	if (test_ioctl(child, TM_IOC_RWERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -1914,13 +1917,40 @@ postamble_2(int child)
 {
 	int result = __RESULT_SUCCESS;
 
-	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EPROTO)
+	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EIO)
 		result = __RESULT_FAILURE;
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		result = __RESULT_FAILURE;
 	state++;
 	return result;
+}
+
+/* open devname with and push nullmod */
+int
+preamble_3(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_3(int child)
+{
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return (result);
 }
 
 /*
@@ -1940,16 +1970,16 @@ struct test_stream {
 static const char sref_none[] = "(none)";
 
 /*
- *  Open and Close 1 stream.
+ *  Open and Close 1 Stream.
  */
-static const char test_group_1[] = "Open and close streams";
+static const char test_group_1[] = "Open and close Streams";
 
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
-#define name_case_1_1 "Open and close 1 stream."
+#define name_case_1_1 "Open and close 1 Stream."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
-Checks that one stream can be opened and closed."
+Checks that one Stream can be opened and closed."
 
 int
 test_case_1_1(int child)
@@ -1967,14 +1997,14 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 #define test_case_1_1_stream_2 (NULL)
 
 /*
- *  Open and Close 3 streams.
+ *  Open and Close 3 Streams.
  */
 #define tgrp_case_1_2 test_group_1
 #define numb_case_1_2 "1.2"
-#define name_case_1_2 "Open and close 3 streams."
+#define name_case_1_2 "Open and close 3 Streams."
 #define sref_case_1_2 sref_none
 #define desc_case_1_2 "\
-Checks that three streams can be opened and closed."
+Checks that three Streams can be opened and closed."
 
 int
 test_case_1_2(int child)
@@ -1991,11 +2021,11 @@ struct test_stream test_1_2 = { NULL, &test_case_1_2, NULL };
 #define test_case_1_2_stream_1 (&test_1_2)
 #define test_case_1_2_stream_2 (&test_1_2)
 
-static const char test_group_2[] = "Perform IOCTL on one stream";
+static const char test_group_2[] = "Perform IOCTL on one Stream";
 static const char sref_case_2[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page.";
 
 /*
- *  Perform IOCTL on one stream - I_NREAD
+ *  Perform IOCTL on one Stream - I_NREAD
  */
 static const char sref_case_2_1[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_NREAD section.";
 
@@ -2004,8 +2034,8 @@ static const char sref_case_2_1[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_1_1 "Perform streamio I_NREAD."
 #define sref_case_2_1_1 sref_case_2_1
 #define desc_case_2_1_1 "\
-Checks that I_NREAD can be performed on a stream.  Because this test is peformed\n\
-on a freshly opened stream, it should return zero (0) as a return value and\n\
+Checks that I_NREAD can be performed on a Stream.  Because this test is peformed\n\
+on a freshly opened Stream, it should return zero (0) as a return value and\n\
 return zero (0) in the integer pointed to by arg."
 
 int
@@ -2052,7 +2082,7 @@ struct test_stream test_2_1_2 = { &preamble_0, &test_case_2_1_2, &postamble_0 };
 #define test_case_2_1_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_PUSH
+ *  Perform IOCTL on one Stream - I_PUSH
  */
 static const char sref_case_2_2[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_PUSH section.";
 
@@ -2061,7 +2091,7 @@ static const char sref_case_2_2[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_2_1 "Perform streamio I_PUSH."
 #define sref_case_2_2_1 sref_case_2_2
 #define desc_case_2_2_1 "\
-Checks that I_PUSH can be performed on a stream."
+Checks that I_PUSH can be performed on a Stream."
 
 int
 test_case_2_2_1(int child)
@@ -2081,8 +2111,9 @@ struct test_stream test_2_2_1 = { &preamble_0, &test_case_2_2_1, &postamble_0 };
 #define name_case_2_2_2 "Perform streamio I_PUSH - EINVAL."
 #define sref_case_2_2_2 sref_case_2_2
 #define desc_case_2_2_2 "\
-Checks that EINVAL is returned when I_PUSH is performed with an invalid module\n\
-name \"nomodule\"."
+Checks that I_PUSH can be performed on a Stream.  Checks that EINVAL is\n\
+returned when I_PUSH is performed with an invalid module name\n\
+\"nomodule\"."
 
 int
 test_case_2_2_2(int child)
@@ -2100,10 +2131,12 @@ struct test_stream test_2_2_2 = { &preamble_0, &test_case_2_2_2, &postamble_0 };
 #define tgrp_case_2_2_3 test_group_2
 #define numb_case_2_2_3 "2.2.3"
 #define name_case_2_2_3 "Perform streamio I_PUSH - EFAULT."
-#define sref_case_2_2_3 sref_case_2_2
+#define sref_case_2_2_3 "AIX, HP-UX, Solaris, UnixWare Documentation."
 #define desc_case_2_2_3 "\
-Checks that EFAULT is returned when arg points outside the caller's address \n\
-space."
+Checks that I_PUSH can be performed on a Stream.  Checks that EFAULT is\n\
+returned when arg points outside the caller's address space.  This error\n\
+is not documented by POSIX, but it is by AIX, HP-UX, Solaris, and\n\
+UnixWare."
 
 int
 test_case_2_2_3(int child)
@@ -2123,8 +2156,8 @@ struct test_stream test_2_2_3 = { &preamble_0, &test_case_2_2_3, &postamble_0 };
 #define name_case_2_2_4 "Perform streamio I_PUSH - EINVAL."
 #define sref_case_2_2_4 sref_case_2_2
 #define desc_case_2_2_4 "\
-Checks that EINVAL is returned when arg specifies a module name that is\n\
-too short."
+Checks that I_PUSH can be performed on a Stream.  Checks that EINVAL is\n\
+returned when arg specifies a module name that is too short."
 
 int
 test_case_2_2_4(int child)
@@ -2144,8 +2177,8 @@ struct test_stream test_2_2_4 = { &preamble_0, &test_case_2_2_4, &postamble_0 };
 #define name_case_2_2_5 "Perform streamio I_PUSH - EINVAL."
 #define sref_case_2_2_5 sref_case_2_2
 #define desc_case_2_2_5 "\
-Checks that EINVAL is returned when arg specifies a module name that is\n\
-too long."
+Checks that I_PUSH can be performed on a Stream.  Checks that EINVAL is\n\
+returned when arg specifies a module name that is too long."
 
 int
 test_case_2_2_5(int child)
@@ -2162,10 +2195,15 @@ struct test_stream test_2_2_5 = { &preamble_0, &test_case_2_2_5, &postamble_0 };
 
 #define tgrp_case_2_2_6 test_group_2
 #define numb_case_2_2_6 "2.2.6"
-#define name_case_2_2_6 "Perform streamio I_PUSH - ENOSR."
-#define sref_case_2_2_6 sref_case_2_2
+#define name_case_2_2_6 "Perform streamio I_PUSH - EINVAL."
+#define sref_case_2_2_6 "SVR 4 STREAMS Programmer's Guide"
 #define desc_case_2_2_6 "\
-Checks that ENOSR is returned when a STREAM's push limit is reached."
+Checks that I_PUSH can be performed on a Stream.  Checks that EINVAL is\n\
+returned when a Stream's push limit is reached.  This error case is not\n\
+documented by POSIX.  Nor is it documented by AIX.  The SVR 4 SPG says\n\
+the number of modules pushed is limited by NSTRPUSH.  OpenSolaris\n\
+returns EINVAL here, we follow that lead.  LiS returns ENOSR here, but\n\
+does not impose a limit."
 
 int
 test_case_2_2_6(int child)
@@ -2175,7 +2213,7 @@ test_case_2_2_6(int child)
 		if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
 	}
-	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") == __RESULT_SUCCESS || last_errno != ENOSR)
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
@@ -2190,7 +2228,8 @@ struct test_stream test_2_2_6 = { &preamble_0, &test_case_2_2_6, &postamble_0 };
 #define name_case_2_2_7 "Perform streamio I_PUSH - EINVAL."
 #define sref_case_2_2_7 sref_case_2_2
 #define desc_case_2_2_7 "\
-Checks that EINVAL is returned when a driver is pushed instead of a module."
+Checks that I_PUSH can be performed on a Stream.  Checks that EINVAL is\n\
+returned when a driver is pushed instead of a module."
 
 int
 test_case_2_2_7(int child)
@@ -2210,8 +2249,8 @@ struct test_stream test_2_2_7 = { &preamble_0, &test_case_2_2_7, &postamble_0 };
 #define name_case_2_2_8 "Perform streamio I_PUSH - ENXIO."
 #define sref_case_2_2_8 sref_case_2_2
 #define desc_case_2_2_8 "\
-Checks that ENXIO is returned when an attempt is made to push a module \n\
-on a hung up STREAM."
+Checks that I_PUSH can be performed on a Stream.  Checks that ENXIO is\n\
+returned when an attempt is made to push a module on a hung up Stream."
 
 int
 test_case_2_2_8(int child)
@@ -2226,8 +2265,84 @@ struct test_stream test_2_2_8 = { &preamble_2_1, &test_case_2_2_8, &postamble_2 
 #define test_case_2_2_8_stream_1 (NULL)
 #define test_case_2_2_8_stream_2 (NULL)
 
+#define tgrp_case_2_2_9 test_group_2
+#define numb_case_2_2_9 "2.2.9"
+#define name_case_2_2_9 "Perform streamio I_PUSH - EIO RDERR."
+#define sref_case_2_2_9 sref_case_2_2
+#define desc_case_2_2_9 "\
+Checks that I_PUSH can be performed on a Stream.  Checks that EIO is\n\
+returned when an attempt is made to push a module on a Stream that has\n\
+received a read error."
+
+int
+test_case_2_2_9(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") == __RESULT_SUCCESS || last_errno != EIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_9 = { &preamble_2_2, &test_case_2_2_9, &postamble_2 };
+
+#define test_case_2_2_9_stream_0 (&test_2_2_9)
+#define test_case_2_2_9_stream_1 (NULL)
+#define test_case_2_2_9_stream_2 (NULL)
+
+#define tgrp_case_2_2_10 test_group_2
+#define numb_case_2_2_10 "2.2.10"
+#define name_case_2_2_10 "Perform streamio I_PUSH - EIO WRERR."
+#define sref_case_2_2_10 sref_case_2_2
+#define desc_case_2_2_10 "\
+Checks that I_PUSH can be performed on a Stream.  Checks that EIO is\n\
+returned when an attempt is made to push a module on a Stream that has\n\
+received a write error."
+
+int
+test_case_2_2_10(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") == __RESULT_SUCCESS || last_errno != EIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_10 = { &preamble_2_3, &test_case_2_2_10, &postamble_2 };
+
+#define test_case_2_2_10_stream_0 (&test_2_2_10)
+#define test_case_2_2_10_stream_1 (NULL)
+#define test_case_2_2_10_stream_2 (NULL)
+
+#define tgrp_case_2_2_11 test_group_2
+#define numb_case_2_2_11 "2.2.11"
+#define name_case_2_2_11 "Perform streamio I_PUSH - EIO RDERR WRERR."
+#define sref_case_2_2_11 sref_case_2_2
+#define desc_case_2_2_11 "\
+Checks that I_PUSH can be performed on a Stream.  Checks that EIO is\n\
+returned when an attempt is made to push a module on a Stream that has\n\
+received a read and write error."
+
+int
+test_case_2_2_11(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") == __RESULT_SUCCESS || last_errno != EIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_11 = { &preamble_2_4, &test_case_2_2_11, &postamble_2 };
+
+#define test_case_2_2_11_stream_0 (&test_2_2_11)
+#define test_case_2_2_11_stream_1 (NULL)
+#define test_case_2_2_11_stream_2 (NULL)
+
+/* additional negative test cases required:
+ *
+ * EINVAL - fd is linked under a multiplexing driver.
+ * EBADF - fd is not a valid open file descriptor.
+ * ENOSTR - fd is not a Stream.
+ * EIO - fd refers to a Stream that is closing.
+ * EPIPE - fd refers to a Pipe and the other end of the pipe is closed.
+ * EINTR - a signal was received before the operation could complete.
+ */
+
 /*
- *  Perform IOCTL on one stream - I_POP
+ *  Perform IOCTL on one Stream - I_POP
  */
 static const char sref_case_2_3[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_POP section.";
 
@@ -2236,8 +2351,8 @@ static const char sref_case_2_3[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_3_1 "Perform streamio I_POP - EINVAL."
 #define sref_case_2_3_1 sref_case_2_3
 #define desc_case_2_3_1 "\
-Checks that I_POP can be performed on a STREAM.  Checks that EINVAL is\n\
-when I_POP is attempted on a STREAM with no module pushed."
+Checks that I_POP can be performed on a Stream.  Checks that EINVAL is\n\
+when I_POP is attempted on a Stream with no module pushed."
 
 int
 test_case_2_3_1(int child)
@@ -2257,7 +2372,7 @@ struct test_stream test_2_3_1 = { &preamble_0, &test_case_2_3_1, &postamble_0 };
 #define name_case_2_3_2 "Perform streamio I_POP."
 #define sref_case_2_3_2 sref_case_2_3
 #define desc_case_2_3_2 "\
-Checks that I_POP can be performed on a STREAM.  Checks that a\n\
+Checks that I_POP can be performed on a Stream.  Checks that a\n\
 module can be popped after being pushed."
 
 int
@@ -2280,7 +2395,7 @@ struct test_stream test_2_3_2 = { &preamble_0, &test_case_2_3_2, &postamble_0 };
 #define name_case_2_3_3 "Perform streamio I_POP - EINVAL."
 #define sref_case_2_3_3 sref_case_2_3
 #define desc_case_2_3_3 "\
-Checks that I_POP can be performed on a STREAM.  Checks that EINVAL is\n\
+Checks that I_POP can be performed on a Stream.  Checks that EINVAL is\n\
 returned when I_POP is peformed twice after a single I_PUSH."
 
 int
@@ -2305,8 +2420,8 @@ struct test_stream test_2_3_3 = { &preamble_0, &test_case_2_3_3, &postamble_0 };
 #define name_case_2_3_4 "Perform streamio I_POP - ENXIO."
 #define sref_case_2_3_4 sref_case_2_3
 #define desc_case_2_3_4 "\
-Checks that I_POP can be performed on a STREAM.  Checks that ENXIO is\n\
-returned when I_POP is peformed on a STREAM that is hung up."
+Checks that I_POP can be performed on a Stream.  Checks that ENXIO is\n\
+returned when I_POP is peformed on a Stream that is hung up."
 
 int
 test_case_2_3_4(int child)
@@ -2321,8 +2436,73 @@ struct test_stream test_2_3_4 = { &preamble_2_1, &test_case_2_3_4, &postamble_2 
 #define test_case_2_3_4_stream_1 (NULL)
 #define test_case_2_3_4_stream_2 (NULL)
 
+#define tgrp_case_2_3_5 test_group_2
+#define numb_case_2_3_5 "2.3.5"
+#define name_case_2_3_5 "Perform streamio I_POP - EIO RDERR."
+#define sref_case_2_3_5 sref_case_2_3
+#define desc_case_2_3_5 "\
+Checks that I_POP can be performed on a Stream.  Checks that EIO is\n\
+returned when I_POP is peformed on a Stream that has received a read\n\
+error."
+
+int
+test_case_2_3_5(int child)
+{
+	if (test_ioctl(child, I_POP, 0) == __RESULT_SUCCESS || last_errno != EIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_5 = { &preamble_2_2, &test_case_2_3_5, &postamble_2 };
+
+#define test_case_2_3_5_stream_0 (&test_2_3_5)
+#define test_case_2_3_5_stream_1 (NULL)
+#define test_case_2_3_5_stream_2 (NULL)
+
+#define tgrp_case_2_3_6 test_group_2
+#define numb_case_2_3_6 "2.3.6"
+#define name_case_2_3_6 "Perform streamio I_POP - EIO WRERR."
+#define sref_case_2_3_6 sref_case_2_3
+#define desc_case_2_3_6 "\
+Checks that I_POP can be performed on a Stream.  Checks that EIO is\n\
+returned when I_POP is peformed on a Stream that has received a write\n\
+error."
+
+int
+test_case_2_3_6(int child)
+{
+	if (test_ioctl(child, I_POP, 0) == __RESULT_SUCCESS || last_errno != EIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_6 = { &preamble_2_3, &test_case_2_3_6, &postamble_2 };
+
+#define test_case_2_3_6_stream_0 (&test_2_3_6)
+#define test_case_2_3_6_stream_1 (NULL)
+#define test_case_2_3_6_stream_2 (NULL)
+
+#define tgrp_case_2_3_7 test_group_2
+#define numb_case_2_3_7 "2.3.7"
+#define name_case_2_3_7 "Perform streamio I_POP - EIO RDERR WRERR."
+#define sref_case_2_3_7 sref_case_2_3
+#define desc_case_2_3_7 "\
+Checks that I_POP can be performed on a Stream.  Checks that EIO is\n\
+returned when I_POP is peformed on a Stream that has receive an error."
+
+int
+test_case_2_3_7(int child)
+{
+	if (test_ioctl(child, I_POP, 0) == __RESULT_SUCCESS || last_errno != EIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_7 = { &preamble_2_4, &test_case_2_3_7, &postamble_2 };
+
+#define test_case_2_3_7_stream_0 (&test_2_3_7)
+#define test_case_2_3_7_stream_1 (NULL)
+#define test_case_2_3_7_stream_2 (NULL)
+
 /*
- *  Perform IOCTL on one stream - I_LOOK
+ *  Perform IOCTL on one Stream - I_LOOK
  */
 static const char sref_case_2_4[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_LOOK section.";
 
@@ -2331,7 +2511,7 @@ static const char sref_case_2_4[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_4_1 "Perform streamio I_LOOK."
 #define sref_case_2_4_1 sref_case_2_4
 #define desc_case_2_4_1 "\
-Checks that I_LOOK can be performed on a stream."
+Checks that I_LOOK can be performed on a Stream."
 
 int
 test_case_2_4_1(int child)
@@ -2340,6 +2520,10 @@ test_case_2_4_1(int child)
 
 	if (test_ioctl(child, I_LOOK, (intptr_t) buf) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
+	state++;
+	if (strncmp("echo", buf, FMNAMESZ))
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_2_4_1 = { &preamble_0, &test_case_2_4_1, &postamble_0 };
@@ -2353,8 +2537,10 @@ struct test_stream test_2_4_1 = { &preamble_0, &test_case_2_4_1, &postamble_0 };
 #define name_case_2_4_2 "Perform streamio I_LOOK - EINVAL."
 #define sref_case_2_4_2 sref_case_2_4
 #define desc_case_2_4_2 "\
-Checks that I_LOOK can be performed on a stream.  The command should \n\
-fail with EINVAL if there is no module in the STREAM."
+Checks that I_LOOK can be performed on a Stream.  The command should \n\
+fail with EINVAL if there is no module in the Stream.  Unfortunately,\n\
+this is a behavior only of STREAMS-based pipes and FIFOs.  This test is\n\
+skipped here."
 
 int
 test_case_2_4_2(int child)
@@ -2367,8 +2553,35 @@ struct test_stream test_2_4_2 = { &preamble_0, &test_case_2_4_2, &postamble_0 };
 #define test_case_2_4_2_stream_1 (NULL)
 #define test_case_2_4_2_stream_2 (NULL)
 
+#define tgrp_case_2_4_3 test_group_2
+#define numb_case_2_4_3 "2.4.3"
+#define name_case_2_4_3 "Perform streamio I_LOOK."
+#define sref_case_2_4_3 sref_case_2_4
+#define desc_case_2_4_3 "\
+Checks that I_LOOK can be performed on a Stream.  Pushes a module and\n\
+then looks at it.  This test case should succeed."
+
+int
+test_case_2_4_3(int child)
+{
+	char buf[FMNAMESZ + 1];
+
+	if (test_ioctl(child, I_LOOK, (intptr_t) buf) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (strncmp("nullmod", buf, FMNAMESZ))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_3 = { &preamble_3, &test_case_2_4_3, &postamble_3 };
+
+#define test_case_2_4_3_stream_0 (&test_2_4_3)
+#define test_case_2_4_3_stream_1 (NULL)
+#define test_case_2_4_3_stream_2 (NULL)
+
 /*
- *  Perform IOCTL on one stream - I_FLUSH
+ *  Perform IOCTL on one Stream - I_FLUSH
  */
 static const char sref_case_2_5[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_FLUSH section.";
 
@@ -2417,7 +2630,7 @@ struct test_stream test_2_5_2 = { &preamble_0, &test_case_2_5_2, &postamble_0 };
 #define name_case_2_5_3 "Perform streamio I_FLUSH - FLUSHR."
 #define sref_case_2_5_3 sref_case_2_5
 #define desc_case_2_5_3 "\
-Checks that I_FLUSH can be performed on a STREAM with FLUSHR."
+Checks that I_FLUSH can be performed on a Stream with FLUSHR."
 
 int
 test_case_2_5_3(int child)
@@ -2437,7 +2650,7 @@ struct test_stream test_2_5_3 = { &preamble_0, &test_case_2_5_3, &postamble_0 };
 #define name_case_2_5_4 "Perform streamio I_FLUSH - FLUSHW."
 #define sref_case_2_5_4 sref_case_2_5
 #define desc_case_2_5_4 "\
-Checks that I_FLUSH can be performed on a STREAM with FLUSHW."
+Checks that I_FLUSH can be performed on a Stream with FLUSHW."
 
 int
 test_case_2_5_4(int child)
@@ -2457,7 +2670,7 @@ struct test_stream test_2_5_4 = { &preamble_0, &test_case_2_5_4, &postamble_0 };
 #define name_case_2_5_5 "Perform streamio I_FLUSH - FLUSHRW."
 #define sref_case_2_5_5 sref_case_2_5
 #define desc_case_2_5_5 "\
-Checks that I_FLUSH can be performed on a STREAM with FLUSHRW."
+Checks that I_FLUSH can be performed on a Stream with FLUSHRW."
 
 int
 test_case_2_5_5(int child)
@@ -2477,8 +2690,8 @@ struct test_stream test_2_5_5 = { &preamble_0, &test_case_2_5_5, &postamble_0 };
 #define name_case_2_5_6 "Perform streamio I_FLUSH - ENXIO."
 #define sref_case_2_5_6 sref_case_2_5
 #define desc_case_2_5_6 "\
-Checks that I_FLUSH can be performed on a STREAM.\n\
-This test is perfomed on a hung up STREAM and should return ENXIO."
+Checks that I_FLUSH can be performed on a Stream.\n\
+This test is perfomed on a hung up Stream and should return ENXIO."
 
 int
 test_case_2_5_6(int child)
@@ -2494,7 +2707,7 @@ struct test_stream test_2_5_6 = { &preamble_2_1, &test_case_2_5_6, &postamble_2 
 #define test_case_2_5_6_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_SRDOPT
+ *  Perform IOCTL on one Stream - I_SRDOPT
  */
 static const char sref_case_2_6[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_SRDOPT section.";
 
@@ -2503,7 +2716,7 @@ static const char sref_case_2_6[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_6_1 "Perform streamio I_SRDOPT - EINVAL."
 #define sref_case_2_6_1 sref_case_2_6
 #define desc_case_2_6_1 "\
-Checks that I_SRDOPT can be performed on a stream.  This case is performed with\n\
+Checks that I_SRDOPT can be performed on a Stream.  This case is performed with\n\
 and invalid argument (RMSGD|RMSGN) and should return EINVAL.  Note that zero (0)\n\
 is valid for compatibility with older versions that did not support protocol\n\
 options."
@@ -2527,7 +2740,7 @@ struct test_stream test_2_6_1 = { &preamble_0, &test_case_2_6_1, &postamble_0 };
 #define name_case_2_6_2 "Perform streamio I_SRDOPT - RNORM | RPROTNORM."
 #define sref_case_2_6_2 sref_case_2_6
 #define desc_case_2_6_2 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RNORM | RPROTNORM)."
 
 int
@@ -2549,7 +2762,7 @@ struct test_stream test_2_6_2 = { &preamble_0, &test_case_2_6_2, &postamble_0 };
 #define name_case_2_6_3 "Perform streamio I_SRDOPT - RNORM | RPROTDAT."
 #define sref_case_2_6_3 sref_case_2_6
 #define desc_case_2_6_3 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RNORM | RPROTDAT)."
 
 int
@@ -2571,7 +2784,7 @@ struct test_stream test_2_6_3 = { &preamble_0, &test_case_2_6_3, &postamble_0 };
 #define name_case_2_6_4 "Perform streamio I_SRDOPT - RNORM | RPROTDIS."
 #define sref_case_2_6_4 sref_case_2_6
 #define desc_case_2_6_4 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RNORM | RPROTDIS)."
 
 int
@@ -2593,7 +2806,7 @@ struct test_stream test_2_6_4 = { &preamble_0, &test_case_2_6_4, &postamble_0 };
 #define name_case_2_6_5 "Perform streamio I_SRDOPT - RMSGN | RPROTNORM."
 #define sref_case_2_6_5 sref_case_2_6
 #define desc_case_2_6_5 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RMSGN | RPROTNORM)."
 
 int
@@ -2615,7 +2828,7 @@ struct test_stream test_2_6_5 = { &preamble_0, &test_case_2_6_5, &postamble_0 };
 #define name_case_2_6_6 "Perform streamio I_SRDOPT - RMSGN | RPROTDAT."
 #define sref_case_2_6_6 sref_case_2_6
 #define desc_case_2_6_6 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RMSGN | RPROTDAT)."
 
 int
@@ -2637,7 +2850,7 @@ struct test_stream test_2_6_6 = { &preamble_0, &test_case_2_6_6, &postamble_0 };
 #define name_case_2_6_7 "Perform streamio I_SRDOPT - RMSGN | RPROTDIS."
 #define sref_case_2_6_7 sref_case_2_6
 #define desc_case_2_6_7 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RMSGN | RPROTDIS)."
 
 int
@@ -2659,7 +2872,7 @@ struct test_stream test_2_6_7 = { &preamble_0, &test_case_2_6_7, &postamble_0 };
 #define name_case_2_6_8 "Perform streamio I_SRDOPT - RMSGD | RPROTNORM."
 #define sref_case_2_6_8 sref_case_2_6
 #define desc_case_2_6_8 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RMSGD | RPROTNORM)."
 
 int
@@ -2681,7 +2894,7 @@ struct test_stream test_2_6_8 = { &preamble_0, &test_case_2_6_8, &postamble_0 };
 #define name_case_2_6_9 "Perform streamio I_SRDOPT - RMSGD | RPROTDAT."
 #define sref_case_2_6_9 sref_case_2_6
 #define desc_case_2_6_9 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RMSGD | RPROTDAT)."
 
 int
@@ -2703,7 +2916,7 @@ struct test_stream test_2_6_9 = { &preamble_0, &test_case_2_6_9, &postamble_0 };
 #define name_case_2_6_10 "Perform streamio I_SRDOPT - RMSGD | RPROTDIS."
 #define sref_case_2_6_10 sref_case_2_6
 #define desc_case_2_6_10 "\
-Checks that I_SRDOPT can be performed on a stream with the values \n\
+Checks that I_SRDOPT can be performed on a Stream with the values \n\
 (RMSGD | RPROTDIS)."
 
 int
@@ -2743,7 +2956,7 @@ struct test_stream test_2_6_11 = { &preamble_0, &test_case_2_6_11, &postamble_0 
 #define test_case_2_6_11_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GRDOPT
+ *  Perform IOCTL on one Stream - I_GRDOPT
  */
 static const char sref_case_2_7[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_GRDOPT section.";
 
@@ -2752,7 +2965,7 @@ static const char sref_case_2_7[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_7_1 "Perform streamio I_GRDOPT - default."
 #define sref_case_2_7_1 sref_case_2_7
 #define desc_case_2_7_1 "\
-Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
+Checks that I_GRDOPT can be performed on a Stream to read the Stream default\n\
 read options."
 
 int
@@ -2779,7 +2992,7 @@ struct test_stream test_2_7_1 = { &preamble_0, &test_case_2_7_1, &postamble_0 };
 #define name_case_2_7_2 "Perform streamio I_GRDOPT - set default."
 #define sref_case_2_7_2 sref_case_2_7
 #define desc_case_2_7_2 "\
-Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
+Checks that I_GRDOPT can be performed on a Stream to read the Stream default\n\
 options after they have been set with I_SRDOPT."
 
 int
@@ -2809,7 +3022,7 @@ struct test_stream test_2_7_2 = { &preamble_0, &test_case_2_7_2, &postamble_0 };
 #define name_case_2_7_3 "Perform streamio I_GRDOPT - RNORM | RPROTDAT."
 #define sref_case_2_7_3 sref_case_2_7
 #define desc_case_2_7_3 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RNORM | RPROTDAT) after they have been set with I_SRDOPT."
 
 int
@@ -2839,7 +3052,7 @@ struct test_stream test_2_7_3 = { &preamble_0, &test_case_2_7_3, &postamble_0 };
 #define name_case_2_7_4 "Perform streamio I_GRDOPT - RNORM | RPROTDIS."
 #define sref_case_2_7_4 sref_case_2_7
 #define desc_case_2_7_4 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RNORM | RPROTDIS) after they have been set with I_SRDOPT."
 
 int
@@ -2869,7 +3082,7 @@ struct test_stream test_2_7_4 = { &preamble_0, &test_case_2_7_4, &postamble_0 };
 #define name_case_2_7_5 "Perform streamio I_GRDOPT - RMSGD | RPROTNORM."
 #define sref_case_2_7_5 sref_case_2_7
 #define desc_case_2_7_5 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RMSGD | RPROTNORM) after they have been set with I_SRDOPT."
 
 int
@@ -2899,7 +3112,7 @@ struct test_stream test_2_7_5 = { &preamble_0, &test_case_2_7_5, &postamble_0 };
 #define name_case_2_7_6 "Perform streamio I_GRDOPT - RMSGD | RPROTDAT."
 #define sref_case_2_7_6 sref_case_2_7
 #define desc_case_2_7_6 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RMSGD | RPROTDAT) after they have been set with I_SRDOPT."
 
 int
@@ -2929,7 +3142,7 @@ struct test_stream test_2_7_6 = { &preamble_0, &test_case_2_7_6, &postamble_0 };
 #define name_case_2_7_7 "Perform streamio I_GRDOPT - RMSGD | RPROTDIS."
 #define sref_case_2_7_7 sref_case_2_7
 #define desc_case_2_7_7 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RMSGD | RPROTDIS) after they have been set with I_SRDOPT."
 
 int
@@ -2959,7 +3172,7 @@ struct test_stream test_2_7_7 = { &preamble_0, &test_case_2_7_7, &postamble_0 };
 #define name_case_2_7_8 "Perform streamio I_GRDOPT - RMSGN | RPROTNORM."
 #define sref_case_2_7_8 sref_case_2_7
 #define desc_case_2_7_8 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RMSGN | RPROTNORM) after they have been set with I_SRDOPT."
 
 int
@@ -2989,7 +3202,7 @@ struct test_stream test_2_7_8 = { &preamble_0, &test_case_2_7_8, &postamble_0 };
 #define name_case_2_7_9 "Perform streamio I_GRDOPT - RMSGN | RPROTDAT."
 #define sref_case_2_7_9 sref_case_2_7
 #define desc_case_2_7_9 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RMSGN | RPROTDAT) after they have been set with I_SRDOPT."
 
 int
@@ -3019,7 +3232,7 @@ struct test_stream test_2_7_9 = { &preamble_0, &test_case_2_7_9, &postamble_0 };
 #define name_case_2_7_10 "Perform streamio I_GRDOPT - RMSGN | RPROTDIS."
 #define sref_case_2_7_10 sref_case_2_7
 #define desc_case_2_7_10 "\
-Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+Checks that I_GRDOPT can be performed on a Stream to read the read options\n\
 (RMSGN | RPROTDIS) after they have been set with I_SRDOPT."
 
 int
@@ -3067,7 +3280,7 @@ struct test_stream test_2_7_11 = { &preamble_0, &test_case_2_7_11, &postamble_0 
 #define test_case_2_7_11_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_STR
+ *  Perform IOCTL on one Stream - I_STR
  */
 static const char sref_case_2_8[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_STR section.";
 
@@ -3097,7 +3310,7 @@ struct test_stream test_2_8_1 = { &preamble_0, &test_case_2_8_1, &postamble_0 };
 #define name_case_2_8_2 "Perform streamio I_STR - EINVAL."
 #define sref_case_2_8_2 sref_case_2_8
 #define desc_case_2_8_2 "\
-Checks that I_STR can be performed on a stream.  This case tests \n\
+Checks that I_STR can be performed on a Stream.  This case tests \n\
 ic_len less than zero, which should return EINVAL."
 
 int
@@ -3119,7 +3332,7 @@ struct test_stream test_2_8_2 = { &preamble_0, &test_case_2_8_2, &postamble_0 };
 #define name_case_2_8_3 "Perform streamio I_STR - EINVAL."
 #define sref_case_2_8_3 sref_case_2_8
 #define desc_case_2_8_3 "\
-Checks that I_STR can be performed on a stream.  This case tests \n\
+Checks that I_STR can be performed on a Stream.  This case tests \n\
 ic_len greater than streams.strmsgsz, which should return EINVAL."
 
 int
@@ -3141,7 +3354,7 @@ struct test_stream test_2_8_3 = { &preamble_0, &test_case_2_8_3, &postamble_0 };
 #define name_case_2_8_4 "Perform streamio I_STR - EINVAL."
 #define sref_case_2_8_4 sref_case_2_8
 #define desc_case_2_8_4 "\
-Checks that I_STR can be performed on a stream.  This case tests \n\
+Checks that I_STR can be performed on a Stream.  This case tests \n\
 ic_timout less than minus one (-1), which should return EINVAL."
 
 int
@@ -3163,7 +3376,7 @@ struct test_stream test_2_8_4 = { &preamble_0, &test_case_2_8_4, &postamble_0 };
 #define name_case_2_8_5 "Perform streamio I_STR."
 #define sref_case_2_8_5 sref_case_2_8
 #define desc_case_2_8_5 "\
-Checks that I_STR can be performed on a stream."
+Checks that I_STR can be performed on a Stream."
 
 int
 test_case_2_8_5(int child)
@@ -3180,7 +3393,7 @@ struct test_stream test_2_8_5 = { &preamble_0, &test_case_2_8_5, &postamble_0 };
 #define test_case_2_8_5_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_SETSIG
+ *  Perform IOCTL on one Stream - I_SETSIG
  */
 static const char sref_case_2_9[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_SETSIG section.";
 
@@ -3189,7 +3402,7 @@ static const char sref_case_2_9[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_9_1 "Perform streamio I_SETSIG - EINVAL."
 #define sref_case_2_9_1 sref_case_2_9
 #define desc_case_2_9_1 "\
-Checks that I_SETSIG can be performed on a stream. This test case uses \n\
+Checks that I_SETSIG can be performed on a Stream. This test case uses \n\
 a signal value of zero (0) that means deregistration and should return \n\
 [EINVAL] because we are not registered."
 
@@ -3211,7 +3424,7 @@ struct test_stream test_2_9_1 = { &preamble_0, &test_case_2_9_1, &postamble_0 };
 #define name_case_2_9_2 "Perform streamio I_SETSIG."
 #define sref_case_2_9_2 sref_case_2_9
 #define desc_case_2_9_2 "\
-Checks that I_SETSIG can be performed on a stream."
+Checks that I_SETSIG can be performed on a Stream."
 
 int
 test_case_2_9_2(int child)
@@ -3227,7 +3440,7 @@ struct test_stream test_2_9_2 = { &preamble_0, &test_case_2_9_2, &postamble_0 };
 #define test_case_2_9_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GETSIG
+ *  Perform IOCTL on one Stream - I_GETSIG
  */
 static const char sref_case_2_10[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_GETSIG section.";
 
@@ -3236,8 +3449,8 @@ static const char sref_case_2_10[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_10_1 "Perform streamio I_GETSIG - EINVAL."
 #define sref_case_2_10_1 sref_case_2_10
 #define desc_case_2_10_1 "\
-Checks that I_GETSIG can be performed on a stream.  This test attempts\n\
-I_GETSIG on a STREAM not registered for events.  This test should return\n\
+Checks that I_GETSIG can be performed on a Stream.  This test attempts\n\
+I_GETSIG on a Stream not registered for events.  This test should return\n\
 [EINVAL]."
 
 int
@@ -3300,7 +3513,7 @@ struct test_stream test_2_10_3 = { &preamble_0, &test_case_2_10_3, &postamble_0 
 #define test_case_2_10_3_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_FIND
+ *  Perform IOCTL on one Stream - I_FIND
  */
 static const char sref_case_2_11[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_FIND section.";
 
@@ -3309,7 +3522,7 @@ static const char sref_case_2_11[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_11_1 "Perform streamio I_FIND - false."
 #define sref_case_2_11_1 sref_case_2_11
 #define desc_case_2_11_1 "\
-Checks that I_FIND can be performed on a stream.  This test should\n\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
 return false (0) because it tests for a bogus module name."
 
 int
@@ -3330,7 +3543,7 @@ struct test_stream test_2_11_1 = { &preamble_0, &test_case_2_11_1, &postamble_0 
 #define name_case_2_11_2 "Perform streamio I_FIND - true."
 #define sref_case_2_11_2 sref_case_2_11
 #define desc_case_2_11_2 "\
-Checks that I_FIND can be performed on a stream.  This test should\n\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
 return true (1) as it tests for the driver name."
 
 int
@@ -3351,7 +3564,7 @@ struct test_stream test_2_11_2 = { &preamble_0, &test_case_2_11_2, &postamble_0 
 #define name_case_2_11_3 "Perform streamio I_FIND - EINVAL."
 #define sref_case_2_11_3 sref_case_2_11
 #define desc_case_2_11_3 "\
-Checks that I_FIND can be performed on a stream.  This test should\n\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
 return error [EINVAL] because the module name is too short."
 
 int
@@ -3372,7 +3585,7 @@ struct test_stream test_2_11_3 = { &preamble_0, &test_case_2_11_3, &postamble_0 
 #define name_case_2_11_4 "Perform streamio I_FIND - EINVAL."
 #define sref_case_2_11_4 sref_case_2_11
 #define desc_case_2_11_4 "\
-Checks that I_FIND can be performed on a stream.  This test should\n\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
 return error [EINVAL] because the module name is too long."
 
 int
@@ -3393,7 +3606,7 @@ struct test_stream test_2_11_4 = { &preamble_0, &test_case_2_11_4, &postamble_0 
 #define name_case_2_11_5 "Perform streamio I_FIND - true."
 #define sref_case_2_11_5 sref_case_2_11
 #define desc_case_2_11_5 "\
-Checks that I_FIND can be performed on a stream.  This test should\n\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
 return true (1) as it pushes and tests for the same module name."
 
 int
@@ -3412,7 +3625,7 @@ struct test_stream test_2_11_5 = { &preamble_0, &test_case_2_11_5, &postamble_0 
 #define test_case_2_11_5_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_LINK
+ *  Perform IOCTL on one Stream - I_LINK
  */
 static const char sref_case_2_12[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_LINK section.";
 
@@ -3421,7 +3634,7 @@ static const char sref_case_2_12[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_12_1 "Perform streamio I_LINK - EINVAL."
 #define sref_case_2_12_1 sref_case_2_12
 #define desc_case_2_12_1 "\
-Checks that I_LINK can be performed on a stream.\n\
+Checks that I_LINK can be performed on a Stream.\n\
 File descriptor does not support multiplexing."
 
 int
@@ -3442,8 +3655,8 @@ struct test_stream test_2_12_1 = { &preamble_0, &test_case_2_12_1, &postamble_0 
 #define name_case_2_12_2 "Perform streamio I_LINK - EINVAL."
 #define sref_case_2_12_2 sref_case_2_12
 #define desc_case_2_12_2 "\
-Checks that I_LINK can be performed on a stream.\n\
-File descriptor argument is not a stream."
+Checks that I_LINK can be performed on a Stream.\n\
+File descriptor argument is not a Stream."
 
 int
 test_case_2_12_2(int child)
@@ -3463,7 +3676,7 @@ struct test_stream test_2_12_2 = { &preamble_1, &test_case_2_12_2, &postamble_1 
 #define name_case_2_12_3 "Perform streamio I_LINK - EBADF."
 #define sref_case_2_12_3 sref_case_2_12
 #define desc_case_2_12_3 "\
-Checks that I_LINK can be performed on a stream.\n\
+Checks that I_LINK can be performed on a Stream.\n\
 File descriptor argument is not a valid, open file descriptor."
 
 int
@@ -3484,7 +3697,7 @@ struct test_stream test_2_12_3 = { &preamble_1, &test_case_2_12_3, &postamble_1 
 #define name_case_2_12_4 "Perform streamio I_LINK - ENXIO."
 #define sref_case_2_12_4 sref_case_2_12
 #define desc_case_2_12_4 "\
-Checks that I_LINK can be performed on a stream.\n\
+Checks that I_LINK can be performed on a Stream.\n\
 Hangup received on file descriptor."
 
 int
@@ -3505,7 +3718,7 @@ struct test_stream test_2_12_4 = { &preamble_2_1, &test_case_2_12_4, &postamble_
 #define name_case_2_12_5 "Perform streamio I_LINK."
 #define sref_case_2_12_5 sref_case_2_12
 #define desc_case_2_12_5 "\
-Checks that I_LINK can be performed on a stream."
+Checks that I_LINK can be performed on a Stream."
 
 int
 test_case_2_12_5(int child)
@@ -3523,7 +3736,7 @@ struct test_stream test_2_12_5 = { &preamble_0, &test_case_2_12_5, &postamble_0 
 #define name_case_2_12_6 "Perform streamio I_LINK."
 #define sref_case_2_12_6 sref_case_2_12
 #define desc_case_2_12_6 "\
-Checks that I_LINK can be performed on a stream."
+Checks that I_LINK can be performed on a Stream."
 
 int
 test_case_2_12_6(int child)
@@ -3541,7 +3754,7 @@ struct test_stream test_2_12_6 = { &preamble_0, &test_case_2_12_6, &postamble_0 
 #define name_case_2_12_7 "Perform streamio I_LINK."
 #define sref_case_2_12_7 sref_case_2_12
 #define desc_case_2_12_7 "\
-Checks that I_LINK can be performed on a stream."
+Checks that I_LINK can be performed on a Stream."
 
 int
 test_case_2_12_7(int child)
@@ -3559,7 +3772,7 @@ struct test_stream test_2_12_7 = { &preamble_0, &test_case_2_12_7, &postamble_0 
 #define name_case_2_12_8 "Perform streamio I_LINK."
 #define sref_case_2_12_8 sref_case_2_12
 #define desc_case_2_12_8 "\
-Checks that I_LINK can be performed on a stream."
+Checks that I_LINK can be performed on a Stream."
 
 int
 test_case_2_12_8(int child)
@@ -3577,7 +3790,7 @@ struct test_stream test_2_12_8 = { &preamble_0, &test_case_2_12_8, &postamble_0 
 #define name_case_2_12_9 "Perform streamio I_LINK."
 #define sref_case_2_12_9 sref_case_2_12
 #define desc_case_2_12_9 "\
-Checks that I_LINK can be performed on a stream."
+Checks that I_LINK can be performed on a Stream."
 
 int
 test_case_2_12_9(int child)
@@ -3591,7 +3804,7 @@ struct test_stream test_2_12_9 = { &preamble_0, &test_case_2_12_9, &postamble_0 
 #define test_case_2_12_9_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_UNLINK
+ *  Perform IOCTL on one Stream - I_UNLINK
  */
 static const char sref_case_2_13[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_UNLINK section.";
 
@@ -3600,7 +3813,7 @@ static const char sref_case_2_13[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_13_1 "Perform streamio I_UNLINK - EINVAL."
 #define sref_case_2_13_1 sref_case_2_13
 #define desc_case_2_13_1 "\
-Checks that I_UNLINK can be performed on a stream.  This test uses \n\
+Checks that I_UNLINK can be performed on a Stream.  This test uses \n\
 an invalid multiplexer identifier and should return EINVAL."
 
 int
@@ -3621,8 +3834,8 @@ struct test_stream test_2_13_1 = { &preamble_0, &test_case_2_13_1, &postamble_0 
 #define name_case_2_13_2 "Perform streamio I_UNLINK."
 #define sref_case_2_13_2 sref_case_2_13
 #define desc_case_2_13_2 "\
-Checks that I_UNLINK can be performed on a stream.  This tests uses \n\
-MUXID_ALL, but there are no STREAMS linked.  It should succeed."
+Checks that I_UNLINK can be performed on a Stream.  This tests uses \n\
+MUXID_ALL, but there are no Streams linked.  It should succeed."
 
 int
 test_case_2_13_2(int child)
@@ -3642,7 +3855,7 @@ struct test_stream test_2_13_2 = { &preamble_0, &test_case_2_13_2, &postamble_0 
 #define name_case_2_13_3 "Perform streamio I_UNLINK - ENXIO."
 #define sref_case_2_13_3 sref_case_2_13
 #define desc_case_2_13_3 "\
-Checks that I_UNLINK can be performed on a hung up STREAM.\n\
+Checks that I_UNLINK can be performed on a hung up Stream.\n\
 This test should return ENXIO."
 
 int
@@ -3663,7 +3876,7 @@ struct test_stream test_2_13_3 = { &preamble_2_1, &test_case_2_13_3, &postamble_
 #define name_case_2_13_4 "Perform streamio I_UNLINK."
 #define sref_case_2_13_4 sref_case_2_13
 #define desc_case_2_13_4 "\
-Checks that I_UNLINK can be performed on a stream."
+Checks that I_UNLINK can be performed on a Stream."
 
 int
 test_case_2_13_4(int child)
@@ -3677,7 +3890,7 @@ struct test_stream test_2_13_4 = { &preamble_0, &test_case_2_13_4, &postamble_0 
 #define test_case_2_13_4_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_RECVFD
+ *  Perform IOCTL on one Stream - I_RECVFD
  */
 static const char sref_case_2_14[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_RECVFD section.";
 
@@ -3686,7 +3899,7 @@ static const char sref_case_2_14[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_14_1 "Perform streamio I_RECVFD - EAGAIN."
 #define sref_case_2_14_1 sref_case_2_14
 #define desc_case_2_14_1 "\
-Checks that I_RECVFD can be performed on a stream."
+Checks that I_RECVFD can be performed on a Stream."
 
 int
 test_case_2_14_1(int child)
@@ -3708,7 +3921,7 @@ struct test_stream test_2_14_1 = { &preamble_0, &test_case_2_14_1, &postamble_0 
 #define name_case_2_14_2 "Perform streamio I_RECVFD - ENXIO."
 #define sref_case_2_14_2 sref_case_2_14
 #define desc_case_2_14_2 "\
-Checks that I_RECVFD can be performed on a stream."
+Checks that I_RECVFD can be performed on a Stream."
 
 int
 test_case_2_14_2(int child)
@@ -3726,7 +3939,7 @@ struct test_stream test_2_14_2 = { &preamble_2_1, &test_case_2_14_2, &postamble_
 #define test_case_2_14_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_PEEK
+ *  Perform IOCTL on one Stream - I_PEEK
  */
 static const char sref_case_2_15[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_PEEK section.";
 
@@ -3735,7 +3948,7 @@ static const char sref_case_2_15[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_15 "Perform streamio I_PEEK."
 #define sref_case_2_15 sref_case_2_15
 #define desc_case_2_15 "\
-Checks that I_PEEK can be performed on a stream."
+Checks that I_PEEK can be performed on a Stream."
 
 int
 test_case_2_15(int child)
@@ -3753,7 +3966,7 @@ struct test_stream test_2_15 = { &preamble_0, &test_case_2_15, &postamble_0 };
 #define test_case_2_15_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_FDINSERT
+ *  Perform IOCTL on one Stream - I_FDINSERT
  */
 static const char sref_case_2_16[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_FDINSERT section.";
 
@@ -3762,7 +3975,7 @@ static const char sref_case_2_16[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_16_1 "Perform streamio I_FDINSERT."
 #define sref_case_2_16_1 sref_case_2_16
 #define desc_case_2_16_1 "\
-Checks that I_FDINSERT can be performed on a stream."
+Checks that I_FDINSERT can be performed on a Stream."
 
 int
 test_case_2_16_1(int child)
@@ -3780,8 +3993,8 @@ struct test_stream test_2_16_1 = { &preamble_0, &test_case_2_16_1, &postamble_0 
 #define name_case_2_16_2 "Perform streamio I_FDINSERT - ENXIO."
 #define sref_case_2_16_2 sref_case_2_16
 #define desc_case_2_16_2 "\
-Checks that I_FDINSERT can be performed on a stream.\n\
-This tests attempts I_FDINSERT on a hung up STREAM and should return ENXIO."
+Checks that I_FDINSERT can be performed on a Stream.\n\
+This tests attempts I_FDINSERT on a hung up Stream and should return ENXIO."
 
 int
 test_case_2_16_2(int child)
@@ -3790,7 +4003,7 @@ test_case_2_16_2(int child)
 	struct strfdinsert fdi;
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
-	fdi.ctlbuf.buf = &buf;
+	fdi.ctlbuf.buf = buf;
 	fdi.databuf.maxlen = 0;
 	fdi.databuf.len = 0;
 	fdi.databuf.buf = NULL;
@@ -3808,7 +4021,7 @@ struct test_stream test_2_16_2 = { &preamble_2_1, &test_case_2_16_2, &postamble_
 #define test_case_2_16_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_SENDFD
+ *  Perform IOCTL on one Stream - I_SENDFD
  */
 static const char sref_case_2_17[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_SENDFD section.";
 
@@ -3817,7 +4030,7 @@ static const char sref_case_2_17[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_17_1 "Perform streamio I_SENDFD."
 #define sref_case_2_17_1 sref_case_2_17
 #define desc_case_2_17_1 "\
-Checks that I_SENDFD can be performed on a stream."
+Checks that I_SENDFD can be performed on a Stream."
 
 int
 test_case_2_17_1(int child)
@@ -3835,7 +4048,7 @@ struct test_stream test_2_17_1 = { &preamble_0, &test_case_2_17_1, &postamble_0 
 #define name_case_2_17_2 "Perform streamio I_SENDFD."
 #define sref_case_2_17_2 sref_case_2_17
 #define desc_case_2_17_2 "\
-Checks that I_SENDFD can be performed on a stream."
+Checks that I_SENDFD can be performed on a Stream."
 
 int
 test_case_2_17_2(int child)
@@ -3849,7 +4062,7 @@ struct test_stream test_2_17_2 = { &preamble_0, &test_case_2_17_2, &postamble_0 
 #define test_case_2_17_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_E_RECVFD
+ *  Perform IOCTL on one Stream - I_E_RECVFD
  */
 static const char sref_case_2_18[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_RECVFD section.";
 
@@ -3858,7 +4071,7 @@ static const char sref_case_2_18[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_18 "Perform streamio I_E_RECVFD."
 #define sref_case_2_18 sref_case_2_18
 #define desc_case_2_18 "\
-Checks that I_E_RECVFD can be performed on a stream."
+Checks that I_E_RECVFD can be performed on a Stream."
 
 int
 test_case_2_18(int child)
@@ -3872,7 +4085,7 @@ struct test_stream test_2_18 = { &preamble_0, &test_case_2_18, &postamble_0 };
 #define test_case_2_18_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_SWROPT
+ *  Perform IOCTL on one Stream - I_SWROPT
  */
 static const char sref_case_2_19[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_SWROPT section.";
 
@@ -3881,7 +4094,7 @@ static const char sref_case_2_19[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_19_1 "Perform streamio I_SWROPT - default."
 #define sref_case_2_19_1 sref_case_2_19
 #define desc_case_2_19_1 "\
-Checks that I_SWROPT can be performed on a stream."
+Checks that I_SWROPT can be performed on a Stream."
 
 int
 test_case_2_19_1(int child)
@@ -3902,7 +4115,7 @@ struct test_stream test_2_19_1 = { &preamble_0, &test_case_2_19_1, &postamble_0 
 #define name_case_2_19_2 "Perform streamio I_SWROPT - SNDZERO."
 #define sref_case_2_19_2 sref_case_2_19
 #define desc_case_2_19_2 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDZERO)."
 
 int
@@ -3924,7 +4137,7 @@ struct test_stream test_2_19_2 = { &preamble_0, &test_case_2_19_2, &postamble_0 
 #define name_case_2_19_3 "Perform streamio I_SWROPT - SNDPIPE."
 #define sref_case_2_19_3 sref_case_2_19
 #define desc_case_2_19_3 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDPIPE)."
 
 int
@@ -3946,7 +4159,7 @@ struct test_stream test_2_19_3 = { &preamble_0, &test_case_2_19_3, &postamble_0 
 #define name_case_2_19_4 "Perform streamio I_SWROPT - SNDHOLD."
 #define sref_case_2_19_4 sref_case_2_19
 #define desc_case_2_19_4 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDHOLD)."
 
 int
@@ -3968,7 +4181,7 @@ struct test_stream test_2_19_4 = { &preamble_0, &test_case_2_19_4, &postamble_0 
 #define name_case_2_19_5 "Perform streamio I_SWROPT - SNDZERO | SNDPIPE."
 #define sref_case_2_19_5 sref_case_2_19
 #define desc_case_2_19_5 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDZERO | SNDPIPE)."
 
 int
@@ -3990,7 +4203,7 @@ struct test_stream test_2_19_5 = { &preamble_0, &test_case_2_19_5, &postamble_0 
 #define name_case_2_19_6 "Perform streamio I_SWROPT - SNDZERO | SNDHOLD."
 #define sref_case_2_19_6 sref_case_2_19
 #define desc_case_2_19_6 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDZERO | SNDHOLD)."
 
 int
@@ -4012,7 +4225,7 @@ struct test_stream test_2_19_6 = { &preamble_0, &test_case_2_19_6, &postamble_0 
 #define name_case_2_19_7 "Perform streamio I_SWROPT - SNDPIPE | SNDHOLD."
 #define sref_case_2_19_7 sref_case_2_19
 #define desc_case_2_19_7 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDPIPE | SNDHOLD)."
 
 int
@@ -4034,7 +4247,7 @@ struct test_stream test_2_19_7 = { &preamble_0, &test_case_2_19_7, &postamble_0 
 #define name_case_2_19_8 "Perform streamio I_SWROPT - SNDZERO | SNDPIPE | SNDHOLD."
 #define sref_case_2_19_8 sref_case_2_19
 #define desc_case_2_19_8 "\
-Checks that I_SWROPT can be performed on a stream with write option values\n\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
 (SNDZERO | SNDPIPE | SNDHOLD)."
 
 int
@@ -4056,7 +4269,7 @@ struct test_stream test_2_19_8 = { &preamble_0, &test_case_2_19_8, &postamble_0 
 #define name_case_2_19_9 "Perform streamio I_SWROPT - EINVAL."
 #define sref_case_2_19_9 sref_case_2_19
 #define desc_case_2_19_9 "\
-Checks that I_SWROPT can be performed on a stream with an invalid argument\n\
+Checks that I_SWROPT can be performed on a Stream with an invalid argument\n\
 value, resulting in the return of EINVAL."
 
 int
@@ -4074,7 +4287,7 @@ struct test_stream test_2_19_9 = { &preamble_0, &test_case_2_19_9, &postamble_0 
 #define test_case_2_19_9_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GWROPT
+ *  Perform IOCTL on one Stream - I_GWROPT
  */
 static const char sref_case_2_20[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_GWROPT section.";
 
@@ -4083,8 +4296,8 @@ static const char sref_case_2_20[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_20_1 "Perform streamio I_GWROPT - default."
 #define sref_case_2_20_1 sref_case_2_20
 #define desc_case_2_20_1 "\
-Checks that I_GWROPT can be performed on a stream to read the stream default\n\
-options (SNDZERO for a regular STREAM)."
+Checks that I_GWROPT can be performed on a Stream to read the Stream default\n\
+options (SNDZERO for a regular Stream)."
 
 int
 test_case_2_20_1(int child)
@@ -4110,7 +4323,7 @@ struct test_stream test_2_20_1 = { &preamble_0, &test_case_2_20_1, &postamble_0 
 #define name_case_2_20_2 "Perform streamio I_GWROPT - default."
 #define sref_case_2_20_2 sref_case_2_20
 #define desc_case_2_20_2 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (0) after they have been set with I_SWROPT."
 
 int
@@ -4140,7 +4353,7 @@ struct test_stream test_2_20_2 = { &preamble_0, &test_case_2_20_2, &postamble_0 
 #define name_case_2_20_3 "Perform streamio I_GWROPT - SNDZERO."
 #define sref_case_2_20_3 sref_case_2_20
 #define desc_case_2_20_3 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDZERO) after they have been set with I_SWROPT."
 
 int
@@ -4170,7 +4383,7 @@ struct test_stream test_2_20_3 = { &preamble_0, &test_case_2_20_3, &postamble_0 
 #define name_case_2_20_4 "Perform streamio I_GWROPT - SNDPIPE."
 #define sref_case_2_20_4 sref_case_2_20
 #define desc_case_2_20_4 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDPIPE) after they have been set with I_SWROPT."
 
 int
@@ -4200,7 +4413,7 @@ struct test_stream test_2_20_4 = { &preamble_0, &test_case_2_20_4, &postamble_0 
 #define name_case_2_20_5 "Perform streamio I_GWROPT - SNDHOLD."
 #define sref_case_2_20_5 sref_case_2_20
 #define desc_case_2_20_5 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDHOLD) after they have been set with I_SWROPT."
 
 int
@@ -4230,7 +4443,7 @@ struct test_stream test_2_20_5 = { &preamble_0, &test_case_2_20_5, &postamble_0 
 #define name_case_2_20_6 "Perform streamio I_GWROPT - SNDZERO | SNDPIPE."
 #define sref_case_2_20_6 sref_case_2_20
 #define desc_case_2_20_6 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDZERO | SNDPIPE) after they have been set with I_SWROPT."
 
 int
@@ -4260,7 +4473,7 @@ struct test_stream test_2_20_6 = { &preamble_0, &test_case_2_20_6, &postamble_0 
 #define name_case_2_20_7 "Perform streamio I_GWROPT - SNDZERO | SNDHOLD."
 #define sref_case_2_20_7 sref_case_2_20
 #define desc_case_2_20_7 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDZERO | SNDHOLD) after they have been set with I_SWROPT."
 
 int
@@ -4290,7 +4503,7 @@ struct test_stream test_2_20_7 = { &preamble_0, &test_case_2_20_7, &postamble_0 
 #define name_case_2_20_8 "Perform streamio I_GWROPT - SNDPIPE | SNDHOLD."
 #define sref_case_2_20_8 sref_case_2_20
 #define desc_case_2_20_8 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDPIPE | SNDHOLD) after they have been set with I_SWROPT."
 
 int
@@ -4320,7 +4533,7 @@ struct test_stream test_2_20_8 = { &preamble_0, &test_case_2_20_8, &postamble_0 
 #define name_case_2_20_9 "Perform streamio I_GWROPT - SNDZERO | SNDPIPE | SNDHOLD."
 #define sref_case_2_20_9 sref_case_2_20
 #define desc_case_2_20_9 "\
-Checks that I_GWROPT can be performed on a stream to read the write options\n\
+Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 (SNDZERO | SNDPIPE | SNDHOLD) after they have been set with I_SWROPT."
 
 int
@@ -4368,7 +4581,7 @@ struct test_stream test_2_20_10 = { &preamble_0, &test_case_2_20_10, &postamble_
 #define test_case_2_20_10_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_LIST
+ *  Perform IOCTL on one Stream - I_LIST
  */
 static const char sref_case_2_21[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_LIST section.";
 
@@ -4377,7 +4590,7 @@ static const char sref_case_2_21[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_21 "Perform streamio I_LIST."
 #define sref_case_2_21 sref_case_2_21
 #define desc_case_2_21 "\
-Checks that I_LIST can be performed on a stream."
+Checks that I_LIST can be performed on a Stream."
 
 int
 test_case_2_21(int child)
@@ -4393,7 +4606,7 @@ struct test_stream test_2_21 = { &preamble_0, &test_case_2_21, &postamble_0 };
 #define test_case_2_21_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_PLINK
+ *  Perform IOCTL on one Stream - I_PLINK
  */
 static const char sref_case_2_22[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_PLINK section.";
 
@@ -4402,7 +4615,7 @@ static const char sref_case_2_22[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_22_1 "Perform streamio I_PLINK - EINVAL."
 #define sref_case_2_22_1 sref_case_2_22
 #define desc_case_2_22_1 "\
-Checks that I_PLINK can be performed on a stream.\n\
+Checks that I_PLINK can be performed on a Stream.\n\
 File descriptor does not support multiplexing."
 
 int
@@ -4423,8 +4636,8 @@ struct test_stream test_2_22_1 = { &preamble_0, &test_case_2_22_1, &postamble_0 
 #define name_case_2_22_2 "Perform streamio I_PLINK - EINVAL."
 #define sref_case_2_22_2 sref_case_2_22
 #define desc_case_2_22_2 "\
-Checks that I_PLINK can be performed on a stream.\n\
-File descriptor argument is not a stream."
+Checks that I_PLINK can be performed on a Stream.\n\
+File descriptor argument is not a Stream."
 
 int
 test_case_2_22_2(int child)
@@ -4444,7 +4657,7 @@ struct test_stream test_2_22_2 = { &preamble_1, &test_case_2_22_2, &postamble_1 
 #define name_case_2_22_3 "Perform streamio I_PLINK - EBADF."
 #define sref_case_2_22_3 sref_case_2_22
 #define desc_case_2_22_3 "\
-Checks that I_PLINK can be performed on a stream.\n\
+Checks that I_PLINK can be performed on a Stream.\n\
 File descriptor argument is not a valid, open file descriptor."
 
 int
@@ -4465,7 +4678,7 @@ struct test_stream test_2_22_3 = { &preamble_1, &test_case_2_22_3, &postamble_1 
 #define name_case_2_22_4 "Perform streamio I_PLINK - ENXIO."
 #define sref_case_2_22_4 sref_case_2_22
 #define desc_case_2_22_4 "\
-Checks that I_PLINK can be performed on a stream.\n\
+Checks that I_PLINK can be performed on a Stream.\n\
 Hangup received on file descriptor."
 
 int
@@ -4486,7 +4699,7 @@ struct test_stream test_2_22_4 = { &preamble_2_1, &test_case_2_22_4, &postamble_
 #define name_case_2_22_5 "Perform streamio I_PLINK."
 #define sref_case_2_22_5 sref_case_2_22
 #define desc_case_2_22_5 "\
-Checks that I_PLINK can be performed on a stream."
+Checks that I_PLINK can be performed on a Stream."
 
 int
 test_case_2_22_5(int child)
@@ -4504,7 +4717,7 @@ struct test_stream test_2_22_5 = { &preamble_0, &test_case_2_22_5, &postamble_0 
 #define name_case_2_22_6 "Perform streamio I_PLINK."
 #define sref_case_2_22_6 sref_case_2_22
 #define desc_case_2_22_6 "\
-Checks that I_PLINK can be performed on a stream."
+Checks that I_PLINK can be performed on a Stream."
 
 int
 test_case_2_22_6(int child)
@@ -4522,7 +4735,7 @@ struct test_stream test_2_22_6 = { &preamble_0, &test_case_2_22_6, &postamble_0 
 #define name_case_2_22_7 "Perform streamio I_PLINK."
 #define sref_case_2_22_7 sref_case_2_22
 #define desc_case_2_22_7 "\
-Checks that I_PLINK can be performed on a stream."
+Checks that I_PLINK can be performed on a Stream."
 
 int
 test_case_2_22_7(int child)
@@ -4540,7 +4753,7 @@ struct test_stream test_2_22_7 = { &preamble_0, &test_case_2_22_7, &postamble_0 
 #define name_case_2_22_8 "Perform streamio I_PLINK."
 #define sref_case_2_22_8 sref_case_2_22
 #define desc_case_2_22_8 "\
-Checks that I_PLINK can be performed on a stream."
+Checks that I_PLINK can be performed on a Stream."
 
 int
 test_case_2_22_8(int child)
@@ -4558,7 +4771,7 @@ struct test_stream test_2_22_8 = { &preamble_0, &test_case_2_22_8, &postamble_0 
 #define name_case_2_22_9 "Perform streamio I_PLINK."
 #define sref_case_2_22_9 sref_case_2_22
 #define desc_case_2_22_9 "\
-Checks that I_PLINK can be performed on a stream."
+Checks that I_PLINK can be performed on a Stream."
 
 int
 test_case_2_22_9(int child)
@@ -4572,7 +4785,7 @@ struct test_stream test_2_22_9 = { &preamble_0, &test_case_2_22_9, &postamble_0 
 #define test_case_2_22_9_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_PUNLINK
+ *  Perform IOCTL on one Stream - I_PUNLINK
  */
 static const char sref_case_2_23[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_PUNLINK section.";
 
@@ -4581,7 +4794,7 @@ static const char sref_case_2_23[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_23_1 "Perform streamio I_PUNLINK - EINVAL."
 #define sref_case_2_23_1 sref_case_2_23
 #define desc_case_2_23_1 "\
-Checks that I_PUNLINK can be performed on a stream.  This test uses \n\
+Checks that I_PUNLINK can be performed on a Stream.  This test uses \n\
 an invalid multiplexer identifier and should return EINVAL."
 
 int
@@ -4602,8 +4815,8 @@ struct test_stream test_2_23_1 = { &preamble_0, &test_case_2_23_1, &postamble_0 
 #define name_case_2_23_2 "Perform streamio I_PUNLINK."
 #define sref_case_2_23_2 sref_case_2_23
 #define desc_case_2_23_2 "\
-Checks that I_PUNLINK can be performed on a stream.  This tests uses \n\
-MUXID_ALL, but there are no STREAMS linked.  It should succeed."
+Checks that I_PUNLINK can be performed on a Stream.  This tests uses \n\
+MUXID_ALL, but there are no Streams linked.  It should succeed."
 
 int
 test_case_2_23_2(int child)
@@ -4623,7 +4836,7 @@ struct test_stream test_2_23_2 = { &preamble_0, &test_case_2_23_2, &postamble_0 
 #define name_case_2_23_3 "Perform streamio I_PUNLINK - ENXIO."
 #define sref_case_2_23_3 sref_case_2_23
 #define desc_case_2_23_3 "\
-Checks that I_PUNLINK can be performed on a hung up STREAM.\n\
+Checks that I_PUNLINK can be performed on a hung up Stream.\n\
 This test should return ENXIO."
 
 int
@@ -4644,7 +4857,7 @@ struct test_stream test_2_23_3 = { &preamble_2_1, &test_case_2_23_3, &postamble_
 #define name_case_2_23_4 "Perform streamio I_PUNLINK."
 #define sref_case_2_23_4 sref_case_2_23
 #define desc_case_2_23_4 "\
-Checks that I_PUNLINK can be performed on a stream."
+Checks that I_PUNLINK can be performed on a Stream."
 
 int
 test_case_2_23_4(int child)
@@ -4658,7 +4871,7 @@ struct test_stream test_2_23_4 = { &preamble_0, &test_case_2_23_4, &postamble_0 
 #define test_case_2_23_4_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_FLUSHBAND
+ *  Perform IOCTL on one Stream - I_FLUSHBAND
  */
 static const char sref_case_2_24[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_FLUSHBAND section.";
 
@@ -4865,7 +5078,7 @@ struct test_stream test_2_24_9 = { &preamble_0, &test_case_2_24_9, &postamble_0 
 #define sref_case_2_24_10 sref_case_2_24
 #define desc_case_2_24_10 "\
 Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
-This test is perfomed on a hung up STREAM and should return ENXIO."
+This test is perfomed on a hung up Stream and should return ENXIO."
 
 int
 test_case_2_24_10(int child)
@@ -4883,7 +5096,7 @@ struct test_stream test_2_24_10 = { &preamble_2_1, &test_case_2_24_10, &postambl
 #define test_case_2_24_10_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_CKBAND
+ *  Perform IOCTL on one Stream - I_CKBAND
  */
 static const char sref_case_2_25[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_CKBAND section.";
 
@@ -4892,7 +5105,7 @@ static const char sref_case_2_25[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_25 "Perform streamio I_CKBAND."
 #define sref_case_2_25 sref_case_2_25
 #define desc_case_2_25 "\
-Checks that I_CKBAND can be performed on a stream."
+Checks that I_CKBAND can be performed on a Stream."
 
 int
 test_case_2_25(int child)
@@ -4908,7 +5121,7 @@ struct test_stream test_2_25 = { &preamble_0, &test_case_2_25, &postamble_0 };
 #define test_case_2_25_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GETBAND
+ *  Perform IOCTL on one Stream - I_GETBAND
  */
 static const char sref_case_2_26[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_GETBAND section.";
 
@@ -4917,7 +5130,7 @@ static const char sref_case_2_26[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_26 "Perform streamio I_GETBAND ENODATA."
 #define sref_case_2_26 sref_case_2_26
 #define desc_case_2_26 "\
-Checks that I_GETBAND can be performed on a stream."
+Checks that I_GETBAND can be performed on a Stream."
 
 int
 test_case_2_26(int child)
@@ -4935,7 +5148,7 @@ struct test_stream test_2_26 = { &preamble_0, &test_case_2_26, &postamble_0 };
 #define test_case_2_26_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_ATMARK
+ *  Perform IOCTL on one Stream - I_ATMARK
  */
 static const char sref_case_2_27[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_ATMARK section.";
 
@@ -4944,7 +5157,7 @@ static const char sref_case_2_27[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_27 "Perform streamio I_ATMARK - false."
 #define sref_case_2_27 sref_case_2_27
 #define desc_case_2_27 "\
-Checks that I_ATMARK can be performed on a stream."
+Checks that I_ATMARK can be performed on a Stream."
 
 int
 test_case_2_27(int child)
@@ -4960,7 +5173,7 @@ struct test_stream test_2_27 = { &preamble_0, &test_case_2_27, &postamble_0 };
 #define test_case_2_27_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_SETCLTIME
+ *  Perform IOCTL on one Stream - I_SETCLTIME
  */
 static const char sref_case_2_28[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_SETCLTIME section.";
 
@@ -4969,7 +5182,7 @@ static const char sref_case_2_28[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_28_1 "Perform streamio I_SETCLTIME."
 #define sref_case_2_28_1 sref_case_2_28
 #define desc_case_2_28_1 "\
-Checks that I_SETCLTIME can be performed on a stream.\n\
+Checks that I_SETCLTIME can be performed on a Stream.\n\
 Checks that the close time can be set to zero."
 
 int
@@ -5009,7 +5222,7 @@ struct test_stream test_2_28_2 = { &preamble_0, &test_case_2_28_2, &postamble_0 
 #define test_case_2_28_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GETCLTIME
+ *  Perform IOCTL on one Stream - I_GETCLTIME
  */
 static const char sref_case_2_29[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_GETCLTIME section.";
 
@@ -5018,7 +5231,7 @@ static const char sref_case_2_29[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_29_1 "Perform streamio I_GETCLTIME - default."
 #define sref_case_2_29_1 sref_case_2_29
 #define desc_case_2_29_1 "\
-Checks that I_GETCLTIME can be performed on a stream.\n\
+Checks that I_GETCLTIME can be performed on a Stream.\n\
 Checks that the default close time is 15000 milliseconds (or 15 seconds)."
 
 int
@@ -5058,7 +5271,7 @@ struct test_stream test_2_29_2 = { &preamble_0, &test_case_2_29_2, &postamble_0 
 #define test_case_2_29_2_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_CANPUT
+ *  Perform IOCTL on one Stream - I_CANPUT
  */
 static const char sref_case_2_30[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_CANPUT section.";
 
@@ -5067,7 +5280,7 @@ static const char sref_case_2_30[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_30_1 "Perform streamio I_CANPUT."
 #define sref_case_2_30_1 sref_case_2_30
 #define desc_case_2_30_1 "\
-Checks that I_CANPUT can be performed on a stream for band 0."
+Checks that I_CANPUT can be performed on a Stream for band 0."
 
 int
 test_case_2_30_1(int child)
@@ -5087,7 +5300,7 @@ struct test_stream test_2_30_1 = { &preamble_0, &test_case_2_30_1, &postamble_0 
 #define name_case_2_30_2 "Perform streamio I_CANPUT."
 #define sref_case_2_30_2 sref_case_2_30
 #define desc_case_2_30_2 "\
-Checks that I_CANPUT can be performed on a stream for band 2."
+Checks that I_CANPUT can be performed on a Stream for band 2."
 
 int
 test_case_2_30_2(int child)
@@ -5107,7 +5320,7 @@ struct test_stream test_2_30_2 = { &preamble_0, &test_case_2_30_2, &postamble_0 
 #define name_case_2_30_3 "Perform streamio I_CANPUT EINVAL."
 #define sref_case_2_30_3 sref_case_2_30
 #define desc_case_2_30_3 "\
-Checks that I_CANPUT performed on a stream for an illegal band (256) will result\n\
+Checks that I_CANPUT performed on a Stream for an illegal band (256) will result\n\
 in an EINVAL error."
 
 int
@@ -5128,9 +5341,9 @@ struct test_stream test_2_30_3 = { &preamble_0, &test_case_2_30_3, &postamble_0 
 #define name_case_2_30_4 "Perform streamio I_CANPUT ANYBAND false."
 #define sref_case_2_30_4 sref_case_2_30
 #define desc_case_2_30_4 "\
-Checks that I_CANPUT can be performed on a stream for the special band ANYBAND.\n\
+Checks that I_CANPUT can be performed on a Stream for the special band ANYBAND.\n\
 Because there is not any writable non-zero band (no non-zero band exists on a \n\
-newly opened stream), the return value should be zero (0)."
+newly opened Stream), the return value should be zero (0)."
 
 int
 test_case_2_30_4(int child)
@@ -5146,14 +5359,14 @@ struct test_stream test_2_30_4 = { &preamble_0, &test_case_2_30_4, &postamble_0 
 #define test_case_2_30_4_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_SERROPT	(Solaris)
+ *  Perform IOCTL on one Stream - I_SERROPT	(Solaris)
  */
 #define tgrp_case_2_31_1 test_group_2
 #define numb_case_2_31_1 "2.31.1"
 #define name_case_2_31_1 "Perform streamio I_SERROPT - default."
 #define sref_case_2_31_1 sref_none
 #define desc_case_2_31_1 "\
-Checks that I_SERROPT can be performed on a stream with error option values\n\
+Checks that I_SERROPT can be performed on a Stream with error option values\n\
 (RERRNORM | WRERRNORM)."
 
 int
@@ -5174,7 +5387,7 @@ struct test_stream test_2_31_1 = { &preamble_0, &test_case_2_31_1, &postamble_0 
 #define name_case_2_31_2 "Perform streamio I_SERROPT - RERRNONPERSIST."
 #define sref_case_2_31_2 sref_none
 #define desc_case_2_31_2 "\
-Checks that I_SERROPT can be performed on a stream with error options values\n\
+Checks that I_SERROPT can be performed on a Stream with error options values\n\
 (RERRNONPERSIST | WRERRNORM)."
 
 int
@@ -5195,7 +5408,7 @@ struct test_stream test_2_31_2 = { &preamble_0, &test_case_2_31_2, &postamble_0 
 #define name_case_2_31_3 "Perform streamio I_SERROPT - WERRNONPERSIST."
 #define sref_case_2_31_3 sref_none
 #define desc_case_2_31_3 "\
-Checks that I_SERROPT can be performed on a stream with error options values\n\
+Checks that I_SERROPT can be performed on a Stream with error options values\n\
 (RERRNORM | WERRNONPERSIST)."
 
 int
@@ -5216,7 +5429,7 @@ struct test_stream test_2_31_3 = { &preamble_0, &test_case_2_31_3, &postamble_0 
 #define name_case_2_31_4 "Perform streamio I_SERROPT - RERRNONPERSIST | WERRNONPERSIST."
 #define sref_case_2_31_4 sref_none
 #define desc_case_2_31_4 "\
-Checks that I_SERROPT can be performed on a stream with error options values\n\
+Checks that I_SERROPT can be performed on a Stream with error options values\n\
 (RERRNONPERSIST | WERRNONPERSIST)."
 
 int
@@ -5237,7 +5450,7 @@ struct test_stream test_2_31_4 = { &preamble_0, &test_case_2_31_4, &postamble_0 
 #define name_case_2_31_5 "Perform streamio I_SERROPT - EINVAL."
 #define sref_case_2_31_5 sref_none
 #define desc_case_2_31_5 "\
-Checks that I_SERROPT can be performed on a stream with an invalid argument\n\
+Checks that I_SERROPT can be performed on a Stream with an invalid argument\n\
 value, resulting in the return of EINVAL."
 
 int
@@ -5254,14 +5467,14 @@ struct test_stream test_2_31_5 = { &preamble_0, &test_case_2_31_5, &postamble_0 
 #define test_case_2_31_5_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GERROPT	(Solaris)
+ *  Perform IOCTL on one Stream - I_GERROPT	(Solaris)
  */
 #define tgrp_case_2_32_1 test_group_2
 #define numb_case_2_32_1 "2.32.1"
 #define name_case_2_32_1 "Perform streamio I_GERROPT - default."
 #define sref_case_2_32_1 sref_none
 #define desc_case_2_32_1 "\
-Checks that I_GERROPT can be performed on a stream to read the stream default\n\
+Checks that I_GERROPT can be performed on a Stream to read the Stream default\n\
 error options."
 
 int
@@ -5288,7 +5501,7 @@ struct test_stream test_2_32_1 = { &preamble_0, &test_case_2_32_1, &postamble_0 
 #define name_case_2_32_2 "Perform streamio I_GERROPT - set to default."
 #define sref_case_2_32_2 sref_none
 #define desc_case_2_32_2 "\
-Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 (RERRNORM | WERRNORM) after they have been set with I_SERROPT."
 
 int
@@ -5318,7 +5531,7 @@ struct test_stream test_2_32_2 = { &preamble_0, &test_case_2_32_2, &postamble_0 
 #define name_case_2_32_3 "Perform streamio I_GERROPT - RERRNONPERSIST."
 #define sref_case_2_32_3 sref_none
 #define desc_case_2_32_3 "\
-Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 (RERRNONPERSIST | WERRNORM) after they have been set with I_SERROPT."
 
 int
@@ -5348,7 +5561,7 @@ struct test_stream test_2_32_3 = { &preamble_0, &test_case_2_32_3, &postamble_0 
 #define name_case_2_32_4 "Perform streamio I_GERROPT - WERRNONPERSIST."
 #define sref_case_2_32_4 sref_none
 #define desc_case_2_32_4 "\
-Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 (RERRNORM | WERRNONPERSIST) after they have been set with I_SERROPT."
 
 int
@@ -5378,7 +5591,7 @@ struct test_stream test_2_32_4 = { &preamble_0, &test_case_2_32_4, &postamble_0 
 #define name_case_2_32_5 "Perform streamio I_GERROPT - RERRNONPERSIST | WERRNONPERSIST."
 #define sref_case_2_32_5 sref_none
 #define desc_case_2_32_5 "\
-Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 (RERRNONPERSIST | WERRNONPERSIST) after they have been set with I_SERROPT."
 
 int
@@ -5425,14 +5638,14 @@ struct test_stream test_2_32_6 = { &preamble_0, &test_case_2_32_6, &postamble_0 
 #define test_case_2_32_6_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_ANCHOR	(Solaris)
+ *  Perform IOCTL on one Stream - I_ANCHOR	(Solaris)
  */
 #define tgrp_case_2_33 test_group_2
 #define numb_case_2_33 "2.33"
 #define name_case_2_33 "Perform streamio I_ANCHOR."
 #define sref_case_2_33 sref_none
 #define desc_case_2_33 "\
-Checks that I_ANCHOR can be performed on a stream."
+Checks that I_ANCHOR can be performed on a Stream."
 
 int
 test_case_2_33(int child)
@@ -5449,14 +5662,14 @@ struct test_stream test_2_33 = { &preamble_0, &test_case_2_33, &postamble_0 };
 
 #if 0
 /*
- *  Perform IOCTL on one stream - I_S_RECVFD	(UnixWare)
+ *  Perform IOCTL on one Stream - I_S_RECVFD	(UnixWare)
  */
 #define tgrp_case_2_34 test_group_2
 #define numb_case_2_34 "2.34"
 #define name_case_2_34 "Perform streamio I_S_RECVFD."
 #define sref_case_2_34 sref_none
 #define desc_case_2_34 "\
-Checks that I_S_RECVFD can be performed on a stream."
+Checks that I_S_RECVFD can be performed on a Stream."
 
 int
 test_case_2_34(int child)
@@ -5474,14 +5687,14 @@ struct test_stream test_2_34 = { &preamble_0, &test_case_2_34, &postamble_0 };
 #define test_case_2_34_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_STATS	(UnixWare)
+ *  Perform IOCTL on one Stream - I_STATS	(UnixWare)
  */
 #define tgrp_case_2_35 test_group_2
 #define numb_case_2_35 "2.35"
 #define name_case_2_35 "Perform streamio I_STATS."
 #define sref_case_2_35 sref_none
 #define desc_case_2_35 "\
-Checks that I_STATS can be performed on a stream."
+Checks that I_STATS can be performed on a Stream."
 
 int
 test_case_2_35(int child)
@@ -5495,14 +5708,14 @@ struct test_stream test_2_35 = { &preamble_0, &test_case_2_35, &postamble_0 };
 #define test_case_2_35_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_BIGPIPE	(UnixWare)
+ *  Perform IOCTL on one Stream - I_BIGPIPE	(UnixWare)
  */
 #define tgrp_case_2_36 test_group_2
 #define numb_case_2_36 "2.36"
 #define name_case_2_36 "Perform streamio I_BIGPIPE."
 #define sref_case_2_36 sref_none
 #define desc_case_2_36 "\
-Checks that I_BIGPIPE can be performed on a stream."
+Checks that I_BIGPIPE can be performed on a Stream."
 
 int
 test_case_2_36(int child)
@@ -5516,14 +5729,14 @@ struct test_stream test_2_36 = { &preamble_0, &test_case_2_36, &postamble_0 };
 #define test_case_2_36_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GETTP	(UnixWare)
+ *  Perform IOCTL on one Stream - I_GETTP	(UnixWare)
  */
 #define tgrp_case_2_37 test_group_2
 #define numb_case_2_37 "2.37"
 #define name_case_2_37 "Perform streamio I_GETTP."
 #define sref_case_2_37 sref_none
 #define desc_case_2_37 "\
-Checks that I_GETTP can be performed on a stream."
+Checks that I_GETTP can be performed on a Stream."
 
 int
 test_case_2_37(int child)
@@ -5537,14 +5750,14 @@ struct test_stream test_2_37 = { &preamble_0, &test_case_2_37, &postamble_0 };
 #define test_case_2_37_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_AUTOPUSH	(MacOT)
+ *  Perform IOCTL on one Stream - I_AUTOPUSH	(MacOT)
  */
 #define tgrp_case_2_38 test_group_2
 #define numb_case_2_38 "2.38"
 #define name_case_2_38 "Perform streamio I_AUTOPUSH."
 #define sref_case_2_38 sref_none
 #define desc_case_2_38 "\
-Checks that I_AUTOPUSH can be performed on a stream."
+Checks that I_AUTOPUSH can be performed on a Stream."
 
 int
 test_case_2_38(int child)
@@ -5558,14 +5771,14 @@ struct test_stream test_2_38 = { &preamble_0, &test_case_2_38, &postamble_0 };
 #define test_case_2_38_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_HEAP_REPORT	(MacOT)
+ *  Perform IOCTL on one Stream - I_HEAP_REPORT	(MacOT)
  */
 #define tgrp_case_2_39 test_group_2
 #define numb_case_2_39 "2.39"
 #define name_case_2_39 "Perform streamio I_HEAP_REPORT."
 #define sref_case_2_39 sref_none
 #define desc_case_2_39 "\
-Checks that I_HEAP_REPORT can be performed on a stream."
+Checks that I_HEAP_REPORT can be performed on a Stream."
 
 int
 test_case_2_39(int child)
@@ -5579,14 +5792,14 @@ struct test_stream test_2_39 = { &preamble_0, &test_case_2_39, &postamble_0 };
 #define test_case_2_39_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_FIFO	(MacOT)
+ *  Perform IOCTL on one Stream - I_FIFO	(MacOT)
  */
 #define tgrp_case_2_40 test_group_2
 #define numb_case_2_40 "2.40"
 #define name_case_2_40 "Perform streamio I_FIFO."
 #define sref_case_2_40 sref_none
 #define desc_case_2_40 "\
-Checks that I_FIFO can be performed on a stream."
+Checks that I_FIFO can be performed on a Stream."
 
 int
 test_case_2_40(int child)
@@ -5600,14 +5813,14 @@ struct test_stream test_2_40 = { &preamble_0, &test_case_2_40, &postamble_0 };
 #define test_case_2_40_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_PUTPMSG	(LiS)
+ *  Perform IOCTL on one Stream - I_PUTPMSG	(LiS)
  */
 #define tgrp_case_2_41 test_group_2
 #define numb_case_2_41 "2.41"
 #define name_case_2_41 "Perform streamio I_PUTPMSG."
 #define sref_case_2_41 sref_none
 #define desc_case_2_41 "\
-Checks that I_PUTPMSG can be performed on a stream."
+Checks that I_PUTPMSG can be performed on a Stream."
 
 int
 test_case_2_41(int child)
@@ -5621,14 +5834,14 @@ struct test_stream test_2_41 = { &preamble_0, &test_case_2_41, &postamble_0 };
 #define test_case_2_41_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_GETPMSG	(LiS)
+ *  Perform IOCTL on one Stream - I_GETPMSG	(LiS)
  */
 #define tgrp_case_2_42 test_group_2
 #define numb_case_2_42 "2.42"
 #define name_case_2_42 "Perform streamio I_GETPMSG."
 #define sref_case_2_42 sref_none
 #define desc_case_2_42 "\
-Checks that I_GETPMSG can be performed on a stream."
+Checks that I_GETPMSG can be performed on a Stream."
 
 int
 test_case_2_42(int child)
@@ -5642,14 +5855,14 @@ struct test_stream test_2_42 = { &preamble_0, &test_case_2_42, &postamble_0 };
 #define test_case_2_42_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_FATTACH	(LiS)
+ *  Perform IOCTL on one Stream - I_FATTACH	(LiS)
  */
 #define tgrp_case_2_43 test_group_2
 #define numb_case_2_43 "2.43"
 #define name_case_2_43 "Perform streamio I_FATTACH."
 #define sref_case_2_43 sref_none
 #define desc_case_2_43 "\
-Checks that I_FATTACH can be performed on a stream."
+Checks that I_FATTACH can be performed on a Stream."
 
 int
 test_case_2_43(int child)
@@ -5663,14 +5876,14 @@ struct test_stream test_2_43 = { &preamble_0, &test_case_2_43, &postamble_0 };
 #define test_case_2_43_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_FDETACH	(LiS)
+ *  Perform IOCTL on one Stream - I_FDETACH	(LiS)
  */
 #define tgrp_case_2_44 test_group_2
 #define numb_case_2_44 "2.44"
 #define name_case_2_44 "Perform streamio I_FDETACH."
 #define sref_case_2_44 sref_none
 #define desc_case_2_44 "\
-Checks that I_FDETACH can be performed on a stream."
+Checks that I_FDETACH can be performed on a Stream."
 
 int
 test_case_2_44(int child)
@@ -5684,14 +5897,14 @@ struct test_stream test_2_44 = { &preamble_0, &test_case_2_44, &postamble_0 };
 #define test_case_2_44_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one stream - I_PIPE	(LiS)
+ *  Perform IOCTL on one Stream - I_PIPE	(LiS)
  */
 #define tgrp_case_2_45 test_group_2
 #define numb_case_2_45 "2.45"
 #define name_case_2_45 "Perform streamio I_PIPE."
 #define sref_case_2_45 sref_none
 #define desc_case_2_45 "\
-Checks that I_PIPE can be performed on a stream."
+Checks that I_PIPE can be performed on a Stream."
 
 int
 test_case_2_45(int child)
@@ -6016,6 +6229,12 @@ struct test_case {
 	test_case_2_2_7_stream_0, test_case_2_2_7_stream_1, test_case_2_2_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_2_8, tgrp_case_2_2_8, name_case_2_2_8, desc_case_2_2_8, sref_case_2_2_8, {
 	test_case_2_2_8_stream_0, test_case_2_2_8_stream_1, test_case_2_2_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_9, tgrp_case_2_2_9, name_case_2_2_9, desc_case_2_2_9, sref_case_2_2_9, {
+	test_case_2_2_9_stream_0, test_case_2_2_9_stream_1, test_case_2_2_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_10, tgrp_case_2_2_10, name_case_2_2_10, desc_case_2_2_10, sref_case_2_2_10, {
+	test_case_2_2_10_stream_0, test_case_2_2_10_stream_1, test_case_2_2_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_11, tgrp_case_2_2_11, name_case_2_2_11, desc_case_2_2_11, sref_case_2_2_11, {
+	test_case_2_2_11_stream_0, test_case_2_2_11_stream_1, test_case_2_2_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, sref_case_2_3_1, {
 	test_case_2_3_1_stream_0, test_case_2_3_1_stream_1, test_case_2_3_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, sref_case_2_3_2, {
@@ -6024,10 +6243,18 @@ struct test_case {
 	test_case_2_3_3_stream_0, test_case_2_3_3_stream_1, test_case_2_3_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, sref_case_2_3_4, {
 	test_case_2_3_4_stream_0, test_case_2_3_4_stream_1, test_case_2_3_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_5, tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, sref_case_2_3_5, {
+	test_case_2_3_5_stream_0, test_case_2_3_5_stream_1, test_case_2_3_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_6, tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, sref_case_2_3_6, {
+	test_case_2_3_6_stream_0, test_case_2_3_6_stream_1, test_case_2_3_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_7, tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, sref_case_2_3_7, {
+	test_case_2_3_7_stream_0, test_case_2_3_7_stream_1, test_case_2_3_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, sref_case_2_4_1, {
 	test_case_2_4_1_stream_0, test_case_2_4_1_stream_1, test_case_2_4_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_4_2, tgrp_case_2_4_2, name_case_2_4_2, desc_case_2_4_2, sref_case_2_4_2, {
 	test_case_2_4_2_stream_0, test_case_2_4_2_stream_1, test_case_2_4_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_4_3, tgrp_case_2_4_3, name_case_2_4_3, desc_case_2_4_3, sref_case_2_4_3, {
+	test_case_2_4_3_stream_0, test_case_2_4_3_stream_1, test_case_2_4_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_5_1, tgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, sref_case_2_5_1, {
 	test_case_2_5_1_stream_0, test_case_2_5_1_stream_1, test_case_2_5_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_5_2, tgrp_case_2_5_2, name_case_2_5_2, desc_case_2_5_2, sref_case_2_5_2, {

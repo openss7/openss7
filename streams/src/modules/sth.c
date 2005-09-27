@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 03:15:56 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 10:04:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/27 03:15:56 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -472,7 +472,7 @@ pgrp_session(pid_t pgrp)
  *      %FWRITE		- perform write checks
  *      %FEXCL		- perform tty setting io checks
  *      %FCREAT		- perform open checks only
- *      %FTRUNC		- perform close checks only
+ *      %FTRUNC		- perform close checks only (no errors)
  *      %FNDELAY	- don't return -ESTRPIPE with FREAD or FWRITE
  *
  *      If no flags are set, simple io checks are performed.  Simple checks include I_PUSH, I_POP,
@@ -516,36 +516,46 @@ straccess(struct stdata *sd, const int access)
 #endif
 	register int flags = sd->sd_flag;
 
-	if (flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP)) {
-		if (!(access & (FCREAT|FTRUNC)) && (flags & STPLEX))
-			return (-EINVAL);
-		if (!(access & FTRUNC) && (flags & STRCLOSE)) {
+	/* no errors for close */
+	if (access & FTRUNC)
+		return (0);
+	if ((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP))) {
+		if (flags & STPLEX)
+			if (!(access & FCREAT))
+				return (-EINVAL);
+		if (flags & STRCLOSE) {
 			if (!(flags & STRISTTY))
 				return (-EIO);
 			return (-ENOTTY);
 		}
-		if ((access & FREAD) && (flags & STRDERR)) {
-			if (sd->sd_eropt & RERRNONPERSIST)
-				clear_bit(STRDERR_BIT, &sd->sd_flag);
-			return (-sd->sd_rerror);
-		}
-		if ((access & FWRITE) && (flags & STWRERR)) {
-			if (sd->sd_eropt & WERRNONPERSIST)
-				clear_bit(STWRERR_BIT, &sd->sd_flag);
-			if (sd->sd_wropt & SNDPIPE)
-				send_sig_info(SIGPIPE, (struct siginfo *) 1, current);
-			return (-sd->sd_werror);
-		}
-		/* POSIX: open(): "[EIO] The path argument names a STREAMS file and a hangup or
-		   error occured during the open()." */
-		if ((access & FCREAT) && (flags & (STRHUP | STRDERR | STWRERR)))
-			return (-EIO);
-		if (!(access & FTRUNC) && (flags & STRHUP)) {
+		if (flags & STRHUP) {
+			/* POSIX: open(): "[EIO] The path argument names a STREAMS file and a
+			   hangup or error occured during the open()." */
+			if (access & FCREAT)
+				return (-EIO);
 			if ((access & FWRITE) && !(flags & (STRISFIFO | STRISPIPE)))
 				return (-ENXIO);	/* for TTY's too? */
 			if ((access & (FREAD | FWRITE)))
 				goto estrpipe;
 			return (-ENXIO);
+		}
+		if (flags & STRDERR) {
+			if (access & FREAD) {
+				if (sd->sd_eropt & RERRNONPERSIST)
+					clear_bit(STRDERR_BIT, &sd->sd_flag);
+				return (-sd->sd_rerror);
+			}
+			return (-EIO);
+		}
+		if (flags & STWRERR) {
+			if (access & FWRITE) {
+				if (sd->sd_eropt & WERRNONPERSIST)
+					clear_bit(STWRERR_BIT, &sd->sd_flag);
+				if (sd->sd_wropt & SNDPIPE)
+					send_sig_info(SIGPIPE, (struct siginfo *) 1, current);
+				return (-sd->sd_werror);
+			}
+			return (-EIO);
 		}
 	}
 	if (!(access & (FREAD | FWRITE | FEXCL)))
@@ -2657,7 +2667,7 @@ strlastclose(struct stdata *sd, int oflag)
 STATIC loff_t
 strllseek(struct file *file, loff_t off, int whence)
 {
-	runqueues();
+	runqueues(); /* after every system call */
 	return (-ESPIPE);
 }
 
@@ -2691,8 +2701,6 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 			mask |= POLLOUT | POLLWRNORM;
 		if (bcanputnextany(sd->sd_wq))
 			mask |= POLLOUT | POLLWRBAND;
-		/* The above have no side effects that would require running the STREAMS scheduler, 
-		   so we do not do runqueues(). */
 	} else
 		mask = POLLERR;
 	return (mask);
@@ -2721,7 +2729,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 		ctrace(sd_put(&sd));
 	} else
 		mask = POLLERR;
-	runqueues();
+	runqueues(); /* after every system call */
 	return (mask);
 }
 
@@ -2733,7 +2741,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 STATIC int
 strmmap(struct file *file, struct vm_area_struct *vma)
 {
-	runqueues();
+	runqueues(); /* after every system call */
 	return (-ENODEV);
 }
 
@@ -2965,6 +2973,7 @@ stropen(struct inode *inode, struct file *file)
       put_error:
 	ctrace(sd_put(&sd));
       error:
+	runqueues(); /* after every system call */
 	return ((err < 0) ? err : -err);
       up_error:
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
@@ -3129,6 +3138,7 @@ strclose(struct inode *inode, struct file *file)
 		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 		up(&inode->i_sem);
 	}
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -3163,7 +3173,7 @@ strfasync(int fd, struct file *file, int on)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
-	runqueues();
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -3528,7 +3538,7 @@ _strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
-	runqueues();
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -3757,8 +3767,7 @@ _strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
-	/* We want to give the driver queues an opportunity to run. */
-	runqueues();
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -3906,6 +3915,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 			err = sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
 		ctrace(sd_put(&sd));
 	}
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -4016,7 +4026,7 @@ _strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int ban
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
-	runqueues();
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -4301,7 +4311,7 @@ _strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ba
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
-	runqueues();
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -5510,7 +5520,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 		do {
 			struct linkblk *l;
 
-			/* FTRUNC ignores STPLEX, STRCLOSE, STRDERR, STWRERR */
+			/* FTRUNC ignores all access errors */
 			if ((err = strwaitopen(sd, FTRUNC)))
 				goto wait_error;
 			swunlock(sd);
@@ -5518,7 +5528,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 			/* protected by STWOPEN bit */
 			l = sd->sd_linkblk;
 
-			/* no locks held -- FTRUNC ignores STPLEX, STRCLOSE, STRDERR, STWRERR */
+			/* no locks held -- FTRUNC ignores all access errors */
 			if ((err = strdoioctl_link(file, mux, l, cmd, FTRUNC)))
 				goto ioctl_error;
 
@@ -5833,11 +5843,8 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
  *  [EIO]	the stream has closed or is closing
  *  [ENXIO]	the stream is hung up
  *  [EPIPE]	the other end of a pipe has closed
- *  [ERESTARTSYS]	a signal was received before the operation could begin
  *  [EINTR]	a signal was received before the operation could complete
- *  [ETIME]	operation timed out
- *  [EAGAIN]	operation would block and stream is opened for non-blocking operation
- *  [ENOSR]	the maximum module push limit has been reached
+ *  [EINVAL]	the maximum module push limit has been reached (LiS does ENOSR here)
  *
  *  Also, any error returned by the module's qi_qopen procedure can also be returned.
  */
@@ -5876,6 +5883,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 				sd->sd_file = file;	/* always before open */
 
 				if (!(err = qattach(sd, fmod, &dev, oflag, MODOPEN, crp))) {
+					bool wasctty = (test_bit(STRISTTY_BIT, &sd->sd_flag) != 0);
 
 					/* Modules not supposed to change dev! connld(4) maybe on
 					   open(), never on %I_PUSH. */
@@ -5883,10 +5891,17 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 
 					sd->sd_pushcnt++;
 
-					/* TODO: MG says that if the %STRISTTY flag is set at this
-					   point to make the stream a controlling terminal (i.e.
-					   redirect standard input, output and error here). */
-
+					if (!wasctty && test_bit(STRISTTY_BIT, &sd->sd_flag)) {
+						/* TODO: MG says that if the %STRISTTY flag is set
+						   at this point (that is, STRISTTY was set by the
+						   module using M_SETOPTS) to make the stream a
+						   controlling terminal (i.e.  redirect standard
+						   input, output and error here). */
+						/* This is also where sd_session and sd_pgrp
+						   members are initialized to appropriate values */
+						sd->sd_session = task_session(current);
+						sd->sd_pgrp = task_pgrp(current);
+					}
 				} else {
 					/* POSIX says ENXIO on module open function failure. (And
 					   in effect, this is all that modules should return as an
@@ -5898,7 +5913,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 				}
 			} else {
 				ptrace(("Error path taken!\n"));
-				err = -ENOSR;
+				err = -EINVAL;
 			}
 			strwakeopen(sd);
 		} else {
@@ -5987,9 +6002,9 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	struct stdata *s2;
 	int err;
 
-	if (!(err = straccess_rlock(sd, (FWRITE | FNDELAY)))) {
+	if (!(err = straccess_rlock(sd, FEXCL))) {
 		if (!(s2 = sd->sd_other)) {
-			if (!(err = straccess_rlock(s2, (FWRITE | FNDELAY)))) {
+			if (!(err = straccess_rlock(s2, FEXCL))) {
 				if ((f2 = fget(arg))) {
 					queue_t *q = s2->sd_rq;
 
@@ -6056,7 +6071,7 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		queue_t *q = sd->sd_rq;
 		mblk_t *mp = NULL;
 
-		if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
+		if (!(err = straccess_rlock(sd, FEXCL))) {
 			mblk_t *b;
 			unsigned long pl;
 
@@ -6812,8 +6827,6 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		swunlock(sd);
 	else if (locking & FREAD)
 		srunlock(sd);
-	if (likely(err == 0))
-		runqueues();	/* after every (successful) system call */
 	return (err);
 }
 
@@ -6830,8 +6843,11 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			err = strioctl(file, cmd, arg);
 		else
 			err = sd->sd_directio->ioctl(file, cmd, arg);
+		if (likely(err >= 0))
+			runqueues();	/* after every (successful) system call */
 		ctrace(sd_put(&sd));
 	}
+	runqueues(); /* after every system call */
 	return (err);
 }
 
@@ -7152,7 +7168,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 			set_bit(STRISTTY_BIT, &sd->sd_flag);
 			/* FIXME: Do we have to do more here? This bit indicates that this Stream
 			   is a controlling tty.  Do we need to figure out the process group of the 
-			   user and set sd->sd_pgrp? */
+			   user and set sd->sd_pgrp?  (Done by I_PUSH, see str_i_push().) */
 		}
 		if (so->so_flags & SO_ISNTTY)
 			clear_bit(STRISTTY_BIT, &sd->sd_flag);

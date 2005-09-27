@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/26 10:08:39 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 10:04:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/26 10:08:39 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:14 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/09/26 10:08:39 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:14 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2047,7 +2047,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (unlikely(nmp->b_band)) {
 			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
-			// nmp->b_bandp = qb;
 			enable = ((q->q_first == emp)
 				  || test_bit(QWANTR_BIT, &q->q_flag)
 				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
@@ -2229,7 +2228,6 @@ __putbq(queue_t *q, mblk_t *mp)
 		      hipri:
 			if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
-			// mp->b_bandp = NULL;
 		      banded:
 			if (q->q_last == b_prev)
 				q->q_last = mp;
@@ -2257,7 +2255,6 @@ __putbq(queue_t *q, mblk_t *mp)
 			if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
 				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 					++q->q_blocked;
-			// mp->b_bandp = bget(qb);
 			goto banded;
 		}
 	} else {
@@ -2491,7 +2488,6 @@ __putq(queue_t *q, mblk_t *mp)
 	      hipri:
 		if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 			set_bit(QFULL_BIT, &q->q_flag);
-		// mp->b_bandp = NULL;
 	      banded:
 		if (q->q_last == b_prev)
 			q->q_last = mp;
@@ -2539,7 +2535,6 @@ __putq(queue_t *q, mblk_t *mp)
 		if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
 			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 				++q->q_blocked;
-		// mp->b_bandp = bget(qb);
 		goto banded;
 	}
 }

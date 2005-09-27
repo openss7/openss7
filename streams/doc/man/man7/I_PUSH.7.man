@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_PUSH.7.man,v 0.9.2.1 2005/08/29 10:00:28 brian Exp $
+.\" @(#) $Id: I_PUSH.7.man,v 0.9.2.2 2005/09/27 10:04:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:00:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/09/27 10:04:12 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_PUSH.7.man,v $
+.\" Revision 0.9.2.2  2005/09/27 10:04:12  brian
+.\" - more test cases, runqueues bug
+.\"
 .\" Revision 0.9.2.1  2005/08/29 10:00:28  brian
 .\" - added manpages
 .\"
@@ -112,11 +115,44 @@ to an appropriate error number.
 .\"
 .SH ERRORS
 .PP
-When
-.B ioctl()
-fails, it returns -1 and sets
+When the
+.B I_PUSH
+.BR ioctl (2)
+command fails, it returns minus one
+.RB ( -1 )
+and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EINVAL ]
+The module name pointed to by
+.I arg
+is too short (zero length), too long (greater than
+.BR FMNAMESZ ),
+does not refer to a
+.I STREAMS
+module on the system, and could not be demand loaded,
+or the module push count
+.B NSTRPUSH
+has been exceeded for the Stream associated with
+.IR fd .
+.TP
+.RB [ EFAULT ]
+.I arg
+describes a string that extends outside the caller's address space.
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to stream that has received a hangup.
+.TP
+.RB [ ENXIO ]
+The
+.B open
+procedure of the pushed module returned an error.
+.PP
+In general, any
+.BR ioctl (2)
+command can fail if:
 .TP \w'[EWOULDBLOCK]\(em'u
 .RB [ EFAULT ]
 .I arg
@@ -237,6 +273,10 @@ calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR close (2),
@@ -276,68 +316,139 @@ is compatible with
 .[
 svr42
 .]
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.IR LiS ,
-.[
-LiS
-.]
+and implementations based on
+.IR "SVR 4.2" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.B Linux Fast-STREAMS
-supports the
-.B RFILL
-read mode.  This read mode is
-.IR AIX \(rg
+.I POSIX
 .[
-aixcpc
-%O "Differences Between Portable Streams Environment and V.4 STREAMS"
+susv3
 .]
-specific.
-.IP \(em
-.B Linux Fast-STREAMS
-provides ioctls that are used to implement this system call.
-.IP \(em
-.B Linux Fast-STREAMS
-recognizes some
-.IR Solaris \(rg-specific
-and
-.IR LiS -specific
-IO control numbers for compatibility.
-.IP \(em
-.IR AIX \(rg
+does not document the
+.RB [ EFAULT ]
+error case.
+.IP ""
+.IR AIX \(rg,
+.[
+aixdoc
+.]
 .IR HP-UX \(rg,
-and
-.IR UnixWare \(rg
-document that, when command is
-.BR I_SETCLTIME ,
-.I arg
-is a pointer to an integer timeout value.
-.IR Solaris \(rg
-documents that, when command is
-.BR I_SETCLTIME ,
-.I arg
-is a long timeout value.
-.I LiS
-follows
-.IR Solaris \(rg.
-.B SUSv2
 .[
-susv2
+hpuxdoc
 .]
-documents that, when command is
-.BR I_SETCLTIME ,
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+document the
+.RB [ EFAULT ]
+error case.
+.IP ""
+Portable
+.I STREAMS
+applications will recognize the
+.RB [ EFAULT ]
+error as indicating that
 .I arg
-is a pointer to an integer timeout value.
-.IR Solaris \(rg
-can be seen in
-.BR strace (8)
-output to pass a pointer instead of a value.  This means that
-.IR Solaris \(rg
-documentation is erroneous, and
+points to a string that extends outside the callers address space.
+.IP \(em
+.I POSIX
+.[
+susv3
+.]
+does not document the situation that occurs when
+.B I_PUSH
+is used to attempt to exceed the maximum push count.
+.IP ""
 .I LiS
-implementation is wrong.
+.[
+lis
+.]
+returns
+.RB [ ENOSR ]
+when the maximum push count is exceeded, however, in the latest
+.I LiS
+releases, the default maximum push count is unlimited and there is no mechanism to set the maximum
+push count.
+.IP ""
+.IR OpenSolaris \(rg
+returns
+.RB [ EINVAL ]
+when the maximum push count is exceeded.  So does
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+The purpose of limiting the maximum push count
+.B NSTRPUSH
+was to keep programs that automatically push modules from running amok an swallowing all system
+resources.
+The
+.I LiS
+approach (no limit) is unacceptable.
+In effect, to satisfy the purpose, any error would do.  The
+.B POSIX
+.[
+susv3
+.]
+choices are
+.RB [ EINVAL ]
+and
+.RB [ ENXIO ].
+.IP ""
+Portable
+.I STREAMS
+applications programs that push modules will take exceptional action whenever an
+.RB [ EINVAL ],
+.RB [ ENXIO ],
+or unknown error is returned.  Such exceptional action should not include attempting to push the
+same (or additional) modules.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+also documents the error
+.RB [ ENOLOAD ]
+when a loadable kernel module failed to load for the module.
+.IP ""
+Although we could return
+.RB [ ENOPKG ]
+in this case, we do not.  The
+.I POSIX
+conforming
+.RB [ EINVAL ]
+is returned indicating that a
+.I STREAMS
+module corresponding to the name specified by
+.I arg
+is not loaded on the system.
+.IP \(em
+.B I_PUSH
+will return whatever error code that the module returned when an module
+.B open
+procedure fails.
+.I POSIX
+.[
+susv3
+.]
+indicates that this should only be
+.RB [ ENXIO ].
+.IP ""
+Portable
+.I STREAMS
+modules will only return
+.RB [ ENXIO ]
+when their
+.B open
+procedures fail.
+.PP
+For general
+.BR ioctl (2)
+compatibility, see
+.BR streamio (7).
 .\"
 .\"
 .SH CONFORMANCE
