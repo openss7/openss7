@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 23:34:25 $ by $Author: brian $
+ Last Modified $Date: 2005/09/28 08:27:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1073,7 +1073,7 @@ strsignal_locked(struct stdata *sd, mblk_t *mp, unsigned long *plp)
  *  @q: stream head read queue
  *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
  *  @band: band from which to retrieve message
- *  @flagsp: pointer to save irq flags.
+ *  @plp: pointer to save irq flags.
  *
  *  LOCKING: This function must be called with the Stream head read locked and the Stream frozen.
  *
@@ -1281,6 +1281,12 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 		return (mp);
 
 	/* only here it there's nothing left on the queue */
+
+	/* check hangup blocking criteria */
+	if ((err = straccess_slow(sd, FREAD)))
+		return ERR_PTR(err);
+
+	/* check nodelay */
 	if ((f_flags & FNDELAY))
 		return ERR_PTR(-EAGAIN);
 
@@ -1291,6 +1297,115 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 			return ERR_PTR(err);
 
 	return strwaitgetq(sd, q, flags, band, plp);
+}
+
+/**
+ *  strgetfp: - get a file pointer from a stream
+ *  @sd: stream head
+ *  @q: stream head read queue
+ *  @plp: pointer to save irq flags.
+ *
+ *  LOCKING: This function must be called with the Stream head read locked and the Stream frozen.
+ *
+ *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
+ *  another (or search the queue and use rmvq()) without races with other procedures acting on the
+ *  queue.  Also there needs to be atomicity between setting or clearing the STRPRI bit and placing
+ *  or removing an M_PCPROTO from the queue.  The write lock acheives that atomicity too.  Perhaps
+ *  we should not even use the STRPRI bit, because we could always check
+ *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
+ *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
+ */
+STATIC inline mblk_t *
+strgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
+{
+	mblk_t *b = NULL;
+
+	/* like a mini service procedure */
+	while ((b = q->q_first)) {
+		switch (b->b_datap->db_type) {
+		case M_SIG:
+		{
+			int err;
+
+			rmvq(q, b);
+			if (strsignal_locked(sd, b, plp)) {
+				/* release and reacquire locks, recheck access */
+				if ((err = straccess_slow(sd, FREAD))) {
+					b = ERR_PTR(err);
+					break;
+				}
+			}
+			continue;
+		}
+		case M_PASSFP:
+			break;
+		default:
+		case M_PCPROTO:
+		case M_PROTO:
+		case M_DATA:
+			return ERR_PTR(-EBADMSG);
+		}
+		rmvq(q, b);
+		break;
+	}
+	return (b);
+}
+
+STATIC streams_fastcall mblk_t *
+strgetfp_slow(struct stdata *sd, queue_t *q, unsigned long *plp)
+{
+	return strgetfp(sd, q, plp);
+}
+
+STATIC mblk_t *
+strwaitgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
+{
+	DECLARE_WAITQUEUE(wait, current);
+	mblk_t *mp;
+	int err;
+
+	add_wait_queue(&sd->sd_waitq, &wait);
+	for (;;) {
+		set_current_state(TASK_INTERRUPTIBLE);
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
+		if ((err = straccess_slow(sd, FREAD))) {
+			mp = ERR_PTR(err);
+			break;
+		}
+		if ((mp = strgetfp_slow(sd, q, plp)))
+			break;
+		zwunlock(sd, *plp);
+		srunlock(sd);
+		schedule();
+		srlock(sd); /* Note access checked above. */
+		*plp = zwlock(sd);
+	}
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&sd->sd_waitq, &wait);
+	return (mp);
+}
+
+STATIC inline mblk_t *
+strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags, unsigned long *plp)
+{
+	mblk_t *mp;
+	int err;
+
+	/* maybe we get lucky... */
+	if ((mp = strgetfp(sd, q, plp)))
+		return (mp);
+
+	/* only here if there is nothing left on the queue */
+
+	/* check hangup blocking criteria */
+	if ((err = straccess_slow(sd, FREAD)))
+		return ERR_PTR(err);
+
+	/* check nodelay */
+	if ((f_flags & FNDELAY))
+		return ERR_PTR(-EAGAIN);
+
+	return strwaitgetfp(sd, q, plp);
 }
 
 /**
@@ -1436,9 +1551,9 @@ strwakeopen_swunlock(struct stdata *sd)
 
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
-	if (!(detached = strdetached(sd)))
-		if (waitqueue_active(&sd->sd_waitq))
-			wake_up_interruptible(&sd->sd_waitq);
+	if (!(detached = strdetached(sd))
+	    && waitqueue_active(&sd->sd_waitq))
+		wake_up_interruptible(&sd->sd_waitq);
 	swunlock(sd);
 	if (detached)
 		strlastclose(sd, 0);
@@ -1459,17 +1574,39 @@ strwakeopen(struct stdata *sd)
 STATIC inline streams_fastcall void
 strwakeread(struct stdata *sd)
 {
-	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
-		if (waitqueue_active(&sd->sd_waitq))
-			wake_up_interruptible(&sd->sd_waitq);
+	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag)
+	    && waitqueue_active(&sd->sd_waitq))
+		wake_up_interruptible(&sd->sd_waitq);
 }
 
 STATIC inline streams_fastcall void
 strwakewrite(struct stdata *sd)
 {
+	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag)
+	    && waitqueue_active(&sd->sd_waitq))
+		wake_up_interruptible(&sd->sd_waitq);
+}
+
+STATIC inline streams_fastcall void
+strwakeiocwait(struct stdata *sd)
+{
+	if (test_bit(IOCWAIT_BIT, &sd->sd_flag)
+	    && waitqueue_active(&sd->sd_waitq))
+		wake_up_interruptible(&sd->sd_waitq);
+}
+
+STATIC inline streams_fastcall void
+strwakeall(struct stdata *sd)
+{
+	bool wake = false;
+	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
+		wake = true;
 	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag))
-		if (waitqueue_active(&sd->sd_waitq))
-			wake_up_interruptible(&sd->sd_waitq);
+		wake = true;
+	if (test_bit(IOCWAIT_BIT, &sd->sd_flag))
+		wake = true;
+	if (wake && waitqueue_active(&sd->sd_waitq))
+		wake_up_interruptible(&sd->sd_waitq);
 }
 
 /**
@@ -4138,7 +4275,7 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 	}
 	dat.len = -1;
 
-	if (!(err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
+	if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
 		mblk_t *chp = NULL, *dhp = NULL;
 		unsigned long pl;
 
@@ -4848,6 +4985,8 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @arg: ioctl argument
  *
  *  Rarely used, can be slow.
+ *
+ *  ACCESS: Don't care about STRHUP, STRDERR or STWRERR.
  */
 STATIC int
 str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
@@ -4866,7 +5005,7 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-EINVAL);
 	}
 
-	if (!(err = straccess_rlock(sd, 0))) {
+	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		for (wq = sd->sd_wq; wq; wq = SAMESTR(wq) ? wq->q_next : NULL)
 			if (!strncmp(wq->q_qinfo->qi_minfo->mi_idname, name, FMNAMESZ))
 				err = 1;
@@ -5050,6 +5189,8 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @arg: ioctl argument
  *
  *  POSIX says that if the stream is not registered for any signals to return EINVAL to %I_GETSIG.
+ *
+ *  ACCESS: Ignore STRHUP, STRDERR, STWRERR.
  */
 STATIC int
 str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
@@ -5062,7 +5203,7 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-EFAULT);
 	}
 	ptrace(("**** Access ok!\n"));
-	if (!(err = straccess_rlock(sd, 0))) {
+	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		struct strevent *se;
 
 		if ((se = __strevent_find(sd)))
@@ -5085,6 +5226,10 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @arg: ioctl argument
  *
  *  LOCKING: This function takes a STREAM head write lock to protect the sd_siglist member.
+ *
+ *  ACCESS: No errors on STRHUP, STRDERR, STWRERR, just STPLEX and STRCLOSE (i.e. FAPPEND is set).
+ *  %I_SETSIG only affects the calling process, thus controlling terminal restrictions do not apply
+ *  (i.e. FEXCL is not set).
  */
 STATIC int
 str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
@@ -5094,7 +5239,7 @@ str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 	if ((arg & ~S_ALL))
 		return (-EINVAL);
 
-	if (!(err = straccess_wlock(sd, FEXCL))) {
+	if (!(err = straccess_wlock(sd, FAPPEND))) {
 		/* quick check */
 		if (arg || (sd->sd_sigflags & S_ALL))
 			err = __strevent_register(file, sd, arg);
@@ -5281,6 +5426,9 @@ extern struct fmodsw sth_fmod;
  *  reads, writes and ioctls to either STREAM will succeed (except for %I_(P)UNLINK, %I_PUSH and
  *  %I_POP, that will also block).  A multi-threaded close will fail to dismantle either STREAM and
  *  we can check for dismantle conditions after the linking has succeeded or failed.
+ *
+ *  ACCESS: Errors on STRHUP, STRDERR, STWRERR, STPLEX, STRCLOSE, also if controlling tty and
+ *  attempted from a background process.
  */
 STATIC int
 str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, const unsigned int cmd)
@@ -5304,7 +5452,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	if (unlikely(!(l = alloclk())))
 		goto error;
 
-	if ((err = strwaitopen(mux, 0)))
+	if ((err = strwaitopen(mux, (FREAD | FWRITE | FEXCL | FNDELAY))))
 		goto free_error;
 
 	err = -EBADF;
@@ -5312,7 +5460,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 		goto unlock_error;
 
 	err = -EINVAL;
-	if (!f->f_op || f->f_op->release != &strclose) /* not a stream */
+	if (!f->f_op || f->f_op->release != &strclose)	/* not a stream */
 		goto fput_error;
 	if (!(sd = stri_acquire(f)) || (sd == mux))
 		goto fput_error;
@@ -5359,7 +5507,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	}
 	strwakeopen(mux);
 
-	ctrace(sd_put(&sd));		/* could be last put */
+	ctrace(sd_put(&sd));	/* could be last put */
 	fput(f);
 	if (err < 0)
 		freelk(l);
@@ -5506,12 +5654,13 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 {
 	struct stdata *sd, **sdp;
 	int err;
+	const int access = (FREAD | FWRITE | FEXCL | FNDELAY);
 
 	err = -EINVAL;
 	if (mux->sd_flag & (STRISFIFO | STRISPIPE))
 		goto error;
 
-	if ((err = strwaitopen(mux, 0)))
+	if ((err = strwaitopen(mux, access)))
 		goto error;
 
 	sdp = (cmd == I_UNLINK) ? &mux->sd_links : &mux->sd_cdevsw->d_plinks;
@@ -5529,7 +5678,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 		do {
 			struct linkblk *l;
 
-			/* FTRUNC ignores all access errors */
+			/* no errors for unlinked Stream */
 			if ((err = strwaitopen(sd, FTRUNC)))
 				goto wait_error;
 			swunlock(sd);
@@ -5537,8 +5686,8 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 			/* protected by STWOPEN bit */
 			l = sd->sd_linkblk;
 
-			/* no locks held -- FTRUNC ignores all access errors */
-			if ((err = strdoioctl_link(file, mux, l, cmd, FTRUNC)))
+			/* no locks held */
+			if ((err = strdoioctl_link(file, mux, l, cmd, access)))
 				goto ioctl_error;
 
 			/* protected by STWOPEN bit */
@@ -5660,7 +5809,7 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 		sm = kmem_alloc(smlist_size, KM_SLEEP);
 	}
 
-	if (!(err = straccess_rlock(sd, 0))) {
+	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		struct queue *q;
 		size_t size = 0;
 		int i = 0;
@@ -6011,9 +6160,9 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	struct stdata *s2;
 	int err;
 
-	if (!(err = straccess_rlock(sd, FEXCL))) {
+	if (!(err = straccess_rlock(sd, (FWRITE | FEXCL | FNDELAY)))) {
 		if (!(s2 = sd->sd_other)) {
-			if (!(err = straccess_rlock(s2, FEXCL))) {
+			if (!(err = straccess_rlock(s2, (FREAD | FEXCL | FNDELAY)))) {
 				if ((f2 = fget(arg))) {
 					queue_t *q = s2->sd_rq;
 
@@ -6056,13 +6205,10 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of current open stream
  *  @arg: ioctl argument, a pointer to a &struct strrecvfd structure
  *
- *  NOTICES: Calling getq() and later calling putbq() is maybe not a good idea.  We have to think
- *  about another process calling getq in the mean time, and, of course getting the wrong message,
- *  or heaven forbid, no message.  So what we want to do is peek the queue for the right type of
- *  message with the queue locked and then remove the right message or unlock the queue.
- *
- *  LOCKING: We write lock the queue to protect the atomicity of the STRPRI bit and the getq() and
- *  putbq() operations.
+ *  NOTICES: POSIX (and UnixWare) says to return ENXIO if the Stream is hung up, but we don't
+ *  initially.  We will attempt to read the queue while STRHUP is set.  Once the queue is empty and
+ *  the Stream is hung up, strtestgetfp() will return -ESTRPIPE that we convert into ENXIO.  This is
+ *  consistent with read() and getpmsg() behavior and makes sense here.
  */
 STATIC inline streams_fastcall int
 str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
@@ -6080,24 +6226,17 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		queue_t *q = sd->sd_rq;
 		mblk_t *mp = NULL;
 
-		if (!(err = straccess_rlock(sd, FEXCL))) {
-			mblk_t *b;
+		if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
 			unsigned long pl;
 
 			/* protect atomicity of STRPRI bit, getq() and putbq() operations */
 			pl = zwlock(sd);
-			if ((b = q->q_first)) {
-				if (b->b_datap->db_type == M_PASSFP) {
-					rmvq(q, b);
-					mp = b;
-				} else
-					err = -EBADMSG;
-			} else
-				err = -EAGAIN;
+			if (IS_ERR(mp = strtestgetfp(sd, q, file->f_flags, &pl)))
+				err = PTR_ERR(mp);
 			zwunlock(sd, pl);
 			srunlock(sd);
 		}
-		if (mp) {
+		if (!err) {
 			struct strrecvfd sr;
 			struct file *f2;
 
@@ -6117,8 +6256,12 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 				putbq(q, mp);
 			}
 		}
-		if (err)
+		if (err) {
+			/* only when we can't block because of hang up */
+			if (err == -ESTRPIPE)
+				err = -ENXIO;	/* that's what POSIX says */
 			put_unused_fd(fd);
+		}
 	}
 	return (err);
 }
@@ -6176,7 +6319,7 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
  *  fails.  For these cases, %I_STR shall fail with errno(3) set to the value in the message.
  */
 STATIC int
-str_i_str(const struct file *file, struct stdata *sd, unsigned long arg, int access)
+str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strioctl ic;
 	int err, rval;
@@ -6185,7 +6328,7 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg, int acc
 		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
-	if ((rval = err = strdoioctl_str(sd, &ic, access, 1)) < 0) {
+	if ((rval = err = strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1)) < 0) {
 		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
@@ -6375,7 +6518,7 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long
 
 STATIC int
 str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg,
-	      size_t len, int access)
+      size_t len, int access)
 {
 	if (len == TRANSPARENT && _IOC_SIZE(cmd) != 0)
 		len = _IOC_SIZE(cmd);
@@ -6523,7 +6666,7 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			return str_i_srdopt(file, sd, arg);
 		case _IOC_NR(I_STR):
 			printd(("%s: got I_STR\n", __FUNCTION__));
-			return str_i_str(file, sd, arg, access);
+			return str_i_str(file, sd, arg);
 		case _IOC_NR(I_SWROPT):
 			printd(("%s: got I_SWROPT\n", __FUNCTION__));
 			return str_i_swropt(file, sd, arg);
@@ -6992,8 +7135,7 @@ strwsrv(queue_t *q)
 
 	assert(sd);
 
-	if (waitqueue_active(&sd->sd_waitq))
-		wake_up_interruptible(&sd->sd_waitq);
+	strwakewrite(sd);
 	return (0);
 }
 
@@ -7294,6 +7436,8 @@ str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 		clear_bit(STWRERR_BIT, &sd->sd_flag);
 		sd->sd_werror = NOERROR;
 	}
+	/* only interruptible and only if IOCWAIT bit set */
+	strwakeiocwait(sd);
 	/* send a flush if required */
 	if (what) {
 		strevent(sd, S_ERROR, 0);
@@ -7333,8 +7477,7 @@ str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   closed (which is why the M_HANGUP was sent), then the STREAM head is supposed to be
 	   unmounted, and if it is not opened, closed. */
 	if (!test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
-		strwakeread(sd);
-		strwakewrite(sd);
+		strwakeall(sd); /* only interruptible */
 		strevent(sd, S_HANGUP, 0);
 		/* If we are a control terminal, we are supposed to send SIGHUP to the session
 		   leader.  The terminal controller (ldterm) should not send us an M_HANGUP message 

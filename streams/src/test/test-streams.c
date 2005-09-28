@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/09/27 23:34:25 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/09/28 08:27:03 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 23:34:25 $ by $Author: brian $
+ Last Modified $Date: 2005/09/28 08:27:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.28  2005/09/28 08:27:03  brian
+ - more HUP and ERR test cases
+
+ Revision 0.9.2.27  2005/09/28 05:57:01  brian
+ - additional STRHUP, STRDERR and STWRERR test cases
+
  Revision 0.9.2.26  2005/09/27 23:34:25  brian
  - added test cases, tweaked straccess()
 
@@ -149,9 +155,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/09/27 23:34:25 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/09/28 08:27:03 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/09/27 23:34:25 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/09/28 08:27:03 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -3527,6 +3533,117 @@ struct test_stream test_2_7_11 = { &preamble_0, &test_case_2_7_11, &postamble_0 
 #define test_case_2_7_11_stream_1 (NULL)
 #define test_case_2_7_11_stream_2 (NULL)
 
+#define tgrp_case_2_7_12 test_group_2
+#define numb_case_2_7_12 "2.7.12"
+#define name_case_2_7_12 "Perform streamio I_GRDOPT."
+#define sref_case_2_7_12 sref_case_2_7
+#define desc_case_2_7_12 "\
+Checks that I_GRDOPT can be performed on a Stream.  This test checks\n\
+that the call is successful regardless of whether the Stream is hung\n\
+up."
+
+int
+test_case_2_7_12(int child)
+{
+	int rdopts = -1;
+
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_7_12 = { &preamble_2_1, &test_case_2_7_12, &postamble_2 };
+
+#define test_case_2_7_12_stream_0 (&test_2_7_12)
+#define test_case_2_7_12_stream_1 (NULL)
+#define test_case_2_7_12_stream_2 (NULL)
+
+#define tgrp_case_2_7_13 test_group_2
+#define numb_case_2_7_13 "2.7.13"
+#define name_case_2_7_13 "Perform streamio I_GRDOPT."
+#define sref_case_2_7_13 sref_case_2_7
+#define desc_case_2_7_13 "\
+Checks that I_GRDOPT can be performed on a Stream.  This test checks\n\
+that the call is successful regardless of whether the Stream is in read\n\
+error."
+
+int
+test_case_2_7_13(int child)
+{
+	int rdopts = -1;
+
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_7_13 = { &preamble_2_2, &test_case_2_7_13, &postamble_2 };
+
+#define test_case_2_7_13_stream_0 (&test_2_7_13)
+#define test_case_2_7_13_stream_1 (NULL)
+#define test_case_2_7_13_stream_2 (NULL)
+
+#define tgrp_case_2_7_14 test_group_2
+#define numb_case_2_7_14 "2.7.14"
+#define name_case_2_7_14 "Perform streamio I_GRDOPT."
+#define sref_case_2_7_14 sref_case_2_7
+#define desc_case_2_7_14 "\
+Checks that I_GRDOPT can be performed on a Stream.  This test checks\n\
+that the call is successful regardless of whether the Stream is in write\n\
+error."
+
+int
+test_case_2_7_14(int child)
+{
+	int rdopts = -1;
+
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_7_14 = { &preamble_2_3, &test_case_2_7_14, &postamble_2 };
+
+#define test_case_2_7_14_stream_0 (&test_2_7_14)
+#define test_case_2_7_14_stream_1 (NULL)
+#define test_case_2_7_14_stream_2 (NULL)
+
+#define tgrp_case_2_7_15 test_group_2
+#define numb_case_2_7_15 "2.7.15"
+#define name_case_2_7_15 "Perform streamio I_GRDOPT."
+#define sref_case_2_7_15 sref_case_2_7
+#define desc_case_2_7_15 "\
+Checks that I_GRDOPT can be performed on a Stream.  This test checks\n\
+that the call is successful regardless of whether the Stream is in error."
+
+int
+test_case_2_7_15(int child)
+{
+	int rdopts = -1;
+
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_7_15 = { &preamble_2_4, &test_case_2_7_15, &postamble_2 };
+
+#define test_case_2_7_15_stream_0 (&test_2_7_15)
+#define test_case_2_7_15_stream_1 (NULL)
+#define test_case_2_7_15_stream_2 (NULL)
+
 /*
  *  Perform IOCTL on one Stream - I_STR
  */
@@ -3640,6 +3757,94 @@ struct test_stream test_2_8_5 = { &preamble_0, &test_case_2_8_5, &postamble_0 };
 #define test_case_2_8_5_stream_1 (NULL)
 #define test_case_2_8_5_stream_2 (NULL)
 
+#define tgrp_case_2_8_6 test_group_2
+#define numb_case_2_8_6 "2.8.6"
+#define name_case_2_8_6 "Perform streamio I_STR - ENXIO."
+#define sref_case_2_8_6 sref_case_2_8
+#define desc_case_2_8_6 "\
+Checks that I_STR can be performed on a Stream.  Check that ENXIO is\n\
+returned when I_STR is attempted on a Stream that has hung up."
+
+int
+test_case_2_8_6(int child)
+{
+	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_8_6 = { &preamble_2_1, &test_case_2_8_6, &postamble_2 };
+
+#define test_case_2_8_6_stream_0 (&test_2_8_6)
+#define test_case_2_8_6_stream_1 (NULL)
+#define test_case_2_8_6_stream_2 (NULL)
+
+#define tgrp_case_2_8_7 test_group_2
+#define numb_case_2_8_7 "2.8.7"
+#define name_case_2_8_7 "Perform streamio I_STR - EPROTO."
+#define sref_case_2_8_7 sref_case_2_8
+#define desc_case_2_8_7 "\
+Checks that I_STR can be performed on a Stream.  Check that EPROTO is\n\
+returned when I_STR is attempted on a Stream that has a read error."
+
+int
+test_case_2_8_7(int child)
+{
+	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_8_7 = { &preamble_2_2, &test_case_2_8_7, &postamble_2 };
+
+#define test_case_2_8_7_stream_0 (&test_2_8_7)
+#define test_case_2_8_7_stream_1 (NULL)
+#define test_case_2_8_7_stream_2 (NULL)
+
+#define tgrp_case_2_8_8 test_group_2
+#define numb_case_2_8_8 "2.8.8"
+#define name_case_2_8_8 "Perform streamio I_STR - EPROTO."
+#define sref_case_2_8_8 sref_case_2_8
+#define desc_case_2_8_8 "\
+Checks that I_STR can be performed on a Stream.  Check that EPROTO is\n\
+returned when I_STR is attempted on a Stream that has a write error."
+
+int
+test_case_2_8_8(int child)
+{
+	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_8_8 = { &preamble_2_3, &test_case_2_8_8, &postamble_2 };
+
+#define test_case_2_8_8_stream_0 (&test_2_8_8)
+#define test_case_2_8_8_stream_1 (NULL)
+#define test_case_2_8_8_stream_2 (NULL)
+
+#define tgrp_case_2_8_9 test_group_2
+#define numb_case_2_8_9 "2.8.9"
+#define name_case_2_8_9 "Perform streamio I_STR - EPROTO."
+#define sref_case_2_8_9 sref_case_2_8
+#define desc_case_2_8_9 "\
+Checks that I_STR can be performed on a Stream.  Check that EPROTO is\n\
+returned when I_STR is attempted on a Stream that has an error."
+
+int
+test_case_2_8_9(int child)
+{
+	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_8_9 = { &preamble_2_4, &test_case_2_8_9, &postamble_2 };
+
+#define test_case_2_8_9_stream_0 (&test_2_8_9)
+#define test_case_2_8_9_stream_1 (NULL)
+#define test_case_2_8_9_stream_2 (NULL)
+
 /*
  *  Perform IOCTL on one Stream - I_SETSIG
  */
@@ -3686,6 +3891,86 @@ struct test_stream test_2_9_2 = { &preamble_0, &test_case_2_9_2, &postamble_0 };
 #define test_case_2_9_2_stream_0 (&test_2_9_2)
 #define test_case_2_9_2_stream_1 (NULL)
 #define test_case_2_9_2_stream_2 (NULL)
+
+#define tgrp_case_2_9_3 test_group_2
+#define numb_case_2_9_3 "2.9.3"
+#define name_case_2_9_3 "Perform streamio I_SETSIG."
+#define sref_case_2_9_3 sref_case_2_9
+#define desc_case_2_9_3 "\
+Checks that I_SETSIG can be performed on a Stream that is hung up."
+
+int
+test_case_2_9_3(int child)
+{
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_9_3 = { &preamble_2_1, &test_case_2_9_3, &postamble_2 };
+
+#define test_case_2_9_3_stream_0 (&test_2_9_3)
+#define test_case_2_9_3_stream_1 (NULL)
+#define test_case_2_9_3_stream_2 (NULL)
+
+#define tgrp_case_2_9_4 test_group_2
+#define numb_case_2_9_4 "2.9.4"
+#define name_case_2_9_4 "Perform streamio I_SETSIG."
+#define sref_case_2_9_4 sref_case_2_9
+#define desc_case_2_9_4 "\
+Checks that I_SETSIG can be performed on a Stream in read error."
+
+int
+test_case_2_9_4(int child)
+{
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_9_4 = { &preamble_2_2, &test_case_2_9_4, &postamble_2 };
+
+#define test_case_2_9_4_stream_0 (&test_2_9_4)
+#define test_case_2_9_4_stream_1 (NULL)
+#define test_case_2_9_4_stream_2 (NULL)
+
+#define tgrp_case_2_9_5 test_group_2
+#define numb_case_2_9_5 "2.9.5"
+#define name_case_2_9_5 "Perform streamio I_SETSIG."
+#define sref_case_2_9_5 sref_case_2_9
+#define desc_case_2_9_5 "\
+Checks that I_SETSIG can be performed on a Stream in write error."
+
+int
+test_case_2_9_5(int child)
+{
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_9_5 = { &preamble_2_3, &test_case_2_9_5, &postamble_2 };
+
+#define test_case_2_9_5_stream_0 (&test_2_9_5)
+#define test_case_2_9_5_stream_1 (NULL)
+#define test_case_2_9_5_stream_2 (NULL)
+
+#define tgrp_case_2_9_6 test_group_2
+#define numb_case_2_9_6 "2.9.6"
+#define name_case_2_9_6 "Perform streamio I_SETSIG."
+#define sref_case_2_9_6 sref_case_2_9
+#define desc_case_2_9_6 "\
+Checks that I_SETSIG can be performed on a Stream in error."
+
+int
+test_case_2_9_6(int child)
+{
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_9_6 = { &preamble_2_4, &test_case_2_9_6, &postamble_2 };
+
+#define test_case_2_9_6_stream_0 (&test_2_9_6)
+#define test_case_2_9_6_stream_1 (NULL)
+#define test_case_2_9_6_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_GETSIG
@@ -3742,7 +4027,7 @@ struct test_stream test_2_10_2 = { &preamble_0, &test_case_2_10_2, &postamble_0 
 #define name_case_2_10_3 "Perform streamio I_GETSIG."
 #define sref_case_2_10_3 sref_case_2_10
 #define desc_case_2_10_3 "\
-Checks that singals can be retrieved after they have been set."
+Checks that signals can be retrieved after they have been set."
 
 int
 test_case_2_10_3(int child)
@@ -3759,6 +4044,102 @@ struct test_stream test_2_10_3 = { &preamble_0, &test_case_2_10_3, &postamble_0 
 #define test_case_2_10_3_stream_0 (&test_2_10_3)
 #define test_case_2_10_3_stream_1 (NULL)
 #define test_case_2_10_3_stream_2 (NULL)
+
+#define tgrp_case_2_10_4 test_group_2
+#define numb_case_2_10_4 "2.10.4"
+#define name_case_2_10_4 "Perform streamio I_GETSIG."
+#define sref_case_2_10_4 sref_case_2_10
+#define desc_case_2_10_4 "\
+Checks that signals can be retrieved after they have been set \n\
+regardless if the Stream is hung up."
+
+int
+test_case_2_10_4(int child)
+{
+	int events;
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_10_4 = { &preamble_2_1, &test_case_2_10_4, &postamble_2 };
+
+#define test_case_2_10_4_stream_0 (&test_2_10_4)
+#define test_case_2_10_4_stream_1 (NULL)
+#define test_case_2_10_4_stream_2 (NULL)
+
+#define tgrp_case_2_10_5 test_group_2
+#define numb_case_2_10_5 "2.10.5"
+#define name_case_2_10_5 "Perform streamio I_GETSIG."
+#define sref_case_2_10_5 sref_case_2_10
+#define desc_case_2_10_5 "\
+Checks that signals can be retrieved after they have been set \n\
+regardless if the Stream is read errored."
+
+int
+test_case_2_10_5(int child)
+{
+	int events;
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_10_5 = { &preamble_2_2, &test_case_2_10_5, &postamble_2 };
+
+#define test_case_2_10_5_stream_0 (&test_2_10_5)
+#define test_case_2_10_5_stream_1 (NULL)
+#define test_case_2_10_5_stream_2 (NULL)
+
+#define tgrp_case_2_10_6 test_group_2
+#define numb_case_2_10_6 "2.10.6"
+#define name_case_2_10_6 "Perform streamio I_GETSIG."
+#define sref_case_2_10_6 sref_case_2_10
+#define desc_case_2_10_6 "\
+Checks that signals can be retrieved after they have been set \n\
+regardless if the Stream is write errored."
+
+int
+test_case_2_10_6(int child)
+{
+	int events;
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_10_6 = { &preamble_2_3, &test_case_2_10_6, &postamble_2 };
+
+#define test_case_2_10_6_stream_0 (&test_2_10_6)
+#define test_case_2_10_6_stream_1 (NULL)
+#define test_case_2_10_6_stream_2 (NULL)
+
+#define tgrp_case_2_10_7 test_group_2
+#define numb_case_2_10_7 "2.10.7"
+#define name_case_2_10_7 "Perform streamio I_GETSIG."
+#define sref_case_2_10_7 sref_case_2_10
+#define desc_case_2_10_7 "\
+Checks that signals can be retrieved after they have been set \n\
+regardless if the Stream is errored."
+
+int
+test_case_2_10_7(int child)
+{
+	int events;
+	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_10_7 = { &preamble_2_4, &test_case_2_10_7, &postamble_2 };
+
+#define test_case_2_10_7_stream_0 (&test_2_10_7)
+#define test_case_2_10_7_stream_1 (NULL)
+#define test_case_2_10_7_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_FIND
@@ -3872,6 +4253,90 @@ struct test_stream test_2_11_5 = { &preamble_0, &test_case_2_11_5, &postamble_0 
 #define test_case_2_11_5_stream_1 (NULL)
 #define test_case_2_11_5_stream_2 (NULL)
 
+#define tgrp_case_2_11_6 test_group_2
+#define numb_case_2_11_6 "2.11.6"
+#define name_case_2_11_6 "Perform streamio I_FIND - true."
+#define sref_case_2_11_6 sref_case_2_11
+#define desc_case_2_11_6 "\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
+return true (1) even for a hung up Stream."
+
+int
+test_case_2_11_6(int child)
+{
+	if (test_ioctl(child, I_FIND, (intptr_t) "testmod") != __RESULT_SUCCESS || last_retval != 1)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_11_6 = { &preamble_2_1, &test_case_2_11_6, &postamble_2 };
+
+#define test_case_2_11_6_stream_0 (&test_2_11_6)
+#define test_case_2_11_6_stream_1 (NULL)
+#define test_case_2_11_6_stream_2 (NULL)
+
+#define tgrp_case_2_11_7 test_group_2
+#define numb_case_2_11_7 "2.11.7"
+#define name_case_2_11_7 "Perform streamio I_FIND - true."
+#define sref_case_2_11_7 sref_case_2_11
+#define desc_case_2_11_7 "\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
+return true (1) even for a read errored Stream."
+
+int
+test_case_2_11_7(int child)
+{
+	if (test_ioctl(child, I_FIND, (intptr_t) "testmod") != __RESULT_SUCCESS || last_retval != 1)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_11_7 = { &preamble_2_2, &test_case_2_11_7, &postamble_2 };
+
+#define test_case_2_11_7_stream_0 (&test_2_11_7)
+#define test_case_2_11_7_stream_1 (NULL)
+#define test_case_2_11_7_stream_2 (NULL)
+
+#define tgrp_case_2_11_8 test_group_2
+#define numb_case_2_11_8 "2.11.8"
+#define name_case_2_11_8 "Perform streamio I_FIND - true."
+#define sref_case_2_11_8 sref_case_2_11
+#define desc_case_2_11_8 "\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
+return true (1) even for a write errored Stream."
+
+int
+test_case_2_11_8(int child)
+{
+	if (test_ioctl(child, I_FIND, (intptr_t) "testmod") != __RESULT_SUCCESS || last_retval != 1)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_11_8 = { &preamble_2_3, &test_case_2_11_8, &postamble_2 };
+
+#define test_case_2_11_8_stream_0 (&test_2_11_8)
+#define test_case_2_11_8_stream_1 (NULL)
+#define test_case_2_11_8_stream_2 (NULL)
+
+#define tgrp_case_2_11_9 test_group_2
+#define numb_case_2_11_9 "2.11.9"
+#define name_case_2_11_9 "Perform streamio I_FIND - true."
+#define sref_case_2_11_9 sref_case_2_11
+#define desc_case_2_11_9 "\
+Checks that I_FIND can be performed on a Stream.  This test should\n\
+return true (1) even for a errored Stream."
+
+int
+test_case_2_11_9(int child)
+{
+	if (test_ioctl(child, I_FIND, (intptr_t) "testmod") != __RESULT_SUCCESS || last_retval != 1)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_11_9 = { &preamble_2_4, &test_case_2_11_9, &postamble_2 };
+
+#define test_case_2_11_9_stream_0 (&test_2_11_9)
+#define test_case_2_11_9_stream_1 (NULL)
+#define test_case_2_11_9_stream_2 (NULL)
+
 /*
  *  Perform IOCTL on one Stream - I_LINK
  */
@@ -3963,17 +4428,20 @@ struct test_stream test_2_12_4 = { &preamble_2_1, &test_case_2_12_4, &postamble_
 
 #define tgrp_case_2_12_5 test_group_2
 #define numb_case_2_12_5 "2.12.5"
-#define name_case_2_12_5 "Perform streamio I_LINK."
+#define name_case_2_12_5 "Perform streamio I_LINK - EPROTO."
 #define sref_case_2_12_5 sref_case_2_12
 #define desc_case_2_12_5 "\
-Checks that I_LINK can be performed on a Stream."
+Checks that I_LINK can be performed on a Stream.\n\
+Read error received on file descriptor."
 
 int
 test_case_2_12_5(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_LINK, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_5 = { &preamble_0, &test_case_2_12_5, &postamble_0 };
+struct test_stream test_2_12_5 = { &preamble_2_2, &test_case_2_12_5, &postamble_2 };
 
 #define test_case_2_12_5_stream_0 (&test_2_12_5)
 #define test_case_2_12_5_stream_1 (NULL)
@@ -3981,17 +4449,20 @@ struct test_stream test_2_12_5 = { &preamble_0, &test_case_2_12_5, &postamble_0 
 
 #define tgrp_case_2_12_6 test_group_2
 #define numb_case_2_12_6 "2.12.6"
-#define name_case_2_12_6 "Perform streamio I_LINK."
+#define name_case_2_12_6 "Perform streamio I_LINK - EPROTO."
 #define sref_case_2_12_6 sref_case_2_12
 #define desc_case_2_12_6 "\
-Checks that I_LINK can be performed on a Stream."
+Checks that I_LINK can be performed on a Stream.\n\
+Write error received on file descriptor."
 
 int
 test_case_2_12_6(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_LINK, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_6 = { &preamble_0, &test_case_2_12_6, &postamble_0 };
+struct test_stream test_2_12_6 = { &preamble_2_3, &test_case_2_12_6, &postamble_2 };
 
 #define test_case_2_12_6_stream_0 (&test_2_12_6)
 #define test_case_2_12_6_stream_1 (NULL)
@@ -3999,17 +4470,20 @@ struct test_stream test_2_12_6 = { &preamble_0, &test_case_2_12_6, &postamble_0 
 
 #define tgrp_case_2_12_7 test_group_2
 #define numb_case_2_12_7 "2.12.7"
-#define name_case_2_12_7 "Perform streamio I_LINK."
+#define name_case_2_12_7 "Perform streamio I_LINK - EPROTO."
 #define sref_case_2_12_7 sref_case_2_12
 #define desc_case_2_12_7 "\
-Checks that I_LINK can be performed on a Stream."
+Checks that I_LINK can be performed on a Stream.\n\
+Error received on file descriptor."
 
 int
 test_case_2_12_7(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_LINK, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_7 = { &preamble_0, &test_case_2_12_7, &postamble_0 };
+struct test_stream test_2_12_7 = { &preamble_2_4, &test_case_2_12_7, &postamble_2 };
 
 #define test_case_2_12_7_stream_0 (&test_2_12_7)
 #define test_case_2_12_7_stream_1 (NULL)
@@ -4121,21 +4595,66 @@ struct test_stream test_2_13_3 = { &preamble_2_1, &test_case_2_13_3, &postamble_
 
 #define tgrp_case_2_13_4 test_group_2
 #define numb_case_2_13_4 "2.13.4"
-#define name_case_2_13_4 "Perform streamio I_UNLINK."
+#define name_case_2_13_4 "Perform streamio I_UNLINK - EPROTO."
 #define sref_case_2_13_4 sref_case_2_13
 #define desc_case_2_13_4 "\
-Checks that I_UNLINK can be performed on a Stream."
+Checks that I_UNLINK can be performed on a read errored Stream.\n\
+This test should return EPROTO."
 
 int
 test_case_2_13_4(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_UNLINK, (intptr_t) MUXID_ALL) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_13_4 = { &preamble_0, &test_case_2_13_4, &postamble_0 };
+struct test_stream test_2_13_4 = { &preamble_2_2, &test_case_2_13_4, &postamble_2 };
 
 #define test_case_2_13_4_stream_0 (&test_2_13_4)
 #define test_case_2_13_4_stream_1 (NULL)
 #define test_case_2_13_4_stream_2 (NULL)
+
+#define tgrp_case_2_13_5 test_group_2
+#define numb_case_2_13_5 "2.13.5"
+#define name_case_2_13_5 "Perform streamio I_UNLINK - EPROTO."
+#define sref_case_2_13_5 sref_case_2_13
+#define desc_case_2_13_5 "\
+Checks that I_UNLINK can be performed on a write errored Stream.\n\
+This test should return EPROTO."
+
+int
+test_case_2_13_5(int child)
+{
+	if (test_ioctl(child, I_UNLINK, (intptr_t) MUXID_ALL) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_13_5 = { &preamble_2_3, &test_case_2_13_5, &postamble_2 };
+
+#define test_case_2_13_5_stream_0 (&test_2_13_5)
+#define test_case_2_13_5_stream_1 (NULL)
+#define test_case_2_13_5_stream_2 (NULL)
+
+#define tgrp_case_2_13_6 test_group_2
+#define numb_case_2_13_6 "2.13.6"
+#define name_case_2_13_6 "Perform streamio I_UNLINK - EPROTO."
+#define sref_case_2_13_6 sref_case_2_13
+#define desc_case_2_13_6 "\
+Checks that I_UNLINK can be performed on an errored Stream.\n\
+This test should return EPROTO."
+
+int
+test_case_2_13_6(int child)
+{
+	if (test_ioctl(child, I_UNLINK, (intptr_t) MUXID_ALL) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_13_6 = { &preamble_2_4, &test_case_2_13_6, &postamble_2 };
+
+#define test_case_2_13_6_stream_0 (&test_2_13_6)
+#define test_case_2_13_6_stream_1 (NULL)
+#define test_case_2_13_6_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_RECVFD
@@ -4147,7 +4666,9 @@ static const char sref_case_2_14[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_14_1 "Perform streamio I_RECVFD - EAGAIN."
 #define sref_case_2_14_1 sref_case_2_14
 #define desc_case_2_14_1 "\
-Checks that I_RECVFD can be performed on a Stream."
+Checks that I_RECVFD can be performed on a Stream.  Check that EAGAIN is\n\
+returned when the file descriptor is set for nonblocking operation and\n\
+the Stream read queue is empty."
 
 int
 test_case_2_14_1(int child)
@@ -4169,7 +4690,8 @@ struct test_stream test_2_14_1 = { &preamble_0, &test_case_2_14_1, &postamble_0 
 #define name_case_2_14_2 "Perform streamio I_RECVFD - ENXIO."
 #define sref_case_2_14_2 sref_case_2_14
 #define desc_case_2_14_2 "\
-Checks that I_RECVFD can be performed on a Stream."
+Checks that I_RECVFD can be performed on a Stream.  Check that ENXIO is\n\
+returned when I_RECVFD is called on a Stream with an empty read queue."
 
 int
 test_case_2_14_2(int child)
@@ -4186,20 +4708,98 @@ struct test_stream test_2_14_2 = { &preamble_2_1, &test_case_2_14_2, &postamble_
 #define test_case_2_14_2_stream_1 (NULL)
 #define test_case_2_14_2_stream_2 (NULL)
 
+#define tgrp_case_2_14_3 test_group_2
+#define numb_case_2_14_3 "2.14.3"
+#define name_case_2_14_3 "Perform streamio I_RECVFD - EPROTO."
+#define sref_case_2_14_3 sref_case_2_14
+#define desc_case_2_14_3 "\
+Checks that I_RECVFD can be performed on a Stream.  Check that EPROTO is \n\
+returned when an M_ERROR message containing EPROTO for the read-side is \n\
+received before the I_RECVFD command is issued."
+
+int
+test_case_2_14_3(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_14_3 = { &preamble_2_2, &test_case_2_14_3, &postamble_2 };
+
+#define test_case_2_14_3_stream_0 (&test_2_14_3)
+#define test_case_2_14_3_stream_1 (NULL)
+#define test_case_2_14_3_stream_2 (NULL)
+
+#define tgrp_case_2_14_4 test_group_2
+#define numb_case_2_14_4 "2.14.4"
+#define name_case_2_14_4 "Perform streamio I_RECVFD - EAGAIN."
+#define sref_case_2_14_4 sref_case_2_14
+#define desc_case_2_14_4 "\
+Checks that I_RECVFD can be performed on Stream, in spite of receiving \n\
+an M_ERROR message containing an EPROTO for the write-side before the \n\
+I_RECVFD command is issued."
+
+int
+test_case_2_14_4(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_14_4 = { &preamble_2_3, &test_case_2_14_4, &postamble_2 };
+
+#define test_case_2_14_4_stream_0 (&test_2_14_4)
+#define test_case_2_14_4_stream_1 (NULL)
+#define test_case_2_14_4_stream_2 (NULL)
+
+#define tgrp_case_2_14_5 test_group_2
+#define numb_case_2_14_5 "2.14.5"
+#define name_case_2_14_5 "Perform streamio I_RECVFD - EPROTO."
+#define sref_case_2_14_5 sref_case_2_14
+#define desc_case_2_14_5 "\
+Checks that I_RECVFD can be performed on a Stream.  Check that EPROTO is \n\
+returned when an M_ERROR message containing EPROTO (for both sides) is \n\
+received before the I_RECVFD command is issued."
+
+int
+test_case_2_14_5(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_14_5 = { &preamble_2_4, &test_case_2_14_5, &postamble_2 };
+
+#define test_case_2_14_5_stream_0 (&test_2_14_5)
+#define test_case_2_14_5_stream_1 (NULL)
+#define test_case_2_14_5_stream_2 (NULL)
+
+/* more tests:
+ * - check that I_RECVFD will block and return EINTR if the wait is interrupted.
+ * - check actual passing of messages. (Will need operational pipes or a
+ *   FIFO for that.
+ */
+
 /*
  *  Perform IOCTL on one Stream - I_PEEK
  */
 static const char sref_case_2_15[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference page, I_PEEK section.";
 
-#define tgrp_case_2_15 test_group_2
-#define numb_case_2_15 "2.15"
-#define name_case_2_15 "Perform streamio I_PEEK."
-#define sref_case_2_15 sref_case_2_15
-#define desc_case_2_15 "\
+#define tgrp_case_2_15_1 test_group_2
+#define numb_case_2_15_1 "2.15.1"
+#define name_case_2_15_1 "Perform streamio I_PEEK - false."
+#define sref_case_2_15_1 sref_case_2_15
+#define desc_case_2_15_1 "\
 Checks that I_PEEK can be performed on a Stream."
 
 int
-test_case_2_15(int child)
+test_case_2_15_1(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
@@ -4207,11 +4807,99 @@ test_case_2_15(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_15 = { &preamble_0, &test_case_2_15, &postamble_0 };
+struct test_stream test_2_15_1 = { &preamble_0, &test_case_2_15_1, &postamble_0 };
 
-#define test_case_2_15_stream_0 (&test_2_15)
-#define test_case_2_15_stream_1 (NULL)
-#define test_case_2_15_stream_2 (NULL)
+#define test_case_2_15_1_stream_0 (&test_2_15_1)
+#define test_case_2_15_1_stream_1 (NULL)
+#define test_case_2_15_1_stream_2 (NULL)
+
+#define tgrp_case_2_15_2 test_group_2
+#define numb_case_2_15_2 "2.15.2"
+#define name_case_2_15_2 "Perform streamio I_PEEK - false."
+#define sref_case_2_15_2 sref_case_2_15
+#define desc_case_2_15_2 "\
+Checks that I_PEEK can be performed on a hung up Stream."
+
+int
+test_case_2_15_2(int child)
+{
+	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
+
+	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_15_2 = { &preamble_2_1, &test_case_2_15_2, &postamble_2 };
+
+#define test_case_2_15_2_stream_0 (&test_2_15_2)
+#define test_case_2_15_2_stream_1 (NULL)
+#define test_case_2_15_2_stream_2 (NULL)
+
+#define tgrp_case_2_15_3 test_group_2
+#define numb_case_2_15_3 "2.15.3"
+#define name_case_2_15_3 "Perform streamio I_PEEK - false."
+#define sref_case_2_15_3 sref_case_2_15
+#define desc_case_2_15_3 "\
+Checks that I_PEEK can be performed on a read errored Stream."
+
+int
+test_case_2_15_3(int child)
+{
+	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
+
+	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_15_3 = { &preamble_2_2, &test_case_2_15_3, &postamble_2 };
+
+#define test_case_2_15_3_stream_0 (&test_2_15_3)
+#define test_case_2_15_3_stream_1 (NULL)
+#define test_case_2_15_3_stream_2 (NULL)
+
+#define tgrp_case_2_15_4 test_group_2
+#define numb_case_2_15_4 "2.15.4"
+#define name_case_2_15_4 "Perform streamio I_PEEK - false."
+#define sref_case_2_15_4 sref_case_2_15
+#define desc_case_2_15_4 "\
+Checks that I_PEEK can be performed on a write errored Stream."
+
+int
+test_case_2_15_4(int child)
+{
+	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
+
+	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_15_4 = { &preamble_2_3, &test_case_2_15_4, &postamble_2 };
+
+#define test_case_2_15_4_stream_0 (&test_2_15_4)
+#define test_case_2_15_4_stream_1 (NULL)
+#define test_case_2_15_4_stream_2 (NULL)
+
+#define tgrp_case_2_15_5 test_group_2
+#define numb_case_2_15_5 "2.15.5"
+#define name_case_2_15_5 "Perform streamio I_PEEK - false."
+#define sref_case_2_15_5 sref_case_2_15
+#define desc_case_2_15_5 "\
+Checks that I_PEEK can be performed on an errored Stream."
+
+int
+test_case_2_15_5(int child)
+{
+	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
+
+	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_15_5 = { &preamble_2_4, &test_case_2_15_5, &postamble_2 };
+
+#define test_case_2_15_5_stream_0 (&test_2_15_5)
+#define test_case_2_15_5_stream_1 (NULL)
+#define test_case_2_15_5_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_FDINSERT
@@ -4268,6 +4956,105 @@ struct test_stream test_2_16_2 = { &preamble_2_1, &test_case_2_16_2, &postamble_
 #define test_case_2_16_2_stream_1 (NULL)
 #define test_case_2_16_2_stream_2 (NULL)
 
+#define tgrp_case_2_16_3 test_group_2
+#define numb_case_2_16_3 "2.16.3"
+#define name_case_2_16_3 "Perform streamio I_FDINSERT."
+#define sref_case_2_16_3 sref_case_2_16
+#define desc_case_2_16_3 "\
+Checks that I_FDINSERT can be performed on a Stream.\n\
+This tests attempts I_FDINSERT on a read errored Stream and should succeed."
+
+int
+test_case_2_16_3(int child)
+{
+	return (__RESULT_SKIPPED);
+#if 0
+	char buf[sizeof(t_uscalar_t)] = { 0, };
+	struct strfdinsert fdi;
+	fdi.ctlbuf.maxlen = 0;
+	fdi.ctlbuf.len = sizeof(t_uscalar_t);
+	fdi.ctlbuf.buf = buf;
+	fdi.databuf.maxlen = 0;
+	fdi.databuf.len = 0;
+	fdi.databuf.buf = NULL;
+	fdi.flags = 0;
+	fdi.fildes = 1;
+	fdi.offset = 0;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+#endif
+}
+struct test_stream test_2_16_3 = { &preamble_2_2, &test_case_2_16_3, &postamble_2 };
+
+#define test_case_2_16_3_stream_0 (&test_2_16_3)
+#define test_case_2_16_3_stream_1 (NULL)
+#define test_case_2_16_3_stream_2 (NULL)
+
+#define tgrp_case_2_16_4 test_group_2
+#define numb_case_2_16_4 "2.16.4"
+#define name_case_2_16_4 "Perform streamio I_FDINSERT - EPROTO."
+#define sref_case_2_16_4 sref_case_2_16
+#define desc_case_2_16_4 "\
+Checks that I_FDINSERT can be performed on a Stream.\n\
+This tests attempts I_FDINSERT on a write errored Stream and should return EPROTO."
+
+int
+test_case_2_16_4(int child)
+{
+	char buf[sizeof(t_uscalar_t)] = { 0, };
+	struct strfdinsert fdi;
+	fdi.ctlbuf.maxlen = 0;
+	fdi.ctlbuf.len = sizeof(t_uscalar_t);
+	fdi.ctlbuf.buf = buf;
+	fdi.databuf.maxlen = 0;
+	fdi.databuf.len = 0;
+	fdi.databuf.buf = NULL;
+	fdi.flags = 0;
+	fdi.fildes = 1;
+	fdi.offset = 0;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_16_4 = { &preamble_2_3, &test_case_2_16_4, &postamble_2 };
+
+#define test_case_2_16_4_stream_0 (&test_2_16_4)
+#define test_case_2_16_4_stream_1 (NULL)
+#define test_case_2_16_4_stream_2 (NULL)
+
+#define tgrp_case_2_16_5 test_group_2
+#define numb_case_2_16_5 "2.16.5"
+#define name_case_2_16_5 "Perform streamio I_FDINSERT - EPROTO."
+#define sref_case_2_16_5 sref_case_2_16
+#define desc_case_2_16_5 "\
+Checks that I_FDINSERT can be performed on a Stream.\n\
+This tests attempts I_FDINSERT on an errored Stream and should return EPROTO."
+
+int
+test_case_2_16_5(int child)
+{
+	char buf[sizeof(t_uscalar_t)] = { 0, };
+	struct strfdinsert fdi;
+	fdi.ctlbuf.maxlen = 0;
+	fdi.ctlbuf.len = sizeof(t_uscalar_t);
+	fdi.ctlbuf.buf = buf;
+	fdi.databuf.maxlen = 0;
+	fdi.databuf.len = 0;
+	fdi.databuf.buf = NULL;
+	fdi.flags = 0;
+	fdi.fildes = 1;
+	fdi.offset = 0;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_16_5 = { &preamble_2_4, &test_case_2_16_5, &postamble_2 };
+
+#define test_case_2_16_5_stream_0 (&test_2_16_5)
+#define test_case_2_16_5_stream_1 (NULL)
+#define test_case_2_16_5_stream_2 (NULL)
+
 /*
  *  Perform IOCTL on one Stream - I_SENDFD
  */
@@ -4293,7 +5080,7 @@ struct test_stream test_2_17_1 = { &preamble_0, &test_case_2_17_1, &postamble_0 
 
 #define tgrp_case_2_17_2 test_group_2
 #define numb_case_2_17_2 "2.17.2"
-#define name_case_2_17_2 "Perform streamio I_SENDFD."
+#define name_case_2_17_2 "Perform streamio I_SENDFD - ENXIO."
 #define sref_case_2_17_2 sref_case_2_17
 #define desc_case_2_17_2 "\
 Checks that I_SENDFD can be performed on a Stream."
@@ -4303,11 +5090,65 @@ test_case_2_17_2(int child)
 {
 	return (__RESULT_SKIPPED);
 }
-struct test_stream test_2_17_2 = { &preamble_0, &test_case_2_17_2, &postamble_0 };
+struct test_stream test_2_17_2 = { &preamble_2_1, &test_case_2_17_2, &postamble_2 };
 
 #define test_case_2_17_2_stream_0 (&test_2_17_2)
 #define test_case_2_17_2_stream_1 (NULL)
 #define test_case_2_17_2_stream_2 (NULL)
+
+#define tgrp_case_2_17_3 test_group_2
+#define numb_case_2_17_3 "2.17.3"
+#define name_case_2_17_3 "Perform streamio I_SENDFD - RDERR."
+#define sref_case_2_17_3 sref_case_2_17
+#define desc_case_2_17_3 "\
+Checks that I_SENDFD can be performed on a Stream."
+
+int
+test_case_2_17_3(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_17_3 = { &preamble_2_2, &test_case_2_17_3, &postamble_2 };
+
+#define test_case_2_17_3_stream_0 (&test_2_17_3)
+#define test_case_2_17_3_stream_1 (NULL)
+#define test_case_2_17_3_stream_2 (NULL)
+
+#define tgrp_case_2_17_4 test_group_2
+#define numb_case_2_17_4 "2.17.4"
+#define name_case_2_17_4 "Perform streamio I_SENDFD - EPROTO WRERR."
+#define sref_case_2_17_4 sref_case_2_17
+#define desc_case_2_17_4 "\
+Checks that I_SENDFD can be performed on a Stream."
+
+int
+test_case_2_17_4(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_17_4 = { &preamble_2_3, &test_case_2_17_4, &postamble_2 };
+
+#define test_case_2_17_4_stream_0 (&test_2_17_4)
+#define test_case_2_17_4_stream_1 (NULL)
+#define test_case_2_17_4_stream_2 (NULL)
+
+#define tgrp_case_2_17_5 test_group_2
+#define numb_case_2_17_5 "2.17.5"
+#define name_case_2_17_5 "Perform streamio I_SENDFD - EPROTO RDERR WRERR."
+#define sref_case_2_17_5 sref_case_2_17
+#define desc_case_2_17_5 "\
+Checks that I_SENDFD can be performed on a Stream."
+
+int
+test_case_2_17_5(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_17_5 = { &preamble_2_4, &test_case_2_17_5, &postamble_2 };
+
+#define test_case_2_17_5_stream_0 (&test_2_17_5)
+#define test_case_2_17_5_stream_1 (NULL)
+#define test_case_2_17_5_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_E_RECVFD
@@ -4533,6 +5374,94 @@ struct test_stream test_2_19_9 = { &preamble_0, &test_case_2_19_9, &postamble_0 
 #define test_case_2_19_9_stream_0 (&test_2_19_9)
 #define test_case_2_19_9_stream_1 (NULL)
 #define test_case_2_19_9_stream_2 (NULL)
+
+#define tgrp_case_2_19_10 test_group_2
+#define numb_case_2_19_10 "2.19.10"
+#define name_case_2_19_10 "Perform streamio I_SWROPT - ENXIO."
+#define sref_case_2_19_10 sref_case_2_19
+#define desc_case_2_19_10 "\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
+(SNDZERO).  Check that ENXIO is return when the Stream is hung up."
+
+int
+test_case_2_19_10(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) == __RESULT_SUCCESS || last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_19_10 = { &preamble_2_1, &test_case_2_19_10, &postamble_2 };
+
+#define test_case_2_19_10_stream_0 (&test_2_19_10)
+#define test_case_2_19_10_stream_1 (NULL)
+#define test_case_2_19_10_stream_2 (NULL)
+
+#define tgrp_case_2_19_11 test_group_2
+#define numb_case_2_19_11 "2.19.11"
+#define name_case_2_19_11 "Perform streamio I_SWROPT - SNDZERO."
+#define sref_case_2_19_11 sref_case_2_19
+#define desc_case_2_19_11 "\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
+(SNDZERO), despite the Stream being read errored."
+
+int
+test_case_2_19_11(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_19_11 = { &preamble_2_2, &test_case_2_19_11, &postamble_2 };
+
+#define test_case_2_19_11_stream_0 (&test_2_19_11)
+#define test_case_2_19_11_stream_1 (NULL)
+#define test_case_2_19_11_stream_2 (NULL)
+
+#define tgrp_case_2_19_12 test_group_2
+#define numb_case_2_19_12 "2.19.12"
+#define name_case_2_19_12 "Perform streamio I_SWROPT - EPROTO."
+#define sref_case_2_19_12 sref_case_2_19
+#define desc_case_2_19_12 "\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
+(SNDZERO).  Check that EPROTO is return when the Stream is write errored."
+
+int
+test_case_2_19_12(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_19_12 = { &preamble_2_3, &test_case_2_19_12, &postamble_2 };
+
+#define test_case_2_19_12_stream_0 (&test_2_19_12)
+#define test_case_2_19_12_stream_1 (NULL)
+#define test_case_2_19_12_stream_2 (NULL)
+
+#define tgrp_case_2_19_13 test_group_2
+#define numb_case_2_19_13 "2.19.13"
+#define name_case_2_19_13 "Perform streamio I_SWROPT - EPROTO."
+#define sref_case_2_19_13 sref_case_2_19
+#define desc_case_2_19_13 "\
+Checks that I_SWROPT can be performed on a Stream with write option values\n\
+(SNDZERO).  Check that EPROTO is return when the Stream is errored."
+
+int
+test_case_2_19_13(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_19_13 = { &preamble_2_4, &test_case_2_19_13, &postamble_2 };
+
+#define test_case_2_19_13_stream_0 (&test_2_19_13)
+#define test_case_2_19_13_stream_1 (NULL)
+#define test_case_2_19_13_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_GWROPT
@@ -4827,6 +5756,114 @@ struct test_stream test_2_20_10 = { &preamble_0, &test_case_2_20_10, &postamble_
 #define test_case_2_20_10_stream_0 (&test_2_20_10)
 #define test_case_2_20_10_stream_1 (NULL)
 #define test_case_2_20_10_stream_2 (NULL)
+
+#define tgrp_case_2_20_11 test_group_2
+#define numb_case_2_20_11 "2.20.11"
+#define name_case_2_20_11 "Perform streamio I_GWROPT - default."
+#define sref_case_2_20_11 sref_case_2_20
+#define desc_case_2_20_11 "\
+Checks that I_GWROPT can be performed on a Stream to read the Stream default\n\
+options (SNDZERO for a regular Stream), despite the Stream being hung up."
+
+int
+test_case_2_20_11(int child)
+{
+	int wropts = -1;
+
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_20_11 = { &preamble_2_1, &test_case_2_20_11, &postamble_2 };
+
+#define test_case_2_20_11_stream_0 (&test_2_20_11)
+#define test_case_2_20_11_stream_1 (NULL)
+#define test_case_2_20_11_stream_2 (NULL)
+
+#define tgrp_case_2_20_12 test_group_2
+#define numb_case_2_20_12 "2.20.12"
+#define name_case_2_20_12 "Perform streamio I_GWROPT - default."
+#define sref_case_2_20_12 sref_case_2_20
+#define desc_case_2_20_12 "\
+Checks that I_GWROPT can be performed on a Stream to read the Stream default\n\
+options (SNDZERO for a regular Stream), despite the Stream being read errored."
+
+int
+test_case_2_20_12(int child)
+{
+	int wropts = -1;
+
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_20_12 = { &preamble_2_2, &test_case_2_20_12, &postamble_2 };
+
+#define test_case_2_20_12_stream_0 (&test_2_20_12)
+#define test_case_2_20_12_stream_1 (NULL)
+#define test_case_2_20_12_stream_2 (NULL)
+
+#define tgrp_case_2_20_13 test_group_2
+#define numb_case_2_20_13 "2.20.13"
+#define name_case_2_20_13 "Perform streamio I_GWROPT - default."
+#define sref_case_2_20_13 sref_case_2_20
+#define desc_case_2_20_13 "\
+Checks that I_GWROPT can be performed on a Stream to read the Stream default\n\
+options (SNDZERO for a regular Stream), despite the Stream being write errored."
+
+int
+test_case_2_20_13(int child)
+{
+	int wropts = -1;
+
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_20_13 = { &preamble_2_3, &test_case_2_20_13, &postamble_2 };
+
+#define test_case_2_20_13_stream_0 (&test_2_20_13)
+#define test_case_2_20_13_stream_1 (NULL)
+#define test_case_2_20_13_stream_2 (NULL)
+
+#define tgrp_case_2_20_14 test_group_2
+#define numb_case_2_20_14 "2.20.14"
+#define name_case_2_20_14 "Perform streamio I_GWROPT - default."
+#define sref_case_2_20_14 sref_case_2_20
+#define desc_case_2_20_14 "\
+Checks that I_GWROPT can be performed on a Stream to read the Stream default\n\
+options (SNDZERO for a regular Stream), despite the Stream being errored."
+
+int
+test_case_2_20_14(int child)
+{
+	int wropts = -1;
+
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_20_14 = { &preamble_2_4, &test_case_2_20_14, &postamble_2 };
+
+#define test_case_2_20_14_stream_0 (&test_2_20_14)
+#define test_case_2_20_14_stream_1 (NULL)
+#define test_case_2_20_14_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_LIST
@@ -6577,6 +7614,14 @@ struct test_case {
 	test_case_2_7_10_stream_0, test_case_2_7_10_stream_1, test_case_2_7_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_7_11, tgrp_case_2_7_11, name_case_2_7_11, desc_case_2_7_11, sref_case_2_7_11, {
 	test_case_2_7_11_stream_0, test_case_2_7_11_stream_1, test_case_2_7_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_7_12, tgrp_case_2_7_12, name_case_2_7_12, desc_case_2_7_12, sref_case_2_7_12, {
+	test_case_2_7_12_stream_0, test_case_2_7_12_stream_1, test_case_2_7_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_7_13, tgrp_case_2_7_13, name_case_2_7_13, desc_case_2_7_13, sref_case_2_7_13, {
+	test_case_2_7_13_stream_0, test_case_2_7_13_stream_1, test_case_2_7_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_7_14, tgrp_case_2_7_14, name_case_2_7_14, desc_case_2_7_14, sref_case_2_7_14, {
+	test_case_2_7_14_stream_0, test_case_2_7_14_stream_1, test_case_2_7_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_7_15, tgrp_case_2_7_15, name_case_2_7_15, desc_case_2_7_15, sref_case_2_7_15, {
+	test_case_2_7_15_stream_0, test_case_2_7_15_stream_1, test_case_2_7_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_8_1, tgrp_case_2_8_1, name_case_2_8_1, desc_case_2_8_1, sref_case_2_8_1, {
 	test_case_2_8_1_stream_0, test_case_2_8_1_stream_1, test_case_2_8_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_8_2, tgrp_case_2_8_2, name_case_2_8_2, desc_case_2_8_2, sref_case_2_8_2, {
@@ -6587,16 +7632,40 @@ struct test_case {
 	test_case_2_8_4_stream_0, test_case_2_8_4_stream_1, test_case_2_8_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_8_5, tgrp_case_2_8_5, name_case_2_8_5, desc_case_2_8_5, sref_case_2_8_5, {
 	test_case_2_8_5_stream_0, test_case_2_8_5_stream_1, test_case_2_8_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_8_6, tgrp_case_2_8_6, name_case_2_8_6, desc_case_2_8_6, sref_case_2_8_6, {
+	test_case_2_8_6_stream_0, test_case_2_8_6_stream_1, test_case_2_8_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_8_7, tgrp_case_2_8_7, name_case_2_8_7, desc_case_2_8_7, sref_case_2_8_7, {
+	test_case_2_8_7_stream_0, test_case_2_8_7_stream_1, test_case_2_8_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_8_8, tgrp_case_2_8_8, name_case_2_8_8, desc_case_2_8_8, sref_case_2_8_8, {
+	test_case_2_8_8_stream_0, test_case_2_8_8_stream_1, test_case_2_8_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_8_9, tgrp_case_2_8_9, name_case_2_8_9, desc_case_2_8_9, sref_case_2_8_9, {
+	test_case_2_8_9_stream_0, test_case_2_8_9_stream_1, test_case_2_8_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_9_1, tgrp_case_2_9_1, name_case_2_9_1, desc_case_2_9_1, sref_case_2_9_1, {
 	test_case_2_9_1_stream_0, test_case_2_9_1_stream_1, test_case_2_9_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_9_2, tgrp_case_2_9_2, name_case_2_9_2, desc_case_2_9_2, sref_case_2_9_2, {
 	test_case_2_9_2_stream_0, test_case_2_9_2_stream_1, test_case_2_9_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_9_3, tgrp_case_2_9_3, name_case_2_9_3, desc_case_2_9_3, sref_case_2_9_3, {
+	test_case_2_9_3_stream_0, test_case_2_9_3_stream_1, test_case_2_9_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_9_4, tgrp_case_2_9_4, name_case_2_9_4, desc_case_2_9_4, sref_case_2_9_4, {
+	test_case_2_9_4_stream_0, test_case_2_9_4_stream_1, test_case_2_9_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_9_5, tgrp_case_2_9_5, name_case_2_9_5, desc_case_2_9_5, sref_case_2_9_5, {
+	test_case_2_9_5_stream_0, test_case_2_9_5_stream_1, test_case_2_9_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_9_6, tgrp_case_2_9_6, name_case_2_9_6, desc_case_2_9_6, sref_case_2_9_6, {
+	test_case_2_9_6_stream_0, test_case_2_9_6_stream_1, test_case_2_9_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_10_1, tgrp_case_2_10_1, name_case_2_10_1, desc_case_2_10_1, sref_case_2_10_1, {
 	test_case_2_10_1_stream_0, test_case_2_10_1_stream_1, test_case_2_10_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_10_2, tgrp_case_2_10_2, name_case_2_10_2, desc_case_2_10_2, sref_case_2_10_2, {
 	test_case_2_10_2_stream_0, test_case_2_10_2_stream_1, test_case_2_10_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_10_3, tgrp_case_2_10_3, name_case_2_10_3, desc_case_2_10_3, sref_case_2_10_3, {
 	test_case_2_10_3_stream_0, test_case_2_10_3_stream_1, test_case_2_10_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_10_4, tgrp_case_2_10_4, name_case_2_10_4, desc_case_2_10_4, sref_case_2_10_4, {
+	test_case_2_10_4_stream_0, test_case_2_10_4_stream_1, test_case_2_10_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_10_5, tgrp_case_2_10_5, name_case_2_10_5, desc_case_2_10_5, sref_case_2_10_5, {
+	test_case_2_10_5_stream_0, test_case_2_10_5_stream_1, test_case_2_10_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_10_6, tgrp_case_2_10_6, name_case_2_10_6, desc_case_2_10_6, sref_case_2_10_6, {
+	test_case_2_10_6_stream_0, test_case_2_10_6_stream_1, test_case_2_10_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_10_7, tgrp_case_2_10_7, name_case_2_10_7, desc_case_2_10_7, sref_case_2_10_7, {
+	test_case_2_10_7_stream_0, test_case_2_10_7_stream_1, test_case_2_10_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_11_1, tgrp_case_2_11_1, name_case_2_11_1, desc_case_2_11_1, sref_case_2_11_1, {
 	test_case_2_11_1_stream_0, test_case_2_11_1_stream_1, test_case_2_11_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_11_2, tgrp_case_2_11_2, name_case_2_11_2, desc_case_2_11_2, sref_case_2_11_2, {
@@ -6607,6 +7676,14 @@ struct test_case {
 	test_case_2_11_4_stream_0, test_case_2_11_4_stream_1, test_case_2_11_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_11_5, tgrp_case_2_11_5, name_case_2_11_5, desc_case_2_11_5, sref_case_2_11_5, {
 	test_case_2_11_5_stream_0, test_case_2_11_5_stream_1, test_case_2_11_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_11_6, tgrp_case_2_11_6, name_case_2_11_6, desc_case_2_11_6, sref_case_2_11_6, {
+	test_case_2_11_6_stream_0, test_case_2_11_6_stream_1, test_case_2_11_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_11_7, tgrp_case_2_11_7, name_case_2_11_7, desc_case_2_11_7, sref_case_2_11_7, {
+	test_case_2_11_7_stream_0, test_case_2_11_7_stream_1, test_case_2_11_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_11_8, tgrp_case_2_11_8, name_case_2_11_8, desc_case_2_11_8, sref_case_2_11_8, {
+	test_case_2_11_8_stream_0, test_case_2_11_8_stream_1, test_case_2_11_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_11_9, tgrp_case_2_11_9, name_case_2_11_9, desc_case_2_11_9, sref_case_2_11_9, {
+	test_case_2_11_9_stream_0, test_case_2_11_9_stream_1, test_case_2_11_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_12_1, tgrp_case_2_12_1, name_case_2_12_1, desc_case_2_12_1, sref_case_2_12_1, {
 	test_case_2_12_1_stream_0, test_case_2_12_1_stream_1, test_case_2_12_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_12_2, tgrp_case_2_12_2, name_case_2_12_2, desc_case_2_12_2, sref_case_2_12_2, {
@@ -6633,20 +7710,50 @@ struct test_case {
 	test_case_2_13_3_stream_0, test_case_2_13_3_stream_1, test_case_2_13_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_13_4, tgrp_case_2_13_4, name_case_2_13_4, desc_case_2_13_4, sref_case_2_13_4, {
 	test_case_2_13_4_stream_0, test_case_2_13_4_stream_1, test_case_2_13_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_13_5, tgrp_case_2_13_5, name_case_2_13_5, desc_case_2_13_5, sref_case_2_13_5, {
+	test_case_2_13_5_stream_0, test_case_2_13_5_stream_1, test_case_2_13_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_13_6, tgrp_case_2_13_6, name_case_2_13_6, desc_case_2_13_6, sref_case_2_13_6, {
+	test_case_2_13_6_stream_0, test_case_2_13_6_stream_1, test_case_2_13_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_14_1, tgrp_case_2_14_1, name_case_2_14_1, desc_case_2_14_1, sref_case_2_14_1, {
 	test_case_2_14_1_stream_0, test_case_2_14_1_stream_1, test_case_2_14_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_14_2, tgrp_case_2_14_2, name_case_2_14_2, desc_case_2_14_2, sref_case_2_14_2, {
 	test_case_2_14_2_stream_0, test_case_2_14_2_stream_1, test_case_2_14_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_15, tgrp_case_2_15, name_case_2_15, desc_case_2_15, sref_case_2_15, {
-	test_case_2_15_stream_0, test_case_2_15_stream_1, test_case_2_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_14_3, tgrp_case_2_14_3, name_case_2_14_3, desc_case_2_14_3, sref_case_2_14_3, {
+	test_case_2_14_3_stream_0, test_case_2_14_3_stream_1, test_case_2_14_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_14_4, tgrp_case_2_14_4, name_case_2_14_4, desc_case_2_14_4, sref_case_2_14_4, {
+	test_case_2_14_4_stream_0, test_case_2_14_4_stream_1, test_case_2_14_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_14_5, tgrp_case_2_14_5, name_case_2_14_5, desc_case_2_14_5, sref_case_2_14_5, {
+	test_case_2_14_5_stream_0, test_case_2_14_5_stream_1, test_case_2_14_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_15_1, tgrp_case_2_15_1, name_case_2_15_1, desc_case_2_15_1, sref_case_2_15_1, {
+	test_case_2_15_1_stream_0, test_case_2_15_1_stream_1, test_case_2_15_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_15_2, tgrp_case_2_15_2, name_case_2_15_2, desc_case_2_15_2, sref_case_2_15_2, {
+	test_case_2_15_2_stream_0, test_case_2_15_2_stream_1, test_case_2_15_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_15_3, tgrp_case_2_15_3, name_case_2_15_3, desc_case_2_15_3, sref_case_2_15_3, {
+	test_case_2_15_3_stream_0, test_case_2_15_3_stream_1, test_case_2_15_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_15_4, tgrp_case_2_15_4, name_case_2_15_4, desc_case_2_15_4, sref_case_2_15_4, {
+	test_case_2_15_4_stream_0, test_case_2_15_4_stream_1, test_case_2_15_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_15_5, tgrp_case_2_15_5, name_case_2_15_5, desc_case_2_15_5, sref_case_2_15_5, {
+	test_case_2_15_5_stream_0, test_case_2_15_5_stream_1, test_case_2_15_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_16_1, tgrp_case_2_16_1, name_case_2_16_1, desc_case_2_16_1, sref_case_2_16_1, {
 	test_case_2_16_1_stream_0, test_case_2_16_1_stream_1, test_case_2_16_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_16_2, tgrp_case_2_16_2, name_case_2_16_2, desc_case_2_16_2, sref_case_2_16_2, {
 	test_case_2_16_2_stream_0, test_case_2_16_2_stream_1, test_case_2_16_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_16_3, tgrp_case_2_16_3, name_case_2_16_3, desc_case_2_16_3, sref_case_2_16_3, {
+	test_case_2_16_3_stream_0, test_case_2_16_3_stream_1, test_case_2_16_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_16_4, tgrp_case_2_16_4, name_case_2_16_4, desc_case_2_16_4, sref_case_2_16_4, {
+	test_case_2_16_4_stream_0, test_case_2_16_4_stream_1, test_case_2_16_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_16_5, tgrp_case_2_16_5, name_case_2_16_5, desc_case_2_16_5, sref_case_2_16_5, {
+	test_case_2_16_5_stream_0, test_case_2_16_5_stream_1, test_case_2_16_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_17_1, tgrp_case_2_17_1, name_case_2_17_1, desc_case_2_17_1, sref_case_2_17_1, {
 	test_case_2_17_1_stream_0, test_case_2_17_1_stream_1, test_case_2_17_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_17_2, tgrp_case_2_17_2, name_case_2_17_2, desc_case_2_17_2, sref_case_2_17_2, {
 	test_case_2_17_2_stream_0, test_case_2_17_2_stream_1, test_case_2_17_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_17_3, tgrp_case_2_17_3, name_case_2_17_3, desc_case_2_17_3, sref_case_2_17_3, {
+	test_case_2_17_3_stream_0, test_case_2_17_3_stream_1, test_case_2_17_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_17_4, tgrp_case_2_17_4, name_case_2_17_4, desc_case_2_17_4, sref_case_2_17_4, {
+	test_case_2_17_4_stream_0, test_case_2_17_4_stream_1, test_case_2_17_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_17_5, tgrp_case_2_17_5, name_case_2_17_5, desc_case_2_17_5, sref_case_2_17_5, {
+	test_case_2_17_5_stream_0, test_case_2_17_5_stream_1, test_case_2_17_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_18, tgrp_case_2_18, name_case_2_18, desc_case_2_18, sref_case_2_18, {
 	test_case_2_18_stream_0, test_case_2_18_stream_1, test_case_2_18_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_19_1, tgrp_case_2_19_1, name_case_2_19_1, desc_case_2_19_1, sref_case_2_19_1, {
@@ -6667,6 +7774,14 @@ struct test_case {
 	test_case_2_19_8_stream_0, test_case_2_19_8_stream_1, test_case_2_19_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_19_9, tgrp_case_2_19_9, name_case_2_19_9, desc_case_2_19_9, sref_case_2_19_9, {
 	test_case_2_19_9_stream_0, test_case_2_19_9_stream_1, test_case_2_19_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_19_10, tgrp_case_2_19_10, name_case_2_19_10, desc_case_2_19_10, sref_case_2_19_10, {
+	test_case_2_19_10_stream_0, test_case_2_19_10_stream_1, test_case_2_19_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_19_11, tgrp_case_2_19_11, name_case_2_19_11, desc_case_2_19_11, sref_case_2_19_11, {
+	test_case_2_19_11_stream_0, test_case_2_19_11_stream_1, test_case_2_19_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_19_12, tgrp_case_2_19_12, name_case_2_19_12, desc_case_2_19_12, sref_case_2_19_12, {
+	test_case_2_19_12_stream_0, test_case_2_19_12_stream_1, test_case_2_19_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_19_13, tgrp_case_2_19_13, name_case_2_19_13, desc_case_2_19_13, sref_case_2_19_13, {
+	test_case_2_19_13_stream_0, test_case_2_19_13_stream_1, test_case_2_19_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_1, tgrp_case_2_20_1, name_case_2_20_1, desc_case_2_20_1, sref_case_2_20_1, {
 	test_case_2_20_1_stream_0, test_case_2_20_1_stream_1, test_case_2_20_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_2, tgrp_case_2_20_2, name_case_2_20_2, desc_case_2_20_2, sref_case_2_20_2, {
@@ -6687,6 +7802,14 @@ struct test_case {
 	test_case_2_20_9_stream_0, test_case_2_20_9_stream_1, test_case_2_20_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_10, tgrp_case_2_20_10, name_case_2_20_10, desc_case_2_20_10, sref_case_2_20_10, {
 	test_case_2_20_10_stream_0, test_case_2_20_10_stream_1, test_case_2_20_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_20_11, tgrp_case_2_20_11, name_case_2_20_11, desc_case_2_20_11, sref_case_2_20_11, {
+	test_case_2_20_11_stream_0, test_case_2_20_11_stream_1, test_case_2_20_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_20_12, tgrp_case_2_20_12, name_case_2_20_12, desc_case_2_20_12, sref_case_2_20_12, {
+	test_case_2_20_12_stream_0, test_case_2_20_12_stream_1, test_case_2_20_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_20_13, tgrp_case_2_20_13, name_case_2_20_13, desc_case_2_20_13, sref_case_2_20_13, {
+	test_case_2_20_13_stream_0, test_case_2_20_13_stream_1, test_case_2_20_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_20_14, tgrp_case_2_20_14, name_case_2_20_14, desc_case_2_20_14, sref_case_2_20_14, {
+	test_case_2_20_14_stream_0, test_case_2_20_14_stream_1, test_case_2_20_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_21, tgrp_case_2_21, name_case_2_21, desc_case_2_21, sref_case_2_21, {
 	test_case_2_21_stream_0, test_case_2_21_stream_1, test_case_2_21_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_22_1, tgrp_case_2_22_1, name_case_2_22_1, desc_case_2_22_1, sref_case_2_22_1, {
