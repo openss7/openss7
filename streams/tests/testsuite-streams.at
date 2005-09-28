@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/09/27 10:04:24 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/27 23:34:26 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/09/27 10:04:24 $ by $Author: brian $
+dnl Last Modified $Date: 2005/09/27 23:34:26 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.11  2005/09/27 23:34:26  brian
+dnl - added test cases, tweaked straccess()
+dnl
 dnl Revision 0.9.2.10  2005/09/27 10:04:24  brian
 dnl - more test cases, runqueues bug
 dnl
@@ -266,6 +269,21 @@ AT_KEYWORDS([streams ioctl I_LOOK])
 AT_CHECK([test_streams 2.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([streams test 2.4.4])
+AT_KEYWORDS([streams ioctl I_LOOK])
+AT_CHECK([test_streams 2.4.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.4.5])
+AT_KEYWORDS([streams ioctl I_LOOK])
+AT_CHECK([test_streams 2.4.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.4.6])
+AT_KEYWORDS([streams ioctl I_LOOK])
+AT_CHECK([test_streams 2.4.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([streams test 2.5.1])
 AT_KEYWORDS([streams ioctl I_FLUSH EINVAL])
 AT_CHECK([test_streams 2.5.1], [], [ignore], [], [], [])
@@ -294,6 +312,21 @@ AT_CLEANUP
 AT_SETUP([streams test 2.5.6])
 AT_KEYWORDS([streams ioctl I_FLUSH ENXIO])
 AT_CHECK([test_streams 2.5.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.7])
+AT_KEYWORDS([streams ioctl I_FLUSH ENXIO])
+AT_CHECK([test_streams 2.5.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.8])
+AT_KEYWORDS([streams ioctl I_FLUSH ENXIO])
+AT_CHECK([test_streams 2.5.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.5.9])
+AT_KEYWORDS([streams ioctl I_FLUSH ENXIO])
+AT_CHECK([test_streams 2.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.6.1])
@@ -349,6 +382,21 @@ AT_CLEANUP
 AT_SETUP([streams test 2.6.11])
 AT_KEYWORDS([streams ioctl I_SRDOPT EINVAL])
 AT_CHECK([test_streams 2.6.11], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.6.12])
+AT_KEYWORDS([streams ioctl I_SRDOPT EPROTO])
+AT_CHECK([test_streams 2.6.12], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.6.13])
+AT_KEYWORDS([streams ioctl I_SRDOPT])
+AT_CHECK([test_streams 2.6.13], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.6.14])
+AT_KEYWORDS([streams ioctl I_SRDOPT EPROTO])
+AT_CHECK([test_streams 2.6.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.7.1])

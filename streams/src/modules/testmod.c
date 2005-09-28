@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/25 22:52:11 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/27 23:34:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 22:52:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 23:34:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.2  2005/09/27 23:34:25  brian
+ - added test cases, tweaked straccess()
+
  Revision 0.9.2.1  2005/09/25 22:52:11  brian
  - added test module and continuing with testing
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/25 22:52:11 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/27 23:34:25 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/25 22:52:11 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/27 23:34:25 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/25 22:52:11 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/27 23:34:25 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -181,6 +184,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			int rwerr;
 
 			rwerr = *(long *) mp->b_cont->b_rptr;
+			printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with a read error (equal to the arg) */
 			if (putnextctl2(OTHERQ(q), M_ERROR, rwerr, NOERROR))
 				goto ack;
@@ -191,7 +195,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int rwerr;
 
-			rwerr = *(int *) mp->b_cont->b_rptr;
+			rwerr = *(long *) mp->b_cont->b_rptr;
+			printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with a write error (equal to the arg) */
 			if (putnextctl2(OTHERQ(q), M_ERROR, NOERROR, rwerr))
 				goto ack;
@@ -202,7 +207,8 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		{
 			int rwerr;
 
-			rwerr = *(int *) mp->b_cont->b_rptr;
+			rwerr = *(long *) mp->b_cont->b_rptr;
+			printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with an error (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_ERROR, rwerr))
 				goto ack;
@@ -215,12 +221,14 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		}
 		break;
 	      ack:
+		mp->b_datap->db_type = M_IOCACK;
 		ioc->ioc_count = 0;
 		ioc->ioc_rval = rval;
 		ioc->ioc_error = 0;
 		qreply(q, mp);
 		return (0);
 	      nak:
+		mp->b_datap->db_type = M_IOCNAK;
 		ioc->ioc_count = 0;
 		ioc->ioc_rval = -1;
 		ioc->ioc_error = err;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:14 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 10:04:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 23:34:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:14 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:24 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:14 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:24 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2347,7 +2347,8 @@ putctl1(queue_t *q, int type, int param)
 	assert(q);
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param;
+		mp->b_wptr[0] = (unsigned char) param;
+		mp->b_wptr++;
 		put(q, mp);
 		return (1);
 	}
@@ -2371,8 +2372,10 @@ putctl2(queue_t *q, int type, int param1, int param2)
 	assert(q);
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param1;
-		*mp->b_wptr++ = (unsigned char) param2;
+		mp->b_wptr[0] = (unsigned char) param1;
+		mp->b_wptr++;
+		mp->b_wptr[0] = (unsigned char) param2;
+		mp->b_wptr++;
 		put(q, mp);
 		return (1);
 	}
@@ -2418,7 +2421,8 @@ putnextctl1(queue_t *q, int type, int param)
 	assert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param;
+		mp->b_wptr[0] = (unsigned char) param;
+		mp->b_wptr++;
 		putnext(q, mp);
 		return (1);
 	}
@@ -2443,8 +2447,10 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 	assert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
-		*mp->b_wptr++ = (unsigned char) param1;
-		*mp->b_wptr++ = (unsigned char) param2;
+		mp->b_wptr[0] = (unsigned char) param1;
+		mp->b_wptr++;
+		mp->b_wptr[0] = (unsigned char) param2;
+		mp->b_wptr++;
 		putnext(q, mp);
 		return (1);
 	}

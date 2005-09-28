@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 10:04:17 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 23:34:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/09/27 10:04:17 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:25 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -474,6 +474,7 @@ pgrp_session(pid_t pgrp)
  *      %FCREAT		- perform open checks only
  *      %FTRUNC		- perform close checks only (no errors)
  *      %FNDELAY	- don't return -ESTRPIPE with FREAD or FWRITE
+ *      %FAPPEND	- no error for STRHUP, STRDERR or STWRERR
  *
  *      If no flags are set, simple io checks are performed.  Simple checks include I_PUSH, I_POP,
  *      I_LINK, I_PLINK.  Close, I_UNLINK, I_PUNLINK should not use this test.
@@ -517,45 +518,53 @@ straccess(struct stdata *sd, const int access)
 	register int flags = sd->sd_flag;
 
 	/* no errors for close */
-	if (access & FTRUNC)
-		return (0);
-	if ((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP))) {
-		if (flags & STPLEX)
-			if (!(access & FCREAT))
-				return (-EINVAL);
-		if (flags & STRCLOSE) {
-			if (!(flags & STRISTTY))
-				return (-EIO);
-			return (-ENOTTY);
-		}
-		if (flags & STRHUP) {
-			/* POSIX: open(): "[EIO] The path argument names a STREAMS file and a
-			   hangup or error occured during the open()." */
-			if (access & FCREAT)
-				return (-EIO);
-			if ((access & FWRITE) && !(flags & (STRISFIFO | STRISPIPE)))
-				return (-ENXIO);	/* for TTY's too? */
-			if ((access & (FREAD | FWRITE)))
-				goto estrpipe;
-			return (-ENXIO);
-		}
-		if (flags & STRDERR) {
-			if (access & FREAD) {
-				if (sd->sd_eropt & RERRNONPERSIST)
-					clear_bit(STRDERR_BIT, &sd->sd_flag);
-				return (-sd->sd_rerror);
+	if (!(access & FTRUNC)) {
+		if ((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP))) {
+			if (flags & STPLEX)
+				if (!(access & FCREAT))
+					return (-EINVAL);
+			if (flags & STRCLOSE) {
+				if (!(flags & STRISTTY))
+					return (-EIO);
+				return (-ENOTTY);
 			}
-			return (-EIO);
-		}
-		if (flags & STWRERR) {
-			if (access & FWRITE) {
-				if (sd->sd_eropt & WERRNONPERSIST)
-					clear_bit(STWRERR_BIT, &sd->sd_flag);
-				if (sd->sd_wropt & SNDPIPE)
-					send_sig_info(SIGPIPE, (struct siginfo *) 1, current);
-				return (-sd->sd_werror);
+			if (!(access & FAPPEND)) {
+				if (flags & STRHUP) {
+					/* POSIX: open(): "[EIO] The path argument names a STREAMS
+					   file and a hangup or error occured during the open()." */
+					if (access & FCREAT)
+						return (-EIO);
+					if ((access & FWRITE) && !(flags & (STRISFIFO | STRISPIPE)))
+						return (-ENXIO);	/* for TTY's too? */
+					if (!(access & (FREAD | FWRITE)))
+						return (-ENXIO);
+					if (!(access & FNDELAY))
+						return (-ESTRPIPE);
+					if (access & FWRITE) {
+						send_sig(SIGPIPE, current, 1);
+						return (-EPIPE);
+					}
+				}
+				if (flags & STRDERR) {
+					if (access & FREAD) {
+						if (sd->sd_eropt & RERRNONPERSIST)
+							clear_bit(STRDERR_BIT, &sd->sd_flag);
+						return (-sd->sd_rerror);
+					} else if (!(access & FWRITE))
+						return (-EIO);
+				}
+				if (flags & STWRERR) {
+					if (access & FWRITE) {
+						if (sd->sd_eropt & WERRNONPERSIST)
+							clear_bit(STWRERR_BIT, &sd->sd_flag);
+						if (sd->sd_wropt & SNDPIPE)
+							send_sig_info(SIGPIPE, (struct siginfo *) 1,
+								      current);
+						return (-sd->sd_werror);
+					} else if (!(access & FREAD))
+						return (-EIO);
+				}
 			}
-			return (-EIO);
 		}
 	}
 	if (!(access & (FREAD | FWRITE | FEXCL)))
@@ -4899,7 +4908,7 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_flag | FLUSHBAND;
 	*mp->b_wptr++ = bi.bi_pri;
 
-	if (!(err = straccess_rlock(sd, 0))) {
+	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY)))) {
 		ctrace(put(sd->sd_wq, mp));
 		trace();
 		srunlock(sd);
@@ -4946,7 +4955,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = arg;
 
-	if (!(err = straccess_rlock(sd, 0))) {
+	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY)))) {
 		ptrace(("putting message %p\n", mp));
 		ctrace(put(sd->sd_wq, mp));
 		trace();
@@ -5697,7 +5706,7 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 	queue_t *q = sd->sd_wq;
 	int err;
 
-	if (!(err = straccess_rlock(sd, 0))) {
+	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		if (SAMESTR(q) && (q = q->q_next))
 			snprintf(fmname, FMNAMESZ + 1, _RD(q)->q_qinfo->qi_minfo->mi_idname);
 		else

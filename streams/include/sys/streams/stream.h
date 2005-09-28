@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.59 2005/09/26 10:08:38 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.60 2005/09/27 23:34:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/26 10:08:38 $ by $Author: brian $
+ Last Modified $Date: 2005/09/27 23:34:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:38 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/09/27 23:34:24 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -151,6 +151,9 @@ typedef unsigned long __streams_dev_t;
 #endif
 #ifndef FCLONE
 #define FCLONE O_CLONE
+#endif
+#ifndef FAPPEND
+#define FAPPEND O_APPEND
 #endif
 
 /* 
