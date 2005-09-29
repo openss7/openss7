@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/09/25 22:52:10 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 22:52:10 $ by $Author: brian $
+ Last Modified $Date: 2005/09/29 00:12:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/09/25 22:52:10 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/09/25 22:52:10 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/09/25 22:52:10 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -207,10 +207,14 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			struct linkblk *l;
 
-			if (!mp->b_cont)
+			if (!mp->b_cont) {
+				__ptrace(("Error path taken!\n"));
 				goto einval;
-			if (!(bot = kmem_alloc(sizeof(*bot), KM_NOSLEEP)))
+			}
+			if (!(bot = kmem_alloc(sizeof(*bot), KM_NOSLEEP))) {
+				__ptrace(("Error path taken!\n"));
 				goto enomem;
+			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
 			write_lock_bh(&mux_lock);
@@ -232,8 +236,10 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			struct linkblk *l;
 
-			if (!mp->b_cont)
+			if (!mp->b_cont) {
+				__ptrace(("Error path taken!\n"));
 				goto einval;
+			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
 			write_lock_bh(&mux_lock);
@@ -324,6 +330,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			goto ack;
 		}
 		default:
+			__ptrace(("Error path taken!\n"));
 			if (mux->other)
 				goto passmsg;
 		      einval:

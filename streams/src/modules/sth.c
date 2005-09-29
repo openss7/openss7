@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/29 00:11:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/28 08:27:00 $ by $Author: brian $
+ Last Modified $Date: 2005/09/29 00:11:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/29 00:11:42 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/29 00:11:42 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/09/28 08:27:00 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/09/29 00:11:42 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2246,7 +2246,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	ioc->iocblk.ioc_id = ++sd->sd_iocid;
 
 	do {
-		ctrace(put(l->l_qtop, mb));
+		ctrace(put(sd->sd_wq, mb));
 		trace();
 
 		mb = strwaitiocack(sd, NULL, access);
@@ -2260,7 +2260,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 				err = ENXIO;
 			/* must return negative errors */
 			err = err > 0 ? -err : err;
-			ptrace(("Error path taken! err = %d\n", err));
+			__ptrace(("Error path taken! err = %d\n", err));
 			break;
 		case M_IOCACK:
 			err = 0;
@@ -5047,7 +5047,7 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_flag | FLUSHBAND;
 	*mp->b_wptr++ = bi.bi_pri;
 
-	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY)))) {
+	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		ctrace(put(sd->sd_wq, mp));
 		trace();
 		srunlock(sd);
@@ -5094,7 +5094,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = arg;
 
-	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY)))) {
+	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		ptrace(("putting message %p\n", mp));
 		ctrace(put(sd->sd_wq, mp));
 		trace();
@@ -5176,7 +5176,7 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 			ptrace(("Error path taken!\n"));
 			return (-EINVAL);
 		}
-		if (!(err = straccess_unlocked(sd, FEXCL)))
+		if (!(err = straccess_unlocked(sd, (FAPPEND | FEXCL))))
 			sd->sd_closetime = drv_msectohz(closetime);
 	}
 	return (err);
@@ -5440,37 +5440,57 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	int err;
 
 	err = -EINVAL;
-	if (mux->sd_flag & (STRISFIFO | STRISPIPE))
+	if (mux->sd_flag & (STRISFIFO | STRISPIPE)) {
+		__ptrace(("Error path taken!\n"));
 		goto error;
-	if (!mux->sd_cdevsw || !mux->sd_cdevsw->d_str)
+	}
+	if (!mux->sd_cdevsw || !mux->sd_cdevsw->d_str) {
+		__ptrace(("Error path taken!\n"));
 		goto error;
+	}
 	st = mux->sd_cdevsw->d_str;
-	if (!st->st_muxrinit || !st->st_muxwinit)
+	if (!st->st_muxrinit || !st->st_muxwinit) {
+		__ptrace(("Error path taken!\n"));
 		goto error;
+	}
 
 	err = -ENOSR;
-	if (unlikely(!(l = alloclk())))
+	if (unlikely(!(l = alloclk()))) {
+		__ptrace(("Error path taken!\n"));
 		goto error;
+	}
 
-	if ((err = strwaitopen(mux, (FREAD | FWRITE | FEXCL | FNDELAY))))
+	if ((err = strwaitopen(mux, (FREAD | FWRITE | FEXCL | FNDELAY)))) {
+		__ptrace(("Error path taken!\n"));
 		goto free_error;
+	}
 
 	err = -EBADF;
-	if (!(f = fget(arg)))
+	if (!(f = fget(arg))) {
+		__ptrace(("Error path taken!\n"));
 		goto unlock_error;
+	}
 
 	err = -EINVAL;
-	if (!f->f_op || f->f_op->release != &strclose)	/* not a stream */
+	if (!f->f_op || f->f_op->release != &strclose)	{ /* not a stream */
+		__ptrace(("Error path taken!\n"));
 		goto fput_error;
-	if (!(sd = stri_acquire(f)) || (sd == mux))
+	}
+	if (!(sd = stri_acquire(f)) || (sd == mux)) {
+		__ptrace(("Error path taken!\n"));
 		goto fput_error;
+	}
 
-	if ((err = strwaitopen(sd, 0)))
+	if ((err = strwaitopen(sd, 0))) {
+		__ptrace(("Error path taken!\n"));
 		goto sdput_error;
+	}
 
 	err = -ENOSR;
-	if ((err = setsq(sd->sd_rq, (struct fmodsw *) mux->sd_cdevsw)))
+	if ((err = setsq(sd->sd_rq, (struct fmodsw *) mux->sd_cdevsw))) {
+		__ptrace(("Error path taken!\n"));
 		goto unlock2_error;
+	}
 
 	swunlock(sd);
 	{
@@ -5502,6 +5522,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 		strwakeopen_swunlock(sd);
 		err = l->l_index;
 	} else {
+		__ptrace(("Error path taken! err = %d\n", err));
 		setsq(sd->sd_rq, NULL);
 		strwakeopen(sd);
 	}
