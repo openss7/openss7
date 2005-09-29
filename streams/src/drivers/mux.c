@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/09/29 06:48:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 00:12:45 $ by $Author: brian $
+ Last Modified $Date: 2005/09/29 06:48:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/09/29 06:48:16 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/09/29 06:48:16 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/09/29 00:12:45 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/09/29 06:48:16 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -196,23 +196,26 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	struct mux *mux = q->q_ptr, *bot;
 	int err;
 
+	trace();
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
+		trace();
 		switch (ioc->iocblk.ioc_cmd) {
 		case I_LINK:
 		case I_PLINK:
 		{
 			struct linkblk *l;
 
+			trace();
 			if (!mp->b_cont) {
-				__ptrace(("Error path taken!\n"));
+				ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			if (!(bot = kmem_alloc(sizeof(*bot), KM_NOSLEEP))) {
-				__ptrace(("Error path taken!\n"));
+				ptrace(("Error path taken!\n"));
 				goto enomem;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
@@ -236,8 +239,9 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			struct linkblk *l;
 
+			trace();
 			if (!mp->b_cont) {
-				__ptrace(("Error path taken!\n"));
+				ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
@@ -281,6 +285,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
+			trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
@@ -307,6 +312,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
+			trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
@@ -330,7 +336,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			goto ack;
 		}
 		default:
-			__ptrace(("Error path taken!\n"));
+			ptrace(("Error path taken!\n"));
 			if (mux->other)
 				goto passmsg;
 		      einval:
@@ -345,14 +351,14 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			ioc->iocblk.ioc_error = -err;
 			ioc->iocblk.ioc_rval = -1;
 			qreply(q, mp);
-			break;
+			return (0);
 		      ack:
 			mp->b_datap->db_type = M_IOCACK;
 			ioc->iocblk.ioc_count = 0;
 			ioc->iocblk.ioc_error = 0;
 			ioc->iocblk.ioc_rval = 0;
 			qreply(q, mp);
-			break;
+			return (0);
 		}
 		break;
 	}
@@ -372,7 +378,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			if ((wq = mux->other->wq)) {
 				putnext(wq, mp);
 				read_unlock_bh(&mux_lock);
-				break;
+				return (0);
 			}
 		}
 		read_unlock_bh(&mux_lock);
@@ -384,7 +390,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				flushq(RD(q), FLUSHALL);
 			mp->b_rptr[0] &= ~FLUSHW;
 			qreply(q, mp);
-			break;
+			return (0);
 		}
 		freemsg(mp);
 		break;
@@ -404,7 +410,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 					    || bcanputnext(wq, mp->b_band)) {
 						putnext(wq, mp);
 						read_unlock_bh(&mux_lock);
-						break;
+						return (0);
 					}
 				}
 				read_unlock_bh(&mux_lock);
@@ -443,7 +449,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 			if ((rq = mux->other->rq)) {
 				putnext(rq, mp);
 				read_unlock_bh(&mux_lock);
-				break;
+				return (0);
 			}
 		}
 		read_unlock_bh(&mux_lock);
@@ -458,7 +464,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				/* pretend to be STREAM head */
 				mp->b_flag |= MSGNOLOOP;
 				qreply(q, mp);
-				break;
+				return (0);
 			}
 		}
 		freemsg(mp);
@@ -477,7 +483,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 					|| bcanputnext(rq, mp->b_band))) {
 					putnext(rq, mp);
 					read_unlock_bh(&mux_lock);
-					break;
+					return (0);
 				}
 			}
 			read_unlock_bh(&mux_lock);
