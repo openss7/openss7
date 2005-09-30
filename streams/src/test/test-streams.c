@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/29 08:08:16 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/29 23:08:20 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 08:08:16 $ by $Author: brian $
+ Last Modified $Date: 2005/09/29 23:08:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.32  2005/09/29 23:08:20  brian
+ - starting testing of FIFOs
+
  Revision 0.9.2.31  2005/09/29 08:08:16  brian
  - fixed multiplexor dismantling bugs
 
@@ -167,9 +170,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/29 08:08:16 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/29 23:08:20 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/29 08:08:16 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/29 23:08:20 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -874,26 +877,34 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_STATS");	/* 2.35 */
 	case I_BIGPIPE:
 		return ("I_BIGPIPE");	/* 2.36 */
-#endif
-#if 0
 	case I_GETTP:
 		return ("I_GETTP");	/* 2.37 */
-	case I_AUTOPUSH:
-		return ("I_AUTOPUSH");	/* 2.38 */
-	case I_HEAP_REPORT:
-		return ("I_HEAP_REPORT");	/* 2.39 */
-	case I_FIFO:
-		return ("I_FIFO");	/* 2.40 */
+#endif
+#if 0
+	case I_GETMSG:
+		return ("I_GETMSG");	/* 2.38 */
+	case I_PUTMSG:
+		return ("I_PUTMSG");	/* 2.39 */
 	case I_PUTPMSG:
-		return ("I_PUTPMSG");	/* 2.41 */
+		return ("I_PUTPMSG");	/* 2.40 */
 	case I_GETPMSG:
-		return ("I_GETPMSG");	/* 2.42 */
-	case I_FATTACH:
-		return ("I_FATTACH");	/* 2.43 */
-	case I_FDETACH:
-		return ("I_FDETACH");	/* 2.44 */
+		return ("I_GETPMSG");	/* 2.41 */
 	case I_PIPE:
-		return ("I_PIPE");	/* 2.45 */
+		return ("I_PIPE");	/* 2.42 */
+	case I_FIFO:
+		return ("I_FIFO");	/* 2.43 */
+#endif
+#if 0
+	case I_AUTOPUSH:
+		return ("I_AUTOPUSH");	/* 2.44 */
+	case I_HEAP_REPORT:
+		return ("I_HEAP_REPORT");	/* 2.45 */
+#endif
+#if 0
+	case I_FATTACH:
+		return ("I_FATTACH");	/* 2.46 */
+	case I_FDETACH:
+		return ("I_FDETACH");	/* 2.47 */
 #endif
 	case TM_IOC_HANGUP:
 		return ("TM_IOC_HANGUP");
@@ -8495,14 +8506,14 @@ struct test_stream test_2_37 = { &preamble_0, &test_case_2_37, &postamble_0 };
 #define test_case_2_37_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_AUTOPUSH	(MacOT)
+ *  Perform IOCTL on one Stream - I_GETMSG  (LfS)
  */
 #define tgrp_case_2_38 test_group_2
 #define numb_case_2_38 "2.38"
-#define name_case_2_38 "Perform streamio I_AUTOPUSH."
+#define name_case_2_38 "Perform streamio I_GETMSG."
 #define sref_case_2_38 sref_none
 #define desc_case_2_38 "\
-Checks that I_AUTOPUSH can be performed on a Stream."
+Checks that I_GETMSG can be performed on a Stream."
 
 int
 test_case_2_38(int child)
@@ -8516,14 +8527,14 @@ struct test_stream test_2_38 = { &preamble_0, &test_case_2_38, &postamble_0 };
 #define test_case_2_38_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_HEAP_REPORT	(MacOT)
+ *  Perform IOCTL on one Stream - I_PUTMSG  (LfS)
  */
 #define tgrp_case_2_39 test_group_2
 #define numb_case_2_39 "2.39"
-#define name_case_2_39 "Perform streamio I_HEAP_REPORT."
+#define name_case_2_39 "Perform streamio I_PUTMSG."
 #define sref_case_2_39 sref_none
 #define desc_case_2_39 "\
-Checks that I_HEAP_REPORT can be performed on a Stream."
+Checks that I_PUTMSG can be performed on a Stream."
 
 int
 test_case_2_39(int child)
@@ -8537,14 +8548,14 @@ struct test_stream test_2_39 = { &preamble_0, &test_case_2_39, &postamble_0 };
 #define test_case_2_39_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_FIFO	(MacOT)
+ *  Perform IOCTL on one Stream - I_GETPMSG  (LfS)
  */
 #define tgrp_case_2_40 test_group_2
 #define numb_case_2_40 "2.40"
-#define name_case_2_40 "Perform streamio I_FIFO."
+#define name_case_2_40 "Perform streamio I_GETPMSG."
 #define sref_case_2_40 sref_none
 #define desc_case_2_40 "\
-Checks that I_FIFO can be performed on a Stream."
+Checks that I_GETPMSG can be performed on a Stream."
 
 int
 test_case_2_40(int child)
@@ -8558,7 +8569,7 @@ struct test_stream test_2_40 = { &preamble_0, &test_case_2_40, &postamble_0 };
 #define test_case_2_40_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_PUTPMSG	(LiS)
+ *  Perform IOCTL on one Stream - I_PUTPMSG  (LfS)
  */
 #define tgrp_case_2_41 test_group_2
 #define numb_case_2_41 "2.41"
@@ -8579,14 +8590,14 @@ struct test_stream test_2_41 = { &preamble_0, &test_case_2_41, &postamble_0 };
 #define test_case_2_41_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_GETPMSG	(LiS)
+ *  Perform IOCTL on one Stream - I_PIPE  (LfS)
  */
 #define tgrp_case_2_42 test_group_2
 #define numb_case_2_42 "2.42"
-#define name_case_2_42 "Perform streamio I_GETPMSG."
+#define name_case_2_42 "Perform streamio I_PIPE."
 #define sref_case_2_42 sref_none
 #define desc_case_2_42 "\
-Checks that I_GETPMSG can be performed on a Stream."
+Checks that I_PIPE can be performed on a Stream."
 
 int
 test_case_2_42(int child)
@@ -8600,14 +8611,14 @@ struct test_stream test_2_42 = { &preamble_0, &test_case_2_42, &postamble_0 };
 #define test_case_2_42_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_FATTACH	(LiS)
+ *  Perform IOCTL on one Stream - I_FIFO  (LfS)
  */
 #define tgrp_case_2_43 test_group_2
 #define numb_case_2_43 "2.43"
-#define name_case_2_43 "Perform streamio I_FATTACH."
+#define name_case_2_43 "Perform streamio I_FIFO."
 #define sref_case_2_43 sref_none
 #define desc_case_2_43 "\
-Checks that I_FATTACH can be performed on a Stream."
+Checks that I_FIFO can be performed on a Stream."
 
 int
 test_case_2_43(int child)
@@ -8621,14 +8632,14 @@ struct test_stream test_2_43 = { &preamble_0, &test_case_2_43, &postamble_0 };
 #define test_case_2_43_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_FDETACH	(LiS)
+ *  Perform IOCTL on one Stream - I_AUTOPUSH	(MacOT)
  */
 #define tgrp_case_2_44 test_group_2
 #define numb_case_2_44 "2.44"
-#define name_case_2_44 "Perform streamio I_FDETACH."
+#define name_case_2_44 "Perform streamio I_AUTOPUSH."
 #define sref_case_2_44 sref_none
 #define desc_case_2_44 "\
-Checks that I_FDETACH can be performed on a Stream."
+Checks that I_AUTOPUSH can be performed on a Stream."
 
 int
 test_case_2_44(int child)
@@ -8642,14 +8653,14 @@ struct test_stream test_2_44 = { &preamble_0, &test_case_2_44, &postamble_0 };
 #define test_case_2_44_stream_2 (NULL)
 
 /*
- *  Perform IOCTL on one Stream - I_PIPE	(LiS)
+ *  Perform IOCTL on one Stream - I_HEAP_REPORT	(MacOT)
  */
 #define tgrp_case_2_45 test_group_2
 #define numb_case_2_45 "2.45"
-#define name_case_2_45 "Perform streamio I_PIPE."
+#define name_case_2_45 "Perform streamio I_HEAP_REPORT."
 #define sref_case_2_45 sref_none
 #define desc_case_2_45 "\
-Checks that I_PIPE can be performed on a Stream."
+Checks that I_HEAP_REPORT can be performed on a Stream."
 
 int
 test_case_2_45(int child)
@@ -8661,6 +8672,49 @@ struct test_stream test_2_45 = { &preamble_0, &test_case_2_45, &postamble_0 };
 #define test_case_2_45_stream_0 (&test_2_45)
 #define test_case_2_45_stream_1 (NULL)
 #define test_case_2_45_stream_2 (NULL)
+
+/*
+ *  Perform IOCTL on one Stream - I_FATTACH	(LfS)
+ */
+#define tgrp_case_2_46 test_group_2
+#define numb_case_2_46 "2.46"
+#define name_case_2_46 "Perform streamio I_FATTACH."
+#define sref_case_2_46 sref_none
+#define desc_case_2_46 "\
+Checks that I_FATTACH can be performed on a Stream."
+
+int
+test_case_2_46(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_46 = { &preamble_0, &test_case_2_46, &postamble_0 };
+
+#define test_case_2_46_stream_0 (&test_2_46)
+#define test_case_2_46_stream_1 (NULL)
+#define test_case_2_46_stream_2 (NULL)
+
+/*
+ *  Perform IOCTL on one Stream - I_FDETACH	(LfS)
+ */
+#define tgrp_case_2_47 test_group_2
+#define numb_case_2_47 "2.44"
+#define name_case_2_47 "Perform streamio I_FDETACH."
+#define sref_case_2_47 sref_none
+#define desc_case_2_47 "\
+Checks that I_FDETACH can be performed on a Stream."
+
+int
+test_case_2_47(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_47 = { &preamble_0, &test_case_2_47, &postamble_0 };
+
+#define test_case_2_47_stream_0 (&test_2_47)
+#define test_case_2_47_stream_1 (NULL)
+#define test_case_2_47_stream_2 (NULL)
+
 #endif
 
 /*

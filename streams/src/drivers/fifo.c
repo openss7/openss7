@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/03 02:03:49 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 02:03:49 $ by $Author: brian $
+ Last Modified $Date: 2005/09/29 23:08:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/03 02:03:49 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/03 02:03:49 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/03 02:03:49 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -152,13 +152,10 @@ static struct module_info fifo_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int fifo_close(queue_t *q, int oflag, cred_t *crp);
-
 static struct qinit fifo_rinit = {
 	.qi_putp = strrput,
-	.qi_qopen = fifo_qopen,
-	.qi_qclose = fifo_close,
+	.qi_qopen = str_open,
+	.qi_qclose = str_close,
 	.qi_minfo = &fifo_minfo,
 };
 
@@ -172,57 +169,6 @@ static struct streamtab fifo_info = {
 	.st_rdinit = &fifo_rinit,
 	.st_wrinit = &fifo_winit,
 };
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  OPEN and CLOSE
- *
- *  -------------------------------------------------------------------------
- */
-
-static int
-fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
-{
-	struct stdata *sd;
-
-	/* already open */
-	if ((sd = q->q_ptr))
-		return (0);
-
-	/* must be opened for at least read or write */
-	if (!(oflag & (FWRITE | FREAD)))
-		return (-EINVAL);
-	/* XXX: does it really?  Are there not any useful STREAMS ioctls? */
-
-	if (!(sd = qstream(q)))
-		return (-EIO);
-
-	/* first open we don't need to write lock stream head to change sd->sd_wq->q_next because
-	   we are not published to the inode yet and we have exclusive access to the stream. */
-
-	WR(q)->q_next = q;
-
-	/* lastly, attach our privates and return */
-	q->q_ptr = WR(q)->q_ptr = sd;
-	/* XXX: should we do an sd_get here? */
-
-	return (0);
-}
-
-static int
-fifo_close(queue_t *q, int oflag, cred_t *crp)
-{
-	struct stdata *sd;
-
-	if (!(sd = q->q_ptr))
-		return (-ENXIO);
-
-	q->q_ptr = WR(q)->q_ptr = NULL;
-	/* XXX: should we do an sd_put here? */
-
-	return (0);
-}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -267,10 +213,35 @@ fifo_open(struct inode *inode, struct file *file)
 
 	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
 	printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
-	file->f_op = fifo_cdev.d_fop;
-	file->private_data = &dev; /* use this device number instead of inode number */
-	file->f_flags &= ~O_CLONE; /* FIFOs never clone */
+	{
+		struct file_operations *f_op;
+
+		err = -ENXIO;
+		if (!(f_op = fops_get(fifo_cdev.d_fop))) {
+			ptrace(("Error path taken!\n"));
+			goto error;
+		}
+#ifdef CONFIG_STREAMS_DEBUG
+		if (f_op->owner)
+			_printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
+				 f_op->owner->name, module_refcount(f_op->owner)));
+		else
+			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+#endif
+#ifdef CONFIG_STREAMS_DEBUG
+		if (file->f_op->owner)
+			_printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
+				 file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
+		else
+			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
+#endif
+		fops_put(file->f_op);
+		file->f_op = f_op;
+	}
+	file->private_data = &dev;	/* use this device number instead of inode number */
+	file->f_flags &= ~O_CLONE;	/* FIFOs never clone */
 	err = file->f_op->open(inode, file);
+      error:
 	return (err);
 }
 

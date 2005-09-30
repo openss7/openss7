@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/25 22:52:11 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/29 23:08:19 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 22:52:11 $ by $Author: brian $
+ Last Modified $Date: 2005/09/29 23:08:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.14  2005/09/29 23:08:19  brian
+ - starting testing of FIFOs
+
  Revision 0.9.2.13  2005/09/25 22:52:11  brian
  - added test module and continuing with testing
 
@@ -113,9 +116,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/25 22:52:11 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/29 23:08:19 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/25 22:52:11 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/29 23:08:19 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -146,6 +149,8 @@ static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
+
+#include <sys/testmod.h>
 
 /*
  *  -------------------------------------------------------------------------
@@ -838,6 +843,14 @@ ioctl_string(int cmd, intptr_t arg)
 	case I_PIPE:
 		return ("I_PIPE");	/* 2.45 */
 #endif
+	case TM_IOC_HANGUP:
+		return ("TM_IOC_HANGUP");
+	case TM_IOC_RDERR:
+		return ("TM_IOC_RDERR");
+	case TM_IOC_WRERR:
+		return ("TM_IOC_WRERR");
+	case TM_IOC_RWERR:
+		return ("TM_IOC_RWERR");
 	default:
 		return ("(unexpected)");
 	}
@@ -1045,7 +1058,7 @@ print_failed(int child)
 	};
 
 	if (verbose > 0)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void
@@ -1059,7 +1072,7 @@ print_script_error(int child)
 	};
 
 	if (verbose > 0)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void
@@ -1073,7 +1086,7 @@ print_passed(int child)
 	};
 
 	if (verbose > 2)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void
@@ -1691,7 +1704,7 @@ test_close(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  STREAM Initialization
+ *  Stream Initialization
  *
  *  -------------------------------------------------------------------------
  */
@@ -1814,16 +1827,16 @@ struct test_stream {
 static const char sref_none[] = "(none)";
 
 /*
- *  Open and Close 1 stream.
+ *  Open and Close 1 Stream.
  */
-static const char test_group_1[] = "Open and close streams";
+static const char test_group_1[] = "Open and close Streams";
 
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
-#define name_case_1_1 "Open and close 1 stream."
+#define name_case_1_1 "Open and close 1 Stream."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
-Checks that one stream can be opened and closed."
+Checks that one Stream can be opened and closed."
 
 int
 test_case_1_1(int child)
@@ -1841,14 +1854,14 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 #define test_case_1_1_stream_2 (NULL)
 
 /*
- *  Open and Close 3 streams.
+ *  Open and Close 3 Streams.
  */
 #define tgrp_case_1_2 test_group_1
 #define numb_case_1_2 "1.2"
-#define name_case_1_2 "Open and close 3 streams."
+#define name_case_1_2 "Open and close 3 Streams."
 #define sref_case_1_2 sref_none
 #define desc_case_1_2 "\
-Checks that three streams can be opened and closed."
+Checks that three Streams can be opened and closed."
 
 int
 test_case_1_2(int child)
@@ -2155,7 +2168,7 @@ struct test_case {
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
 	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
-	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0} , {
+	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
