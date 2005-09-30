@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.60 2005/09/27 23:34:24 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.61 2005/09/30 08:26:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 23:34:24 $ by $Author: brian $
+ Last Modified $Date: 2005/09/30 08:26:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/09/27 23:34:24 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/30 08:26:50 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -166,6 +166,7 @@ typedef struct free_rtn {
 	caddr_t free_arg;
 } frtn_t;
 
+/* 24 bytes on 32 bit, 44 on 64 bit */
 typedef struct datab {
 	union {
 		struct datab *freep;
@@ -177,11 +178,16 @@ typedef struct datab {
 	unsigned char *db_lim;
 	unsigned char db_ref;		/* shadow reference count */
 	unsigned char db_type;
-	unsigned char db_iswhat;	/* Mac OT */
-	unsigned char db_filler2;	/* Mac OT */
-	uint db_size;			/* Mac OT */
-	unsigned char *db_msgaddr;	/* Mac OT */
-	long db_filler;			/* Mac OT */
+	unsigned char db_class;		/* Mac OT, OSF/1, DGUX, call it db_iswhat */
+	unsigned char db_pad;		/* Mac OT, OSF/1, DGUX, call it db_filler2 */
+	unsigned int db_size;		/* not really necessary (db_lim - db_base) but present in SVR3.1 */
+#if 0
+	unsigned char db_cache[DB_CACHESIZE]; /* where SVR3.1 stuck the internal data buffer */
+#endif
+#if 0
+	unsigned char *db_msgaddr;	/* Mac OT, OSF/1, DGUX, used internally */
+	long db_filler;			/* Mac OT, OSF/1, DGUX, used internally */
+#endif
 	/* Linux Fast-STREAMS specific members */
 	atomic_t db_users;		/* actual reference count */
 } dblk_t;
@@ -260,7 +266,7 @@ typedef enum msg_type {
 	M_PCTTY = 0x9a,		/* v A */
 } msg_type_t;
 
-/* 40 bytes on 32 bit, 76 on 64 bit */
+/* 28 bytes on 32 bit, 52 on 64 bit */
 typedef struct msgb {
 	struct msgb *b_next;		/* next msgb on queue */
 	struct msgb *b_prev;		/* prev msgb on queue */
@@ -271,10 +277,12 @@ typedef struct msgb {
 	unsigned char b_band;		/* band of this message */
 	unsigned char b_pad1;		/* padding */
 	unsigned short b_flag;		/* message flags */
+#if 0
 	long b_pad2;			/* padding */
 	/* private Linux Fast-STREAMS specific members */
 	struct queue *b_queue;		/* queue for this message */
 	size_t b_size;			/* size of this message on queue */
+#endif
 } mblk_t;
 
 #define MSGMARK		(1<<0)	/* last byte of message is marked */

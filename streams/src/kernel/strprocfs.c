@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/27 10:04:14 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/30 08:26:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 10:04:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/30 08:26:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/27 10:04:14 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/30 08:26:56 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/09/27 10:04:14 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/30 08:26:56 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -920,8 +920,10 @@ get_streams_msgb_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", b_datap");
 	len += snprintf(page + len, maxlen - len, ", b_band");
 	len += snprintf(page + len, maxlen - len, ", b_flag");
+#if 0
 	len += snprintf(page + len, maxlen - len, ", b_queue");
 	len += snprintf(page + len, maxlen - len, ", b_size");
+#endif
 	return (len);
 }
 static int
@@ -940,8 +942,10 @@ get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_datap);
 	len += snprintf(page + len, maxlen - len, ", %hhu", b->b_band);
 	len += snprintf(page + len, maxlen - len, ", %hu", b->b_flag);
+#if 0
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_queue);
 	len += snprintf(page + len, maxlen - len, ", %d", b->b_size);
+#endif
       done:
 	return (len);
 }
@@ -1022,6 +1026,8 @@ get_streams_datab_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", db_lim");
 	len += snprintf(page + len, maxlen - len, ", db_ref");
 	len += snprintf(page + len, maxlen - len, ", db_type");
+	len += snprintf(page + len, maxlen - len, ", db_class");
+	len += snprintf(page + len, maxlen - len, ", db_size");
 	len += snprintf(page + len, maxlen - len, ", db_users");
 	return (len);
 }
@@ -1038,6 +1044,8 @@ get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
 	len += snprintf(page + len, maxlen - len, ", db_lim: %p", db->db_lim);
 	len += snprintf(page + len, maxlen - len, ", db_ref: %hhu", db->db_ref);
 	len += snprintf(page + len, maxlen - len, ", db_type: %hhu", db->db_type);
+	len += snprintf(page + len, maxlen - len, ", db_class: %hhu", db->db_class);
+	len += snprintf(page + len, maxlen - len, ", db_size: %d:", db->db_size);
 	len += snprintf(page + len, maxlen - len, ", db_users: %d", atomic_read(&db->db_users));
       done:
 	return (len);

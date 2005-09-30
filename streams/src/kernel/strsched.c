@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/09/27 10:04:14 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/30 08:26:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 10:04:14 $ by $Author: brian $
+ Last Modified $Date: 2005/09/30 08:26:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/09/27 10:04:14 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/30 08:26:56 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/09/27 10:04:14 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/30 08:26:56 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3670,8 +3670,10 @@ freechains(struct strthread *t)
 		t->freemsg_tail = &t->freemsg_head;
 		while ((mp = mp_next)) {
 			mp_next = xchg(&mp->b_next, NULL);
+#if 0
 			/* fake out freeb */
 			ctrace(qput(&mp->b_queue));
+#endif
 			mp->b_next = mp->b_prev = NULL;
 			freemsg(mp);
 		}

@@ -201,7 +201,7 @@
 
 @CONFIG_STREAMS_CLONE_MODULE_TRUE@	node	/dev/clone	     c	*	clone		0
 @CONFIG_STREAMS_ECHO_MODULE_TRUE@	node	/dev/echo	     c	*	clone		echo
-@CONFIG_STREAMS_FIFO_MODULE_TRUE@	node	/dev/fifo	     c  0666    clone		fifo
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@	node	/dev/fifo	     c  0666    fifo		0
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/strlog	     c	*	clone		log
 @CONFIG_STREAMS_LOG_MODULE_TRUE@	node	/dev/conslog	     c	*	log		1
 @CONFIG_STREAMS_LOOP_MODULE_TRUE@	node	/dev/loop.1	     c	0644	loop		1

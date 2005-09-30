@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/29 23:08:20 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/30 09:54:37 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 23:08:20 $ by $Author: brian $
+ Last Modified $Date: 2005/09/30 09:54:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.34  2005/09/30 09:54:37  brian
+ - trying to get I_RECVFD working, sync
+
+ Revision 0.9.2.33  2005/09/30 08:27:06  brian
+ - I_SENDFD tests complete
+
  Revision 0.9.2.32  2005/09/29 23:08:20  brian
  - starting testing of FIFOs
 
@@ -170,9 +176,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/29 23:08:20 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/30 09:54:37 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/29 23:08:20 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/30 09:54:37 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -222,6 +228,7 @@ static const char *sstdname = "XSI/XSR";
 static const char *shortname = "STREAMS";
 static char devname[256] = "/dev/echo";
 static char muxname[256] = "/dev/mux";
+static char fifoname[256] = "/dev/fifo";
 
 static int exit_on_failure = 0;
 
@@ -2051,6 +2058,174 @@ postamble_5(int child)
 	return (result);
 }
 
+int
+preamble_6(int child)
+{
+	if (!test_fd[child] && test_open(child, fifoname) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_6(int child)
+{
+	return postamble_0(child);
+}
+
+int
+preamble_6_2_1(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (preamble_0(child + 1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_HANGUP, (intptr_t) 0) != __RESULT_SUCCESS && last_errno != ENXIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+preamble_6_2_2(int child)
+{
+	if (preamble_6(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (preamble_0(child + 1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_RDERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+preamble_6_2_3(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (preamble_0(child + 1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+preamble_6_2_4(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (preamble_0(child + 1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_RWERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_6_2(int child)
+{
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EIO)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child + 1) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return result;
+}
+
+int
+preamble_6_3(int child)
+{
+	if (preamble_6(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (preamble_0(child + 1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_6_3(int child)
+{
+	int result = __RESULT_SUCCESS;
+
+	if (postamble_0(child + 1) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_6(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return (result);
+}
+
+int
+preamble_7(int child)
+{
+	if (preamble_6(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (preamble_1(child + 1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child + 1, I_LINK, (intptr_t) test_fd[child]) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_7(int child)
+{
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child + 1, I_UNLINK, (intptr_t) MUXID_ALL) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_1(child + 1) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_6(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return (result);
+}
+
+
+
+
 /*
  *  =========================================================================
  *
@@ -2701,16 +2876,20 @@ struct test_stream test_2_4_1 = { &preamble_0, &test_case_2_4_1, &postamble_0 };
 #define sref_case_2_4_2 sref_case_2_4
 #define desc_case_2_4_2 "\
 Checks that I_LOOK can be performed on a Stream.  The command should \n\
-fail with EINVAL if there is no module in the Stream.  Unfortunately,\n\
-this is a behavior only of STREAMS-based pipes and FIFOs.  This test is\n\
-skipped here."
+fail with EINVAL if there is no module in the Stream.  This is a\n\
+behavior only of STREAMS-based pipes and FIFOs.  This test is on a FIFO."
 
 int
 test_case_2_4_2(int child)
 {
-	return (__RESULT_SKIPPED);
+	char buf[FMNAMESZ + 1];
+
+	if (test_ioctl(child, I_LOOK, (intptr_t) buf) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_4_2 = { &preamble_0, &test_case_2_4_2, &postamble_0 };
+struct test_stream test_2_4_2 = { &preamble_6, &test_case_2_4_2, &postamble_6 };
 
 #define test_case_2_4_2_stream_0 (&test_2_4_2)
 #define test_case_2_4_2_stream_1 (NULL)
@@ -5165,10 +5344,30 @@ struct test_stream test_2_14_6 = { &preamble_5, &test_case_2_14_6, &postamble_5 
 #define test_case_2_14_6_stream_1 (NULL)
 #define test_case_2_14_6_stream_2 (NULL)
 
+#define tgrp_case_2_14_7 test_group_2
+#define numb_case_2_14_7 "2.14.7"
+#define name_case_2_14_7 "Perform streamio I_RECVFD."
+#define sref_case_2_14_7 sref_case_2_14
+#define desc_case_2_14_7 "\
+Checks that I_RECVFD can be performed on a Stream."
+
+int
+test_case_2_14_7(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_14_7 = { &preamble_6_3, &test_case_2_14_7, &postamble_6_3 };
+
+#define test_case_2_14_7_stream_0 (&test_2_14_7)
+#define test_case_2_14_7_stream_1 (NULL)
+#define test_case_2_14_7_stream_2 (NULL)
+
 /* more tests:
  * - check that I_RECVFD will block and return EINTR if the wait is interrupted.
- * - check actual passing of messages. (Will need operational pipes or a
- *   FIFO for that.
  */
 
 /*
@@ -5509,14 +5708,17 @@ static const char sref_case_2_17[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) referenc
 #define name_case_2_17_1 "Perform streamio I_SENDFD."
 #define sref_case_2_17_1 sref_case_2_17
 #define desc_case_2_17_1 "\
-Checks that I_SENDFD can be performed on a Stream."
+Checks that I_SENDFD can be performed on a Stream.  This test is\n\
+performed using two FIFOs."
 
 int
 test_case_2_17_1(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_17_1 = { &preamble_0, &test_case_2_17_1, &postamble_0 };
+struct test_stream test_2_17_1 = { &preamble_6, &test_case_2_17_1, &postamble_6 };
 
 #define test_case_2_17_1_stream_0 (&test_2_17_1)
 #define test_case_2_17_1_stream_1 (NULL)
@@ -5527,14 +5729,17 @@ struct test_stream test_2_17_1 = { &preamble_0, &test_case_2_17_1, &postamble_0 
 #define name_case_2_17_2 "Perform streamio I_SENDFD - ENXIO."
 #define sref_case_2_17_2 sref_case_2_17
 #define desc_case_2_17_2 "\
-Checks that I_SENDFD can be performed on a Stream."
+Checks that I_SENDFD can be performed on a Stream.  Checks that ENXIO is\n\
+returned when the Stream is hung up."
 
 int
 test_case_2_17_2(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) == __RESULT_SUCCESS || last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_17_2 = { &preamble_2_1, &test_case_2_17_2, &postamble_2 };
+struct test_stream test_2_17_2 = { &preamble_6_2_1, &test_case_2_17_2, &postamble_6_2 };
 
 #define test_case_2_17_2_stream_0 (&test_2_17_2)
 #define test_case_2_17_2_stream_1 (NULL)
@@ -5542,17 +5747,20 @@ struct test_stream test_2_17_2 = { &preamble_2_1, &test_case_2_17_2, &postamble_
 
 #define tgrp_case_2_17_3 test_group_2
 #define numb_case_2_17_3 "2.17.3"
-#define name_case_2_17_3 "Perform streamio I_SENDFD - RDERR."
+#define name_case_2_17_3 "Perform streamio I_SENDFD - EPROTO RDERR."
 #define sref_case_2_17_3 sref_case_2_17
 #define desc_case_2_17_3 "\
-Checks that I_SENDFD can be performed on a Stream."
+Checks that I_SENDFD can be performed on a Stream.  Checks that EPROTO\n\
+is returned when the other Stream head is read errored."
 
 int
 test_case_2_17_3(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_17_3 = { &preamble_2_2, &test_case_2_17_3, &postamble_2 };
+struct test_stream test_2_17_3 = { &preamble_6_2_2, &test_case_2_17_3, &postamble_6_2 };
 
 #define test_case_2_17_3_stream_0 (&test_2_17_3)
 #define test_case_2_17_3_stream_1 (NULL)
@@ -5563,14 +5771,17 @@ struct test_stream test_2_17_3 = { &preamble_2_2, &test_case_2_17_3, &postamble_
 #define name_case_2_17_4 "Perform streamio I_SENDFD - EPROTO WRERR."
 #define sref_case_2_17_4 sref_case_2_17
 #define desc_case_2_17_4 "\
-Checks that I_SENDFD can be performed on a Stream."
+Checks that I_SENDFD can be performed on a Stream.  Checks that EPROTO\n\
+is returned when the Stream is write errored."
 
 int
 test_case_2_17_4(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_17_4 = { &preamble_2_3, &test_case_2_17_4, &postamble_2 };
+struct test_stream test_2_17_4 = { &preamble_6_2_3, &test_case_2_17_4, &postamble_6_2 };
 
 #define test_case_2_17_4_stream_0 (&test_2_17_4)
 #define test_case_2_17_4_stream_1 (NULL)
@@ -5581,14 +5792,17 @@ struct test_stream test_2_17_4 = { &preamble_2_3, &test_case_2_17_4, &postamble_
 #define name_case_2_17_5 "Perform streamio I_SENDFD - EPROTO RDERR WRERR."
 #define sref_case_2_17_5 sref_case_2_17
 #define desc_case_2_17_5 "\
-Checks that I_SENDFD can be performed on a Stream."
+Checks that I_SENDFD can be performed on a Stream.  Checks that EPROTO\n\
+is returned when the Stream is errored."
 
 int
 test_case_2_17_5(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_17_5 = { &preamble_2_4, &test_case_2_17_5, &postamble_2 };
+struct test_stream test_2_17_5 = { &preamble_6_2_4, &test_case_2_17_5, &postamble_6_2 };
 
 #define test_case_2_17_5_stream_0 (&test_2_17_5)
 #define test_case_2_17_5_stream_1 (NULL)
@@ -5605,9 +5819,11 @@ is returned when the Stream is linked under a Multiplexing Driver."
 int
 test_case_2_17_6(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_17_6 = { &preamble_2_4, &test_case_2_17_6, &postamble_2 };
+struct test_stream test_2_17_6 = { &preamble_7, &test_case_2_17_6, &postamble_7 };
 
 #define test_case_2_17_6_stream_0 (&test_2_17_6)
 #define test_case_2_17_6_stream_1 (NULL)
@@ -9266,6 +9482,8 @@ struct test_case {
 	test_case_2_14_5_stream_0, test_case_2_14_5_stream_1, test_case_2_14_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_14_6, tgrp_case_2_14_6, name_case_2_14_6, desc_case_2_14_6, sref_case_2_14_6, {
 	test_case_2_14_6_stream_0, test_case_2_14_6_stream_1, test_case_2_14_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_14_7, tgrp_case_2_14_7, name_case_2_14_7, desc_case_2_14_7, sref_case_2_14_7, {
+	test_case_2_14_7_stream_0, test_case_2_14_7_stream_1, test_case_2_14_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_15_1, tgrp_case_2_15_1, name_case_2_15_1, desc_case_2_15_1, sref_case_2_15_1, {
 	test_case_2_15_1_stream_0, test_case_2_15_1_stream_1, test_case_2_15_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_15_2, tgrp_case_2_15_2, name_case_2_15_2, desc_case_2_15_2, sref_case_2_15_2, {
@@ -9601,7 +9819,7 @@ do_tests(int num_tests)
 	show = 0;
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "\nUsing device %s, %s\n\n", devname, muxname);
+		fprintf(stdout, "\nUsing device %s, %s, %s\n\n", devname, muxname, fifoname);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}

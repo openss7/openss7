@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:24 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/30 08:26:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/27 23:34:24 $ by $Author: brian $
+ Last Modified $Date: 2005/09/30 08:26:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:24 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/30 08:26:56 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/09/27 23:34:24 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/30 08:26:56 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -524,7 +524,9 @@ allocb(size_t size, uint priority)
 		/* set up data block */
 		db->db_base = base;
 		db->db_lim = base + size;
+		db->db_size = size;
 		db_set(db, 1);
+		db->db_type = M_DATA; /* not necessary if zeroed */
 		/* set up message block */
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
@@ -683,7 +685,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 	mblk_t *mp;
 
 	if ((mp = mdbblock_alloc(priority, &esballoc))) {
-		struct mdbblock *md = (struct mdbblock *) mp;
+		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
 
 		/* set up internal buffer with free routine info */
@@ -692,8 +694,9 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		db->db_frtnp = (struct free_rtn *) md->databuf;
 		db->db_base = base;
 		db->db_lim = base + size;
+		db->db_size = size;
 		db_set(db, 1);
-		db->db_type = M_DATA;
+		db->db_type = M_DATA; /* not necessary if zeroed */
 		/* set up message block */
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
@@ -715,7 +718,9 @@ freeb(mblk_t *mp)
 	trace();
 	/* check null ptr, message still on queue */
 	assert(mp);
+#if 0
 	assert(!mp->b_queue);
+#endif
 
 	db = xchg(&mp->b_datap, NULL);
 
@@ -730,7 +735,7 @@ freeb(mblk_t *mp)
 		if (db->db_base != db_to_buf(db)) {
 			/* handle external data buffer */
 			if (!db->db_frtnp)
-				kmem_free(db->db_base, db->db_lim - db->db_base);
+				kmem_free(db->db_base, db->db_size);
 			else
 				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
@@ -962,6 +967,7 @@ pullupmsg(mblk_t *mp, ssize_t len)
 	dp = &md->datablk.d_dblock;
 	dp->db_base = base;
 	dp->db_lim = base + size;
+	dp->db_size = size;
 	db_set(dp, 1);
 	dp->db_type = db->db_type;
 	/* copy from old initial datab */
@@ -981,7 +987,7 @@ pullupmsg(mblk_t *mp, ssize_t len)
 		if (db->db_base != db_to_buf(db)) {
 			/* handle external data buffer */
 			if (!db->db_frtnp)
-				kmem_free(db->db_base, db->db_lim - db->db_base);
+				kmem_free(db->db_base, db->db_size);
 			else
 				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
@@ -2027,8 +2033,10 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	if (!emp)
 		goto putq;
+#if 0
 	if (q != emp->b_queue)
 		goto bug;
+#endif
 	/* ingnore message class for insq() */
 	enable = ((q->q_first == emp)
 		  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
@@ -2062,7 +2070,9 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		nmp->b_prev->b_next = nmp;
 	nmp->b_next = emp;
 	emp->b_prev = nmp;
+#if 0
 	ctrace(nmp->b_queue = qget(q));
+#endif
 	/* some adding to do */
 	q->q_msgs++;
 	size = msgsize(nmp);
@@ -2076,9 +2086,13 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 				++q->q_blocked;
 		}
 	}
+#if 0
 	nmp->b_size = size;
+#endif
 	return (1 + enable);	/* success */
+#if 0
       bug:
+#endif
       enomem:
 	/* couldn't allocate a band structure! */
 	goto failure;
@@ -2226,8 +2240,13 @@ __putbq(queue_t *q, mblk_t *mp)
 		if (likely(mp->b_band == 0)) {
 			enable = test_bit(QWANTR_BIT, &q->q_flag) ? 1 : 0;
 		      hipri:
+#if 0
 			if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
+#else
+			if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+				set_bit(QFULL_BIT, &q->q_flag);
+#endif
 		      banded:
 			if (q->q_last == b_prev)
 				q->q_last = mp;
@@ -2238,7 +2257,9 @@ __putbq(queue_t *q, mblk_t *mp)
 				b_next->b_prev = mp;
 			if ((mp->b_prev = b_prev))
 				b_prev->b_next = mp;
+#if 0
 			ctrace(mp->b_queue = qget(q));
+#endif
 			return (1 + enable);
 		} else {
 			struct qband *qb;
@@ -2252,9 +2273,15 @@ __putbq(queue_t *q, mblk_t *mp)
 			if (qb->qb_first == b_next)
 				qb->qb_first = mp;
 			qb->qb_msgs++;
+#if 0
 			if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
 				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 					++q->q_blocked;
+#else
+			if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
+				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
+					++q->q_blocked;
+#endif
 			goto banded;
 		}
 	} else {
@@ -2492,8 +2519,13 @@ __putq(queue_t *q, mblk_t *mp)
 		enable = ((q->q_first == b_next)
 			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 	      hipri:
+#if 0
 		if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 			set_bit(QFULL_BIT, &q->q_flag);
+#else
+		if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+			set_bit(QFULL_BIT, &q->q_flag);
+#endif
 	      banded:
 		if (q->q_last == b_prev)
 			q->q_last = mp;
@@ -2504,7 +2536,9 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next->b_prev = mp;
 		if ((mp->b_prev = b_prev))
 			b_prev->b_next = mp;
+#if 0
 		ctrace(mp->b_queue = qget(q));
+#endif
 		return (1 + enable);	/* success */
 	}
 	/* find position of priority messages */
@@ -2538,9 +2572,15 @@ __putq(queue_t *q, mblk_t *mp)
 		if (qb->qb_first == b_next)
 			qb->qb_first = mp;
 		qb->qb_msgs++;
+#if 0
 		if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
 			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 				++q->q_blocked;
+#else
+		if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
+			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
+				++q->q_blocked;
+#endif
 		goto banded;
 	}
 }
@@ -3092,8 +3132,10 @@ __rmvq(queue_t *q, mblk_t *mp)
 	assert(q);
 	assert(mp);
 
+#if 0
 	/* We know which queue the message belongs too, make sure its still there. */
 	assert(q == mp->b_queue);
+#endif
 
 	b_prev = mp->b_prev;
 	b_next = mp->b_next;
@@ -3115,7 +3157,11 @@ __rmvq(queue_t *q, mblk_t *mp)
 			for (qb = q->q_bandp; qb;
 			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next) ;
 		}
+#if 0
 		q->q_count -= mp->b_size;
+#else
+		q->q_count -= msgsize(mp);
+#endif
 		if (q->q_count == 0) {
 			clear_bit(QFULL_BIT, &q->q_flag);
 			clear_bit(QWANTW_BIT, &q->q_flag);
@@ -3144,7 +3190,11 @@ __rmvq(queue_t *q, mblk_t *mp)
 		if (qb->qb_last == mp)
 			qb->qb_last = b_prev;
 		qb->qb_msgs--;
+#if 0
 		qb->qb_count -= mp->b_size;
+#else
+		qb->qb_count -= msgsize(mp);
+#endif
 		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 				--q->q_blocked;
@@ -3157,7 +3207,9 @@ __rmvq(queue_t *q, mblk_t *mp)
 		/* including band zero */
 		clear_bit(QWANTR_BIT, &q->q_flag);
 	}
+#if 0
 	ctrace(qput(&mp->b_queue));
+#endif
 	return (backenable);
 }
 
@@ -3190,8 +3242,10 @@ rmvq(queue_t *q, mblk_t *mp)
 
 	pl = qwlock(q);
 
+#if 0
 	assert(mp->b_queue);
 	assert(q == mp->b_queue);
+#endif
 
 	backenable = __rmvq(q, mp);
 

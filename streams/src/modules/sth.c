@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/29 08:08:12 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 08:08:12 $ by $Author: brian $
+ Last Modified $Date: 2005/09/30 09:54:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/29 08:08:12 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/29 08:08:12 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/29 08:08:12 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -6218,6 +6218,7 @@ freefd_func(caddr_t arg)
 
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
+	trace();
 	fput(file);
 	return;
 }
@@ -6231,47 +6232,71 @@ freefd_func(caddr_t arg)
 STATIC inline streams_fastcall int
 str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	struct file *f2;
 	struct stdata *s2;
+	struct file *f2;
 	int err;
+	bool fifo, pipe;
 
-	if (!(err = straccess_rlock(sd, (FWRITE | FEXCL | FNDELAY)))) {
-		if (!(s2 = sd->sd_other)) {
-			if (!(err = straccess_rlock(s2, (FREAD | FEXCL | FNDELAY)))) {
-				if ((f2 = fget(arg))) {
-					queue_t *q = s2->sd_rq;
+	if ((err = straccess_rlock(sd, (FWRITE | FEXCL | FNDELAY))))
+		goto exit;
 
-					/* SVR 4 SPG says that this message is placed directly on
-					   the read queue of the target stream head. */
-					if (canput(q)) {
-						mblk_t *mp;
-						frtn_t freefd = { freefd_func, (caddr_t) f2 };
+	fifo = (test_bit(STRISFIFO_BIT, &sd->sd_flag) != 0);
+	pipe = (test_bit(STRISPIPE_BIT, &sd->sd_flag) != 0);
 
-						if ((mp = esballoc((void *) f2, sizeof(f2),
-								   BPRI_MED, &freefd))) {
-							mp->b_datap->db_type = M_PASSFP;
-							mp->b_rptr = mp->b_wptr =
-							    mp->b_datap->db_base;
-							*((typeof(f2) *) mp->b_wptr) = f2;
-							mp->b_wptr += sizeof(f2);
-							putq(q, mp);
-						} else {
-							err = -ENOSR;
-							fput(f2);
-						}
-					} else {
-						err = -EAGAIN;
-						fput(f2);
-					}
-				} else
-					err = -EBADF;
-				srunlock(s2);
-			}
-		} else
-			err = -ENXIO;	/* XXX: EINVAL? ENXIO? */
-		srunlock(sd);
+	err = -EINVAL;		/* POSIX says EINVAL */
+	if (!fifo && !pipe)
+		goto unlock_exit;
+
+	if (fifo)
+		s2 = sd;
+	if (pipe)
+		s2 = sd->sd_other;
+
+	if (!s2)
+		goto unlock_exit;
+
+	if ((err = straccess_rlock(s2, (FREAD | FEXCL | FNDELAY))))
+		goto unlock_exit;
+
+	err = -EBADF;
+	if (!(f2 = fget(arg)))
+		goto unlock2_exit;
+
+	/* can't pass our own file descriptor on a FIFO */
+	err = -EINVAL;
+	if (fifo && f2 == file)
+		goto fput_exit;
+
+	/* SVR 4 SPG says that this message is placed directly on the read queue of the target
+	   stream head. */
+	err = -EAGAIN;
+	if (!canput(s2->sd_rq))
+		goto fput_exit;
+
+	{
+		mblk_t *mp;
+		frtn_t freefd = { freefd_func, (caddr_t) f2 };
+
+		err = -ENOSR;
+		if (!(mp = esballoc(NULL, 0, BPRI_MED, &freefd)))
+			goto fput_exit;
+
+		mp->b_datap->db_type = M_PASSFP;
+		mp->b_rptr = mp->b_wptr = (unsigned char *) &mp->b_datap->db_frtnp->free_arg;
+		mp->b_wptr += sizeof(caddr_t);
+		put(s2->sd_rq, mp);
+		err = 0;
 	}
+
+      unlock2_exit:
+	srunlock(s2);
+      unlock_exit:
+	srunlock(sd);
+      exit:
 	return (err);
+      fput_exit:
+	fput(f2);
+	goto unlock2_exit;
 }
 
 /**
@@ -6289,7 +6314,9 @@ STATIC inline streams_fastcall int
 str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strrecvfd *srp = (typeof(srp)) arg;
-	int fd, err;
+	queue_t *q = sd->sd_rq;
+	mblk_t *mp = NULL;
+	int err;
 
 	if (!arg)
 		return (-EINVAL);
@@ -6297,46 +6324,39 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!access_ok(VERIFY_WRITE, srp, sizeof(*srp)))
 		return (-EFAULT);
 
-	if ((err = fd = get_unused_fd()) >= 0) {
-		queue_t *q = sd->sd_rq;
-		mblk_t *mp = NULL;
+	if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
+		unsigned long pl;
 
-		if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
-			unsigned long pl;
+		/* protect atomicity of STRPRI bit, getq() and putbq() operations */
+		pl = zwlock(sd);
+		if (IS_ERR(mp = strtestgetfp(sd, q, file->f_flags, &pl)))
+			err = PTR_ERR(mp);
+		zwunlock(sd, pl);
+		srunlock(sd);
+	}
+	if (!err) {
+#if HAVE_DUPFD_ADDR
+		static int (*dupfd) (struct file *, unsigned int) = (typeof(dupfd)) HAVE_DUPFD_ADDR;
+#else
+#error Must have dupfd() defined.
+#endif
+		struct strrecvfd sr;
+		struct file *f2;
 
-			/* protect atomicity of STRPRI bit, getq() and putbq() operations */
-			pl = zwlock(sd);
-			if (IS_ERR(mp = strtestgetfp(sd, q, file->f_flags, &pl)))
-				err = PTR_ERR(mp);
-			zwunlock(sd, pl);
-			srunlock(sd);
-		}
-		if (!err) {
-			struct strrecvfd sr;
-			struct file *f2;
-
-			/* we now have a M_PASSFP message in mp */
-			f2 = (struct file *) mp->b_rptr;
-			sr.fd = fd;
+		/* we now have a M_PASSFP message in mp */
+		f2 = (struct file *) mp->b_rptr;
+		if ((err = dupfd(f2, 0)) >= 0) {
+			sr.fd = err;
 			sr.uid = f2->f_uid;
 			sr.gid = f2->f_gid;
-			if (!(err = copyout(&sr, (typeof(&sr)) arg, sizeof(sr)))) {
-				fd_install(fd, f2);
-				/* we need to do another get because an fput will be done when the
-				   mblk is freed */
-				get_file(f2);
-				freemsg(mp);
-			} else {
-				/* shouldn't happen, we verified the area before! */
-				putbq(q, mp);
-			}
+			err = copyout(&sr, (typeof(&sr)) arg, sizeof(sr));
 		}
-		if (err) {
-			/* only when we can't block because of hang up */
-			if (err == -ESTRPIPE)
-				err = -ENXIO;	/* that's what POSIX says */
-			put_unused_fd(fd);
-		}
+		freemsg(mp);
+	}
+	if (err) {
+		/* only when we can't block because of hang up */
+		if (err == -ESTRPIPE)
+			err = -ENXIO;	/* that's what POSIX says */
 	}
 	return (err);
 }
@@ -7835,6 +7855,9 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			goto error;
 		/* qattach() above does the right thing with regard to setq() */
 	} else if (sd->sd_flag & STRISFIFO) {
+		/* fifos cannot be clone opened */
+		if (sflag == CLONEOPEN)
+			return (-ENXIO);
 		/* start off life as a fifo */
 		_WR(q)->q_next = q;
 	} else if (sd->sd_flag & STRISPIPE) {
