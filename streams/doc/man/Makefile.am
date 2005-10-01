@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/11 02:39:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/01 05:11:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/11 02:39:49 $ by $Author: brian $
+# Last Modified $Date: 2005/10/01 05:11:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -914,6 +914,14 @@ module_pages += \
 	man8/test-sc.8 \
 	man8/scls.8 \
 	man8/strinfo.8
+endif
+if CONFIG_STREAMS_TESTMOD
+module_pages += \
+	man4/testmod.4
+endif
+if CONFIG_STREAMS_TESTMOD_MODULE
+module_pages += \
+	man4/testmod.4
 endif
 util_pages =
 if CONFIG_STREAMS_UTILS
@@ -2159,6 +2167,14 @@ dist_noinst_module_pages += \
 	man8/test-sc.8.man \
 	man8/scls.8.man \
 	man8/strinfo.8.man
+endif
+if CONFIG_STREAMS_TESTMOD
+dist_noinst_module_pages += \
+	man4/testmod.4.man
+endif
+if CONFIG_STREAMS_TESTMOD_MODULE
+dist_noinst_module_pages += \
+	man4/testmod.4.man
 endif
 dist_noinst_util_pages =
 if CONFIG_STREAMS_UTILS
