@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/30 09:54:33 $ by $Author: brian $
+ Last Modified $Date: 2005/10/01 04:31:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/09/30 09:54:33 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -6219,6 +6219,7 @@ freefd_func(caddr_t arg)
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
 	trace();
+	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file, file_count(file) - 1));
 	fput(file);
 	return;
 }
@@ -6262,6 +6263,8 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!(f2 = fget(arg)))
 		goto unlock2_exit;
 
+	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2)));
+
 	/* can't pass our own file descriptor on a FIFO */
 	err = -EINVAL;
 	if (fifo && f2 == file)
@@ -6295,6 +6298,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
       exit:
 	return (err);
       fput_exit:
+	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2) - 1));
 	fput(f2);
 	goto unlock2_exit;
 }
@@ -6314,9 +6318,7 @@ STATIC inline streams_fastcall int
 str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strrecvfd *srp = (typeof(srp)) arg;
-	queue_t *q = sd->sd_rq;
-	mblk_t *mp = NULL;
-	int err;
+	int fd, err;
 
 	if (!arg)
 		return (-EINVAL);
@@ -6324,39 +6326,54 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!access_ok(VERIFY_WRITE, srp, sizeof(*srp)))
 		return (-EFAULT);
 
-	if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
-		unsigned long pl;
+	if ((err = fd = get_unused_fd()) >= 0) {
+		queue_t *q = sd->sd_rq;
+		mblk_t *mp = NULL;
 
-		/* protect atomicity of STRPRI bit, getq() and putbq() operations */
-		pl = zwlock(sd);
-		if (IS_ERR(mp = strtestgetfp(sd, q, file->f_flags, &pl)))
-			err = PTR_ERR(mp);
-		zwunlock(sd, pl);
-		srunlock(sd);
-	}
-	if (!err) {
-#if HAVE_DUPFD_ADDR
-		static int (*dupfd) (struct file *, unsigned int) = (typeof(dupfd)) HAVE_DUPFD_ADDR;
-#else
-#error Must have dupfd() defined.
-#endif
-		struct strrecvfd sr;
-		struct file *f2;
+		if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {
+			unsigned long pl;
 
-		/* we now have a M_PASSFP message in mp */
-		f2 = (struct file *) mp->b_rptr;
-		if ((err = dupfd(f2, 0)) >= 0) {
-			sr.fd = err;
+			/* protect atomicity of STRPRI bit, getq() and putbq() operations */
+			pl = zwlock(sd);
+			if (IS_ERR(mp = strtestgetfp(sd, q, file->f_flags, &pl)))
+				err = PTR_ERR(mp);
+			zwunlock(sd, pl);
+			srunlock(sd);
+		}
+		if (!err) {
+			struct strrecvfd sr;
+			struct file *f2;
+
+			/* we now have a M_PASSFP message in mp */
+			f2 = *(struct file **) mp->b_rptr;
+			printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
+				  file_count(f2)));
+			sr.fd = fd;
 			sr.uid = f2->f_uid;
 			sr.gid = f2->f_gid;
-			err = copyout(&sr, (typeof(&sr)) arg, sizeof(sr));
+			if (!(err = copyout(&sr, (typeof(&sr)) arg, sizeof(sr)))) {
+				fd_install(fd, f2);
+				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
+					  file_count(f2)));
+				/* we need to do another get because an fput will be done when the
+				   mblk is freed */
+				get_file(f2);
+				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
+					  file_count(f2)));
+				freemsg(mp);
+				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
+					  file_count(f2)));
+			} else {
+				/* shouldn't happen, we verified the area before! */
+				putbq(q, mp);
+			}
 		}
-		freemsg(mp);
-	}
-	if (err) {
-		/* only when we can't block because of hang up */
-		if (err == -ESTRPIPE)
-			err = -ENXIO;	/* that's what POSIX says */
+		if (err) {
+			/* only when we can't block because of hang up */
+			if (err == -ESTRPIPE)
+				err = -ENXIO;	/* that's what POSIX says */
+			put_unused_fd(fd);
+		}
 	}
 	return (err);
 }
