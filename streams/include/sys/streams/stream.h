@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.61 2005/09/30 08:26:50 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.62 2005/10/02 01:50:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/30 08:26:50 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 01:50:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/09/30 08:26:50 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/10/02 01:50:59 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -318,7 +318,7 @@ struct stroptions {
 	ushort so_copyopt;		/* Solaris */
 };
 
-#define INFPSZ		( -1UL)	/* infinite packet size */
+#define INFPSZ		(0x7ffffff)	/* infinite packet size */
 
 #define SO_ALL		( -1UL)	/* set all old options (Solaris uses true mask) */
 #define SO_READOPT	(1<< 0)	/* set read option */

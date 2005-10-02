@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/30 09:54:42 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/02 01:51:21 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/09/30 09:54:42 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/02 01:51:21 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.17  2005/10/02 01:51:21  brian
+dnl - getpmsg testing and putpmsg testing, sync
+dnl
 dnl Revision 0.9.2.16  2005/09/30 09:54:42  brian
 dnl - trying to get I_RECVFD working, sync
 dnl
@@ -1511,3 +1514,104 @@ AT_SETUP([streams test 2.33])
 AT_KEYWORDS([streams ioctl I_ANCHOR])
 AT_CHECK([test_streams 2.33], [], [ignore], [], [], [])
 AT_CLEANUP
+
+AT_SETUP([streams test 2.34])
+AT_KEYWORDS([streams ioctl I_S_RECVRD])
+AT_CHECK([test_streams 2.34], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.35])
+AT_KEYWORDS([streams ioctl I_STATS])
+AT_CHECK([test_streams 2.35], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.36])
+AT_KEYWORDS([streams ioctl I_BIGPIPE])
+AT_CHECK([test_streams 2.36], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.37])
+AT_KEYWORDS([streams ioctl I_GETTP])
+AT_CHECK([test_streams 2.37], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.38])
+AT_KEYWORDS([streams ioctl I_GETMSG])
+AT_CHECK([test_streams 2.38], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.39])
+AT_KEYWORDS([streams ioctl I_PUTMSG])
+AT_CHECK([test_streams 2.39], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.40.1])
+AT_KEYWORDS([streams ioctl I_GETPMSG HUP])
+AT_CHECK([test_streams 2.40.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.40.2])
+AT_KEYWORDS([streams ioctl I_GETPMSG EPROTO RDERR])
+AT_CHECK([test_streams 2.40.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.40.3])
+AT_KEYWORDS([streams ioctl I_GETPMSG WRERR])
+AT_CHECK([test_streams 2.40.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.40.4])
+AT_KEYWORDS([streams ioctl I_GETPMSG EPROTO RDERR WRERR])
+AT_CHECK([test_streams 2.40.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.41.1])
+AT_KEYWORDS([streams ioctl I_PUTPMSG ENXIO HUP])
+AT_CHECK([test_streams 2.41.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.41.2])
+AT_KEYWORDS([streams ioctl I_PUTPMSG RDERR])
+AT_CHECK([test_streams 2.41.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.41.3])
+AT_KEYWORDS([streams ioctl I_PUTPMSG EPROTO WRERR])
+AT_CHECK([test_streams 2.41.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.41.4])
+AT_KEYWORDS([streams ioctl I_PUTPMSG EPROTO RDERR WRERR])
+AT_CHECK([test_streams 2.41.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.42])
+AT_KEYWORDS([streams ioctl I_PIPE])
+AT_CHECK([test_streams 2.42], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.43])
+AT_KEYWORDS([streams ioctl I_FIFO])
+AT_CHECK([test_streams 2.43], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.44])
+AT_KEYWORDS([streams ioctl I_AUTOPUSH])
+AT_CHECK([test_streams 2.44], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.45])
+AT_KEYWORDS([streams ioctl I_HEAP_REPORT])
+AT_CHECK([test_streams 2.45], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.46])
+AT_KEYWORDS([streams ioctl I_FATTACH])
+AT_CHECK([test_streams 2.46], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.47])
+AT_KEYWORDS([streams ioctl I_FDETACH])
+AT_CHECK([test_streams 2.47], [], [ignore], [], [], [])
+AT_CLEANUP
+

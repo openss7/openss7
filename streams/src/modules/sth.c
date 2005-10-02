@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/01 04:31:41 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 01:51:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/10/01 04:31:41 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1497,7 +1497,7 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
 		return (0);
 
 	/* have read lock and access was ok */
-	if (!bcanputnext(sd->sd_wq, band))
+	if (bcanputnext(sd->sd_wq, band))
 		return (0);
 
 	if ((f_flags & FNDELAY) && !test_bit(STRNDEL_BIT, &sd->sd_flag))
@@ -2556,7 +2556,7 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
 				return (err);
 		}
 		if (dlen >= 0) {
-			if ((err = strsizecheck(sd, M_DATA, clen)) < 0)
+			if ((err = strsizecheck(sd, M_DATA, dlen)) < 0)
 				return (err);
 			if (dlen < err) {
 				/* control part apply putpmsg() rules */
@@ -2586,39 +2586,66 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
  *  Note: POSIX ioctl(2) says "I_FDINSERT also blocks, unless prevented by lack of internal
  *  resources, waiting for the availability of message blocks in the STREAM, regardless of priority
  *  or whether O_NONBLOCK has been specified.  No partial message is sent."
+ *
+ *  So, we go to great lengths to release the Stream head read lock, wait on buffers, perform copyin
+ *  operations (that can also sleep) and then reacquire the Stream head read lock, rechecking write
+ *  access permissions.
  */
 STATIC inline mblk_t *
-strallocpmsg(const struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
+strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
 	     const int band, const int flags, const int user)
 {
-	mblk_t *mp, *dp;
-	int clen = ctlp ? ctlp->len : -1;
-	int dlen = datp ? datp->len : -1;
-	int norm = (flags == MSG_BAND);
+	mblk_t *mp;
+	int err;
 
-	/* FIXME: shouldn't wait on message blocks with STREAM head read locked */
-	if (!(mp = alloc_proto(clen, dlen, sd->sd_wroff, norm ? M_PROTO : M_PCPROTO, BPRI_WAITOK)))
-		return ERR_PTR(-ENOSR);
-	dp = mp;
-	if (clen > 0) {
-		if (!user)
-			bcopy(ctlp->buf, dp->b_rptr, clen);
-		else if (copyin(dp->b_rptr, ctlp->buf, clen))
-			goto efault;
-		dp = dp->b_cont;
+	srunlock(sd);
+	{
+		int clen = ctlp ? ctlp->len : -1;
+		int dlen = datp ? datp->len : -1;
+		int norm = (flags == MSG_BAND);
+		int type = norm ? M_PROTO : M_PCPROTO;
+		mblk_t *dp;
+
+		/* cannot wait on message blocks with STREAM head read locked */
+		if (!(mp = alloc_proto(clen, dlen, sd->sd_wroff, type, BPRI_WAITOK)))
+			goto enosr;
+		dp = mp;
+		/* copyin can sleep */
+		if (clen > 0) {
+			if (!user)
+				bcopy(ctlp->buf, dp->b_rptr, clen);
+			else if (copyin(dp->b_rptr, ctlp->buf, clen))
+				goto efault;
+			dp = dp->b_cont;
+		}
+		if (dlen > 0) {
+			if (!user)
+				bcopy(datp->buf, dp->b_rptr, dlen);
+			else if (copyin(dp->b_rptr, datp->buf, dlen))
+				goto efault;
+			dp = dp->b_cont;
+		}
+		mp->b_band = norm ? band : 0;
 	}
-	if (dlen > 0) {
-		if (!user)
-			bcopy(datp->buf, dp->b_rptr, dlen);
-		else if (copyin(dp->b_rptr, datp->buf, dlen))
-			goto efault;
-		dp = dp->b_cont;
-	}
-	mp->b_band = norm ? band : 0;
+	srlock(sd);
+
+	if ((err = straccess(sd, FWRITE)))
+		goto error;
+
 	return (mp);
+
       efault:
+	err = -EFAULT;
+	goto free_error;
+      enosr:
+	err = -ENOSR;
+	goto lock_error;
+      free_error:
 	freemsg(mp);
-	return ERR_PTR(-EFAULT);
+      lock_error:
+	srlock(sd);
+      error:
+	return ERR_PTR(err);
 }
 
 /**
@@ -6528,36 +6555,13 @@ str_i_anchor(const struct file *file, struct stdata *sd, unsigned long arg)
  */
 
 /**
- *  str_i_putpmsg: - perform putpmsg(2) system call emulation as streamio(7) ioctl
- *  @file: file pointer for the stream
- *  @sd: stream head
- *  @cmd: ioctl command, always %I_PUTPMSG
- *  @arg: ioctl argument, a pointer to the &struct strpmsg structure
- */
-STATIC inline streams_fastcall int
-str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
-{
-	struct strpmsg *sp = (struct strpmsg *) arg;
-	int band, flags;
-
-	if (!copyin(&sp->band, &band, sizeof(&sp->band)))
-		return (-EFAULT);
-
-	if (!copyin(&sp->flags, &flags, sizeof(&sp->flags)))
-		return (-EFAULT);
-
-	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
-}
-
-/**
  *  str_i_getpmsg: - perform getpmsg(2) system call emulation as streamio(7) ioctl
  *  @file: file pointer for the stream
  *  @sd: stream head
- *  @cmd: ioctl command, always %I_GETPMSG
  *  @arg: ioctl argument, a pointer to the &struct strpmsg structure
  */
 STATIC inline streams_fastcall int
-str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+str_i_getpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strpmsg *sg = (struct strpmsg *) arg;
 
@@ -6565,14 +6569,35 @@ str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
 }
 
 /**
+ *  str_i_putpmsg: - perform putpmsg(2) system call emulation as streamio(7) ioctl
+ *  @file: file pointer for the stream
+ *  @sd: stream head
+ *  @arg: ioctl argument, a pointer to the &struct strpmsg structure
+ */
+STATIC inline streams_fastcall int
+str_i_putpmsg(struct file *file, struct stdata *sd, unsigned long arg)
+{
+	struct strpmsg *sp = (struct strpmsg *) arg;
+	int band, flags;
+	int err;
+
+	if ((err = copyin(&sp->band, &band, sizeof(&sp->band))))
+		return (err);
+
+	if ((err = copyin(&sp->flags, &flags, sizeof(&sp->flags))))
+		return (err);
+
+	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
+}
+
+/**
  *  str_i_fattach: - perform fattach(2) system call emulation as streamio(7) ioctl
  *  @file: file pointer for the stream
  *  @sd: stream head
- *  @cmd: ioctl command, always %I_FATTACH
  *  @arg: a pointer to a character string describing the path
  */
 STATIC int
-str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+str_i_fattach(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	char path[256];
 	int err;
@@ -6591,13 +6616,12 @@ str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
  *  str_i_fdetach: - perform fdetach(2) system call emulation as streamio(7) ioctl
  *  @file: file pointer for the stream
  *  @sd: stream head
- *  @cmd: ioctl command, always %I_FDETACH
  *  @arg: a pointer to a character string describing the path
  *
  *  Note the file and stream are unimportant.  This is a system call emulation.
  */
 STATIC int
-str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+str_i_fdetach(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
 	char path[256];
@@ -6612,13 +6636,12 @@ str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned l
  *  str_i_pipe: - perform pipe(2) system call emulation as streamio(7) ioctl
  *  @file: file pointer for the stream
  *  @sd: stream head
- *  @cmd: ioctl command, always %I_PIPE
  *  @arg: pointer to array into which to receive two file descriptors
  *
  *  Note the file and stream are unimportant.  This is a system call emulation.
  */
 STATIC int
-str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
+str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int fds[2];
 	int err;
@@ -6800,21 +6823,21 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			printd(("%s: got I_ANCHOR\n", __FUNCTION__));
 			return str_i_anchor(file, sd, arg);
 			/* Linux Fast-STREAMS special ioctls */
-		case _IOC_NR(I_PUTPMSG):	/* putpmsg syscall emulation */
-			printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
-			return str_i_putpmsg(file, sd, cmd, arg);
 		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
 			printd(("%s: got I_GETPMSG\n", __FUNCTION__));
-			return str_i_getpmsg(file, sd, cmd, arg);
-		case _IOC_NR(I_FATTACH):	/* fattach syscall emulation */
-			printd(("%s: got I_FATTACH\n", __FUNCTION__));
-			return str_i_fattach(file, sd, cmd, arg);
-		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
-			printd(("%s: got I_FDETACH\n", __FUNCTION__));
-			return str_i_fdetach(file, sd, cmd, arg);
+			return str_i_getpmsg(file, sd, arg);
+		case _IOC_NR(I_PUTPMSG):	/* putpmsg syscall emulation */
+			printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+			return str_i_putpmsg(file, sd, arg);
 		case _IOC_NR(I_PIPE):	/* pipe syscall emulation */
 			printd(("%s: got I_PIPE\n", __FUNCTION__));
-			return str_i_pipe(file, sd, cmd, arg);
+			return str_i_pipe(file, sd, arg);
+		case _IOC_NR(I_FATTACH):	/* fattach syscall emulation */
+			printd(("%s: got I_FATTACH\n", __FUNCTION__));
+			return str_i_fattach(file, sd, arg);
+		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
+			printd(("%s: got I_FDETACH\n", __FUNCTION__));
+			return str_i_fdetach(file, sd, arg);
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCGETS))
 		}
 		break;

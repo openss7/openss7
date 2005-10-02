@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/30 08:26:56 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/10/02 01:51:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/30 08:26:56 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 01:51:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/30 08:26:56 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/10/02 01:51:02 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/09/30 08:26:56 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/10/02 01:51:02 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -531,6 +531,7 @@ allocb(size_t size, uint priority)
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
 	}
+	__printd(("%s: allocated mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
 	return (mp);
       buf_alloc_error:
 	mdbblock_free(mp);
@@ -721,6 +722,7 @@ freeb(mblk_t *mp)
 #if 0
 	assert(!mp->b_queue);
 #endif
+	__printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
 
 	db = xchg(&mp->b_datap, NULL);
 
