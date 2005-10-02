@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/30 08:26:56 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/10/02 10:34:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/30 08:26:56 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 10:34:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/30 08:26:56 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/10/02 10:34:35 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/09/30 08:26:56 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/10/02 10:34:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -218,8 +218,14 @@ mdbblock_alloc(uint priority, void *func)
 		if ((mp = xchg(&t->freemblk_head, NULL)))
 			t->freemblk_head = xchg(&mp->b_next, NULL);
 		local_irq_restore(flags);
-		if (mp != NULL)
+		if (mp != NULL) {
+			struct mdbblock *md = (struct mdbblock *)mp;
+			ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
+			mp->b_prev = NULL;
+			md->msgblk.m_func = func;
+			ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
 			return (mp);
+		}
 	}
 	case BPRI_MED:
 		slab_flags = SLAB_ATOMIC;
@@ -254,6 +260,7 @@ mdbblock_alloc(uint priority, void *func)
 		atomic_inc(&sdi->si_cnt);
 		if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 			sdi->si_hwl = atomic_read(&sdi->si_cnt);
+		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 	}
       fail:
 	return (mp);
@@ -329,6 +336,11 @@ raise_bufcalls(void)
  *  
  *  To reduce latency on allocation to a minimum, we null the state of the blocks when they are
  *  placed to the free list rather than when they are allocated.
+ *
+ *  The only thing not initialized are the mbinfo and dbinfo debugging lists.  The message blocks
+ *  still stay on these lists until they are completely deallocated.  (See freeblocks() below.)
+ *  Also the current msgb and datab counts are not decremented until the blocks are returned to the
+ *  memory cache.
  */
 void
 mdbblock_free(mblk_t *mp)
@@ -336,10 +348,12 @@ mdbblock_free(mblk_t *mp)
 	struct strthread *t = this_thread;
 	struct mdbblock *md = (typeof(md)) mp;
 
-	trace();
+	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 	/* don't zero hidden list structures */
 	bzero(&md->datablk.d_dblock, sizeof(md->datablk.d_dblock));
 	bzero(&md->msgblk.m_mblock, sizeof(md->msgblk.m_mblock));
+	/* avoid exposing data from previous use */
+	bzero(&md->databuf, sizeof(md->databuf));
 	md->msgblk.m_func = NULL;
 	ctrace(qput(&md->msgblk.m_queue));
 	md->msgblk.m_private = NULL;
@@ -381,6 +395,7 @@ freeblocks(struct strthread *t)
 			list_del_init(&md->datablk.db_list);
 			write_unlock_irqrestore(&smi->si_rwlock, flags);
 #endif
+			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 			atomic_dec(&smi->si_cnt);
 			mp_next = xchg(&mp->b_next, NULL);
 			mp->b_prev = NULL;

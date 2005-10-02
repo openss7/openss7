@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 01:51:07 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 10:34:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/02 01:51:07 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2596,10 +2596,10 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 	     const int band, const int flags, const int user)
 {
 	mblk_t *mp;
-	int err;
+	int err = 0;
 
 	srunlock(sd);
-	{
+	do {
 		int clen = ctlp ? ctlp->len : -1;
 		int dlen = datp ? datp->len : -1;
 		int norm = (flags == MSG_BAND);
@@ -2607,44 +2607,34 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 		mblk_t *dp;
 
 		/* cannot wait on message blocks with STREAM head read locked */
-		if (!(mp = alloc_proto(clen, dlen, sd->sd_wroff, type, BPRI_WAITOK)))
-			goto enosr;
-		dp = mp;
-		/* copyin can sleep */
-		if (clen > 0) {
-			if (!user)
-				bcopy(ctlp->buf, dp->b_rptr, clen);
-			else if (copyin(dp->b_rptr, ctlp->buf, clen))
-				goto efault;
-			dp = dp->b_cont;
-		}
-		if (dlen > 0) {
-			if (!user)
-				bcopy(datp->buf, dp->b_rptr, dlen);
-			else if (copyin(dp->b_rptr, datp->buf, dlen))
-				goto efault;
-			dp = dp->b_cont;
-		}
-		mp->b_band = norm ? band : 0;
+		if ((mp = alloc_proto(clen, dlen, sd->sd_wroff, type, BPRI_WAITOK))) {
+			dp = mp;
+			/* copyin can sleep */
+			if (clen > 0) {
+				if (!user)
+					bcopy(ctlp->buf, dp->b_rptr, clen);
+				else if ((err = copyin(dp->b_rptr, ctlp->buf, clen)))
+					break;
+				dp = dp->b_cont;
+			}
+			if (dlen > 0) {
+				if (!user)
+					bcopy(datp->buf, dp->b_rptr, dlen);
+				else if ((err = copyin(dp->b_rptr, datp->buf, dlen)))
+					break;
+				dp = dp->b_cont;
+			}
+			mp->b_band = norm ? band : 0;
+		} else
+			err = -ENOSR;
+	} while (0);
+	srlock(sd);
+
+	if (mp) {
+		if (!err && !(err = straccess(sd, FWRITE)))
+			return (mp);
+		freemsg(mp);
 	}
-	srlock(sd);
-
-	if ((err = straccess(sd, FWRITE)))
-		goto error;
-
-	return (mp);
-
-      efault:
-	err = -EFAULT;
-	goto free_error;
-      enosr:
-	err = -ENOSR;
-	goto lock_error;
-      free_error:
-	freemsg(mp);
-      lock_error:
-	srlock(sd);
-      error:
 	return ERR_PTR(err);
 }
 
@@ -3551,7 +3541,6 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 	ssize_t xferd, mread = nbytes;
 	bool ndelay, stop;
 	mblk_t *mp, *first;
-	int flags = file->f_flags;
 	int err = 0;
 
 	if (ppos != &file->f_pos)
@@ -3581,7 +3570,7 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 		/* Block if there is no data to be read (and generate M_READ if required). */
 
 		for (first = NULL, xferd = 0, stop = false;
-		     !stop && (mp = strtestgetq(sd, q, flags, MSG_BAND, 0, mread, &pl))
+		     !stop && (mp = strtestgetq(sd, q, file->f_flags, MSG_BAND, 0, mread, &pl))
 		     && !IS_ERR(mp); mread = 0, first = strlinkmsg(first, mp)) {
 			/* remember first block flag and band */
 			msg_type_t type;
@@ -3661,8 +3650,10 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 			continue;
 		}
 
-		if (IS_ERR(mp))
+		if (IS_ERR(mp)) {
 			err = PTR_ERR(mp);
+			ptrace(("error is %d\n", err));
+		}
 
 		/* Ok, now everything is ready to copyout() the message, but because copyout() can
 		   sleep (page-fault and vm-wait) we need to release the locks on the Stream */
@@ -3682,11 +3673,27 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 	if (xferd > 0)
 		return (xferd);
 
-	/* For old TTY semantics we are supposed to return zero (0) instead of [EAGAIN]. */
-	/* If we have hit the end of a pipe or FIFO return zero (0) instead of [ESTRPIPE]. */
-	if ((err == -EAGAIN && ndelay) || (err = -ESTRPIPE))
-		return (0);
-
+	switch (err) {
+	case -EAGAIN:
+		ptrace(("ndelay is %d\n", (int) ndelay));
+		if (!ndelay)
+			break;
+		trace();
+		/* For old TTY semantics we are supposed to return zero (0) instead of [EAGAIN]. */
+		err = 0;
+		break;
+	case -ESTRPIPE:
+		trace();
+		/* If we have hit the end of a pipe or FIFO return zero (0) instead of [ESTRPIPE]. */
+		err = 0;
+		break;
+	case 0:
+		trace();
+		break;
+	default:
+		ptrace(("error is %d\n", err));
+		break;
+	}
 	return (err);
 }
 
@@ -3726,13 +3733,10 @@ _strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 	else
 #endif
 	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
-			if (likely(!sd->sd_directio || !sd->sd_directio->read))
-				err = strread(file, buf, len, ppos);
-			else
-				err = sd->sd_directio->read(file, buf, len, ppos);
-			srunlock(sd);
-		}
+		if (likely(!sd->sd_directio || !sd->sd_directio->read))
+			err = strread(file, buf, len, ppos);
+		else
+			err = sd->sd_directio->read(file, buf, len, ppos);
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
@@ -4258,11 +4262,15 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 
 	if (!flagsp)
 		return (-EINVAL);
-	if (copyin(flagsp, &flags, sizeof(*flagsp)))
-		return (-EFAULT);
+	if (!access_ok(VERIFY_WRITE, flagsp, sizeof(*flagsp)))
+		return (-EINVAL);
+	if ((err = copyin(flagsp, &flags, sizeof(*flagsp))))
+		return (err);
 	if (bandp) {
-		if (copyin(bandp, &band, sizeof(*bandp)))
+		if (!access_ok(VERIFY_WRITE, bandp, sizeof(*bandp)))
 			return (-EFAULT);
+		if ((err = copyin(bandp, &band, sizeof(*bandp))))
+			return (err);
 		/* operate as getpmsg(2s) */
 		switch (flags) {
 		case MSG_HIPRI:
@@ -4303,11 +4311,18 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 	if (ctlp) {
 		if (!access_ok(VERIFY_WRITE, ctlp, sizeof(*ctlp)))
 			return (-EFAULT);
-		copyin(ctlp, &ctl, sizeof(*ctlp));
+		if ((err = copyin(ctlp, &ctl, sizeof(*ctlp))))
+			return (err);
+		printd(("%s: ctl.len = %d\n", __FUNCTION__, ctl.len));
+		printd(("%s: ctl.maxlen = %d\n", __FUNCTION__, ctl.maxlen));
 		if (ctl.maxlen < 0)
 			ctl.maxlen = -1;
-		else if (!access_ok(VERIFY_WRITE, ctl.buf, ctl.maxlen))
-			return (-EFAULT);
+		else {
+			printd(("%s: ctl.buf = %p\n", __FUNCTION__, ctl.buf));
+			if (!access_ok(VERIFY_WRITE, ctl.buf, ctl.maxlen))
+				return (-EFAULT);
+			trace();
+		}
 	} else {
 		ctl.maxlen = -1;
 		ctl.buf = NULL;
@@ -4317,11 +4332,18 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 	if (datp) {
 		if (!access_ok(VERIFY_WRITE, datp, sizeof(*datp)))
 			return (-EFAULT);
-		copyin(datp, &dat, sizeof(*datp));
+		if ((err = copyin(datp, &dat, sizeof(*datp))))
+			return (-EFAULT);
+		printd(("%s: dat.len = %d\n", __FUNCTION__, dat.len));
+		printd(("%s: dat.maxlen = %d\n", __FUNCTION__, dat.maxlen));
 		if (dat.maxlen < 0)
 			dat.maxlen = -1;
-		else if (!access_ok(VERIFY_WRITE, dat.buf, dat.maxlen))
-			return (-EFAULT);
+		else {
+			printd(("%s: dat.buf = %p\n", __FUNCTION__, dat.buf));
+			if (!access_ok(VERIFY_WRITE, dat.buf, dat.maxlen))
+				return (-EFAULT);
+			trace();
+		}
 	} else {
 		dat.maxlen = -1;
 		dat.buf = NULL;
@@ -6000,13 +6022,13 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC inline streams_fastcall int
 str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err = 0, rtn = 0;
+	int err, rtn = 0;
 	struct strpeek sp;
 
 	if (!arg)
 		return (-EINVAL);
-	if (copyin((typeof(&sp)) arg, &sp, sizeof(sp)))
-		return (-EFAULT);
+	if ((err = copyin((typeof(&sp)) arg, &sp, sizeof(sp))))
+		return (err);
 	if (sp.ctlbuf.maxlen < 0 || sp.databuf.maxlen < 0 || (sp.ctlbuf.maxlen && !sp.ctlbuf.buf)
 	    || (sp.databuf.maxlen && !sp.databuf.buf))
 		return (-EINVAL);

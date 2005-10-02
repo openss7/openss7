@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.3 2005/09/18 18:44:08 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.4 2005/10/02 10:55:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/10/02 10:55:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -141,13 +141,21 @@ The
 field contains the result of the request at the
 .IR "Stream head" .
 Zero
-.RB ( 0 )
-indicates success and non-zero indicates failure.  If failure is indicated, the module should not
+.RB ( (caddr_t)(0) )
+indicates success and non-zero (typically
+.BR (caddr_t)(1) )
+indicates failure.  If failure is indicated, the module should not
 generate an
 .BR M_IOCNAK (9)
 message.  It must abort all
 .BR ioctl (2)
-procesing, clean up its data structures, and return.
+processing, clean up its data structures,
+remove and free any message blocks linked to the
+.I cp_private
+member,
+free the
+.B M_IOCDATA
+message, and return.
 .PP
 The
 .I cp_private
@@ -181,6 +189,109 @@ This message should not be queued by a module or driver unless it intends to pro
 the
 .BR ioctl (2)
 in some way.
+.\"
+.\"
+.SH USAGE
+.PP
+The guidelines for processing the
+.B M_IOCDATA
+message are as follows:
+.IP \(bu  \w'\(bu\(em'u
+If a module receives an
+.B M_IOCDATA
+message to its write-side
+.I put
+procedure, and the module is not processing an
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+request, the module passes the
+.B M_IOCDATA
+downstream, directly from its
+.I put
+procedure, with a call to
+.BR putnext (9).
+.IP \(bu
+If a driver receives an
+.B M_IOCDATA
+message to its write-side
+.I put
+procedure, and the driver is not processing an
+.BR M_COPIN (9)
+or
+.BR M_COPYOUT (9)
+request, the driver discards the
+.B M_IOCDATA
+message.
+.IP \(bu
+If a module receives an
+.B M_IOCDATA
+message to its read-side
+.I put
+procedure, the module should either pass the message upstream using
+.BR putnext (9)
+or discard the message.
+.IP \(bu
+Drivers should not generate
+.B M_IOCDATA
+messages upstream.
+.IP \(bu
+If an
+.B M_IOCDATA
+message is received at the
+.IR "Stream head" ,
+the message is discarded.
+.IP \(bu
+If a module or driver is processing an
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+request, and an
+.B M_IOCDATA
+message is received to the write-side
+.I put
+procedure, the module or driver must process the message, but may queue the message for processing
+out of the module's
+.I service
+procedure.
+.IP \(bu
+When processing the message the module or driver examines the
+.I cp_rval
+member of the contained
+.BR copyresp (9)
+structure to determine if the operation was successful or not.
+.IP \(bu
+If not successful, all operations
+associated with the
+.BR M_IOCTL (9)
+must be aborted and cleaned up.  No
+.BR M_IOCNAK (9)
+message is sent.
+.IP \(bu
+If successful and a
+.BR M_COPYIN (9)
+request was being performed,
+.BR M_DATA (9)
+blocks following the message contain the copied in data.
+.IP \(bu
+If successful and a
+.BR M_COPYOUT (9)
+request was being performed,
+only success is indicated.
+.IP \(bu
+When successful, the module or driver may continue the
+.BR M_IOCTL (9)
+operation with additional
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+requests, or by concluding the 
+.BR M_IOCTL (9)
+operation with a
+.BR M_IOCACK (9)
+or
+.BR M_IOCNAK (9)
+acknowledgement.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -217,10 +328,20 @@ and
 .BR copyresp (9),
 structures to each other and which members are overlaid over which other members, and what the
 differences are between the 32-bit architecture structures and the 64-bit architecture structures,
-is complicated and problematic amoungst
+is complicated and problematic among
 .IR UNIX \(rg
 implementations of
 .IR STREAMS .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon the ordering or overlap of members within the
+.BR copyresp (9)
+structure, and will only examine and modify members in accordance with the
+.IR "SVR 4 STREAMS Programmer's Guide" .
+.[
+svr4spg
+.]
 .IP \(em
 When a module or driver receives an
 .B M_IOCDATA
@@ -231,6 +352,9 @@ is non-zero), it is supposed to free any private resources associated with the
 abort the 
 .BR ioctl (2)
 operation, free the message, and return.
+.[
+svr4spg
+.]
 When the
 .I Stream head
 sends such a message, it aborts the current
@@ -256,6 +380,26 @@ has the bug that it waits for a subsequent
 or
 .BR M_IOCNAK (9)
 block.
+(Note however, that modules and drivers previously written to work with
+.I LiS
+will also work with
+.BR "@PACKAGE_TITLE@" ;
+however, the extraneous
+.BR M_IOCACK (9)
+or
+.BR M_IOCNAK (9)
+will be discarded by the
+.I Stream head
+as the input-output control transaction has been closed, and the error number reported will be that
+of the failed
+.BR copyin (9)
+or
+.BR copyout (9)
+operation, i.e.
+.RB [ EFAULT ],
+and not that contained in any
+.BR M_IOCNAK (9)
+message.)
 .IP ""
 Portable
 .I STREAMS

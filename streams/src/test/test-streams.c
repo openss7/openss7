@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/02 01:51:12 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/02 10:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 01:51:12 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 10:34:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.36  2005/10/02 10:34:53  brian
+ - staring full read/write getmsg/putmsg testing
+
  Revision 0.9.2.35  2005/10/02 01:51:12  brian
  - getpmsg testing and putpmsg testing, sync
 
@@ -179,9 +182,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/02 01:51:12 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/02 10:34:53 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/02 01:51:12 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/02 10:34:53 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1255,9 +1258,9 @@ void
 print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                    [%d:%03d]\n",
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"%-14s----->|                                |  |                    [%d:%03d]\n",
+		"  %-14s--->|                                |  |                    [%d:%03d]\n",
+		"    %-14s->|                                |  |                    [%d:%03d]\n",
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
@@ -1269,9 +1272,9 @@ void
 print_command(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                    [%d:%03d]\n",
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"%-14s----->|                                |  |                    [%d:%03d]\n",
+		"  %-14s--->|                                |  |                    [%d:%03d]\n",
+		"    %-14s->|                                |  |                    [%d:%03d]\n",
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
@@ -1326,7 +1329,7 @@ print_success_value(int child, int value)
 		"                    |            [%10d]        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose)
+	if (verbose > 3)
 		print_triple_int(child, msgs, value, child, state);
 }
 
@@ -1348,8 +1351,8 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"%1$14s- - ->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
-		"  %1$14s- ->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"%1$14s----->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"  %1$14s--->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
 		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
 		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
@@ -1456,8 +1459,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
-			print_success_value(child, last_retval);
+		print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
 }
@@ -1494,55 +1496,41 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 }
 
 int
+test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	print_datcall(child, "putmsg(2)-----", data ? data->len : -1);
+	for (;;) {
+		if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
+	}
+}
+
+int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
-	if (flags & MSG_BAND || band) {
-		if (verbose > 3) {
-			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
-			fflush(stdout);
+	print_datcall(child, "putpmsg(2)----", data ? data->len : -1);
+	for (;;) {
+		if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
 		}
-		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
-		for (;;) {
-			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
-					continue;
-				return (__RESULT_FAILURE);
-			}
-			if (verbose > 3)
-				print_success_value(child, last_retval);
-			return (__RESULT_SUCCESS);
-		}
-	} else {
-		if (verbose > 3) {
-			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
-			fflush(stdout);
-		}
-		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putmsg(2)-----", data ? data->len : 0);
-		for (;;) {
-			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
-					continue;
-				return (__RESULT_FAILURE);
-			}
-			if (verbose > 3)
-				print_success_value(child, last_retval);
-			return (__RESULT_SUCCESS);
-		}
+		print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
 	}
 }
 
 int
 test_write(int child, const void *buf, size_t len)
 {
-	print_syscall(child, "write(2)------");
+	print_datcall(child, "write(2)------", len);
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1576,7 +1564,7 @@ test_writev(int child, const struct iovec *iov, int num)
 int
 test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 {
-	print_syscall(child, "getmsg(2)-----");
+	print_datcall(child, "getmsg(2)-----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1591,7 +1579,7 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 int
 test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
 {
-	print_syscall(child, "getpmsg(2)----");
+	print_datcall(child, "getpmsg(2)----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1606,7 +1594,7 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 int
 test_read(int child, void *buf, size_t count)
 {
-	print_syscall(child, "read(2)-------");
+	print_datcall(child, "read(2)-------", count);
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1877,6 +1865,14 @@ postamble_0(int child)
 	return __RESULT_SUCCESS;
 }
 
+/*
+ *  =========================================================================
+ *
+ *  Premables and Postambles...
+ *
+ *  =========================================================================
+ */
+
 int
 preamble_1(int child)
 {
@@ -1892,11 +1888,11 @@ postamble_1(int child)
 	return postamble_0(child);
 }
 
-/* open a hungup mux */
+/* open a hungup dev */
 int
 preamble_2_1(int child)
 {
-	if (preamble_1(child) != __RESULT_SUCCESS)
+	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
@@ -1908,11 +1904,11 @@ preamble_2_1(int child)
 	return __RESULT_SUCCESS;
 }
 
-/* open a mux with rderr */
+/* open a dev with rderr */
 int
 preamble_2_2(int child)
 {
-	if (preamble_1(child) != __RESULT_SUCCESS)
+	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
@@ -1924,11 +1920,11 @@ preamble_2_2(int child)
 	return __RESULT_SUCCESS;
 }
 
-/* open a mux with wrerr */
+/* open a dev with wrerr */
 int
 preamble_2_3(int child)
 {
-	if (preamble_1(child) != __RESULT_SUCCESS)
+	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
@@ -1940,11 +1936,11 @@ preamble_2_3(int child)
 	return __RESULT_SUCCESS;
 }
 
-/* open a mux with rderr and wrerr */
+/* open a dev with rderr and wrerr */
 int
 preamble_2_4(int child)
 {
-	if (preamble_1(child) != __RESULT_SUCCESS)
+	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
@@ -1964,7 +1960,7 @@ postamble_2(int child)
 	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EIO)
 		result = __RESULT_FAILURE;
 	state++;
-	if (postamble_1(child) != __RESULT_SUCCESS)
+	if (postamble_0(child) != __RESULT_SUCCESS)
 		result = __RESULT_FAILURE;
 	state++;
 	return result;
@@ -2021,6 +2017,84 @@ postamble_4(int child)
 		result = __RESULT_FAILURE;
 	state++;
 	return (result);
+}
+
+/* open a hungup mux */
+int
+preamble_4_2_1(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_HANGUP, (intptr_t) 0) != __RESULT_SUCCESS && last_errno != ENXIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a mux with rderr */
+int
+preamble_4_2_2(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_RDERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a mux with wrerr */
+int
+preamble_4_2_3(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a mux with rderr and wrerr */
+int
+preamble_4_2_4(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_RWERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_4_2(int child)
+{
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EIO)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return result;
 }
 
 int
@@ -4926,7 +5000,7 @@ test_case_2_12_4(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_4 = { &preamble_2_1, &test_case_2_12_4, &postamble_2 };
+struct test_stream test_2_12_4 = { &preamble_4_2_1, &test_case_2_12_4, &postamble_4_2 };
 
 #define test_case_2_12_4_stream_0 (&test_2_12_4)
 #define test_case_2_12_4_stream_1 (NULL)
@@ -4947,7 +5021,7 @@ test_case_2_12_5(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_5 = { &preamble_2_2, &test_case_2_12_5, &postamble_2 };
+struct test_stream test_2_12_5 = { &preamble_4_2_2, &test_case_2_12_5, &postamble_4_2 };
 
 #define test_case_2_12_5_stream_0 (&test_2_12_5)
 #define test_case_2_12_5_stream_1 (NULL)
@@ -4968,7 +5042,7 @@ test_case_2_12_6(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_6 = { &preamble_2_3, &test_case_2_12_6, &postamble_2 };
+struct test_stream test_2_12_6 = { &preamble_4_2_3, &test_case_2_12_6, &postamble_4_2 };
 
 #define test_case_2_12_6_stream_0 (&test_2_12_6)
 #define test_case_2_12_6_stream_1 (NULL)
@@ -4989,7 +5063,7 @@ test_case_2_12_7(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_12_7 = { &preamble_2_4, &test_case_2_12_7, &postamble_2 };
+struct test_stream test_2_12_7 = { &preamble_4_2_4, &test_case_2_12_7, &postamble_4_2 };
 
 #define test_case_2_12_7_stream_0 (&test_2_12_7)
 #define test_case_2_12_7_stream_1 (NULL)
@@ -5125,7 +5199,7 @@ test_case_2_13_3(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_13_3 = { &preamble_2_1, &test_case_2_13_3, &postamble_2 };
+struct test_stream test_2_13_3 = { &preamble_4_2_1, &test_case_2_13_3, &postamble_4_2 };
 
 #define test_case_2_13_3_stream_0 (&test_2_13_3)
 #define test_case_2_13_3_stream_1 (NULL)
@@ -5146,7 +5220,7 @@ test_case_2_13_4(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_13_4 = { &preamble_2_2, &test_case_2_13_4, &postamble_2 };
+struct test_stream test_2_13_4 = { &preamble_4_2_2, &test_case_2_13_4, &postamble_4_2 };
 
 #define test_case_2_13_4_stream_0 (&test_2_13_4)
 #define test_case_2_13_4_stream_1 (NULL)
@@ -5167,7 +5241,7 @@ test_case_2_13_5(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_13_5 = { &preamble_2_3, &test_case_2_13_5, &postamble_2 };
+struct test_stream test_2_13_5 = { &preamble_4_2_3, &test_case_2_13_5, &postamble_4_2 };
 
 #define test_case_2_13_5_stream_0 (&test_2_13_5)
 #define test_case_2_13_5_stream_1 (NULL)
@@ -5188,7 +5262,7 @@ test_case_2_13_6(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_13_6 = { &preamble_2_4, &test_case_2_13_6, &postamble_2 };
+struct test_stream test_2_13_6 = { &preamble_4_2_4, &test_case_2_13_6, &postamble_4_2 };
 
 #define test_case_2_13_6_stream_0 (&test_2_13_6)
 #define test_case_2_13_6_stream_1 (NULL)
@@ -5240,7 +5314,7 @@ test_case_2_14_2(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_14_2 = { &preamble_2_1, &test_case_2_14_2, &postamble_2 };
+struct test_stream test_2_14_2 = { &preamble_6_2_1, &test_case_2_14_2, &postamble_6_2 };
 
 #define test_case_2_14_2_stream_0 (&test_2_14_2)
 #define test_case_2_14_2_stream_1 (NULL)
@@ -5264,7 +5338,7 @@ test_case_2_14_3(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_14_3 = { &preamble_2_2, &test_case_2_14_3, &postamble_2 };
+struct test_stream test_2_14_3 = { &preamble_6_2_2, &test_case_2_14_3, &postamble_6_2 };
 
 #define test_case_2_14_3_stream_0 (&test_2_14_3)
 #define test_case_2_14_3_stream_1 (NULL)
@@ -5288,7 +5362,7 @@ test_case_2_14_4(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_14_4 = { &preamble_2_3, &test_case_2_14_4, &postamble_2 };
+struct test_stream test_2_14_4 = { &preamble_6_2_3, &test_case_2_14_4, &postamble_6_2 };
 
 #define test_case_2_14_4_stream_0 (&test_2_14_4)
 #define test_case_2_14_4_stream_1 (NULL)
@@ -5312,7 +5386,7 @@ test_case_2_14_5(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_14_5 = { &preamble_2_4, &test_case_2_14_5, &postamble_2 };
+struct test_stream test_2_14_5 = { &preamble_6_2_4, &test_case_2_14_5, &postamble_6_2 };
 
 #define test_case_2_14_5_stream_0 (&test_2_14_5)
 #define test_case_2_14_5_stream_1 (NULL)
@@ -6802,7 +6876,7 @@ test_case_2_22_4(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_22_4 = { &preamble_2_1, &test_case_2_22_4, &postamble_2 };
+struct test_stream test_2_22_4 = { &preamble_4_2_1, &test_case_2_22_4, &postamble_4_2 };
 
 #define test_case_2_22_4_stream_0 (&test_2_22_4)
 #define test_case_2_22_4_stream_1 (NULL)
@@ -6823,7 +6897,7 @@ test_case_2_22_5(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_22_5 = { &preamble_2_2, &test_case_2_22_5, &postamble_2 };
+struct test_stream test_2_22_5 = { &preamble_4_2_2, &test_case_2_22_5, &postamble_4_2 };
 
 #define test_case_2_22_5_stream_0 (&test_2_22_5)
 #define test_case_2_22_5_stream_1 (NULL)
@@ -6844,7 +6918,7 @@ test_case_2_22_6(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_22_6 = { &preamble_2_3, &test_case_2_22_6, &postamble_2 };
+struct test_stream test_2_22_6 = { &preamble_4_2_3, &test_case_2_22_6, &postamble_4_2 };
 
 #define test_case_2_22_6_stream_0 (&test_2_22_6)
 #define test_case_2_22_6_stream_1 (NULL)
@@ -6865,7 +6939,7 @@ test_case_2_22_7(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_22_7 = { &preamble_2_4, &test_case_2_22_7, &postamble_2 };
+struct test_stream test_2_22_7 = { &preamble_4_2_4, &test_case_2_22_7, &postamble_4_2 };
 
 #define test_case_2_22_7_stream_0 (&test_2_22_7)
 #define test_case_2_22_7_stream_1 (NULL)
@@ -6978,7 +7052,7 @@ test_case_2_23_3(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_23_3 = { &preamble_2_1, &test_case_2_23_3, &postamble_2 };
+struct test_stream test_2_23_3 = { &preamble_4_2_1, &test_case_2_23_3, &postamble_4_2 };
 
 #define test_case_2_23_3_stream_0 (&test_2_23_3)
 #define test_case_2_23_3_stream_1 (NULL)
@@ -6999,7 +7073,7 @@ test_case_2_23_4(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_23_4 = { &preamble_2_2, &test_case_2_23_4, &postamble_2 };
+struct test_stream test_2_23_4 = { &preamble_4_2_2, &test_case_2_23_4, &postamble_4_2 };
 
 #define test_case_2_23_4_stream_0 (&test_2_23_4)
 #define test_case_2_23_4_stream_1 (NULL)
@@ -7020,7 +7094,7 @@ test_case_2_23_5(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_23_5 = { &preamble_2_3, &test_case_2_23_5, &postamble_2 };
+struct test_stream test_2_23_5 = { &preamble_4_2_3, &test_case_2_23_5, &postamble_4_2 };
 
 #define test_case_2_23_5_stream_0 (&test_2_23_5)
 #define test_case_2_23_5_stream_1 (NULL)
@@ -7041,7 +7115,7 @@ test_case_2_23_6(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_23_6 = { &preamble_2_4, &test_case_2_23_6, &postamble_2 };
+struct test_stream test_2_23_6 = { &preamble_4_2_4, &test_case_2_23_6, &postamble_4_2 };
 
 #define test_case_2_23_6_stream_0 (&test_2_23_6)
 #define test_case_2_23_6_stream_1 (NULL)
@@ -8911,6 +8985,216 @@ struct test_stream test_2_40_4 = { &preamble_2_4, &test_case_2_40_4, &postamble_
 #define test_case_2_40_4_stream_1 (NULL)
 #define test_case_2_40_4_stream_2 (NULL)
 
+#define tgrp_case_2_40_5 test_group_2
+#define numb_case_2_40_5 "2.40.5"
+#define name_case_2_40_5 "Perform streamio I_GETPMSG - EPROTO."
+#define sref_case_2_40_5 sref_case_2_40
+#define desc_case_2_40_5 "\
+Checks that I_GETPMSG can be performed on a hung up Stream.  Checks that\n\
+EAGAIN is returned when I_GETPMSG with MSG_HIPRI is attempted on a\n\
+Stream that has no data and the Stream is set for non-blocking\n\
+operation."
+
+int
+test_case_2_40_5(int child)
+{
+	struct strpmsg sg;
+	char buf[1];
+
+	sg.ctlbuf.maxlen = 0;
+	sg.ctlbuf.len = -1;
+	sg.ctlbuf.buf = buf;
+
+	sg.databuf.maxlen = 0;
+	sg.databuf.len = -1;
+	sg.databuf.buf = buf;
+
+	sg.band = 0;
+	sg.flags = MSG_HIPRI;
+
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_40_5 = { &preamble_0, &test_case_2_40_5, &postamble_0 };
+
+#define test_case_2_40_5_stream_0 (&test_2_40_5)
+#define test_case_2_40_5_stream_1 (NULL)
+#define test_case_2_40_5_stream_2 (NULL)
+
+#define tgrp_case_2_40_6 test_group_2
+#define numb_case_2_40_6 "2.40.6"
+#define name_case_2_40_6 "Perform streamio I_GETPMSG - EPROTO."
+#define sref_case_2_40_6 sref_case_2_40
+#define desc_case_2_40_6 "\
+Checks that I_GETPMSG can be performed on a hung up Stream.  Checks that\n\
+EAGAIN is returned when I_GETPMSG with MSG_BAND is attempted on a\n\
+Stream that has no data and the Stream is set for non-blocking\n\
+operation."
+
+int
+test_case_2_40_6(int child)
+{
+	struct strpmsg sg;
+	char buf[1];
+
+	sg.ctlbuf.maxlen = 0;
+	sg.ctlbuf.len = -1;
+	sg.ctlbuf.buf = buf;
+
+	sg.databuf.maxlen = 0;
+	sg.databuf.len = -1;
+	sg.databuf.buf = buf;
+
+	sg.band = 1;
+	sg.flags = MSG_BAND;
+
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_40_6 = { &preamble_0, &test_case_2_40_6, &postamble_0 };
+
+#define test_case_2_40_6_stream_0 (&test_2_40_6)
+#define test_case_2_40_6_stream_1 (NULL)
+#define test_case_2_40_6_stream_2 (NULL)
+
+#define tgrp_case_2_40_7 test_group_2
+#define numb_case_2_40_7 "2.40.7"
+#define name_case_2_40_7 "Perform streamio I_GETPMSG - EPROTO."
+#define sref_case_2_40_7 sref_case_2_40
+#define desc_case_2_40_7 "\
+Checks that I_GETPMSG can be performed on a hung up Stream.  Checks that\n\
+EAGAIN is returned when I_GETPMSG with MSG_ANY is attempted on a\n\
+Stream that has no data and the Stream is set for non-blocking\n\
+operation."
+
+int
+test_case_2_40_7(int child)
+{
+	struct strpmsg sg;
+	char buf[1];
+
+	sg.ctlbuf.maxlen = 0;
+	sg.ctlbuf.len = -1;
+	sg.ctlbuf.buf = buf;
+
+	sg.databuf.maxlen = 0;
+	sg.databuf.len = -1;
+	sg.databuf.buf = buf;
+
+	sg.band = 0;
+	sg.flags = MSG_ANY;
+
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_40_7 = { &preamble_0, &test_case_2_40_7, &postamble_0 };
+
+#define test_case_2_40_7_stream_0 (&test_2_40_7)
+#define test_case_2_40_7_stream_1 (NULL)
+#define test_case_2_40_7_stream_2 (NULL)
+
+#define tgrp_case_2_40_8 test_group_2
+#define numb_case_2_40_8 "2.40.8"
+#define name_case_2_40_8 "Perform streamio I_GETPMSG - EINVAL."
+#define sref_case_2_40_8 sref_case_2_40
+#define desc_case_2_40_8 "\
+Checks that I_GETPMSG can be performed on a hung up Stream.  Checks that\n\
+EINVAL is returned when the Stream is linked under a Multiplexing\n\
+Driver."
+
+int
+test_case_2_40_8(int child)
+{
+	struct strpmsg sg;
+	char buf[1];
+
+	sg.ctlbuf.maxlen = 0;
+	sg.ctlbuf.len = -1;
+	sg.ctlbuf.buf = buf;
+
+	sg.databuf.maxlen = 0;
+	sg.databuf.len = -1;
+	sg.databuf.buf = buf;
+
+	sg.band = 0;
+	sg.flags = MSG_ANY;
+
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_40_8 = { &preamble_5, &test_case_2_40_8, &postamble_5 };
+
+#define test_case_2_40_8_stream_0 (&test_2_40_8)
+#define test_case_2_40_8_stream_1 (NULL)
+#define test_case_2_40_8_stream_2 (NULL)
+
+#define tgrp_case_2_40_9 test_group_2
+#define numb_case_2_40_9 "2.40.9"
+#define name_case_2_40_9 "Perform streamio I_GETPMSG - EFAULT."
+#define sref_case_2_40_9 sref_case_2_40
+#define desc_case_2_40_9 "\
+Checks that I_GETPMSG can be performed on a hung up Stream.  Checks that\n\
+EFAULT is returned when arg extends outside the callers valid address\n\
+space."
+
+int
+test_case_2_40_9(int child)
+{
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) 1) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_40_9 = { &preamble_5, &test_case_2_40_9, &postamble_5 };
+
+#define test_case_2_40_9_stream_0 (&test_2_40_9)
+#define test_case_2_40_9_stream_1 (NULL)
+#define test_case_2_40_9_stream_2 (NULL)
+
+#define tgrp_case_2_40_10 test_group_2
+#define numb_case_2_40_10 "2.40.10"
+#define name_case_2_40_10 "Perform streamio I_GETPMSG - EFAULT."
+#define sref_case_2_40_10 sref_case_2_40
+#define desc_case_2_40_10 "\
+Checks that I_GETPMSG can be performed on a hung up Stream.  Checks that\n\
+EFAULT is returned when a buffer extends outside the callers valid\n\
+address space."
+
+int
+test_case_2_40_10(int child)
+{
+	struct strpmsg sg;
+
+	sg.ctlbuf.maxlen = 5;
+	sg.ctlbuf.len = -1;
+	sg.ctlbuf.buf = (char *) -1;
+
+	sg.databuf.maxlen = 5;
+	sg.databuf.len = -1;
+	sg.databuf.buf = (char *) -1;
+
+	sg.band = 0;
+	sg.flags = MSG_ANY;
+
+	if (test_ioctl(child, I_GETPMSG, (intptr_t) &sg) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_40_10 = { &preamble_0, &test_case_2_40_10, &postamble_0 };
+
+#define test_case_2_40_10_stream_0 (&test_2_40_10)
+#define test_case_2_40_10_stream_1 (NULL)
+#define test_case_2_40_10_stream_2 (NULL)
+
 /*
  *  Perform IOCTL on one Stream - I_PUTPMSG  (LfS)
  */
@@ -9185,6 +9469,599 @@ struct test_stream test_2_47 = { &preamble_0, &test_case_2_47, &postamble_0 };
 #define test_case_2_47_stream_0 (&test_2_47)
 #define test_case_2_47_stream_1 (NULL)
 #define test_case_2_47_stream_2 (NULL)
+
+static const char test_group_3[] = "Perform information transfer on one Stream";
+
+static const char test_group_3_1[] = "Perform READ on one Stream";
+static const char sref_case_3_1[] = "POSIX 1003.1 2003/SUSv3 read(2p) reference page.";
+
+#define tgrp_case_3_1_1 test_group_3_1
+#define numb_case_3_1_1 "3.1.1"
+#define name_case_3_1_1 "Perform read - EOF."
+#define sref_case_3_1_1 sref_case_3_1
+#define desc_case_3_1_1 "\
+Check that read() can be performed on a Stream.  Checks that zero (0) is\n\
+returned when read() is attempted on a Stream that has received a hang\n\
+up."
+
+int
+test_case_3_1_1(int child)
+{
+	char buf[16];
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_1 = { &preamble_2_1, &test_case_3_1_1, &postamble_2 };
+
+#define test_case_3_1_1_stream_0 (&test_3_1_1)
+#define test_case_3_1_1_stream_1 (NULL)
+#define test_case_3_1_1_stream_2 (NULL)
+
+#define tgrp_case_3_1_2 test_group_3_1
+#define numb_case_3_1_2 "3.1.2"
+#define name_case_3_1_2 "Perform read - EPROTO."
+#define sref_case_3_1_2 sref_case_3_1
+#define desc_case_3_1_2 "\
+Check that read() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when read() is attempted on a Stream that has received an\n\
+asynchronous EPROTO read error."
+
+int
+test_case_3_1_2(int child)
+{
+	char buf[16];
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_2 = { &preamble_2_2, &test_case_3_1_2, &postamble_2 };
+
+#define test_case_3_1_2_stream_0 (&test_3_1_2)
+#define test_case_3_1_2_stream_1 (NULL)
+#define test_case_3_1_2_stream_2 (NULL)
+
+#define tgrp_case_3_1_3 test_group_3_1
+#define numb_case_3_1_3 "3.1.3"
+#define name_case_3_1_3 "Perform read - EAGAIN."
+#define sref_case_3_1_3 sref_case_3_1
+#define desc_case_3_1_3 "\
+Check that read() can be performed on a Stream.  Checks that EAGAIN is\n\
+returned when read() is attempted on a Stream that has received an\n\
+asyncrhonous EPROTO write error (and non-blocking operation is set)."
+
+int
+test_case_3_1_3(int child)
+{
+	char buf[16];
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_3 = { &preamble_2_3, &test_case_3_1_3, &postamble_2 };
+
+#define test_case_3_1_3_stream_0 (&test_3_1_3)
+#define test_case_3_1_3_stream_1 (NULL)
+#define test_case_3_1_3_stream_2 (NULL)
+
+#define tgrp_case_3_1_4 test_group_3_1
+#define numb_case_3_1_4 "3.1.4"
+#define name_case_3_1_4 "Perform read - EPROTO."
+#define sref_case_3_1_4 sref_case_3_1
+#define desc_case_3_1_4 "\
+Check that read() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when read() is attempted on a Stream that has received an\n\
+asyncrhonous EPROTO error."
+
+int
+test_case_3_1_4(int child)
+{
+	char buf[16];
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_4 = { &preamble_2_4, &test_case_3_1_4, &postamble_2 };
+
+#define test_case_3_1_4_stream_0 (&test_3_1_4)
+#define test_case_3_1_4_stream_1 (NULL)
+#define test_case_3_1_4_stream_2 (NULL)
+
+#define tgrp_case_3_1_5 test_group_3_1
+#define numb_case_3_1_5 "3.1.5"
+#define name_case_3_1_5 "Perform read - EINVAL."
+#define sref_case_3_1_5 sref_case_3_1
+#define desc_case_3_1_5 "\
+Check that read() can be performed on a Stream.  Checks that EINVAL is\n\
+returned when read() is attempted on a Stream that is linked under a\n\
+Multiplexing Driver."
+
+int
+test_case_3_1_5(int child)
+{
+	char buf[16];
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_5 = { &preamble_5, &test_case_3_1_5, &postamble_5 };
+
+#define test_case_3_1_5_stream_0 (&test_3_1_5)
+#define test_case_3_1_5_stream_1 (NULL)
+#define test_case_3_1_5_stream_2 (NULL)
+
+#define tgrp_case_3_1_6 test_group_3_1
+#define numb_case_3_1_6 "3.1.6"
+#define name_case_3_1_6 "Perform read - EAGAIN."
+#define sref_case_3_1_6 sref_case_3_1
+#define desc_case_3_1_6 "\
+Check that read() can be performed on a Stream.  The O_NONBLOCK flag is\n\
+set for the file descriptor and the process would be delayed."
+
+int
+test_case_3_1_6(int child)
+{
+	char buf[16];
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_6 = { &preamble_0, &test_case_3_1_6, &postamble_0 };
+
+#define test_case_3_1_6_stream_0 (&test_3_1_6)
+#define test_case_3_1_6_stream_1 (NULL)
+#define test_case_3_1_6_stream_2 (NULL)
+
+#define tgrp_case_3_1_7 test_group_3_1
+#define numb_case_3_1_7 "3.1.7"
+#define name_case_3_1_7 "Perform read - EBADF."
+#define sref_case_3_1_7 sref_case_3_1
+#define desc_case_3_1_7 "\
+Check that read() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not a valid file descriptor."
+
+int
+test_case_3_1_7(int child)
+{
+	char buf[16];
+	int oldfd = test_fd[child];
+
+	test_fd[child] = -1;
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_7 = { &preamble_0, &test_case_3_1_7, &postamble_0 };
+
+#define test_case_3_1_7_stream_0 (&test_3_1_7)
+#define test_case_3_1_7_stream_1 (NULL)
+#define test_case_3_1_7_stream_2 (NULL)
+
+#define tgrp_case_3_1_8 test_group_3_1
+#define numb_case_3_1_8 "3.1.8"
+#define name_case_3_1_8 "Perform read - EBADF."
+#define sref_case_3_1_8 sref_case_3_1
+#define desc_case_3_1_8 "\
+Check that read() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not open for reading."
+
+int
+test_case_3_1_8(int child)
+{
+	char buf[16];
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 2;
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_8 = { &preamble_0, &test_case_3_1_8, &postamble_0 };
+
+#define test_case_3_1_8_stream_0 (&test_3_1_8)
+#define test_case_3_1_8_stream_1 (NULL)
+#define test_case_3_1_8_stream_2 (NULL)
+
+static const char test_group_3_2[] = "Perform READV on one Stream";
+static const char sref_case_3_2[] = "POSIX 1003.1 2003/SUSv3 readv(2p) reference page.";
+
+#define tgrp_case_3_2_1 test_group_3_2
+#define numb_case_3_2_1 "3.2.1"
+#define name_case_3_2_1 "Perform readv - EOF."
+#define sref_case_3_2_1 sref_case_3_2
+#define desc_case_3_2_1 "\
+Check that readv() can be performed on a Stream.  Checks that zero (0) is\n\
+returned when readv() is attempted on a Stream that has received a hang\n\
+up."
+
+int
+test_case_3_2_1(int child)
+{
+	char buf[16];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	if (test_readv(child, iov, 1) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_1 = { &preamble_2_1, &test_case_3_2_1, &postamble_2 };
+
+#define test_case_3_2_1_stream_0 (&test_3_2_1)
+#define test_case_3_2_1_stream_1 (NULL)
+#define test_case_3_2_1_stream_2 (NULL)
+
+#define tgrp_case_3_2_2 test_group_3_2
+#define numb_case_3_2_2 "3.2.2"
+#define name_case_3_2_2 "Perform readv - EPROTO."
+#define sref_case_3_2_2 sref_case_3_2
+#define desc_case_3_2_2 "\
+Check that readv() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when readv() is attempted on a Stream that has received an\n\
+asynchronous EPROTO readv error."
+
+int
+test_case_3_2_2(int child)
+{
+	char buf[16];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_2 = { &preamble_2_2, &test_case_3_2_2, &postamble_2 };
+
+#define test_case_3_2_2_stream_0 (&test_3_2_2)
+#define test_case_3_2_2_stream_1 (NULL)
+#define test_case_3_2_2_stream_2 (NULL)
+
+#define tgrp_case_3_2_3 test_group_3_2
+#define numb_case_3_2_3 "3.2.3"
+#define name_case_3_2_3 "Perform readv - EAGAIN."
+#define sref_case_3_2_3 sref_case_3_2
+#define desc_case_3_2_3 "\
+Check that readv() can be performed on a Stream.  Checks that EAGAIN is\n\
+returned when readv() is attempted on a Stream that has received an\n\
+asyncrhonous EPROTO write error (and non-blocking operation is set)."
+
+int
+test_case_3_2_3(int child)
+{
+	char buf[16];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_3 = { &preamble_2_3, &test_case_3_2_3, &postamble_2 };
+
+#define test_case_3_2_3_stream_0 (&test_3_2_3)
+#define test_case_3_2_3_stream_1 (NULL)
+#define test_case_3_2_3_stream_2 (NULL)
+
+#define tgrp_case_3_2_4 test_group_3_2
+#define numb_case_3_2_4 "3.2.4"
+#define name_case_3_2_4 "Perform readv - EPROTO."
+#define sref_case_3_2_4 sref_case_3_2
+#define desc_case_3_2_4 "\
+Check that readv() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when readv() is attempted on a Stream that has received an\n\
+asyncrhonous EPROTO error."
+
+int
+test_case_3_2_4(int child)
+{
+	char buf[16];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_4 = { &preamble_2_4, &test_case_3_2_4, &postamble_2 };
+
+#define test_case_3_2_4_stream_0 (&test_3_2_4)
+#define test_case_3_2_4_stream_1 (NULL)
+#define test_case_3_2_4_stream_2 (NULL)
+
+#define tgrp_case_3_2_5 test_group_3_2
+#define numb_case_3_2_5 "3.2.5"
+#define name_case_3_2_5 "Perform readv - EINVAL."
+#define sref_case_3_2_5 sref_case_3_2
+#define desc_case_3_2_5 "\
+Check that readv() can be performed on a Stream.  Checks that EINVAL is\n\
+returned when readv() is attempted on a Stream that is linked under a\n\
+Multiplexing Driver."
+
+int
+test_case_3_2_5(int child)
+{
+	char buf[16];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_5 = { &preamble_5, &test_case_3_2_5, &postamble_5 };
+
+#define test_case_3_2_5_stream_0 (&test_3_2_5)
+#define test_case_3_2_5_stream_1 (NULL)
+#define test_case_3_2_5_stream_2 (NULL)
+
+#define tgrp_case_3_2_6 test_group_3_2
+#define numb_case_3_2_6 "3.2.6"
+#define name_case_3_2_6 "Perform readv - EAGAIN."
+#define sref_case_3_2_6 sref_case_3_2
+#define desc_case_3_2_6 "\
+Check that readv() can be performed on a Stream.  The O_NONBLOCK flag is\n\
+set for the file descriptor and the process would be delayed."
+
+int
+test_case_3_2_6(int child)
+{
+	char buf[16];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_6 = { &preamble_0, &test_case_3_2_6, &postamble_0 };
+
+#define test_case_3_2_6_stream_0 (&test_3_2_6)
+#define test_case_3_2_6_stream_1 (NULL)
+#define test_case_3_2_6_stream_2 (NULL)
+
+#define tgrp_case_3_2_7 test_group_3_2
+#define numb_case_3_2_7 "3.2.7"
+#define name_case_3_2_7 "Perform readv - EBADF."
+#define sref_case_3_2_7 sref_case_3_2
+#define desc_case_3_2_7 "\
+Check that readv() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not a valid file descriptor."
+
+int
+test_case_3_2_7(int child)
+{
+	char buf[16];
+	int oldfd = test_fd[child];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	test_fd[child] = -1;
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_7 = { &preamble_0, &test_case_3_2_7, &postamble_0 };
+
+#define test_case_3_2_7_stream_0 (&test_3_2_7)
+#define test_case_3_2_7_stream_1 (NULL)
+#define test_case_3_2_7_stream_2 (NULL)
+
+#define tgrp_case_3_2_8 test_group_3_2
+#define numb_case_3_2_8 "3.2.8"
+#define name_case_3_2_8 "Perform readv - EBADF."
+#define sref_case_3_2_8 sref_case_3_2
+#define desc_case_3_2_8 "\
+Check that readv() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not open for reading."
+
+int
+test_case_3_2_8(int child)
+{
+	char buf[16];
+	int oldfd = test_fd[child];
+	struct iovec iov[1];
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = sizeof(buf);
+
+	test_fd[child] = 2;
+
+	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_8 = { &preamble_0, &test_case_3_2_8, &postamble_0 };
+
+#define test_case_3_2_8_stream_0 (&test_3_2_8)
+#define test_case_3_2_8_stream_1 (NULL)
+#define test_case_3_2_8_stream_2 (NULL)
+
+static const char test_group_3_3[] = "Perform WRITE on one Stream";
+static const char sref_case_3_3[] = "POSIX 1003.1 2003/SUSv3 write(2p) reference page.";
+
+#define tgrp_case_3_3_1 test_group_3_3
+#define numb_case_3_3_1 "3.3.1"
+#define name_case_3_3_1 "Perform write."
+#define sref_case_3_3_1 sref_case_3_3
+#define desc_case_3_3_1 "\
+Check that write() can be performed on a Stream."
+
+int
+test_case_3_3_1(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_3_3_1 = { &preamble_0, &test_case_3_3_1, &postamble_0 };
+
+#define test_case_3_3_1_stream_0 (&test_3_3_1)
+#define test_case_3_3_1_stream_1 (NULL)
+#define test_case_3_3_1_stream_2 (NULL)
+
+static const char test_group_3_4[] = "Perform WRITEV on one Stream";
+static const char sref_case_3_4[] = "POSIX 1003.1 2003/SUSv3 writev(2p) reference page.";
+
+#define tgrp_case_3_4_1 test_group_3_4
+#define numb_case_3_4_1 "3.4.1"
+#define name_case_3_4_1 "Perform writev."
+#define sref_case_3_4_1 sref_case_3_4
+#define desc_case_3_4_1 "\
+Check that writev() can be performed on a Stream."
+
+int
+test_case_3_4_1(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_3_4_1 = { &preamble_0, &test_case_3_4_1, &postamble_0 };
+
+#define test_case_3_4_1_stream_0 (&test_3_4_1)
+#define test_case_3_4_1_stream_1 (NULL)
+#define test_case_3_4_1_stream_2 (NULL)
+
+static const char test_group_3_5[] = "Perform GETMSG on one Stream";
+static const char sref_case_3_5[] = "POSIX 1003.1 2003/SUSv3 getmsg(2p) reference page.";
+
+#define tgrp_case_3_5_1 test_group_3_5
+#define numb_case_3_5_1 "3.5.1"
+#define name_case_3_5_1 "Perform getmsg."
+#define sref_case_3_5_1 sref_case_3_5
+#define desc_case_3_5_1 "\
+Check that getmsg() can be performed on a Stream.  Checks that zero is\n\
+returned for both the control part size and data part size, indicating a\n\
+hung up Stream, when getmsg() is called on a hung up Stream."
+
+int
+test_case_3_5_1(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (ctl.len != 0 || dat.len != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_1 = { &preamble_2_1, &test_case_3_5_1, &postamble_2 };
+
+#define test_case_3_5_1_stream_0 (&test_3_5_1)
+#define test_case_3_5_1_stream_1 (NULL)
+#define test_case_3_5_1_stream_2 (NULL)
+
+static const char test_group_3_6[] = "Perform GETPMSG on one Stream";
+static const char sref_case_3_6[] = "POSIX 1003.1 2003/SUSv3 getpmsg(2p) reference page.";
+
+#define tgrp_case_3_6_1 test_group_3_6
+#define numb_case_3_6_1 "3.6.1"
+#define name_case_3_6_1 "Perform getpmsg."
+#define sref_case_3_6_1 sref_case_3_6
+#define desc_case_3_6_1 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_1(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_3_6_1 = { &preamble_0, &test_case_3_6_1, &postamble_0 };
+
+#define test_case_3_6_1_stream_0 (&test_3_6_1)
+#define test_case_3_6_1_stream_1 (NULL)
+#define test_case_3_6_1_stream_2 (NULL)
+
+static const char test_group_3_7[] = "Perform PUTMSG on one Stream";
+static const char sref_case_3_7[] = "POSIX 1003.1 2003/SUSv3 putmsg(2p) reference page.";
+
+#define tgrp_case_3_7_1 test_group_3_7
+#define numb_case_3_7_1 "3.7.1"
+#define name_case_3_7_1 "Perform putmsg."
+#define sref_case_3_7_1 sref_case_3_7
+#define desc_case_3_7_1 "\
+Check that putmsg() can be performed on a Stream."
+
+int
+test_case_3_7_1(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_3_7_1 = { &preamble_0, &test_case_3_7_1, &postamble_0 };
+
+#define test_case_3_7_1_stream_0 (&test_3_7_1)
+#define test_case_3_7_1_stream_1 (NULL)
+#define test_case_3_7_1_stream_2 (NULL)
+
+static const char test_group_3_8[] = "Perform PUTPMSG on one Stream";
+static const char sref_case_3_8[] = "POSIX 1003.1 2003/SUSv3 putpmsg(2p) reference page.";
+
+#define tgrp_case_3_8_1 test_group_3_8
+#define numb_case_3_8_1 "3.8.1"
+#define name_case_3_8_1 "Perform putpmsg."
+#define sref_case_3_8_1 sref_case_3_8
+#define desc_case_3_8_1 "\
+Check that putpmsg() can be performed on a Stream."
+
+int
+test_case_3_8_1(int child)
+{
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_3_8_1 = { &preamble_0, &test_case_3_8_1, &postamble_0 };
+
+#define test_case_3_8_1_stream_0 (&test_3_8_1)
+#define test_case_3_8_1_stream_1 (NULL)
+#define test_case_3_8_1_stream_2 (NULL)
+
 
 /*
  *  -------------------------------------------------------------------------
@@ -10033,6 +10910,18 @@ struct test_case {
 	test_case_2_40_3_stream_0, test_case_2_40_3_stream_1, test_case_2_40_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_40_4, tgrp_case_2_40_4, name_case_2_40_4, desc_case_2_40_4, sref_case_2_40_4, {
 	test_case_2_40_4_stream_0, test_case_2_40_4_stream_1, test_case_2_40_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_40_5, tgrp_case_2_40_5, name_case_2_40_5, desc_case_2_40_5, sref_case_2_40_5, {
+	test_case_2_40_5_stream_0, test_case_2_40_5_stream_1, test_case_2_40_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_40_6, tgrp_case_2_40_6, name_case_2_40_6, desc_case_2_40_6, sref_case_2_40_6, {
+	test_case_2_40_6_stream_0, test_case_2_40_6_stream_1, test_case_2_40_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_40_7, tgrp_case_2_40_7, name_case_2_40_7, desc_case_2_40_7, sref_case_2_40_7, {
+	test_case_2_40_7_stream_0, test_case_2_40_7_stream_1, test_case_2_40_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_40_8, tgrp_case_2_40_8, name_case_2_40_8, desc_case_2_40_8, sref_case_2_40_8, {
+	test_case_2_40_8_stream_0, test_case_2_40_8_stream_1, test_case_2_40_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_40_9, tgrp_case_2_40_9, name_case_2_40_9, desc_case_2_40_9, sref_case_2_40_9, {
+	test_case_2_40_9_stream_0, test_case_2_40_9_stream_1, test_case_2_40_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_40_10, tgrp_case_2_40_10, name_case_2_40_10, desc_case_2_40_10, sref_case_2_40_10, {
+	test_case_2_40_10_stream_0, test_case_2_40_10_stream_1, test_case_2_40_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_41_1, tgrp_case_2_41_1, name_case_2_41_1, desc_case_2_41_1, sref_case_2_41_1, {
 	test_case_2_41_1_stream_0, test_case_2_41_1_stream_1, test_case_2_41_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_41_2, tgrp_case_2_41_2, name_case_2_41_2, desc_case_2_41_2, sref_case_2_41_2, {
@@ -10053,6 +10942,50 @@ struct test_case {
 	test_case_2_46_stream_0, test_case_2_46_stream_1, test_case_2_46_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_47, tgrp_case_2_47, name_case_2_47, desc_case_2_47, sref_case_2_47, {
 	test_case_2_47_stream_0, test_case_2_47_stream_1, test_case_2_47_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, sref_case_3_1_1, {
+	test_case_3_1_1_stream_0, test_case_3_1_1_stream_1, test_case_3_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_2, tgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, sref_case_3_1_2, {
+	test_case_3_1_2_stream_0, test_case_3_1_2_stream_1, test_case_3_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_3, tgrp_case_3_1_3, name_case_3_1_3, desc_case_3_1_3, sref_case_3_1_3, {
+	test_case_3_1_3_stream_0, test_case_3_1_3_stream_1, test_case_3_1_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_4, tgrp_case_3_1_4, name_case_3_1_4, desc_case_3_1_4, sref_case_3_1_4, {
+	test_case_3_1_4_stream_0, test_case_3_1_4_stream_1, test_case_3_1_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_5, tgrp_case_3_1_5, name_case_3_1_5, desc_case_3_1_5, sref_case_3_1_5, {
+	test_case_3_1_5_stream_0, test_case_3_1_5_stream_1, test_case_3_1_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_6, tgrp_case_3_1_6, name_case_3_1_6, desc_case_3_1_6, sref_case_3_1_6, {
+	test_case_3_1_6_stream_0, test_case_3_1_6_stream_1, test_case_3_1_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_7, tgrp_case_3_1_7, name_case_3_1_7, desc_case_3_1_7, sref_case_3_1_7, {
+	test_case_3_1_7_stream_0, test_case_3_1_7_stream_1, test_case_3_1_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_8, tgrp_case_3_1_8, name_case_3_1_8, desc_case_3_1_8, sref_case_3_1_8, {
+	test_case_3_1_8_stream_0, test_case_3_1_8_stream_1, test_case_3_1_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, sref_case_3_2_1, {
+	test_case_3_2_1_stream_0, test_case_3_2_1_stream_1, test_case_3_2_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_2, tgrp_case_3_2_2, name_case_3_2_2, desc_case_3_2_2, sref_case_3_2_2, {
+	test_case_3_2_2_stream_0, test_case_3_2_2_stream_1, test_case_3_2_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_3, tgrp_case_3_2_3, name_case_3_2_3, desc_case_3_2_3, sref_case_3_2_3, {
+	test_case_3_2_3_stream_0, test_case_3_2_3_stream_1, test_case_3_2_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_4, tgrp_case_3_2_4, name_case_3_2_4, desc_case_3_2_4, sref_case_3_2_4, {
+	test_case_3_2_4_stream_0, test_case_3_2_4_stream_1, test_case_3_2_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_5, tgrp_case_3_2_5, name_case_3_2_5, desc_case_3_2_5, sref_case_3_2_5, {
+	test_case_3_2_5_stream_0, test_case_3_2_5_stream_1, test_case_3_2_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_6, tgrp_case_3_2_6, name_case_3_2_6, desc_case_3_2_6, sref_case_3_2_6, {
+	test_case_3_2_6_stream_0, test_case_3_2_6_stream_1, test_case_3_2_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_7, tgrp_case_3_2_7, name_case_3_2_7, desc_case_3_2_7, sref_case_3_2_7, {
+	test_case_3_2_7_stream_0, test_case_3_2_7_stream_1, test_case_3_2_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_8, tgrp_case_3_2_8, name_case_3_2_8, desc_case_3_2_8, sref_case_3_2_8, {
+	test_case_3_2_8_stream_0, test_case_3_2_8_stream_1, test_case_3_2_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_1, tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, sref_case_3_3_1, {
+	test_case_3_3_1_stream_0, test_case_3_3_1_stream_1, test_case_3_3_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_1, tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, sref_case_3_4_1, {
+	test_case_3_4_1_stream_0, test_case_3_4_1_stream_1, test_case_3_4_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_1, tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, sref_case_3_5_1, {
+	test_case_3_5_1_stream_0, test_case_3_5_1_stream_1, test_case_3_5_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, sref_case_3_6_1, {
+	test_case_3_6_1_stream_0, test_case_3_6_1_stream_1, test_case_3_6_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, sref_case_3_7_1, {
+	test_case_3_7_1_stream_0, test_case_3_7_1_stream_1, test_case_3_7_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_1, tgrp_case_3_8_1, name_case_3_8_1, desc_case_3_8_1, sref_case_3_8_1, {
+	test_case_3_8_1_stream_0, test_case_3_8_1_stream_1, test_case_3_8_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

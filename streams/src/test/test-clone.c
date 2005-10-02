@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/29 23:08:19 $
+ @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/02 10:34:46 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 23:08:19 $ by $Author: brian $
+ Last Modified $Date: 2005/10/02 10:34:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-clone.c,v $
+ Revision 0.9.2.15  2005/10/02 10:34:46  brian
+ - staring full read/write getmsg/putmsg testing
+
  Revision 0.9.2.14  2005/09/29 23:08:19  brian
  - starting testing of FIFOs
 
@@ -116,9 +119,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/29 23:08:19 $"
+#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/02 10:34:46 $"
 
-static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/29 23:08:19 $";
+static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/02 10:34:46 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -822,27 +825,29 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_STATS");	/* 2.35 */
 	case I_BIGPIPE:
 		return ("I_BIGPIPE");	/* 2.36 */
-#endif
-#if 0
 	case I_GETTP:
 		return ("I_GETTP");	/* 2.37 */
-	case I_AUTOPUSH:
-		return ("I_AUTOPUSH");	/* 2.38 */
-	case I_HEAP_REPORT:
-		return ("I_HEAP_REPORT");	/* 2.39 */
-	case I_FIFO:
-		return ("I_FIFO");	/* 2.40 */
-	case I_PUTPMSG:
-		return ("I_PUTPMSG");	/* 2.41 */
-	case I_GETPMSG:
-		return ("I_GETPMSG");	/* 2.42 */
-	case I_FATTACH:
-		return ("I_FATTACH");	/* 2.43 */
-	case I_FDETACH:
-		return ("I_FDETACH");	/* 2.44 */
-	case I_PIPE:
-		return ("I_PIPE");	/* 2.45 */
 #endif
+	case I_GETMSG:
+		return ("I_GETMSG");	/* 2.38 */
+	case I_PUTMSG:
+		return ("I_PUTMSG");	/* 2.39 */
+	case I_PUTPMSG:
+		return ("I_PUTPMSG");	/* 2.40 */
+	case I_GETPMSG:
+		return ("I_GETPMSG");	/* 2.41 */
+	case I_PIPE:
+		return ("I_PIPE");	/* 2.42 */
+	case I_FIFO:
+		return ("I_FIFO");	/* 2.43 */
+	case I_AUTOPUSH:
+		return ("I_AUTOPUSH");	/* 2.44 */
+	case I_HEAP_REPORT:
+		return ("I_HEAP_REPORT");	/* 2.45 */
+	case I_FATTACH:
+		return ("I_FATTACH");	/* 2.46 */
+	case I_FDETACH:
+		return ("I_FDETACH");	/* 2.47 */
 	case TM_IOC_HANGUP:
 		return ("TM_IOC_HANGUP");
 	case TM_IOC_RDERR:
@@ -1188,9 +1193,9 @@ void
 print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                    [%d:%03d]\n",
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"%-14s----->|                                |  |                    [%d:%03d]\n",
+		"  %-14s--->|                                |  |                    [%d:%03d]\n",
+		"    %-14s->|                                |  |                    [%d:%03d]\n",
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
@@ -1202,9 +1207,9 @@ void
 print_command(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                                |  |                    [%d:%03d]\n",
-		"  %-14s<--/|                                |  |                    [%d:%03d]\n",
-		"    %-14s</|                                |  |                    [%d:%03d]\n",
+		"%-14s----->|                                |  |                    [%d:%03d]\n",
+		"  %-14s--->|                                |  |                    [%d:%03d]\n",
+		"    %-14s->|                                |  |                    [%d:%03d]\n",
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
@@ -1259,7 +1264,7 @@ print_success_value(int child, int value)
 		"                    |            [%10d]        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose)
+	if (verbose > 3)
 		print_triple_int(child, msgs, value, child, state);
 }
 
@@ -1281,8 +1286,8 @@ void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"%1$14s- - ->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
-		"  %1$14s- ->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"%1$14s----->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
+		"  %1$14s--->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
 		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                    [%3$d:%4$03d]\n",
 		"                    |- - %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
@@ -1389,8 +1394,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
-			print_success_value(child, last_retval);
+		print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
 }
@@ -1427,55 +1431,41 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 }
 
 int
+test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	print_datcall(child, "putmsg(2)-----", data ? data->len : -1);
+	for (;;) {
+		if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
+	}
+}
+
+int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
-	if (flags & MSG_BAND || band) {
-		if (verbose > 3) {
-			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
-			fflush(stdout);
+	print_datcall(child, "putpmsg(2)----", data ? data->len : -1);
+	for (;;) {
+		if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
 		}
-		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
-		for (;;) {
-			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
-					continue;
-				return (__RESULT_FAILURE);
-			}
-			if (verbose > 3)
-				print_success_value(child, last_retval);
-			return (__RESULT_SUCCESS);
-		}
-	} else {
-		if (verbose > 3) {
-			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
-			fflush(stdout);
-		}
-		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putmsg(2)-----", data ? data->len : 0);
-		for (;;) {
-			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
-					continue;
-				return (__RESULT_FAILURE);
-			}
-			if (verbose > 3)
-				print_success_value(child, last_retval);
-			return (__RESULT_SUCCESS);
-		}
+		print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
 	}
 }
 
 int
 test_write(int child, const void *buf, size_t len)
 {
-	print_syscall(child, "write(2)------");
+	print_datcall(child, "write(2)------", len);
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1509,7 +1499,7 @@ test_writev(int child, const struct iovec *iov, int num)
 int
 test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 {
-	print_syscall(child, "getmsg(2)-----");
+	print_datcall(child, "getmsg(2)-----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1524,7 +1514,7 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 int
 test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
 {
-	print_syscall(child, "getpmsg(2)----");
+	print_datcall(child, "getpmsg(2)----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1539,7 +1529,7 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 int
 test_read(int child, void *buf, size_t count)
 {
-	print_syscall(child, "read(2)-------");
+	print_datcall(child, "read(2)-------", count);
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1809,6 +1799,14 @@ postamble_0(int child)
 	state++;
 	return __RESULT_SUCCESS;
 }
+
+/*
+ *  =========================================================================
+ *
+ *  Premables and Postambles...
+ *
+ *  =========================================================================
+ */
 
 /*
  *  =========================================================================
