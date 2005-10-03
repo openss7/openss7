@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:06:58 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/03 04:21:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 04:21:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/03 04:21:59 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:06:58 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/03 04:21:59 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -106,7 +106,11 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 					   -1, -1, NULL});
 	args.band = band;
 	args.flags = flags;
+#if 0
 	return (write(fd, &args, LFS_GETMSG_PUTMSG_ULEN));
+#else
+	return (ioctl(fd, I_PUTPMSG, &args));
+#endif
 }
 
 int

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:06:58 $
+ @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/03 04:21:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 04:21:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/03 04:21:59 $"
 
 static char const ident[] =
-    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:06:58 $";
+    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/03 04:21:59 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -108,7 +108,12 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 					   -1, -1, NULL});
 	args.band = bandp ? *bandp : 0;
 	args.flags = flagsp ? *flagsp : 0;
-	if ((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0) {
+#if 0
+	if ((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0)
+#else
+	if ((err = ioctl(fd, I_GETPMSG, &args)) >= 0)
+#endif
+	{
 		if (ctlptr)
 			ctlptr->len = args.ctlbuf.len;
 		if (datptr)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 10:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 04:22:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $";
 
 //#define __NO_VERSION__
 
@@ -96,7 +96,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/02 10:34:41 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3534,7 +3534,7 @@ strmsgcount(mblk_t *b, bool protdis)
  *
  */
 ssize_t
-strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
+strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q = sd->sd_rq;
@@ -3543,8 +3543,10 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 	mblk_t *mp, *first;
 	int err = 0;
 
-	if (ppos != &file->f_pos)
+	if (ppos != &file->f_pos && ppos && *ppos != 0) {
+		__ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long)*ppos, (long)file->f_pos));
 		return (-ESPIPE);
+	}
 
 	if (nbytes == 0)
 		return (0);
@@ -3569,7 +3571,7 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 
 		/* Block if there is no data to be read (and generate M_READ if required). */
 
-		for (first = NULL, xferd = 0, stop = false;
+		for (mp = NULL, first = NULL, xferd = 0, stop = false;
 		     !stop && (mp = strtestgetq(sd, q, file->f_flags, MSG_BAND, 0, mread, &pl))
 		     && !IS_ERR(mp); mread = 0, first = strlinkmsg(first, mp)) {
 			/* remember first block flag and band */
@@ -3699,11 +3701,11 @@ strread(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 
 EXPORT_SYMBOL(strread);
 
-STATIC int _strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
+STATIC int _strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *, int __user *);
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 STATIC ssize_t
-_strread_getpmsg(struct file *file, char *buf, size_t len, loff_t *ppos)
+_strread_getpmsg(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 {
 	struct strpmsg *sg = (struct strpmsg *) buf;
 
@@ -3716,7 +3718,7 @@ _strread_getpmsg(struct file *file, char *buf, size_t len, loff_t *ppos)
 #endif
 
 STATIC ssize_t
-_strread(struct file *file, char *buf, size_t len, loff_t *ppos)
+_strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 {
 	struct stdata *sd;
 	int err;
@@ -3803,7 +3805,7 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 	return (err);
 }
 
-STATIC int _strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
+STATIC int _strputpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int, int);
 
 /**
  *  strwrite: - write file operation for a stream
@@ -3837,7 +3839,7 @@ STATIC int _strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int
  *  work with writev() and leave it at that?
  */
 ssize_t
-strwrite(struct file *file, const char *buf, size_t nbytes, loff_t *ppos)
+strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
 	ssize_t err, q_maxpsz, written = 0;
@@ -3923,9 +3925,9 @@ EXPORT_SYMBOL(strwrite);
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 STATIC ssize_t
-_strwrite_putpmsg(struct file *file, const char *buf, size_t len, loff_t *ppos)
+_strwrite_putpmsg(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 {
-	struct strpmsg *sp = (struct strpmsg *) buf;
+	struct strpmsg __user *sp = (struct strpmsg *) buf;
 	int band, flags;
 
 	/* write emulation of the putpmsg system call: the problem with this approach is that it
@@ -3943,7 +3945,7 @@ _strwrite_putpmsg(struct file *file, const char *buf, size_t len, loff_t *ppos)
 #endif
 
 STATIC ssize_t
-_strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
+_strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 {
 	struct stdata *sd;
 	int err;
@@ -4135,7 +4137,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
  *  NOTICES: GLIBC2 puts -1 in band when it is called as putmsg().
  */
 int
-strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags)
+strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
 {
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp;
@@ -4209,7 +4211,7 @@ strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band
 EXPORT_SYMBOL(strputpmsg);
 
 STATIC int
-_strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags)
+_strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
 {
 	struct stdata *sd;
 	int err;
@@ -4250,7 +4252,7 @@ _strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int ban
  *  GLIBC2 puts NULL in bandp for getmsg().
  */
 int
-strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp)
+strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q = sd->sd_rq;
@@ -4333,7 +4335,7 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 		if (!access_ok(VERIFY_WRITE, datp, sizeof(*datp)))
 			return (-EFAULT);
 		if ((err = copyin(datp, &dat, sizeof(*datp))))
-			return (-EFAULT);
+			return (err);
 		printd(("%s: dat.len = %d\n", __FUNCTION__, dat.len));
 		printd(("%s: dat.maxlen = %d\n", __FUNCTION__, dat.maxlen));
 		if (dat.maxlen < 0)
@@ -4515,7 +4517,7 @@ strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *ban
 EXPORT_SYMBOL(strgetpmsg);
 
 STATIC int
-_strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp)
+_strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd;
 	int err;
@@ -6585,7 +6587,7 @@ str_i_anchor(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC inline streams_fastcall int
 str_i_getpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 {
-	struct strpmsg *sg = (struct strpmsg *) arg;
+	struct strpmsg __user *sg = (struct strpmsg *) arg;
 
 	return _strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/02 10:34:53 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/03 04:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 10:34:53 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 04:22:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.37  2005/10/03 04:22:00  brian
+ - read/readv/getmsg/getpmsg testing
+
  Revision 0.9.2.36  2005/10/02 10:34:53  brian
  - staring full read/write getmsg/putmsg testing
 
@@ -182,9 +185,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/02 10:34:53 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/03 04:22:00 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/02 10:34:53 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/03 04:22:00 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -9870,6 +9873,7 @@ test_case_3_2_7(int child)
 		test_fd[child] = oldfd;
 		return (__RESULT_FAILURE);
 	}
+	state++;
 	test_fd[child] = oldfd;
 	return (__RESULT_SUCCESS);
 }
@@ -9999,6 +10003,329 @@ struct test_stream test_3_5_1 = { &preamble_2_1, &test_case_3_5_1, &postamble_2 
 #define test_case_3_5_1_stream_1 (NULL)
 #define test_case_3_5_1_stream_2 (NULL)
 
+#define tgrp_case_3_5_2 test_group_3_5
+#define numb_case_3_5_2 "3.5.2"
+#define name_case_3_5_2 "Perform getmsg - EPROTO."
+#define sref_case_3_5_2 sref_case_3_5
+#define desc_case_3_5_2 "\
+Check that getmsg() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when getmsg() is attempted on a Stream that has received an\n\
+asyncrhonous EPROTO read error."
+
+int
+test_case_3_5_2(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_2 = { &preamble_2_2, &test_case_3_5_2, &postamble_2 };
+
+#define test_case_3_5_2_stream_0 (&test_3_5_2)
+#define test_case_3_5_2_stream_1 (NULL)
+#define test_case_3_5_2_stream_2 (NULL)
+
+#define tgrp_case_3_5_3 test_group_3_5
+#define numb_case_3_5_3 "3.5.3"
+#define name_case_3_5_3 "Perform getmsg - EAGAIN."
+#define sref_case_3_5_3 sref_case_3_5
+#define desc_case_3_5_3 "\
+Check that getmsg() can be performed on a Stream.  Checks that EAGAIN is\n\
+returned when getmsg() is attempted on a Stream that has received an\n\
+asynchronous EPROTO write error and the Stream is set for non-blocking\n\
+operation."
+
+int
+test_case_3_5_3(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_3 = { &preamble_2_3, &test_case_3_5_3, &postamble_2 };
+
+#define test_case_3_5_3_stream_0 (&test_3_5_3)
+#define test_case_3_5_3_stream_1 (NULL)
+#define test_case_3_5_3_stream_2 (NULL)
+
+#define tgrp_case_3_5_4 test_group_3_5
+#define numb_case_3_5_4 "3.5.4"
+#define name_case_3_5_4 "Perform getmsg - EPROTO."
+#define sref_case_3_5_4 sref_case_3_5
+#define desc_case_3_5_4 "\
+Check that getmsg() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when getmsg() is attempted on a Stream that has received an\n\
+asynchronous EPROTO error."
+
+int
+test_case_3_5_4(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_4 = { &preamble_2_4, &test_case_3_5_4, &postamble_2 };
+
+#define test_case_3_5_4_stream_0 (&test_3_5_4)
+#define test_case_3_5_4_stream_1 (NULL)
+#define test_case_3_5_4_stream_2 (NULL)
+
+#define tgrp_case_3_5_5 test_group_3_5
+#define numb_case_3_5_5 "3.5.5"
+#define name_case_3_5_5 "Perform getmsg - EINVAL."
+#define sref_case_3_5_5 sref_case_3_5
+#define desc_case_3_5_5 "\
+Check that getmsg() can be performed on a Stream.  Checks that EINVAL is\n\
+returned when getmsg() is attempted on a Stream is linked under a\n\
+Multiplexing Driver."
+
+int
+test_case_3_5_5(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_5 = { &preamble_5, &test_case_3_5_5, &postamble_5 };
+
+#define test_case_3_5_5_stream_0 (&test_3_5_5)
+#define test_case_3_5_5_stream_1 (NULL)
+#define test_case_3_5_5_stream_2 (NULL)
+
+#define tgrp_case_3_5_6 test_group_3_5
+#define numb_case_3_5_6 "3.5.6"
+#define name_case_3_5_6 "Perform getmsg - EAGAIN."
+#define sref_case_3_5_6 sref_case_3_5
+#define desc_case_3_5_6 "\
+Check that getmsg() can be performed on a Stream.  Checks that EAGAIN is\n\
+returned when the O_NONBLOCK flag is set for the file descriptor and the\n\
+process would be delayed."
+
+int
+test_case_3_5_6(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_6 = { &preamble_0, &test_case_3_5_6, &postamble_0 };
+
+#define test_case_3_5_6_stream_0 (&test_3_5_6)
+#define test_case_3_5_6_stream_1 (NULL)
+#define test_case_3_5_6_stream_2 (NULL)
+
+#define tgrp_case_3_5_7 test_group_3_5
+#define numb_case_3_5_7 "3.5.7"
+#define name_case_3_5_7 "Perform getmsg - EBADF."
+#define sref_case_3_5_7 sref_case_3_5
+#define desc_case_3_5_7 "\
+Check that getmsg() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not a valid file descriptor."
+
+int
+test_case_3_5_7(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+	int oldfd = test_fd[child];
+
+	test_fd[child] = -1;
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_7 = { &preamble_0, &test_case_3_5_7, &postamble_0 };
+
+#define test_case_3_5_7_stream_0 (&test_3_5_7)
+#define test_case_3_5_7_stream_1 (NULL)
+#define test_case_3_5_7_stream_2 (NULL)
+
+#define tgrp_case_3_5_8 test_group_3_5
+#define numb_case_3_5_8 "3.5.8"
+#define name_case_3_5_8 "Perform getmsg - EBADF."
+#define sref_case_3_5_8 sref_case_3_5
+#define desc_case_3_5_8 "\
+Check that getmsg() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not open for reading."
+
+int
+test_case_3_5_8(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 2;
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_8 = { &preamble_0, &test_case_3_5_8, &postamble_0 };
+
+#define test_case_3_5_8_stream_0 (&test_3_5_8)
+#define test_case_3_5_8_stream_1 (NULL)
+#define test_case_3_5_8_stream_2 (NULL)
+
+#define tgrp_case_3_5_9 test_group_3_5
+#define numb_case_3_5_9 "3.5.9"
+#define name_case_3_5_9 "Perform getmsg - EINVAL."
+#define sref_case_3_5_9 sref_case_3_5
+#define desc_case_3_5_9 "\
+Check that getmsg() can be performed on a Stream.  Checks that EINVAL is\n\
+returned when the flagsp argument points to flags that contain an\n\
+invalid value (other than 0 or RS_HIPRI)."
+
+int
+test_case_3_5_9(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	flags = RS_HIPRI + 1;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_9 = { &preamble_0, &test_case_3_5_9, &postamble_0 };
+
+#define test_case_3_5_9_stream_0 (&test_3_5_9)
+#define test_case_3_5_9_stream_1 (NULL)
+#define test_case_3_5_9_stream_2 (NULL)
+
 static const char test_group_3_6[] = "Perform GETPMSG on one Stream";
 static const char sref_case_3_6[] = "POSIX 1003.1 2003/SUSv3 getpmsg(2p) reference page.";
 
@@ -10007,18 +10334,342 @@ static const char sref_case_3_6[] = "POSIX 1003.1 2003/SUSv3 getpmsg(2p) referen
 #define name_case_3_6_1 "Perform getpmsg."
 #define sref_case_3_6_1 sref_case_3_6
 #define desc_case_3_6_1 "\
-Check that getpmsg() can be performed on a Stream."
+Check that getpmsg() can be performed on a Stream.  Checks that zero is\n\
+returned for both the control part size and data part size, indicating a\n\
+hung up Stream, when getpmsg() is called on a hung up Stream."
 
 int
 test_case_3_6_1(int child)
 {
-	return (__RESULT_SKIPPED);
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (ctl.len != 0 || dat.len != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_6_1 = { &preamble_0, &test_case_3_6_1, &postamble_0 };
+struct test_stream test_3_6_1 = { &preamble_2_1, &test_case_3_6_1, &postamble_2 };
 
 #define test_case_3_6_1_stream_0 (&test_3_6_1)
 #define test_case_3_6_1_stream_1 (NULL)
 #define test_case_3_6_1_stream_2 (NULL)
+
+#define tgrp_case_3_6_2 test_group_3_6
+#define numb_case_3_6_2 "3.6.2"
+#define name_case_3_6_2 "Perform getpmsg - EPROTO."
+#define sref_case_3_6_2 sref_case_3_6
+#define desc_case_3_6_2 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when getpmsg() is attempted on a Stream that has received an\n\
+asyncrhonous EPROTO read error."
+
+int
+test_case_3_6_2(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_2 = { &preamble_2_2, &test_case_3_6_2, &postamble_2 };
+
+#define test_case_3_6_2_stream_0 (&test_3_6_2)
+#define test_case_3_6_2_stream_1 (NULL)
+#define test_case_3_6_2_stream_2 (NULL)
+
+#define tgrp_case_3_6_3 test_group_3_6
+#define numb_case_3_6_3 "3.6.3"
+#define name_case_3_6_3 "Perform getpmsg - EAGAIN."
+#define sref_case_3_6_3 sref_case_3_6
+#define desc_case_3_6_3 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EAGAIN is\n\
+returned when getpmsg() is attempted on a Stream that has received an\n\
+asynchronous EPROTO write error and the Stream is set for non-blocking\n\
+operation."
+
+int
+test_case_3_6_3(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_3 = { &preamble_2_3, &test_case_3_6_3, &postamble_2 };
+
+#define test_case_3_6_3_stream_0 (&test_3_6_3)
+#define test_case_3_6_3_stream_1 (NULL)
+#define test_case_3_6_3_stream_2 (NULL)
+
+#define tgrp_case_3_6_4 test_group_3_6
+#define numb_case_3_6_4 "3.6.4"
+#define name_case_3_6_4 "Perform getpmsg - EPROTO."
+#define sref_case_3_6_4 sref_case_3_6
+#define desc_case_3_6_4 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
+returned when getpmsg() is attempted on a Stream that has received an\n\
+asynchronous EPROTO error."
+
+int
+test_case_3_6_4(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_4 = { &preamble_2_4, &test_case_3_6_4, &postamble_2 };
+
+#define test_case_3_6_4_stream_0 (&test_3_6_4)
+#define test_case_3_6_4_stream_1 (NULL)
+#define test_case_3_6_4_stream_2 (NULL)
+
+#define tgrp_case_3_6_5 test_group_3_6
+#define numb_case_3_6_5 "3.6.5"
+#define name_case_3_6_5 "Perform getpmsg - EINVAL."
+#define sref_case_3_6_5 sref_case_3_6
+#define desc_case_3_6_5 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EINVAL is\n\
+returned when getpmsg() is attempted on a Stream is linked under a\n\
+Multiplexing Driver."
+
+int
+test_case_3_6_5(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_5 = { &preamble_5, &test_case_3_6_5, &postamble_5 };
+
+#define test_case_3_6_5_stream_0 (&test_3_6_5)
+#define test_case_3_6_5_stream_1 (NULL)
+#define test_case_3_6_5_stream_2 (NULL)
+
+#define tgrp_case_3_6_6 test_group_3_6
+#define numb_case_3_6_6 "3.6.6"
+#define name_case_3_6_6 "Perform getpmsg - EAGAIN."
+#define sref_case_3_6_6 sref_case_3_6
+#define desc_case_3_6_6 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EAGAIN is\n\
+returned when the O_NONBLOCK flag is set for the file descriptor and the\n\
+process would be delayed."
+
+int
+test_case_3_6_6(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_6 = { &preamble_0, &test_case_3_6_6, &postamble_0 };
+
+#define test_case_3_6_6_stream_0 (&test_3_6_6)
+#define test_case_3_6_6_stream_1 (NULL)
+#define test_case_3_6_6_stream_2 (NULL)
+
+#define tgrp_case_3_6_7 test_group_3_6
+#define numb_case_3_6_7 "3.6.7"
+#define name_case_3_6_7 "Perform getpmsg - EBADF."
+#define sref_case_3_6_7 sref_case_3_6
+#define desc_case_3_6_7 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not a valid file descriptor."
+
+int
+test_case_3_6_7(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+	int oldfd = test_fd[child];
+
+	test_fd[child] = -1;
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_7 = { &preamble_0, &test_case_3_6_7, &postamble_0 };
+
+#define test_case_3_6_7_stream_0 (&test_3_6_7)
+#define test_case_3_6_7_stream_1 (NULL)
+#define test_case_3_6_7_stream_2 (NULL)
+
+#define tgrp_case_3_6_8 test_group_3_6
+#define numb_case_3_6_8 "3.6.8"
+#define name_case_3_6_8 "Perform getpmsg - EBADF."
+#define sref_case_3_6_8 sref_case_3_6
+#define desc_case_3_6_8 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EBADF is\n\
+returned when the fildes argument is not open for reading."
+
+int
+test_case_3_6_8(int child)
+{
+	struct strbuf ctl;
+	struct strbuf dat;
+	int band;
+	int flags;
+	char cbuf[1];
+	char dbuf[1];
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 2;
+
+	ctl.maxlen = 1;
+	ctl.len = -1;
+	ctl.buf = cbuf;
+
+	dat.maxlen = 1;
+	dat.len = -1;
+	dat.buf = dbuf;
+
+	band = 0;
+	flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EBADF) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_8 = { &preamble_0, &test_case_3_6_8, &postamble_0 };
+
+#define test_case_3_6_8_stream_0 (&test_3_6_8)
+#define test_case_3_6_8_stream_1 (NULL)
+#define test_case_3_6_8_stream_2 (NULL)
 
 static const char test_group_3_7[] = "Perform PUTMSG on one Stream";
 static const char sref_case_3_7[] = "POSIX 1003.1 2003/SUSv3 putmsg(2p) reference page.";
@@ -10980,8 +11631,38 @@ struct test_case {
 	test_case_3_4_1_stream_0, test_case_3_4_1_stream_1, test_case_3_4_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_5_1, tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, sref_case_3_5_1, {
 	test_case_3_5_1_stream_0, test_case_3_5_1_stream_1, test_case_3_5_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_2, tgrp_case_3_5_2, name_case_3_5_2, desc_case_3_5_2, sref_case_3_5_2, {
+	test_case_3_5_2_stream_0, test_case_3_5_2_stream_1, test_case_3_5_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_3, tgrp_case_3_5_3, name_case_3_5_3, desc_case_3_5_3, sref_case_3_5_3, {
+	test_case_3_5_3_stream_0, test_case_3_5_3_stream_1, test_case_3_5_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_4, tgrp_case_3_5_4, name_case_3_5_4, desc_case_3_5_4, sref_case_3_5_4, {
+	test_case_3_5_4_stream_0, test_case_3_5_4_stream_1, test_case_3_5_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_5, tgrp_case_3_5_5, name_case_3_5_5, desc_case_3_5_5, sref_case_3_5_5, {
+	test_case_3_5_5_stream_0, test_case_3_5_5_stream_1, test_case_3_5_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_6, tgrp_case_3_5_6, name_case_3_5_6, desc_case_3_5_6, sref_case_3_5_6, {
+	test_case_3_5_6_stream_0, test_case_3_5_6_stream_1, test_case_3_5_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_7, tgrp_case_3_5_7, name_case_3_5_7, desc_case_3_5_7, sref_case_3_5_7, {
+	test_case_3_5_7_stream_0, test_case_3_5_7_stream_1, test_case_3_5_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_8, tgrp_case_3_5_8, name_case_3_5_8, desc_case_3_5_8, sref_case_3_5_8, {
+	test_case_3_5_8_stream_0, test_case_3_5_8_stream_1, test_case_3_5_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_9, tgrp_case_3_5_9, name_case_3_5_9, desc_case_3_5_9, sref_case_3_5_9, {
+	test_case_3_5_9_stream_0, test_case_3_5_9_stream_1, test_case_3_5_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, sref_case_3_6_1, {
 	test_case_3_6_1_stream_0, test_case_3_6_1_stream_1, test_case_3_6_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_2, tgrp_case_3_6_2, name_case_3_6_2, desc_case_3_6_2, sref_case_3_6_2, {
+	test_case_3_6_2_stream_0, test_case_3_6_2_stream_1, test_case_3_6_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_3, tgrp_case_3_6_3, name_case_3_6_3, desc_case_3_6_3, sref_case_3_6_3, {
+	test_case_3_6_3_stream_0, test_case_3_6_3_stream_1, test_case_3_6_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_4, tgrp_case_3_6_4, name_case_3_6_4, desc_case_3_6_4, sref_case_3_6_4, {
+	test_case_3_6_4_stream_0, test_case_3_6_4_stream_1, test_case_3_6_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_5, tgrp_case_3_6_5, name_case_3_6_5, desc_case_3_6_5, sref_case_3_6_5, {
+	test_case_3_6_5_stream_0, test_case_3_6_5_stream_1, test_case_3_6_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_6, tgrp_case_3_6_6, name_case_3_6_6, desc_case_3_6_6, sref_case_3_6_6, {
+	test_case_3_6_6_stream_0, test_case_3_6_6_stream_1, test_case_3_6_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_7, tgrp_case_3_6_7, name_case_3_6_7, desc_case_3_6_7, sref_case_3_6_7, {
+	test_case_3_6_7_stream_0, test_case_3_6_7_stream_1, test_case_3_6_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_8, tgrp_case_3_6_8, name_case_3_6_8, desc_case_3_6_8, sref_case_3_6_8, {
+	test_case_3_6_8_stream_0, test_case_3_6_8_stream_1, test_case_3_6_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, sref_case_3_7_1, {
 	test_case_3_7_1_stream_0, test_case_3_7_1_stream_1, test_case_3_7_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_1, tgrp_case_3_8_1, name_case_3_8_1, desc_case_3_8_1, sref_case_3_8_1, {

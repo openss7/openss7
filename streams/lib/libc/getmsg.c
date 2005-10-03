@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:06:58 $
+ @(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/03 04:21:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:06:58 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 04:21:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:06:58 $"
+#ident "@(#) $RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/03 04:21:59 $"
 
 static char const ident[] =
-    "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:06:58 $";
+    "$RCSfile: getmsg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/03 04:21:59 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -82,5 +82,7 @@ static char const ident[] =
 int
 getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp)
 {
-	return getpmsg(fd, ctlptr, datptr, NULL, flagsp);
+	int band = -1;
+
+	return getpmsg(fd, ctlptr, datptr, &band, flagsp);
 }

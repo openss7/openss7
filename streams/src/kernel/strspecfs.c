@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 04:21:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -498,8 +498,9 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 	if (!(err = spec_reparent(file, cdev, dev))) {
 		file->f_flags =
 		    (sflag == CLONEOPEN) ? (file->f_flags | O_CLONE) : (file->f_flags & ~O_CLONE);
-
-		if (!(err = file->f_op->open(file->f_dentry->d_inode, file))) {
+		err = file->f_op->open(file->f_dentry->d_inode, file);
+		file->f_flags &= ~O_CLONE;
+		if (!err) {
 			dput(dentry);
 			mntput(mnt);
 			return (0);
