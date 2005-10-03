@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/03 04:22:00 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 17:42:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $";
 
 //#define __NO_VERSION__
 
@@ -74,6 +74,10 @@ static char const ident[] =
 #include <asm/ioctls.h>		/* for TGETS, etc. */
 #include <linux/termios.h>	/* for struct termios, etc. */
 #include <linux/sockios.h>	/* for FIOCGETOWN, etc. */
+
+#ifndef __user
+#define __user
+#endif
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -96,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/03 04:22:00 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3845,10 +3849,13 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 	ssize_t err, q_maxpsz, written = 0;
 	int access;
 
-	if ((err = strsizecheck(sd, M_DATA, nbytes)) < 0)
+	if (!access_ok(VERIFY_READ, buf, nbytes))
+		return (-EFAULT);
+
+	if ((q_maxpsz = err = strsizecheck(sd, M_DATA, nbytes)) < 0)
 		return (err);
 
-	if ((q_maxpsz = err) == 0 && !(sd->sd_wropt & SNDZERO))
+	if (q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO))
 		return (0);
 
 	if (test_bit(STRHOLD_BIT, &sd->sd_flag)
@@ -3865,6 +3872,8 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 		/* Note: if q_minpsz is zero and the nbytes length is greater than q_maxpsz, we are 
 		   supposed to break the message down into separate q_maxpsz segments. */
 
+		/* the following can sleep */
+
 		block = min(nbytes - written, q_maxpsz);
 
 		/* POSIX says always blocks awaiting message blocks */
@@ -3876,42 +3885,37 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 		b->b_rptr += sd->sd_wroff;
 		b->b_wptr += sd->sd_wroff;
 
-		if ((err = copyin(buf, b->b_wptr, block)))
-			break;
+		if ((err = copyin(buf, b->b_wptr, block)) == 0) {
 
-		b->b_wptr += block;
+			b->b_wptr += block;
 
-		if (written + block >= nbytes && test_bit(STRDELIM_BIT, &sd->sd_flag))
-			/* If we performed a full write of the requested number of bytes, we set
-			   the MSGDELIM flag to indicate that a full write was performed.  If we
-			   perform a partial write this flag will not be set. */
-			b->b_flag |= MSGDELIM;
+			/* locks on */
+			if ((err = straccess_rlock(sd, access)) == 0) {
+
+				if (written + block >= nbytes
+				    && test_bit(STRDELIM_BIT, &sd->sd_flag))
+					/* If we performed a full write of the requested number of
+					   bytes, we set the MSGDELIM flag to indicate that a full
+					   write was performed.  If we perform a partial write this 
+					   flag will not be set. */
+					b->b_flag |= MSGDELIM;
+
+				/* possibly wait for message band */
+				err = strwaitband(sd, file->f_flags, 0, MSG_BAND);
+				srunlock(sd);
+			}
+		}
 
 		/* send off the message block */
-		srlock(sd);
-		{
-
-			if (written)
-				/* subsequent access checks should return -ESTRPIPE instead of
-				   generating signals so that we can simply return the amount
-				   written. */
-				err = straccess(sd, FWRITE);
-			else
-				err = straccess(sd, (FWRITE | FNDELAY));
-
-			/* possibly wait for message band */
-			if (!err && !(err = strwaitband(sd, file->f_flags, 0, MSG_BAND))) {
-				/* We don't really queue these, see strwput(). */
-				ctrace(put(sd->sd_wq, b));
-				trace();
-			}
-
-		}
-		srunlock(sd);
-
-		if (!err)
+		if (!err) {
+			/* We don't really queue these, see strwput(). */
+			ctrace(put(sd->sd_wq, b));
+			trace();
 			written += block;
-		else {
+			/* subsequent access checks should return -ESTRPIPE instead of generating
+			   signals so that we can simply return the amount written. */
+			access = FWRITE;
+		} else {
 			freeb(b);
 			break;
 		}
@@ -3962,13 +3966,10 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 	else
 #endif
 	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if ((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0) {
-			if (!sd->sd_directio || !sd->sd_directio->write)
-				err = strwrite(file, buf, len, ppos);
-			else
-				err = sd->sd_directio->write(file, buf, len, ppos);
-			srunlock(sd);
-		}
+		if (!sd->sd_directio || !sd->sd_directio->write)
+			err = strwrite(file, buf, len, ppos);
+		else
+			err = sd->sd_directio->write(file, buf, len, ppos);
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
@@ -4137,11 +4138,13 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
  *  NOTICES: GLIBC2 puts -1 in band when it is called as putmsg().
  */
 int
-strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
+strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
+	   int flags)
 {
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp;
 	struct strbuf ctl, dat;
+	int err;
 
 	if (band != -1) {
 		if (flags != MSG_HIPRI && flags != MSG_BAND)
@@ -4163,16 +4166,16 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	/* Now band and flags are both correct according to putpmsg() */
 
 	if (ctlp) {
-		if (copyin(ctlp, &ctl, sizeof(*ctlp)))
-			return (-EFAULT);
+		if ((err = copyin(ctlp, &ctl, sizeof(*ctlp))))
+			return (err);
 	} else {
 		ctl.buf = NULL;
 		ctl.len = -1;
 		ctl.maxlen = -1;
 	}
 	if (datp) {
-		if (copyin(datp, &dat, sizeof(*datp)))
-			return (-EFAULT);
+		if ((err = copyin(datp, &dat, sizeof(*datp))))
+			return (err);
 	} else {
 		dat.buf = NULL;
 		dat.len = -1;
@@ -4199,19 +4202,24 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 				return (-EINVAL);
 		}
 	}
-	if (!IS_ERR(mp = strputpmsg_common(file, &ctl, &dat, band, flags))) {
-		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(put(sd->sd_wq, mp));
-		trace();
-		return (0);
+	if ((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0) {
+		mp = strputpmsg_common(file, &ctl, &dat, band, flags);
+		srunlock(sd);
+		if (!IS_ERR(mp)) {
+			/* use put instead of putnext because of STRHOLD feature */
+			ctrace(put(sd->sd_wq, mp));
+			trace();
+		} else
+			err = PTR_ERR(mp);
 	}
-	return PTR_ERR(mp);
+	return (err);
 }
 
 EXPORT_SYMBOL(strputpmsg);
 
 STATIC int
-_strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
+_strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
+	    int flags)
 {
 	struct stdata *sd;
 	int err;
@@ -4220,13 +4228,10 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	if (!(file->f_mode & FWRITE))
 		err = -EBADF;
 	else if (likely((sd = stri_acquire(file)) != NULL)) {
-		if ((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0) {
-			if (likely(!sd->sd_directio || !sd->sd_directio->putpmsg))
-				err = strputpmsg(file, ctlp, datp, band, flags);
-			else
-				err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
-			srunlock(sd);
-		}
+		if (likely(!sd->sd_directio || !sd->sd_directio->putpmsg))
+			err = strputpmsg(file, ctlp, datp, band, flags);
+		else
+			err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
@@ -4275,18 +4280,23 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			return (err);
 		/* operate as getpmsg(2s) */
 		switch (flags) {
-		case MSG_HIPRI:
-			if (band != 0)
-				return (-EINVAL);
-			break;
-		case 0:
-			/* careful, our library puts getmsg() flags in getpmsg() */
-			/* some libraries also put -1 in band */
-			flags = MSG_ANY;
+		case MSG_HIPRI: /* also RS_HIPRI */
 			if (band != 0 && band != -1)
 				return (-EINVAL);
-			band = 0;
-			bandp = NULL;	/* signal lower down that this is getmsg() */
+			if (band == -1) {
+				band = 0;
+				bandp = NULL;	/* signal lower down that this is getmsg() */
+			}
+			break;
+		case 0:
+			/* careful, our library puts getmsg() flags in getpmsg() but then puts -1 in band */
+			if (band != -1)
+				return (-EINVAL);
+			else {
+				flags = MSG_ANY;
+				band = 0;
+				bandp = NULL;	/* signal lower down that this is getmsg() */
+			}
 			break;
 		case MSG_ANY:
 			if (band != 0)
@@ -5125,9 +5135,9 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_pri;
 
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
+		srunlock(sd);
 		ctrace(put(sd->sd_wq, mp));
 		trace();
-		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);
@@ -5172,10 +5182,10 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = arg;
 
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
+		srunlock(sd);
 		ptrace(("putting message %p\n", mp));
 		ctrace(put(sd->sd_wq, mp));
 		trace();
-		srunlock(sd);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);

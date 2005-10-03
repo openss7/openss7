@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/10/01 04:31:39 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/03 17:41:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/01 04:31:39 $ by $Author: brian $
+# Last Modified $Date: 2005/10/03 17:41:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -951,7 +951,8 @@ dnl
 			  struct file_system_type.get_sb,
 			  struct super_operations.read_inode2,
 			  struct kstatfs.f_type,
-			  struct kobject.kref], [:], [:], [
+			  struct kobject.kref,
+			  struct file_operations.unlocked_ioctl], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -973,6 +974,9 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+    at_ioctl_getmsg="$linux_cv_member_struct_file_operations_unlocked_ioctl"
+    AC_SUBST([at_ioctl_getmsg])dnl
+    AM_CONDITIONAL(USING_IOCTL_GETPMSG_PUTPMSG, test :$at_ioctl_getmsg = :yes)dnl
 	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl, kill_proc_info, send_group_sig_info, session_of_pgrp])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])

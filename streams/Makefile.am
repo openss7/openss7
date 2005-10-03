@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/09/25 22:52:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/10/03 17:41:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/25 22:52:09 $ by $Author: brian $
+# Last Modified $Date: 2005/10/03 17:41:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -474,9 +474,15 @@ libstreams_la_SOURCES		= \
 				lib/libc/pipe.c \
 				lib/libc/putmsg.c \
 				lib/libc/putpmsg.c
-libstreams_la_LDFLAGS		= -no-undefined -version-info 0:0:0
+libstreams_la_LDFLAGS		= -no-undefined
 libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
+
+if USING_IOCTL_GETPMSG_PUTPMSG
+libstreams_la_LDFLAGS		+= -version-info 0:1:0
+else
+libstreams_la_LDFLAGS		+= -version-info 0:0:0
+endif
 
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 

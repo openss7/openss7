@@ -1,7 +1,7 @@
 # vim: ft=sh sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/27 19:48:49 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/03 17:42:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/27 19:48:49 $ by $Author: brian $
+# Last Modified $Date: 2005/10/03 17:42:12 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: atlocal.in,v $
+# Revision 0.9.2.11  2005/10/03 17:42:12  brian
+# - working up read/write getmsg/putmsg tests
+#
 # Revision 0.9.2.10  2005/05/27 19:48:49  brian
 # - updated headers
 #
@@ -156,6 +159,8 @@ at_prefix="@prefix@"
 at_sbindir="@sbindir@"
 at_sharedstatedir="@sharedstatedir@"
 at_sysconfdir="@sysconfdir@"
+
+at_ioctl_getmsg="@at_ioctl_getmsg@"
 
 #
 #   The following needs to be performed by the individual test suites instead

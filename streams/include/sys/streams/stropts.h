@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.16 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.17 2005/10/03 17:41:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/10/03 17:41:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/03 17:41:59 $"
 
 #ifndef __SYS_STROPTS_H__
 #warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -267,6 +267,23 @@ struct strpmsg {
 	int band;
 	int flags;			/* actually long for Mac OT */
 };
+
+#if 0
+/* this approach might be better */
+struct strgetpmsg {
+	struct strbuf *ctlptr;
+	struct strbuf *dataptr;
+	int *bandp;
+	int *flagsp;
+};
+
+struct strputpmsg {
+	struct strbuf *ctlptr;
+	struct strbuf *dataptr;
+	int band;
+	int flags;
+};
+#endif
 
 #define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678)
 
