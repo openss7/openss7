@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/03 17:42:06 $ by $Author: brian $
+ Last Modified $Date: 2005/10/04 11:51:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $";
 
 //#define __NO_VERSION__
 
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/03 17:42:06 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2617,14 +2617,14 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 			if (clen > 0) {
 				if (!user)
 					bcopy(ctlp->buf, dp->b_rptr, clen);
-				else if ((err = copyin(dp->b_rptr, ctlp->buf, clen)))
+				else if ((err = copyin(ctlp->buf, dp->b_rptr, clen)))
 					break;
 				dp = dp->b_cont;
 			}
 			if (dlen > 0) {
 				if (!user)
 					bcopy(datp->buf, dp->b_rptr, dlen);
-				else if ((err = copyin(dp->b_rptr, datp->buf, dlen)))
+				else if ((err = copyin(datp->buf, dp->b_rptr, dlen)))
 					break;
 				dp = dp->b_cont;
 			}
@@ -2663,10 +2663,8 @@ strputpmsg_common(const struct file *file, const struct strbuf *ctlp, const stru
 
 	if ((err = strpsizecheck(sd, ctlp, datp, 1)) < 0)
 		return ERR_PTR(err);
-
 	if ((err = strwaitband(sd, file->f_flags, band, flags)))
 		return ERR_PTR(err);
-
 	return strallocpmsg(sd, ctlp, datp, band, flags, 1);
 }
 
@@ -3933,17 +3931,15 @@ _strwrite_putpmsg(struct file *file, const char __user *buf, size_t len, loff_t 
 {
 	struct strpmsg __user *sp = (struct strpmsg *) buf;
 	int band, flags;
+	int err;
 
 	/* write emulation of the putpmsg system call: the problem with this approach is that it
 	   almost completely destroys the ability to have a 64-bit application running against a
 	   32-bit kernel because the pointers cannot be properly converted. */
-
-	if (!copyin(&sp->band, &band, sizeof(&sp->band)))
-		return (-EFAULT);
-
-	if (!copyin(&sp->flags, &flags, sizeof(&sp->flags)))
-		return (-EFAULT);
-
+	if ((err = copyin(&sp->band, &band, sizeof(&sp->band))))
+		return (err);
+	if ((err = copyin(&sp->flags, &flags, sizeof(&sp->flags))))
+		return (err);
 	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
 }
 #endif
@@ -6617,10 +6613,8 @@ str_i_putpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 
 	if ((err = copyin(&sp->band, &band, sizeof(&sp->band))))
 		return (err);
-
 	if ((err = copyin(&sp->flags, &flags, sizeof(&sp->flags))))
 		return (err);
-
 	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
 }
 
