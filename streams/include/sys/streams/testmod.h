@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.1 2005/09/25 22:52:10 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.2 2005/10/05 09:25:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 22:52:10 $ by $Author: brian $
+ Last Modified $Date: 2005/10/05 09:25:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
+ Revision 0.9.2.2  2005/10/05 09:25:24  brian
+ - poll tests, some noxious problem still with poll
+
  Revision 0.9.2.1  2005/09/25 22:52:10  brian
  - added test module and continuing with testing
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_STREAMS_TESTMOD_H__
 #define __SYS_STREAMS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_TESTMOD_H__
 #warning "Do no include sys/streams/testmod.h directly, include sys/testmod.h instead."
@@ -70,5 +73,6 @@
 #define TM_IOC_RDERR		((TM_IOC_MAGIC << 8) | 0x02)
 #define TM_IOC_WRERR		((TM_IOC_MAGIC << 8) | 0x03)
 #define TM_IOC_RWERR		((TM_IOC_MAGIC << 8) | 0x04)
+#define TM_IOC_SIGNAL		((TM_IOC_MAGIC << 8) | 0x05)
 
 #endif				/* __SYS_STREAMS_TESTMOD_H__ */
