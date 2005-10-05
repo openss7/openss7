@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/10/02 10:34:37 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/10/05 09:25:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 10:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/10/05 09:25:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/10/02 10:34:37 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/10/05 09:25:26 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/10/02 10:34:37 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/10/05 09:25:26 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1291,6 +1291,7 @@ _bcanputany(queue_t *q)
 
 	pl = qrlock(q);
 	result = (q->q_blocked < q->q_nband);
+	ptrace(("queue bands blocked %d, available %d\n", q->q_blocked, q->q_nband));
 	qrunlock(q, pl);
 
 	return (result);
@@ -1399,8 +1400,6 @@ __get_qband(queue_t *q, unsigned char band)
 		qb = __find_qband(q, band);
 		assert(qb);
 	} else {
-		unsigned char q_nband = q->q_nband;
-
 		do {
 			if (!(qb = allocqb()))
 				break;
@@ -1409,7 +1408,7 @@ __get_qband(queue_t *q, unsigned char band)
 			qb->qb_lowat = q->q_lowat;
 			qb->qb_flag = QB_WANTR;
 			++q->q_nband;
-		} while (band > q_nband);
+		} while (band > q->q_nband);
 	}
 	return (qb);
 }
@@ -2104,8 +2103,13 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
       failure:
 	return (0);		/* failure */
       putq:
-	/* insert at end */
-	return __putq(q, nmp);
+	{
+		int be;
+		/* insert at end */
+		if ((be = __putq(q, nmp)) == 3)
+			be = 2;
+		return (be);
+	}
 }
 
 /**

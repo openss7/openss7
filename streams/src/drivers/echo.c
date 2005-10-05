@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/29 06:48:16 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 06:48:16 $ by $Author: brian $
+ Last Modified $Date: 2005/10/05 03:27:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/29 06:48:16 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/29 06:48:16 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/09/29 06:48:16 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -147,9 +147,14 @@ static struct module_info echo_minfo = {
 static int
 echo_rput(queue_t *q, mblk_t *mp)
 {
-	swerr();
-	if (!putq(q, mp))
-		freemsg(mp);
+	putnext(q, mp);
+	return (0);
+}
+
+static int
+echo_rsrv(queue_t *q)
+{
+	qenable(OTHERQ(q));
 	return (0);
 }
 
@@ -212,10 +217,30 @@ echo_wput(queue_t *q, mblk_t *mp)
 	case M_PCCTL:
 	case M_RSE:
 	case M_PCRSE:
-		qreply(q, mp);
+		if (mp->b_datap->db_type < QPCTL && (q->q_first || !bcanputnext(OTHERQ(q), mp->b_band)))
+			putq(q, mp);
+		else
+			qreply(q, mp);
 		return (0);
 	}
 	freemsg(mp);
+	return (0);
+}
+
+static int
+echo_wsrv(queue_t *q)
+{
+	mblk_t *mp;
+	queue_t *rq = RD(q);
+
+	while ((mp = getq(q))) {
+		if (bcanputnext(rq, mp->b_band)) {
+			putnext(rq, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
 	return (0);
 }
 
@@ -335,6 +360,7 @@ echo_close(queue_t *q, int oflag, cred_t *crp)
 
 static struct qinit echo_rqinit = {
 	.qi_putp = echo_rput,
+	.qi_srvp = echo_rsrv,
 	.qi_qopen = echo_open,
 	.qi_qclose = echo_close,
 	.qi_minfo = &echo_minfo,
@@ -342,6 +368,7 @@ static struct qinit echo_rqinit = {
 
 static struct qinit echo_wqinit = {
 	.qi_putp = echo_wput,
+	.qi_srvp = echo_wsrv,
 	.qi_minfo = &echo_minfo,
 };
 

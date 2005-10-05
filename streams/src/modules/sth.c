@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/04 11:51:56 $ by $Author: brian $
+ Last Modified $Date: 2005/10/05 09:25:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $";
 
 //#define __NO_VERSION__
 
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/04 11:51:56 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1126,6 +1126,8 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 		{
 			int err;
 
+			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
+				clear_bit(STRMSIG_BIT, &sd->sd_flag);
 			rmvq(q, b);
 			if (strsignal_locked(sd, b, plp)) {
 				/* released and reacquired locks, recheck access */
@@ -1152,6 +1154,8 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 		case M_PASSFP:
 			return ERR_PTR(-EBADMSG);
 		}
+		if (b->b_next && b->b_next->b_datap->db_type == M_SIG)
+			set_bit(STRMSIG_BIT, &sd->sd_flag);
 		rmvq(q, b);
 		break;
 	}
@@ -1164,6 +1168,10 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 	/* Like putbq() but handles STRPRI bit and under queue locks */
 	if (mp->b_datap->db_type >= QPCTL)
 		set_bit(STRPRI_BIT, &sd->sd_flag);
+	if (mp->b_datap->db_type == M_SIG)
+		set_bit(STRMSIG_BIT, &sd->sd_flag);
+	else
+		clear_bit(STRMSIG_BIT, &sd->sd_flag);
 	insq(q, q->q_first, mp);
 }
 
@@ -1197,6 +1205,10 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsi
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if ((err = straccess_slow(sd, FREAD))) {
 			mp = ERR_PTR(err);
+			break;
+		}
+		if (signal_pending(current)) {
+			mp = ERR_PTR(-EINTR);
 			break;
 		}
 		if ((mp = strgetq_slow(sd, q, flags, band, plp)))
@@ -1309,6 +1321,9 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 	if ((err = straccess_slow(sd, FREAD)))
 		return ERR_PTR(err);
 
+	if (signal_pending(current))
+		return ERR_PTR(-ERESTARTSYS);
+
 	/* check nodelay */
 	if ((f_flags & FNDELAY))
 		return ERR_PTR(-EAGAIN);
@@ -1350,6 +1365,8 @@ strgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 		{
 			int err;
 
+			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
+				clear_bit(STRMSIG_BIT, &sd->sd_flag);
 			rmvq(q, b);
 			if (strsignal_locked(sd, b, plp)) {
 				/* release and reacquire locks, recheck access */
@@ -1395,6 +1412,10 @@ strwaitgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 			mp = ERR_PTR(err);
 			break;
 		}
+		if (signal_pending(current)) {
+			mp = ERR_PTR(-EINTR);
+			break;
+		}
 		if ((mp = strgetfp_slow(sd, q, plp)))
 			break;
 		zwunlock(sd, *plp);
@@ -1428,6 +1449,9 @@ strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags, unsigned long *pl
 	if ((f_flags & FNDELAY))
 		return ERR_PTR(-EAGAIN);
 
+	if (signal_pending(current))
+		return ERR_PTR(-ERESTARTSYS);
+
 	return strwaitgetfp(sd, q, plp);
 }
 
@@ -1454,6 +1478,10 @@ __strwaitband(struct stdata *sd, int band)
 		set_current_state(TASK_INTERRUPTIBLE);
 		if ((err = straccess_slow(sd, FWRITE)))
 			break;
+		if (signal_pending(current)) {
+			err = -EINTR;
+			break;
+		}
 		/* have read lock and access is ok */
 		if (bcanputnext(sd->sd_wq, band))
 			break;
@@ -1507,6 +1535,9 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
 	if ((f_flags & FNDELAY) && !test_bit(STRNDEL_BIT, &sd->sd_flag))
 		return (-EAGAIN);
 
+	if (signal_pending(current))
+		return (-ERESTARTSYS);
+
 	return __strwaitband(sd, band);
 }
 
@@ -1556,6 +1587,8 @@ strwaitopen(struct stdata *sd, const int access)
 {
 	int err;
 
+	if (signal_pending(current))
+		return (-ERESTARTSYS);
 	if (!(err = straccess_wlock(sd, access))) {
 		if (!test_and_set_bit(STWOPEN_BIT, &sd->sd_flag))
 			return (0);
@@ -1654,11 +1687,12 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 	add_wait_queue(&sd->sd_waitq, &wait);
 	for (;;) {
 		set_current_state(TASK_INTERRUPTIBLE);
-		err = -ERESTARTSYS;	/* XXX: sure? Not EINTR? */
-		if (signal_pending(current))
-			break;
 		if ((err = straccess_slow(sd, access)))
 			break;
+		if (signal_pending(current)) {
+			err = -EINTR;
+			break;
+		}
 		if (sd->sd_readers >= 1 && sd->sd_writers >= 1)
 			break;
 		schedule();
@@ -3727,8 +3761,10 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* FIXME: we really need to do these as an (unlocked) ioctl now */
-	if (unlikely(len == LFS_GETMSG_PUTMSG_ULEN))
-		return _strread_getpmsg(file, buf, len, ppos);
+	if (unlikely(len == LFS_GETMSG_PUTMSG_ULEN)) {
+		err = _strread_getpmsg(file, buf, len, ppos);
+		goto exit;
+	}
 #endif
 
 #if 0				/* vfs_read() checks this */
@@ -3744,6 +3780,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
+      exit:
 	/* We want to give the driver queues an opportunity to run. */
 	runqueues();		/* after every system call */
 	return (err);
@@ -3952,8 +3989,10 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* FIXME: we really need to do these as an (unlocked) ioctl now */
-	if (len == LFS_GETMSG_PUTMSG_ULEN)
-		return _strwrite_putpmsg(file, buf, len, ppos);
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		err = _strwrite_putpmsg(file, buf, len, ppos);
+		goto exit;
+	}
 #endif
 
 #if 0				/* vfs_write() checks this */
@@ -3969,6 +4008,8 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
+      exit:
+	/* We want to give the driver queues an opportunity to run. */
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -7377,7 +7418,7 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   new message is discarded.  The relevant processes are then woken up or signalled. */
 	/* protect atomicity of STRPRI bit and putq() */
 	pl = zwlock(sd);
-	if (test_bit(STRPRI_BIT, &sd->sd_flag)) {
+	if (test_and_set_bit(STRPRI_BIT, &sd->sd_flag)) {
 		zwunlock(sd, pl);
 		freemsg(mp);
 	} else {
@@ -7419,7 +7460,7 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 			   is protected by the queue write lock.  Note that if another M_PCPROTO
 			   message arrives between the flushq() and the zwlock() it deserves to be
 			   discarded under the M_PCPROTO case above anyway. */
-			if (test_bit(STRPRI_BIT, &sd->sd_flag)) {
+			if (test_bit(STRPRI_BIT, &sd->sd_flag) || test_bit(STRMSIG_BIT, &sd->sd_flag)) {
 				mblk_t *b;
 				unsigned long pl;
 
@@ -7427,6 +7468,8 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 				b = q->q_first;
 				if (!b || b->b_datap->db_type != M_PCPROTO)
 					clear_bit(STRPRI_BIT, &sd->sd_flag);
+				if (!b || b->b_datap->db_type != M_SIG)
+					clear_bit(STRMSIG_BIT, &sd->sd_flag);
 				zwunlock(sd, pl);
 			}
 		}
@@ -7533,6 +7576,8 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC inline streams_fastcall int
 str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
+	unsigned long pl;
+
 	/* MG 7.9.6:- "M_SIG, M_PCSIG -- these messages send signals to the process group. The
 	   first byte of the message contains the number of the signal to send.  For an M_PCSIG
 	   message the signal is sent immediately.  For an M_SIG message it is placed on the read
@@ -7540,7 +7585,12 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   the signal is SIGPOLL, it will be sent only to the processes that requested it with the
 	   I_SETSIG ioctl.  Other signals are sent to a process only if the stream is associated
 	   with the control terminal (see 7.11.2)." */
-	putq(q, mp);
+	pl = zwlock(sd);
+	insq(q, NULL, mp);	/* frozen equivalent to putq() */
+	if (q->q_first->b_datap->db_type == M_SIG)
+		set_bit(STRMSIG_BIT, &sd->sd_flag);
+	zwunlock(sd, pl);
+	strwakeread(sd);
 	return (0);
 }
 
