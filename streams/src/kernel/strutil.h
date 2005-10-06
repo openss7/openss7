@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/09/25 06:27:30 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/06 10:25:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:30 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 10:25:28 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -59,7 +59,7 @@
 extern struct syncq *global_syncq;
 
 extern bool __rmvq(queue_t *q, mblk_t *mp);
-extern bool __flushq(queue_t *q, int flag, mblk_t ***mppp);
+extern bool __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[]);
 
 /* queue band gets and puts */
 extern qband_t *STREAMS_FASTCALL(bget(qband_t *qb));
