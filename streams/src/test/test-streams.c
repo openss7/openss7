@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 09:25:40 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/06 10:25:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/05 09:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 10:25:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.45  2005/10/06 10:25:34  brian
+ - fixed backenabling, flushing, working up I_PEEK
+
+ Revision 0.9.2.44  2005/10/06 08:05:53  brian
+ - fixed poll tests and poll bugs
+
  Revision 0.9.2.43  2005/10/05 09:25:40  brian
  - poll tests, some noxious problem still with poll
 
@@ -203,9 +209,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 09:25:40 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/06 10:25:34 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 09:25:40 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/06 10:25:34 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1086,6 +1092,70 @@ poll_string(short events)
 	return ("unknown");
 }
 
+const char *
+poll_events_string(short events)
+{
+	static char string[256] = "";
+	int offset = 0, size = 256, len = 0;
+
+	if (events & POLLIN) {
+		len = snprintf(string + offset, size, "POLLIN|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLPRI) {
+		len = snprintf(string + offset, size, "POLLPRI|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLOUT) {
+		len = snprintf(string + offset, size, "POLLOUT|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDNORM) {
+		len = snprintf(string + offset, size, "POLLRDNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDBAND) {
+		len = snprintf(string + offset, size, "POLLRDBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRNORM) {
+		len = snprintf(string + offset, size, "POLLWRNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRBAND) {
+		len = snprintf(string + offset, size, "POLLWRBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLERR) {
+		len = snprintf(string + offset, size, "POLLERR|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLHUP) {
+		len = snprintf(string + offset, size, "POLLHUP|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLNVAL) {
+		len = snprintf(string + offset, size, "POLLNVAL|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLMSG) {
+		len = snprintf(string + offset, size, "POLLMSG|");
+		offset += len;
+		size -= len;
+	}
+	return (string);
+}
+
 void
 print_less(int child)
 {
@@ -1531,6 +1601,29 @@ print_success_value(int child, int value)
 }
 
 void
+print_int_string_state(int child, const char *msgs[], const int value, const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_poll_value(int child, int value, short revents)
+{
+	static const char *msgs[] = {
+		"%10d<--------/|%-32s|  |                    [%d:%03d]\n",
+		"  %10d<------/|%-32s|  |                    [%d:%03d]\n",
+		"    %10d<----/|%-32s|  |                    [%d:%03d]\n",
+		"          %10d|%-32s|  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 3)
+		print_int_string_state(child, msgs, value, poll_events_string(revents));
+}
+
+void
 print_ioctl(int child, int cmd, intptr_t arg)
 {
 	print_command_info(child, "ioctl(2)------", ioctl_string(cmd, arg));
@@ -1850,19 +1943,19 @@ test_isastream(int child)
 }
 
 int
-test_poll(int child, short events, short *revents, long ms)
+test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd[1] = { test_fd[child], events, 0 };
+	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
 	int result;
 
 	print_poll(child, events);
-	if ((result = last_retval = poll(pfd, 1, ms)) == -1) {
+	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
 		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
 	}
-	print_success_value(child, last_retval);
+	print_poll_value(child, last_retval, pfd.revents);
 	if (last_retval == 1 && revents)
-		*revents = pfd[1].revents;
+		*revents = pfd.revents;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6350,6 +6443,55 @@ struct test_stream test_2_15_6 = { &preamble_5, &test_case_2_15_6, &postamble_5 
 #define test_case_2_15_6_stream_0 (&test_2_15_6)
 #define test_case_2_15_6_stream_1 (NULL)
 #define test_case_2_15_6_stream_2 (NULL)
+
+#define tgrp_case_2_15_7 test_group_2
+#define numb_case_2_15_7 "2.15.7"
+#define name_case_2_15_7 "Perform streamio I_PEEK - true."
+#define sref_case_2_15_7 sref_case_2_15
+#define desc_case_2_15_7 "\
+Checks that I_PEEK can be performed on an errored Stream.  Check that\n\
+I_PEEK can be used to peek an RS_HIPRI message on the read queue."
+
+int
+test_case_2_15_7(int child)
+{
+	char cbuf[16] = "0123456789012345";
+	char dbuf[16] = "5432109876543210";
+	struct strpeek peek = { {sizeof(cbuf), -1, cbuf}, {sizeof(dbuf), -1, dbuf}, RS_HIPRI };
+	struct strbuf ctl = { -1, sizeof(cbuf), cbuf };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+
+	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, &ctl, &dat, RS_HIPRI) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (peek.flags != RS_HIPRI)
+		return (__RESULT_FAILURE);
+	state++;
+	if (peek.ctlbuf.len != sizeof(cbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	if (peek.databuf.len != sizeof(dbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_15_7 = { &preamble_0, &test_case_2_15_7, &postamble_0 };
+
+#define test_case_2_15_7_stream_0 (&test_2_15_7)
+#define test_case_2_15_7_stream_1 (NULL)
+#define test_case_2_15_7_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_FDINSERT
@@ -13721,7 +13863,10 @@ test_case_3_10_5(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLIN, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLIN, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	{
 		char buf[16] = { 0, };
@@ -13732,13 +13877,22 @@ test_case_3_10_5(int child)
 			return (__RESULT_FAILURE);
 	}
 	state++;
-	if (test_poll(child, POLLIN, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLIN))
+	if (test_poll(child, POLLIN, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLIN))
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLIN, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLIN, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13761,7 +13915,10 @@ test_case_3_10_6(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLPRI, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLPRI, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	{
 		char buf[16] = { 0, };
@@ -13773,13 +13930,22 @@ test_case_3_10_6(int child)
 			return (__RESULT_FAILURE);
 	}
 	state++;
-	if (test_poll(child, POLLPRI, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLPRI))
+	if (test_poll(child, POLLPRI, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLPRI))
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLPRI, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLPRI, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13802,7 +13968,13 @@ test_case_3_10_7(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLOUT, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLOUT))
+	if (test_poll(child, POLLOUT, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLOUT))
 		return (__RESULT_FAILURE);
 	state++;
 	{
@@ -13810,7 +13982,10 @@ test_case_3_10_7(int child)
 		struct strbuf ctl = { -1, sizeof(buf), buf };
 		struct strbuf dat = { -1, sizeof(buf), buf };
 
-		if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS || last_retval == 0)
+		if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval == 0)
 			return (__RESULT_FAILURE);
 		while (last_retval != 0) {
 			state++;
@@ -13822,13 +13997,22 @@ test_case_3_10_7(int child)
 		}
 	}
 	state++;
-	if (test_poll(child, POLLOUT, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLOUT, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLOUT, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLOUT))
+	if (test_poll(child, POLLOUT, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLOUT))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13851,7 +14035,10 @@ test_case_3_10_8(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLRDNORM, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLRDNORM, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	{
 		char buf[16] = { 0, };
@@ -13862,13 +14049,22 @@ test_case_3_10_8(int child)
 			return (__RESULT_FAILURE);
 	}
 	state++;
-	if (test_poll(child, POLLRDNORM, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLRDNORM))
+	if (test_poll(child, POLLRDNORM, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLRDNORM))
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLRDNORM, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLRDNORM, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13891,7 +14087,10 @@ test_case_3_10_9(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLRDBAND, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLRDBAND, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	{
 		char buf[16] = { 0, };
@@ -13902,13 +14101,22 @@ test_case_3_10_9(int child)
 			return (__RESULT_FAILURE);
 	}
 	state++;
-	if (test_poll(child, POLLRDBAND, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLRDBAND))
+	if (test_poll(child, POLLRDBAND, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLRDBAND))
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLRDBAND, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLRDBAND, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13931,7 +14139,13 @@ test_case_3_10_10(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLWRNORM, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLWRNORM))
+	if (test_poll(child, POLLWRNORM, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLWRNORM))
 		return (__RESULT_FAILURE);
 	state++;
 	{
@@ -13939,7 +14153,10 @@ test_case_3_10_10(int child)
 		struct strbuf ctl = { -1, sizeof(buf), buf };
 		struct strbuf dat = { -1, sizeof(buf), buf };
 
-		if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS || last_retval == 0)
+		if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval == 0)
 			return (__RESULT_FAILURE);
 		while (last_retval != 0) {
 			state++;
@@ -13951,13 +14168,22 @@ test_case_3_10_10(int child)
 		}
 	}
 	state++;
-	if (test_poll(child, POLLWRNORM, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLWRNORM, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLWRNORM, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLWRNORM))
+	if (test_poll(child, POLLWRNORM, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLWRNORM))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13981,7 +14207,13 @@ test_case_3_10_11(int child)
 	short revents = 0;
 
 #if 0
-	if (test_poll(child, POLLWRBAND, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLWRBAND))
+	if (test_poll(child, POLLWRBAND, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLWRBAND))
 		return (__RESULT_FAILURE);
 	state++;
 #endif
@@ -13990,7 +14222,10 @@ test_case_3_10_11(int child)
 		struct strbuf ctl = { -1, sizeof(buf), buf };
 		struct strbuf dat = { -1, sizeof(buf), buf };
 
-		if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS || last_retval == 0)
+		if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval == 0)
 			return (__RESULT_FAILURE);
 		while (last_retval != 0) {
 			state++;
@@ -14002,13 +14237,22 @@ test_case_3_10_11(int child)
 		}
 	}
 	state++;
-	if (test_poll(child, POLLWRBAND, &revents, 0) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_poll(child, POLLWRBAND, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_FLUSH, FLUSHRW) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_poll(child, POLLWRBAND, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLWRBAND))
+	if (test_poll(child, POLLWRBAND, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLWRBAND))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14031,7 +14275,13 @@ test_case_3_10_12_1(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLERR, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLERR))
+	if (test_poll(child, POLLERR, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLERR))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14054,7 +14304,13 @@ test_case_3_10_12_2(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLERR, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLERR))
+	if (test_poll(child, POLLERR, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLERR))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14077,7 +14333,13 @@ test_case_3_10_12_3(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLERR, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLERR))
+	if (test_poll(child, POLLERR, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLERR))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14100,7 +14362,13 @@ test_case_3_10_13(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLHUP, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLHUP))
+	if (test_poll(child, POLLHUP, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLHUP))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14123,7 +14391,14 @@ test_case_3_10_14(int child)
 {
 	short revents = 0;
 
-	if (test_poll(child, POLLNVAL, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLNVAL))
+	/* Linux bug. */
+	if (test_poll(child, POLLNVAL, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLNVAL))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14148,7 +14423,13 @@ test_case_3_10_15(int child)
 #if 0
 	short revents = 0;
 
-	if (test_poll(child, POLLMSG, &revents, 0) != __RESULT_SUCCESS || last_retval == 0 || !(revents & POLLMSG))
+	if (test_poll(child, POLLMSG, &revents, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval == 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (!(revents & POLLMSG))
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14754,6 +15035,8 @@ struct test_case {
 	test_case_2_15_5_stream_0, test_case_2_15_5_stream_1, test_case_2_15_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_15_6, tgrp_case_2_15_6, name_case_2_15_6, desc_case_2_15_6, sref_case_2_15_6, {
 	test_case_2_15_6_stream_0, test_case_2_15_6_stream_1, test_case_2_15_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_15_7, tgrp_case_2_15_7, name_case_2_15_7, desc_case_2_15_7, sref_case_2_15_7, {
+	test_case_2_15_7_stream_0, test_case_2_15_7_stream_1, test_case_2_15_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_16_1, tgrp_case_2_16_1, name_case_2_16_1, desc_case_2_16_1, sref_case_2_16_1, {
 	test_case_2_16_1_stream_0, test_case_2_16_1_stream_1, test_case_2_16_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_16_2, tgrp_case_2_16_2, name_case_2_16_2, desc_case_2_16_2, sref_case_2_16_2, {
