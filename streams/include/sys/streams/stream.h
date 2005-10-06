@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.62 2005/10/02 01:50:59 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.64 2005/10/06 10:25:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 01:50:59 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 10:25:18 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/10/02 01:50:59 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/10/06 10:25:18 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -997,7 +997,7 @@ extern void STREAMS_FASTCALL(flushq(queue_t *q, int flag));
 extern void freeq(queue_t *q);
 extern void STREAMS_FASTCALL(put(queue_t *q, mblk_t *mp));
 extern void STREAMS_FASTCALL(putnext(queue_t *q, mblk_t *mp));
-extern void STREAMS_FASTCALL(qbackenable(queue_t *q));
+extern void STREAMS_FASTCALL(qbackenable(queue_t *q, const unsigned char band, const char bands[]));
 extern void qdelete(queue_t *rq);
 extern void STREAMS_FASTCALL(qenable(queue_t *q));
 extern void qinsert(struct stdata *sd, queue_t *rq);

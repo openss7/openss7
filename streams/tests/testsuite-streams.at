@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/10/05 09:25:46 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/10/06 10:25:40 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,17 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/10/05 09:25:46 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/06 10:25:40 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.26  2005/10/06 10:25:40  brian
+dnl - fixed backenabling, flushing, working up I_PEEK
+dnl
+dnl Revision 0.9.2.25  2005/10/06 05:34:36  brian
+dnl - more testing and corrections
+dnl
 dnl Revision 0.9.2.24  2005/10/05 09:25:46  brian
 dnl - poll tests, some noxious problem still with poll
 dnl
@@ -944,6 +950,11 @@ AT_CLEANUP
 AT_SETUP([streams test 2.15.6])
 AT_KEYWORDS([streams ioctl I_PEEK EINVAL PLEX])
 AT_CHECK([test_streams 2.15.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 2.15.7])
+AT_KEYWORDS([streams ioctl I_PEEK])
+AT_CHECK([test_streams 2.15.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 2.16.1])
@@ -2296,8 +2307,8 @@ AT_KEYWORDS([streams poll POLLNVAL])
 AT_CHECK([test_streams 3.10.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([streams test 3.10.15])
-AT_KEYWORDS([streams poll POLLMSG])
-AT_CHECK([test_streams 3.10.15], [], [ignore], [], [], [])
-AT_CLEANUP
+dnl AT_SETUP([streams test 3.10.15])
+dnl AT_KEYWORDS([streams poll POLLMSG])
+dnl AT_CHECK([test_streams 3.10.15], [], [ignore], [], [], [])
+dnl AT_CLEANUP
 

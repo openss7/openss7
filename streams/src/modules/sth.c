@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/05 09:25:30 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 10:25:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $";
 
 //#define __NO_VERSION__
 
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/05 09:25:30 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1054,10 +1054,11 @@ STATIC inline void
 strsignal(struct stdata *sd, mblk_t *mp)
 {
 	int sig = mp->b_rptr[0];
+	int band = mp->b_band;
 
 	freemsg(mp);
 	if (sig == SIGPOLL)
-		strevent(sd, S_MSG, mp->b_band);
+		strevent(sd, S_MSG, band);
 	else if (test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0)
 		/* Note: to send SIGHUP to the session leader, use M_HANGUP. */
 		kill_pg(sd->sd_pgrp, sig, 1);
@@ -1131,10 +1132,10 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 			rmvq(q, b);
 			if (strsignal_locked(sd, b, plp)) {
 				/* released and reacquired locks, recheck access */
-				if ((err = straccess_slow(sd, FREAD))) {
-					b = ERR_PTR(err);
-					break;
-				}
+				if ((err = straccess_slow(sd, FREAD)))
+					return (ERR_PTR(err));
+				if (signal_pending(current))
+					return ERR_PTR(-EINTR);
 			}
 			continue;
 		}
@@ -1370,10 +1371,10 @@ strgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 			rmvq(q, b);
 			if (strsignal_locked(sd, b, plp)) {
 				/* release and reacquire locks, recheck access */
-				if ((err = straccess_slow(sd, FREAD))) {
-					b = ERR_PTR(err);
-					break;
-				}
+				if ((err = straccess_slow(sd, FREAD)))
+					return ERR_PTR(err);
+				if (signal_pending(current))
+					return ERR_PTR(-EINTR);
 			}
 			continue;
 		}
@@ -1630,26 +1631,32 @@ strwakeopen(struct stdata *sd)
 }
 
 STATIC inline streams_fastcall void
+strwakepoll(struct stdata *sd)
+{
+	if (waitqueue_active(&sd->sd_polllist))
+		wake_up_interruptible(&sd->sd_polllist);
+}
+
+STATIC inline streams_fastcall void
 strwakeread(struct stdata *sd)
 {
-	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag)
-	    && waitqueue_active(&sd->sd_waitq))
+	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
 		wake_up_interruptible(&sd->sd_waitq);
+	strwakepoll(sd);
 }
 
 STATIC inline streams_fastcall void
 strwakewrite(struct stdata *sd)
 {
-	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag)
-	    && waitqueue_active(&sd->sd_waitq))
+	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag))
 		wake_up_interruptible(&sd->sd_waitq);
+	strwakepoll(sd);
 }
 
 STATIC inline streams_fastcall void
 strwakeiocwait(struct stdata *sd)
 {
-	if (test_bit(IOCWAIT_BIT, &sd->sd_flag)
-	    && waitqueue_active(&sd->sd_waitq))
+	if (test_bit(IOCWAIT_BIT, &sd->sd_flag))
 		wake_up_interruptible(&sd->sd_waitq);
 }
 
@@ -1666,6 +1673,7 @@ strwakeall(struct stdata *sd)
 		wake = true;
 	if (wake && waitqueue_active(&sd->sd_waitq))
 		wake_up_interruptible(&sd->sd_waitq);
+	strwakepoll(sd);
 }
 
 /**
@@ -2909,7 +2917,7 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 
 	if ((sd = stri_lookup(file))) {
 		mask = 0;
-		poll_wait(file, &sd->sd_waitq, poll);
+		poll_wait(file, &sd->sd_polllist, poll);
 		if (test_bit(STRDERR_BIT, &sd->sd_flag) || test_bit(STWRERR_BIT, &sd->sd_flag))
 			mask |= POLLERR;
 		if (test_bit(STRHUP_BIT, &sd->sd_flag))
@@ -2918,6 +2926,8 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 			mask |= POLLPRI;
 		if (test_bit(STRMSIG_BIT, &sd->sd_flag))
 			mask |= POLLMSG;
+		if (test_bit(STPLEX_BIT, &sd->sd_flag))
+			mask |= POLLNVAL;
 		if (canget(sd->sd_rq))
 			mask |= POLLIN | POLLRDNORM;
 		if (bcangetany(sd->sd_rq))
@@ -2927,7 +2937,7 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 		if (bcanputnextany(sd->sd_wq))
 			mask |= POLLOUT | POLLWRBAND;
 	} else
-		mask = POLLERR;
+		mask = POLLNVAL;
 	return (mask);
 }
 
@@ -2941,19 +2951,19 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 
 	/* VFS doesn't check this */
 	if (!(file->f_mode & (FREAD | FWRITE)))
-		mask = POLLERR;
+		mask = POLLNVAL;
 	else if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (straccess_rlock(sd, FNDELAY) == 0) {
+		if (straccess_rlock(sd, (FCREAT | FAPPEND)) == 0) {
 			if (likely(!sd->sd_directio || !sd->sd_directio->poll))
 				mask = strpoll(file, poll);
 			else
 				mask = sd->sd_directio->poll(file, poll);
 			srunlock(sd);
 		} else
-			mask = POLLERR;
+			mask = POLLNVAL;
 		ctrace(sd_put(&sd));
 	} else
-		mask = POLLERR;
+		mask = POLLNVAL;
 	runqueues();		/* after every system call */
 	return (mask);
 }
@@ -3580,7 +3590,7 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	int err = 0;
 
 	if (ppos != &file->f_pos && ppos && *ppos != 0) {
-		__ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long)*ppos, (long)file->f_pos));
+		__ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long) *ppos, (long) file->f_pos));
 		return (-ESPIPE);
 	}
 
@@ -3737,7 +3747,8 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 EXPORT_SYMBOL(strread);
 
-STATIC int _strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *, int __user *);
+STATIC int _strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *,
+		       int __user *);
 
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 STATIC ssize_t
@@ -4294,7 +4305,8 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
  *  GLIBC2 puts NULL in bandp for getmsg().
  */
 int
-strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
+strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
+	   int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q = sd->sd_rq;
@@ -4307,7 +4319,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	if (!flagsp)
 		return (-EINVAL);
 	if (!access_ok(VERIFY_WRITE, flagsp, sizeof(*flagsp)))
-		return (-EINVAL);
+		return (-EFAULT);
 	if ((err = copyin(flagsp, &flags, sizeof(*flagsp))))
 		return (err);
 	if (bandp) {
@@ -4317,7 +4329,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			return (err);
 		/* operate as getpmsg(2s) */
 		switch (flags) {
-		case MSG_HIPRI: /* also RS_HIPRI */
+		case MSG_HIPRI:	/* also RS_HIPRI */
 			if (band != 0 && band != -1)
 				return (-EINVAL);
 			if (band == -1) {
@@ -4326,7 +4338,8 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			}
 			break;
 		case 0:
-			/* careful, our library puts getmsg() flags in getpmsg() but then puts -1 in band */
+			/* careful, our library puts getmsg() flags in getpmsg() but then puts -1
+			   in band */
 			if (band != -1)
 				return (-EINVAL);
 			else {
@@ -4564,7 +4577,8 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 EXPORT_SYMBOL(strgetpmsg);
 
 STATIC int
-_strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
+_strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
+	    int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd;
 	int err;
@@ -6076,83 +6090,80 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!arg)
 		return (-EINVAL);
+	if (!access_ok(VERIFY_WRITE, arg, sizeof(sp)))
+		return (-EFAULT);
 	if ((err = copyin((typeof(&sp)) arg, &sp, sizeof(sp))))
 		return (err);
-	if (sp.ctlbuf.maxlen < 0 || sp.databuf.maxlen < 0 || (sp.ctlbuf.maxlen && !sp.ctlbuf.buf)
-	    || (sp.databuf.maxlen && !sp.databuf.buf))
+
+	if (sp.flags != 0 && sp.flags != RS_HIPRI)
 		return (-EINVAL);
-	if (sp.ctlbuf.maxlen
-	    && (err = verify_area(VERIFY_WRITE, sp.ctlbuf.buf, sp.ctlbuf.maxlen)) < 0)
-		return (err);
-	if (sp.databuf.maxlen
-	    && (err = verify_area(VERIFY_WRITE, sp.databuf.buf, sp.databuf.maxlen)) < 0)
-		return (err);
+
+	if (sp.ctlbuf.maxlen < 0) {
+		sp.ctlbuf.maxlen = -1;
+		sp.ctlbuf.buf = NULL;
+	} else if (!access_ok(VERIFY_WRITE, sp.ctlbuf.buf, sp.ctlbuf.maxlen))
+		return (-EFAULT);
+	sp.ctlbuf.len = -1;
+
+	if (sp.databuf.maxlen < 0) {
+		sp.databuf.maxlen = -1;
+		sp.databuf.buf = NULL;
+	} else if (!access_ok(VERIFY_WRITE, sp.databuf.buf, sp.databuf.maxlen))
+		return (-EFAULT);
+	sp.databuf.len = -1;
+
 	if (!(err = straccess_rlock(sd, FREAD | FNDELAY))) {
+		mblk_t *b, *dp = NULL;
 		unsigned long pl;
 		queue_t *q = sd->sd_rq;
 
 		pl = qrlock(q);
-		do {
-			mblk_t *mp, *dp;
-			ssize_t blen;
-			ssize_t clen = sp.ctlbuf.maxlen;
-			ssize_t dlen = sp.databuf.maxlen;
-			ssize_t davail, cavail;
 
-			if (!(mp = q->q_first)) {
-				err = 0;
-				rtn = 0;
-				break;
-			}
-			davail = msgdsize(mp);	/* M_DATA blocks */
-			cavail = msgsize(mp) - davail;	/* isddatablks - M_DATA blocks */
-			sp.flags = mp->b_datap->db_type > QPCTL ? RS_HIPRI : 0;
-			sp.ctlbuf.len = 0;
-			sp.databuf.len = 0;
-			for (dp = mp; dp; dp = dp->b_cont) {
-				if ((blen = dp->b_wptr - dp->b_rptr) <= 0)
-					continue;
-				if (dp->b_datap->db_type == M_DATA) {
-					/* goes in data part */
-					if (dlen == -1)
-						break;
-					if (blen > dlen) {
-						if (copyout(sp.databuf.buf + sp.databuf.len,
-							    dp->b_rptr, dlen))
-							return (-EFAULT);
-						sp.databuf.len += dlen;
-						dlen = 0;
-						break;
-					}
-					/* FIXME: can't copyout under locks */
-					if (copyout(sp.databuf.buf + sp.databuf.len,
-						    dp->b_rptr, blen))
-						return (-EFAULT);
-					sp.databuf.len += blen;
-					dlen -= blen;
-				} else {
-					/* goes in ctrl part */
-					if (clen == -1)
-						break;
-					if (blen > clen) {
-						if (copyout(sp.ctlbuf.buf + sp.ctlbuf.len,
-							    dp->b_rptr, clen))
-							return (-EFAULT);
-						sp.ctlbuf.len += clen;
-						clen = 0;
-						break;
-					}
-					if (copyout(sp.ctlbuf.buf + sp.ctlbuf.len,
-						    dp->b_rptr, blen))
-						return (-EFAULT);
-					sp.ctlbuf.len += blen;
-					clen -= blen;
-				}
-			}
-			rtn = 1;
-		} while (0);
+		if ((b = q->q_first) && !(dp = dupmsg(b)))
+			err = -ENOSR;
+
 		qrunlock(q, pl);
 		srunlock(sd);
+
+		if ((b = dp)) {
+			ssize_t clen = sp.ctlbuf.maxlen;
+			ssize_t dlen = sp.databuf.maxlen;
+
+			rtn = 1;
+			sp.flags = b->b_datap->db_type > QPCTL ? RS_HIPRI : 0;
+			sp.ctlbuf.len = -1;
+			sp.databuf.len = -1;
+
+			for (; b; b = b->b_cont) {
+				ssize_t blen, copylen;
+
+				if ((blen = b->b_wptr - b->b_rptr) <= 0)
+					continue;
+				if (b->b_datap->db_type == M_DATA) {
+
+					/* goes in data part */
+					if (dlen <= 0)
+						continue;
+					copylen = (blen > dlen) ? dlen : blen;
+					if (copyout(sp.databuf.buf + sp.databuf.len, b->b_rptr, copylen))
+						return (-EFAULT);
+					sp.databuf.len = (sp.databuf.len <= 0) ? copylen : sp.databuf.len + copylen;
+					dlen -= copylen;
+				} else {
+					/* goes in ctrl part */
+					if (clen <= 0)
+						continue;
+					copylen = (blen > clen) ? clen : blen;
+					if (copyout(sp.ctlbuf.buf + sp.ctlbuf.len, b->b_rptr, copylen))
+						return (-EFAULT);
+					sp.ctlbuf.len = (sp.ctlbuf.len <= 0) ? copylen : sp.ctlbuf.len + copylen;
+					clen -= copylen;
+				}
+			}
+			put_user(sp.ctlbuf.len, &((typeof(&sp))arg)->ctlbuf.len);
+			put_user(sp.databuf.len, &((typeof(&sp))arg)->databuf.len);
+			put_user(sp.flags, &((typeof(&sp))arg)->flags);
+		}
 	}
 	if (err < 0)
 		return (err);
@@ -6445,22 +6456,22 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 			/* we now have a M_PASSFP message in mp */
 			f2 = *(struct file **) mp->b_rptr;
 			printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
-				  file_count(f2)));
+				file_count(f2)));
 			sr.fd = fd;
 			sr.uid = f2->f_uid;
 			sr.gid = f2->f_gid;
 			if (!(err = copyout(&sr, (typeof(&sr)) arg, sizeof(sr)))) {
 				fd_install(fd, f2);
 				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
-					  file_count(f2)));
+					file_count(f2)));
 				/* we need to do another get because an fput will be done when the
 				   mblk is freed */
 				get_file(f2);
 				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
-					  file_count(f2)));
+					file_count(f2)));
 				freemsg(mp);
 				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
-					  file_count(f2)));
+					file_count(f2)));
 			} else {
 				/* shouldn't happen, we verified the area before! */
 				putbq(q, mp);
@@ -7331,17 +7342,41 @@ EXPORT_SYMBOL(strwput);
  *  when we do a canputnext(sd->sd_wq) it sets the QWANTW on sd->sd_wq->q_next if the module below
  *  the stream head is flow controlled.  When congestion subsides to the low water mark, the queue
  *  will backenable us and we will run and wake up any waiters blocked on flow control.
+ *
+ *  Note that we must also trigger stream events here.  Two in particular are S_WRNORM and S_WRBAND.
+ *  We altered qbackenable to set the QBACK bit on the queue and the QB_BACK bit on a queue band
+ *  when it backenables the queue.  This is an indication that flow control has subsided for the
+ *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
+ *  for signalling streams events.
  */
 int
 strwsrv(queue_t *q)
 {
 	struct stdata *sd;
+	unsigned long pl;
+	struct qband *qb;
+	int band;
+	unsigned char be[NBAND] = { 0, };
 
 	assert(q);
 
 	sd = qstream(q);
 
 	assert(sd);
+
+	pl = qrlock(q);
+	if (test_and_clear_bit(QBACK_BIT, &q->q_flag))
+		be[0] = 1;
+	for (qb = q->q_bandp, band = q->q_nband; qb; qb = qb->qb_next, band--)
+		if (test_and_clear_bit(QB_BACK_BIT, &qb->qb_flag))
+			be[band] = 1;
+	qrunlock(q, pl);
+
+	if (be[0])
+		strevent(sd, S_WRNORM, 0);
+	for (band = q->q_nband; band > 0; band--)
+		if (be[band])
+			strevent(sd, S_WRBAND, band);
 
 	strwakewrite(sd);
 	return (0);
@@ -7460,7 +7495,8 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 			   is protected by the queue write lock.  Note that if another M_PCPROTO
 			   message arrives between the flushq() and the zwlock() it deserves to be
 			   discarded under the M_PCPROTO case above anyway. */
-			if (test_bit(STRPRI_BIT, &sd->sd_flag) || test_bit(STRMSIG_BIT, &sd->sd_flag)) {
+			if (test_bit(STRPRI_BIT, &sd->sd_flag)
+			    || test_bit(STRMSIG_BIT, &sd->sd_flag)) {
 				mblk_t *b;
 				unsigned long pl;
 
@@ -7715,9 +7751,12 @@ str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC inline streams_fastcall int
 str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	clear_bit(STRHUP_BIT, &sd->sd_flag);
+#if 0
 	if (test_and_clear_bit(STRHUP_BIT, &sd->sd_flag))
 		strevent(sd, S_HANGUP, 0);
+#else
+	clear_bit(STRHUP_BIT, &sd->sd_flag);
+#endif
 	freemsg(mp);
 	return (0);
 }

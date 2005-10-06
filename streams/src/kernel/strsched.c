@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/10/02 10:34:35 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/06 10:25:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/02 10:34:35 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 10:25:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/10/02 10:34:35 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/06 10:25:26 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/10/02 10:34:35 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/06 10:25:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -847,8 +847,8 @@ freeq(queue_t *rq)
 
 	clear_bit(QUSE_BIT, &rq->q_flag);
 	clear_bit(QUSE_BIT, &wq->q_flag);
-	__flushq(rq, FLUSHALL, &mpp);
-	__flushq(wq, FLUSHALL, &mpp);
+	__flushq(rq, FLUSHALL, &mpp, NULL);
+	__flushq(wq, FLUSHALL, &mpp, NULL);
 	__freebands(rq);
 	__freebands(wq);
 	__freeq(rq);
@@ -1140,7 +1140,7 @@ find_event(int event_id)
 streams_fastcall struct strevent *
 sealloc(void)
 {
-	return event_alloc(SE_STREAM, NULL);
+	return ctrace(event_alloc(SE_STREAM, NULL));
 }
 
 EXPORT_SYMBOL(sealloc);		/* include/sys/streams/strsubr.h */
@@ -1299,7 +1299,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_STREAM, q))) {
+	if ((se = ctrace(event_alloc(SE_STREAM, q)))) {
 		se->x.e.procp = procp;
 		se->x.e.events = events;
 		id = strsched_event(se);
@@ -1313,7 +1313,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long)
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_BUFCALL, q))) {
+	if ((se = ctrace(event_alloc(SE_BUFCALL, q)))) {
 		ctrace(se->x.b.queue = qget(q));
 		se->x.b.func = func;
 		se->x.b.arg = arg;
@@ -1329,7 +1329,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_TIMEOUT, q))) {
+	if ((se = ctrace(event_alloc(SE_TIMEOUT, q)))) {
 		ctrace(se->x.t.queue = qget(q));
 		se->x.t.func = func;
 		se->x.t.arg = arg;
@@ -1347,7 +1347,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_WELDQ, q))) {
+	if ((se = ctrace(event_alloc(SE_WELDQ, q)))) {
 		ctrace(se->x.w.queue = qget(q));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -1366,7 +1366,7 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	long id = 0;
 	struct strevent *se;
 
-	if ((se = event_alloc(SE_UNWELDQ, q))) {
+	if ((se = ctrace(event_alloc(SE_UNWELDQ, q)))) {
 		ctrace(se->x.w.queue = qget(q));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -3815,6 +3815,7 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
 	init_waitqueue_head(&sd->sd_waitq);
+	init_waitqueue_head(&sd->sd_polllist);
 	slockinit(sd);		/* stream head read/write lock */
 	plockinit(sd);		/* stream plumbing read/write lock */
 	zlockinit(sd);		/* stream freeze read/write lock */

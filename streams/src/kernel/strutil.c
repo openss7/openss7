@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/10/05 09:25:26 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/10/06 10:25:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/05 09:25:26 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 10:25:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/10/05 09:25:26 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/10/06 10:25:27 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/10/05 09:25:26 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/10/06 10:25:27 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -526,7 +526,7 @@ allocb(size_t size, uint priority)
 		db->db_lim = base + size;
 		db->db_size = size;
 		db_set(db, 1);
-		db->db_type = M_DATA; /* not necessary if zeroed */
+		db->db_type = M_DATA;	/* not necessary if zeroed */
 		/* set up message block */
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
@@ -697,7 +697,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		db->db_lim = base + size;
 		db->db_size = size;
 		db_set(db, 1);
-		db->db_type = M_DATA; /* not necessary if zeroed */
+		db->db_type = M_DATA;	/* not necessary if zeroed */
 		/* set up message block */
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
@@ -1171,9 +1171,13 @@ __STRUTIL_EXTERN_INLINE queue_t *backq(queue_t *q);
 
 EXPORT_SYMBOL(backq);
 
+static struct qband *__get_qband(queue_t *q, unsigned char band);
+
 /**
  *  qbackenable: - backenable a queue
  *  @q:		the queue to backenable
+ *  @band:	(highest) band number to backenable
+ *  @bands:	array of bands to backenable (if more than one)
  *
  *  CONTEXT: qbackenable() can be called from any context.
  *
@@ -1181,7 +1185,7 @@ EXPORT_SYMBOL(backq);
  *  takes a STREAM head read lock.
  */
 streams_fastcall void
-qbackenable(queue_t *q)
+qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	struct stdata *sd;
 	queue_t *q_back;
@@ -1195,8 +1199,31 @@ qbackenable(queue_t *q)
 	prlock(sd);
 	q_back = backq(q);
 	while ((q = q_back) && !q->q_qinfo->qi_srvp && (q_back = backq(q))) ;
-	if (q)
-		enableq(q);	/* normal enable */
+	if (q) {
+		unsigned long pl;
+		struct qband *qb;
+
+		pl = qwlock(q);
+		if (bands == NULL) {
+			if (band == 0)
+				set_bit(QBACK_BIT, &q->q_flag);
+			else if ((qb = __get_qband(q, band)))
+				set_bit(QB_BACK_BIT, &qb->qb_flag);
+		} else {
+			int bnum;
+
+			if (bands[0])
+				set_bit(QBACK_BIT, &q->q_flag);
+			for (bnum = band; bnum > 0; bnum--)
+				if (bands[bnum] && (qb = __get_qband(q, bnum)))
+					set_bit(QB_BACK_BIT, &qb->qb_flag);
+		}
+		qwunlock(q, pl);
+
+		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
+		   control */
+		qenable(q);	/* always enable if a service procedure exists */
+	}
 	prunlock(sd);
 }
 
@@ -1730,7 +1757,7 @@ flushband(queue_t *q, int band, int flag)
 	trace();
 	if (backenable) {
 		trace();
-		qbackenable(q);
+		qbackenable(q, band, NULL);
 	}
 	trace();
 	/* we want to free messages with the locks off so that other CPUs can process this queue
@@ -1748,6 +1775,7 @@ EXPORT_SYMBOL(flushband);
  *  @q:		queue from which to flush messages
  *  @flag:	how, %FLUSHDATA or %FLUSHALL
  *  @mppp:	pointer to a pointer to the end of a message chain
+ *  @bands:	array of band backenable flags
  *
  *  NOTICES: This function must be called with a queue write lock held across the call.
  *
@@ -1767,14 +1795,15 @@ EXPORT_SYMBOL(flushband);
  *  Note that the putq() deferral chain is flushed as well.
  */
 bool
-__flushq(queue_t *q, int flag, mblk_t ***mppp)
+__flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 {
 	bool backenable = false;
+	mblk_t *b;
 
 	if (likely(flag == FLUSHALL)) {
 		/* This is fast! For flushall, we link the whole chain onto the free list and null
 		   out counts and markers */
-		if ((**mppp = q->q_first)) {
+		if ((b = **mppp = q->q_first)) {
 			struct qband *qb;
 
 			*mppp = &q->q_last->b_next;
@@ -1796,15 +1825,23 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp)
 			}
 			q->q_blocked = 0;
 			backenable = true;	/* always backenable when queue empty */
+			if (bands)
+				do {
+					bands[b->b_band] = true;
+				} while ((b = b->b_next));
 		}
 	} else if (likely(flag == FLUSHDATA)) {
-		mblk_t *b, *b_next;
-
 		if ((b = q->q_first)) {
+			mblk_t *b_next;
+
 			do {
 				b_next = b->b_next;
 				if (isdatamsg(b)) {
-					backenable |= __rmvq(q, b);
+					if (__rmvq(q, b)) {
+						backenable = true;
+						if (bands)
+							bands[b->b_band] = true;
+					}
 					**mppp = b;
 					*mppp = &b->b_next;
 					**mppp = NULL;
@@ -1833,6 +1870,8 @@ flushq(queue_t *q, int flag)
 	bool backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long pl;
+	int q_nband;
+	unsigned char back[NBAND] = { 0, };
 
 	assert(q);
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
@@ -1841,12 +1880,13 @@ flushq(queue_t *q, int flag)
 
 	trace();
 	pl = qwlock(q);
-	backenable = __flushq(q, flag, &mpp);
+	q_nband = q->q_nband;
+	backenable = __flushq(q, flag, &mpp, back);
 	qwunlock(q, pl);
 	trace();
 	if (backenable) {
 		trace();
-		qbackenable(q);
+		qbackenable(q, q_nband, back);
 	}
 	trace();
 	/* we want to free messages with the locks off so that other CPUs can process this queue
@@ -1877,7 +1917,7 @@ unsigned long
 freezestr(queue_t *q)
 {
 	struct stdata *sd;
-	
+
 	assert(q);
 	sd = qstream(q);
 	assert(sd);
@@ -2014,7 +2054,7 @@ getq(queue_t *q)
 	mp = __getq(q, &backenable);
 	qwunlock(q, pl);
 	if (backenable)
-		qbackenable(q);
+		qbackenable(q, mp->b_band, NULL);
 	return (mp);
 }
 
@@ -2105,6 +2145,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
       putq:
 	{
 		int be;
+
 		/* insert at end */
 		if ((be = __putq(q, nmp)) == 3)
 			be = 2;
@@ -2778,8 +2819,8 @@ qdelete(queue_t *q)
 
 	pl = pwlock(sd);
 
-	(q+0)->q_next = NULL;
-	(q+1)->q_next = NULL;
+	(q + 0)->q_next = NULL;
+	(q + 1)->q_next = NULL;
 
 	ctrace(pwunlock(sd, pl));
 
@@ -2826,8 +2867,8 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 	ptrace(("detaching stream %p queue pair %p\n", qstream(q), q));
 
 	err = ctrace(qclose(q, flags, crp));
-	ctrace(qprocsoff(q));		/* in case qclose forgot */
-	ctrace(qdelete(q));		/* half delete */
+	ctrace(qprocsoff(q));	/* in case qclose forgot */
+	ctrace(qdelete(q));	/* half delete */
 	trace();
 	return (err);
 }
@@ -3082,7 +3123,7 @@ qcountstrm(queue_t *q)
 
 	if (q) {
 		struct stdata *sd;
-		
+
 		sd = qstream(q);
 		assert(sd);
 		prlock(sd);
@@ -3259,7 +3300,7 @@ rmvq(queue_t *q, mblk_t *mp)
 
 	/* Backenabling under locks is not so severe now that write locks only suppress soft irq. */
 	if (backenable)
-		qbackenable(q);
+		qbackenable(q, mp->b_band, NULL);
 }
 
 EXPORT_SYMBOL(rmvq);
@@ -3772,7 +3813,7 @@ void
 unfreezestr(queue_t *q, unsigned long flags)
 {
 	struct stdata *sd;
-	
+
 	assert(q);
 	sd = qstream(q);
 	assert(sd);

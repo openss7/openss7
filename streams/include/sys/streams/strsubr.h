@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.50 2005/09/30 08:26:50 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.52 2005/10/06 08:05:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/30 08:26:50 $ by $Author: brian $
+ Last Modified $Date: 2005/10/06 08:05:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/09/30 08:26:50 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/10/06 08:05:46 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -196,6 +196,7 @@ struct stdata {
 	pid_t sd_session;		/* controlling session id */
 	pid_t sd_pgrp;			/* foreground process group */
 	ushort sd_wroff;		/* write offset */
+	unsigned char sd_band;		/* highest blocked band */
 	ssize_t sd_minpsz;		/* cached sd_wq->q_next->q_minpsz */
 	ssize_t sd_maxpsz;		/* cached sd_wq->q_next->q_maxpsz */
 	int sd_rerror;			/* read error */
@@ -211,6 +212,7 @@ struct stdata {
 	struct strevent *sd_siglist;	/* list of procs for SIGPOLL */
 	struct fasync_struct *sd_fasync;	/* list of procs for SIGIO */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
+	wait_queue_head_t sd_polllist;	/* waiters on poll */
 	wait_queue_head_t sd_waitq;	/* waiters */
 //      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
