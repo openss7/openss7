@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:03 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/08/31 19:03:03 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -143,12 +143,12 @@ MODULE_ALIAS("/dev/streams/pipe/*");
 #endif
 
 static struct module_info pipe_minfo = {
-	mi_idnum:CONFIG_STREAMS_PIPE_MODID,
-	mi_idname:CONFIG_STREAMS_PIPE_NAME,
-	mi_minpsz:STRMINPSZ,
-	mi_maxpsz:STRMAXPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_PIPE_MODID,
+	.mi_idname = CONFIG_STREAMS_PIPE_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);

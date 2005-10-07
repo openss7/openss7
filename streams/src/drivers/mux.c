@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/06 05:34:34 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/10/07 09:34:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/06 05:34:34 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/06 05:34:34 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/10/07 09:34:14 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/06 05:34:34 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/10/07 09:34:14 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -72,6 +72,8 @@ static char const ident[] =
  *  cmn_err(9) which generates each and every message to the kernel log.
  */
 
+#include <stdbool.h>
+
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
@@ -89,7 +91,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/06 05:34:34 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/10/07 09:34:14 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -157,8 +159,8 @@ MODULE_ALIAS("/dev/streams/mux/*");
 STATIC struct module_info mux_minfo = {
 	.mi_idnum = CONFIG_STREAMS_MUX_MODID,
 	.mi_idname = CONFIG_STREAMS_MUX_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
@@ -397,32 +399,27 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	}
 	default:
 	      passmsg:
-		read_lock_bh(&mux_lock);
-		if (mux->other) {
-			queue_t *wq;
+	{
+		queue_t *wq = NULL;
 
-			if ((wq = mux->other->wq)) {
-				/* check the QSVCBUSY flag in MP drivers to avoid missequencing of
-				   messages when service procedure is running concurrent with put
-				   procedure */
-				if (!q->q_first && !(q->q_flag & QSVCBUSY)) {
-					if (mp->b_datap->db_type >= QPCTL
-					    || bcanputnext(wq, mp->b_band)) {
-						putnext(wq, mp);
-						read_unlock_bh(&mux_lock);
-						return (0);
-					}
-				}
-				read_unlock_bh(&mux_lock);
-				putq(q, mp);
-				break;
-			}
-		}
+		read_lock_bh(&mux_lock);
+		if (mux->other)
+			wq = mux->other->wq;
 		read_unlock_bh(&mux_lock);
 
-		freemsg(mp);
-		putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
+		/* if not linked behave like echo driver */
+		if (!wq)
+			wq = RD(q);
+
+		/* Check the QSVCBUSY flag in MP drivers to avoid missequencing of messages when
+		   service procedure is running concurrent with put procedure */
+		if (mp->b_datap->db_type < QPCTL
+		    && (q->q_first || (q->q_flag & QSVCBUSY) || !bcanputnext(wq, mp->b_band)))
+			putq(q, mp);
+		else
+			putnext(wq, mp);
 		break;
+	}
 	}
 	return (0);
 }
@@ -541,18 +538,19 @@ mux_uwsrv(queue_t *q)
 	read_lock_bh(&mux_lock);
 	if (mux->other)
 		wq = mux->other->wq;
-	if (wq) {
-		while ((mp = getq(q))) {
-			if (mp->b_datap->db_type >= QPCTL || bcanputnext(wq, mp->b_band)) {
-				putnext(wq, mp);
-				continue;
-			}
-			putbq(q, mp);
-			break;
-		}
-	} else
-		flushq(q, FLUSHALL);
 	read_unlock_bh(&mux_lock);
+
+	if (!wq)
+		wq = RD(q);
+
+	while ((mp = getq(q))) {
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(wq, mp->b_band)) {
+			putnext(wq, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
 	return (0);
 }
 
@@ -570,13 +568,21 @@ mux_ursrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
 	struct mux *bot;
+	bool found = false;
 
 	/* Find the lower queues feeding this one and enable them. */
 	read_lock_bh(&mux_lock);
 	for (bot = mux_links; bot; bot = bot->next)
-		if (bot->other == mux)
+		if (bot->other == mux) {
 			qenable(bot->rq);
+			found = true;
+		}
 	read_unlock_bh(&mux_lock);
+
+	/* echo behaviour otherwise */
+	if (!found)
+		qenable(WR(q));
+
 	return (0);
 }
 

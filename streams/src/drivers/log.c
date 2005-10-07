@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/09/10 18:16:32 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -162,12 +162,12 @@ MODULE_ALIAS("/dev/streams/conslog");
 #endif
 
 static struct module_info log_minfo = {
-	mi_idnum:CONFIG_STREAMS_LOG_MODID,
-	mi_idname:CONFIG_STREAMS_LOG_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_LOG_MODID,
+	.mi_idname = CONFIG_STREAMS_LOG_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 queue_t *log_conq = NULL;

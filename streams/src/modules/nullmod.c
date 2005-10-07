@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/07 09:34:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:35 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.3  2005/10/07 09:34:23  brian
+ - more testing and corrections
+
  Revision 0.9.2.2  2005/09/10 18:16:35  brian
  - more test build
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/07 09:34:23 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/07 09:34:23 $";
 
 /* 
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -92,7 +95,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:35 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/07 09:34:23 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -142,8 +145,8 @@ MODULE_ALIAS("streams-module-nullmod");
 STATIC struct module_info nullmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULLMOD_MODID,
 	.mi_idname = CONFIG_STREAMS_NULLMOD_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };

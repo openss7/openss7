@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.40 2005/09/26 10:56:41 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.41 2005/10/07 09:34:00 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/09/26 10:56:41 $ by $Author: brian $
+% Last Modified $Date: 2005/10/07 09:34:00 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -692,6 +692,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.41  2005/10/07 09:34:00  brian
+- more testing and corrections
+
 Revision 0.9.2.40  2005/09/26 10:56:41  brian
 - doc updates
 
@@ -4911,9 +4914,7 @@ placing the message on the queue.@footnote{Under @cite{@value{PACKAGE_TITLE}}, t
 @manref{putq(9)}, @manref{putbq(9)} and @manref{insq(9)}.} If the message is passed to
 @manpage{putq(9)} with a @var{b_band} value that is greater than the number of @code{qband}
 structures associated with the queue, @manpage{putq(9)} tries to allocate a new @code{qband}
-structure for each band up to and including the band of the message.@footnote{@value{PACKAGE_TITLE}
-currently only allocated the band in question and does not allocate intermediate queue band
-structures as described.}
+structure for each band up to and including the band of the message.
 
 The above also applies to @manpage{putbq(9)} and @manpage{insq(9)}.  If an attempt is made to insert
 a message out of order in a queue via @manpage{insq(9)}, the message is not inserted and the routine
@@ -12548,7 +12549,8 @@ Modules using @dfn{STREAMS} synchronization barriers, either explicitly by confi
 default, must use @manref{qwait(9)} and @manref{qwait_sig(9)} instead of @manref{CV_WAIT(9)} or
 @manref{CV_WAIT_SIG(9)} from within @member{qi_qopen} and @member{qi_qclose}
 procedures.@footnote{Modules are not permitted to sleep outside of their queue open and close
-procedures.}
+procedures.  Attempting to sleep in a @command{put} or @command{service} procedure will panic most
+kernels.}
 
 @node MP Put and Service Procedures
 @section MP Put and Service Procedures

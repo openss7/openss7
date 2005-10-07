@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/05 03:27:21 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/10/05 03:27:21 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -138,8 +138,8 @@ MODULE_ALIAS("/dev/streams/echo/*");
 static struct module_info echo_minfo = {
 	.mi_idnum = CONFIG_STREAMS_ECHO_MODID,
 	.mi_idname = CONFIG_STREAMS_ECHO_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
@@ -217,7 +217,10 @@ echo_wput(queue_t *q, mblk_t *mp)
 	case M_PCCTL:
 	case M_RSE:
 	case M_PCRSE:
-		if (mp->b_datap->db_type < QPCTL && (q->q_first || !bcanputnext(OTHERQ(q), mp->b_band)))
+		/* Check QSVCBUSY flag in MP drivers to avoid missequencing of messages when
+		   service procedure is running concurrent with put procedure. */
+		if (mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)
+						     || !bcanputnext(OTHERQ(q), mp->b_band)))
 			putq(q, mp);
 		else
 			qreply(q, mp);

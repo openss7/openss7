@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/10 18:16:32 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -141,12 +141,12 @@ MODULE_ALIAS("/dev/streams/sad/user");
 #endif
 
 static struct module_info sad_minfo = {
-	mi_idnum:CONFIG_STREAMS_SAD_MODID,
-	mi_idname:CONFIG_STREAMS_SAD_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_SAD_MODID,
+	.mi_idname = CONFIG_STREAMS_SAD_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 /* private structures */

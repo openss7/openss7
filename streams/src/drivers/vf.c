@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/11 02:38:59 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/11 02:38:59 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.2  2005/10/07 09:34:14  brian
+ - more testing and corrections
+
  Revision 0.9.2.1  2005/09/11 02:38:59  brian
  - added experimental verification driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/11 02:38:59 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/09/11 02:38:59 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2005/09/11 02:38:59 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
@@ -154,8 +157,8 @@ MODULE_ALIAS("/dev/streams/vf/*");
 STATIC struct module_info vf_minfo = {
 	.mi_idnum = CONFIG_STREAMS_VF_MODID,
 	.mi_idname = CONFIG_STREAMS_VF_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };

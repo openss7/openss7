@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:14 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/31 19:03:14 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -124,8 +124,8 @@ MODULE_ALIAS("streams-module-connld");
 static struct module_info connld_minfo = {
 	.mi_idnum = CONFIG_STREAMS_CONNLD_MODID,
 	.mi_idname = CONFIG_STREAMS_CONNLD_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };

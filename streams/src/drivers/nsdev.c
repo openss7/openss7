@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:07 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:07 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:07 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:07 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/09/03 08:12:07 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -143,12 +143,12 @@ MODULE_ALIAS("/dev/streams/nsdev/*");
 #endif
 
 static struct module_info nsdev_minfo = {
-	mi_idnum:CONFIG_STREAMS_NSDEV_MODID,
-	mi_idname:CONFIG_STREAMS_NSDEV_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	.mi_idnum = CONFIG_STREAMS_NSDEV_MODID,
+	.mi_idname = CONFIG_STREAMS_NSDEV_NAME,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 static struct qinit nsdev_rinit = {

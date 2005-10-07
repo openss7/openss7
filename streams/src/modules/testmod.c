@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/05 09:25:31 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/05 09:25:31 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.4  2005/10/07 09:34:24  brian
+ - more testing and corrections
+
  Revision 0.9.2.3  2005/10/05 09:25:31  brian
  - poll tests, some noxious problem still with poll
 
@@ -62,9 +65,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/05 09:25:31 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/05 09:25:31 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/05 09:25:31 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -139,8 +142,8 @@ MODULE_ALIAS("streams-module-testmod");
 static struct module_info testmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_TESTMOD_MODID,
 	.mi_idname = CONFIG_STREAMS_TESTMOD_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = INFPSZ,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
@@ -218,7 +221,19 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			err = ENOSR;
 			goto nak;
 		}
-		case TM_IOC_SIGNAL:
+		case TM_IOC_PSIGNAL:
+		{
+			int signum;
+
+			signum = *(long *) mp->b_cont->b_rptr;
+			printd(("%s: signal number is %d\n", __FUNCTION__, signum));
+			/* Synthesize an M_SIG message with a signal (equal to the arg) */
+			if (putnextctl1(OTHERQ(q), M_PCSIG, signum))
+				goto ack;
+			err = ENOSR;
+			goto nak;
+		}
+		case TM_IOC_NSIGNAL:
 		{
 			int signum;
 
