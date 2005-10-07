@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/10/06 10:25:27 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/07 09:34:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/06 10:25:27 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/10/06 10:25:27 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/07 09:34:18 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/10/06 10:25:27 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/07 09:34:18 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -662,7 +662,7 @@ dupmsg(mblk_t *mp)
 	mblk_t *msg = NULL;
 	register mblk_t *b, **bp = &msg;
 
-	for (b = msg; b; b = b->b_cont, bp = &(*bp)->b_cont)
+	for (b = mp; b; b = b->b_cont, bp = &(*bp)->b_cont)
 		if (!(*bp = dupb(b)))
 			goto error;
 	return (msg);
@@ -2470,7 +2470,7 @@ putnextctl(queue_t *q, int type)
 
 	assert(q);
 	assert(q->q_next);
-	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
+	if (!datamsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
 		return (1);

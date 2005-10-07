@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/06 10:25:30 $ by $Author: brian $
+ Last Modified $Date: 2005/10/07 09:34:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $";
 
 //#define __NO_VERSION__
+
+#include <stdbool.h>		/* for bool type, true and false */
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,8 +87,6 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
-#include <stdbool.h>		/* for bool type, true and false */
-
 #include "sys/config.h"
 #include "src/kernel/strsched.h"	/* for allocstr */
 #include "src/kernel/strlookup.h"	/* for cmin_get() */
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/10/06 10:25:30 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -555,10 +555,10 @@ straccess(struct stdata *sd, const int access)
 				if (flags & STRHUP) {
 					/* POSIX: open(): "[EIO] The path argument names a STREAMS
 					   file and a hangup or error occured during the open()." */
-					if (access & FCREAT)
-						return (-EIO);
 					if ((access & FWRITE) && !(flags & (STRISFIFO | STRISPIPE)))
 						return (-ENXIO);	/* for TTY's too? */
+					if (access & FCREAT)
+						return (-EIO);
 					if (!(access & (FREAD | FWRITE)))
 						return (-ENXIO);
 					if (!(access & FNDELAY))
@@ -1056,12 +1056,12 @@ strsignal(struct stdata *sd, mblk_t *mp)
 	int sig = mp->b_rptr[0];
 	int band = mp->b_band;
 
-	freemsg(mp);
 	if (sig == SIGPOLL)
 		strevent(sd, S_MSG, band);
 	else if (test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0)
 		/* Note: to send SIGHUP to the session leader, use M_HANGUP. */
 		kill_pg(sd->sd_pgrp, sig, 1);
+	freemsg(mp);
 }
 
 /*
@@ -2508,11 +2508,14 @@ STATIC inline ssize_t
 strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {
 	if (type == M_DATA) {
+		ssize_t sd_maxpsz;
 		if (size < sd->sd_minpsz)
 			return (-ERANGE);
-		if (size > sd->sd_maxpsz) {
+		if ((sd_maxpsz = sd->sd_maxpsz) < 0)
+			sd_maxpsz = INT_MAX;
+		if (size > sd_maxpsz) {
 			if (sd->sd_minpsz == 0)
-				size = sd->sd_maxpsz;
+				size = sd_maxpsz;
 			else
 				return (-ERANGE);
 		}
@@ -2598,13 +2601,13 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
 		ssize_t err;
 
 		if (clen >= 0) {
-			if ((err = strsizecheck(sd, M_PROTO, clen)) < 0)
+			if ((err = strsizecheck(sd, M_PROTO, clen)) < -1)
 				return (err);
 		}
 		if (dlen >= 0) {
-			if ((err = strsizecheck(sd, M_DATA, dlen)) < 0)
+			if ((err = strsizecheck(sd, M_DATA, dlen)) < -1)
 				return (err);
-			if (dlen < err) {
+			if ((size_t) dlen < (size_t) err) {
 				/* control part apply putpmsg() rules */
 				if (clen >= 0)
 					return (-ERANGE);
@@ -2703,7 +2706,7 @@ strputpmsg_common(const struct file *file, const struct strbuf *ctlp, const stru
 	struct stdata *sd = stri_lookup(file);
 	int err = 0;
 
-	if ((err = strpsizecheck(sd, ctlp, datp, 1)) < 0)
+	if ((err = strpsizecheck(sd, ctlp, datp, 1)) < -1)
 		return ERR_PTR(err);
 	if ((err = strwaitband(sd, file->f_flags, band, flags)))
 		return ERR_PTR(err);
@@ -4064,7 +4067,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 		return ERR_PTR(err);
 
 	if (type == M_DATA
-	    && (sd->sd_minpsz > size || (size > sd->sd_maxpsz && sd->sd_minpsz != 0)))
+	    && (sd->sd_minpsz > size || (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0)))
 		return ERR_PTR(-ERANGE);
 
 	if ((band == -1) || bcanputnext(sd->sd_wq, band))
@@ -4081,7 +4084,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 					break;
 				if (type == M_DATA
 				    && (sd->sd_minpsz > size
-					|| (size > sd->sd_maxpsz && sd->sd_minpsz != 0))) {
+					|| (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0))) {
 					err = -ERANGE;
 					break;
 				}
@@ -4126,7 +4129,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 	if (!(q = sd->sd_wq->q_next))
 		goto espipe;
-	if (q->q_minpsz > size || size > q->q_maxpsz || size > sysctl_str_strmsgsz)
+	if (q->q_minpsz > size || size > (size_t) q->q_maxpsz || size > sysctl_str_strmsgsz)
 		goto erange;
 	if (ppos == &file->f_pos) {
 		char *base = kmap(page) + offset;
@@ -5073,21 +5076,22 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 
 			if (ctrace(sd2 = sd_get(stri_lookup(f2)))) {
 				/* POSIX says to return ENXIO when the passed in stream is hung up. 
-				   Note that we should not care if the stream is linked under a
-				   multiplexing driver or not, we can still pass its queue pointer, 
-				   but we return EINVAL anyway. For closing, it is the
-				   responsibility of the receiving driver to determine whether the
-				   referenced queue pair still exists before acting upon the
-				   message. */
-				if (!(err = straccess_rlock(sd2, 0))) {
-					queue_t *qbot, *q_next;
+				   Note that we do not care if the stream is linked under a
+				   multiplexing driver or not, we can still pass its queue pointer.
+				   For closing, it is the responsibility of the receiving driver to
+				   determine whether the referenced queue pair still exists before
+				   acting upon the message.  We return an error (EIO) if the Stream
+				   is closing at the time that it is referenced. We also return an
+				   error if there is a read or write error on the inserted Stream. */
+				if (!(err = straccess_rlock(sd2, FCREAT | FREAD | FWRITE))) {
+					queue_t *qbot;
 
 					/* Magic Garden 7.9.7 says that the queue to use is the
 					   queue pointer at the bottom of the stream. It doesn't
 					   say that it is the read queue pointer, but we already
 					   know that from experience. */
-					for (qbot = sd2->sd_wq; (q_next = qbot->q_next);
-					     qbot = q_next) ;
+					for (qbot = sd2->sd_wq; SAMESTR(qbot);
+					     qbot = qbot->q_next) ;
 					token = (typeof(token)) _RD(qbot);
 					srunlock(sd2);
 				}
@@ -6119,8 +6123,11 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 
 		pl = qrlock(q);
 
-		if ((b = q->q_first) && !(dp = dupmsg(b)))
-			err = -ENOSR;
+		if ((b = q->q_first)) {
+			if (sp.flags == 0 || b->b_datap->db_type >= QPCTL)
+				if (!(dp = dupmsg(b)))
+					err = -ENOSR;
+		}
 
 		qrunlock(q, pl);
 		srunlock(sd);
@@ -6144,25 +6151,37 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 					/* goes in data part */
 					if (dlen <= 0)
 						continue;
+					if (sp.databuf.len < 0)
+						sp.databuf.len = 0;
 					copylen = (blen > dlen) ? dlen : blen;
-					if (copyout(sp.databuf.buf + sp.databuf.len, b->b_rptr, copylen))
-						return (-EFAULT);
-					sp.databuf.len = (sp.databuf.len <= 0) ? copylen : sp.databuf.len + copylen;
+					if (copyout(b->b_rptr, sp.databuf.buf + sp.databuf.len, copylen)) {
+						err = -EFAULT;
+						break;
+					}
+					sp.databuf.len += copylen;
 					dlen -= copylen;
 				} else {
 					/* goes in ctrl part */
 					if (clen <= 0)
 						continue;
+					if (sp.ctlbuf.len < 0)
+						sp.ctlbuf.len = 0;
 					copylen = (blen > clen) ? clen : blen;
-					if (copyout(sp.ctlbuf.buf + sp.ctlbuf.len, b->b_rptr, copylen))
-						return (-EFAULT);
-					sp.ctlbuf.len = (sp.ctlbuf.len <= 0) ? copylen : sp.ctlbuf.len + copylen;
+					if (copyout(b->b_rptr, sp.ctlbuf.buf + sp.ctlbuf.len, copylen)) {
+						err = -EFAULT;
+						break;
+					}
+					sp.ctlbuf.len += copylen;
 					clen -= copylen;
 				}
 			}
-			put_user(sp.ctlbuf.len, &((typeof(&sp))arg)->ctlbuf.len);
-			put_user(sp.databuf.len, &((typeof(&sp))arg)->databuf.len);
-			put_user(sp.flags, &((typeof(&sp))arg)->flags);
+			if (err >= 0) {
+				put_user(sp.ctlbuf.len, &((typeof(&sp))arg)->ctlbuf.len);
+				put_user(sp.databuf.len, &((typeof(&sp))arg)->databuf.len);
+				put_user(sp.flags, &((typeof(&sp))arg)->flags);
+			}
+			/* done with duplicate */
+			freemsg(dp);
 		}
 	}
 	if (err < 0)
