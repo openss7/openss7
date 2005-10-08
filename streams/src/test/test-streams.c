@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/10/07 09:34:32 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/10/08 04:55:42 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:32 $ by $Author: brian $
+ Last Modified $Date: 2005/10/08 04:55:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.50  2005/10/08 04:55:42  brian
+ - passing full set of getmsg/getpmsg tests
+
+ Revision 0.9.2.49  2005/10/08 01:51:25  brian
+ - getmsg processing
+
+ Revision 0.9.2.48  2005/10/08 01:01:01  brian
+ - corrected getmsg behavior to tests
+
  Revision 0.9.2.47  2005/10/07 09:34:32  brian
  - more testing and corrections
 
@@ -215,9 +224,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/10/07 09:34:32 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/10/08 04:55:42 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/10/07 09:34:32 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/10/08 04:55:42 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -13263,6 +13272,660 @@ struct test_stream test_3_5_11 = { &preamble_0, &test_case_3_5_11, &postamble_0 
 #define test_case_3_5_11_stream_1 (NULL)
 #define test_case_3_5_11_stream_2 (NULL)
 
+int
+test_case_3_5_12_x(int child, int flags)
+{
+	char gcbuf[128] = { 0, };
+	char gdbuf[256] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(pcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	if (gdat.len != sizeof(pdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_5_12_1 test_group_3_5
+#define numb_case_3_5_12_1 "3.5.12.1"
+#define name_case_3_5_12_1 "Perform getmsg."
+#define sref_case_3_5_12_1 sref_case_3_5
+#define desc_case_3_5_12_1 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+normal complete control and data part can be retrieved."
+
+int
+test_case_3_5_12_1(int child)
+{
+	return test_case_3_5_12_x(child, 0);
+}
+struct test_stream test_3_5_12_1 = { &preamble_0, &test_case_3_5_12_1, &postamble_0 };
+
+#define test_case_3_5_12_1_stream_0 (&test_3_5_12_1)
+#define test_case_3_5_12_1_stream_1 (NULL)
+#define test_case_3_5_12_1_stream_2 (NULL)
+
+#define tgrp_case_3_5_12_2 test_group_3_5
+#define numb_case_3_5_12_2 "3.5.12.2"
+#define name_case_3_5_12_2 "Perform getmsg."
+#define sref_case_3_5_12_2 sref_case_3_5
+#define desc_case_3_5_12_2 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+high-priority complete control and data part can be retrieved."
+
+int
+test_case_3_5_12_2(int child)
+{
+	return test_case_3_5_12_x(child, RS_HIPRI);
+}
+struct test_stream test_3_5_12_2 = { &preamble_0, &test_case_3_5_12_2, &postamble_0 };
+
+#define test_case_3_5_12_2_stream_0 (&test_3_5_12_2)
+#define test_case_3_5_12_2_stream_1 (NULL)
+#define test_case_3_5_12_2_stream_2 (NULL)
+
+int
+test_case_3_5_13_x(int child, int flags)
+{
+	char gcbuf[64] = { 0, };
+	char gdbuf[256] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != MORECTL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (test_getmsg(child, &gctl, NULL, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_5_13_1 test_group_3_5
+#define numb_case_3_5_13_1 "3.5.13.1"
+#define name_case_3_5_13_1 "Perform getmsg - MORECTL."
+#define sref_case_3_5_13_1 sref_case_3_5
+#define desc_case_3_5_13_1 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+normal partial control and complete data part can be retrieved."
+
+int
+test_case_3_5_13_1(int child)
+{
+	return test_case_3_5_13_x(child, 0);
+}
+struct test_stream test_3_5_13_1 = { &preamble_0, &test_case_3_5_13_1, &postamble_0 };
+
+#define test_case_3_5_13_1_stream_0 (&test_3_5_13_1)
+#define test_case_3_5_13_1_stream_1 (NULL)
+#define test_case_3_5_13_1_stream_2 (NULL)
+
+#define tgrp_case_3_5_13_2 test_group_3_5
+#define numb_case_3_5_13_2 "3.5.13.2"
+#define name_case_3_5_13_2 "Perform getmsg - MORECTL."
+#define sref_case_3_5_13_2 sref_case_3_5
+#define desc_case_3_5_13_2 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+high-priority partial control and complete data part can be retrieved."
+
+int
+test_case_3_5_13_2(int child)
+{
+	return test_case_3_5_13_x(child, RS_HIPRI);
+}
+struct test_stream test_3_5_13_2 = { &preamble_0, &test_case_3_5_13_2, &postamble_0 };
+
+#define test_case_3_5_13_2_stream_0 (&test_3_5_13_2)
+#define test_case_3_5_13_2_stream_1 (NULL)
+#define test_case_3_5_13_2_stream_2 (NULL)
+
+int
+test_case_3_5_14_x(int child, int flags)
+{
+	char gcbuf[128] = { 0, };
+	char gdbuf[128] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != MOREDATA)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	gflags = 0;
+	if (test_getmsg(child, NULL, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_5_14_1 test_group_3_5
+#define numb_case_3_5_14_1 "3.5.14.1"
+#define name_case_3_5_14_1 "Perform getmsg - MOREDATA."
+#define sref_case_3_5_14_1 sref_case_3_5
+#define desc_case_3_5_14_1 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+normal complete control and partial data part can be retrieved."
+
+int
+test_case_3_5_14_1(int child)
+{
+	return test_case_3_5_14_x(child, 0);
+}
+struct test_stream test_3_5_14_1 = { &preamble_0, &test_case_3_5_14_1, &postamble_0 };
+
+#define test_case_3_5_14_1_stream_0 (&test_3_5_14_1)
+#define test_case_3_5_14_1_stream_1 (NULL)
+#define test_case_3_5_14_1_stream_2 (NULL)
+
+#define tgrp_case_3_5_14_2 test_group_3_5
+#define numb_case_3_5_14_2 "3.5.14.2"
+#define name_case_3_5_14_2 "Perform getmsg - MOREDATA."
+#define sref_case_3_5_14_2 sref_case_3_5
+#define desc_case_3_5_14_2 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+high-priority complete control and partial data part can be retrieved."
+
+int
+test_case_3_5_14_2(int child)
+{
+	return test_case_3_5_14_x(child, RS_HIPRI);
+}
+struct test_stream test_3_5_14_2 = { &preamble_0, &test_case_3_5_14_2, &postamble_0 };
+
+#define test_case_3_5_14_2_stream_0 (&test_3_5_14_2)
+#define test_case_3_5_14_2_stream_1 (NULL)
+#define test_case_3_5_14_2_stream_2 (NULL)
+
+int
+test_case_3_5_15_x(int child, int flags)
+{
+	char gcbuf[64] = { 0, };
+	char gdbuf[128] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != (MORECTL | MOREDATA))
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_5_15_1 test_group_3_5
+#define numb_case_3_5_15_1 "3.5.15.1"
+#define name_case_3_5_15_1 "Perform getmsg - MORECTL MOREDATA."
+#define sref_case_3_5_15_1 sref_case_3_5
+#define desc_case_3_5_15_1 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+normal partial control and partial data part can be retrieved."
+
+int
+test_case_3_5_15_1(int child)
+{
+	return test_case_3_5_15_x(child, 0);
+}
+struct test_stream test_3_5_15_1 = { &preamble_0, &test_case_3_5_15_1, &postamble_0 };
+
+#define test_case_3_5_15_1_stream_0 (&test_3_5_15_1)
+#define test_case_3_5_15_1_stream_1 (NULL)
+#define test_case_3_5_15_1_stream_2 (NULL)
+
+#define tgrp_case_3_5_15_2 test_group_3_5
+#define numb_case_3_5_15_2 "3.5.15.2"
+#define name_case_3_5_15_2 "Perform getmsg - MORECTL MOREDATA."
+#define sref_case_3_5_15_2 sref_case_3_5
+#define desc_case_3_5_15_2 "\
+Check that getmsg() can be performed on a Stream.  Checks that a\n\
+high-priority partial control and partial data part can be retrieved."
+
+int
+test_case_3_5_15_2(int child)
+{
+	return test_case_3_5_15_x(child, RS_HIPRI);
+}
+struct test_stream test_3_5_15_2 = { &preamble_0, &test_case_3_5_15_2, &postamble_0 };
+
+#define test_case_3_5_15_2_stream_0 (&test_3_5_15_2)
+#define test_case_3_5_15_2_stream_1 (NULL)
+#define test_case_3_5_15_2_stream_2 (NULL)
+
+#define tgrp_case_3_5_16 test_group_3_5
+#define numb_case_3_5_16 "3.5.16"
+#define name_case_3_5_16 "Perform getmsg - EBADMSG."
+#define sref_case_3_5_16 sref_case_3_5
+#define desc_case_3_5_16 "\
+Check that getmsg() can be performed on a Stream.  Checks that EBADMSG\n\
+is returned when an M_PASSFP message is at the head of the Stream head\n\
+read queue."
+
+int
+test_case_3_5_16(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf ctl = { sizeof(buf), -1, buf };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EBADMSG)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_16 = { &preamble_6_3, &test_case_3_5_16, &postamble_6_3 };
+
+#define test_case_3_5_16_stream_0 (&test_3_5_16)
+#define test_case_3_5_16_stream_1 (NULL)
+#define test_case_3_5_16_stream_2 (NULL)
+
+#define tgrp_case_3_5_17 test_group_3_5
+#define numb_case_3_5_17 "3.5.17"
+#define name_case_3_5_17 "Perform getmsg - EBADMSG."
+#define sref_case_3_5_17 sref_case_3_5
+#define desc_case_3_5_17 "\
+Check that getmsg() can be performed on a Stream.  Checks that EBADMSG\n\
+is returned when the message at the head of the Stream head read queue\n\
+is a normal priority message and the flags argument specifies RS_HIPRI."
+
+int
+test_case_3_5_17(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf pctl = { -1, sizeof(buf), buf };
+	struct strbuf pdat = { -1, sizeof(buf), buf };
+	int pflags = 0;
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gflags = RS_HIPRI;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EBADMSG)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_17 = { &preamble_0, &test_case_3_5_17, &postamble_0 };
+
+#define test_case_3_5_17_stream_0 (&test_3_5_17)
+#define test_case_3_5_17_stream_1 (NULL)
+#define test_case_3_5_17_stream_2 (NULL)
+
+#define tgrp_case_3_5_18 test_group_3_5
+#define numb_case_3_5_18 "3.5.18"
+#define name_case_3_5_18 "Perform getmsg - ENOSTR."
+#define sref_case_3_5_18 sref_case_3_5
+#define desc_case_3_5_18 "\
+Check that getmsg() can be performed on a Stream.  Checks that ENOSTR\n\
+is returned when getmsg() is performed on a file descriptor that does\n\
+not correspond to a Stream."
+
+int
+test_case_3_5_18(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gflags = RS_HIPRI;
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 0;
+	start_tt(100);
+	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != ENOSTR) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_18 = { &preamble_0, &test_case_3_5_18, &postamble_0 };
+
+#define test_case_3_5_18_stream_0 (&test_3_5_18)
+#define test_case_3_5_18_stream_1 (NULL)
+#define test_case_3_5_18_stream_2 (NULL)
+
+#define tgrp_case_3_5_19 test_group_3_5
+#define numb_case_3_5_19 "3.5.19"
+#define name_case_3_5_19 "Perform getmsg - ENODEV."
+#define sref_case_3_5_19 sref_case_3_5
+#define desc_case_3_5_19 "\
+Check that getmsg() can be performed on a Stream.  Checks that ENODEV\n\
+is returned when getmsg() is performed on a file descriptor associated\n\
+with a device that does not support the getmsg() system call."
+
+int
+test_case_3_5_19(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gflags = RS_HIPRI;
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 0;
+	start_tt(100);
+	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != ENODEV) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_19 = { &preamble_0, &test_case_3_5_19, &postamble_0 };
+
+#define test_case_3_5_19_stream_0 (&test_3_5_19)
+#define test_case_3_5_19_stream_1 (NULL)
+#define test_case_3_5_19_stream_2 (NULL)
+
+#define tgrp_case_3_5_20 test_group_3_5
+#define numb_case_3_5_20 "3.5.20"
+#define name_case_3_5_20 "Perform getmsg."
+#define sref_case_3_5_20 sref_case_3_5
+#define desc_case_3_5_20 "\
+Check that getmsg() can be performed on a Stream.  Checks that\n\
+zero-length control and data parts will be retrieved under the proper\n\
+circumstances."
+
+int
+test_case_3_5_20(int child)
+{
+	struct strbuf pctl = { -1, 0, NULL };
+	struct strbuf pdat = { -1, 0, NULL };
+	int pflags = 0;
+
+	char buf[16] = { 0, };
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gflags = 0;
+
+	/* can't send zero length control? */
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	gctl.maxlen = -1;
+	gdat.maxlen = -1;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != (MORECTL | MOREDATA))
+		return (__RESULT_FAILURE);
+	state++;
+	gctl.maxlen = 0;
+	gdat.maxlen = -1;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != MOREDATA)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	gctl.maxlen = sizeof(buf);
+	gdat.maxlen = sizeof(buf);
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_5_20 = { &preamble_0, &test_case_3_5_20, &postamble_0 };
+
+#define test_case_3_5_20_stream_0 (&test_3_5_20)
+#define test_case_3_5_20_stream_1 (NULL)
+#define test_case_3_5_20_stream_2 (NULL)
+
 static const char test_group_3_6[] = "Perform GETPMSG on one Stream";
 static const char sref_case_3_6[] = "POSIX 1003.1 2003/SUSv3 getpmsg(2p) reference page.";
 
@@ -13902,6 +14565,784 @@ struct test_stream test_3_6_15 = { &preamble_0, &test_case_3_6_15, &postamble_0 
 #define test_case_3_6_15_stream_1 (NULL)
 #define test_case_3_6_15_stream_2 (NULL)
 
+int
+test_case_3_6_16_x(int child, int flags)
+{
+	char gcbuf[128] = { 0, };
+	char gdbuf[256] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = (flags == MSG_BAND) ? 1 : 0;
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = (flags == MSG_BAND) ? 1 : 0;
+	int pflags = (flags == MSG_ANY) ? MSG_BAND : flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(pcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	if (gdat.len != sizeof(pdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_6_16_1 test_group_3_6
+#define numb_case_3_6_16_1 "3.6.16.1"
+#define name_case_3_6_16_1 "Perform getpmsg - MSG_ANY."
+#define sref_case_3_6_16_1 sref_case_3_6
+#define desc_case_3_6_16_1 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_16_1(int child)
+{
+	return test_case_3_6_16_x(child, MSG_ANY);
+}
+struct test_stream test_3_6_16_1 = { &preamble_0, &test_case_3_6_16_1, &postamble_0 };
+
+#define test_case_3_6_16_1_stream_0 (&test_3_6_16_1)
+#define test_case_3_6_16_1_stream_1 (NULL)
+#define test_case_3_6_16_1_stream_2 (NULL)
+
+#define tgrp_case_3_6_16_2 test_group_3_6
+#define numb_case_3_6_16_2 "3.6.16.2"
+#define name_case_3_6_16_2 "Perform getpmsg - MSG_BAND."
+#define sref_case_3_6_16_2 sref_case_3_6
+#define desc_case_3_6_16_2 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_16_2(int child)
+{
+	return test_case_3_6_16_x(child, MSG_BAND);
+}
+struct test_stream test_3_6_16_2 = { &preamble_0, &test_case_3_6_16_2, &postamble_0 };
+
+#define test_case_3_6_16_2_stream_0 (&test_3_6_16_2)
+#define test_case_3_6_16_2_stream_1 (NULL)
+#define test_case_3_6_16_2_stream_2 (NULL)
+
+#define tgrp_case_3_6_16_3 test_group_3_6
+#define numb_case_3_6_16_3 "3.6.16.3"
+#define name_case_3_6_16_3 "Perform getpmsg - MSG_HIPRI."
+#define sref_case_3_6_16_3 sref_case_3_6
+#define desc_case_3_6_16_3 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_16_3(int child)
+{
+	return test_case_3_6_16_x(child, MSG_HIPRI);
+}
+struct test_stream test_3_6_16_3 = { &preamble_0, &test_case_3_6_16_3, &postamble_0 };
+
+#define test_case_3_6_16_3_stream_0 (&test_3_6_16_3)
+#define test_case_3_6_16_3_stream_1 (NULL)
+#define test_case_3_6_16_3_stream_2 (NULL)
+
+int
+test_case_3_6_17_x(int child, int flags)
+{
+	char gcbuf[64] = { 0, };
+	char gdbuf[256] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = (flags == MSG_BAND) ? 1 : 0;
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = (flags == MSG_BAND) ? 1 : 0;
+	int pflags = (flags == MSG_ANY) ? MSG_BAND : flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != MORECTL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	gband = (flags == MSG_BAND) ? 1 : 0;
+	gflags = flags;
+	if (test_getpmsg(child, &gctl, NULL, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_6_17_1 test_group_3_6
+#define numb_case_3_6_17_1 "3.6.17.1"
+#define name_case_3_6_17_1 "Perform getpmsg - MORECTL MSG_ANY."
+#define sref_case_3_6_17_1 sref_case_3_6
+#define desc_case_3_6_17_1 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_17_1(int child)
+{
+	return test_case_3_6_17_x(child, MSG_ANY);
+}
+struct test_stream test_3_6_17_1 = { &preamble_0, &test_case_3_6_17_1, &postamble_0 };
+
+#define test_case_3_6_17_1_stream_0 (&test_3_6_17_1)
+#define test_case_3_6_17_1_stream_1 (NULL)
+#define test_case_3_6_17_1_stream_2 (NULL)
+
+#define tgrp_case_3_6_17_2 test_group_3_6
+#define numb_case_3_6_17_2 "3.6.17.2"
+#define name_case_3_6_17_2 "Perform getpmsg - MORECTL MSG_BAND."
+#define sref_case_3_6_17_2 sref_case_3_6
+#define desc_case_3_6_17_2 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_17_2(int child)
+{
+	return test_case_3_6_17_x(child, MSG_BAND);
+}
+struct test_stream test_3_6_17_2 = { &preamble_0, &test_case_3_6_17_2, &postamble_0 };
+
+#define test_case_3_6_17_2_stream_0 (&test_3_6_17_2)
+#define test_case_3_6_17_2_stream_1 (NULL)
+#define test_case_3_6_17_2_stream_2 (NULL)
+
+#define tgrp_case_3_6_17_3 test_group_3_6
+#define numb_case_3_6_17_3 "3.6.17.3"
+#define name_case_3_6_17_3 "Perform getpmsg - MORECTL MSG_HIPRI."
+#define sref_case_3_6_17_3 sref_case_3_6
+#define desc_case_3_6_17_3 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_17_3(int child)
+{
+	return test_case_3_6_17_x(child, MSG_HIPRI);
+}
+struct test_stream test_3_6_17_3 = { &preamble_0, &test_case_3_6_17_3, &postamble_0 };
+
+#define test_case_3_6_17_3_stream_0 (&test_3_6_17_3)
+#define test_case_3_6_17_3_stream_1 (NULL)
+#define test_case_3_6_17_3_stream_2 (NULL)
+
+int
+test_case_3_6_18_x(int child, int flags)
+{
+	char gcbuf[128] = { 0, };
+	char gdbuf[128] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = (flags == MSG_BAND) ? 1 : 0;
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = (flags == MSG_BAND) ? 1 : 0;
+	int pflags = (flags == MSG_ANY) ? MSG_BAND : flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != MOREDATA)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, NULL, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_6_18_1 test_group_3_6
+#define numb_case_3_6_18_1 "3.6.18.1"
+#define name_case_3_6_18_1 "Perform getpmsg - MOREDATA MSG_ANY."
+#define sref_case_3_6_18_1 sref_case_3_6
+#define desc_case_3_6_18_1 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_18_1(int child)
+{
+	return test_case_3_6_18_x(child, MSG_ANY);
+}
+struct test_stream test_3_6_18_1 = { &preamble_0, &test_case_3_6_18_1, &postamble_0 };
+
+#define test_case_3_6_18_1_stream_0 (&test_3_6_18_1)
+#define test_case_3_6_18_1_stream_1 (NULL)
+#define test_case_3_6_18_1_stream_2 (NULL)
+
+#define tgrp_case_3_6_18_2 test_group_3_6
+#define numb_case_3_6_18_2 "3.6.18.2"
+#define name_case_3_6_18_2 "Perform getpmsg - MOREDATA MSG_BAND."
+#define sref_case_3_6_18_2 sref_case_3_6
+#define desc_case_3_6_18_2 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_18_2(int child)
+{
+	return test_case_3_6_18_x(child, MSG_BAND);
+}
+struct test_stream test_3_6_18_2 = { &preamble_0, &test_case_3_6_18_2, &postamble_0 };
+
+#define test_case_3_6_18_2_stream_0 (&test_3_6_18_2)
+#define test_case_3_6_18_2_stream_1 (NULL)
+#define test_case_3_6_18_2_stream_2 (NULL)
+
+#define tgrp_case_3_6_18_3 test_group_3_6
+#define numb_case_3_6_18_3 "3.6.18.3"
+#define name_case_3_6_18_3 "Perform getpmsg - MOREDATA MSG_HIPRI."
+#define sref_case_3_6_18_3 sref_case_3_6
+#define desc_case_3_6_18_3 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_18_3(int child)
+{
+	return test_case_3_6_18_x(child, MSG_HIPRI);
+}
+struct test_stream test_3_6_18_3 = { &preamble_0, &test_case_3_6_18_3, &postamble_0 };
+
+#define test_case_3_6_18_3_stream_0 (&test_3_6_18_3)
+#define test_case_3_6_18_3_stream_1 (NULL)
+#define test_case_3_6_18_3_stream_2 (NULL)
+
+int
+test_case_3_6_19_x(int child, int flags)
+{
+	char gcbuf[64] = { 0, };
+	char gdbuf[128] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = (flags == MSG_BAND) ? 1 : 0;
+	int gflags = flags;
+
+	char pcbuf[128] = { 0, };
+	char pdbuf[256] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = (flags == MSG_BAND) ? 1 : 0;
+	int pflags = (flags == MSG_ANY) ? MSG_BAND : flags;
+
+	int i;
+
+	/* put known data in buffers */
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = i;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != (MORECTL | MOREDATA))
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(gcbuf)) {
+		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gcbuf); i++)
+		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (gdat.len != sizeof(gdbuf)) {
+		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	for (i = 0; i < sizeof(gdbuf); i++)
+		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+#define tgrp_case_3_6_19_1 test_group_3_6
+#define numb_case_3_6_19_1 "3.6.19.1"
+#define name_case_3_6_19_1 "Perform getpmsg - MORECTL MOREDATA MSG_ANY."
+#define sref_case_3_6_19_1 sref_case_3_6
+#define desc_case_3_6_19_1 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_19_1(int child)
+{
+	return test_case_3_6_19_x(child, MSG_ANY);
+}
+struct test_stream test_3_6_19_1 = { &preamble_0, &test_case_3_6_19_1, &postamble_0 };
+
+#define test_case_3_6_19_1_stream_0 (&test_3_6_19_1)
+#define test_case_3_6_19_1_stream_1 (NULL)
+#define test_case_3_6_19_1_stream_2 (NULL)
+
+#define tgrp_case_3_6_19_2 test_group_3_6
+#define numb_case_3_6_19_2 "3.6.19.2"
+#define name_case_3_6_19_2 "Perform getpmsg - MORECTL MOREDATA MSG_BAND."
+#define sref_case_3_6_19_2 sref_case_3_6
+#define desc_case_3_6_19_2 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_19_2(int child)
+{
+	return test_case_3_6_19_x(child, MSG_BAND);
+}
+struct test_stream test_3_6_19_2 = { &preamble_0, &test_case_3_6_19_2, &postamble_0 };
+
+#define test_case_3_6_19_2_stream_0 (&test_3_6_19_2)
+#define test_case_3_6_19_2_stream_1 (NULL)
+#define test_case_3_6_19_2_stream_2 (NULL)
+
+#define tgrp_case_3_6_19_3 test_group_3_6
+#define numb_case_3_6_19_3 "3.6.19.3"
+#define name_case_3_6_19_3 "Perform getpmsg - MORECTL MOREDATA MSG_HIPRI."
+#define sref_case_3_6_19_3 sref_case_3_6
+#define desc_case_3_6_19_3 "\
+Check that getpmsg() can be performed on a Stream."
+
+int
+test_case_3_6_19_3(int child)
+{
+	return test_case_3_6_19_x(child, MSG_HIPRI);
+}
+struct test_stream test_3_6_19_3 = { &preamble_0, &test_case_3_6_19_3, &postamble_0 };
+
+#define test_case_3_6_19_3_stream_0 (&test_3_6_19_3)
+#define test_case_3_6_19_3_stream_1 (NULL)
+#define test_case_3_6_19_3_stream_2 (NULL)
+
+#define tgrp_case_3_6_20 test_group_3_6
+#define numb_case_3_6_20 "3.6.20"
+#define name_case_3_6_20 "Perform getpmsg - EBADMSG."
+#define sref_case_3_6_20 sref_case_3_6
+#define desc_case_3_6_20 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EBADMSG\n\
+is returned when an M_PASSFP message is at the head of the Stream head\n\
+read queue."
+
+int
+test_case_3_6_20(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf ctl = { sizeof(buf), -1, buf };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int band = 0;
+	int flags = MSG_ANY;
+
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EBADMSG)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_20 = { &preamble_6_3, &test_case_3_6_20, &postamble_6_3 };
+
+#define test_case_3_6_20_stream_0 (&test_3_6_20)
+#define test_case_3_6_20_stream_1 (NULL)
+#define test_case_3_6_20_stream_2 (NULL)
+
+#define tgrp_case_3_6_21 test_group_3_6
+#define numb_case_3_6_21 "3.6.21"
+#define name_case_3_6_21 "Perform getpmsg - EBADMSG."
+#define sref_case_3_6_21 sref_case_3_6
+#define desc_case_3_6_21 "\
+Check that getpmsg() can be performed on a Stream.  Checks taht EBADMSG\n\
+is returned when the message at the head of the Stream head read queue\n\
+is a normal priority message and the flags argument specifies MSG_HIPRI."
+
+int
+test_case_3_6_21(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf pctl = { -1, sizeof(buf), buf };
+	struct strbuf pdat = { -1, sizeof(buf), buf };
+	int pband = 0;
+	int pflags = MSG_BAND;
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gband = 0;
+	int gflags = MSG_HIPRI;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != EBADMSG)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_21 = { &preamble_0, &test_case_3_6_21, &postamble_0 };
+
+#define test_case_3_6_21_stream_0 (&test_3_6_21)
+#define test_case_3_6_21_stream_1 (NULL)
+#define test_case_3_6_21_stream_2 (NULL)
+
+#define tgrp_case_3_6_22 test_group_3_6
+#define numb_case_3_6_22 "3.6.22"
+#define name_case_3_6_22 "Perform getpmsg - EBADMSG."
+#define sref_case_3_6_22 sref_case_3_6
+#define desc_case_3_6_22 "\
+Check that getpmsg() can be performed on a Stream.  Checks that EBADMSG\n\
+is returned when the message at the head of the Stream head read queue\n\
+is a lower normal priority message than that requested with the MSG_BAND\n\
+and bandp arguments."
+
+int
+test_case_3_6_22(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf pctl = { -1, sizeof(buf), buf };
+	struct strbuf pdat = { -1, sizeof(buf), buf };
+	int pband = 0;
+	int pflags = MSG_BAND;
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gband = 1;
+	int gflags = MSG_BAND;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != EBADMSG)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_22 = { &preamble_0, &test_case_3_6_22, &postamble_0 };
+
+#define test_case_3_6_22_stream_0 (&test_3_6_22)
+#define test_case_3_6_22_stream_1 (NULL)
+#define test_case_3_6_22_stream_2 (NULL)
+
+#define tgrp_case_3_6_23 test_group_3_6
+#define numb_case_3_6_23 "3.6.23"
+#define name_case_3_6_23 "Perform getpmsg - ENOSTR."
+#define sref_case_3_6_23 sref_case_3_6
+#define desc_case_3_6_23 "\
+Check that getpmsg() can be performed on a Stream.  Check that ENOSTR is\n\
+returned when no Stream is associated with the file descriptor."
+
+int
+test_case_3_6_23(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gband = 0;
+	int gflags = MSG_ANY;
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 0;
+	start_tt(100);
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != ENOSTR) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_23 = { &preamble_0, &test_case_3_6_23, &postamble_0 };
+
+#define test_case_3_6_23_stream_0 (&test_3_6_23)
+#define test_case_3_6_23_stream_1 (NULL)
+#define test_case_3_6_23_stream_2 (NULL)
+
+#define tgrp_case_3_6_24 test_group_3_6
+#define numb_case_3_6_24 "3.6.24"
+#define name_case_3_6_24 "Perform getpmsg - ENODEV."
+#define sref_case_3_6_24 sref_case_3_6
+#define desc_case_3_6_24 "\
+Check that getpmsg() can be performed on a Stream.  Check that ENODEV is\n\
+returned when the file descriptor is a device that does not support the\n\
+getpmsg() system call."
+
+int
+test_case_3_6_24(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gband = 0;
+	int gflags = MSG_ANY;
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 0;
+	start_tt(100);
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != ENODEV) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_24 = { &preamble_0, &test_case_3_6_24, &postamble_0 };
+
+#define test_case_3_6_24_stream_0 (&test_3_6_24)
+#define test_case_3_6_24_stream_1 (NULL)
+#define test_case_3_6_24_stream_2 (NULL)
+
+#define tgrp_case_3_6_25 test_group_3_6
+#define numb_case_3_6_25 "3.6.25"
+#define name_case_3_6_25 "Perform getpmsg."
+#define sref_case_3_6_25 sref_case_3_6
+#define desc_case_3_6_25 "\
+Check that getpmsg() can be performed on a Stream.  Checks that\n\
+zero-length control and data parts will be retrieved under the proper\n\
+circumstances."
+
+int
+test_case_3_6_25(int child)
+{
+	struct strbuf pctl = { -1, 0, NULL };
+	struct strbuf pdat = { -1, 0, NULL };
+	int pband = 0;
+	int pflags = MSG_BAND;
+
+	char buf[16] = { 0, };
+	struct strbuf gctl = { sizeof(buf), -1, buf };
+	struct strbuf gdat = { sizeof(buf), -1, buf };
+	int gband = 0;
+	int gflags = MSG_ANY;
+
+	/* can't send zero length control? */
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	gctl.maxlen = -1;
+	gdat.maxlen = -1;
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != (MORECTL | MOREDATA))
+		return (__RESULT_FAILURE);
+	state++;
+	gctl.maxlen = 0;
+	gdat.maxlen = -1;
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != MOREDATA)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	gctl.maxlen = sizeof(buf);
+	gdat.maxlen = sizeof(buf);
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_6_25 = { &preamble_0, &test_case_3_6_25, &postamble_0 };
+
+#define test_case_3_6_25_stream_0 (&test_3_6_25)
+#define test_case_3_6_25_stream_1 (NULL)
+#define test_case_3_6_25_stream_2 (NULL)
+
 static const char test_group_3_7[] = "Perform PUTMSG on one Stream";
 static const char sref_case_3_7[] = "POSIX 1003.1 2003/SUSv3 putmsg(2p) reference page.";
 
@@ -14292,6 +15733,75 @@ struct test_stream test_3_7_10 = { &preamble_8_0, &test_case_3_7_10, &postamble_
 #define test_case_3_7_10_stream_0 (&test_3_7_10)
 #define test_case_3_7_10_stream_1 (NULL)
 #define test_case_3_7_10_stream_2 (NULL)
+
+#define tgrp_case_3_7_11 test_group_3_7
+#define numb_case_3_7_11 "3.7.11"
+#define name_case_3_7_11 "Perform putmsg - EINVAL."
+#define sref_case_3_7_11 sref_case_3_7
+#define desc_case_3_7_11 "\
+Check that putmsg() can be performed on a Stream.  Checks that EINVAL is\n\
+returned when the flags argument is set to RS_HIPRI and no control part\n\
+is specified."
+
+int
+test_case_3_7_11(int child)
+{
+	char dbuf[16] = { 0, };
+	struct strbuf ctl = { -1, -1, NULL };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = RS_HIPRI;
+
+	if (test_putmsg(child, NULL, &dat, flags) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, &ctl, &dat, flags) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_11 = { &preamble_0, &test_case_3_7_11, &postamble_0 };
+
+#define test_case_3_7_11_stream_0 (&test_3_7_11)
+#define test_case_3_7_11_stream_1 (NULL)
+#define test_case_3_7_11_stream_2 (NULL)
+
+#define tgrp_case_3_7_12 test_group_3_7
+#define numb_case_3_7_12 "3.7.12"
+#define name_case_3_7_12 "Perform putmsg."
+#define sref_case_3_7_12 sref_case_3_7
+#define desc_case_3_7_12 "\
+Check that putmsg() can be performed on a Stream.  Checks that zero is\n\
+returned (and no message sent) when no control or data part is specified."
+
+int
+test_case_3_7_12(int child)
+{
+	struct strbuf ctl = { -1, -1, NULL };
+	struct strbuf dat = { -1, -1, NULL };
+	int flags = 0;
+
+	if (test_putmsg(child, NULL, NULL, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, &ctl, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &ctl, &dat, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_12 = { &preamble_0, &test_case_3_7_12, &postamble_0 };
+
+#define test_case_3_7_12_stream_0 (&test_3_7_12)
+#define test_case_3_7_12_stream_1 (NULL)
+#define test_case_3_7_12_stream_2 (NULL)
 
 static const char test_group_3_8[] = "Perform PUTPMSG on one Stream";
 static const char sref_case_3_8[] = "POSIX 1003.1 2003/SUSv3 putpmsg(2p) reference page.";
@@ -16614,6 +18124,32 @@ struct test_case {
 	test_case_3_5_10_stream_0, test_case_3_5_10_stream_1, test_case_3_5_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_5_11, tgrp_case_3_5_11, name_case_3_5_11, desc_case_3_5_11, sref_case_3_5_11, {
 	test_case_3_5_11_stream_0, test_case_3_5_11_stream_1, test_case_3_5_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_12_1, tgrp_case_3_5_12_1, name_case_3_5_12_1, desc_case_3_5_12_1, sref_case_3_5_12_1, {
+	test_case_3_5_12_1_stream_0, test_case_3_5_12_1_stream_1, test_case_3_5_12_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_12_2, tgrp_case_3_5_12_2, name_case_3_5_12_2, desc_case_3_5_12_2, sref_case_3_5_12_2, {
+	test_case_3_5_12_2_stream_0, test_case_3_5_12_2_stream_1, test_case_3_5_12_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_13_1, tgrp_case_3_5_13_1, name_case_3_5_13_1, desc_case_3_5_13_1, sref_case_3_5_13_1, {
+	test_case_3_5_13_1_stream_0, test_case_3_5_13_1_stream_1, test_case_3_5_13_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_13_2, tgrp_case_3_5_13_2, name_case_3_5_13_2, desc_case_3_5_13_2, sref_case_3_5_13_2, {
+	test_case_3_5_13_2_stream_0, test_case_3_5_13_2_stream_1, test_case_3_5_13_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_14_1, tgrp_case_3_5_14_1, name_case_3_5_14_1, desc_case_3_5_14_1, sref_case_3_5_14_1, {
+	test_case_3_5_14_1_stream_0, test_case_3_5_14_1_stream_1, test_case_3_5_14_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_14_2, tgrp_case_3_5_14_2, name_case_3_5_14_2, desc_case_3_5_14_2, sref_case_3_5_14_2, {
+	test_case_3_5_14_2_stream_0, test_case_3_5_14_2_stream_1, test_case_3_5_14_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_15_1, tgrp_case_3_5_15_1, name_case_3_5_15_1, desc_case_3_5_15_1, sref_case_3_5_15_1, {
+	test_case_3_5_15_1_stream_0, test_case_3_5_15_1_stream_1, test_case_3_5_15_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_15_2, tgrp_case_3_5_15_2, name_case_3_5_15_2, desc_case_3_5_15_2, sref_case_3_5_15_2, {
+	test_case_3_5_15_2_stream_0, test_case_3_5_15_2_stream_1, test_case_3_5_15_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_16, tgrp_case_3_5_16, name_case_3_5_16, desc_case_3_5_16, sref_case_3_5_16, {
+	test_case_3_5_16_stream_0, test_case_3_5_16_stream_1, test_case_3_5_16_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_17, tgrp_case_3_5_17, name_case_3_5_17, desc_case_3_5_17, sref_case_3_5_17, {
+	test_case_3_5_17_stream_0, test_case_3_5_17_stream_1, test_case_3_5_17_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_18, tgrp_case_3_5_18, name_case_3_5_18, desc_case_3_5_18, sref_case_3_5_18, {
+	test_case_3_5_18_stream_0, test_case_3_5_18_stream_1, test_case_3_5_18_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_19, tgrp_case_3_5_19, name_case_3_5_19, desc_case_3_5_19, sref_case_3_5_19, {
+	test_case_3_5_19_stream_0, test_case_3_5_19_stream_1, test_case_3_5_19_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_20, tgrp_case_3_5_20, name_case_3_5_20, desc_case_3_5_20, sref_case_3_5_20, {
+	test_case_3_5_20_stream_0, test_case_3_5_20_stream_1, test_case_3_5_20_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, sref_case_3_6_1, {
 	test_case_3_6_1_stream_0, test_case_3_6_1_stream_1, test_case_3_6_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_6_2, tgrp_case_3_6_2, name_case_3_6_2, desc_case_3_6_2, sref_case_3_6_2, {
@@ -16644,6 +18180,42 @@ struct test_case {
 	test_case_3_6_14_stream_0, test_case_3_6_14_stream_1, test_case_3_6_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_6_15, tgrp_case_3_6_15, name_case_3_6_15, desc_case_3_6_15, sref_case_3_6_15, {
 	test_case_3_6_15_stream_0, test_case_3_6_15_stream_1, test_case_3_6_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_16_1, tgrp_case_3_6_16_1, name_case_3_6_16_1, desc_case_3_6_16_1, sref_case_3_6_16_1, {
+	test_case_3_6_16_1_stream_0, test_case_3_6_16_1_stream_1, test_case_3_6_16_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_16_2, tgrp_case_3_6_16_2, name_case_3_6_16_2, desc_case_3_6_16_2, sref_case_3_6_16_2, {
+	test_case_3_6_16_2_stream_0, test_case_3_6_16_2_stream_1, test_case_3_6_16_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_16_3, tgrp_case_3_6_16_3, name_case_3_6_16_3, desc_case_3_6_16_3, sref_case_3_6_16_3, {
+	test_case_3_6_16_3_stream_0, test_case_3_6_16_3_stream_1, test_case_3_6_16_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_17_1, tgrp_case_3_6_17_1, name_case_3_6_17_1, desc_case_3_6_17_1, sref_case_3_6_17_1, {
+	test_case_3_6_17_1_stream_0, test_case_3_6_17_1_stream_1, test_case_3_6_17_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_17_2, tgrp_case_3_6_17_2, name_case_3_6_17_2, desc_case_3_6_17_2, sref_case_3_6_17_2, {
+	test_case_3_6_17_2_stream_0, test_case_3_6_17_2_stream_1, test_case_3_6_17_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_17_3, tgrp_case_3_6_17_3, name_case_3_6_17_3, desc_case_3_6_17_3, sref_case_3_6_17_3, {
+	test_case_3_6_17_3_stream_0, test_case_3_6_17_3_stream_1, test_case_3_6_17_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_18_1, tgrp_case_3_6_18_1, name_case_3_6_18_1, desc_case_3_6_18_1, sref_case_3_6_18_1, {
+	test_case_3_6_18_1_stream_0, test_case_3_6_18_1_stream_1, test_case_3_6_18_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_18_2, tgrp_case_3_6_18_2, name_case_3_6_18_2, desc_case_3_6_18_2, sref_case_3_6_18_2, {
+	test_case_3_6_18_2_stream_0, test_case_3_6_18_2_stream_1, test_case_3_6_18_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_18_3, tgrp_case_3_6_18_3, name_case_3_6_18_3, desc_case_3_6_18_3, sref_case_3_6_18_3, {
+	test_case_3_6_18_3_stream_0, test_case_3_6_18_3_stream_1, test_case_3_6_18_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_19_1, tgrp_case_3_6_19_1, name_case_3_6_19_1, desc_case_3_6_19_1, sref_case_3_6_19_1, {
+	test_case_3_6_19_1_stream_0, test_case_3_6_19_1_stream_1, test_case_3_6_19_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_19_2, tgrp_case_3_6_19_2, name_case_3_6_19_2, desc_case_3_6_19_2, sref_case_3_6_19_2, {
+	test_case_3_6_19_2_stream_0, test_case_3_6_19_2_stream_1, test_case_3_6_19_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_19_3, tgrp_case_3_6_19_3, name_case_3_6_19_3, desc_case_3_6_19_3, sref_case_3_6_19_3, {
+	test_case_3_6_19_3_stream_0, test_case_3_6_19_3_stream_1, test_case_3_6_19_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_20, tgrp_case_3_6_20, name_case_3_6_20, desc_case_3_6_20, sref_case_3_6_20, {
+	test_case_3_6_20_stream_0, test_case_3_6_20_stream_1, test_case_3_6_20_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_21, tgrp_case_3_6_21, name_case_3_6_21, desc_case_3_6_21, sref_case_3_6_21, {
+	test_case_3_6_21_stream_0, test_case_3_6_21_stream_1, test_case_3_6_21_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_22, tgrp_case_3_6_22, name_case_3_6_22, desc_case_3_6_22, sref_case_3_6_22, {
+	test_case_3_6_22_stream_0, test_case_3_6_22_stream_1, test_case_3_6_22_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_23, tgrp_case_3_6_23, name_case_3_6_23, desc_case_3_6_23, sref_case_3_6_23, {
+	test_case_3_6_23_stream_0, test_case_3_6_23_stream_1, test_case_3_6_23_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_24, tgrp_case_3_6_24, name_case_3_6_24, desc_case_3_6_24, sref_case_3_6_24, {
+	test_case_3_6_24_stream_0, test_case_3_6_24_stream_1, test_case_3_6_24_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_25, tgrp_case_3_6_25, name_case_3_6_25, desc_case_3_6_25, sref_case_3_6_25, {
+	test_case_3_6_25_stream_0, test_case_3_6_25_stream_1, test_case_3_6_25_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, sref_case_3_7_1, {
 	test_case_3_7_1_stream_0, test_case_3_7_1_stream_1, test_case_3_7_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7_2, tgrp_case_3_7_2, name_case_3_7_2, desc_case_3_7_2, sref_case_3_7_2, {
@@ -16664,6 +18236,10 @@ struct test_case {
 	test_case_3_7_9_stream_0, test_case_3_7_9_stream_1, test_case_3_7_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7_10, tgrp_case_3_7_10, name_case_3_7_10, desc_case_3_7_10, sref_case_3_7_10, {
 	test_case_3_7_10_stream_0, test_case_3_7_10_stream_1, test_case_3_7_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_11, tgrp_case_3_7_11, name_case_3_7_11, desc_case_3_7_11, sref_case_3_7_11, {
+	test_case_3_7_11_stream_0, test_case_3_7_11_stream_1, test_case_3_7_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_12, tgrp_case_3_7_12, name_case_3_7_12, desc_case_3_7_12, sref_case_3_7_12, {
+	test_case_3_7_12_stream_0, test_case_3_7_12_stream_1, test_case_3_7_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_1, tgrp_case_3_8_1, name_case_3_8_1, desc_case_3_8_1, sref_case_3_8_1, {
 	test_case_3_8_1_stream_0, test_case_3_8_1_stream_1, test_case_3_8_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_2, tgrp_case_3_8_2, name_case_3_8_2, desc_case_3_8_2, sref_case_3_8_2, {

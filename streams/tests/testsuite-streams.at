@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/10/07 09:34:38 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/10/08 04:55:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,20 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/10/07 09:34:38 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/08 04:55:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 0.9.2.31  2005/10/08 04:55:46  brian
+dnl - passing full set of getmsg/getpmsg tests
+dnl
+dnl Revision 0.9.2.30  2005/10/08 01:51:26  brian
+dnl - getmsg processing
+dnl
+dnl Revision 0.9.2.29  2005/10/08 01:01:01  brian
+dnl - corrected getmsg behavior to tests
+dnl
 dnl Revision 0.9.2.28  2005/10/07 09:34:38  brian
 dnl - more testing and corrections
 dnl
@@ -2094,7 +2103,7 @@ AT_CHECK([test_streams 3.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 3.5.1])
-AT_KEYWORDS([streams getmsg])
+AT_KEYWORDS([streams getmsg HUP])
 AT_CHECK([test_streams 3.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2148,8 +2157,75 @@ AT_KEYWORDS([streams getmsg EINTR])
 AT_CHECK([test_streams 3.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([streams test 3.5.12.1])
+AT_KEYWORDS([streams getmsg])
+AT_CHECK([test_streams 3.5.12.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.12.2])
+AT_KEYWORDS([streams getmsg RS_HIPRI])
+AT_CHECK([test_streams 3.5.12.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.13.1])
+AT_KEYWORDS([streams getmsg MORECTL])
+AT_CHECK([test_streams 3.5.13.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.13.2])
+AT_KEYWORDS([streams getmsg MORECTL RS_HIPRI])
+AT_CHECK([test_streams 3.5.13.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.14.1])
+AT_KEYWORDS([streams getmsg MOREDATA])
+AT_CHECK([test_streams 3.5.14.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.14.2])
+AT_KEYWORDS([streams getmsg MOREDATA RS_HIPRI])
+AT_CHECK([test_streams 3.5.14.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.15.1])
+AT_KEYWORDS([streams getmsg MORECTL MOREDATA])
+AT_CHECK([test_streams 3.5.15.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.15.2])
+AT_KEYWORDS([streams getmsg MORECTL MOREDATA RS_HIPRI])
+AT_CHECK([test_streams 3.5.15.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.16])
+AT_KEYWORDS([streams getmsg EBADMSG])
+AT_CHECK([test_streams 3.5.16], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.17])
+AT_KEYWORDS([streams getmsg EBADMSG])
+AT_CHECK([test_streams 3.5.17], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.18])
+AT_KEYWORDS([streams getmsg ENOSTR])
+AT_CHECK([test_streams 3.5.18], [], [ignore], [], [], [])
+AT_XFAIL_IF(true)
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.19])
+AT_KEYWORDS([streams getmsg ENODEV])
+AT_CHECK([test_streams 3.5.19], [], [ignore], [], [], [])
+AT_XFAIL_IF(true)
+AT_CLEANUP
+
+AT_SETUP([streams test 3.5.20])
+AT_KEYWORDS([streams getmsg])
+AT_CHECK([test_streams 3.5.20], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([streams test 3.6.1])
-AT_KEYWORDS([streams getpmsg])
+AT_KEYWORDS([streams getpmsg HUP])
 AT_CHECK([test_streams 3.6.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2174,7 +2250,7 @@ AT_CHECK([test_streams 3.6.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 3.6.6])
-AT_KEYWORDS([streams getpmsg EAGAIN])
+AT_KEYWORDS([streams getpmsg EAGAIN O_NONBLOCK])
 AT_CHECK([test_streams 3.6.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2221,6 +2297,98 @@ AT_CLEANUP
 AT_SETUP([streams test 3.6.15])
 AT_KEYWORDS([streams getpmsg EINTR])
 AT_CHECK([test_streams 3.6.15], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.16.1])
+AT_KEYWORDS([streams getpmsg MSG_ANY])
+AT_CHECK([test_streams 3.6.16.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.16.2])
+AT_KEYWORDS([streams getpmsg MSG_BAND])
+AT_CHECK([test_streams 3.6.16.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.16.3])
+AT_KEYWORDS([streams getpmsg MSG_HIPRI])
+AT_CHECK([test_streams 3.6.16.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.17.1])
+AT_KEYWORDS([streams getpmsg MORECTL MSG_ANY])
+AT_CHECK([test_streams 3.6.17.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.17.2])
+AT_KEYWORDS([streams getpmsg MORECTL MSG_BAND])
+AT_CHECK([test_streams 3.6.17.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.17.3])
+AT_KEYWORDS([streams getpmsg MORECTL MSG_HIPRI])
+AT_CHECK([test_streams 3.6.17.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.18.1])
+AT_KEYWORDS([streams getpmsg MOREDATA MSG_ANY])
+AT_CHECK([test_streams 3.6.18.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.18.2])
+AT_KEYWORDS([streams getpmsg MOREDATA MSG_BAND])
+AT_CHECK([test_streams 3.6.18.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.18.3])
+AT_KEYWORDS([streams getpmsg MOREDATA MSG_HIPRI])
+AT_CHECK([test_streams 3.6.18.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.19.1])
+AT_KEYWORDS([streams getpmsg MORECTL MOREDATA MSG_ANY])
+AT_CHECK([test_streams 3.6.19.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.19.2])
+AT_KEYWORDS([streams getpmsg MORECTL MOREDATA MSG_BAND])
+AT_CHECK([test_streams 3.6.19.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.19.3])
+AT_KEYWORDS([streams getpmsg MORECTL MOREDATA MSG_HIPRI])
+AT_CHECK([test_streams 3.6.19.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.20])
+AT_KEYWORDS([streams getpmsg EBADMSG])
+AT_CHECK([test_streams 3.6.20], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.21])
+AT_KEYWORDS([streams getpmsg EBADMSG])
+AT_CHECK([test_streams 3.6.21], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.22])
+AT_KEYWORDS([streams getpmsg EBADMSG])
+AT_CHECK([test_streams 3.6.22], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.23])
+AT_KEYWORDS([streams getpmsg ENOSTR])
+AT_CHECK([test_streams 3.6.23], [], [ignore], [], [], [])
+AT_XFAIL_IF(true)
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.24])
+AT_KEYWORDS([streams getpmsg ENODEV])
+AT_CHECK([test_streams 3.6.24], [], [ignore], [], [], [])
+AT_XFAIL_IF(true)
+AT_CLEANUP
+
+AT_SETUP([streams test 3.6.25])
+AT_KEYWORDS([streams getpmsg])
+AT_CHECK([test_streams 3.6.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 3.7.1])
@@ -2271,6 +2439,16 @@ AT_CLEANUP
 AT_SETUP([streams test 3.7.10])
 AT_KEYWORDS([streams putmsg EINTR])
 AT_CHECK([test_streams 3.7.10], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.7.11])
+AT_KEYWORDS([streams putmsg EINVAL])
+AT_CHECK([test_streams 3.7.11], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([streams test 3.7.12])
+AT_KEYWORDS([streams putmsg])
+AT_CHECK([test_streams 3.7.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([streams test 3.8.1])

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:23 $ by $Author: brian $
+ Last Modified $Date: 2005/10/08 04:55:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $";
 
 //#define __NO_VERSION__
 
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/07 09:34:23 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -717,7 +717,9 @@ alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
 {
 	mblk_t *mp = NULL, *dp = NULL;
 
-	if (psize > 0) {
+	/* yes, POSIX says we can send zero length control parts */
+	if (psize >= 0) {
+		ptrace(("Allocating cntl part %d bytes\n", psize));
 		if ((mp = allocb(psize, bpri))) {
 			mp->b_datap->db_type = type;
 			mp->b_wptr = mp->b_rptr + psize;
@@ -725,13 +727,14 @@ alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
 			return (mp);
 	}
 	if (dsize >= 0) {
+		ptrace(("Allocating data part %d bytes\n", dsize));
 		if ((dp = allocb(dsize + wroff, bpri))) {
 			dp->b_datap->db_type = M_DATA;
 			dp->b_rptr += wroff;
 			dp->b_wptr = dp->b_rptr + dsize;
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
-			if (psize <= 0)
+			if (psize < 0)
 				dp->b_flag |= MSGDELIM;
 		} else {
 			if (mp)
@@ -4438,7 +4441,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			band = mp->b_band;
 		}
 		{
-			mblk_t *b, **bp, **b_contp;
+			mblk_t *b, **bp = &mp;
 			mblk_t **ctp = &chp, **dtp = &dhp;
 			unsigned short b_flag = mp->b_flag;
 
@@ -4453,25 +4456,26 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			/* XXX: So, what is done below is to rip message blocks off of the original
 			   message, duplicate any overlap blocks, restore initial message block
 			   flags, put the tail back and work with the head. */
-
-			for (bp = &mp; (b = *bp); bp = b_contp) {
+			while ((b = *bp)) {
 				struct strbuf *part;
 				mblk_t ***head;
 				ssize_t blen, dlen;
 				const bool data = (b->b_datap->db_type == M_DATA);
 
-				b_contp = &b->b_cont;
 				part = data ? &dat : &ctl;
 				head = data ? &dtp : &ctp;
+
+				ptrace(("Processing %s block\n", data ? "M_DATA" : "M_(PC)PROTO" ));
 
 				if ((blen = b->b_wptr - b->b_rptr) <= 0)
 					blen = 0;
 
-				dlen = part->maxlen - part->len;
+				dlen = (part->len > 0) ? part->maxlen - part->len : part->maxlen;
 
-				if (part->maxlen == -1 || (blen && blen > dlen)) {
+				if (part->maxlen == -1 || (blen && !dlen)) {
 					/* no room - leave in tail */
 					retval |= data ? MOREDATA : MORECTL;
+					bp = &b->b_cont;
 					continue;	/* leave in tail */
 				} else if ((dlen = min(blen, dlen)) == blen) {
 					/* full block - remove from tail */
@@ -4479,8 +4483,10 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 						b->b_cont = NULL;
 				} else if ((b = dupb(b))) {
 					/* partial: duplicate */
+					retval |= data ? MOREDATA : MORECTL;
 					(*bp)->b_rptr += dlen;
 					b->b_wptr -= (blen - dlen);
+					bp = &(*bp)->b_cont;
 				} else {
 					/* world of pain - put message back together */
 					(*ctp) = mp;
@@ -4549,6 +4555,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 
 				if ((blen = b->b_wptr - b->b_rptr) <= 0)
 					continue;
+				ptrace(("Copying out cntl part %d bytes\n", blen));
 				copyout(b->b_rptr, ctl.buf + len, blen);
 				len += blen;
 			}
@@ -4558,6 +4565,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 
 				if ((blen = b->b_wptr - b->b_rptr) <= 0)
 					continue;
+				ptrace(("Copying out data part %d bytes\n", blen));
 				copyout(b->b_rptr, dat.buf + len, blen);
 				len += blen;
 			}
