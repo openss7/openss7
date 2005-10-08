@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/08 04:55:39 $ by $Author: brian $
+ Last Modified $Date: 2005/10/08 11:21:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $";
 
 //#define __NO_VERSION__
 
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/08 04:55:39 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2610,7 +2610,7 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
 		if (dlen >= 0) {
 			if ((err = strsizecheck(sd, M_DATA, dlen)) < -1)
 				return (err);
-			if ((size_t) dlen < (size_t) err) {
+			if ((size_t) dlen > (size_t) err) {
 				/* control part apply putpmsg() rules */
 				if (clen >= 0)
 					return (-ERANGE);
@@ -3637,13 +3637,12 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			{
 				ssize_t count = strmsgcount(mp, protdis);
 
-				if (type != M_DATA)
-					stop = !bytemode;
-				else {
+				if (type == M_DATA) {
 					/* Only look at MSGMARK and MSGDELIM on M_DATA messages. */
-					if ((mp->b_flag & MSGMARK)
-					    || (svr4mode && (mp->b_flag & MSGDELIM)))
+					if ((mp->b_flag & MSGMARK))
 						stop = true;
+					else if ((mp->b_flag & MSGDELIM) || !svr4mode)
+						stop = !bytemode;
 					if (count == 0) {
 						if (!stop && xferd)
 							/* terminal end of file, put it back */
@@ -3651,7 +3650,8 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 						/* its an M_READ boundary message */
 						goto stop;
 					}
-				}
+				} else
+					stop = !bytemode;
 				xferd += count;
 			}
 
@@ -3937,7 +3937,7 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 		b->b_rptr += sd->sd_wroff;
 		b->b_wptr += sd->sd_wroff;
 
-		if ((err = copyin(buf, b->b_wptr, block)) == 0) {
+		if ((err = copyin(buf + written, b->b_wptr, block)) == 0) {
 
 			b->b_wptr += block;
 

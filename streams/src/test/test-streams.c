@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/10/08 04:55:42 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/10/08 11:21:44 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/08 04:55:42 $ by $Author: brian $
+ Last Modified $Date: 2005/10/08 11:21:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.51  2005/10/08 11:21:44  brian
+ - complete tests for write/putmsg/putpmsg
+
  Revision 0.9.2.50  2005/10/08 04:55:42  brian
  - passing full set of getmsg/getpmsg tests
 
@@ -224,9 +227,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/10/08 04:55:42 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/10/08 11:21:44 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/10/08 04:55:42 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/10/08 11:21:44 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -7686,6 +7689,47 @@ struct test_stream test_2_16_16 = { &preamble_0_1, &test_case_2_16_16, &postambl
 #define test_case_2_16_16_stream_1 (NULL)
 #define test_case_2_16_16_stream_2 (NULL)
 
+#define tgrp_case_2_16_17 test_group_2
+#define numb_case_2_16_17 "2.16.17"
+#define name_case_2_16_17 "Perform streamio I_FDINSERT - EBADF."
+#define sref_case_2_16_17 sref_case_2_16
+#define desc_case_2_16_17 "\
+Checks that I_FDINSERT can be performed on a Stream.  Checks that\n\
+ioctl() I_FDINSERT will block awaiting flow control at the Stream head,\n\
+and that the wait can be interrupted by a signal and ioctl() will return\n\
+EINTR."
+
+int
+test_case_2_16_17(int child)
+{
+	char buf[sizeof(t_uscalar_t)] = { 0, };
+	struct strfdinsert fdi;
+	fdi.ctlbuf.maxlen = -1;
+	fdi.ctlbuf.len = sizeof(t_uscalar_t);
+	fdi.ctlbuf.buf = buf;
+	fdi.databuf.maxlen = -1;
+	fdi.databuf.len = -1;
+	fdi.databuf.buf = NULL;
+	fdi.flags = 0;
+	fdi.fildes = test_fd[child];
+	fdi.offset = 0;
+
+	if (start_tt(100) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) == __RESULT_SUCCESS || last_errno != EINTR)
+		return (__RESULT_FAILURE);
+	state++;
+	print_signal(child, last_signum);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_16_17 = { &preamble_8_0, &test_case_2_16_17, &postamble_8 };
+
+#define test_case_2_16_17_stream_0 (&test_2_16_17)
+#define test_case_2_16_17_stream_1 (NULL)
+#define test_case_2_16_17_stream_2 (NULL)
+
 /*
  *  Perform IOCTL on one Stream - I_SENDFD
  */
@@ -9395,6 +9439,104 @@ struct test_stream test_2_24_14 = { &preamble_5, &test_case_2_24_14, &postamble_
 #define test_case_2_24_14_stream_0 (&test_2_24_14)
 #define test_case_2_24_14_stream_1 (NULL)
 #define test_case_2_24_14_stream_2 (NULL)
+
+#define tgrp_case_2_24_15 test_group_2
+#define numb_case_2_24_15 "2.24.15"
+#define name_case_2_24_15 "Perform streamio I_FLUSHBAND."
+#define sref_case_2_24_15 sref_case_2_24
+#define desc_case_2_24_15 "\
+Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
+Checks that only the specified messages are flushed."
+
+int
+preamble_test_case_2_24_15(int child)
+{
+	char buf[32] = { 0, };
+	struct strbuf ctl = { sizeof(buf), sizeof(buf), buf };
+	struct strbuf dat = { sizeof(buf), sizeof(buf), buf };
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 1, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 1, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 2, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, 2, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_2_24_15(int child)
+{
+	struct bandinfo bi = { 1, FLUSHRW };
+
+	char buf[32] = { 0, };
+	struct strbuf ctl = { sizeof(buf), sizeof(buf), buf };
+	struct strbuf dat = { sizeof(buf), sizeof(buf), buf };
+	int band = 0;
+	int flags = MSG_ANY;
+
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	band = 0;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (flags != MSG_BAND || band != 2)
+		return (__RESULT_FAILURE);
+	state++;
+	band = 0;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (flags != MSG_BAND || band != 2)
+		return (__RESULT_FAILURE);
+	state++;
+	band = 0;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (flags != MSG_BAND || band != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	band = 0;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (flags != MSG_BAND || band != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	state++;
+	band = 0;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_24_15 = { &preamble_test_case_2_24_15, &test_case_2_24_15, &postamble_0 };
+
+#define test_case_2_24_15_stream_0 (&test_2_24_15)
+#define test_case_2_24_15_stream_1 (NULL)
+#define test_case_2_24_15_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_CKBAND
@@ -11895,6 +12037,828 @@ struct test_stream test_3_1_10 = { &preamble_0, &test_case_3_1_10, &postamble_0 
 #define test_case_3_1_10_stream_1 (NULL)
 #define test_case_3_1_10_stream_2 (NULL)
 
+#define tgrp_case_3_1_11_1 test_group_3_1
+#define numb_case_3_1_11_1 "3.1.11.1"
+#define name_case_3_1_11_1 "Perform read - RNORM."
+#define sref_case_3_1_11_1 sref_case_3_1
+#define desc_case_3_1_11_1 "\
+Check that read() can be performed on a Stream.  Check that if a portion\n\
+of a message is read in byte-mode (RNORM) that the remainder is placed\n\
+back on the read queue."
+
+int
+preamble_test_case_3_1_11_1(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_11_1(int child)
+{
+	char buf[32] = { 0, };
+	int i;
+
+	if (test_read(child, buf, 16) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf + 16, 16) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i + 16] != (char) (i + 16))
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_11_1 = { &preamble_test_case_3_1_11_1, &test_case_3_1_11_1, &postamble_0 };
+
+#define test_case_3_1_11_1_stream_0 (&test_3_1_11_1)
+#define test_case_3_1_11_1_stream_1 (NULL)
+#define test_case_3_1_11_1_stream_2 (NULL)
+
+#define tgrp_case_3_1_11_2 test_group_3_1
+#define numb_case_3_1_11_2 "3.1.11.2"
+#define name_case_3_1_11_2 "Perform read - RNORM."
+#define sref_case_3_1_11_2 sref_case_3_1
+#define desc_case_3_1_11_2 "\
+Check that read() can be performed on a Stream.  Check that message\n\
+boundaries are ignored in byte-mode (RNORM) and that read() continues\n\
+until the byte count is satisfied."
+
+int
+preamble_test_case_3_1_11_2(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_11_2(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != sizeof(buf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i + 32] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_11_2 = { &preamble_test_case_3_1_11_2, &test_case_3_1_11_2, &postamble_0 };
+
+#define test_case_3_1_11_2_stream_0 (&test_3_1_11_2)
+#define test_case_3_1_11_2_stream_1 (NULL)
+#define test_case_3_1_11_2_stream_2 (NULL)
+
+#define tgrp_case_3_1_11_3 test_group_3_1
+#define numb_case_3_1_11_3 "3.1.11.3"
+#define name_case_3_1_11_3 "Perform read - RNORM."
+#define sref_case_3_1_11_3 sref_case_3_1
+#define desc_case_3_1_11_3 "\
+Check that read() can be performed on a Stream.  Check that in byte-mode\n\
+(RNORM), read() terminates on a zero-length message and that the\n\
+zero-length message is placed back on the read queue for a subsequent\n\
+read() call."
+
+int
+preamble_test_case_3_1_11_3(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = 0;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_11_3(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_11_3 = { &preamble_test_case_3_1_11_3, &test_case_3_1_11_3, &postamble_0 };
+
+#define test_case_3_1_11_3_stream_0 (&test_3_1_11_3)
+#define test_case_3_1_11_3_stream_1 (NULL)
+#define test_case_3_1_11_3_stream_2 (NULL)
+
+#define tgrp_case_3_1_12_1 test_group_3_1
+#define numb_case_3_1_12_1 "3.1.12.1"
+#define name_case_3_1_12_1 "Perform read - RMSGD."
+#define sref_case_3_1_12_1 sref_case_3_1
+#define desc_case_3_1_12_1 "\
+Check that read() can be performed on a Stream.  Check that if a portion\n\
+of a message is read in message discard read mode (RMSGD) that the\n\
+remainder of the message is discarded."
+
+int
+preamble_test_case_3_1_12_1(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_12_1(int child)
+{
+	char buf[32] = { 0, };
+	int i;
+
+	if (test_read(child, buf, 16) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf + 16, 16) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_12_1 = { &preamble_test_case_3_1_12_1, &test_case_3_1_12_1, &postamble_0 };
+
+#define test_case_3_1_12_1_stream_0 (&test_3_1_12_1)
+#define test_case_3_1_12_1_stream_1 (NULL)
+#define test_case_3_1_12_1_stream_2 (NULL)
+
+#define tgrp_case_3_1_12_2 test_group_3_1
+#define numb_case_3_1_12_2 "3.1.12.2"
+#define name_case_3_1_12_2 "Perform read - RMSGD."
+#define sref_case_3_1_12_2 sref_case_3_1
+#define desc_case_3_1_12_2 "\
+Check that read() can be performed on a Stream.  Check that if an entire\n\
+message is read in message discard mode (RMSGD) that read() terminates\n\
+and returns the number of bytes read."
+
+int
+preamble_test_case_3_1_12_2(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_12_2(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_12_2 = { &preamble_test_case_3_1_12_2, &test_case_3_1_12_2, &postamble_0 };
+
+#define test_case_3_1_12_2_stream_0 (&test_3_1_12_2)
+#define test_case_3_1_12_2_stream_1 (NULL)
+#define test_case_3_1_12_2_stream_2 (NULL)
+
+#define tgrp_case_3_1_12_3 test_group_3_1
+#define numb_case_3_1_12_3 "3.1.12.3"
+#define name_case_3_1_12_3 "Perform read - RMSGD."
+#define sref_case_3_1_12_3 sref_case_3_1
+#define desc_case_3_1_12_3 "\
+Check that read() can be performed on a Stream.  Check that a\n\
+zero-length message terminates the read() and returns zero in message\n\
+discard mode (RMSGD)."
+
+int
+preamble_test_case_3_1_12_3(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = 0;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_12_3(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_12_3 = { &preamble_test_case_3_1_12_3, &test_case_3_1_12_3, &postamble_0 };
+
+#define test_case_3_1_12_3_stream_0 (&test_3_1_12_3)
+#define test_case_3_1_12_3_stream_1 (NULL)
+#define test_case_3_1_12_3_stream_2 (NULL)
+
+#define tgrp_case_3_1_13_1 test_group_3_1
+#define numb_case_3_1_13_1 "3.1.13.1"
+#define name_case_3_1_13_1 "Perform read - RMSGN."
+#define sref_case_3_1_13_1 sref_case_3_1
+#define desc_case_3_1_13_1 "\
+Check that read() can be performed on a Stream.  Check that if the\n\
+entire message is not read, that the remainder is placed back on the\n\
+read queue in RMSGN read mode."
+
+int
+preamble_test_case_3_1_13_1(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_13_1(int child)
+{
+	char buf[32] = { 0, };
+	int i;
+
+	if (test_read(child, buf, 16) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf + 16, 16) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i + 16] != (char) (i + 16))
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_13_1 = { &preamble_test_case_3_1_13_1, &test_case_3_1_13_1, &postamble_0 };
+
+#define test_case_3_1_13_1_stream_0 (&test_3_1_13_1)
+#define test_case_3_1_13_1_stream_1 (NULL)
+#define test_case_3_1_13_1_stream_2 (NULL)
+
+#define tgrp_case_3_1_13_2 test_group_3_1
+#define numb_case_3_1_13_2 "3.1.13.2"
+#define name_case_3_1_13_2 "Perform read - RMSGN."
+#define sref_case_3_1_13_2 sref_case_3_1
+#define desc_case_3_1_13_2 "\
+Check that read() can be performed on a Stream.  Check that if an entire\n\
+message is read in message non-discard mode (RMSGN) that read()\n\
+terminates and returns the number of bytes read."
+
+int
+preamble_test_case_3_1_13_2(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_13_2(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_13_2 = { &preamble_test_case_3_1_13_2, &test_case_3_1_13_2, &postamble_0 };
+
+#define test_case_3_1_13_2_stream_0 (&test_3_1_13_2)
+#define test_case_3_1_13_2_stream_1 (NULL)
+#define test_case_3_1_13_2_stream_2 (NULL)
+
+#define tgrp_case_3_1_13_3 test_group_3_1
+#define numb_case_3_1_13_3 "3.1.13.3"
+#define name_case_3_1_13_3 "Perform read - RMSGN."
+#define sref_case_3_1_13_3 sref_case_3_1
+#define desc_case_3_1_13_3 "\
+Check that read() can be performed on a Stream.  Check that a\n\
+zero-length message terminates the read() and returns zero in message\n\
+non-discard mode (RMSGN)."
+
+int
+preamble_test_case_3_1_13_3(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = 0;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_13_3(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_13_3 = { &preamble_test_case_3_1_13_3, &test_case_3_1_13_3, &postamble_0 };
+
+#define test_case_3_1_13_3_stream_0 (&test_3_1_13_3)
+#define test_case_3_1_13_3_stream_1 (NULL)
+#define test_case_3_1_13_3_stream_2 (NULL)
+
+#define tgrp_case_3_1_14_1 test_group_3_1
+#define numb_case_3_1_14_1 "3.1.14.1"
+#define name_case_3_1_14_1 "Perform read - RPROTNORM EBADMSG."
+#define sref_case_3_1_14_1 sref_case_3_1
+#define desc_case_3_1_14_1 "\
+Check that read() can be performed on a Stream.  The file is a Stream\n\
+file that is set to control-normal mode and the message waiting to be\n\
+read includes a control part."
+
+int
+preamble_test_case_3_1_14_1(int child)
+{
+	char cbuf[16] = { 0, };
+	char dbuf[16] = { 0, };
+	struct strbuf ctl = { -1, sizeof(cbuf), cbuf };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(cbuf); i++)
+		cbuf[i] = i;
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i + sizeof(cbuf);
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, &ctl, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_14_1(int child)
+{
+	char buf[32] = { 0, };
+
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EBADMSG)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_14_1 = { &preamble_test_case_3_1_14_1, &test_case_3_1_14_1, &postamble_0 };
+
+#define test_case_3_1_14_1_stream_0 (&test_3_1_14_1)
+#define test_case_3_1_14_1_stream_1 (NULL)
+#define test_case_3_1_14_1_stream_2 (NULL)
+
+#define tgrp_case_3_1_14_2 test_group_3_1
+#define numb_case_3_1_14_2 "3.1.14.2"
+#define name_case_3_1_14_2 "Perform read - RPROTNORM."
+#define sref_case_3_1_14_2 sref_case_3_1
+#define desc_case_3_1_14_2 "\
+Check that read() can be performed on a Stream.  Checks that messages\n\
+without a control part are read correctly in RPROTNORM mode."
+
+int
+preamble_test_case_3_1_14_2(int child)
+{
+	char cbuf[16] = { 0, };
+	char dbuf[16] = { 0, };
+	struct strbuf ctl = { -1, sizeof(cbuf), cbuf };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(cbuf); i++)
+		cbuf[i] = i;
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i + sizeof(cbuf);
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_14_2(int child)
+{
+	char buf[32] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i] != (char)(i + 16))
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_14_2 = { &preamble_test_case_3_1_14_2, &test_case_3_1_14_2, &postamble_0 };
+
+#define test_case_3_1_14_2_stream_0 (&test_3_1_14_2)
+#define test_case_3_1_14_2_stream_1 (NULL)
+#define test_case_3_1_14_2_stream_2 (NULL)
+
+#define tgrp_case_3_1_15 test_group_3_1
+#define numb_case_3_1_15 "3.1.15"
+#define name_case_3_1_15 "Perform read - RPROTDAT."
+#define sref_case_3_1_15 sref_case_3_1
+#define desc_case_3_1_15 "\
+Check that read() can be performed on a Stream.  Checks that a control\n\
+part is read as data in RPROTDAT read control mode."
+
+int
+preamble_test_case_3_1_15(int child)
+{
+	char cbuf[16] = { 0, };
+	char dbuf[16] = { 0, };
+	struct strbuf ctl = { -1, sizeof(cbuf), cbuf };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(cbuf); i++)
+		cbuf[i] = i;
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i + sizeof(cbuf);
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, &ctl, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_15(int child)
+{
+
+	char buf[32] = { 0, };
+
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(buf); i++)
+		if (buf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_15 = { &preamble_test_case_3_1_15, &test_case_3_1_15, &postamble_0 };
+
+#define test_case_3_1_15_stream_0 (&test_3_1_15)
+#define test_case_3_1_15_stream_1 (NULL)
+#define test_case_3_1_15_stream_2 (NULL)
+
+#define tgrp_case_3_1_16 test_group_3_1
+#define numb_case_3_1_16 "3.1.16"
+#define name_case_3_1_16 "Perform read - RPROTDIS."
+#define sref_case_3_1_16 sref_case_3_1
+#define desc_case_3_1_16 "\
+Check that read() can be performed on a Stream.  Checks that a control\n\
+part is discarded in RPROTDIS read control mode."
+
+int
+preamble_test_case_3_1_16(int child)
+{
+	char cbuf[16] = { 0, };
+	char dbuf[16] = { 0, };
+	struct strbuf ctl = { -1, sizeof(cbuf), cbuf };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(cbuf); i++)
+		cbuf[i] = i;
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i + sizeof(cbuf);
+
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, &ctl, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_16(int child)
+{
+	char buf[32] = { 0, };
+
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 16; i++)
+		if (buf[i] != (char)(i + 16))
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_16 = { &preamble_test_case_3_1_16, &test_case_3_1_16, &postamble_0 };
+
+#define test_case_3_1_16_stream_0 (&test_3_1_16)
+#define test_case_3_1_16_stream_1 (NULL)
+#define test_case_3_1_16_stream_2 (NULL)
+
 static const char test_group_3_2[] = "Perform READV on one Stream";
 static const char sref_case_3_2[] = "POSIX 1003.1 2003/SUSv3 readv(2p) reference page.";
 
@@ -12491,6 +13455,278 @@ struct test_stream test_3_3_10 = { &preamble_8_0, &test_case_3_3_10, &postamble_
 #define test_case_3_3_10_stream_0 (&test_3_3_10)
 #define test_case_3_3_10_stream_1 (NULL)
 #define test_case_3_3_10_stream_2 (NULL)
+
+#define tgrp_case_3_3_11 test_group_3_3
+#define numb_case_3_3_11 "3.3.11"
+#define name_case_3_3_11 "Perform write."
+#define sref_case_3_3_11 sref_case_3_3
+#define desc_case_3_3_11 "\
+Check that write() can be performed on a Stream."
+
+int
+test_case_3_3_11(int child)
+{
+	char buf[32] = { 0, };
+	char dbuf[64] = { 0, };
+	struct strbuf ctl = { -1, -1, NULL };
+	struct strbuf dat = { sizeof(dbuf), -1, dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(buf); i++)
+		buf[i] = (char)i;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != sizeof(buf))
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != sizeof(buf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(buf); i++)
+		if (dbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_11 = { &preamble_0, &test_case_3_3_11, &postamble_0 };
+
+#define test_case_3_3_11_stream_0 (&test_3_3_11)
+#define test_case_3_3_11_stream_1 (NULL)
+#define test_case_3_3_11_stream_2 (NULL)
+
+#define tgrp_case_3_3_12 test_group_3_3
+#define numb_case_3_3_12 "3.3.12"
+#define name_case_3_3_12 "Perform write."
+#define sref_case_3_3_12 sref_case_3_3
+#define desc_case_3_3_12 "\
+Check that write() can be performed on a Stream.  Check that if zero\n\
+bytes are written to a Stream that a zero-length message is sent and\n\
+zero is returned."
+
+int
+test_case_3_3_12(int child)
+{
+	char buf[32] = { 0, };
+	
+	if (test_write(child, buf, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_12 = { &preamble_0, &test_case_3_3_12, &postamble_0 };
+
+#define test_case_3_3_12_stream_0 (&test_3_3_12)
+#define test_case_3_3_12_stream_1 (NULL)
+#define test_case_3_3_12_stream_2 (NULL)
+
+#define tgrp_case_3_3_13 test_group_3_3
+#define numb_case_3_3_13 "3.3.13"
+#define name_case_3_3_13 "Perform write."
+#define sref_case_3_3_13 sref_case_3_3
+#define desc_case_3_3_13 "\
+Check that write() can be performed on a Stream.  Check that if zero\n\
+bytes are written to a pipe or FIFO that no message is sent and zero is\n\
+returned."
+
+int
+test_case_3_3_13(int child)
+{
+	char buf[32] = { 0, };
+	
+	if (test_write(child, buf, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_13 = { &preamble_6, &test_case_3_3_13, &postamble_6 };
+
+#define test_case_3_3_13_stream_0 (&test_3_3_13)
+#define test_case_3_3_13_stream_1 (NULL)
+#define test_case_3_3_13_stream_2 (NULL)
+
+#define tgrp_case_3_3_14 test_group_3_3
+#define numb_case_3_3_14 "3.3.14"
+#define name_case_3_3_14 "Perform write."
+#define sref_case_3_3_14 sref_case_3_3
+#define desc_case_3_3_14 "\
+Check that write() can be performed on a Stream.  Check that if write\n\
+option SNDZERO is set on a pipe or FIFO that zero bytes written sends a\n\
+zero-length message and returns zero."
+
+int
+test_case_3_3_14(int child)
+{
+	char buf[32] = { 0, };
+
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_14 = { &preamble_0, &test_case_3_3_14, &postamble_0 };
+
+#define test_case_3_3_14_stream_0 (&test_3_3_14)
+#define test_case_3_3_14_stream_1 (NULL)
+#define test_case_3_3_14_stream_2 (NULL)
+
+#define tgrp_case_3_3_15 test_group_3_3
+#define numb_case_3_3_15 "3.3.15"
+#define name_case_3_3_15 "Perform write."
+#define sref_case_3_3_15 sref_case_3_3
+#define desc_case_3_3_15 "\
+Check that write() can be performed on a Stream.  Check that write()\n\
+breaks large writes down into maximum packet size chunks."
+
+int
+test_case_3_3_15(int child)
+{
+	char buf[4096 + 128] = { 0, };
+	char dbuf[4096 + 128] = { 0, };
+	struct strbuf dat = { sizeof(dbuf), -1, dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < 4096; i++)
+		buf[i] = (char)i;
+	for (i = 0; i < 128; i++)
+		buf[i+4096] = (char)(128-i);
+
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != (4096 + 128))
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 4096)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 4096; i++)
+		if (dbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 128)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 128; i++)
+		if (dbuf[i] != (char)(128-i)) {
+			printf("Character at position %d is %d\n", i, (int)dbuf[i]);
+			return (__RESULT_FAILURE);
+		}
+	state++;
+	if (test_getmsg(child, NULL, &dat, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_15 = { &preamble_0, &test_case_3_3_15, &postamble_0 };
+
+#define test_case_3_3_15_stream_0 (&test_3_3_15)
+#define test_case_3_3_15_stream_1 (NULL)
+#define test_case_3_3_15_stream_2 (NULL)
+
+#define tgrp_case_3_3_16 test_group_3_3
+#define numb_case_3_3_16 "3.3.16"
+#define name_case_3_3_16 "Perform write."
+#define sref_case_3_3_16 sref_case_3_3
+#define desc_case_3_3_16 "\
+Check that write() can be performed on a Stream.  Check that a write()\n\
+of exactly the maximum packet size does not also generate a zero length\n\
+message."
+
+int
+test_case_3_3_16(int child)
+{
+	char buf[4096] = { 0, };
+	char dbuf[4096] = { 0, };
+	struct strbuf dat = { sizeof(dbuf), -1, dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < 4096; i++)
+		buf[i] = (char)i;
+
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != (4096))
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 4096)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 4096; i++)
+		if (dbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, NULL, &dat, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_16 = { &preamble_0, &test_case_3_3_16, &postamble_0 };
+
+#define test_case_3_3_16_stream_0 (&test_3_3_16)
+#define test_case_3_3_16_stream_1 (NULL)
+#define test_case_3_3_16_stream_2 (NULL)
 
 static const char test_group_3_4[] = "Perform WRITEV on one Stream";
 static const char sref_case_3_4[] = "POSIX 1003.1 2003/SUSv3 writev(2p) reference page.";
@@ -15803,6 +17039,286 @@ struct test_stream test_3_7_12 = { &preamble_0, &test_case_3_7_12, &postamble_0 
 #define test_case_3_7_12_stream_1 (NULL)
 #define test_case_3_7_12_stream_2 (NULL)
 
+#define tgrp_case_3_7_13 test_group_3_7
+#define numb_case_3_7_13 "3.7.13"
+#define name_case_3_7_13 "Perform putmsg."
+#define sref_case_3_7_13 sref_case_3_7
+#define desc_case_3_7_13 "\
+Check that putmsg() can be performed on a Stream.  Check that a message\n\
+with control but no data part can be sent with putmsg()."
+
+int
+test_case_3_7_13(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = 0;
+
+	char gcbuf[32] = { 0, };
+	char gdbuf[32] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = 0;
+
+	int i;
+
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = (char)i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+
+	if (test_putmsg(child, &pctl, NULL, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(pcbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pcbuf); i++)
+		if (gcbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_13 = { &preamble_0, &test_case_3_7_13, &postamble_0 };
+
+#define test_case_3_7_13_stream_0 (&test_3_7_13)
+#define test_case_3_7_13_stream_1 (NULL)
+#define test_case_3_7_13_stream_2 (NULL)
+
+#define tgrp_case_3_7_14 test_group_3_7
+#define numb_case_3_7_14 "3.7.14"
+#define name_case_3_7_14 "Perform putmsg."
+#define sref_case_3_7_14 sref_case_3_7
+#define desc_case_3_7_14 "\
+Check that putmsg() can be performed on a Stream.  Check that a message\n\
+with data but not control part can be sent with putmsg()."
+
+int
+test_case_3_7_14(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = 0;
+
+	char gcbuf[32] = { 0, };
+	char gdbuf[32] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = 0;
+
+	int i;
+
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = (char)i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+
+	if (test_putmsg(child, NULL, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != sizeof(pdbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_14 = { &preamble_0, &test_case_3_7_14, &postamble_0 };
+
+#define test_case_3_7_14_stream_0 (&test_3_7_14)
+#define test_case_3_7_14_stream_1 (NULL)
+#define test_case_3_7_14_stream_2 (NULL)
+
+#define tgrp_case_3_7_15 test_group_3_7
+#define numb_case_3_7_15 "3.7.15"
+#define name_case_3_7_15 "Perform putmsg."
+#define sref_case_3_7_15 sref_case_3_7
+#define desc_case_3_7_15 "\
+Check that putmsg() can be performed on a Stream.  Checks that a high\n\
+priority message with control and data parts can be sent with putmsg()."
+
+int
+test_case_3_7_15(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = RS_HIPRI;
+
+	char gcbuf[32] = { 0, };
+	char gdbuf[32] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gflags = 0;
+
+	int i;
+
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = (char)i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(pcbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != sizeof(pdbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pcbuf); i++)
+		if (gcbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+			return (__RESULT_FAILURE);
+	state++;
+	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_15 = { &preamble_0, &test_case_3_7_15, &postamble_0 };
+
+#define test_case_3_7_15_stream_0 (&test_3_7_15)
+#define test_case_3_7_15_stream_1 (NULL)
+#define test_case_3_7_15_stream_2 (NULL)
+
+#define tgrp_case_3_7_16 test_group_3_7
+#define numb_case_3_7_16 "3.7.16"
+#define name_case_3_7_16 "Perform putmsg - ERANGE."
+#define sref_case_3_7_16 sref_case_3_7
+#define desc_case_3_7_16 "\
+Check that putmsg() can be performed on a Stream.  Check that an attempt\n\
+to send a control part and a data part where the data part is larger\n\
+than the maximum packet size fails with error ERANGE."
+
+int
+test_case_3_7_16(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[4097] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = RS_HIPRI;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) == __RESULT_SUCCESS || last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_16 = { &preamble_0, &test_case_3_7_16, &postamble_0 };
+
+#define test_case_3_7_16_stream_0 (&test_3_7_16)
+#define test_case_3_7_16_stream_1 (NULL)
+#define test_case_3_7_16_stream_2 (NULL)
+
+#define tgrp_case_3_7_17 test_group_3_7
+#define numb_case_3_7_17 "3.7.17"
+#define name_case_3_7_17 "Perform putmsg - ERANGE."
+#define sref_case_3_7_17 sref_case_3_7
+#define desc_case_3_7_17 "\
+Check that putmsg() can be performed on a Stream.  Check that ERANGE is\n\
+returned when the size of the control part exceeds the maximum\n\
+configured size for the control part of a message."
+
+int
+test_case_3_7_17(int child)
+{
+	char pcbuf[(1<<12)+1] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = RS_HIPRI;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) == __RESULT_SUCCESS || last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_17 = { &preamble_0, &test_case_3_7_17, &postamble_0 };
+
+#define test_case_3_7_17_stream_0 (&test_3_7_17)
+#define test_case_3_7_17_stream_1 (NULL)
+#define test_case_3_7_17_stream_2 (NULL)
+
+#define tgrp_case_3_7_18 test_group_3_7
+#define numb_case_3_7_18 "3.7.18"
+#define name_case_3_7_18 "Perform putmsg."
+#define sref_case_3_7_18 sref_case_3_7
+#define desc_case_3_7_18 "\
+Check that putmsg() can be performed on a Stream.  Check that ERANGE is\n\
+returned when the size of the data part exceeds the maximum configured\n\
+size for the data part of a message."
+
+int
+test_case_3_7_18(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[(1<<18)+1] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pflags = RS_HIPRI;
+
+	if (test_putmsg(child, &pctl, &pdat, pflags) == __RESULT_SUCCESS || last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_7_18 = { &preamble_0, &test_case_3_7_18, &postamble_0 };
+
+#define test_case_3_7_18_stream_0 (&test_3_7_18)
+#define test_case_3_7_18_stream_1 (NULL)
+#define test_case_3_7_18_stream_2 (NULL)
+
 static const char test_group_3_8[] = "Perform PUTPMSG on one Stream";
 static const char sref_case_3_8[] = "POSIX 1003.1 2003/SUSv3 putpmsg(2p) reference page.";
 
@@ -16253,6 +17769,351 @@ struct test_stream test_3_8_11 = { &preamble_8_1, &test_case_3_8_11, &postamble_
 #define test_case_3_8_11_stream_0 (&test_3_8_11)
 #define test_case_3_8_11_stream_1 (NULL)
 #define test_case_3_8_11_stream_2 (NULL)
+
+#define tgrp_case_3_8_12 test_group_3_8
+#define numb_case_3_8_12 "3.8.12"
+#define name_case_3_8_12 "Perform putpmsg."
+#define sref_case_3_8_12 sref_case_3_8
+#define desc_case_3_8_12 "\
+Check that putpmsg() can be performed on a Stream.  Checks that zero is\n\
+returned (and no message sent) when no control or data part is specified."
+
+int
+test_case_3_8_12(int child)
+{
+	struct strbuf ctl = { -1, -1, NULL };
+	struct strbuf dat = { -1, -1, NULL };
+	int band = 1;
+	int flags = MSG_BAND;
+
+	if (test_putpmsg(child, NULL, NULL, band, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, &ctl, &dat, band, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	band = 0;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_12 = { &preamble_0, &test_case_3_8_12, &postamble_0 };
+
+#define test_case_3_8_12_stream_0 (&test_3_8_12)
+#define test_case_3_8_12_stream_1 (NULL)
+#define test_case_3_8_12_stream_2 (NULL)
+
+#define tgrp_case_3_8_13 test_group_3_8
+#define numb_case_3_8_13 "3.8.13"
+#define name_case_3_8_13 "Perform putpmsg."
+#define sref_case_3_8_13 sref_case_3_8
+#define desc_case_3_8_13 "\
+Check that putpmsg() can be performed on a Stream.  Check that a message\n\
+with control but no data part can be sent with putpmsg()."
+
+int
+test_case_3_8_13(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = 1;
+	int pflags = MSG_BAND;
+
+	char gcbuf[32] = { 0, };
+	char gdbuf[32] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = 0;
+	int gflags = MSG_ANY;
+
+	int i;
+
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = (char)i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+
+	if (test_putpmsg(child, &pctl, NULL, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gband != pband)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(pcbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pcbuf); i++)
+		if (gcbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_13 = { &preamble_0, &test_case_3_8_13, &postamble_0 };
+
+#define test_case_3_8_13_stream_0 (&test_3_8_13)
+#define test_case_3_8_13_stream_1 (NULL)
+#define test_case_3_8_13_stream_2 (NULL)
+
+#define tgrp_case_3_8_14 test_group_3_8
+#define numb_case_3_8_14 "3.8.14"
+#define name_case_3_8_14 "Perform putpmsg."
+#define sref_case_3_8_14 sref_case_3_8
+#define desc_case_3_8_14 "\
+Check that putpmsg() can be performed on a Stream.  Check that a message\n\
+with data but not control part can be sent with putpmsg()."
+
+int
+test_case_3_8_14(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = 1;
+	int pflags = MSG_BAND;
+
+	char gcbuf[32] = { 0, };
+	char gdbuf[32] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = 0;
+	int gflags = MSG_ANY;
+
+	int i;
+
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = (char)i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+
+	if (test_putpmsg(child, NULL, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gband != pband)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != -1)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != sizeof(pdbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+			return (__RESULT_FAILURE);
+	state++;
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_14 = { &preamble_0, &test_case_3_8_14, &postamble_0 };
+
+#define test_case_3_8_14_stream_0 (&test_3_8_14)
+#define test_case_3_8_14_stream_1 (NULL)
+#define test_case_3_8_14_stream_2 (NULL)
+
+#define tgrp_case_3_8_15 test_group_3_8
+#define numb_case_3_8_15 "3.8.15"
+#define name_case_3_8_15 "Perform putpmsg."
+#define sref_case_3_8_15 sref_case_3_8
+#define desc_case_3_8_15 "\
+Check that putpmsg() can be performed on a Stream.  Checks that a high\n\
+priority message with control and data parts can be sent with putpmsg()."
+
+int
+test_case_3_8_15(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = 0;
+	int pflags = MSG_HIPRI;
+
+	char gcbuf[32] = { 0, };
+	char gdbuf[32] = { 0, };
+	struct strbuf gctl = { sizeof(gcbuf), -1, gcbuf };
+	struct strbuf gdat = { sizeof(gdbuf), -1, gdbuf };
+	int gband = 0;
+	int gflags = MSG_ANY;
+
+	int i;
+
+	for (i = 0; i < sizeof(pcbuf); i++)
+		pcbuf[i] = (char)i;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gband != pband)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gflags != pflags)
+		return (__RESULT_FAILURE);
+	state++;
+	if (gctl.len != sizeof(pcbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	if (gdat.len != sizeof(pdbuf))
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pcbuf); i++)
+		if (gcbuf[i] != (char)i)
+			return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(pdbuf); i++)
+		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+			return (__RESULT_FAILURE);
+	state++;
+	gband = 0;
+	gflags = MSG_ANY;
+	if (test_getpmsg(child, &gctl, &gdat, &gband, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_15 = { &preamble_0, &test_case_3_8_15, &postamble_0 };
+
+#define test_case_3_8_15_stream_0 (&test_3_8_15)
+#define test_case_3_8_15_stream_1 (NULL)
+#define test_case_3_8_15_stream_2 (NULL)
+
+#define tgrp_case_3_8_16 test_group_3_8
+#define numb_case_3_8_16 "3.8.16"
+#define name_case_3_8_16 "Perform putpmsg - ERANGE."
+#define sref_case_3_8_16 sref_case_3_8
+#define desc_case_3_8_16 "\
+Check that putpmsg() can be performed on a Stream.  Check that an attempt\n\
+to send a control part and a data part where the data part is larger\n\
+than the maximum packet size fails with error ERANGE."
+
+int
+test_case_3_8_16(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[4097] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = 0;
+	int pflags = MSG_HIPRI;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) == __RESULT_SUCCESS || last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_16 = { &preamble_0, &test_case_3_8_16, &postamble_0 };
+
+#define test_case_3_8_16_stream_0 (&test_3_8_16)
+#define test_case_3_8_16_stream_1 (NULL)
+#define test_case_3_8_16_stream_2 (NULL)
+
+#define tgrp_case_3_8_17 test_group_3_8
+#define numb_case_3_8_17 "3.8.17"
+#define name_case_3_8_17 "Perform putpmsg - ERANGE."
+#define sref_case_3_8_17 sref_case_3_8
+#define desc_case_3_8_17 "\
+Check that putpmsg() can be performed on a Stream.  Check that ERANGE is\n\
+returned when the size of the control part exceeds the maximum\n\
+configured size for the control part of a message."
+
+int
+test_case_3_8_17(int child)
+{
+	char pcbuf[(1<<12)+1] = { 0, };
+	char pdbuf[32] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = 0;
+	int pflags = MSG_HIPRI;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) == __RESULT_SUCCESS || last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_17 = { &preamble_0, &test_case_3_8_17, &postamble_0 };
+
+#define test_case_3_8_17_stream_0 (&test_3_8_17)
+#define test_case_3_8_17_stream_1 (NULL)
+#define test_case_3_8_17_stream_2 (NULL)
+
+#define tgrp_case_3_8_18 test_group_3_8
+#define numb_case_3_8_18 "3.8.18"
+#define name_case_3_8_18 "Perform putpmsg."
+#define sref_case_3_8_18 sref_case_3_8
+#define desc_case_3_8_18 "\
+Check that putpmsg() can be performed on a Stream.  Check that ERANGE is\n\
+returned when the size of the data part exceeds the maximum configured\n\
+size for the data part of a message."
+
+int
+test_case_3_8_18(int child)
+{
+	char pcbuf[32] = { 0, };
+	char pdbuf[(1<<18)+1] = { 0, };
+	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
+	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
+	int pband = 0;
+	int pflags = MSG_HIPRI;
+
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) == __RESULT_SUCCESS || last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_8_18 = { &preamble_0, &test_case_3_8_18, &postamble_0 };
+
+#define test_case_3_8_18_stream_0 (&test_3_8_18)
+#define test_case_3_8_18_stream_1 (NULL)
+#define test_case_3_8_18_stream_2 (NULL)
 
 static const char test_group_3_9[] = "Perform ISASTREAM on one Stream";
 static const char sref_case_3_9[] = "POSIX 1003.1 2003/SUSv3 isastream(2p) reference page.";
@@ -17706,6 +19567,8 @@ struct test_case {
 	test_case_2_16_15_stream_0, test_case_2_16_15_stream_1, test_case_2_16_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_16_16, tgrp_case_2_16_16, name_case_2_16_16, desc_case_2_16_16, sref_case_2_16_16, {
 	test_case_2_16_16_stream_0, test_case_2_16_16_stream_1, test_case_2_16_16_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_16_17, tgrp_case_2_16_17, name_case_2_16_17, desc_case_2_16_17, sref_case_2_16_17, {
+	test_case_2_16_17_stream_0, test_case_2_16_17_stream_1, test_case_2_16_17_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_17_1, tgrp_case_2_17_1, name_case_2_17_1, desc_case_2_17_1, sref_case_2_17_1, {
 	test_case_2_17_1_stream_0, test_case_2_17_1_stream_1, test_case_2_17_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_17_2, tgrp_case_2_17_2, name_case_2_17_2, desc_case_2_17_2, sref_case_2_17_2, {
@@ -17848,6 +19711,8 @@ struct test_case {
 	test_case_2_24_13_stream_0, test_case_2_24_13_stream_1, test_case_2_24_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_24_14, tgrp_case_2_24_14, name_case_2_24_14, desc_case_2_24_14, sref_case_2_24_14, {
 	test_case_2_24_14_stream_0, test_case_2_24_14_stream_1, test_case_2_24_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_24_15, tgrp_case_2_24_15, name_case_2_24_15, desc_case_2_24_15, sref_case_2_24_15, {
+	test_case_2_24_15_stream_0, test_case_2_24_15_stream_1, test_case_2_24_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_25_1, tgrp_case_2_25_1, name_case_2_25_1, desc_case_2_25_1, sref_case_2_25_1, {
 	test_case_2_25_1_stream_0, test_case_2_25_1_stream_1, test_case_2_25_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_25_2, tgrp_case_2_25_2, name_case_2_25_2, desc_case_2_25_2, sref_case_2_25_2, {
@@ -18038,6 +19903,32 @@ struct test_case {
 	test_case_3_1_9_stream_0, test_case_3_1_9_stream_1, test_case_3_1_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_1_10, tgrp_case_3_1_10, name_case_3_1_10, desc_case_3_1_10, sref_case_3_1_10, {
 	test_case_3_1_10_stream_0, test_case_3_1_10_stream_1, test_case_3_1_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_11_1, tgrp_case_3_1_11_1, name_case_3_1_11_1, desc_case_3_1_11_1, sref_case_3_1_11_1, {
+	test_case_3_1_11_1_stream_0, test_case_3_1_11_1_stream_1, test_case_3_1_11_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_11_2, tgrp_case_3_1_11_2, name_case_3_1_11_2, desc_case_3_1_11_2, sref_case_3_1_11_2, {
+	test_case_3_1_11_2_stream_0, test_case_3_1_11_2_stream_1, test_case_3_1_11_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_11_3, tgrp_case_3_1_11_3, name_case_3_1_11_3, desc_case_3_1_11_3, sref_case_3_1_11_3, {
+	test_case_3_1_11_3_stream_0, test_case_3_1_11_3_stream_1, test_case_3_1_11_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_12_1, tgrp_case_3_1_12_1, name_case_3_1_12_1, desc_case_3_1_12_1, sref_case_3_1_12_1, {
+	test_case_3_1_12_1_stream_0, test_case_3_1_12_1_stream_1, test_case_3_1_12_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_12_2, tgrp_case_3_1_12_2, name_case_3_1_12_2, desc_case_3_1_12_2, sref_case_3_1_12_2, {
+	test_case_3_1_12_2_stream_0, test_case_3_1_12_2_stream_1, test_case_3_1_12_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_12_3, tgrp_case_3_1_12_3, name_case_3_1_12_3, desc_case_3_1_12_3, sref_case_3_1_12_3, {
+	test_case_3_1_12_3_stream_0, test_case_3_1_12_3_stream_1, test_case_3_1_12_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_13_1, tgrp_case_3_1_13_1, name_case_3_1_13_1, desc_case_3_1_13_1, sref_case_3_1_13_1, {
+	test_case_3_1_13_1_stream_0, test_case_3_1_13_1_stream_1, test_case_3_1_13_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_13_2, tgrp_case_3_1_13_2, name_case_3_1_13_2, desc_case_3_1_13_2, sref_case_3_1_13_2, {
+	test_case_3_1_13_2_stream_0, test_case_3_1_13_2_stream_1, test_case_3_1_13_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_13_3, tgrp_case_3_1_13_3, name_case_3_1_13_3, desc_case_3_1_13_3, sref_case_3_1_13_3, {
+	test_case_3_1_13_3_stream_0, test_case_3_1_13_3_stream_1, test_case_3_1_13_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_14_1, tgrp_case_3_1_14_1, name_case_3_1_14_1, desc_case_3_1_14_1, sref_case_3_1_14_1, {
+	test_case_3_1_14_1_stream_0, test_case_3_1_14_1_stream_1, test_case_3_1_14_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_14_2, tgrp_case_3_1_14_2, name_case_3_1_14_2, desc_case_3_1_14_2, sref_case_3_1_14_2, {
+	test_case_3_1_14_2_stream_0, test_case_3_1_14_2_stream_1, test_case_3_1_14_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_15, tgrp_case_3_1_15, name_case_3_1_15, desc_case_3_1_15, sref_case_3_1_15, {
+	test_case_3_1_15_stream_0, test_case_3_1_15_stream_1, test_case_3_1_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_16, tgrp_case_3_1_16, name_case_3_1_16, desc_case_3_1_16, sref_case_3_1_16, {
+	test_case_3_1_16_stream_0, test_case_3_1_16_stream_1, test_case_3_1_16_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, sref_case_3_2_1, {
 	test_case_3_2_1_stream_0, test_case_3_2_1_stream_1, test_case_3_2_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_2_2, tgrp_case_3_2_2, name_case_3_2_2, desc_case_3_2_2, sref_case_3_2_2, {
@@ -18080,6 +19971,18 @@ struct test_case {
 	test_case_3_3_9_stream_0, test_case_3_3_9_stream_1, test_case_3_3_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_3_10, tgrp_case_3_3_10, name_case_3_3_10, desc_case_3_3_10, sref_case_3_3_10, {
 	test_case_3_3_10_stream_0, test_case_3_3_10_stream_1, test_case_3_3_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_11, tgrp_case_3_3_11, name_case_3_3_11, desc_case_3_3_11, sref_case_3_3_11, {
+	test_case_3_3_11_stream_0, test_case_3_3_11_stream_1, test_case_3_3_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_12, tgrp_case_3_3_12, name_case_3_3_12, desc_case_3_3_12, sref_case_3_3_12, {
+	test_case_3_3_12_stream_0, test_case_3_3_12_stream_1, test_case_3_3_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_13, tgrp_case_3_3_13, name_case_3_3_13, desc_case_3_3_13, sref_case_3_3_13, {
+	test_case_3_3_13_stream_0, test_case_3_3_13_stream_1, test_case_3_3_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_14, tgrp_case_3_3_14, name_case_3_3_14, desc_case_3_3_14, sref_case_3_3_14, {
+	test_case_3_3_14_stream_0, test_case_3_3_14_stream_1, test_case_3_3_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_15, tgrp_case_3_3_15, name_case_3_3_15, desc_case_3_3_15, sref_case_3_3_15, {
+	test_case_3_3_15_stream_0, test_case_3_3_15_stream_1, test_case_3_3_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_16, tgrp_case_3_3_16, name_case_3_3_16, desc_case_3_3_16, sref_case_3_3_16, {
+	test_case_3_3_16_stream_0, test_case_3_3_16_stream_1, test_case_3_3_16_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_4_1, tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, sref_case_3_4_1, {
 	test_case_3_4_1_stream_0, test_case_3_4_1_stream_1, test_case_3_4_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_4_2, tgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, sref_case_3_4_2, {
@@ -18240,6 +20143,18 @@ struct test_case {
 	test_case_3_7_11_stream_0, test_case_3_7_11_stream_1, test_case_3_7_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7_12, tgrp_case_3_7_12, name_case_3_7_12, desc_case_3_7_12, sref_case_3_7_12, {
 	test_case_3_7_12_stream_0, test_case_3_7_12_stream_1, test_case_3_7_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_13, tgrp_case_3_7_13, name_case_3_7_13, desc_case_3_7_13, sref_case_3_7_13, {
+	test_case_3_7_13_stream_0, test_case_3_7_13_stream_1, test_case_3_7_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_14, tgrp_case_3_7_14, name_case_3_7_14, desc_case_3_7_14, sref_case_3_7_14, {
+	test_case_3_7_14_stream_0, test_case_3_7_14_stream_1, test_case_3_7_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_15, tgrp_case_3_7_15, name_case_3_7_15, desc_case_3_7_15, sref_case_3_7_15, {
+	test_case_3_7_15_stream_0, test_case_3_7_15_stream_1, test_case_3_7_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_16, tgrp_case_3_7_16, name_case_3_7_16, desc_case_3_7_16, sref_case_3_7_16, {
+	test_case_3_7_16_stream_0, test_case_3_7_16_stream_1, test_case_3_7_16_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_17, tgrp_case_3_7_17, name_case_3_7_17, desc_case_3_7_17, sref_case_3_7_17, {
+	test_case_3_7_17_stream_0, test_case_3_7_17_stream_1, test_case_3_7_17_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_18, tgrp_case_3_7_18, name_case_3_7_18, desc_case_3_7_18, sref_case_3_7_18, {
+	test_case_3_7_18_stream_0, test_case_3_7_18_stream_1, test_case_3_7_18_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_1, tgrp_case_3_8_1, name_case_3_8_1, desc_case_3_8_1, sref_case_3_8_1, {
 	test_case_3_8_1_stream_0, test_case_3_8_1_stream_1, test_case_3_8_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_2, tgrp_case_3_8_2, name_case_3_8_2, desc_case_3_8_2, sref_case_3_8_2, {
@@ -18262,6 +20177,20 @@ struct test_case {
 	test_case_3_8_10_stream_0, test_case_3_8_10_stream_1, test_case_3_8_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_11, tgrp_case_3_8_11, name_case_3_8_11, desc_case_3_8_11, sref_case_3_8_11, {
 	test_case_3_8_11_stream_0, test_case_3_8_11_stream_1, test_case_3_8_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_12, tgrp_case_3_8_12, name_case_3_8_12, desc_case_3_8_12, sref_case_3_8_12, {
+	test_case_3_8_12_stream_0, test_case_3_8_12_stream_1, test_case_3_8_12_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_13, tgrp_case_3_8_13, name_case_3_8_13, desc_case_3_8_13, sref_case_3_8_13, {
+	test_case_3_8_13_stream_0, test_case_3_8_13_stream_1, test_case_3_8_13_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_14, tgrp_case_3_8_14, name_case_3_8_14, desc_case_3_8_14, sref_case_3_8_14, {
+	test_case_3_8_14_stream_0, test_case_3_8_14_stream_1, test_case_3_8_14_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_15, tgrp_case_3_8_15, name_case_3_8_15, desc_case_3_8_15, sref_case_3_8_15, {
+	test_case_3_8_15_stream_0, test_case_3_8_15_stream_1, test_case_3_8_15_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_16, tgrp_case_3_8_16, name_case_3_8_16, desc_case_3_8_16, sref_case_3_8_16, {
+	test_case_3_8_16_stream_0, test_case_3_8_16_stream_1, test_case_3_8_16_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_17, tgrp_case_3_8_17, name_case_3_8_17, desc_case_3_8_17, sref_case_3_8_17, {
+	test_case_3_8_17_stream_0, test_case_3_8_17_stream_1, test_case_3_8_17_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_18, tgrp_case_3_8_18, name_case_3_8_18, desc_case_3_8_18, sref_case_3_8_18, {
+	test_case_3_8_18_stream_0, test_case_3_8_18_stream_1, test_case_3_8_18_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_9_1, tgrp_case_3_9_1, name_case_3_9_1, desc_case_3_9_1, sref_case_3_9_1, {
 	test_case_3_9_1_stream_0, test_case_3_9_1_stream_1, test_case_3_9_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_9_2, tgrp_case_3_9_2, name_case_3_9_2, desc_case_3_9_2, sref_case_3_9_2, {
