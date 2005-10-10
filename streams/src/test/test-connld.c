@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/07 09:34:28 $
+ @(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:17 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:28 $ by $Author: brian $
+ Last Modified $Date: 2005/10/10 10:37:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-connld.c,v $
+ Revision 0.9.2.17  2005/10/10 10:37:17  brian
+ - FIFOs working nicely and tested.
+
  Revision 0.9.2.16  2005/10/07 09:34:28  brian
  - more testing and corrections
 
@@ -122,9 +125,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/07 09:34:28 $"
+#ident "@(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:17 $"
 
-static char const ident[] = "$RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/07 09:34:28 $";
+static char const ident[] = "$RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:17 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -157,6 +160,8 @@ static char const ident[] = "$RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.
 #endif
 
 #include <sys/testmod.h>
+
+#include <linux/limits.h>
 
 /*
  *  -------------------------------------------------------------------------

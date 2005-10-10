@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/07 09:34:30 $
+ @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:20 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:30 $ by $Author: brian $
+ Last Modified $Date: 2005/10/10 10:37:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-nsdev.c,v $
+ Revision 0.9.2.17  2005/10/10 10:37:20  brian
+ - FIFOs working nicely and tested.
+
  Revision 0.9.2.16  2005/10/07 09:34:30  brian
  - more testing and corrections
 
@@ -122,9 +125,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/07 09:34:30 $"
+#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:20 $"
 
-static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/07 09:34:30 $";
+static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:20 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -157,6 +160,8 @@ static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9
 #endif
 
 #include <sys/testmod.h>
+
+#include <linux/limits.h>
 
 /*
  *  -------------------------------------------------------------------------

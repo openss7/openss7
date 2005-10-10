@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipe.4.man,v 0.9.2.5 2005/07/21 20:47:19 brian Exp $
+.\" @(#) $Id: pipe.4.man,v 0.9.2.6 2005/10/10 10:37:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/21 20:47:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/10/10 10:37:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -160,13 +160,127 @@ for a fully connected,
 .IR STREAMS -based,
 bi-directional pipe.
 .\"
+.SS Characteristics
+.PP
+Following are some characteristics of
+.IR STREAMS -based
+pips that cause their behaviour to differ from that of
+regular
+.I STREAMS
+character special device files:
+.IP \(bu \w'\(bu\(em'u
+.IR STREAMS -based
+pipes cannot be clone opened.
+But see
+.BR connld (4).
+.IP \(bu
+.IR STREAMS -based
+pipes have both ends open for both read and write.
+.IP \(bu
+When a
+.IR STREAMS -based
+pipe is hung up, or the other end of the
+.IR STREAMS -based
+pipe is closed, write and write-like operations return
+.RB [ EPIPE ]
+and generate a
+.RI { SIGPIPE }
+signal to the caller, instead of simply returning
+.RB [ ENXIO ]
+as is the case for regular
+.I STREAMS
+devices.
+This is true for
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2),
+.BR putpmsg (2),
+and
+.BR streamio (7)
+input-output controls that write messages to the
+.IR Stream ,
+such as
+.BR I_FDINSERT (7).
+.IP \(bu
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed,
+.IR STREAMS -based
+pipes will generate
+.RI { SIGPIPE }
+to the caller in addition to returning the error from the asynchronous write error message.  This
+behavior can be suppressed by clearing the
+.B SNDPIPE
+option using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behavior for regular
+.I STREAMS
+character special files.
+.IP \(bu
+By default, attempting to write a zero-length data message to a
+.BR STREAMS -based
+pipe with
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2),
+or
+.BR putpmsg (2),
+will succeed, return zero, but no message will be generated.  Generation of the message can be
+enabled by setting the
+.B SNDZERO
+option using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behaviour for regular
+.I STREAMS
+character special files.
+.IP \(bu
+.IR STREAMS -based
+pipes break large writes down into independent data messages of 4096 bytes or less.  Writes of less
+than or equal to 4096 bytes are guaranteed atomic.  Writes of greater than 4096 byes are not
+guaranteed atomic.  This is default behaviour of all
+.I STREAMS
+character special files, unless altered by the driver.
+.IP \(bu
+An end of a
+.IR STREAMS -based
+pipes that has no modules pushed, even when full and blocked on write, will not block on close as
+described under
+.BR I_SETCLTIME (7),
+because there is no driver write queue.
+.IP \(bu
+.BR I_LIST (7)
+will not report a count for a driver
+on either end of a
+.IR STREAMS -based
+pipe
+.RI ( STREAMS -based
+pipes have no driver).
+.IP \(bu
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+and
+.BR I_PUNLINK (7),
+will always fail with error
+.RB [ EINVAL ]
+on a
+.IR STREAMS -based
+pipe.
+.IP \(bu
+.BR I_SENDFD (7)
+and
+.BR I_RECVFD (7)
+will operate on a
+.IR STREAMS -based
+pipe (whereas they fail on a regular
+.I STREAMS
+character special file).
+.\"
 .\"
 .SH USAGE
 .PP
 The characteristics of bi-directional
 .IR STREAMS -based
-pipes
-.RB ( spipes )
+pipes,
 by comparison to
 SVR 3
 .[
@@ -174,24 +288,38 @@ svr3
 .]
 style pipes is as follows:
 .IP \(bu 2
-.B spipes
+.IR STREAMS -based
+pipes
 are bi-directional.  Both sides are opened for both read and write.  Data
 written to one end of the pipe can be read by the other.  Both ends of the
 pipe can have data written and read.
 .IP \(bu 2
-.B spipes
-can have modules pushed and popped from either side of the pipe.  (See also
-.BR pipemod (4).)
+.IR STREAMS -based
+pipes
+can have modules pushed and popped from either side of the pipe.  However, before pushing a
+.I STREAMS
+module on either side of the
+.IR STREAMS -based
+pipe, the
+.BR pipemod (4)
+module should be pushed on one end of the
+.IR STREAMS -based
+pipe to reverse the sense of
+.BR M_FLUSH (9)
+bits for proper flushing of the pipe.
 .IP \(bu 2
-.B spipes
+.IR STREAMS -based
+pipes
 can have the
 .BR connld (4)
 module can be pushed onto one end of the pipe.
 .IP \(bu 2
-.B spipes
+.IR STREAMS -based
+pipes
 have controllable flow control and minimum and maximum packet size characteristics.
 .IP \(bu 2
-.B spipes
+.IR STREAMS -based
+pipes
 permit the use of the
 .BR getmsg (2),
 .BR getpmsg (2s),
@@ -200,7 +328,8 @@ and
 .BR putpmsg (2s)
 system calls on the pipe ends.
 .IP \(bu 2
-.B spipes
+.IR STREAMS -based
+pipes
 permit the use of
 .I STREAMS
 IO controls on either pipe end.  See
@@ -253,6 +382,20 @@ When first opened, a
 .B spx
 device behaves similar to an Echo Device,
 .BR echo (4).
+.PP
+Under
+.B @PACKAGE_TITLE@
+it is possible to make all
+.B Linux
+system pipes
+.IR STREAMS -based.
+This must be done when the package is configured and will be effected when the
+.I STREAMS
+pipe kernel module is loaded.  Once the kernel module is loaded all pipes subsequently opened with
+the
+.BR pipe (2)
+system call will be
+.IR STREAMS -based.
 .\"
 .\"
 .SH IMPLEMENTATION

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/06 10:25:26 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/10 10:37:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/06 10:25:26 $ by $Author: brian $
+ Last Modified $Date: 2005/10/10 10:37:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/06 10:25:26 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/10 10:37:08 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/06 10:25:26 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/10 10:37:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -837,7 +837,10 @@ void freechain(mblk_t *mp, mblk_t **mpp);
  *  @rq:	read queue of queue pair
  *
  *  Can be called by the module writer on private queue pairs allocated with allocq().  All message
- *  blocks will be flushed.
+ *  blocks will be flushed.  freeq() is normally called at process context.  If we have flushed
+ *  M_PASSFP messages from the queue before closing, we want to do the fput()s now instead of
+ *  deferring to Stream context that will cause a might_sleep() to fire on the fput().  So, instead
+ *  of doing freechain here we actually free each message.
  */
 void
 freeq(queue_t *rq)
@@ -852,8 +855,24 @@ freeq(queue_t *rq)
 	__freebands(rq);
 	__freebands(wq);
 	__freeq(rq);
+#if 0
 	if (mp)
 		freechain(mp, mpp);
+#else
+	if (mp) {
+		mblk_t *b, *b_next = mp;
+
+		while ((b = b_next)) {
+			b_next = b->b_next;
+#if 0
+			/* fake out freeb */
+			ctrace(qput(&mp->b_queue));
+#endif
+			b->b_next = b->b_prev = NULL;
+			freemsg(b);
+		}
+	}
+#endif
 }
 
 EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */

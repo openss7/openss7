@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/10/10 10:37:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/08 11:21:39 $ by $Author: brian $
+ Last Modified $Date: 2005/10/10 10:37:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/10/10 10:37:12 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/10/10 10:37:12 $";
 
 //#define __NO_VERSION__
 
@@ -100,7 +100,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/08 11:21:39 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/10/10 10:37:12 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -555,18 +555,14 @@ straccess(struct stdata *sd, const int access)
 				if (flags & STRHUP) {
 					/* POSIX: open(): "[EIO] The path argument names a STREAMS
 					   file and a hangup or error occured during the open()." */
-					if ((access & FWRITE) && !(flags & (STRISFIFO | STRISPIPE)))
+					if (access & FWRITE)
 						return (-ENXIO);	/* for TTY's too? */
 					if (access & FCREAT)
 						return (-EIO);
-					if (!(access & (FREAD | FWRITE)))
+					if (!(access & FREAD))
 						return (-ENXIO);
 					if (!(access & FNDELAY))
 						return (-ESTRPIPE);
-					if (access & FWRITE) {
-						send_sig(SIGPIPE, current, 1);
-						return (-EPIPE);
-					}
 				}
 				if (flags & STRDERR) {
 					if (access & FREAD) {
@@ -1692,13 +1688,12 @@ STATIC int
 __strwaitfifo(struct stdata *sd, const int oflag)
 {
 	DECLARE_WAITQUEUE(wait, current);
-	int access = oflag & (FREAD | FWRITE);
 	int err = 0;
 
 	add_wait_queue(&sd->sd_waitq, &wait);
 	for (;;) {
 		set_current_state(TASK_INTERRUPTIBLE);
-		if ((err = straccess_slow(sd, access)))
+		if ((err = straccess_slow(sd, FCREAT)))
 			break;
 		if (signal_pending(current)) {
 			err = -EINTR;
@@ -1716,14 +1711,17 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 STATIC inline int
 strwaitfifo(struct stdata *sd, const int oflag)
 {
-	if (oflag & FNDELAY)
-		return (0);
-
 	if ((oflag & (FREAD | FWRITE)) == (FREAD | FWRITE))
 		return (0);
 
 	if (sd->sd_readers >= 1 && sd->sd_writers >= 1)
 		return (0);
+
+	if ((oflag & (FNDELAY | FREAD)) == (FNDELAY | FREAD))
+		return (0);
+
+	if ((oflag & (FNDELAY | FWRITE)) == (FNDELAY | FWRITE))
+		return (-ENXIO);
 
 	return __strwaitfifo(sd, oflag);
 }
@@ -3206,10 +3204,13 @@ stropen(struct inode *inode, struct file *file)
 		/* do this if no error and FIFO *after* releasing open bit */
 		if (sd->sd_flag & STRISFIFO)
 			/* POSIX blocking semantics for FIFOS */
-			strwaitfifo(sd, oflag);
-	} else {
+			err = strwaitfifo(sd, oflag);
+	}
+	if (err) {
 		ptrace(("performing strclose() on sd %p\n", sd));
+		sd_put(&sd); /* avoid assure() statement in strclose() */
 		strclose(inode, file);
+		goto error;
 	}
       put_error:
 	ctrace(sd_put(&sd));
@@ -4253,7 +4254,7 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 				   and 0 shall be returned." */
 				return (0);
 			if ((dat.len == 0) && !(sd->sd_wropt & SNDZERO))
-				return (-EINVAL);
+				return (0);
 		}
 	}
 	if ((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0) {
@@ -6346,6 +6347,14 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 /**
  *  freefd_func: - free function for file descriptor
  *  @arg: file pointer as caddr_t argument
+ *
+ *  NOTICES:  There is one problem with this approach: a final fput() of a file pointer can sleep,
+ *  so if these messages are flushed from the read queue of the receiving Stream head in STREAMS
+ *  scheduler context from an M_FLUSH message passed from below, the fput() could sleep while soft
+ *  interrupts are locked out.  That is not good.  FC4 (and others) complains loudly in the logs
+ *  when this happens.  To avoid this, keep file pointers open until passed file pointers have been
+ *  received by the other end or flushed.  Another option would be to refuse to flush them from the
+ *  read queue, and leave them hanging around until the queue pair is closed (under user context).
  */
 STATIC void
 freefd_func(caddr_t arg)
@@ -8020,6 +8029,10 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	if (!(sd = qstream(q)))
 		return (-EIO);
+
+	/* Linux cannot currently specify no read-write open flags.  O_RDONLY is defined as zero
+	   (0) ala the historical SVR3 behaviour despite longstanding POSIX recommendations to the
+	   contrary.  But we check anyway in case that changes in the future. */
 
 	/* must be opened for at least read or write */
 	if ((sd->sd_flag & (STRISFIFO | STRISPIPE | STRISSOCK)) && !(oflag & (FWRITE | FREAD)))

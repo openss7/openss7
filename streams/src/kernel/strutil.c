@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/09 20:22:56 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/10 10:37:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/09 20:22:56 $ by $Author: brian $
+ Last Modified $Date: 2005/10/10 10:37:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/09 20:22:56 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/10 10:37:09 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/09 20:22:56 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/10 10:37:09 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1678,6 +1678,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 				**mppp = NULL;
 				qb->qb_count = 0;
 				q->q_msgs -= qb->qb_msgs;
+				assert(q->q_msgs >= 0);
 				qb->qb_msgs = 0;
 				qb->qb_first = qb->qb_last = NULL;
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
@@ -1801,12 +1802,13 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 	bool backenable = false;
 	mblk_t *b;
 
-	if (likely(flag == FLUSHALL)) {
-		/* This is fast! For flushall, we link the whole chain onto the free list and null
-		   out counts and markers */
-		if ((b = **mppp = q->q_first)) {
+	if ((b = q->q_first)) {
+		if (likely(flag == FLUSHALL)) {
 			struct qband *qb;
 
+			/* This is fast! For flushall, we link the whole chain onto the free list
+			   and null out counts and markers */
+			**mppp = b;
 			*mppp = &q->q_last->b_next;
 			**mppp = NULL;
 			q->q_first = q->q_last = NULL;
@@ -1830,9 +1832,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 				do {
 					bands[b->b_band] = true;
 				} while ((b = b->b_next));
-		}
-	} else if (likely(flag == FLUSHDATA)) {
-		if ((b = q->q_first)) {
+		} else if (likely(flag == FLUSHDATA)) {
 			mblk_t *b_next;
 
 			do {
@@ -1849,9 +1849,9 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 				}
 			}
 			while ((b = b_next));
-		}
-	} else
-		never();
+		} else
+			never();
+	}
 	return (backenable);
 }
 
@@ -3207,6 +3207,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 	if (q->q_last == mp)
 		q->q_last = b_prev;
 	q->q_msgs--;
+	assert(q->q_msgs >= 0);
 	if (likely(mp->b_band == 0)) {
 		if (mp->b_datap->db_type < QPCTL) {
 			struct qband *qb;
@@ -3219,6 +3220,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 		q->q_count -= mp->b_size;
 #else
 		q->q_count -= msgsize(mp);
+		assert(q->q_count >= 0);
 #endif
 		if (q->q_count == 0) {
 			clear_bit(QFULL_BIT, &q->q_flag);
@@ -3252,10 +3254,12 @@ __rmvq(queue_t *q, mblk_t *mp)
 				qb->qb_last = b_prev;
 		}
 		qb->qb_msgs--;
+		assert(qb->qb_msgs >= 0);
 #if 0
 		qb->qb_count -= mp->b_size;
 #else
 		qb->qb_count -= msgsize(mp);
+		assert(qb->qb_count >= 0);
 #endif
 		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))

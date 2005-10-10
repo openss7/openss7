@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fifo.4s.man,v 0.9.2.5 2005/07/21 20:47:19 brian Exp $
+.\" @(#) $Id: fifo.4s.man,v 0.9.2.6 2005/10/10 10:37:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/21 20:47:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/10/10 10:37:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -100,8 +100,124 @@ The
 pseudo-device driver is a regular
 .I STREAMS
 character special device driver with the following exceptions:
-.NP
-.NP
+.\"
+.SS Characteristics
+.PP
+Following are some characteristics of FIFOs that cause their behaviour to differ from that of
+regular STREAMS character special device files:
+.IP \(bu \w'\(bu\(em'u
+FIFOs cannot be clone opened.
+.IP \(bu
+FIFOs must be opened for read, write or both.  A FIFO cannot be opened otherwise.
+.IP \(bu
+FIFOs opened with the
+.B O_NONBLOCK
+flag set, will not block on the open, regardless of whether they are opened
+.B O_RDONLY
+and there are no writers, or opened
+.B O_WRONLY
+and there are no readers.
+.IP \(bu
+FIFOs opened without the
+.B O_NONBLOCK
+flag set, will block on the open if opened
+.B O_RDONLY
+and there are no writers, or opened
+.B O_WRONLY
+and there are no readers.
+.IP \(bu
+FIFOs opened without the
+.B O_NONBLOCK
+flag set, will not block on the open if opened
+.BR O_RDWR .
+.IP \(bu
+When a FIFO is hung up, write and write-like operations return
+.RB [ EPIPE ]
+and generate a
+.RI { SIGPIPE }
+signal to the caller, instead of simply returning
+.RB [ ENXIO ]
+as is the case for regular
+.I STREAMS
+devices.
+This is true for
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2),
+.BR putpmsg (2),
+and
+.BR streamio (7)
+input-output controls that write messages to the
+.IR Stream ,
+such as
+.BR I_FDINSERT (7).
+.IP \(bu
+If there are no writers at the time that a read or read-like operation is performed, and the
+.I Stream
+is set for blocking operation, the read operation will block awaiting writers to the
+.IR Stream .
+.IP \(bu
+If there are no readers at the time that a write or write-like operation is performed, and the
+.I Stream
+is set for blocking operation, the write operation will block awaiting readers of the
+.IR Stream .
+.IP \(bu
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed, FIFOs will generate
+.RI { SIGPIPE }
+to the caller in addition to returning the error from the asynchronous write error message.  This
+behavior can be suppressed by clearing the
+.B SNDPIPE
+option using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behavior for regular
+.I STREAMS
+character special files.
+.IP \(bu
+By default, attempting to write a zero-length data message to a FIFO with
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2),
+or
+.BR putpmsg (2),
+will succeed, return zero, but no message will be generated.  Generation of the message can be
+enabled by setting the
+.B SNDZERO
+option using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behaviour for regular
+.I STREAMS
+character special files.
+.IP \(bu
+FIFOs break large writes down into independent data messages of 4096 bytes or less.  Writes of less
+than or equal to 4096 bytes are guaranteed atomic.  Writes of greater than 4096 byes are not
+guaranteed atomic.  This is default behaviour of all
+.I STREAMS
+character special files, unless altered by the driver.
+.IP \(bu
+FIFOs that have no modules pushed, even when full and blocked on write, will not block on close as
+described under
+.BR I_SETCLTIME (7),
+because there is no driver write queue.
+.IP \(bu
+.BR I_LIST (7)
+will not report a count for a driver (FIFOs have no driver).
+.IP \(bu
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+and
+.BR I_PUNLINK (7),
+will always fail with error
+.RB [ EINVAL ]
+on a FIFO.
+.IP \(bu
+.BR I_SENDFD (7)
+and
+.BR I_RECVFD (7)
+will operate on a FIFO (whereas they fail on a regular
+.I STREAMS
+character special file).
 .\"
 .\"
 .SH NOTICES
@@ -130,6 +246,15 @@ It may be necessary to push the
 .BR pipemod (4)
 module on one end of the FIFO to maintain the sense of
 .BR M_FLUSH .
+.PP
+Under
+.B @PACKAGE_TITLE@
+is it possible to make all
+.B Linux
+system FIFOs
+.IR STREAMS -based.
+This is accomplished during configuration of the package and when the package kernel modules are
+loaded.
 .\"
 .\"
 .SH DEVICES
@@ -161,7 +286,9 @@ fifo device.
 .SH BUGS
 .PP
 .B sfx
-has no known bugs.
+and
+.B fifo
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -189,6 +316,9 @@ SUSv3.
 .[
 susv3
 .]
+Conformance is verified using the
+.BR test-fifo (8)
+verification test suite.
 .\"
 .\"
 .SH HISTORY
