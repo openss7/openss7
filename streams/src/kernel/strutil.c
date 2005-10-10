@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/07 09:34:18 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/09 20:22:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:18 $ by $Author: brian $
+ Last Modified $Date: 2005/10/09 20:22:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/07 09:34:18 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/09 20:22:56 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/10/07 09:34:18 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/09 20:22:56 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1663,6 +1663,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 			/* This is faster.  For flushall, we link the qband chain onto the free
 			   list and null out qband counts and markers. */
 			if ((**mppp = qb->qb_first)) {
+				ptrace(("queue %p, band %d, flag %d\n", q, (int)band, flag));
 				/* link around entire band */
 				if (qb->qb_first->b_prev)
 					qb->qb_first->b_prev->b_next = qb->qb_last->b_next;
@@ -2010,7 +2011,7 @@ EXPORT_SYMBOL(getmid);
  *  no message on the queue.
  */
 static mblk_t *
-__getq(queue_t *q, bool * be)
+__getq(queue_t *q, bool *be)
 {
 	mblk_t *mp;
 
@@ -2053,8 +2054,12 @@ getq(queue_t *q)
 	pl = qwlock(q);
 	mp = __getq(q, &backenable);
 	qwunlock(q, pl);
-	if (backenable)
-		qbackenable(q, mp->b_band, NULL);
+	if (backenable) {
+		unsigned char b_band;
+
+		b_band = mp ? mp->b_band : 0;
+		qbackenable(q, b_band, NULL);
+	}
 	return (mp);
 }
 
@@ -2099,10 +2104,12 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 			enable = ((q->q_first == emp)
 				  || test_bit(QWANTR_BIT, &q->q_flag)
 				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
-			if (!qb->qb_last)
-				qb->qb_first = qb->qb_last = nmp;
-			else if (qb->qb_first == emp)
+			if (qb->qb_last == emp || qb->qb_last == NULL)
+				qb->qb_last = nmp;
+			if (qb->qb_first == emp->b_next || qb->qb_first == NULL)
 				qb->qb_first = nmp;
+			assert(qb->qb_first != NULL);
+			assert(qb->qb_last != NULL);
 		}
 	}
 	if (q->q_first == emp)
@@ -2315,10 +2322,12 @@ __putbq(queue_t *q, mblk_t *mp)
 				return (0);
 			enable = (test_bit(QWANTR_BIT, &q->q_flag)
 				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
-			if (qb->qb_last == b_prev)
+			if (qb->qb_last == b_prev || qb->qb_last == NULL)
 				qb->qb_last = mp;
-			if (qb->qb_first == b_next)
+			if (qb->qb_first == b_next || qb->qb_first == NULL)
 				qb->qb_first = mp;
+			assert(qb->qb_first != NULL);
+			assert(qb->qb_last != NULL);
 			qb->qb_msgs++;
 #if 0
 			if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
@@ -2606,7 +2615,7 @@ __putq(queue_t *q, mblk_t *mp)
 		if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 			return (0);
 		/* find position for our message */
-		while (unlikely(b_next && b_next->b_band > mp->b_band)) {
+		while (unlikely(b_next && b_next->b_band >= mp->b_band)) {
 			b_prev = b_next;
 			b_next = b_prev->b_next;
 		}
@@ -2614,10 +2623,12 @@ __putq(queue_t *q, mblk_t *mp)
 		enable = ((q->q_first == b_next)
 			  || test_bit(QWANTR_BIT, &q->q_flag)
 			  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
-		if (qb->qb_last == b_prev)
+		if (qb->qb_last == b_prev || qb->qb_last == NULL)
 			qb->qb_last = mp;
-		if (qb->qb_first == b_next)
+		if (qb->qb_first == b_next || qb->qb_first == NULL)
 			qb->qb_first = mp;
+		assert(qb->qb_first != NULL);
+		assert(qb->qb_last != NULL);
 		qb->qb_msgs++;
 #if 0
 		if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
@@ -3184,7 +3195,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 	assert(q == mp->b_queue);
 #endif
 
-	b_prev = mp->b_prev;
+	b_prev = mp->b_prev; /* NULL for getq */
 	b_next = mp->b_next;
 	if (b_prev)
 		b_prev->b_next = b_next;
@@ -3232,10 +3243,14 @@ __rmvq(queue_t *q, mblk_t *mp)
 			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next, --q_nband) ;
 		}
 		assert(qb);
-		if (qb->qb_first == mp)
-			qb->qb_first = b_next;
-		if (qb->qb_last == mp)
-			qb->qb_last = b_prev;
+		if (qb->qb_first == mp && qb->qb_last == mp)
+			qb->qb_first = qb->qb_last = NULL;
+		else {
+			if (qb->qb_first == mp)
+				qb->qb_first = b_next;
+			if (qb->qb_last == mp)
+				qb->qb_last = b_prev;
+		}
 		qb->qb_msgs--;
 #if 0
 		qb->qb_count -= mp->b_size;
@@ -3244,7 +3259,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 #endif
 		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
-				--q->q_blocked;
+				q->q_blocked--;
 			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 				backenable = true;
 		}

@@ -89,3 +89,4 @@
 -Tklock_t
 -T__user
 -T__kernel
+-Tbool
