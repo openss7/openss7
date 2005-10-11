@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/09/12 13:12:13 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/11 10:45:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/12 13:12:13 $ by $Author: brian $
+ Last Modified $Date: 2005/10/11 10:45:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/09/12 13:12:13 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/11 10:45:40 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/09/12 13:12:13 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/11 10:45:40 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -84,7 +84,7 @@ pthread_setcanceltype(int type, int *oldtype)
 	return (0);
 }
 
-#define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
+#define DUMMY_STREAM "/dev/nuls"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
 static int

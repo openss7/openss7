@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/09/09 20:27:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/10/11 10:45:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/09 20:27:26 $ by $Author: brian $
+# Last Modified $Date: 2005/10/11 10:45:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.27  2005/10/11 10:45:53  brian
+# - STREAMS-based pipes are working on RH 7.2 and FC4
+# - starting test suites for STREAMS-based pipes
+# - completed testing of STREAMS-based FIFOs
+# - updated documentation for FIFOs
+#
 # Revision 0.9.2.26  2005/09/09 20:27:26  brian
 # - added mux driver
 #
@@ -188,6 +194,12 @@ TESTSUITE_DEPS		+= $(TESTSUITE)-nuls.at
 endif
 if CONFIG_STREAMS_NULS_MODULE
 TESTSUITE_DEPS		+= $(TESTSUITE)-nuls.at
+endif
+if CONFIG_STREAMS_PIPE
+TESTSUITE_DEPS		+= $(TESTSUITE)-pipe.at
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+TESTSUITE_DEPS		+= $(TESTSUITE)-pipe.at
 endif
 if CONFIG_STREAMS_PIPEMOD
 TESTSUITE_DEPS		+= $(TESTSUITE)-pipemod.at

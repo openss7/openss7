@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/11 10:45:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
+ Last Modified $Date: 2005/10/11 10:45:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/11 10:45:42 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/11 10:45:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/10/07 09:34:14 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/11 10:45:42 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -151,80 +151,31 @@ static struct module_info pipe_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int pipe_close(queue_t *q, int oflag, cred_t *crp);
-
 static struct qinit pipe_rinit = {
-	qi_putp:strrput,
-	qi_qopen:pipe_open,
-	qi_qclose:pipe_close,
-	qi_minfo:&pipe_minfo,
+	.qi_putp = strrput,
+	.qi_qopen = str_open,
+	.qi_qclose = str_close,
+	.qi_minfo = &pipe_minfo,
 };
 
 static struct qinit pipe_winit = {
-	qi_srvp:strwsrv,
-	qi_minfo:&pipe_minfo,
+	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
+	.qi_minfo = &pipe_minfo,
 };
 
 static struct streamtab pipe_info = {
-	st_rdinit:&pipe_rinit,
-	st_wrinit:&pipe_winit,
+	.st_rdinit = &pipe_rinit,
+	.st_wrinit = &pipe_winit,
 };
 
 /* 
  *  -------------------------------------------------------------------------
  *
- *  OPEN and CLOSE
+ *  INITIALIZATION
  *
  *  -------------------------------------------------------------------------
  */
-
-static int
-pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
-{
-	struct stdata *sd;
-
-	/* already open */
-	if ((sd = q->q_ptr))
-		return (0);
-
-	/* must be opened for at least read or write */
-	if (!(oflag & (FWRITE | FREAD)))
-		return (-EINVAL);
-	/* XXX: does it really?  Are there not any useful STREAMS ioctls? */
-
-	if (!(sd = qstream(q)))
-		return (-EIO);
-
-	/* first open we don't need to write lock stream head to change sd->sd_wq->q_next because
-	   we are not published to the inode yet and we have exclusive access to the stream. */
-
-	/* start off life like a FIFO */
-	WR(q)->q_next = q;
-
-	/* actually this would be enough for unidirectional pipes, for bidirectional we need to open
-	 * two pipe ends and then attach them together with I_FDINSERT */
-
-	/* lastly, attach our privates and return */
-	q->q_ptr = WR(q)->q_ptr = sd;
-	/* XXX: should we do an sd_get here? */
-
-	return (0);
-}
-
-static int
-pipe_close(queue_t *q, int oflag, cred_t *crp)
-{
-	struct stdata *sd;
-
-	if (!(sd = q->q_ptr))
-		return (-ENXIO);
-
-	q->q_ptr = WR(q)->q_ptr = NULL;
-	/* XXX: should we do an sd_put here? */
-
-	return (0);
-}
 
 static struct cdevsw pipe_cdev = {
 	.d_name = CONFIG_STREAMS_PIPE_NAME,

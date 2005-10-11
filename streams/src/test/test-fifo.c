@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:18 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/11 10:45:50 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/10 10:37:18 $ by $Author: brian $
+ Last Modified $Date: 2005/10/11 10:45:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.18  2005/10/11 10:45:50  brian
+ - STREAMS-based pipes are working on RH 7.2 and FC4
+ - starting test suites for STREAMS-based pipes
+ - completed testing of STREAMS-based FIFOs
+ - updated documentation for FIFOs
+
  Revision 0.9.2.17  2005/10/10 10:37:18  brian
  - FIFOs working nicely and tested.
 
@@ -125,9 +131,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:18 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/11 10:45:50 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:18 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/11 10:45:50 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2229,17 +2235,17 @@ struct test_stream {
 static const char sref_none[] = "(none)";
 
 /*
- *  Open and Close 1 Stream.
+ *  Open and Close 1 FIFO.
  */
-static const char test_group_1[] = "Open and close Streams";
+static const char test_group_1[] = "Open and close a FIFO.";
 static const char sref_group_1[] = "POSIX 1003.1 2004/SUSv3 open(2p) reference page, FIFOs.";
 
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
-#define name_case_1_1 "Open and close 1 Stream."
+#define name_case_1_1 "Open and close 1 FIFO."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
-Checks that one Stream can be opened and closed."
+Checks that one STREAMS-based FIFO can be opened and closed."
 
 int
 test_case_1_1(int child)

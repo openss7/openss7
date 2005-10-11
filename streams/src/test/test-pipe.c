@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/10/10 10:37:21 $
+ @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/11 10:45:50 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/10 10:37:21 $ by $Author: brian $
+ Last Modified $Date: 2005/10/11 10:45:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipe.c,v $
+ Revision 0.9.2.15  2005/10/11 10:45:50  brian
+ - STREAMS-based pipes are working on RH 7.2 and FC4
+ - starting test suites for STREAMS-based pipes
+ - completed testing of STREAMS-based FIFOs
+ - updated documentation for FIFOs
+
  Revision 0.9.2.14  2005/10/10 10:37:21  brian
  - FIFOs working nicely and tested.
 
@@ -119,9 +125,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/10/10 10:37:21 $"
+#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/11 10:45:50 $"
 
-static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/10/10 10:37:21 $";
+static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/11 10:45:50 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1494,7 +1500,7 @@ print_success(int child)
 		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if (verbose > 3)
 		print_double_int(child, msgs, child, state);
 }
 
@@ -2046,25 +2052,7 @@ end_tests(int index)
 int
 preamble_0(int child)
 {
-	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	state++;
-	return __RESULT_SUCCESS;
-}
-
-int
-preamble_0_1(int child)
-{
-	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_RDONLY) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	state++;
-	return __RESULT_SUCCESS;
-}
-
-int
-preamble_0_2(int child)
-{
-	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_WRONLY) != __RESULT_SUCCESS)
+	if (!test_fd[child + 0]  && !test_fd[child + 1] && test_pipe(child + 0) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -2073,7 +2061,10 @@ preamble_0_2(int child)
 int
 postamble_0(int child)
 {
-	if (test_fd[child] && test_close(child) != __RESULT_SUCCESS)
+	if (test_fd[child + 0] && test_close(child + 0) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_fd[child + 1] && test_close(child + 1) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -2082,7 +2073,7 @@ postamble_0(int child)
 /*
  *  =========================================================================
  *
- *  Premables and Postambles...
+ *  Preambles and Postambles...
  *
  *  =========================================================================
  */
@@ -2104,16 +2095,17 @@ struct test_stream {
 static const char sref_none[] = "(none)";
 
 /*
- *  Open and Close 1 Stream.
+ *  Open and Close 1 pipe.
  */
-static const char test_group_1[] = "Open and close Streams";
+static const char test_group_1[] = "Open and close a pipe.";
+static const char sref_group_1[] = "POSIX 1003.1 2004/SUSv3 open(2p) reference page, pipes.";
 
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
-#define name_case_1_1 "Open and close 1 Stream."
+#define name_case_1_1 "Open and close 1 pipe."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
-Checks that one Stream can be opened and closed."
+Checks that one STREAMS-based pipe can be opened and closed."
 
 int
 test_case_1_1(int child)
@@ -2130,30 +2122,37 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 #define test_case_1_1_stream_1 (NULL)
 #define test_case_1_1_stream_2 (NULL)
 
-/*
- *  Open and Close 3 Streams.
- */
-#define tgrp_case_1_2 test_group_1
-#define numb_case_1_2 "1.2"
-#define name_case_1_2 "Open and close 3 Streams."
-#define sref_case_1_2 sref_none
-#define desc_case_1_2 "\
-Checks that three Streams can be opened and closed."
+static const char test_group_2[] = "IOCTL on a pipe";
+static const char sref_group_2[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, pipe.";
+
+static const char sref_case_2_1[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_LOOK.";
+
+#define tgrp_case_2_1_1 test_group_2
+#define numb_case_2_1_1 "2.1.1"
+#define name_case_2_1_1 "I_LOOK ioctl() on a pipe - EINVAL."
+#define sref_case_2_1_1 sref_case_2_1
+#define desc_case_2_1_1 "\
+Check that I_LOOK can be performed on a pipe.  Checks that the I_LOOK\n\
+command on a pipe with no modules pushed fails and returns EINVAL."
 
 int
-test_case_1_2(int child)
+test_case_2_1_1(int child)
 {
-	if (preamble_0(child) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (postamble_0(child) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-struct test_stream test_1_2 = { NULL, &test_case_1_2, NULL };
+	char buf[FMNAMESZ + 1];
 
-#define test_case_1_2_stream_0 (&test_1_2)
-#define test_case_1_2_stream_1 (&test_1_2)
-#define test_case_1_2_stream_2 (&test_1_2)
+	if (test_ioctl(child, I_LOOK, (intptr_t) buf) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_1_1 = { &preamble_0, &test_case_2_1_1, &postamble_0 };
+
+#define test_case_2_1_1_stream_0 (&test_2_1_1)
+#define test_case_2_1_1_stream_1 (&test_2_1_1)
+#define test_case_2_1_1_stream_2 (NULL)
 
 /*
  *  -------------------------------------------------------------------------
@@ -2444,8 +2443,8 @@ struct test_case {
 	{
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
 	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
-	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, sref_case_2_1_1, {
+	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

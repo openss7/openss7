@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/02 19:22:31 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/11 10:45:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/02 19:22:31 $ by $Author: brian $
+ Last Modified $Date: 2005/10/11 10:45:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/02 19:22:31 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/11 10:45:43 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/09/02 19:22:31 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/11 10:45:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -97,6 +97,21 @@ static char const ident[] =
 #define O_CLONE (O_CREAT|O_EXCL)
 #endif
 
+/*
+ *  Opening of pipes has changed somewhat from the original implementation.  Originally we went to
+ *  the extent of creating two inodes, one for each end of the pipe.  This is not necessary.  We now
+ *  only create one inode and hang both Stream heads off of the same inode.  This has advantages,
+ *  particularly with the assignment of inode numbers in the specfs, as well as allowing the inode
+ *  semaphore to protect both Stream heads.
+ *
+ *  Traditional SVR 4.2 implemenations of pipes use a separate filesystem for pipes and FIFOs
+ *  (pipefs).  Linux uses a separate filesystem for sockets as well (sockfs).  Linux Fast-STREAMS
+ *  pipe inodes are allocated from the Shadown Special Filesystem (specfs) just as any other Stream.
+ *  This permits Streams, STREAMS-based pipes, STREAMS-based FIFOs (and even STREAMS-based sockets)
+ *  to be treated in the same fashion with regard to filesystem.
+ */
+
+#if 0
 /*
  *  This is a variation on the theme of the old spec_open.
  */
@@ -208,8 +223,231 @@ do_spipe(int *fds)
       no_file1:
 	return (err);
 }
+#else
+
+/* we want macro versions of these */
+
+#undef getmajor
+#define getmajor(__ino) (((__ino)>>16)&0x0000ffff)
+
+#undef getminor
+#define getminor(__ino) (((__ino)>>0)&0x0000ffff)
+
+#undef makedevice
+#define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
+
+STATIC spinlock_t pipe_ino_lock = SPIN_LOCK_UNLOCKED;
+STATIC int pipe_ino = 0;
+
+#ifdef HAVE_FILE_MOVE_ADDR
+static typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+#define file_move(__f, __l) _file_move(__f, __l)
+#endif
+#ifdef HAVE_FILE_KILL_ADDR
+static typeof(&file_kill) _file_kill = (typeof(_file_kill)) HAVE_FILE_KILL_ADDR;
+#define file_kill(__f) _file_kill(__f)
+#else
+void file_kill(struct file *file) {
+	static LIST_HEAD(kill_list);
+	file_move(file, &kill_list); /* out of the way.. */
+}
+#endif
+#ifdef HAVE_PUT_FILP_ADDR
+static typeof(&put_filp) _put_filp = (typeof(_put_filp)) HAVE_PUT_FILP_ADDR;
+#define put_filp(__f) _put_filp(__f)
+#endif
+
+long
+do_spipe(int *fds)
+{
+	dev_t dev;
+	minor_t minor;
+	modID_t modid;
+	struct vfsmount *mnt;
+	struct dentry *dentry;
+	struct inode *snode;
+	struct cdevsw *cdev;
+	int fdr, fdw, err;
+	struct file *fr, *fw;
+	struct file_operations *f_op;
+
+	err = -ENFILE;
+	if (!(fr = get_empty_filp())) {
+		__ptrace(("Error path taken!\n"));
+		goto error;
+	}
+	if (!(fw = get_empty_filp())) {
+		__ptrace(("Error path taken!\n"));
+		goto fr_put;
+	}
+	if ((cdev = cdev_find("pipe"))) {
+		spin_lock(&pipe_ino_lock);
+		minor = ++pipe_ino;
+		spin_unlock(&pipe_ino_lock);
+
+		modid = cdev->d_modid;
+		dev = makedevice(modid, minor);
+		snode = spec_snode(dev, cdev);
+		sdev_put(cdev);
+	} else {
+		__ptrace(("Error path taken!\n"));
+		goto fw_put;
+	}
+	if (!snode) {
+		__ptrace(("Error path taken!\n"));
+		goto fw_put;
+	}
+	if (IS_ERR(snode)) {
+		err = PTR_ERR(snode);
+		__ptrace(("Error path taken! err = %d\n", err));
+		goto fw_put;
+	}
+	if ((fdr = get_unused_fd()) < 0) {
+		err = fdr;
+		__ptrace(("Error path taken! err = %d\n", err));
+		goto snode_put;
+	}
+	if ((fdw = get_unused_fd()) < 0) {
+		err = fdw;
+		__ptrace(("Error path taken! err = %d\n", err));
+		goto fdr_put;
+	}
+	err = -ENODEV;
+	if (!(mnt = specfs_mount())) {
+		__ptrace(("Error path taken!\n"));
+		goto fdw_put;
+	}
+
+	{
+		struct qstr name;
+		char buf[25];
+
+		name.name = buf;
+		name.len = snprintf(buf, sizeof(buf), "STR pipe/%lu", getminor(dev));
+		err = -ENOMEM;
+		if (!(dentry = d_alloc(NULL, &name))) {
+			__ptrace(("Error path taken!\n"));
+			goto mnt_put;
+		}
+		dentry->d_sb = snode->i_sb;
+		dentry->d_parent = dentry;
+	}
+	d_instantiate(dentry, snode);
+	err = -ENXIO;
+	if (!(f_op = snode->i_fop) || !f_op->open) {
+		__ptrace(("Error path taken!\n"));
+		goto dentry_put;
+	}
+	fops_get(f_op);
+	fops_get(f_op);
+
+	fr->f_dentry = fw->f_dentry = dget(dentry);
+	fr->f_vfsmnt = fw->f_vfsmnt = mntget(mntget(mnt));
+#if 0				/* FIXME: need for 2.6.11 */
+	fr->f_mapping = fw->f_mapping = snode->i_mapping;
+#endif
+	fr->f_pos = fw->f_pos = 0;
+	fr->f_flags = O_RDONLY;
+	fw->f_flags = O_WRONLY;
+	fr->f_op = fw->f_op = f_op;
+	fr->f_mode = FMODE_READ;
+	fw->f_mode = FMODE_WRITE;
+#if 0				/* FIXME: need for 2.6.11 */
+	fr->f_version = fw->f_version = 0;
+#endif
+
+	specfs_umount();
+
+	file_move(fr, &snode->i_sb->s_files);
+	file_move(fw, &snode->i_sb->s_files);
+
+	fr->f_flags |= O_CLONE;
+	if ((err = fr->f_op->open(snode, fr))) {
+		__ptrace(("Error path taken! err = %d\n", err));
+		goto cleanup_both;
+	}
+	fr->f_flags &= ~O_CLONE;
+
+	fw->f_flags |= O_CLONE;
+	if ((err = fw->f_op->open(snode, fw))) {
+		__ptrace(("Error path taken! err = %d\n", err));
+		goto cleanup_write;
+	}
+	fw->f_flags &= ~O_CLONE;
+
+	/* link Stream heads together */
+	{
+		struct stdata *sdr = (struct stdata *) fr->private_data;
+		struct stdata *sdw = (struct stdata *) fw->private_data;
+
+		sdr->sd_wq->q_next = sdw->sd_rq;
+		sdw->sd_wq->q_next = sdr->sd_rq;
+
+		sdr->sd_other = sdw;
+		sdw->sd_other = sdr;
+	}
+
+	fd_install(fdr, fr);
+	fd_install(fdw, fw);
+
+	fds[0] = fdr;
+	fds[1] = fdw;
+
+	return (0);
+
+      dentry_put:
+	dput(dentry);
+	snode = NULL;
+      mnt_put:
+	specfs_umount();
+      fdw_put:
+	put_unused_fd(fdw);
+      fdr_put:
+	put_unused_fd(fdr);
+      snode_put:
+	if (snode)
+		iput(snode);
+      fw_put:
+	put_filp(fw);
+      fr_put:
+	put_filp(fr);
+      error:
+	return (err);
+
+      cleanup_both:
+	file_kill(fr);
+	file_kill(fw);
+	fops_put(f_op);
+	fops_put(f_op);
+	fr->f_dentry = fw->f_dentry = NULL;
+	dput(dentry);
+	dput(dentry);
+	fr->f_vfsmnt = fw->f_vfsmnt = NULL;
+	mntput(mnt);
+	mntput(mnt);
+	put_unused_fd(fdr);
+	put_unused_fd(fdw);
+	put_filp(fr);
+	put_filp(fw);
+	return (err);
+
+      cleanup_write:
+	fput(fr);
+	file_kill(fw);
+	fops_put(f_op);
+	fw->f_dentry = NULL;
+	dput(dentry);
+	fw->f_vfsmnt = NULL;
+	mntput(mnt);
+	put_unused_fd(fdr);
+	put_unused_fd(fdw);
+	put_filp(fw);
+	return (err);
+}
+#endif
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(do_spipe);
 #endif
+
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */

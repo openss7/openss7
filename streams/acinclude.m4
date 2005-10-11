@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/10/03 17:41:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/10/11 10:45:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/03 17:41:57 $ by $Author: brian $
+# Last Modified $Date: 2005/10/11 10:45:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1162,6 +1162,7 @@ AC_DEFUN([_LFS_CONFIG_LIS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_LFS], [dnl
     _LINUX_KERNEL_SYMBOL_EXPORT([file_move])
+    _LINUX_KERNEL_SYMBOL_EXPORT([file_kill])
     _LINUX_KERNEL_SYMBOL_EXPORT([open_softirq], [dnl
 	AC_MSG_ERROR([
 *** 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/29 23:08:18 $ by $Author: brian $
+ Last Modified $Date: 2005/10/11 10:45:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/29 23:08:18 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -202,9 +202,9 @@ static struct cdevsw fifo_cdev = {
  *
  *  fifo_open() is only used to open a fifo device (named pipe) from a character device node in an
  *  external filesystem.  This is never called for direct opens of a specfs device node (for direct
- *  opens, see spec_dev_open() in strspecfs.c).  The character device inode is opened directly and
+ *  opens, fee spec_dev_open() in strspecfs.c).  The character device inode is opened directly and
  *  no inode in the shadow filesystem is addressed.
- */
+f*/
 STATIC int
 fifo_open(struct inode *inode, struct file *file)
 {

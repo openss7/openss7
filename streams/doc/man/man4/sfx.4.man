@@ -1,1 +1,423 @@
-.so man4/fifo.4s.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: sfx.4.man,v 0.9.2.12 2005/10/11 10:45:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/10/11 10:45:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SFX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sfx, fifo
+\- \fISTREAMS\fR FIFO Device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+none
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The named pipe obtained by opening a special device node created with the
+.BR mkfifo (1)
+command are not necessarily \fISTREAMS\fR devices.  The
+.B sfx
+.I STREAMS
+pseudo-device driver provides a mechanism for assigning
+.IR STREAMS -based
+fifos within the file system.
+.PP
+The
+.B sfx
+pseudo-device driver is a regular
+.I STREAMS
+character special device driver with the following exceptions:
+.\"
+.SS Characteristics
+.PP
+Following are some characteristics of FIFOs that cause their behaviour to differ from that of
+regular STREAMS character special device files:
+.IP \(bu \w'\(bu\(em'u
+FIFOs cannot be clone opened.
+.IP \(bu
+FIFOs must be opened for read, write or both.  A FIFO cannot be opened otherwise.  (But see
+.RI \(lq NOTICES \(rq,
+below.)
+.IP \(bu
+FIFOs opened with the
+.B O_NONBLOCK
+flag set, will not block on the open, regardless of whether they are opened
+.B O_RDONLY
+and there are no writers, or opened
+.B O_WRONLY
+and there are no readers.
+.IP \(bu
+FIFOs opened with the
+.B O_NONBLOCK
+flag set, for write-only,
+.BR O_WRONLY ,
+operation, when no process has the FIFO open for reading will fail an return
+.RB [ ENXIO ],
+to the call to
+.RB open (2).
+.IP \(bu
+FIFOs opened with the
+.B O_NONBLOCK
+flag set, for read-only,
+.BR O_RDONLY ,
+operation, when no process has the FIFO open for writing will not block, will succeed and return
+zero to the call to
+.BR open (2).
+.IP \(bu
+FIFOs opened without the
+.B O_NONBLOCK
+flag set, will block on the open if opened
+.B O_RDONLY
+and there are no writers, or opened
+.B O_WRONLY
+and there are no readers.
+.IP \(bu
+FIFOs opened without the
+.B O_NONBLOCK
+flag set, will not block on the open if opened
+.BR O_RDWR .
+.IP \(bu
+When a FIFO is hung up, write and write-like operations return
+.RB [ ENXIO ]
+as is the case for regular
+.I STREAMS
+devices.
+This is true for
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2),
+.BR putpmsg (2),
+and
+.BR streamio (7)
+input-output controls that write messages to the
+.IR Stream ,
+such as
+.BR I_FDINSERT (7).
+.IP \(bu
+If there are no writers at the time that a read or read-like operation is performed, and the
+.I Stream
+is set for blocking operation, the read operation will block awaiting writers to the
+.IR Stream .
+.IP \(bu
+If there are no readers at the time that a write or write-like operation is performed, and the
+the write or write-like operations fail, generate a
+.RI { SIGPIPE }
+signal to the callers, and return
+.RB [ EPIPE ],
+regardless of whether the file descriptor is set for blocking or non-blocking operation.
+.IP \(bu
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed, FIFOs will generate
+.RI { SIGPIPE }
+to the caller in addition to returning the error from the asynchronous write error message.  This
+behavior can be suppressed by clearing the
+.B SNDPIPE
+write option flag using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behavior for regular
+.I STREAMS
+character special files.
+.IP \(bu
+By default, attempting to write a zero-length data message to a FIFO with
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2),
+or
+.BR putpmsg (2),
+will succeed, return zero, but no message will be generated.  Generation of the message can be
+enabled by setting the
+.B SNDZERO
+write option flag using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behaviour for regular
+.I STREAMS
+character special files.
+.IP \(bu
+FIFOs break large writes down into independent data messages of
+.RB { PIPE_BUF }
+bytes or less.  Writes of less than or equal to
+.RB { PIPE_BUF }
+bytes are guaranteed atomic (i.e. they will not be interleaved with data from writes by other
+processes).  Writes
+of greater than
+.RB { PIPE_BUF }
+byes are not guaranteed atomic (i.e. may be interleaved with data from writes by other processes).
+This is default behaviour of all
+.I STREAMS
+character special files, unless altered by the driver.
+.IP \(bu
+FIFOs that have no modules pushed, even when full and blocked on write, will not block on close as
+described under
+.BR I_SETCLTIME (7),
+because there is no driver write queue.
+.IP \(bu
+.BR I_LIST (7)
+will not report a count for a driver (FIFOs have no driver).
+.IP \(bu
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+and
+.BR I_PUNLINK (7),
+will always fail with error
+.RB [ EINVAL ]
+when issued to a file descriptor associated with a FIFO.
+.IP \(bu
+.BR I_SENDFD (7)
+and
+.BR I_RECVFD (7)
+can succeed on a FIFO (whereas they always fail on a regular
+.I STREAMS
+character special file).
+.\"
+.\"
+.SH NOTICES
+.PP
+Normally a
+.I STREAMS
+special file is associated with a device number.  For
+.BR sfx ,
+the
+.I STREAMS
+special file is associated with the inode in the file system in which the
+character special node was created.  This acts identically to a FIFO created
+with
+.BR mkfifo (1),
+with the exception that a
+.BR stat (2)
+on the device node will say that it is an
+.B S_IFCHR
+device node.  A
+.BR fstat (2)
+on a file descriptor opening this device node in the file system will say that
+the file descriptor is of type
+.BR S_IFIFO .
+.PP
+It may be necessary to push the
+.BR pipemod (4)
+module on one end of the FIFO to maintain the sense of
+.BR M_FLUSH .
+.PP
+Under
+.B @PACKAGE_TITLE@
+is it possible to make all
+.B Linux
+system FIFOs
+.IR STREAMS -based.
+This is accomplished during configuration of the package and when the package kernel modules are
+loaded.
+.PP
+Under
+.B Linux
+a FIFO cannot be opened without read or write.  This is because
+.B Linux
+defines the
+.B O_RDONLY
+flag to
+.BR open (2)
+to be zero, despite
+.I POSIX
+.[
+susv3
+.]
+recommendations to the contrary.
+.PP
+.RB { PIPE_BUF }
+under
+.B @PACKAGE_TITLE@
+is set to the historical default of
+.B 4096
+bytes.
+.PP
+.RB { PIPE_BUF }
+characteristics are accomplished by setting the
+.I STREAMS
+minimum packet size to zero
+.RB ( 0 ),
+the maximum packet size to
+.RB ( 4096 ),
+the high water mark to
+.RB ( 5120 ),
+and the low water mark to
+.BR ( 1024 ).
+These are the defaults for all
+.I Stream heads
+and can only be altered by a driver or module.
+.PP
+Some
+.I STREAMS
+implementations do not permit
+.IR STREAMS -based
+pipes or FIFOs to be linked beneath a multiplexing driver.
+.B @PACKAGE_TITLE@
+permits
+.I STREAMS -based
+pipes and FIFOs to be linked beneath a multiplexing driver.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/fifo ", " /dev/sfx
+The external filesystem
+.I STREAMS
+FIFO devices.
+.TP
+.BR /dev/fifo
+An instance of an external filesystem
+.I STREAMS
+FIFO character device.  This FIFO device instance is provided for testing, primarily by the
+.BR test-fifo (8)
+conformance verification suite.
+.TP
+.BR /dev/streams/sfx ", " /devices/sfx
+The
+.BR specfs (5)
+shadow special filesystem
+.I STREAMS
+fifo device.
+.TP
+.BI /dev/streams/fifo/ nnn
+Instances of
+.BR specfs (5)
+shadow special filesystem
+.I STREAMS
+FIFO devices.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mkfifo (1),
+.BR stat (2),
+.BR fstat (2),
+.BR pipe (2),
+.BR pipe (4),
+.BR spx (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B sfx
+and
+.B fifo
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B sfx
+is a character special node based replacement for fifos.  See
+.BR mkfifo (1).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+Conformance is verified using the
+.BR test-fifo (8)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B fifos
+first appeared in SVR 3,
+.[
+svr3
+.]
+but were not implemented using
+.IR STREAMS .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
