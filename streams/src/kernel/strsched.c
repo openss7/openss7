@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/10 10:37:08 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/12 10:20:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/10 10:37:08 $ by $Author: brian $
+ Last Modified $Date: 2005/10/12 10:20:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/10 10:37:08 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/12 10:20:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/10/10 10:37:08 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/12 10:20:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -840,7 +840,8 @@ void freechain(mblk_t *mp, mblk_t **mpp);
  *  blocks will be flushed.  freeq() is normally called at process context.  If we have flushed
  *  M_PASSFP messages from the queue before closing, we want to do the fput()s now instead of
  *  deferring to Stream context that will cause a might_sleep() to fire on the fput().  So, instead
- *  of doing freechain here we actually free each message.
+ *  of doing freechain here we actually free each message.  (freechain() now frees blocks
+ *  immediately.)
  */
 void
 freeq(queue_t *rq)
@@ -856,9 +857,6 @@ freeq(queue_t *rq)
 	__freebands(wq);
 	__freeq(rq);
 #if 0
-	if (mp)
-		freechain(mp, mpp);
-#else
 	if (mp) {
 		mblk_t *b, *b_next = mp;
 
@@ -872,6 +870,9 @@ freeq(queue_t *rq)
 			freemsg(b);
 		}
 	}
+#else
+	if (mp)
+		freechain(mp, mpp);
 #endif
 }
 
@@ -3714,6 +3715,7 @@ freechains(struct strthread *t)
 	}
 }
 
+#if 0
 /*
  *  freechain:	- place a chain of message blocks on the free list
  *  @mp:	head of message block chain
@@ -3736,6 +3738,36 @@ freechain(mblk_t *mp, mblk_t **mpp)
 	if (!test_and_set_bit(flushwork, &t->flags))
 		__raise_streams();
 }
+#else
+/*
+ *  freechain:	- place a chain of message blocks on the free list
+ *  @mp:	head of message block chain
+ *  @mpp:	
+ *
+ *  Frees a chain of message blocks to the freechains list.  The freechains list contians one big
+ *  chain of message blocks formed by concatenating these freed chains.  Rather than dealing with
+ *  them later, because of M_PASSFP problems, we want to free them now, they will, however, not be
+ *  freed back to the memory caches until the end of the STREAMS scheduler SOFTIRQ run.
+ */
+void
+freechain(mblk_t *mp, mblk_t **mpp)
+{
+	mblk_t *b, *b_next = mp;
+
+	assert(mp);
+	assert(mpp != &mp);
+
+	while ((b = b_next)) {
+		b_next = b->b_next;
+#if 0
+		/* fake out freeb */
+		ctrace(qput(&mp->b_queue));
+#endif
+		b->b_next = b->b_prev = NULL;
+		freemsg(b);
+	}
+}
+#endif
 
 /*
  *  _runqueues:	- run scheduled STRAMS events on the current processor

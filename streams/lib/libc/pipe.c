@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/11 10:45:40 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/12 09:55:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/11 10:45:40 $ by $Author: brian $
+ Last Modified $Date: 2005/10/12 09:55:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/11 10:45:40 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/12 09:55:46 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/11 10:45:40 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/12 09:55:46 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -84,6 +84,7 @@ pthread_setcanceltype(int type, int *oldtype)
 	return (0);
 }
 
+#if 0
 #define DUMMY_STREAM "/dev/nuls"	/* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
@@ -103,6 +104,35 @@ __lis_pipe(int *fds)
 	}
 	return 0;
 }
+#endif
+
+/* I prefer not to use a dummy stream anyway. */
+static int
+__lfs_pipe(int *fds)
+{
+	int fd1, fd2;
+	int error;
+
+	if ((fd1 = open("/dev/pipe", O_RDWR)) < 0) {
+		return (-1);
+	}
+	if ((fd2 = open("/dev/pipe", O_RDWR)) < 0) {
+		error = errno;
+		close(fd1);
+		errno = error;
+		return (-1);
+	}
+	if (ioctl(fd1, I_PIPE, fd2) < 0) {
+		error = errno;
+		close(fd2);
+		close(fd1);
+		errno = error;
+		return (-1);
+	}
+	fds[0] = fd1;
+	fds[1] = fd2;
+	return (0);
+}
 
 /**
  * @ingroup libLiS
@@ -119,7 +149,11 @@ pipe(int *fds)
 	int oldtype, ret;
 
 	pthread_setcanceltype(PTHREAD_CANCEL_DISABLE, &oldtype);
+#if 0
 	ret = __lis_pipe(fds);
+#else
+	ret = __lfs_pipe(fds);
+#endif
 	pthread_setcanceltype(oldtype, NULL);
 	return (ret);
 }

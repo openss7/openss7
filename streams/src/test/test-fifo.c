@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/11 10:45:50 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/12 09:55:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/11 10:45:50 $ by $Author: brian $
+ Last Modified $Date: 2005/10/12 09:55:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.19  2005/10/12 09:55:51  brian
+ - STREAMS-based pipes are also working and tested
+
  Revision 0.9.2.18  2005/10/11 10:45:50  brian
  - STREAMS-based pipes are working on RH 7.2 and FC4
  - starting test suites for STREAMS-based pipes
@@ -131,9 +134,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/11 10:45:50 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/12 09:55:51 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/11 10:45:50 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/12 09:55:51 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -207,7 +210,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define FFLUSH(stream)
 
 #define SHORT_WAIT	  20	// 100 // 10
-#define NORMAL_WAIT	 100	// 500 // 100
+#define NORMAL_WAIT	 200	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1UL
@@ -268,7 +271,6 @@ int show = 1;
 static long timer_scale = 1;
 
 #define TEST_TIMEOUT 5000
-#define SHORT_DELAY 100
 
 typedef struct timer_range {
 	long lo;
@@ -2331,7 +2333,7 @@ int
 test_case_1_4(int child)
 {
 	last_signum = 0;
-	start_tt(100);
+	start_tt(LONG_WAIT);
 	if (test_open(child, devname, O_NONBLOCK | O_RDONLY) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2360,7 +2362,7 @@ int
 test_case_1_5(int child)
 {
 	last_signum = 0;
-	start_tt(100);
+	start_tt(LONG_WAIT);
 	if (test_open(child, devname, O_NONBLOCK | O_WRONLY) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2393,7 +2395,7 @@ int
 test_case_1_6_1(int child)
 {
 	last_signum = 0;
-	start_tt(100);
+	start_tt(NORMAL_WAIT);
 	if (test_open(child, devname, O_RDONLY) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2424,7 +2426,7 @@ int
 test_case_1_6_2_rd(int child)
 {
 	last_signum = 0;
-	start_tt(600);
+	start_tt(LONG_WAIT + NORMAL_WAIT);
 	if (test_open(child, devname, O_RDONLY) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2435,11 +2437,11 @@ struct test_stream test_1_6_2_rd = { NULL, &test_case_1_6_2_rd, &postamble_0 };
 int
 test_case_1_6_2_wr(int child)
 {
-	test_msleep(child, 500);
+	test_msleep(child, LONG_WAIT);
 	if (test_open(child, devname, O_WRONLY) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	test_msleep(child, 100);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -2462,7 +2464,7 @@ int
 test_case_1_7_1(int child)
 {
 	last_signum = 0;
-	start_tt(100);
+	start_tt(NORMAL_WAIT);
 	if (test_open(child, devname, O_WRONLY) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2493,7 +2495,7 @@ int
 test_case_1_7_2_wr(int child)
 {
 	last_signum = 0;
-	start_tt(600);
+	start_tt(LONG_WAIT + NORMAL_WAIT);
 	if (test_open(child, devname, O_RDONLY) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2504,11 +2506,11 @@ struct test_stream test_1_7_2_wr = { NULL, &test_case_1_7_2_wr, NULL };
 int
 test_case_1_7_2_rd(int child)
 {
-	test_msleep(child, 500);
+	test_msleep(child, LONG_WAIT);
 	if (test_open(child, devname, O_WRONLY) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	test_msleep(child, 100);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -2683,7 +2685,7 @@ preamble_test_case_2_2_5(int child)
 	if (preamble_0(child + 1) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child + 1]) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -2736,7 +2738,7 @@ preamble_test_case_2_2_6(int child)
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (start_tt(100) != __RESULT_SUCCESS)
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return __RESULT_SUCCESS;
@@ -2780,7 +2782,7 @@ test_case_2_2_7_rcv(int child)
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (start_tt(300) != __RESULT_SUCCESS)
+	if (start_tt(3 * NORMAL_WAIT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
@@ -2795,11 +2797,11 @@ test_case_2_2_7_snd(int child)
 {
 	struct strrecvfd recvfd;
 
-	test_msleep(child, 100);
-	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child - 1]) != __RESULT_SUCCESS)
+	test_msleep(child, NORMAL_WAIT);
+	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
-	test_msleep(child, 100);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -2824,7 +2826,7 @@ test_case_2_3_1(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != ENXIO)
@@ -2852,7 +2854,7 @@ test_case_2_3_2(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EPROTO)
@@ -2880,7 +2882,7 @@ test_case_2_3_3(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EPROTO)
@@ -2908,7 +2910,7 @@ test_case_2_3_4(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EPROTO)
@@ -3303,7 +3305,7 @@ test_case_3_1_3(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	last_signum = 0;
-	if (start_tt(100) != __RESULT_SUCCESS)
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
@@ -3654,7 +3656,7 @@ preamble_test_case_3_1_11_wr(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	/* wait for reader to close */
-	test_msleep(child, 100);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -3862,7 +3864,7 @@ test_case_3_2_3(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	last_signum = 0;
-	if (start_tt(100) != __RESULT_SUCCESS)
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_putmsg(child, NULL, &dat, 0) != __RESULT_SUCCESS)
@@ -4214,7 +4216,7 @@ preamble_test_case_3_2_11_wr(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	/* wait for reader to close */
-	test_msleep(child, 100);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -4423,7 +4425,7 @@ test_case_3_3_3(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	last_signum = 0;
-	if (start_tt(100) != __RESULT_SUCCESS)
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
@@ -4775,7 +4777,7 @@ preamble_test_case_3_3_11_wr(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	/* wait for reader to close */
-	test_msleep(child, 100);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -4830,8 +4832,6 @@ struct test_stream test_3_3_11_rd = { &preamble_test_case_3_3_11_rd, &test_case_
  *  I_UNLINK on a FIFO returns EINVAL.
  *  I_PUNLINK on a FIFO returns EINVAL.
  *  I_LIST returns zero (0): no driver.
- *  FIFOs block on read when there are no writers, if non-blocking returns zero.
- *  Also true for streamio ioctls() that check read access.
  *  FIFOs (even when full) will not block on close (no driver).
  */
 

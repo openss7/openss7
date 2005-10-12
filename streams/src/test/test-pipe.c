@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/11 10:45:50 $
+ @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/12 09:55:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/11 10:45:50 $ by $Author: brian $
+ Last Modified $Date: 2005/10/12 09:55:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipe.c,v $
+ Revision 0.9.2.16  2005/10/12 09:55:51  brian
+ - STREAMS-based pipes are also working and tested
+
  Revision 0.9.2.15  2005/10/11 10:45:50  brian
  - STREAMS-based pipes are working on RH 7.2 and FC4
  - starting test suites for STREAMS-based pipes
@@ -125,9 +128,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/11 10:45:50 $"
+#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/12 09:55:51 $"
 
-static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/11 10:45:50 $";
+static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/12 09:55:51 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -177,7 +180,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "PIPE";
-static char devname[256] = "/dev/sfx";
+static char devname[256] = "/dev/pipe";
 
 static int exit_on_failure = 0;
 
@@ -201,7 +204,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define FFLUSH(stream)
 
 #define SHORT_WAIT	  20	// 100 // 10
-#define NORMAL_WAIT	 100	// 500 // 100
+#define NORMAL_WAIT	 200	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1UL
@@ -262,7 +265,6 @@ int show = 1;
 static long timer_scale = 1;
 
 #define TEST_TIMEOUT 5000
-#define SHORT_DELAY 100
 
 typedef struct timer_range {
 	long lo;
@@ -2041,6 +2043,38 @@ end_tests(int index)
 	return (__RESULT_SUCCESS);
 }
 
+static int
+begin_pipe_tests(int index)
+{
+	int child = 0;
+
+	if (begin_tests(index) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	print_pipe(child);
+	if (pipe(test_fd) >= 0) {
+		test_fd[2] = test_fd[1];
+		print_success(child);
+		return (__RESULT_SUCCESS);
+	}
+	print_errno(child, (last_errno = errno));
+	return (__RESULT_FAILURE);
+}
+
+static int
+end_pipe_tests(int index)
+{
+	int result = __RESULT_SUCCESS;
+
+	test_fd[2] = 0;
+	if (test_close(0) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	if (test_close(1) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	if (end_tests(index) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	return (result);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2050,9 +2084,22 @@ end_tests(int index)
  */
 
 int
+preamble_0_blocking(int child)
+{
+	if (!test_fd[child])
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
 preamble_0(int child)
 {
-	if (!test_fd[child + 0]  && !test_fd[child + 1] && test_pipe(child + 0) != __RESULT_SUCCESS)
+	if (preamble_0_blocking(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	/* to make test cases the same as the FIFO case */
+	if (test_nonblock(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -2061,12 +2108,6 @@ preamble_0(int child)
 int
 postamble_0(int child)
 {
-	if (test_fd[child + 0] && test_close(child + 0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	state++;
-	if (test_fd[child + 1] && test_close(child + 1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	state++;
 	return __RESULT_SUCCESS;
 }
 
@@ -2077,6 +2118,104 @@ postamble_0(int child)
  *
  *  =========================================================================
  */
+
+int
+preamble_2(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "testmod") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a hungup dev */
+int
+preamble_2_1(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_HANGUP, (intptr_t) 0) != __RESULT_SUCCESS && last_errno != ENXIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a dev with rderr */
+int
+preamble_2_2(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_RDERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a dev with wrerr */
+int
+preamble_2_3(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a dev with rderr and wrerr */
+int
+preamble_2_4(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_RWERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a dev with a signal waiting */
+int
+preamble_2_5(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_PSIGNAL, (intptr_t) SIGHUP) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+postamble_2(int child)
+{
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EIO)
+		result = __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS && last_errno != ENXIO && last_errno != EIO)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return result;
+}
+
 
 /*
  *  =========================================================================
@@ -2110,9 +2249,9 @@ Checks that one STREAMS-based pipe can be opened and closed."
 int
 test_case_1_1(int child)
 {
-	if (preamble_0(child) != __RESULT_SUCCESS)
+	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
-	if (postamble_0(child) != __RESULT_SUCCESS)
+	if (end_pipe_tests(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -2153,6 +2292,2166 @@ struct test_stream test_2_1_1 = { &preamble_0, &test_case_2_1_1, &postamble_0 };
 #define test_case_2_1_1_stream_0 (&test_2_1_1)
 #define test_case_2_1_1_stream_1 (&test_2_1_1)
 #define test_case_2_1_1_stream_2 (NULL)
+
+
+/*  I_SENDFD/I_RECVFD works on pipes. */
+
+static const char sref_case_2_2[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_RECVFD.";
+
+#define tgrp_case_2_2_1 test_group_2
+#define numb_case_2_2_1 "2.2.1"
+#define name_case_2_2_1 "I_RECVFD ioctl() on a pipe - ENXIO."
+#define sref_case_2_2_1 sref_case_2_2
+#define desc_case_2_2_1 "\
+Check that I_RECVFD can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_RECVFD is attempted on a hung up pipe with an empty\n\
+read queue."
+
+int
+test_case_2_2_1(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_1 = { &preamble_2_1, &test_case_2_2_1, &postamble_2 };
+
+#define test_case_2_2_1_stream_0 (&test_2_2_1)
+#define test_case_2_2_1_stream_1 (NULL)
+#define test_case_2_2_1_stream_2 (NULL)
+
+#define tgrp_case_2_2_2 test_group_2
+#define numb_case_2_2_2 "2.2.2"
+#define name_case_2_2_2 "I_RECVFD ioctl() on a pipe - EPROTO."
+#define sref_case_2_2_2 sref_case_2_2
+#define desc_case_2_2_2 "\
+Check that I_RECVFD can be performed on a pipe.  Checks that EPROTO is\n\
+returned when I_RECVFD is attempted on a pipe that has received an\n\
+asychronous EPROTO read error."
+
+int
+test_case_2_2_2(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_2 = { &preamble_2_2, &test_case_2_2_2, &postamble_2 };
+
+#define test_case_2_2_2_stream_0 (&test_2_2_2)
+#define test_case_2_2_2_stream_1 (NULL)
+#define test_case_2_2_2_stream_2 (NULL)
+
+#define tgrp_case_2_2_3 test_group_2
+#define numb_case_2_2_3 "2.2.3"
+#define name_case_2_2_3 "I_RECVFD ioctl() on a pipe - EAGAIN."
+#define sref_case_2_2_3 sref_case_2_2
+#define desc_case_2_2_3 "\
+Check that I_RECVFD can be performed on a pipe.  Checks that EAGAIN is\n\
+returned when I_RECVFD is attempted on an empty pipe that has received\n\
+an asyncrhonous EPROTO write error."
+
+int
+test_case_2_2_3(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_3 = { &preamble_2_3, &test_case_2_2_3, &postamble_2 };
+
+#define test_case_2_2_3_stream_0 (&test_2_2_3)
+#define test_case_2_2_3_stream_1 (NULL)
+#define test_case_2_2_3_stream_2 (NULL)
+
+#define tgrp_case_2_2_4 test_group_2
+#define numb_case_2_2_4 "2.2.4"
+#define name_case_2_2_4 "I_RECVFD ioctl() on a pipe - EPROTO."
+#define sref_case_2_2_4 sref_case_2_2
+#define desc_case_2_2_4 "\
+Check that I_RECVFD can be performed on a pipe.  Checks that EPROTO is\n\
+returned when I_RECVFD is attempted on an empty pipe that has received\n\
+an asynchronous EPROTO error."
+
+int
+test_case_2_2_4(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_4 = { &preamble_2_4, &test_case_2_2_4, &postamble_2 };
+
+#define test_case_2_2_4_stream_0 (&test_2_2_4)
+#define test_case_2_2_4_stream_1 (NULL)
+#define test_case_2_2_4_stream_2 (NULL)
+
+#define tgrp_case_2_2_5 test_group_2
+#define numb_case_2_2_5 "2.2.5"
+#define name_case_2_2_5 "I_RECVFD ioctl() on a pipe."
+#define sref_case_2_2_5 sref_case_2_2
+#define desc_case_2_2_5 "\
+Check that I_RECVFD can be performed on a pipe."
+
+int
+preamble_test_case_2_2_5(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child + 1, I_SENDFD, (intptr_t) test_fd[child + 1]) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+int
+test_case_2_2_5(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_5 = { &preamble_test_case_2_2_5, &test_case_2_2_5, &postamble_0 };
+
+#define test_case_2_2_5_stream_0 (&test_2_2_5)
+#define test_case_2_2_5_stream_1 (NULL)
+#define test_case_2_2_5_stream_2 (NULL)
+
+#define tgrp_case_2_2_6 test_group_2
+#define numb_case_2_2_6 "2.2.6"
+#define name_case_2_2_6 "I_RECVFD ioctl() on a pipe - EINTR."
+#define sref_case_2_2_6 sref_case_2_2
+#define desc_case_2_2_6 "\
+Check that I_RECVFD can be performed on a pipe.  Checks that when\n\
+I_RECVFD is attempted on a pipe that is set for non-blocking operation,\n\
+that I_RECVFD will block awaiting the arrival of an M_PASSFP message and\n\
+that the wait can be interrupted by a signal."
+
+int
+preamble_test_case_2_2_6(int child)
+{
+	if (preamble_0_blocking(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return __RESULT_SUCCESS;
+}
+int
+test_case_2_2_6(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINTR)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != SIGALRM)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_6 = { &preamble_test_case_2_2_6, &test_case_2_2_6, &postamble_0 };
+
+#define test_case_2_2_6_stream_0 (&test_2_2_6)
+#define test_case_2_2_6_stream_1 (NULL)
+#define test_case_2_2_6_stream_2 (NULL)
+
+#define tgrp_case_2_2_7 test_group_2
+#define numb_case_2_2_7 "2.2.7"
+#define name_case_2_2_7 "I_RECVFD ioctl() on a pipe - EINTR."
+#define sref_case_2_2_7 sref_case_2_2
+#define desc_case_2_2_7 "\
+Check that I_RECVFD can be performed on a pipe.  Checks that when\n\
+I_RECVFD is attempted on a pipe that is set for non-blocking operation,\n\
+that I_RECVFD will block awaiting the arrival of an M_PASSFP message."
+
+int
+test_case_2_2_7(int child)
+{
+	struct strrecvfd recvfd;
+
+	last_signum = 0;
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child + 1, I_SENDFD, (intptr_t) test_fd[child + 1]) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	stop_tt();
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_7 = { &preamble_0_blocking, &test_case_2_2_7, &postamble_0 };
+
+#define test_case_2_2_7_stream_0 (&test_2_2_7)
+#define test_case_2_2_7_stream_1 (NULL)
+#define test_case_2_2_7_stream_2 (NULL)
+
+static const char sref_case_2_3[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_SENDFD.";
+
+#define tgrp_case_2_3_1 test_group_2
+#define numb_case_2_3_1 "2.3.1"
+#define name_case_2_3_1 "I_SENDFD ioctl() on a pipe - ENXIO."
+#define sref_case_2_3_1 sref_case_2_3
+#define desc_case_2_3_1 "\
+Check that I_SENDFD can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_SENDFD is attempted on a hung up pipe."
+
+int
+test_case_2_3_1(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_1 = { &preamble_2_1, &test_case_2_3_1, &postamble_2 };
+
+#define test_case_2_3_1_stream_0 (&test_2_3_1)
+#define test_case_2_3_1_stream_1 (NULL)
+#define test_case_2_3_1_stream_2 (NULL)
+
+#define tgrp_case_2_3_2 test_group_2
+#define numb_case_2_3_2 "2.3.2"
+#define name_case_2_3_2 "I_SENDFD ioctl() on a pipe."
+#define sref_case_2_3_2 sref_none
+#define desc_case_2_3_2 "\
+Check that I_SENDFD can be performed on a pipe.  Checks that I_SENDFD is\n\
+successful when attempted on a pipe-end that has received an\n\
+asyncrhonous EPROTO read error."
+
+int
+test_case_2_3_2(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_2 = { &preamble_2_2, &test_case_2_3_2, &postamble_2 };
+
+#define test_case_2_3_2_stream_0 (&test_2_3_2)
+#define test_case_2_3_2_stream_1 (NULL)
+#define test_case_2_3_2_stream_2 (NULL)
+
+#define tgrp_case_2_3_3 test_group_2
+#define numb_case_2_3_3 "2.3.3"
+#define name_case_2_3_3 "I_SENDFD ioctl() on a pipe - EPROTO."
+#define sref_case_2_3_3 sref_none
+#define desc_case_2_3_3 "\
+Check that I_SENDFD can be performed on a pipe.  Checks that EPROTO is\n\
+returned when I_SENDFD is attempted on a pipe that has received an\n\
+asynchronous EPROTO write error."
+
+int
+test_case_2_3_3(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_3 = { &preamble_2_3, &test_case_2_3_3, &postamble_2 };
+
+#define test_case_2_3_3_stream_0 (&test_2_3_3)
+#define test_case_2_3_3_stream_1 (NULL)
+#define test_case_2_3_3_stream_2 (NULL)
+
+#define tgrp_case_2_3_4 test_group_2
+#define numb_case_2_3_4 "2.3.4"
+#define name_case_2_3_4 "I_SENDFD ioctl() on a pipe - EPROTO."
+#define sref_case_2_3_4 sref_none
+#define desc_case_2_3_4 "\
+Check that I_SENDFD can be performed on a pipe.  Checks that EPROTO is\n\
+returned when I_SENDFD is attempted on a pipe that has received an\n\
+asyncrhonous EPROTO error."
+
+int
+test_case_2_3_4(int child)
+{
+	struct strrecvfd recvfd;
+
+	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_4 = { &preamble_2_4, &test_case_2_3_4, &postamble_2 };
+
+#define test_case_2_3_4_stream_0 (&test_2_3_4)
+#define test_case_2_3_4_stream_1 (NULL)
+#define test_case_2_3_4_stream_2 (NULL)
+
+#define tgrp_case_2_4_1 test_group_2
+#define numb_case_2_4_1 "2.4.1"
+#define name_case_2_4_1 "I_PUSH ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_1 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_PUSH."
+#define desc_case_2_4_1 "\
+Check that I_PUSH can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_PUSH is attempted on a hung up pipe."
+
+int
+test_case_2_4_1(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_1 = { &preamble_2_1, &test_case_2_4_1, &postamble_2 };
+
+#define test_case_2_4_1_stream_0 (&test_2_4_1)
+#define test_case_2_4_1_stream_1 (NULL)
+#define test_case_2_4_1_stream_2 (NULL)
+
+#define tgrp_case_2_4_2 test_group_2
+#define numb_case_2_4_2 "2.4.2"
+#define name_case_2_4_2 "I_POP ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_2 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_POP."
+#define desc_case_2_4_2 "\
+Check that I_POP can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_POP is attempted on a hung up pipe."
+
+int
+test_case_2_4_2(int child)
+{
+	if (test_ioctl(child, I_POP, (intptr_t) 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_2 = { &preamble_2_1, &test_case_2_4_2, &postamble_2 };
+
+#define test_case_2_4_2_stream_0 (&test_2_4_2)
+#define test_case_2_4_2_stream_1 (NULL)
+#define test_case_2_4_2_stream_2 (NULL)
+
+#define tgrp_case_2_4_3 test_group_2
+#define numb_case_2_4_3 "2.4.3"
+#define name_case_2_4_3 "I_FLUSH ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_3 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_FLUSH."
+#define desc_case_2_4_3 "\
+Check that I_FLUSH can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_FLUSH is attempted on a hung up pipe."
+
+int
+test_case_2_4_3(int child)
+{
+	if (test_ioctl(child, I_FLUSH, (intptr_t) FLUSHRW) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_3 = { &preamble_2_1, &test_case_2_4_3, &postamble_2 };
+
+#define test_case_2_4_3_stream_0 (&test_2_4_3)
+#define test_case_2_4_3_stream_1 (NULL)
+#define test_case_2_4_3_stream_2 (NULL)
+
+#define tgrp_case_2_4_4 test_group_2
+#define numb_case_2_4_4 "2.4.4"
+#define name_case_2_4_4 "I_STR ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_4 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_STR."
+#define desc_case_2_4_4 "\
+Check that I_STR can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_STR is attempted on a hung up pipe."
+
+int
+test_case_2_4_4(int child)
+{
+	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+
+	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_4 = { &preamble_2_1, &test_case_2_4_4, &postamble_2 };
+
+#define test_case_2_4_4_stream_0 (&test_2_4_4)
+#define test_case_2_4_4_stream_1 (NULL)
+#define test_case_2_4_4_stream_2 (NULL)
+
+#define tgrp_case_2_4_5 test_group_2
+#define numb_case_2_4_5 "2.4.5"
+#define name_case_2_4_5 "I_FDINSERT ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_5 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_FDINSERT."
+#define desc_case_2_4_5 "\
+Check that I_FDINSERT can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_FDINSERT is attempted on a hung up pipe."
+
+int
+test_case_2_4_5(int child)
+{
+	char buf[sizeof(t_uscalar_t)] = { 0, };
+	struct strfdinsert fdi;
+
+	fdi.ctlbuf.maxlen = 0;
+	fdi.ctlbuf.len = sizeof(t_uscalar_t);
+	fdi.ctlbuf.buf = buf;
+	fdi.databuf.maxlen = 0;
+	fdi.databuf.len = 0;
+	fdi.databuf.buf = NULL;
+	fdi.flags = 0;
+	fdi.fildes = test_fd[child];
+	fdi.offset = 0;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_5 = { &preamble_2_1, &test_case_2_4_5, &postamble_2 };
+
+#define test_case_2_4_5_stream_0 (&test_2_4_5)
+#define test_case_2_4_5_stream_1 (NULL)
+#define test_case_2_4_5_stream_2 (NULL)
+
+#define tgrp_case_2_4_6 test_group_2
+#define numb_case_2_4_6 "2.4.6"
+#define name_case_2_4_6 "I_SWROPT ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_6 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_SWROPT."
+#define desc_case_2_4_6 "\
+Check that I_SWROPT can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_SWROPT is attempted on a hung up pipe."
+
+int
+test_case_2_4_6(int child)
+{
+	if (test_ioctl(child, I_SWROPT, SNDPIPE) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_6 = { &preamble_2_1, &test_case_2_4_6, &postamble_2 };
+
+#define test_case_2_4_6_stream_0 (&test_2_4_6)
+#define test_case_2_4_6_stream_1 (NULL)
+#define test_case_2_4_6_stream_2 (NULL)
+
+#define tgrp_case_2_4_7 test_group_2
+#define numb_case_2_4_7 "2.4.7"
+#define name_case_2_4_7 "I_FLUSHBAND ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_7 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_FLUSHBAND."
+#define desc_case_2_4_7 "\
+Check that I_FLUSHBAND can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_FLUSHBAND is attempted on a hung up pipe."
+
+int
+test_case_2_4_7(int child)
+{
+	struct bandinfo bi = { 1, FLUSHRW };
+
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_7 = { &preamble_2_1, &test_case_2_4_7, &postamble_2 };
+
+#define test_case_2_4_7_stream_0 (&test_2_4_7)
+#define test_case_2_4_7_stream_1 (NULL)
+#define test_case_2_4_7_stream_2 (NULL)
+
+#define tgrp_case_2_4_8 test_group_2
+#define numb_case_2_4_8 "2.4.8"
+#define name_case_2_4_8 "I_CANPUT ioctl() on a pipe - ENXIO."
+#define sref_case_2_4_8 "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_CANPUT."
+#define desc_case_2_4_8 "\
+Check that I_CANPUT can be performed on a pipe.  Checks that ENXIO is\n\
+returned when I_CANPUT is attempted on a hung up pipe."
+
+int
+test_case_2_4_8(int child)
+{
+	if (test_ioctl(child, I_CANPUT, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_4_8 = { &preamble_2_1, &test_case_2_4_8, &postamble_2 };
+
+#define test_case_2_4_8_stream_0 (&test_2_4_8)
+#define test_case_2_4_8_stream_1 (NULL)
+#define test_case_2_4_8_stream_2 (NULL)
+
+static const char test_group_3[] = "System Calls to a pipe";
+
+static const char sref_case_3_1[] = "POSIX 1003.1 2004/SUSv3 write(2p) reference page, pipes.";
+
+/* Write requests of {PIPE_BUF} bytes or less shall not be interleaved
+ * with data from other processes doing writes on the same pipe.  Writes
+ * of greater than {PIPE_BUF} bytes may have data interleaved, on
+ * arbitrary boundaries, with writes by other processes, whether or not
+ * the O_NONBLOCK flag of the file status flags is set. */
+
+#define tgrp_case_3_1_1 test_group_3
+#define numb_case_3_1_1 "3.1.1"
+#define name_case_3_1_1 "write() to a pipe."
+#define sref_case_3_1_1 sref_case_3_1
+#define desc_case_3_1_1 "\
+Checks that write() can be performed on a pipe.  Checks that writes of\n\
+PIPE_BUF bytes or less are not interleaved despite the setting of\n\
+O_NONBLOCK."
+
+int
+test_case_3_1_1_rd(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < 5; i++) {
+		if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (dat.len != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_1_rd = { &preamble_0_blocking, &test_case_3_1_1_rd, &postamble_0 };
+int
+test_case_3_1_1_w1(int child)
+{
+	char buf[4096] = { 0, };
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_1_w1 = { &preamble_0_blocking, &test_case_3_1_1_w1, &postamble_0 };
+int
+test_case_3_1_1_w2(int child)
+{
+	char buf[4096] = { 0, };
+	int i;
+
+	do {
+		last_errno = 0;
+		test_write(child, buf, sizeof(buf));
+		state++;
+	} while (last_errno == EAGAIN);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_1_w2 = { &preamble_0_blocking, &test_case_3_1_1_w2, &postamble_0 };
+
+#define test_case_3_1_1_stream_0 (&test_3_1_1_rd)
+#define test_case_3_1_1_stream_1 (&test_3_1_1_w2)
+#define test_case_3_1_1_stream_2 (&test_3_1_1_w1)
+
+/* If the O_NONBLOCK flag is clear, a write request may cause the thread
+ * to block but on normal completion it shall return nbyte. */
+
+#define tgrp_case_3_1_2 test_group_3
+#define numb_case_3_1_2 "3.1.2"
+#define name_case_3_1_2 "write() to a pipe."
+#define sref_case_3_1_2 sref_case_3_1
+#define desc_case_3_1_2 "\
+Checks that write() can be performed on a pipe.  Checks that when set\n\
+for blocking operation, writes block until nbytes are sent."
+
+int
+test_case_3_1_2_rd(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (dat.len != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_2_rd = { &preamble_0_blocking, &test_case_3_1_2_rd, &postamble_0 };
+int
+test_case_3_1_2_wr(int child)
+{
+	char buf[4096<<2] = { 0, };
+	int i;
+
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != sizeof(buf))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_2_wr = { &preamble_0_blocking, &test_case_3_1_2_wr, &postamble_0 };
+
+#define test_case_3_1_2_stream_0 (&test_3_1_2_rd)
+#define test_case_3_1_2_stream_1 (&test_3_1_2_wr)
+#define test_case_3_1_2_stream_2 (NULL)
+
+#define tgrp_case_3_1_3 test_group_3
+#define numb_case_3_1_3 "3.1.3"
+#define name_case_3_1_3 "write() to a pipe."
+#define sref_case_3_1_3 sref_case_3_1
+#define desc_case_3_1_3 "\
+Checks that write() can be performed on a pipe.  Checks that when set\n\
+for blocking operation, writes block until nbytes are sent or until an\n\
+interrupt is received."
+
+int
+test_case_3_1_3(int child)
+{
+	char buf[9000] = { 0, };
+	int i;
+
+	last_signum = 0;
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 8192)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != SIGALRM)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_3 = { &preamble_0_blocking, &test_case_3_1_3, &postamble_0 };
+
+#define test_case_3_1_3_stream_0 (&test_3_1_3)
+#define test_case_3_1_3_stream_1 (NULL)
+#define test_case_3_1_3_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, write() requests shall not block the
+ * thread. */
+
+#define tgrp_case_3_1_4 test_group_3
+#define numb_case_3_1_4 "3.1.4"
+#define name_case_3_1_4 "write() to a pipe."
+#define sref_case_3_1_4 sref_case_3_1
+#define desc_case_3_1_4 "\
+Checks that write() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, write() does not block."
+
+int
+test_case_3_1_4(int child)
+{
+	char buf[9000] = { 0, };
+
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 8192)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_4 = { &preamble_0, &test_case_3_1_4, &postamble_0 };
+
+#define test_case_3_1_4_stream_0 (&test_3_1_4)
+#define test_case_3_1_4_stream_1 (NULL)
+#define test_case_3_1_4_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, a write request for {PIPE_BUF} or
+ * fewer bytes shall either transfer all the data and return the number
+ * of bytes requested, or shall transfer no data and return [EAGAIN]. */
+
+#define tgrp_case_3_1_5 test_group_3
+#define numb_case_3_1_5 "3.1.5"
+#define name_case_3_1_5 "write() to a pipe."
+#define sref_case_3_1_5 sref_case_3_1
+#define desc_case_3_1_5 "\
+Checks that write() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, and less than PIPE_BUF bytes are requested,\n\
+either PIPE_BUF bytes will be transferred or error EAGAIN returned."
+
+int
+test_case_3_1_5(int child)
+{
+	char buf[300] = { 0, };
+
+	for (;;) {
+		last_errno = 0;
+		test_write(child, buf, sizeof(buf));
+		state++;
+		if (last_errno == EAGAIN)
+			return (__RESULT_SUCCESS);
+		state++;
+		if (last_errno != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+}
+struct test_stream test_3_1_5 = { &preamble_0, &test_case_3_1_5, &postamble_0 };
+
+#define test_case_3_1_5_stream_0 (&test_3_1_5)
+#define test_case_3_1_5_stream_1 (NULL)
+#define test_case_3_1_5_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, a write request for more than
+ * {PIPE_BUF} bytes shall either at least transfer {PIPE_BUF} bytes to
+ * an empty pipe, otherwise it will transfer what it can and return the
+ * number of bytes requested. */
+
+/* If the O_NONBLOCK flag is set, a write request for more than
+ * {PIPE_BUF} bytes when no data can be written will fail and return
+ * [EAGAIN]. */
+
+/*  pipes break writes down into 4096 byte M_DATA messages (atomic constraints).
+ *  If a pipe can write 1 byte it will write up to 4096 bytes.
+ *  If a pipe writes more than 4096 bytes and would block beyond 4096 and is set for non-blocking
+ *      operation, it will return 4096, and not write the remainder. */
+
+#define tgrp_case_3_1_6 test_group_3
+#define numb_case_3_1_6 "3.1.6"
+#define name_case_3_1_6 "write() to a pipe."
+#define sref_case_3_1_6 sref_case_3_1
+#define desc_case_3_1_6 "\
+Checks that write() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, and more than PIPE_BUF bytes are requested,\n\
+either PIPE_BUF or more bytes will be transferred or error EAGAIN\n\
+returned."
+
+int
+test_case_3_1_6(int child)
+{
+	char buf[5000] = { 0, };
+
+	for (;;) {
+		last_errno = 0;
+		test_write(child, buf, sizeof(buf));
+		state++;
+		if (last_errno == EAGAIN)
+			return (__RESULT_SUCCESS);
+		state++;
+		if (last_errno != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval < 4096)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+}
+struct test_stream test_3_1_6 = { &preamble_0, &test_case_3_1_6, &postamble_0 };
+
+#define test_case_3_1_6_stream_0 (&test_3_1_6)
+#define test_case_3_1_6_stream_1 (NULL)
+#define test_case_3_1_6_stream_2 (NULL)
+
+/* Writing a zero-length buffer (nbyte is zero) to a STREAMS-based pipe
+ * or pipe sends no message and 0 is returned.  The process may issue
+ * I_SWROPT ioctl() to enable zero-length messages to be sent across the
+ * pipe or pipe.
+ *
+ *  pipes do not send zero-length messages by default (must set SNDZERO).
+ */
+
+#define tgrp_case_3_1_7 test_group_3
+#define numb_case_3_1_7 "3.1.7"
+#define name_case_3_1_7 "write() to a pipe."
+#define sref_case_3_1_7 sref_case_3_1
+#define desc_case_3_1_7 "\
+Checks that write() can be performed on a pipe.  Writing a zero-length\n\
+buffer (nbyte is zero) to a STREAMS-based pipe or pipe sends no message\n\
+and 0 is returned.  The process may issue I_SWROPT ioctl() to enable\n\
+zero-length messages to be sent across the pipe or pipe."
+
+int
+test_case_3_1_7(int child)
+{
+	char buf[16] = { 0, };
+
+	if (test_write(child + 1, NULL, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child + 1, I_SWROPT, (intptr_t) (SNDPIPE | SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_write(child + 1, NULL, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_7 = { &preamble_0, &test_case_3_1_7, &postamble_0 };
+
+#define test_case_3_1_7_stream_0 (&test_3_1_7)
+#define test_case_3_1_7_stream_1 (NULL)
+#define test_case_3_1_7_stream_2 (NULL)
+
+/*  pipes return ENXIO on write when hung up.
+ *  Also true for streamio ioctls() that check write access. */
+
+#define tgrp_case_3_1_8 test_group_3
+#define numb_case_3_1_8 "3.1.8"
+#define name_case_3_1_8 "write() to a pipe - ENXIO."
+#define sref_case_3_1_8 sref_case_3_1
+#define desc_case_3_1_8 "\
+Checks that write() can be performed on a pipe.  Checks that ENXIO is\n\
+returned when attempting to write() to a pipe that has received a hang\n\
+up."
+
+int
+test_case_3_1_8(int child)
+{
+	char buf[16] = { 0, };
+
+	last_signum = 0;
+	if (test_write(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_8 = { &preamble_2_1, &test_case_3_1_8, &postamble_2 };
+
+#define test_case_3_1_8_stream_0 (&test_3_1_8)
+#define test_case_3_1_8_stream_1 (NULL)
+#define test_case_3_1_8_stream_2 (NULL)
+
+/*  pipes send SIGPIPE on write errors by default (must clear SNDPIPE).
+ *  Also true for streamio ioctls() that check write access. */
+
+#define tgrp_case_3_1_9 test_group_3
+#define numb_case_3_1_9 "3.1.9"
+#define name_case_3_1_9 "write() to a pipe - EPROTO."
+#define sref_case_3_1_9 sref_case_3_1
+#define desc_case_3_1_9 "\
+Checks that write() can be performed on a pipe.  Checks that EPROTO is\n\
+returned and SIGPIPE generated when attempting to write() to a pipe that\n\
+has received an asynchronous EPROTO write error."
+
+int
+test_case_3_1_9(int child)
+{
+	char buf[16] = { 0, };
+
+	last_signum = 0;
+	if (test_write(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != SIGPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_9 = { &preamble_2_3, &test_case_3_1_9, &postamble_2 };
+
+#define test_case_3_1_9_stream_0 (&test_3_1_9)
+#define test_case_3_1_9_stream_1 (NULL)
+#define test_case_3_1_9_stream_2 (NULL)
+
+#define tgrp_case_3_1_10 test_group_3
+#define numb_case_3_1_10 "3.1.10"
+#define name_case_3_1_10 "write() to a pipe - EPROTO."
+#define sref_case_3_1_10 sref_case_3_1
+#define desc_case_3_1_10 "\
+Checks that write() can be performed on a pipe.  Checks that EPROTO is\n\
+returned when attempting to write() to a pipe that has received an\n\
+asynchronous EPROTO error.  Checks that the SIGPIPE signal can be\n\
+suppressed with I_SWROPT."
+
+int
+preamble_test_case_3_1_10(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+int
+test_case_3_1_10(int child)
+{
+	char buf[16] = { 0, };
+
+	last_signum = 0;
+	if (test_write(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_10 = { &preamble_test_case_3_1_10, &test_case_3_1_10, &postamble_2 };
+
+#define test_case_3_1_10_stream_0 (&test_3_1_10)
+#define test_case_3_1_10_stream_1 (NULL)
+#define test_case_3_1_10_stream_2 (NULL)
+
+/*  pipes return EPIPE and generate SIGPIPE when write and there are no readers.
+ *  Also true for streamio ioctls() that check write access. */
+
+#define tgrp_case_3_1_11 test_group_3
+#define numb_case_3_1_11 "3.1.11"
+#define name_case_3_1_11 "write() to a pipe - EPIPE."
+#define sref_case_3_1_11 sref_case_3_1
+#define desc_case_3_1_11 "\
+Checks that write() can be performed on a pipe.  Checks that EPIPE is\n\
+returned and SIGPIPE generated when a write() attempt is make on a pipe\n\
+that has no readers."
+
+int
+preamble_test_case_3_1_11(int child)
+{
+	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_close(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_1_11(int child)
+{
+	char buf[16] = { 0, };
+
+	last_signum = 0;
+	if (test_write(child + 1, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child + 1, last_signum);
+	state++;
+	if (last_signum != SIGPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_1_11 = { &preamble_test_case_3_1_11, &test_case_3_1_11, NULL };
+
+#define test_case_3_1_11_stream_0 (&test_3_1_11)
+#define test_case_3_1_11_stream_1 (NULL)
+#define test_case_3_1_11_stream_2 (NULL)
+
+static const char sref_case_3_2[] = "POSIX 1003.1 2004/SUSv3 putmsg(2p) reference page, pipes.";
+
+/* Write requests of {PIPE_BUF} bytes or less shall not be interleaved
+ * with data from other processes doing writes on the same pipe.  Writes
+ * of greater than {PIPE_BUF} bytes may have data interleaved, on
+ * arbitrary boundaries, with writes by other processes, whether or not
+ * the O_NONBLOCK flag of the file status flags is set. */
+
+#define tgrp_case_3_2_1 test_group_3
+#define numb_case_3_2_1 "3.2.1"
+#define name_case_3_2_1 "putmsg() to a pipe."
+#define sref_case_3_2_1 sref_case_3_2
+#define desc_case_3_2_1 "\
+Checks that putmsg() can be performed on a pipe.  Checks that writes of\n\
+PIPE_BUF bytes or less are not interleaved despite the setting of\n\
+O_NONBLOCK."
+
+int
+test_case_3_2_1_rd(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+	int i;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	for (i = 0; i < 5; i++) {
+		if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (dat.len != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_1_rd = { &preamble_0_blocking, &test_case_3_2_1_rd, &postamble_0 };
+int
+test_case_3_2_1_w1(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_putmsg(child, NULL, &dat, 0) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_1_w1 = { &preamble_0_blocking, &test_case_3_2_1_w1, &postamble_0 };
+int
+test_case_3_2_1_w2(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	do {
+		last_errno = 0;
+		test_putmsg(child, NULL, &dat, 0);
+		state++;
+	} while (last_errno == EAGAIN);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_1_w2 = { &preamble_0_blocking, &test_case_3_2_1_w2, &postamble_0 };
+
+#define test_case_3_2_1_stream_0 (&test_3_2_1_rd)
+#define test_case_3_2_1_stream_1 (&test_3_2_1_w2)
+#define test_case_3_2_1_stream_2 (&test_3_2_1_w1)
+
+/* If the O_NONBLOCK flag is clear, a putmsg request may cause the thread
+ * to block but on normal completion it shall return nbyte. */
+
+#define tgrp_case_3_2_2 test_group_3
+#define numb_case_3_2_2 "3.2.2"
+#define name_case_3_2_2 "putmsg() to a pipe."
+#define sref_case_3_2_2 sref_case_3_2
+#define desc_case_3_2_2 "\
+Checks that putmsg() can be performed on a pipe.  Checks that when set\n\
+for blocking operation, putmsg() blocks until the number of bytes\n\
+requested are sent."
+
+int
+test_case_3_2_2_rd(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (dat.len != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_2_rd = { &preamble_0_blocking, &test_case_3_2_2_rd, &postamble_0 };
+int
+test_case_3_2_2_wr(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_putmsg(child, NULL, &dat, 0) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_2_wr = { &preamble_0_blocking, &test_case_3_2_2_wr, &postamble_0 };
+
+#define test_case_3_2_2_stream_0 (&test_3_2_2_rd)
+#define test_case_3_2_2_stream_1 (&test_3_2_2_wr)
+#define test_case_3_2_2_stream_2 (NULL)
+
+#define tgrp_case_3_2_3 test_group_3
+#define numb_case_3_2_3 "3.2.3"
+#define name_case_3_2_3 "putmsg() to a pipe."
+#define sref_case_3_2_3 sref_case_3_2
+#define desc_case_3_2_3 "\
+Checks that putmsg() can be performed on a pipe.  Checks that when set\n\
+for blocking operation, putmsg() blocks until the number of bytes\n\
+requested are sent or until an interrupt is received."
+
+int
+test_case_3_2_3(int child)
+{
+	char buf[9000] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+	int i;
+
+	last_signum = 0;
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINTR)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != SIGALRM)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_3 = { &preamble_0_blocking, &test_case_3_2_3, &postamble_0 };
+
+#define test_case_3_2_3_stream_0 (&test_3_2_3)
+#define test_case_3_2_3_stream_1 (NULL)
+#define test_case_3_2_3_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, putmsg() requests shall not block the
+ * thread. */
+
+#define tgrp_case_3_2_4 test_group_3
+#define numb_case_3_2_4 "3.2.4"
+#define name_case_3_2_4 "putmsg() to a pipe."
+#define sref_case_3_2_4 sref_case_3_2
+#define desc_case_3_2_4 "\
+Checks that putmsg() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, putmsg() does not block."
+
+int
+test_case_3_2_4(int child)
+{
+	char buf[9000] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	if (test_putmsg(child, NULL, &dat, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_4 = { &preamble_0, &test_case_3_2_4, &postamble_0 };
+
+#define test_case_3_2_4_stream_0 (&test_3_2_4)
+#define test_case_3_2_4_stream_1 (NULL)
+#define test_case_3_2_4_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, a putmsg request for {PIPE_BUF} or
+ * fewer bytes shall either transfer all the data and return the number
+ * of bytes requested, or shall transfer no data and return [EAGAIN]. */
+
+#define tgrp_case_3_2_5 test_group_3
+#define numb_case_3_2_5 "3.2.5"
+#define name_case_3_2_5 "putmsg() to a pipe."
+#define sref_case_3_2_5 sref_case_3_2
+#define desc_case_3_2_5 "\
+Checks that putmsg() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, and less than PIPE_BUF bytes are requested,\n\
+either PIPE_BUF bytes will be transferred or error EAGAIN returned."
+
+int
+test_case_3_2_5(int child)
+{
+	char buf[300] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	for (;;) {
+		last_errno = 0;
+		test_putmsg(child, NULL, &dat, 0);
+		state++;
+		if (last_errno == EAGAIN)
+			return (__RESULT_SUCCESS);
+		state++;
+		if (last_errno != 0)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+}
+struct test_stream test_3_2_5 = { &preamble_0, &test_case_3_2_5, &postamble_0 };
+
+#define test_case_3_2_5_stream_0 (&test_3_2_5)
+#define test_case_3_2_5_stream_1 (NULL)
+#define test_case_3_2_5_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, a putmsg request for more than
+ * {PIPE_BUF} bytes shall either at least transfer {PIPE_BUF} bytes to
+ * an empty pipe, otherwise it will transfer what it can and return the
+ * number of bytes requested. */
+
+/* If the O_NONBLOCK flag is set, a putmsg request for more than
+ * {PIPE_BUF} bytes when no data can be written will fail and return
+ * [EAGAIN]. */
+
+/*  pipes break writes down into 4096 byte M_DATA messages (atomic constraints).
+ *  If a pipe can putmsg 1 byte it will putmsg up to 4096 bytes.
+ *  If a pipe writes more than 4096 bytes and would block beyond 4096 and is set for non-blocking
+ *      operation, it will return 4096, and not putmsg the remainder. */
+
+#define tgrp_case_3_2_6 test_group_3
+#define numb_case_3_2_6 "3.2.6"
+#define name_case_3_2_6 "putmsg() to a pipe."
+#define sref_case_3_2_6 sref_case_3_2
+#define desc_case_3_2_6 "\
+Checks that putmsg() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, and more than PIPE_BUF bytes are requested,\n\
+either PIPE_BUF or more bytes will be transferred or error EAGAIN\n\
+returned."
+
+int
+test_case_3_2_6(int child)
+{
+	char buf[5000] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	for (;;) {
+		last_errno = 0;
+		test_putmsg(child, NULL, &dat, 0);
+		state++;
+		if (last_errno == EAGAIN)
+			return (__RESULT_SUCCESS);
+		state++;
+		if (last_errno != 0)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+}
+struct test_stream test_3_2_6 = { &preamble_0, &test_case_3_2_6, &postamble_0 };
+
+#define test_case_3_2_6_stream_0 (&test_3_2_6)
+#define test_case_3_2_6_stream_1 (NULL)
+#define test_case_3_2_6_stream_2 (NULL)
+
+/* Writing a zero-length buffer (nbyte is zero) to a STREAMS-based pipe
+ * or pipe sends no message and 0 is returned.  The process may issue
+ * I_SWROPT ioctl() to enable zero-length messages to be sent across the
+ * pipe or pipe.
+ *
+ *  pipes do not send zero-length messages by default (must set SNDZERO).
+ */
+
+#define tgrp_case_3_2_7 test_group_3
+#define numb_case_3_2_7 "3.2.7"
+#define name_case_3_2_7 "putmsg() to a pipe."
+#define sref_case_3_2_7 sref_case_3_2
+#define desc_case_3_2_7 "\
+Checks that putmsg() can be performed on a pipe.  Writing a zero-length\n\
+buffer (nbyte is zero) to a STREAMS-based pipe or pipe sends no message\n\
+and 0 is returned.  The process may issue I_SWROPT ioctl() to enable\n\
+zero-length messages to be sent across the pipe or pipe."
+
+int
+test_case_3_2_7(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, 0, NULL };
+
+	if (test_putmsg(child + 1, NULL, &dat, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child + 1, I_SWROPT, (intptr_t) (SNDPIPE | SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child + 1, NULL, &dat, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_7 = { &preamble_0, &test_case_3_2_7, &postamble_0 };
+
+#define test_case_3_2_7_stream_0 (&test_3_2_7)
+#define test_case_3_2_7_stream_1 (NULL)
+#define test_case_3_2_7_stream_2 (NULL)
+
+/*  pipes return ENXIO on putmsg when hung up.
+ *  Also true for streamio ioctls() that check putmsg access. */
+
+#define tgrp_case_3_2_8 test_group_3
+#define numb_case_3_2_8 "3.2.8"
+#define name_case_3_2_8 "putmsg() to a pipe - ENXIO."
+#define sref_case_3_2_8 sref_case_3_2
+#define desc_case_3_2_8 "\
+Checks that putmsg() can be performed on a pipe.  Checks that ENXIO is\n\
+returned when attempting to putmsg() to a pipe that has received a hang\n\
+up."
+
+int
+test_case_3_2_8(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putmsg(child, NULL, &dat, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_8 = { &preamble_2_1, &test_case_3_2_8, &postamble_2 };
+
+#define test_case_3_2_8_stream_0 (&test_3_2_8)
+#define test_case_3_2_8_stream_1 (NULL)
+#define test_case_3_2_8_stream_2 (NULL)
+
+/*  pipes send SIGPIPE on putmsg errors by default (must clear SNDPIPE).
+ *  Also true for streamio ioctls() that check putmsg access. */
+
+#define tgrp_case_3_2_9 test_group_3
+#define numb_case_3_2_9 "3.2.9"
+#define name_case_3_2_9 "putmsg() to a pipe - EPROTO."
+#define sref_case_3_2_9 sref_case_3_2
+#define desc_case_3_2_9 "\
+Checks that putmsg() can be performed on a pipe.  Checks that EPROTO is\n\
+returned and SIGPIPE generated when attempting to putmsg() to a pipe that\n\
+has received an asynchronous EPROTO putmsg error."
+
+int
+test_case_3_2_9(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putmsg(child, NULL, &dat, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != SIGPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_9 = { &preamble_2_3, &test_case_3_2_9, &postamble_2 };
+
+#define test_case_3_2_9_stream_0 (&test_3_2_9)
+#define test_case_3_2_9_stream_1 (NULL)
+#define test_case_3_2_9_stream_2 (NULL)
+
+#define tgrp_case_3_2_10 test_group_3
+#define numb_case_3_2_10 "3.2.10"
+#define name_case_3_2_10 "putmsg() to a pipe - EPROTO."
+#define sref_case_3_2_10 sref_case_3_2
+#define desc_case_3_2_10 "\
+Checks that putmsg() can be performed on a pipe.  Checks that EPROTO is\n\
+returned when attempting to putmsg() to a pipe that has received an\n\
+asynchronous EPROTO error.  Checks that the SIGPIPE signal can be\n\
+suppressed with I_SWROPT."
+
+int
+preamble_test_case_3_2_10(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+int
+test_case_3_2_10(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putmsg(child, NULL, &dat, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_10 = { &preamble_test_case_3_2_10, &test_case_3_2_10, &postamble_2 };
+
+#define test_case_3_2_10_stream_0 (&test_3_2_10)
+#define test_case_3_2_10_stream_1 (NULL)
+#define test_case_3_2_10_stream_2 (NULL)
+
+/*  pipes return EPIPE and generate SIGPIPE when putmsg and there are no readers.
+ *  Also true for streamio ioctls() that check putmsg access. */
+
+#define tgrp_case_3_2_11 test_group_3
+#define numb_case_3_2_11 "3.2.11"
+#define name_case_3_2_11 "putmsg() to a pipe - EPIPE."
+#define sref_case_3_2_11 sref_case_3_2
+#define desc_case_3_2_11 "\
+Checks that putmsg() can be performed on a pipe.  Checks that EPIPE is\n\
+returned and SIGPIPE generated when a putmsg() attempt is make on a pipe\n\
+that has no readers."
+
+int
+preamble_test_case_3_2_11(int child)
+{
+	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_close(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_2_11(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putmsg(child + 1, NULL, &dat, 0) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child + 1, last_signum);
+	state++;
+	if (last_signum != SIGPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_2_11 = { &preamble_test_case_3_2_11, &test_case_3_2_11, &postamble_0 };
+
+#define test_case_3_2_11_stream_0 (&test_3_2_11)
+#define test_case_3_2_11_stream_1 (NULL)
+#define test_case_3_2_11_stream_2 (NULL)
+
+static const char sref_case_3_3[] = "POSIX 1003.1 2004/SUSv3 putpmsg(2p) reference page, pipes.";
+
+/* Write requests of {PIPE_BUF} bytes or less shall not be interleaved
+ * with data from other processes doing writes on the same pipe.  Writes
+ * of greater than {PIPE_BUF} bytes may have data interleaved, on
+ * arbitrary boundaries, with writes by other processes, whether or not
+ * the O_NONBLOCK flag of the file status flags is set. */
+
+#define tgrp_case_3_3_1 test_group_3
+#define numb_case_3_3_1 "3.3.1"
+#define name_case_3_3_1 "putpmsg() to a pipe."
+#define sref_case_3_3_1 sref_case_3_3
+#define desc_case_3_3_1 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that writes of\n\
+PIPE_BUF bytes or less are not interleaved despite the setting of\n\
+O_NONBLOCK."
+
+int
+test_case_3_3_1_rd(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+	int i;
+
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	for (i = 0; i < 5; i++) {
+		if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (dat.len != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_1_rd = { &preamble_0_blocking, &test_case_3_3_1_rd, &postamble_0 };
+int
+test_case_3_3_1_w1(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_1_w1 = { &preamble_0_blocking, &test_case_3_3_1_w1, &postamble_0 };
+int
+test_case_3_3_1_w2(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	do {
+		last_errno = 0;
+		test_putpmsg(child, NULL, &dat, 0, MSG_BAND);
+		state++;
+	} while (last_errno == EAGAIN);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_1_w2 = { &preamble_0_blocking, &test_case_3_3_1_w2, &postamble_0 };
+
+#define test_case_3_3_1_stream_0 (&test_3_3_1_rd)
+#define test_case_3_3_1_stream_1 (&test_3_3_1_w2)
+#define test_case_3_3_1_stream_2 (&test_3_3_1_w1)
+
+/* If the O_NONBLOCK flag is clear, a putpmsg request may cause the thread
+ * to block but on normal completion it shall return nbyte. */
+
+#define tgrp_case_3_3_2 test_group_3
+#define numb_case_3_3_2 "3.3.2"
+#define name_case_3_3_2 "putpmsg() to a pipe."
+#define sref_case_3_3_2 sref_case_3_3
+#define desc_case_3_3_2 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that when set\n\
+for blocking operation, putpmsg() blocks until the number of bytes\n\
+requested are sent."
+
+int
+test_case_3_3_2_wr(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_2_wr = { &preamble_0_blocking, &test_case_3_3_2_wr, &postamble_0 };
+int
+test_case_3_3_2_rd(int child)
+{
+	char buf[4096] = { 0, };
+	struct strbuf dat = { sizeof(buf), -1, buf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		state++;
+		if (last_retval != 0)
+			return (__RESULT_FAILURE);
+		state++;
+		if (dat.len != sizeof(buf))
+			return (__RESULT_FAILURE);
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_2_rd = { &preamble_0_blocking, &test_case_3_3_2_rd, &postamble_0 };
+
+#define test_case_3_3_2_stream_0 (&test_3_3_2_wr)
+#define test_case_3_3_2_stream_1 (&test_3_3_2_rd)
+#define test_case_3_3_2_stream_2 (NULL)
+
+#define tgrp_case_3_3_3 test_group_3
+#define numb_case_3_3_3 "3.3.3"
+#define name_case_3_3_3 "putpmsg() to a pipe."
+#define sref_case_3_3_3 sref_case_3_3
+#define desc_case_3_3_3 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that when set\n\
+for blocking operation, putpmsg() blocks until the number of bytes\n\
+requested are sent or until an interrupt is received."
+
+int
+test_case_3_3_3(int child)
+{
+	char buf[9000] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+	int i;
+
+	last_signum = 0;
+	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINTR)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != SIGALRM)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_3 = { &preamble_0_blocking, &test_case_3_3_3, &postamble_0 };
+
+#define test_case_3_3_3_stream_0 (&test_3_3_3)
+#define test_case_3_3_3_stream_1 (NULL)
+#define test_case_3_3_3_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, putpmsg() requests shall not block the
+ * thread. */
+
+#define tgrp_case_3_3_4 test_group_3
+#define numb_case_3_3_4 "3.3.4"
+#define name_case_3_3_4 "putpmsg() to a pipe."
+#define sref_case_3_3_4 sref_case_3_3
+#define desc_case_3_3_4 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, putpmsg() does not block."
+
+int
+test_case_3_3_4(int child)
+{
+	char buf[9000] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_4 = { &preamble_0, &test_case_3_3_4, &postamble_0 };
+
+#define test_case_3_3_4_stream_0 (&test_3_3_4)
+#define test_case_3_3_4_stream_1 (NULL)
+#define test_case_3_3_4_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, a putpmsg request for {PIPE_BUF} or
+ * fewer bytes shall either transfer all the data and return the number
+ * of bytes requested, or shall transfer no data and return [EAGAIN]. */
+
+#define tgrp_case_3_3_5 test_group_3
+#define numb_case_3_3_5 "3.3.5"
+#define name_case_3_3_5 "putpmsg() to a pipe."
+#define sref_case_3_3_5 sref_case_3_3
+#define desc_case_3_3_5 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, and less than PIPE_BUF bytes are requested,\n\
+either PIPE_BUF bytes will be transferred or error EAGAIN returned."
+
+int
+test_case_3_3_5(int child)
+{
+	char buf[300] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	for (;;) {
+		last_errno = 0;
+		test_putpmsg(child, NULL, &dat, 0, MSG_BAND);
+		state++;
+		if (last_errno == EAGAIN)
+			return (__RESULT_SUCCESS);
+		state++;
+		if (last_errno != 0)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+}
+struct test_stream test_3_3_5 = { &preamble_0, &test_case_3_3_5, &postamble_0 };
+
+#define test_case_3_3_5_stream_0 (&test_3_3_5)
+#define test_case_3_3_5_stream_1 (NULL)
+#define test_case_3_3_5_stream_2 (NULL)
+
+/* If the O_NONBLOCK flag is set, a putpmsg request for more than
+ * {PIPE_BUF} bytes shall either at least transfer {PIPE_BUF} bytes to
+ * an empty pipe, otherwise it will transfer what it can and return the
+ * number of bytes requested. */
+
+/* If the O_NONBLOCK flag is set, a putpmsg request for more than
+ * {PIPE_BUF} bytes when no data can be written will fail and return
+ * [EAGAIN]. */
+
+/*  pipes break writes down into 4096 byte M_DATA messages (atomic constraints).
+ *  If a pipe can putpmsg 1 byte it will putpmsg up to 4096 bytes.
+ *  If a pipe writes more than 4096 bytes and would block beyond 4096 and is set for non-blocking
+ *      operation, it will return 4096, and not putpmsg the remainder. */
+
+#define tgrp_case_3_3_6 test_group_3
+#define numb_case_3_3_6 "3.3.6"
+#define name_case_3_3_6 "putpmsg() to a pipe."
+#define sref_case_3_3_6 sref_case_3_3
+#define desc_case_3_3_6 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that when set\n\
+for non-blocking operation, and more than PIPE_BUF bytes are requested,\n\
+either PIPE_BUF or more bytes will be transferred or error EAGAIN\n\
+returned."
+
+int
+test_case_3_3_6(int child)
+{
+	char buf[5000] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	for (;;) {
+		last_errno = 0;
+		test_putpmsg(child, NULL, &dat, 0, MSG_BAND);
+		state++;
+		if (last_errno == EAGAIN)
+			return (__RESULT_SUCCESS);
+		state++;
+		if (last_errno != 0)
+			return (__RESULT_FAILURE);
+		state++;
+	}
+}
+struct test_stream test_3_3_6 = { &preamble_0, &test_case_3_3_6, &postamble_0 };
+
+#define test_case_3_3_6_stream_0 (&test_3_3_6)
+#define test_case_3_3_6_stream_1 (NULL)
+#define test_case_3_3_6_stream_2 (NULL)
+
+/* Writing a zero-length buffer (nbyte is zero) to a STREAMS-based pipe
+ * or pipe sends no message and 0 is returned.  The process may issue
+ * I_SWROPT ioctl() to enable zero-length messages to be sent across the
+ * pipe or pipe.
+ *
+ *  pipes do not send zero-length messages by default (must set SNDZERO).
+ */
+
+#define tgrp_case_3_3_7 test_group_3
+#define numb_case_3_3_7 "3.3.7"
+#define name_case_3_3_7 "putpmsg() to a pipe."
+#define sref_case_3_3_7 sref_case_3_3
+#define desc_case_3_3_7 "\
+Checks that putpmsg() can be performed on a pipe.  Writing a zero-length\n\
+buffer (nbyte is zero) to a STREAMS-based pipe or pipe sends no message\n\
+and 0 is returned.  The process may issue I_SWROPT ioctl() to enable\n\
+zero-length messages to be sent across the pipe or pipe."
+
+int
+test_case_3_3_7(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, 0, NULL };
+
+	if (test_putpmsg(child + 1, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EAGAIN)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child + 1, I_SWROPT, (intptr_t) (SNDPIPE | SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putpmsg(child + 1, NULL, &dat, 0, MSG_BAND) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_7 = { &preamble_0, &test_case_3_3_7, &postamble_0 };
+
+#define test_case_3_3_7_stream_0 (&test_3_3_7)
+#define test_case_3_3_7_stream_1 (NULL)
+#define test_case_3_3_7_stream_2 (NULL)
+
+/*  pipes return ENXIO on putpmsg when hung up.
+ *  Also true for streamio ioctls() that check putpmsg access. */
+
+#define tgrp_case_3_3_8 test_group_3
+#define numb_case_3_3_8 "3.3.8"
+#define name_case_3_3_8 "putpmsg() to a pipe - ENXIO."
+#define sref_case_3_3_8 sref_case_3_3
+#define desc_case_3_3_8 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that ENXIO is\n\
+returned when attempting to putpmsg() to a pipe that has received a hang\n\
+up."
+
+int
+test_case_3_3_8(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENXIO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_8 = { &preamble_2_1, &test_case_3_3_8, &postamble_2 };
+
+#define test_case_3_3_8_stream_0 (&test_3_3_8)
+#define test_case_3_3_8_stream_1 (NULL)
+#define test_case_3_3_8_stream_2 (NULL)
+
+/*  pipes send SIGPIPE on putpmsg errors by default (must clear SNDPIPE).
+ *  Also true for streamio ioctls() that check putpmsg access. */
+
+#define tgrp_case_3_3_9 test_group_3
+#define numb_case_3_3_9 "3.3.9"
+#define name_case_3_3_9 "putpmsg() to a pipe - EPROTO."
+#define sref_case_3_3_9 sref_case_3_3
+#define desc_case_3_3_9 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that EPROTO is\n\
+returned and SIGPIPE generated when attempting to putpmsg() to a pipe that\n\
+has received an asynchronous EPROTO putpmsg error."
+
+int
+test_case_3_3_9(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != SIGPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_9 = { &preamble_2_3, &test_case_3_3_9, &postamble_2 };
+
+#define test_case_3_3_9_stream_0 (&test_3_3_9)
+#define test_case_3_3_9_stream_1 (NULL)
+#define test_case_3_3_9_stream_2 (NULL)
+
+#define tgrp_case_3_3_10 test_group_3
+#define numb_case_3_3_10 "3.3.10"
+#define name_case_3_3_10 "putpmsg() to a pipe - EPROTO."
+#define sref_case_3_3_10 sref_case_3_3
+#define desc_case_3_3_10 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that EPROTO is\n\
+returned when attempting to putpmsg() to a pipe that has received an\n\
+asynchronous EPROTO error.  Checks that the SIGPIPE signal can be\n\
+suppressed with I_SWROPT."
+
+int
+preamble_test_case_3_3_10(int child)
+{
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, TM_IOC_WRERR, (intptr_t) EPROTO) != __RESULT_SUCCESS && last_errno != EIO)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+int
+test_case_3_3_10(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putpmsg(child, NULL, &dat, 0, MSG_BAND) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPROTO)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child, last_signum);
+	state++;
+	if (last_signum != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_10 = { &preamble_test_case_3_3_10, &test_case_3_3_10, &postamble_2 };
+
+#define test_case_3_3_10_stream_0 (&test_3_3_10)
+#define test_case_3_3_10_stream_1 (NULL)
+#define test_case_3_3_10_stream_2 (NULL)
+
+/*  pipes return EPIPE and generate SIGPIPE when putpmsg and there are no readers.
+ *  Also true for streamio ioctls() that check putpmsg access. */
+
+#define tgrp_case_3_3_11 test_group_3
+#define numb_case_3_3_11 "3.3.11"
+#define name_case_3_3_11 "putpmsg() to a pipe - EPIPE."
+#define sref_case_3_3_11 sref_case_3_3
+#define desc_case_3_3_11 "\
+Checks that putpmsg() can be performed on a pipe.  Checks that EPIPE is\n\
+returned and SIGPIPE generated when a putpmsg() attempt is make on a pipe\n\
+that has no readers."
+
+int
+preamble_test_case_3_3_11(int child)
+{
+	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_close(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_3_3_11(int child)
+{
+	char buf[16] = { 0, };
+	struct strbuf dat = { -1, sizeof(buf), buf };
+
+	last_signum = 0;
+	if (test_putpmsg(child + 1, NULL, &dat, 0, MSG_BAND) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_signum != 0)
+		print_signal(child + 1, last_signum);
+	state++;
+	if (last_signum != SIGPIPE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_3_3_11 = { &preamble_test_case_3_3_11, &test_case_3_3_11, &postamble_0 };
+
+#define test_case_3_3_11_stream_0 (&test_3_3_11)
+#define test_case_3_3_11_stream_1 (NULL)
+#define test_case_3_3_11_stream_2 (NULL)
+
+/*
+ *  Some things to test for pipes.
+ *
+ *  pipes cannot be clone opened.
+ *  I_LINK on a pipe returns EINVAL.
+ *  I_PLINK on a pipe returns EINVAL.
+ *  I_UNLINK on a pipe returns EINVAL.
+ *  I_PUNLINK on a pipe returns EINVAL.
+ *  I_LIST returns zero (0): no driver.
+ *  pipes (even when full) will not block on close (no driver).
+ */
 
 /*
  *  -------------------------------------------------------------------------
@@ -2444,7 +4743,111 @@ struct test_case {
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
 	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, sref_case_2_1_1, {
-	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_1, tgrp_case_2_2_1, name_case_2_2_1, desc_case_2_2_1, sref_case_2_2_1, {
+	test_case_2_2_1_stream_0, test_case_2_2_1_stream_1, test_case_2_2_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_2, tgrp_case_2_2_2, name_case_2_2_2, desc_case_2_2_2, sref_case_2_2_2, {
+	test_case_2_2_2_stream_0, test_case_2_2_2_stream_1, test_case_2_2_2_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_3, tgrp_case_2_2_3, name_case_2_2_3, desc_case_2_2_3, sref_case_2_2_3, {
+	test_case_2_2_3_stream_0, test_case_2_2_3_stream_1, test_case_2_2_3_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_4, tgrp_case_2_2_4, name_case_2_2_4, desc_case_2_2_4, sref_case_2_2_4, {
+	test_case_2_2_4_stream_0, test_case_2_2_4_stream_1, test_case_2_2_4_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_5, tgrp_case_2_2_5, name_case_2_2_5, desc_case_2_2_5, sref_case_2_2_5, {
+	test_case_2_2_5_stream_0, test_case_2_2_5_stream_1, test_case_2_2_5_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_6, tgrp_case_2_2_6, name_case_2_2_6, desc_case_2_2_6, sref_case_2_2_6, {
+	test_case_2_2_6_stream_0, test_case_2_2_6_stream_1, test_case_2_2_6_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_2_7, tgrp_case_2_2_7, name_case_2_2_7, desc_case_2_2_7, sref_case_2_2_7, {
+	test_case_2_2_7_stream_0, test_case_2_2_7_stream_1, test_case_2_2_7_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, sref_case_2_3_1, {
+	test_case_2_3_1_stream_0, test_case_2_3_1_stream_1, test_case_2_3_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, sref_case_2_3_2, {
+	test_case_2_3_2_stream_0, test_case_2_3_2_stream_1, test_case_2_3_2_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_3_3, tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, sref_case_2_3_3, {
+	test_case_2_3_3_stream_0, test_case_2_3_3_stream_1, test_case_2_3_3_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, sref_case_2_3_4, {
+	test_case_2_3_4_stream_0, test_case_2_3_4_stream_1, test_case_2_3_4_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, sref_case_2_4_1, {
+	test_case_2_4_1_stream_0, test_case_2_4_1_stream_1, test_case_2_4_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_2, tgrp_case_2_4_2, name_case_2_4_2, desc_case_2_4_2, sref_case_2_4_2, {
+	test_case_2_4_2_stream_0, test_case_2_4_2_stream_1, test_case_2_4_2_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_3, tgrp_case_2_4_3, name_case_2_4_3, desc_case_2_4_3, sref_case_2_4_3, {
+	test_case_2_4_3_stream_0, test_case_2_4_3_stream_1, test_case_2_4_3_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_4, tgrp_case_2_4_4, name_case_2_4_4, desc_case_2_4_4, sref_case_2_4_4, {
+	test_case_2_4_4_stream_0, test_case_2_4_4_stream_1, test_case_2_4_4_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_5, tgrp_case_2_4_5, name_case_2_4_5, desc_case_2_4_5, sref_case_2_4_5, {
+	test_case_2_4_5_stream_0, test_case_2_4_5_stream_1, test_case_2_4_5_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_6, tgrp_case_2_4_6, name_case_2_4_6, desc_case_2_4_6, sref_case_2_4_6, {
+	test_case_2_4_6_stream_0, test_case_2_4_6_stream_1, test_case_2_4_6_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_7, tgrp_case_2_4_7, name_case_2_4_7, desc_case_2_4_7, sref_case_2_4_7, {
+	test_case_2_4_7_stream_0, test_case_2_4_7_stream_1, test_case_2_4_7_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_2_4_8, tgrp_case_2_4_8, name_case_2_4_8, desc_case_2_4_8, sref_case_2_4_8, {
+	test_case_2_4_8_stream_0, test_case_2_4_8_stream_1, test_case_2_4_8_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, sref_case_3_1_1, {
+	test_case_3_1_1_stream_0, test_case_3_1_1_stream_1, test_case_3_1_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_2, tgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, sref_case_3_1_2, {
+	test_case_3_1_2_stream_0, test_case_3_1_2_stream_1, test_case_3_1_2_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_3, tgrp_case_3_1_3, name_case_3_1_3, desc_case_3_1_3, sref_case_3_1_3, {
+	test_case_3_1_3_stream_0, test_case_3_1_3_stream_1, test_case_3_1_3_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_4, tgrp_case_3_1_4, name_case_3_1_4, desc_case_3_1_4, sref_case_3_1_4, {
+	test_case_3_1_4_stream_0, test_case_3_1_4_stream_1, test_case_3_1_4_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_5, tgrp_case_3_1_5, name_case_3_1_5, desc_case_3_1_5, sref_case_3_1_5, {
+	test_case_3_1_5_stream_0, test_case_3_1_5_stream_1, test_case_3_1_5_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_6, tgrp_case_3_1_6, name_case_3_1_6, desc_case_3_1_6, sref_case_3_1_6, {
+	test_case_3_1_6_stream_0, test_case_3_1_6_stream_1, test_case_3_1_6_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_7, tgrp_case_3_1_7, name_case_3_1_7, desc_case_3_1_7, sref_case_3_1_7, {
+	test_case_3_1_7_stream_0, test_case_3_1_7_stream_1, test_case_3_1_7_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_8, tgrp_case_3_1_8, name_case_3_1_8, desc_case_3_1_8, sref_case_3_1_8, {
+	test_case_3_1_8_stream_0, test_case_3_1_8_stream_1, test_case_3_1_8_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_9, tgrp_case_3_1_9, name_case_3_1_9, desc_case_3_1_9, sref_case_3_1_9, {
+	test_case_3_1_9_stream_0, test_case_3_1_9_stream_1, test_case_3_1_9_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_10, tgrp_case_3_1_10, name_case_3_1_10, desc_case_3_1_10, sref_case_3_1_10, {
+	test_case_3_1_10_stream_0, test_case_3_1_10_stream_1, test_case_3_1_10_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_1_11, tgrp_case_3_1_11, name_case_3_1_11, desc_case_3_1_11, sref_case_3_1_11, {
+	test_case_3_1_11_stream_0, test_case_3_1_11_stream_1, test_case_3_1_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, sref_case_3_2_1, {
+	test_case_3_2_1_stream_0, test_case_3_2_1_stream_1, test_case_3_2_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_2, tgrp_case_3_2_2, name_case_3_2_2, desc_case_3_2_2, sref_case_3_2_2, {
+	test_case_3_2_2_stream_0, test_case_3_2_2_stream_1, test_case_3_2_2_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_3, tgrp_case_3_2_3, name_case_3_2_3, desc_case_3_2_3, sref_case_3_2_3, {
+	test_case_3_2_3_stream_0, test_case_3_2_3_stream_1, test_case_3_2_3_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_4, tgrp_case_3_2_4, name_case_3_2_4, desc_case_3_2_4, sref_case_3_2_4, {
+	test_case_3_2_4_stream_0, test_case_3_2_4_stream_1, test_case_3_2_4_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_5, tgrp_case_3_2_5, name_case_3_2_5, desc_case_3_2_5, sref_case_3_2_5, {
+	test_case_3_2_5_stream_0, test_case_3_2_5_stream_1, test_case_3_2_5_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_6, tgrp_case_3_2_6, name_case_3_2_6, desc_case_3_2_6, sref_case_3_2_6, {
+	test_case_3_2_6_stream_0, test_case_3_2_6_stream_1, test_case_3_2_6_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_7, tgrp_case_3_2_7, name_case_3_2_7, desc_case_3_2_7, sref_case_3_2_7, {
+	test_case_3_2_7_stream_0, test_case_3_2_7_stream_1, test_case_3_2_7_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_8, tgrp_case_3_2_8, name_case_3_2_8, desc_case_3_2_8, sref_case_3_2_8, {
+	test_case_3_2_8_stream_0, test_case_3_2_8_stream_1, test_case_3_2_8_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_9, tgrp_case_3_2_9, name_case_3_2_9, desc_case_3_2_9, sref_case_3_2_9, {
+	test_case_3_2_9_stream_0, test_case_3_2_9_stream_1, test_case_3_2_9_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_10, tgrp_case_3_2_10, name_case_3_2_10, desc_case_3_2_10, sref_case_3_2_10, {
+	test_case_3_2_10_stream_0, test_case_3_2_10_stream_1, test_case_3_2_10_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_2_11, tgrp_case_3_2_11, name_case_3_2_11, desc_case_3_2_11, sref_case_3_2_11, {
+	test_case_3_2_11_stream_0, test_case_3_2_11_stream_1, test_case_3_2_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_1, tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, sref_case_3_3_1, {
+	test_case_3_3_1_stream_0, test_case_3_3_1_stream_1, test_case_3_3_1_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_2, tgrp_case_3_3_2, name_case_3_3_2, desc_case_3_3_2, sref_case_3_3_2, {
+	test_case_3_3_2_stream_0, test_case_3_3_2_stream_1, test_case_3_3_2_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_3, tgrp_case_3_3_3, name_case_3_3_3, desc_case_3_3_3, sref_case_3_3_3, {
+	test_case_3_3_3_stream_0, test_case_3_3_3_stream_1, test_case_3_3_3_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_4, tgrp_case_3_3_4, name_case_3_3_4, desc_case_3_3_4, sref_case_3_3_4, {
+	test_case_3_3_4_stream_0, test_case_3_3_4_stream_1, test_case_3_3_4_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_5, tgrp_case_3_3_5, name_case_3_3_5, desc_case_3_3_5, sref_case_3_3_5, {
+	test_case_3_3_5_stream_0, test_case_3_3_5_stream_1, test_case_3_3_5_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_6, tgrp_case_3_3_6, name_case_3_3_6, desc_case_3_3_6, sref_case_3_3_6, {
+	test_case_3_3_6_stream_0, test_case_3_3_6_stream_1, test_case_3_3_6_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_7, tgrp_case_3_3_7, name_case_3_3_7, desc_case_3_3_7, sref_case_3_3_7, {
+	test_case_3_3_7_stream_0, test_case_3_3_7_stream_1, test_case_3_3_7_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_8, tgrp_case_3_3_8, name_case_3_3_8, desc_case_3_3_8, sref_case_3_3_8, {
+	test_case_3_3_8_stream_0, test_case_3_3_8_stream_1, test_case_3_3_8_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_9, tgrp_case_3_3_9, name_case_3_3_9, desc_case_3_3_9, sref_case_3_3_9, {
+	test_case_3_3_9_stream_0, test_case_3_3_9_stream_1, test_case_3_3_9_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_10, tgrp_case_3_3_10, name_case_3_3_10, desc_case_3_3_10, sref_case_3_3_10, {
+	test_case_3_3_10_stream_0, test_case_3_3_10_stream_1, test_case_3_3_10_stream_2}, &begin_pipe_tests, &end_pipe_tests, 0, 0}, {
+		numb_case_3_3_11, tgrp_case_3_3_11, name_case_3_3_11, desc_case_3_3_11, sref_case_3_3_11, {
+	test_case_3_3_11_stream_0, test_case_3_3_11_stream_1, test_case_3_3_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/10/11 10:45:45 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/11 10:45:45 $ by $Author: brian $
+ Last Modified $Date: 2005/10/12 10:20:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/10/11 10:45:45 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/10/11 10:45:45 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $";
 
 //#define __NO_VERSION__
 
@@ -95,12 +95,14 @@ static char const ident[] =
 #include "src/kernel/strsad.h"	/* for autopush */
 #include "src/kernel/strutil.h"	/* for q locking and puts and gets */
 #include "src/kernel/strattach.h"	/* for do_fattach/do_fdetach */
+#if 0
 #include "src/kernel/strpipe.h"	/* for do_spipe */
+#endif
 #include "src/drivers/clone.h"	/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/10/11 10:45:45 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -540,6 +542,22 @@ straccess(struct stdata *sd, const int access)
 #endif
 	register int flags = sd->sd_flag;
 
+	if ((access & (FREAD | FWRITE))) {
+		/* POSIX semantics for pipes and FIFOs */
+		if (flags & (STRISFIFO | STRISPIPE)) {
+			if (flags & STRISPIPE) {
+				if ((access & (FREAD | FWRITE)) && sd->sd_wq->q_next != sd->sd_rq
+				    && (sd->sd_other == NULL || (sd->sd_other->sd_flag & STRCLOSE)))
+					goto estrpipe;
+			}
+			if (flags & STRISFIFO) {
+				if ((access & FREAD) && sd->sd_writers == 0)
+					goto estrpipe;
+				if ((access & FWRITE) && sd->sd_readers == 0)
+					goto estrpipe;
+			}
+		}
+	}
 	/* no errors for close */
 	if (!(access & FTRUNC)) {
 		if ((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP))) {
@@ -612,22 +630,6 @@ straccess(struct stdata *sd, const int access)
 				return (-EIO);
 			kill_pg(pgrp, SIGTTOU, 1);
 			return (-ERESTARTSYS);
-		}
-	}
-	if (!(access & (FREAD | FWRITE)))
-		return (0);
-	/* POSIX semantics for pipes and FIFOs */
-	if (flags & (STRISFIFO | STRISPIPE)) {
-		if (flags & STRISPIPE) {
-			if ((access & (FREAD | FWRITE))
-			    && (sd->sd_other == NULL || (sd->sd_other->sd_flag & STRCLOSE)))
-				goto estrpipe;
-		}
-		if (flags & STRISFIFO) {
-			if ((access & FREAD) && sd->sd_writers == 0)
-				goto estrpipe;
-			if ((access & FWRITE) && sd->sd_readers == 0)
-				goto estrpipe;
 		}
 	}
 	return (0);
@@ -1785,6 +1787,9 @@ strwaitclose(struct stdata *sd, int oflag)
 	}
 	/* STREAM head last */
 	ctrace(qdetach(sd->sd_rq, oflag, crp));
+	/* procs are off for the STREAM head, flush queues now to dump M_PASSFP. */
+	flushq(sd->sd_rq, FLUSHALL);
+	flushq(sd->sd_wq, FLUSHALL);
 	trace();
 }
 
@@ -2794,6 +2799,83 @@ strunlink(struct stdata *stp)
 	}
 }
 
+#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
+ || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
+ || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
+EXPORT_SYMBOL(strwsrv);
+#endif
+
+#if !HAVE_KILL_SL_EXPORT
+#if HAVE_KILL_SL_ADDR
+static int (*kill_sl_func) (pid_t, int, int) = (typeof(kill_sl_func)) HAVE_KILL_SL_ADDR;
+
+#define kill_sl kill_sl_func
+#else
+STATIC int
+__kill_sl_info(int sig, struct siginfo *info, pid_t sess)
+{
+#if HAVE_SEND_GROUP_SIG_INFO_ADDR
+	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) =
+	    (typeof(send_group_sig_info)) HAVE_SEND_GROUP_SIG_INFO_ADDR;
+#endif
+	struct task_struct *p;
+	int retval = -ESRCH;
+
+	do_each_task_pid(sess, PIDTYPE_SID, p) {
+		int err;
+
+		if (!p->signal->leader)
+			continue;
+		err = send_group_sig_info(sig, info, p);
+		if (retval)
+			retval = err;
+	}
+	while_each_task_pid(sess, PIDTYPE_SID, p);
+	return (retval);
+}
+
+int
+kill_sl_info(int sig, struct siginfo *info, pid_t sess)
+{
+	int error;
+
+	read_lock(&tasklist_lock);
+	error = __kill_sl_info(sig, info, sess);
+	read_unlock(&tasklist_lock);
+	return (error);
+}
+
+int
+kill_sl(pid_t sess, int sig, int priv)
+{
+	return kill_sl_info(sig, (void *) (long) (priv != 0), sess);
+}
+#endif
+#endif
+
+STATIC inline streams_fastcall void
+strhangup(struct stdata *sd)
+{
+	/* If we are a pipe and are fattached, and the other end of the pipe is closing or has
+	   closed (which is why the M_HANGUP was sent), then the STREAM head is supposed to be
+	   unmounted, and if it is not opened, closed. */
+	if (!test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
+		strwakeall(sd);	/* only interruptible */
+		strevent(sd, S_HANGUP, 0);
+		/* If we are a control terminal, we are supposed to send SIGHUP to the session
+		   leader.  The terminal controller (ldterm) should not send us an M_HANGUP message 
+		   if CLOCAL is set. Linux sends SIGCONT after SIGHUP on consoles. Solaris sends
+		   SIGTSTP to the foreground process group that doesn't make much sense (its a
+		   hack). */
+		if (test_bit(STRISTTY_BIT, &sd->sd_flag))
+			kill_sl(sd->sd_session, SIGHUP, 1);
+		if (test_bit(STRISPIPE_BIT, &sd->sd_flag))
+			if (test_bit(STRMOUNT_BIT, &sd->sd_flag)) {
+				/* TODO: fdetach the inode and possibly close the stream */
+			}
+	}
+}
+
 /**
  *  strlastclose: - do the last close of a stream
  *  @sd:	the STREAM head to close
@@ -2846,6 +2928,8 @@ strunlink(struct stdata *stp)
 STATIC void
 strlastclose(struct stdata *sd, int oflag)
 {
+	struct stdata *sd_other;
+
 	ptrace(("last close of stream %p\n", sd));
 	/* First order of business is to wake everybody up.  We have already set the STRCLOSE bit
 	   by this point and when the waiters wake up, straccess() will kick them out with an
@@ -2855,18 +2939,16 @@ strlastclose(struct stdata *sd, int oflag)
 		wake_up_all(&sd->sd_waitq);
 
 	trace();
-	if (sd->sd_other && sd->sd_wq->q_next) {
-		mblk_t *b;
-
+	if ((sd_other = sd->sd_other)) {
 		trace();
 		/* Perhaps strlastclose() should first send a M_HANGUP message downstream in the
-		   same fashion as needs to be done for pipes and master pseudo-terminals. */
-		while (!(b = allocb(0, BPRI_WAITOK))) ;
-
-		b->b_datap->db_type = M_HANGUP;
-
-		ctrace(put(sd->sd_wq, b));
-		trace();
+		   same fashion as needs to be done for pipes and master pseudo-terminals, however
+		   rather than generating the message we perform the actions on the other stream
+		   head directly. */
+		strhangup(sd->sd_other);
+		ctrace(sd_put(&sd->sd_other));
+		/* we do not free the stream head (or stream head queue pair) until the other
+		   stream head does this too */
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -2880,8 +2962,8 @@ strlastclose(struct stdata *sd, int oflag)
 	ctrace(cdrv_put(sd->sd_cdevsw));
 	sd->sd_cdevsw = NULL;
 
-	/* not last put, but it had better be the next to last */
-	assure(atomic_read(&((struct shinfo *) sd)->sh_refs) == 2);
+	/* not last put, but it had better be the next to last if not a pipe */
+	assure(sd_other != NULL || atomic_read(&((struct shinfo *) sd)->sh_refs) == 2);
 
 	/* this sd_put() balances the original allocation of the stream */
 	ctrace(sd_put(&sd));	/* not last put */
@@ -4640,6 +4722,7 @@ strfdetach(const char *path)
 #endif
 }
 
+#if 0
 /**
  *  strpipe: - pipe system call
  *  @fds: array to which to return two file descriptors
@@ -4653,6 +4736,7 @@ strpipe(int fds[2])
 	return (-ENOSYS);
 #endif
 }
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -6393,13 +6477,8 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!fifo && !pipe)
 		goto unlock_exit;
 
-	if (fifo)
+	if (fifo || (pipe && !(s2 = sd->sd_other)))
 		s2 = sd;
-	if (pipe)
-		s2 = sd->sd_other;
-
-	if (!s2)
-		goto unlock_exit;
 
 	if ((err = straccess_rlock(s2, (FREAD | FEXCL | FNDELAY))))
 		goto unlock_exit;
@@ -6410,10 +6489,19 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2)));
 
-	/* can't pass our own file descriptor on a FIFO */
+	/* Ok, with this approach we have a problem with passing a file pointer that is associated
+	   with the stream head to which it is passed.  The problem is that if the M_PASSFP message
+	   containing a file pointer to the stream head sits on that stream head's read queue when
+	   the last file descriptor is closed, that stream head will never close.  Therefore, if the
+	   file pointer passed is associated with the stream head to which we are passing the file
+	   pointer, we return EINVAL.  In general it is not very useful to pass a stream head its own 
+	   file pointer. */
 	err = -EINVAL;
-	if (fifo && f2 == file)
+	if (f2->f_op && f2->f_op->release == &strclose && stri_lookup(f2) == s2)
 		goto fput_exit;
+
+	/* There is also some problem with sending one pipe end's file pointer to the other,
+	 * however, we new flush Stream head queues on close as well as on qput(). */
 
 	/* SVR 4 SPG says that this message is placed directly on the read queue of the target
 	   stream head. */
@@ -6748,6 +6836,7 @@ str_i_fdetach(struct file *file, struct stdata *sd, unsigned long arg)
 	return strfdetach(path);
 }
 
+#if 0
 /**
  *  str_i_pipe: - perform pipe(2) system call emulation as streamio(7) ioctl
  *  @file: file pointer for the stream
@@ -6770,6 +6859,70 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 
 	return (err);
 }
+#else
+/**
+ *  str_i_pipe: - support pipe(2) system call
+ *  @file: file pointer for the stream
+ *  @sd: stream head
+ *  @arg: pointer to array into which to receive two file descriptors
+ *
+ *  This is done a little different.  Open up one pipe device (/dev/sfx) another pipe device and
+ *  then do ioctl(fd1, I_PIPE, fd2) to link them together into a bidirectional pipe.
+ */
+STATIC int
+str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err;
+
+	if (!(err = straccess_rlock(sd, FCREAT))) {
+
+		err = -EINVAL;
+		if (test_bit(STRISPIPE_BIT, &sd->sd_flag)
+		    && sd->sd_other == NULL && sd->sd_wq->q_next == sd->sd_rq) {
+			struct file *f2;
+
+			err = -EBADF;
+			if ((f2 = fget(arg)) && f2->f_op && f2->f_op->release == &strclose) {
+				struct stdata *sd2;
+
+				err = -EIO;
+				if (ctrace(sd2 = sd_get(stri_lookup(f2)))) {
+
+					err = -EINVAL;
+					if (sd != sd2 && !(err = straccess_rlock(sd2, FCREAT))) {
+
+						err = -EINVAL;
+						if (test_bit(STRISPIPE_BIT, &sd2->sd_flag)
+						    && sd2->sd_other == NULL
+						    && sd2->sd_wq->q_next == sd2->sd_rq) {
+							unsigned long pl, pl2;
+
+							pl = pwlock(sd);
+							pl2 = pwlock(sd2);
+
+							/* weld 'em together */
+							sd->sd_other = sd_get(sd2);
+							sd2->sd_other = sd_get(sd);
+
+							sd->sd_wq->q_next = sd2->sd_rq;
+							sd2->sd_wq->q_next = sd->sd_rq;
+
+							pwunlock(sd2, pl2);
+							pwunlock(sd, pl);
+							err = 0;
+						}
+						srunlock(sd2);
+					}
+					ctrace(sd_put(&sd2));
+				}
+				fput(f2);
+			}
+		}
+		srunlock(sd);
+	}
+	return (err);
+}
+#endif
 
 STATIC int
 str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg,
@@ -7418,60 +7571,6 @@ strwsrv(queue_t *q)
 	return (0);
 }
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
- || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL(strwsrv);
-#endif
-
-#if !HAVE_KILL_SL_EXPORT
-#if HAVE_KILL_SL_ADDR
-static int (*kill_sl_func) (pid_t, int, int) = (typeof(kill_sl_func)) HAVE_KILL_SL_ADDR;
-
-#define kill_sl kill_sl_func
-#else
-STATIC int
-__kill_sl_info(int sig, struct siginfo *info, pid_t sess)
-{
-#if HAVE_SEND_GROUP_SIG_INFO_ADDR
-	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) =
-	    (typeof(send_group_sig_info)) HAVE_SEND_GROUP_SIG_INFO_ADDR;
-#endif
-	struct task_struct *p;
-	int retval = -ESRCH;
-
-	do_each_task_pid(sess, PIDTYPE_SID, p) {
-		int err;
-
-		if (!p->signal->leader)
-			continue;
-		err = send_group_sig_info(sig, info, p);
-		if (retval)
-			retval = err;
-	}
-	while_each_task_pid(sess, PIDTYPE_SID, p);
-	return (retval);
-}
-
-int
-kill_sl_info(int sig, struct siginfo *info, pid_t sess)
-{
-	int error;
-
-	read_lock(&tasklist_lock);
-	error = __kill_sl_info(sig, info, sess);
-	read_unlock(&tasklist_lock);
-	return (error);
-}
-
-int
-kill_sl(pid_t sess, int sig, int priv)
-{
-	return kill_sl_info(sig, (void *) (long) (priv != 0), sess);
-}
-#endif
-#endif
-
 /*
  *  Read Message Handling
  *  =========================================================================
@@ -7762,24 +7861,7 @@ str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   exists, it is unspecified whether on (sic) EOF condition or [EIO] is returned.  Any
 	   subsequent write() to the terminal device shall return -1, with errno set to [EIO],
 	   until the device is closed." */
-	/* If we are a pipe and are fattached, and the other end of the pipe is closing or has
-	   closed (which is why the M_HANGUP was sent), then the STREAM head is supposed to be
-	   unmounted, and if it is not opened, closed. */
-	if (!test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
-		strwakeall(sd);	/* only interruptible */
-		strevent(sd, S_HANGUP, 0);
-		/* If we are a control terminal, we are supposed to send SIGHUP to the session
-		   leader.  The terminal controller (ldterm) should not send us an M_HANGUP message 
-		   if CLOCAL is set. Linux sends SIGCONT after SIGHUP on consoles. Solaris sends
-		   SIGTSTP to the foreground process group that doesn't make much sense (its a
-		   hack). */
-		if (test_bit(STRISTTY_BIT, &sd->sd_flag))
-			kill_sl(sd->sd_session, SIGHUP, 1);
-		if (test_bit(STRISPIPE_BIT, &sd->sd_flag))
-			if (test_bit(STRMOUNT_BIT, &sd->sd_flag)) {
-				/* TODO: fdetach the inode and possibly close the stream */
-			}
-	}
+	strhangup(sd);
 	freemsg(mp);
 	return (0);
 }
@@ -8019,7 +8101,8 @@ EXPORT_SYMBOL(strrput);
  *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
  *  @crp:	pointer to user's credentials structure
  *
- *  XXX: Should really move all of stropen() for already existing stream heads to here.
+ *  These could be separated into str_open, fifo_qopen and pipe_qopen but it is simpler to just
+ *  leave them all in one.
  */
 int
 str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
@@ -8055,13 +8138,26 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		/* fifos cannot be clone opened */
 		if (sflag == CLONEOPEN)
 			return (-ENXIO);
-		/* start off life as a fifo */
+		/* start off life as a fifo: named pipe */
 		_WR(q)->q_next = q;
 	} else if (sd->sd_flag & STRISPIPE) {
-		/* FIXME: create another stream head and attach it to the first */
-		/* FIXME: place a M_PASSFP message on the first stream head */
-		/* start off life as a fifo */
+		static int pipe_minor = 0;
+		static spinlock_t pipe_lock = SPIN_LOCK_UNLOCKED;
+		minor_t minor;
+
+		/* pipes must be clone opened */
+		if (sflag != CLONEOPEN)
+			return (-ENXIO);
+
+		spin_lock(&pipe_lock);
+		minor = ++pipe_minor;
+		spin_unlock(&pipe_lock);
+
+		/* start off life as a fifo: unidirectional unnamed pipe */
 		_WR(q)->q_next = q;
+
+		*devp = makedevice(getmajor(*devp), minor);
+		/* don't worry, if we wrap we will reuse inodes but not Stream heads */
 	} else if (sd->sd_flag & STRISSOCK) {
 		/* leave as null device for now */
 	}
