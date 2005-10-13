@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/10/09 20:23:02 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/10/13 10:58:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/09 20:23:02 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.53  2005/10/13 10:58:54  brian
+ - working up testing of sad(4) and sc(4)
+
  Revision 0.9.2.52  2005/10/09 20:23:02  brian
  - some simple corrections to message queueing and test cases
 
@@ -230,9 +233,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/10/09 20:23:02 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/10/13 10:58:54 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/10/09 20:23:02 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/10/13 10:58:54 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -308,7 +311,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define FFLUSH(stream)
 
 #define SHORT_WAIT	  20	// 100 // 10
-#define NORMAL_WAIT	 100	// 500 // 100
+#define NORMAL_WAIT	 200	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1UL
@@ -369,7 +372,6 @@ int show = 1;
 static long timer_scale = 1;
 
 #define TEST_TIMEOUT 5000
-#define SHORT_DELAY 100
 
 typedef struct timer_range {
 	long lo;
@@ -1607,7 +1609,7 @@ print_success(int child)
 		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if (verbose > 3)
 		print_double_int(child, msgs, child, state);
 }
 

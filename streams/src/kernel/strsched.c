@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/12 10:20:10 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/13 10:58:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/12 10:20:10 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/12 10:20:10 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/13 10:58:38 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/12 10:20:10 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/13 10:58:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3986,6 +3986,7 @@ sd_put(struct stdata **sdp)
 			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */
 			assure(atomic_read(&((struct queinfo *)q)->qu_refs) == 2);
+			ptrace(("queue references qu_refs = %d\n", atomic_read(&((struct queinfo *)q)->qu_refs)));
 			ctrace(qput(&sd->sd_wq));
 			ctrace(qput(&sd->sd_rq));	/* should be last put */
 			/* initial qget is balanced in qdetach()/qdelete() */

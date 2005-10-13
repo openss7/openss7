@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/07 09:34:14 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -391,7 +391,7 @@ sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case DRVOPEN:
 		if (minor != 0 && minor != 1)
 			break;
-		if (minor != 0 || crp->cr_uid == 0 || crp->cr_ruid == 0)
+		if (minor == 0 && crp->cr_uid != 0 && crp->cr_ruid != 0)
 			return (-EACCES);
 		*devp = makedevice(major, minor);
 		sads[minor].assigned |= 1;

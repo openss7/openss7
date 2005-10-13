@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/12 09:55:51 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/13 10:58:48 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/12 09:55:51 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.20  2005/10/13 10:58:48  brian
+ - working up testing of sad(4) and sc(4)
+
  Revision 0.9.2.19  2005/10/12 09:55:51  brian
  - STREAMS-based pipes are also working and tested
 
@@ -134,9 +137,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/12 09:55:51 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/13 10:58:48 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/12 09:55:51 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/13 10:58:48 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -4928,149 +4931,152 @@ int
 test_run(struct test_stream *stream[])
 {
 	int children = 0;
-	pid_t this_child, child[3] = { 0, };
+	pid_t this_pid;
 	int this_status, status[3] = { 0, };
 
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
-		switch ((child[2] = fork())) {
+		switch ((test_pid[2] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
 		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			if (child[1])
-				kill(child[1], SIGKILL);	/* toast stream[1] child */
+			if (test_pid[0])
+				kill(test_pid[0], SIGKILL);	/* toast stream[0] child */
+			if (test_pid[1])
+				kill(test_pid[1], SIGKILL);	/* toast stream[1] child */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
+			// printf("Child 2 pid is %d\n", (int)test_pid[2]);
 			break;
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
 	if (stream[1]) {
-		switch ((child[1] = fork())) {
+		switch ((test_pid[1] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
 		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			if (test_pid[0])
+				kill(test_pid[0], SIGKILL);	/* toast stream[0] child */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
+			// printf("Child 1 pid is %d\n", (int)test_pid[1]);
 			break;
 		}
 	} else
 		status[1] = __RESULT_SUCCESS;
 	if (stream[0]) {
-		switch ((child[0] = fork())) {
+		switch ((test_pid[0] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
 		case -1:	/* error */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
+			// printf("Child 0 pid is %d\n", (int)test_pid[0]);
 			break;
 		}
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
 	      waitagain:
-		if ((this_child = wait(&this_status)) > 0) {
+		if ((this_pid = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
-				if (this_child == child[0]) {
-					child[0] = 0;
+				if (this_pid == test_pid[0]) {
+					test_pid[0] = 0;
 					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[1])
-							kill(child[1], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
+						if (test_pid[1])
+							kill(test_pid[1], SIGKILL);
+						if (test_pid[2])
+							kill(test_pid[2], SIGKILL);
 					}
 				}
-				if (this_child == child[1]) {
-					child[1] = 0;
+				if (this_pid == test_pid[1]) {
+					test_pid[1] = 0;
 					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
+						if (test_pid[0])
+							kill(test_pid[0], SIGKILL);
+						if (test_pid[2])
+							kill(test_pid[2], SIGKILL);
 					}
 				}
-				if (this_child == child[2]) {
-					child[2] = 0;
+				if (this_pid == test_pid[2]) {
+					test_pid[2] = 0;
 					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[1])
-							kill(child[1], SIGKILL);
+						if (test_pid[0])
+							kill(test_pid[0], SIGKILL);
+						if (test_pid[1])
+							kill(test_pid[1], SIGKILL);
 					}
 				}
 			} else if (WIFSIGNALED(this_status)) {
 				int signal = WTERMSIG(this_status);
 
-				if (this_child == child[0]) {
+				if (this_pid == test_pid[0]) {
 					print_terminated(0, signal);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[0] = 0;
+					test_pid[0] = 0;
 				}
-				if (this_child == child[1]) {
+				if (this_pid == test_pid[1]) {
 					print_terminated(1, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[1] = 0;
+					test_pid[1] = 0;
 				}
-				if (this_child == child[2]) {
+				if (this_pid == test_pid[2]) {
 					print_terminated(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
 					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[2] = 0;
+					test_pid[2] = 0;
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
 
-				if (this_child == child[0]) {
+				if (this_pid == test_pid[0]) {
 					print_stopped(0, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[0] = __RESULT_FAILURE;
-					child[0] = 0;
+					test_pid[0] = 0;
 				}
-				if (this_child == child[1]) {
+				if (this_pid == test_pid[1]) {
 					print_stopped(1, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[1] = __RESULT_FAILURE;
-					child[1] = 0;
+					test_pid[1] = 0;
 				}
-				if (this_child == child[2]) {
+				if (this_pid == test_pid[2]) {
 					print_stopped(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[2] = __RESULT_FAILURE;
-					child[2] = 0;
+					test_pid[2] = 0;
 				}
 			}
 		} else {
@@ -5078,12 +5084,12 @@ test_run(struct test_stream *stream[])
 				timer_timeout = 0;
 				print_timeout(3);
 			}
-			if (child[0])
-				kill(child[0], SIGKILL);
-			if (child[1])
-				kill(child[1], SIGKILL);
-			if (child[2])
-				kill(child[2], SIGKILL);
+			if (test_pid[0])
+				kill(test_pid[0], SIGKILL);
+			if (test_pid[1])
+				kill(test_pid[1], SIGKILL);
+			if (test_pid[2])
+				kill(test_pid[2], SIGKILL);
 			goto waitagain;
 		}
 	}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/12 10:20:11 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/10/12 10:20:11 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3198,6 +3198,8 @@ stropen(struct inode *inode, struct file *file)
 		/* 1st step: attach the driver and call its open routine */
 		if ((err = qopen(sd->sd_rq, &dev, oflag, sflag, crp))) {
 			ptrace(("Error path taken for sd %p\n", sd));
+			qdelete(sd->sd_rq);	/* cancel original queue pair allocation */
+			ctrace(cdrv_put(xchg(&sd->sd_cdevsw, NULL))); /* cancel hold on module */
 			goto up_put_error;	/* will destroy new stream head */
 		}
 		/* 2nd step: check for redirected return */
@@ -3290,7 +3292,7 @@ stropen(struct inode *inode, struct file *file)
 	}
 	if (err) {
 		ptrace(("performing strclose() on sd %p\n", sd));
-		sd_put(&sd); /* avoid assure() statement in strclose() */
+		sd_put(&sd);	/* avoid assure() statement in strclose() */
 		strclose(inode, file);
 		goto error;
 	}
@@ -6670,16 +6672,16 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err, rval;
 
 	if ((err = copyin((typeof(&ic)) arg, &ic, sizeof(ic)))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		__ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	if ((rval = err = strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1)) < 0) {
-		ptrace(("Error path taken! err = %d\n", err));
+		__ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	/* POSIX says to copy out the ic_len member upon success. */
 	if ((err = copyout(&ic.ic_len, &((typeof(&ic)) arg)->ic_len, sizeof(ic.ic_len)))) {
-		ptrace(("Error path taken! err = %d\n", err));
+		__ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	return (rval);
@@ -7887,12 +7889,15 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 			union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 			/* allow module or driver to free cp_private */
+			__ptrace(("Rejecting M_COPYIN/M_COPYOUT.\n"));
 			mp->b_datap->db_type = M_IOCDATA;
 			mp->b_wptr = mp->b_rptr + sizeof(ioc->copyresp);
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			qreply(q, mp);
-		} else
+		} else {
+			swerr();
 			freemsg(mp);
+		}
 	}
 	return (0);
 }

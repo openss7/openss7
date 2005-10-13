@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:23 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/10/13 10:58:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:23 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:23 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/10/13 10:58:41 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:23 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/10/13 10:58:41 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:23 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/10/13 10:58:41 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -143,8 +143,6 @@ static struct module_info sc_minfo = {
  */
 struct sc {
 	int iocstate;
-	int transparent;
-	int count;
 };
 
 /* 
@@ -184,17 +182,27 @@ sc_wput(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case M_IOCTL:
+		__trace();
 		ioc = (typeof(ioc)) mp->b_rptr;
 		switch (ioc->iocblk.ioc_cmd) {
 		case SC_IOC_LIST:
+			/* there is really no reason why a regular user cannot list modules and
+			   related information. */
+#if 0
+			__trace();
 			err = -EPERM;
-			if (ioc->iocblk.ioc_uid != 0)
+			if (ioc->iocblk.ioc_uid != 0) {
+				__ptrace(("Error path taken!\n"));
 				goto nak;
+			}
+#endif
+			__trace();
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				void *addr = *(void **) dp->b_rptr;
 
+				__trace();
 				if (addr == NULL) {
-					rval = /* how name drivers and modules? */ 0;
+					rval = cdev_count + fmod_count;
 					goto ack;
 				}
 				mp->b_datap->db_type = M_COPYIN;
@@ -202,19 +210,19 @@ sc_wput(queue_t *q, mblk_t *mp)
 				ioc->copyreq.cq_size = sizeof(struct sc_list);
 				ioc->copyreq.cq_flag = 0;
 				sc->iocstate = 1;
-				sc->transparent = 1;
 				qreply(q, mp);
 				return (0);
 			}
-			sc->iocstate = 1;
-			sc->transparent = 0;
-			goto sc_list_state_1;
+			__trace();
+			err = -EINVAL;
+			goto nak;
 		}
 		break;
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
 		switch (ioc->copyresp.cp_cmd) {
 		case SC_IOC_LIST:
+			__trace();
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
 				struct fmodsw *fmod;
@@ -224,28 +232,48 @@ sc_wput(queue_t *q, mblk_t *mp)
 				struct sc_list *list;
 				struct sc_mlist *mlist;
 				struct qinit *qinit;
+				ssize_t size;
+				caddr_t uaddr;
 
+				__trace();
 				switch (sc->iocstate) {
 				case 1:
-				      sc_list_state_1:
+					if (ioc->copyresp.cp_rval != 0) {
+						__ptrace(("Aborting ioctl!\n"));
+						sc->iocstate = 0;
+						freemsg(mp);
+						return (0);
+					}
+					__trace();
 					n = 0;
-					err = -EFAULT;
-					if (!dp)
-						goto nak;
-					if (dp->b_wptr == dp->b_rptr) {
-						err = 0;
+					if (!dp || dp->b_wptr == dp->b_rptr) {
 						rval = cdev_count + fmod_count;
 						goto ack;
 					}
 					err = -EFAULT;
-					if (dp->b_wptr < dp->b_rptr + sizeof(*list))
+					if (dp->b_wptr < dp->b_rptr + sizeof(*list)) {
+						__ptrace(("Error path taken!\n"));
 						goto nak;
+					}
 					list = (typeof(list)) dp->b_rptr;
+					count = list->sc_nmods;
+					uaddr = (caddr_t) list->sc_mlist;
 					err = -EINVAL;
-					if (list->sc_nmods < 0)
+					if (count < 0) {
+						__ptrace(("Error path taken!\n"));
 						goto nak;
-					count = sc->count;
-					list->sc_nmods = count;
+					}
+					__trace();
+					freemsg(dp);
+					mp->b_cont = NULL;
+					size = count * sizeof(*mlist);
+					err = -ENOSR;
+					if (!(dp = allocb(BPRI_MED, size))) {
+						__ptrace(("Error path taken!\n"));
+						goto nak;
+					}
+					mp->b_cont = dp;
+					dp->b_wptr = dp->b_rptr + size;
 					mlist = (typeof(mlist)) dp->b_rptr;
 					/* list all devices */
 					read_lock(&cdevsw_lock);
@@ -253,47 +281,64 @@ sc_wput(queue_t *q, mblk_t *mp)
 						if (n >= count)
 							break;
 						cdev = list_entry(pos, struct cdevsw, d_list);
+
 						qinit = cdev->d_str->st_rdinit;
 						mlist->major = cdev->d_major;
 						mlist->mi = *qinit->qi_minfo;
-						if (qinit->qi_mstat)
+						strncpy(mlist->name, mlist->mi.mi_idname,
+							FMNAMESZ + 1);
+						mlist->mi.mi_idname = NULL;
+						if (qinit->qi_mstat) {
 							mlist->ms = *qinit->qi_mstat;
+							mlist->ms.ms_xptr = NULL;
+						}
 						n++;
 						mlist++;
 					}
 					read_unlock(&cdevsw_lock);
+					__trace();
 					/* list all modules */
 					read_lock(&fmodsw_lock);
 					list_for_each(pos, &fmodsw_list) {
 						if (n >= count)
 							break;
 						fmod = list_entry(pos, struct fmodsw, f_list);
+
 						qinit = fmod->f_str->st_rdinit;
 						mlist->major = 0;
 						mlist->mi = *qinit->qi_minfo;
-						if (qinit->qi_mstat)
+						strncpy(mlist->name, mlist->mi.mi_idname,
+							FMNAMESZ + 1);
+						mlist->mi.mi_idname = NULL;
+						if (qinit->qi_mstat) {
 							mlist->ms = *qinit->qi_mstat;
+							mlist->ms.ms_xptr = NULL;
+						}
 						n++;
 						mlist++;
 					}
 					read_unlock(&fmodsw_lock);
+					__trace();
 					/* zero all excess elements */
 					for (; n < count; n++, mlist++) {
 						mlist->major = -1;
 					}
+					__trace();
 					mp->b_datap->db_type = M_COPYOUT;
-					ioc->copyreq.cq_addr = (void *) list->sc_mlist;
-					ioc->copyreq.cq_size = sc->count * sizeof(struct sc_mlist);
+					ioc->copyreq.cq_addr = uaddr;
+					ioc->copyreq.cq_size = size;
 					ioc->copyreq.cq_flag = 0;
 					sc->iocstate = 2;
 					qreply(q, mp);
 					return (0);
 				case 2:
 					/* done */
+					rval = cdev_count + fmod_count;
 					sc->iocstate = 0;
 					goto ack;
 				}
 			}
+			__ptrace(("Error path taken!\n"));
 			goto nak;
 		}
 	      nak:
@@ -306,7 +351,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		return (0);
 	      ack:
 		sc->iocstate = 0;
-		mp->b_datap->db_type = M_IOCNAK;
+		mp->b_datap->db_type = M_IOCACK;
 		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_rval = rval;
 		ioc->iocblk.ioc_error = 0;
@@ -338,12 +383,14 @@ sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (sflag == MODOPEN && WR(q)->q_next != NULL) {
 		struct sc *sc;
 
+		/* don't need to be privileged to push the module, just to use it */
+#if 0
 		if (crp->cr_uid != 0 && crp->cr_ruid != 0)
 			return (-EACCES);
+#endif
 		if (!(sc = kmem_alloc(sizeof(*sc), KM_NOSLEEP)))
 			return (-ENOMEM);
 		sc->iocstate = 0;
-		sc->transparent = 0;
 		q->q_ptr = WR(q)->q_ptr = sc;
 		return (0);
 	}
@@ -359,7 +406,6 @@ sc_close(queue_t *q, int oflag, cred_t *crp)
 	if (!sc)
 		return (ENXIO);
 	sc->iocstate = 0;
-	sc->transparent = 0;
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	kmem_free(q->q_ptr, sizeof(struct sc));
 	return (0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.3 2005/10/07 09:34:10 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.4 2005/10/13 10:58:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:10 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
+ Revision 0.9.2.4  2005/10/13 10:58:34  brian
+ - working up testing of sad(4) and sc(4)
+
  Revision 0.9.2.3  2005/10/07 09:34:10  brian
  - more testing and corrections
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_STREAMS_TESTMOD_H__
 #define __SYS_STREAMS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_TESTMOD_H__
 #warning "Do no include sys/streams/testmod.h directly, include sys/testmod.h instead."
@@ -78,5 +81,7 @@
 #define TM_IOC_RWERR		((TM_IOC_MAGIC << 8) | 0x04)
 #define TM_IOC_PSIGNAL		((TM_IOC_MAGIC << 8) | 0x05)
 #define TM_IOC_NSIGNAL		((TM_IOC_MAGIC << 8) | 0x06)
+#define TM_IOC_COPYIN		((TM_IOC_MAGIC << 8) | 0x07)
+#define TM_IOC_COPYOUT		((TM_IOC_MAGIC << 8) | 0x08)
 
 #endif				/* __SYS_STREAMS_TESTMOD_H__ */

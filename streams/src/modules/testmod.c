@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:24 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.5  2005/10/13 10:58:44  brian
+ - working up testing of sad(4) and sc(4)
+
  Revision 0.9.2.4  2005/10/07 09:34:24  brian
  - more testing and corrections
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/07 09:34:24 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -167,15 +170,14 @@ testmod_rput(queue_t *q, mblk_t *mp)
 static int
 testmod_wput(queue_t *q, mblk_t *mp)
 {
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	int err = EINVAL;
+	int rval = 0;
+
 	/* we don't queue so we don't need to worry about M_FLUSH */
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
-	{
-		struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
-		int err = EINVAL;
-		int rval = 0;
-
-		switch (ioc->ioc_cmd) {
+		switch (ioc->iocblk.ioc_cmd) {
 		case TM_IOC_HANGUP:
 			/* It is convenient to by able to synthesize an M_HANGUP message upstream
 			   so that the test program can test the response of a hung up stream to
@@ -245,6 +247,61 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			err = ENOSR;
 			goto nak;
 		}
+		case TM_IOC_COPYIN:
+		{
+			mp->b_datap->db_type = M_COPYIN;
+			ioc->copyreq.cq_addr = *(caddr_t *) mp->b_cont->b_rptr;
+			mp->b_cont->b_rptr = mp->b_cont->b_datap->db_base;
+			mp->b_cont->b_wptr = mp->b_cont->b_datap->db_lim;
+			ioc->copyreq.cq_size = mp->b_cont->b_wptr - mp->b_cont->b_rptr;
+			ioc->copyreq.cq_flag = 0;
+			ioc->copyreq.cq_private = NULL;
+			goto reply;
+		}
+		case TM_IOC_COPYOUT:
+		{
+			mp->b_datap->db_type = M_COPYOUT;
+			ioc->copyreq.cq_addr = *(caddr_t *) mp->b_cont->b_rptr;
+			mp->b_cont->b_rptr = mp->b_cont->b_datap->db_base;
+			mp->b_cont->b_wptr = mp->b_cont->b_datap->db_lim;
+			ioc->copyreq.cq_size = mp->b_cont->b_wptr - mp->b_cont->b_rptr;
+			ioc->copyreq.cq_flag = 0;
+			ioc->copyreq.cq_private = NULL;
+			goto reply;
+		}
+		default:
+			/* pass along anything we don't understand */
+			break;
+		}
+		break;
+	case M_IOCDATA:
+		switch (ioc->copyresp.cp_cmd) {
+		case TM_IOC_HANGUP:
+		case TM_IOC_RDERR:
+		case TM_IOC_WRERR:
+		case TM_IOC_RWERR:
+		case TM_IOC_PSIGNAL:
+		case TM_IOC_NSIGNAL:
+			if (ioc->copyresp.cp_rval != NULL)
+				/* abort operations */
+				goto free_it;
+			break;
+		case TM_IOC_COPYIN:
+		{
+			if (ioc->copyresp.cp_rval != NULL)
+				/* abort operations */
+				goto free_it;
+			rval = 0;
+			goto ack;
+		}
+		case TM_IOC_COPYOUT:
+		{
+			if (ioc->copyresp.cp_rval != NULL)
+				/* abort operations */
+				goto free_it;
+			rval = 0;
+			goto ack;
+		}
 		default:
 			/* pass along anything we don't understand */
 			break;
@@ -252,21 +309,24 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		break;
 	      ack:
 		mp->b_datap->db_type = M_IOCACK;
-		ioc->ioc_count = 0;
-		ioc->ioc_rval = rval;
-		ioc->ioc_error = 0;
-		qreply(q, mp);
-		return (0);
+		ioc->iocblk.ioc_count = 0;
+		ioc->iocblk.ioc_rval = rval;
+		ioc->iocblk.ioc_error = 0;
+		goto reply;
 	      nak:
 		mp->b_datap->db_type = M_IOCNAK;
-		ioc->ioc_count = 0;
-		ioc->ioc_rval = -1;
-		ioc->ioc_error = err;
-		qreply(q, mp);
-		return (0);
-	}
+		ioc->iocblk.ioc_count = 0;
+		ioc->iocblk.ioc_rval = -1;
+		ioc->iocblk.ioc_error = err;
+		goto reply;
 	}
 	putnext(q, mp);
+	return (0);
+      free_it:
+	freemsg(mp);
+	return (0);
+      reply:
+	qreply(q, mp);
 	return (0);
 }
 

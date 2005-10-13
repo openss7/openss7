@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:23 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/10 10:37:23 $ by $Author: brian $
+ Last Modified $Date: 2005/10/13 10:58:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sc.c,v $
+ Revision 0.9.2.18  2005/10/13 10:58:53  brian
+ - working up testing of sad(4) and sc(4)
+
  Revision 0.9.2.17  2005/10/10 10:37:23  brian
  - FIFOs working nicely and tested.
 
@@ -125,9 +128,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:23 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/10 10:37:23 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -163,6 +166,9 @@ static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.
 
 #include <linux/limits.h>
 
+#include <sys/sad.h>
+#include <sys/sc.h>
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -177,7 +183,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "SC";
-static char devname[256] = "/dev/sad/admin";
+static char devname[256] = "/dev/sad";
 
 static int exit_on_failure = 0;
 
@@ -201,7 +207,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define FFLUSH(stream)
 
 #define SHORT_WAIT	  20	// 100 // 10
-#define NORMAL_WAIT	 100	// 500 // 100
+#define NORMAL_WAIT	 200	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define INFINITE_WAIT	-1UL
@@ -262,7 +268,6 @@ int show = 1;
 static long timer_scale = 1;
 
 #define TEST_TIMEOUT 5000
-#define SHORT_DELAY 100
 
 typedef struct timer_range {
 	long lo;
@@ -912,6 +917,8 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("TM_IOC_PSIGNAL");
 	case TM_IOC_NSIGNAL:
 		return ("TM_IOC_NSIGNAL");
+	case SC_IOC_LIST:
+		return ("SC_IOC_LIST");
 	default:
 		return ("(unexpected)");
 	}
@@ -1500,7 +1507,7 @@ print_success(int child)
 		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if (verbose > 3)
 		print_double_int(child, msgs, child, state);
 }
 
@@ -2055,6 +2062,9 @@ preamble_0(int child)
 	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
+	if (test_ioctl(child, I_PUSH, (intptr_t) "sc") != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
 	return __RESULT_SUCCESS;
 }
 
@@ -2088,7 +2098,7 @@ postamble_0(int child)
 /*
  *  =========================================================================
  *
- *  Premables and Postambles...
+ *  Preambles and Postambles...
  *
  *  =========================================================================
  */
@@ -2116,7 +2126,7 @@ static const char test_group_1[] = "Open and close Streams";
 
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
-#define name_case_1_1 "Open and close 1 Stream."
+#define name_case_1_1 "Open and close 1 SAD Stream and push the SC module."
 #define sref_case_1_1 sref_none
 #define desc_case_1_1 "\
 Checks that one Stream can be opened and closed."
@@ -2141,7 +2151,7 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
  */
 #define tgrp_case_1_2 test_group_1
 #define numb_case_1_2 "1.2"
-#define name_case_1_2 "Open and close 3 Streams."
+#define name_case_1_2 "Open and close 3 SAD Streams and push the SC module."
 #define sref_case_1_2 sref_none
 #define desc_case_1_2 "\
 Checks that three Streams can be opened and closed."
@@ -2160,6 +2170,107 @@ struct test_stream test_1_2 = { NULL, &test_case_1_2, NULL };
 #define test_case_1_2_stream_0 (&test_1_2)
 #define test_case_1_2_stream_1 (&test_1_2)
 #define test_case_1_2_stream_2 (&test_1_2)
+
+static const char test_group_2[] = "STREAMS Configuration (SC) Module, ioctl(2).";
+static const char sref_group_2[] = "STREAMS Configuration (SC) Module, sc(4) manual page.";
+
+#define tgrp_case_2_1 test_group_2
+#define numb_case_2_1 "2.1"
+#define name_case_2_1 "Obtain the number of modules loaded on the system."
+#define sref_case_2_1 sref_group_2
+#define desc_case_2_1 "\
+Check that SC_IOC_LIST can be performed on the SC module.  Checks that an\n\
+argument of NULL will return the number of modules loaded on the system."
+
+int
+test_case_2_1(int child)
+{
+	if (test_ioctl(child, SC_IOC_LIST, (intptr_t) NULL) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	/* We should have at least 4 modules loaded, sth, clone, sad and sc. */
+	if (last_retval < 4)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_1 = { &preamble_0, &test_case_2_1, &postamble_0 };
+
+#define test_case_2_1_stream_0 (&test_2_1)
+#define test_case_2_1_stream_1 (NULL)
+#define test_case_2_1_stream_2 (NULL)
+
+#define tgrp_case_2_2 test_group_2
+#define numb_case_2_2 "2.2"
+#define name_case_2_2 "Obtain the number of modules loaded on the system."
+#define sref_case_2_2 sref_group_2
+#define desc_case_2_2 "\
+Check that SC_IOC_LIST can be performed on the SC module.  Checks that a\n\
+sc_nmods value of zero (0) and a sc_mlist pointer of (NULL) will return\n\
+the number of modules loaded on the system."
+
+int
+test_case_2_2(int child)
+{
+	struct sc_list scl = { 0, NULL };
+
+	if (test_ioctl(child, SC_IOC_LIST, (intptr_t) &scl) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	/* We should have at least 4 modules loaded, sth, clone, sad and sc. */
+	if (last_retval < 4)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2 = { &preamble_0, &test_case_2_2, &postamble_0 };
+
+#define test_case_2_2_stream_0 (&test_2_2)
+#define test_case_2_2_stream_1 (NULL)
+#define test_case_2_2_stream_2 (NULL)
+
+#define tgrp_case_2_3 test_group_2
+#define numb_case_2_3 "2.3"
+#define name_case_2_3 "Obtain information on modules loaded on the system."
+#define sref_case_2_3 sref_group_2
+#define desc_case_2_3 "\
+Check that SC_IOC_LIST can be performed on the SC module.  Checks that
+an adequately size sc_nmods value and a sc_mlist pointer will return
+information on all modules loaded on the system."
+
+int
+test_case_2_3(int child)
+{
+	struct sc_list scl = { 0, NULL };
+
+	if (test_ioctl(child, SC_IOC_LIST, (intptr_t) &scl) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	/* We should have at least 4 modules loaded, sth, clone, sad and sc. */
+	if ((scl.sc_nmods = last_retval) < 4)
+		return (__RESULT_FAILURE);
+	state++;
+	{
+		struct sc_mlist sml[scl.sc_nmods];
+
+		memset(sml, 0, scl.sc_nmods * sizeof(struct sc_mlist));
+		scl.sc_mlist = sml;
+		if (test_ioctl(child, SC_IOC_LIST, (intptr_t) &scl) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		{
+			int i;
+			for (i = 0; i < scl.sc_nmods; i++)
+				printf("%s\n", sml[i].name);
+		}
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3 = { &preamble_0, &test_case_2_3, &postamble_0 };
+
+#define test_case_2_3_stream_0 (&test_2_3)
+#define test_case_2_3_stream_1 (NULL)
+#define test_case_2_3_stream_2 (NULL)
 
 /*
  *  -------------------------------------------------------------------------
@@ -2254,149 +2365,152 @@ int
 test_run(struct test_stream *stream[])
 {
 	int children = 0;
-	pid_t this_child, child[3] = { 0, };
+	pid_t this_pid;
 	int this_status, status[3] = { 0, };
 
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
-		switch ((child[2] = fork())) {
+		switch ((test_pid[2] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
 		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			if (child[1])
-				kill(child[1], SIGKILL);	/* toast stream[1] child */
+			if (test_pid[0])
+				kill(test_pid[0], SIGKILL);	/* toast stream[0] child */
+			if (test_pid[1])
+				kill(test_pid[1], SIGKILL);	/* toast stream[1] child */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
+			// printf("Child 2 pid is %d\n", (int)test_pid[2]);
 			break;
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
 	if (stream[1]) {
-		switch ((child[1] = fork())) {
+		switch ((test_pid[1] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
 		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			if (test_pid[0])
+				kill(test_pid[0], SIGKILL);	/* toast stream[0] child */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
+			// printf("Child 1 pid is %d\n", (int)test_pid[1]);
 			break;
 		}
 	} else
 		status[1] = __RESULT_SUCCESS;
 	if (stream[0]) {
-		switch ((child[0] = fork())) {
+		switch ((test_pid[0] = fork())) {
 		case 00:	/* we are the child */
 			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
 		case -1:	/* error */
 			return __RESULT_FAILURE;
 		default:	/* we are the parent */
 			children++;
+			// printf("Child 0 pid is %d\n", (int)test_pid[0]);
 			break;
 		}
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
 	      waitagain:
-		if ((this_child = wait(&this_status)) > 0) {
+		if ((this_pid = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
-				if (this_child == child[0]) {
-					child[0] = 0;
+				if (this_pid == test_pid[0]) {
+					test_pid[0] = 0;
 					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[1])
-							kill(child[1], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
+						if (test_pid[1])
+							kill(test_pid[1], SIGKILL);
+						if (test_pid[2])
+							kill(test_pid[2], SIGKILL);
 					}
 				}
-				if (this_child == child[1]) {
-					child[1] = 0;
+				if (this_pid == test_pid[1]) {
+					test_pid[1] = 0;
 					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[2])
-							kill(child[2], SIGKILL);
+						if (test_pid[0])
+							kill(test_pid[0], SIGKILL);
+						if (test_pid[2])
+							kill(test_pid[2], SIGKILL);
 					}
 				}
-				if (this_child == child[2]) {
-					child[2] = 0;
+				if (this_pid == test_pid[2]) {
+					test_pid[2] = 0;
 					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
-						if (child[0])
-							kill(child[0], SIGKILL);
-						if (child[1])
-							kill(child[1], SIGKILL);
+						if (test_pid[0])
+							kill(test_pid[0], SIGKILL);
+						if (test_pid[1])
+							kill(test_pid[1], SIGKILL);
 					}
 				}
 			} else if (WIFSIGNALED(this_status)) {
 				int signal = WTERMSIG(this_status);
 
-				if (this_child == child[0]) {
+				if (this_pid == test_pid[0]) {
 					print_terminated(0, signal);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[0] = 0;
+					test_pid[0] = 0;
 				}
-				if (this_child == child[1]) {
+				if (this_pid == test_pid[1]) {
 					print_terminated(1, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[1] = 0;
+					test_pid[1] = 0;
 				}
-				if (this_child == child[2]) {
+				if (this_pid == test_pid[2]) {
 					print_terminated(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
 					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
-					child[2] = 0;
+					test_pid[2] = 0;
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
 
-				if (this_child == child[0]) {
+				if (this_pid == test_pid[0]) {
 					print_stopped(0, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[0] = __RESULT_FAILURE;
-					child[0] = 0;
+					test_pid[0] = 0;
 				}
-				if (this_child == child[1]) {
+				if (this_pid == test_pid[1]) {
 					print_stopped(1, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[1] = __RESULT_FAILURE;
-					child[1] = 0;
+					test_pid[1] = 0;
 				}
-				if (this_child == child[2]) {
+				if (this_pid == test_pid[2]) {
 					print_stopped(2, signal);
-					if (child[0])
-						kill(child[0], SIGKILL);
-					if (child[1])
-						kill(child[1], SIGKILL);
-					if (child[2])
-						kill(child[2], SIGKILL);
+					if (test_pid[0])
+						kill(test_pid[0], SIGKILL);
+					if (test_pid[1])
+						kill(test_pid[1], SIGKILL);
+					if (test_pid[2])
+						kill(test_pid[2], SIGKILL);
 					status[2] = __RESULT_FAILURE;
-					child[2] = 0;
+					test_pid[2] = 0;
 				}
 			}
 		} else {
@@ -2404,12 +2518,12 @@ test_run(struct test_stream *stream[])
 				timer_timeout = 0;
 				print_timeout(3);
 			}
-			if (child[0])
-				kill(child[0], SIGKILL);
-			if (child[1])
-				kill(child[1], SIGKILL);
-			if (child[2])
-				kill(child[2], SIGKILL);
+			if (test_pid[0])
+				kill(test_pid[0], SIGKILL);
+			if (test_pid[1])
+				kill(test_pid[1], SIGKILL);
+			if (test_pid[2])
+				kill(test_pid[2], SIGKILL);
 			goto waitagain;
 		}
 	}
@@ -2452,6 +2566,12 @@ struct test_case {
 	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
 	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, sref_case_2_1, {
+	test_case_2_1_stream_0, test_case_2_1_stream_1, test_case_2_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, {
+	test_case_2_2_stream_0, test_case_2_2_stream_1, test_case_2_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, {
+	test_case_2_3_stream_0, test_case_2_3_stream_1, test_case_2_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
