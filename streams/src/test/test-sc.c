@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/14 12:26:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:53 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:26:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sc.c,v $
+ Revision 0.9.2.19  2005/10/14 12:26:54  brian
+ - SC module and scls utility tested
+
  Revision 0.9.2.18  2005/10/13 10:58:53  brian
  - working up testing of sad(4) and sc(4)
 
@@ -128,9 +131,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/14 12:26:54 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/14 12:26:54 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2176,7 +2179,7 @@ static const char sref_group_2[] = "STREAMS Configuration (SC) Module, sc(4) man
 
 #define tgrp_case_2_1 test_group_2
 #define numb_case_2_1 "2.1"
-#define name_case_2_1 "Obtain the number of modules loaded on the system."
+#define name_case_2_1 "Perform SC_IOC_LIST."
 #define sref_case_2_1 sref_group_2
 #define desc_case_2_1 "\
 Check that SC_IOC_LIST can be performed on the SC module.  Checks that an\n\
@@ -2202,7 +2205,7 @@ struct test_stream test_2_1 = { &preamble_0, &test_case_2_1, &postamble_0 };
 
 #define tgrp_case_2_2 test_group_2
 #define numb_case_2_2 "2.2"
-#define name_case_2_2 "Obtain the number of modules loaded on the system."
+#define name_case_2_2 "Perform SC_IOC_LIST."
 #define sref_case_2_2 sref_group_2
 #define desc_case_2_2 "\
 Check that SC_IOC_LIST can be performed on the SC module.  Checks that a\n\
@@ -2231,15 +2234,40 @@ struct test_stream test_2_2 = { &preamble_0, &test_case_2_2, &postamble_0 };
 
 #define tgrp_case_2_3 test_group_2
 #define numb_case_2_3 "2.3"
-#define name_case_2_3 "Obtain information on modules loaded on the system."
+#define name_case_2_3 "Perform SC_IOC_LIST - EFAULT."
 #define sref_case_2_3 sref_group_2
 #define desc_case_2_3 "\
-Check that SC_IOC_LIST can be performed on the SC module.  Checks that
-an adequately size sc_nmods value and a sc_mlist pointer will return
-information on all modules loaded on the system."
+Check that SC_IOC_LIST can be performed on the SC module.  Checks that\n\
+EFAULT is returned when arg points outside the caller's address space."
 
 int
 test_case_2_3(int child)
+{
+	if (test_ioctl(child, SC_IOC_LIST, (intptr_t) -1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3 = { &preamble_0, &test_case_2_3, &postamble_0 };
+
+#define test_case_2_3_stream_0 (&test_2_3)
+#define test_case_2_3_stream_1 (NULL)
+#define test_case_2_3_stream_2 (NULL)
+
+#define tgrp_case_2_4 test_group_2
+#define numb_case_2_4 "2.4"
+#define name_case_2_4 "Perform SC_IOC_LIST."
+#define sref_case_2_4 sref_group_2
+#define desc_case_2_4 "\
+Check that SC_IOC_LIST can be performed on the SC module.  Checks that\n\
+an adequately size sc_nmods value and a sc_mlist pointer will return\n\
+information on all modules loaded on the system."
+
+int
+test_case_2_4(int child)
 {
 	struct sc_list scl = { 0, NULL };
 
@@ -2260,17 +2288,61 @@ test_case_2_3(int child)
 		{
 			int i;
 			for (i = 0; i < scl.sc_nmods; i++)
-				printf("%s\n", sml[i].name);
+				print_string(child, sml[i].name);
 		}
 	}
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_3 = { &preamble_0, &test_case_2_3, &postamble_0 };
+struct test_stream test_2_4 = { &preamble_0, &test_case_2_4, &postamble_0 };
 
-#define test_case_2_3_stream_0 (&test_2_3)
-#define test_case_2_3_stream_1 (NULL)
-#define test_case_2_3_stream_2 (NULL)
+#define test_case_2_4_stream_0 (&test_2_4)
+#define test_case_2_4_stream_1 (NULL)
+#define test_case_2_4_stream_2 (NULL)
+
+#define tgrp_case_2_5 test_group_2
+#define numb_case_2_5 "2.5"
+#define name_case_2_5 "Perform SC_IOC_LIST."
+#define sref_case_2_5 sref_group_2
+#define desc_case_2_5 "\
+Check that SC_IOC_LIST can be performed on the SC module.  Checks that\n\
+an undersized size sc_nmods value and a sc_mlist pointer will return\n\
+information on only those sc_nmods modules loaded on the system."
+
+int
+test_case_2_5(int child)
+{
+	struct sc_list scl = { 0, NULL };
+
+	if (test_ioctl(child, SC_IOC_LIST, (intptr_t) &scl) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	/* We should have at least 4 modules loaded, sth, clone, sad and sc. */
+	if ((scl.sc_nmods = last_retval) < 4)
+		return (__RESULT_FAILURE);
+	state++;
+	scl.sc_nmods--;
+	{
+		struct sc_mlist sml[scl.sc_nmods];
+
+		memset(sml, 0, scl.sc_nmods * sizeof(struct sc_mlist));
+		scl.sc_mlist = sml;
+		if (test_ioctl(child, SC_IOC_LIST, (intptr_t) &scl) != __RESULT_SUCCESS)
+			return (__RESULT_FAILURE);
+		{
+			int i;
+			for (i = 0; i < scl.sc_nmods; i++)
+				print_string(child, sml[i].name);
+		}
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_5 = { &preamble_0, &test_case_2_5, &postamble_0 };
+
+#define test_case_2_5_stream_0 (&test_2_5)
+#define test_case_2_5_stream_1 (NULL)
+#define test_case_2_5_stream_2 (NULL)
 
 /*
  *  -------------------------------------------------------------------------
@@ -2572,6 +2644,10 @@ struct test_case {
 	test_case_2_2_stream_0, test_case_2_2_stream_1, test_case_2_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, sref_case_2_3, {
 	test_case_2_3_stream_0, test_case_2_3_stream_1, test_case_2_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_4, tgrp_case_2_4, name_case_2_4, desc_case_2_4, sref_case_2_4, {
+	test_case_2_4_stream_0, test_case_2_4_stream_1, test_case_2_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_5, tgrp_case_2_5, name_case_2_5, desc_case_2_5, sref_case_2_5, {
+	test_case_2_5_stream_0, test_case_2_5_stream_1, test_case_2_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

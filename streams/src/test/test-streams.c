@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/10/13 10:58:54 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/10/14 12:26:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:54 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:26:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.54  2005/10/14 12:26:54  brian
+ - SC module and scls utility tested
+
  Revision 0.9.2.53  2005/10/13 10:58:54  brian
  - working up testing of sad(4) and sc(4)
 
@@ -233,9 +236,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/10/13 10:58:54 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/10/14 12:26:54 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/10/13 10:58:54 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/10/14 12:26:54 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1021,6 +1024,14 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("TM_IOC_PSIGNAL");
 	case TM_IOC_NSIGNAL:
 		return ("TM_IOC_NSIGNAL");
+	case TM_IOC_IOCTL:
+		return ("TM_IOC_IOCTL");
+	case TM_IOC_COPYIN:
+		return ("TM_IOC_COPYIN");
+	case TM_IOC_COPYOUT:
+		return ("TM_IOC_COPYOUT");
+	case TM_IOC_COPYIO:
+		return ("TM_IOC_COPYIO");
 	default:
 		return ("(unexpected)");
 	}
@@ -4885,6 +4896,36 @@ struct test_stream test_2_8_10 = { &preamble_5, &test_case_2_8_10, &postamble_5 
 #define test_case_2_8_10_stream_0 (&test_2_8_10)
 #define test_case_2_8_10_stream_1 (NULL)
 #define test_case_2_8_10_stream_2 (NULL)
+
+#define tgrp_case_2_8_11 test_group_2
+#define numb_case_2_8_11 "2.8.11"
+#define name_case_2_8_11 "Perform streamio I_STR."
+#define sref_case_2_8_11 sref_case_2_8
+#define desc_case_2_8_11 "\
+Checks that I_STR can be performed on a Stream.  Check that an I_STR\n\
+that copies data in and out is successful."
+
+int
+test_case_2_8_11(int child)
+{
+	char buf[1024] = { 0, };
+	struct strioctl ic = { .ic_cmd = TM_IOC_IOCTL, .ic_timout = 0, .ic_len = sizeof(buf), .ic_dp = buf, };
+	int i;
+
+	if (test_ioctl(child, I_STR, (intptr_t) &ic) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < sizeof(buf); i++)
+		if ((unsigned char) buf[i] != (unsigned char) 0xa5)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_8_11 = { &preamble_2, &test_case_2_8_11, &postamble_2 };
+
+#define test_case_2_8_11_stream_0 (&test_2_8_11)
+#define test_case_2_8_11_stream_1 (NULL)
+#define test_case_2_8_11_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one Stream - I_SETSIG
@@ -12423,6 +12464,167 @@ struct test_stream test_2_47 = { &preamble_0, &test_case_2_47, &postamble_0 };
 #define test_case_2_47_stream_0 (&test_2_47)
 #define test_case_2_47_stream_1 (NULL)
 #define test_case_2_47_stream_2 (NULL)
+
+#define tgrp_case_2_48_1 test_group_2
+#define numb_case_2_48_1 "2.48.1"
+#define name_case_2_48_1 "Perform streamio TRANSPARENT."
+#define sref_case_2_48_1 sref_none
+#define desc_case_2_48_1 "\
+Checks that a TRANSPARENT ioctl can be performed on a Stream.  Check\n\
+that a TRANSPARENT ioctl that that copies data in is successful."
+
+int
+test_case_2_48_1(int child)
+{
+	char buf[1024] = { 0, };
+	int i;
+
+	if (test_ioctl(child, TM_IOC_COPYIN, (intptr_t) buf) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_48_1 = { &preamble_2, &test_case_2_48_1, &postamble_2 };
+
+#define test_case_2_48_1_stream_0 (&test_2_48_1)
+#define test_case_2_48_1_stream_1 (NULL)
+#define test_case_2_48_1_stream_2 (NULL)
+
+#define tgrp_case_2_48_2 test_group_2
+#define numb_case_2_48_2 "2.48.2"
+#define name_case_2_48_2 "Perform streamio TRANSPARENT."
+#define sref_case_2_48_2 sref_none
+#define desc_case_2_48_2 "\
+Checks that a TRANSPARENT ioctl can be performed on a Stream.  Check\n\
+that a TRANSPARENT ioctl that that copies data out is successful."
+
+int
+test_case_2_48_2(int child)
+{
+	char buf[1024] = { 0, };
+	int i;
+
+	if (test_ioctl(child, TM_IOC_COPYOUT, (intptr_t) buf) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 64; i++)
+		if ((unsigned char) buf[i] != (unsigned char) 0xa5)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_48_2 = { &preamble_2, &test_case_2_48_2, &postamble_2 };
+
+#define test_case_2_48_2_stream_0 (&test_2_48_2)
+#define test_case_2_48_2_stream_1 (NULL)
+#define test_case_2_48_2_stream_2 (NULL)
+
+#define tgrp_case_2_48_3 test_group_2
+#define numb_case_2_48_3 "2.48.3"
+#define name_case_2_48_3 "Perform streamio TRANSPARENT."
+#define sref_case_2_48_3 sref_none
+#define desc_case_2_48_3 "\
+Checks that a TRANSPARENT ioctl can be performed on a Stream.  Check\n\
+that a TRANSPARENT ioctl that that copies data in and out is successful."
+
+int
+test_case_2_48_3(int child)
+{
+	char buf[1024] = { 0, };
+	int i;
+
+	if (test_ioctl(child, TM_IOC_COPYIO, (intptr_t) buf) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 64; i++)
+		if ((unsigned char) buf[i] != (unsigned char) 0xa5)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_48_3 = { &preamble_2, &test_case_2_48_3, &postamble_2 };
+
+#define test_case_2_48_3_stream_0 (&test_2_48_3)
+#define test_case_2_48_3_stream_1 (NULL)
+#define test_case_2_48_3_stream_2 (NULL)
+
+#define tgrp_case_2_48_4 test_group_2
+#define numb_case_2_48_4 "2.48.4"
+#define name_case_2_48_4 "Perform streamio TRANSPARENT - EFAULT."
+#define sref_case_2_48_4 sref_none
+#define desc_case_2_48_4 "\
+Checks that a TRANSPARENT ioctl can be performed on a Stream.  Check\n\
+that EFAULT is returned when the user address is invalid on a copyin\n\
+operation."
+
+int
+test_case_2_48_4(int child)
+{
+	if (test_ioctl(child, TM_IOC_COPYIN, (intptr_t) -1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_48_4 = { &preamble_2, &test_case_2_48_4, &postamble_2 };
+
+#define test_case_2_48_4_stream_0 (&test_2_48_4)
+#define test_case_2_48_4_stream_1 (NULL)
+#define test_case_2_48_4_stream_2 (NULL)
+
+#define tgrp_case_2_48_5 test_group_2
+#define numb_case_2_48_5 "2.48.5"
+#define name_case_2_48_5 "Perform streamio TRANSPARENT - EFAULT."
+#define sref_case_2_48_5 sref_none
+#define desc_case_2_48_5 "\
+Checks that a TRANSPARENT ioctl can be performed on a Stream.  Check\n\
+that EFAULT is returned when the user address is invalid on a copyout\n\
+operation."
+
+int
+test_case_2_48_5(int child)
+{
+	if (test_ioctl(child, TM_IOC_COPYOUT, (intptr_t) -1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_48_5 = { &preamble_2, &test_case_2_48_5, &postamble_2 };
+
+#define test_case_2_48_5_stream_0 (&test_2_48_5)
+#define test_case_2_48_5_stream_1 (NULL)
+#define test_case_2_48_5_stream_2 (NULL)
+
+#define tgrp_case_2_48_6 test_group_2
+#define numb_case_2_48_6 "2.48.6"
+#define name_case_2_48_6 "Perform streamio TRANSPARENT - EFAULT."
+#define sref_case_2_48_6 sref_none
+#define desc_case_2_48_6 "\
+Checks that a TRANSPARENT ioctl can be performed on a Stream.  Check\n\
+that EFAULT is returned when the user address is invalid on a copyin\n\
+and copyout operation."
+
+int
+test_case_2_48_6(int child)
+{
+	if (test_ioctl(child, TM_IOC_COPYIO, (intptr_t) -1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_48_6 = { &preamble_2, &test_case_2_48_6, &postamble_2 };
+
+#define test_case_2_48_6_stream_0 (&test_2_48_6)
+#define test_case_2_48_6_stream_1 (NULL)
+#define test_case_2_48_6_stream_2 (NULL)
 
 static const char test_group_3[] = "Perform information transfer on one Stream";
 
@@ -20228,6 +20430,8 @@ struct test_case {
 	test_case_2_8_9_stream_0, test_case_2_8_9_stream_1, test_case_2_8_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_8_10, tgrp_case_2_8_10, name_case_2_8_10, desc_case_2_8_10, sref_case_2_8_10, {
 	test_case_2_8_10_stream_0, test_case_2_8_10_stream_1, test_case_2_8_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_8_11, tgrp_case_2_8_11, name_case_2_8_11, desc_case_2_8_11, sref_case_2_8_11, {
+	test_case_2_8_11_stream_0, test_case_2_8_11_stream_1, test_case_2_8_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_9_1, tgrp_case_2_9_1, name_case_2_9_1, desc_case_2_9_1, sref_case_2_9_1, {
 	test_case_2_9_1_stream_0, test_case_2_9_1_stream_1, test_case_2_9_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_9_2, tgrp_case_2_9_2, name_case_2_9_2, desc_case_2_9_2, sref_case_2_9_2, {
@@ -20760,6 +20964,18 @@ struct test_case {
 	test_case_2_46_stream_0, test_case_2_46_stream_1, test_case_2_46_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_47, tgrp_case_2_47, name_case_2_47, desc_case_2_47, sref_case_2_47, {
 	test_case_2_47_stream_0, test_case_2_47_stream_1, test_case_2_47_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_48_1, tgrp_case_2_48_1, name_case_2_48_1, desc_case_2_48_1, sref_case_2_48_1, {
+	test_case_2_48_1_stream_0, test_case_2_48_1_stream_1, test_case_2_48_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_48_2, tgrp_case_2_48_2, name_case_2_48_2, desc_case_2_48_2, sref_case_2_48_2, {
+	test_case_2_48_2_stream_0, test_case_2_48_2_stream_1, test_case_2_48_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_48_3, tgrp_case_2_48_3, name_case_2_48_3, desc_case_2_48_3, sref_case_2_48_3, {
+	test_case_2_48_3_stream_0, test_case_2_48_3_stream_1, test_case_2_48_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_48_4, tgrp_case_2_48_4, name_case_2_48_4, desc_case_2_48_4, sref_case_2_48_4, {
+	test_case_2_48_4_stream_0, test_case_2_48_4_stream_1, test_case_2_48_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_48_5, tgrp_case_2_48_5, name_case_2_48_5, desc_case_2_48_5, sref_case_2_48_5, {
+	test_case_2_48_5_stream_0, test_case_2_48_5_stream_1, test_case_2_48_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_48_6, tgrp_case_2_48_6, name_case_2_48_6, desc_case_2_48_6, sref_case_2_48_6, {
+	test_case_2_48_6_stream_0, test_case_2_48_6_stream_1, test_case_2_48_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, sref_case_3_1_1, {
 	test_case_3_1_1_stream_0, test_case_3_1_1_stream_1, test_case_3_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_1_2, tgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, sref_case_3_1_2, {

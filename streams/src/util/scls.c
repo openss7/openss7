@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/13 10:59:04 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/14 12:27:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:59:04 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:27:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/13 10:59:04 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/14 12:27:03 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/13 10:59:04 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/14 12:27:03 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -124,6 +124,10 @@ Arguments:\n\
 	specific drivers and modules to list instead of all drivers and\n\
 	modules\n\
 Options:\n\
+    -c, --count\n\
+        print module_stats only\n\
+    -l, --long\n\
+        print module_info and module_stats\n\
     -q, --quiet\n\
         suppress output\n\
     -d, --debug [LEVEL]\n\
@@ -223,7 +227,6 @@ main(int argc, char **argv)
 {
 	int i, fd, count;
 	struct sc_list *list;
-	struct strioctl ic;
 
 	while (1) {
 		int c, val;
@@ -333,47 +336,46 @@ main(int argc, char **argv)
 			exit(2);
 		}
 	}
+	if (debug)
+		fprintf(stderr, "%s: opening /dev/nuls\n", argv[0]);
 	if ((fd = open("/dev/nuls", O_RDWR)) < 0) {
 		if (debug)
 			fprintf(stderr, "%s: could not open /dev/nuls\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
+	if (debug)
+		fprintf(stderr, "%s: pushing sc module\n", argv[0]);
 	if (ioctl(fd, I_PUSH, "sc") < 0) {
 		if (debug)
 			fprintf(stderr, "%s: could not push sc module\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
+	if (debug)
+		fprintf(stderr, "%s: getting size of list\n", argv[0]);
 	/* go out and get all the names anyway */
-	ic.ic_cmd = SC_IOC_LIST;
-	ic.ic_timout = -1;
-	ic.ic_len = 0;
-	ic.ic_dp = NULL;
-	if ((count = ioctl(fd, I_STR, &ic) < 0)) {
+	if ((count = ioctl(fd, SC_IOC_LIST, NULL)) < 0) {
 		if (debug)
-			fprintf(stderr, "%s: could not perform I_STR command\n", argv[0]);
+			fprintf(stderr, "%s: could not perform SC_IOC_LIST command\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}
+	if (debug)
+		fprintf(stderr, "%s: size of list = %d\n", argv[0], count);
 	/* get entire list */
-	ic.ic_cmd = SC_IOC_LIST;
-	ic.ic_timout = -1;
-	ic.ic_len = sizeof(struct sc_list) + count * sizeof(struct sc_mlist);
-	ic.ic_dp = malloc(ic.ic_len);
-	if (ic.ic_dp == NULL) {
+	if ((list = malloc(sizeof(struct sc_list) + count * sizeof(struct sc_mlist))) == NULL) {
 		if (debug)
 			fprintf(stderr, "%s: could not allocate memory\n", argv[0]);
 		fprintf(stderr, "%s: %s\n", argv[0], strerror(ENOMEM));
 		fflush(stderr);
 		exit(1);
 	}
-	list = (struct sc_list *) ic.ic_dp;
 	list->sc_nmods = count;
 	list->sc_mlist = (struct sc_mlist *) (list + 1);
-	if (ioctl(fd, I_STR, &ic) < 0) {
+	if (ioctl(fd, SC_IOC_LIST, list) < 0) {
 		if (debug)
-			fprintf(stderr, "%s: could not perform second I_STR command\n", argv[0]);
+			fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
 		perror(argv[0]);
 		exit(1);
 	}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/11 10:45:43 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/10/14 12:26:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/11 10:45:43 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:26:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/11 10:45:43 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/10/14 12:26:42 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/11 10:45:43 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/10/14 12:26:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -273,11 +273,11 @@ do_spipe(int *fds)
 
 	err = -ENFILE;
 	if (!(fr = get_empty_filp())) {
-		__ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		goto error;
 	}
 	if (!(fw = get_empty_filp())) {
-		__ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		goto fr_put;
 	}
 	if ((cdev = cdev_find("pipe"))) {
@@ -290,31 +290,31 @@ do_spipe(int *fds)
 		snode = spec_snode(dev, cdev);
 		sdev_put(cdev);
 	} else {
-		__ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		goto fw_put;
 	}
 	if (!snode) {
-		__ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		goto fw_put;
 	}
 	if (IS_ERR(snode)) {
 		err = PTR_ERR(snode);
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		goto fw_put;
 	}
 	if ((fdr = get_unused_fd()) < 0) {
 		err = fdr;
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		goto snode_put;
 	}
 	if ((fdw = get_unused_fd()) < 0) {
 		err = fdw;
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		goto fdr_put;
 	}
 	err = -ENODEV;
 	if (!(mnt = specfs_mount())) {
-		__ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		goto fdw_put;
 	}
 
@@ -326,7 +326,7 @@ do_spipe(int *fds)
 		name.len = snprintf(buf, sizeof(buf), "STR pipe/%lu", getminor(dev));
 		err = -ENOMEM;
 		if (!(dentry = d_alloc(NULL, &name))) {
-			__ptrace(("Error path taken!\n"));
+			ptrace(("Error path taken!\n"));
 			goto mnt_put;
 		}
 		dentry->d_sb = snode->i_sb;
@@ -335,7 +335,7 @@ do_spipe(int *fds)
 	d_instantiate(dentry, snode);
 	err = -ENXIO;
 	if (!(f_op = snode->i_fop) || !f_op->open) {
-		__ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		goto dentry_put;
 	}
 	fops_get(f_op);
@@ -363,14 +363,14 @@ do_spipe(int *fds)
 
 	fr->f_flags |= O_CLONE;
 	if ((err = fr->f_op->open(snode, fr))) {
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		goto cleanup_both;
 	}
 	fr->f_flags &= ~O_CLONE;
 
 	fw->f_flags |= O_CLONE;
 	if ((err = fw->f_op->open(snode, fw))) {
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		goto cleanup_write;
 	}
 	fw->f_flags &= ~O_CLONE;

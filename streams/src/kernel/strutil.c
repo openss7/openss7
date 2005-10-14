@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/10 10:37:09 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/14 12:26:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/10 10:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:26:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/10 10:37:09 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/14 12:26:42 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/10/10 10:37:09 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/14 12:26:42 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -722,12 +722,13 @@ freeb(mblk_t *mp)
 #if 0
 	assert(!mp->b_queue);
 #endif
-	printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
-
 	db = xchg(&mp->b_datap, NULL);
+
+	printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
 
 	/* check double free */
 	assert(db);
+	assert(db->db_ref > 0);
 
 	/* message block marked free above */
 	if (db_dec_and_test(db)) {

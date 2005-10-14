@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sc.at,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/13 10:59:06 $
+dnl @(#) $RCSfile: testsuite-sc.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/10/14 12:27:09 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/10/13 10:59:06 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/14 12:27:09 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sc.at,v $
+dnl Revision 0.9.2.8  2005/10/14 12:27:09  brian
+dnl - SC module and scls utility tested
+dnl
 dnl Revision 0.9.2.7  2005/10/13 10:59:06  brian
 dnl - working up testing of sad(4) and sc(4)
 dnl
@@ -146,7 +149,17 @@ AT_CHECK([test_sc 2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sc test 2.3])
-AT_KEYWORDS([sc ioctl SC_IOC_LIST])
+AT_KEYWORDS([sc ioctl SC_IOC_LIST EFAULT])
 AT_CHECK([test_sc 2.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sc test 2.4])
+AT_KEYWORDS([sc ioctl SC_IOC_LIST])
+AT_CHECK([test_sc 2.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sc test 2.5])
+AT_KEYWORDS([sc ioctl SC_IOC_LIST])
+AT_CHECK([test_sc 2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/14 12:26:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:44 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:26:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.6  2005/10/14 12:26:49  brian
+ - SC module and scls utility tested
+
  Revision 0.9.2.5  2005/10/13 10:58:44  brian
  - working up testing of sad(4) and sc(4)
 
@@ -68,9 +71,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/14 12:26:49 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/14 12:26:49 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -95,7 +98,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/13 10:58:44 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/14 12:26:49 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -249,24 +252,86 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		}
 		case TM_IOC_COPYIN:
 		{
+			caddr_t uaddr;
+
+			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
+			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_datap->db_base <
+			    FASTBUF) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
+			uaddr = *(caddr_t *) mp->b_cont->b_rptr;
+			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
+			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
+
 			mp->b_datap->db_type = M_COPYIN;
-			ioc->copyreq.cq_addr = *(caddr_t *) mp->b_cont->b_rptr;
-			mp->b_cont->b_rptr = mp->b_cont->b_datap->db_base;
-			mp->b_cont->b_wptr = mp->b_cont->b_datap->db_lim;
-			ioc->copyreq.cq_size = mp->b_cont->b_wptr - mp->b_cont->b_rptr;
+			ioc->copyreq.cq_addr = uaddr;
+			ioc->copyreq.cq_size = FASTBUF;
 			ioc->copyreq.cq_flag = 0;
 			ioc->copyreq.cq_private = NULL;
 			goto reply;
 		}
 		case TM_IOC_COPYOUT:
 		{
+			caddr_t uaddr;
+
+			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
+			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_rptr < FASTBUF) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
+			uaddr = *(caddr_t *) mp->b_cont->b_rptr;
+			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
+			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
+
 			mp->b_datap->db_type = M_COPYOUT;
-			ioc->copyreq.cq_addr = *(caddr_t *) mp->b_cont->b_rptr;
-			mp->b_cont->b_rptr = mp->b_cont->b_datap->db_base;
-			mp->b_cont->b_wptr = mp->b_cont->b_datap->db_lim;
-			ioc->copyreq.cq_size = mp->b_cont->b_wptr - mp->b_cont->b_rptr;
+			ioc->copyreq.cq_addr = uaddr;
+			ioc->copyreq.cq_size = FASTBUF;
 			ioc->copyreq.cq_flag = 0;
 			ioc->copyreq.cq_private = NULL;
+			goto reply;
+		}
+		case TM_IOC_IOCTL:
+		{
+			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
+			if (mp->b_cont == NULL
+			    || mp->b_cont->b_wptr - mp->b_cont->b_rptr != ioc->iocblk.ioc_count) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
+			memset(mp->b_cont->b_rptr, 0xa5, ioc->iocblk.ioc_count);
+			mp->b_datap->db_type = M_IOCACK;
+			ioc->iocblk.ioc_rval = 0;
+			ioc->iocblk.ioc_error = 0;
+			goto reply;
+		}
+		case TM_IOC_COPYIO:
+		{
+			caddr_t uaddr;
+
+			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
+			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_datap->db_base <
+			    FASTBUF) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
+			uaddr = *(caddr_t *) mp->b_cont->b_rptr;
+			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
+			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
+
+			mp->b_datap->db_type = M_COPYIN;
+			ioc->copyreq.cq_addr = uaddr;
+			ioc->copyreq.cq_size = FASTBUF;
+			ioc->copyreq.cq_flag = 0;
+			ioc->copyreq.cq_private = (mblk_t *) uaddr;
 			goto reply;
 		}
 		default:
@@ -288,9 +353,24 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			break;
 		case TM_IOC_COPYIN:
 		{
+			int i;
+
 			if (ioc->copyresp.cp_rval != NULL)
 				/* abort operations */
 				goto free_it;
+			if (!mp->b_cont || mp->b_cont->b_wptr - mp->b_cont->b_rptr != FASTBUF) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
+			for (i = 0; i < FASTBUF; i++)
+				if ((unsigned char) mp->b_cont->b_rptr[i] != (unsigned char) 0xa5)
+					break;
+			if (i == FASTBUF) {
+				ptrace(("Error path taken!\n"));
+				err = EINVAL;
+				goto nak;
+			}
 			rval = 0;
 			goto ack;
 		}
@@ -299,6 +379,40 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->copyresp.cp_rval != NULL)
 				/* abort operations */
 				goto free_it;
+			rval = 0;
+			goto ack;
+		}
+		case TM_IOC_COPYIO:
+		{
+			int i;
+
+			if (ioc->copyresp.cp_rval != NULL)
+				/* abort operations */
+				goto free_it;
+			if (ioc->copyresp.cp_private != NULL) {
+				if (!mp->b_cont
+				    || mp->b_cont->b_wptr - mp->b_cont->b_rptr != FASTBUF) {
+					ptrace(("Error path taken!\n"));
+					err = EINVAL;
+					goto nak;
+				}
+				for (i = 0; i < FASTBUF; i++)
+					if ((unsigned char) mp->b_cont->b_rptr[i] !=
+					    (unsigned char) 0xa5)
+						break;
+				if (i == FASTBUF) {
+					ptrace(("Error path taken!\n"));
+					err = EINVAL;
+					goto nak;
+				}
+				memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
+
+				mp->b_datap->db_type = M_COPYOUT;
+				ioc->copyreq.cq_addr = (caddr_t) ioc->copyreq.cq_private;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = NULL;
+				goto reply;
+			}
 			rval = 0;
 			goto ack;
 		}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:41 $ by $Author: brian $
+ Last Modified $Date: 2005/10/14 12:26:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/10/13 10:58:41 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1853,6 +1853,15 @@ strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 STATIC inline streams_fastcall void
 strwakeioctl(struct stdata *sd)
 {
+	mblk_t *mp;
+
+	/* outdate old id */
+	++sd->sd_iocid;
+	/* clean out remaining blocks */
+	if ((mp = xchg(&sd->sd_iocblk, NULL))) {
+		swerr();
+		ctrace(freemsg(mp));
+	}
 	clear_bit(IOCWAIT_BIT, &sd->sd_flag);
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_all(&sd->sd_waitq);
@@ -1918,7 +1927,10 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 		if (ioc->iocblk.ioc_id == sd->sd_iocid) {
-			sd->sd_iocblk = mp;
+			if ((mp = xchg(&sd->sd_iocblk, mp))) {
+				swerr();
+				ctrace(freemsg(mp));
+			}
 			/* might not be sleeping yet */
 			if (waitqueue_active(&sd->sd_waitq))
 				wake_up_all(&sd->sd_waitq);
@@ -1968,7 +1980,7 @@ strcopyinb(const caddr_t uaddr, mblk_t **dpp, size_t len, bool user)
 	if (!(dp = *dpp) || (dp->b_datap->db_lim < dp->b_rptr + len)) {
 		/* no room in current buffer */
 		if (dp)
-			freemsg(dp);
+			ctrace(freemsg(dp));
 		/* get a new data buffer -- use the one we just freed if possible, or block */
 		if (!((*dpp) = dp = allocb(len, BPRI_WAITOK)))
 			return (-ENOSR);
@@ -2062,6 +2074,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	ioc->iocblk.ioc_cr = current_creds;
 	ioc->iocblk.ioc_count = ic->ic_len;
 
+	/* implicit copyin for I_STR ioctl */
 	if ((err = strcopyinb(ic->ic_dp, &mb->b_cont, ic->ic_len, user))) {
 		freemsg(mb);
 		return (err);
@@ -2085,7 +2098,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	}
 
 	/* protected by IOCWAIT bit */
-	ioc->iocblk.ioc_id = ++sd->sd_iocid;
+	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
 		ctrace(put(sd->sd_wq, mb));
@@ -2117,6 +2130,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			ptrace(("Error path taken! err = %d\n", err));
 			break;
 		case M_IOCACK:
+			/* implicit copyout for I_STR ioctl */
 			if (ioc->iocblk.ioc_count > 0) {
 				if (!(err = strcopyoutb(mb->b_cont, ic->ic_dp,
 							ioc->iocblk.ioc_count, user))) {
@@ -2129,6 +2143,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			break;
 		case M_COPYIN:
 		case M_COPYOUT:
+			/* yes we permit I_STR ioctls to do this */
 			if (mb->b_datap->db_type == M_COPYIN)
 				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
 						 ioc->copyreq.cq_size, user);
@@ -2140,8 +2155,8 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 				ioc->copyresp.cp_rval = (caddr_t) 0;
 				continue;
 			}
-			ioc->copyresp.cp_rval = (caddr_t) -err;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			ioc->copyresp.cp_rval = (caddr_t) 1;
 			ctrace(put(sd->sd_wq, mb));
 			trace();
 			goto abort;
@@ -2151,9 +2166,9 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			break;
 		}
 		freemsg(mb);
-	      abort:
 		break;
 	} while (1);
+      abort:
 	strwakeioctl(sd);
 	return (err);
 }
@@ -2179,6 +2194,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	ioc->iocblk.ioc_cr = current_creds;
 	ioc->iocblk.ioc_count = TRANSPARENT;
 
+	/* no implicit copyin for TRANPARENT ioctl */
 	while (!(db = allocb(sizeof(arg), BPRI_WAITOK))) ;
 
 	db->b_datap->db_type = M_DATA;
@@ -2191,12 +2207,12 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	timeo = sd->sd_ioctime;
 
 	if ((err = strwaitioctl(sd, &timeo, access))) {
-		freemsg(mb);
+		ctrace(freemsg(mb));
 		return (err);
 	}
 
 	/* protected by IOCWAIT bit */
-	ioc->iocblk.ioc_id = ++sd->sd_iocid;
+	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
 		ctrace(put(sd->sd_wq, mb));
@@ -2221,14 +2237,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			ptrace(("Error path taken! err = %d\n", err));
 			break;
 		case M_IOCACK:
-			if (ioc->iocblk.ioc_count > 0) {
-				if (!(err = strcopyoutb(db->b_cont, (caddr_t) arg,
-							ioc->iocblk.ioc_count, user)))
-					err = ioc->iocblk.ioc_rval;
-				else
-					ptrace(("Error path taken! err = %d\n", err));
-			} else
-				err = ioc->iocblk.ioc_rval;
+			/* no implicit copyout for TRANPARENT ioctl */
+			err = ioc->iocblk.ioc_rval;
 			break;
 		case M_COPYIN:
 		case M_COPYOUT:
@@ -2243,8 +2253,8 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 				ioc->copyresp.cp_rval = (caddr_t) 0;
 				continue;
 			}
-			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			ioc->copyresp.cp_rval = (caddr_t) 1;
 			ctrace(put(sd->sd_wq, mb));
 			trace();
 			goto abort;
@@ -2253,7 +2263,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			err = -EIO;
 			break;
 		}
-		freemsg(mb);
+		ctrace(freemsg(mb));
 		break;
 	} while (1);
       abort:
@@ -2317,7 +2327,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	}
 
 	/* protected by IOCWAIT bit */
-	ioc->iocblk.ioc_id = ++sd->sd_iocid;
+	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
 		/* could we place it directly to qtop? */
@@ -2345,8 +2355,8 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			/* wrong response */
 			ioc = (typeof(ioc)) mb->b_rptr;
 			mb->b_datap->db_type = M_IOCDATA;
-			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			ioc->copyresp.cp_rval = (caddr_t) 1;
 			ctrace(put(sd->sd_wq, mb));
 			trace();
 			goto abort;
@@ -2389,7 +2399,7 @@ strirput(queue_t *q, mblk_t *mp)
 	case M_IOCNAK:
 	case M_COPYIN:
 	case M_COPYOUT:
-		if (strwakeiocack(sd, mp))
+		if (ctrace(strwakeiocack(sd, mp)))
 			return (0);
 	}
 	return ((*sd->sd_muxinit->qi_putp) (q, mp));
@@ -2448,7 +2458,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	/* block here 'till we get the IOCWAIT_BIT */
 	while (strwaitioctl(sd, NULL, FTRUNC)) ;	/* no errors please */
 
-	ioc->iocblk.ioc_id = ++sd->sd_iocid;
+	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	qi_old = sd->sd_rq->q_qinfo;
 	if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
@@ -2481,8 +2491,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 		case M_COPYOUT:
 			swerr();
 			mb->b_datap->db_type = M_IOCDATA;
-			ioc->copyresp.cp_rval = (caddr_t) 1;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
+			ioc->copyresp.cp_rval = (caddr_t) 1;
 			ctrace(put(sd->sd_wq, mb));
 			trace();
 			goto abort;
@@ -3681,7 +3691,7 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	int err = 0;
 
 	if (ppos != &file->f_pos && ppos && *ppos != 0) {
-		__ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long) *ppos, (long) file->f_pos));
+		ptrace(("Error path taken! ppos = %p, &file->f_pos = %p, *ppos = %ld, file->f_pos = %ld\n", ppos, &file->f_pos, (long) *ppos, (long) file->f_pos));
 		return (-ESPIPE);
 	}
 
@@ -6672,16 +6682,16 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err, rval;
 
 	if ((err = copyin((typeof(&ic)) arg, &ic, sizeof(ic)))) {
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	if ((rval = err = strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1)) < 0) {
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	/* POSIX says to copy out the ic_len member upon success. */
 	if ((err = copyout(&ic.ic_len, &((typeof(&ic)) arg)->ic_len, sizeof(ic.ic_len)))) {
-		__ptrace(("Error path taken! err = %d\n", err));
+		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
 	return (rval);
@@ -7884,12 +7894,12 @@ str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC inline streams_fastcall int
 str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (!strwakeiocack(sd, mp)) {
+	if (!ctrace(strwakeiocack(sd, mp))) {
 		if (_WR(q)->q_next) {
 			union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 			/* allow module or driver to free cp_private */
-			__ptrace(("Rejecting M_COPYIN/M_COPYOUT.\n"));
+			ptrace(("Rejecting M_COPYIN/M_COPYOUT.\n"));
 			mp->b_datap->db_type = M_IOCDATA;
 			mp->b_wptr = mp->b_rptr + sizeof(ioc->copyresp);
 			ioc->copyresp.cp_rval = (caddr_t) 1;
@@ -7905,7 +7915,7 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC inline streams_fastcall int
 str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (!strwakeiocack(sd, mp))
+	if (!ctrace(strwakeiocack(sd, mp)))
 		freemsg(mp);
 	return (0);
 }
