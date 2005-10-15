@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/15 02:12:32 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:53 $ by $Author: brian $
+ Last Modified $Date: 2005/10/15 02:12:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.19  2005/10/15 02:12:32  brian
+ - continuing SAD testing
+
  Revision 0.9.2.18  2005/10/13 10:58:53  brian
  - working up testing of sad(4) and sc(4)
 
@@ -128,9 +131,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/15 02:12:32 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/13 10:58:53 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/15 02:12:32 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2191,6 +2194,65 @@ struct test_stream test_1_3 = { NULL, &test_case_1_3, NULL };
 #define test_case_1_3_stream_1 (NULL)
 #define test_case_1_3_stream_2 (NULL)
 
+static const char test_group_2[] = "STREAMS Administrative Driver (SAD), ioctl(2).";
+static const char sref_group_2[] = "STREAMS Administrative Driver (SAD), sad(4) manual page.";
+
+#define tgrp_case_2_1_1 test_group_2
+#define numb_case_2_1_1 "2.1.1"
+#define name_case_2_1_1 "Perform SAD_VML - EINVAL."
+#define sref_case_2_1_1 sref_group_2
+#define desc_case_2_1_1 "\
+Check that SAD_VML can be performed.  Checks that EINVAL is returned\n\
+when sl_nmods is less than one (1)."
+
+int
+test_case_2_1_1(int child)
+{
+	struct str_mlist sml = { "sad" };
+	struct str_list sl = { 0, &sml };
+
+	if (test_ioctl(child, SAD_VML, (intptr_t) &sl) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_1_1 = { &preamble_0, &test_case_2_1_1, &postamble_0 };
+
+#define test_case_2_1_1_stream_0 (&test_2_1_1)
+#define test_case_2_1_1_stream_1 (NULL)
+#define test_case_2_1_1_stream_2 (NULL)
+
+#define tgrp_case_2_1_2 test_group_2
+#define numb_case_2_1_2 "2.1.2"
+#define name_case_2_1_2 "Perform SAD_VML."
+#define sref_case_2_1_2 sref_group_2
+#define desc_case_2_1_2 "\
+Check that SAD_VML can be performed on one module alreay loaded on the\n\
+system."
+
+int
+test_case_2_1_2(int child)
+{
+	struct str_mlist sml = { "sad" };
+	struct str_list sl = { 1, &sml };
+
+	if (test_ioctl(child, SAD_VML, (intptr_t) &sl) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_1_2 = { &preamble_0, &test_case_2_1_2, &postamble_0 };
+
+#define test_case_2_1_2_stream_0 (&test_2_1_2)
+#define test_case_2_1_2_stream_1 (NULL)
+#define test_case_2_1_2_stream_2 (NULL)
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2487,6 +2549,10 @@ struct test_case {
 	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, {
 	test_case_1_3_stream_0, test_case_1_3_stream_1, test_case_1_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, sref_case_2_1_1, {
+	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, sref_case_2_1_2, {
+	test_case_2_1_2_stream_0, test_case_2_1_2_stream_1, test_case_2_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

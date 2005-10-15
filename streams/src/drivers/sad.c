@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 02:12:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:36 $ by $Author: brian $
+ Last Modified $Date: 2005/10/15 02:12:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 02:12:32 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 02:12:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/13 10:58:36 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 02:12:32 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -153,6 +153,7 @@ static struct module_info sad_minfo = {
 struct sad {
 	int assigned;
 	int iocstate;
+	int transparent;
 	int nmods;
 } sads[2];
 
@@ -161,7 +162,7 @@ sad_put(queue_t *q, mblk_t *mp)
 {
 	struct sad *sad = q->q_ptr;
 	union ioctypes *ioc;
-	int err = 0, rval = 0;
+	int err = 0, rval = 0, count = 0;
 	mblk_t *dp = mp->b_cont;
 
 	switch (mp->b_datap->db_type) {
@@ -193,46 +194,46 @@ sad_put(queue_t *q, mblk_t *mp)
 				goto nak;
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				mp->b_datap->db_type = M_COPYIN;
-				ioc->copyreq.cq_addr = *(void **) dp->b_rptr;
+				ioc->copyreq.cq_addr = *(caddr_t *) dp->b_rptr;
 				ioc->copyreq.cq_size = sizeof(struct strapush);
 				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) ioc->copyreq.cq_addr;
+				sad->transparent = 1;
 				sad->iocstate = 1;
 				qreply(q, mp);
 				return (0);
 			}
-			err = -EFAULT;
-			if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct strapush))
-				goto nak;
+			sad->transparent = 0;
 			sad->iocstate = 1;
 			goto sad_sap_state1;
 		case SAD_GAP:
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				mp->b_datap->db_type = M_COPYIN;
-				ioc->copyreq.cq_addr = *(void **) dp->b_rptr;
+				ioc->copyreq.cq_addr = *(caddr_t *) dp->b_rptr;
 				ioc->copyreq.cq_size = sizeof(struct strapush);
 				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) ioc->copyreq.cq_addr;
+				sad->transparent = 1;
 				sad->iocstate = 1;
 				qreply(q, mp);
 				return (0);
 			}
-			err = -EFAULT;
-			if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct strapush))
-				goto nak;
+			sad->transparent = 0;
 			sad->iocstate = 1;
 			goto sad_gap_state1;
 		case SAD_VML:
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
 				mp->b_datap->db_type = M_COPYIN;
-				ioc->copyreq.cq_addr = *(void **) dp->b_rptr;
+				ioc->copyreq.cq_addr = *(caddr_t *) dp->b_rptr;
 				ioc->copyreq.cq_size = sizeof(struct str_list);
 				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_private = (mblk_t *) ioc->copyreq.cq_addr;
+				sad->transparent = 1;
 				sad->iocstate = 1;
 				qreply(q, mp);
 				return (0);
 			}
-			err = -EFAULT;
-			if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct str_list))
-				goto nak;
+			sad->transparent = 0;
 			sad->iocstate = 1;
 			goto sad_vml_state1;
 		}
@@ -240,118 +241,133 @@ sad_put(queue_t *q, mblk_t *mp)
 		goto nak;
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
+		if (ioc->copyresp.cp_rval != (caddr_t) 0) {
+			sad->transparent = 0;
+			sad->iocstate = 0;
+			goto abort;
+		}
 		switch (ioc->copyresp.cp_cmd) {
 		case SAD_SAP:
-			err = -(long) ioc->copyresp.cp_rval;
-			if (err == 0) {
-				struct strapush *sap;
+		{
+			struct strapush *sap;
 
-				switch (sad->iocstate) {
-				case 1:
-				      sad_sap_state1:
-					err = -EFAULT;
-					if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*sap))
-						goto nak;
-					sap = (typeof(sap)) dp->b_rptr;
-					switch (sap->sap_cmd) {
-					case SAP_CLEAR:
+			switch (sad->iocstate) {
+			case 1:
+			      sad_sap_state1:
+				err = -EFAULT;
+				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*sap))
+					goto nak;
+				sap = (typeof(sap)) dp->b_rptr;
+				switch (sap->sap_cmd) {
+				case SAP_CLEAR:
 #if 0
-						err = -EINVAL;
-						if (0 > sap->sap_major ||
-						    sap->sap_major >= MAX_CHRDEV)
-							goto nak;
-#endif
-						err = autopush_del(sap);
-						if (err)
-							goto nak;
-						goto ack;
-					case SAP_ONE:	/* just a range of 1 */
-						sap->sap_lastminor = sap->sap_minor;
-						goto range;
-					case SAP_ALL:	/* just a range of all */
-						sap->sap_lastminor = 255;
-						sap->sap_minor = 0;
-						goto range;
-					case SAP_RANGE:
-					      range:
-						err = -EINVAL;
-						if (sap->sap_lastminor >= sap->sap_minor)
-							goto nak;
-#if 0
-						err = -EINVAL;
-						if (0 > sap->sap_major ||
-						    sap->sap_major >= MAX_CHRDEV)
-							goto nak;
-#endif
-						err = autopush_add(sap);
-						if (err)
-							goto nak;
-						goto ack;
-					}
 					err = -EINVAL;
-					break;
-				}
-			}
-			goto nak;
-		case SAD_GAP:
-			err = -(long) ioc->copyresp.cp_rval;
-			if (err == 0) {
-				struct strapush *sap;
-
-				switch (sad->iocstate) {
-				case 1:
-				      sad_gap_state1:
-					sap = (typeof(sap)) dp->b_rptr;
-					err = -ENODEV;
-					if (!(sap = autopush_find(makedevice(sap->sap_major,
-									     sap->sap_minor))))
+					if (0 > sap->sap_major || sap->sap_major >= MAX_CHRDEV)
 						goto nak;
-					bcopy(sap, dp->b_rptr, sizeof(*sap));
-					mp->b_datap->db_type = M_COPYOUT;
-					sad->iocstate = 2;
-					qreply(q, mp);
-					return (0);
-				case 2:
-					/* done */
-					sad->iocstate = 0;
+#endif
+					err = autopush_del(sap);
+					if (err)
+						goto nak;
+					goto ack;
+				case SAP_ONE:	/* just a range of 1 */
+					sap->sap_lastminor = sap->sap_minor;
+					goto range;
+				case SAP_ALL:	/* just a range of all */
+					sap->sap_lastminor = 255;
+					sap->sap_minor = 0;
+					goto range;
+				case SAP_RANGE:
+				      range:
+					err = -EINVAL;
+					if (sap->sap_lastminor >= sap->sap_minor)
+						goto nak;
+#if 0
+					err = -EINVAL;
+					if (0 > sap->sap_major || sap->sap_major >= MAX_CHRDEV)
+						goto nak;
+#endif
+					err = autopush_add(sap);
+					if (err)
+						goto nak;
 					goto ack;
 				}
-				err = -EIO;
+				err = -EINVAL;
+				break;
 			}
-			goto nak;
-		case SAD_VML:
-			err = -(long) ioc->copyresp.cp_rval;
-			if (err == 0) {
-				struct str_list *slp;
-				struct str_mlist *slm;
-
-				switch (sad->iocstate) {
-				case 1:
-				      sad_vml_state1:
-					slp = (typeof(slp)) dp->b_rptr;
-					err = -EINVAL;
-					if ((sad->nmods = slp->sl_nmods) < 1)
-						goto nak;
-					mp->b_datap->db_type = M_COPYIN;
-					ioc->copyreq.cq_addr = (void *) slp->sl_modlist;
-					ioc->copyreq.cq_size =
-					    sad->nmods * sizeof(struct str_mlist);
-					ioc->copyreq.cq_flag = 0;
-					sad->iocstate = 2;
-					qreply(q, mp);
-					return (0);
-				case 2:
-					slm = (typeof(slm)) dp->b_rptr;
-					if ((err = autopush_vml(slm, sad->nmods)) < 0)
-						goto nak;
-					rval = err;
-					goto ack;
-				}
-			}
+			err = -EIO;
 			goto nak;
 		}
-		return (0);
+		case SAD_GAP:
+		{
+			struct strapush *sap;
+
+			switch (sad->iocstate) {
+			case 1:
+			      sad_gap_state1:
+				err = -EFAULT;
+				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct strapush))
+					goto nak;
+				sap = (typeof(sap)) dp->b_rptr;
+				err = -ENODEV;
+				if (!(sap = autopush_find(makedevice(sap->sap_major,
+								     sap->sap_minor))))
+					goto nak;
+				bcopy(sap, dp->b_rptr, sizeof(*sap));
+				if (sad->transparent == 0) {
+					mp->b_datap->db_type = M_COPYOUT;
+					ioc->copyreq.cq_addr = (caddr_t) ioc->copyresp.cp_private;
+					ioc->copyreq.cq_size = sizeof(struct strapush);
+					ioc->copyreq.cq_flag = 0;
+					sad->transparent = 0;
+					sad->iocstate = 2;
+					qreply(q, mp);
+					return (0);
+				}
+				/* use implied I_STR copyout */
+				count = sizeof(struct strapush);
+				goto ack;
+			case 2:
+				/* done */
+				goto ack;
+			}
+			err = -EIO;
+			goto nak;
+		}
+		case SAD_VML:
+		{
+			struct str_list *slp;
+			struct str_mlist *slm;
+
+			switch (sad->iocstate) {
+			case 1:
+			      sad_vml_state1:
+				err = -EFAULT;
+				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct str_list))
+					goto nak;
+				slp = (typeof(slp)) dp->b_rptr;
+				err = -EINVAL;
+				if ((sad->nmods = slp->sl_nmods) < 1)
+					goto nak;
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_addr = (caddr_t) slp->sl_modlist;
+				ioc->copyreq.cq_size = sad->nmods * sizeof(struct str_mlist);
+				ioc->copyreq.cq_flag = 0;
+				sad->iocstate = 2;
+				qreply(q, mp);
+				return (0);
+			case 2:
+				slm = (typeof(slm)) dp->b_rptr;
+				if ((err = autopush_vml(slm, sad->nmods)) < 0)
+					goto nak;
+				rval = err;
+				goto ack;
+			}
+			err = -EIO;
+			goto nak;
+		}
+		}
 	}
+      abort:
 	freemsg(mp);
 	return (0);
       nak:
@@ -360,14 +376,18 @@ sad_put(queue_t *q, mblk_t *mp)
 	ioc->iocblk.ioc_count = 0;
 	ioc->iocblk.ioc_rval = -1;
 	ioc->iocblk.ioc_error = -err;
+	sad->transparent = 0;
+	sad->iocstate = 0;
 	qreply(q, mp);
 	return (0);
       ack:
 	sad->iocstate = 0;
 	mp->b_datap->db_type = M_IOCACK;
-	ioc->iocblk.ioc_count = 0;
+	ioc->iocblk.ioc_count = count;
 	ioc->iocblk.ioc_rval = rval;
 	ioc->iocblk.ioc_error = 0;
+	sad->transparent = 0;
+	sad->iocstate = 0;
 	qreply(q, mp);
 	return (0);
 }
@@ -413,15 +433,15 @@ sad_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit sad_qinit = {
-	qi_putp:sad_put,
-	qi_qopen:sad_open,
-	qi_qclose:sad_close,
-	qi_minfo:&sad_minfo,
+      qi_putp:sad_put,
+      qi_qopen:sad_open,
+      qi_qclose:sad_close,
+      qi_minfo:&sad_minfo,
 };
 
 static struct streamtab sad_info = {
-	st_rdinit:&sad_qinit,
-	st_wrinit:&sad_qinit,
+      st_rdinit:&sad_qinit,
+      st_wrinit:&sad_qinit,
 };
 
 static struct cdevsw sad_cdev = {
@@ -434,15 +454,15 @@ static struct cdevsw sad_cdev = {
 };
 
 static struct devnode sad_node_admin = {
-	n_name:"admin",
-	n_flag:0,
-	n_mode:S_IFCHR | S_IRUSR | S_IWUSR,
+      n_name:"admin",
+      n_flag:0,
+      n_mode:S_IFCHR | S_IRUSR | S_IWUSR,
 };
 
 static struct devnode sad_node_user = {
-	n_name:"user",
-	n_flag:0,
-	n_mode:S_IFCHR | S_IRUGO | S_IWUGO,
+      n_name:"user",
+      n_flag:0,
+      n_mode:S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 #ifdef CONFIG_STREAMS_SAD_MODULE
