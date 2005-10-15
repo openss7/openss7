@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/10/15 02:12:32 $
+dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/10/15 10:19:56 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/10/15 02:12:32 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/15 10:19:56 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sad.at,v $
+dnl Revision 0.9.2.9  2005/10/15 10:19:56  brian
+dnl - working up autopush and SAD driver tests
+dnl
 dnl Revision 0.9.2.8  2005/10/15 02:12:32  brian
 dnl - continuing SAD testing
 dnl
@@ -149,7 +152,97 @@ AT_CHECK([test_sad 2.1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([sad test 2.1.2])
-AT_KEYWORDS([sad SAD_VML])
+AT_KEYWORDS([sad SAD_VML EFAULT])
 AT_CHECK([test_sad 2.1.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.1.3])
+AT_KEYWORDS([sad SAD_VML EFAULT])
+AT_CHECK([test_sad 2.1.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.1.4])
+AT_KEYWORDS([sad SAD_VML])
+AT_CHECK([test_sad 2.1.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.2.1])
+AT_KEYWORDS([sad SAD_GAP EFAULT])
+AT_CHECK([test_sad 2.2.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.2.2])
+AT_KEYWORDS([sad SAD_GAP EINVAL])
+AT_CHECK([test_sad 2.2.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.2.3])
+AT_KEYWORDS([sad SAD_GAP ENOSTR])
+AT_CHECK([test_sad 2.2.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.2.4])
+AT_KEYWORDS([sad SAD_GAP ENODEV])
+AT_CHECK([test_sad 2.2.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.2.5])
+AT_KEYWORDS([sad SAD_GAP])
+AT_CHECK([test_sad 2.2.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.1])
+AT_KEYWORDS([sad SAD_SAP EFAULT])
+AT_CHECK([test_sad 2.3.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.2])
+AT_KEYWORDS([sad SAD_SAP EINVAL])
+AT_CHECK([test_sad 2.3.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.3])
+AT_KEYWORDS([sad SAD_SAP EINVAL])
+AT_CHECK([test_sad 2.3.3], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.4])
+AT_KEYWORDS([sad SAD_SAP EINVAL])
+AT_CHECK([test_sad 2.3.4], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.5])
+AT_KEYWORDS([sad SAD_SAP ENOSTR])
+AT_CHECK([test_sad 2.3.5], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.6])
+AT_KEYWORDS([sad SAD_SAP EEXIST])
+AT_CHECK([test_sad 2.3.6], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.7])
+AT_KEYWORDS([sad SAD_SAP ERANGE])
+AT_CHECK([test_sad 2.3.7], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.8])
+AT_KEYWORDS([sad SAD_SAP ERANGE])
+AT_CHECK([test_sad 2.3.8], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.9])
+AT_KEYWORDS([sad SAD_SAP ENODEV])
+AT_CHECK([test_sad 2.3.9], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.10])
+AT_KEYWORDS([sad SAD_SAP ENOSR])
+AT_CHECK([test_sad 2.3.10], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sad test 2.3.11])
+AT_KEYWORDS([sad SAD_SAP])
+AT_CHECK([test_sad 2.3.11], [], [ignore], [], [], [])
 AT_CLEANUP
 

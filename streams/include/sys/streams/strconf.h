@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.19 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.20 2005/10/15 10:19:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/10/15 10:19:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/15 10:19:47 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -101,6 +101,7 @@ extern int autopush_add(struct strapush *sap);
 extern int autopush_del(struct strapush *sap);
 extern int autopush_vml(struct str_mlist *smp, int nmods);
 extern struct strapush *autopush_find(dev_t dev);
+extern struct strapush *autopush_search(const char *name, minor_t minor);
 
 extern int apush_get(struct strapush *sap);
 extern int apush_set(struct strapush *sap);

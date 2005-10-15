@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/15 02:12:32 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/15 10:19:52 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/15 02:12:32 $ by $Author: brian $
+ Last Modified $Date: 2005/10/15 10:19:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.20  2005/10/15 10:19:52  brian
+ - working up autopush and SAD driver tests
+
  Revision 0.9.2.19  2005/10/15 02:12:32  brian
  - continuing SAD testing
 
@@ -131,9 +134,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/15 02:12:32 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/15 10:19:52 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/15 02:12:32 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/15 10:19:52 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -170,6 +173,8 @@ static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2
 #include <linux/limits.h>
 
 #include <sys/sad.h>
+
+#include "include/sys/config.h"
 
 /*
  *  -------------------------------------------------------------------------
@@ -920,6 +925,12 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("TM_IOC_PSIGNAL");
 	case TM_IOC_NSIGNAL:
 		return ("TM_IOC_NSIGNAL");
+	case SAD_VML:
+		return ("SAD_VML");
+	case SAD_GAP:
+		return ("SAD_GAP");
+	case SAD_SAP:
+		return ("SAD_SAP");
 	default:
 		return ("(unexpected)");
 	}
@@ -2208,7 +2219,7 @@ when sl_nmods is less than one (1)."
 int
 test_case_2_1_1(int child)
 {
-	struct str_mlist sml = { "sad" };
+	struct str_mlist sml = { CONFIG_STREAMS_SAD_NAME };
 	struct str_list sl = { 0, &sml };
 
 	if (test_ioctl(child, SAD_VML, (intptr_t) &sl) == __RESULT_SUCCESS)
@@ -2227,16 +2238,68 @@ struct test_stream test_2_1_1 = { &preamble_0, &test_case_2_1_1, &postamble_0 };
 
 #define tgrp_case_2_1_2 test_group_2
 #define numb_case_2_1_2 "2.1.2"
-#define name_case_2_1_2 "Perform SAD_VML."
+#define name_case_2_1_2 "Perform SAD_VML - EFAULT."
 #define sref_case_2_1_2 sref_group_2
 #define desc_case_2_1_2 "\
-Check that SAD_VML can be performed on one module alreay loaded on the\n\
-system."
+Check that SAD_VML can be performed.  Checks that EFAULT is returned\n\
+when arg is NULL or points outside the caller's address space."
 
 int
 test_case_2_1_2(int child)
 {
-	struct str_mlist sml = { "sad" };
+	if (test_ioctl(child, SAD_VML, (intptr_t) NULL) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_1_2 = { &preamble_0, &test_case_2_1_2, &postamble_0 };
+
+#define test_case_2_1_2_stream_0 (&test_2_1_2)
+#define test_case_2_1_2_stream_1 (NULL)
+#define test_case_2_1_2_stream_2 (NULL)
+
+#define tgrp_case_2_1_3 test_group_2
+#define numb_case_2_1_3 "2.1.3"
+#define name_case_2_1_3 "Perform SAD_VML - EFAULT."
+#define sref_case_2_1_3 sref_group_2
+#define desc_case_2_1_3 "\
+Check that SAD_VML can be performed.  Checks that EFAULT is returned\n\
+when sl_mlist is NULL or points outside the caller's address space."
+
+int
+test_case_2_1_3(int child)
+{
+	struct str_list sl = { 1, NULL };
+
+	if (test_ioctl(child, SAD_VML, (intptr_t) &sl) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_1_3 = { &preamble_0, &test_case_2_1_3, &postamble_0 };
+
+#define test_case_2_1_3_stream_0 (&test_2_1_3)
+#define test_case_2_1_3_stream_1 (NULL)
+#define test_case_2_1_3_stream_2 (NULL)
+
+#define tgrp_case_2_1_4 test_group_2
+#define numb_case_2_1_4 "2.1.4"
+#define name_case_2_1_4 "Perform SAD_VML."
+#define sref_case_2_1_4 sref_group_2
+#define desc_case_2_1_4 "\
+Check that SAD_VML can be performed on one module alreay loaded on the\n\
+system."
+
+int
+test_case_2_1_4(int child)
+{
+	struct str_mlist sml = { "sth" };
 	struct str_list sl = { 1, &sml };
 
 	if (test_ioctl(child, SAD_VML, (intptr_t) &sl) != __RESULT_SUCCESS)
@@ -2247,11 +2310,602 @@ test_case_2_1_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_2_1_2 = { &preamble_0, &test_case_2_1_2, &postamble_0 };
+struct test_stream test_2_1_4 = { &preamble_0, &test_case_2_1_4, &postamble_0 };
 
-#define test_case_2_1_2_stream_0 (&test_2_1_2)
-#define test_case_2_1_2_stream_1 (NULL)
-#define test_case_2_1_2_stream_2 (NULL)
+#define test_case_2_1_4_stream_0 (&test_2_1_4)
+#define test_case_2_1_4_stream_1 (NULL)
+#define test_case_2_1_4_stream_2 (NULL)
+
+#define tgrp_case_2_2_1 test_group_2
+#define numb_case_2_2_1 "2.2.1"
+#define name_case_2_2_1 "Perform SAD_GAP - EFAULT."
+#define sref_case_2_2_1 sref_group_2
+#define desc_case_2_2_1 "\
+Check that SAD_GAP can be performed.  Checks that EFAULT is returned\n\
+when arg is NULL or points outside the callers address space."
+
+int
+test_case_2_2_1(int child)
+{
+	struct strapush sap = { 0, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (test_ioctl(child, SAD_GAP, (intptr_t) NULL) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_GAP, (intptr_t) -1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_1 = { &preamble_0, &test_case_2_2_1, &postamble_0 };
+
+#define test_case_2_2_1_stream_0 (&test_2_2_1)
+#define test_case_2_2_1_stream_1 (NULL)
+#define test_case_2_2_1_stream_2 (NULL)
+
+#define tgrp_case_2_2_2 test_group_2
+#define numb_case_2_2_2 "2.2.2"
+#define name_case_2_2_2 "Perform SAD_GAP - EINVAL."
+#define sref_case_2_2_2 sref_group_2
+#define desc_case_2_2_2 "\
+Check that SAD_GAP can be performed.  Checks that EINVAL is returned\n\
+the device specified by sap_major and sap_minor is invaalid."
+
+int
+test_case_2_2_2(int child)
+{
+	struct strapush sap = { SAP_ALL, 0, -1, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, };
+
+	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_2 = { &preamble_0, &test_case_2_2_2, &postamble_0 };
+
+#define test_case_2_2_2_stream_0 (&test_2_2_2)
+#define test_case_2_2_2_stream_1 (NULL)
+#define test_case_2_2_2_stream_2 (NULL)
+
+#define tgrp_case_2_2_3 test_group_2
+#define numb_case_2_2_3 "2.2.3"
+#define name_case_2_2_3 "Perform SAD_GAP - ENOSTR."
+#define sref_case_2_2_3 sref_group_2
+#define desc_case_2_2_3 "\
+Check that SAD_GAP can be performed.  Checks that ENOSTR is returned\n\
+when the device specified by sap_major and sap_minor is not a STREAMS\n\
+device."
+
+int
+test_case_2_2_3(int child)
+{
+	struct strapush sap = { 0, 136, 5, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, };
+
+	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENOSTR)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_3 = { &preamble_0, &test_case_2_2_3, &postamble_0 };
+
+#define test_case_2_2_3_stream_0 (&test_2_2_3)
+#define test_case_2_2_3_stream_1 (NULL)
+#define test_case_2_2_3_stream_2 (NULL)
+
+#define tgrp_case_2_2_4 test_group_2
+#define numb_case_2_2_4 "2.2.4"
+#define name_case_2_2_4 "Perform SAD_GAP - ENODEV."
+#define sref_case_2_2_4 sref_group_2
+#define desc_case_2_2_4 "\
+Check that SAD_GAP can be performed.  Checks that ENODEV is returned\n\
+when the device specified by sap_major and sap_minor is not configured\n\
+for autopush."
+
+int
+test_case_2_2_4(int child)
+{
+	struct strapush sap = { 0, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENODEV)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_2_4 = { &preamble_0, &test_case_2_2_4, &postamble_0 };
+
+#define test_case_2_2_4_stream_0 (&test_2_2_4)
+#define test_case_2_2_4_stream_1 (NULL)
+#define test_case_2_2_4_stream_2 (NULL)
+
+#define tgrp_case_2_2_5 test_group_2
+#define numb_case_2_2_5 "2.2.5"
+#define name_case_2_2_5 "Perform SAD_GAP."
+#define sref_case_2_2_5 sref_group_2
+#define desc_case_2_2_5 "\
+Check that SAD_GAP can be performed."
+
+int
+preamble_test_case_2_2_5(int child)
+{
+	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_2_2_5(int child)
+{
+	struct strapush sap2 = { 0, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap2) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+postamble_test_case_2_2_5(int child)
+{
+	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return (result);
+}
+struct test_stream test_2_2_5 = { &preamble_test_case_2_2_5, &test_case_2_2_5, &postamble_test_case_2_2_5 };
+
+#define test_case_2_2_5_stream_0 (&test_2_2_5)
+#define test_case_2_2_5_stream_1 (NULL)
+#define test_case_2_2_5_stream_2 (NULL)
+
+#define tgrp_case_2_3_1 test_group_2
+#define numb_case_2_3_1 "2.3.1"
+#define name_case_2_3_1 "Perform SAD_SAP - EFAULT."
+#define sref_case_2_3_1 sref_group_2
+#define desc_case_2_3_1 "\
+Check that SAD_SAP can be performed.  Checks that EFAULT is returned\n\
+when arg is NULL or points outside the callers address space."
+
+int
+test_case_2_3_1(int child)
+{
+	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (test_ioctl(child, SAD_SAP, (intptr_t) NULL) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) -1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_1 = { &preamble_0, &test_case_2_3_1, &postamble_0 };
+
+#define test_case_2_3_1_stream_0 (&test_2_3_1)
+#define test_case_2_3_1_stream_1 (NULL)
+#define test_case_2_3_1_stream_2 (NULL)
+
+#define tgrp_case_2_3_2 test_group_2
+#define numb_case_2_3_2 "2.3.2"
+#define name_case_2_3_2 "Perform SAD_SAP - EINVAL."
+#define sref_case_2_3_2 sref_group_2
+#define desc_case_2_3_2 "\
+Check that SAD_SAP can be performed.  Checks that EINVAL is returned\n\
+when sap_cmd, sap_major, sap_minor or sap_lastminor was invalid."
+
+int
+test_case_2_3_2(int child)
+{
+	struct strapush sap = { 5, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	struct strapush sap1 = { SAP_CLEAR, 0, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, };
+	struct strapush sap2 = { SAP_CLEAR, -1, -1, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	struct strapush sap3 = { SAP_CLEAR, -1, 4, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap2) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap2) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_2 = { &preamble_0, &test_case_2_3_2, &postamble_0 };
+
+#define test_case_2_3_2_stream_0 (&test_2_3_2)
+#define test_case_2_3_2_stream_1 (NULL)
+#define test_case_2_3_2_stream_2 (NULL)
+
+#define tgrp_case_2_3_3 test_group_2
+#define numb_case_2_3_3 "2.3.3"
+#define name_case_2_3_3 "Perform SAD_SAP - EINVAL."
+#define sref_case_2_3_3 sref_group_2
+#define desc_case_2_3_3 "\
+Check that SAD_SAP can be performed.  Checks that EINVAL is returned\n\
+when sap_nlist is less than one or greater than MAXAPUSH."
+
+int
+test_case_2_3_3(int child)
+{
+	struct strapush sap1 = { SAP_ALL, -1, 0, 1, 0, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	struct strapush sap2 = { SAP_ALL, -1, 0, 1, MAXAPUSH + 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap2) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_3 = { &preamble_0, &test_case_2_3_3, &postamble_0 };
+
+#define test_case_2_3_3_stream_0 (&test_2_3_3)
+#define test_case_2_3_3_stream_1 (NULL)
+#define test_case_2_3_3_stream_2 (NULL)
+
+#define tgrp_case_2_3_4 test_group_2
+#define numb_case_2_3_4 "2.3.4"
+#define name_case_2_3_4 "Perform SAD_SAP - EINVAL."
+#define sref_case_2_3_4 sref_group_2
+#define desc_case_2_3_4 "\
+Check that SAD_SAP can be performed.  Checks that EINVAL is returned\n\
+when sap_list contained invalid information (names are null or not null\n\
+terminated)."
+
+int
+test_case_2_3_4(int child)
+{
+	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, { "", }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_4 = { &preamble_0, &test_case_2_3_4, &postamble_0 };
+
+#define test_case_2_3_4_stream_0 (&test_2_3_4)
+#define test_case_2_3_4_stream_1 (NULL)
+#define test_case_2_3_4_stream_2 (NULL)
+
+#define tgrp_case_2_3_5 test_group_2
+#define numb_case_2_3_5 "2.3.5"
+#define name_case_2_3_5 "Perform SAD_SAP - ENOSTR."
+#define sref_case_2_3_5 sref_group_2
+#define desc_case_2_3_5 "\
+Check that SAD_SAP can be performed.  Checks that ENOSTR is returned\n\
+when sap_major, sap_minor and sap_lastminor specify a character device\n\
+that is not a STREAMS device."
+
+int
+test_case_2_3_5(int child)
+{
+	struct strapush sap = { SAP_ALL, 137, 5, 6, 1, { CONFIG_STREAMS_SC_NAME, }, 0, };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENOSTR)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_5 = { &preamble_0, &test_case_2_3_5, &postamble_0 };
+
+#define test_case_2_3_5_stream_0 (&test_2_3_5)
+#define test_case_2_3_5_stream_1 (NULL)
+#define test_case_2_3_5_stream_2 (NULL)
+
+#define tgrp_case_2_3_6 test_group_2
+#define numb_case_2_3_6 "2.3.6"
+#define name_case_2_3_6 "Perform SAD_SAP - EEXIST."
+#define sref_case_2_3_6 sref_group_2
+#define desc_case_2_3_6 "\
+Check that SAD_SAP can be performed.  Checks that EEXIST is returned\n\
+when sap_module, sap_major, sap_minor and sap_lastminor specify a\n\
+STREAMS device that is already configured for autopush and the sap_cmd\n\
+was SAP_ONE, SAP_RANGE or SAP_ALL."
+
+int
+preamble_test_case_2_3_6(int child)
+{
+	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	state++;
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) & sap) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+test_case_2_3_6(int child)
+{
+	struct strapush sap1 = { SAP_ONE, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	struct strapush sap2 = { SAP_RANGE, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	struct strapush sap3 = { SAP_ALL, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EEXIST)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap2) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EEXIST)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap3) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != EEXIST)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+int
+postamble_test_case_2_3_6(int child)
+{
+	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, SAD_SAP, (intptr_t) & sap) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return (result);
+}
+struct test_stream test_2_3_6 = { &preamble_test_case_2_3_6, &test_case_2_3_6, &postamble_test_case_2_3_6 };
+
+#define test_case_2_3_6_stream_0 (&test_2_3_6)
+#define test_case_2_3_6_stream_1 (NULL)
+#define test_case_2_3_6_stream_2 (NULL)
+
+#define tgrp_case_2_3_7 test_group_2
+#define numb_case_2_3_7 "2.3.7"
+#define name_case_2_3_7 "Perform SAD_SAP - ERANGE."
+#define sref_case_2_3_7 sref_group_2
+#define desc_case_2_3_7 "\
+Check that SAD_SAP can be performed.  Checks that ERANGE is returned\n\
+when SAP_CLEAR is attempted on a subrange of a range previously set with\n\
+SAP_RANGE."
+
+int
+preamble_test_case_2_3_7(int child)
+{
+	struct strapush sap = { SAP_RANGE, -1, 0, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	state++;
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+}
+
+int
+test_case_2_3_7(int child)
+{
+	struct strapush sap = { SAP_CLEAR, -1, 1, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
+postamble_test_case_2_3_7(int child)
+{
+	struct strapush sap = { SAP_CLEAR, -1, 0, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
+	int result = __RESULT_SUCCESS;
+
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	state++;
+	return (result);
+}
+struct test_stream test_2_3_7 = { &preamble_test_case_2_3_7, &test_case_2_3_7, &postamble_test_case_2_3_7 };
+
+#define test_case_2_3_7_stream_0 (&test_2_3_7)
+#define test_case_2_3_7_stream_1 (NULL)
+#define test_case_2_3_7_stream_2 (NULL)
+
+#define tgrp_case_2_3_8 test_group_2
+#define numb_case_2_3_8 "2.3.8"
+#define name_case_2_3_8 "Perform SAD_SAP - ERANGE."
+#define sref_case_2_3_8 sref_group_2
+#define desc_case_2_3_8 "\
+Check that SAD_SAP can be performed.  Checks that ERANGE is returned\n\
+when sap_lastminor is less than or equal to sap_minor and sap_cmd was\n\
+SAP_RANGE."
+
+int
+test_case_2_3_8(int child)
+{
+	struct strapush sap1 = { SAP_RANGE, -1, 1, 0, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+	struct strapush sap2 = { SAP_RANGE, -1, 1, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap2) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ERANGE)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_8 = { &preamble_0, &test_case_2_3_8, &postamble_0 };
+
+#define test_case_2_3_8_stream_0 (&test_2_3_8)
+#define test_case_2_3_8_stream_1 (NULL)
+#define test_case_2_3_8_stream_2 (NULL)
+
+#define tgrp_case_2_3_9 test_group_2
+#define numb_case_2_3_9 "2.3.9"
+#define name_case_2_3_9 "Perform SAD_SAP - ENODEV."
+#define sref_case_2_3_9 sref_group_2
+#define desc_case_2_3_9 "\
+Check that SAD_SAP can be performed.  Checks that ENODEV is returned\n\
+when the device specified by sap_major and sap_minor is not configured\n\
+with an autopush list and the sap_cmd was SAP_CLEAR."
+
+int
+test_case_2_3_9(int child)
+{
+	struct strapush sap1 = { SAP_CLEAR, -1, 0, 1, 1, { CONFIG_STREAMS_SC_NAME, }, 0, CONFIG_STREAMS_SAD_NAME };
+
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_errno != ENODEV)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_2_3_9 = { &preamble_0, &test_case_2_3_9, &postamble_0 };
+
+#define test_case_2_3_9_stream_0 (&test_2_3_9)
+#define test_case_2_3_9_stream_1 (NULL)
+#define test_case_2_3_9_stream_2 (NULL)
+
+#define tgrp_case_2_3_10 test_group_2
+#define numb_case_2_3_10 "2.3.10"
+#define name_case_2_3_10 "Perform SAD_SAP - ENOSR."
+#define sref_case_2_3_10 sref_group_2
+#define desc_case_2_3_10 "\
+Check that SAD_SAP can be performed.  Checks that ENOSR is returned\n\
+when resources could not be allocated to complete the command."
+
+int
+test_case_2_3_10(int child)
+{
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_3_10 = { &preamble_0, &test_case_2_3_10, &postamble_0 };
+
+#define test_case_2_3_10_stream_0 (&test_2_3_10)
+#define test_case_2_3_10_stream_1 (NULL)
+#define test_case_2_3_10_stream_2 (NULL)
+
+#define tgrp_case_2_3_11 test_group_2
+#define numb_case_2_3_11 "2.3.11"
+#define name_case_2_3_11 "Perform SAD_SAP."
+#define sref_case_2_3_11 sref_group_2
+#define desc_case_2_3_11 "\
+Check that SAD_SAP can be performed."
+
+int
+test_case_2_3_11(int child)
+{
+	if (getuid() != 0 && geteuid() != 0)
+		return (__RESULT_SKIPPED);
+	return (__RESULT_SKIPPED);
+}
+struct test_stream test_2_3_11 = { &preamble_0, &test_case_2_3_11, &postamble_0 };
+
+#define test_case_2_3_11_stream_0 (&test_2_3_11)
+#define test_case_2_3_11_stream_1 (NULL)
+#define test_case_2_3_11_stream_2 (NULL)
+
 
 /*
  *  -------------------------------------------------------------------------
@@ -2553,6 +3207,42 @@ struct test_case {
 	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, sref_case_2_1_2, {
 	test_case_2_1_2_stream_0, test_case_2_1_2_stream_1, test_case_2_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, sref_case_2_1_3, {
+	test_case_2_1_3_stream_0, test_case_2_1_3_stream_1, test_case_2_1_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, sref_case_2_1_4, {
+	test_case_2_1_4_stream_0, test_case_2_1_4_stream_1, test_case_2_1_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_1, tgrp_case_2_2_1, name_case_2_2_1, desc_case_2_2_1, sref_case_2_2_1, {
+	test_case_2_2_1_stream_0, test_case_2_2_1_stream_1, test_case_2_2_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_2, tgrp_case_2_2_2, name_case_2_2_2, desc_case_2_2_2, sref_case_2_2_2, {
+	test_case_2_2_2_stream_0, test_case_2_2_2_stream_1, test_case_2_2_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_3, tgrp_case_2_2_3, name_case_2_2_3, desc_case_2_2_3, sref_case_2_2_3, {
+	test_case_2_2_3_stream_0, test_case_2_2_3_stream_1, test_case_2_2_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_4, tgrp_case_2_2_4, name_case_2_2_4, desc_case_2_2_4, sref_case_2_2_4, {
+	test_case_2_2_4_stream_0, test_case_2_2_4_stream_1, test_case_2_2_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2_5, tgrp_case_2_2_5, name_case_2_2_5, desc_case_2_2_5, sref_case_2_2_5, {
+	test_case_2_2_5_stream_0, test_case_2_2_5_stream_1, test_case_2_2_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, sref_case_2_3_1, {
+	test_case_2_3_1_stream_0, test_case_2_3_1_stream_1, test_case_2_3_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, sref_case_2_3_2, {
+	test_case_2_3_2_stream_0, test_case_2_3_2_stream_1, test_case_2_3_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_3, tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, sref_case_2_3_3, {
+	test_case_2_3_3_stream_0, test_case_2_3_3_stream_1, test_case_2_3_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, sref_case_2_3_4, {
+	test_case_2_3_4_stream_0, test_case_2_3_4_stream_1, test_case_2_3_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_5, tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, sref_case_2_3_5, {
+	test_case_2_3_5_stream_0, test_case_2_3_5_stream_1, test_case_2_3_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_6, tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, sref_case_2_3_6, {
+	test_case_2_3_6_stream_0, test_case_2_3_6_stream_1, test_case_2_3_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_7, tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, sref_case_2_3_7, {
+	test_case_2_3_7_stream_0, test_case_2_3_7_stream_1, test_case_2_3_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_8, tgrp_case_2_3_8, name_case_2_3_8, desc_case_2_3_8, sref_case_2_3_8, {
+	test_case_2_3_8_stream_0, test_case_2_3_8_stream_1, test_case_2_3_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_9, tgrp_case_2_3_9, name_case_2_3_9, desc_case_2_3_9, sref_case_2_3_9, {
+	test_case_2_3_9_stream_0, test_case_2_3_9_stream_1, test_case_2_3_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_10, tgrp_case_2_3_10, name_case_2_3_10, desc_case_2_3_10, sref_case_2_3_10, {
+	test_case_2_3_10_stream_0, test_case_2_3_10_stream_1, test_case_2_3_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_11, tgrp_case_2_3_11, name_case_2_3_11, desc_case_2_3_11, sref_case_2_3_11, {
+	test_case_2_3_11_stream_0, test_case_2_3_11_stream_1, test_case_2_3_11_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 

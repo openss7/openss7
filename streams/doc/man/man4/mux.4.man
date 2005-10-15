@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mux.4.man,v 0.9.2.1 2005/09/11 02:39:50 brian Exp $
+.\" @(#) $Id: mux.4.man,v 0.9.2.2 2005/10/15 10:19:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/11 02:39:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/10/15 10:19:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mux.4.man,v $
+.\" Revision 0.9.2.2  2005/10/15 10:19:45  brian
+.\" - working up autopush and SAD driver tests
+.\"
 .\" Revision 0.9.2.1  2005/09/11 02:39:50  brian
 .\" - added missin manpages
 .\"
@@ -458,6 +461,9 @@ and LiS
 lis
 .]
 documentation.
+Conformance is verified using the
+.BR test-mux (8)
+verification test suite.
 .\"
 .\"
 .SH HISTORY

@@ -90,3 +90,4 @@
 -T__user
 -T__kernel
 -Tbool
+-Tintptr_t

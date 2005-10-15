@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: loop.4.man,v 0.9.2.3 2005/09/11 02:39:49 brian Exp $
+.\" @(#) $Id: loop.4.man,v 0.9.2.4 2005/10/15 10:19:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/11 02:39:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/10/15 10:19:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -284,6 +284,9 @@ and LiS
 lis
 .]
 documentation.
+Conformance is verified using the
+.BR test-loop (8)
+verification test suite.
 .\"
 .\"
 .SH HISTORY
