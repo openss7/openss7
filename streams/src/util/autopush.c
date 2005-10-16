@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/10/15 10:19:55 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/16 05:31:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/15 10:19:55 $ by $Author: brian $
+ Last Modified $Date: 2005/10/16 05:31:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/10/15 10:19:55 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/16 05:31:43 $"
 
-static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/10/15 10:19:55 $";
+static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/10/16 05:31:43 $";
 
 /* 
  *  autopush(8)
@@ -61,20 +61,24 @@ static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2
  *  modules.
  */
 
-#include <stdlib.h>
+#define _XOPEN_SOURCE 600
+
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <memory.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <limits.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
 
 #include <stropts.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
@@ -87,11 +91,11 @@ static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2
 #define SAD_USER_FILENAME   "/dev/sad"
 #define SAD_ADMIN_FILENAME  "/dev/sad"
 
-static int output = 1;
-static int debug = 0;
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
 
 static void
-version(int argc, char **argv)
+version(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -104,7 +108,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -123,7 +127,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -167,12 +171,12 @@ Options:\n\
     -l, --lastminor LASTMINOR\n\
         specify the LASTMINOR device number in a range (used with -s)\n\
     -q, --quiet\n\
-        suppress normal output (equivalent to --debug=0)\n\
-    -d, --debug [LEVEL]\n\
-        increase or set debugging verbosity\n\
+        suppress normal output\n\
+    -D, --debug [LEVEL]\n\
+        increment or set debug LEVEL (default: 0)\n\
     -x, --verbose [LEVEL]\n\
-        increase or set output verbosity\n\
-    -h, --help, -?, --?\n\
+        increment or set output verbosity LEVEL (default: 1)\n\
+    -h, --help, -?\n\
         print this usage information and exit\n\
     -V, --version\n\
         print version and exit\n\
@@ -256,7 +260,7 @@ sad_vml(int fd, struct str_list *sml)
 #endif
 
 static struct sc_list *
-sc_list(char **argv, int fd)
+sc_list(char *argv[], int fd)
 {
 	int count;
 	struct sc_list *list = NULL;
@@ -302,7 +306,7 @@ sc_list(char **argv, int fd)
 }
 
 static int
-autopush_set(char **argv, char *devname, int major, int minor, int lastminor, int nmods, char **modlist)
+autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, int nmods, char **modlist)
 {
 	struct strapush sap;
 	int i, fd, cmd;
@@ -359,7 +363,7 @@ autopush_set(char **argv, char *devname, int major, int minor, int lastminor, in
 }
 
 static int
-autopush_cln(char **argv, char *devname, int major, int minor)
+autopush_cln(char *argv[], char *devname, int major, int minor)
 {
 	if (debug)
 		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname, major, minor);
@@ -367,7 +371,7 @@ autopush_cln(char **argv, char *devname, int major, int minor)
 }
 
 static int
-autopush_ver(char **argv, int nmods, char **modlist)
+autopush_ver(char *argv[], int nmods, char **modlist)
 {
 	int i, fd;
 	union {
@@ -401,7 +405,7 @@ autopush_ver(char **argv, int nmods, char **modlist)
 }
 
 static int
-autopush_get(char **argv, char *devname, int major, int minor)
+autopush_get(char *argv[], char *devname, int major, int minor)
 {
 	struct strapush sap;
 	int header = 0;
@@ -519,7 +523,7 @@ autopush_get(char **argv, char *devname, int major, int minor)
 }
 
 static int
-autopush_res(char **argv, char *devname, int major, int minor)
+autopush_res(char *argv[], char *devname, int major, int minor)
 {
 	struct strapush sap;
 	int header = 0;
@@ -629,7 +633,7 @@ autopush_res(char **argv, char *devname, int major, int minor)
 }
 
 static int
-autopush_fil(char **argv, char *filename)
+autopush_fil(char *argv[], char *filename)
 {
 	char buffer[1024];
 	char *line;
@@ -741,9 +745,8 @@ autopush_fil(char **argv, char *filename)
 }
 
 int
-main(int argc, char **argv)
+main(int argc, char *argv[])
 {
-	int c, val;
 	char filename[256] = "";
 	char devname[FMNAMESZ + 1] = "";
 	int major = -1;
@@ -759,42 +762,46 @@ main(int argc, char **argv)
 		OPTION_CLONE,
 	} option = OPTION_NONE;
 
-	while (1) {
-#ifdef _GNU_SOURCE
-		int option_index = 0;
-		static struct option long_options[] = {
-			/* *INDENT-OFF* */
-			{ "file",	required_argument,	NULL, 'f' },
-			{ "set",	no_argument,		NULL, 's' },
-			{ "get",	no_argument,		NULL, 'g' },
-			{ "reset",	no_argument,		NULL, 'r' },
-			{ "clone",	no_argument,		NULL, 'c' },
-			{ "verify",	no_argument,		NULL, 'v' },
-			{ "name",	required_argument,	NULL, 'N' },
-			{ "major",	required_argument,	NULL, 'M' },
-			{ "minor",	required_argument,	NULL, 'm' },
-			{ "lastminor",	required_argument,	NULL, 'l' },
-			{ "quiet",	no_argument,		NULL, 'q' },
-			{ "debug",	optional_argument,	NULL, 'd' },
-			{ "verbose",	optional_argument,	NULL, 'x' },
-			{ "version",	no_argument,		NULL, 'V' },
-			{ "copying",	no_argument,		NULL, 'C' },
-			{ "help",	no_argument,		NULL, 'h' },
-			{ "?",		no_argument,		NULL, 'h' },
-			{ 0, }
-			/* *INDENT-ON* */
-		};
+	for (;;) {
+		int c, val;
 
-		c = getopt_long_only(argc, argv, "f:sgrcM:m:N:l:vqd::x::VCh?", long_options, &option_index);
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"file",	required_argument,	NULL, 'f'},
+			{"set",		no_argument,		NULL, 's'},
+			{"get",		no_argument,		NULL, 'g'},
+			{"reset",	no_argument,		NULL, 'r'},
+			{"clone",	no_argument,		NULL, 'c'},
+			{"verify",	no_argument,		NULL, 'v'},
+			{"name",	required_argument,	NULL, 'N'},
+			{"major",	required_argument,	NULL, 'M'},
+			{"minor",	required_argument,	NULL, 'm'},
+			{"lastminor",	required_argument,	NULL, 'l'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
+			{"verbose",	optional_argument,	NULL, 'x'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
+			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
+		};
+		/* *INDENT-ON* */
+
+		c = getopt_long_only(argc, argv, "f:sgrcM:m:N:l:vqD::x::hVC?W:", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "f:sgrcM:m:N:l:vqd::x::VCh?");
+		c = getopt(argc, argv, "f:sgrcM:m:N:l:vqDxhVC?");
 #endif				/* _GNU_SOURCE */
-		if (c == -1)
+		if (c == -1) {
+			if (debug)
+				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
+		}
 		switch (c) {
 		case 0:
-			usage(argc, argv);
-			exit(2);
+			goto bad_usage;
 		case 'f':	/* -f, --file filename */
 			if (option != OPTION_NONE)
 				goto bad_option;
@@ -858,11 +865,6 @@ main(int argc, char **argv)
 				goto bad_option;
 			option = OPTION_CLONE;
 			break;
-		case 'q':	/* -q, --quiet */
-			output = 0;
-			debug = 0;
-			break;
-			break;
 		case 'd':	/* -d, --debug [LEVEL] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
@@ -874,7 +876,13 @@ main(int argc, char **argv)
 				goto bad_option;
 			debug = val;
 			break;
-		case 'x':	/* -x, --verbose [LEVEL] */
+		case 'q':	/* -q, --quiet */
+			if (debug)
+				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
+			debug = 0;
+			output = 0;
+			break;
+		case 'x':	/* -x, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -885,7 +893,8 @@ main(int argc, char **argv)
 				goto bad_option;
 			output = val;
 			break;
-		case 'h':	/* -h, --help, -? --? */
+		case 'h':	/* -h, --help */
+		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
 			help(argc, argv);
@@ -905,7 +914,7 @@ main(int argc, char **argv)
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (output > 0 || debug > 0) {
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -916,11 +925,15 @@ main(int argc, char **argv)
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
 		}
 	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
 	switch (option) {
 	case OPTION_FILE:
 		if (optind < argc) {

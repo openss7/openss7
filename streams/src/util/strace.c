@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/21 20:47:24 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/10/16 05:31:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:24 $ by $Author: brian $
+ Last Modified $Date: 2005/10/16 05:31:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/21 20:47:24 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/10/16 05:31:43 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/21 20:47:24 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/10/16 05:31:43 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -584,7 +584,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -598,7 +598,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -639,12 +639,12 @@ Options:\n\
         increase or set debugging verbosity\n\
     -v, --verbose [LEVEL]\n\
         increase or set output verbosity\n\
-    -h, --help\n\
-        prints this usage information and exits\n\
+    -h, --help, -?\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        prints copying permissions and exits\n\
+        print copying permissions and exit\n\
 ", argv[0], program, loggername);
 }
 
@@ -1060,17 +1060,18 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
-				     &option_index);
-#else
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
-#endif
+#endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
 				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
 		}
 		switch (c) {
+		case 0:
+			goto bad_usage;
 		case 'n':	/* -n, --noforeground */
 			if (debug)
 				fprintf(stderr, "%s: suppressing deamon mode\n", argv[0]);
@@ -1106,10 +1107,10 @@ main(int argc, char *argv[])
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
 			debug = 0;
+			output = 0;
 			break;
-		case 'D':	/* -D, --debug [LEVEL] */
+		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -1122,7 +1123,7 @@ main(int argc, char *argv[])
 			if (debug)
 				nomead = 0;
 			break;
-		case 'v':	/* -v, --verbose [LEVEL] */
+		case 'v':	/* -v, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -1154,7 +1155,7 @@ main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (output > 0 || debug > 0) {
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -1165,6 +1166,7 @@ main(int argc, char *argv[])
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);

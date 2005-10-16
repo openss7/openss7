@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/14 12:27:03 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/16 05:31:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:27:03 $ by $Author: brian $
+ Last Modified $Date: 2005/10/16 05:31:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/14 12:27:03 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/16 05:31:43 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/10/14 12:27:03 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/16 05:31:43 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -78,11 +78,11 @@ static char const ident[] =
 #include <stropts.h>
 #include <sys/sc.h>
 
-static int debug = 0;
-static int output = 1;
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
 
 static void
-version(int argc, char **argv)
+version(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -95,7 +95,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char **argv)
+usage(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -109,7 +109,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char **argv)
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -223,12 +223,12 @@ printit(struct sc_mlist *l, int cmd)
 };
 
 int
-main(int argc, char **argv)
+main(int argc, char *argv[])
 {
 	int i, fd, count;
 	struct sc_list *list;
 
-	while (1) {
+	for (;;) {
 		int c, val;
 
 #if defined _GNU_SOURCE
@@ -237,8 +237,8 @@ main(int argc, char **argv)
 		static struct option long_options[] = {
 			{"long",	no_argument,		NULL, 'l'},
 			{"count",	no_argument,		NULL, 'c'},
-			{"debug",	optional_argument,	NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
@@ -248,9 +248,9 @@ main(int argc, char **argv)
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "lcdqvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "lcqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "lcdqvhVC?");
+		c = getopt(argc, argv, "lcqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -258,6 +258,8 @@ main(int argc, char **argv)
 			break;
 		}
 		switch (c) {
+		case 0:
+			goto bad_usage;
 		case 'l':
 			if (command != CMN_NONE)
 				goto bad_option;
@@ -272,24 +274,24 @@ main(int argc, char **argv)
 				fprintf(stderr, "%s: setting count command\n", argv[0]);
 			command = CMN_COUNT;
 			break;
-		case 'd':	/* -d, --debug */
+		case 'D':	/* -D, --debug */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
-				break;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
 			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			debug = val;
 			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
 			debug = 0;
+			output = 0;
 			break;
-		case 'v':	/* -v, --verbose */
+		case 'v':	/* -v, --verbose [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -320,7 +322,9 @@ main(int argc, char **argv)
 		default:
 		      bad_option:
 			optind--;
-			if (output > 0 || debug > 0) {
+			goto bad_nonopt;
+		      bad_nonopt:
+			if (output || debug) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
 					while (optind < argc)
@@ -331,6 +335,7 @@ main(int argc, char **argv)
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
