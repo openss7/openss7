@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-aspext-04.me,v 0.9.2.2 2005/05/14 08:33:18 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-aspext-04.me,v 0.9.2.3 2005/10/17 11:53:45 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,14 +47,14 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:18 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2005/10/17 11:53:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.ds version Version\ 0.3
-.ds date February\ 21,\ 2004
-.ds expiry January\ 2004
+.ds version Version\ 0.4
+.ds date October\ 16,\ 2005
+.ds expiry April\ 2006
 .nr levels 0
-.so ../draft.me
+.so ../draft2.me
 .bp
 .sz \n(pp
 .he 'Internet Draft'UA ASPEXT'\\\\*[date]'
@@ -74,55 +74,29 @@ Expires in \*[expiry];;
 Application Server Process (ASP) Extension (ASPEXT) Framework
 for
 Signalling User Adaptation Layers
-<draft-bidulock-sigtran-aspext-03.\*(|x>
+<draft-bidulock-sigtran-aspext-04.\*(|x>
 .)l
 .rr |x
 .ne 4
-.uh "Status of this Memo"
-.pp
-.pp
-This document is an Internet-Draft and is in full conformance with all
-provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
-of the Internet Engineering Task Force (IETF), its areas, and its working
-groups.  Note that other groups may also distribute working documents as
-Internet-Drafts.
-.pp
-Internet-Drafts are draft documents valid for a maximum of six months and may
-be updated, replaced, or obsoleted by other documents at any time.  It is
-inappropriate to use Internet-Drafts as reference material or to cite them
-other than as 'work in progress'.
-.pp
-The list of current Internet-Drafts can be accessed at
-http://www.ietf.org/ietf/1id-abstracts.txt
-.pp
-The list of Internet-Draft Shadow Directories can be accessed at
-http://www.ietf.org/shadow.html
-.pp
-To learn the current status of any Internet-Draft, please check the
-'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
-Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
-(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
-.uh "Copyright"
-.pp
-Copyright \(co The Internet Society (2004).  All Rights Reserved.
+.#S 2005 \*[expiry]
 .uh "Abstract"
 .pp
 This Internet-Draft describes \fI\)ASP Extensions (ASPEXT)\fR for Signalling
 User Adaptation Protocols,
 .[
-iua-rfc
+iua
 %Z 1
 .]
 .[
-iua-bis
+iua
 %Z 2
 .]
 .[
-dua-05
+dua
 %Z 2
 .]
 .[
-v5ua-03
+v5ua
 %Z 2
 .]
 .[
@@ -130,23 +104,23 @@ gr303ua00
 %Z 2
 .]
 .[
-m2ua-rfc
+m2ua
 %Z 1
 .]
 .[
-m3ua-rfc
+m3ua
 %Z 1
 .]
 .[
-sua-16
+sua
 %Z 1
 .]
 .[
-isua-02
+isua
 %Z 2
 .]
 .[
-tua-03
+tua
 %Z 2
 .]
 which permits cooperating Signalling Peer Processes (SPPs) to indicate to each
@@ -162,34 +136,34 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-iua-rfc
+iua
 .]
 .[
-iua-bis
+iua
 .]
 .[
-dua-05
+dua
 .]
 .[
-v5ua-03
+v5ua
 .]
 .[
 gr303ua00
 .]
 .[
-m2ua-rfc
+m2ua
 .]
 .[
-m3ua-rfc
+m3ua
 .]
 .[
-sua-16
+sua
 .]
 .[
-isua-02
+isua
 .]
 .[
-tua-03
+tua
 .]
 for the purpose of supporting a framework for extending the parameters and
 procedures of these Adaptation Layers.
@@ -204,6 +178,7 @@ tab(:);
 li1c0lssss.
 AS:\(em:Application Server.
 ASP:\(em:Application Server Process.
+ASPCONG:\(em:ASP Congestion Extension.
 ASPEXT:\(em:ASP Extensions.
 CAP:\(em:CAMEL Application Protocol.
 CORID:\(em:Correlation Id Extension
@@ -257,35 +232,35 @@ rfc 2960
 .]
 ISDN Signalling User Adaptation Layers
 .[
-iua-rfc
+iua
 .]
 .[
-iua-bis
+iua
 .]
 .[
-dua-05
+dua
 .]
 .[
-v5ua-03
+v5ua
 .]
 .[
 gr303ua00
 .]
 or SS7 Signalling User Adaptation Layers.
 .[
-m2ua-rfc
+m2ua
 .]
 .[
-m3ua-rfc
+m3ua
 .]
 .[
-sua-16
+sua
 .]
 .[
-isua-02
+isua
 .]
 .[
-tua-03
+tua
 .]
 supporting the concept of ASP Management\*#.
 .(d
@@ -293,7 +268,7 @@ supporting the concept of ASP Management\*#.
 Currently all SS7 Signalling User Adaptation Layers support ASP Management
 with the exception of M2PA.
 .[
-m2pa-09
+m2pa
 %Z 2
 .]
 .)d
@@ -315,16 +290,16 @@ The existing UA procedures\*#
 .ip \*#
 See, for example, Section 4 of the specific UA document.
 .[
-m3ua-rfc
+m3ua
 .]
 .[
-sua-16
+sua
 .]
 .[
-isua-02
+isua
 .]
 .[
-tua-03
+tua
 .]
 .)d
 make no provisions for the management of extensions.  Any mechanism that an
@@ -351,15 +326,7 @@ Support for an SPP supporting \fI\)ASPEXT\fR interworking with an SPP that
 does not support \fI\)ASPEXT\fR.
 .#e
 .sh 1 "Conventions"
-.pp
-The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
-\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
-\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
-in this document, are to be interpreted as described in.
-.[
-key words
-%Z 1
-.]
+.#C
 .#e
 .sh 1 "Protocol Elements"
 .ds #w \*#
@@ -370,16 +337,16 @@ they are included in addition to the parameters of the UAs.\*#
 .ip \*#
 See, for example, Section 3 of the specific UA document.
 .[
-m3ua-rfc
+m3ua
 .]
 .[
-sua-16
+sua
 .]
 .[
-isua-02
+isua
 .]
 .[
-tua-03
+tua
 .]
 .)d
 .sh 2 "Parameters"
@@ -442,38 +409,43 @@ nl.
 0:None
 1:Protocol Limits Extension
 .[
-sginfo-03
+sginfo
 %Z 2
 .]
 2:Load Selection Extension
 .[
-loadsel-03
+loadsel
 %Z 2
 .]
 3:Load Grouping Extension
 .[
-loadgrp-03
+loadgrp
 %Z 2
 .]
 4:Correlation Id and Heartbeat Extension
 .[
-corid-03
+corid
 %Z 2
 .]
 5:Registration Extension
 .[
-regext-03
+regext
 %Z 2
 .]
 6:Session Identification Extension
 .[
-sessid-03
+sessid
 %Z 2
 .]
 7:Dynamic Registration Option
 8:Double-Ended (DE) IPSP Model Option
 .[
-m3ua-implementors-guide-04
+m3ua
+%Z 2
+.]
+9:ASP Congestion Extension
+.[
+aspcong
 %Z 2
 .]
 \-:(All other values are IETF reserved.)
@@ -695,11 +667,11 @@ The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
 \fI\)ASP Extensions\fR parameter identifying (for example) two
 extensions: Load Selection
 .[
-loadsel-03
+loadsel
 .]
 and Correlation Id/Heartbeat;
 .[
-corid-03
+corid
 .]
 indicating the ASP's support for these two extensions requiring interworking
 support.
@@ -708,7 +680,7 @@ The SGP or IPSP responds with an \fI\)ASPUP ACK\fR message containing an \fI\)AS
 Extensions\fR parameter identifying (for example) support for only one
 extension: Load Selection
 .[
-loadsel-03
+loadsel
 .]
 .np
 The ASP and SGP/IPSP register the peer's support (or lack of support) for the
@@ -757,11 +729,11 @@ The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
 \fI\)ASP Extensions\fR parameter identifying (for example) two
 extensions: Load Selection
 .[
-loadsel-03
+loadsel
 .]
 and Correlation Id/Heartbeat;
 .[
-corid-03
+corid
 .]
 indicating the ASP's support for these two extensions requiring interworking
 support.
@@ -819,11 +791,11 @@ The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
 \fI\)ASP Extensions\fR parameter identifying (for example) two
 extensions: Load Selection
 .[
-loadsel-03
+loadsel
 .]
 and Correlation Id/Heartbeat;
 .[
-corid-03
+corid
 .]
 indicating the ASP's support for these two extensions requiring interworking
 support.
@@ -896,38 +868,38 @@ extension accordingly.
 \fI\)ASPEXT\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA.
 .[
-iua-rfc
+iua
 .]
 .[
-iua-bis
+iua
 .]
 .[
-dua-05
+dua
 .]
 .[
-v5ua-03
+v5ua
 .]
 .[
 gr303ua00
 .]
 .[
-m2ua-rfc
+m2ua
 .]
 .[
-m3ua-rfc
+m3ua
 .]
 .[
-sua-16
+sua
 .]
 .[
-isua-02
+isua
 .]
 .[
-tua-03
+tua
 .]
 Please see the SIGTRAN security document
 .[
-sigsec-03
+sigsec
 %Z 1
 .]
 for security considerations and recommendations that are applicable to each of
@@ -952,34 +924,34 @@ invalid.
 \fI\)ASPEXT\fR provides an additional \fI\)ASP Extensions\fR message
 parameter to the common parameter range of the SIGTRAN UAs:
 .[
-iua-rfc
+iua
 .]
 .[
-iua-bis
+iua
 .]
 .[
-dua-05
+dua
 .]
 .[
-v5ua-03
+v5ua
 .]
 .[
 gr303ua00
 .]
 .[
-m2ua-rfc
+m2ua
 .]
 .[
-m3ua-rfc
+m3ua
 .]
 .[
-sua-16
+sua
 .]
 .[
-isua-02
+isua
 .]
 .[
-tua-03
+tua
 .]
 .af $p a
 .np
@@ -1054,6 +1026,13 @@ supporting the Extension and UA implementations not supporting the Extension.
 This section provides historical information on the changes made to this
 draft.  This section will be removed from the document when the document is
 finalized.
+.sh 2 "Changes from Version 0.3 to Version 0.4" 0 4
+.bu
+updated to IETF boilerplate for first and last page.
+.bu
+updated references, version numbers and dates.
+.bu
+added ASPCONG extension.
 .sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
 .bu
 updated references, version numbers and dates.
@@ -1077,7 +1056,7 @@ added CVS change log.
 .bu
 added dynamic registration and DE IPSP model from IG
 .[
-m3ua-implementors-guide-04
+m3ua
 .]
 as extensions.
 .sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
@@ -1097,6 +1076,9 @@ updated author's address.
 .nf
 \fC\s-3\
 $Log: draft-bidulock-sigtran-aspext-04.me,v $
+Revision 0.9.2.3  2005/10/17 11:53:45  brian
+- updated drafts for republication
+
 Revision 0.9.2.2  2005/05/14 08:33:18  brian
 - copyright header correction
 
@@ -1134,19 +1116,10 @@ $LIST$
 .\".pp
 .\"The authors would like to thank
 .\"for their valuable comments and suggestions.
-.uh "Author's Addresses"
-.lp
-.TS
-expand tab(;);
-lr.
-Brian Bidulock;Phone: +1-780-490-1141
-OpenSS7 Corporation;Email: bidulock@openss7.org
-1469 Jeffreys Crescent;URL: http//www.openss7.org/
-Edmonton, AB  T6L 6T1;
-Canada;
-.TE
+.#A
 .bl 3
+.fi
 .lp
 This Internet draft expires \*[expiry].
 .)b
-.#T 2004
+.#T 2005

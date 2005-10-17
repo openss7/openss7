@@ -204,7 +204,6 @@
 %D May 1990
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1155.txt
 
 %L RFC 1157
 %R RFC 1157
@@ -217,7 +216,6 @@
 %D May 1990
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1157.txt
 
 %L RFC 1901
 %R RFC 1901
@@ -230,7 +228,6 @@
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1901.txt
 
 %L RFC 1902
 %R RFC 1902
@@ -243,7 +240,6 @@
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1902.txt
 
 %L RFC 1903
 %R RFC 1903
@@ -256,7 +252,6 @@
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1903.txt
 
 %L RFC 1904
 %R RFC 1904
@@ -269,7 +264,6 @@
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1904.txt
 
 %L RFC 1905
 %R RFC 1905
@@ -282,7 +276,6 @@
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1905.txt
 
 %L RFC 1906
 %R RFC 1906
@@ -295,7 +288,6 @@
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc1906.txt
 
 %L RFC 2271
 %R RFC 2271
@@ -307,7 +299,6 @@
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2271.txt
 
 %L RFC 2272
 %R RFC 2272
@@ -320,7 +311,6 @@
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2272.txt
 
 %L RFC 2273
 %R RFC 2273
@@ -332,7 +322,6 @@
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2273.txt
 
 %L RFC 2275
 %R RFC 2275
@@ -344,7 +333,6 @@
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2275.txt
 
 %L RFC 2575
 %R RFC 2575
@@ -356,7 +344,6 @@
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2575.txt
 
 %L RFC 2574
 %R RFC 2574
@@ -367,7 +354,6 @@
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2574.txt
 
 %L RFC 2578
 %R RFC 2578
@@ -379,7 +365,6 @@
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2578.txt
 
 %L RFC 2579
 %R RFC 2579
@@ -391,7 +376,6 @@
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2579.txt
 
 %L RFC 2580
 %R RFC 2580
@@ -403,7 +387,6 @@
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc2580.txt
 
 %L RFC 3410
 %R RFC 3410
@@ -416,7 +399,6 @@
 %D December 2002
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc3410.txt
 
 %L TLI
 %A Unix International
@@ -484,6 +466,18 @@
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
 
+%K sigsec-rfc
+%L SIGSEC
+%A John Loughney
+%A Michael Tuexen
+%A Javier Pastor-Balbas
+%E John Loughney, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Security Considerations for Signaling Transport (SIGTRAN) Protocols
+%R RFC 3788
+%D June 2004
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K sigsec-03
 %L SIGSEC
 %A John Loughney
@@ -536,19 +530,18 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K M2UA-RFC
 %L M2UA
 %A Ken Morneault
 %A Ram Dantu
 %A Greg Sidebottom
-%A Tom George
 %A Brian Bidulock
 %A Jacob Heitz
 %E Ken Morneault, (ed)
 %Q Internet Engineering Task Force - Signalling Transport Working Group
-%T SS7 MTP2-User Adaptation Layer (M2UA)
-%R <draft-ietf-sigtran-m2ua-09.txt>
-%D July, 2001
-%O Work In Progress.
+%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) - User Adaptation Layer
+%R RFC 3331
+%D September, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
 %L M2UA
@@ -561,8 +554,8 @@
 %E Ken Morneault, (ed)
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T SS7 MTP2-User Adaptation Layer (M2UA)
-%R <draft-ietf-sigtran-m2ua-11.txt>
-%D November, 2001
+%R <draft-ietf-sigtran-m2ua-15.txt>
+%D February, 2002
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -591,23 +584,36 @@
 %E Ken Morneault, (ed)
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T SS7 MTP2-User Adaptation Layer (M2UA)
-%R <draft-ietf-sigtran-m2ua-15.txt>
-%D February, 2002
+%R <draft-ietf-sigtran-m2ua-11.txt>
+%D November, 2001
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
-%K M2UA-RFC
 %L M2UA
 %A Ken Morneault
 %A Ram Dantu
 %A Greg Sidebottom
+%A Tom George
 %A Brian Bidulock
 %A Jacob Heitz
 %E Ken Morneault, (ed)
 %Q Internet Engineering Task Force - Signalling Transport Working Group
-%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) - User Adaptation Layer
-%R RFC 3331
-%D September, 2002
+%T SS7 MTP2-User Adaptation Layer (M2UA)
+%R <draft-ietf-sigtran-m2ua-09.txt>
+%D July, 2001
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%L M3UA-BIS
+%K m3ua-bis-05
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3)-User Adaptation Layer (M3UA)
+%R <draft-ietf-sigtran-rfc3332bis-05.txt>
+%D October 2005
+%O Work In Progress
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
 %L M3UAIG
@@ -762,6 +768,21 @@
 %D September, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K SUA-RFC
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Signalling Connection Control Part User Adaptation Layer (SUA)
+%R RFC 3868
+%D October, 2004
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K sua-16
 %L SUA
 %A John Loughney
@@ -777,7 +798,6 @@
 %D December 11, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-16.txt
 
 %K sua-15
 %L SUA
@@ -794,7 +814,6 @@
 %D June 30, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-15.txt
 
 %K sua-14
 %L SUA14
@@ -895,6 +914,17 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K isua-03
+%L ISUA
+%A Brian Bidulock
+%E Brian Bidulock, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T SS7 ISUP-User Adaptation Layer (ISUA)
+%R <draft-bidulock-sigtran-isua-03.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K isua-02
 %L ISUA
 %A Brian Bidulock
@@ -902,7 +932,7 @@
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T SS7 ISUP-User Adaptation Layer (ISUA)
 %R <draft-bidulock-sigtran-isua-02.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -928,6 +958,17 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K tua-04
+%L TUA
+%A Brian Bidulock
+%E Brian Bidulock, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T SS7 TCAP-User Adaptation Layer (TUA)
+%R <draft-bidulock-sigtran-tua-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K tua-03
 %L TUA
 %A Brian Bidulock
@@ -935,7 +976,7 @@
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T SS7 TCAP-User Adaptation Layer (TUA)
 %R <draft-bidulock-sigtran-tua-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -995,10 +1036,11 @@
 %T ISDN Q.921-User Adaptation Layer
 %R draft-ietf-sigtran-rfc3057bis-00.txt
 %D May 2003
+%O Work In Progress.
 %I The Internet Society
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3057bis-00.txt
 
-%K IUA-RFC
+%K iua-rfc
+%K iuarfc
 %L IUA
 %A Ken Morneault
 %A Selvam Rengasami
@@ -1010,7 +1052,20 @@
 %R RFC 3057
 %D November, 2000
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc3057.txt
+
+%K dua-rfc
+%K duarfc
+%L DUA
+%A Ranjith Mukundan
+%A Narsimullo Mangalpally
+%A Ken Morneault
+%A Anil Vydyam
+%E Ranjith Mukundan
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Digital Private Network Signaling System (DPNSS)/Digital Access Signaling System 2 (DASS 2) Extensions to the IUA Protocol
+%R RFC 4129
+%D August 2005
+%I Internet Engineering Task Force - Signalling Transport Working Group
 
 %K dua-05
 %L DUA
@@ -1025,7 +1080,6 @@
 %D January 2003
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-dua-05.txt
 
 %K dua-04
 %L DUA
@@ -1040,7 +1094,6 @@
 %D October 2002
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-dua-04.txt
 
 %K dua-00
 %L DUA
@@ -1055,7 +1108,17 @@
 %D July 2001
 %O Work In Progress. [Expired]
 %I Internet Engineering Task Force - Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-dua-00.txt
+
+%K v5ua-rfc
+%L V5UA
+%A Eva Weilandt
+%A Neeraj Khanchandani
+%A Sanjay Rao
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T V5.2-User Adaption Layer (V5UA)
+%R RFC 3807
+%D June 2004
+%I Internet Engineering Task Force - Signalling Transport Working Group
 
 %K v5ua-03
 %L V5UA03
@@ -1091,7 +1154,6 @@
 %D December 2002
 %O Work In Progress
 %I Internet Engineering Task Force - Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-gr303ua-00.txt
 
 %L GR303UA
 %A Ranjith Mukundan
@@ -1103,13 +1165,23 @@
 %O Work In Progress
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K sginfo-04
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R <draft-bidulock-sigtran-sginfo-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K sginfo-03
 %L SGINFO
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Signalling Gateway (SG) Information Support
 %R <draft-bidulock-sigtran-sginfo-03.txt>
-%D February 21, 2004
+%D Febrary 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1143,13 +1215,33 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K aspcong-00
+%L ASPCONG
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T ASP Congestion
+%R <draft-bidulock-sigtran-aspcong-00.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%K aspext-04
+%L ASPEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R <draft-bidulock-sigtran-aspext-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K aspext-03
 %L ASPEXT
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Application Server Process (ASP) Extension Framework
 %R <draft-bidulock-sigtran-aspext-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1183,13 +1275,23 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K corid-04
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R <draft-bidulock-sigtran-corid-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K corid-03
 %L CORID
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
 %R <draft-bidulock-sigtran-corid-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1223,13 +1325,23 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K sessid-04
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R <draft-bidulock-sigtran-sessid-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K sessid-03
 %L SESSID
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Session Identification for SS7 Signalling User Adaptation Layers
 %R <draft-bidulock-sigtran-sessid-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1263,13 +1375,23 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K regext-04
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R <draft-bidulock-sigtran-regext-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K regext-03
 %L REGEXT
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
 %R <draft-bidulock-sigtran-regext-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1303,13 +1425,23 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K loadsel-04
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R <draft-bidulock-sigtran-loadsel-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K loadsel-03
 %L LOADSEL
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
 %R <draft-bidulock-sigtran-loadsel-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1343,13 +1475,23 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K loadgrp-04
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R <draft-bidulock-sigtran-loadgrp-04.txt>
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K loadgrp-03
 %L LOADGRP
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
 %R <draft-bidulock-sigtran-loadgrp-03.txt>
-%D February 21, 2004
+%D February 24, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1421,6 +1563,20 @@
 %D October, 1998
 %I The Internet Society
 
+%K m2pa-rfc
+%L M2PA
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2)-User Peer-to-Peer Adaptation Layer (M2PA)
+%D September 2005
+%R RFC 4165
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K m2pa-11
 %L M2PA11
 %A Tom George
@@ -1435,7 +1591,6 @@
 %D January 29, 2004
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-11.txt
 
 %K m2pa-10
 %L M2PA10
@@ -1451,7 +1606,6 @@
 %D October 16, 2003
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-10.txt
 
 %K m2pa-09
 %L M2PA09
@@ -1468,7 +1622,6 @@
 %D June 29, 2003
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-09.txt
 
 %K m2pa-08
 %L M2PA08
@@ -1484,7 +1637,6 @@
 %D April 22, 2003
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-08.txt
 
 %K m2pa-07
 %L M2PA07
@@ -1502,7 +1654,6 @@
 %D January 17, 2003
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-07.txt
 
 %K m2pa-06
 %L M2PA06
@@ -1520,7 +1671,6 @@
 %D August 28, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-06.txt
 
 %K m2pa-05
 %L M2PA05
@@ -1538,7 +1688,6 @@
 %D May 3, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-05.txt
 
 %K m2pa-04
 %L M2PA04
@@ -1555,7 +1704,6 @@
 %D February 28, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-04.txt
 
 %K m2pa-03
 %L M2PA03
@@ -1572,7 +1720,6 @@
 %D July 20, 2001
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-03.txt
 
 %K m2pa-02
 %L M2PA02
@@ -1589,7 +1736,16 @@
 %D March 2, 2001
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-02.txt
+
+%L M2PATEST06
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T SS7 MTP-User Peer-to-Peer Adaptation Layer Test Specifications (M2PA-TEST)
+%R <draft-bidulock-sigtran-m2pa-test-06.txt>
+%D October 16, 2005
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
 
 %L M2PATEST05
 %A Brian Bidulock
@@ -1597,10 +1753,9 @@
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T SS7 MTP-User Peer-to-Peer Adaptation Layer Test Specifications (M2PA-TEST)
 %R <draft-bidulock-sigtran-m2pa-test-05.txt>
-%D February 14, 2004
+%D February 24, 2005
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-05.txt
 
 %L M2PATEST04
 %A Brian Bidulock
@@ -1611,7 +1766,6 @@
 %D July 26, 2003
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-04.txt
 
 %L M2PATEST03
 %A Brian Bidulock
@@ -1622,7 +1776,6 @@
 %D March 29, 2003
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-03.txt
 
 %L M2PATEST02
 %A Brian Bidulock
@@ -1633,7 +1786,6 @@
 %D September 15, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-02.txt
 
 %L M2PATEST01
 %A Brian Bidulock
@@ -1644,7 +1796,6 @@
 %D April 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-01.txt
 
 %L M2PATEST00
 %A Brian Bidulock
@@ -1655,7 +1806,6 @@
 %D December 2001
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
-%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-00.txt
 
 %K q700
 %L Q.700
@@ -1915,11 +2065,33 @@
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
 
+%K q772
+%L Q.772
+%A ITU
+%R ITU-T Recommendation Q.772
+%T Signalling System No. 7 \- Transaction Capabilities Information Element Definitions
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+
 %K q773
 %L Q.773
 %A ITU
 %R ITU-T Recommendation Q.773
 %T Signalling System No. 7 \- Transaction Capabilities Formats and Encoding
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+
+%K q774
+%L Q.774
+%A ITU
+%R ITU-T Recommendation Q.774
+%T Signalling System No. 7 \- Transaction Capabilities Procedures
 %D March 1993
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU

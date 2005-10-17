@@ -50,11 +50,11 @@
 .\" (0.7.8.5) modified 2001/12/17 11:47:22 by brian
 .\"
 .\" =========================================================================
-.ds version Version\ 0.5
-.ds date February\ 14,\ 2004
-.ds expiry August\ 2004
+.ds version Version\ 0.6
+.ds date October\ 16,\ 2005
+.ds expiry April\ 2006
 .nr levels 3
-.so ../draft.me
+.so ../draft2.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'M2PA-TEST'\\\\*[date]'
@@ -73,43 +73,18 @@ Expires in \*[expiry];;
 \fB\f(HBSS7 MTP2-User Peer-to-Peer Adaptation Layer
 Test Specifications
 M2PA-TEST
-<draft-bidulock-sigtran-m2pa-test-05.\*(|x>
+<draft-bidulock-sigtran-m2pa-test-06.\*(|x>
 .)l
 .rr |x
 .ne 4
-.uh "Status of this Memo"
-.pp
-This document is an Internet-Draft and is in full conformance with all
-provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
-of the Internet Engineering Task Force (IETF), its areas, and its working
-groups.  Note that other groups may also distribute working documents as
-Internet-Drafts.
-.pp
-Internet-Drafts are draft documents valid for a maximum of six months and may
-be updated, replaced, or obsoleted by other documents at any time.  It is
-inappropriate to use Internet-Drafts as reference material or to cite them
-other than as 'work in progress'.
-.pp
-The list of current Internet-Drafts can be accessed at
-http://www.ietf.org/ietf/1id-abstracts.txt
-.pp
-The list of Internet-Draft Shadow Directories can be accessed at
-http://www.ietf.org/shadow.html
-.pp
-To learn the current status of any Internet-Draft, please check the
-'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
-Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
-(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
-.uh "Copyright"
-.pp
-Copyright \(co The Internet Society (2004).  All Rights Reserved.
+.#S 2005 \*[expiry] a
 .uh "Abstract"
 .pp
 This Internet Draft provides information for the Internet community on test
 cases for testing the
 \fISS7 MTP2-User Peer-to-Peer Adaptation Layer\fR
 .[
-m2pa-11
+m2pa-rfc
 %Z 1
 .]
 based on the conformance test specifications for SS7 MTP Level 2.
@@ -134,7 +109,7 @@ history for this document appears at the end of the document.
 This draft provides a set of detailed tests of the
 \fISS7 MTP2-User Peer-to-Peer Adaptation Layer\fR
 .[
-m2pa-11
+m2pa-rfc
 .]
 based on the test specifications for SS7 MTP Level 2.
 .[
@@ -144,7 +119,7 @@ These tests are intended to validate the
 \fISS7 MTP2-User Peer-to-Peer Adaptation Layer\fR
 (M2PA) protocol.
 .[
-m2pa-11
+m2pa-rfc
 .]
 .pp
 These tests attempt to completely validate the M2PA protocol without
@@ -169,7 +144,7 @@ q781
 is largely applicable to SS7 signalling links using the SS7 MTP2-User
 Peer-to-Peer Adaptation Layer,
 .[
-m2pa-11
+m2pa-rfc
 .]
 those test cases describe messages and some sequences that are not applicable
 to M2PA.  This document describes a set of Validation and Compatibility tests that
@@ -188,11 +163,11 @@ q780
 .pp
 M2PA
 .[
-m2pa-11
+m2pa-rfc
 .]
 provides that, unless modified by the M2PA specification,
 .[
-m2pa-11
+m2pa-rfc
 .]
 that the procedures of the applicable MTP Level 2 standard are to be used.
 This includes ITU,
@@ -249,7 +224,7 @@ although similar, are outside the scope of this document.
 .pp
 This document extends the terminology of M2PA
 .[
-m2pa-11
+m2pa-rfc
 .]
 with the following terms:
 .lp
@@ -343,30 +318,22 @@ llil.
 .\"
 .\"
 .sh 2 Conventions
-.pp
-The keywords \fBMUST\fR, \fBMUST NOT\fR, \fBREQUIRED\fR, \fBSHALL\fR,
-\fBSHALL NOT\fR, \fBSHOULD\fR, \fBSHOULD NOT\fR, \fBRECOMMENDED\fR,
-\fBNOT RECOMMENDED\fR, \fBMAY\fR, and \fBOPTIONAL\fR, when they appear
-in this document, are to be interpreted as described in RFC 2119.
-.[
-rfc 2119
-%Z 1
-.]
+.#C
 .pp
 This test specification is not a replacement for or extension of the \fISS7
 MTP2-User Peer-to-Peer Adaptation Layer\fR protocol specification.
 .[
-m2pa-11
+m2pa-rfc
 .]
 Where this document and the requirements or recommendations of the \fISS7
 MTP2-User Peer-to-Peer Adaptation Layer\fR protocol specification
 .[
-m2pa-11
+m2pa-rfc
 .]
 disagree, the requirements and recommendations of the \fISS7 MTP2-User
 Peer-to-Peer Adaptation Layer\fR protocol specification
 .[
-m2pa-11
+m2pa-rfc
 .]
 shall be taken as authoritative.
 .\"
@@ -491,7 +458,7 @@ A protocol testing device acting as \(lqSP B\(rq.
 A simulation device or function used to issue commands and collect response to
 and from the SS7 MTP2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-11
+m2pa-rfc
 .]
 implementation at position \(lqSP A\(rq.
 .np
@@ -519,7 +486,7 @@ q781
 .]
 with the exception that an M2PA
 .[
-m2pa-11
+m2pa-rfc
 .]
 signalling link has been interposed for an SS7 signalling link.
 .[
@@ -569,7 +536,7 @@ An implementation for compatibility testing acting as \(lqSP B\(rq.
 A simulation device or function used to issue commands and collect responses to
 and from the SS7 MTP2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-11
+m2pa-rfc
 .]
 implementation at position \(lqSP A\(rq.
 .np
@@ -577,7 +544,7 @@ implementation at position \(lqSP A\(rq.
 A simulation device or function used to issue commands and collect responses to
 and from the SS7 MTP2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-11
+m2pa-rfc
 .]
 implementation at position \(lqSP B\(rq.
 .np
@@ -605,7 +572,7 @@ q781
 .]
 with the exception that an M2PA
 .[
-m2pa-11
+m2pa-rfc
 .]
 signalling link has been interposed for an SS7 signalling link.
 .[
@@ -6205,7 +6172,7 @@ t1.111
 .]
 .B M2PA
 .[
-m2pa-11
+m2pa-rfc
 .]
 requires that the excessive delay of acknowledgment timer T7 expire when the
 oldest unacknowledged User Data message is over T7 old.  This test sends User
@@ -6772,7 +6739,7 @@ are being performed, the test environment and Implementations Under Test (IUT)
 \fBMUST\fR use the security measures required in the Security section of the
 M2PA specification
 .[
-m2pa-11
+m2pa-rfc
 .]
 while the tests are being performed.  Test results without the required
 security measures in place during testing will be of little value for
@@ -6789,11 +6756,20 @@ There are no IANA considerations for this draft.
 This section provides historical information on the changes made to this
 draft.  This section will be removed from the document when the document is
 finalized.
+.sh 2 "Changes fron Version 0.5 to Version 0.6" 0 6
+.np
+The test specification has been updated to the M2PA RFC.
+.[
+m2pa-rfc
+.]
+.np
+Updated first page and last page IETF boiler plates.
 .sh 2 "Changes fron Version 0.4 to Version 0.5" 0 5
 .np
 The test specification has been updated to M2PA Draft Revision 11.
 .[
 m2pa-11
+%Z 2
 .]
 .np
 Corrected error in test case 3.1.8: SP A should maintain the "Processor
@@ -7046,19 +7022,9 @@ $LIST$
 .pp
 The author would like to thank Jeffrey Craig, Tom George and Tolga Aversen for
 their valuable comments and suggestions.
-.uh "Author's Addresses"
-.lp
-.TS
-expand tab(;);
-lr.
-Brian Bidulock;Phone: +1-780-490-1141
-OpenSS7 Corporation;Email: bidulock@openss7.org
-1469 Jeffreys Crescent;URL: http//www.openss7.org/
-Edmonton, AB  T6L 6T1;
-Canada;
-.TE
+.#A
 .bl 3
 .lp
 This draft expires \*[expiry].
 .)b
-.#T 2004
+.#T 2005
