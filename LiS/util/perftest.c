@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/18 03:11:35 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/18 09:46:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/18 03:11:35 $ by $Author: brian $
+ Last Modified $Date: 2005/10/18 09:46:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 1.1.2.2  2005/10/18 09:46:31  brian
+ - changes to perftest
+
  Revision 1.1.2.1  2005/10/18 03:11:35  brian
  - added pipe performance test
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/18 03:11:35 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/18 09:46:31 $"
 
-static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/18 03:11:35 $";
+static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/18 09:46:31 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -172,6 +175,7 @@ read_child(int fd)
 			avg_tput = (avg_tput + (count * msgsize / report)) / 2;
 			fprintf(stdout, "%d Msgs read: %5ld, throughput: %10ld\n", fd, (long)avg_msgs,
 				(long)avg_tput);
+			fflush(stdout);
 			count = 0;
 			if (start_timer()) {
 				if (verbose)
@@ -254,6 +258,7 @@ write_child(int fd)
 			avg_tput = (avg_tput + (count * msgsize / report)) / 2;
 			fprintf(stdout, "%d Msgs sent: %5ld, throughput: %10ld\n", fd, (long)avg_msgs,
 				(long)avg_tput);
+			fflush(stdout);
 			count = 0;
 			if (start_timer()) {
 				if (verbose)
@@ -484,6 +489,7 @@ Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, 
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
+	fflush(stdout);
 }
 
 void
