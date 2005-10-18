@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/10/03 17:41:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/10/18 08:55:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/03 17:41:57 $ by $Author: brian $
+# Last Modified $Date: 2005/10/18 08:55:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -184,10 +184,10 @@ if CONFIG_STREAMS_NULS_MODULE
 libexec_PROGRAMS		+= test-nuls
 endif
 if CONFIG_STREAMS_PIPE
-libexec_PROGRAMS		+= test-pipe
+libexec_PROGRAMS		+= test-pipe perftest perftestn
 endif
 if CONFIG_STREAMS_PIPE_MODULE
-libexec_PROGRAMS		+= test-pipe
+libexec_PROGRAMS		+= test-pipe perftest perftestn
 endif
 if CONFIG_STREAMS_PIPEMOD
 libexec_PROGRAMS		+= test-pipemod
@@ -212,7 +212,7 @@ endif
 #LFS_EXTRA_TESTS		= 
 #LFS_EXTRA_TOOLS		= @PACKAGE_TARNAME@_mknod
 
-LDADD				= libstreams.la
+#LDADD				= libstreams.la
 
 lib_LTLIBRARIES			= libstreams.la
 
@@ -652,6 +652,16 @@ test_pipe_SOURCES		= src/test/test-pipe.c
 test_pipe_LDFLAGS		= -static libstreams.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS)
+
+perftest_SOURCES		= src/test/perftest.c
+perftest_LDFLAGS		= -static libstreams.la
+perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+perftest_CFLAGS			= $(LFS_CFLAGS)
+
+perftestn_SOURCES		= src/test/perftest.c
+perftestn_LDFLAGS		= 
+perftestn_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNATIVE_PIPES
+perftestn_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
 test_pipemod_LDFLAGS		= -static libstreams.la

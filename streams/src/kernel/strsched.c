@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/13 10:58:38 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/18 03:10:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:38 $ by $Author: brian $
+ Last Modified $Date: 2005/10/18 03:10:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/13 10:58:38 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/18 03:10:11 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/13 10:58:38 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/18 03:10:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3975,7 +3975,6 @@ sd_put(struct stdata **sdp)
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
 		if (atomic_dec_and_test(&sh->sh_refs)) {
-			queue_t *q  = sd->sd_rq;
 			/* the last reference is gone, there should be nothing left (but a queue
 			   pair) */
 			assert(sd->sd_inode == NULL);
@@ -3985,8 +3984,8 @@ sd_put(struct stdata **sdp)
 			/* zero stream reference on queue pair to avoid double put on sd */
 			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */
-			assure(atomic_read(&((struct queinfo *)q)->qu_refs) == 2);
-			ptrace(("queue references qu_refs = %d\n", atomic_read(&((struct queinfo *)q)->qu_refs)));
+			assure(atomic_read(&((struct queinfo *)sd->sd_rq)->qu_refs) == 2);
+			ptrace(("queue references qu_refs = %d\n", atomic_read(&((struct queinfo *)sd->sd_rq)->qu_refs)));
 			ctrace(qput(&sd->sd_wq));
 			ctrace(qput(&sd->sd_rq));	/* should be last put */
 			/* initial qget is balanced in qdetach()/qdelete() */

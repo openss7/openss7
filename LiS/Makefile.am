@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.23 $) $Date: 2005/08/29 10:31:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.24 $) $Date: 2005/10/18 03:11:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:31:44 $ by $Author: brian $
+# Last Modified $Date: 2005/10/18 03:11:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,7 +75,7 @@ libLiSuser_la_LDFLAGS		=
 libLiSuser_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiSuser_la_CFLAGS		= $(USER_CFLAGS)
 
-libexec_PROGRAMS		= timetst strtst polltst
+libexec_PROGRAMS		= timetst strtst polltst perftest
 bin_PROGRAMS			=
 sbin_PROGRAMS			= streams
 
@@ -100,6 +100,7 @@ if RPM_BUILD_USER
 
 libexec_PROGRAMS		= timetst \
 				  strtst \
+				  perftest \
 				  thrtst \
 				  lis_test \
 				  lis_test2
@@ -319,6 +320,12 @@ strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strtst_LDFLAGS			= -lpthread -static libLiS.la
 strtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strtst_CFLAGS			= $(USER_CFLAGS)
+
+perftest_SOURCES		= util/perftest.c
+perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+perftest_LDFLAGS		= -static libLiS.la
+perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+perftest_CFLAGS			= $(USER_CFLAGS)
 
 polltst_SOURCES			= util/polltst.c
 polltst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
