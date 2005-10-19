@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/18 08:55:27 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/19 01:53:28 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/18 08:55:27 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 01:53:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.3  2005/10/19 01:53:28  brian
+ - some alterations to perf tests
+
  Revision 0.9.2.2  2005/10/18 08:55:27  brian
  - added Linux native pipe test
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/18 08:55:27 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/19 01:53:28 $"
 
-static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/18 08:55:27 $";
+static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/19 01:53:28 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -117,6 +120,8 @@ int readwrite = 1;
 int native = 0;
 int readwrite = 0;
 #endif
+int push = 0;
+int blocking = 0;
 char my_msg[MAXMSGSIZE] = { 0, };
 
 volatile int timer_timeout = 0;
@@ -164,7 +169,7 @@ start_timer(void)
 int
 read_child(int fd)
 {
-	int count = 0, avg_msgs = 0, avg_tput = 0;
+	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
 	struct pollfd pfd = { fd, POLLIN | POLLERR | POLLHUP, 0 };
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
@@ -177,12 +182,17 @@ read_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			avg_msgs = (avg_msgs + count) / 2;
-			avg_tput = (avg_tput + (count * msgsize / report)) / 2;
-			fprintf(stdout, "%d Msgs read: %5ld, throughput: %10ld\n", fd, (long)avg_msgs,
-				(long)avg_tput);
+			int thrput = bytcnt / report;
+			int msgcnt = thrput / msgsize;
+			avg_msgs = (2 * avg_msgs + msgcnt) / 3;
+			avg_tput = (2 * avg_tput + thrput) / 3;
+			fprintf(stdout, "%d Msgs read: %ld (%ld), throughput: %ld (%ld)\n", fd,
+					(long)msgcnt,
+					(long)avg_msgs,
+					(long)thrput,
+					(long)avg_tput);
 			fflush(stdout);
-			count = 0;
+			bytcnt = 0;
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
@@ -202,17 +212,19 @@ read_child(int fd)
 		if (pfd.revents & POLLIN) {
 			int ret;
 			if (readwrite) {
-				if ((ret = read(fd, my_msg, msgsize)) > 0) {
-					++count;
-					continue;
+				while (!timer_timeout && (ret = read(fd, my_msg, msgsize)) > 0) {
+					bytcnt += ret;
+					if (bytcnt < 0)
+						goto dead;
 				}
 			} else {
 				int flags;
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { msgsize, 0, my_msg };
-				if ((ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
-					++count;
-					continue;
+				while (!timer_timeout && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
+					bytcnt += dbuf.len;
+					if (bytcnt < 0)
+						goto dead;
 				}
 			}
 			if (ret < 0) {
@@ -247,7 +259,7 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	int count = 0, avg_msgs = 0, avg_tput = 0;
+	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
 	struct pollfd pfd = { fd, POLLOUT | POLLERR | POLLHUP, 0 };
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
@@ -260,12 +272,17 @@ write_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			avg_msgs = (avg_msgs + count) / 2;
-			avg_tput = (avg_tput + (count * msgsize / report)) / 2;
-			fprintf(stdout, "%d Msgs sent: %5ld, throughput: %10ld\n", fd, (long)avg_msgs,
-				(long)avg_tput);
+			int thrput = bytcnt / report;
+			int msgcnt = thrput / msgsize;
+			avg_msgs = (2 * avg_msgs + msgcnt) / 3;
+			avg_tput = (2 * avg_tput + thrput) / 3;
+			fprintf(stdout, "%d Msgs sent: %ld (%ld), throughput: %ld (%ld)\n", fd,
+					(long)msgcnt,
+					(long)avg_msgs,
+					(long)thrput,
+					(long)avg_tput);
 			fflush(stdout);
-			count = 0;
+			bytcnt = 0;
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
@@ -285,15 +302,17 @@ write_child(int fd)
 		if (pfd.revents & POLLOUT) {
 			int ret;
 			if (readwrite) {
-				if ((ret = write(fd, my_msg, msgsize)) > 0) {
-					++count;
-					continue;
+				while (!timer_timeout && (ret = write(fd, my_msg, msgsize)) > 0) {
+					bytcnt += ret;
+					if (bytcnt < 0)
+						goto dead;
 				}
 			} else {
 				struct strbuf dbuf = { 0, msgsize, my_msg };
-				if ((ret = putmsg(fd, NULL, &dbuf, 0)) != -1) {
-					++count;
-					continue;
+				while (!timer_timeout && (ret = putmsg(fd, NULL, &dbuf, 0)) != -1) {
+					bytcnt += msgsize;
+					if (bytcnt < 0)
+						goto dead;
 				}
 			}
 			if (ret < 0) {
@@ -340,6 +359,7 @@ do_tests(void)
 	if (verbose > 1) {
 		fprintf(stderr, "--> Pipe opened.\n");
 	}
+#if 0
 	if (!native) {
 		if (verbose > 1) {
 			fprintf(stderr, "Setting options on fd %d\n", fds[0]);
@@ -350,14 +370,18 @@ do_tests(void)
 			goto dead;
 		}
 	}
-	if (fcntl(fds[0], F_SETFL, O_NONBLOCK) < 0) {
-		if (verbose)
-			perror("fcntl(O_NONBLOCK)");
-		goto dead;
+#endif
+	if (!blocking) {
+		if (fcntl(fds[0], F_SETFL, O_NONBLOCK) < 0) {
+			if (verbose)
+				perror("fcntl(O_NONBLOCK)");
+			goto dead;
+		}
 	}
 	if (verbose > 1) {
 		fprintf(stderr, "--> Options set.\n");
 	}
+#if 0
 	if (!native) {
 		if (verbose > 1) {
 			fprintf(stderr, "Setting options on fd %d\n", fds[1]);
@@ -368,22 +392,28 @@ do_tests(void)
 			goto dead;
 		}
 	}
-	if (fcntl(fds[1], F_SETFL, O_NONBLOCK) < 0) {
-		if (verbose)
-			perror("fcntl(O_NONBLOCK)");
-		goto dead;
+#endif
+	if (!blocking) {
+		if (fcntl(fds[1], F_SETFL, O_NONBLOCK) < 0) {
+			if (verbose)
+				perror("fcntl(O_NONBLOCK)");
+			goto dead;
+		}
 	}
 	if (verbose > 1) {
 		fprintf(stderr, "--> Options set.\n");
 	}
 	if (!native) {
+		int i;
 		if (verbose > 1) {
-			fprintf(stderr, "Pushing pipemod on %d\n", fds[0]);
+			fprintf(stderr, "Pushing %d instances of pipemod on %d\n", push, fds[0]);
 		}
-		if (ioctl(fds[0], I_PUSH, "pipemod") < 0) {
-			if (verbose)
-				perror("ioctl(I_PUSH)");
-			goto dead;
+		for (i = 0; i < push; i++) {
+			if (ioctl(fds[0], I_PUSH, "pipemod") < 0) {
+				if (verbose)
+					perror("ioctl(I_PUSH)");
+				goto dead;
+			}
 		}
 		if (verbose > 1) {
 			fprintf(stderr, "--> Pipemod pushed.\n");
@@ -555,6 +585,10 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -p, --push=[COUNT]\n\
+        push COUNT instances of pipemod [default: %5$d]\n\
+    -b, --blocking\n\
+        Use blocking operation on read and write\n\
     -s, --size=[MSGSIZE]\n\
         Packet size to be used for testing [default: %2$d]\n\
     -r, --readwrite\n\
@@ -570,7 +604,7 @@ Options:\n\
         Prints this usage message and exists\n\
     -V, --version\n\
         Prints the version and exists\n\
-", argv[0], msgsize, report, verbose);
+", argv[0], msgsize, report, verbose, push);
 }
 
 int
@@ -582,6 +616,8 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"push",	required_argument,	NULL, 'p'},
+			{"blocking",	no_argument,		NULL, 'b'},
 			{"size",	required_argument,	NULL, 's'},
 			{"readwrite",	no_argument,		NULL, 'r'},
 			{"time",	required_argument,	NULL, 't'},
@@ -592,13 +628,25 @@ main(int argc, char *argv[])
 			{"?",		no_argument,		NULL, 'h'},
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "ns:rt:qvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "p:bs:rt:qvhV?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "ns:rt:qvhV?");
+		c = getopt(argc, argv, "p:bs:rt:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'p':
+			if (optarg == NULL) {
+				push++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			push = val;
+			break;
+		case 'b':
+			blocking = 1;
+			break;
 		case 's':
 			msgsize = strtol(optarg, NULL, 0);
 			if (1 > msgsize || msgsize > MAXMSGSIZE)
