@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 06:27:28 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/19 11:08:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:28 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 06:27:28 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/19 11:08:21 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 06:27:28 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/19 11:08:21 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -88,6 +88,7 @@ static char const ident[] =
 #endif
 #if ! HAVE_KFUNC_MODULE_PUT
 #define module_put(__m) __MOD_DEC_USE_COUNT((__m))
+#define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
 #endif
 
 #include "sys/config.h"
@@ -868,9 +869,10 @@ sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
 		_printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
+		__assert(module_refcount(cdev->d_kmod) > 0);
 		module_put(cdev->d_kmod);
 		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, cdev->d_name,
-			cdev->d_kmod->name, module_refcount(cdev->d_kmod)));
+			 cdev->d_kmod->name, module_refcount(cdev->d_kmod)));
 	}
 }
 
@@ -927,7 +929,10 @@ fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
 		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
+		__assert(module_refcount(fmod->f_kmod) > 0);
 		module_put(fmod->f_kmod);
+		_printd(("%s: %s: [%s] count is now %d\n", __FUNCTION__, fmod->f_name,
+			 fmod->f_kmod->name, module_refcount(fmod->f_kmod)));
 	}
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/19 11:08:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/26 10:08:39 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/19 11:08:21 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/09/26 10:08:39 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/19 11:08:21 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -80,6 +80,10 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
 #include <sys/ddi.h>
+
+#if ! HAVE_KFUNC_MODULE_PUT
+#define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
+#endif
 
 #include "sys/config.h"
 #include "src/modules/sth.h"	/* for stream operations */

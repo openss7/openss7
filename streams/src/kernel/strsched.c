@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/18 03:10:11 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/19 11:08:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/18 03:10:11 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/18 03:10:11 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/19 11:08:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/18 03:10:11 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/19 11:08:22 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1646,21 +1646,15 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 
 	assert(q);
 	assert(func);
+	assert(!test_bit(QPROCS_BIT, &q->q_flag));
 
-	ctrace(qold = xchg(&this_thread->currentq, qget(q)));
 	sd = qstream(q);
 	assert(sd);
 	prlock(sd);
-	if (!test_bit(QPROCS_BIT, &q->q_flag))
-		func(q, mp);
-	else {
-		/* procs have been turned off */
-		swerr();
-		freemsg(mp);
-	}
+	qold = xchg(&this_thread->currentq, q);
+	func(q, mp);
 	prunlock(sd);
 	this_thread->currentq = qold;
-	ctrace(qput(&q));
 }
 
 /*
@@ -1684,21 +1678,15 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 
 	assert(q);
 	assert(func);
+	assert(!test_bit(QPROCS_BIT, &q->q_flag));
 
-	ctrace(qold = xchg(&this_thread->currentq, qget(q)));
+	qold = xchg(&this_thread->currentq, q);
 	sd = qstream(q);
 	assert(sd);
 	prlock(sd);
-	if (!test_bit(QPROCS_BIT, &q->q_flag))
-		func(arg, mp);
-	else {
-		/* procs have been turned off */
-		swerr();
-		freemsg(mp);
-	}
+	func(arg, mp);
 	prunlock(sd);
 	this_thread->currentq = qold;
-	ctrace(qput(&q));
 }
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -1712,7 +1700,7 @@ strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
  *  qwakeup:	- wake waiters on a queue pair
  *  @q:		one queue of the queue pair to wake
  */
-STATIC void
+STATIC inline streams_fastcall void
 qwakeup(queue_t *q)
 {
 	struct queinfo *qu = ((struct queinfo *) RD(q));
@@ -1753,7 +1741,6 @@ STATIC inline streams_fastcall void
 putp_fast(queue_t *q, mblk_t *mp)
 {
 	queue_t *qold;
-	struct stdata *sd;
 
 	assert(q);
 	assert(q->q_qinfo);
@@ -1762,23 +1749,13 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
 
-	ctrace(qold = xchg(&this_thread->currentq, qget(q)));
-	sd = qstream(q);
-	assert(sd);
-	prlock(sd);
-	if (!test_bit(QPROCS_BIT, &q->q_flag)) {
-		ptrace(("calling put procedure\n"));
-		ctrace((void) q->q_qinfo->qi_putp(q, mp));
-		trace();
-		qwakeup(q);
-	} else {
-		/* procs have been turned off */
-		swerr();
-		freemsg(mp);
-	}
-	prunlock(sd);
+	/* procs can't be turned off */
+	assert(!test_bit(QPROCS_BIT, &q->q_flag));
+
+	qold = xchg(&this_thread->currentq, q);
+	(void) q->q_qinfo->qi_putp(q, mp);
 	this_thread->currentq = qold;
-	ctrace(qput(&q));
+	qwakeup(q);
 }
 STATIC void
 putp(queue_t *q, mblk_t *mp)
@@ -2446,36 +2423,10 @@ qstrfunc_slow(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg
  *  If this function is called from process context, and the barrier is raised, the calling process
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
- *
- *  NOTICES: AIX-style message filtering is performed outside synchronization.  This means that the
- *  message filtering function must be fully re-entrant and able to run concurrently with other
- *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
- *  queue's private structure).
  */
 STATIC inline streams_fastcall void
 qputp(queue_t *q, mblk_t *mp)
 {
-	{
-		queue_t *newq;
-		struct stdata *sd;
-
-		trace();
-		assert(q);
-		sd = qstream(q);
-		assert(sd);
-		prlock(sd);
-		for (newq = q; newq && newq->q_ftmsg && !newq->q_ftmsg(mp); newq = newq->q_next) ;
-		if (!newq) {
-			ptrace(("message filtered, discarding\n"));
-			prunlock(sd);
-			/* no queue wants the message - throw it away */
-			freemsg(mp);
-			return;
-		}
-		prunlock(sd);
-		/* FIXME: this is not safe. */
-		q = newq;
-	}
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
 		struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
@@ -2496,6 +2447,182 @@ qputp_slow(queue_t *q, mblk_t *mp)
 {
 	qputp(q, mp);
 }
+
+/**
+ *  putnext:	- put a message on the queue next to this one
+ *  @q:		this queue
+ *  @mp:	message to put
+ *
+ *  CONTEXT: STREAMS context (stream head locked).
+ *
+ *  MP-STREAMS: Calling this function is MP-safe provided that it is called from the correct
+ *  context, or if the caller can guarantee the validity of the q->q_next pointer.
+ *
+ *  NOTICES: If this function is called from an interrupt service routine (hard irq), use
+ *  MPSTR_STPLOCK(9) and MPSTR_STPRELE(9) to hold a stream head write lock across the call.  The
+ *  put(9) function will be called on the next queue invoking the queue's put procedure if
+ *  syncrhonization has passed.  This can also happer for the next queue if the put procedure also
+ *  does a putnext().  It might be necessary for the put procedure of all queues in the stream to
+ *  know that they might be called at hard irq, if only so that they do not perform excessively long
+ *  operations and impact system performance.
+ *
+ *  For a driver interrupt service routine, put(9) is a better choice, with a brief put procedure
+ *  that does little more than a put(q).  Operations on the message can them be performed from the
+ *  queue's service procedure, that is guaranteed to run at STREAMS scheduler context, with
+ *  hard interrupts enabled.
+ *
+ *  CONTEXT: Any. putnext() takes a Stream head plumb read lock so that the function can be called
+ *  from outside of STREAMS context.  Caller is responsible for the validity of the q pointer across
+ *  the call.  The put() procedure of the next queue will be executed in the same context as
+ *  putnext() was called.
+ *
+ *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
+ *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
+ */
+streams_fastcall void
+putnext(queue_t *q, mblk_t *mp)
+{
+	assert(mp);
+	assert(q);
+	assert(q->q_next);
+#ifdef CONFIG_STREAMS_SYNCQS
+	ctrace(qputp(q->q_next, mp));
+#else
+	q = q->q_next;
+	{
+		/* copy of putp_fast() */
+		queue_t *qold;
+
+		assert(q);
+		assert(q->q_qinfo);
+		assert(q->q_qinfo->qi_putp);
+
+		/* spin here if Stream frozen by other than caller */
+		freeze_barrier(q);
+
+		/* procs can't be turned off */
+		assert(!test_bit(QPROCS_BIT, &q->q_flag));
+
+		qold = xchg(&this_thread->currentq, q);
+		(void) q->q_qinfo->qi_putp(q, mp);
+		this_thread->currentq = qold;
+		qwakeup(q);
+	}
+#endif
+	trace();
+}
+
+EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
+
+/**
+ *  put:	- call a queue's qi_putq() procedure
+ *  @q:		the queue's procedure to call
+ *  @mp:	the message to place on the queue
+ *
+ *  NOTICES: Don't put to put routines that do not exist.
+ *
+ *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure is
+ *  aware that it may be called in ISR context.  Also, if called in hardirq context, message
+ *  filtering will not be performed.
+ *
+ *  TODO: Well...  There is a lot of interrupt disabling that must be done if we allow STREAMS queue
+ *  functions to be called at interrupt context.  What we really want is for hardirq routines to
+ *  call put() and have the invocation of the qi_putp procedure delayed and handled within the
+ *  STREAMS environment.  That way we only need to suppress local STREAMS execution when taking
+ *  spinlocks and manipulating queues.  Because we are normally already in STREAMS when running
+ *  queue procedures, suppressing local STREAMS execution has little to no effect.
+ *
+ *  But, we don't want to use the general event deferral mechanism because that requires allocation
+ *  of a strevent structure and that could fail.  put() returns void.  What we could do is create a
+ *  separate mechanism for listing the mblk against the queue itself and invoking the STREAMS
+ *  scheduler to call the qi_putp on the queue with the messages and taking the appropriate
+ *  synchronization (i.e. calling qputp()).  Well, if we save the function, queue and argument in
+ *  the mbinfo structure just as we do for deferral against synchroniation queues, but queue the
+ *  message against the STREAMS scheduler rather than the syncrhoniation queue, using atomic
+ *  exchanges, then we could also defer qwriter() and streams_put() along with put() from
+ *  non-STREAMS contexts.  If only these three (queue) functions are called from outside STREAMS and
+ *  no others like putq() or getq(), then we could avoid suppressing hard interrupts throughout
+ *  STREAMS.  That is rather attractive.
+ *
+ *  Note that, because putnext() is just put(q->q_next, mp), this protects putnext() as well.
+ *
+ *  Well, not anymore.  Changed put() to take a Stream head pluming read lock once from outside of
+ *  STREAMS and have putnext() take no locks from inside STREAMS.
+ *
+ *  NOTICES: AIX-style message filtering is performed outside synchronization.  This means that the
+ *  message filtering function must be fully re-entrant and able to run concurrently with other
+ *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
+ *  queue's private structure).
+ */
+streams_fastcall void
+put(queue_t *q, mblk_t *mp)
+{
+	assert(mp);
+	assert(q);
+	assert(q->q_qinfo);
+	assert(q->q_qinfo->qi_putp);
+
+	trace();
+	if (!in_irq()) {
+		struct stdata *sd;
+
+		sd = qstream(q);
+		assert(sd);
+		prlock(sd);
+
+		/* This AIX message filtering thing is really bad for performance when done the old 
+		   way (from qputp()). Consider that if there are 100 modules on the Stream, the
+		   old way will check 5000 times.  This can be done by put(), but NOT by putnext()! 
+		   Also, we should only do this when not in an irq(). */
+		trace();
+		while (q && q->q_ftmsg && !q->q_ftmsg(mp))
+			q = q->q_next;
+		if (likely(q != NULL)) {
+#ifdef CONFIG_STREAMS_SYNCQS
+			ctrace(qputp(q, mp));
+#else
+			{
+				/* copy of putp_fast() */
+				queue_t *qold;
+
+				assert(q);
+				assert(q->q_qinfo);
+				assert(q->q_qinfo->qi_putp);
+
+				/* spin here if Stream frozen by other than caller */
+				freeze_barrier(q);
+
+				/* procs can't be turned off */
+				assert(!test_bit(QPROCS_BIT, &q->q_flag));
+
+				qold = xchg(&this_thread->currentq, q);
+				(void) q->q_qinfo->qi_putp(q, mp);
+				this_thread->currentq = qold;
+				qwakeup(q);
+			}
+#endif
+		} else {
+			ptrace(("message filtered, discarding\n"));
+			/* no queue wants the message - throw it away */
+			freemsg(mp);
+		}
+		prunlock(sd);
+	} else {
+		/* defer for execution inside STREAMS */
+		struct mbinfo *m = (typeof(m)) mp;
+
+		/* XXX: Because the context is !in_interrupt(), and because the STREAMS softirq is
+		   at the bottom of the softirq stack, deferring at this point will execute at the
+		   earliest opportunity anyway. */
+		m->m_func = (void *) &putp;
+		ctrace(m->m_queue = qget(q));	/* don't let it get away */
+		m->m_private = NULL;
+		/* schedule for execution inside STREAMS */
+		strsched_mfunc_fast(mp);
+	}
+}
+
+EXPORT_SYMBOL(put);
 
 /**
  *  qsrvp:	- execute a queue's service procedure synchronized
@@ -2671,70 +2798,6 @@ __strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 }
 
 EXPORT_SYMBOL(__strfunc);
-
-/**
- *  put:	- call a queue's qi_putq() procedure
- *  @q:		the queue's procedure to call
- *  @mp:	the message to place on the queue
- *
- *  NOTICES: Don't put to put routines that do not exist.
- *
- *  CONTEXT: Any.  But beware that if you call this function from an ISR that the put procedure is
- *  aware that it may be called in ISR context.  Also, if called in hardirq context, message
- *  filtering will not be performed.
- *
- *  TODO: Well...  There is a lot of interrupt disabling that must be done if we allow STREAMS queue
- *  functions to be called at interrupt context.  What we really want is for hardirq routines to
- *  call put() and have the invocation of the qi_putp procedure delayed and handled within the
- *  STREAMS environment.  That way we only need to suppress local STREAMS execution when taking
- *  spinlocks and manipulating queues.  Because we are normally already in STREAMS when running
- *  queue procedures, suppressing local STREAMS execution has little to no effect.
- *
- *  But, we don't want to use the general event deferral mechanism because that requires allocation
- *  of a strevent structure and that could fail.  put() returns void.  What we could do is create a
- *  separate mechanism for listing the mblk against the queue itself and invoking the STREAMS
- *  scheduler to call the qi_putp on the queue with the messages and taking the appropriate
- *  synchronization (i.e. calling qputp()).  Well, if we save the function, queue and argument in
- *  the mbinfo structure just as we do for deferral against synchroniation queues, but queue the
- *  message against the STREAMS scheduler rather than the syncrhoniation queue, using atomic
- *  exchanges, then we could also defer qwriter() and streams_put() along with put() from
- *  non-STREAMS contexts.  If only these three (queue) functions are called from outside STREAMS and
- *  no others like putq() or getq(), then we could avoid suppressing hard interrupts throughout
- *  STREAMS.  That is rather attractive.
- *
- *  Note that, because putnext() is just put(q->q_next, mp), this protects putnext() as well.
- */
-streams_fastcall void
-put(queue_t *q, mblk_t *mp)
-{
-	assert(mp);
-	assert(q);
-	assert(q->q_qinfo);
-	assert(q->q_qinfo->qi_putp);
-
-	trace();
-	if (!in_irq()) {
-		ctrace(qputp(q, mp));
-		trace();
-		trace();
-		trace();
-		trace();
-	} else {
-		/* defer for execution inside STREAMS */
-		struct mbinfo *m = (typeof(m)) mp;
-
-		/* XXX: Because the context is !in_interrupt(), and because the STREAMS softirq is
-		   at the bottom of the softirq stack, deferring at this point will execute at the
-		   earliest opportunity anyway. */
-		m->m_func = (void *) &putp;
-		ctrace(m->m_queue = qget(q));	/* don't let it get away */
-		m->m_private = NULL;
-		/* schedule for execution inside STREAMS */
-		strsched_mfunc_fast(mp);
-	}
-}
-
-EXPORT_SYMBOL(put);
 
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -3980,6 +4043,7 @@ sd_put(struct stdata **sdp)
 			assert(sd->sd_inode == NULL);
 			assert(sd->sd_clone == NULL);
 			assert(sd->sd_iocblk == NULL);
+			assert(sd->sd_cdevsw == NULL);
 			assert(sd->sd_rq);
 			/* zero stream reference on queue pair to avoid double put on sd */
 			qstream(sd->sd_rq) = NULL;

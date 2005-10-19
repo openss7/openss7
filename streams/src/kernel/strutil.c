@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/14 12:26:42 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/19 11:08:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:26:42 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/14 12:26:42 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/19 11:08:24 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/10/14 12:26:42 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/19 11:08:24 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1990,7 +1990,7 @@ getmid(const char *name)
 	if ((cdev = cdev_find(name))) {
 		modID_t modid = cdev->d_modid;
 
-		sdev_put(cdev);
+		ctrace(sdev_put(cdev));
 		return (modid);
 	}
 	return (0);
@@ -2210,64 +2210,6 @@ EXPORT_SYMBOL(insq);
 __STRUTIL_EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
 
 EXPORT_SYMBOL(OTHERQ);
-
-/**
- *  putnext:	- put a message on the queue next to this one
- *  @q:		this queue
- *  @mp:	message to put
- *
- *  CONTEXT: STREAMS context (stream head locked).
- *
- *  MP-STREAMS: Calling this function is MP-safe provided that it is called from the correct
- *  context, or if the caller can guarantee the validity of the q->q_next pointer.
- *
- *  NOTICES: If this function is called from an interrupt service routine (hard irq), use
- *  MPSTR_STPLOCK(9) and MPSTR_STPRELE(9) to hold a stream head write lock across the call.  The
- *  put(9) function will be called on the next queue invoking the queue's put procedure if
- *  syncrhonization has passed.  This can also happer for the next queue if the put procedure also
- *  does a putnext().  It might be necessary for the put procedure of all queues in the stream to
- *  know that they might be called at hard irq, if only so that they do not perform excessively long
- *  operations and impact system performance.
- *
- *  For a driver interrupt service routine, put(9) is a better choice, with a brief put procedure
- *  that does little more than a put(q).  Operations on the message can them be performed from the
- *  queue's service procedure, that is guaranteed to run at STREAMS scheduler context, with
- *  hard interrupts enabled.
- *
- *  CONTEXT: Any. putnext() takes a Stream head plumb read lock so that the function can be called
- *  from outside of STREAMS context.  Caller is responsible for the validity of the q pointer across
- *  the call.  The put() procedure of the next queue will be executed in the same context as
- *  putnext() was called.
- *
- */
-streams_fastcall void
-putnext(queue_t *q, mblk_t *mp)
-{
-	struct stdata *sd;
-	queue_t *q_next;
-
-	assert(mp);
-	assert(q);
-	assert(q->q_next);
-
-	sd = qstream(q);
-
-	assert(sd);
-
-	prlock(sd);
-	q_next = q->q_next;
-
-	assert(q_next);
-
-	ctrace(put(q->q_next, mp));
-	trace();
-
-	prunlock(sd);
-
-	trace();
-}
-
-EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
 
 /*
  *  __putbq:
@@ -2778,7 +2720,7 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 					goto put_noent;
 				setq(q, st->st_rdinit, st->st_wrinit);
 			}
-			cdrv_put(cdev);
+			ctrace(cdrv_put(cdev));
 			err = 0;
 		}
 		*devp = dev;
@@ -2786,7 +2728,7 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 	qprocson(q);		/* in case qopen() forgot */
 	return (0);
       put_noent:
-	cdrv_put(cdev);
+	ctrace(cdrv_put(cdev));
       enoent:
 	qclose(q, oflag, crp);	/* need to call close */
       qerror:

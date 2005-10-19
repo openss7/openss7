@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:26:47 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/10/14 12:26:47 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -199,6 +199,16 @@ struct streamtab str_info = {
 
 #define stri_lookup(__f) (__f)->private_data
 
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_LOCK
+#define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
+#define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
+#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock);
+#else
+#define stri_trylock(__i)   down_interruptible(&(__i)->i_sem)
+#define stri_lock(__i)	    down(&(__i)->i_sem)
+#define stri_unlock(__i)    up(&(__i)->i_sem)
+#endif
+
 /**
  *  stri_insert:    - inserta  reference to a stream head into a file pointer
  *  @file:	file pointer for stream
@@ -216,12 +226,10 @@ stri_insert(struct file *file, struct stdata *sd)
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
-	down(&inode->i_sem);
-	// spin_lock(&inode->i_lock);
+	stri_lock(inode);
 	ctrace(stri_lookup(file) = sd_get(sd));
-	// spin_unlock(&inode->i_lock);
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-	up(&inode->i_sem);
+	stri_unlock(inode);
 }
 
 /**
@@ -236,12 +244,10 @@ stri_acquire(struct file *file)
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
-	down(&inode->i_sem);
-	// spin_lock(&inode->i_lock);
+	stri_lock(inode);
 	ctrace(sd = sd_get(stri_lookup(file)));
-	// spin_unlock(&inode->i_lock);
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-	up(&inode->i_sem);
+	stri_unlock(inode);
 	return (sd);
 }
 
@@ -262,15 +268,13 @@ stri_remove(struct file *file)
 #if 0
 	/* always hold the inode spinlock while lookup up the STREAM head */
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
-	down(&inode->i_sem);
-	// spin_lock(&inode->i_lock);
+	stri_lock(inode);
 #endif
 	sd = stri_lookup(file);
 	stri_lookup(file) = NULL;
 #if 0				/* leave locked */
-	// spin_unlock(&inode->i_lock);
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-	up(&inode->i_sem);
+	stri_unlock(inode);
 #endif
 	return (sd);
 }
@@ -362,9 +366,9 @@ strremove(struct stdata *sd)
 	struct inode *inode;
 
 	if ((inode = sd->sd_inode)) {
-		down(&inode->i_sem);
+		stri_lock(inode);
 		strremove_locked(inode, sd);
-		up(&inode->i_sem);
+		stri_unlock(inode);
 		iput(inode);
 	}
 }
@@ -669,7 +673,7 @@ straccess_rlock(struct stdata *sd, const int access)
 	int err;
 
 	srlock(sd);
-	if ((err = straccess_slow(sd, access)))
+	if ((err = straccess(sd, access)))
 		srunlock(sd);
 	return (err);
 }
@@ -680,7 +684,7 @@ straccess_wlock(struct stdata *sd, const int access)
 	int err;
 
 	swlock(sd);
-	if ((err = straccess_slow(sd, access)))
+	if ((err = straccess(sd, access)))
 		swunlock(sd);
 	return (err);
 }
@@ -1524,7 +1528,7 @@ __strwaitband(struct stdata *sd, int band)
  *
  *  LOCKING: must hold a read lock on the stream head.
  */
-STATIC inline int
+STATIC inline streams_fastcall int
 strwaitband(struct stdata *sd, const int f_flags, const int band, const int flags)
 {
 	if (flags == MSG_HIPRI)
@@ -2520,7 +2524,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
  *
  *  NOTICES: Make @type and explicit constant for efficient inlining.
  */
-STATIC inline ssize_t
+STATIC inline streams_fastcall ssize_t
 strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {
 	if (type == M_DATA) {
@@ -2996,6 +3000,7 @@ strlastclose(struct stdata *sd, int oflag)
 STATIC loff_t
 strllseek(struct file *file, loff_t off, int whence)
 {
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (-ESPIPE);
 }
@@ -3060,6 +3065,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 		ctrace(sd_put(&sd));
 	} else
 		mask = POLLNVAL;
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (mask);
 }
@@ -3072,6 +3078,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 STATIC int
 strmmap(struct file *file, struct vm_area_struct *vma)
 {
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (-ENODEV);
 }
@@ -3134,7 +3141,7 @@ stralloc(dev_t dev)
 	return (sd);
       no_sd:
 	rare();			/* this is highly unlikely as we block allocating stream heads */
-	cdrv_put(cdev);
+	ctrace(cdrv_put(cdev));
 	/* POSIX open() reference page also allows [ENOMEM] here. */
 	return ERR_PTR(-ENOSR);
 }
@@ -3180,8 +3187,9 @@ stropen(struct inode *inode, struct file *file)
 
 	/* always lock inode */
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
-	if ((err = down_interruptible(&inode->i_sem)))
+	if ((err = stri_trylock(inode)))
 		goto error;
+	// spin_lock(&inode->i_lock);
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
 		ptrace(("driver open in effect\n"));
@@ -3223,7 +3231,7 @@ stropen(struct inode *inode, struct file *file)
 			ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev),
 				getminor(dev)));
 			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-			up(&inode->i_sem);
+			stri_unlock(inode);
 			if (!(cdev = cdrv_get(getmajor(dev)))) {
 				err = -ENODEV;
 				ptrace(("Error path taken for sd %p\n", sd));
@@ -3238,21 +3246,21 @@ stropen(struct inode *inode, struct file *file)
 				ptrace(("Error path taken for sd %p\n", sd));
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
-				cdrv_put(cdev);
+				ctrace(cdrv_put(cdev));
 				goto up_put_error;
 			}
 			sd->sd_dev = dev;
-			cdrv_put(sd->sd_cdevsw);
+			ctrace(cdrv_put(sd->sd_cdevsw));
 			sd->sd_cdevsw = cdev;
 			/* FIXME: pull stuff out of qattach here. */
 			inode = file->f_dentry->d_inode;
 			printd(("%s: locking inode %p\n", __FUNCTION__, inode));
-			down(&inode->i_sem);
+			stri_lock(inode);
 		}
 		ptrace(("publishing sd %p\n", sd));
 		strinsert(inode, sd);	/* publish to inode, device */
 		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-		up(&inode->i_sem);
+		stri_unlock(inode);
 		ptrace(("performing autopush() on sd %p\n", sd));
 		/* 3rd step: autopush modules and call their open routines */
 		if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp))) {
@@ -3266,7 +3274,7 @@ stropen(struct inode *inode, struct file *file)
 		dev_t dev;
 
 		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-		up(&inode->i_sem);
+		stri_unlock(inode);
 		/* already have STREAM head */
 		if ((err = strwaitopen(sd, FCREAT))) {
 			ptrace(("Error path taken for sd %p\n", sd));
@@ -3309,15 +3317,16 @@ stropen(struct inode *inode, struct file *file)
       put_error:
 	ctrace(sd_put(&sd));
       error:
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return ((err < 0) ? err : -err);
       up_error:
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-	up(&inode->i_sem);
+	stri_unlock(inode);
 	goto error;
       up_put_error:
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-	up(&inode->i_sem);
+	stri_unlock(inode);
 	ctrace(sd_put(&sd));
 	goto error;
 }
@@ -3437,8 +3446,7 @@ strclose(struct inode *inode, struct file *file)
 
 	ptrace(("closing stream on inode %p\n", inode));
 	printd(("%s: locking inode %p\n", __FUNCTION__, inode));
-	down(&inode->i_sem);
-	// spin_lock(&inode->i_lock);
+	stri_lock(inode);
 	if (likely((sd = stri_remove(file)) != NULL)) {
 		int oflag = make_oflag(file);
 
@@ -3454,7 +3462,7 @@ strclose(struct inode *inode, struct file *file)
 			/* remove from the inode clone list */
 			strremove_locked(inode, sd);
 			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-			up(&inode->i_sem);
+			stri_unlock(inode);
 			ptrace(("putting inode %p\n", inode));
 			ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 				atomic_read(&inode->i_count) - 1));
@@ -3463,17 +3471,17 @@ strclose(struct inode *inode, struct file *file)
 			ctrace(strlastclose(sd, oflag));
 		} else {
 			printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-			up(&inode->i_sem);
+			stri_unlock(inode);
 		}
 
 		/* this put balances the sd_get() in stri_insert() */
 		ctrace(sd_put(&sd));	/* could be final */
 	} else {
 		err = -EIO;
-		// spin_unlock(&inode->i_lock);
 		printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
-		up(&inode->i_sem);
+		stri_unlock(inode);
 	}
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -3509,6 +3517,7 @@ strfasync(int fd, struct file *file, int on)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -3851,6 +3860,7 @@ EXPORT_SYMBOL(strread);
 STATIC int _strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *,
 		       int __user *);
 
+#if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 STATIC ssize_t
 _strread_getpmsg(struct file *file, char __user *buf, size_t len, loff_t *ppos)
@@ -3864,6 +3874,7 @@ _strread_getpmsg(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 	return _strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
 }
 #endif
+#endif
 
 STATIC ssize_t
 _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
@@ -3871,12 +3882,14 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 	struct stdata *sd;
 	int err;
 
+#if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* FIXME: we really need to do these as an (unlocked) ioctl now */
 	if (unlikely(len == LFS_GETMSG_PUTMSG_ULEN)) {
 		err = _strread_getpmsg(file, buf, len, ppos);
 		goto exit;
 	}
+#endif
 #endif
 
 #if 0				/* vfs_read() checks this */
@@ -3892,8 +3905,10 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
+	goto exit;
       exit:
 	/* We want to give the driver queues an opportunity to run. */
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -4005,9 +4020,9 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 	if (q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO))
 		return (0);
 
-	if (test_bit(STRHOLD_BIT, &sd->sd_flag)
-	    && (err = strhold(sd, file->f_flags, buf, nbytes)) != 0)
-		return (err);
+	if (unlikely(test_bit(STRHOLD_BIT, &sd->sd_flag) != 0))
+		if ((err = strhold(sd, file->f_flags, buf, nbytes)) != 0)
+			return (err);
 
 	/* first access check is with FNDELAY to generate pipe signals */
 	access = FWRITE | FNDELAY;
@@ -4054,7 +4069,7 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 		}
 
 		/* send off the message block */
-		if (!err) {
+		if (likely(err == 0)) {
 			/* We don't really queue these, see strwput(). */
 			ctrace(put(sd->sd_wq, b));
 			trace();
@@ -4074,6 +4089,7 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 
 EXPORT_SYMBOL(strwrite);
 
+#if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 STATIC ssize_t
 _strwrite_putpmsg(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
@@ -4092,6 +4108,7 @@ _strwrite_putpmsg(struct file *file, const char __user *buf, size_t len, loff_t 
 	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
 }
 #endif
+#endif
 
 STATIC ssize_t
 _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
@@ -4099,12 +4116,14 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 	struct stdata *sd;
 	int err;
 
+#if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* FIXME: we really need to do these as an (unlocked) ioctl now */
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		err = _strwrite_putpmsg(file, buf, len, ppos);
 		goto exit;
 	}
+#endif
 #endif
 
 #if 0				/* vfs_write() checks this */
@@ -4120,8 +4139,10 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 		ctrace(sd_put(&sd));
 	} else
 		err = -ENOSTR;
+	goto exit;
       exit:
 	/* We want to give the driver queues an opportunity to run. */
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -4246,6 +4267,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		ctrace(put(sd->sd_wq, mp));
 		trace();
 		/* We want to give the driver queues an opportunity to run. */
+		if (this_thread->flags & (QRUNFLAGS))
 		runqueues();
 		return (size);
 	}
@@ -4270,6 +4292,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 			err = sd->sd_directio->sendpage(file, page, offset, size, ppos, more);
 		ctrace(sd_put(&sd));
 	}
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -4385,6 +4408,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -4701,6 +4725,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	} else
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -7415,10 +7440,9 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			err = strioctl(file, cmd, arg);
 		else
 			err = sd->sd_directio->ioctl(file, cmd, arg);
-		if (likely(err >= 0))
-			runqueues();	/* after every (successful) system call */
 		ctrace(sd_put(&sd));
 	}
+	if (this_thread->flags & (QRUNFLAGS))
 	runqueues();		/* after every system call */
 	return (err);
 }
@@ -7501,10 +7525,8 @@ strwput(queue_t *q, mblk_t *mp)
 			rmvq(q, bp);
 			zwunlock(sd, pl);
 			/* delayed one has to go - can't delay the other */
-			prlock(sd);
 			ctrace(putnext(q, bp));
 			ctrace(putnext(q, mp));
-			prunlock(sd);
 		} else if (test_bit(STRDELIM_BIT, &sd->sd_flag)
 			   || !test_bit(STRHOLD_BIT, &sd->sd_flag)
 			   || bp == mp
@@ -7517,10 +7539,8 @@ strwput(queue_t *q, mblk_t *mp)
 			   delimited, or longer than one block or a zero-length message, or can't
 			   hold another write same size. */
 			zwunlock(sd, pl);
-			prlock(sd);
 			ctrace(putnext(q, mp));
 			trace();
-			prunlock(sd);
 		} else {
 			/* new M_DATA message with more room */
 			insq(q, NULL, mp);	/* putq without locks */

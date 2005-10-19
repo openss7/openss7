@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/03 04:21:59 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -94,11 +94,15 @@ static char const ident[] =
 
 #include "sys/strdebug.h"
 
+#if ! HAVE_KFUNC_MODULE_PUT
+#define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
+#endif
+
 #include "sys/config.h"
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/03 04:21:59 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -593,7 +597,7 @@ spec_dev_open(struct inode *inode, struct file *file)
 	    ? ((cmin->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN)
 	    : ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
 	err = spec_open(inode, file, dev, sflag);
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       up_exit:
 	up(&inode->i_sem);
       exit:
@@ -664,11 +668,11 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 				_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 					atomic_read(&inode->i_count)));
 				d_add(new, inode);
-				cdrv_put(cdev);
+				ctrace(cdrv_put(cdev));
 				return (NULL);	/* success */
 			}
 			_ptrace(("no inode for cmin %s\n", cmin->n_name));
-			cdrv_put(cdev);
+			ctrace(cdrv_put(cdev));
 			return ERR_PTR(-EIO);
 		} else {
 			/* check if the name is a valid number */
@@ -685,19 +689,19 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 					if (IS_ERR((inode = spec_snode(dev, cdev)))) {
 						_ptrace(("no inode for number %s\n",
 							 new->d_name.name));
-						cdrv_put(cdev);
+						ctrace(cdrv_put(cdev));
 						return ((struct dentry *) inode);
 						/* already contains error */
 					}
 					_ptrace(("found inode for number %s\n", new->d_name.name));
 					d_add(new, inode);
-					cdrv_put(cdev);
+					ctrace(cdrv_put(cdev));
 					return (NULL);	/* success */
 				}
 			}
 		}
 		_ptrace(("no inode for %s\n", new->d_name.name));
-		cdrv_put(cdev);
+		ctrace(cdrv_put(cdev));
 	}
 	return ERR_PTR(-ENOENT);
 }
@@ -806,7 +810,7 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 				}
 			}
 			read_unlock(&cdevsw_lock);
-			cdrv_put(cdev);
+			ctrace(cdrv_put(cdev));
 		}
 		break;
 	}
@@ -979,7 +983,7 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 			igrab(inode);
 			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
 				atomic_read(&inode->i_count)));
-			sdev_put(cdev);
+			ctrace(sdev_put(cdev));
 			d_add(new, inode);
 			return (NULL);	/* success */
 		}
@@ -987,7 +991,7 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		   directory %s could demand load streams-%s, where streams-%s is not a driver but
 		   a module. */
 		_ptrace(("no inode for cdev %s\n", cdev->d_name));
-		sdev_put(cdev);
+		ctrace(sdev_put(cdev));
 	} else
 		_ptrace(("no cdev for %s\n", new->d_name.name));
 	return ERR_PTR(-ENOENT);
@@ -1647,6 +1651,16 @@ spec_remount_fs(struct super_block *sb, int *flags, char *data)
 	return (data ? spec_parse_options(data, sbi) : 0);
 }
 
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_LOCK
+#define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
+#define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
+#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock);
+#else
+#define stri_trylock(__i)   down_interruptible(&(__i)->i_sem)
+#define stri_lock(__i)	    down(&(__i)->i_sem)
+#define stri_unlock(__i)    up(&(__i)->i_sem)
+#endif
+
 /**
  *  spec_clear_inode: - clear filesystem specific junk out of inode
  *  @inode:	inode to clear
@@ -1660,14 +1674,14 @@ STATIC void
 spec_clear_inode(struct inode *inode)
 {
 	/* Never adjust i_pipe without taking the inode semaphore. */
-	down(&inode->i_sem);
+	stri_lock(inode);
 	if (inode->i_pipe) {
 #if 0
 		ctrace(sd_put(&((struct stdata *) inode->i_pipe)));
 #endif
 		inode->i_pipe = NULL;
 	}
-	up(&inode->i_sem);
+	stri_unlock(inode);
 }
 
 STATIC void

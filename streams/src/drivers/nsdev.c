@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/07 09:34:14 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -196,7 +196,7 @@ nsdevopen(struct inode *inode, struct file *file)
 		printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 		err = spec_open(file, cdev, dev, sflag);
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		sdev_put(cdev);
+		ctrace(sdev_put(cdev));
 	} else
 		err = -ENOENT;
 	return (err);
@@ -280,7 +280,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       exit:
 	return (err);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/11 10:45:42 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,6 +67,10 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#if ! HAVE_KFUNC_MODULE_PUT
+#define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
+#endif
+
 #include "sys/config.h"
 #include "src/kernel/strsched.h"	/* for allocstr */
 #include "src/kernel/strsad.h"	/* for autopush */
@@ -75,7 +79,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/11 10:45:42 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"

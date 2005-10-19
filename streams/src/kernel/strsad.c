@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 10:19:51 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/10/19 11:08:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/15 10:19:51 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 10:19:51 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/10/19 11:08:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/15 10:19:51 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/10/19 11:08:22 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -154,9 +154,7 @@ autopush_find(dev_t dev)
 	struct cdevsw *cdev;
 	struct apinfo *api = NULL;
 
-	read_lock(&cdevsw_lock);
-	cdev = __cdev_lookup(getmajor(dev));
-	read_unlock(&cdevsw_lock);
+	cdev = sdev_get(getmajor(dev));
 	if (cdev == NULL)
 		goto notfound;
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
@@ -166,7 +164,7 @@ autopush_find(dev_t dev)
 		ap_get(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       notfound:
 	return ((struct strapush *) api);
 }
@@ -198,7 +196,7 @@ autopush_search(const char *name, minor_t minor)
 		ap_get(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       notfound:
 	return ((struct strapush *) api);
 }
@@ -258,11 +256,9 @@ autopush_add(struct strapush *sap)
 		}
 	}
 	err = -ENOSTR;
-	if (sap->sap_module[0] == '\0') {
-		read_lock(&cdevsw_lock);
-		cdev = __cdev_lookup(sap->sap_major);
-		read_unlock(&cdevsw_lock);
-	} else {
+	if (sap->sap_module[0] == '\0')
+		cdev = sdev_get(sap->sap_major);
+	else {
 		cdev = cdev_find(sap->sap_module);
 		sap->sap_major = cdev->d_major;
 	}
@@ -276,7 +272,7 @@ autopush_add(struct strapush *sap)
 	err = __autopush_add(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       error:
 	return (err);
 }
@@ -304,11 +300,9 @@ autopush_del(struct strapush *sap)
 		goto error;
 	}
 	err = -ENODEV;
-	if (sap->sap_module[0] == '\0') {
-		read_lock(&cdevsw_lock);
-		cdev = __cdev_lookup(sap->sap_major);
-		read_unlock(&cdevsw_lock);
-	} else
+	if (sap->sap_module[0] == '\0')
+		cdev = sdev_get(sap->sap_major);
+	else
 		cdev = cdev_find(sap->sap_module);
 	if (cdev == NULL) {
 		ptrace(("Error path taken! ENODEV\n"));
@@ -320,7 +314,7 @@ autopush_del(struct strapush *sap)
 	err = __autopush_del(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	sdev_put(cdev);
+	ctrace(sdev_put(cdev));
       error:
 	return (err);
 }
@@ -396,11 +390,9 @@ apush_get(struct strapush *sap)
 			ptrace(("Error path taken! EINVAL\n"));
 			goto einval;
 		}
-		if (sap->sap_module[0] == '\0') {
-			read_lock(&cdevsw_lock);
-			cdev = __cdev_lookup(sap->sap_major);
-			read_unlock(&cdevsw_lock);
-		} else
+		if (sap->sap_module[0] == '\0')
+			cdev = sdev_get(sap->sap_major);
+		else
 			cdev = cdev_find(sap->sap_module);
 		if (cdev == NULL) {
 			ptrace(("Error path taken! ENOSTR\n"));
@@ -416,7 +408,7 @@ apush_get(struct strapush *sap)
 			ap_put((struct apinfo *) ap);
 		}
 		printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-		sdev_put(cdev);
+		ctrace(sdev_put(cdev));
 		if (!ap) {
 			ptrace(("Error path taken! ENODEV\n"));
 			goto enodev;

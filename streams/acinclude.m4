@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/10/11 10:45:30 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/10/19 11:08:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/11 10:45:30 $ by $Author: brian $
+# Last Modified $Date: 2005/10/19 11:08:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -952,7 +952,8 @@ dnl
 			  struct super_operations.read_inode2,
 			  struct kstatfs.f_type,
 			  struct kobject.kref,
-			  struct file_operations.unlocked_ioctl], [:], [:], [
+			  struct file_operations.unlocked_ioctl,
+			  struct inode.i_lock], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

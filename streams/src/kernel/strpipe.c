@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/10/14 12:26:42 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/19 11:08:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:26:42 $ by $Author: brian $
+ Last Modified $Date: 2005/10/19 11:08:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/10/14 12:26:42 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/19 11:08:21 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/10/14 12:26:42 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/19 11:08:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -288,7 +288,7 @@ do_spipe(int *fds)
 		modid = cdev->d_modid;
 		dev = makedevice(modid, minor);
 		snode = spec_snode(dev, cdev);
-		sdev_put(cdev);
+		ctrace(sdev_put(cdev));
 	} else {
 		ptrace(("Error path taken!\n"));
 		goto fw_put;
