@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/19 11:08:32 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/20 08:18:58 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:32 $ by $Author: brian $
+ Last Modified $Date: 2005/10/20 08:18:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.5  2005/10/20 08:18:58  brian
+ - modifications for queuing and scheduling testing
+
  Revision 0.9.2.4  2005/10/19 11:08:32  brian
  - performance tweaks
 
@@ -81,10 +84,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/19 11:08:32 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/20 08:18:58 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/19 11:08:32 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/20 08:18:58 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -129,6 +132,7 @@ int push = 0;
 int blocking = 0;
 int asynchronous = 0;
 char my_msg[MAXMSGSIZE] = { 0, };
+char modname[256] = "pipemod";
 
 volatile int timer_timeout = 0;
 
@@ -617,17 +621,17 @@ do_tests(void)
 		int i;
 
 		if (verbose > 1) {
-			fprintf(stderr, "Pushing %d instances of pipemod on %d\n", push, fds[0]);
+			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname, fds[0]);
 		}
 		for (i = 0; i < push; i++) {
-			if (ioctl(fds[0], I_PUSH, "pipemod") < 0) {
+			if (ioctl(fds[0], I_PUSH, modname) < 0) {
 				if (verbose)
 					perror("ioctl(I_PUSH)");
 				goto dead;
 			}
 		}
 		if (verbose > 1) {
-			fprintf(stderr, "--> Pipemod pushed.\n");
+			fprintf(stderr, "--> %s pushed.\n", modname);
 		}
 	}
 	if (asynchronous)
@@ -739,8 +743,10 @@ Arguments:\n\
 Options:\n\
     -a, --async\n\
         Perform asynchronous testing\n\
+    -m, --module=MODNAME\n\
+        Module name to push [default: %6$s]\n\
     -p, --push=[COUNT]\n\
-        Push COUNT instances of pipemod [default: %5$d]\n\
+        Push COUNT instances of module [default: %5$d]\n\
     -b, --blocking\n\
         Use blocking operation on read and write\n\
     -s, --size=[MSGSIZE]\n\
@@ -758,7 +764,7 @@ Options:\n\
         Prints this usage message and exists\n\
     -V, --version\n\
         Prints the version and exists\n\
-", argv[0], msgsize, report, verbose, push);
+", argv[0], msgsize, report, verbose, push, modname);
 }
 
 int
@@ -771,6 +777,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"module",	required_argument,	NULL, 'm'},
 			{"async",	no_argument,		NULL, 'a'},
 			{"push",	required_argument,	NULL, 'p'},
 			{"blocking",	no_argument,		NULL, 'b'},
@@ -782,16 +789,26 @@ main(int argc, char *argv[])
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "ap:bs:rt:qvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "m:ap:bs:rt:qvhV?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "ap:bs:rt:qvhV?");
+		c = getopt(argc, argv, "m:ap:bs:rt:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'm':
+			if (verbose > 1)
+				fprintf(stderr, "Processing -m, --module=%s option\n", optarg);
+			if (optarg == NULL)
+				goto bad_option;
+			if (strnlen(optarg, FMNAMESZ + 1) > FMNAMESZ)
+				goto bad_option;
+			strncpy(modname, optarg, FMNAMESZ + 1);
+			break;
 		case 'a':
 			asynchronous = 1;
 			break;

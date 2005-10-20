@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/20 08:18:58 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $
 
  -----------------------------------------------------------------------------
 
@@ -50,32 +50,22 @@
 
  -----------------------------------------------------------------------------
 
- $Log: nullmod.c,v $
- Revision 0.9.2.4  2005/10/20 08:18:58  brian
+ $Log: bufmod.c,v $
+ Revision 0.9.2.1  2005/10/20 08:18:58  brian
  - modifications for queuing and scheduling testing
 
- Revision 0.9.2.3  2005/10/07 09:34:23  brian
- - more testing and corrections
-
- Revision 0.9.2.2  2005/09/10 18:16:35  brian
- - more test build
-
- Revision 0.9.2.1  2005/09/08 05:52:41  brian
- - added nullmod module and loop driver
- - corrections during testing
- - many ioctl(2p) test cases work very well now
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/20 08:18:58 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/20 08:18:58 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $";
 
 /* 
- *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
- *  module.  Its purpose is primarily for testing and for serviing as an example of the skeleton of
- *  a STREAMS module.
+ *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
+ *  STREAMS module and buffering input and output.  Its purpose is primarily for testing and for
+ *  serviing as an example of the skeleton of a STREAMS module.
  *
  *  This is an absurdly simple module.
  *
@@ -96,58 +86,58 @@ static char const ident[] =
 
 #include "sys/config.h"
 
-#define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/10/20 08:18:58 $"
-#define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
-#define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define NULLMOD_LICENSE		"GPL"
-#define NULLMOD_BANNER		NULLMOD_DESCRIP		"\n" \
-				NULLMOD_COPYRIGHT	"\n" \
-				NULLMOD_REVISION	"\n" \
-				NULLMOD_DEVICE		"\n" \
-				NULLMOD_CONTACT		"\n"
-#define NULLMOD_SPLASH		NULLMOD_DEVICE		" - " \
-				NULLMOD_REVISION	"\n"
+#define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $"
+#define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
+#define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define BUFMOD_LICENSE		"GPL"
+#define BUFMOD_BANNER		BUFMOD_DESCRIP		"\n" \
+				BUFMOD_COPYRIGHT	"\n" \
+				BUFMOD_REVISION		"\n" \
+				BUFMOD_DEVICE		"\n" \
+				BUFMOD_CONTACT		"\n"
+#define BUFMOD_SPLASH		BUFMOD_DEVICE		" - " \
+				BUFMOD_REVISION		"\n"
 
-#ifdef CONFIG_STREAMS_NULLMOD_MODULE
-MODULE_AUTHOR(NULLMOD_CONTACT);
-MODULE_DESCRIPTION(NULLMOD_DESCRIP);
-MODULE_SUPPORTED_DEVICE(NULLMOD_DEVICE);
-MODULE_LICENSE(NULLMOD_LICENSE);
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
+MODULE_AUTHOR(BUFMOD_CONTACT);
+MODULE_DESCRIPTION(BUFMOD_DESCRIP);
+MODULE_SUPPORTED_DEVICE(BUFMOD_DEVICE);
+MODULE_LICENSE(BUFMOD_LICENSE);
 #if defined MODULE_ALIAS
-MODULE_ALIAS("streams-nullmod");
+MODULE_ALIAS("streams-bufmod");
 #endif
 #endif
 
-#ifndef CONFIG_STREAMS_NULLMOD_NAME
-//#define CONFIG_STREAMS_NULLMOD_NAME "nullmod"
-#error "CONFIG_STREAMS_NULLMOD_NAME must be defined."
+#ifndef CONFIG_STREAMS_BUFMOD_NAME
+//#define CONFIG_STREAMS_BUFMOD_NAME "bufmod"
+#error "CONFIG_STREAMS_BUFMOD_NAME must be defined."
 #endif
-#ifndef CONFIG_STREAMS_NULLMOD_MODID
-//#define CONFIG_STREAMS_NULLMOD_MODID 13
-#error "CONFIG_STREAMS_NULLMOD_MODID must be defined."
+#ifndef CONFIG_STREAMS_BUFMOD_MODID
+//#define CONFIG_STREAMS_BUFMOD_MODID 13
+#error "CONFIG_STREAMS_BUFMOD_MODID must be defined."
 #endif
 
-modID_t modid = CONFIG_STREAMS_NULLMOD_MODID;
+modID_t modid = CONFIG_STREAMS_BUFMOD_MODID;
 
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module ID for NULLMOD.");
+MODULE_PARM_DESC(modid, "Module ID for BUFMOD.");
 
 #ifdef MODULE_ALIAS
 #if LFS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULLMOD_MODID));
-MODULE_ALIAS("streams-module-nullmod");
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_BUFMOD_MODID));
+MODULE_ALIAS("streams-module-bufmod");
 #endif
 #endif
 
-STATIC struct module_info nullmod_minfo = {
-	.mi_idnum = CONFIG_STREAMS_NULLMOD_MODID,
-	.mi_idname = CONFIG_STREAMS_NULLMOD_NAME,
+STATIC struct module_info bufmod_minfo = {
+	.mi_idnum = CONFIG_STREAMS_BUFMOD_MODID,
+	.mi_idname = CONFIG_STREAMS_BUFMOD_NAME,
 	.mi_minpsz = STRMINPSZ,
 	.mi_maxpsz = STRMAXPSZ,
 	.mi_hiwat = STRHIGH,
@@ -264,7 +254,7 @@ testcase_10(union ioctypes *ioc, mblk_t *dp)
  */
 
 STATIC int
-nullmod_wput(queue_t *q, mblk_t *mp)
+bufmod_wput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
@@ -322,14 +312,53 @@ nullmod_wput(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 	}
-	putnext(q, mp);
+	/* always buffer, always schedule out of service procedure for testing */
+	if (!putq(q, mp)) {
+		mp->b_band = 0;
+		putq(q, mp);	/* this must succeed */
+	}
 	return (0);
 }
 
 STATIC int
-nullmod_rput(queue_t *q, mblk_t *mp)
+bufmod_wsrv(queue_t *q)
 {
-	putnext(q, mp);
+	mblk_t *mp;
+
+	while ((mp = getq(q))) {
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
+	return (0);
+}
+
+STATIC int
+bufmod_rput(queue_t *q, mblk_t *mp)
+{
+	if (!putq(q, mp)) {
+		mp->b_band = 0;
+		putq(q, mp);	/* this must succeed */
+	}
+	return (0);
+}
+
+STATIC int
+bufmod_rsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	while ((mp = getq(q))) {
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
 	return (0);
 }
 
@@ -341,7 +370,7 @@ nullmod_rput(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
 
@@ -359,7 +388,7 @@ nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (EIO);		/* can't be opened as driver */
 }
 STATIC int
-nullmod_close(queue_t *q, int oflag, cred_t *crp)
+bufmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
@@ -376,65 +405,67 @@ nullmod_close(queue_t *q, int oflag, cred_t *crp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC struct qinit nullmod_rinit = {
-	.qi_putp = nullmod_rput,
-	.qi_qopen = nullmod_open,
-	.qi_qclose = nullmod_close,
-	.qi_minfo = &nullmod_minfo,
+STATIC struct qinit bufmod_rinit = {
+	.qi_putp = bufmod_rput,
+	.qi_srvp = bufmod_rsrv,
+	.qi_qopen = bufmod_open,
+	.qi_qclose = bufmod_close,
+	.qi_minfo = &bufmod_minfo,
 };
 
-STATIC struct qinit nullmod_winit = {
-	.qi_putp = nullmod_wput,
-	.qi_minfo = &nullmod_minfo,
+STATIC struct qinit bufmod_winit = {
+	.qi_putp = bufmod_wput,
+	.qi_srvp = bufmod_wsrv,
+	.qi_minfo = &bufmod_minfo,
 };
 
-STATIC struct streamtab nullmod_info = {
-	.st_rdinit = &nullmod_rinit,
-	.st_wrinit = &nullmod_winit,
+STATIC struct streamtab bufmod_info = {
+	.st_rdinit = &bufmod_rinit,
+	.st_wrinit = &bufmod_winit,
 };
 
-STATIC struct fmodsw nullmod_fmod = {
-	.f_name = CONFIG_STREAMS_NULLMOD_NAME,
-	.f_str = &nullmod_info,
+STATIC struct fmodsw bufmod_fmod = {
+	.f_name = CONFIG_STREAMS_BUFMOD_NAME,
+	.f_str = &bufmod_info,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_NULLMOD_MODULE
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
 STATIC
 #endif
 int __init
-nullmod_init(void)
+bufmod_init(void)
 {
 	int err;
 
-#ifdef CONFIG_STREAMS_NULLMOD_MODULE
-	printk(KERN_INFO NULLMOD_BANNER);
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
+	printk(KERN_INFO BUFMOD_BANNER);
 #else
-	printk(KERN_INFO NULLMOD_SPLASH);
+	printk(KERN_INFO BUFMOD_SPLASH);
 #endif
-	nullmod_minfo.mi_idnum = modid;
-	if ((err = register_strmod(&nullmod_fmod)) < 0)
+	bufmod_minfo.mi_idnum = modid;
+	if ((err = register_strmod(&bufmod_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_NULLMOD_MODULE
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
 STATIC
 #endif
 void __exit
-nullmod_exit(void)
+bufmod_exit(void)
 {
 	int err;
 
-	if ((err = unregister_strmod(&nullmod_fmod)) < 0)
+	if ((err = unregister_strmod(&bufmod_fmod)) < 0)
 		return (void) (err);
 	return (void) (0);
 };
 
-#ifdef CONFIG_STREAMS_NULLMOD_MODULE
-module_init(nullmod_init);
-module_exit(nullmod_exit);
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
+module_init(bufmod_init);
+module_exit(bufmod_exit);
 #endif

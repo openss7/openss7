@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/08 05:52:40 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/20 08:18:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
+ Last Modified $Date: 2005/10/20 08:18:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/08 05:52:40 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/20 08:18:57 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/09/08 05:52:40 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/20 08:18:57 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -86,7 +86,7 @@ int sysctl_str_strthresh = (1 << 20);	/* memory limit */
 int sysctl_str_strhold = 0;		/* active stream hold feature */
 int sysctl_str_strctlsz = (1 << 12);	/* maximum stream control size */
 int sysctl_str_strmsgsz = (1 << 18);	/* maximum stream message size */
-int sysctl_str_nstrmsgs = (1 << 12);	/* maximum number of streams messages */
+int sysctl_str_nstrmsgs = (1 << 18);	/* maximum number of streams messages */
 int sysctl_str_nband = 256;		/* number of queue bands */
 int sysctl_str_reuse_fmodsw = 0;	/* reuse fmodsw entries if true */
 int sysctl_str_max_apush = MAX_APUSH;	/* max no autopushed mods per stream */

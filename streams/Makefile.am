@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/10/18 08:55:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/10/20 08:18:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/18 08:55:25 $ by $Author: brian $
+# Last Modified $Date: 2005/10/20 08:18:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -266,6 +266,9 @@ libLfS_streams_a_SOURCES		= \
 if CONFIG_STREAMS_STH
 libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
 endif
+if CONFIG_STREAMS_BUFMOD
+libLfS_streams_a_SOURCES	+= src/modules/bufmod.c
+endif
 if CONFIG_STREAMS_NULLMOD
 libLfS_streams_a_SOURCES	+= src/modules/nullmod.c
 endif
@@ -373,6 +376,9 @@ libLfS_modules_a_SOURCES	=
 
 if CONFIG_STREAMS_STH_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
+endif
+if CONFIG_STREAMS_BUFMOD_MODULE
+libLfS_modules_a_SOURCES	+= src/modules/bufmod.c
 endif
 if CONFIG_STREAMS_NULLMOD_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/nullmod.c
