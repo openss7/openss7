@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.24 $) $Date: 2005/10/18 03:11:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.25 $) $Date: 2005/10/21 03:55:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/18 03:11:35 $ by $Author: brian $
+# Last Modified $Date: 2005/10/21 03:55:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -185,7 +185,8 @@ CLEANFILES			+= drivers/str/linux/relay3.c
 libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 				  drivers/str/linux/liskmod.c \
 				  drivers/str/linux/mtdrv.c \
-				  drivers/str/linux/relay3.c
+				  drivers/str/linux/relay3.c \
+				  drivers/str/bufmod.c
 
 libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \

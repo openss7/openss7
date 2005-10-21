@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/19 11:08:22 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/21 03:54:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:22 $ by $Author: brian $
+ Last Modified $Date: 2005/10/21 03:54:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/19 11:08:22 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/21 03:54:26 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/19 11:08:22 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/21 03:54:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3584,7 +3584,11 @@ queuerun(struct strthread *t)
 			t->qtail = &t->qhead;
 			while ((q = q_link)) {
 				q_link = xchg(&q->q_link, NULL);
+#ifdef CONFIG_STREAMS_SYNCQS
 				qsrvp(q);
+#else
+				srvp_fast(q);
+#endif
 			}
 		}
 	} while (test_bit(qrunflag, &t->flags));

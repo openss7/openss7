@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/19 11:08:24 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/21 03:54:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:24 $ by $Author: brian $
+ Last Modified $Date: 2005/10/21 03:54:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/19 11:08:24 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/21 03:54:26 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/10/19 11:08:24 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2005/10/21 03:54:26 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1434,7 +1434,9 @@ __get_qband(queue_t *q, unsigned char band)
 			qb->qb_next = xchg(&q->q_bandp, qb);
 			qb->qb_hiwat = q->q_hiwat;
 			qb->qb_lowat = q->q_lowat;
+#if 0
 			qb->qb_flag = QB_WANTR;
+#endif
 			++q->q_nband;
 		} while (band > q->q_nband);
 	}
@@ -1825,7 +1827,9 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 					--q->q_blocked;
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
+#if 0
 				set_bit(QB_WANTR_BIT, &qb->qb_flag);
+#endif
 			}
 			q->q_blocked = 0;
 			backenable = true;	/* always backenable when queue empty */
@@ -2019,15 +2023,19 @@ __getq(queue_t *q, bool *be)
 	if ((mp = q->q_first))
 		*be = __rmvq(q, mp);
 	else {
+#if 0
 		struct qband *qb;
+#endif
 
 		*be = false;
 		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
 			*be = true;
+#if 0
 		/* wanted to read all bands */
 		for (qb = q->q_bandp; qb; qb = qb->qb_next)
 			if (!test_and_set_bit(QB_WANTR_BIT, &qb->qb_flag))
 				*be = true;
+#endif
 	}
 	return (mp);
 }
@@ -2102,9 +2110,14 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (unlikely(nmp->b_band)) {
 			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
+#if 0
 			enable = ((q->q_first == emp)
 				  || test_bit(QWANTR_BIT, &q->q_flag)
 				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
+#else
+			enable = ((q->q_first == emp)
+				  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+#endif
 			if (qb->qb_last == emp || qb->qb_last == NULL)
 				qb->qb_last = nmp;
 			if (qb->qb_first == emp->b_next || qb->qb_first == NULL)
@@ -2263,8 +2276,12 @@ __putbq(queue_t *q, mblk_t *mp)
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
+#if 0
 			enable = (test_bit(QWANTR_BIT, &q->q_flag)
 				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
+#else
+			enable = (test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+#endif
 			if (qb->qb_last == b_prev || qb->qb_last == NULL)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next || qb->qb_first == NULL)
@@ -2563,9 +2580,14 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 		/* enable if will be first message in queue, or requested by getq() */
+#if 0
 		enable = ((q->q_first == b_next)
 			  || test_bit(QWANTR_BIT, &q->q_flag)
 			  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
+#else
+		enable = ((q->q_first == b_next)
+			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+#endif
 		if (qb->qb_last == b_prev || qb->qb_last == NULL)
 			qb->qb_last = mp;
 		if (qb->qb_first == b_next || qb->qb_first == NULL)
@@ -2935,11 +2957,15 @@ qprocsoff(queue_t *q)
 			struct qband *qb;
 
 			for (qb = rq->q_bandp; qb; qb = qb->qb_next) {
+#if 0
 				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
+#endif
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 			}
 			for (qb = wq->q_bandp; qb; qb = qb->qb_next) {
+#if 0
 				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
+#endif
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 			}
 		}
@@ -3015,6 +3041,7 @@ qprocson(queue_t *q)
 		/* schedule service procedure on first message */
 		set_bit(QWANTR_BIT, &rq->q_flag);
 		set_bit(QWANTR_BIT, &wq->q_flag);
+#if 0
 		{
 			struct qband *qb;
 
@@ -3023,6 +3050,7 @@ qprocson(queue_t *q)
 			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
 				set_bit(QB_WANTR_BIT, &qb->qb_flag);
 		}
+#endif
 
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq)))
@@ -3152,6 +3180,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 	q->q_msgs--;
 	assert(q->q_msgs >= 0);
 	if (likely(mp->b_band == 0)) {
+#if 0
 		if (mp->b_datap->db_type < QPCTL) {
 			struct qband *qb;
 
@@ -3159,6 +3188,7 @@ __rmvq(queue_t *q, mblk_t *mp)
 			for (qb = q->q_bandp; qb;
 			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next) ;
 		}
+#endif
 #if 0
 		q->q_count -= mp->b_size;
 #else
@@ -3182,10 +3212,15 @@ __rmvq(queue_t *q, mblk_t *mp)
 		{
 			unsigned char q_nband, band;
 
+#if 0
 			/* wanted to read all bands of higher priority than this */
 			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
 			     qb && q_nband > band;
 			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next, --q_nband) ;
+#else
+			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
+			     qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
+#endif
 		}
 		assert(qb);
 		if (qb->qb_first == mp && qb->qb_last == mp)
@@ -3210,9 +3245,11 @@ __rmvq(queue_t *q, mblk_t *mp)
 			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 				backenable = true;
 		}
+#if 0
 		/* no longer want to read this or lower bands */
 		for (; qb; qb = qb->qb_next)
 			clear_bit(QB_WANTR_BIT, &qb->qb_flag);
+#endif
 		/* including band zero */
 		clear_bit(QWANTR_BIT, &q->q_flag);
 	}

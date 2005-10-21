@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/20 08:18:58 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/21 03:54:27 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/20 08:18:58 $ by $Author: brian $
+ Last Modified $Date: 2005/10/21 03:54:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.6  2005/10/21 03:54:27  brian
+ - modifications for queueing testing
+
  Revision 0.9.2.5  2005/10/20 08:18:58  brian
  - modifications for queuing and scheduling testing
 
@@ -84,10 +87,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/20 08:18:58 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/21 03:54:27 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/10/20 08:18:58 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/10/21 03:54:27 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -223,7 +226,7 @@ test_sync(int fds[])
 			}
 		}
 		if (tbytcnt <= rbytcnt) {
-			int ret;
+			int ret = 0;
 
 			if (readwrite) {
 				while (!timer_timeout && (ret = write(fds[1], my_msg, msgsize)) > 0) {
@@ -257,7 +260,7 @@ test_sync(int fds[])
 			}
 		}
 		if (rbytcnt < tbytcnt) {
-			int ret;
+			int ret = 0;
 
 			if (readwrite) {
 				while (!timer_timeout && (ret = read(fds[0], my_msg, msgsize)) > 0) {
@@ -346,7 +349,7 @@ read_child(int fd)
 			goto dead;
 		}
 		if (pfd.revents & POLLIN) {
-			int ret;
+			int ret = 0;
 
 			if (readwrite) {
 				while (!timer_timeout && (ret = read(fd, my_msg, msgsize)) > 0) {
@@ -438,7 +441,7 @@ write_child(int fd)
 			goto dead;
 		}
 		if (pfd.revents & POLLOUT) {
-			int ret;
+			int ret = 0;
 
 			if (readwrite) {
 				while (!timer_timeout && (ret = write(fd, my_msg, msgsize)) > 0) {

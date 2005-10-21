@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/20 08:18:58 $ by $Author: brian $
+ Last Modified $Date: 2005/10/21 03:54:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.2  2005/10/21 03:54:27  brian
+ - modifications for queueing testing
+
  Revision 0.9.2.1  2005/10/20 08:18:58  brian
  - modifications for queuing and scheduling testing
 
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $";
 
 /* 
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/10/20 08:18:58 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -147,107 +150,6 @@ STATIC struct module_info bufmod_minfo = {
 /* 
  *  -------------------------------------------------------------------------
  *
- *  Test and Verification Cases
- *
- *  -------------------------------------------------------------------------
- */
-
-/*
- *  Test Case 1: allocb()  Test allocation and freeing of message blocks.
- */
-STATIC int
-testcase_1(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_2(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_3(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_4(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_5(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_6(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_7(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_8(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_9(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-STATIC int
-testcase_10(union ioctypes *ioc, mblk_t *dp)
-{
-	ioc->iocblk.ioc_rval = 0;
-	ioc->iocblk.ioc_error = 0;
-	ioc->iocblk.ioc_count = 0;
-	return (0);
-}
-
-/* 
- *  -------------------------------------------------------------------------
- *
  *  PUT routines
  *
  *  -------------------------------------------------------------------------
@@ -256,61 +158,13 @@ testcase_10(union ioctypes *ioc, mblk_t *dp)
 STATIC int
 bufmod_wput(queue_t *q, mblk_t *mp)
 {
-	switch (mp->b_datap->db_type) {
-	case M_IOCTL:
-	{
-		int err = 0;
-		union ioctypes *ioc;
-
-		ioc = (typeof(ioc)) mp->b_rptr;
-		if (_IOC_TYPE(ioc->iocblk.ioc_cmd) != 'V')
-			break;
-		switch (_IOC_NR(ioc->iocblk.ioc_cmd)) {
-		case 1:
-			err = testcase_1(ioc, mp->b_cont);
-			break;
-		case 2:
-			err = testcase_2(ioc, mp->b_cont);
-			break;
-		case 3:
-			err = testcase_3(ioc, mp->b_cont);
-			break;
-		case 4:
-			err = testcase_4(ioc, mp->b_cont);
-			break;
-		case 5:
-			err = testcase_5(ioc, mp->b_cont);
-			break;
-		case 6:
-			err = testcase_6(ioc, mp->b_cont);
-			break;
-		case 7:
-			err = testcase_7(ioc, mp->b_cont);
-			break;
-		case 8:
-			err = testcase_8(ioc, mp->b_cont);
-			break;
-		case 9:
-			err = testcase_9(ioc, mp->b_cont);
-			break;
-		case 10:
-			err = testcase_10(ioc, mp->b_cont);
-			break;
-		default:
-			err = -EINVAL;
-			break;
+	if (mp->b_datap->db_type == M_FLUSH) {
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, FLUSHALL, mp->b_rptr[1]);
+			else
+				flushq(q, FLUSHALL);
 		}
-		if (err) {
-			mp->b_datap->db_type = M_IOCNAK;
-			ioc->iocblk.ioc_count = 0;
-			ioc->iocblk.ioc_error = -err;
-			ioc->iocblk.ioc_rval = -1;
-		} else {
-			mp->b_datap->db_type = M_IOCACK;
-		}
-		qreply(q, mp);
-		return (0);
-	}
 	}
 	/* always buffer, always schedule out of service procedure for testing */
 	if (!putq(q, mp)) {
@@ -321,24 +175,16 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 }
 
 STATIC int
-bufmod_wsrv(queue_t *q)
-{
-	mblk_t *mp;
-
-	while ((mp = getq(q))) {
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-			putnext(q, mp);
-			continue;
-		}
-		putbq(q, mp);
-		break;
-	}
-	return (0);
-}
-
-STATIC int
 bufmod_rput(queue_t *q, mblk_t *mp)
 {
+	if (mp->b_datap->db_type == M_FLUSH) {
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, FLUSHALL, mp->b_rptr[1]);
+			else
+				flushq(q, FLUSHALL);
+		}
+	}
 	if (!putq(q, mp)) {
 		mp->b_band = 0;
 		putq(q, mp);	/* this must succeed */
@@ -347,7 +193,7 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 }
 
 STATIC int
-bufmod_rsrv(queue_t *q)
+bufmod_srv(queue_t *q)
 {
 	mblk_t *mp;
 
@@ -407,7 +253,7 @@ bufmod_close(queue_t *q, int oflag, cred_t *crp)
  */
 STATIC struct qinit bufmod_rinit = {
 	.qi_putp = bufmod_rput,
-	.qi_srvp = bufmod_rsrv,
+	.qi_srvp = bufmod_srv,
 	.qi_qopen = bufmod_open,
 	.qi_qclose = bufmod_close,
 	.qi_minfo = &bufmod_minfo,
@@ -415,7 +261,7 @@ STATIC struct qinit bufmod_rinit = {
 
 STATIC struct qinit bufmod_winit = {
 	.qi_putp = bufmod_wput,
-	.qi_srvp = bufmod_wsrv,
+	.qi_srvp = bufmod_srv,
 	.qi_minfo = &bufmod_minfo,
 };
 
