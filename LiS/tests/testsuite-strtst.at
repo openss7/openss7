@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/06/24 17:19:49 $
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/10/23 05:01:27 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -54,11 +54,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/24 17:19:49 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/23 05:01:27 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-strtst.at,v $
+dnl Revision 1.1.2.7  2005/10/23 05:01:27  brian
+dnl - test programs and modules for POSIX testing
+dnl
 dnl Revision 1.1.2.6  2005/06/24 17:19:49  brian
 dnl - skip band test on failure
 dnl
@@ -79,151 +82,104 @@ dnl - added test suite for strtst
 dnl
 dnl ==========================================================================
 
+m4_divert_push([DEFAULTS])
+function test_strtst() {
+    if test `id -u` -ne 0 ; then return 77 ; fi
+    strtst $1
+    return $?
+}
+m4_divert_pop([DEFAULTS])
+
 AT_TESTED([strtst])
 AT_BANNER([LiS STREAMS test])
 
 AT_SETUP([strtst open])
-AT_KEYWORDS([streams open])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst open
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst open])
+AT_CHECK([test_strtst open], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst ioctl])
-AT_KEYWORDS([streams ioctl])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst ioctl
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst ioctl])
+AT_CHECK([test_strtst ioctl], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst module])
-AT_KEYWORDS([streams module])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst module
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst module])
+AT_CHECK([test_strtst module], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst rdopt])
-AT_KEYWORDS([streams rdopt])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst rdopt
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst rdopt])
+AT_CHECK([test_strtst rdopt], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst write])
-AT_KEYWORDS([streams write])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst write
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst write])
+AT_CHECK([test_strtst write], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst timer])
-AT_KEYWORDS([streams timer])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst timer
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst timer])
+AT_CHECK([test_strtst timer], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst putmsg])
-AT_KEYWORDS([streams putmsg])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst putmsg
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst putmsg])
+AT_CHECK([test_strtst putmsg], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst poll])
-AT_KEYWORDS([streams poll])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst poll
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst poll])
+AT_CHECK([test_strtst poll], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst mux])
-AT_KEYWORDS([streams mux])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst mux
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst mux])
+AT_CHECK([test_strtst mux], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst clone])
-AT_KEYWORDS([streams clone])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst clone
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst clone])
+AT_CHECK([test_strtst clone], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst bufcall])
-AT_KEYWORDS([streams bufcall])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst bufcall
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst bufcall])
+AT_CHECK([test_strtst bufcall], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst sad])
-AT_KEYWORDS([streams sad])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst sad
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst sad])
+AT_CHECK([test_strtst sad], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst fifo])
-AT_KEYWORDS([streams fifo])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst fifo
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst fifo])
+AT_CHECK([test_strtst fifo], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst passfd])
-AT_KEYWORDS([streams passfd])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst passfd
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst passfd])
+AT_CHECK([test_strtst passfd], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst band])
-AT_KEYWORDS([streams band])
-AT_CHECK([
-    retval=
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst band || exit 77
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst band])
+AT_CHECK([test_strtst band || exit 77], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst flush])
-AT_KEYWORDS([streams flush])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst flush
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst flush])
+AT_CHECK([test_strtst flush], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst autopush])
-AT_KEYWORDS([streams autopush])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst autopush
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst autopush])
+AT_CHECK([test_strtst autopush], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([strtst mt_open])
-AT_KEYWORDS([streams mt_open])
-AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
-    strtst mt_open
-    ], [], [ignore], [], [], [])
+AT_KEYWORDS([strtst mt_open])
+AT_CHECK([test_strtst mt_open], [], [ignore], [], [], [])
 AT_CLEANUP
 

@@ -108,24 +108,24 @@
 * minor_dev	Minor device number for upper entries.			*
 *									*
 ************************************************************************/
-typedef struct mux_tbl {
-	struct mux_tbl *list;
+typedef struct mmux_tbl {
+	struct mmux_tbl *list;
 	queue_t *outq;
-	struct mux_tbl *othermux;
-	struct mux_tbl *ctl_strm;
+	struct mmux_tbl *othermux;
+	struct mmux_tbl *ctl_strm;
 	int muxid;
 	int minor_dev;
 
-} mux_tbl_t;
+} mmux_tbl_t;
 
 /************************************************************************
 *                              Storage                                  *
 ************************************************************************/
 
-mux_tbl_t *mux_head;			/* head of mux tbl entry thread */
+mmux_tbl_t *mmux_head;			/* head of mux tbl entry thread */
 
 #define	MAXMUX		100	/* max number of minors open */
-int mux_minors[MAXMUX];			/* index by minor, in-use flags */
+int mmux_minors[MAXMUX];			/* index by minor, in-use flags */
 
 /************************************************************************
 *                         Streamtab Structure                           *
@@ -134,7 +134,7 @@ int mux_minors[MAXMUX];			/* index by minor, in-use flags */
 * The following is the streamtab structure for the multiplexor.		*
 *									*
 ************************************************************************/
-static struct module_info mux_minfo = {
+static struct module_info mmux_minfo = {
 	0,				/* id */
 	"mini-mux",			/* name */
 	0,				/* min packet size accepted */
@@ -146,44 +146,44 @@ static struct module_info mux_minfo = {
 /*
  * Driver entry points -- upper
  */
-static int mux_open(queue_t *, dev_t *, int, int, cred_t *);
-static int mux_close(queue_t *, int, cred_t *);
-static int mux_wput(queue_t *, mblk_t *);
-static int mux_rsrv(queue_t *);
+static int mmux_open(queue_t *, dev_t *, int, int, cred_t *);
+static int mmux_close(queue_t *, int, cred_t *);
+static int mmux_wput(queue_t *, mblk_t *);
+static int mmux_rsrv(queue_t *);
 
 /*
  * Driver entry points -- lower
  */
-static int mux_lrput(queue_t *, mblk_t *);
-static int mux_lwsrv(queue_t *);
+static int mmux_lrput(queue_t *, mblk_t *);
+static int mmux_lwsrv(queue_t *);
 
 /*
  * qinit structures (rd and wr side, upper) 
  */
-static struct qinit mux_rinit = {
+static struct qinit mmux_rinit = {
 	NULL,				/* put */
-	mux_rsrv,			/* service */
-	mux_open,			/* open */
-	mux_close,			/* close */
+	mmux_rsrv,			/* service */
+	mmux_open,			/* open */
+	mmux_close,			/* close */
 	NULL,				/* admin */
-	&mux_minfo,			/* info */
+	&mmux_minfo,			/* info */
 	NULL				/* stat */
 };
 
-static struct qinit mux_winit = {
-	mux_wput,			/* put */
+static struct qinit mmux_winit = {
+	mmux_wput,			/* put */
 	NULL,				/* service */
 	NULL,				/* open */
 	NULL,				/* close */
 	NULL,				/* admin */
-	&mux_minfo,			/* info */
+	&mmux_minfo,			/* info */
 	NULL				/* stat */
 };
 
 /*
  * qinit structures (rd and wr side, lower) 
  */
-static struct module_info mux_lminfo = {
+static struct module_info mmux_lminfo = {
 	0,				/* id */
 	"mini-mux-lwr",			/* name */
 	0,				/* min packet size accepted */
@@ -192,33 +192,33 @@ static struct module_info mux_lminfo = {
 	512L				/* low water mark */
 };
 
-static struct qinit mux_lrinit = {
-	mux_lrput,			/* put */
+static struct qinit mmux_lrinit = {
+	mmux_lrput,			/* put */
 	NULL,				/* service */
 	NULL,				/* open */
 	NULL,				/* close */
 	NULL,				/* admin */
-	&mux_lminfo,			/* info */
+	&mmux_lminfo,			/* info */
 	NULL				/* stat */
 };
 
-static struct qinit mux_lwinit = {
+static struct qinit mmux_lwinit = {
 	NULL,				/* put */
-	mux_lwsrv,			/* service */
+	mmux_lwsrv,			/* service */
 	NULL,				/* open */
 	NULL,				/* close */
 	NULL,				/* admin */
-	&mux_lminfo,			/* info */
+	&mmux_lminfo,			/* info */
 	NULL				/* stat */
 };
 
 /* streamtab for the loopback driver.
  */
-struct streamtab mux_info = {
-	&mux_rinit,			/* read queue */
-	&mux_winit,			/* write queue */
-	&mux_lrinit,			/* mux read queue */
-	&mux_lwinit			/* mux write queue */
+struct streamtab mmux_info = {
+	&mmux_rinit,			/* read queue */
+	&mmux_winit,			/* write queue */
+	&mmux_lrinit,			/* mux read queue */
+	&mmux_lwinit			/* mux write queue */
 };
 
 /************************************************************************
@@ -228,39 +228,39 @@ struct streamtab mux_info = {
 * Allocate a new mux structure and link it into the master list.	*
 *									*
 ************************************************************************/
-static mux_tbl_t *
+static mmux_tbl_t *
 new_mux(void)
 {
-	mux_tbl_t *muxp;
+	mmux_tbl_t *muxp;
 
-	muxp = (mux_tbl_t *) ALLOC(sizeof(*muxp));
+	muxp = (mmux_tbl_t *) ALLOC(sizeof(*muxp));
 	if (muxp == NULL)
 		return (NULL);
 
 	memset(muxp, 0, sizeof(*muxp));
-	muxp->list = mux_head;
-	mux_head = muxp;
+	muxp->list = mmux_head;
+	mmux_head = muxp;
 
 	return (muxp);
 
 }				/* new_mux */
 
 /************************************************************************
-*                          mux_open                                     *
+*                          mmux_open                                     *
 *************************************************************************
 *									*
 * Open routine for the multiplexor.					*
 *									*
 ************************************************************************/
 static int
-mux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+mmux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
-	mux_tbl_t *muxp;
+	mmux_tbl_t *muxp;
 	int dev;
 
 	if (sflag == CLONEOPEN) {
 		for (dev = 1; dev < MAXMUX; dev++) {
-			if (mux_minors[dev] == 0)
+			if (mmux_minors[dev] == 0)
 				break;
 		}
 	} else
@@ -269,7 +269,7 @@ mux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	if (dev >= MAXMUX)
 		return (OPENFAIL);
 
-	mux_minors[dev] = 1;	/* minor in use */
+	mmux_minors[dev] = 1;	/* minor in use */
 	*devp = makedevice(getmajor(*devp), dev);
 
 	if (q->q_ptr != NULL)	/* already open */
@@ -286,10 +286,10 @@ mux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 
 	return (0);		/* success */
 
-}				/* mux_open */
+}				/* mmux_open */
 
 /************************************************************************
-*                             mux_ioctl                                 *
+*                             mmux_ioctl                                 *
 *************************************************************************
 *									*
 * Handle ioctl from upstream.						*
@@ -300,7 +300,7 @@ mux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 *									*
 ************************************************************************/
 void
-mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
+mmux_ioctl(mmux_tbl_t * muxp, mblk_t *mp)
 {
 	struct iocblk *iocb;
 	struct linkblk *lk;
@@ -314,7 +314,7 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 	case I_LINK:
 	case I_PLINK:
 	{
-		mux_tbl_t *lwr;
+		mmux_tbl_t *lwr;
 
 		if (mp->b_cont == NULL) {	/* no linkblk */
 			error = EINVAL;
@@ -336,7 +336,7 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 		RD(lwr->outq)->q_ptr = lwr;	/* hook queues to tbl */
 		WR(lwr->outq)->q_ptr = lwr;
 		qenable(RD(lwr->outq));	/* run service procedure */
-		cmn_err(CE_CONT, "mux_ioctl: I_LINK dev %u to muxid %u\n", muxp->minor_dev,
+		cmn_err(CE_CONT, "mmux_ioctl: I_LINK dev %u to muxid %u\n", muxp->minor_dev,
 			lk->l_index);
 	}
 		break;
@@ -344,8 +344,8 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 	case I_UNLINK:
 	case I_PUNLINK:
 	{
-		mux_tbl_t *lwr;
-		mux_tbl_t *prev;
+		mmux_tbl_t *lwr;
+		mmux_tbl_t *prev;
 
 		if (mp->b_cont == NULL) {	/* no linkblk */
 			error = EINVAL;
@@ -358,7 +358,7 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 		 */
 		lk = (struct linkblk *) mp->b_cont->b_rptr;
 		prev = NULL;
-		for (lwr = mux_head; lwr != NULL; lwr = lwr->list) {
+		for (lwr = mmux_head; lwr != NULL; lwr = lwr->list) {
 			if (lwr->ctl_strm == muxp	/* this is ctl strm */
 			    && lwr->muxid == lk->l_index	/* and this muxid */
 			    ) {
@@ -369,16 +369,16 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 		}
 
 		if (lwr == NULL) {	/* not found */
-			cmn_err(CE_CONT, "mux_ioctl: I_UNLINK muxid %u: unknown muxid\n",
+			cmn_err(CE_CONT, "mmux_ioctl: I_UNLINK muxid %u: unknown muxid\n",
 				lk->l_index);
 			error = EINVAL;
 			goto iocnak;
 		}
 
-		cmn_err(CE_CONT, "mux_ioctl: I_UNLINK minor=%u -> muxid=%u\n", muxp->minor_dev,
+		cmn_err(CE_CONT, "mmux_ioctl: I_UNLINK minor=%u -> muxid=%u\n", muxp->minor_dev,
 			lk->l_index);
 		if (prev == NULL)	/* 1st in list */
-			mux_head = lwr->list;	/* link around it */
+			mmux_head = lwr->list;	/* link around it */
 		else		/* middle of list */
 			prev->list = lwr->list;	/* link around it */
 
@@ -398,7 +398,7 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 		uplink = 1;
 	case MINIMUX_DOWN:	/* point upper to lower */
 	{
-		mux_tbl_t *lwr;
+		mmux_tbl_t *lwr;
 		int l_index;
 
 		if (iocb->ioc_count != sizeof(int)) {
@@ -407,13 +407,13 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 		}
 
 		l_index = *((int *) mp->b_cont->b_rptr);
-		for (lwr = mux_head; lwr != NULL; lwr = lwr->list) {
+		for (lwr = mmux_head; lwr != NULL; lwr = lwr->list) {
 			if (lwr->ctl_strm == muxp && lwr->muxid == l_index)
 				break;
 		}
 
 		if (lwr == NULL) {	/* not found */
-			cmn_err(CE_CONT, "mux_ioctl: MINIMUX_DOWN muxid %u: unknown muxid\n",
+			cmn_err(CE_CONT, "mmux_ioctl: MINIMUX_DOWN muxid %u: unknown muxid\n",
 				l_index);
 			error = EINVAL;
 			goto iocnak;
@@ -443,20 +443,20 @@ mux_ioctl(mux_tbl_t * muxp, mblk_t *mp)
 	iocb->ioc_count = rtn_count;
 	putnext(muxp->outq, mp);
 
-}				/* mux_ioctl */
+}				/* mmux_ioctl */
 
 /************************************************************************
-*                             mux_wput                                  *
+*                             mmux_wput                                  *
 *************************************************************************
 *									*
 * Upper wput routine.							*
 *									*
 ************************************************************************/
 static int
-mux_wput(queue_t *q, mblk_t *mp)
+mmux_wput(queue_t *q, mblk_t *mp)
 {
 	queue_t *fwdq;
-	mux_tbl_t *muxp;
+	mmux_tbl_t *muxp;
 
 	if (q->q_ptr == NULL) {
 		freemsg(mp);
@@ -480,7 +480,7 @@ mux_wput(queue_t *q, mblk_t *mp)
 		break;
 
 	case M_IOCTL:
-		mux_ioctl(muxp, mp);
+		mmux_ioctl(muxp, mp);
 		break;
 
 	case M_FLUSH:		/* flush upper queue */
@@ -503,10 +503,10 @@ mux_wput(queue_t *q, mblk_t *mp)
 
 	return (0);
 
-}				/* mux_wput */
+}				/* mmux_wput */
 
 /************************************************************************
-*                        mux_messenger_service                          *
+*                        mmux_messenger_service                          *
 *************************************************************************
 *									*
 * Service a queue by attempting to forward messages subject to flow	*
@@ -514,12 +514,12 @@ mux_wput(queue_t *q, mblk_t *mp)
 *									*
 ************************************************************************/
 static void
-mux_messenger_service(queue_t *q)
+mmux_messenger_service(queue_t *q)
 {
-	mux_tbl_t *muxp;
+	mmux_tbl_t *muxp;
 	mblk_t *mp;
 
-	muxp = (mux_tbl_t *) q->q_ptr;
+	muxp = (mmux_tbl_t *) q->q_ptr;
 
 	while ((mp = getq(q)) != NULL) {
 		if (mp->b_datap->db_type <= QPCTL && !canputnext(q)
@@ -531,57 +531,57 @@ mux_messenger_service(queue_t *q)
 		putnext(q, mp);
 	}
 
-}				/* mux_messenger_service */
+}				/* mmux_messenger_service */
 
 #if 0
 /************************************************************************
-*                              mux_wsrv                                 *
+*                              mmux_wsrv                                 *
 *************************************************************************
 *									*
 * Upper write service routine.	Unused.					*
 *									*
 ************************************************************************/
 static int
-mux_wsrv(queue_t *q)
+mmux_wsrv(queue_t *q)
 {
 	return (0);
-}				/* mux_wsrv */
+}				/* mmux_wsrv */
 #endif
 
 /************************************************************************
-*                             mux_rsrv                                  *
+*                             mmux_rsrv                                  *
 *************************************************************************
 *									*
 * Upper read service procedure.						*
 *									*
 ************************************************************************/
 static int
-mux_rsrv(queue_t *q)
+mmux_rsrv(queue_t *q)
 {
-	mux_messenger_service(q);
+	mmux_messenger_service(q);
 	return (0);
 
-}				/* mux_rsrv */
+}				/* mmux_rsrv */
 
 /************************************************************************
-*                             mux_close                                 *
+*                             mmux_close                                 *
 *************************************************************************
 *									*
 * Close routine.							*
 *									*
 ************************************************************************/
 static int
-mux_close(queue_t *q, int dummy, cred_t *credp)
+mmux_close(queue_t *q, int dummy, cred_t *credp)
 {
-	mux_tbl_t *muxp;
-	mux_tbl_t *prev;
+	mmux_tbl_t *muxp;
+	mmux_tbl_t *prev;
 
 	if (q->q_ptr == NULL)
 		return (0);
 
 	prev = NULL;
-	for (muxp = mux_head; muxp != NULL; muxp = muxp->list) {
-		if (muxp == (mux_tbl_t *) q->q_ptr)
+	for (muxp = mmux_head; muxp != NULL; muxp = muxp->list) {
+		if (muxp == (mmux_tbl_t *) q->q_ptr)
 			break;	/* found it */
 		prev = muxp;
 	}
@@ -589,14 +589,14 @@ mux_close(queue_t *q, int dummy, cred_t *credp)
 	if (muxp == NULL)
 		return (0);	/* not found */
 
-	cmn_err(CE_CONT, "mux_close: minor=%d", muxp->minor_dev);
+	cmn_err(CE_CONT, "mmux_close: minor=%d", muxp->minor_dev);
 	if (muxp->othermux != NULL)
 		cmn_err(CE_CONT, " -> muxid=%d\n", muxp->othermux->muxid);
 	else
 		cmn_err(CE_CONT, " no lower\n");
 
 	if (prev == NULL)	/* 1st in list */
-		mux_head = muxp->list;	/* link around it */
+		mmux_head = muxp->list;	/* link around it */
 	else			/* middle of list */
 		prev->list = muxp->list;	/* link around it */
 
@@ -607,25 +607,25 @@ mux_close(queue_t *q, int dummy, cred_t *credp)
 	RD(muxp->outq)->q_ptr = NULL;	/* clobber q ptr (cheap insurance) */
 	WR(muxp->outq)->q_ptr = NULL;
 	q->q_ptr = NULL;
-	mux_minors[muxp->minor_dev] = 0;	/* make minor available */
+	mmux_minors[muxp->minor_dev] = 0;	/* make minor available */
 
 	FREE(muxp);		/* free structure */
 
 	return 0;
-}				/* mux_close */
+}				/* mmux_close */
 
 /************************************************************************
-*                           mux_lrput                                   *
+*                           mmux_lrput                                   *
 *************************************************************************
 *									*
 * Lower read put procedure.  Receives messages from driver below.	*
 *									*
 ************************************************************************/
 static int
-mux_lrput(queue_t *q, mblk_t *mp)
+mmux_lrput(queue_t *q, mblk_t *mp)
 {
 	queue_t *fwdq;
-	mux_tbl_t *muxp;
+	mmux_tbl_t *muxp;
 
 	if (q->q_ptr == NULL) {
 		freemsg(mp);
@@ -676,45 +676,45 @@ mux_lrput(queue_t *q, mblk_t *mp)
 
 	return (0);
 
-}				/* mux_lrput */
+}				/* mmux_lrput */
 
 /************************************************************************
-*                              mux_lwsrv                                *
+*                              mmux_lwsrv                                *
 *************************************************************************
 *									*
 * Lower write service routine.						*
 *									*
 ************************************************************************/
 static int
-mux_lwsrv(queue_t *q)
+mmux_lwsrv(queue_t *q)
 {
-	mux_messenger_service(q);
+	mmux_messenger_service(q);
 	return (0);
 
-}				/* mux_lwsrv */
+}				/* mmux_lwsrv */
 
 #if 0
 /************************************************************************
-*                             mux_lrsrv                                 *
+*                             mmux_lrsrv                                 *
 *************************************************************************
 *									*
 * Lower read service procedure.  Unused.				*
 *									*
 ************************************************************************/
 static int
-mux_lrsrv(queue_t *q)
+mmux_lrsrv(queue_t *q)
 {
 	return (0);
-}				/* mux_lrsrv */
+}				/* mmux_lrsrv */
 #endif
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
-MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-" __stringify(MUX__CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0) "-1");
-MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0) "-2");
+MODULE_ALIAS("char-major-" __stringify(MMUX__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(MMUX__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-" __stringify(MMUX__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(MMUX__CMAJOR_0) "-1");
+MODULE_ALIAS("char-major-" __stringify(MMUX__CMAJOR_0) "-2");
 MODULE_ALIAS("/dev/mux_clone");
 MODULE_ALIAS("/dev/minimux.1");
 MODULE_ALIAS("/dev/minimux.2");

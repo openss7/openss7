@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.4.4 $) $Date: 2005/10/22 20:00:26 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.4.5 $) $Date: 2005/10/23 05:01:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/22 20:00:26 $ by $Author: brian $
+# Last Modified $Date: 2005/10/23 05:01:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,12 +71,15 @@
 driver	clone-drvr	clone_	*
 driver	fifo		fifo_	*	512
 driver	loop-around	sloop_	*
-driver	mini-mux	mux_	*
+driver	mini-mux	mmux_	*
 driver	printk		printk_	*
 #driver	link-drvr	ldl_	*
 driver	sad		sad_	*
 #driver	ip_to_dlpi	ip2xinet	*
 driver	mtdrv		mtdrv_	*
+driver	nuls		nuls_	*
+driver	echo		echo_	*
+driver	mux		mux_	*
 #
 # this must be 30 for iBCS compatibility
 #
@@ -92,6 +95,7 @@ module	connld		connld_
 module	relay		relay_
 module	relay2		relay2_
 module	bufmod		bufmod_
+module	testmod		testmod_
 module	nullmod		nullmod_
 #module	ip_strms	ip_to_streams_
 #module	timod		timod_
@@ -126,10 +130,14 @@ objname driver	sad		sad
 #objname driver	ip_to_dlpi	ip_to_dlpi
 objname driver	mtdrv		mtdrv
 #objname driver	inet		inet
+objname	driver	nuls		nuls
+objname	driver	echo		echo
+objname	driver	mux		mux
 objname module	pipemod		pipemod
 objname module	connld		connld
 objname module	relay2		relay
 objname	module	bufmod		bufmod
+objname	module	testmod		testmod
 objname	module	nullmod		nullmod
 #objname module	ip_strms	ip_strm_mod
 #objname module	timod		timod
@@ -161,6 +169,7 @@ objname	module	nullmod		nullmod
 #loadable sad	too closely coupled with LiS to be loadable
 loadable pipemod
 loadable bufmod
+loadable testmod
 loadable nullmod
 #loadable timod
 #loadable tirdwr
@@ -168,6 +177,9 @@ loadable nullmod
 #loadable ip_to_dlpi
 loadable mtdrv
 #loadable inet
+loadable    nuls
+loadable    echo
+loadable    mux
 
 #
 # Initialization specifications
@@ -204,8 +216,11 @@ node	/dev/clone_drvr	     c	*	clone-drvr	0
 #node	/dev/ldl	     c	*	clone-drvr	link-drvr
 node	/dev/printk	     c	*	printk		0
 node	/dev/sad	     c	*	clone-drvr	sad
-node	/dev/fifo	     c  0666    clone-drvr	fifo
-node	/dev/fifo.0          c  0666    fifo            0
+node	/dev/fifo	     c	0666	clone-drvr	fifo
+node	/dev/fifo.0          c	0666	fifo		0
+node	/dev/nuls	     c	*	clone-drvr	nuls
+node	/dev/echo	     c	*	clone-drvr	echo
+node	/dev/mux	     c	*	clone-drvr	mux
 #
 # These are iBCS devices that should already be installed on a
 # system that supports the iBCS.  The /dev entries are supposed

@@ -1,7 +1,7 @@
 dnl vim: ft=config
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.5 $) $Date: 2005/06/19 09:39:07 $
+dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.6 $) $Date: 2005/10/23 05:01:27 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/19 09:39:07 $ by $Author: brian $
+dnl Last Modified $Date: 2005/10/23 05:01:27 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite.at,v $
+dnl Revision 1.1.4.6  2005/10/23 05:01:27  brian
+dnl - test programs and modules for POSIX testing
+dnl
 dnl Revision 1.1.4.5  2005/06/19 09:39:07  brian
 dnl - commented out dummy args
 dnl
@@ -82,6 +85,9 @@ dnl AT_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify 
 
 m4_include([kernel.at])
 
+m4_include([testsuite-streams.at])
+m4_include([testsuite-fifo.at])
+m4_include([testsuite-pipe.at])
 m4_include([testsuite-strtst.at])
 m4_include([testsuite-timetst.at])
 m4_include([testsuite-test.at])

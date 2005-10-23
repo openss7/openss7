@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.26 $) $Date: 2005/10/22 20:00:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.27 $) $Date: 2005/10/23 05:01:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/22 20:00:22 $ by $Author: brian $
+# Last Modified $Date: 2005/10/23 05:01:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,7 +75,13 @@ libLiSuser_la_LDFLAGS		=
 libLiSuser_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiSuser_la_CFLAGS		= $(USER_CFLAGS)
 
-libexec_PROGRAMS		= timetst strtst polltst perftest
+libexec_PROGRAMS		= timetst \
+				  strtst \
+				  polltst \
+				  perftest \
+				  test-streams \
+				  test-fifo \
+				  test-pipe
 bin_PROGRAMS			=
 sbin_PROGRAMS			= streams
 
@@ -103,7 +109,10 @@ libexec_PROGRAMS		= timetst \
 				  perftest \
 				  thrtst \
 				  lis_test \
-				  lis_test2
+				  lis_test2 \
+				  test-streams \
+				  test-fifo \
+				  test-pipe
 
 bin_PROGRAMS			= oc \
 				  pafd \
@@ -187,7 +196,11 @@ libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 				  drivers/str/linux/mtdrv.c \
 				  drivers/str/linux/relay3.c \
 				  drivers/str/bufmod.c \
-				  drivers/str/nullmod.c
+				  drivers/str/nullmod.c \
+				  drivers/str/testmod.c \
+				  drivers/str/nuls.c \
+				  drivers/str/echo.c \
+				  drivers/str/mux.c
 
 libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=`echo $@ | sed -e 's|lib.*_a-|${kpre}|;s|\.o||;s|-|_|g'` $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
@@ -322,6 +335,24 @@ strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strtst_LDFLAGS			= -lpthread -static libLiS.la
 strtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strtst_CFLAGS			= $(USER_CFLAGS)
+
+test_streams_SOURCES		= util/test-streams.c
+test_streams_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_streams_LDFLAGS		= -lpthread -static libLiS.la
+test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_streams_CFLAGS		= $(USER_CFLAGS)
+
+test_fifo_SOURCES		= util/test-fifo.c
+test_fifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_fifo_LDFLAGS		= -lpthread -static libLiS.la
+test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_fifo_CFLAGS		= $(USER_CFLAGS)
+
+test_pipe_SOURCES		= util/test-pipe.c
+test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_pipe_LDFLAGS		= -lpthread -static libLiS.la
+test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_pipe_CFLAGS		= $(USER_CFLAGS)
 
 perftest_SOURCES		= util/perftest.c
 perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)

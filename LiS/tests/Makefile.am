@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.9 $) $Date: 2005/06/15 00:46:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.10 $) $Date: 2005/10/23 05:01:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/15 00:46:04 $ by $Author: brian $
+# Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.10  2005/10/23 05:01:26  brian
+# - test programs and modules for POSIX testing
+#
 # Revision 1.1.4.9  2005/06/15 00:46:04  brian
 # - corrected a couple targets
 #
@@ -111,6 +114,9 @@ package.m4: $(top_srcdir)/configure
 # my rule
 TESTSUITE_DEPS		= \
 			kernel.at \
+			$(TESTSUITE)-streams.at \
+			$(TESTSUITE)-fifo.at \
+			$(TESTSUITE)-pipe.at \
 			$(TESTSUITE)-strtst.at \
 			$(TESTSUITE)-timetst.at \
 			$(TESTSUITE)-test.at \
