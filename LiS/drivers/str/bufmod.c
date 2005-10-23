@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/21 03:55:36 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/21 03:55:36 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 20:00:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/21 03:55:36 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $"
+
+static char const ident[] =
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $";
 
 /*
- *  bufmod.c - "bufmod" module
+ *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
+ *  STREAMS module and buffering input and output.  Its purpose is primarily for testing and for
+ *  serving as an example of the skeleton of a STREAMS module.
  *
- *  bufmod is a buffering module used in performance testing of message queuing
- *  and scheduling.  It puts all received messages in both directions on the
- *  queue and schedules them from the service procedure.
+ *  This is an absurdly simple module.
+ *
+ *  In addition, this module provide a specialized set of input-output controls for testing and
+ *  verifying various internal STREAMS functions.
  */
 
 #include <sys/LiS/module.h>	/* should be first */
@@ -74,232 +80,237 @@
 #include <sys/cmn_err.h>
 #include <sys/osif.h>
 
-/*
- *  Some configuration sanity checks
- */
-#ifndef BUFMOD__MOD
-#error Not configured
+#define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $"
+#define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
+#define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define BUFMOD_LICENSE		"GPL"
+#define BUFMOD_BANNER		BUFMOD_DESCRIP		"\n" \
+				BUFMOD_COPYRIGHT	"\n" \
+				BUFMOD_REVISION		"\n" \
+				BUFMOD_DEVICE		"\n" \
+				BUFMOD_CONTACT		"\n"
+#define BUFMOD_SPLASH		BUFMOD_DEVICE		" - " \
+				BUFMOD_REVISION		"\n"
+
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
+MODULE_AUTHOR(BUFMOD_CONTACT);
+MODULE_DESCRIPTION(BUFMOD_DESCRIP);
+MODULE_SUPPORTED_DEVICE(BUFMOD_DEVICE);
+MODULE_LICENSE(BUFMOD_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-bufmod");
+#endif
 #endif
 
-#ifndef BUFMOD__ID
-#define BUFMOD__ID 0x8887
+#ifndef CONFIG_STREAMS_BUFMOD_NAME
+#define CONFIG_STREAMS_BUFMOD_NAME BUFMOD__MOD_NAME
+//#error "CONFIG_STREAMS_BUFMOD_NAME must be defined."
+#endif
+#ifndef CONFIG_STREAMS_BUFMOD_MODID
+#define CONFIG_STREAMS_BUFMOD_MODID BUFMOD__ID
+//#error "CONFIG_STREAMS_BUFMOD_MODID must be defined."
 #endif
 
-#define  MOD_ID   BUFMOD__ID
-#define  MOD_NAME "bufmod"
+modID_t modid = CONFIG_STREAMS_BUFMOD_MODID;
 
-/*
- *  function prototypes
- */
-static int bufmod_open(queue_t *, dev_t *, int, int, cred_t *);
-static int bufmod_close(queue_t *, int, cred_t *);
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for BUFMOD.");
 
-static int bufmod_rput(queue_t *, mblk_t *);
-static int bufmod_wput(queue_t *, mblk_t *);
-static int bufmod_srv(queue_t *);
-
-/*
- *  module structure
- */
-static struct module_info bufmod_minfo = {
-	MOD_ID,				/* id */
-	MOD_NAME,			/* name */
-	0,				/* min packet size accepted */
-	4096,				/* max packet size accepted */
-	5120,				/* highwater mark */
-	1024				/* lowwater mark */
-};
-
-static struct qinit bufmod_rinit = {
-	bufmod_rput,			/* put */
-	bufmod_srv,			/* service */
-	bufmod_open,			/* open */
-	bufmod_close,			/* close */
-	NULL,				/* admin */
-	&bufmod_minfo,			/* info */
-	NULL				/* stat */
-};
-
-static struct qinit bufmod_winit = {
-	bufmod_wput,			/* put */
-	bufmod_srv,			/* service */
-	NULL,				/* open */
-	NULL,				/* close */
-	NULL,				/* admin */
-	&bufmod_minfo,			/* info */
-	NULL				/* stat */
-};
-
-struct streamtab bufmod_info = {
-	&bufmod_rinit,			/* read queue init */
-	&bufmod_winit,			/* write queue init */
-	NULL,				/* lower mux read queue init */
-	NULL				/* lower mux write queue init */
-};
-
-/*
- *  open
- */
-static int
-bufmod_open(q, devp, flag, sflag, credp)
-	queue_t *q;
-	dev_t *devp;
-	int flag, sflag;
-	cred_t *credp;
-{
-	queue_t *rq = RD(q);
-	char *cp = rq->q_ptr;
-
-#ifdef BUFMOD_DEBUG
-	cmn_err(CE_CONT, "%s_open( 0x%p, 0x%x, 0x%x, 0x%x, ... )\n", MOD_NAME, q, *devp, flag,
-		sflag);
+#ifdef MODULE_ALIAS
+#if LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_BUFMOD_MODID));
+MODULE_ALIAS("streams-module-bufmod");
+#endif
 #endif
 
-	if (rq->q_ptr == NULL)
-		MODGET();
-	rq->q_ptr = (void *) ++cp;
-	WR(q)->q_ptr = rq->q_ptr;
+STATIC struct module_info bufmod_minfo = {
+	.mi_idnum = CONFIG_STREAMS_BUFMOD_MODID,
+	.mi_idname = CONFIG_STREAMS_BUFMOD_NAME,
+	.mi_minpsz = 0,
+	.mi_maxpsz = 4096,
+	.mi_hiwat = 5120,
+	.mi_lowat = 1024,
+};
 
-	qprocson(q);
-
-	return 0;		/* success */
-}
-
-/*
- *  close
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  PUT routines
+ *
+ *  -------------------------------------------------------------------------
  */
-static int
-bufmod_close(q, flag, credp)
-	queue_t *q;
-	int flag;
-	cred_t *credp;
-{
-#ifdef BUFMOD_DEBUG
-	cmn_err(CE_CONT, "%s_close( 0x%p, 0x%x, ... )\n", MOD_NAME, q, flag);
-#endif
 
-	RD(q)->q_ptr = WR(q)->q_ptr = NULL;
-	MODPUT();
-	qprocsoff(q);
-
-	return 0;		/* success */
-}
-
-/*
- *  put
- */
-static int
+STATIC int
 bufmod_wput(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_datap->db_type == M_FLUSH) {
+	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHW) {
-			if (mp->b_rptr[0] & FLUSHW)
+			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, FLUSHALL, mp->b_rptr[1]);
 			else
 				flushq(q, FLUSHALL);
 		}
 	}
-	if (!putq(q, mp)) {
+	if (likely(mp->b_datap->db_type >= QPCTL
+		   || (q->q_first == NULL && !(q->q_flag & QRUNNING)
+		       && bcanputnext(q, mp->b_band)))) {
+		putnext(q, mp);
+		return (0);
+	}
+	/* always buffer, always schedule out of service procedure for testing */
+	if (unlikely(putq(q, mp) == 0)) {
 		mp->b_band = 0;
-		putq(q, mp);	/* must succeed */
+		putq(q, mp);	/* this must succeed */
 	}
 	return (0);
 }
-static int
+
+STATIC int
 bufmod_rput(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_datap->db_type == M_FLUSH) {
+	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHR) {
-			if (mp->b_rptr[0] & FLUSHW)
+			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, FLUSHALL, mp->b_rptr[1]);
 			else
 				flushq(q, FLUSHALL);
 		}
 	}
-	if (!putq(q, mp)) {
+	if (likely(mp->b_datap->db_type >= QPCTL
+		   || (q->q_first == NULL && !(q->q_flag & QRUNNING)
+		       && bcanputnext(q, mp->b_band)))) {
+		putnext(q, mp);
+		return (0);
+	}
+	if (unlikely(putq(q, mp) == 0)) {
 		mp->b_band = 0;
-		putq(q, mp);	/* must succeed */
+		putq(q, mp);	/* this must succeed */
 	}
 	return (0);
 }
-static int
+
+STATIC int
 bufmod_srv(queue_t *q)
 {
 	mblk_t *mp;
 
 	while ((mp = getq(q))) {
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+		if (likely(mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band))) {
 			putnext(q, mp);
 			continue;
 		}
-		putbq(q, mp);	/* must succeed */
+		putbq(q, mp);
 		break;
 	}
 	return (0);
 }
 
-
-#ifdef MODULE
-
 /*
- *  Linux loadable module interface
+ *  -------------------------------------------------------------------------
+ *
+ *  OPEN and CLOSE
+ *
+ *  -------------------------------------------------------------------------
  */
-
-#ifdef KERNEL_2_5
-int
-bufmod_init_module(void)
-#else
-int
-init_module(void)
-#endif
+STATIC int
+bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	int ret = lis_register_strmod(&bufmod_info, MOD_NAME);
+	queue_t *wq;
 
-	if (ret < 0) {
-		cmn_err(CE_CONT, "%s - unable to register module.\n", MOD_NAME);
-		return ret;
+	if (q->q_ptr != NULL) {
+		return (0);	/* already open */
 	}
-
-	return 0;
+	wq = WR(q);
+	if (sflag == MODOPEN || wq->q_next != NULL) {
+		/* inherit packet sizes of what we are pushed over */
+		wq->q_minpsz = wq->q_next->q_minpsz;
+		wq->q_maxpsz = wq->q_next->q_maxpsz;
+		q->q_ptr = wq->q_ptr = q;	/* just set it to something */
+		qprocson(q);
+		return (0);
+	}
+	return (EIO);		/* can't be opened as driver */
 }
-
-#ifdef KERNEL_2_5
-void
-bufmod_cleanup_module(void)
-#else
-void
-cleanup_module(void)
-#endif
+STATIC int
+bufmod_close(queue_t *q, int oflag, cred_t *crp)
 {
-	if (lis_unregister_strmod(&bufmod_info) < 0)
-		cmn_err(CE_CONT, "%s - unable to unregister module.\n", MOD_NAME);
-	return;
+	(void) oflag;
+	(void) crp;
+	if (!q->q_ptr)
+		return (ENXIO);
+	qprocsoff(q);
+	q->q_ptr = WR(q)->q_ptr = NULL;
+	return (0);
 }
 
-#ifdef KERNEL_2_5
-module_init(bufmod_init_module);
-module_exit(bufmod_cleanup_module);
-#endif
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Registration and initialization
+ *
+ *  -------------------------------------------------------------------------
+ */
+STATIC struct qinit bufmod_rinit = {
+	.qi_putp = bufmod_rput,
+	.qi_srvp = bufmod_srv,
+	.qi_qopen = bufmod_open,
+	.qi_qclose = bufmod_close,
+	.qi_minfo = &bufmod_minfo,
+};
 
-#if defined(LINUX)		/* linux kernel */
+STATIC struct qinit bufmod_winit = {
+	.qi_putp = bufmod_wput,
+	.qi_srvp = bufmod_srv,
+	.qi_minfo = &bufmod_minfo,
+};
 
-#ifdef __attribute_used__
-#undef __attribute_used__
-#endif
-#define __attribute_used__
+STATIC struct streamtab bufmod_info = {
+	.st_rdinit = &bufmod_rinit,
+	.st_wrinit = &bufmod_winit,
+};
 
-#if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL");
-#endif
-#if defined(MODULE_AUTHOR)
-MODULE_AUTHOR("Brian Bidulock <bidulock@openss7.org>");
-#endif
-#if defined(MODULE_DESCRIPTION)
-MODULE_DESCRIPTION("STREAMS 'bufmod' buffering module");
-#endif
-#if defined(MODULE_ALIAS)
-MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
-#endif
 
-#endif				/* LINUX */
-#endif				/* MODULE */
+#ifdef MODULE
+STATIC
+#endif
+int __init
+bufmod_init(void)
+{
+	int err;
+
+#ifdef MODULE
+	printk(KERN_INFO BUFMOD_BANNER);
+#else
+	printk(KERN_INFO BUFMOD_SPLASH);
+#endif
+	bufmod_minfo.mi_idnum = modid;
+	if ((err = lis_register_strmod(&bufmod_info, CONFIG_STREAMS_BUFMOD_NAME)) < 0)
+		return (err);
+	if (modid == 0 && err > 0)
+		modid = err;
+	return (0);
+}
+
+#ifdef MODULE
+STATIC
+#endif
+void __exit
+bufmod_exit(void)
+{
+	int err;
+
+	if ((err = lis_unregister_strmod(&bufmod_info)) < 0)
+		return (void) (err);
+	return (void) (0);
+}
+
+#ifdef MODULE
+module_init(bufmod_init);
+module_exit(bufmod_exit);
+#endif

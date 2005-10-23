@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.66 2005/10/21 03:54:25 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.67 2005/10/22 19:58:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/21 03:54:25 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 19:58:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/10/21 03:54:25 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/10/22 19:58:14 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -946,25 +946,25 @@ extern int STREAMS_FASTCALL(adjmsg(mblk_t *mp, ssize_t length));
 extern mblk_t *STREAMS_FASTCALL(allocb(size_t size, unsigned int priority));
 extern mblk_t *STREAMS_FASTCALL(copyb(mblk_t *mp));
 extern void STREAMS_FASTCALL(freeb(mblk_t *bp));
-extern void STREAMS_FASTCALL(freemsg(mblk_t *mp));
-extern mblk_t *STREAMS_FASTCALL(copymsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE void STREAMS_FASTCALL(freemsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(copymsg(mblk_t *mp));
 extern int STREAMS_FASTCALL(ctlmsg(unsigned char type));
 extern int STREAMS_FASTCALL(datamsg(unsigned char type));
 extern mblk_t *STREAMS_FASTCALL(dupb(mblk_t *mp));
-extern mblk_t *STREAMS_FASTCALL(dupmsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(dupmsg(mblk_t *mp));
 extern mblk_t *STREAMS_FASTCALL(esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo));
 __STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * db);
 __STRUTIL_EXTERN_INLINE int isdatamsg(mblk_t *mp);
 __STRUTIL_EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
 __STRUTIL_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
-extern size_t STREAMS_FASTCALL(msgdsize(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgdsize(mblk_t *mp));
 extern mblk_t *STREAMS_FASTCALL(msgpullup(mblk_t *mp, ssize_t length));
-extern size_t STREAMS_FASTCALL(msgsize(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgsize(mblk_t *mp));
 __STRUTIL_EXTERN_INLINE int pcmsg(unsigned char type);
 extern int STREAMS_FASTCALL(pullupmsg(mblk_t *mp, ssize_t len));
-extern mblk_t *STREAMS_FASTCALL(rmvb(mblk_t *mp, mblk_t *bp));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(rmvb(mblk_t *mp, mblk_t *bp));
 extern int STREAMS_FASTCALL(testb(size_t size, unsigned int priority));
-__STRUTIL_EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(unlinkb(mblk_t *mp));
 extern size_t STREAMS_FASTCALL(xmsgsize(mblk_t *mp));
 
 extern bcid_t STREAMS_FASTCALL(bufcall(unsigned size, int priority, void (*function) (long), long arg));
@@ -1038,6 +1038,44 @@ bcmp(const void *s1, const void *s2, size_t len)
 
 /* Message functions. */
 
+__STRUTIL_EXTERN_INLINE streams_fastcall void
+freemsg(mblk_t *mp)
+{
+	register mblk_t *b, *bp;
+
+	for (b = mp; (bp = b); b = b->b_cont, freeb(bp)) ;
+}
+
+__STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
+copymsg(mblk_t *mp)
+{
+	mblk_t *msg = NULL;
+	register mblk_t *b, **bp = &msg;
+
+	for (b = mp; b; b = b->b_cont, bp = &(*bp)->b_cont)
+		if (!(*bp = copyb(b)))
+			goto error;
+	return (msg);
+      error:
+	freemsg(mp);
+	return (NULL);
+}
+
+__STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
+dupmsg(mblk_t *mp)
+{
+	mblk_t *msg = NULL;
+	register mblk_t *b, **bp = &msg;
+
+	for (b = mp; b; b = b->b_cont, bp = &(*bp)->b_cont)
+		if (!(*bp = dupb(b)))
+			goto error;
+	return (msg);
+      error:
+	freemsg(msg);
+	return (NULL);
+}
+
 __STRUTIL_EXTERN_INLINE int
 isdatablk(dblk_t * db)
 {
@@ -1069,13 +1107,53 @@ linkmsg(mblk_t *mp1, mblk_t *mp2)
 	return (mp2);
 }
 
+__STRUTIL_EXTERN_INLINE streams_fastcall size_t
+msgdsize(mblk_t *mp)
+{
+	register mblk_t *b;
+	size_t size = 0;
+
+	for (b = mp; b; b = b->b_cont)
+		if (b->b_datap->db_type == M_DATA)
+			if (b->b_wptr > b->b_rptr)
+				size += b->b_wptr - b->b_rptr;
+	return (size);
+}
+
+__STRUTIL_EXTERN_INLINE streams_fastcall size_t
+msgsize(mblk_t *mp)
+{
+	register mblk_t *b;
+	size_t size = 0;
+
+	for (b = mp; b; b = b->b_cont)
+		if (b->b_wptr > b->b_rptr)
+			size += b->b_wptr - b->b_rptr;
+	return (size);
+}
+
 __STRUTIL_EXTERN_INLINE int
 pcmsg(unsigned char type)
 {
 	return ((type & QPCTL) != 0);
 }
 
-__STRUTIL_EXTERN_INLINE mblk_t *
+__STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
+rmvb(mblk_t *mp, mblk_t *bp)
+{
+	mblk_t **mpp;
+
+	if (likely(bp != NULL)) {
+		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
+		if (likely(*mpp != NULL)) {
+			*mpp = xchg(&bp->b_cont, NULL);
+			return (mp);
+		}
+	}
+	return ((mblk_t *) (-1));
+}
+
+__STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
 unlinkb(mblk_t *mp)
 {
 	return (mp ? xchg(&mp->b_cont, NULL) : NULL);

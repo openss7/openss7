@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.4.3 $) $Date: 2005/10/21 03:55:36 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.4.4 $) $Date: 2005/10/22 20:00:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/21 03:55:36 $ by $Author: brian $
+# Last Modified $Date: 2005/10/22 20:00:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,6 +92,7 @@ module	connld		connld_
 module	relay		relay_
 module	relay2		relay2_
 module	bufmod		bufmod_
+module	nullmod		nullmod_
 #module	ip_strms	ip_to_streams_
 #module	timod		timod_
 #module	tirdwr		tirdwr_
@@ -129,6 +130,7 @@ objname module	pipemod		pipemod
 objname module	connld		connld
 objname module	relay2		relay
 objname	module	bufmod		bufmod
+objname	module	nullmod		nullmod
 #objname module	ip_strms	ip_strm_mod
 #objname module	timod		timod
 #objname module	tirdwr		tirdwr
@@ -159,6 +161,7 @@ objname	module	bufmod		bufmod
 #loadable sad	too closely coupled with LiS to be loadable
 loadable pipemod
 loadable bufmod
+loadable nullmod
 #loadable timod
 #loadable tirdwr
 #loadable ldl

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/09/25 06:27:29 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/22 19:58:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/25 06:27:29 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 19:58:16 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -113,7 +113,7 @@ extern void sq_put(struct syncq **sqp);
 extern void freechain(mblk_t *mp, mblk_t **mpp);
 
 /* force scheduling queues */
-extern void qschedule(queue_t *q);
+// extern void qschedule(queue_t *q);
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* synq functions */

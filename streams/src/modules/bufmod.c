@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/22 19:58:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/21 03:54:27 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 19:58:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.3  2005/10/22 19:58:19  brian
+ - more performance testing an tweaks
+
  Revision 0.9.2.2  2005/10/21 03:54:27  brian
  - modifications for queueing testing
 
@@ -60,15 +63,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/22 19:58:19 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/22 19:58:19 $";
 
-/* 
+/*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
  *  STREAMS module and buffering input and output.  Its purpose is primarily for testing and for
- *  serviing as an example of the skeleton of a STREAMS module.
+ *  serving as an example of the skeleton of a STREAMS module.
  *
  *  This is an absurdly simple module.
  *
@@ -91,7 +94,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/21 03:54:27 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/10/22 19:58:19 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -158,7 +161,7 @@ STATIC struct module_info bufmod_minfo = {
 STATIC int
 bufmod_wput(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_datap->db_type == M_FLUSH) {
+	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, FLUSHALL, mp->b_rptr[1]);
@@ -166,8 +169,14 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHALL);
 		}
 	}
+	if (likely(mp->b_datap->db_type >= QPCTL
+		   || (q->q_first == NULL && !(q->q_flag & QSVCBUSY)
+		       && bcanputnext(q, mp->b_band)))) {
+		putnext(q, mp);
+		return (0);
+	}
 	/* always buffer, always schedule out of service procedure for testing */
-	if (!putq(q, mp)) {
+	if (unlikely(putq(q, mp) == 0)) {
 		mp->b_band = 0;
 		putq(q, mp);	/* this must succeed */
 	}
@@ -177,7 +186,7 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 STATIC int
 bufmod_rput(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_datap->db_type == M_FLUSH) {
+	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, FLUSHALL, mp->b_rptr[1]);
@@ -185,7 +194,13 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHALL);
 		}
 	}
-	if (!putq(q, mp)) {
+	if (likely(mp->b_datap->db_type >= QPCTL
+		   || (q->q_first == NULL && !(q->q_flag & QSVCBUSY)
+		       && bcanputnext(q, mp->b_band)))) {
+		putnext(q, mp);
+		return (0);
+	}
+	if (unlikely(putq(q, mp) == 0)) {
 		mp->b_band = 0;
 		putq(q, mp);	/* this must succeed */
 	}
@@ -198,7 +213,7 @@ bufmod_srv(queue_t *q)
 	mblk_t *mp;
 
 	while ((mp = getq(q))) {
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+		if (likely(mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band))) {
 			putnext(q, mp);
 			continue;
 		}
@@ -208,7 +223,7 @@ bufmod_srv(queue_t *q)
 	return (0);
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  OPEN and CLOSE
@@ -229,6 +244,7 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		wq->q_minpsz = wq->q_next->q_minpsz;
 		wq->q_maxpsz = wq->q_next->q_maxpsz;
 		q->q_ptr = wq->q_ptr = q;	/* just set it to something */
+		qprocson(q);
 		return (0);
 	}
 	return (EIO);		/* can't be opened as driver */
@@ -240,6 +256,7 @@ bufmod_close(queue_t *q, int oflag, cred_t *crp)
 	(void) crp;
 	if (!q->q_ptr)
 		return (ENXIO);
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }
@@ -296,7 +313,7 @@ bufmod_init(void)
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
-};
+}
 
 #ifdef CONFIG_STREAMS_BUFMOD_MODULE
 STATIC
@@ -309,7 +326,7 @@ bufmod_exit(void)
 	if ((err = unregister_strmod(&bufmod_fmod)) < 0)
 		return (void) (err);
 	return (void) (0);
-};
+}
 
 #ifdef CONFIG_STREAMS_BUFMOD_MODULE
 module_init(bufmod_init);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:27 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 19:58:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/10/19 11:08:27 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -396,7 +396,7 @@ strinccounts(struct file *file, struct stdata *sd, int oflag)
 }
 
 STATIC INLINE bool
-strdetached(struct stdata * sd)
+strdetached(struct stdata *sd)
 {
 	/* test for detached close needed */
 	if (sd->sd_opens == 0 && !(sd->sd_flag & (STWOPEN | STPLEX | STRMOUNT))
@@ -425,7 +425,7 @@ strdetached(struct stdata * sd)
  *  count.
  */
 STATIC INLINE bool
-strdeccounts(struct stdata * sd, int oflag)
+strdeccounts(struct stdata *sd, int oflag)
 {
 	bool last = false;
 	bool wake = false;
@@ -1134,7 +1134,9 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 
 			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
 				clear_bit(STRMSIG_BIT, &sd->sd_flag);
+			prlock(sd);
 			rmvq(q, b);
+			prunlock(sd);
 			if (strsignal_locked(sd, b, plp)) {
 				/* released and reacquired locks, recheck access */
 				if ((err = straccess_slow(sd, FREAD)))
@@ -1162,7 +1164,9 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 		}
 		if (b->b_next && b->b_next->b_datap->db_type == M_SIG)
 			set_bit(STRMSIG_BIT, &sd->sd_flag);
+		prlock(sd);
 		rmvq(q, b);
+		prunlock(sd);
 		break;
 	}
 	return (b);
@@ -1373,7 +1377,9 @@ strgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 
 			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
 				clear_bit(STRMSIG_BIT, &sd->sd_flag);
+			prlock(sd);
 			rmvq(q, b);
+			prunlock(sd);
 			if (strsignal_locked(sd, b, plp)) {
 				/* release and reacquire locks, recheck access */
 				if ((err = straccess_slow(sd, FREAD)))
@@ -1391,7 +1397,9 @@ strgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 		case M_DATA:
 			return ERR_PTR(-EBADMSG);
 		}
+		prlock(sd);
 		rmvq(q, b);
+		prunlock(sd);
 		break;
 	}
 	return (b);
@@ -1489,8 +1497,12 @@ __strwaitband(struct stdata *sd, int band)
 			break;
 		}
 		/* have read lock and access is ok */
-		if (bcanputnext(sd->sd_wq, band))
+		prlock(sd);
+		if (bcanputnext(sd->sd_wq, band)) {
+			prunlock(sd);
 			break;
+		}
+		prunlock(sd);
 		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 		schedule();
@@ -1535,8 +1547,12 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
 		return (0);
 
 	/* have read lock and access was ok */
-	if (bcanputnext(sd->sd_wq, band))
+	prlock(sd);
+	if (bcanputnext(sd->sd_wq, band)) {
+		prunlock(sd);
 		return (0);
+	}
+	prunlock(sd);
 
 	if ((f_flags & FNDELAY) && !test_bit(STRNDEL_BIT, &sd->sd_flag))
 		return (-EAGAIN);
@@ -2529,6 +2545,7 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {
 	if (type == M_DATA) {
 		ssize_t sd_maxpsz;
+
 		if (size < sd->sd_minpsz)
 			return (-ERANGE);
 		if ((sd_maxpsz = sd->sd_maxpsz) < 0)
@@ -3001,7 +3018,7 @@ STATIC loff_t
 strllseek(struct file *file, loff_t off, int whence)
 {
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (-ESPIPE);
 }
 
@@ -3029,6 +3046,7 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 			mask |= POLLMSG;
 		if (test_bit(STPLEX_BIT, &sd->sd_flag))
 			mask |= POLLNVAL;
+		prlock(sd);
 		if (canget(sd->sd_rq))
 			mask |= POLLIN | POLLRDNORM;
 		if (bcangetany(sd->sd_rq))
@@ -3037,6 +3055,7 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 			mask |= POLLOUT | POLLWRNORM;
 		if (bcanputnextany(sd->sd_wq))
 			mask |= POLLOUT | POLLWRBAND;
+		prunlock(sd);
 	} else
 		mask = POLLNVAL;
 	return (mask);
@@ -3066,7 +3085,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 	} else
 		mask = POLLNVAL;
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (mask);
 }
 
@@ -3079,7 +3098,7 @@ STATIC int
 strmmap(struct file *file, struct vm_area_struct *vma)
 {
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (-ENODEV);
 }
 
@@ -3217,7 +3236,7 @@ stropen(struct inode *inode, struct file *file)
 		if ((err = qopen(sd->sd_rq, &dev, oflag, sflag, crp))) {
 			ptrace(("Error path taken for sd %p\n", sd));
 			qdelete(sd->sd_rq);	/* cancel original queue pair allocation */
-			ctrace(cdrv_put(xchg(&sd->sd_cdevsw, NULL))); /* cancel hold on module */
+			ctrace(cdrv_put(xchg(&sd->sd_cdevsw, NULL)));	/* cancel hold on module */
 			goto up_put_error;	/* will destroy new stream head */
 		}
 		/* 2nd step: check for redirected return */
@@ -3318,7 +3337,7 @@ stropen(struct inode *inode, struct file *file)
 	ctrace(sd_put(&sd));
       error:
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return ((err < 0) ? err : -err);
       up_error:
 	printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
@@ -3482,7 +3501,7 @@ strclose(struct inode *inode, struct file *file)
 		stri_unlock(inode);
 	}
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -3518,7 +3537,7 @@ strfasync(int fd, struct file *file, int on)
 	} else
 		err = -ENOSTR;
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -3909,7 +3928,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
       exit:
 	/* We want to give the driver queues an opportunity to run. */
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -3954,6 +3973,7 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 		if ((err = strwaitband(sd, f_flags, 0, MSG_BAND)) == 0) {
 			mblk_t *b;
 
+			prlock(sd);
 			if ((b = getq(sd->sd_wq))) {
 				if (nbytes && b->b_datap->db_lim > b->b_wptr + nbytes) {
 					bcopy(fastbuf, b->b_wptr, nbytes);
@@ -3961,10 +3981,9 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 					err = nbytes;
 				}
 				/* write locked and verified */
-				prlock(sd);
 				putnext(sd->sd_wq, b);
-				prunlock(sd);
 			}
+			prunlock(sd);
 		}
 	}
 
@@ -4143,7 +4162,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
       exit:
 	/* We want to give the driver queues an opportunity to run. */
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -4268,7 +4287,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		trace();
 		/* We want to give the driver queues an opportunity to run. */
 		if (this_thread->flags & (QRUNFLAGS))
-		runqueues();
+			runqueues();
 		return (size);
 	}
       erange:
@@ -4293,7 +4312,7 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 		ctrace(sd_put(&sd));
 	}
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -4409,7 +4428,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -4584,7 +4603,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 				part = data ? &dat : &ctl;
 				head = data ? &dtp : &ctp;
 
-				ptrace(("Processing %s block\n", data ? "M_DATA" : "M_(PC)PROTO" ));
+				ptrace(("Processing %s block\n", data ? "M_DATA" : "M_(PC)PROTO"));
 
 				if ((blen = b->b_wptr - b->b_rptr) <= 0)
 					blen = 0;
@@ -4726,7 +4745,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 		err = -ENOSTR;
 	/* We want to give the driver queues an opportunity to run. */
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 
@@ -5109,10 +5128,12 @@ str_i_canput(const struct file *file, struct stdata *sd, unsigned long arg)
 		if (!(err = straccess_rlock(sd, (FWRITE | FNDELAY)))) {
 			queue_t *q = sd->sd_wq;
 
+			prlock(sd);
 			if (arg != ANYBAND)
 				err = bcanputnext(q, arg) ? 1 : 0;
 			else
 				err = bcanputnextany(q) ? 1 : 0;
+			prunlock(sd);
 			srunlock(sd);
 		}
 	}
@@ -6284,7 +6305,8 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 					if (sp.databuf.len < 0)
 						sp.databuf.len = 0;
 					copylen = (blen > dlen) ? dlen : blen;
-					if (copyout(b->b_rptr, sp.databuf.buf + sp.databuf.len, copylen)) {
+					if (copyout
+					    (b->b_rptr, sp.databuf.buf + sp.databuf.len, copylen)) {
 						err = -EFAULT;
 						break;
 					}
@@ -6297,7 +6319,8 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 					if (sp.ctlbuf.len < 0)
 						sp.ctlbuf.len = 0;
 					copylen = (blen > clen) ? clen : blen;
-					if (copyout(b->b_rptr, sp.ctlbuf.buf + sp.ctlbuf.len, copylen)) {
+					if (copyout
+					    (b->b_rptr, sp.ctlbuf.buf + sp.ctlbuf.len, copylen)) {
 						err = -EFAULT;
 						break;
 					}
@@ -6306,9 +6329,9 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 				}
 			}
 			if (err >= 0) {
-				put_user(sp.ctlbuf.len, &((typeof(&sp))arg)->ctlbuf.len);
-				put_user(sp.databuf.len, &((typeof(&sp))arg)->databuf.len);
-				put_user(sp.flags, &((typeof(&sp))arg)->flags);
+				put_user(sp.ctlbuf.len, &((typeof(&sp)) arg)->ctlbuf.len);
+				put_user(sp.databuf.len, &((typeof(&sp)) arg)->databuf.len);
+				put_user(sp.flags, &((typeof(&sp)) arg)->flags);
 			}
 			/* done with duplicate */
 			freemsg(dp);
@@ -6514,7 +6537,8 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!fifo && !pipe)
 		goto unlock_exit;
 
-	if (fifo || (pipe && !(s2 = sd->sd_other)))
+	s2 = sd->sd_other;
+	if (fifo || (pipe && !s2))
 		s2 = sd;
 
 	if ((err = straccess_rlock(s2, (FREAD | FEXCL | FNDELAY))))
@@ -6538,7 +6562,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		goto fput_exit;
 
 	/* There is also some problem with sending one pipe end's file pointer to the other,
-	 * however, we new flush Stream head queues on close as well as on qput(). */
+	   however, we new flush Stream head queues on close as well as on qput(). */
 
 	/* SVR 4 SPG says that this message is placed directly on the read queue of the target
 	   stream head. */
@@ -7443,7 +7467,7 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		ctrace(sd_put(&sd));
 	}
 	if (this_thread->flags & (QRUNFLAGS))
-	runqueues();		/* after every system call */
+		runqueues();	/* after every system call */
 	return (err);
 }
 

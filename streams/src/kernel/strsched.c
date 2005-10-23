@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/21 03:54:26 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/10/22 19:58:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/21 03:54:26 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 19:58:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/21 03:54:26 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/10/22 19:58:16 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/21 03:54:26 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/10/22 19:58:16 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3576,7 +3576,7 @@ bufcalls(struct strthread *t)
 STATIC void
 queuerun(struct strthread *t)
 {
-	register queue_t *q, *q_link;
+	queue_t *q, *q_link;
 
 	do {
 		clear_bit(qrunflag, &t->flags);
@@ -3587,55 +3587,42 @@ queuerun(struct strthread *t)
 #ifdef CONFIG_STREAMS_SYNCQS
 				qsrvp(q);
 #else
-				srvp_fast(q);
+				/* hand inline copy of srvp_fast() */
+				assert(q);
+				if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
+					queue_t *qold;
+
+					/* spin here if Stream frozen by other than caller */
+					freeze_barrier(q);
+
+					assert(q->q_qinfo);
+
+					qold = xchg(&this_thread->currentq, q);
+					{
+						struct stdata *sd = qstream(q);
+
+						assert(sd);
+						prlock(sd);
+						/* check if procs are turned off */
+						if (!test_bit(QPROCS_BIT, &q->q_flag)) {
+							int (*qi_srvp) (queue_t *);
+
+							if ((qi_srvp = q->q_qinfo->qi_srvp)) {
+								set_bit(QSVCBUSY_BIT, &q->q_flag);
+								(void) qi_srvp(q);
+								clear_bit(QSVCBUSY_BIT, &q->q_flag);
+							}
+						}
+						prunlock(sd);
+					}
+					this_thread->currentq = qold;
+					qwakeup(q);
+				}
+				ctrace(qput(&q));	/* cancel qget from qschedule */
 #endif
 			}
 		}
 	} while (test_bit(qrunflag, &t->flags));
-}
-
-/**
- *  setqsched:	- schedule execution of queue procedures
- */
-void
-setqsched(void)
-{
-	struct strthread *t = this_thread;
-
-	if (!test_and_set_bit(qrunflag, &t->flags))
-		__raise_streams();
-}
-
-EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
-
-/**
- *  qready:	- test if queue procedures are scheduled
- */
-int
-qready(void)
-{
-	struct strthread *t = this_thread;
-
-	return (test_bit(qrunflag, &t->flags) != 0);
-}
-
-EXPORT_SYMBOL(qready);		/* include/sys/streams/stream.h */
-
-/**
- *  qschedule:	- schedule a queue for service
- *  @q:		queue to schedule for service
- *
- */
-void
-qschedule(queue_t *q)
-{
-	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
-		struct strthread *t = this_thread;
-
-		/* put ourselves on the run list */
-		ctrace(*xchg(&t->qtail, &q->q_link) = qget(q));	/* MP-SAFE */
-		setqsched();
-	}
 }
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -3665,95 +3652,6 @@ sqsched(syncq_t *sq)
 	}
 }
 #endif
-
-/**
- *  qenable:	- schedule a queue for execution
- *  @q:		queue to schedule for service
- *
- *  Another name for qschedule(9), qenable() schedules a queue for service regardless of the setting
- *  of the %QNOENB_BIT, but has to check for the existence of a service procedure.
- */
-streams_fastcall void
-qenable(queue_t *q)
-{
-	if (q->q_qinfo->qi_srvp)
-		qschedule(q);
-}
-
-EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
-
-/**
- *  enableq:	- enable a queue service procedure
- *  @q:		queue for which service procedure is to be enabled
- *
- *  Schedule a queue's service procedure for execution.  enableq() only schedules a queue service
- *  procedure if a service procedure exists for @q, and if the queue has not been previously
- *  noenabled with noenable() (i.e. the %QNOENB flag is set on the queue).
- */
-int
-enableq(queue_t *q)
-{
-	if (q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag)) {
-		qenable(q);
-		return (1);
-	}
-	return (0);
-}
-
-EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
-
-/**
- *  enableok:	- permit scheduling of a queue service procedure
- *  @q:		queue to permit service procedure scheduling
- *
- *  This function simply clears the %QNOENB flag on the queue.  It does not schedule the queue.
- *  That must be done with a separate call to enableq() or qenable().  It is not supposed to be
- *  called by a thread that froze the Stream with freezestr(9); but, it will still work.
- */
-void
-enableok(queue_t *q)
-{
-	struct stdata *sd;
-	unsigned long pl;
-
-	assert(q);
-	assure(not_frozen_by_caller(q));
-	sd = qstream(q);
-	assert(sd);
-
-	/* block on frozen stream unless stream frozen by caller */
-	pl = zrlock(sd);
-	clear_bit(QNOENB_BIT, &q->q_flag);
-	zrunlock(sd, pl);
-}
-
-EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
-
-/**
- *  noenable:	- defer scheduling of a queue service procedure
- *  @q:		queue to defer service procedure scheduling
- *
- *  This function simply sets the %QNOENB flag on the queue.  It is not supposed to be called by a
- *  thread that froze the Stream with freezestr(9); but, it will still work.
- */
-void
-noenable(queue_t *q)
-{
-	struct stdata *sd;
-	unsigned long pl;
-
-	assert(q);
-	assure(not_frozen_by_caller(q));
-	sd = qstream(q);
-	assert(sd);
-
-	/* block on frozen stream unless stream frozen by caller */
-	pl = zrlock(sd);
-	set_bit(QNOENB_BIT, &q->q_flag);
-	zrunlock(sd, pl);
-}
-
-EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 
 /*
  *  freechains:	- free chains of message blocks
@@ -3854,35 +3752,40 @@ _runqueues(struct softirq_action *unused)
 
 	atomic_inc(&t->lock);
 
-	/* do deferred m_func's first */
-	if (test_bit(strmfuncs, &t->flags))
-		ctrace(domfuncs(t));
+	if (unlikely((t->flags & (STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG
+			 | STREVENTS | STRBCFLAG | STRBCWAIT)) != 0)) {
+		/* do deferred m_func's first */
+		if (test_bit(strmfuncs, &t->flags))
+			ctrace(domfuncs(t));
 #if defined CONFIG_STREAMS_SYNCQS
-	/* catch up on backlog first */
-	if (test_bit(qsyncflag, &t->flags))
-		ctrace(backlog(t));
+		/* catch up on backlog first */
+		if (test_bit(qsyncflag, &t->flags))
+			ctrace(backlog(t));
 #endif
-	/* do timeouts */
-	if (test_bit(strtimout, &t->flags))
-		ctrace(timeouts(t));
-	/* do stream head write queue scanning */
-	if (test_bit(scanqflag, &t->flags))
-		ctrace(scanqueues(t));
-	/* do pending events */
-	if (test_bit(strevents, &t->flags))
-		ctrace(doevents(t));
-	/* do buffer calls if necessary */
-	if (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags))
-		ctrace(bufcalls(t));
+		/* do timeouts */
+		if (test_bit(strtimout, &t->flags))
+			ctrace(timeouts(t));
+		/* do stream head write queue scanning */
+		if (test_bit(scanqflag, &t->flags))
+			ctrace(scanqueues(t));
+		/* do pending events */
+		if (test_bit(strevents, &t->flags))
+			ctrace(doevents(t));
+		/* do buffer calls if necessary */
+		if (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags))
+			ctrace(bufcalls(t));
+	}
 	/* run queue service procedures if necessary */
 	if (test_bit(qrunflag, &t->flags))
 		ctrace(queuerun(t));
-	/* free flush chains if necessary */
-	if (test_bit(flushwork, &t->flags))
-		ctrace(freechains(t));
-	/* free mdbblocks to cache, if memory needed */
-	if (test_bit(freeblks, &t->flags))
-		ctrace(freeblocks(t));
+	if (unlikely((t->flags & (FLUSHWORK | FREEBLKS)) != 0)) {
+		/* free flush chains if necessary */
+		if (test_bit(flushwork, &t->flags))
+			ctrace(freechains(t));
+		/* free mdbblocks to cache, if memory needed */
+		if (test_bit(freeblks, &t->flags))
+			ctrace(freeblocks(t));
+	}
 
 	atomic_dec(&t->lock);
 }

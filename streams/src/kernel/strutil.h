@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/10/06 10:25:28 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/22 19:58:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/06 10:25:28 $ by $Author: brian $
+ Last Modified $Date: 2005/10/22 19:58:17 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -58,7 +58,9 @@
 /* global synchq */
 extern struct syncq *global_syncq;
 
+#if 0
 extern bool __rmvq(queue_t *q, mblk_t *mp);
+#endif
 extern bool __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[]);
 
 /* queue band gets and puts */
