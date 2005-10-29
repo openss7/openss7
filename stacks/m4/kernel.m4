@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/08/29 10:11:22 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/10/29 04:36:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/10/29 04:36:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -491,7 +491,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		    (*i686-up-64GB) linux_cv_k_boot=i686-up-64GB ;;
 		    (*)		    linux_cv_k_boot=		 ;;
 		esac
-		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$//`
+		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$// -e s/-$//`
 		;;
 	    (suse)
 		case "${kversion}" in
