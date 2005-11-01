@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/10/21 03:55:37 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/11/01 11:20:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/21 03:55:37 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:20:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 1.1.2.5  2005/11/01 11:20:34  brian
+ - updates for testing and documentation
+
  Revision 1.1.2.4  2005/10/21 03:55:37  brian
  - changes for queueing performance testing
 
@@ -84,10 +87,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/10/21 03:55:37 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/11/01 11:20:34 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/10/21 03:55:37 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/11/01 11:20:34 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -133,6 +136,8 @@ int blocking = 0;
 int asynchronous = 0;
 char my_msg[MAXMSGSIZE] = { 0, };
 char modname[256] = "pipemod";
+
+int dummy = 0;
 
 volatile int timer_timeout = 0;
 
@@ -646,15 +651,26 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argv[])
+print_header(void)
 {
 	if (!verbose)
 		return;
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "\nSTREAMS Benchmark Performance Tests on a Pipe\n");
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+copying(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	print_header();
 	fprintf(stdout, "\
-LiS Benchmark Performance Tests on a Pipe\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -696,6 +712,7 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
 	fflush(stdout);
 }
@@ -706,12 +723,16 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -725,6 +746,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -738,6 +760,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -761,9 +784,11 @@ Options:\n\
         Increase verbosity or set to LEVEL [default: %4$d]\n\
         This option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        Print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        Print version and exit\n\
+    -C, --copying\n\
+        Print copying permission and exit\n\
 ", argv[0], msgsize, report, verbose, push, modname);
 }
 
@@ -788,6 +813,7 @@ main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL,		0,			NULL,  0 }
 		};
@@ -856,6 +882,9 @@ main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			copying(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -879,7 +908,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

@@ -1,0 +1,257 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: bufmod.4.man,v 1.1.2.1 2005/11/01 11:20:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/01 11:20:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BUFMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B bufmod
+\- \fISTREAMS\fR null module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+.BI "int " fd ;
+.HP 8
+.BI "int open(" \*(lq\fR/dev/nuls\fP\*(rq ", " \fR0\fP );
+.HP 8
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqbufmod\*(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B bufmod
+is a
+.I STREAMS
+module that is pushed over any
+.IR Stream ,
+.IR STREAMS -based
+.BR pipe (4)
+or
+.IR STREAMS -based
+.BR fifo (4).
+.PP
+Aside from being a
+.I STREAMS
+module,
+.B bufmod
+performs no actions other than to perform flow control and queueing of messages.
+All messages passed from the
+.I Stream head
+toward the
+.B bufmod
+module are passed on downstream from the
+.B bufmod
+write-side
+.B put
+procedure (with
+.BR putnext (9))
+when flow control conditions are not in effect.  When flow controlled, messages are placed on the
+write-side queue to be scheduled from the module's
+.B service
+procedure.
+All messages received from the driver,
+are passed on upstream from the
+read-side
+.B put
+procedure, or scheduled for the read-side
+.B service
+procedure under flow control.
+.\"
+.\"
+.SH USAGE
+.PP
+The primary purpose of
+.B bufmod
+is as a test module for use with the
+.BR test-streams (8)
+conformance test program,
+and the
+.BR perftest (8)
+performance benchmarking program.  The other purpose of
+.B bufmod
+is as an example skeleton for a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR bufmod
+is implementation-specific to the
+.B @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The source code for
+.B bufmod
+serves as an example skeleton for a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH MODULES
+.PP
+.B bufmod
+is a
+.I STREAMS
+module named
+.IR \*(lqbufmod\*(rq .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR open (2s),
+.BR ioctl (2),
+.BR streamio (7),
+.BR putnext (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B bufmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B bufmod
+is compatible with the null module described in the
+.IR "SVR 4.0" ", \*(lq" "STREAMS Programmer's Guide" ",\*(rq"
+.[
+svr4spg
+%P Section 6.1.1.1, "Null Module Example"
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The null module example of
+.I "SVR 4.0"
+does not queue messages and has no
+.B service
+procedure.  See also
+.BR nullmod (4).
+.IP \(em
+.B bufmod
+is specific to
+.BR "@PACKAGE_TITLE@" ,
+and will not be used by portable
+.I STREAMS
+modules, drivers and applications programs.
+.IP \(em
+The
+.I SVR 4.0 SPG
+.[
+svr4spg
+.]
+does not name this module.  The name
+.B bufmod
+was chosen for
+.BR "@PACKAGE_TITLE@" .
+.IP \(em
+.B bufmod
+is used as an example skeleton module and for use by the
+.BR test-streams (8)
+conformance test program, and the
+.BR perftest (8)
+performance benchmarking program.  It will not be used by portable
+.I STREAMS
+modules, drivers or applications.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.0" .
+.[
+svr4spg
+.]
+Conformance is not verified.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B bufmod
+first appeared in
+.IR "SVR 4.0" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

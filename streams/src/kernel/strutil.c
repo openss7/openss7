@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/22 19:58:16 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/11/01 11:21:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 19:58:16 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:21:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/22 19:58:16 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/11/01 11:21:08 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/10/22 19:58:16 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/11/01 11:21:08 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1682,8 +1682,6 @@ qschedule(queue_t *q)
 		setqsched();
 	}
 }
-
-EXPORT_SYMBOL(qschedule);
 
 /**
  *  qenable:	- schedule a queue for execution

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/13 10:58:48 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/01 11:21:11 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:48 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:21:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.21  2005/11/01 11:21:11  brian
+ - updates for testing and documentation
+
  Revision 0.9.2.20  2005/10/13 10:58:48  brian
  - working up testing of sad(4) and sc(4)
 
@@ -137,9 +140,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/13 10:58:48 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/01 11:21:11 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/10/13 10:58:48 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/01 11:21:11 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -162,6 +165,7 @@ static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <time.h>
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -200,8 +204,8 @@ static int show_acks = 0;
 static int show_timeout = 0;
 static int show_data = 1;
 
-static int last_prim = 0;
-static int last_event = 0;
+//static int last_prim = 0;
+//static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -290,6 +294,7 @@ long test_start = 0;
 
 static int state;
 
+#if 0
 /*
  *  Return the current time in milliseconds.
  */
@@ -393,6 +398,7 @@ time_event(int child, int event)
 	}
 	return (event);
 }
+#endif
 
 static int timer_timeout = 0;
 static int last_signum = 0;
@@ -1670,9 +1676,11 @@ int
 test_waitsig(int child)
 {
 	int signum;
+	sigset_t set;
 
+	sigemptyset(&set);
 	while ((signum = last_signum) == 0)
-		sigsuspend(NULL);
+		sigsuspend(&set);
 	print_signal(child, signum);
 	return (__RESULT_SUCCESS);
 
@@ -1959,7 +1967,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -1986,7 +1994,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {
@@ -2798,8 +2806,6 @@ struct test_stream test_2_2_7_rcv = { &preamble_0, &test_case_2_2_7_rcv, &postam
 int
 test_case_2_2_7_snd(int child)
 {
-	struct strrecvfd recvfd;
-
 	test_msleep(child, NORMAL_WAIT);
 	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
@@ -2827,8 +2833,6 @@ returned when I_SENDFD is attempted on a hung up FIFO."
 int
 test_case_2_3_1(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2855,8 +2859,6 @@ asyncrhonous EPROTO read error."
 int
 test_case_2_3_2(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2883,8 +2885,6 @@ asynchronous EPROTO write error."
 int
 test_case_2_3_3(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2911,8 +2911,6 @@ asyncrhonous EPROTO error."
 int
 test_case_2_3_4(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) 1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -3036,6 +3034,10 @@ struct test_stream test_2_4_4 = { &preamble_2_1, &test_case_2_4_4, &postamble_2 
 #define desc_case_2_4_5 "\
 Check that I_FDINSERT can be performed on a FIFO.  Checks that ENXIO is\n\
 returned when I_FDINSERT is attempted on a hung up FIFO."
+
+#ifdef LIS
+typedef ulong t_uscalar_t;
+#endif
 
 int
 test_case_2_4_5(int child)
@@ -3186,7 +3188,6 @@ int
 test_case_3_1_1_w2(int child)
 {
 	char buf[4096] = { 0, };
-	int i;
 
 	if (test_nonblock(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3245,7 +3246,6 @@ int
 test_case_3_1_2_wr(int child)
 {
 	char buf[4096<<2] = { 0, };
-	int i;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3302,7 +3302,6 @@ int
 test_case_3_1_3(int child)
 {
 	char buf[9000] = { 0, };
-	int i;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3861,7 +3860,6 @@ test_case_3_2_3(int child)
 {
 	char buf[9000] = { 0, };
 	struct strbuf dat = { -1, sizeof(buf), buf };
-	int i;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4422,7 +4420,6 @@ test_case_3_3_3(int child)
 {
 	char buf[9000] = { 0, };
 	struct strbuf dat = { -1, sizeof(buf), buf };
-	int i;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);

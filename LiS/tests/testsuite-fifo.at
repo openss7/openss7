@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-fifo.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $
+dnl @(#) $RCSfile: testsuite-fifo.at,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:32 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/10/23 05:01:27 $ by $Author: brian $
+dnl Last Modified $Date: 2005/11/01 11:20:32 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-fifo.at,v $
+dnl Revision 1.1.2.2  2005/11/01 11:20:32  brian
+dnl - updates for testing and documentation
+dnl
 dnl Revision 1.1.2.1  2005/10/23 05:01:27  brian
 dnl - test programs and modules for POSIX testing
 dnl
@@ -115,8 +118,23 @@ function test_fifo() {
     else
 	options=
     fi
-    test-fifo $options -e -o $1
-    return $?
+    if test-fifo $options -e -o $1
+    then
+	if test :${at_STRCONF_PACKAGE:-LiS} = :LfS
+	then
+	    # check for leaks
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+	    then
+		return 1
+	    else
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    else
+	return $?
+    fi
 }
 m4_divert_pop([DEFAULTS])
 

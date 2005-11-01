@@ -1,7 +1,7 @@
 # vim: ft=sh sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/03 17:42:12 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/11/01 11:21:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/03 17:42:12 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:21:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: atlocal.in,v $
+# Revision 0.9.2.12  2005/11/01 11:21:20  brian
+# - updates for testing and documentation
+#
 # Revision 0.9.2.11  2005/10/03 17:42:12  brian
 # - working up read/write getmsg/putmsg tests
 #
@@ -79,6 +82,8 @@
 #
 # This file is sourced by the autotest testsuite after options parsing.
 #
+
+at_STRCONF_PACKAGE="@STRCONF_PACKAGE@"
 
 at_AUTOM4TE="@ac_pt_AUTOM4TE@"
 at_AUTOTEST="@ac_pt_AUTOTEST@"

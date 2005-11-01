@@ -1,0 +1,339 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: testmod.4.man,v 1.1.2.1 2005/11/01 11:20:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/01 11:20:25 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: testmod.4.man,v $
+.\" Revision 1.1.2.1  2005/11/01 11:20:25  brian
+.\" - updates for testing and documentation
+.\"
+.\" Revision 0.9.2.1  2005/10/01 05:11:46  brian
+.\" - added testmod documentation to pass checks
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TESTMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B testmod
+\- \fISTREAMS\fR test module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+.BI "int " fd ;
+.HP 8
+.BI "int open(" \*(lq\fR/dev/nuls\fP\*(rq ", " \fR0\fP );
+.HP 8
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqtestmod\*(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B testmod
+is a
+.I STREAMS
+module that is pushed over any
+.IR Stream ,
+.IR STREAMS -based
+.BR pipe (4)
+or
+.IR STREAMS -based
+.BR fifo (4).
+.PP
+Aside from being a
+.I STREAMS
+module,
+.BR testmod
+performs no actions on the data path.  All messages passed from the
+.I Stream head
+toward the
+.B testmod
+module are passed on downstream from the
+.B testmod
+write-side
+.B put
+procedure (with
+.BR putnext (9));
+all messaes received from the driver, are passed on upstream from the read-side
+.B put
+procedure.  The
+.B testmod
+module has no write- or read-side
+.B service
+procedure.
+.PP
+.B testmod
+does, however, respond to a number of specialized input-output controls that are dedicated to
+performing functions in the kernel necessary for the execution of test cases on a
+.IR Stream .
+These input-output controls are described below:
+.\"
+.SS IOCTLS
+.PP
+The following input-output control command can be executed on the file descriptor
+.I fd
+after the
+.B testmod
+module has been pushed:
+.\"
+.TP
+.B TM_IOC_HANGUP
+Send a
+.BR M_HANGUP (9)
+message to the
+.IR "Stream head" .
+.IP ""
+This input-output control command takes no argument.
+It is used primarily by
+.BR test-streams (8)
+to test the reaction to system calls executed on a
+.I Stream
+that is hung up.
+.\"
+.TP
+.B TM_IOC_RDERR
+Send a two-byte
+.BR M_ERROR (9)
+message to the
+.I Stream head
+with the read error set to
+.I arg
+and the write error set to
+.BR NOERROR .
+.IP ""
+This input-output control command takes a single argument that contains the error number to be
+placed in the read error byte of the
+.BR M_ERROR (9)
+message.
+It is used primarily by
+.BR test-streams (8)
+to test the reaction to system calls executed on a
+.I Stream
+that has a read error.
+.\"
+.TP
+.B TM_IOC_WRERR
+Send a two-byte
+.BR M_ERROR (9)
+message to the
+.I Stream head
+with the read error set to
+.B NOERROR
+and the write error set to
+.IR arg .
+.IP ""
+This input-output control command takes a single argument that contains the error number to be
+placed in the write error byte of the
+.BR M_ERROR (9)
+message.
+It is used primarily by
+.BR test-streams (8)
+to test the reaction to system calls executed on a
+.I Stream
+that has a write error.
+.\"
+.TP
+.B TM_IOC_RWERR
+Send a one-byte
+.BR M_ERROR (9)
+message to the
+.I Stream head
+with the error set to
+.IR arg .
+.IP ""
+This input-output control command takes a single argument that contains the error number to be
+placed in the
+.BR M_ERROR (9)
+message.
+It is used primarily by
+.BR test-streams (8)
+to test the reaction to system calls executed on a
+.I Stream
+that has an error.
+.\"
+.\"
+.SH USAGE
+.PP
+The primary purpose of
+.B testmod
+is as a test module for use with the
+.BR test-streams (8)
+conformance test program.  The other purpose of
+.B testmod
+is as an example of a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B testmod
+is implementation-specific to the
+.B @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The source code for
+.B testmod
+serves as an example for a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH MODULES
+.PP
+.B testmod
+is a
+.I STREAMS
+module named
+.RI \(lq testmod \(rq.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR open (2s),
+.BR ioctl (2),
+.BR streamio (7),
+.BR putnext (9),
+.BR nullmod (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B testmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B testmod
+is compatible with the null module described in the
+.I SVR 4.0, \(lqSTREAMS Programmer's Guide,\(rq
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B testmod
+is specific to
+.BR "@PACKAGE_TITLE@" ,
+and will not be used by portable
+.I STREAMS
+modules, drivers and applications programs.
+.IP \(em
+The
+.I SVR 4.0 SPG
+.[
+svr4spg
+.]
+does not name this module.  The name
+.B testmod
+was chosen for
+.BR "@PACKAGE_TITLE" .
+See also
+.BR nullmod (4).
+.IP \(em
+.B testmod
+is used as an example skeleton module and for use by the
+.BR test-streams (8)
+conformance test program.  It will not be used by portable
+.I STREAMS
+module, drivers or applications.
+.PP
+See
+.BR STREAMS (9)
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.0" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B testmod
+first appeared in
+.IR "SVR 4.0" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

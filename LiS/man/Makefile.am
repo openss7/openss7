@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2005/07/14 22:03:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.15 $) $Date: 2005/11/01 11:20:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:22 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -134,6 +134,12 @@ man_MANS = \
 	man4/mtdrv.4 \
 	man4/mux_clone.4 \
 	man4/pipemod.4 \
+	man4/bufmod.4 \
+	man4/nullmod.4 \
+	man4/testmod.4 \
+	man4/echo.4 \
+	man4/nuls.4 \
+	man4/mux.4 \
 	man4/printk.4 \
 	man4/relay.4 \
 	man4/relay2.4 \
@@ -152,6 +158,10 @@ man_MANS = \
 	man8/strms_down.8 \
 	man8/strms_status.8 \
 	man8/strms_up.8 \
+	man8/perftest.8 \
+	man8/test-streams.8 \
+	man8/test-fifo.8 \
+	man8/test-pipe.8 \
 	man8/strtst.8 \
 	man8/thrtst.8 \
 	man8/timetst.8 \
@@ -805,6 +815,12 @@ dist_noinst_MANS = \
 	man4/mtdrv.4.man \
 	man4/mux_clone.4.man \
 	man4/pipemod.4.man \
+	man4/bufmod.4.man \
+	man4/nullmod.4.man \
+	man4/testmod.4.man \
+	man4/echo.4.man \
+	man4/nuls.4.man \
+	man4/mux.4.man \
 	man4/printk.4.man \
 	man4/relay.4.man \
 	man4/relay2.4.man \
@@ -823,6 +839,10 @@ dist_noinst_MANS = \
 	man8/strms_down.8.man \
 	man8/strms_status.8.man \
 	man8/strms_up.8.man \
+	man8/perftest.8.man \
+	man8/test-streams.8.man \
+	man8/test-fifo.8.man \
+	man8/test-pipe.8.man \
 	man8/strtst.8.man \
 	man8/thrtst.8.man \
 	man8/timetst.8.man \

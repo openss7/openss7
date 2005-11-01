@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 05:01:27 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:20:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 1.1.2.2  2005/11/01 11:20:34  brian
+ - updates for testing and documentation
+
  Revision 1.1.2.1  2005/10/23 05:01:27  brian
  - test programs and modules for POSIX testing
 
@@ -140,9 +143,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:34 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:34 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -3035,7 +3038,9 @@ struct test_stream test_2_4_4 = { &preamble_2_1, &test_case_2_4_4, &postamble_2 
 Check that I_FDINSERT can be performed on a FIFO.  Checks that ENXIO is\n\
 returned when I_FDINSERT is attempted on a hung up FIFO."
 
+#ifdef LIS
 typedef ulong t_uscalar_t;
+#endif
 
 int
 test_case_2_4_5(int child)

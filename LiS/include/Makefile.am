@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.11 $) $Date: 2005/07/14 22:03:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.12 $) $Date: 2005/11/01 11:20:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:21 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,7 @@ nobase_pkginclude_HEADERS = \
 	sys/strmsg.h \
 	sys/stropts.h \
 	sys/strport.h \
+	sys/testmod.h \
 	sys/LiS/buffcall.h \
 	sys/LiS/config.h \
 	sys/LiS/ddi.h \
@@ -105,6 +106,7 @@ nobase_pkginclude_HEADERS = \
 	sys/LiS/stream.h \
 	sys/LiS/strlog.h \
 	sys/LiS/strmdbg.h \
+	sys/LiS/testmod.h \
 	sys/LiS/wait.h
 
 nobase_nodist_pkginclude_HEADERS = \

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/08/29 10:19:12 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/11/01 11:21:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:19:12 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:21:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -106,12 +106,12 @@ AC_DEFUN([AC_UTIL], [dnl
     _UTIL_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
-    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
-    fi
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
+dnl if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+dnl	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
+dnl fi
     PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
 dnl Just check config.log if you want to see these...
 dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])

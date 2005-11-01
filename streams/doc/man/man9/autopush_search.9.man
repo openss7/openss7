@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush_find.9.man,v 0.9.2.13 2005/11/01 11:21:03 brian Exp $
+.\" @(#) $Id: autopush_search.9.man,v 0.9.2.1 2005/11/01 11:21:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH_FIND 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH AUTOPUSH_SEARCH 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B autopush_find
-\- finds an autopush list entry for a given \fISTREAMS\fP device number
+.B autopush_search
+\- finds an autopush list entry for a given \fISTREAMS\fP device name and number
 .\"
 .\"
 .SH SYNOPSIS
@@ -87,18 +87,18 @@ sort-adjacent-labels
 .br
 .B #include <sys/sad.h>
 .HP
-.BI "struct strapush *autopush_find(struct cdevsw *" cdev ", minor_t " minor );
+.BI "struct strapush *autopush_search(const char *" name ", minor_t " minor );
 .\"
 .\"
 .SH ARGUMENTS
 .TP
-.I cdev
-a pointer to the character device entry in the
-.BR cdevsw []
-array.
+.I name
+a pointer to the name of the
+.I STREAMS
+driver
 .TP
 .I minor
-the minor device number.
+the minor device number
 .\"
 .\"
 .SH INTERFACE
@@ -108,17 +108,16 @@ the minor device number.
 .\"
 .SH DESCRIPTION
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 performs the same function within the kernel as is provided to user space via
 the
 .B SAD_GAP
 IO control to the
 .BR sad (4)
 .I STREAMS
-Adminstrative Driver.  This function finds and returns a pointer to
-the autopush list associated with the \fISTREAMS\fP character major device
-specified by
-.IR cdev ,
+Adminsitrative Driver.  This function finds and returns a pointer to
+the autopush list associated with the \fISTREAMS\fR driver name specified by
+.IR name ,
 and the character minor device specified by
 .IR minor .
 The autopush list is described by a pointer to a
@@ -170,26 +169,27 @@ module names representing the module autopush list.
 .\"
 .\"
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 is useful along with
-.BR autopush_add (9)
+.BR autopush_find (9),
+.BR autopush_add (9),
 and
 .BR autopush_del (9)
-when registering \fISTREAMS\fP character devices with
+when registering
+.I STREAMS
+character devices with
 .BR register_strdev (9).
-.BR autopush_find ()
-permits a kernel module to find the autopush list within a
-.BR cdevsw
-table entry.
+.BR autopush_search ()
+permits a kernel module to find the autopush list for a named device driver.
 .\"
 .\"
 .SH USAGE
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 is a
 .BR "@PACKAGE_TITLE@" -specific
 function.
-.BR autopush_find ()
+.BR autopush_search ()
 should not be used by portable
 .I STREAMS
 drivers or modules.  Instead, the
@@ -203,50 +203,50 @@ should be used instead.
 .SH RETURN
 .PP
 Upon success,
-.BR autopush_find ()
+.BR autopush_search ()
 returns a pointer to the
 .B strapush
-structure describing the autopush list for the requested \fISTREAMS\fP device.
+structure describing the autopush list for the requested
+.I STREAMS
+device.
 Upon failure,
-.BR autopush_find ()
+.BR autopush_search ()
 returns
 .BR NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 fails and returns
 .B NULL
 when the autopush list associated with
-.I cdev
+.I name
 is empty, or does not contain an entry for the character minor device number
 .IR minor .
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 can only be called from process context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 is MP-safe.  The caller is responsible to ensure exclusive access to the
 passed in
-.B cdevsw
-structure
-.IR cdev .
+.IR name .
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 simply locates the
 .B strapush
 structure associated with the
-.I cdev
+.I name
 and
 .I minor
 arguments.  The module name list is neither validated, nor are any kernel
@@ -258,7 +258,7 @@ modules loaded as a side-effect of the lookup.
 .BR sad (4),
 .BR autopush_add (9),
 .BR autopush_del (9),
-.BR autopush_search (9),
+.BR autopush_find (9),
 .BR register_strdev (9),
 .BR unregister_strdev (9).
 .\"
@@ -271,7 +271,7 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 is a
 .B @PACKAGE_TITLE@
 .[
@@ -286,7 +286,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 is a
 .B @PACKAGE_TITLE@
 .[
@@ -299,7 +299,7 @@ modules and drivers.
 .\"
 .SH HISTORY
 .PP
-.BR autopush_find ()
+.BR autopush_search ()
 is new for
 .BR "@PACKAGE_TITLE@" .
 .[

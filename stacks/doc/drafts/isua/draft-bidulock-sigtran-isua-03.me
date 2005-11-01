@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-isua-03.me,v 0.9.2.3 2005/10/17 11:53:43 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-isua-03.me,v 0.9.2.4 2005/11/01 11:20:43 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,7 +47,7 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2005/10/17 11:53:43 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.4 $) modified $Date: 2005/11/01 11:20:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .ds version Version\ 0.3
@@ -1523,6 +1523,7 @@ c1l.
 .ip "" 2
 The \fI\)Message Class\fR field of the Common Message Header contains
 the class of the message.  The supported classes are as follows:
+.(l
 .TS
 tab(;);
 n1c1n2l.
@@ -1541,6 +1542,7 @@ n1c1n2l.
 12;-;127;Reserved by the IETF
 128;-;255;Reserved for IETF-Defined Message Class Extensions
 .TE
+.)l
 .sh 3 "Message Types"
 .ip "Message Type: 8-bits (unsigned integer)\fR" 2
 .ip "" 2
@@ -2120,6 +2122,7 @@ The \fI\)CALR\fR message is formatted as follows:
 .lp
 The \fI\)CALR\fR message can contain the following parameters:
 .ix +4
+.(l
 .TS
 tab(:);
 lbw(2.5i)ss
@@ -2129,6 +2132,7 @@ _
 Optional Parameters:Optional:
 ::*1
 .TE
+.)l
 .ip "Note 1:" 8
 .sh 3 "Progress (CPRG)"
 .pp
@@ -5862,7 +5866,7 @@ The \fI\)Circuit Status\fR parameter contains (a list of) the following
 fields:
 .ip "\fB\)Circuit Id field: 16 bits (unsigned integer)\fR" 2
 .ip "" 2
-The Circuit Id field  contains the circuit identifier for one circuit.  This
+The Circuit Id field contains the circuit identifier for one circuit.  This
 is the least significant bit aligned Circuit Identification Code (CIC)
 .[
 q763
@@ -6690,33 +6694,33 @@ ASP is in ASP-INACTIVE state, otherwise it will move to AS-DOWN state.
 .nf
 .sz -2
 \fC\
-     +----------+   one ASP trans to ACTIVE   +-------------+
-     |    AS-   |---------------------------->|     AS-     |
-     | INACTIVE |                             |   ACTIVE    |
-     |          |<---                         |             |
-     +----------+    \\                        +-------------+
-        ^   |         \\ Tr Expiry,                ^    |
-        |   |          \\ at least one             |    |
-        |   |           \\ ASP in ASP-INACTIVE     |    |
-        |   |            \\                        |    |
-        |   |             \\                       |    |
-        |   |              \\                      |    |
-one ASP |   | all ASP       \\            one ASP  |    | Last ACTIVE
-trans   |   | trans to       \\           trans to |    | ASP trans to
-to      |   | ASP-DOWN        -------\\   ASP-     |    | ASP-INACTIVE
-ASP-    |   |                         \\  ACTIVE   |    | or ASP-DOWN
-INACTIVE|   |                          \\          |    | (start Tr)
-        |   |                           \\         |    |
-        |   |                            \\        |    |
-        |   v                             \\       |    v
-     +----------+                          \\  +-------------+
-     |          |                           --|             |
-     | AS-DOWN  |                             | AS-PENDING  |
-     |          |                             |  (queuing) |
-     |          |<----------------------------|             |
-     +----------+    Tr Expiry and no ASP     +-------------+
+     +----------+   one ASP trans to ACTIVE  +-------------+
+     |    AS-   |--------------------------->|     AS-     |
+     | INACTIVE |                            |   ACTIVE    |
+     |          |<---                        |             |
+     +----------+    \\                       +-------------+
+        ^   |         \\ Tr Expiry,               ^    |
+        |   |          \\ at least one            |    |
+        |   |           \\ ASP in ASP-INACTIVE    |    |
+        |   |            \\                       |    |
+        |   |             \\                      |    |
+        |   |              \\                     |    |
+one ASP |   | all ASP       \\           one ASP  |    | Last ACTIVE
+trans   |   | trans to       \\          trans to |    | ASP trans to
+to      |   | ASP-DOWN        ------\\   ASP-     |    | ASP-INACTIVE
+ASP-    |   |                        \\  ACTIVE   |    | or ASP-DOWN
+INACTIVE|   |                         \\          |    | (start Tr)
+        |   |                          \\         |    |
+        |   |                           \\        |    |
+        |   v                            \\       |    v
+     +----------+                         \\  +-------------+
+     |          |                          --|             |
+     | AS-DOWN  |                            | AS-PENDING  |
+     |          |                            |  (queuing)  |
+     |          |<---------------------------|             |
+     +----------+    Tr Expiry and no ASP    +-------------+
                      in ASP-INACTIVE state
-                                                                        
+
        Tr = Recovery Timer
 .sz +2
 .)c
@@ -8173,6 +8177,9 @@ This is the initial version of this document.
 .nf
 \fC\s-3
 $Log: draft-bidulock-sigtran-isua-03.me,v $
+Revision 0.9.2.4  2005/11/01 11:20:43  brian
+- updates for testing and documentation
+
 Revision 0.9.2.3  2005/10/17 11:53:43  brian
 - updated drafts for republication
 

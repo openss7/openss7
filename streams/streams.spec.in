@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/09/14 23:41:29 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/11/01 11:20:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/14 23:41:29 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -945,7 +945,7 @@ Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
-Prefix:         %{_sysconfdir}
+#Prefix:         %{_sysconfdir}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-utils
 Conflicts:      %{_conflict}-util
@@ -999,8 +999,8 @@ fi
 %{_sbindir}/*
 %{_libexecdir}/*test*
 #%{_libexecdir}/*tst
-%{_sysconfdir}/strload.conf
-%{_sysconfdir}/strsetup.conf
+#%{_sysconfdir}/strload.conf
+#%{_sysconfdir}/strsetup.conf
 %endif
 
 # ===========================================================================
@@ -1207,6 +1207,7 @@ Summary:    %{title} init scripts and config files
 Group:      System Environment/Base
 Prefix:     %{_configdir}
 Prefix:     %{_initrddir}
+Prefix:     %{_sysconfdir}
 %if %{without_ko_modules}
 Prefix:     %{_modutildir}
 %endif
@@ -1560,6 +1561,8 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_sysconfdir}/streams.conf
+%{_sysconfdir}/strload.conf
+%{_sysconfdir}/strsetup.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %{_modutildir}/*
@@ -1570,6 +1573,8 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_sysconfdir}/streams.conf
+%{_sysconfdir}/strload.conf
+%{_sysconfdir}/strsetup.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %endif
@@ -1591,6 +1596,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
+# Revision 0.9.2.117  2005/11/01 11:20:52  brian
+# - updates for testing and documentation
+#
 # Revision 0.9.2.116  2005/09/14 23:41:29  brian
 # - bumped release numbers and change logs
 #

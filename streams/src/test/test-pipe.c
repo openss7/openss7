@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/13 10:58:51 $
+ @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/01 11:21:11 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:51 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:21:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipe.c,v $
+ Revision 0.9.2.18  2005/11/01 11:21:11  brian
+ - updates for testing and documentation
+
  Revision 0.9.2.17  2005/10/13 10:58:51  brian
  - working up testing of sad(4) and sc(4)
 
@@ -131,9 +134,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/13 10:58:51 $"
+#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/01 11:21:11 $"
 
-static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/13 10:58:51 $";
+static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/01 11:21:11 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -156,6 +159,7 @@ static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <time.h>
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -194,8 +198,8 @@ static int show_acks = 0;
 static int show_timeout = 0;
 static int show_data = 1;
 
-static int last_prim = 0;
-static int last_event = 0;
+//static int last_prim = 0;
+//static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -284,6 +288,7 @@ long test_start = 0;
 
 static int state;
 
+#if 0
 /*
  *  Return the current time in milliseconds.
  */
@@ -387,6 +392,7 @@ time_event(int child, int event)
 	}
 	return (event);
 }
+#endif
 
 static int timer_timeout = 0;
 static int last_signum = 0;
@@ -1664,9 +1670,11 @@ int
 test_waitsig(int child)
 {
 	int signum;
+	sigset_t set;
 
+	sigemptyset(&set);
 	while ((signum = last_signum) == 0)
-		sigsuspend(NULL);
+		sigsuspend(&set);
 	print_signal(child, signum);
 	return (__RESULT_SUCCESS);
 
@@ -1953,7 +1961,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -1980,7 +1988,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {
@@ -2543,8 +2551,6 @@ returned when I_SENDFD is attempted on a hung up pipe."
 int
 test_case_2_3_1(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2571,8 +2577,6 @@ asyncrhonous EPROTO read error."
 int
 test_case_2_3_2(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2596,8 +2600,6 @@ asynchronous EPROTO write error."
 int
 test_case_2_3_3(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2624,8 +2626,6 @@ asyncrhonous EPROTO error."
 int
 test_case_2_3_4(int child)
 {
-	struct strrecvfd recvfd;
-
 	if (test_ioctl(child, I_SENDFD, (intptr_t) test_fd[child]) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2749,6 +2749,10 @@ struct test_stream test_2_4_4 = { &preamble_2_1, &test_case_2_4_4, &postamble_2 
 #define desc_case_2_4_5 "\
 Check that I_FDINSERT can be performed on a pipe.  Checks that ENXIO is\n\
 returned when I_FDINSERT is attempted on a hung up pipe."
+
+#ifdef LIS
+typedef ulong t_uscalar_t;
+#endif
 
 int
 test_case_2_4_5(int child)
@@ -2918,7 +2922,6 @@ int
 test_case_3_1_1_w2(int child)
 {
 	char buf[4096] = { 0, };
-	int i;
 
 	do {
 		last_errno = 0;
@@ -2971,7 +2974,6 @@ int
 test_case_3_1_2_wr(int child)
 {
 	char buf[4096<<2] = { 0, };
-	int i;
 
 	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3000,7 +3002,6 @@ int
 test_case_3_1_3(int child)
 {
 	char buf[9000] = { 0, };
-	int i;
 
 	last_signum = 0;
 	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
@@ -3528,7 +3529,6 @@ test_case_3_2_3(int child)
 {
 	char buf[9000] = { 0, };
 	struct strbuf dat = { -1, sizeof(buf), buf };
-	int i;
 
 	last_signum = 0;
 	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
@@ -4058,7 +4058,6 @@ test_case_3_3_3(int child)
 {
 	char buf[9000] = { 0, };
 	struct strbuf dat = { -1, sizeof(buf), buf };
-	int i;
 
 	last_signum = 0;
 	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)

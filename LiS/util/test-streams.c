@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 05:01:27 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:20:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 1.1.2.2  2005/11/01 11:20:34  brian
+ - updates for testing and documentation
+
  Revision 1.1.2.1  2005/10/23 05:01:27  brian
  - test programs and modules for POSIX testing
 
@@ -239,9 +242,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:34 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:27 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:34 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -309,6 +312,8 @@ static int show_acks = 0;
 static int show_timeout = 0;
 static int show_data = 1;
 
+//static int last_prim = 0;
+//static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -8027,8 +8032,9 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_4(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8074,8 +8080,9 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_6(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8099,8 +8106,9 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_7(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8124,8 +8132,9 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_8(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8404,8 +8413,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_5(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
@@ -8467,8 +8477,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_7(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
@@ -8500,8 +8511,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_8(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
@@ -8533,8 +8545,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_9(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
@@ -11259,8 +11272,9 @@ Checks that I_SERROPT can be performed on a Stream with error options values\n\
 int
 test_case_2_31_2(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, RERRNONPERSIST) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -11284,8 +11298,9 @@ Checks that I_SERROPT can be performed on a Stream with error options values\n\
 int
 test_case_2_31_3(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, WERRNONPERSIST) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -11309,8 +11324,9 @@ Checks that I_SERROPT can be performed on a Stream with error options values\n\
 int
 test_case_2_31_4(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -11357,8 +11373,9 @@ the Stream is linked under a Multiplexing Driver."
 int
 test_case_2_31_6(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -11382,8 +11399,9 @@ errors are persistent when set to RERRNORM."
 int
 test_case_2_31_7(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11424,8 +11442,9 @@ errors are persistent when set to WERRNORM."
 int
 test_case_2_31_8(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -11466,8 +11485,9 @@ errors are non-persistent when set to RERRNONPERSIST."
 int
 test_case_2_31_9(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -11508,8 +11528,9 @@ errors are non-persistent when set to WERRNONPERSIST."
 int
 test_case_2_31_10(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11550,8 +11571,9 @@ error options."
 int
 test_case_2_32_1(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
@@ -11580,8 +11602,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_2(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNORM)) != __RESULT_SUCCESS)
@@ -11613,8 +11636,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_3(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -11646,8 +11670,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_4(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11679,8 +11704,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_5(int child)
 {
-	return (__RESULT_NOTAPPL);
-#if 0
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)

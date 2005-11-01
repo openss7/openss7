@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/10/14 12:26:54 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/11/01 11:21:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:26:54 $ by $Author: brian $
+ Last Modified $Date: 2005/11/01 11:21:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.55  2005/11/01 11:21:12  brian
+ - updates for testing and documentation
+
  Revision 0.9.2.54  2005/10/14 12:26:54  brian
  - SC module and scls utility tested
 
@@ -236,9 +239,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/10/14 12:26:54 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/11/01 11:21:12 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/10/14 12:26:54 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/11/01 11:21:12 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -261,6 +264,7 @@ static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <time.h>
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -273,6 +277,10 @@ static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0
 #include <sys/testmod.h>
 
 #include <linux/limits.h>
+
+#ifdef LIS
+typedef ulong t_uscalar_t;
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -301,8 +309,8 @@ static int show_acks = 0;
 static int show_timeout = 0;
 static int show_data = 1;
 
-static int last_prim = 0;
-static int last_event = 0;
+//static int last_prim = 0;
+//static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -391,6 +399,7 @@ long test_start = 0;
 
 static int state;
 
+#if 0
 /*
  *  Return the current time in milliseconds.
  */
@@ -494,6 +503,7 @@ time_event(int child, int event)
 	}
 	return (event);
 }
+#endif
 
 static int timer_timeout = 0;
 static int last_signum = 0;
@@ -1779,9 +1789,11 @@ int
 test_waitsig(int child)
 {
 	int signum;
+	sigset_t set;
 
+	sigemptyset(&set);
 	while ((signum = last_signum) == 0)
-		sigsuspend(NULL);
+		sigsuspend(&set);
 	print_signal(child, signum);
 	return (__RESULT_SUCCESS);
 
@@ -2068,7 +2080,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -2095,7 +2107,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {
@@ -8017,10 +8029,14 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_4(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_19_4 = { &preamble_0, &test_case_2_19_4, &postamble_0 };
 
@@ -8061,10 +8077,14 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_6(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_19_6 = { &preamble_0, &test_case_2_19_6, &postamble_0 };
 
@@ -8083,10 +8103,14 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_7(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_19_7 = { &preamble_0, &test_case_2_19_7, &postamble_0 };
 
@@ -8105,10 +8129,14 @@ Checks that I_SWROPT can be performed on a Stream with write option values\n\
 int
 test_case_2_19_8(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_19_8 = { &preamble_0, &test_case_2_19_8, &postamble_0 };
 
@@ -8382,6 +8410,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_5(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
@@ -8394,6 +8425,7 @@ test_case_2_20_5(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_20_5 = { &preamble_0, &test_case_2_20_5, &postamble_0 };
 
@@ -8442,6 +8474,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_7(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
@@ -8454,6 +8489,7 @@ test_case_2_20_7(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_20_7 = { &preamble_0, &test_case_2_20_7, &postamble_0 };
 
@@ -8472,6 +8508,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_8(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
@@ -8484,6 +8523,7 @@ test_case_2_20_8(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_20_8 = { &preamble_0, &test_case_2_20_8, &postamble_0 };
 
@@ -8502,6 +8542,9 @@ Checks that I_GWROPT can be performed on a Stream to read the write options\n\
 int
 test_case_2_20_9(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int wropts = -1;
 
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
@@ -8514,6 +8557,7 @@ test_case_2_20_9(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_20_9 = { &preamble_0, &test_case_2_20_9, &postamble_0 };
 
@@ -11225,10 +11269,14 @@ Checks that I_SERROPT can be performed on a Stream with error options values\n\
 int
 test_case_2_31_2(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, RERRNONPERSIST) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_2 = { &preamble_0, &test_case_2_31_2, &postamble_0 };
 
@@ -11247,10 +11295,14 @@ Checks that I_SERROPT can be performed on a Stream with error options values\n\
 int
 test_case_2_31_3(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, WERRNONPERSIST) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_3 = { &preamble_0, &test_case_2_31_3, &postamble_0 };
 
@@ -11269,10 +11321,14 @@ Checks that I_SERROPT can be performed on a Stream with error options values\n\
 int
 test_case_2_31_4(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_4 = { &preamble_0, &test_case_2_31_4, &postamble_0 };
 
@@ -11314,10 +11370,14 @@ the Stream is linked under a Multiplexing Driver."
 int
 test_case_2_31_6(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_6 = { &preamble_5, &test_case_2_31_6, &postamble_5 };
 
@@ -11336,6 +11396,9 @@ errors are persistent when set to RERRNORM."
 int
 test_case_2_31_7(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11357,6 +11420,7 @@ test_case_2_31_7(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_7 = { &preamble_2, &test_case_2_31_7, &postamble_0 };
 
@@ -11375,6 +11439,9 @@ errors are persistent when set to WERRNORM."
 int
 test_case_2_31_8(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -11396,6 +11463,7 @@ test_case_2_31_8(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_8 = { &preamble_2, &test_case_2_31_8, &postamble_0 };
 
@@ -11414,6 +11482,9 @@ errors are non-persistent when set to RERRNONPERSIST."
 int
 test_case_2_31_9(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -11435,6 +11506,7 @@ test_case_2_31_9(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_9 = { &preamble_2, &test_case_2_31_9, &postamble_0 };
 
@@ -11453,6 +11525,9 @@ errors are non-persistent when set to WERRNONPERSIST."
 int
 test_case_2_31_10(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	char buf[16] = { 0, };
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11471,6 +11546,7 @@ test_case_2_31_10(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_31_10 = { &preamble_2, &test_case_2_31_10, &postamble_0 };
 
@@ -11492,6 +11568,9 @@ error options."
 int
 test_case_2_32_1(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
@@ -11501,6 +11580,7 @@ test_case_2_32_1(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_32_1 = { &preamble_0, &test_case_2_32_1, &postamble_0 };
 
@@ -11519,6 +11599,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_2(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNORM)) != __RESULT_SUCCESS)
@@ -11531,6 +11614,7 @@ test_case_2_32_2(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_32_2 = { &preamble_0, &test_case_2_32_2, &postamble_0 };
 
@@ -11549,6 +11633,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_3(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -11561,6 +11648,7 @@ test_case_2_32_3(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_32_3 = { &preamble_0, &test_case_2_32_3, &postamble_0 };
 
@@ -11579,6 +11667,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_4(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11591,6 +11682,7 @@ test_case_2_32_4(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_32_4 = { &preamble_0, &test_case_2_32_4, &postamble_0 };
 
@@ -11609,6 +11701,9 @@ Checks that I_GERROPT can be performed on a Stream to read the errror options\n\
 int
 test_case_2_32_5(int child)
 {
+#ifdef LIS
+	return (__RESULT_FAILURE);
+#else
 	int erropts = -1;
 
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -11621,6 +11716,7 @@ test_case_2_32_5(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+#endif
 }
 struct test_stream test_2_32_5 = { &preamble_0, &test_case_2_32_5, &postamble_0 };
 
@@ -12477,7 +12573,6 @@ int
 test_case_2_48_1(int child)
 {
 	char buf[1024] = { 0, };
-	int i;
 
 	if (test_ioctl(child, TM_IOC_COPYIN, (intptr_t) buf) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -13549,7 +13644,6 @@ preamble_test_case_3_1_14_2(int child)
 {
 	char cbuf[16] = { 0, };
 	char dbuf[16] = { 0, };
-	struct strbuf ctl = { -1, sizeof(cbuf), cbuf };
 	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
 	int flags = 0;
 	int i;
@@ -15291,8 +15385,6 @@ test_case_3_5_10(int child)
 	struct strbuf ctl;
 	struct strbuf dat;
 	int flags;
-	char cbuf[1];
-	char dbuf[1];
 
 	ctl.maxlen = 1;
 	ctl.len = -1;
@@ -16677,8 +16769,6 @@ test_case_3_6_14(int child)
 	struct strbuf dat;
 	int band;
 	int flags;
-	char cbuf[1];
-	char dbuf[1];
 
 
 	ctl.maxlen = 1;
@@ -18106,7 +18196,6 @@ test_case_3_7_13(int child)
 	char pcbuf[32] = { 0, };
 	char pdbuf[32] = { 0, };
 	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
-	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
 	int pflags = 0;
 
 	char gcbuf[32] = { 0, };
@@ -18168,7 +18257,6 @@ test_case_3_7_14(int child)
 {
 	char pcbuf[32] = { 0, };
 	char pdbuf[32] = { 0, };
-	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
 	int pflags = 0;
 
@@ -18878,7 +18966,6 @@ test_case_3_8_13(int child)
 	char pcbuf[32] = { 0, };
 	char pdbuf[32] = { 0, };
 	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
-	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
 	int pband = 1;
 	int pflags = MSG_BAND;
 
@@ -18947,7 +19034,6 @@ test_case_3_8_14(int child)
 {
 	char pcbuf[32] = { 0, };
 	char pdbuf[32] = { 0, };
-	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
 	int pband = 1;
 	int pflags = MSG_BAND;

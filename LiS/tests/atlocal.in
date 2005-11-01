@@ -1,7 +1,7 @@
 # vim: ft=sh sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.4 $) $Date: 2005/05/27 19:48:41 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.5 $) $Date: 2005/11/01 11:20:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/27 19:48:41 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: atlocal.in,v $
+# Revision 1.1.4.5  2005/11/01 11:20:32  brian
+# - updates for testing and documentation
+#
 # Revision 1.1.4.4  2005/05/27 19:48:41  brian
 # - updated headers
 #
@@ -73,6 +76,8 @@
 #
 # This file is sourced by the autotest testsuite after options parsing.
 #
+
+at_STRCONF_PACKAGE="@STRCONF_PACKAGE@"
 
 at_AUTOM4TE="@ac_pt_AUTOM4TE@"
 at_AUTOTEST="@ac_pt_AUTOTEST@"

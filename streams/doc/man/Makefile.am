@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/01 05:11:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/11/01 11:20:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/01 05:11:44 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -891,6 +891,14 @@ if CONFIG_STREAMS_NULLMOD_MODULE
 module_pages += \
 	man4/nullmod.4
 endif
+if CONFIG_STREAMS_BUFMOD
+module_pages += \
+	man4/bufmod.4
+endif
+if CONFIG_STREAMS_BUFMOD_MODULE
+module_pages += \
+	man4/bufmod.4
+endif
 if CONFIG_STREAMS_PIPEMOD
 module_pages += \
 	man4/pipemod.4 \
@@ -1004,6 +1012,8 @@ man_MANS = \
 	man7/streamio.7 \
 	man8/streams_mknod.8 \
 	man8/test-streams.8 \
+	man8/perftest.8 \
+	man8/perftestn.8 \
 	man9/LfS.9 \
 	man9/OTHERQ.9 \
 	man9/RD.9 \
@@ -1074,6 +1084,7 @@ man_MANS = \
 	man9/autopush_add.9 \
 	man9/autopush_del.9 \
 	man9/autopush_find.9 \
+	man9/autopush_search.9 \
 	man9/autopush_vml.9 \
 	man9/backq.9 \
 	man9/bcanget.9 \
@@ -2144,6 +2155,14 @@ if CONFIG_STREAMS_NULLMOD_MODULE
 dist_noinst_module_pages += \
 	man4/nullmod.4.man
 endif
+if CONFIG_STREAMS_BUFMOD
+dist_noinst_module_pages += \
+	man4/bufmod.4.man
+endif
+if CONFIG_STREAMS_BUFMOD_MODULE
+dist_noinst_module_pages += \
+	man4/bufmod.4.man
+endif
 if CONFIG_STREAMS_PIPEMOD
 dist_noinst_module_pages += \
 	man4/pipemod.4.man \
@@ -2250,6 +2269,8 @@ dist_noinst_MANS = \
 	man7/streamio.7.man \
 	man8/streams_mknod.8.man \
 	man8/test-streams.8.man \
+	man8/perftest.8.man \
+	man8/perftestn.8.man \
 	man9/DDI.9.man \
 	man9/Intro.9.man \
 	man9/LfS.9.man \
@@ -2323,6 +2344,7 @@ dist_noinst_MANS = \
 	man9/autopush_add.9.man \
 	man9/autopush_del.9.man \
 	man9/autopush_find.9.man \
+	man9/autopush_search.9.man \
 	man9/autopush_vml.9.man \
 	man9/backq.9.man \
 	man9/bcanget.9.man \

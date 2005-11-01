@@ -1,0 +1,258 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: echo.4.man,v 1.1.2.1 2005/11/01 11:20:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/01 11:20:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ECHO 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B echo
+\- echo \fISTREAMS\fP device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <unistd.h>
+.br
+.B #include <stropts.h>
+.HP 12
+.BI "int " fd " = open(" /dev/echo ", " oflag );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I fd
+is a file descriptor for an echo stream opened using the
+.BR open (2)
+system call on one of the following devices:
+.TP
+.RB \*(lq /dev/echo \*(rq
+This device is accessible to all users.
+.PP
+The
+.B echo
+device is characterized by the following behaviour:
+.IP \(em \w'\(em\(em'u
+Most 
+.I STREAMS
+messages written to the driver's write queue are echoed back to the stream
+head read queue.  These messages include:
+.BR M_DATA,
+.BR M_PROTO,
+and
+.BR M_PCPROTO .
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B echo
+does not support any I/O controls of its own and all I/O controls delivered
+will return an
+.IR errno (3)
+of
+.BR [ EOPNOTSUPP ].
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B echo
+device can be opened when no other suitable device exists and modules may be
+pushed on the
+.B echo
+device.
+.PP
+The primary use of the
+.B echo
+device is the
+.I STREAMS
+verification utility
+.BR strvf (8).
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B echo
+device is used on
+.IR HP-UX \(rg
+systems in support of the
+.BR strvf (8)
+utility.
+.B Linux Fast-STREAMS
+provides this device in support of
+.BR strvf (8)
+and for compatibility with
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B echo
+is implemented as a regular
+.I STREAMS
+pseudo-device driver.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.B /dev/echo
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR open (2),
+.IR errno (3),
+.BR nuls (4),
+.BR spx (4),
+.BR strvf (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B echo
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.IR HP-UX \(rg.
+This is an
+.IR HP-UX \(rg-
+and
+.IR OSF/1 \(rg-specific
+device.
+.[
+hpuxspg
+.]
+.[
+osfspg
+.]
+.B echo
+is provided in
+.B Linux Fast-STREAMS
+for compatibility with
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+do not document all behaviour.
+.IP \(em
+Use for purposes other than
+.BR strvf (8)
+are not necessarily compatible.
+.IP \(em
+For an
+.IR AIX \(rg
+and
+.IR UnixWare \(rg
+equivalent, see
+.BR spx (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+documentation.
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B echo
+first appeared in
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg?
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

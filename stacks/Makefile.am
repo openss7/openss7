@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/08/29 10:31:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/11/01 11:20:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:31:51 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -846,39 +846,42 @@ ss7_source_FILES		= $(mods_source_FILES) \
 EXTRA_DIST			+= $(ss7_source_FILES)
 
 EXTRA_DOCS 			+= \
-				doc/drafts/isua/draft-bidulock-sigtran-isua-02.pdf \
-				doc/drafts/isua/draft-bidulock-sigtran-isua-02.ps \
-				doc/drafts/isua/draft-bidulock-sigtran-isua-02.txt \
-				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.pdf \
-				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.ps \
-				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.txt \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-03.pdf \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-03.ps \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-03.txt \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-06.pdf \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-06.ps \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-06.txt \
 				doc/drafts/m2pa/draft-george-sigtran-m2pa-interop-01.txt \
 				doc/drafts/m2pa/draft-ietf-sigtran-m2pa-11.txt \
-				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.pdf \
-				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.ps \
-				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.txt \
-				doc/drafts/tua/draft-bidulock-sigtran-tua-03.pdf \
-				doc/drafts/tua/draft-bidulock-sigtran-tua-03.ps \
-				doc/drafts/tua/draft-bidulock-sigtran-tua-03.txt \
-				doc/drafts/ua/draft-bidulock-sigtran-aspext-03.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-aspext-03.ps \
-				doc/drafts/ua/draft-bidulock-sigtran-aspext-03.txt \
-				doc/drafts/ua/draft-bidulock-sigtran-corid-03.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-corid-03.ps \
-				doc/drafts/ua/draft-bidulock-sigtran-corid-03.txt \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-02.pdf \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-02.ps \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-02.txt \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-04.pdf \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-04.ps \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-04.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-04.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-04.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-04.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-04.txt \
 				doc/drafts/ua/draft-bidulock-sigtran-datamodel-00.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.ps \
-				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.txt \
-				doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.ps \
-				doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.txt \
-				doc/drafts/ua/draft-bidulock-sigtran-regext-03.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-regext-03.ps \
-				doc/drafts/ua/draft-bidulock-sigtran-regext-03.txt \
-				doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.pdf \
-				doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
-				doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-04.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-04.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-04.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-04.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-04.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-04.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-05.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-05.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-05.txt\
+				doc/drafts/ua/draft-bidulock-sigtran-aspcong-00.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-aspcong-00.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-aspcong-00.txt
 
 EXTRA_DIST			+= $(EXTRA_DOCS)
 

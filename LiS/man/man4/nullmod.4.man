@@ -1,0 +1,244 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: nullmod.4.man,v 1.1.2.1 2005/11/01 11:20:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/01 11:20:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH NULLMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B nullmod
+\- \fISTREAMS\fR null module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+.BI "int " fd ;
+.HP 8
+.BI "int open(" \*(lq\fR/dev/nuls\fP\*(rq ", " \fR0\fP );
+.HP 8
+.BI "int ioctl(" fd ", " I_PUSH ", " \*(lqnullmod\*(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B nullmod
+is a
+.I STREAMS
+module that is pushed over any
+.IR Stream ,
+.IR STREAMS -based
+.BR pipe (4)
+or
+.IR STREAMS -based
+.BR fifo (4).
+.PP
+Aside from being a
+.I STREAMS
+module,
+.B nullmod
+performs no actions.  All messages passed from the
+.I Stream head
+toward the
+.B nullmod
+module are passed on downstream from the
+.B nullmod
+write-side
+.B put
+procedure (with
+.BR putnext (9));
+all messages received from the driver,
+are passed on upstream from the
+read-side
+.B put
+procedure.  The
+.B nullmod
+module has no write- or read-side
+.B service
+procedure.
+.\"
+.\"
+.SH USAGE
+.PP
+The primary purpose of
+.B nullmod
+is as a test module for use with the
+.BR test-streams (8)
+conformance test program.  The other purpose of
+.B nullmod
+is as an example skeleton for a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR nullmod
+is implementation-specific to the
+.B @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The source code for
+.B nullmod
+serves as an example skeleton for a
+.I STREAMS
+pushable module.
+.\"
+.\"
+.SH MODULES
+.PP
+.B nullmod
+is a
+.I STREAMS
+module named
+.IR \*(lqnullmod\*(rq .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR open (2s),
+.BR ioctl (2),
+.BR streamio (7),
+.BR putnext (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B nullmod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B nullmod
+is compatible with the null module described in the
+.IR "SVR 4.0" ", \*(lq" "STREAMS Programmer's Guide" ",\*(rq"
+.[
+svr4spg
+%P Section 6.1.1.1, "Null Module Example"
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B nullmod
+is specific to
+.BR "@PACKAGE_TITLE@" ,
+and will not be used by portable
+.I STREAMS
+modules, drivers and applications programs.
+.IP \(em
+The
+.I SVR 4.0 SPG
+.[
+svr4spg
+.]
+does not name this module.  The name
+.B nullmod
+was chosen for
+.BR "@PACKAGE_TITLE@" .
+.IP \(em
+.B nullmod
+is used as an example skeleton module and for use by the
+.BR test-streams (8)
+conformance test program.  It will not be used by portable
+.I STREAMS
+modules, drivers or applications.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.0" .
+.[
+svr4spg
+.]
+Conformance is verified using the
+.BR test-nullmod (8)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B nullmod
+first appeared in
+.IR "SVR 4.0" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

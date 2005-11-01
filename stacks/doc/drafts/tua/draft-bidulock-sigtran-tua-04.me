@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-tua-04.me,v 0.9.2.3 2005/10/17 11:53:44 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-tua-04.me,v 0.9.2.4 2005/11/01 11:20:46 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,7 +47,7 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2005/10/17 11:53:44 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.4 $) modified $Date: 2005/11/01 11:20:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .ds version Version\ 0.4
@@ -487,6 +487,7 @@ between the SG and the ASP.
 Depending on the TC-users supported, the TUA supports the 4
 possible TCAP operation classes transparently.  The TCAP operation
 classes are defined as follows:
+.(l
 .TS
 tab(:);
 li1c1lw(4.5i).
@@ -507,6 +508,7 @@ Operation Class 4:\-:T{
 provides for transactions reporting neither success nor failure.
 T}
 .TE
+.)l
 .sh 4 "Native Management Functions"
 .pp
 The TUA layer provides the capability to indicate errors associated with
@@ -2659,6 +2661,7 @@ The \fI\)CREJ\fR message is formatted as follows:
 .lp
 The \fI\)CREJ\fR message can contain the following parameters:
 .ix +4
+.(l
 .TS
 tab(:);
 lbw(2.5i)ss
@@ -2667,6 +2670,7 @@ Parameters
 _
 Problem Code:Mandatory:
 .TE
+.)l
 .sh 3 "Cancel (CCAN)"
 .pp
 The \fI\)Cancel (CCAN)\fR message is used to cancel an operation within
@@ -5219,6 +5223,7 @@ The \fI\)Address\fR field contains a list of one or more address parameters.
 At least one address parameter \fB\)MUST\fR be present in the Address field.
 The \fI\)Address\fR field can contain the following parameters:
 .ix +4
+.(l
 .TS
 tab(:);
 lbw(2.5i)ss
@@ -5229,6 +5234,7 @@ Point Code:Conditional:*1
 Subsystem Number:Conditional:*1
 Global Title:Optional:
 .TE
+.)l
 .ip "Note :1" 8
 When the Address field contains a \fI\)Subsystem Number\fR parameter, it must
 also contain a \fI\)Point Code\fR parameter.
@@ -6195,7 +6201,7 @@ t1.114
 .lp
 .TS H
 tab(:);
-l1n1lw(2.7i)1lw(2.9i).
+l1n|lw(2.6i)|lw(2.8i).
 ::ITU:ANSI
 =
 .TH
@@ -7382,33 +7388,33 @@ ASP is in ASP-INACTIVE state, otherwise it will move to AS-DOWN state.
 .nf
 .sz -2
 \fC\
-     +----------+   one ASP trans to ACTIVE   +-------------+
-     |    AS-   |---------------------------->|     AS-     |
-     | INACTIVE |                             |   ACTIVE    |
-     |          |<---                         |             |
-     +----------+    \\                        +-------------+
-        ^   |         \\ Tr Expiry,                ^    |
-        |   |          \\ at least one             |    |
-        |   |           \\ ASP in ASP-INACTIVE     |    |
-        |   |            \\                        |    |
-        |   |             \\                       |    |
-        |   |              \\                      |    |
-one ASP |   | all ASP       \\            one ASP  |    | Last ACTIVE
-trans   |   | trans to       \\           trans to |    | ASP trans to
-to      |   | ASP-DOWN        -------\\   ASP-     |    | ASP-INACTIVE
-ASP-    |   |                         \\  ACTIVE   |    | or ASP-DOWN
-INACTIVE|   |                          \\          |    | (start Tr)
-        |   |                           \\         |    |
-        |   |                            \\        |    |
-        |   v                             \\       |    v
-     +----------+                          \\  +-------------+
-     |          |                           --|             |
-     | AS-DOWN  |                             | AS-PENDING  |
-     |          |                             |  (queuing) |
-     |          |<----------------------------|             |
-     +----------+    Tr Expiry and no ASP     +-------------+
+     +----------+   one ASP trans to ACTIVE  +-------------+
+     |    AS-   |--------------------------->|     AS-     |
+     | INACTIVE |                            |   ACTIVE    |
+     |          |<---                        |             |
+     +----------+    \\                       +-------------+
+        ^   |         \\ Tr Expiry,               ^    |
+        |   |          \\ at least one            |    |
+        |   |           \\ ASP in ASP-INACTIVE    |    |
+        |   |            \\                       |    |
+        |   |             \\                      |    |
+        |   |              \\                     |    |
+one ASP |   | all ASP       \\           one ASP  |    | Last ACTIVE
+trans   |   | trans to       \\          trans to |    | ASP trans to
+to      |   | ASP-DOWN        ------\\   ASP-     |    | ASP-INACTIVE
+ASP-    |   |                        \\  ACTIVE   |    | or ASP-DOWN
+INACTIVE|   |                         \\          |    | (start Tr)
+        |   |                          \\         |    |
+        |   |                           \\        |    |
+        |   v                            \\       |    v
+     +----------+                         \\  +-------------+
+     |          |                          --|             |
+     | AS-DOWN  |                            | AS-PENDING  |
+     |          |                            |  (queuing)  |
+     |          |<---------------------------|             |
+     +----------+    Tr Expiry and no ASP    +-------------+
                      in ASP-INACTIVE state
-                                                                        
+
        Tr = Recovery Timer
 .sz +2
 .)c
@@ -8913,6 +8919,9 @@ updated author's address.
 .nf
 \fC\s-3
 $Log: draft-bidulock-sigtran-tua-04.me,v $
+Revision 0.9.2.4  2005/11/01 11:20:46  brian
+- updates for testing and documentation
+
 Revision 0.9.2.3  2005/10/17 11:53:44  brian
 - updated drafts for republication
 

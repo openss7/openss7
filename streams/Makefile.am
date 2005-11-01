@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/10/20 08:18:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/11/01 11:20:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/20 08:18:56 $ by $Author: brian $
+# Last Modified $Date: 2005/11/01 11:20:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -423,7 +423,8 @@ EXTRA_TEX			+= \
 				scripts/texi/fdl.texi \
 				scripts/texi/gpl.texi \
 				scripts/texi/install.texi \
-				scripts/texi/lesser.texi
+				scripts/texi/lesser.texi \
+				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
