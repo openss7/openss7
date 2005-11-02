@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/18 12:47:50 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:47:50 $ by $Author: brian $
+ Last Modified $Date: 2005/11/02 11:13:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/18 12:47:50 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/18 12:47:50 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -418,7 +418,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/18 12:47:50 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -555,12 +555,12 @@ MODULE_ALIAS("/dev/inet/sctp");
 #endif				/* MODULE */
 
 STATIC struct module_info ss_minfo = {
-	mi_idnum:DRV_ID,		/* Module ID number */
-	mi_idname:DRV_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10,		/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
 STATIC int ss_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -570,25 +570,25 @@ STATIC int ss_rput(queue_t *, mblk_t *);
 STATIC int ss_rsrv(queue_t *);
 
 STATIC struct qinit ss_rinit = {
-	qi_putp:ss_rput,		/* Read put (msg from below) */
-	qi_srvp:ss_rsrv,		/* Read queue service */
-	qi_qopen:ss_open,		/* Each open */
-	qi_qclose:ss_close,		/* Last close */
-	qi_minfo:&ss_minfo,		/* Information */
+	.qi_putp = ss_rput,		/* Read put (msg from below) */
+	.qi_srvp = ss_rsrv,		/* Read queue service */
+	.qi_qopen = ss_open,		/* Each open */
+	.qi_qclose = ss_close,		/* Last close */
+	.qi_minfo = &ss_minfo,		/* Information */
 };
 
 STATIC int ss_wput(queue_t *, mblk_t *);
 STATIC int ss_wsrv(queue_t *);
 
 STATIC struct qinit ss_winit = {
-	qi_putp:ss_wput,		/* Write put (msg from above) */
-	qi_srvp:ss_wsrv,		/* Write queue service */
-	qi_minfo:&ss_minfo,		/* Information */
+	.qi_putp = ss_wput,		/* Write put (msg from above) */
+	.qi_srvp = ss_wsrv,		/* Write queue service */
+	.qi_minfo = &ss_minfo,		/* Information */
 };
 
 MODULE_STATIC struct streamtab ss_info = {
-	st_rdinit:&ss_rinit,		/* Upper read queue */
-	st_wrinit:&ss_winit,		/* Lower read queue */
+	.st_rdinit = &ss_rinit,		/* Upper read queue */
+	.st_wrinit = &ss_winit,		/* Lower read queue */
 };
 
 /*
@@ -15557,11 +15557,20 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: can't push as module\n", DRV_NAME));
 		return (EIO);
 	}
-	if (cmajor != SS__CMAJOR_0 || cminor < FIRST_CMINOR || cminor > LAST_CMINOR) {
+#if defined LIS
+	if (cmajor != SS__CMAJOR_0)
 		return (ENXIO);
-	}
+#endif
+#if defined LFS
+	/* Linux Fast-STREAMS always passes internal major device numbers (module ids) */
+	if (cmajor != SS__DRV_ID)
+		return (ENXIO);
+#endif
+	if (cminor < FIRST_CMINOR || cminor > LAST_CMINOR)
+		return (ENXIO);
 	prof = &ss_profiles[cminor - FIRST_CMINOR];
-	cminor = FREE_CMINOR;
+	if (sflag == CLONEOPEN)
+		cminor = FREE_CMINOR;
 	spin_lock_bh(&ss_lock);
 	for (; *ipp; ipp = &(*ipp)->next) {
 		if (cmajor != (*ipp)->cmajor)
@@ -15680,11 +15689,97 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
 STATIC struct cdevsw ss_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ss_info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
-	.d_mode = S_IFCHR,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
 };
+
+STATIC struct devnode inet_node_ip = {
+	.n_name = "ip",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_icmp = {
+	.n_name = "icmp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_ggp = {
+	.n_name = "ggp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_ipip = {
+	.n_name = "ipip",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_tcp = {
+	.n_name = "tcp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_egp = {
+	.n_name = "egp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_pup = {
+	.n_name = "pup",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_udp = {
+	.n_name = "udp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_idp = {
+	.n_name = "idp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_rawip = {
+	.n_name = "rawip",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_ticots_ord = {
+	.n_name = "ticots_ord",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_ticots = {
+	.n_name = "ticots",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+STATIC struct devnode inet_node_ticlts = {
+	.n_name = "ticlts",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+#if defined HAVE_OPENSS7_SCTP
+STATIC struct devnode inet_node_sctp = {
+	.n_name = "sctp",
+	.n_flag = D_CLONE, /* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+#endif
 
 STATIC int
 ss_register_strdev(major_t major)
@@ -15693,6 +15788,22 @@ ss_register_strdev(major_t major)
 
 	if ((err = register_strdev(&ss_cdev, major)) < 0)
 		return (err);
+	register_strnod(&ss_cdev, &inet_node_ip, IP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_icmp, ICMP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_ggp, GGP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_ipip, IPIP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_tcp, TCP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_egp, EGP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_pup, PUP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_udp, UDP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_idp, IDP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_rawip, RAWIP_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_ticots_ord, TICOTS_ORD_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_ticots, TICOTS_CMINOR);
+	register_strnod(&ss_cdev, &inet_node_ticlts, TICLTS_CMINOR);
+#if defined HAVE_OPENSS7_SCTP
+	register_strnod(&ss_cdev, &inet_node_sctp, SCTP_CMINOR);
+#endif
 	return (0);
 }
 
@@ -15701,6 +15812,22 @@ ss_unregister_strdev(major_t major)
 {
 	int err;
 
+#if defined HAVE_OPENSS7_SCTP
+	unregister_strnod(&ss_cdev, SCTP_CMINOR);
+#endif
+	unregister_strnod(&ss_cdev, TICLTS_CMINOR);
+	unregister_strnod(&ss_cdev, TICOTS_CMINOR);
+	unregister_strnod(&ss_cdev, TICOTS_ORD_CMINOR);
+	unregister_strnod(&ss_cdev, RAWIP_CMINOR);
+	unregister_strnod(&ss_cdev, IDP_CMINOR);
+	unregister_strnod(&ss_cdev, UDP_CMINOR);
+	unregister_strnod(&ss_cdev, PUP_CMINOR);
+	unregister_strnod(&ss_cdev, EGP_CMINOR);
+	unregister_strnod(&ss_cdev, TCP_CMINOR);
+	unregister_strnod(&ss_cdev, IPIP_CMINOR);
+	unregister_strnod(&ss_cdev, GGP_CMINOR);
+	unregister_strnod(&ss_cdev, ICMP_CMINOR);
+	unregister_strnod(&ss_cdev, IP_CMINOR);
 	if ((err = unregister_strdev(&ss_cdev, major)) < 0)
 		return (err);
 	return (0);

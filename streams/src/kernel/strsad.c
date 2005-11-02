@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/10/19 11:08:22 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/02 11:13:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:22 $ by $Author: brian $
+ Last Modified $Date: 2005/11/02 11:13:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/10/19 11:08:22 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/02 11:13:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/10/19 11:08:22 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/02 11:13:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -154,7 +154,7 @@ autopush_find(dev_t dev)
 	struct cdevsw *cdev;
 	struct apinfo *api = NULL;
 
-	cdev = sdev_get(getmajor(dev));
+	cdev = cdrv_get(getmajor(dev));
 	if (cdev == NULL)
 		goto notfound;
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));

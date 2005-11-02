@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/19 11:08:19 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:19 $ by $Author: brian $
+ Last Modified $Date: 2005/11/02 11:14:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/19 11:08:19 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/19 11:08:19 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/10/19 11:08:19 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -282,17 +282,25 @@ cdev_open(struct inode *inode, struct file *file)
 	minor = MINOR(inode->i_rdev);
 	major = MAJOR(inode->i_rdev);
 #endif
-	if (!(cdev = sdev_get(major)))
+	ptrace(("%s: major is %d\n", __FUNCTION__, (int) major));
+	ptrace(("%s: minor is %d\n", __FUNCTION__, (int) minor));
+	if (!(cdev = sdev_get(major))) {
+		ptrace(("%s: cannot find major device %d\n", __FUNCTION__, (int) major));
 		return (-ENXIO);
+	}
 	minor = cdev_minor(cdev, major, minor);
 	major = cdev->d_major;
 	modid = cdev->d_modid;
+	ptrace(("%s: final major is %d\n", __FUNCTION__, (int) major));
+	ptrace(("%s: final minor is %d\n", __FUNCTION__, (int) minor));
+	ptrace(("%s: final modid is %d\n", __FUNCTION__, (int) modid));
 	dev = makedevice(modid, minor);
 	sflag = DRVOPEN;
 	if (cdev->d_flag & D_CLONE)
 		sflag = CLONEOPEN;
 	else if ((cmin = cmin_get(cdev, minor)) && cmin->n_flag & D_CLONE)
 		sflag = CLONEOPEN;
+	ptrace(("%s: opening device\n", __FUNCTION__));
 	err = spec_open(file, cdev, dev, sflag);
 	ctrace(sdev_put(cdev));
 	return (err);
