@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/23 04:59:25 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/03 12:42:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 04:59:25 $ by $Author: brian $
+ Last Modified $Date: 2005/11/03 12:42:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/23 04:59:25 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/03 12:42:50 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/10/23 04:59:25 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/03 12:42:50 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -198,7 +198,6 @@ queue_guess(queue_t *q)
 mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
-	struct strthread *t = this_thread;
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 	mblk_t *mp = NULL;
 	int slab_flags;
@@ -208,7 +207,10 @@ mdbblock_alloc(uint priority, void *func)
 		goto fail;
 	switch (priority) {
 	case BPRI_HI:
+#if 0
+	/* testing theory about BPRI_HI allocation errors */
 	{
+		struct strthread *t = this_thread;
 		unsigned long flags;
 
 		local_irq_save(flags);	/* MP-SAFE */
@@ -219,7 +221,8 @@ mdbblock_alloc(uint priority, void *func)
 			t->freemblk_head = xchg(&mp->b_next, NULL);
 		local_irq_restore(flags);
 		if (mp != NULL) {
-			struct mdbblock *md = (struct mdbblock *)mp;
+			struct mdbblock *md = (struct mdbblock *) mp;
+
 			ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 			mp->b_prev = NULL;
 			md->msgblk.m_func = func;
@@ -227,6 +230,7 @@ mdbblock_alloc(uint priority, void *func)
 			return (mp);
 		}
 	}
+#endif
 	case BPRI_MED:
 		slab_flags = SLAB_ATOMIC;
 		break;
@@ -242,6 +246,7 @@ mdbblock_alloc(uint priority, void *func)
 	if ((mp = kmem_cache_alloc(sdi->si_cache, slab_flags))) {
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
+
 #if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 #endif

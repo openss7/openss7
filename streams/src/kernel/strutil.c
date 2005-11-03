@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/11/01 11:21:08 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/11/03 12:42:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/01 11:21:08 $ by $Author: brian $
+ Last Modified $Date: 2005/11/03 12:42:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/11/01 11:21:08 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/11/03 12:42:52 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/11/01 11:21:08 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/11/03 12:42:52 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -695,6 +695,10 @@ freeb(mblk_t *mp)
 	assert(mp);
 #if 0
 	assert(!mp->b_queue);
+#else
+	/* we always null these when we take a message off a queue */
+	assert(mp->b_prev == NULL);
+	assert(mp->b_next == NULL);
 #endif
 	db = xchg(&mp->b_datap, NULL);
 
