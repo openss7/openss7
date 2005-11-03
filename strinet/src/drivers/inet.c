@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/02 11:13:04 $ by $Author: brian $
+ Last Modified $Date: 2005/11/03 12:43:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -93,6 +93,27 @@ static char const ident[] =
 #undef STATIC
 #undef INLINE
 #include <net/sctp.h>
+#endif
+
+#if 0
+/* Turn on some tracing and debugging. */
+#undef ensure
+#undef assure
+#undef assert
+#undef printd
+#undef swerr
+#undef rare
+#undef seldom
+#undef likely
+
+#define ensure __ensure
+#define assure __assure
+#define assert __assert
+#define printd __printd
+#define swerr __swerr
+#define rare __rare
+#define seldom __seldom
+#define _DEBUG
 #endif
 
 /* Compatibility functions between 2.4 and 2.6. */
@@ -418,7 +439,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:13:04 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -558,7 +579,7 @@ STATIC struct module_info ss_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_maxpsz = 1 << 16,		/* Max packet size accepted */
 	.mi_hiwat = 1 << 15,		/* Hi water mark */
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
@@ -12179,12 +12200,23 @@ ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot->sendmsg, return (-EFAULT));
+	/* An unfortunate state of affairs exists in recent 2.6 kernels: copy_from_user does not
+	   check whether the data segment is indeed a user segment before issuing kernel traps
+	   concerning functions that can possibly sleep.  Therefore, even though this call will not
+	   sleep, a warning is issued on each attempt from interrupt level.  So, when in interrupt,
+	   we back out temporarily and re-enter.  It is a bad hack: worse things can happen when
+	   interrupts are released. */
 	{
+		int interrupt = in_interrupt();
 		mm_segment_t fs = get_fs();
 
+		if (interrupt)
+			__local_bh_enable();
 		set_fs(KERNEL_DS);
 		res = sock_sendmsg(ss->sock, msg, len);
 		set_fs(fs);
+		if (interrupt)
+			local_bh_disable();
 	}
 	if (res <= 0)
 		printd(("%s: %p: ERROR: from sock->sk->sk_prot->sendmsg %d\n", DRV_NAME, ss, res));
@@ -12208,12 +12240,23 @@ ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot->recvmsg, return (-EFAULT));
+	/* An unfortunate state of affairs exists in recent 2.6 kernels: copy_to_user does not
+	   check whether the data segment is indeed a user segment before issuing kernel traps
+	   concerning functions that can possibly sleep.  Therefore, even though this call will not
+	   sleep, a warning is issued on each attempt from interrupt level.  So, when in interrupt,
+	   we back out temporarily and re-enter.  It is a bad hack: worse things can happen when
+	   interrupts are released. */
 	{
+		int interrupt = in_interrupt();
 		mm_segment_t fs = get_fs();
 
+		if (interrupt)
+			__local_bh_enable();
 		set_fs(KERNEL_DS);
 		res = sock_recvmsg(ss->sock, msg, size, sflags);
 		set_fs(fs);
+		if (interrupt)
+			local_bh_disable();
 	}
 	if (res < 0)
 		printd(("%s: %p: ERROR: from sock->ops->recvmsg %d\n", DRV_NAME, ss, res));
@@ -12750,7 +12793,7 @@ t_error_ack(queue_t *q, ulong prim, long error)
  *  T_OK_ACK            19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_sock_recvmsg(queue_t *q, int flags);
+STATIC int ss_sock_recvmsg(queue_t *q);
 STATIC int
 t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 {
@@ -12804,7 +12847,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 				}
 			}
 			/* make sure any data on the socket is delivered */
-			ss_sock_recvmsg(as->rq, 0);
+			ss_sock_recvmsg(as->rq);
 			break;
 		case TS_WACK_DREQ7:
 			ensure(cp, goto free_error);
@@ -13313,7 +13356,7 @@ ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-ss_sock_recvmsg(queue_t *q, int flags)
+ss_sock_recvmsg(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -13360,7 +13403,7 @@ ss_sock_recvmsg(queue_t *q, int flags)
 			msg.msg_iovlen = sizeof(iov) / sizeof(struct iovec);
 			msg.msg_control = cbuf;
 			msg.msg_controllen = sizeof(cbuf);
-			msg.msg_flags = flags;
+			msg.msg_flags = MSG_DONTWAIT;
 			if ((res = ss_recvmsg(ss, &msg, size)) < 0) {
 				freemsg(mp);
 				return (res);
@@ -13401,7 +13444,7 @@ ss_sock_recvmsg(queue_t *q, int flags)
 		}
 #endif
 		if (ss->p.info.SERV_type == T_CLTS) {
-			if (flags & MSG_ERRQUEUE) {
+			if (msg.msg_flags & MSG_ERRQUEUE) {
 				if ((err = t_uderror_ind(q, &msg, mp)) != QR_ABSORBED)
 					return (err);
 			} else if ((err = t_unitdata_ind(q, &msg, mp)) != QR_ABSORBED)
@@ -14933,7 +14976,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
 		case TS_WREQ_ORDREL:	/* TCP bug I believe */
-			return ss_sock_recvmsg(q, 0);
+			return ss_sock_recvmsg(q);
 		}
 		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
@@ -14943,7 +14986,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	case SOCK_RDM:
 		switch (ss_get_state(ss)) {
 		case TS_IDLE:
-			return ss_sock_recvmsg(q, 0);
+			return ss_sock_recvmsg(q);
 		}
 		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
@@ -15111,6 +15154,10 @@ ss_r_error(queue_t *q, mblk_t *mp)
 STATIC int
 ss_w_prim(queue_t *q, mblk_t *mp)
 {
+	assert(q);
+	assert(mp);
+	assert(mp->b_datap);
+
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		return ss_w_data(q, mp);
@@ -15133,6 +15180,10 @@ ss_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 ss_r_prim(queue_t *q, mblk_t *mp)
 {
+	assert(q);
+	assert(mp);
+	assert(mp->b_datap);
+
 	switch (mp->b_datap->db_type) {
 	case M_RSE:
 	case M_PCRSE:
@@ -15161,7 +15212,7 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked;
 
-	if (mp->b_datap->db_type < QPCTL && q->q_count) {
+	if (mp->b_datap->db_type < QPCTL && (q->q_first || q->q_flag & QSVCBUSY)) {
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
 		return (0);
