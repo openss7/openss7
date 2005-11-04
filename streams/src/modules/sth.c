@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 19:58:19 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 12:32:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/10/22 19:58:19 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2075,9 +2075,11 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	long timeo;
 	int err = 0;
 
-	if (ic->ic_len < 0 || ic->ic_len > sysctl_str_strmsgsz)
+	if (ic->ic_len < 0 || ic->ic_len > sysctl_str_strmsgsz) {
 		/* POSIX less than zero or larger than maximum data part. */
+		ptrace(("Error path taken!\n"));
 		return (-EINVAL);
+	}
 
 	if (!access_ok(VERIFY_WRITE, ic->ic_dp, ic->ic_len))
 		return (-EFAULT);
@@ -2100,11 +2102,12 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		return (err);
 	}
 
-	if (ic->ic_timout == INFTIM) {
+	if (ic->ic_timout == (int) INFTIM) {
 		timeo = MAX_SCHEDULE_TIMEOUT;
 	} else if (ic->ic_timout == 0) {
 		timeo = sd->sd_ioctime;
-	} else if (ic->ic_timout < INFTIM) {
+	} else if (ic->ic_timout < (int) INFTIM) {
+		ptrace(("Error path taken!\n"));
 		/* POSIX says if ic_timout < -1 return EINVAL */
 		freemsg(mb);
 		return (-EINVAL);
@@ -2143,8 +2146,10 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		case M_IOCNAK:
 			err = ioc->iocblk.ioc_error;
 			/* SVR 4 SPG says if error is zero return EINVAL */
-			if (err == 0)
+			if (err == 0) {
+				ptrace(("Error not set, now EINVAL!\n"));
 				err = EINVAL;
+			}
 			/* must return negative errors */
 			err = err > 0 ? -err : err;
 			ptrace(("Error path taken! err = %d\n", err));

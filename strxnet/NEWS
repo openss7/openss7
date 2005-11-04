@@ -5,7 +5,10 @@ See the end for copying conditions.
 
 * Major changes in strxnet-0.9.2.7
 
-  Minor bug fixes release.
+  This release has been verified (conformance test suite passes) for operation
+  with Linux Fast-STREAMS (streams-0.7a.4).  Some test cases were updated
+  because LiS was not operating correctly on pipes (does not send SIGPIPE on
+  write error contrary to POSIX).
 
 * Major changes in strxnet-0.9.2.6
 

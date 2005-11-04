@@ -8,7 +8,7 @@ Description:		The @PACKAGE@ package includes kernel modules,
 			utilities, test programs, daemons, and development
 			environment for the development and execution of
 			X/Open Networking (XNET) protocol stack components and
-			applications for the %{_STREAMS} STREAMS environment.
+			applications for the SVR 4.2 STREAMS environment.
 			This distribution is only currently applicable to 2.4
 			kernels and was targetted at ix86 and ppc
 			architectures, but should build and install for other
@@ -17,14 +17,14 @@ Keywords:		XNS, TPI, XTI, TLI, libxnet, libxti
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
-			1.5MB @PACKAGE@-@VERSION@.tar.bz2
-			1.8MB @PACKAGE@-@VERSION@.tar.gz
+			2.1MB @PACKAGE@-@VERSION@.tar.bz2
+			2.5MB @PACKAGE@-@VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			1.5MB @PACKAGE@-@VERSION@.tar.bz2
-			1.8MB @PACKAGE@-@VERSION@.tar.gz
+			2.1MB @PACKAGE@-@VERSION@.tar.bz2
+			2.5MB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		Linux
 Requires:		Linux kernel 2.4 or 2.6,
-			LiS-2.18.1 or streams-0.7a.3 SVR 4.2 STREAMS
+			LiS-2.18.2 or streams-0.7a.4 SVR 4.2 STREAMS
 			strxns
 Copying-policy:		GPL
 Comment:		Report bugs to @PACKAGE_BUGREPORT@
