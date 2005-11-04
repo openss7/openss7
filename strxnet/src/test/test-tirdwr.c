@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:05 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/11/04 07:36:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:05 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 07:36:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.22  2005/11/04 07:36:40  brian
+ - all test cases pass on Linux Fast-STREAMS
+
+ Revision 0.9.2.21  2005/11/04 03:40:24  brian
+ - started strxnet testing
+
  Revision 0.9.2.20  2005/07/18 12:45:05  brian
  - standard indentation
 
@@ -111,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:05 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/11/04 07:36:40 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:05 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/11/04 07:36:40 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -3178,7 +3184,13 @@ stream_start(int child, int index)
 	case 1:
 		if (test_pipe(0) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
+		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
 		if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(0, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(1, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
@@ -3205,9 +3217,9 @@ stream_stop(int child)
 	case 1:
 		if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
-		if (test_close(1) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
 		if (test_close(0) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(1) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		return __RESULT_SUCCESS;
 	case 2:
@@ -4537,6 +4549,58 @@ postamble_0(int child)
 	return (__RESULT_FAILURE);
 }
 
+int
+preamble_1_top(int child)
+{
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+postamble_1_top(int child)
+{
+	int failed = -1;
+
+	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS && last_errno != EIO)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+int
+postamble_1b_top(int child)
+{
+	int failed = -1;
+
+	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
 #if 0
 static int
 preamble_1(int child)
@@ -4681,6 +4745,7 @@ preamble_2_conn(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
+	test_msleep(child, SHORT_WAIT);	/* delay to avoid LiS ioctl bug */
 	if (expect(child, INFINITE_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5468,9 +5533,6 @@ M_DATA messages after pushing the module."
 int
 test_case_2_1_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	for (;;) {
 		state++;
@@ -5486,9 +5548,6 @@ test_case_2_1_top(int child)
 		}
 		break;
 	}
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5520,10 +5579,10 @@ test_case_2_1_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_2_1_top	preamble_0
+#define preamble_2_1_top	preamble_1_top
 #define preamble_2_1_bot	preamble_0
 
-#define postamble_2_1_top	postamble_0
+#define postamble_2_1_top	postamble_1_top
 #define postamble_2_1_bot	postamble_0
 
 struct test_stream test_2_1_top = { &preamble_2_1_top, &test_case_2_1_top, &postamble_2_1_top };
@@ -5540,9 +5599,6 @@ T_DATA_IND messages after pushing the module."
 int
 test_case_2_2_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	for (;;) {
@@ -5558,9 +5614,6 @@ test_case_2_2_top(int child)
 		}
 		break;
 	}
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5596,10 +5649,10 @@ test_case_2_2_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_2_2_top	preamble_0
+#define preamble_2_2_top	preamble_1_top
 #define preamble_2_2_bot	preamble_0
 
-#define postamble_2_2_top	postamble_0
+#define postamble_2_2_top	postamble_1_top
 #define postamble_2_2_bot	postamble_0
 
 struct test_stream test_2_2_top = { &preamble_2_2_top, &test_case_2_2_top, &postamble_2_2_top };
@@ -5616,9 +5669,6 @@ T_OPTDATA_IND messages after pushing the module."
 int
 test_case_2_3_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	for (;;) {
@@ -5634,9 +5684,6 @@ test_case_2_3_top(int child)
 		}
 		break;
 	}
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5672,10 +5719,10 @@ test_case_2_3_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_2_3_top	preamble_0
+#define preamble_2_3_top	preamble_1_top
 #define preamble_2_3_bot	preamble_0
 
-#define postamble_2_3_top	postamble_0
+#define postamble_2_3_top	postamble_1_top
 #define postamble_2_3_bot	postamble_0
 
 struct test_stream test_2_3_top = { &preamble_2_3_top, &test_case_2_3_top, &postamble_2_3_top };
@@ -5696,9 +5743,6 @@ test_case_2_4_top(int child)
 {
 	int count = 0;
 
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	for (;;) {
 		state++;
@@ -5717,9 +5761,6 @@ test_case_2_4_top(int child)
 	}
 	state++;
 	if (get_data(child, __TEST_READ) != 0)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5755,10 +5796,10 @@ test_case_2_4_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_2_4_top	preamble_0
+#define preamble_2_4_top	preamble_1_top
 #define preamble_2_4_bot	preamble_0
 
-#define postamble_2_4_top	postamble_0
+#define postamble_2_4_top	postamble_1_top
 #define postamble_2_4_bot	postamble_0
 
 struct test_stream test_2_4_top = { &preamble_2_4_top, &test_case_2_4_top, &postamble_2_4_top };
@@ -5777,9 +5818,6 @@ been received."
 int
 test_case_2_5_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	for (;;) {
 		state++;
@@ -5799,9 +5837,6 @@ test_case_2_5_top(int child)
 	}
 	state++;
 	if (get_data(child, __TEST_READ) != 0)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5837,10 +5872,10 @@ test_case_2_5_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_2_5_top	preamble_0
+#define preamble_2_5_top	preamble_1_top
 #define preamble_2_5_bot	preamble_0
 
-#define postamble_2_5_top	postamble_0
+#define postamble_2_5_top	postamble_1b_top
 #define postamble_2_5_bot	postamble_0
 
 struct test_stream test_2_5_top = { &preamble_2_5_top, &test_case_2_5_top, &postamble_2_5_top };
@@ -5858,9 +5893,6 @@ Tests that data can be sent with write(2) after pushing the module."
 int
 test_case_3_1_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5868,9 +5900,6 @@ test_case_3_1_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5900,10 +5929,10 @@ test_case_3_1_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_1_top	preamble_0
+#define preamble_3_1_top	preamble_1_top
 #define preamble_3_1_bot	preamble_0
 
-#define postamble_3_1_top	postamble_0
+#define postamble_3_1_top	postamble_1_top
 #define postamble_3_1_bot	postamble_0
 
 struct test_stream test_3_1_top = { &preamble_3_1_top, &test_case_3_1_top, &postamble_3_1_top };
@@ -5919,9 +5948,6 @@ Tests that data can be sent with writev(2) after pushing the module."
 int
 test_case_3_2_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5929,9 +5955,6 @@ test_case_3_2_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5961,10 +5984,10 @@ test_case_3_2_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_2_top	preamble_0
+#define preamble_3_2_top	preamble_1_top
 #define preamble_3_2_bot	preamble_0
 
-#define postamble_3_2_top	postamble_0
+#define postamble_3_2_top	postamble_1_top
 #define postamble_3_2_bot	postamble_0
 
 struct test_stream test_3_2_top = { &preamble_3_2_top, &test_case_3_2_top, &postamble_3_2_top };
@@ -5980,9 +6003,6 @@ Tests that data can be sent with putmsg(2) after pushing the module."
 int
 test_case_3_3_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5990,9 +6010,6 @@ test_case_3_3_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6022,10 +6039,10 @@ test_case_3_3_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_3_top	preamble_0
+#define preamble_3_3_top	preamble_1_top
 #define preamble_3_3_bot	preamble_0
 
-#define postamble_3_3_top	postamble_0
+#define postamble_3_3_top	postamble_1_top
 #define postamble_3_3_bot	postamble_0
 
 struct test_stream test_3_3_top = { &preamble_3_3_top, &test_case_3_3_top, &postamble_3_3_top };
@@ -6041,9 +6058,6 @@ Tests that expedited data cannot be sent with putpmsg(2) after pushing the modul
 int
 test_case_3_4_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6051,9 +6065,6 @@ test_case_3_4_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6068,11 +6079,10 @@ test_case_3_4_bot(int child)
 		state++;
 		switch (wait_event(child, LONG_WAIT)) {
 		case __EVENT_NO_MSG:
-		case __TEST_DATA:
-			continue;
 		case __TEST_DISCON_REQ:
 			break;
 		default:
+		case __TEST_DATA:
 			goto failure;
 		}
 		break;
@@ -6083,10 +6093,10 @@ test_case_3_4_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_4_top	preamble_0
+#define preamble_3_4_top	preamble_1_top
 #define preamble_3_4_bot	preamble_0
 
-#define postamble_3_4_top	postamble_0
+#define postamble_3_4_top	postamble_1_top
 #define postamble_3_4_bot	postamble_0
 
 struct test_stream test_3_4_top = { &preamble_3_4_top, &test_case_3_4_top, &postamble_3_4_top };
@@ -6102,9 +6112,6 @@ Tests that data can be sent with write(2) after orderly release."
 int
 test_case_3_5_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
@@ -6114,9 +6121,6 @@ test_case_3_5_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6152,10 +6156,10 @@ test_case_3_5_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_5_top	preamble_0
+#define preamble_3_5_top	preamble_1_top
 #define preamble_3_5_bot	preamble_0
 
-#define postamble_3_5_top	postamble_0
+#define postamble_3_5_top	postamble_1_top
 #define postamble_3_5_bot	postamble_0
 
 struct test_stream test_3_5_top = { &preamble_3_5_top, &test_case_3_5_top, &postamble_3_5_top };
@@ -6171,9 +6175,6 @@ Tests that data cannot be sent with write(2) after disconnect."
 int
 test_case_3_6_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
@@ -6183,9 +6184,6 @@ test_case_3_6_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6217,10 +6215,10 @@ test_case_3_6_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_6_top	preamble_0
+#define preamble_3_6_top	preamble_1_top
 #define preamble_3_6_bot	preamble_0
 
-#define postamble_3_6_top	postamble_0
+#define postamble_3_6_top	postamble_1b_top
 #define postamble_3_6_bot	postamble_0
 
 struct test_stream test_3_6_top = { &preamble_3_6_top, &test_case_3_6_top, &postamble_3_6_top };
@@ -6236,9 +6234,6 @@ Tests that data can be sent with putmsg(2) after orderly release."
 int
 test_case_3_7_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
@@ -6248,9 +6243,6 @@ test_case_3_7_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6286,10 +6278,10 @@ test_case_3_7_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_7_top	preamble_0
+#define preamble_3_7_top	preamble_1_top
 #define preamble_3_7_bot	preamble_0
 
-#define postamble_3_7_top	postamble_0
+#define postamble_3_7_top	postamble_1_top
 #define postamble_3_7_bot	postamble_0
 
 struct test_stream test_3_7_top = { &preamble_3_7_top, &test_case_3_7_top, &postamble_3_7_top };
@@ -6305,9 +6297,6 @@ Tests that data cannot be sent with putmsg(2) after disconnect."
 int
 test_case_3_8_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
@@ -6317,9 +6306,6 @@ test_case_3_8_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6344,10 +6330,10 @@ test_case_3_8_bot(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_3_8_top	preamble_0
+#define preamble_3_8_top	preamble_1_top
 #define preamble_3_8_bot	preamble_0
 
-#define postamble_3_8_top	postamble_0
+#define postamble_3_8_top	postamble_1b_top
 #define postamble_3_8_bot	postamble_0
 
 struct test_stream test_3_8_top = { &preamble_3_8_top, &test_case_3_8_top, &postamble_3_8_top };
@@ -6366,9 +6352,6 @@ an error on the stream."
 int
 test_case_4_1_top(int child)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
 	if (get_data(child, __TEST_READ) >= 0 || last_errno != EPROTO)
@@ -6377,9 +6360,13 @@ test_case_4_1_top(int child)
 	if (get_data(child, __TEST_READV) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
+	test_gflags = 0;
+	test_gband = 0;
 	if (get_data(child, __TEST_GETMSG) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
+	test_gflags = MSG_ANY;
+	test_gband = 0;
 	if (get_data(child, __TEST_GETPMSG) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
@@ -6393,9 +6380,6 @@ test_case_4_1_top(int child)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6432,10 +6416,10 @@ test_case_4_1_1_bot(int child)
 	return test_case_4_1_bot(child, __TEST_CONN_IND);
 }
 
-#define preamble_4_1_1_top	preamble_0
+#define preamble_4_1_1_top	preamble_1_top
 #define preamble_4_1_1_bot	preamble_0
 
-#define postamble_4_1_1_top	postamble_0
+#define postamble_4_1_1_top	postamble_1_top
 #define postamble_4_1_1_bot	postamble_0
 
 struct test_stream test_4_1_1_top = { &preamble_4_1_1_top, &test_case_4_1_1_top, &postamble_4_1_1_top };
@@ -6457,10 +6441,10 @@ test_case_4_1_2_bot(int child)
 	return test_case_4_1_bot(child, __TEST_CONN_CON);
 }
 
-#define preamble_4_1_2_top	preamble_0
+#define preamble_4_1_2_top	preamble_1_top
 #define preamble_4_1_2_bot	preamble_0
 
-#define postamble_4_1_2_top	postamble_0
+#define postamble_4_1_2_top	postamble_1_top
 #define postamble_4_1_2_bot	postamble_0
 
 struct test_stream test_4_1_2_top = { &preamble_4_1_2_top, &test_case_4_1_2_top, &postamble_4_1_2_top };
@@ -6482,10 +6466,10 @@ test_case_4_1_3_bot(int child)
 	return test_case_4_1_bot(child, __TEST_EXDATA_IND);
 }
 
-#define preamble_4_1_3_top	preamble_0
+#define preamble_4_1_3_top	preamble_1_top
 #define preamble_4_1_3_bot	preamble_0
 
-#define postamble_4_1_3_top	postamble_0
+#define postamble_4_1_3_top	postamble_1_top
 #define postamble_4_1_3_bot	postamble_0
 
 struct test_stream test_4_1_3_top = { &preamble_4_1_3_top, &test_case_4_1_3_top, &postamble_4_1_3_top };
@@ -6506,10 +6490,10 @@ test_case_4_1_4_bot(int child)
 	return test_case_4_1_bot(child, __TEST_INFO_ACK);
 }
 
-#define preamble_4_1_4_top	preamble_0
+#define preamble_4_1_4_top	preamble_1_top
 #define preamble_4_1_4_bot	preamble_0
 
-#define postamble_4_1_4_top	postamble_0
+#define postamble_4_1_4_top	postamble_1_top
 #define postamble_4_1_4_bot	postamble_0
 
 struct test_stream test_4_1_4_top = { &preamble_4_1_4_top, &test_case_4_1_4_top, &postamble_4_1_4_top };
@@ -6530,10 +6514,10 @@ test_case_4_1_5_bot(int child)
 	return test_case_4_1_bot(child, __TEST_BIND_ACK);
 }
 
-#define preamble_4_1_5_top	preamble_0
+#define preamble_4_1_5_top	preamble_1_top
 #define preamble_4_1_5_bot	preamble_0
 
-#define postamble_4_1_5_top	postamble_0
+#define postamble_4_1_5_top	postamble_1_top
 #define postamble_4_1_5_bot	postamble_0
 
 struct test_stream test_4_1_5_top = { &preamble_4_1_5_top, &test_case_4_1_5_top, &postamble_4_1_5_top };
@@ -6554,10 +6538,10 @@ test_case_4_1_6_bot(int child)
 	return test_case_4_1_bot(child, __TEST_ERROR_ACK);
 }
 
-#define preamble_4_1_6_top	preamble_0
+#define preamble_4_1_6_top	preamble_1_top
 #define preamble_4_1_6_bot	preamble_0
 
-#define postamble_4_1_6_top	postamble_0
+#define postamble_4_1_6_top	postamble_1_top
 #define postamble_4_1_6_bot	postamble_0
 
 struct test_stream test_4_1_6_top = { &preamble_4_1_6_top, &test_case_4_1_6_top, &postamble_4_1_6_top };
@@ -6578,10 +6562,10 @@ test_case_4_1_7_bot(int child)
 	return test_case_4_1_bot(child, __TEST_OK_ACK);
 }
 
-#define preamble_4_1_7_top	preamble_0
+#define preamble_4_1_7_top	preamble_1_top
 #define preamble_4_1_7_bot	preamble_0
 
-#define postamble_4_1_7_top	postamble_0
+#define postamble_4_1_7_top	postamble_1_top
 #define postamble_4_1_7_bot	postamble_0
 
 struct test_stream test_4_1_7_top = { &preamble_4_1_7_top, &test_case_4_1_7_top, &postamble_4_1_7_top };
@@ -6603,10 +6587,10 @@ test_case_4_1_8_bot(int child)
 	return test_case_4_1_bot(child, __TEST_UNITDATA_IND);
 }
 
-#define preamble_4_1_8_top	preamble_0
+#define preamble_4_1_8_top	preamble_1_top
 #define preamble_4_1_8_bot	preamble_0
 
-#define postamble_4_1_8_top	postamble_0
+#define postamble_4_1_8_top	postamble_1_top
 #define postamble_4_1_8_bot	postamble_0
 
 struct test_stream test_4_1_8_top = { &preamble_4_1_8_top, &test_case_4_1_8_top, &postamble_4_1_8_top };
@@ -6627,10 +6611,10 @@ test_case_4_1_9_bot(int child)
 	return test_case_4_1_bot(child, __TEST_UDERROR_IND);
 }
 
-#define preamble_4_1_9_top	preamble_0
+#define preamble_4_1_9_top	preamble_1_top
 #define preamble_4_1_9_bot	preamble_0
 
-#define postamble_4_1_9_top	postamble_0
+#define postamble_4_1_9_top	postamble_1_top
 #define postamble_4_1_9_bot	postamble_0
 
 struct test_stream test_4_1_9_top = { &preamble_4_1_9_top, &test_case_4_1_9_top, &postamble_4_1_9_top };
@@ -6651,10 +6635,10 @@ test_case_4_1_10_bot(int child)
 	return test_case_4_1_bot(child, __TEST_OPTMGMT_ACK);
 }
 
-#define preamble_4_1_10_top	preamble_0
+#define preamble_4_1_10_top	preamble_1_top
 #define preamble_4_1_10_bot	preamble_0
 
-#define postamble_4_1_10_top	postamble_0
+#define postamble_4_1_10_top	postamble_1_top
 #define postamble_4_1_10_bot	postamble_0
 
 struct test_stream test_4_1_10_top = { &preamble_4_1_10_top, &test_case_4_1_10_top, &postamble_4_1_10_top };
@@ -6675,10 +6659,10 @@ test_case_4_1_11_bot(int child)
 	return test_case_4_1_bot(child, __TEST_ADDR_ACK);
 }
 
-#define preamble_4_1_11_top	preamble_0
+#define preamble_4_1_11_top	preamble_1_top
 #define preamble_4_1_11_bot	preamble_0
 
-#define postamble_4_1_11_top	postamble_0
+#define postamble_4_1_11_top	postamble_1_top
 #define postamble_4_1_11_bot	postamble_0
 
 struct test_stream test_4_1_11_top = { &preamble_4_1_11_top, &test_case_4_1_11_top, &postamble_4_1_11_top };
@@ -6699,10 +6683,10 @@ test_case_4_1_12_bot(int child)
 	return test_case_4_1_bot(child, __TEST_CAPABILITY_ACK);
 }
 
-#define preamble_4_1_12_top	preamble_0
+#define preamble_4_1_12_top	preamble_1_top
 #define preamble_4_1_12_bot	preamble_0
 
-#define postamble_4_1_12_top	postamble_0
+#define postamble_4_1_12_top	postamble_1_top
 #define postamble_4_1_12_bot	postamble_0
 
 struct test_stream test_4_1_12_top = { &preamble_4_1_12_top, &test_case_4_1_12_top, &postamble_4_1_12_top };
@@ -6721,9 +6705,6 @@ error on the stream."
 int
 test_case_4_2_top(int child, int signal)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	if (do_signal(child, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6733,9 +6714,13 @@ test_case_4_2_top(int child, int signal)
 	if (get_data(child, __TEST_READV) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
+	test_gflags = 0;
+	test_gband = 0;
 	if (get_data(child, __TEST_GETMSG) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
+	test_gflags = MSG_ANY;
+	test_gband = 0;
 	if (get_data(child, __TEST_GETPMSG) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
@@ -6749,9 +6734,6 @@ test_case_4_2_top(int child, int signal)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6783,10 +6765,10 @@ test_case_4_2_1_top(int child)
 
 #define test_case_4_2_1_bot test_case_4_2_bot
 
-#define preamble_4_2_1_top	preamble_0
+#define preamble_4_2_1_top	preamble_1_top
 #define preamble_4_2_1_bot	preamble_0
 
-#define postamble_4_2_1_top	postamble_0
+#define postamble_4_2_1_top	postamble_1_top
 #define postamble_4_2_1_bot	postamble_0
 
 struct test_stream test_4_2_1_top = { &preamble_4_2_1_top, &test_case_4_2_1_top, &postamble_4_2_1_top };
@@ -6808,10 +6790,10 @@ test_case_4_2_2_top(int child)
 
 #define test_case_4_2_2_bot test_case_4_2_bot
 
-#define preamble_4_2_2_top	preamble_0
+#define preamble_4_2_2_top	preamble_1_top
 #define preamble_4_2_2_bot	preamble_0
 
-#define postamble_4_2_2_top	postamble_0
+#define postamble_4_2_2_top	postamble_1_top
 #define postamble_4_2_2_bot	postamble_0
 
 struct test_stream test_4_2_2_top = { &preamble_4_2_2_top, &test_case_4_2_2_top, &postamble_4_2_2_top };
@@ -6833,10 +6815,10 @@ test_case_4_2_3_top(int child)
 
 #define test_case_4_2_3_bot test_case_4_2_bot
 
-#define preamble_4_2_3_top	preamble_0
+#define preamble_4_2_3_top	preamble_1_top
 #define preamble_4_2_3_bot	preamble_0
 
-#define postamble_4_2_3_top	postamble_0
+#define postamble_4_2_3_top	postamble_1_top
 #define postamble_4_2_3_bot	postamble_0
 
 struct test_stream test_4_2_3_top = { &preamble_4_2_3_top, &test_case_4_2_3_top, &postamble_4_2_3_top };
@@ -6859,10 +6841,10 @@ test_case_4_2_4_top(int child)
 
 #define test_case_4_2_4_bot test_case_4_2_bot
 
-#define preamble_4_2_4_top	preamble_0
+#define preamble_4_2_4_top	preamble_1_top
 #define preamble_4_2_4_bot	preamble_0
 
-#define postamble_4_2_4_top	postamble_0
+#define postamble_4_2_4_top	postamble_1_top
 #define postamble_4_2_4_bot	postamble_0
 
 struct test_stream test_4_2_4_top = { &preamble_4_2_4_top, &test_case_4_2_4_top, &postamble_4_2_4_top };
@@ -6885,10 +6867,10 @@ test_case_4_2_5_top(int child)
 
 #define test_case_4_2_5_bot test_case_4_2_bot
 
-#define preamble_4_2_5_top	preamble_0
+#define preamble_4_2_5_top	preamble_1_top
 #define preamble_4_2_5_bot	preamble_0
 
-#define postamble_4_2_5_top	postamble_0
+#define postamble_4_2_5_top	postamble_1_top
 #define postamble_4_2_5_bot	postamble_0
 
 struct test_stream test_4_2_5_top = { &preamble_4_2_5_top, &test_case_4_2_5_top, &postamble_4_2_5_top };
@@ -6910,10 +6892,10 @@ test_case_4_2_6_top(int child)
 
 #define test_case_4_2_6_bot test_case_4_2_bot
 
-#define preamble_4_2_6_top	preamble_0
+#define preamble_4_2_6_top	preamble_1_top
 #define preamble_4_2_6_bot	preamble_0
 
-#define postamble_4_2_6_top	postamble_0
+#define postamble_4_2_6_top	postamble_1_top
 #define postamble_4_2_6_bot	postamble_0
 
 struct test_stream test_4_2_6_top = { &preamble_4_2_6_top, &test_case_4_2_6_top, &postamble_4_2_6_top };
@@ -6935,10 +6917,10 @@ test_case_4_2_7_top(int child)
 
 #define test_case_4_2_7_bot test_case_4_2_bot
 
-#define preamble_4_2_7_top	preamble_0
+#define preamble_4_2_7_top	preamble_1_top
 #define preamble_4_2_7_bot	preamble_0
 
-#define postamble_4_2_7_top	postamble_0
+#define postamble_4_2_7_top	postamble_1_top
 #define postamble_4_2_7_bot	postamble_0
 
 struct test_stream test_4_2_7_top = { &preamble_4_2_7_top, &test_case_4_2_7_top, &postamble_4_2_7_top };
@@ -6960,10 +6942,10 @@ test_case_4_2_8_top(int child)
 
 #define test_case_4_2_8_bot test_case_4_2_bot
 
-#define preamble_4_2_8_top	preamble_0
+#define preamble_4_2_8_top	preamble_1_top
 #define preamble_4_2_8_bot	preamble_0
 
-#define postamble_4_2_8_top	postamble_0
+#define postamble_4_2_8_top	postamble_1_top
 #define postamble_4_2_8_bot	postamble_0
 
 struct test_stream test_4_2_8_top = { &preamble_4_2_8_top, &test_case_4_2_8_top, &postamble_4_2_8_top };
@@ -6986,10 +6968,10 @@ test_case_4_2_9_top(int child)
 
 #define test_case_4_2_9_bot test_case_4_2_bot
 
-#define preamble_4_2_9_top	preamble_0
+#define preamble_4_2_9_top	preamble_1_top
 #define preamble_4_2_9_bot	preamble_0
 
-#define postamble_4_2_9_top	postamble_0
+#define postamble_4_2_9_top	postamble_1_top
 #define postamble_4_2_9_bot	postamble_0
 
 struct test_stream test_4_2_9_top = { &preamble_4_2_9_top, &test_case_4_2_9_top, &postamble_4_2_9_top };
@@ -7011,10 +6993,10 @@ test_case_4_2_10_top(int child)
 
 #define test_case_4_2_10_bot test_case_4_2_bot
 
-#define preamble_4_2_10_top	preamble_0
+#define preamble_4_2_10_top	preamble_1_top
 #define preamble_4_2_10_bot	preamble_0
 
-#define postamble_4_2_10_top	postamble_0
+#define postamble_4_2_10_top	postamble_1_top
 #define postamble_4_2_10_bot	postamble_0
 
 struct test_stream test_4_2_10_top = { &preamble_4_2_10_top, &test_case_4_2_10_top, &postamble_4_2_10_top };
@@ -7037,10 +7019,10 @@ test_case_4_2_11_top(int child)
 
 #define test_case_4_2_11_bot test_case_4_2_bot
 
-#define preamble_4_2_11_top	preamble_0
+#define preamble_4_2_11_top	preamble_1_top
 #define preamble_4_2_11_bot	preamble_0
 
-#define postamble_4_2_11_top	postamble_0
+#define postamble_4_2_11_top	postamble_1_top
 #define postamble_4_2_11_bot	postamble_0
 
 struct test_stream test_4_2_11_top = { &preamble_4_2_11_top, &test_case_4_2_11_top, &postamble_4_2_11_top };
@@ -7063,10 +7045,10 @@ test_case_4_2_12_top(int child)
 
 #define test_case_4_2_12_bot test_case_4_2_bot
 
-#define preamble_4_2_12_top	preamble_0
+#define preamble_4_2_12_top	preamble_1_top
 #define preamble_4_2_12_bot	preamble_0
 
-#define postamble_4_2_12_top	postamble_0
+#define postamble_4_2_12_top	postamble_1_top
 #define postamble_4_2_12_bot	postamble_0
 
 struct test_stream test_4_2_12_top = { &preamble_4_2_12_top, &test_case_4_2_12_top, &postamble_4_2_12_top };
@@ -7088,10 +7070,10 @@ test_case_4_2_13_top(int child)
 
 #define test_case_4_2_13_bot test_case_4_2_bot
 
-#define preamble_4_2_13_top	preamble_0
+#define preamble_4_2_13_top	preamble_1_top
 #define preamble_4_2_13_bot	preamble_0
 
-#define postamble_4_2_13_top	postamble_0
+#define postamble_4_2_13_top	postamble_1_top
 #define postamble_4_2_13_bot	postamble_0
 
 struct test_stream test_4_2_13_top = { &preamble_4_2_13_top, &test_case_4_2_13_top, &postamble_4_2_13_top };
@@ -7113,10 +7095,10 @@ test_case_4_2_14_top(int child)
 
 #define test_case_4_2_14_bot test_case_4_2_bot
 
-#define preamble_4_2_14_top	preamble_0
+#define preamble_4_2_14_top	preamble_1_top
 #define preamble_4_2_14_bot	preamble_0
 
-#define postamble_4_2_14_top	postamble_0
+#define postamble_4_2_14_top	postamble_1_top
 #define postamble_4_2_14_bot	postamble_0
 
 struct test_stream test_4_2_14_top = { &preamble_4_2_14_top, &test_case_4_2_14_top, &postamble_4_2_14_top };
@@ -7135,9 +7117,6 @@ results in an error on the stream."
 int
 test_case_4_3_top(int child, int signal)
 {
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	if (do_signal(child, signal) == __RESULT_SUCCESS || last_errno != EPROTO)
 		goto failure;
 	state++;
@@ -7147,9 +7126,13 @@ test_case_4_3_top(int child, int signal)
 	if (get_data(child, __TEST_READV) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
+	test_gflags = 0;
+	test_gband = 0;
 	if (get_data(child, __TEST_GETMSG) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
+	test_gflags = MSG_ANY;
+	test_gband = 0;
 	if (get_data(child, __TEST_GETPMSG) >= 0 || last_errno != EPROTO)
 		goto failure;
 	state++;
@@ -7163,9 +7146,6 @@ test_case_4_3_top(int child, int signal)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7197,10 +7177,10 @@ test_case_4_3_1_top(int child)
 
 #define test_case_4_3_1_bot test_case_4_3_bot
 
-#define preamble_4_3_1_top	preamble_0
+#define preamble_4_3_1_top	preamble_1_top
 #define preamble_4_3_1_bot	preamble_0
 
-#define postamble_4_3_1_top	postamble_0
+#define postamble_4_3_1_top	postamble_1_top
 #define postamble_4_3_1_bot	postamble_0
 
 struct test_stream test_4_3_1_top = { &preamble_4_3_1_top, &test_case_4_3_1_top, &postamble_4_3_1_top };
@@ -7222,10 +7202,10 @@ test_case_4_3_2_top(int child)
 
 #define test_case_4_3_2_bot test_case_4_3_bot
 
-#define preamble_4_3_2_top	preamble_0
+#define preamble_4_3_2_top	preamble_1_top
 #define preamble_4_3_2_bot	preamble_0
 
-#define postamble_4_3_2_top	postamble_0
+#define postamble_4_3_2_top	postamble_1_top
 #define postamble_4_3_2_bot	postamble_0
 
 struct test_stream test_4_3_2_top = { &preamble_4_3_2_top, &test_case_4_3_2_top, &postamble_4_3_2_top };
@@ -7247,10 +7227,10 @@ test_case_4_3_3_top(int child)
 
 #define test_case_4_3_3_bot test_case_4_3_bot
 
-#define preamble_4_3_3_top	preamble_0
+#define preamble_4_3_3_top	preamble_1_top
 #define preamble_4_3_3_bot	preamble_0
 
-#define postamble_4_3_3_top	postamble_0
+#define postamble_4_3_3_top	postamble_1_top
 #define postamble_4_3_3_bot	postamble_0
 
 struct test_stream test_4_3_3_top = { &preamble_4_3_3_top, &test_case_4_3_3_top, &postamble_4_3_3_top };
@@ -7272,10 +7252,10 @@ test_case_4_3_4_top(int child)
 
 #define test_case_4_3_4_bot test_case_4_3_bot
 
-#define preamble_4_3_4_top	preamble_0
+#define preamble_4_3_4_top	preamble_1_top
 #define preamble_4_3_4_bot	preamble_0
 
-#define postamble_4_3_4_top	postamble_0
+#define postamble_4_3_4_top	postamble_1_top
 #define postamble_4_3_4_bot	postamble_0
 
 struct test_stream test_4_3_4_top = { &preamble_4_3_4_top, &test_case_4_3_4_top, &postamble_4_3_4_top };
@@ -7297,10 +7277,10 @@ test_case_4_3_5_top(int child)
 
 #define test_case_4_3_5_bot test_case_4_3_bot
 
-#define preamble_4_3_5_top	preamble_0
+#define preamble_4_3_5_top	preamble_1_top
 #define preamble_4_3_5_bot	preamble_0
 
-#define postamble_4_3_5_top	postamble_0
+#define postamble_4_3_5_top	postamble_1_top
 #define postamble_4_3_5_bot	postamble_0
 
 struct test_stream test_4_3_5_top = { &preamble_4_3_5_top, &test_case_4_3_5_top, &postamble_4_3_5_top };
@@ -7322,10 +7302,10 @@ test_case_4_3_6_top(int child)
 
 #define test_case_4_3_6_bot test_case_4_3_bot
 
-#define preamble_4_3_6_top	preamble_0
+#define preamble_4_3_6_top	preamble_1_top
 #define preamble_4_3_6_bot	preamble_0
 
-#define postamble_4_3_6_top	postamble_0
+#define postamble_4_3_6_top	postamble_1_top
 #define postamble_4_3_6_bot	postamble_0
 
 struct test_stream test_4_3_6_top = { &preamble_4_3_6_top, &test_case_4_3_6_top, &postamble_4_3_6_top };
@@ -7347,10 +7327,10 @@ test_case_4_3_7_top(int child)
 
 #define test_case_4_3_7_bot test_case_4_3_bot
 
-#define preamble_4_3_7_top	preamble_0
+#define preamble_4_3_7_top	preamble_1_top
 #define preamble_4_3_7_bot	preamble_0
 
-#define postamble_4_3_7_top	postamble_0
+#define postamble_4_3_7_top	postamble_1_top
 #define postamble_4_3_7_bot	postamble_0
 
 struct test_stream test_4_3_7_top = { &preamble_4_3_7_top, &test_case_4_3_7_top, &postamble_4_3_7_top };
@@ -7372,10 +7352,10 @@ test_case_4_3_8_top(int child)
 
 #define test_case_4_3_8_bot test_case_4_3_bot
 
-#define preamble_4_3_8_top	preamble_0
+#define preamble_4_3_8_top	preamble_1_top
 #define preamble_4_3_8_bot	preamble_0
 
-#define postamble_4_3_8_top	postamble_0
+#define postamble_4_3_8_top	postamble_1_top
 #define postamble_4_3_8_bot	postamble_0
 
 struct test_stream test_4_3_8_top = { &preamble_4_3_8_top, &test_case_4_3_8_top, &postamble_4_3_8_top };
@@ -7397,10 +7377,10 @@ test_case_4_3_9_top(int child)
 
 #define test_case_4_3_9_bot test_case_4_3_bot
 
-#define preamble_4_3_9_top	preamble_0
+#define preamble_4_3_9_top	preamble_1_top
 #define preamble_4_3_9_bot	preamble_0
 
-#define postamble_4_3_9_top	postamble_0
+#define postamble_4_3_9_top	postamble_1_top
 #define postamble_4_3_9_bot	postamble_0
 
 struct test_stream test_4_3_9_top = { &preamble_4_3_9_top, &test_case_4_3_9_top, &postamble_4_3_9_top };
@@ -7422,10 +7402,10 @@ test_case_4_3_10_top(int child)
 
 #define test_case_4_3_10_bot test_case_4_3_bot
 
-#define preamble_4_3_10_top	preamble_0
+#define preamble_4_3_10_top	preamble_1_top
 #define preamble_4_3_10_bot	preamble_0
 
-#define postamble_4_3_10_top	postamble_0
+#define postamble_4_3_10_top	postamble_1_top
 #define postamble_4_3_10_bot	postamble_0
 
 struct test_stream test_4_3_10_top = { &preamble_4_3_10_top, &test_case_4_3_10_top, &postamble_4_3_10_top };
@@ -7447,10 +7427,10 @@ test_case_4_3_11_top(int child)
 
 #define test_case_4_3_11_bot test_case_4_3_bot
 
-#define preamble_4_3_11_top	preamble_0
+#define preamble_4_3_11_top	preamble_1_top
 #define preamble_4_3_11_bot	preamble_0
 
-#define postamble_4_3_11_top	postamble_0
+#define postamble_4_3_11_top	postamble_1_top
 #define postamble_4_3_11_bot	postamble_0
 
 struct test_stream test_4_3_11_top = { &preamble_4_3_11_top, &test_case_4_3_11_top, &postamble_4_3_11_top };

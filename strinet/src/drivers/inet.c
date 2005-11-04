@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/03 12:43:00 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 03:40:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -439,7 +439,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/11/03 12:43:00 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13491,8 +13491,12 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 		p->sk = sk;
 		p->state = sk->sk_state;	/* capture current state */
 		mp->b_wptr += sizeof(*p);
+#if defined LFS
+		put(q, mp);
+#else
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
+#endif
 		return (void) (0);
 	}
 	/* set up bufcall so we don't lose events */
