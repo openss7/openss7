@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 07:36:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -82,8 +82,8 @@ static char const ident[] =
 #endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:45:04 $"
+#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -91,9 +91,9 @@ static char const ident[] =
 			TIMOD_COPYRIGHT	"\n" \
 			TIMOD_REVISION	"\n" \
 			TIMOD_DEVICE	"\n" \
-			TIMOD_CONTACT	"\n"
+			TIMOD_CONTACT
 #define TIMOD_SPLASH	TIMOD_DEVICE	" - " \
-			TIMOD_REVISION	"\n"
+			TIMOD_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(TIMOD_CONTACT);
@@ -107,10 +107,13 @@ MODULE_ALIAS("streams-timod");
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
-#define TIMOD_MOD_ID		CONFIG_STREAMS_TIMOD_MODID
-#define TIMOD_MOD_NAME		CONFIG_STREAMS_TIMOD_NAME
-#endif				/* LFS */
+#ifndef TIMOD_MOD_NAME
+#define TIMOD_MOD_NAME		"timod"
+#endif
+
+#ifndef TIMOD_MOD_ID
+#define TIMOD_MOD_ID		0
+#endif
 
 /*
  *  =========================================================================
@@ -129,12 +132,12 @@ MODULE_ALIAS("streams-timod");
 #endif				/* MODULE */
 
 static struct module_info timod_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 static int timod_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -144,20 +147,20 @@ static int timod_rput(queue_t *, mblk_t *);
 static int timod_wput(queue_t *, mblk_t *);
 
 static struct qinit timod_rinit = {
-	qi_putp:timod_rput,		/* Read put (message from below) */
-	qi_qopen:timod_open,		/* Each open */
-	qi_qclose:timod_close,		/* Last close */
-	qi_minfo:&timod_minfo,		/* Information */
+	.qi_putp = timod_rput,		/* Read put (message from below) */
+	.qi_qopen = timod_open,		/* Each open */
+	.qi_qclose = timod_close,		/* Last close */
+	.qi_minfo = &timod_minfo,		/* Information */
 };
 
 static struct qinit timod_winit = {
-	qi_putp:timod_wput,		/* Write put (message from above) */
-	qi_minfo:&timod_minfo,		/* Information */
+	.qi_putp = timod_wput,		/* Write put (message from above) */
+	.qi_minfo = &timod_minfo,		/* Information */
 };
 
 MODULE_STATIC struct streamtab timodinfo = {
-	st_rdinit:&timod_rinit,		/* Upper read queue */
-	st_wrinit:&timod_winit,		/* Upper write queue */
+	.st_rdinit = &timod_rinit,		/* Upper read queue */
+	.st_wrinit = &timod_winit,		/* Upper write queue */
 };
 
 /*

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 07:36:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $";
 
 #include <sys/os7/compat.h>
 
@@ -70,19 +70,17 @@ static char const ident[] =
 // #define TIRDWR_TPI_PEDANTIC
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/18 12:45:04 $"
-#define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
-				TIRDWR_EXTRA		"\n" \
-				TIRDWR_REVISION		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
+				TIRDWR_REVISION		"\n" \
 				TIRDWR_DEVICE		"\n" \
 				TIRDWR_CONTACT
-#define TIRDWR_SPLASH		TIRDWR_DEVICE		"\n" \
+#define TIRDWR_SPLASH		TIRDWR_DEVICE		" - " \
 				TIRDWR_REVISION
 
 #ifdef LINUX
@@ -122,12 +120,12 @@ MODULE_ALIAS("streams-tirdwr");
 #endif				/* MODULE */
 
 static struct module_info tirdwr_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 static int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -137,20 +135,20 @@ static int tirdwr_rput(queue_t *q, mblk_t *mp);
 static int tirdwr_wput(queue_t *q, mblk_t *mp);
 
 static struct qinit tirdwr_rinit = {
-	qi_putp:tirdwr_rput,		/* Read put (message from below) */
-	qi_qopen:tirdwr_open,		/* Each open */
-	qi_qclose:tirdwr_close,		/* Last close */
-	qi_minfo:&tirdwr_minfo,		/* Information */
+	.qi_putp = tirdwr_rput,		/* Read put (message from below) */
+	.qi_qopen = tirdwr_open,		/* Each open */
+	.qi_qclose = tirdwr_close,		/* Last close */
+	.qi_minfo = &tirdwr_minfo,		/* Information */
 };
 
 static struct qinit tirdwr_winit = {
-	qi_putp:tirdwr_wput,		/* Write put (message from above) */
-	qi_minfo:&tirdwr_minfo,		/* Information */
+	.qi_putp = tirdwr_wput,		/* Write put (message from above) */
+	.qi_minfo = &tirdwr_minfo,		/* Information */
 };
 
 static struct streamtab tirdwrinfo = {
-	st_rdinit:&tirdwr_rinit,	/* Upper read queue */
-	st_wrinit:&tirdwr_winit,	/* Upper write queue */
+	.st_rdinit = &tirdwr_rinit,	/* Upper read queue */
+	.st_wrinit = &tirdwr_winit,	/* Upper write queue */
 };
 
 /*
@@ -602,11 +600,11 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 		/* Documentation states that XTI/TLI library commands should fail with EPROTO.
 		   Also, there is never any reason why the user should be accessing lower layer
 		   IOCTLs with tirdwr installed.  This acheives that effect. */
-		tirdwr_eproto(priv, NULL, NULL);
 		mp->b_datap->db_type = M_IOCNAK;
 		iocp->ioc_error = EPROTO;
 		iocp->ioc_rval = -1;
 		qreply(q, mp);
+		tirdwr_eproto(priv, NULL, NULL); /* XXX */
 		break;
 	default:
 		tirdwr_eproto(priv, mp, NULL);
@@ -764,8 +762,11 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 static int
 tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
+	queue_t *rq, *wq;
 	(void) oflag;
 	(void) crp;
+	(void) rq;
+	(void) wq;
 #if defined LIS
 	/* protect against some LiS bugs */
 	if (q->q_ptr == NULL) {
@@ -778,6 +779,10 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 		goto skip_pop;
 	}
 #endif				/* defined LIS */
+	rq = RD(q);
+	wq = WR(q);
+	__ensure(rq->q_next != NULL, goto skip_pop);
+	__ensure(wq->q_next != NULL, goto skip_pop);
 	tirdwr_pop(q);
 	goto skip_pop;
       skip_pop:

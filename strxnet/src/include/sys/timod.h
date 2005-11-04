@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.3 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.4 2005/11/04 07:36:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 07:36:33 $ by $Author: brian $
 
  $Log: timod.h,v $
+ Revision 0.9.2.4  2005/11/04 07:36:33  brian
+ - all test cases pass on Linux Fast-STREAMS
+
  Revision 0.9.2.3  2005/05/14 08:28:29  brian
  - copyright header correction
 
@@ -62,7 +65,7 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define TIMOD			('T'<<8)
 #define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */
@@ -90,6 +93,8 @@ struct _o_ti_user {
 	int ti_lookflg;			/* buffered look flag */
 };
 
+/* These clash with termios ioctls if 'T' is used. */
+/* OSF uses 't' instead. */
 #define _O_TI_GETINFO		(TIMOD|1)	/* OSF */
 #define _O_TI_OPTMGMT		(TIMOD|2)	/* OSF */
 #define _O_TI_BIND		(TIMOD|3)	/* OSF */
@@ -106,6 +111,8 @@ typedef struct xti_state {
 	unsigned int xtis_qlen;		/* Saved qlen parameter from t_bind */
 } XTIS, *XTISP;
 
+/* Some of these clash with BSD termios ioctls if 'T' is used. */
+/* Linux wronly uses 'T' instead of 't' for BSD ioctls. */
 #define TI_GETINFO		(TIMOD|140)
 #define TI_OPTMGMT		(TIMOD|141)
 #define TI_BIND			(TIMOD|142)
