@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/10/20 08:18:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/11/05 09:28:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/20 08:18:57 $ by $Author: brian $
+# Last Modified $Date: 2005/11/05 09:28:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -199,6 +199,31 @@ AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
     esac
     AM_CONDITIONAL([CONFIG_STREAMS_SYNCQS], [test :${lfs_streams_syncqs:-yes} = :yes])
 ])# _LFS_SETUP_SYNCQS
+# =============================================================================
+
+# =============================================================================
+# _LFS_SETUP_KTHREADS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
+    AC_ARG_ENABLE([streams-kthreads],
+	AS_HELP_STRING([--disable-streams-kthreads],
+	    [disable STREAMS kernel threads.
+	    @<:@default=enabled@:>@]),
+	    [enable_streams_kthreads="$enableval"],
+	    [enable_streams_kthreads='yes'])
+    AC_CACHE_CHECK([for STREAMS kernel threads], [lfs_streams_kthreads], [dnl
+	lfs_streams_kthreads="${enable_streams_kthreads:-no}"
+	])
+    case ${lfs_streams_kthreads:-yes} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [], [When defined]
+	    AC_PACKAGE_TITLE [will include use kernel threads for the STREAMS
+	    scheduler; when undefined,] AC_PACKAGE_TITLE [will use softirqs
+	    for the STREAMS scheduler.])
+	    ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${lfs_streams_kthreads:-yes} = :yes])
+])# _LFS_SETUP_KTHREADS
 # =============================================================================
 
 # =============================================================================
@@ -768,6 +793,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_SETUP_DEBUG
     _LFS_SETUP_MODULE
     _LFS_SETUP_SYNCQS
+    _LFS_SETUP_KTHREADS
     _LFS_SETUP_UTILS
     _LFS_SETUP_MODULES
     _LFS_SETUP_DRIVERS
@@ -812,7 +838,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h], [:], [:], [
+			  asm/uaccess.h linux/kthread.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -887,6 +913,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
 #if HAVE_KINC_ASM_UACCESS_H
@@ -956,6 +985,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
 #endif
 #include <linux/time.h>		/* for struct timespec */
 ])
@@ -1078,6 +1110,9 @@ dnl
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
 #endif
 #include <linux/time.h>		/* for struct timespec */]],
 			[[struct timespec ts;

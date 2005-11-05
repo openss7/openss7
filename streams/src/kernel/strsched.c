@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/03 12:42:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/05 09:28:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/03 12:42:50 $ by $Author: brian $
+ Last Modified $Date: 2005/11/05 09:28:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/03 12:42:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/05 09:28:59 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/03 12:42:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/05 09:28:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,6 +70,11 @@ static char const ident[] =
 #endif
 #if HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>	/* for kthread_create and friends */
+#include <linux/cpu.h>		/* for cpu_online, cpu_is_offline */
+#include <linux/notifier.h>	/* for CPU notifier callbacks */
 #endif
 #include <linux/delay.h>
 #include <linux/sysctl.h>
@@ -109,6 +114,26 @@ struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 EXPORT_SYMBOL(strthreads);
 #endif
 
+#if defined CONFIG_STREAMS_KTHREADS
+
+streams_fastcall void
+__raise_streams(void)
+{
+	struct strthread *t = this_thread;
+
+	wake_up_process(t->proc);
+}
+
+static inline streams_fastcall void
+cpu_raise_streams(unsigned int cpu)
+{
+	struct strthread *t = &strthreads[cpu];
+
+	wake_up_process(t->proc);
+}
+
+#else				/* defined CONFIG_STREAMS_KTHREADS */
+
 #if HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! HAVE_RAISE_SOFTIRQ_EXPORT
 void fastcall
 raise_softirq(unsigned int nr)
@@ -126,6 +151,24 @@ __raise_streams(void)
 {
 	raise_softirq(STREAMS_SOFTIRQ);
 }
+
+#if !defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if defined __IRQ_STAT
+#define cpu_raise_softirq(__cpu,__nr) set_bit((__nr),(unsigned long *)&(__IRQ_STAT((__cpu), __softirq_pending)))
+#define HAVE_KFUNC_CPU_RAISE_SOFTIRQ 1
+#else
+#warning Cannot raise soft irqs on another CPU!
+#define cpu_raise_softirq(__cpu,__nr) raise_softirq((__nr))
+#endif
+#endif
+
+static inline streams_fastcall void
+cpu_raise_streams(unsigned int cpu)
+{
+	cpu_raise_softirq(cpu, STREAMS_SOFTIRQ);
+}
+
+#endif				/* defined CONFIG_STREAMS_KTHREADS */
 
 EXPORT_SYMBOL(__raise_streams);
 
@@ -208,7 +251,7 @@ mdbblock_alloc(uint priority, void *func)
 	switch (priority) {
 	case BPRI_HI:
 #if 0
-	/* testing theory about BPRI_HI allocation errors */
+		/* testing theory about BPRI_HI allocation errors */
 	{
 		struct strthread *t = this_thread;
 		unsigned long flags;
@@ -284,16 +327,6 @@ raise_local_bufcalls(void)
 			__raise_streams();
 }
 
-#if !defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
-#if defined __IRQ_STAT
-#define cpu_raise_softirq(__cpu,__nr) set_bit((__nr),(unsigned long *)&(__IRQ_STAT((__cpu), __softirq_pending)))
-#define HAVE_KFUNC_CPU_RAISE_SOFTIRQ 1
-#else
-#warning Cannot raise soft irqs on another CPU!
-#define cpu_raise_softirq(__cpu,__nr) raise_softirq((__nr))
-#endif
-#endif
-
 /*
  *  raise_bufcalls: - raise buffer callbacks on all STREAMS scheduler threads
  *
@@ -316,12 +349,12 @@ STATIC void
 raise_bufcalls(void)
 {
 	struct strthread *t;
-	int i;
+	unsigned int cpu;
 
-	for (i = 0, t = &strthreads[0]; i < NR_CPUS; i++, t++)
+	for (cpu = 0, t = &strthreads[0]; cpu < NR_CPUS; cpu++, t++)
 		if (test_bit(strbcwait, &t->flags))
 			if (!test_and_set_bit(strbcflag, &t->flags))
-				cpu_raise_softirq(i, STREAMS_SOFTIRQ);
+				cpu_raise_streams(cpu);
 }
 
 /**
@@ -1285,7 +1318,7 @@ timeout_function(unsigned long arg)
 {
 	struct strevent *se = (struct strevent *) arg;
 
-#if HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if defined CONFIG_STREAMS_KTHREADS || HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 	struct strthread *t = &strthreads[se->x.t.cpu];
 #else
 	struct strthread *t = this_thread;
@@ -1293,9 +1326,9 @@ timeout_function(unsigned long arg)
 
 	*xchg(&t->strtimout_tail, &se->se_next) = se;	/* MP-SAFE */
 	if (!test_and_set_bit(strtimout, &t->flags))
-#if HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if defined CONFIG_STREAMS_KTHREADS || HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		/* bind timeout back to the CPU that called for it */
-		cpu_raise_softirq(se->x.t.cpu, STREAMS_SOFTIRQ);
+		cpu_raise_streams(se->x.t.cpu);
 #else
 		__raise_streams();
 #endif
@@ -1409,12 +1442,12 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
  *  @q:		queue against which to synchronize callback
  *  @size:	size of message block requested
  *  @priority:	priority of message block request
- *  @function:	callback function
- *  @arg:	argument to callback function
+ *  @function:	the callback function
+ *  @arg:	a client argument to the callback function
  *
- *  Notices: Note that, for MP safety, bufcalls are always raised against the same processor that
- *  invoked the buffer call.  This means that the callback function (at least on 2.4 kernels) will
- *  not execute until after the caller exits or hits a pre-emption point.
+ *  Notices: Note that, for MP safety, bufcalls are always queued against the same processor that
+ *  invoked the buffer call.  This means that the callback function will not execute until after the
+ *  caller exits or hits a pre-emption point.
  */
 bcid_t
 __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg)
@@ -1465,6 +1498,19 @@ unbufcall(bcid_t bcid)
 
 EXPORT_SYMBOL(unbufcall);	/* include/sys/streams/stream.h */
 
+/*
+ *  __timeout:	- generate a timeout callback
+ *  @q:		queue against which to synchronize callback
+ *  @timo_fcn:	the callback function
+ *  @arg:	a client argument to the callback function
+ *  @ticks:	the number of clock ticks to wait
+ *  @pl:	the priority level at which to run the callback function
+ *  @cpu:	the cpu on which to run the callback function
+ *
+ *  Notices: Note that, for MP safety, timeouts are always raised against the same processor that
+ *  invoked the timeout callback.  This means that the callback function will not execute until
+ *  after the caller exists the calling function or hits a pre-emption point.
+ */
 toid_t
 __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu)
 {
@@ -1701,6 +1747,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 	}
 	prunlock(sd);
 }
+
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
@@ -1877,6 +1924,7 @@ srvp_fast(queue_t *q)
 	}
 	ctrace(qput(&q));	/* cancel qget from qschedule */
 }
+
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 srvp(queue_t *q)
@@ -2891,7 +2939,7 @@ do_bufcall_synced(struct strevent *se)
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
 		queue_t *qold;
 		struct stdata *sd;
-		
+
 		assert(q);
 		sd = qstream(q);
 		assert(sd);
@@ -2949,7 +2997,7 @@ do_timeout_synced(struct strevent *se)
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
 		queue_t *qold;
 		struct stdata *sd;
-		
+
 		assert(q);
 		sd = qstream(q);
 		assert(sd);
@@ -3717,7 +3765,7 @@ void
 freechain(mblk_t *mp, mblk_t **mpp)
 {
 	struct strthread *t;
-	
+
 	assert(mp);
 	assert(mpp != &mp);
 
@@ -3776,7 +3824,7 @@ _runqueues(struct softirq_action *unused)
 	atomic_inc(&t->lock);
 
 	if (unlikely((t->flags & (STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG
-			 | STREVENTS | STRBCFLAG | STRBCWAIT)) != 0)) {
+				  | STREVENTS | STRBCFLAG | STRBCWAIT)) != 0)) {
 		/* do deferred m_func's first */
 		if (test_bit(strmfuncs, &t->flags))
 			ctrace(domfuncs(t));
@@ -3825,9 +3873,9 @@ void
 runqueues(void)
 {
 	if (this_thread->flags & (QRUNFLAGS)) {
-		local_bh_disable();	/* simulates softirq context */
+		enter_streams();	/* simulate STREAMS context */
 		ctrace(_runqueues(NULL));
-		local_bh_enable();	/* go back to user context */
+		leave_streams();	/* go back to user context */
 	}
 }
 
@@ -3978,8 +4026,9 @@ sd_put(struct stdata **sdp)
 			/* zero stream reference on queue pair to avoid double put on sd */
 			qstream(sd->sd_rq) = NULL;
 			/* these are left valid until last reference released */
-			assure(atomic_read(&((struct queinfo *)sd->sd_rq)->qu_refs) == 2);
-			ptrace(("queue references qu_refs = %d\n", atomic_read(&((struct queinfo *)sd->sd_rq)->qu_refs)));
+			assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
+			ptrace(("queue references qu_refs = %d\n",
+				atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
 			ctrace(qput(&sd->sd_wq));
 			ctrace(qput(&sd->sd_rq));	/* should be last put */
 			/* initial qget is balanced in qdetach()/qdelete() */
@@ -4096,6 +4145,239 @@ str_init_caches(void)
 	return (0);
 }
 
+#if defined CONFIG_STREAMS_KTHREADS
+#if HAVE_KINC_LINUX_KTHREAD_H
+static int
+kstreamd(void *__bind_cpu)
+{
+	set_user_nice(current, 19);
+	set_current_state(TASK_INTERRUPTIBLE);
+	while (!kthread_should_stop()) {
+		if (!(this_thread->flags & (QRUNFLAGS)))
+			schedule();
+		__set_current_state(TASK_RUNNING);
+		while ((this_thread->flags & (QRUNFLAGS))) {
+			preempt_disable();
+			if (cpu_is_offline((long) __bind_cpu))
+				goto wait_to_die;
+			_runqueues(NULL);
+			preempt_enable();
+			cond_resched();
+		}
+		set_current_state(TASK_INTERRUPTIBLE);
+	}
+	__set_current_state(TASK_RUNNING);
+	return (0);
+      wait_to_die:
+	preempt_enable();
+	set_current_state(TASK_INTERRUPTIBLE);
+	while (!kthread_should_stop()) {
+		schedule();
+		set_current_state(TASK_INTERRUPTIBLE);
+	}
+	__set_current_state(TASK_RUNNING);
+	return (0);
+}
+
+#if defined CONFIG_HOTPLUG_CPU
+static void
+takeover_strsched(unsigned int cpu)
+{
+	struct strthread *t = this_thread;
+	struct strthread *o = &strthreads[cpu];
+	unsigned long flags;
+
+	local_irq_save(flags);
+	if (o->qhead) {
+		*xchg(&t->qtail, o->qtail) = o->qhead;
+		o->qhead = NULL;
+		o->qtail = &o->qhead;
+	}
+	if (o->strmfuncs_head) {
+		*xchg(&t->strmfuncs_tail, o->strmfuncs_tail) = o->strmfuncs_head;
+		o->strmfuncs_head = NULL;
+		o->strmfuncs_tail = &o->strmfuncs_head;
+	}
+	if (o->strbcalls_head) {
+		*xchg(&t->strbcalls_tail, o->strbcalls_tail) = o->strbcalls_head;
+		o->strbcalls_head = NULL;
+		o->strbcalls_tail = &o->strbcalls_head;
+	}
+	if (o->strtimout_head) {
+		*xchg(&t->strtimout_tail, o->strtimout_tail) = o->strtimout_head;
+		o->strtimout_head = NULL;
+		o->strtimout_tail = &o->strtimout_head;
+	}
+	if (o->strevents_head) {
+		*xchg(&t->strevents_tail, o->strevents_tail) = o->strevents_head;
+		o->strevents_head = NULL;
+		o->strevents_tail = &o->strevents_head;
+	}
+	if (o->scanqhead) {
+		*xchg(&t->scanqtail, o->scanqtail) = o->scanqhead;
+		o->scanqhead = NULL;
+		o->scanqtail = &o->scanqhead;
+	}
+	if (o->freemsg_head) {
+		*xchg(&t->freemsg_tail, o->freemsg_tail) = o->freemsg_head;
+		o->freemsg_head = NULL;
+		o->freemsg_tail = &o->freemsg_head;
+	}
+	if (o->freemblk_head) {
+		*xchg(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
+		o->freemblk_head = NULL;
+		o->freemblk_tail = &o->freemblk_head;
+	}
+	if (o->freeevnt_head) {
+		*xchg(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
+		o->freeevnt_head = NULL;
+		o->freeevnt_tail = &o->freeevnt_head;
+	}
+	local_irq_restore(flags);
+}
+#endif				/* defined CONFIG_HOTPLUG_CPU */
+static int __devinit
+str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
+{
+	int hotcpu = (unsigned long) hcpu;
+	struct strthread *t = &strthreads[hotcpu];
+	struct task_struct *p = t->proc;
+
+	switch (action) {
+	case CPU_UP_PREPARE:
+		if (IS_ERR(p = kthread_create(kstreamd, hcpu, "kstreamd/%d", hotcpu))) {
+			pswerr(("kstreamd for %i failed\n", hotcpu));
+			return (NOTIFY_BAD);
+		}
+		kthread_bind(p, hotcpu);
+		t->proc = p;
+		break;
+	case CPU_ONLINE:
+		wake_up_process(p);
+		break;
+#if defined CONFIG_HOTPLUG_CPU
+	case CPU_UP_CANCELLED:
+		kthread_bind(p, smp_processor_id());
+	case CPU_DEAD:
+		t->proc = NULL;
+		kthread_stop(p);
+		takeover_strsched(hotcpu);
+		break;
+#endif				/* defined CONFIG_HOTPLUG_CPU */
+	}
+	return (NOTIFY_OK);
+}
+static struct notifier_block __devinitdata str_cpu_nfb = {
+	.notifier_call = str_cpu_callback,
+};
+static int
+spawn_kstreamd(void)
+{
+	void *cpu = (void *) (long) smp_processor_id();
+
+	str_cpu_callback(&str_cpu_nfb, CPU_UP_PREPARE, cpu);
+	str_cpu_callback(&str_cpu_nfb, CPU_ONLINE, cpu);
+	register_cpu_notifier(&str_cpu_nfb);
+	return (0);
+}
+static void
+kill_kstreamd(void)
+{
+	int cpu;
+
+	for (cpu = 0; cpu < NR_CPUS; cpu++) {
+		struct strthread *t = &strthreads[cpu];
+		struct task_struct *p = t->proc;
+
+		/* make it runnable on this processor */
+		kthread_bind(p, smp_processor_id());
+		t->proc = NULL;
+		kthread_stop(p);
+	}
+	/* FIXME: need to clean out outstanding events now that everything is stopped */
+	return;
+}
+#else				/* HAVE_KINC_LINUX_KTHREAD_H */
+static int
+kstreamd(void *__bind_cpu)
+{
+	int bind_cpu = (int) (long) __bind_cpu;
+	int cpu = cpu_logical_map(bind_cpu);
+	struct strthread *t = &strthreads[cpu]; /* XXX? or is it bind_cpu */
+
+	daemonize();
+	set_user_nice(current, 19);
+	sigfillset(&current->blocked);
+	set_cpus_allowed(current, 1UL << cpu);
+	if (cpu() != cpu)
+		swerr();
+	sprintf(current->comm, "kstreamd/%d", bind_cpu);
+	__set_current_state(TASK_INTERRUPTIBLE);
+	mb();
+	t->proc = current;
+	for (;;) {
+		if (!(t->flags & (QRUNFLAGS)))
+			schedule();
+		__set_current_state(TASK_RUNNING);
+		while (t->flags & (QRUNFLAGS)) {
+			_runqueues(NULL);
+			if (current->need_resched)
+				scehdule();
+		}
+		__set_current_state(TASK_INTERRUPTIBLE);
+	}
+}
+static int
+spawn_kstreamd(void)
+{
+	int cpu;
+
+	for (cpu = 0; cpu < smp_num_cpus; cpu++) {
+		struct strthread *t = &strthreads[cpu];
+
+		if (kernel_thread(kstreamd, (void *) (long) cpu, CLONE_KERNEL) >= 0) {
+			/* wait for thread to come online */
+			while (!t->proc)
+				yeild();
+		} else
+			pswerr(("%s failed for cpu %d\n", __FUNCTION__, cpu));
+	}
+	return (0);
+}
+static void
+kill_kstreamd(void)
+{
+	int cpu;
+
+	for (cpu = 0; cpu < smp_num_cpus; cpu++) {
+		struct strthread *t = &strthreads[cpu];
+		struct task_struct *p = t->proc;
+
+		if (p) {
+			kill_proc(p->pid, SIGTERM, 1);
+			t->proc = NULL;
+		}
+	}
+	return (0);
+}
+#endif				/* HAVE_KINC_LINUX_KTHREAD_H */
+
+static void
+init_strsched(void)
+{
+	spawn_kstreamd();
+	return;
+}
+
+static void
+term_strsched(void)
+{
+	kill_kstreamd();
+	return;
+}
+
+#else				/* defined CONFIG_STREAMS_KTHREADS */
+
 #ifndef open_softirq
 #ifdef HAVE_OPEN_SOFTIRQ_ADDR
 /**
@@ -4115,6 +4397,22 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 }
 #endif
 #endif
+
+static void
+init_strsched(void)
+{
+	open_softirq(STREAMS_SOFTIRQ, _runqueues, NULL);
+	return;
+}
+
+static void
+term_strsched(void)
+{
+	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
+	return;
+}
+
+#endif				/* defined CONFIG_STREAMS_KTHREADS */
 
 /**
  *  strsched_init:  - initialize the STREAMS scheduler
@@ -4162,7 +4460,7 @@ strsched_init(void)
 	init_timer(&scan_timer);
 	scan_timer.data = 0;
 	scan_timer.function = scan_timeout_function;
-	open_softirq(STREAMS_SOFTIRQ, _runqueues, NULL);
+	init_strsched();
 	return (0);
 }
 
@@ -4176,7 +4474,7 @@ void
 strsched_exit(void)
 {
 	del_timer(&scan_timer);
-	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
+	term_strsched();
 #if defined CONFIG_STREAMS_SYNCQS
 	sq_put(&global_syncq);
 #endif

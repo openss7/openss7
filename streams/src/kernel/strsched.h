@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/22 19:58:16 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/11/05 09:28:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 19:58:16 $ by $Author: brian $
+ Last Modified $Date: 2005/11/05 09:28:59 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -152,17 +152,27 @@ do { \
 		__raise_streams(); \
 } while (0)
 
+#if defined CONFIG_STREAMS_KTHREADS
 #define enter_streams() \
 do { \
-	local_bh_disable(); \
 	local_str_disable(); \
 } while (0)
 
 #define leave_streams() \
 do { \
 	local_str_enable(); \
+} while (0)
+#else				/* defined CONFIG_STREAMS_KTHREADS */
+#define enter_streams() \
+do { \
+	local_bh_disable(); \
+} while (0)
+
+#define leave_streams() \
+do { \
 	local_bh_enable(); \
 } while (0)
+#endif				/* defined CONFIG_STREAMS_KTHREADS */
 
 __SCHED_EXTERN_INLINE context_t
 current_context(void)
