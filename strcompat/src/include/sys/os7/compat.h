@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.23 2005/07/15 23:09:16 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.24 2005/11/04 20:50:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:16 $ by $Author: brian $
+ Last Modified $Date: 2005/11/04 20:50:29 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -105,6 +105,11 @@ typedef void irqreturn_t;
 
 #include <sys/strconf.h>
 #include <sys/strlog.h>
+
+/* queue flags */
+#if defined LIS
+#define QSVCBUSY QRUNNING
+#endif
 
 /* minor device number range */
 #if defined LIS
