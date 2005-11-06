@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/05 09:28:59 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/05 22:54:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/05 09:28:59 $ by $Author: brian $
+ Last Modified $Date: 2005/11/05 22:54:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/05 09:28:59 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/05 22:54:55 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/05 09:28:59 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/05 22:54:55 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -4289,56 +4289,91 @@ kill_kstreamd(void)
 		struct strthread *t = &strthreads[cpu];
 		struct task_struct *p = t->proc;
 
-		/* make it runnable on this processor */
-		kthread_bind(p, smp_processor_id());
-		t->proc = NULL;
-		kthread_stop(p);
+		if (p) {
+			/* make it runnable on this processor */
+			kthread_bind(p, smp_processor_id());
+			t->proc = NULL;
+			kthread_stop(p);
+		}
 	}
 	/* FIXME: need to clean out outstanding events now that everything is stopped */
 	return;
 }
 #else				/* HAVE_KINC_LINUX_KTHREAD_H */
+#if !HAVE_KFUNC_SET_USER_NICE
+#define set_user_nice(__p, __val) (__p)->nice = (__val)
+#endif
+#if !HAVE_KFUNC_SET_CPUS_ALLOWED
+#define set_cpus_allowed(__p, __mask) (__p)->cpus_allowed = (__mask)
+#endif
+#if defined HAVE_DO_EXIT_ADDR
+static asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
+= (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
+#undef do_exit
+#define do_exit do_exit_
+#endif
 static int
 kstreamd(void *__bind_cpu)
 {
 	int bind_cpu = (int) (long) __bind_cpu;
 	int cpu = cpu_logical_map(bind_cpu);
-	struct strthread *t = &strthreads[cpu]; /* XXX? or is it bind_cpu */
+	struct strthread *t = &strthreads[cpu];
 
 	daemonize();
+#if 0
+	current->policy = SCHED_FIFO;
+	current->rt_priority = 50;
+#else
 	set_user_nice(current, 19);
+#endif
 	sigfillset(&current->blocked);
+	sigdelset(&current->blocked, SIGKILL);
 	set_cpus_allowed(current, 1UL << cpu);
 	if (cpu() != cpu)
 		swerr();
-	sprintf(current->comm, "kstreamd/%d", bind_cpu);
+	sprintf(current->comm, "kstreamd_CPU%d", bind_cpu);
 	__set_current_state(TASK_INTERRUPTIBLE);
 	mb();
 	t->proc = current;
 	for (;;) {
-		if (!(t->flags & (QRUNFLAGS)))
+		if (signal_pending(current))
+			do_exit(0);
+		if (!(t->flags & (QRUNFLAGS))) {
 			schedule();
+			if (signal_pending(current)
+			    && sigismember(&current->pending.signal, SIGKILL))
+				break;
+		}
 		__set_current_state(TASK_RUNNING);
 		while (t->flags & (QRUNFLAGS)) {
 			_runqueues(NULL);
 			if (current->need_resched)
-				scehdule();
+				schedule();
+			if (signal_pending(current)
+			    && sigismember(&current->pending.signal, SIGKILL))
+				break;
 		}
 		__set_current_state(TASK_INTERRUPTIBLE);
 	}
+	t->proc = NULL;
+	/* FIXME: might need to migrate */
+	return (0);
 }
+#ifndef CLONE_KERNEL
+#define CLONE_KERNEL (CLONE_FS|CLONE_FILES|CLONE_SIGNAL)
+#endif
 static int
 spawn_kstreamd(void)
 {
 	int cpu;
 
 	for (cpu = 0; cpu < smp_num_cpus; cpu++) {
-		struct strthread *t = &strthreads[cpu];
+		struct strthread *t = &strthreads[cpu_logical_map(cpu)];
 
 		if (kernel_thread(kstreamd, (void *) (long) cpu, CLONE_KERNEL) >= 0) {
 			/* wait for thread to come online */
 			while (!t->proc)
-				yeild();
+				yield();
 		} else
 			pswerr(("%s failed for cpu %d\n", __FUNCTION__, cpu));
 	}
@@ -4350,15 +4385,17 @@ kill_kstreamd(void)
 	int cpu;
 
 	for (cpu = 0; cpu < smp_num_cpus; cpu++) {
-		struct strthread *t = &strthreads[cpu];
+		struct strthread *t = &strthreads[cpu_logical_map(cpu)];
 		struct task_struct *p = t->proc;
 
 		if (p) {
-			kill_proc(p->pid, SIGTERM, 1);
-			t->proc = NULL;
+			kill_proc(p->pid, SIGKILL, 1);
+			/* wait for thread to die */
+			while (t->proc)
+				yield();
 		}
 	}
-	return (0);
+	return;
 }
 #endif				/* HAVE_KINC_LINUX_KTHREAD_H */
 
