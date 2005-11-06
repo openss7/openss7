@@ -25,7 +25,7 @@ Primary-site:		http://www.openss7.org/
 Platforms:		Linux
 Requires:		Linux kernel 2.4 or 2.6,
 			LiS-2.18.2 or streams-0.7a.4 SVR 4.2 STREAMS
-			strxns
+			strcompat-0.9.2.2, strxns-0.9.2.2
 Copying-policy:		GPL
 Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End

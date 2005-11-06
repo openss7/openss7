@@ -15,15 +15,15 @@ Keywords:		XNS, INET, TPI
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
-			1.1MB @PACKAGE@-@VERSION@.tar.bz2
-			1.4MB @PACKAGE@-@VERSION@.tar.gz
+			1.5MB @PACKAGE@-@VERSION@.tar.bz2
+			1.9MB @PACKAGE@-@VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			1.1MB @PACKAGE@-@VERSION@.tar.bz2
-			1.4MB @PACKAGE@-@VERSION@.tar.gz
+			1.5MB @PACKAGE@-@VERSION@.tar.bz2
+			1.9MB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		Linux
 Requires:		Linux kernel 2.4 or 2.6,
-			LiS-2.18.1 or streams-0.7a.3 SVR 4.2 STREAMS
-			strxns-0.9.2-1, strxnet-0.9.2-1
+			LiS-2.18.2 or streams-0.7a.4 SVR 4.2 STREAMS
+			strcompat-0.9.2.2, strxns-0.9.2.2, strxnet-0.9.2.7
 Copying-policy:		GPL
 Comment:		Report bugs to @PACKAGE_BUGREPORT@
 End

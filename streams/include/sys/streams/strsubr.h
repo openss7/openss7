@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.53 2005/11/05 09:28:58 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.54 2005/11/06 11:00:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/05 09:28:58 $ by $Author: brian $
+ Last Modified $Date: 2005/11/06 11:00:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/11/05 09:28:58 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/11/06 11:00:54 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -420,17 +420,17 @@ enum {
 	qwantrun,			/* runqueues() wanted to run */
 };
 
-#define QRUNFLAG	(1 << qrunflag	)
-#define STRMFUNCS	(1 << strmfuncs )
-#define STRBCFLAG	(1 << strbcflag	)
-#define STRBCWAIT	(1 << strbcwait	)
-#define FLUSHWORK	(1 << flushwork	)
-#define FREEBLKS	(1 << freeblks	)
-#define STRTIMOUT	(1 << strtimout )
-#define SCANQFLAG	(1 << scanqflag )
-#define STREVENTS	(1 << strevents )
-#define QSYNCFLAG	(1 << qsyncflag )
-#define QWANTRUN	(1 << qwantrun  )
+#define QRUNFLAG	(1 << qrunflag	)	/* 0x00000001 */
+#define STRMFUNCS	(1 << strmfuncs )	/* 0x00000002 */
+#define STRBCFLAG	(1 << strbcflag	)	/* 0x00000004 */
+#define STRBCWAIT	(1 << strbcwait	)	/* 0x00000008 */
+#define FLUSHWORK	(1 << flushwork	)	/* 0x00000010 */
+#define FREEBLKS	(1 << freeblks	)	/* 0x00000020 */
+#define STRTIMOUT	(1 << strtimout )	/* 0x00000040 */
+#define SCANQFLAG	(1 << scanqflag )	/* 0x00000080 */
+#define STREVENTS	(1 << strevents )	/* 0x00000100 */
+#define QSYNCFLAG	(1 << qsyncflag )	/* 0x00000200 */
+#define QWANTRUN	(1 << qwantrun  )	/* 0x00000400 */
 
 #define QRUNFLAGS	(QRUNFLAG|STRMFUNCS|STRBCFLAG|STRBCWAIT|FLUSHWORK|FREEBLKS|STRTIMOUT|SCANQFLAG|STREVENTS)
 

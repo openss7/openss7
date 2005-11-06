@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/09/14 23:41:23 $
+# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/11/06 10:59:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/14 23:41:23 $ by $Author: brian $
+# Last Modified $Date: 2005/11/06 10:59:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1542,9 +1542,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strcompat.spec.in,v $
-# Revision 0.9.2.6  2005/09/14 23:41:23  brian
-# - bumped release numbers and change logs
+# Revision 0.9.2.7  2005/11/06 10:59:14  brian
+# - updates
 #
+
+* Wed Sep 14 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.6  2005/09/14 23:41:23  brian
+- bumped release numbers and change logs
 
 * Fri Jul  8 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.5  2005/07/08 13:14:29  brian

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/04 03:40:23 $ by $Author: brian $
+ Last Modified $Date: 2005/11/06 11:01:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -438,8 +438,8 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/11/04 03:40:23 $"
+#define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -12200,23 +12200,12 @@ ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot->sendmsg, return (-EFAULT));
-	/* An unfortunate state of affairs exists in recent 2.6 kernels: copy_from_user does not
-	   check whether the data segment is indeed a user segment before issuing kernel traps
-	   concerning functions that can possibly sleep.  Therefore, even though this call will not
-	   sleep, a warning is issued on each attempt from interrupt level.  So, when in interrupt,
-	   we back out temporarily and re-enter.  It is a bad hack: worse things can happen when
-	   interrupts are released. */
 	{
-		int interrupt = in_interrupt();
 		mm_segment_t fs = get_fs();
 
-		if (interrupt)
-			__local_bh_enable();
 		set_fs(KERNEL_DS);
 		res = sock_sendmsg(ss->sock, msg, len);
 		set_fs(fs);
-		if (interrupt)
-			local_bh_disable();
 	}
 	if (res <= 0)
 		printd(("%s: %p: ERROR: from sock->sk->sk_prot->sendmsg %d\n", DRV_NAME, ss, res));
@@ -12240,23 +12229,12 @@ ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
 	ensure(ss->sock->sk->sk_prot->recvmsg, return (-EFAULT));
-	/* An unfortunate state of affairs exists in recent 2.6 kernels: copy_to_user does not
-	   check whether the data segment is indeed a user segment before issuing kernel traps
-	   concerning functions that can possibly sleep.  Therefore, even though this call will not
-	   sleep, a warning is issued on each attempt from interrupt level.  So, when in interrupt,
-	   we back out temporarily and re-enter.  It is a bad hack: worse things can happen when
-	   interrupts are released. */
 	{
-		int interrupt = in_interrupt();
 		mm_segment_t fs = get_fs();
 
-		if (interrupt)
-			__local_bh_enable();
 		set_fs(KERNEL_DS);
 		res = sock_recvmsg(ss->sock, msg, size, sflags);
 		set_fs(fs);
-		if (interrupt)
-			local_bh_disable();
 	}
 	if (res < 0)
 		printd(("%s: %p: ERROR: from sock->ops->recvmsg %d\n", DRV_NAME, ss, res));
@@ -13491,12 +13469,8 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 		p->sk = sk;
 		p->state = sk->sk_state;	/* capture current state */
 		mp->b_wptr += sizeof(*p);
-#if defined LFS
-		put(q, mp);
-#else
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
-#endif
 		return (void) (0);
 	}
 	/* set up bufcall so we don't lose events */
@@ -14745,7 +14719,10 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	}
 	if (rtn < 0) {
+#ifndef _TEST
+		/* not so rare() during conformance suite testing */
 		rare();
+#endif
 		ss_set_state(ss, oldstate);
 		/* The put and srv procedures do not recognize all errors.  Sometimes we return an
 		   error to here just to restore the previous state. */
@@ -14966,7 +14943,8 @@ ss_r_read(queue_t *q, mblk_t *mp)
 
 	if (!ss->sock)
 		goto discard;
-	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
+	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN
+			|| p->state == TCP_CLOSE || p->state == TCP_CLOSE_WAIT);
 	printd(("%s: %p: sk_data_ready [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {

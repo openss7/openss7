@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 1.1.4.3 2005/05/12 02:02:21 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 1.1.4.4 2005/11/06 11:00:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/12 02:02:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/06 11:00:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -1725,6 +1725,10 @@ is set in
 .IR flags ,
 and the stream is flow controlled.
 It should deliver the message in this case.
+.PP
+.B LiS
+incorrectly passes a zero length data message when the data buffer length is zero (0), contrary to
+POSIX.
 .PP
 .B LiS
 incorrectly returns

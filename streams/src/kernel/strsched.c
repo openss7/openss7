@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/05 22:54:55 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/11/06 11:00:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/05 22:54:55 $ by $Author: brian $
+ Last Modified $Date: 2005/11/06 11:00:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/05 22:54:55 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/11/06 11:00:57 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/05 22:54:55 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/11/06 11:00:57 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -3819,7 +3819,7 @@ _runqueues(struct softirq_action *unused)
 	trace();
 	t = this_thread;
 	if (atomic_read(&t->lock) != 0)
-		return set_bit(qwantrun, &t->flags);
+		return ctrace(set_bit(qwantrun, &t->flags));
 
 	atomic_inc(&t->lock);
 
@@ -3872,10 +3872,26 @@ _runqueues(struct softirq_action *unused)
 void
 runqueues(void)
 {
-	if (this_thread->flags & (QRUNFLAGS)) {
+	struct strthread *t = this_thread;
+
+	if (t->flags & (QRUNFLAGS)) {
+		int i = 0;
+
+#if HAVE_KINC_LINUX_KTHREAD_H
+		preempt_disable();
+#endif
 		enter_streams();	/* simulate STREAMS context */
-		ctrace(_runqueues(NULL));
+		do {
+			ctrace(_runqueues(NULL));
+		} while (++i < 10 && t->flags & (QRUNFLAGS));
+		assure(i < 10);
+		if (i >= 10)
+			pswerr(("thread flags stuck at 0x%08lx\n", t->flags));
 		leave_streams();	/* go back to user context */
+#if HAVE_KINC_LINUX_KTHREAD_H
+		preempt_enable();
+		cond_resched();
+#endif
 	}
 }
 

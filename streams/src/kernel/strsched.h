@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/11/05 09:28:59 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/11/06 11:00:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/05 09:28:59 $ by $Author: brian $
+ Last Modified $Date: 2005/11/06 11:00:58 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -155,12 +155,10 @@ do { \
 #if defined CONFIG_STREAMS_KTHREADS
 #define enter_streams() \
 do { \
-	local_str_disable(); \
 } while (0)
 
 #define leave_streams() \
 do { \
-	local_str_enable(); \
 } while (0)
 #else				/* defined CONFIG_STREAMS_KTHREADS */
 #define enter_streams() \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/18 12:47:57 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/11/06 11:01:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:47:57 $ by $Author: brian $
+ Last Modified $Date: 2005/11/06 11:01:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.37  2005/11/06 11:01:12  brian
+ - changes from testing
+
  Revision 0.9.2.36  2005/07/18 12:47:57  brian
  - standard indentation
 
@@ -204,9 +207,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/18 12:47:57 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/11/06 11:01:12 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/18 12:47:57 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/11/06 11:01:12 $";
 
 /*
  *  Simple test program for INET streams.
@@ -32365,7 +32368,8 @@ test_case_13_5_4_resp(int child)
 int
 test_case_13_5_4_list(int child)
 {
-	test_data = "";
+	/* LiS has a bug where it passes a zero length data message. */
+	test_data = "data";
 	test_opts = NULL;
 	test_olen = 0;
 	test_resfd = test_fd[1];
