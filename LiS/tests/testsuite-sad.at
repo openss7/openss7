@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/11/07 10:56:23 $
+dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/11/07 10:54:54 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,13 +61,13 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/11/07 10:56:23 $ by $Author: brian $
+dnl Last Modified $Date: 2005/11/07 10:54:54 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sad.at,v $
-dnl Revision 0.9.2.10  2005/11/07 10:56:23  brian
-dnl - converged SAD tests for LiS and LfS
+dnl Revision 1.1.2.1  2005/11/07 10:54:54  brian
+dnl - added SAD testing
 dnl
 dnl Revision 0.9.2.9  2005/10/15 10:19:56  brian
 dnl - working up autopush and SAD driver tests

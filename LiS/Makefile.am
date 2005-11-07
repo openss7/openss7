@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.27 $) $Date: 2005/10/23 05:01:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.28 $) $Date: 2005/11/07 10:54:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/23 05:01:25 $ by $Author: brian $
+# Last Modified $Date: 2005/11/07 10:54:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,8 @@ libexec_PROGRAMS		= timetst \
 				  perftest \
 				  test-streams \
 				  test-fifo \
-				  test-pipe
+				  test-pipe \
+				  test-sad
 bin_PROGRAMS			=
 sbin_PROGRAMS			= streams
 
@@ -112,7 +113,8 @@ libexec_PROGRAMS		= timetst \
 				  lis_test2 \
 				  test-streams \
 				  test-fifo \
-				  test-pipe
+				  test-pipe \
+				  test-sad
 
 bin_PROGRAMS			= oc \
 				  pafd \
@@ -353,6 +355,12 @@ test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 test_pipe_LDFLAGS		= -lpthread -static libLiS.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(USER_CFLAGS)
+
+test_sad_SOURCES		= util/test-sad.c
+test_sad_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+test_sad_LDFLAGS		= -lpthread -static libLiS.la
+test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sad_CFLAGS			= $(USER_CFLAGS)
 
 perftest_SOURCES		= util/perftest.c
 perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)

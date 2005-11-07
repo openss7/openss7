@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.10 $) $Date: 2005/10/23 05:01:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.11 $) $Date: 2005/11/07 10:54:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
+# Last Modified $Date: 2005/11/07 10:54:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.11  2005/11/07 10:54:54  brian
+# - added SAD testing
+#
 # Revision 1.1.4.10  2005/10/23 05:01:26  brian
 # - test programs and modules for POSIX testing
 #
@@ -117,6 +120,7 @@ TESTSUITE_DEPS		= \
 			$(TESTSUITE)-streams.at \
 			$(TESTSUITE)-fifo.at \
 			$(TESTSUITE)-pipe.at \
+			$(TESTSUITE)-sad.at \
 			$(TESTSUITE)-strtst.at \
 			$(TESTSUITE)-timetst.at \
 			$(TESTSUITE)-test.at \

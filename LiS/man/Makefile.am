@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.15 $) $Date: 2005/11/01 11:20:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.16 $) $Date: 2005/11/07 10:54:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/01 11:20:23 $ by $Author: brian $
+# Last Modified $Date: 2005/11/07 10:54:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -162,6 +162,7 @@ man_MANS = \
 	man8/test-streams.8 \
 	man8/test-fifo.8 \
 	man8/test-pipe.8 \
+	man8/test-sad.8 \
 	man8/strtst.8 \
 	man8/thrtst.8 \
 	man8/timetst.8 \
@@ -843,6 +844,7 @@ dist_noinst_MANS = \
 	man8/test-streams.8.man \
 	man8/test-fifo.8.man \
 	man8/test-pipe.8.man \
+	man8/test-sad.8.man \
 	man8/strtst.8.man \
 	man8/thrtst.8.man \
 	man8/timetst.8.man \

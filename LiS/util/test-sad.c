@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/07 10:56:21 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/11/07 10:54:59 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/07 10:56:21 $ by $Author: brian $
+ Last Modified $Date: 2005/11/07 10:54:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
- Revision 0.9.2.21  2005/11/07 10:56:21  brian
- - converged SAD tests for LiS and LfS
+ Revision 1.1.2.1  2005/11/07 10:54:59  brian
+ - added SAD testing
 
  Revision 0.9.2.20  2005/10/15 10:19:52  brian
  - working up autopush and SAD driver tests
@@ -137,9 +137,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/07 10:56:21 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/11/07 10:54:59 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/07 10:56:21 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/11/07 10:54:59 $";
 
 #include <sys/types.h>
 #include <stropts.h>

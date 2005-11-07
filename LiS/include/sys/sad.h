@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: sad.h,v 1.1.1.1.12.2 2005/07/13 12:01:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -56,7 +56,7 @@
 #ifndef _SYS_SAD_H
 #define _SYS_SAD_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:19 $"
 
 #ifndef _SYS_STROPTS_H
 #include <sys/stropts.h>	/* for FMNAMESZ */
@@ -78,9 +78,9 @@
 
 struct apcommon {
 	unsigned apc_cmd;		/* Command */
-	major_t apc_major;		/* Major device number */
-	minor_t apc_minor;		/* First minor device number */
-	minor_t apc_lastminor;		/* Last minor device number */
+	long apc_major;			/* Major device number */
+	long apc_minor;			/* First minor device number */
+	long apc_lastminor;		/* Last minor device number */
 	unsigned int apc_npush;		/* Number of modules to autopush */
 };
 
