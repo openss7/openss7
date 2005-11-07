@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/01 11:20:32 $
+dnl @(#) $RCSfile: testsuite-pipe.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/11/07 03:01:56 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/11/01 11:20:32 $ by $Author: brian $
+dnl Last Modified $Date: 2005/11/07 03:01:56 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-pipe.at,v $
+dnl Revision 1.1.2.3  2005/11/07 03:01:56  brian
+dnl - marked expected failures
+dnl
 dnl Revision 1.1.2.2  2005/11/01 11:20:32  brian
 dnl - updates for testing and documentation
 dnl
@@ -160,11 +163,13 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.1])
 AT_KEYWORDS([pipe ioctl I_RECVFD ENXIO HUP])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.2])
 AT_KEYWORDS([pipe ioctl I_RECVFD EPROTO RDERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -175,6 +180,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.2.4])
 AT_KEYWORDS([pipe ioctl I_RECVFD EPROTO RDERR WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -195,6 +201,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.1])
 AT_KEYWORDS([pipe ioctl I_SENDFD ENXIO HUP])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -205,11 +212,13 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.3])
 AT_KEYWORDS([pipe ioctl I_SENDFD EPROTO WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.3.4])
 AT_KEYWORDS([pipe ioctl I_SENDFD EPROTO RDERR WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -240,6 +249,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.4.6])
 AT_KEYWORDS([pipe ioctl I_SWROPT ENXIO HUP])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -250,6 +260,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 2.4.8])
 AT_KEYWORDS([pipe ioctl I_CANPUT ENXIO HUP])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 2.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -265,11 +276,13 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.3])
 AT_KEYWORDS([pipe write ~O_NONBLOCK SIGNAL])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.4])
 AT_KEYWORDS([pipe write O_NONBLOCK])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -285,6 +298,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.7])
 AT_KEYWORDS([pipe write zero-length])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -295,16 +309,19 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.9])
 AT_KEYWORDS([pipe write EPROTO SIGPIPE WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.10])
 AT_KEYWORDS([pipe write EPROTO RDERR WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.1.11])
 AT_KEYWORDS([pipe write EPIPE SIGPIPE])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.1.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -320,11 +337,13 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.3])
 AT_KEYWORDS([pipe putmsg ~O_NONBLOCK SIGNAL])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.4])
 AT_KEYWORDS([pipe putmsg O_NONBLOCK])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -340,6 +359,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.7])
 AT_KEYWORDS([pipe putmsg zero-length])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -350,16 +370,19 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.9])
 AT_KEYWORDS([pipe putmsg EPROTO SIGPIPE WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.10])
 AT_KEYWORDS([pipe putmsg EPROTO RDERR WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.2.11])
 AT_KEYWORDS([pipe putmsg EPIPE SIGPIPE])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.2.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -375,11 +398,13 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.3])
 AT_KEYWORDS([pipe putpmsg ~O_NONBLOCK SIGNAL])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.4])
 AT_KEYWORDS([pipe putpmsg O_NONBLOCK])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -395,6 +420,7 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.7])
 AT_KEYWORDS([pipe putpmsg zero-length])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -405,16 +431,19 @@ AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.9])
 AT_KEYWORDS([pipe putpmsg EPROTO SIGPIPE WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.10])
 AT_KEYWORDS([pipe putpmsg EPROTO RDERR WRERR])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix pipe test 3.3.11])
 AT_KEYWORDS([pipe putpmsg EPIPE SIGPIPE])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CHECK([test_pipe 3.3.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
