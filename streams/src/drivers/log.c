@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:13 $ by $Author: brian $
+ Last Modified $Date: 2005/11/08 02:49:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/10/07 09:34:13 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -238,6 +238,38 @@ log_trace_filter(queue_t *q, short mid, short sid, char level)
 	return (rval);
 }
 
+static int
+log_rput(queue_t *q, mblk_t *mp)
+{
+	/* pass message along with flow control */
+	if (mp->b_datap->db_type >= QPCTL
+	    || (!q->q_first && !(q->q_flag & QSVCBUSY) && bcanputnext(q, mp->b_band))) {
+		putnext(q, mp);
+		return (1);
+	}
+	if (putq(q, mp))
+		return (1);
+	freemsg(mp);
+	return (0);
+}
+
+static int
+log_rsrv(queue_t *q)
+{
+	mblk_t *mp;
+
+	/* simply drain the queue */
+	while ((mp = getq(q))) {
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+			putnext(q, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
+	return (0);
+}
+
 /*
  *  Allocate a control block portion for a log message and fill it out.
  */
@@ -262,7 +294,7 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
 	if ((mp = allocb(sizeof(*lp), BPRI_MED))) {
 		struct timeval tv;
 
-		mp->b_datap->db_type = M_PROTO;
+		mp->b_datap->db_type = (flags & SL_NOPUTBUF) ? M_PCPROTO : M_PROTO;
 		lp = (typeof(lp)) mp->b_rptr;
 		mp->b_wptr = mp->b_rptr + sizeof(*lp);
 		mp->b_band = (7 - pri);
@@ -287,21 +319,17 @@ static int
 log_deliver_msg(queue_t *q, short mid, short sid, char level, int flags, int seq, mblk_t *dp,
 		int source)
 {
-	int rval = 0;
 	mblk_t *bp, *mp;
 
 	if (q && (bp = dupmsg(dp)) && (mp = log_alloc_ctl(q, mid, sid, level, flags, seq, source))) {
 		mp->b_cont = bp;
-		if (bcanput(q, mp->b_band) && putq(q, mp))
-			rval = 1;
-		else
-			freemsg(mp);
+		return log_rput(q, mp);
 	}
-	return (rval);
+	return (0);
 }
 
 static int
-log_put(queue_t *q, mblk_t *mp)
+log_wput(queue_t *q, mblk_t *mp)
 {
 	struct log *log = q->q_ptr;
 	union ioctypes *ioc;
@@ -528,19 +556,21 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit log_rqinit = {
-	qi_qopen:log_open,
-	qi_qclose:log_close,
-	qi_minfo:&log_minfo,
+	.qi_putp = log_rput,
+	.qi_srvp = log_rsrv,
+	.qi_qopen = log_open,
+	.qi_qclose = log_close,
+	.qi_minfo = &log_minfo,
 };
 
 static struct qinit log_wqinit = {
-	qi_putp:log_put,
-	qi_minfo:&log_minfo,
+	.qi_putp = log_wput,
+	.qi_minfo = &log_minfo,
 };
 
 static struct streamtab log_info = {
-	st_rdinit:&log_rqinit,
-	st_wrinit:&log_wqinit,
+	.st_rdinit = &log_rqinit,
+	.st_wrinit = &log_wqinit,
 };
 
 static struct cdevsw log_cdev = {
@@ -560,11 +590,11 @@ static vstrlog_t oldlog = NULL;
 
 /*
  *  Allocate a data block and fill it in with the format string and an argument
- *  list beignning with the integer aligned following the format string.  We
+ *  list beginning with the integer aligned following the format string.  We
  *  need to parse the format string (twice: once for sizing and once to assemble
  *  the list) to do this, so the number of arguments passed should be small
- *  (NLOGARGS is 3).  We process as many arguments as passed but you shouold not
- *  send mor than NLOGARGS.
+ *  (NLOGARGS is 3).  We process as many arguments as passed but you should not
+ *  send more than NLOGARGS.
  */
 static mblk_t *
 log_alloc_data(char *fmt, va_list args)
@@ -984,7 +1014,11 @@ log_init(void)
 	if (major == 0 && err > 0)
 		major = err;
 	/* hook into vstrlog */
+#if 0
 	oldlog = xchg(&vstrlog, &log_vstrlog);
+#else
+	oldlog = register_strlog(&log_vstrlog);
+#endif
 	return (0);
 }
 
@@ -995,7 +1029,11 @@ void __exit
 log_exit(void)
 {
 	/* unhook from vstrlog */
+#if 0
 	vstrlog = oldlog;
+#else
+	register_strlog(oldlog);
+#endif
 	unregister_strdev(&log_cdev, major);
 }
 

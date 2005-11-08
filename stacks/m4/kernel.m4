@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/10/29 04:36:36 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/11/08 03:05:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/29 04:36:36 $ by $Author: brian $
+# Last Modified $Date: 2005/11/08 03:05:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1617,7 +1617,12 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	    [enable_k_inline='no'])
 	if test :"${enable_k_inline:-no}" != :no 
 	then
-	    linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
+	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	    then
+		linux_cflags="$linux_cflags${linux_cflags:+ }-finline-functions"
+	    else
+		linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
+	    fi
 	fi
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude | -I${kbuilddir}/include |g"`
 	eval "linux_dir=\"${kbuilddir}/include2\"" ; if test -d "$linux_dir" ; then

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.11 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.12 2005/11/08 02:49:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/11/08 02:49:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/11/08 02:49:15 $"
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
@@ -65,7 +65,7 @@
 #define SL_FATAL    0x0010
 #define SL_WARN	    0x0020
 #define SL_NOTE	    0x0040
-#define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
+#define SL_NOPUTBUF 0x0080	/* uw7 compatibility */
 
 #define LOGMSGSZ    1024	/* max format string length */
 #define NLOGARGS    3		/* max number of arguments (really unlimited) */
@@ -79,7 +79,8 @@ extern int strlog(short mid, short sid, char level, unsigned short flags, char *
     __attribute__ ((format(printf, 5, 6)));
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
-extern vstrlog_t vstrlog;
+extern vstrlog_t register_strlog(vstrlog_t newlog);
+//extern vstrlog_t vstrlog;
 
 struct trace_ids {
 	short ti_mid;

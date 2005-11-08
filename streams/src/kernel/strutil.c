@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/11/03 12:42:52 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/08 02:49:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/03 12:42:52 $ by $Author: brian $
+ Last Modified $Date: 2005/11/08 02:49:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/11/03 12:42:52 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/08 02:49:16 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/11/03 12:42:52 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/08 02:49:16 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -3922,7 +3922,7 @@ static char str_err_buf[LOGMSGSZ];
 /*
  *  This is a default implementation for strlog(9).  When SL_CONSOLE is set, we print directly to
  *  the console using printk(9).  For SL_ERROR and SL_TRACE, we have no STREAMS error or trace
- *  loggers running, so we marks those messages as unseen by those loggers.  We also provide a hook
+ *  loggers running, so we mark those messages as unseen by those loggers.  We also provide a hook
  *  here so that the strutil package can hook into this call.  Because we cannot filter, only
  *  SL_CONSOLE messages are printed to the system logs.  This follows the rules for setting the
  *  priority according described in log(4).
@@ -3962,9 +3962,33 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 	return (rval);
 }
 
-vstrlog_t vstrlog = &vstrlog_default;
+static rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
+static vstrlog_t vstrlog = &vstrlog_default;
+//EXPORT_SYMBOL(vstrlog);
 
-EXPORT_SYMBOL(vstrlog);
+/**
+ *  register_strlog:	- register a new STREAMS logger
+ *  @newlog:	new vstrlog function pointer
+ *
+ *  DESCRIPTION: register_strlog() registers a new STREAMS logger callback function and returns the
+ *  previous callback function.  Suitable locks are taken to protect module unloading.
+ *
+ *  CONTEXT: register_strlog() is intended to be called from a STREAMS module or driver qi_qopen() or
+ *  qi_qclose() procedure.  It must be called from process context.
+ */
+vstrlog_t
+register_strlog(vstrlog_t newlog)
+{
+	unsigned long flags;
+	vstrlog_t oldlog;
+
+	write_lock_irqsave(&strlog_reg_lock, flags);
+	oldlog = xchg(&vstrlog, newlog);
+	write_unlock_irqrestore(&strlog_reg_lock, flags);
+	return (oldlog);
+}
+
+EXPORT_SYMBOL(register_strlog);
 
 /**
  *  strlog:	- log a STREAMS message
@@ -3974,12 +3998,17 @@ EXPORT_SYMBOL(vstrlog);
  *  @flag:	flags controlling distribution
  *  @fmt:	printf(3) format
  *  @...:	format specific arguments
+ *
+ *  CONTEXT: strlog() can be called from any context, however, the caller should be aware that this
+ *  function is complex and should only be called from in_interrupt() or in_streams() context
+ *  sparingly.
  */
 int
 strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	int result = 0;
 
+	read_lock(&strlog_reg_lock);
 	if (vstrlog != NULL) {
 		va_list args;
 
@@ -3987,6 +4016,7 @@ strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
 		va_end(args);
 	}
+	read_unlock(&strlog_reg_lock);
 	return (result);
 }
 
