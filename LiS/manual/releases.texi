@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.13 2005/09/14 23:40:54 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.14 2005/11/13 08:56:56 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/09/14 23:40:54 $ by $Author: brian $
+@c Last Modified $Date: 2005/11/13 08:56:56 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -468,7 +468,21 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a bug fixes release.
+The major change for 2.18.2 is the port-back of POSIX/SUSv3 XSR/XSI
+conformance test suites and performance programs from Linux Fast-STREAMS.  The
+purpose of porting back theses tests suites and supporting modules and drivers
+is to provide the ability to do comparison tests between LiS and Linux
+Fast-STREAMS.
+
+Another change is a module unloading safe vstrlog hook register and unregister
+functions register_strlog() and unregister_strlog().
+
+Some bug corrections and fixes for glaring SMP errors reported by Kutluck.
+
+This might be the last OpenSS7 release of Linux STREAMS.  You should seriously
+consider using the Linux Fast-STREAMS package (streams-0.7a.4) instead.  If
+you need comptibility to LiS (or other STREAMS implementation), investigate
+the strcompat package.
 
 @node Release LiS-2.18.1
 @subsection Release LiS-2.18.1

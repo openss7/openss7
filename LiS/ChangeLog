@@ -1,3 +1,92 @@
+2005-11-13  brian  <bidulock@openss7.org>
+	* Changes from OpenSS7 2.18.1 release:
+	* (.indent.pro): added a few types
+	* (.pkgrelease): bumped release number
+	* (ChangeLog):
+	- updated this change long
+	- added copyright notice at bottom
+	* (LiS.spec.in): updated changelog
+	* (Makefile.am):
+	- added the following test programs backported to LiS:
+	- added test-streams to build
+	- added test-fifo to build
+	- added test-pipe to build
+	- added test-sad to build
+	- added perftest to build
+	- added the following test modules and drivers backported to LiS
+	- added bufmod module
+	- added nullmod module
+	- added testmod module
+	- added nuls module
+	- added echo module
+	- added mux driver
+	* (NEWS): updated
+	* (am/help.am): corrected spelling
+	* (drivers/str/Config.in):
+	- added the following test modules and drivers backported to LiS
+	- added bufmod module
+	- added nullmod module
+	- added testmod module
+	- added nuls driver
+	- added echo driver
+	- added mux driver
+	* (drivers/str/bufmod.c): new file for bufmod module
+	* (drivers/str/echo.c): new file for echo driver
+	* (drivers/str/minimux.c):
+	- resolved namespace clash between minimux and mux drivers
+	* (drivers/str/mux.c): new file for mux driver
+	* (drivers/str/nullmod.c): new file for nullmod driver
+	* (drivers/str/nuls.c): new file for nuls driver
+	* (drivers/str/testmod.c): new file for testmod module
+	* (include/Makefile.am):
+	- added sys/testmod.h and sys/LiS/testmod.h headers to build
+	* (include/sys/sad.h):
+	- correct problem with missing major_t and minor_t definitions
+	* (incldue/sys/testmod.h): new file for testmod ioctls
+	* (incldue/sys/LiS/testmod.h): new file for testmod ioctls
+	* (m4/kernel.m4):
+	- fixed FC4 boot kernel name extraction
+	- removed -Winline when maintainer mode (because they then become errors)
+	* (man/Makefile.am):
+	- added manual pages for
+	- bufmod, nullmod, testmod, echo, nuls, mux
+	- perftest, test-streams, test-fifo, test-pipe, test-sad
+	* (man/man4/bufmod.4.man): new file
+	* (man/man4/echo.4.man): new file
+	* (man/man4/mux.4.man): new file
+	* (man/man4/nullmod.4.man): new file
+	* (man/man4/nuls.4.man): new file
+	* (man/man4/testmod.4.man): new file
+	* (man/man4/stremio.7.man): new file
+	* (man/man8/perftest.8.man): new file
+	* (man/man8/test-fifo.8.man): new file
+	* (man/man8/test-pipe.8.man): new file
+	* (man/man8/test-sad.8.man): new file
+	* (man/man8/test-streams.8.man): new file
+	* (manual/LiS.texi): include proper testsuite.texi file
+	* (manual/Makefile.am): add testsuite.texi file dependency
+	* (manual/releases.texi): updated release notes
+	* (manual/texi/testsuite.texi):
+	- added descriptions of pre- and post-installation tests
+	* (tests/Makefile.am):
+	- added testsuite-streams, testsuite-fifo, testsuite-pipe and testsuite-sad
+	  test suites
+	* (tests/aclocal.in):
+	- added at_STRCONF_PACKAGE so that testsuites can know which package they
+	  are running against (LiS or LfS).
+	* (tests/testsuite-fifo.at): backport of Linux Fast-STREAMS testsuite
+	* (tests/testsuite-pipe.at): backport of Linux Fast-STREAMS testsuite
+	* (tests/testsuite-sad.at): backport of Linux Fast-STREAMS testsuite
+	* (tests/testsuite-streams.at): backport of Linux Fast-STREAMS testsuite
+	* (tests/testsuite-strtst.at): factoring
+	* (tests/testsuite.at): added new test suites
+	* (util/perftest.c): added backported performance test program
+	* (util/test-fifo.): added backported conformance test program
+	* (util/test-pipe.): added backported conformance test program
+	* (util/test-sad.): added backported conformance test program
+	* (util/test-streams.): added backported conformance test program
+
+
 2005-03-12  brian  <bidulock@openss7.org>
 	* Changes from GCOM 2.18.0 release:
 	* (drivers/str/clone.c):
