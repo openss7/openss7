@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
+ Last Modified $Date: 2005/11/13 07:54:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $";
 
 /*
- *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
- *  distinct from the Linux syslog and klog.  One of the primary purposes of providing such a
- *  logging device is to suport the strlog(9) trace faciltiy.  This is a useful tool for debugging
- *  and interrogation of a live system.  Both Linux STREAMS (LiS) and Linux Fast-STREAMS (LfS) have
- *  been equipped with a hook to the strlog(9) function.  This hook is a vstrlog function pointer
- *  that defaults to internal kernel logging.  When the strlog(9) function is called by a STREAMS
- *  driver or module, we here first scan for whether there is an open trace or error logging stream
- *  willing to accept the message (from mid, sid and level).  If there is a logger that wishes to
- *  accept the message, it is formatted and sent upstream.  If there is no logger, or if the logger
- *  is flow controlled, the message is simply dropped.  This means that a STREAMS driver or module
- *  can generate alot of trace information without worrying about its impact on system performance.
- *  Normally calls to strlog(9) would be simply null operations.  Only when a trace or error logger
- *  is present in the system would information be passed upstream.  This is far preferrable to
- *  cmn_err(9) which generates each and every message to the kernel log.
+ *  This driver provides a multiplexing driver as an example and a test program.
  */
 
 #include <stdbool.h>
@@ -95,7 +82,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"

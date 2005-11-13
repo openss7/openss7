@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:45:04 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 08:00:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
+ Last Modified $Date: 2005/11/13 08:00:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:45:04 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 08:00:34 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:45:04 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 08:00:34 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -5169,9 +5169,9 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 {
 	struct _t_user *user;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_CLTS), TSF_IDLE)))
+	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!unitdata)
@@ -5244,7 +5244,7 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && (__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -5523,9 +5523,9 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 	struct _t_user *user;
 	int nbytes, i;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_CLTS), TSF_IDLE)))
+	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!unitdata || !iov)
@@ -5602,7 +5602,7 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && (__xnet_t_peek(fd) & ~T_DATA) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -6150,10 +6150,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.14 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.15 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.14 $)
- * @date \$Date: 2005/07/18 12:45:04 $
+ * @version \$Name:  $(\$Revision: 0.9.2.15 $)
+ * @date \$Date: 2005/11/13 08:00:34 $
  *
  * @}
  */

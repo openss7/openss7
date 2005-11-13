@@ -5,7 +5,21 @@ See the end for copying conditions.
 
 * Major changes in LiS-2.18.2
 
-  This is simply a bug fix release.
+  The major change for 2.18.2 is the port-back of POSIX/SUSv3 XSR/XSI
+  conformance test suites and performance programs from Linux Fast-STREAMS.  The
+  purpose of porting back theses tests suites and supporting modules and drivers
+  is to provide the ability to do comparison tests between LiS and Linux
+  Fast-STREAMS.
+
+  Another change is a module unloading safe vstrlog hook register and unregister
+  functions register_strlog() and unregister_strlog().
+
+  Some bug corrections and fixes for glaring SMP errors reported by Kutluck.
+
+  This might be the last OpenSS7 release of Linux STREAMS.  You should seriously
+  consider using the Linux Fast-STREAMS package (streams-0.7a.4) instead.  If
+  you need comptibility to LiS (or other STREAMS implementation), investigate
+  the strcompat package.
 
 * Major changes in LiS-2.18.1
 

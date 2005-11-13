@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/08/29 10:18:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 07:55:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:18:54 $ by $Author: brian $
+# Last Modified $Date: 2005/11/13 07:55:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -320,7 +320,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compat_compat_lis='not required'
 	else
 	    compat_compat_lis="${enable_compat_lis:-module}"
-	    if test :$compat_compat_lis = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    if test ":$compat_compat_lis" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 		compat_compat_lis='yes'
 	    fi
 	fi])
@@ -329,7 +329,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compat_compat_lfs='not required'
 	else
 	    compat_compat_lfs="${enable_compat_lfs:-module}"
-	    if test :$compat_compat_lfs = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    if test ":$compat_compat_lfs" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 		compat_compat_lfs='yes'
 	    fi
 	fi])
@@ -530,7 +530,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_lis:-module} in
+    case "${compat_compat_lis:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -548,7 +548,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_lfs:-module} in
+    case "${compat_compat_lfs:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LFS], [], [When defined, Linux STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with
@@ -604,10 +604,10 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${compat_compat_hpux:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${compat_compat_irix:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${compat_compat_irix:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${compat_compat_lis:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${compat_compat_lis:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test :${compat_compat_lfs:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test :${compat_compat_lfs:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test ":${compat_compat_lis:-module}"	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test ":${compat_compat_lis:-module}"	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test ":${compat_compat_lfs:-module}"	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test ":${compat_compat_lfs:-module}"	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${compat_compat_mac:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${compat_compat_mac:-module}	= :module])
 ])# _COMPAT_SETUP_COMPAT

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/11/09 06:52:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/11/13 07:57:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/09 06:52:50 $ by $Author: brian $
+ Last Modified $Date: 2005/11/13 07:57:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/11/09 06:52:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/11/13 07:57:27 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/11/09 06:52:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/11/13 07:57:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -412,38 +412,36 @@ mdbblock_free(mblk_t *mp)
  *  then work on them one by one.  After we free something, we want to raise pending buffer
  *  callbacks on all STREAMS scheduler threads in an attempt to let them use the freed blocks.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 freeblocks(struct strthread *t)
 {
 	register mblk_t *mp, *mp_next;
 
-	do {
-		clear_bit(freeblks, &t->flags);
-		if ((mp_next = xchg(&t->freemblk_head, NULL))) {	/* MP-SAFE */
-			t->freemblk_tail = &t->freemblk_head;
-			while ((mp = mp_next)) {
-				struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
-				struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
+	clear_bit(freeblks, &t->flags);
+	if ((mp_next = xchg(&t->freemblk_head, NULL))) {	/* MP-SAFE */
+		t->freemblk_tail = &t->freemblk_head;
+		while ((mp = mp_next)) {
+			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
+			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 
 #if defined CONFIG_STREAMS_DEBUG
-				unsigned long flags;
-				struct mdbblock *md = (struct mdbblock *) mp;
+			unsigned long flags;
+			struct mdbblock *md = (struct mdbblock *) mp;
 
-				write_lock_irqsave(&smi->si_rwlock, flags);
-				list_del_init(&md->msgblk.m_list);
-				list_del_init(&md->datablk.db_list);
-				write_unlock_irqrestore(&smi->si_rwlock, flags);
+			write_lock_irqsave(&smi->si_rwlock, flags);
+			list_del_init(&md->msgblk.m_list);
+			list_del_init(&md->datablk.db_list);
+			write_unlock_irqrestore(&smi->si_rwlock, flags);
 #endif
-				printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
-				atomic_dec(&smi->si_cnt);
-				mp_next = xchg(&mp->b_next, NULL);
-				mp->b_prev = NULL;
-				kmem_cache_free(sdi->si_cache, mp);
-				atomic_dec(&sdi->si_cnt);
-			}
-			raise_bufcalls();
+			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+			atomic_dec(&smi->si_cnt);
+			mp_next = xchg(&mp->b_next, NULL);
+			mp->b_prev = NULL;
+			kmem_cache_free(sdi->si_cache, mp);
+			atomic_dec(&sdi->si_cnt);
 		}
-	} while (test_bit(freeblks, &t->flags));
+		raise_bufcalls();
+	}
 }
 
 /* 
@@ -3329,7 +3327,7 @@ EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
  *
  *  Process all message functions deferred from hardirq in the order in which they were received.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 domfuncs(struct strthread *t)
 {
 	register mblk_t *b, *b_next;
@@ -3353,7 +3351,7 @@ domfuncs(struct strthread *t)
  *  
  *  Process all oustanding timeouts in the order in which they were received.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 timeouts(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -3390,7 +3388,7 @@ struct timer_list scan_timer;
  *
  *  Note that the only queues on this list are stream head write queues.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 scanqueues(struct strthread *t)
 {
 	register struct queue *q, *q_link;
@@ -3446,7 +3444,7 @@ EXPORT_SYMBOL(qscan);		/* for stream head in include/sys/streams/strsubr.h */
  *  doevents:	- process STREAMS events
  *  @t:		STREAMS execution thread
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 doevents(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -3592,7 +3590,7 @@ runsyncq(struct syncq *sq)
  *  access was requested.  This is acceptable and reduces the burder of tracking two perimeters with
  *  shared or exclusive access.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 backlog(struct strthread *t)
 {
 	register syncq_t *sq, *sq_link;
@@ -3622,7 +3620,7 @@ backlog(struct strthread *t)
  *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
  *  an allocation is successful.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 bufcalls(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -3646,7 +3644,7 @@ bufcalls(struct strthread *t)
  *
  *  Run queue service procedures.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 queuerun(struct strthread *t)
 {
 	queue_t *q, *q_link;
@@ -3733,26 +3731,24 @@ sqsched(syncq_t *sq)
  *  Free chains of message blocks outstanding from flush operations that were left over at the end
  *  of the CPU run.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 freechains(struct strthread *t)
 {
 	register mblk_t *mp, *mp_next;
 
-	do {
-		clear_bit(flushwork, &t->flags);
-		if ((mp_next = xchg(&t->freemsg_head, NULL))) {	/* MP-SAFE */
-			t->freemsg_tail = &t->freemsg_head;
-			while ((mp = mp_next)) {
-				mp_next = xchg(&mp->b_next, NULL);
+	clear_bit(flushwork, &t->flags);
+	if ((mp_next = xchg(&t->freemsg_head, NULL))) {	/* MP-SAFE */
+		t->freemsg_tail = &t->freemsg_head;
+		while ((mp = mp_next)) {
+			mp_next = xchg(&mp->b_next, NULL);
 #if 0
-				/* fake out freeb */
-				ctrace(qput(&mp->b_queue));
+			/* fake out freeb */
+			ctrace(qput(&mp->b_queue));
 #endif
-				mp->b_next = mp->b_prev = NULL;
-				freemsg(mp);
-			}
+			mp->b_next = mp->b_prev = NULL;
+			freemsg(mp);
 		}
-	} while (test_bit(flushwork, &t->flags));
+	}
 }
 
 #if 0
@@ -3822,6 +3818,10 @@ _runqueues(struct softirq_action *unused)
 
 	trace();
 	t = this_thread;
+
+	if (!(t->flags & (QRUNFLAGS)))
+		return;
+
 	if (atomic_read(&t->lock) != 0)
 		return ctrace(set_bit(qwantrun, &t->flags));
 
@@ -3862,6 +3862,7 @@ _runqueues(struct softirq_action *unused)
 			if (test_bit(freeblks, &t->flags))
 				ctrace(freeblocks(t));
 		}
+		clear_bit(qwantrun, &t->flags);
 	} while (t->flags & (QRUNFLAGS));
 
 	atomic_dec(&t->lock);
@@ -3878,20 +3879,20 @@ _runqueues(struct softirq_action *unused)
 void
 runqueues(void)
 {
-	struct strthread *t = this_thread;
-
-	if (t->flags & (QRUNFLAGS)) {
+#if 0
+	return;
+#else
 #if HAVE_KINC_LINUX_KTHREAD_H
-		preempt_disable();
+	preempt_disable();
 #endif
-		enter_streams();	/* simulate STREAMS context */
-		_runqueues(NULL);
-		leave_streams();	/* go back to user context */
+	enter_streams();	/* simulate STREAMS context */
+	_runqueues(NULL);
+	leave_streams();	/* go back to user context */
 #if HAVE_KINC_LINUX_KTHREAD_H
-		preempt_enable();
-		cond_resched();
+	preempt_enable();
+	cond_resched();
 #endif
-	}
+#endif
 }
 
 EXPORT_SYMBOL(runqueues);	/* include/sys/streams/strsubr.h */
@@ -4165,10 +4166,15 @@ str_init_caches(void)
 static int
 kstreamd(void *__bind_cpu)
 {
+#if 0
+	current->policy = SCHED_FIFO;
+	current->rt_priority = 50;
+#else
 	set_user_nice(current, 19);
+#endif
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
-		while (!(this_thread->flags & (QRUNFLAGS)))
+		if (!(this_thread->flags & (QRUNFLAGS)))
 			schedule();
 		__set_current_state(TASK_RUNNING);
 		preempt_disable();
@@ -4321,7 +4327,7 @@ kill_kstreamd(void)
 #endif
 #if defined HAVE_DO_EXIT_ADDR
 static asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
-    = (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
+= (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
 #undef do_exit
 #define do_exit do_exit_
 #endif
@@ -4351,7 +4357,7 @@ kstreamd(void *__bind_cpu)
 	for (;;) {
 		if (signal_pending(current))
 			do_exit(0);
-		while (!(t->flags & (QRUNFLAGS))) {
+		if (!(t->flags & (QRUNFLAGS))) {
 			schedule();
 			if (signal_pending(current)
 			    && sigismember(&current->pending.signal, SIGKILL))

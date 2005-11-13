@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/06 11:01:02 $ by $Author: brian $
+ Last Modified $Date: 2005/11/13 07:58:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -439,7 +439,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/11/06 11:01:02 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -15602,7 +15602,9 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (cminor < FIRST_CMINOR || cminor > LAST_CMINOR)
 		return (ENXIO);
 	prof = &ss_profiles[cminor - FIRST_CMINOR];
+#if 0
 	if (sflag == CLONEOPEN)
+#endif
 		cminor = FREE_CMINOR;
 	spin_lock_bh(&ss_lock);
 	for (; *ipp; ipp = &(*ipp)->next) {
@@ -15722,7 +15724,7 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
 STATIC struct cdevsw ss_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ss_info,
-	.d_flag = D_MP,
+	.d_flag = D_MP | D_CLONE,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,

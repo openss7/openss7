@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/23 22:05:37 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/11/13 07:55:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:05:37 $ by $Author: brian $
+ Last Modified $Date: 2005/11/13 07:55:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/23 22:05:37 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/11/13 07:55:17 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/23 22:05:37 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/11/13 07:55:17 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1574,7 +1574,7 @@ recv_xti_sctp_stream()
 	     &bind_req,
 	     &bind_resp) == SOCKET_ERROR) {
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     
     exit(1);
@@ -1678,7 +1678,7 @@ recv_xti_sctp_stream()
 	    t_errno);
     fflush(where);
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     exit(1);
   }
@@ -1702,7 +1702,7 @@ recv_xti_sctp_stream()
 	    errno,
 	    t_errno);
     fflush(where);
-    close(s_listen);
+    t_close(s_listen);
     exit(1);
   }
   
@@ -3555,7 +3555,7 @@ recv_xti_tcp_stream()
 	     &bind_req,
 	     &bind_resp) == SOCKET_ERROR) {
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     
     exit(1);
@@ -3659,7 +3659,7 @@ recv_xti_tcp_stream()
 	    t_errno);
     fflush(where);
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     exit(1);
   }
@@ -3682,7 +3682,7 @@ recv_xti_tcp_stream()
 	    "recv_xti_tcp_stream: t_open: errno %d t_errno %d\n",
 	    errno,
 	    t_errno);
-    close(s_listen);
+    t_close(s_listen);
     exit(1);
   }
 
@@ -3694,12 +3694,12 @@ recv_xti_tcp_stream()
 	    errno,
 	    t_errno);
     fflush(where);
-    close(s_data);
-    close(s_listen);
+    t_close(s_data);
+    t_close(s_listen);
     exit(1);
   }
 
-  close(s_listen);
+  t_close(s_listen);
   
   if (debug) {
     fprintf(where,
@@ -5121,7 +5121,7 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
     confidence_iteration++;
 
     /* this datapoint is done, so we don't need the socket any longer */
-    close(data_socket);
+    t_close(data_socket);
 
   }
 
@@ -6601,7 +6601,7 @@ void
     if (t_rcvudata(s_data,
 		   &recv_unitdata,
 		   &flags) != 0) {
-      if (errno == TNODATA) {
+      if (t_errno == TNODATA) {
 	continue;
       }
       if (errno == EINTR) {
@@ -6648,7 +6648,7 @@ void
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_xti_udp_rr: Transaction %d complete.\n",
 	      trans_received);
@@ -6697,7 +6697,7 @@ void
   send_response();
 
   /* we are done with the socket now */
-  close(s_data);
+  t_close(s_data);
 
 }
 
@@ -6876,7 +6876,7 @@ recv_xti_sctp_rr()
 	     &bind_req,
 	     &bind_resp) == SOCKET_ERROR) {
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     
     exit(1);
@@ -6942,7 +6942,7 @@ recv_xti_sctp_rr()
 	    t_errno);
     fflush(where);
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     exit(1);
   }
@@ -6966,7 +6966,7 @@ recv_xti_sctp_rr()
 	    errno,
 	    t_errno);
     fflush(where);
-    close(s_listen);
+    t_close(s_listen);
     exit(1);
   }
   
@@ -8258,7 +8258,7 @@ recv_xti_tcp_rr()
 	     &bind_req,
 	     &bind_resp) == SOCKET_ERROR) {
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     
     exit(1);
@@ -8324,7 +8324,7 @@ recv_xti_tcp_rr()
 	    t_errno);
     fflush(where);
     netperf_response.content.serv_errno = t_errno;
-    close(s_listen);
+    t_close(s_listen);
     send_response();
     exit(1);
   }
@@ -8348,7 +8348,7 @@ recv_xti_tcp_rr()
 	    errno,
 	    t_errno);
     fflush(where);
-    close(s_listen);
+    t_close(s_listen);
     exit(1);
   }
   

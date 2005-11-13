@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/08/29 10:18:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/11/13 07:53:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:18:38 $ by $Author: brian $
+# Last Modified $Date: 2005/11/13 07:53:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -172,7 +172,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRUTIL],
 			       [do not include STRUTIL in master pack @<:@included@:>@]),
 		[with_STRUTIL="$withval"],
-		[with_STRUTIL='yes'])
+		[with_STRUTIL='no'])
     if test :${with_STRUTIL:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strutil])
     fi
