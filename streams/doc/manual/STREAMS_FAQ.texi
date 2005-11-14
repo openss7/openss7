@@ -1,0 +1,1780 @@
+% -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
+% =========================================================================
+%
+% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.1 2005/11/14 11:20:03 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2005/11/14 11:20:03 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename STREAMS_FAQ.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Frequently Asked Questions
+@settitle @value{MANUAL_TITLE}
+
+@dircategory STREAMS
+@direntry
+* STREAMS FAQ: (STREAMS FAQ).	STREAMS Frequently Asked Questions
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Frequently Asked Questions
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this guide
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed guide).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this guide
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this guide into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Frequently Asked Questions
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
+This guide was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this guide
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this guide
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this guide into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Manpage index
+@defcodeindex mp
+
+@c Concatenate indices
+@syncodeindex fn cp
+@syncodeindex vr cp
+@synindex ky cp
+@syncodeindex pg cp
+@syncodeindex tp cp
+@synindex mp cp
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Guide
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@iftex
+
+@macro tabfig {image, number, caption}
+@cartouche
+@float Table,Table \number\
+@image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro tabfigsized {image, number, caption, size}
+@cartouche
+@float Table,Table \number\
+@image{\image\,\size\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro figure {image, number, caption}
+@cartouche
+@float Figure,Figure \number\
+@image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@cartouche
+@float Figure,Figure \number\
+@image{\image\,\size\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@command{\name\}
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro ioctlref {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@end iftex
+
+@ifnottex
+
+@macro tabfig {image, number, caption}
+@image{\image\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@end macro
+
+@macro tabfigsized {image, number, caption, size}
+@image{\image\,\size\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@end macro
+
+@macro figure {image, number, caption}
+@image{\image\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@image{\image\,\size\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@command{\name\} [@inforef{\name\, , *manpages*}]
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\} [@inforef{\name\, , *manpages*}]
+@end macro
+
+@macro ioctlref {name}
+@code{\name\} [@inforef{\name\(2), , *manpages*}; @inforef{streamio(7), , *manpages*}]
+@end macro
+
+@end ifnottex
+
+@macro tabref {number}
+@ref{Table \number\}
+@end macro
+
+@macro figref {number}
+@ref{Figure \number\}
+@end macro
+
+@macro manpage {name}
+@mpindex \name\
+@command{\name\}
+@end macro
+
+@macro type {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro member {name}
+@vindex \name\
+@var{\name\}
+@end macro
+
+@macro constant {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro signal {name}
+@vindex \name\
+@{@b{@code{\name\}}@}
+@end macro
+
+@macro errno {name}
+@vindex \name\
+[@b{@code{\name\}}]
+@end macro
+
+@macro stropt {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro streamio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro termio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro sockio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro msg {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro header {name}
+@pindex \name\
+@file{\name\}
+@end macro
+
+@menu
+* Acknowledgements::
+* Preface::
+* FAQ::
+* Copying::
+* Glossary::
+* List of Figures::
+* Index::
+
+ --- The Detailed Node Listing ---
+
+Acknowledgements
+
+* Sponsors::			Sponsors
+* Contributors::		Contributors
+
+Preface
+
+FAQ
+
+* What is STREAMS?::		STREAMS Description
+* Does Linux have STREAMS?::	STREAMS and Linux
+* Why STREAMS?::		STREAMS Justification
+* Why Fast?::			STREAMS Implementation
+* Why Linux?::			STREAMS for Linux
+* Why Compatibility?::		STREAMS Compatibility
+
+Copying
+
+* GNU General Public License::		GPL
+* GNU Free Documentation License::	FDL
+
+@end menu
+
+@c Indices
+@c 
+@c * Concept Index::		Concept Index
+@c * Type Index::			Type Index
+@c * Function Index::		Function Index
+@c * Variable Index::		Variable Index
+@c * File Index::			File Index
+
+
+@c --------------------------------------------------------------------------
+
+@node Acknowledgements
+@unnumbered Acknowledgements
+@cindex credits
+
+@include texi/funding.texi
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex document information
+
+@subsection Notice
+@cindex document notice
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from X/Open publications and other sources).
+Consult the permission notices contained in the documentation for more information.
+
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
+Documentation License}) with all sections invariant.
+
+@subsection Abstract
+@cindex document abstract
+
+This document provides @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Objective
+@cindex document objective
+
+The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
+developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
+
+This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
+kernel levels.
+
+@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+(I/O) mechanism and to support development of communication services.
+
+@dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
+that expedite software design and implementation.
+
+@subsection Intent
+@cindex document intent
+
+The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+is intended to be read alone and is not intended to replace or supplement the
+@cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
+(see @manref{STREAMS(9)}) provide a better reference to the programmer.
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@cindex document audience
+
+This document is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} filesystem, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, etc.
+
+The guide is intended for network and systems programmers, who use the @dfn{STREAMS} mechanism at
+user and kernel levels for @cite{Linux} and @cite{UNIX} system communication services.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@subsection Revisions
+@cindex document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package.
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log: STREAMS_FAQ.texi,v $
+Revision 0.9.2.1  2005/11/14 11:20:03  brian
+- working up manual
+
+Revision 0.9.2.43  2005/11/14 04:43:55  brian
+- updating manual
+
+Revision 0.9.2.42  2005/11/13 23:04:01  brian
+- starting cleanup of SPG
+
+Revision 0.9.2.41  2005/10/07 09:34:00  brian
+- more testing and corrections
+
+Revision 0.9.2.40  2005/09/26 10:56:41  brian
+- doc updates
+
+Revision 0.9.2.39  2005/09/20 12:53:07  brian
+- more doc updates, corrected QFULL handling
+
+Revision 0.9.2.38  2005/09/18 07:38:35  brian
+- more doc updates
+
+Revision 0.9.2.37  2005/09/17 11:52:08  brian
+- documentation updates
+
+Revision 0.9.2.36  2005/09/17 08:20:57  brian
+- more doc updates
+
+Revision 0.9.2.35  2005/09/17 00:46:12  brian
+- document updates
+
+Revision 0.9.2.34  2005/09/16 03:06:02  brian
+- added glossary
+
+Revision 0.9.2.33  2005/09/15 13:02:52  brian
+- added new graphics and updates
+
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
+postscript or portable document format) version of this document is an @strong{UNCONTROLLED
+VERSION}.
+
+@subsection Disclaimer
+@cindex document disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
+consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action, arising out of or in connection with
+any use of this document or the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
+reason, including but not limited to, conformity with standards promulgated by various agencies,
+utilization of advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
+Corporation} is under no obligation to provide any feature listed herein.
+
+@subsubsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@node FAQ
+@chapter FAQ
+@cindex FAQ
+@menu
+* What is STREAMS?::			STREAMS Description
+* Does Linux have STREAMS?::		STREAMS and Linux
+* Why STREAMS?::			STREAMS Justification
+* Why Fast?::				STREAMS Implementation
+* Why Linux?::				STREAMS for Linux
+* Why Compatibility?::			STREAMS Compatibility
+@end menu
+
+@node What is STREAMS?
+@section What is STREAMS?
+
+@dfn{STREAMS} is a facility first presented in a paper by Dennis M. Ritchie in
+1984,@footnote{@cite{A Stream Input-Output System, AT&T Bell Laboratories Technical Journal 63, No.
+8 Part 2 (October, 1984), pp.  1897-1910.}} originally implemented on 4.1BSD and later part of
+@cite{Bell Laboratories Eighth Edition UNIX}, incorporated into
+@cite{UNIX System V Release 3.0}
+@cindex UNIX System V Release 3.0
+and enhanced in
+@cite{UNIX System V Release 4}
+@cindex UNIX System V Release 4
+and
+@cite{UNIX System V Release 4.2}.
+@cindex UNIX System V Release 4.2
+@dfn{STREAMS} was used in @cite{SVR4} for terminal input/output, pseudo-terminals, pipes, named
+pipes (FIFOs), interprocess communication and networking.  Since its release in @cite{System V
+Release 4}, @dfn{STREAMS} has been implemented across a wide range of @cite{UNIX}, @cite{UNIX}-like,
+and @cite{UNIX}-based systems, making its implementation and use an @i{ipso facto} standard.
+
+@dfn{STREAMS} is a facility that allows for a reconfigurable full duplex communications path,
+@dfn{Stream}, between a user process and a driver in the kernel.  Kernel protocol modules can be
+pushed onto and popped from the @dfn{Stream} between the user process and driver.  The @dfn{Stream}
+can be reconfigured in this way by a user process.  The user process, neighbouring protocol modules
+and the driver communicate with each other using a message passing scheme closely related to
+@dfn{MOM (Message Oriented Middleware)}.  This permits a loose coupling between protocol modules,
+drivers and user processes, allowing a third-party and loadable kernel module approach to be taken
+toward the provisioning of protocol modules on platforms supporting @dfn{STREAMS}.
+
+On @cite{UNIX System V Relase 4.2},
+@cindex UNIX System V Release 4.2
+@dfn{STREAMS} was used for terminal input-output, pipes, FIFOs (named pipes), and network
+communications.  Modern @cite{UNIX}, @cite{UNIX}-like and @cite{UNIX}-based systems providing
+@dfn{STREAMS} normally support some degree of network communications using @dfn{STREAMS}; however,
+many do not support @dfn{STREAMS}-based pipe and FIFOs@footnote{For example, AIX.} or terminal
+input-output.@footnote{For example, HP-UX}.
+
+
+@node Does Linux have STREAMS?
+@section Does Linux have STREAMS?
+@cindex Does Linux have STREAMS?
+
+No, @b{Linux} does not have @dfn{STREAMS} as part of the kernel (yet).  That is rather peculiar,
+particularly since @b{Linux} normally follows SVR4 first and 4BSD second.  (Otherwise, it would just
+be another BSD.)
+
+Two open source @dfn{STREAMS} implementations are available for @b{Linux}: @cite{Linux STREAMS
+(LiS)} and @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+
+@cite{Linux STREAMS (LiS)} is a @dfn{STREAMS} implementation for @b{Linux} originally released and
+maintained by @uref{http://www.gcom.com/,GCOM Inc.}, and recently rereleased under @dfn{GPL} by
+@uref{http://www.openss7.org/,The OpenSS7 Project}.
+
+A number of attempts were made to move the @cite{Linux STREAMS (LiS)} project into the @b{Linux}
+kernel, however, each attempt crashed and burned in a shower of flames from BSD advocates on LKML.
+Arguments against do not appear to be based on valid technical argument.  This is discussed more in
+the next section (@pxref{Why STREAMS?}).
+
+Nevertheless, the @cite{Linux STREAMS (LiS)} does not conform to @b{Linux} kernel coding standards
+and practices and could likely be rejected out of hand for mainline support on that basis.  Also,
+@cite{Linux STREAMS (LiS)} also has a number of problems with conformance and recent releases have
+bugs and races that make its production use questionable.@footnote{One of the major shortcomings of
+@cite{LiS} in the author's opinion is that, because the code was intendended on being portable, it
+is rather obfuscated and difficult to maintain or repair.}
+
+Versions of @cite{LiS} are available that supports 2.2, 2.4 and 2.6 @b{Linux} kernels, however,
+recevent releases only support 2.4 and 2.6 kernels.
+
+@subsection Linux Fast-STREAMS (LfS)
+@cindex Linux Fast-STREAMS (LfS)
+
+@cite{@value{PACKAGE_TITLE}} is a new implementation of @dfn{STREAMS} for @b{Linux} developed under
+the @uref{http://www.openss7.org/, OpenSS7 Project} and with development principally funded by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.  This is the implementation that corresponds to
+this manual.
+
+@cite{@value{PACKAGE_TITLE}} was developed as a production replacement for @cite{LiS} that was both
+mantainable and suitable for mainline adoption.  The principal behind the implementation was that
+portability was secondary to performance, conformance, maintainability and suitability for mainline
+adoption.
+
+@subsection STREAMS for FreeBSD
+@cindex FreeBSD
+
+At one point an attempt was made to provide a @dfn{STREAMS} implementation for @cite{FreeBSD},
+however, it appears that it never matured.
+If there is sufficient interest, it would be possible to port @cite{@value{PACKAGE_TITLE}} to
+@cite{FreeBSD} and other BSD variants.
+
+@subsection OpenSTREAMS?
+@cindex OpenSTREAMS
+
+Perhaps we should have called @cite{@value{PACKAGE_TITLE}} @b{OpenSTREAMS}; however, as there
+already exists suitable @dfn{STREAMS} packages for all @cite{UNIX} and @cite{UNIX}-based systems
+(with the possible exception of BSD variants) and even other operating systems (many RTOS also
+support @dfn{STREAMS}) conformance, compatibilty, maintainability and mainline adoption for
+@b{Linux} have taken a higher priority than portability.
+
+
+@node Why STREAMS?
+@section Why STREAMS?
+@cindex Why STREAMS?
+
+@menu
+* STREAMS versus Sockets::	STREAMS and Sockets
+* STREAMS Benefits::		STREAMS Benefits
+* STREAMS Criticism::		STREAMS Criticism
+* STREAMS Realities::		STREAMS Realities
+@end menu
+
+So, "Why @dfn{STREAMS}" you might ask.
+
+The @uref{http://www.openss7.org/,OpenSS7 Project} selected @dfn{STREAMS} as the basis for its
+telecommunications protocol and networking stacks some years ago because of its ability to encourage
+reuse of protocol components and its flexibility in configuring protocol stacks.  In the
+telecommunications industry, many protocols exists and tend to be collected into profiles that mix
+and match protocol layers.  @dfn{STREAMS} has an innate ability to provide support for flexible
+configuration of protocol layers.
+
+Also, telecommunications platforms must work with media streams as well as signalling streams.
+Because of its terminal subsystem background, @dfn{STREAMS} is far more suitable when applied to
+media streams that consist of steady flows of fixed size (small) message blocks.  Other mechanisms
+within the @b{Linux} kernel are either  unsuitable to such an approach (e.g, @samp{skbuff}s) or 
+too application specific (e.g, @dfn{ALS}).
+
+The subsections that follow delve into this question deeper.
+
+@node STREAMS versus Sockets
+@subsection STREAMS versus Sockets
+@cindex STREAMS versus Sockets
+
+A basic question that is sometimes asked is: "Why use @dfn{STREAMS} when you can just use
+@b{Linux}'s NET4 BSD Sockets instead?"
+
+The answer to this question is that @dfn{STREAMS} provides capabilities for specialized protocols
+and streamed input/output requirements (such as media) that are not ameniable to the sockets
+interface or queue mechanisms.
+
+Two examples are SS7 (Signalling System Number 7) which is a specialized Telecommunications protocol
+used be switching equipment in the Public Switched Telephone Network; and transferring and
+manipulating voice channels associated with telephone call or other telecommunications services.
+These are the reasons why the @url{http://www.openss7.org/, OpenSS7 Project}
+@cindex OpenSS7 Project
+originally embarked on using @dfn{STREAMS}.  You will find that a large number of @cite{SS7} stack
+vendors also deliver @cite{UNIX} and even @cite{RTOS} SS7 products on @dfn{STREAMS}.
+
+Although the BSD Sockets framework was established to permit arbitrary protocols to be implemented
+within the framework, it is seldom that BSD Sockets is actually used in this fashion.  One reason
+for this is the tight coupling (function call interface) between layers in BSD sockets.  @b{Linux}
+has an even tighter coubpling between protocol layers and removes entire layers from the BSD model.
+
+@quotation
+The @cite{4.2BSD} version of @cite{UNIX} introduced @dfn{sockets}
+@cindex sockets
+[Leffler, McKusick, Karels,
+Quaterman 1988].  The operating system provided an infrastructure in which network protocols could
+be implemented.  It provided memory management facilities, a set of system calls for accessing
+network software, an object-oriented framework for the network protocols themselves, and a
+formalized device driver interface.  The @dfn{sockets}
+@cindex sockets
+mechanism was primarily used to implement the
+TCP/IP
+@cindex TCP/IP
+protocols for the
+ARPA
+@cindex ARPANET
+Internet.
+The device driver interface made it possible for the operating system to support a wide range of
+network controllers.  @dfn{sockets}
+@cindex sockets
+are widely used for the implementation of TCP/IP
+@cindex TCP/IP
+on @cite{UNIX} systems and have been ported to many implementations of @cite{UNIX System V}.
+Although it is possible to implement other protocols within the @dfn{sockets} mechanism, it was not
+often done.
+
+An alternative infrastructure for providing network protocols is @dfn{STREAMS}, originally designed
+by Dennis Ritchie [Ritchie 1984a] and first released in @cite{UNIX System V Release 3.0}.
+@dfn{STREAMS} provides an environment in which communications protocols can be developed.  It
+consists of a set of system calls, kernel functions and data structures.  With this environment it
+is easier to write modular and reusable code.  The code is also simpler because many of the support
+functions the programmer needs are provided by the @dfn{STREAMS} infrastructure.
+@end quotation
+
+Have you ever seen the @dfn{RTP (Real-Time Transport Protocol, RFC 1889)} implemented under a
+Socket?  Why not?  Is not the sockets interface so flexible as to permit such protocols to be
+implemented?
+
+There are several reasons that @dfn{BSD Sockets} have not been used for other protocol development:
+
+@itemize
+
+@item  Although @dfn{BSD Sockets} provides a framework for protocol development, it does not provide
+many utility functions for working with arbitrary protocols.  Most of the utilities are DARPA
+ARPANET specific.@footnote{This should not be suprising as the 4BSD releases were developed for
+DARPA.}
+
+@item Protocol to protocol module interfaces are poorly standardized for the @dfn{BSD Sockets} system,
+whereas, protocol to protocol module service interfaces are well defined under OSI for
+@dfn{STREAMS}.  (@b{Linux} discards the protocol to protocol interface anyway.)
+
+@item The @dfn{BSD Sockets} interface can easily be applied over @dfn{STREAMS} transport protocol
+modules; however, the reverse is not true: the @dfn{STREAMS} interface cannot easily be provided
+over the @dfn{BSD Sockets} protocol modules.@footnote{A case in point is the iBCS.
+@cindex iBCS
+@cindex Intel Binary Compatibility Suite
+You will see in the iBCS
+@cindex iBCS
+@cindex Intel Binary Compatibility Suite
+that, although a basic XTI over Sockets implementation can be provided, none of the @dfn{STREAMS}
+facilities can be supported.  In constrast the @dfn{STREAMS} INET driver that performs XTI over
+Sockets with in the @dfn{STREAMS} framework is easily implemented as a single device driver and
+provides both @cite{iBCS}
+@cindex iBCS
+@cindex Intel Binary Compatibility Suite
+and @dfn{STREAMS} capabilities.}
+
+@item Support in the @dfn{BSD Sockets} model for dynamically loaded protocol (kernel) modules and
+administrative reconfiguration of protocols and interfaces for new protocols are poorly
+supported.@footnote{Or not supported in a standardized way.  @dfn{STREAMS} use of standardized
+interfaces and facilities permits portability of a module between operating systems with ease.}
+
+@item The @dfn{BSD Sockets} model has almost no support for banded or priority message queues within the
+model and no systemic approach to flow control.
+
+@item The @b{Linux} implementation of @dfn{BSD Sockets} discards much of the general purpose protocol
+framework, presumably in the pursuit of speed.
+
+@end itemize
+
+BSD sockets consists of a socket that interfaces with the user using file system and socket
+semantics, a protocol control block that represents the upper-most protocol, a socket to protocol
+interface, additional protocol control blocks representing lower protocol components, a protocol to
+protocol interface, a device interface abstraction, and a protocol to device interface.
+
+@b{Linux} discards the protocol control block, socket to protocol interface, protocol to protocol
+interface, and protocol to device interface.
+
+One of the major ramifications of @b{Linux} discarding the protocol to protocol interface is that it
+is very difficult to implement layered or tunnelled protocols in the @b{Linux} kernel.@footnote{That
+is, even more difficult than on a BSD system.}  Layered protocols that run, say, over UDP, such as
+@samp{econet}, must internally use the socket interface to a UDP datagram socket to layer the
+@samp{econet} protocol over UDP.  Under @dfn{STREAMS} it is much easier to either push @samp{econet}
+as a module over the UDP transport provider stream, or to @ioctlref{I_LINK} transport provider
+streams under an @samp{econet} multiplexing driver.
+
+In commenting on the relative performance of @dfn{STREAMS} and @dfn{Sockets}, Mitchel Waite had
+this to say:
+
+@quotation
+Sockets are like pipes with more power.  They are bidirectional and may cross network or other
+machine boundaries.  In addition, sockets allow limited control information as well as data.
+
+Streams are more general still, with extensive control information passing capabilities.
+
+On most @cite{UNIX} systems, messages (if available) have the lowest overhead and highest
+bandwidth, with pipes following close behind.  Because they support complex networking facilities,
+sockets are probably less efficient than streams, but because they rarely appear on the same machine
+as streams, the question is somewhat academic.  They certainly have much lower bandwidth than pipes
+or messages.@footnote{@cite{UNIX Papers, for UNIX Developers and Power Users, (Waite, 1987) pp. 358-359}}
+@end quotation
+
+With @dfn{@value{PACKAGE_TITLE}} it will be very possible to compare the performance of @dfn{STREAMS}
+in comparison to @dfn{Sockets}.  It will also be possible to compare the performance of traditional
+@b{Linux} pipes and FIFOs with @dfn{STREAMS}-based pipes and FIFOs.@footnote{In fact, such a
+performance comparison has been performed using @cite{@value{PACKAGE_TITLE}}.  On the test system, a
+@dfn{STREAMS}-based pipe delivered 80% of the write/read throughput performance experienced by
+@b{Linux} native pipes.}
+
+@node STREAMS Benefits
+@subsection STREAMS Benefits
+@cindex benefits, STREAMS
+@cindex STREAMS, benefits
+
+@dfn{STREAMS} provides a flexible, portable, and reusable set of tools for development of @b{Linux}
+system communication services.  @dfn{STREAMS} allows an easy creation of modules that offer standard
+data communications services and the ability to manipulate those modules on a @dfn{Stream}.  From
+user level, modules can be dynamically selected and interconnected; kernel programming, assembly,
+and link editing are not required to create the interconnection.
+
+@dfn{STREAMS} also greatly simplifies the user interface for languages that have complex input and
+output requirements.
+
+@subsection Standardized Service Interfaces
+@cindex Standardized Service Interfaces
+
+@dfn{STREAMS} simplifies the creation of modules that present a service interface to any
+neighbouring application program, module, or device driver.  A service interface is defined at the
+boundary between two neighbours.  In @dfn{STREAMS}, a @i{service interface} is a set of messages and
+the rules that allow passage of these messages across the boundary.  A module that implements a
+service interface will receive a message from a neighbour and respond with an appropriate action
+(for example, send back a request to retransmit) based on the specific message received and the
+preceding sequence of messages.
+
+In general, any two modules can be connected anywhere in a @dfn{Stream}.  However, rational sequences are
+generally constructed by connecting modules with compatible protocol service interfaces.  For
+example, a module that implements an @dfn{SS7 MTP2 Signalling Link} protocol layer, as shown in
+@figref{13}, presents a protocol service interface at its input and output sides.  In this case,
+other modules should only be connected to the input and output side if they have the compatible
+@dfn{SS7 Signalling Link} service interface.
+
+@subsection Manipulating Modules
+@cindex Manipulating Modules
+
+@dfn{STREAMS} provides the ability to manipulate modules from user level, to interchange modules
+with common service interfaces, and to change the service interface to a @dfn{STREAMS} user
+process.  These capabilities yield further benefits when implementing networking services and
+protocols, including:
+
+@itemize
+@item User level programs can be independent of underlying protocols and physical communications
+media.
+@item Network architectures and higher level protocols can be independent of underlying protocols,
+drivers, and physical communications media.
+@item Higher level services can be created by selecting and connecting lower level services and
+protocols.
+@end itemize
+
+@subsubsection Protocol Portability
+
+@figref{203} shows how the same @dfn{SS7 Signalling Link} protocol module can be used with different
+drivers on different machines by implementing compatible service interfaces.  The @dfn{SS7
+Signalling Link} protocol module interfaces are @cite{Data Link Provider Interface (DLPI)} and
+@cite{High-Level Data Link Control (HDLC)}.
+
+@figuresized{SPG_fig53,203,Protocol Module Portability,4in}
+
+This arrangements permits the @cite{SS7 Signalling Link} module to be implemented and conformance
+tested once, yet applied to many @cite{HDLC} drivers.  Each @cite{HDLC} driver can be specific to
+the hardware that it supports without affecting reuse of the upper layer modules.
+
+For the @uref{http://www.openss7.org/,OpenSS7} SS7 stacks, this permits the same @cite{SS7
+Signalling Link} module to be used and only a hardware specific @cite{HDLC} driver to be written for
+each hardware interface device.  It also allows the same @cite{SS7 Signalling Link} module to be
+used with non-@dfn{HDLC} links (such as UDP-based pseudo links).
+
+@subsubsection Protocol Substitution
+
+Alternate protocol modules (and device drivers) can be exchanged on the same machine if they are
+implemented to an equivalent service interface.
+
+@figref{206} illustrates how @dfn{STREAMS} can substitute upper layer protocol modules to implement
+a different protocol stack over the same @dfn{HDLC} driver.  As each module and driver support the
+same service interface at each level, it is conceivable that the resulting modules could be
+recombined to support, for example, @cite{SS7 MTP} over an @cite{ISDN LAPB} channel.@footnote{SS7
+MTP over ISDN LAPB was originally defined under ISDN as an E-Channel.}
+
+@figuresized{SPG_fig56,206,Protocol Substitution,4in}
+
+@subsubsection Protocol Migration
+
+@figref{204} illustrates how @dfn{STREAMS} can move functions between kernel software and front end
+firmware.  A common downstream service interface allows the transport protocol module to be
+independent of the number or type of modules below.  The same transport module will connect without
+modification to either an @dfn{SS7 Signalling Link} module or @dfn{SS7 Signalling Link} driver that
+has the same service interface.
+
+By shifting functions between software and firmware, you can produce cost-effective, functionally
+equivalent systems over a wide range of configurations.  They can rapidly incorporate technological
+advances.  The same transport protocol module can be used on a lower capacity machine, where
+economics may preclude the use of front-end hardware, and also on a larger scale system where a
+front-end is economically justified.
+
+@figuresized{SPG_fig54,204,Protocol Migration,4in}
+
+The @uref{http://www.openss7.org/,OpenSS7} @cite{SS7 Protocol Stack} uses this capability of
+@dfn{STREAMS} to provide for hardware that contains varying levels of support for @dfn{SS7-HDLC} or
+@dfn{SS7 Signalling Data Terminal} functions (such as @dfn{AERM} and @dfn{SUERM} capabilities).
+The implementation goes one layer lower than illustrated in @figref{204}, and provides an @dfn{HDLC}
+module that runs over a bare bearer channel (i.e, accepts a bit-stream at its lower service
+interface).  This supports any channel interface hardware that can be placed in a raw mode making
+initial hardware driver support easier, following the left side of @figref{204}.  Hardware that
+supports @dfn{HDLC} functions, @dfn{Signalling Data Terminal} functions or even @dfn{Signalling
+Link} functions in firmware can use an integrated driver as illustrated on the right side of
+@figref{204}.
+
+Although, in practice, the performance cost of breaking a protocol layer into independent protocol
+modules within @dfn{STREAMS} is low, a firmware implementation as that shown on the right performs
+somewhat better, but typically at a higher monetary cost.  @dfn{STREAMS} provides a wide range of
+scalable cost/performance options to the system designer in this regard.
+
+@subsubsection Module Reusability
+
+@figref{205} shows the same canonical module (for example, one that provide delete and kill
+processing on character strings) reused in two different @dfn{Streams}.  This module would typically
+be implemented as a filter, with no downstream service interface.  In both cases, a @dfn{tty}
+interface is presented to the @dfn{Stream}'s user process since the module is nearest the
+@dfn{Stream head}.
+
+@figuresized{SPG_fig55,205,Module Reusability,4in}
+
+@node STREAMS Criticism
+@subsection STREAMS Criticism
+@cindex STREAMS Criticism
+
+Following are some excerpts from Dennis M. Ritchie's original (1984) Bell Technical Journal paper on
+the stream I/O system.  These excerpts are the limitations of the system as were perceived by Dennis
+M. Ritchie at the time.  Strangely enough, although every limitation listed by Dennis was fixed even
+as early as @cite{UNIX System V Release 3.0} and even in the @cite{UNIX Eighth Edition}, some BSD
+advocates will use these limitations as a reason for not using @dfn{STREAMS} in BSD.  Also, note
+that BSD'ers will also say that @dfn{STREAMS} was a @cite{UNIX Eighth Edition} (Bell Laboratories
+Research version of UNIX) thing; however, Dennis' paper clearly states that the base system for the
+initial @cite{Stream Input-Output System} was @cite{4.1BSD}.  Also note that @cite{4.1BSD} already
+had @dfn{sockets} and that some of Ritchie's work was taken from @dfn{sockets}.  It took until
+@cite{4.2BSD} for @cite{BBN} to add the @dfn{DARPANET} protocol stack to sockets.
+
+Perhaps it is not so surprising why @cite{BSD}'ers hark back to Ritchie's original problem list for
+@dfn{STREAMS}: because it was at that point that @cite{BSD} decided to not follow the @dfn{STREAMS} work
+too closely, except as regards IPC, and @cite{UNIX} domain mechanisms.  It is likely that @cite{BSD} would have
+used @dfn{STREAMS}, however, it was included in @cite{UNIX System V Release 3.0} and this was the
+first release that @cite{AT&T} was allowed to aggressively market under the terms of the
+@dfn{Modified Judgement}.
+
+@quotation
+Although the new organization performs well, it has several peculiarities and limitations.  Some of
+them seem inherent, some are fixable, and some are the subject of current work.
+
+I/O control calls turn into messages that require answers before a result can be returned to the
+user.  Sometimes the message ultimately goes to another user-level process that may reply tardily or
+never.  The stream is write-locked until the reply returns, in order to eliminate the need to
+determine which process gets which reply.  A timeout breaks the lock, so there is an unjustified
+error return if a reply is late, and a long lockup period if one is lost.  The problem can be
+ameliorated by working harder on it, but it typifies the difficulties that turn up when direct calls
+are replaced by message-passing schemes.
+@end quotation
+
+This problem was never really fixed I suppose because most @dfn{STREAMS} specifications say that
+only one @command{ioctl} can be outstanding for a given stream.  Nevertheless, an @command{ioctl}
+identifier was added to the @msg{M_IOCTL}
+message that uniquely identifies the @command{ioctl}; but, a timer is still used.  With
+the @ioctlref{I_STR}
+@command{ioctl}, however, the caller has control over the duration of the timeout.
+Strange, but this unfixed problem is the one that seldom gets raised as a reason for not using
+@dfn{STREAMS}.
+
+@quotation
+Several oddities appear because time spent in server routines cannot be assigned to any particular
+user or process.  It is impossible, for example, for devices to support privileged @command{ioctl}
+calls, because the device has no idea who generated the message.  Accounting and scheduling becomes
+less accurate; a short census of several systems showed that between 4 and 8 per cent of non-idle
+CPU time was being spent in server routines.  Finally, the annonimity for server processing most
+certainly makes it more difficult to measure the performance of the new I/O system.
+@end quotation
+
+This problem with privileged @command{ioctl} calls was easily fixed by adding the credentials of the
+caller to the @msg{M_IOCTL}
+message.
+This limitation is also not mentioned by @dfn{STREAMS} critics.
+
+@quotation
+In its current form the stream I/O system is purely data-driven.  That is, data is presented by a
+user's @command{write} call, and passes through to the device; conversely, data appears unbidden from
+a device an passes to the top level, where it is picked up by @command{read} calls.  Wherever
+possible flow control throttles down fast generators of data, but nowhere except at the consumer end
+of a stream is there knowledge for precisely how much data is desired.  Consider a command to execute
+possibly interactive program on another machine connected to a stream.  The simplest such common
+sets up the connection and invokes the remote program, and then copies characters from its own
+standard input to the stream, and from the stream to its standard output.  The scheme is adequate in
+practise, but breaks when the user types more than the remote program expects.  For example, if the
+remote program reads no input at all, any typed-ahead characters are sent to the remote system and
+lost.  This demonstrates a problem, but I know of no solution inside the stream I/O mechanism
+itself; other ideas will have to be applied.
+@end quotation
+
+Back-enabling of queues and the use of the @msg{M_READ}
+message makes it possible for the consumer end of the stream to signal its desire for data
+downstream.
+Also, in the example that Ritchie gives here, the network protocol (TCP) is of no help either.
+This limitation is also not mentioned by @dfn{STREAMS} critics.
+
+@quotation
+Streams are linear connections; by themselves, they support no notion of multiplexing, fan-in or
+fan-out.  Except at the ends of a stream, each invocation of a module has a unique "next" and
+"previous" module.  Two locally-important applications of streams testify to the importance of
+multiplexing: Blit terminal connections, where the multiplexing is done well, though at some
+performance costs, but a user program, and remote execution of commands over a network, where it is
+desired, but not now easy, to separate the standard output from error output.  It seems likely that
+a general multiplexing mechanism could help in both cases, but again, I do not yet know how to
+design it.
+@end quotation
+
+This was, of course, solved, even in @cite{UNIX System V Release 3.0} with the
+@streamio{I_LINK},
+@streamio{I_PLINK},
+@streamio{I_UNLINK}
+and
+@streamio{I_PUNLINK}
+@dfn{STREAMS} @command{ioctl} commands and the concept of a multiplexing pseudo-device driver.
+This fixed limitation you will see mentioned below.
+
+The following excerpt shows how @cite{BSD}'ers like to misinterpret the situation:
+
+@quotation
+Original work on the flexible configuration of IPC processing modules was done at Bell Laboratories
+in @cite{UNIX Eigth Edition} [Presotto & Richie, 1985].  This @i{stream I/O system} was based on
+@cite{UNIX}
+character I/O system.  It allowed a user process to open a raw terminal port and then to insert
+appropriate kernel-processing modules, such as one to do normal terminal line editing.  Modules to
+process network protocols also could be inserted.  Stacking a terminal-processing module on top of a
+network-processing module allowed flexible and efficient implementation of @i{network virtual
+terminals} within the kernel.  A problem with streams modules, however, is that they are inherently
+linear in nature, and thus they do not adequately handle the fan-in and fan-out associated with
+multiplexing in datagram-based networks; such multiplexing is done in device drivers, below the
+modules proper.  The Eighth Edition stream I/O system was adopted in System V, Release 3 as the
+STREAMS system.
+@footnote{@cite{The Design and Implementation of the 4.4BSD Operating System, McKusick, et. al.,
+(Addison-Wesley, 1996) pp. 15-16}}
+@end quotation
+
+Well, the @cite{UNIX Eighth Edition} @dfn{Stream Input-Output System} may have been included in
+@cite{UNIX System V Release 3.0} as stated, however, Ritchie's @dfn{Stream Input-Output System} was
+implemented on @cite{4.1BSD} for the October 1984 paper.
+
+@quotation
+The design of the networking facilities for 4.2BSD took a different approach, based on the
+@dfn{socket} interface and a flexible multilayer network architecture.  This design allows a single
+system to support multiple sets of networking protocols with stream datagram, and other types of
+access.  Protocol modules may deal with multiplexing of data from different connection onto a single
+transport medium, as well as with demultiplexing of data for different protocols and connection
+received from each network device.  The 4.4BSD release made small extensions to the socket interface
+to allow the implementation of the @cite{ISO} networking protocols.
+@footnote{@cite{The Design and Implementation of the 4.4BSD Operating System, McKusick, et. al.,
+(Addison-Wesley, 1996) pp. 15-16}}
+@end quotation
+
+@node STREAMS Realities
+@subsection STREAMS Realities
+@cindex STREAMS Realities
+
+The realities of @dfn{STREAMS} are as follows:
+
+@itemize
+
+@item @dfn{STREAMS} is implemented on every major ``Big Iron'' @cite{UNIX}.
+
+Even Sun Microsystems chose to abandon @dfn{BSD Sockets} as an internal kernel networking implementation
+and moved to the @cite{UNIX System V Release 4} @dfn{STREAMS} subsystem instead.@footnote{BSD'er
+will tell you that Sun Microsystems just made a bad decision.} @dfn{STREAMS} is implemented (to list
+a few) in 
+@cite{AIX 5L Version 5.1 PSE},
+@cindex AIX
+@cite{HP-UX 11.0i v2 STREAMS/UX},
+@cindex HP-UX
+@cite{OSF/1 1.2/Digital UNIX},
+@cindex OSF/1
+@cindex Digital UNIX
+@cite{UnixWare 7.1.3 (OpenUnix 8)},
+@cindex UnixWare
+@cindex OpenUnix
+@cite{Solaris 9/SunOS 5.9},
+@cindex Solaris
+@cindex SunOS
+@cite{Super-UX},
+@cindex Super-UX
+@cite{UXP/V}
+@cindex UXP/V
+and
+@cite{MacOS OT}.
+@cindex MacOS
+
+@item @dfn{STREAMS} is implemented on many Real-Time Operating Systems (RTOS) based on @cite{UNIX}.
+
+Examples include @cite{WindRiver}, @cite{PSOS}, @cite{VxWorks}, etc.
+
+@item @dfn{STREAMS} implementations are widely standardized on the @cite{UNIX System V Release 4.2}
+specifications.
+
+@item @dfn{STREAMS} provides standardized (POSIX, OpenGroup, SVID) Transport Library Interface to
+communications networking suites.
+
+@item @dfn{STREAMS} has many portable implementations.
+
+@end itemize
+
+@node Why Fast?
+@section Why Fast?
+@cindex Why Fast?
+
+@dfn{@value{PACKAGE_TITLE}} includes the word @cite{fast} in the name because of the original roots of
+the @dfn{@value{PACKAGE_TITLE}} development effort.  @dfn{@value{PACKAGE_TITLE}} was originally developed by
+the @url{http://www.openss7.org/, OpenSS7 Project} as a production replacement for the
+@cite{Linux STREAMS (LiS)}
+@cindex Linux STREAMS (LiS)
+package previously available from @url{http://www.gcom.com/, GCOM}.
+@cindex GCOM
+One of the reasons for contemplating a replacement for
+@cite{Linux STREAMS (LiS)}
+@cindex Linux STREAMS (LiS)
+was the dismal performance provided by
+@cite{Linux STREAMS (LiS)}.
+@cindex Linux STREAMS (LiS)
+Other reasons included:
+@itemize
+
+@item Mainline Adoption instead of Portability
+
+@cite{LiS} attempts to maintain portability across a number of operating systems.  The goals of
+portability and mainline adoption are usually at cross-purposes.  @dfn{@value{PACKAGE_TITLE}} proposes
+mainline adoption in contrast to portability.  Many @dfn{STREAMS} implementations are available for
+other operating systems.
+
+@item Production Grade
+
+@cite{LiS} attempts to always provide debugging facilities@footnote{In fact, these debugging
+facilities always point at the driver or module writer when a bug is encountered in LiS itself!} and
+does not trust the driver or module writer.  This leads to poor performance and in many cases the
+propagation of bugs to the field by failing to panic the kernel.  @dfn{@value{PACKAGE_TITLE}} aims at a
+production grade environment that implicitly trusts the driver or module while providing optional
+debugging facilities (both compile-time options as well as run-time options).
+
+@item SVR 4.2 MP Compatibility
+@cindex SVR 4.2 MP
+
+@cite{LiS} only provides @cite{SVR 4} uniprocessor capabilities.  @dfn{@value{PACKAGE_TITLE}} provides
+@cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+capabilities.
+
+@item Portability
+
+@cite{LiS} forces ported drivers and modules from other implementations to use the @cite{LiS} DDI
+and configuration mechanisms.  @dfn{@value{PACKAGE_TITLE}} provides compatibility functions for all
+major implementations of @dfn{STREAMS} as well as providing a rich DDI based on @cite{SVR 4.2 MP},
+@cindex SVR 4.2 MP
+@cite{Solaris}, and other implementations.
+
+@item Bug Circumvention
+
+@cite{LiS} implementation approach has resulted in @cite{LiS} masking its own internal bugs while
+pointing at the third-party module or driver (with log statements) whenever it fails to mask its own
+bugs.  In the process @cite{LiS} masks bugs even in the module or driver permitting defects to
+propagate to the field.  @cite{@value{PACKAGE_TITLE}} uses industry standard programming by
+assertions approaches in its implementation avoiding these difficulties.
+
+@item New Implementation
+
+@cite{@value{PACKAGE_TITLE}} is a completely new implementation of @dfn{STREAMS} independent from
+@cite{LiS} and not derived from @cite{LiS}.  @cite{LiS} is a collection of software available under
+various licenses with little or no commercial licensing alternatives available.
+@cite{@value{PACKAGE_TITLE}} is released in entirety under the @dfn{GPL}, but the implementation can
+be commercially licensed from @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
+@item Scalable
+
+@cite{LiS}, particularly on 2.4 kernels, has difficulty with the scalability of major and minor
+device numbers.  This is a limitation related to some @b{Linux} 2.4 kernels themselves, however,
+@cite{@value{PACKAGE_TITLE}} surmounts this difficulty by providing a @dfn{Shadow Special Filesystem
+(specfs)} that permits an almost unlimited number of major and minor devices on even the limited
+@b{Linux} 2.4 kernels.
+
+@item Soft Real Time Performance
+
+@cite{LiS} avoids use of high-performance @b{Linux}-specific facilities because of its aims at
+portability.  @dfn{@value{PACKAGE_TITLE}} being aimed at only @b{Linux} uses the highest-performance
+techniques available in the @b{Linux} kernel for implementation.  This includes kernel memory
+caches and other techniques.
+
+@item Maintainability
+
+Due to its initial objective to be portable to a number of environments, @cite{LiS} has a large
+volume of source code that never gets executed in the @b{Linux} environment.  Also, coding style
+does not seem to follow any mainstream practices.  Aside from log messages and a few debugging flag
+facilities, @cite{LiS} does not provide any debugging facilities.
+
+@cite{@value{PACKAGE_TITLE}} provides a fully functional @dfn{STREAMS} logging facility and
+@command{strerr} and @command{strace} utilities.  This permits the logging and tracing of live
+modules and also permits diagnosis of a running (fielded) system.  Additional support for panic
+recovery (without system failure or reboot) is also possible.
+
+@cite{@value{PACKAGE_TITLE}} is also resplendent with the same maintenance features based on
+@command{autoconf}, @command{rpm} and @command{deb} that are used by all @cite{OpenSS7} packages,
+including check scripts and installation conformance and verification test suites.
+
+@end itemize
+
+@node Why Linux?
+@section Why Linux?
+@cindex Why Linux?
+
+Well, @b{Linux} is the only @cite{SVR 4}
+@cindex SVR 4
+based system that does not provide @dfn{STREAMS}, although @dfn{STREAMS} is an essential part of
+@cite{SVR 4}.
+@cindex SVR 4
+Without @dfn{STREAMS}, @b{Linux} is just another @cite{BSD},
+@cindex BSD
+and perhaps a bad one.
+
+@node Why Compatibility?
+@section Why Compatibility?
+@cindex Why Compatibility?
+
+@dfn{@value{PACKAGE_TITLE}} is designed and implemented to be compatible with as many
+@cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+based implementations of @dfn{STREAMS} as possible.  This is done for several reasons:
+
+@enumerate
+
+@item @i{Porting legacy drivers to @b{Linux}:}
+
+Many legacy @dfn{STREAMS} drivers have been written and developed for @cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+or @cite{UNIX} systems based on @cite{SVR 4.2 MP}.
+@cindex SVR 4.2 MP
+Remaining compatible with as many implementation as possible permits these legacy drivers to be
+easily ported from their native @cite{UNIX} variant to the @dfn{@value{PACKAGE_TITLE}}
+@cindex @value{PACKAGE_TITLE} (LfS)
+environment, thus quickly porting these legacy drivers to @b{Linux}.
+
+@item @i{Leverage of knowledge base:}
+
+Many developers are familiar one or another of the mainstream @cite{UNIX} implementations of
+@cite{SVR 4.2 MP STREAMS}.
+@cindex SVR 4.2 MP, @dfn{STREAMS}
+By remaining as compatible as possible with all these implementations of @dfn{STREAMS} permits
+knowledge and expertise in the @cite{UNIX} variant of @dfn{STREAMS} to be transferred and applied
+to @dfn{@value{PACKAGE_TITLE}}
+@cindex @value{PACKAGE_TITLE} (LfS)
+on @b{Linux}.
+
+@item @i{Reverse portability:}
+
+Because it is as compatible as possible with other @dfn{STREAMS} implementations, @dfn{STREAMS}
+drivers and modules developed on @dfn{@value{PACKAGE_TITLE}} can easily be ported to other
+implementations if a set of compatibility and portability guidelines are followed.  This allows
+@dfn{STREAMS} drivers and modules developed on the @b{Linux} operating system to be used on branded
+@cite{UNIX} systems (or commercially available @dfn{RTOS} ssytems) with minimal porting and
+modification.
+
+@item @i{Standardization:}
+
+By being as compatible as possible with as many @dfn{STREAMS} implementations as possible,
+@dfn{@value{PACKAGE_TITLE}}
+@cindex @value{PACKAGE_TITLE} (LfS)
+implements an @i{ipso facto} standard.  Unfortunately, the
+@cite{OpenGroup}
+@cindex OpenGroup
+and
+@cite{POSIX}
+@cindex POSIX
+have been very lacking in the standardization of internal kernel interfaces such as @dfn{STREAMS}.
+Maximum compatibility moves close to providing a standard for such interfaces.
+
+@end enumerate
+
+@subsection Intel Binary Compatibility Suite (iBCS)
+@cindex Intel Binary Compatibility Suite (iBCS)
+
+The @cite{Intel Binary Compatibility Suite} provides binary compatibility on the @cite{Intel}
+architecture for systems conforming to @cite{SVR 4.2}.  @cite{RedHat} has released an @cite{iBCS}
+module for their distributions of @b{Linux} and the @b{Linux Kernel} for some time.
+
+@subsubsection OpenGroup Specifications
+@cindex OpenGroup Specifications
+
+OpenGroup and POSIX specifications have never directly addressed @dfn{STREAMS} implementation within
+the operating system.  I suppose that this is primarily because 4BSD based system have seldom
+included @dfn{STREAMS}.  Perhaps it was due to some ideological upheaval from BSD advocates that did
+not want to see @dfn{STREAMS} become part of a standard.
+
+Nevertheless, the @dfn{STREAMS} subsystem has been an optional part of the
+@url{http://www.opengroup.org/, OpenGroup} specifications for some time.  It is my opinion that the
+@url{http://www.opengroup.org/, OpenGroup} has missed a rich opportunity for standardization of
+kernel level interfaces.
+
+@unnumberedsubsubsec UNIX 03 Compliance
+@cindex UNIX 03 compliance
+@cindex compliance, UNIX 03
+
+@dfn{UNIX 03} compliance to @cite{Open Group Extensions} requires that XTI/TLI networking support be
+provided.  (See @cite{XNS 5.2}).  As the @dfn{iBCS} has proven, this does not require full
+@dfn{STREAMS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
+Even though the @cite{XNS 5.2} specification does not describe @dfn{STREAMS}, the @cite{SUSv3} does.
+The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals of the @dfn{STREAMS}
+facility in their @dfn{CAE} specifications; however, they are described and the user-space
+facilities and system calls are completely defined and described.
+
+@unnumberedsubsubsec UNIX 98 Compliance
+@cindex UNIX 98 compliance
+@cindex compliance, UNIX 98
+
+@dfn{UNIX 98} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
+provided.  (See @cite{XNS 5}).  As the @dfn{iBCS} has proven, this does not require full
+@dfn{STREAMS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
+Even though the @cite{XNS 5} specification does not describe @dfn{STREAMS}, the @cite{XSI 5} and
+@cite{SUSv2} does.  The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals
+of the @dfn{STREAMS} facility in their @dfn{CAE} specifications; however, they are described and the
+user-space facilities and system calls are completely defined and described.
+
+@unnumberedsubsubsec UNIX 95 Compliance
+@cindex UNIX 95 compliance
+@cindex compliance, UNIX 95
+
+@dfn{UNIX 95} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
+provided.  (See @cite{XNS 4.2}).  As the @dfn{iBCS} has proven, this does not require full
+@dfn{STREAMS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
+Even though the @cite{XNS 4.2} specification does not describe @dfn{STREAMS}, the @cite{XSI 4.2} and
+@cite{SUS} does.  The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals of
+the @dfn{STREAMS} facility in their @dfn{CAE} specifications; however, they are described and the
+user-space facilities and system calls are completely defined and described.
+
+@subsection Device Driver Interface (DDI)
+@cindex DDI
+
+
+
+@node Copying
+@appendix Copying
+
+@menu
+* GNU General Public License::		GPL
+* GNU Free Documentation License::	FDL
+@end menu
+
+@include texi/gpl.texi
+
+@include texi/fdl.texi
+
+@node Glossary
+@unnumbered Glossary
+
+@multitable @columnfractions .30 .70
+
+@item @dfn{anchor} @tab
+@cindex anchor
+A @dfn{STREAMS} locking mechanism that prevents the removal of @dfn{STREAMS} modules with the
+@streamio{I_POP} @command{ioctl}.  Anchors are placed on @dfn{STREAMS} modules by adding the
+@samp{[anchor]} flag to @manref{autopush(8)} configuration files or directly with the
+@streamio{I_ANCHOR} @command{ioctl}.
+
+@item @dfn{autopush} @tab
+@cindex autopush
+A @dfn{STREAMS} mechanism that enables a pre-specified list of modules to be pushed automatically
+onto a @dfn{Stream} when a @dfn{STREAMS} device is opened.  This mechanism is used only for
+administrative purposes.
+
+@item @dfn{back-enable} @tab
+@cindex back-enable
+To enable (by @dfn{STREAMS}) a preceding blocked queue's @command{service} procedure when
+@dfn{STREAMS} determines that a succeeding queue has reached its low-water mark.
+
+@item @dfn{blocked} @tab
+@cindex blocked
+A queue's @command{service} procedure that cannot be enabled due to flow control.
+
+@item @dfn{clone device} @tab
+@cindex clone device
+A @dfn{STREAMS} device that returns an unused major/minor device number when initially opened,
+rather than requiring the minor device to be specified by name in the @command{open} call.
+
+@item @dfn{close procedure} @tab
+@cindex close procedure
+A routine that is called when a module is popped from a @dfn{Stream} or when a driver is closed.
+A pointer to this procedure is specified in the @member{qi_qopen} member of the @mantype{queue(9)}
+structure associated with the read side of the module's queue pair.
+
+@item @dfn{control Stream} @tab
+@cindex control Stream
+A @dfn{Stream} above a multiplexing driver used to establish lower multiplexer connections.
+Multiplexed @dfn{Stream} configurations are maintained through the controlling @dfn{Stream} to a
+multiplexing driver.
+
+@item @dfn{Device Driver Interface} @tab
+@cindex Device Driver Interface
+An interface that facilitates driver portability across different @cite{UNIX} system versions.
+
+@item @dfn{device driver} @tab
+@cindex device driver
+A @dfn{Stream} component whose principle functions are handling an associated physical device and
+transforming data and information between the external interface and the @dfn{Stream}.
+
+@item @dfn{Driver Kernel Interface} @tab
+@cindex Driver Kernel Interface
+An interface between the @cite{UNIX} system kernel and different types of drivers.  It consists of a
+set of driver defined functions that are called by the kernel.  These functions are entry points
+into a driver.
+
+@item @dfn{downstream} @tab
+@cindex downstream
+A direction of data flow going from the @dfn{Stream head} toward a driver.  Also called the
+@dfn{write-side} and @dfn{output-side}.
+
+@item @dfn{driver} @tab
+@cindex driver
+A module that forms the @dfn{Stream end}.  It can be a device driver or a pseudo-device driver.  It
+is a required component in @dfn{STREAMS} (except in @dfn{STREAMS}-based pipes and FIFOs), and is
+physically identical to a module.  It typically handles data transfer between the kernel and a
+device and does little or no processing of data.
+
+@item @dfn{enable} @tab
+@cindex enable
+A term used to describe scheduling of a queue's @command{service} procedure.
+
+@item @dfn{FIFO} @tab
+@cindex FIFO
+@dfn{First In, First Out}.  A term used in @dfn{STREAMS} for named pipes.  This term is also used in
+queue scheduling.
+
+@item @dfn{flow control} @tab
+@cindex flow control
+A @dfn{STREAMS} mechanism that regulates the rate of message transfer within a @dfn{Strema} and from
+user space into a @dfn{Stream}.
+
+@item @dfn{hardware emulation module} @tab
+@cindex hardware emulation module
+A module required when the terminal line discipline is on a @dfn{Stream} but there is no terminal
+driver at the @dfn{Stream end}.  This module recognizes all @manref{termio(7)} @command{ioctl}s
+necessary to support terminal semantics specified by @mantype{termio(9)} and @mantype{termios(9)}.
+
+@item @dfn{input side} @tab
+@cindex input side
+A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
+@dfn{read-side} and @dfn{upstream}.
+
+@item @dfn{line discipline} @tab
+@cindex line discipline
+A @dfn{STREAMS} module that performs @manref{termio(7)} canonical and non-canonical processing.  It
+shares some @manref{termio(7)} processing with a driver in a @dfn{STREAMS} terminal subsystem.
+
+@item @dfn{lower Stream} @tab
+@cindex lower Stream
+A @dfn{Stream} connected beneath a multiplexing pseudo-device driver, by means of an
+@streamio{I_LINK} or @streamio{I_PLINK} @command{ioctl}.  The far end of a lower @dfn{Stream}
+terminates at a device driver or another multiplexer driver.
+
+@item @dfn{master driver} @tab
+@cindex master driver
+A @dfn{STREAMS}-based device supported by the pseudo-terminal subsystem.  It is the controlling part
+of the pseudo-terminal subsystem (also called @samp{ptm}).
+
+@item @dfn{message} @tab
+@cindex message
+One or more linked message blocks.  A message is referenced by its first message block and its type
+is defined by the message type of that block.
+
+@item @dfn{message block} @tab
+@cindex message block
+A triplet consisting of a data buffer and associated control structures, a @mantype{msgb(9)}
+structure, a @mantype{datab(9)} structure.  It carries data or information, as identified by its
+message type, in a @dfn{Stream}.
+
+@item @dfn{message queue} @tab
+@cindex message queue
+A linked list of zero or more messages connected together.
+
+@item @dfn{message type} @tab
+@cindex message type
+A enumerated set of values identifying the contents of a message.
+
+@item @dfn{module} @tab
+@cindex module
+A defined set of kernel-level routines and data structure used to process data, status, and control
+information on a @dfn{Stream}.  It is an optional element, but there can be many modules in one
+@dfn{Stream}.  It consists of a pair of queues (read queue and write queue), and it communicates to
+other components in a @dfn{Stream} by passing messages.
+
+@item @dfn{multiplexer} @tab
+@cindex multiplexer
+A @dfn{STREAMS} mechanism that allows message to be routed among multiple @dfn{Streams} in the
+kernel.  A multiplexing configuration includes at least one multiplexing pseudo-device driver
+connected to one or more upper @dfn{Streams} and one or more lower @dfn{Streams}.
+
+@item @dfn{named Stream} @tab
+@cindex named Stream
+A @dfn{Stream}, typically a pipe, with a name associated with it by way of a call to
+@manref{fattach(3)} (that is, a @manref{mount(2)} operation).  This is different from a named pipe
+(FIFO) in two ways: a named pipe (FIFO) is unidirectional while a named @dfn{Stream} is
+bidirectional; a name @dfn{Stream} need not refer to a pipe, but can be another type of
+@dfn{Stream}.
+
+@item @dfn{open routine} @tab
+@cindex open routine
+A procedure in each @dfn{STREAMS} driver and module called by @dfn{STREAMS} on each @command{open}
+system call made on the @dfn{Stream}.  A module's @command{open} procedure is also called when the
+module is pushed.
+
+@item @dfn{packet mode} @tab
+@cindex packet mode
+A feature supported by the @dfn{STREAMS}-based pseudo-terminal subsystem.  It is used to inform a
+process on the master side when state changes occur on the slave side of a pseudo-TTY.  It is
+enabled by pushing a module called @samp{pckt} on the master side.
+
+@item @dfn{persistent link} @tab
+@cindex persistent link
+A connection below a multiplexer that can exist without having an open controlling @dfn{Stream}
+associated with it.
+
+@item @dfn{pipe} @tab
+@cindex pipe
+See @dfn{STREAMS}-based pipe.
+
+@item @dfn{pop} @tab
+@cindex pop
+A term used when a module that is immediately below the @dfn{Stream} head is removed.
+
+@item @dfn{pseudo-device driver} @tab
+@cindex pseudo-device driver
+A software driver, not directly associated with a physical device, that performs functions internal
+to a @dfn{Stream} such as a multiplexer or @manref{log(4)} driver.
+
+@item @dfn{pseudo-terminal subsystem} @tab
+@cindex pseudo-terminal subsystem
+A user interface identical to a terminal subsystem except that there is a process in place of a
+hardware device.  It consists of at least a master device, slave device, line discipline module, and
+hardware emulation module.
+
+@item @dfn{push} @tab
+@cindex push
+A term used when a muodule is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
+
+@item @dfn{pushable module} @tab
+@cindex pushable module
+A module put between the @dfn{Stream head} and driver.  It performs intermediate transformations on
+messages flowing between the @dfn{Stream head} and driver.  A driver is a non-pushable module.
+
+@item @dfn{put procedure} @tab
+@cindex put procedure
+A routine in a module or driver associated with a queue that receives messages from the preceding
+queue.  It is the single entry point into a queue from a preceding queue.  It may perform processing
+on the message and will then generally either queue the message for subsequent processing by this
+queue's @command{service} procedure, or will pass the message to the @command{put} procedure of the
+following queue (using @manref{putnext(9)}).
+
+@item @dfn{queue} @tab
+@cindex queue
+A data structure that contains status information, a pointer to routines processing message, and
+pointers for administering a @dfn{Stream}.  It typically contains pointer to @command{put} and
+@command{service} procedures, a message queue, and private data.
+
+@item @dfn{read-side} @tab
+@cindex read-side
+A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
+@dfn{upstream} and @dfn{input-side}.
+
+@item @dfn{read queue} @tab
+@cindex read queue
+A message queue in a module or driver containing messages moving @dfn{upstream}.  Associated with
+the @manref{read(2)} system call and input from a driver.
+
+@item @dfn{remote mode} @tab
+@cindex remote mode
+A feature available with the pseudo-terminal subsystem.  It is used for applications that perform
+the canonical and echoing functions normally done by line discipline module and TTY driver.  It
+enables applications on the master side to turn off the canonical processing.
+
+@item @dfn{STREAMS Administrative Driver} @tab
+@cindex STREAMS Administrative Driver
+A @dfn{STREAMS} Administrative Driver that provides an interface to the @manref{autopush(8)}
+mechanism.
+
+@item @dfn{schedule} @tab
+@cindex schedule
+To place a queue on the internal list of queues that will subsequently have their service procedure
+called by the @dfn{STREAMS} scheduler.  @dfn{STREAMS} scheduling is independent of @cite{Linux}
+process scheduling.
+
+@item @dfn{service interface} @tab
+@cindex service interface
+A set of primitives that define a service at the boundary between a service user and a service
+provider and the rules (typically represented by a state machine) for allowable sequences of the
+primitives across the boundary.  At a @dfn{Stream}/user boundary, the primitives are typically
+contained in the control part of a message; within a @dfn{Stream}, in @msg{M_PROTO} or
+@msg{M_PCPROTO} message blocks.
+
+@item @dfn{service procedure} @tab
+@cindex service procedure
+A module or driver routine associated with a queue that receives messages queue for it by the
+@command{put} procedure is called by the @dfn{STREAMS} scheduler.  It may perform processing on the
+message and generally passes the message to the @command{put} procedure of the following queue.
+
+@item @dfn{service provider} @tab
+@cindex service provider
+An entity in a service interface that responds to request primitives from the service user with
+response and event primitives.
+
+@item @dfn{service user} @tab
+@cindex service user
+An entity in a service interface that generates request primitives for the service provider and
+consumes response and event primitives.
+
+@item @dfn{slave driver} @tab
+@cindex slave driver
+A @dfn{STREAMS}-based device supported by the pseudo-terminal subsystem.  It is also called
+@samp{pts} and works with a line discipline module and hardware emulation module to provide an
+interface to a user process.
+
+@item @dfn{standard pipe} @tab
+@cindex standard pipe
+A mechanism for the unidirectional flow of data between two processes where data written by one
+process becomes data read by the other process.
+
+@item @dfn{Stream} @tab
+@cindex Stream
+A kernel level aggregate created by connecting @dfn{STREAMS} components, resulting from an
+application of the @dfn{STREAMS} mechanism.  The primary components are the @dfn{Stream head}, the
+driver (or @dfn{Stream end}), and zero or more pushable modules between the @dfn{Stream head} and
+driver.
+
+@item @dfn{STREAMS-based pipe} @tab
+@cindex STREAMS-based pipe
+A mechanism used for bidirectional data transfer implemented using @dfn{STREAMS}, and sharing the
+properties of @dfn{STREAMS}-based devices.
+
+@item @dfn{Stream end} @tab
+@cindex Stream end
+A @dfn{Stream} component furthest from the user process that contains a driver.
+
+@item @dfn{Stream head} @tab
+@cindex Stream head
+A @dfn{Stream} component closest to the user process.  It provides the interface between the
+@dfn{Stream} and the user process.
+
+@item @dfn{STREAMS} @tab
+@cindex STREAMS
+A kernel mechanism that provides the framework for network services and data communication.  It
+defines interface standards for character intput/output within the kernel, and between the kernel
+and user level.  The @dfn{STREAMS} mechanism includes integral functions, utility routines, kernel
+facilities, and a set of structures.
+
+@item @dfn{TTY driver} @tab
+@cindex TTY driver
+A @dfn{STREAMS}-based device used in a terminal subsystem.
+
+@item @dfn{upper stream} @tab
+@cindex upper stream
+A @dfn{Stream} that terminates above a multiplexing driver.  The beginning of an upper @dfn{Stream}
+originates at the @dfn{Stream head} or another multiplexing driver.
+
+@item @dfn{upstream} @tab
+@cindex upstream
+A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
+@dfn{read-side} and @dfn{input side}.
+
+@item @dfn{water mark} @tab
+@cindex water mark
+A limit value used in flow control.  Each queue has a high-water mark and a low-water mark.  The
+high-water mark value indicates the upper limit related to the number of bytes contained on the
+queue.  When the queued character reaches its high water mark, @dfn{STREAMS} causes another queue
+that attempts to send a message to this queue to become blocked.  When the characters in this queue
+are reduced to the low-water mark value, the other queue is unblocked by @dfn{STREAMS}.
+
+@item @dfn{write queue} @tab
+@cindex write queue
+A message qeuue in a module or driver containing messages moving downstream.  Associated with the
+@manref{write(2)} system call and output from a user process.
+
+@item @dfn{write-side} @tab
+@cindex write-side
+A direction of data flow going from the @dfn{Stream head} toward a driver.  Also called downstream
+and output side.
+
+@end multitable
+
+@node List of Figures
+@unnumbered List of Figures
+
+@listoffloats Figure
+
+@node Index
+@unnumbered Index
+
+@c @page
+@c @node Indices
+@c @unnumbered Indices
+@c @menu
+@c * Concept Index::		Index of Concepts
+@c * Type Index::			Index of Data Types
+@c * Function Index::		Index of Functions and Macros
+@c * Variable Index::		Index of Variables and Constants
+@c * File Index::			Index of Files and Programs
+@c @end menu
+@c 
+@c @page
+@c @node Concept Index
+@c @unnumberedsec Concept Index
+@printindex cp
+
+@c @page
+@c @node Type Index
+@c @unnumberedsec Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Function Index
+@c @unnumberedsec Function and Macro Index
+@c @printindex fn
+@c 
+@c @page
+@c @node Variable Index
+@c @unnumberedsec Variable and Constant Macro Index
+@c @printindex vr
+@c 
+@c @page
+@c @node File Index
+@c @unnumberedsec Program and File Index
+@c @printindex pg
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
