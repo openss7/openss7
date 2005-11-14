@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/11/01 11:21:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/14 11:19:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/01 11:21:06 $ by $Author: brian $
+# Last Modified $Date: 2005/11/14 11:19:49 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-info_TEXINFOS		= STREAMS.texi SPG.texi porting.texi
+info_TEXINFOS		= STREAMS.texi SPG.texi porting.texi STREAMS_FAQ.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
@@ -126,7 +126,8 @@ FIG_FIGS		= \
 			  SPG_fig52.fig \
 			  SPG_fig53.fig \
 			  SPG_fig54.fig \
-			  SPG_fig55.fig
+			  SPG_fig55.fig \
+			  SPG_fig56.fig
 
 ## PKG_BUILD_INDEP
 endif
