@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.45 2005/11/14 23:27:06 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.46 2005/11/15 12:04:55 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/14 23:27:06 $ by $Author: brian $
+% Last Modified $Date: 2005/11/15 12:04:55 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -685,6 +685,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.46  2005/11/15 12:04:55  brian
+- second run at SPG
+
 Revision 0.9.2.45  2005/11/14 23:27:06  brian
 - more workup
 
@@ -1109,21 +1112,22 @@ not directly seen by a user process.
 This section describes the basic set of operations for manipulating @dfn{STREAMS} entities.
 
 A @dfn{STREAMS} driver is similar to a traditional character I/O driver in that it has one or more
-nodes associated with it in the file system and it is accessed using the open system call.
+nodes associated with it in the file system and it is accessed using the @manpage{open(2)} system call.
 Typically, each file system node corresponds to a separate minor device for that driver.  Opening
 different minor devices of a driver will cause separate @dfn{Streams} to be connected between a user
-process and the driver.  The file descriptor returned by the open call is used for further access to
+process and the driver.  The file descriptor returned by the @manpage{open(2)} call is used for further access to
 the @dfn{Stream}.  If the same minor device is opened more than once, only one @dfn{Stream} will be
-created; the first open call will create the @dfn{Stream}, and subsequent open calls will return a
+created; the first @manpage{open(2)} call will create the @dfn{Stream}, and subsequent @manpage{open(2)} calls will return a
 file descriptor that references that @dfn{Stream}.  Each process that opens the same minor device
 will share the same @dfn{Stream} to the device driver.
 
-Once a device is opened, a user process can send data to the device using the write system call and
-receive data from the device using the read system call.  Access to @dfn{STREAMS} drivers using read
-and write is compatible with the traditional character I/O mechanism.
+Once a device is opened, a user process can send data to the device using the @manpage{write(2)}
+system call and receive data from the device using the @manpage{read(2)} system call.  Access to
+@dfn{STREAMS} drivers using @manpage{read(2)} and @manpage{write(2)} is compatible with the
+traditional character I/O mechanism.
 
-The close system call will close a device and dismantle the associated @dfn{Stream} when the last
-open reference to the @dfn{Stream} is given up.
+The @manpage{close(2)} system call will close a device and dismantle the associated @dfn{Stream}
+when the last open reference to the @dfn{Stream} is given up.
 
 The following example shows how a simple @dfn{Stream} is used.  In the example, the user program
 interacts with a communications device that provides point-to-point data transfer between two
@@ -1160,7 +1164,7 @@ main()
 In the example, @file{/dev/comm/01} identifies a minor device of the communications device driver.
 When this file is opened, the system recognizes the device as a @dfn{STREAMS} device and connects a
 @dfn{Stream} to the driver.  @figref{103} shows the state of the @dfn{Stream} following the call to
-open.
+@manpage{open(2)}.
 
 @figuresized{SPG_fig03,103,Stream to Communications Driver,4in}
 @c [strm.stmdvi.gif]
@@ -1171,12 +1175,13 @@ communications line.  The example assumes that a user is sending data from the o
 communications line.  The program reads up to @samp{1024} bytes at a time, and then writes the
 number of bytes just read.
 
-The read call returns the available data, which may contain fewer than @samp{1024} bytes.  If no
-data are currently available at the @dfn{Stream head}, the read call blocks until data arrive.
+The @manpage{read(2)} call returns the available data, which may contain fewer than @samp{1024}
+bytes.  If no data are currently available at the @dfn{Stream head}, the @manpage{read(2)} call
+blocks until data arrive.
 
-Similarly, the write call attempts to send count bytes to @file{/dev/comm/01}.  However,
-@dfn{STREAMS} implements a flow control mechanism that prevents a user from exhausting system
-resources by flooding a device driver with data.
+Similarly, the @manpage{write(2)} call attempts to send count bytes to @file{/dev/comm/01}.
+However, @dfn{STREAMS} implements a flow control mechanism that prevents a user from exhausting
+system resources by flooding a device driver with data.
 
 Flow control is a @dfn{STREAMS} mechanism that controls the rate of message transfer among the
 modules, drivers, @dfn{Stream head}, and processes.  Flow control is local to each @dfn{Stream} and
@@ -1186,10 +1191,10 @@ any one @dfn{Stream}, but does not consider buffer pool levels or buffer usage i
 @dfn{Streams}.  Flow control is not applied to high priority messages (message priority will be
 discussed later).
 
-If the @dfn{Stream} exerts flow control on the user, the write call blocks until flow control has
-been relieved.  The call will not return until it has sent count bytes to the device.  exit is
-called to terminate the user process.  This system call also closes all open files, thereby
-dismantling the @dfn{Stream} in this example.
+If the @dfn{Stream} exerts flow control on the user, the @manpage{write(2)} call blocks until flow
+control has been relieved.  The call will not return until it has sent count bytes to the device.
+@manpage{exit(2)} is called to terminate the user process.  This system call also closes all open
+files, thereby dismantling the @dfn{Stream} in this example.
 
 @node Components
 @section Components
@@ -1211,14 +1216,14 @@ A queue is an interface between a @dfn{STREAMS} driver or module and the rest of
 Queues are always allocated as an adjacent pair.  The queue with the lower address in the pair is a
 read queue, and the queue with the higher address is used for the write queue.
 
-A queue's service routine is invoked to process messages on the queue.  It usually removes
-successive messages from the queue, processes them, and calls the put routine of the next module in
-the @dfn{Stream} to give the processed message to the next queue.
+A queue's @command{service} routine is invoked to process messages on the queue.  It usually removes
+successive messages from the queue, processes them, and calls the @command{put} routine of the next
+module in the @dfn{Stream} to give the processed message to the next queue.
 
-A queue's put routine is invoked by the preceding queue's put and/or service routine to add a
-message to the current queue.  If a module does not need to enqueue messages, its put routine can
-call the neighboring queue's put routine.  (@ref{Processing} discusses the service and put routines
-in more detail.)
+A queue's @command{put} routine is invoked by the preceding queue's @command{put} and/or
+@command{service} routine to add a message to the current queue.  If a module does not need to
+enqueue messages, its @command{put} routine can call the neighboring queue's @command{put} routine.
+(@ref{Processing} discusses the @command{service} and @command{put} routines in more detail.)
 
 Each queue also has a pointer to an open and close routine.  The open routine of a driver is called
 when the driver is first opened and on every successive open of the @dfn{Stream}.  The open routine
@@ -1234,7 +1239,7 @@ All input and output under @dfn{STREAMS} is based on messages.  The objects pass
 @dfn{STREAMS} modules are pointers to messages.  All @dfn{STREAMS} messages use two data structures
 (msgb and datab) to refer to the message data.  These data structures describe the type of the
 message and contain pointers to the data of the message, as well as other information.  Messages are
-sent through a @dfn{Stream} by successive calls to the put procedure of each module or driver in the
+sent through a @dfn{Stream} by successive calls to the @command{put} procedure of each module or driver in the
 @dfn{Stream}.
 
 @subsubsection Message Types
@@ -1279,9 +1284,9 @@ classes of message queuing priority.  All messages have an associated priority f
 (ordinary) messages have a priority of zero.  Priority messages have a priority greater than zero.
 High priority messages are high priority by virtue of their message type.  The priority field in
 high priority messages is unused and should always be set to zero.  @dfn{STREAMS} prevents high
-priority messages from being blocked by flow control and causes a service procedure to process them
-ahead of all ordinary messages on the queue.  This results in the high priority message transiting
-each module with minimal delay.
+priority messages from being blocked by flow control and causes a @command{service} procedure to
+process them ahead of all ordinary messages on the queue.  This results in the high priority message
+transiting each module with minimal delay.
 
 Non-priority, ordinary messages are placed at the end of the queue following all other messages in
 the queue.  Priority messages can be either high priority or priority band messages.  High priority
@@ -1328,7 +1333,8 @@ These are dynamically attached to the queue on a linked list (@dfn{message queue
 @samp{Bu} in @figref{48}) as they pass through the module.
 
 @item Processing procedures
-A put procedure processes messages and must be incorporated in each queue.  An optional service
+A put procedure processes messages and must be incorporated in each queue.  An optional
+@command{service}
 procedure can also be incorporated.  According to their function, the procedures can send messages
 upstream and/or downstream, and they can also modify the private data in their module.
 

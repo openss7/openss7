@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/14 11:19:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/11/15 12:04:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/14 11:19:49 $ by $Author: brian $
+# Last Modified $Date: 2005/11/15 12:04:54 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-info_TEXINFOS		= STREAMS.texi SPG.texi porting.texi STREAMS_FAQ.texi
+info_TEXINFOS		= STREAMS.texi SPG.texi porting.texi STREAMS_FAQ.texi SPG2.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \

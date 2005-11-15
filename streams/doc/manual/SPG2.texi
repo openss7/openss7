@@ -1,0 +1,2581 @@
+% -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
+% =========================================================================
+%
+% @(#) $Id: SPG2.texi,v 0.9.2.1 2005/11/15 12:05:09 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2005/11/15 12:05:09 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename SPG2.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE STREAMS Programmer's Guide
+@settitle @value{MANUAL_TITLE}
+
+@dircategory STREAMS
+@direntry
+* SPG2: (SPG2).			STREAMS Programmer's Guide (Take 2)
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE STREAMS Programmer's Guide
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this guide
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed guide).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this guide
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this guide into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE STREAMS Programmer's Guide
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
+This guide was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this guide
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this guide
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this guide into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Manpage index
+@defcodeindex mp
+
+@c Concatenate indices
+@syncodeindex fn cp
+@syncodeindex vr cp
+@synindex ky cp
+@syncodeindex pg cp
+@syncodeindex tp cp
+@synindex mp cp
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Guide
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@iftex
+
+@macro tabfig {image, number, caption}
+@cartouche
+@float Table,Table \number\
+@image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro tabfigsized {image, number, caption, size}
+@cartouche
+@float Table,Table \number\
+@image{\image\,\size\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro figure {image, number, caption}
+@cartouche
+@float Figure,Figure \number\
+@image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@cartouche
+@float Figure,Figure \number\
+@image{\image\,\size\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@command{\name\}
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro ioctlref {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@end iftex
+
+@ifnottex
+
+@macro tabfig {image, number, caption}
+@image{\image\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@end macro
+
+@macro tabfigsized {image, number, caption, size}
+@image{\image\,\size\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@end macro
+
+@macro figure {image, number, caption}
+@image{\image\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@image{\image\,\size\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@command{\name\} (@inforef{\name\, , *manpages*})
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\} (@inforef{\name\, , *manpages*})
+@end macro
+
+@macro ioctlref {name}
+@code{\name\} (@inforef{\name\(2), , *manpages*}; @inforef{streamio(7), , *manpages*})
+@end macro
+
+@end ifnottex
+
+@macro tabref {number}
+@ref{Table \number\}
+@end macro
+
+@macro figref {number}
+@ref{Figure \number\}
+@end macro
+
+@macro manpage {name}
+@mpindex \name\
+@command{\name\}
+@end macro
+
+@macro type {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro member {name}
+@vindex \name\
+@var{\name\}
+@end macro
+
+@macro constant {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro signal {name}
+@vindex \name\
+@{@b{@code{\name\}}@}
+@end macro
+
+@macro errno {name}
+@vindex \name\
+(@b{@code{\name\}})
+@end macro
+
+@macro stropt {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro streamio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro termio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro sockio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro msg {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro header {name}
+@pindex \name\
+@file{\name\}
+@end macro
+
+@menu
+* Acknowledgements::
+* Preface::
+* Introduction::
+* Overview::
+* Mechanism::
+* Processing::
+* Messages::
+* Polling::
+* Modules and Drivers::
+* Modules::
+* Drivers::
+* Multiplexing::
+* Pipes and FIFOs::
+* Terminal Subsystem::
+* Synchronization::
+* Reference::
+* Conformance::
+* Portability::
+* Data Structures::
+* Message Types::
+* Utilities::
+* Debugging::
+* Configuration::
+* Administration::
+* Examples::
+* Copying::
+* Glossary::
+* Index::
+
+ --- The Detailed Node Listing ---
+
+Acknowledgements
+
+* Sponsors::			Sponsors
+* Contributors::		Contributors
+
+Preface
+Introduction
+
+* Background::			STREAMS Background
+* What is STREAMS?::		STREAMS Description
+* Basic Streams Operations::	STREAMS Basic Operations
+* Components::			STREAMS Components
+* Multiplexing of Streams::	STREAMS Multiplexing
+* Benefits of STREAMS::		STREAMS Benefits
+
+Overview
+
+* Definitions::			STREAMS Definitions
+* Concepts::			STREAMS Concepts
+* Application Interface::	STREAMS Application Interface
+* Kernel Level Facilities::	STREAMS Kernel Facilities
+* Subsystems::			STREAMS Subsystems
+
+Mechanism
+
+* Mechanism Overview::		STREAMS Mechanism Overview
+* Stream Construction::		STREAMS Stream Construction
+
+Processing
+
+* Procedures::			STREAMS Put and Service Procedures
+* Asynchronous Example::	STREAMS Asynchronous Stream Example
+
+Messages
+
+* Messages Overview::		STREAMS Messages Overview
+* Message Structure::		STREAMS Message Structure
+* Queues and Priority::		STREAMS Message Queues and Priority
+* Service Interfaces::		STREAMS Service Interfaces
+* Message Allocation::		STREAMS Message Allocation and Freeing
+* Extended Buffers::		STREAMS Extended Buffers
+
+Polling
+
+* Input and Output Polling::	STREAMS Input and Output Polling
+* Controlling Terminal::	STREAMS Stream as Controlling Terminal
+
+Modules and Drivers
+
+* Environment::			STREAMS Module and Driver Environment
+* Input-Output Control::	STREAMS Input and Output Control
+* Flush Handling::		STREAMS Flush Handling
+* Driver-Kernel Interface::	STREAMS Driver-Kernel Interface
+* Design Guidelines::		STREAMS Design Guidelines
+
+Modules
+
+* Module::			STREAMS Modules
+* Module Flow Control::		STREAMS Module Flow Control
+* Module Design Guidelines::	STREAMS Module Design Guidelines
+
+Drivers
+
+* External Device Numbers::	External Device Numbering
+* Internal Device Numbers::	Internal Device Numbering
+* spec File System::		Avoiding Device Numbering
+* Clone Device::		Clone Device Numbering
+* Named STREAMS Device::	Reusable Device Numbering
+
+* Driver::			STREAMS Drivers
+* Cloning::			STREAMS Driver Cloning
+* Loop-Around Driver::		STREAMS Loop-Around Driver Example
+* Driver Design Guidelines::	STREAMS Driver Design Guidelines
+
+Multiplexing
+
+* Multiplexors::		STREAMS Multiplexing
+* Connecting and Disconnecting Lower Stream::
+				STREAMS Multiplexor Connect and Disconnect Lower Stream
+* Multiplexor Construction Example::
+				STREAMS Multiplexor Construction Example
+* Multiplexing Driver::		STREAMS Multiplexing Driver
+* Persistent Links::		STREAMS Multiplexor Persistent Links
+* Multiplexing Driver Design Guidelines::
+				STREAMS Multiplexing Driver Design Guidelines
+
+Pipes and FIFOs
+
+* Pipes and FIFOs::		STREAMS-based Pipes and FIFOs
+* Flushing Pipes and FIFOs::	Flushing STREAMS-based Pipes and FIFOs
+* Named Streams::		Named STREAMS-based Pipes and FIFOs
+* Unique Connections::		Unique Connections for STREAMS-based Pipes and FIFOs
+
+Terminal Subsystem
+
+* Terminal Subsystem::		STREAMS-based Terminal Subssytem
+* Pseudo-Terminal Subsystem::	STREAMS-based Pseudo-Terminal Subsystem
+
+Synchronization
+
+* MT Configuration::		MP STREAMS MT Configuration
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
+* Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
+
+* STREAMS Framework Integrity::
+* MP Message Ordering::
+* MP-UNSAFE Modules::
+* MP Put and Service Procedures::
+* MP Timeout and Buffer Callbacks::
+* MP Open and Close Procedures::
+* MP Module Unloading::
+* MP Locking::
+* MP Asynchronous Callbacks::
+* Stream Integrity::
+
+Reference
+
+* Files::			STREAMS Files
+* Modules::			STREAMS Modules
+* Drivers::			STREAMS Drivers
+* System Calls::		STREAMS System Calls
+* Input-Output Controls::	STREAMS Input-Output Controls
+* Module Entry Points::		STREAMS Module Entry Points
+* Structures::			STREAMS Structures
+* Registration::		STREAMS Module and Driver Registration Functions
+* Message Handling::		STREAMS Message Handling Functions
+* Queue Handling::		STREAMS Queue Handling Functions
+* Miscellaneous Functions::	STREAMS Miscellaneous Functions
+* Extensions::			STREAMS Extension Functions
+* Compatibility::		STREAMS Compatibility Functions
+
+Conformance
+
+* SVR 4.2 Compatibility::	SVR 4.2 MP DDI/DKI Compatibility
+* AIX Compatibility::		AIX 5L Version 5.1 Compatibility
+* HP-UX Compatibility::		HP-UX 11.0i v2 Compatibility
+* OSF/1 Compatibility::		OSF/1 1.2/Digital UNIX Compatibility
+* UnixWare Compatibility::	UnixWare 7.1.3 Compatibility
+* Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
+* SUX Compatibility::		Super/UX Compatibility
+* UXP Compatibility::		UXP/V Compatibility
+* LiS Compatibility::		LiS 2.18.1 Compatibility
+
+Portability
+
+* Core Function Support::	Porting with Core Function Support
+* SVR 4.2 Portability::		Porting from SVR 4.2 MP
+* AIX Portability::		Porting from AIX 5L Version 5.1
+* HP-UX Portability::		Porting from HP-UX 11.0i v2
+* OSF/1 Portability::		Porting from OSF/1 1.2/Digital UNIX
+* UnixWare Portability::	Porting from UnixWare 7.1.3
+* Solaris Portability::		Porting from Solaris 9/SunOS 5.9
+* SUX Portability::		Porting from Super/UX
+* UXP Portability::		Porting from UXP/V
+* LiS Portability::		Porting from LiS 2.18.1
+
+Data Structures
+
+* Stream Structures::
+* Queue Structures::
+* Message Structures::
+* Input Output Control Structures::
+* Link Structures::
+* Options Structures::
+
+Message Types
+
+* Message Type::
+* Ordinary Messages::
+* High Priority Messages::
+
+Utilities
+
+Debugging
+
+Configuration
+
+Administration
+
+* Administrative Utilities::	STREAMS Administrative Utilities
+* System Controls::		STREAMS System Controls
+* /proc File System::		STREAMS /proc File System
+
+Examples
+
+* Module Example::		STREAMS Module Example
+* Driver Example::		STREAMS Driver Example
+
+Copying
+
+* GNU General Public License::		GPL
+* GNU Free Documentation License::	FDL
+
+Glossary
+
+Index
+
+@end menu
+
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node Acknowledgements
+@unnumbered Acknowledgements
+@cindex credits
+
+@include texi/funding.texi
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex document information
+
+@subsection Notice
+@cindex document notice
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX
+International.} publications and other sources).  Consult the permission notices contained in the
+documentation for more information.
+
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
+Documentation License}) with all sections invariant.
+
+@subsection Abstract
+@cindex document abstract
+
+This document provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Objective
+@cindex document objective
+
+The objective of this document is to provide a guide for the @dfn{STREAMS} programmer when
+developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
+
+This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
+kernel levels.
+
+@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+(I/O) mechanism and to support development of communication services.
+
+@dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
+that expedite software design and implementation.
+
+@subsection Intent
+@cindex document intent
+
+The intent of this document is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+is intended to be read alone and is not intended to replace or supplement the
+@cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
+(see @manref{STREAMS(9)}) provide a better reference to the programmer.
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@cindex document audience
+
+This document is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, etc.
+
+The guide is intended for network and systems programmers, who use the @dfn{STREAMS} mechanism at
+user and kernel levels for @cite{Linux} and @cite{UNIX} system communication services.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@subsection Revisions
+@cindex document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this document is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package.
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log: SPG2.texi,v $
+Revision 0.9.2.1  2005/11/15 12:05:09  brian
+- second run at SPG
+
+Revision 0.9.2.45  2005/11/14 23:27:06  brian
+- more workup
+
+Revision 0.9.2.44  2005/11/14 11:19:49  brian
+- working up manual
+
+Revision 0.9.2.43  2005/11/14 04:43:55  brian
+- updating manual
+
+Revision 0.9.2.42  2005/11/13 23:04:01  brian
+- starting cleanup of SPG
+
+Revision 0.9.2.41  2005/10/07 09:34:00  brian
+- more testing and corrections
+
+Revision 0.9.2.40  2005/09/26 10:56:41  brian
+- doc updates
+
+Revision 0.9.2.39  2005/09/20 12:53:07  brian
+- more doc updates, corrected QFULL handling
+
+Revision 0.9.2.38  2005/09/18 07:38:35  brian
+- more doc updates
+
+Revision 0.9.2.37  2005/09/17 11:52:08  brian
+- documentation updates
+
+Revision 0.9.2.36  2005/09/17 08:20:57  brian
+- more doc updates
+
+Revision 0.9.2.35  2005/09/17 00:46:12  brian
+- document updates
+
+Revision 0.9.2.34  2005/09/16 03:06:02  brian
+- added glossary
+
+Revision 0.9.2.33  2005/09/15 13:02:52  brian
+- added new graphics and updates
+
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed,
+postscript or portable document format) version of this document is an @strong{UNCONTROLLED
+VERSION}.
+
+@subsection Disclaimer
+@cindex document disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
+consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action, arising out of or in connection with
+any use of this document or the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
+reason, including but not limited to, conformity with standards promulgated by various agencies,
+utilization of advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
+Corporation} is under no obligation to provide any feature listed herein.
+
+@subsubsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@section Organization
+@cindex organization
+
+This guide has several chapters, each discussing a unique topic.  @ref{Introduction},
+@ref{Overview}, @ref{Mechanism} and @ref{Processing} contain introductory information and can be
+ignored by those already familiar with @dfn{STREAMS} concepts and facilities.
+
+This document is organized as follows:
+
+@ifnottex
+@menu
+  Acknowledgements::
+  Preface::
+* Introduction::
+* Overview::
+* Mechanism::
+* Processing::
+* Messages::
+* Polling::
+* Modules and Drivers::
+* Modules::
+* Drivers::
+* Multiplexing::
+* Pipes and FIFOs::
+* Terminal Subsystem::
+* Synchronization::
+* Reference::
+* Conformance::
+* Portability::
+* Data Structures::
+* Message Types::
+* Utilities::
+* Debugging::
+* Configuration::
+* Administration::
+* Examples::
+* Copying::
+* Glossary::
+* Index::
+@end menu
+@end ifnottex
+@iftex
+@table @emph
+@item @ref{Preface}
+Describes the organization and purpose of the guide.  It also defines an intended audience and an
+expected background of the users of the guide.
+@item @ref{Introduction}
+An introduction to @dfn{STREAMS} and the @cite{@value{PACKAGE_TITLE}} package.
+@dfn{STREAMS} Fundamentals.  Presents an overview and the benefits of @dfn{STREAMS}.
+@item @ref{Overview}
+A brief overview of @dfn{STREAMS}.
+@item @ref{Mechanism}
+A description of the @dfn{STREAMS} framework.  Describes the basic operations for constructing,
+using, and dismantling Streams.  These operations are performed using @manpage{open(2)},
+@manpage{close(2)}, @manpage{read(2)}, @manpage{write(2)}, and @manpage{ioctl(2)}.
+@item @ref{Processing}
+Processing and procedures within the @dfn{STREAMS} framework.  Gives an overview of the
+@dfn{STREAMS} put and service routines.
+@item @ref{Messages}
+@dfn{STREAMS} Messages, organization, types, priority, queueing, and general handling.  Discusses
+@dfn{STREAMS} messages, their structure, linkage, queueing, and interfacing with other @dfn{STREAMS}
+components.
+@item @ref{Polling}
+Polling of @dfn{STREAMS} file descriptors and other asynchronous application techniques.  Describes
+how @dfn{STREAMS} allows user processes to monitor, control, and poll Streams to allow an effective
+utilization of system resources.
+@item @ref{Modules and Drivers}
+An overview of @dfn{STREAMS} modules, drivers and multiplexing drivers.  Describes the @dfn{STREAMS}
+module and driver environment, input-output controls, routines, declarations, flush handling, driver-kernel
+interface, and also provides general design guidelines for modules and drivers.
+@item @ref{Modules}
+Details of @dfn{STREAMS} modules, including examples.  Provides information on module construction
+and function.
+@item @ref{Drivers}
+Details of @dfn{STREAMS} drivers, including examples.  Discusses @dfn{STREAMS} drivers, elements of
+driver flow control, flush handling, cloning, and processing.
+@item @ref{Multiplexing}
+Details of @dfn{STREAMS} multiplexing drivers, including examples.  Describes the @dfn{STREAMS}
+multiplexing facility.
+@item @ref{Pipes and FIFOs}
+Details of @dfn{STREAMS}-based Pipes and FIFOs.  Provides information on creating, writing, reading,
+and closing of @dfn{STREAMS}-based pipes and FIFOs and unique connections.
+@item @ref{Terminal Subsystem}
+Details of @dfn{STREAMS}-based Terminals and Pseudo-terminals.  Discusses @dfn{STREAMS}-based
+terminal and and pseudo-terminal subsystems.
+@item @ref{Synchronization}
+Discusses @dfn{STREAMS} in a symmetrical multi-processor environment.
+@item @ref{Reference}
+Reference section.
+@item @ref{Conformance}
+Conformance of the @cite{@value{PACKAGE_TITLE}} package to other @cite{UNIX} implementations of
+@dfn{STREAMS}.
+@item @ref{Portability}
+Portability of @dfn{STREAMS} modules and drivers written for other @cite{UNIX} implementations of
+@dfn{STREAMS} and how they can most easily be ported into @cite{@value{PACKAGE_TITLE}}; but, for
+more details on this topic, see the @cite{@value{PACKAGE_TITLE} - @dfn{STREAMS} Portability Guide}.
+@item @ref{Data Structures}
+Primary @dfn{STREAMS} Data Sturctures, descriptions of their members, flags, constants and use.
+Summarizes data structures commonly used by @dfn{STREAMS} modules and drivers.
+@item @ref{Message Types}
+@dfn{STREAMS} Message Type reference, with descriptions of each message type.  Describes
+@dfn{STREAMS} messages and their use.
+@item @ref{Utilities}
+@dfn{STREAMS} kernel-level utility functions for the module or driver writer.  Describes
+@dfn{STREAMS} utility routines and their usage.
+@item @ref{Debugging}
+@dfn{STREAMS} debugging facilities and their use.
+Provides debugging aids for developers.
+@item @ref{Configuration}
+@dfn{STREAMS} configuration, the @dfn{STREAMS Administrative Driver} and the autopush facility.
+Describes how modules and drivers are configured into the @dfn{Linux} and @dfn{UNIX} system, tunable
+parameters, and the autopush facility.
+@item @ref{Administration}
+Administration of the @dfn{STREAMS} subsystem.
+@item @ref{Examples}
+Collected examples.
+@c @item @ref{Device Numbers}
+@c Specifics on device numbering and the @dfn{Shadow Special Filesystem}.
+@c @item @ref{Multi-Threading}
+@c Syncrhonization for Symmetrical Multiprocessor (SMP) architectures.
+@end table
+@end iftex
+
+
+@subsubsection Conventions Used
+
+This guide uses @cite{texinfo} typographical conventions.
+
+Throughout this guide, the word @dfn{STREAMS} will refer to the mechanism and the word @dfn{Stream}
+will refer to the path between a user application and a driver.  In connection with
+@dfn{STREAMS}-based pipes @dfn{Stream} refers to the data transfer path in the kernel between the
+kernel and one or more user processes.
+
+Examples are given to highlight the most important and common capabilities of @dfn{STREAMS}.  They
+are not exhaustive and, for simplicity, often reference fictional drivers and modules.  Some
+examples are also present in the @cite{@value{PACKAGE_TITLE}} package, both for testing and example
+purposes.
+
+System calls, @dfn{STREAMS} utility routines, header files, and data structures are given using
+@command{texinfo} @file{filename} typesetting, when they are mentioned in the text.
+
+Variable names, pointers, and parameters are given using @command{texinfo} @var{variable}
+typesetting conventions.  Routine, field, and structure names unique to the examples are also given
+using @command{texinfo} @var{variable} typesetting conventions when they are mentioned in the text.
+
+Declarations and short examples are in @command{texinfo} @samp{sample} typesetting.
+
+@command{texinfo} displays are used to show program source code.
+@ignore
+Screens are used to simulate what a user will see on a video display screen or to show program
+source code.
+@end ignore
+
+Data structure formats are also shown in @command{texinfo} displays.
+
+@ignore
+[Boxcaut.gif]
+
+The caution sign is used to show possible harm or damage to a system, an application, a process, a
+piece of hardware, etc.
+
+[Boxnote.gif]
+
+The note sign is used to emphasize points of interest, to present parenthetical information, and to
+cite references to other documents and commands.
+@end ignore
+
+@subsection Other Documentation
+
+Although the @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}} provides a guide to aid in
+developing @dfn{STREAMS} applications, readers are encouraged to consult the
+@cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages (see
+@manref{STREAMS(9)}) provide a better reference to the programmer.
+For detailed information on
+system calls used by @dfn{STREAMS} (section 2), and
+@dfn{STREAMS} utilities from section 8.
+@dfn{STREAMS} specific input output control (ioctl) calls are provided in @manref{streamio(7)}.
+@dfn{STREAMS} modules and drivers are described on section 7.
+@dfn{STREAMS} is also described to some extent in the @cite{System V Interface Definition, Third Edition}.
+
+@subsection UNIX Edition
+
+This system conforms to @cite{UNIX System V Release 4.2} for @cite{Linux}.
+
+
+@subsection Related Manuals
+
+@cite{@value{PACKAGE_TITLE} Installation and Reference Manual}
+
+@subsection Copyright
+
+@copyright{} 1997-2005  OpenSS7 Corporation.  All Rights Reserved.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@c ============================================================================
+@node Introduction
+@chapter Introduction
+@menu
+* Background::			STREAMS Background
+* What is STREAMS?::		STREAMS Description
+* Basic Streams Operations::	STREAMS Basic Operations
+* Components::			STREAMS Components
+* Multiplexing of Streams::	STREAMS Multiplexing
+* Benefits of STREAMS::		STREAMS Benefits
+@end menu
+
+@c ----------------------------------------------------------------------------
+@node Background
+@section Background
+
+@dfn{STREAMS} is a facility first presented in a paper by Dennis M. Ritchie in
+1984,@footnote{@cite{A Stream Input-Output System, AT&T Bell Laboratories Technical Journal 63, No.
+8 Part 2 (October, 1984), pp.  1897-1910.}} originally implemented on 4.1BSD and later part of
+@cite{Bell Laboratories Eighth Edition UNIX}, incorporated into
+@cite{UNIX System V Release 3.0}
+@cindex UNIX System V Release 3.0
+and enhanced in
+@cite{UNIX System V Release 4}
+@cindex UNIX System V Release 4
+and
+@cite{UNIX System V Release 4.2}.
+@cindex UNIX System V Release 4.2
+@dfn{STREAMS} was used in @cite{SVR4} for terminal input/output, pseudo-terminals, pipes, named
+pipes (FIFOs), interprocess communication and networking.  Since its release in @cite{System V
+Release 4}, @dfn{STREAMS} has been implemented across a wide range of @cite{UNIX}, @cite{UNIX}-like,
+and @cite{UNIX}-based systems, making its implementation and use an @i{ipso facto} standard.
+
+@dfn{STREAMS} is a facility that allows for a reconfigurable full duplex communications path,
+@dfn{Stream}, between a user process and a driver in the kernel.  Kernel protocol modules can be
+pushed onto and popped from the @dfn{Stream} between the user process and driver.  The @dfn{Stream}
+can be reconfigured in this way by a user process.  The user process, neighbouring protocol modules
+and the driver communicate with each other using a message passing scheme closely related to
+@dfn{MOM (Message Oriented Middleware)}.  This permits a loose coupling between protocol modules,
+drivers and user processes, allowing a third-party and loadable kernel module approach to be taken
+toward the provisioning of protocol modules on platforms supporting @dfn{STREAMS}.
+
+On @cite{UNIX System V Relase 4.2},
+@cindex UNIX System V Release 4.2
+@dfn{STREAMS} was used for terminal input-output, pipes, FIFOs (named pipes), and network
+communications.  Modern @cite{UNIX}, @cite{UNIX}-like and @cite{UNIX}-based systems providing
+@dfn{STREAMS} normally support some degree of network communications using @dfn{STREAMS}; however,
+many do not support @dfn{STREAMS}-based pipe and FIFOs@footnote{For example, AIX.} or terminal
+input-output.@footnote{For example, HP-UX}.
+
+@cite{Linux} has not traditionally implemented a @dfn{STREAMS} subsystem.  It is not clear why,
+however, perceived ideological differences between @dfn{STREAMS} and @dfn{Sockets} and also the
+@dfn{XTI/TLI} and @dfn{Sockets} interfaces to @dfn{Internet Protocol} services are usually at the
+centre of the debate.  For additional details on the debate,
+@pxref{Top, , About This Manual, STREAMS_FAQ, @value{PACKAGE_TITLE} Frequently Asked Questions}.
+
+@cite{Linux} pipes and FIFOs are @cite{SVR3}-style, and the @cite{Linux} terminal subsystem is
+@cite{BSD}-like.  @cite{UNIX 98 Pseudo-Terminals}, @file{ptys}, have a specialized implementation
+that does not follow the @dfn{STREAMS} framework and, therefore, do not support the pushing or
+popping of @dfn{STREAMS} modules.  Internal networking implementation under @cite{Linux} follows the
+@cite{BSD} approach with a native (system call) @dfn{Sockets} interface only.
+
+@cite{RedHat} at one time provided an @cite{Intel Binary Compatibility Suite (iBCS)} module for
+@cite{Linux} that supported the @dfn{XTI/TLI} interface and @file{socksys} system calls and
+input-output controls, but not the @dfn{STREAMS} framework (and therefore cannot push or pop
+modules).
+
+A @dfn{STREAMS} package for @cite{Linux} was written and eventually distributed and maintained by
+@uref{http://www.gcom.com/,GCOM Inc.}   This is the @cite{Linux STREAMS (LiS)} package.  This
+package had some failings and was repeatedly rejected for mainline adoption, which prompted the
+development of @cite{@value{PACKAGE_TITLE}}.  @cite{Linux STREAM (LiS)} is no longer supported (it
+does not have a maintainer).
+
+@cite{@value{PACKAGE_TITLE}} is the current open source implementation of @cite{STREAMS} for
+@cite{Linux} and provides all of the capabilities of @cite{UNIX System V Release 4.2 MP}, plus
+support for mainstream @cite{UNIX} implementations based on @cite{UNIX System V Release 4.2 MP}
+through compatibility modules.
+
+Although it is intended primarily as documentation for the @cite{@value{PACKAGE_TITLE}}
+implementation of @cite{STREAMS}, much of the @cite{@value{MANUAL_TITLE} - @value{MANUAL_TYPE}} is
+generally applicable to all @cite{STREAMS} implementations.
+
+@c ----------------------------------------------------------------------------
+@node What is STREAMS?
+@section What is STREAMS?
+
+@dfn{STREAMS} is a flexible, message oriented framework for the development of @cite{GNU/Linux}
+communications facilities and protocols.  It provide a set of system calls, kernel resources, and
+kernel utilities within a framework that is applicable to a wide range of communications facilities
+including terminal subsystems, interprocess communication, and networking.  It provides standard
+interfaces for communication input and output within the kernel, common facilities for device
+drivers, and a standard interface@footnote{@cite{XPG 4.2/XNS 4.2}, @cite{XPG 5/XNS 5},
+@cite{POSIX/SUSv2 XSI Extensions} and @cite{POSIX/SUSv3 XSR Extensions}.} between the kernel and the
+rest of the @cite{GNU/Linux} system.
+
+The standard interface and mechanism enable modular, portable development and easy integration of
+high performance network services and their components.  Because it is a message passing
+architecture, @dfn{STREAMS} does not impose a specific network architecture (as does the @dfn{BSD
+Sockets} kernel architecture.  The @dfn{STREAMS} user interface is uses the familiar @cite{UNIX}
+character special file input and output mechanisms @manpage{open(2)}, @manpage{read(2)},
+@manpage{write(2)}, @manpage{ioctl(2)}, @manpage{close(2)}; and provides additional system calls,
+@manpage{poll(2)}, @manpage{getmsg(2)}, @manpage{getpmsg(2)}, @manpage{putmsg(2)},
+@manpage{putpmsg(2)}, to assist in message passing between user-level applications and
+kernel-resident modules.  Also, @dfn{STREAMS} defines a standard set of input-output controls
+(@manpage{ioctl(2)}) for manipulation and configuration of @dfn{STREAMS} by a user-space
+application.
+
+As a message passing architecture, the @dfn{STREAMS} interface between the user process and kernel
+resident modules can be treated either as fully synchronous exchanges or can be treated
+asynchronously for maximum performance.
+
+@subsection Characteristics
+
+@dfn{STREAMS} has the the following characteristics that are not exhibited (or are exhibited in
+different ways) by other kernel level subsystems:
+
+@itemize @bullet
+
+@item @dfn{STREAMS} is based on the character device special file which is one of the most flexible
+special files available in the @cite{GNU/Linux} system.
+
+@item @dfn{STREAMS} is a message passing architecture, similar to @cite{Message Oriented Middleware
+(MOM)} that acheives a high degree of functional decoupling between modules.  This allows the
+service interface between modules to correspond to the natural interfaces found or described between
+protocol layers in protocol stack without requiring the implementation to conform to any given
+model.
+
+As a contrasting example, the @dfn{BSD Sockets} implementation, internal to the kernel, provides
+strict socket-protocol, protocol-protocol and protocol-device function call interfaces.
+
+@item By using @command{put} and @command{service} procedures for each module, and scheduling
+@command{service} procedures, @dfn{STREAMS} combines background scheduling of coroutine service
+procedures with message queueing and flow control to provide a mechanism robust for both event driven
+subsystem and soft real-time subsystem.
+
+In contrast, @dfn{BSD Sockets}, internal to the kernel, requires the sending component across the
+socket-protocol, protocol-protocol, or protocol-device to handle flow control.  @dfn{STREAMS}
+integrates flow control within the @dfn{STREAMS} framework.
+
+@item @dfn{STREAMS} permits user runtime configuration of kernel data structure and modules to
+provide for a wide range of novel configurations and capabilies in a live @cite{GNU/Linux} system.
+The @dfn{BSD Sockets} protocol framework does not provide this capability.
+
+@item @dfn{STREAMS} is as applicable to termination input-output and interprocess communication as
+it is to networking protocols.
+
+@dfn{BSD Sockets} is only applicable to a restricted range of networking protocols.
+
+@item @dfn{STREAMS} provides mechanisms (the pushing and popping of modules, and the linking and
+unlinking of @dfn{Streams} under multiplexing drivers) for complex configuration of protocol stacks;
+the precise topology being typically under the control of user space daemon processes.
+
+No other kernel protocol stack framework provides this flexible capability.  Under @dfn{BSD Sockets}
+it is necessary to define specialized socket types to perform these configuration functions and not
+in any standard way.
+
+@end itemize
+
+@subsection Components
+
+@dfn{STREAMS} provides a full-duplex communications path for data and control information between a
+kernel-resident driver and a user space process (see @figref{101}).
+
+Within the kernel, a @dfn{Stream} is comprised of the following basic components:
+
+@itemize @bullet
+@item A @dfn{Stream head} that is inside the @cite{Linux} kernel, but which sits closest to the user
+space process.  The @dfn{Stream head} is responsible for communicating with user space processes and
+that presents the standard @dfn{STREAMS} I/O interface to user space processes and applications.
+@item A @dfn{Stream end} or @dfn{Driver} that is inside the @cite{Linux} kernel, but which sits
+farthest from the user space process.  A @dfn{Stream end} or @dfn{Driver} that interfaces to
+hardware or other mechanisms within the @cite{Linux} kernel.
+@item  A @dfn{Module} that sits between the @dfn{Stream head} and @dfn{Stream end}.  The
+@dfn{Module} provides modular and flexible processing of control and data information passed up and
+down the @dfn{Stream}.
+@end itemize
+
+@figuresized{SPG_fig01,101,Simple Stream,3in}
+
+@subsubsection Stream head
+
+A @dfn{Stream head} is the component of a @dfn{Stream} that is closest to the user space process.
+The @dfn{Stream head} is responsible for directly communicating with the user space process in user
+context and for converting system calls to actions performed on the @dfn{Stream head} or the
+conversion of control and data information passed between the user space process and the
+@dfn{Stream} in response to system calls.  All @dfn{Streams} are associate with a @dfn{Stream head}.
+In the case of @dfn{STREAMS}-based pipes, the @dfn{Stream} may be associated with two
+(interconnected) @dfn{Stream heads}.  Because the @dfn{Stream head} follows the same structure as a
+@dfn{Module}, it can be viewed as a specialized module.
+
+With @dfn{STREAMS}, pipes and FIFOs are also @dfn{STREAMS}-based.@footnote{Unlike the native
+@cite{Linux} pipes and FIFOs that use the older @cite{UNIX System V Release 3} or @dfn{BSD}
+approaches to these facilities.}  @dfn{STREAMS}-based pipes and FIFOs do not have a @dfn{Driver}
+component.
+
+@dfn{STREAMS}-based pipes place another @dfn{Stream head} in the position of the @dfn{Driver}.  That
+is, a @dfn{STREAMS}-based pipe is a full-duplex communications path between two otherwise
+independent @dfn{Stream heads}.  @dfn{Modules} may be placed between the @dfn{Stream heads} in the
+same fashion as they can exist between a @dfn{Stream head} and a @dfn{Driver} in a normal
+@dfn{Stream}.
+A @dfn{STREAMS}-based pipe is illustrated in @figref{102}.
+
+@figuresized{SPG_fig02,102,@dfn{STREAMS}-based Pipe,3in}
+
+@dfn{STREAMS}-based FIFOs consist of a single @dfn{Stream head} that has its downstream path
+connected to its upstream path where the @dfn{Driver} would be located.  @dfn{Modules} can be pushed
+under this single @dfn{Stream Head}.
+A @dfn{STREAMS}-based FIFO is illustrated in @figref{103}.
+
+@figuresized{SPG_fig07,103,@dfn{STREAMS}-based @dfn{FIFO} (named pipe),3in}
+
+For more information on @dfn{STREAMS}-based pipes and FIFOs, @pxref{Pipes and FIFOs}.
+
+@subsubsection Module
+
+A @dfn{STREAMS} @dfn{Module} is an optional processing element that is placed between the
+@dfn{Stream head} and the @dfn{Stream end}.  The @dfn{Module} can perform processing functions on
+the data and control information flowing in either direction on the @dfn{Stream}.  It can
+communicate with neighbouring modules, the @dfn{Stream head} or a @dfn{Driver} using @dfn{STREAMS}
+messages.  Each @dfn{Module} is self-contained in the sense that it does not directly invoke
+functions provided by, nor access datastructures of, neighbouring modules, but rather communicates
+data, status and control information using messages.  This functional isolation provides a loose
+coupling that permits flexible recombination and reuse of @dfn{Modules}.  A @dfn{Module} follows the
+same framework as the @dfn{Stream head} and @dfn{Driver}, has all of the same entry points and can
+use all of the same @dfn{STREAMS} and kernel utilities to perform its function.
+
+@dfn{Modules} can be inserted between a @dfn{Stream head} and @dfn{Stream end} (or another
+@dfn{Stream head} in the case of a @dfn{STREAMS}-based pipe or FIFO).  The insertion and deletion of
+@dfn{Modules} from a @dfn{Stream} is referred to as @dfn{pushing} and @dfn{popping} a @dfn{Module}
+due to the fact that that modules are inserted or removed from just beneath the @dfn{Stream head} in
+a push-down stack fashion.  Pushing and popping of modules can be performed using standard
+@manpage{ioctl(2)} calls and can be performed by user space applications without any need for kernel
+programming, assembly, or relinking.
+
+For more information on @dfn{STREAMS Modules}, see @pxref{Module Component}.
+
+@subsubsection Driver
+
+All @dfn{Streams}, with the sole exception of @dfn{STREAMS}-based pipe and FIFOs, contain a
+@dfn{Driver} a the @dfn{Stream end}.  A @dfn{STREAMS} @dfn{Driver} can either be a @dfn{device
+driver} that directly or indirectly controls hardware, or can be a @dfn{pseudo-device driver} that
+interface with other software subsystems within the kernel.  @dfn{STREAMS} drivers normally perform
+little processing within the @dfn{STREAMS} framework and typically only provide conversion between
+@dfn{STREAMS} messages and hardware or software events (e.g. interrupts) and conversion between
+@dfn{STREAMS} framework data structures and device related data structures.
+
+For more information on @dfn{STREAMS Drivers}, see @pxref{Driver Component}.
+
+@subsubsection Queues
+
+Each component in a @dfn{Stream} (@dfn{Stream head}, @dfn{Module}, @dfn{Driver}) has an associated
+pair of queues.  One @dfn{queue} in each pair is responsible for managing the message flow in the
+@dfn{downstream} direction from @dfn{Stream head} to @dfn{Stream end}; the other for the
+@dfn{upstream} direction.  The @dfn{downstream} @dfn{queue} is called the @dfn{write-side}
+@dfn{queue} in the @dfn{queue} pair; the @dfn{upstream} @dfn{queue}, the @dfn{read-side}
+@dfn{queue}.
+
+Each @dfn{queue} in the pair provides pointers necessary for organizing the temporary storage and
+management of @dfn{STREAMS} messages on the @dfn{queue}, as well as function pointers to procedures
+to be invoked when messages are placed on the @dfn{queue} or need to be taken off of the
+@dfn{queue}, and pointers to auxillary and module-private data structures.  The @dfn{read-side}
+@dfn{queue} also contains function pointers to procedures used to @command{open} and @command{close}
+the @dfn{Stream head}, @dfn{Module} or @dfn{Driver} instance associated with the @dfn{queue} pair.
+@dfn{Queue} pairs are dynamically allocated when an instance of the @dfn{driver}, @dfn{module} or
+@dfn{Stream head} is created and deallocated when the instance is destroyed.
+
+For more information on @dfn{STREAMS Queues}, see @pxref{Queue Component}.
+
+@subsubsection Messages
+
+@dfn{STREAMS} is a message passing architecture.  @dfn{STREAMS} messages can contain control
+information or data, or both.  Messages that contain control information are intended to illicit a
+response from a neighbouring module, @dfn{Stream head} or @dfn{Stream end}.  The control information
+typically uses the message type to invoke a general function and the fields in the control part of
+the messge as arguments to a call to the function.  The data portion of a message represents
+information that is (from the perspective of the @dfn{STREAMS} framework) unstructured.  Only
+cooperating modules, the @dfn{Stream head} or @dfn{Stream end} need know or agree upon the format of
+control or data messages.
+
+A @dfn{STREAMS} message consists of one or more blocks.  Each block is a 3-tuple of a message block,
+a data block and a data buffer.  Each data block has a message type, and the data buffer contains
+the control information or data associated with each block in the message.  @dfn{STREAMS} messages
+typically consist of one control-type block (@constant{M_PROTO}) and zero or more data-type blocks
+(@constant{M_DATA}), or just a data-type block.
+
+A set of specialized and standard message types define messages that can be sent by a @dfn{module}
+or @dfn{driver} to control the @dfn{Stream head}.  A set of specialized and standard message types
+define messages that can be sent by the @dfn{Stream head} to control a @dfn{module} or @dfn{driver},
+normaly in response to a standard input-output control for the @dfn{Stream}.
+
+@dfn{STREAMS} messages are passed between a module, @dfn{Stream head} or @dfn{Driver} using a
+@command{put} procedure associated with the queue in the queue pair for the direction in which
+the message is being passed.  Messages passed towards the @dfn{Stream head} are passed in the
+@dfn{upstream} direction, and those towards the @dfn{Stream end}, in the @dfn{downstream} direction.
+The @dfn{read-side} queue in the queue pair associated with the module instance to which a message
+is passed is responsible for processing or queueing @dfn{upstream} messages; the @dfn{write-side}
+queue, for processing @dfn{downstream} messages.
+
+@dfn{STREAMS} messages are generated by the @dfn{Stream head} and passed @dfn{downstream} in
+response to @manpage{write(2)}, @manpage{putmsg(2)}, and @manpage{putpmsg(2)} system calls; they are
+also consumed by the @dfn{Stream head} and converted to information passed to user space in response
+to @manpage{read(2)}, @manpage{getmsg(2)}, and @manpage{getpmsg(2)} system calls.
+
+@dfn{STREAMS} messages are also generated by the @dfn{Driver} and passed @dfn{upstream} to
+ultimately be read by the @dfn{Stream head}; they are also consumed when written by the @dfn{Stream
+head} and ultimately arrive at the @dfn{Driver}.
+
+For more information on @dfn{STREAMS Messages}, see @pxref{Message Component}.
+
+@c ----------------------------------------------------------------------------
+@node Basic Streams Operations
+@section Basic Streams Operations
+
+This section provides a basic description of the user level interface and system calls that are used
+to manipulate a @dfn{Stream}.
+
+A @dfn{Stream} is similar, and indeed is implemented, as a character device special file and is
+associated with a character device within the @cite{GNU/Linux} system.  Each @dfn{STREAMS} character
+device special file (character device node, see @manref{mknod(2)}) has associated with it a major
+and minor device number.  In the usual situation, a @dfn{Stream} is associated with each minor
+character device node in a similar fashion to a minor device instance for regular character device
+drivers.
+
+@dfn{STREAMS} devices are opened, as are character device drivers, with the @manpage{open(2)} system
+call.@footnote{An exception is @dfn{STREAMS}-based pipes, that are opened with the @manpage{pipe(2)}
+system call.}  Opening a minor device node accesses a separate @dfn{Stream} instance between the
+user level process and the @dfn{STREAMS} device driver.  As with normal character devices, the file
+descriptor returned from the @manpage{open(2)} call, can be used to further access the @dfn{Stream}.
+
+Opening a minor device node for the first time results in the creation of a new instance of a
+@dfn{Stream} between the @dfn{Stream head} and the @dfn{driver}.  Subsequent opens of the same minor
+device node does not result in the creation of a new @dfn{Stream}, but provides another file
+descriptor that can be used to access the same @dfn{Stream} instance.  Only the first open of a
+minor device node will result in the creation of a new @dfn{Stream} instance.
+
+Once it has opened a @dfn{Stream}, the user level process can send and receive data to and from the
+@dfn{Stream} with the usual @manpage{read(2)} and @manpage{write(2)} system calls that are
+compatible with the existing character device interpretations of these system calls.  @dfn{STREAMS}
+also provides the additional system calls, @manpage{getmsg(2)} and @manpage{getpmsg(2)}, to read
+control and data information from the @dfn{Stream}, as well as @manpage{putmsg(2)} and
+@manpage{putpmsg(2)} to write control and data information.  These additional system calls provide a
+richer interface to the @dfn{Stream} than is provided by the traditional @manpage{read(2)} and
+@manpage{write(2)} calls.
+
+A @dfn{Stream} is closed using the @manpage{close(2)} system call (or a call that closes file
+descriptors such as @manpage{exit(2)}).  If a number of processes have the @dfn{Stream} open, only
+the last @manpage{close(2)} of a @dfn{Stream} will result in the destruction of the @dfn{Stream}
+instance.
+
+@subsection Basic Operations Example
+
+An basic example of opening, reading from and writing to a @dfn{Stream} driver is shown in
+@ref{Listing 101}, below.  The example is for a communications device that provide a communications
+channel for data transfer between two processes or hosts.   Data written to the device is
+communicated over the channel to the remote process or host.  Data read from the device was written
+by the remote process or host.
+
+@cartouche
+@iftex
+@float Listing,Listing 101
+@end iftex
+@smallexample
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+main()
+@{
+        char buf[1024]
+        int fd, count;
+
+        if ((fd = open("/dev/streams/comm/1", O_RDWR)) < 0) @{
+                perror("open failed");
+                exit(1);
+        @}
+
+        while ((count = read(fd, buf, 1024)) > 0) @{
+                if (write(fd, buf, count) != count) @{
+                        perror("write failed");
+                        break;
+                @}
+        @}
+        exit(0);
+@}
+@end smallexample
+@iftex
+@caption{@emph{Basic Operations}}
+@end float
+@end iftex
+@ifnottex
+@anchor{Listing 101} @center @emph{Listing 101.@:  Basic Operations}
+@set lstnum 101
+@end ifnottex
+@end cartouche
+
+In the example in @ref{Listing 101}, a simple @dfn{Stream} is opened using the @manpage{open(2)}
+call.  @file{/dev/streams/comm/1} is the path to the character minor device node in the filesystem.
+When the device is opened, the character device node is recognized as a @dfn{STREAMS} special file,
+and the @dfn{STREAMS} subsystem creates a @dfn{Stream} (if one does not already exist for the minor
+device node) an associates it with the minor device node.  @figref{103} illustrates the state of the
+@dfn{Stream} at the point after the @manpage{open(2)} call returns.
+
+@figuresized{SPG_fig03,103,Stream to Communications Driver,3in}
+
+The @command{while} loop in @ref{Listing 101} simply reads data from the device using the
+@manpage{read(2)} system call and then writes the data back to the device using the
+@manpage{write(2)} system call.
+
+When a @dfn{Stream} is opened for blocking operation (i.e., neither @constant{O_NONBLOCK} nor
+@constant{O_NDLEAY} were set), @manpage{read(2)} will block until some data arrives.  The
+@manpage{read(2)} call might, however, return less that the requested @samp{1024} bytes.  When data
+is read, the routine simply writes the data back to the device.
+
+@dfn{STREAMS} implements flow control both in the upstream and downstream directions.  Flow control
+limits the amount of normal data that can be queued awaiting processing within the @dfn{Stream}.
+High and low water marks for flow control are set on a queue pair basis.  Flow control is local and
+specific to a given @dfn{Stream}.  High priority control messages are not subject to @dfn{STREAMS}
+flow control.
+
+When a @dfn{Stream} is opened for blocking operation (i.e., neither @constant{O_NONBLOCK} nor
+@constant{O_NDLEAY} were set), @manpage{write(2)} will block while waiting for flow control to
+subside. @manpage{write(2)} will always block awaiting the availability of @dfn{STREAMS} message
+blocks to satisfy the call, regardless of the setting of @constant{O_NONBLOCK} or
+@constant{O_NDELAY}.
+
+In the example in @ref{Listing 101}, the @manpage{exit(2)} system call is used to exit the program;
+however, the @manpage{exit(2)} results in the equivalent of a call to @manpage{close(2)} for all
+open file descriptors and the @dfn{Stream} is flushed and destroyed before the program is finally
+exitted.
+
+@c ----------------------------------------------------------------------------
+@node Components
+@section Components
+@menu
+* Queue Component::
+* Message Component::
+* Module Component::
+* Driver Component::
+@end menu
+
+This section briefly describes each @dfn{STREAMS} component and how they interact within a
+@dfn{Stream}.  Chapters later in this manual describe the components and their interaction in
+greater detail.
+
+@c ----------------------------------------
+@node Queue Component
+@subsection Queues
+
+A @dfn{queue} provides an interface between an instance of a @dfn{STREAMS} driver, module or
+@dfn{Stream head}, and the other modules and drivers that make up a @dfn{Stream} for a direction of
+message flow (i.e., @dfn{upstream} or @dfn{downstream}).  When an instance of a @dfn{STREAMS}
+driver, module or @dfn{Stream head} is associated with a @dfn{Stream}, a pair of queues are
+allocated to represent the driver, module or @dfn{Stream head} within the @dfn{Stream}.  Queue data
+structures are always allocated in pairs.  The first queue in the pair is the @dfn{read-side} or
+@dfn{upstream} queue in the pair; the second queue, the @dfn{write-side} or @dfn{downstream} queue.
+
+@ignore
+A queue is an interface between a @dfn{STREAMS} driver or module and the rest of the @dfn{Stream}.
+Queues are always allocated as an adjacent pair.  The queue with the lower address in the pair is a
+read queue, and the queue with the higher address is used for the write queue.
+@end ignore
+
+The @dfn{STREAMS} module, driver or @dfn{Stream head} provides five procedures that are associated
+with each queue in a queue pair: the @command{put}, @command{service}, @command{open},
+@command{close} and @command{admin} routines.  Normaly the @command{open} and @command{close}
+routines are only associated with the @dfn{read-side} of the queue pair.
+
+A @command{put} procedure is associated with each queue in a pair.  The @command{put} procedure is
+used by @dfn{STREAMS} to present a new message to an upstream or downstream queue.  At the
+@dfn{Stream head} or @dfn{Stream end} the @dfn{Stream head} write-side, or @dfn{Stream end}
+read-side, queue @command{put} procedure is normally invoked using the @manref{put(9)} utility.
+A module within the @dfn{Stream} typically has its @command{put} procedure invoked by an adjacent
+module, driver or @dfn{Stream head} that uses the @manref{putnext(9)} utility from its own
+@command{put} or @command{service} procedure to pass message to adjacent modules.
+
+@ignore
+A queue's @command{service} routine is invoked to process messages on the queue.  It usually removes
+successive messages from the queue, processes them, and calls the @command{put} routine of the next
+module in the @dfn{Stream} to give the processed message to the next queue.
+
+A queue's @command{put} routine is invoked by the preceding queue's @command{put} and/or
+@command{service} routine to add a message to the current queue.  If a module does not need to
+enqueue messages, its @command{put} routine can call the neighboring queue's @command{put} routine.
+(@ref{Processing} discusses the @command{service} and @command{put} routines in more detail.)
+
+Each queue also has a pointer to an @command{open} and @command{close} routine.  The @command{open}
+routine of a driver is called when the driver is first opened and on every successive open of the
+@dfn{Stream}.  The @command{open} routine of a module is called when the module is first pushed on
+the @dfn{Stream} and on every successive open of the @dfn{Stream}.  The @command{close} routine of
+the module is called when the module is popped (removed) off the @dfn{Stream}.  The @command{close}
+routine of the driver is called when the last reference to the @dfn{Stream} is given up and the
+@dfn{Stream} is dismantled.
+@end ignore
+
+@c ----------------------------------------
+@node Message Component
+@subsection Messages
+
+All input and output under @dfn{STREAMS} is based on messages.  The objects passed between
+@dfn{STREAMS} modules are pointers to messages.  All @dfn{STREAMS} messages use two data structures
+(msgb and datab) to refer to the message data.  These data structures describe the type of the
+message and contain pointers to the data of the message, as well as other information.  Messages are
+sent through a @dfn{Stream} by successive calls to the @command{put} procedure of each module or driver in the
+@dfn{Stream}.
+
+@subsubsection Message Types
+
+All @dfn{STREAMS} messages are assigned message types to indicate their intended use by modules and
+drivers and to determine their handling by the @dfn{Stream head}.  A driver or module can assign
+most types to a message it generates, and a module can modify a message type during processing.  The
+@dfn{Stream head} will convert certain system calls to specified message types and send them
+downstream, and it will respond to other calls by copying the contents of certain message types that
+were sent upstream.
+
+Most message types are internal to @dfn{STREAMS} and can only be passed from one @dfn{STREAMS}
+component to another.  A few message types, for example M_DATA, M_PROTO, and M_PCPROTO, can also be
+passed between a @dfn{Stream} and user processes.  M_DATA messages carry data within a @dfn{Stream}
+and between a @dfn{Stream} and a user process.  M_PROTO or M_PCPROTO messages carry both data and
+control information.
+
+As shown in @figref{104}, a @dfn{STREAMS} message consists of one or more linked message blocks that
+are attached to the first message block of the same message.
+
+@figuresized{SPG_fig05,104,A Message,4in}
+@c [strm.strmsg.gif]
+
+Messages can exist stand-alone, as in @figref{104}, when the message is being processed by a
+procedure.  Alternately, a message can await processing on a linked list of messages, called a
+message queue.  In @figref{105}, @samp{Message 2} is linked to @samp{Message 1}.
+
+@figuresized{SPG_fig06,105,Messages on a Message Queue,4in}
+@c [strm.msgque.gif]
+
+When a message is on a queue, the first block of the message contains links to preceding and
+succeeding messages on the same message queue, in addition to the link to the second block of the
+message (if present).  The message queue head and tail are contained in the queue.
+
+@dfn{STREAMS} utility routines enable developers to manipulate messages and message queues.
+
+@subsubsection Message Queueing Priority
+
+In certain cases, messages containing urgent information (such as a break or alarm conditions) must
+pass through the @dfn{Stream} quickly.  To accommodate these cases, @dfn{STREAMS} provides multiple
+classes of message queuing priority.  All messages have an associated priority field.  Normal
+(ordinary) messages have a priority of zero.  Priority messages have a priority greater than zero.
+High priority messages are high priority by virtue of their message type.  The priority field in
+high priority messages is unused and should always be set to zero.  @dfn{STREAMS} prevents high
+priority messages from being blocked by flow control and causes a @command{service} procedure to
+process them ahead of all ordinary messages on the queue.  This results in the high priority message
+transiting each module with minimal delay.
+
+Non-priority, ordinary messages are placed at the end of the queue following all other messages in
+the queue.  Priority messages can be either high priority or priority band messages.  High priority
+messages are placed at the head of the queue but after any other high priority messages already in
+the queue.  Priority band messages that enable support of urgent, expedited data are placed in the
+queue after high priority messages but before ordinary messages.
+
+Message priority is defined by the message type; once a message is created, its priority cannot be
+changed.  Certain message types come in equivalent high priority/ordinary pairs (for example,
+@msg{M_PCPROTO} and @msg{M_PROTO}), so that a module or device driver can choose between the two
+priorities when sending information.
+
+
+@c ----------------------------------------
+@node Module Component
+@subsection Modules
+
+A module performs intermediate transformations on messages passing between a @dfn{Stream head} and a
+driver.  There may be zero or more modules in a @dfn{Stream} (zero when the driver performs all the
+required character and device processing).
+
+Each module is constructed from a pair of queue structures (see @samp{Au/Ad} and @samp{Bu/Bd} in
+@figref{48}) upstream through the module (@samp{Au} and @samp{Bu} in @figref{48}).  The other set
+(@samp{Ad} and @samp{Bd}) performs another set of functions on downstream messages.
+
+Each of the two queues in a module will generally have distinct functions, that is, unrelated
+processing procedures and data.  The queues operate independently and @samp{Au} will not know if a
+message passes through @samp{Ad} unless @samp{Ad} is programmed to inform it.  Messages and data can
+be shared only if the developer specifically programs the module functions to perform the sharing.
+
+Each queue can directly access the adjacent queue in the direction of message flow (for example,
+@samp{Au} to @samp{Bu} or @samp{Bd} to @samp{Ad}).  In addition, within a module, a queue can
+readily locate its mate and access its messages and data.
+
+@figuresized{SPG_fig48,48,A @dfn{Stream} in More Detail,4in}
+@c [strm.strfig.gif]
+
+Each queue in a module points to messages, processing procedures, and data:
+
+@table @dfn
+
+@item Messages
+These are dynamically attached to the queue on a linked list (@dfn{message queue}, see @samp{Ad} and
+@samp{Bu} in @figref{48}) as they pass through the module.
+
+@item Processing procedures
+A put procedure processes messages and must be incorporated in each queue.  An optional
+@command{service}
+procedure can also be incorporated.  According to their function, the procedures can send messages
+upstream and/or downstream, and they can also modify the private data in their module.
+
+@item Data
+Developers may use a private field in the queue to reference private data structures (for example,
+state information and translation tables).
+
+@end table
+
+In general, each of the two queues in a module has a distinct set of all of these elements.
+
+
+@c ----------------------------------------
+@node Driver Component
+@subsection Drivers
+
+@dfn{STREAMS} device drivers are an initial part of a @dfn{Stream}.  They are structurally similar
+to @dfn{STREAMS} modules.  The call interfaces to driver routines are identical to the interfaces
+used for modules.
+
+There are three significant differences between modules and drivers.  A driver must be able to
+handle interrupts from the device, a driver can have multiple @dfn{Streams} connected to it, and a
+driver is initialized/deinitialized via open and close.  A module is initialized/deinitialized via
+the @streamio{I_PUSH} @command{ioctl} and @streamio{I_POP} @command{ioctl}.
+
+Drivers and modules can pass signals, error codes, and return values to processes via message types
+provided for that purpose.
+
+
+@c ----------------------------------------------------------------------------
+@node Multiplexing of Streams
+@section Multiplexing
+
+@c ----------------------------------------------------------------------------
+@node Benefits of STREAMS
+@section Benefits of STREAMS
+
+@c ============================================================================
+@node Overview
+@chapter Overview
+@menu
+* Definitions::			STREAMS Definitions
+* Concepts::			STREAMS Concepts
+* Application Interface::	STREAMS Application Interface
+* Kernel Level Facilities::	STREAMS Kernel Facilities
+* Subsystems::			STREAMS Subsystems
+@end menu
+
+@node Definitions
+@section Definitions
+
+@node Concepts
+@section Concepts
+
+@node Application Interface
+@section Application Interface
+
+@node Kernel Level Facilities
+@section Kernel Level Facilities
+
+@node Subsystems
+@section Subsystems
+
+@c ============================================================================
+@node Mechanism
+@chapter Mechanism
+@menu
+* Mechanism Overview::		STREAMS Mechanism Overview
+* Stream Construction::		STREAMS Stream Construction
+@end menu
+
+@node Mechanism Overview
+@section Mechanism Overview
+
+@node Stream Construction
+@section Stream Construction
+
+@c ============================================================================
+@node Processing
+@chapter Processing
+@menu
+* Procedures::			STREAMS Put and Service Procedures
+* Asynchronous Example::	STREAMS Asynchronous Stream Example
+@end menu
+
+@node Procedures
+@section Procedures
+
+@node Asynchronous Example
+@section Asynchronous Example
+
+@c ============================================================================
+@node Messages
+@chapter Messages
+@menu
+* Messages Overview::		STREAMS Messages Overview
+* Message Structure::		STREAMS Message Structure
+* Queues and Priority::		STREAMS Message Queues and Priority
+* Service Interfaces::		STREAMS Service Interfaces
+* Message Allocation::		STREAMS Message Allocation and Freeing
+* Extended Buffers::		STREAMS Extended Buffers
+@end menu
+
+
+@node Messages Overview
+@section Messages Overview
+
+@node Message Structure
+@section Message Structure
+
+@node Queues and Priority
+@section Queues and Priority
+
+@node Service Interfaces
+@section Service Interfaces
+
+@node Message Allocation
+@section Message Allocation
+
+@node Extended Buffers
+@section Extended Buffers
+
+@c ============================================================================
+@node Polling
+@chapter Polling
+@menu
+* Input and Output Polling::	STREAMS Input and Output Polling
+* Controlling Terminal::	STREAMS Stream as Controlling Terminal
+@end menu
+
+
+@node Input and Output Polling
+@section Input and Output Polling
+
+@node Controlling Terminal
+@section Controlling Terminal
+
+@c ============================================================================
+@node Modules and Drivers
+@chapter Modules and Drivers
+@menu
+* Environment::			STREAMS Module and Driver Environment
+* Input-Output Control::	STREAMS Input and Output Control
+* Flush Handling::		STREAMS Flush Handling
+* Driver-Kernel Interface::	STREAMS Driver-Kernel Interface
+* Design Guidelines::		STREAMS Design Guidelines
+@end menu
+
+
+@node Environment
+@section Environment
+
+@node Input-Output Control
+@section Input-Output Control
+
+@node Flush Handling
+@section Flush Handling
+
+@node Driver-Kernel Interface
+@section Driver-Kernel Interface
+
+@node Design Guidelines
+@section Design Guidelines
+
+@c ============================================================================
+@node Modules
+@chapter Modules
+@menu
+* Module::			STREAMS Modules
+* Module Flow Control::		STREAMS Module Flow Control
+* Module Design Guidelines::	STREAMS Module Design Guidelines
+@end menu
+
+
+@node Module
+@section Module
+
+@node Module Flow Control
+@section Module Flow Control
+
+@node Module Design Guidelines
+@section Module Design Guidelines
+
+@c ============================================================================
+@node Drivers
+@chapter Drivers
+@menu
+* External Device Numbers::	External Device Numbering
+* Internal Device Numbers::	Internal Device Numbering
+* spec File System::		Avoiding Device Numbering
+* Clone Device::		Clone Device Numbering
+* Named STREAMS Device::	Reusable Device Numbering
+* Driver::			STREAMS Drivers
+* Cloning::			STREAMS Driver Cloning
+* Loop-Around Driver::		STREAMS Loop-Around Driver Example
+* Driver Design Guidelines::	STREAMS Driver Design Guidelines
+@end menu
+
+
+@node External Device Numbers
+@section External Device Numbers
+
+@node Internal Device Numbers
+@section Internal Device Numbers
+
+@node spec File System
+@section spec File System
+
+@node Clone Device
+@section Clone Device
+
+@node Named STREAMS Device
+@section Named STREAMS Device
+
+@node Driver
+@section Driver
+
+@node Cloning
+@section Cloning
+
+@node Loop-Around Driver
+@section Loop-Around Driver
+
+@node Driver Design Guidelines
+@section Driver Design Guidelines
+
+@c ============================================================================
+@node Multiplexing
+@chapter Multiplexing
+@menu
+* Multiplexors::		STREAMS Multiplexing
+* Connecting and Disconnecting Lower Stream::
+				STREAMS Multiplexor Connect and Disconnect Lower Stream
+* Multiplexor Construction Example::
+				STREAMS Multiplexor Construction Example
+* Multiplexing Driver::		STREAMS Multiplexing Driver
+* Persistent Links::		STREAMS Multiplexor Persistent Links
+* Multiplexing Driver Design Guidelines::
+				STREAMS Multiplexing Driver Design Guidelines
+@end menu
+
+
+@node Multiplexors
+@section Multiplexors
+
+@node Connecting and Disconnecting Lower Stream
+@section Connecting and Disconnecting Lower Stream
+
+@node Multiplexor Construction Example
+@section Multiplexor Construction Example
+
+@node Multiplexing Driver
+@section Multiplexing Driver
+
+@node Persistent Links
+@section Persistent Links
+
+@node Multiplexing Driver Design Guidelines
+@section Multiplexing Driver Design Guidelines
+
+@c ============================================================================
+@node Pipes and FIFOs
+@chapter Pipes and FIFOs
+@menu
+* STREAMS Pipes and FIFOs::	STREAMS-based Pipes and FIFOs
+* Flushing Pipes and FIFOs::	Flushing STREAMS-based Pipes and FIFOs
+* Named Streams::		Named STREAMS-based Pipes and FIFOs
+* Unique Connections::		Unique Connections for STREAMS-based Pipes and FIFOs
+@end menu
+
+
+@node STREAMS Pipes and FIFOs
+@section Pipes and FIFOs
+
+@node Flushing Pipes and FIFOs
+@section Flushing Pipes and FIFOs
+
+@node Named Streams
+@section Named Streams
+
+@node Unique Connections
+@section Unique Connections
+
+@c ============================================================================
+@node Terminal Subsystem
+@chapter Terminal Subsystem
+@menu
+* STREAMS Terminal Subsystem::	STREAMS-based Terminal Subssytem
+* Pseudo-Terminal Subsystem::	STREAMS-based Pseudo-Terminal Subsystem
+@end menu
+
+
+@node STREAMS Terminal Subsystem
+@section Terminal Subsystem
+
+@node Pseudo-Terminal Subsystem
+@section Pseudo-Terminal Subsystem
+
+@c ============================================================================
+@node Synchronization
+@chapter Synchronization
+@menu
+* MT Configuration::		MP STREAMS MT Configuration
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
+* Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
+* STREAMS Framework Integrity::
+* MP Message Ordering::
+* MP-UNSAFE Modules::
+* MP Put and Service Procedures::
+* MP Timeout and Buffer Callbacks::
+* MP Open and Close Procedures::
+* MP Module Unloading::
+* MP Locking::
+* MP Asynchronous Callbacks::
+* Stream Integrity::
+@end menu
+
+
+@node MT Configuration
+@section MT Configuration
+
+@node Asynchronous Entry Points
+@section Asynchronous Entry Points
+
+@node Asynchronous Callbacks
+@section Asynchronous Callbacks
+
+@node Synchronous Entry Points
+@section Synchronous Entry Points
+
+@node Synchronous Callbacks
+@section Synchronous Callbacks
+
+@node STREAMS Framework Integrity
+@section STREAMS Framework Integrity
+
+@node MP Message Ordering
+@section MP Message Ordering
+
+@node MP-UNSAFE Modules
+@section MP-UNSAFE Modules
+
+@node MP Put and Service Procedures
+@section MP Put and Service Procedures
+
+@node MP Timeout and Buffer Callbacks
+@section MP Timeout and Buffer Callbacks
+
+@node MP Open and Close Procedures
+@section MP Open and Close Procedures
+
+@node MP Module Unloading
+@section MP Module Unloading
+
+@node MP Locking
+@section MP Locking
+
+@node MP Asynchronous Callbacks
+@section MP Asynchronous Callbacks
+
+@node Stream Integrity
+@section Stream Integrity
+
+@c ============================================================================
+@node Reference
+@chapter Reference
+@menu
+* Files::			STREAMS Files
+* System Modules::		STREAMS Modules
+* System Drivers::		STREAMS Drivers
+* System Calls::		STREAMS System Calls
+* Input-Output Controls::	STREAMS Input-Output Controls
+* Module Entry Points::		STREAMS Module Entry Points
+* Structures::			STREAMS Structures
+* Registration::		STREAMS Module and Driver Registration Functions
+* Message Handling::		STREAMS Message Handling Functions
+* Queue Handling::		STREAMS Queue Handling Functions
+* Miscellaneous Functions::	STREAMS Miscellaneous Functions
+* Extensions::			STREAMS Extension Functions
+* Compatibility::		STREAMS Compatibility Functions
+@end menu
+
+
+@node Files
+@section Files
+
+@node System Modules
+@section System Modules
+
+@node System Drivers
+@section System Drivers
+
+@node System Calls
+@section System Calls
+
+@node Input-Output Controls
+@section Input-Output Controls
+
+@node Module Entry Points
+@section Module Entry Points
+
+@node Structures
+@section Structures
+
+@node Registration
+@section Registration
+
+@node Message Handling
+@section Message Handling
+
+@node Queue Handling
+@section Queue Handling
+
+@node Miscellaneous Functions
+@section Miscellaneous Functions
+
+@node Extensions
+@section Extensions
+
+@node Compatibility
+@section Compatibility
+
+@c ============================================================================
+@node Conformance
+@chapter Conformance
+@menu
+* SVR 4.2 Compatibility::	SVR 4.2 MP DDI/DKI Compatibility
+* AIX Compatibility::		AIX 5L Version 5.1 Compatibility
+* HP-UX Compatibility::		HP-UX 11.0i v2 Compatibility
+* OSF/1 Compatibility::		OSF/1 1.2/Digital UNIX Compatibility
+* UnixWare Compatibility::	UnixWare 7.1.3 Compatibility
+* Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
+* SUX Compatibility::		Super/UX Compatibility
+* UXP Compatibility::		UXP/V Compatibility
+* LiS Compatibility::		LiS 2.18.1 Compatibility
+@end menu
+
+
+@node SVR 4.2 Compatibility
+@section SVR 4.2 Compatibility
+
+@node AIX Compatibility
+@section AIX Compatibility
+
+@node HP-UX Compatibility
+@section HP-UX Compatibility
+
+@node OSF/1 Compatibility
+@section OSF/1 Compatibility
+
+@node UnixWare Compatibility
+@section UnixWare Compatibility
+
+@node Solaris Compatibility
+@section Solaris Compatibility
+
+@node SUX Compatibility
+@section SUX Compatibility
+
+@node UXP Compatibility
+@section UXP Compatibility
+
+@node LiS Compatibility
+@section LiS Compatibility
+
+@c ============================================================================
+@node Portability
+@chapter Portability
+@menu
+* Core Function Support::	Porting with Core Function Support
+* SVR 4.2 Portability::		Porting from SVR 4.2 MP
+* AIX Portability::		Porting from AIX 5L Version 5.1
+* HP-UX Portability::		Porting from HP-UX 11.0i v2
+* OSF/1 Portability::		Porting from OSF/1 1.2/Digital UNIX
+* UnixWare Portability::	Porting from UnixWare 7.1.3
+* Solaris Portability::		Porting from Solaris 9/SunOS 5.9
+* SUX Portability::		Porting from Super/UX
+* UXP Portability::		Porting from UXP/V
+* LiS Portability::		Porting from LiS 2.18.1
+@end menu
+
+
+@node Core Function Support
+@section Core Function Support
+
+@node SVR 4.2 Portability
+@section SVR 4.2 Portability
+
+@node AIX Portability
+@section AIX Portability
+
+@node HP-UX Portability
+@section HP-UX Portability
+
+@node OSF/1 Portability
+@section OSF/1 Portability
+
+@node UnixWare Portability
+@section UnixWare Portability
+
+@node Solaris Portability
+@section Solaris Portability
+
+@node SUX Portability
+@section SUX Portability
+
+@node UXP Portability
+@section UXP Portability
+
+@node LiS Portability
+@section LiS Portability
+
+@c ============================================================================
+@node Data Structures
+@appendix Data Structures
+@menu
+* Stream Structures::
+* Queue Structures::
+* Message Structures::
+* Input Output Control Structures::
+* Link Structures::
+* Options Structures::
+@end menu
+
+
+@node Stream Structures
+@section Stream Structures
+
+@node Queue Structures
+@section Queue Structures
+
+@node Message Structures
+@section Message Structures
+
+@node Input Output Control Structures
+@section Input Output Control Structures
+
+@node Link Structures
+@section Link Structures
+
+@node Options Structures
+@section Options Structures
+
+@c ============================================================================
+@node Message Types
+@appendix Message Types
+@menu
+* Message Type::
+* Ordinary Messages::
+* High Priority Messages::
+@end menu
+
+
+@node Message Type
+@section Message Type
+
+@node Ordinary Messages
+@section Ordinary Messages
+
+@node High Priority Messages
+@section High Priority Messages
+
+@c ============================================================================
+@node Utilities
+@appendix Utilities
+@menu
+@end menu
+
+@c ============================================================================
+@node Debugging
+@appendix Debugging
+@menu
+@end menu
+
+@c ============================================================================
+@node Configuration
+@appendix Configuration
+@menu
+@end menu
+
+@c ============================================================================
+@node Administration
+@appendix Administration
+@menu
+* Administrative Utilities::	STREAMS Administrative Utilities
+* System Controls::		STREAMS System Controls
+* /proc File System::		STREAMS /proc File System
+@end menu
+
+
+@node Administrative Utilities
+@section Administrative Utilities
+
+@node System Controls
+@section System Controls
+
+@node /proc File System
+@section /proc File System
+
+@c ============================================================================
+@node Examples
+@appendix Examples
+@menu
+* Module Example::		STREAMS Module Example
+* Driver Example::		STREAMS Driver Example
+@end menu
+
+
+@node Module Example
+@section Module Example
+
+@node Driver Example
+@section Driver Example
+
+@c ============================================================================
+@node Copying
+@appendix Copying
+@menu
+* GNU General Public License::		GPL
+* GNU Free Documentation License::	FDL
+@end menu
+
+@include texi/gpl.texi
+
+@include texi/fdl.texi
+
+@c ============================================================================
+@node Glossary
+@unnumbered Glossary
+
+@multitable @columnfractions .30 .70
+
+@item @dfn{anchor} @tab
+@cindex anchor
+A @dfn{STREAMS} locking mechanism that prevents the removal of @dfn{STREAMS} modules with the
+@streamio{I_POP} @command{ioctl}.  Anchors are placed on @dfn{STREAMS} modules by adding the
+@samp{[anchor]} flag to @manref{autopush(8)} configuration files or directly with the
+@streamio{I_ANCHOR} @command{ioctl}.
+
+@item @dfn{autopush} @tab
+@cindex autopush
+A @dfn{STREAMS} mechanism that enables a pre-specified list of modules to be pushed automatically
+onto a @dfn{Stream} when a @dfn{STREAMS} device is opened.  This mechanism is used only for
+administrative purposes.
+
+@item @dfn{back-enable} @tab
+@cindex back-enable
+To enable (by @dfn{STREAMS}) a preceding blocked queue's @command{service} procedure when
+@dfn{STREAMS} determines that a succeeding queue has reached its low-water mark.
+
+@item @dfn{blocked} @tab
+@cindex blocked
+A queue's @command{service} procedure that cannot be enabled due to flow control.
+
+@item @dfn{clone device} @tab
+@cindex clone device
+A @dfn{STREAMS} device that returns an unused major/minor device number when initially opened,
+rather than requiring the minor device to be specified by name in the @command{open} call.
+
+@item @dfn{close procedure} @tab
+@cindex close procedure
+A routine that is called when a module is popped from a @dfn{Stream} or when a driver is closed.
+A pointer to this procedure is specified in the @member{qi_qopen} member of the @mantype{queue(9)}
+structure associated with the read side of the module's queue pair.
+
+@item @dfn{control Stream} @tab
+@cindex control Stream
+A @dfn{Stream} above a multiplexing driver used to establish lower multiplexer connections.
+Multiplexed @dfn{Stream} configurations are maintained through the controlling @dfn{Stream} to a
+multiplexing driver.
+
+@item @dfn{Device Driver Interface} @tab
+@cindex Device Driver Interface
+An interface that facilitates driver portability across different @cite{UNIX} system versions.
+
+@item @dfn{device driver} @tab
+@cindex device driver
+A @dfn{Stream} component whose principle functions are handling an associated physical device and
+transforming data and information between the external interface and the @dfn{Stream}.
+
+@item @dfn{Driver Kernel Interface} @tab
+@cindex Driver Kernel Interface
+An interface between the @cite{UNIX} system kernel and different types of drivers.  It consists of a
+set of driver defined functions that are called by the kernel.  These functions are entry points
+into a driver.
+
+@item @dfn{downstream} @tab
+@cindex downstream
+A direction of data flow going from the @dfn{Stream head} toward a driver.  Also called the
+@dfn{write-side} and @dfn{output-side}.
+
+@item @dfn{driver} @tab
+@cindex driver
+A module that forms the @dfn{Stream end}.  It can be a device driver or a pseudo-device driver.  It
+is a required component in @dfn{STREAMS} (except in @dfn{STREAMS}-based pipes and FIFOs), and is
+physically identical to a module.  It typically handles data transfer between the kernel and a
+device and does little or no processing of data.
+
+@item @dfn{enable} @tab
+@cindex enable
+A term used to describe scheduling of a queue's @command{service} procedure.
+
+@item @dfn{FIFO} @tab
+@cindex FIFO
+@dfn{First In, First Out}.  A term used in @dfn{STREAMS} for named pipes.  This term is also used in
+queue scheduling.
+
+@item @dfn{flow control} @tab
+@cindex flow control
+A @dfn{STREAMS} mechanism that regulates the rate of message transfer within a @dfn{Strema} and from
+user space into a @dfn{Stream}.
+
+@item @dfn{hardware emulation module} @tab
+@cindex hardware emulation module
+A module required when the terminal line discipline is on a @dfn{Stream} but there is no terminal
+driver at the @dfn{Stream end}.  This module recognizes all @manref{termio(7)} @command{ioctl}s
+necessary to support terminal semantics specified by @mantype{termio(9)} and @mantype{termios(9)}.
+
+@item @dfn{input side} @tab
+@cindex input side
+A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
+@dfn{read-side} and @dfn{upstream}.
+
+@item @dfn{line discipline} @tab
+@cindex line discipline
+A @dfn{STREAMS} module that performs @manref{termio(7)} canonical and non-canonical processing.  It
+shares some @manref{termio(7)} processing with a driver in a @dfn{STREAMS} terminal subsystem.
+
+@item @dfn{lower Stream} @tab
+@cindex lower Stream
+A @dfn{Stream} connected beneath a multiplexing pseudo-device driver, by means of an
+@streamio{I_LINK} or @streamio{I_PLINK} @command{ioctl}.  The far end of a lower @dfn{Stream}
+terminates at a device driver or another multiplexer driver.
+
+@item @dfn{master driver} @tab
+@cindex master driver
+A @dfn{STREAMS}-based device supported by the pseudo-terminal subsystem.  It is the controlling part
+of the pseudo-terminal subsystem (also called @samp{ptm}).
+
+@item @dfn{message} @tab
+@cindex message
+One or more linked message blocks.  A message is referenced by its first message block and its type
+is defined by the message type of that block.
+
+@item @dfn{message block} @tab
+@cindex message block
+A triplet consisting of a data buffer and associated control structures, a @mantype{msgb(9)}
+structure, a @mantype{datab(9)} structure.  It carries data or information, as identified by its
+message type, in a @dfn{Stream}.
+
+@item @dfn{message queue} @tab
+@cindex message queue
+A linked list of zero or more messages connected together.
+
+@item @dfn{message type} @tab
+@cindex message type
+A enumerated set of values identifying the contents of a message.
+
+@item @dfn{module} @tab
+@cindex module
+A defined set of kernel-level routines and data structure used to process data, status, and control
+information on a @dfn{Stream}.  It is an optional element, but there can be many modules in one
+@dfn{Stream}.  It consists of a pair of queues (read queue and write queue), and it communicates to
+other components in a @dfn{Stream} by passing messages.
+
+@item @dfn{multiplexer} @tab
+@cindex multiplexer
+A @dfn{STREAMS} mechanism that allows message to be routed among multiple @dfn{Streams} in the
+kernel.  A multiplexing configuration includes at least one multiplexing pseudo-device driver
+connected to one or more upper @dfn{Streams} and one or more lower @dfn{Streams}.
+
+@item @dfn{named Stream} @tab
+@cindex named Stream
+A @dfn{Stream}, typically a pipe, with a name associated with it by way of a call to
+@manref{fattach(3)} (that is, a @manref{mount(2)} operation).  This is different from a named pipe
+(FIFO) in two ways: a named pipe (FIFO) is unidirectional while a named @dfn{Stream} is
+bidirectional; a name @dfn{Stream} need not refer to a pipe, but can be another type of
+@dfn{Stream}.
+
+@item @dfn{open routine} @tab
+@cindex open routine
+A procedure in each @dfn{STREAMS} driver and module called by @dfn{STREAMS} on each @command{open}
+system call made on the @dfn{Stream}.  A module's @command{open} procedure is also called when the
+module is pushed.
+
+@item @dfn{packet mode} @tab
+@cindex packet mode
+A feature supported by the @dfn{STREAMS}-based pseudo-terminal subsystem.  It is used to inform a
+process on the master side when state changes occur on the slave side of a pseudo-TTY.  It is
+enabled by pushing a module called @samp{pckt} on the master side.
+
+@item @dfn{persistent link} @tab
+@cindex persistent link
+A connection below a multiplexer that can exist without having an open controlling @dfn{Stream}
+associated with it.
+
+@item @dfn{pipe} @tab
+@cindex pipe
+See @dfn{STREAMS}-based pipe.
+
+@item @dfn{pop} @tab
+@cindex pop
+A term used when a module that is immediately below the @dfn{Stream} head is removed.
+
+@item @dfn{pseudo-device driver} @tab
+@cindex pseudo-device driver
+A software driver, not directly associated with a physical device, that performs functions internal
+to a @dfn{Stream} such as a multiplexer or @manref{log(4)} driver.
+
+@item @dfn{pseudo-terminal subsystem} @tab
+@cindex pseudo-terminal subsystem
+A user interface identical to a terminal subsystem except that there is a process in place of a
+hardware device.  It consists of at least a master device, slave device, line discipline module, and
+hardware emulation module.
+
+@item @dfn{push} @tab
+@cindex push
+A term used when a muodule is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
+
+@item @dfn{pushable module} @tab
+@cindex pushable module
+A module put between the @dfn{Stream head} and driver.  It performs intermediate transformations on
+messages flowing between the @dfn{Stream head} and driver.  A driver is a non-pushable module.
+
+@item @dfn{put procedure} @tab
+@cindex put procedure
+A routine in a module or driver associated with a queue that receives messages from the preceding
+queue.  It is the single entry point into a queue from a preceding queue.  It may perform processing
+on the message and will then generally either queue the message for subsequent processing by this
+queue's @command{service} procedure, or will pass the message to the @command{put} procedure of the
+following queue (using @manref{putnext(9)}).
+
+@item @dfn{queue} @tab
+@cindex queue
+A data structure that contains status information, a pointer to routines processing message, and
+pointers for administering a @dfn{Stream}.  It typically contains pointer to @command{put} and
+@command{service} procedures, a message queue, and private data.
+
+@item @dfn{read-side} @tab
+@cindex read-side
+A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
+@dfn{upstream} and @dfn{input-side}.
+
+@item @dfn{read queue} @tab
+@cindex read queue
+A message queue in a module or driver containing messages moving @dfn{upstream}.  Associated with
+the @manref{read(2)} system call and input from a driver.
+
+@item @dfn{remote mode} @tab
+@cindex remote mode
+A feature available with the pseudo-terminal subsystem.  It is used for applications that perform
+the canonical and echoing functions normally done by line discipline module and TTY driver.  It
+enables applications on the master side to turn off the canonical processing.
+
+@item @dfn{STREAMS Administrative Driver} @tab
+@cindex STREAMS Administrative Driver
+A @dfn{STREAMS} Administrative Driver that provides an interface to the @manref{autopush(8)}
+mechanism.
+
+@item @dfn{schedule} @tab
+@cindex schedule
+To place a queue on the internal list of queues that will subsequently have their service procedure
+called by the @dfn{STREAMS} scheduler.  @dfn{STREAMS} scheduling is independent of @cite{Linux}
+process scheduling.
+
+@item @dfn{service interface} @tab
+@cindex service interface
+A set of primitives that define a service at the boundary between a service user and a service
+provider and the rules (typically represented by a state machine) for allowable sequences of the
+primitives across the boundary.  At a @dfn{Stream}/user boundary, the primitives are typically
+contained in the control part of a message; within a @dfn{Stream}, in @msg{M_PROTO} or
+@msg{M_PCPROTO} message blocks.
+
+@item @dfn{service procedure} @tab
+@cindex service procedure
+A module or driver routine associated with a queue that receives messages queue for it by the
+@command{put} procedure is called by the @dfn{STREAMS} scheduler.  It may perform processing on the
+message and generally passes the message to the @command{put} procedure of the following queue.
+
+@item @dfn{service provider} @tab
+@cindex service provider
+An entity in a service interface that responds to request primitives from the service user with
+response and event primitives.
+
+@item @dfn{service user} @tab
+@cindex service user
+An entity in a service interface that generates request primitives for the service provider and
+consumes response and event primitives.
+
+@item @dfn{slave driver} @tab
+@cindex slave driver
+A @dfn{STREAMS}-based device supported by the pseudo-terminal subsystem.  It is also called
+@samp{pts} and works with a line discipline module and hardware emulation module to provide an
+interface to a user process.
+
+@item @dfn{standard pipe} @tab
+@cindex standard pipe
+A mechanism for the unidirectional flow of data between two processes where data written by one
+process becomes data read by the other process.
+
+@item @dfn{Stream} @tab
+@cindex Stream
+A kernel level aggregate created by connecting @dfn{STREAMS} components, resulting from an
+application of the @dfn{STREAMS} mechanism.  The primary components are the @dfn{Stream head}, the
+driver (or @dfn{Stream end}), and zero or more pushable modules between the @dfn{Stream head} and
+driver.
+
+@item @dfn{STREAMS-based pipe} @tab
+@cindex STREAMS-based pipe
+A mechanism used for bidirectional data transfer implemented using @dfn{STREAMS}, and sharing the
+properties of @dfn{STREAMS}-based devices.
+
+@item @dfn{Stream end} @tab
+@cindex Stream end
+A @dfn{Stream} component furthest from the user process that contains a driver.
+
+@item @dfn{Stream head} @tab
+@cindex Stream head
+A @dfn{Stream} component closest to the user process.  It provides the interface between the
+@dfn{Stream} and the user process.
+
+@item @dfn{STREAMS} @tab
+@cindex STREAMS
+A kernel mechanism that provides the framework for network services and data communication.  It
+defines interface standards for character intput/output within the kernel, and between the kernel
+and user level.  The @dfn{STREAMS} mechanism includes integral functions, utility routines, kernel
+facilities, and a set of structures.
+
+@item @dfn{TTY driver} @tab
+@cindex TTY driver
+A @dfn{STREAMS}-based device used in a terminal subsystem.
+
+@item @dfn{upper stream} @tab
+@cindex upper stream
+A @dfn{Stream} that terminates above a multiplexing driver.  The beginning of an upper @dfn{Stream}
+originates at the @dfn{Stream head} or another multiplexing driver.
+
+@item @dfn{upstream} @tab
+@cindex upstream
+A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
+@dfn{read-side} and @dfn{input side}.
+
+@item @dfn{water mark} @tab
+@cindex water mark
+A limit value used in flow control.  Each queue has a high-water mark and a low-water mark.  The
+high-water mark value indicates the upper limit related to the number of bytes contained on the
+queue.  When the queued character reaches its high water mark, @dfn{STREAMS} causes another queue
+that attempts to send a message to this queue to become blocked.  When the characters in this queue
+are reduced to the low-water mark value, the other queue is unblocked by @dfn{STREAMS}.
+
+@item @dfn{write queue} @tab
+@cindex write queue
+A message qeuue in a module or driver containing messages moving downstream.  Associated with the
+@manref{write(2)} system call and output from a user process.
+
+@item @dfn{write-side} @tab
+@cindex write-side
+A direction of data flow going from the @dfn{Stream head} toward a driver.  Also called downstream
+and output side.
+
+@end multitable
+
+@c ============================================================================
+@iftex
+@node List of Figures
+@unnumbered List of Figures
+
+@listoffloats Figure
+@end iftex
+
+@c ============================================================================
+@iftex
+@node List of Listings
+@unnumbered List of Listings
+
+@listoffloats Listing
+@end iftex
+
+@c ============================================================================
+@node Index
+@unnumbered Index
+
+@c @page
+@c @node Indices
+@c @unnumbered Indices
+@c @menu
+@c * Concept Index::		Index of Concepts
+@c * Type Index::			Index of Data Types
+@c * Function Index::		Index of Functions and Macros
+@c * Variable Index::		Index of Variables and Constants
+@c * File Index::			Index of Files and Programs
+@c @end menu
+@c 
+@c @page
+@c @node Concept Index
+@c @unnumberedsec Concept Index
+@printindex cp
+
+@c @page
+@c @node Type Index
+@c @unnumberedsec Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Function Index
+@c @unnumberedsec Function and Macro Index
+@c @printindex fn
+@c 
+@c @page
+@c @node Variable Index
+@c @unnumberedsec Variable and Constant Macro Index
+@c @printindex vr
+@c 
+@c @page
+@c @node File Index
+@c @unnumberedsec Program and File Index
+@c @printindex pg
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
