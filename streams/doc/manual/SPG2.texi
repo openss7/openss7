@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.2 2005/11/16 03:20:03 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.3 2005/11/16 10:30:39 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/16 03:20:03 $ by $Author: brian $
+% Last Modified $Date: 2005/11/16 10:30:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -674,6 +674,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.3  2005/11/16 10:30:39  brian
+- still working up take 2
+
 Revision 0.9.2.2  2005/11/16 03:20:03  brian
 - working up take 2
 
@@ -1078,7 +1081,7 @@ different ways) by other kernel level subsystems:
 special files available in the @cite{GNU/Linux} system.
 
 @item @dfn{STREAMS} is a message passing architecture, similar to @cite{Message Oriented Middleware
-(MOM)} that acheives a high degree of functional decoupling between modules.  This allows the
+(MOM)} that achieves a high degree of functional decoupling between modules.  This allows the
 service interface between modules to correspond to the natural interfaces found or described between
 protocol layers in protocol stack without requiring the implementation to conform to any given
 model.
@@ -1096,7 +1099,7 @@ socket-protocol, protocol-protocol, or protocol-device to handle flow control.  
 integrates flow control within the @dfn{STREAMS} framework.
 
 @item @dfn{STREAMS} permits user runtime configuration of kernel data structure and modules to
-provide for a wide range of novel configurations and capabilies in a live @cite{GNU/Linux} system.
+provide for a wide range of novel configurations and capabilities in a live @cite{GNU/Linux} system.
 The @dfn{BSD Sockets} protocol framework does not provide this capability.
 
 @item @dfn{STREAMS} is as applicable to termination input-output and interprocess communication as
@@ -1163,9 +1166,9 @@ A @dfn{STREAMS}-based pipe is illustrated in @figref{102}.
 @dfn{STREAMS}-based FIFOs consist of a single @dfn{Stream head} that has its downstream path
 connected to its upstream path where the @dfn{Driver} would be located.  @dfn{Modules} can be pushed
 under this single @dfn{Stream Head}.
-A @dfn{STREAMS}-based FIFO is illustrated in @figref{103}.
+A @dfn{STREAMS}-based FIFO is illustrated in @figref{109}.
 
-@figuresized{SPG_fig07,103,@dfn{STREAMS}-based @dfn{FIFO} (named pipe),3in}
+@figuresized{SPG_fig07,109,@dfn{STREAMS}-based @dfn{FIFO} (named pipe),3in}
 
 For more information on @dfn{STREAMS}-based pipes and FIFOs, @pxref{Pipes and FIFOs}.
 
@@ -1306,6 +1309,8 @@ the last @manpage{close(2)} of a @dfn{Stream} will result in the destruction of 
 instance.
 
 @subsection Basic Operations Example
+An basic example of opening, reading from and writing to a @dfn{Stream} driver is shown in
+@ref{Listing 101}.
 
 @cartouche
 @iftex
@@ -1347,14 +1352,13 @@ main()
 @end ifnottex
 @end cartouche
 
-An basic example of opening, reading from and writing to a @dfn{Stream} driver is shown in
-@ref{Listing 101}.  The example is for a communications device that provide a communications channel
-for data transfer between two processes or hosts.   Data written to the device is communicated over
-the channel to the remote process or host.  Data read from the device was written by the remote
-process or host.
+The example in @ref{Listing 101} is for a communications device that provide a communications
+channel for data transfer between two processes or hosts.   Data written to the device is
+communicated over the channel to the remote process or host.  Data read from the device was written
+by the remote process or host.
 
 In the example in @ref{Listing 101}, a simple @dfn{Stream} is opened using the @manpage{open(2)}
-call.  @file{/dev/streams/comm/1} is the path to the character minor device node in the filesystem.
+call.  @file{/dev/streams/comm/1} is the path to the character minor device node in the file system.
 When the device is opened, the character device node is recognized as a @dfn{STREAMS} special file,
 and the @dfn{STREAMS} subsystem creates a @dfn{Stream} (if one does not already exist for the minor
 device node) an associates it with the minor device node.  @figref{103} illustrates the state of the
@@ -1386,7 +1390,7 @@ blocks to satisfy the call, regardless of the setting of @constant{O_NONBLOCK} o
 In the example in @ref{Listing 101}, the @manpage{exit(2)} system call is used to exit the program;
 however, the @manpage{exit(2)} results in the equivalent of a call to @manpage{close(2)} for all
 open file descriptors and the @dfn{Stream} is flushed and destroyed before the program is finally
-exitted.
+exited.
 
 @c ----------------------------------------------------------------------------
 @node Components
@@ -1396,6 +1400,7 @@ exitted.
 * Message Component::
 * Module Component::
 * Driver Component::
+* Stream Head Component::
 @end menu
 
 This section briefly describes each @dfn{STREAMS} component and how they interact within a
@@ -1424,7 +1429,7 @@ This subsection provides a brief overview of @dfn{queue} procedures.
 
 The @dfn{STREAMS} module, driver or @dfn{Stream head} provides five procedures that are associated
 with each queue in a queue pair: the @command{put}, @command{service}, @command{open},
-@command{close} and @command{admin} procedures.  Normaly the @command{open} and @command{close}
+@command{close} and @command{admin} procedures.  Normally the @command{open} and @command{close}
 procedures (and possibly the optional @command{admin} procedure) are only associated with the
 @dfn{read-side} of the queue pair.
 
@@ -1469,7 +1474,7 @@ then the @dfn{Stream} will not be dismantled on the last close and the @command{
 called until the @dfn{Stream} is eventually unlinked (@ioctlref{I_UNLINK}) or detached
 (@manref{fdetach(3)}).
 
-Procedures are deciribed in greater detail in @ref{Procedures}.
+Procedures are described in greater detail in @ref{Procedures}.
 
 @c ----------------------------------------
 @node Message Component
@@ -1514,71 +1519,104 @@ Message types are described in detail in @ref{Message Types}.
 
 @subsubsection Message Linkage
 
-Messages blocks of differing types can be linked together into chained messages as illustrated in
+Messages blocks of differing types can be linked together into composite messages as illustrated in
 @figref{104}.
 
 @figuresized{SPG_fig05,104,A Message,4in}
 
-@ignore
-All @dfn{STREAMS} messages are assigned message types to indicate their intended use by modules and
-drivers and to determine their handling by the @dfn{Stream head}.  A driver or module can assign
-most types to a message it generates, and a module can modify a message type during processing.  The
-@dfn{Stream head} will convert certain system calls to specified message types and send them
-downstream, and it will respond to other calls by copying the contents of certain message types that
-were sent upstream.
+Messages, once allocated, or when removed from a queue, exist standalone (i.e., they are not
+attached to any queue).  Messages normally exist standalone when they have been first allocated by
+an interrupt service routine, or by the @dfn{Stream head}.  They are placed into the @dfn{Stream} by
+the driver or @dfn{Stream head} at the @dfn{Stream end} by calling @manref{put(9)}.  After being
+inserted into a @dfn{Stream}, message normally only exist standalone in a given queue's
+@command{put} or @command{service} procedures.  A queue's @command{put} or @command{service}
+procedure normally do one of the following:
+@itemize @bullet
+@item pass the message along to an adjacent queue with @manref{putnext(9)} or @manref{qreply(9)};
+@item process and consume the message by deallocating it with @manref{freemsg(9)};
+@item place the message on the queue from the @command{put} procedure with @manref{putq(9)} or from
+the @command{service} procedure using @manref{putbq(9)}.
+@end itemize
+Once placed on a queue, a message exists only on that queue and all other references to the message
+are dropped.
 
-Most message types are internal to @dfn{STREAMS} and can only be passed from one @dfn{STREAMS}
-component to another.  A few message types, for example M_DATA, M_PROTO, and M_PCPROTO, can also be
-passed between a @dfn{Stream} and user processes.  M_DATA messages carry data within a @dfn{Stream}
-and between a @dfn{Stream} and a user process.  M_PROTO or M_PCPROTO messages carry both data and
-control information.
+Only one reference to a message block (@manpage{msgb(9)}) exists within the @dfn{STREAMS} framework.
+Additional references to the same data block (@manpage{datab(9)}) and data buffer can be established
+by duplicating the messages block, @manpage{msgb(9)} (without duplicating either the data
+block,(@manpage{datab(9)}, or data buffer).  The @dfn{STREAMS} @manref{dupb(9)} and
+@manref{dupmsg(9)} utilities can be used to duplicate message blocks.  Also, the entire 3-tuple of
+message block, data block and data buffer can be copied using the @manref{copyb(9)} and
+@manref{copymsg(9)} @dfn{STREAMS} utilities.
 
-As shown in @figref{104}, a @dfn{STREAMS} message consists of one or more linked message blocks that
-are attached to the first message block of the same message.
+When a message is first allocated, it is the responsibility of the allocating procedure to either
+pass the message to a queue @command{put} procedure, place the message on its own message queue, or
+free the message.  When a message is removed from a message queue, the reference then becomes the
+responsibility of the procedure that removed it from the queue.  Under special circumstances, it
+might be necessary to temporarily store a reference to a standalone message in a module private
+data structure, however, this is usually not necessary.
 
-@figuresized{SPG_fig05,104,A Message,4in}
-@c [strm.strmsg.gif]
+When a message has been placed on a queue, it is linked into the list of messages already on the
+queue.  Messages that exist on a message queue await processing by the queue's @command{service}
+procedure.  Essentially, queue @command{put} procedures are a way of performing immediate message
+processing, and placing a message on a message queue for later processing by the queue's
+@command{service} procedure is a way of deferring message processing until a later time: that is,
+until @dfn{STREAMS} schedules the @command{service} procedure for execution.
 
-Messages can exist stand-alone, as in @figref{104}, when the message is being processed by a
-procedure.  Alternately, a message can await processing on a linked list of messages, called a
-message queue.  In @figref{105}, @samp{Message 2} is linked to @samp{Message 1}.
+Two messages linked together on a message queue is illustrated in @figref{105}.  In the figure,
+@samp{Message 2} is linked to @samp{Message 1}.
 
 @figuresized{SPG_fig06,105,Messages on a Message Queue,4in}
-@c [strm.msgque.gif]
 
-When a message is on a queue, the first block of the message contains links to preceding and
-succeeding messages on the same message queue, in addition to the link to the second block of the
-message (if present).  The message queue head and tail are contained in the queue.
+As illustrated in @figref{105}, when a message exists on a message queue, the first message block in
+the message (which can possibly contain a chain of message blocks) is linked into a double linked
+list used by the message queue to order and track messages.  The queue structure, @manref{queue(9)},
+contains the head and tail pointers for the linked list of messages that reside on the queue.  Some
+of the fields in the first message block (such as the linked list pointers) are significant only in
+the first message block of the message and applies to all the message blocks in the message (such as
+message band).
 
-@dfn{STREAMS} utility routines enable developers to manipulate messages and message queues.
-@end ignore
+Message linkage is described in detail in @ref{Message Structure}.
 
 @subsubsection Message Queueing Priority
 
 This subsection provides a brief overview of @dfn{message queueing priority}.
 
-@ignore
-In certain cases, messages containing urgent information (such as a break or alarm conditions) must
-pass through the @dfn{Stream} quickly.  To accommodate these cases, @dfn{STREAMS} provides multiple
-classes of message queuing priority.  All messages have an associated priority field.  Normal
-(ordinary) messages have a priority of zero.  Priority messages have a priority greater than zero.
-High priority messages are high priority by virtue of their message type.  The priority field in
-high priority messages is unused and should always be set to zero.  @dfn{STREAMS} prevents high
-priority messages from being blocked by flow control and causes a @command{service} procedure to
-process them ahead of all ordinary messages on the queue.  This results in the high priority message
-transiting each module with minimal delay.
+@dfn{STREAMS} message queues provide the ability to process messages of differing priority.  There
+are three classes of message priority (in order of increasing priority):
+@enumerate
+@item Normal messages.
+@item Priority messages.
+@item High-priority messages.
+@end enumerate
 
-Non-priority, ordinary messages are placed at the end of the queue following all other messages in
-the queue.  Priority messages can be either high priority or priority band messages.  High priority
-messages are placed at the head of the queue but after any other high priority messages already in
-the queue.  Priority band messages that enable support of urgent, expedited data are placed in the
-queue after high priority messages but before ordinary messages.
+Normal messages are queued in priority band @samp{0}.  Priority messages are queued in bands greater
+than zero (@samp{1} through @samp{255} inclusive).  Messages of a higher ordinal band number are of
+greater priority.  For example, a priority message for band @samp{23} is queued ahead of messages
+for band @samp{22}.  Normal and priority messages are subject to flow control within a @dfn{Stream},
+and a queued according to priority.
 
-Message priority is defined by the message type; once a message is created, its priority cannot be
-changed.  Certain message types come in equivalent high priority/ordinary pairs (for example,
-@msg{M_PCPROTO} and @msg{M_PROTO}), so that a module or device driver can choose between the two
-priorities when sending information.
-@end ignore
+High priority messages are assigned a priority band of @samp{0}; however, their message type
+distinguishes them as high priority messages and they are queued ahead of all other messages.  (The
+priority band for high priority messages is ignored and always set to @samp{0} whenever a high
+priority message type is queued.) High priority messages are given special treatment within the
+@dfn{Stream} and are not subjected to flow control; however, only one high priority message can be
+outstanding for a given transaction or operation within a @dfn{Stream}.  The @dfn{Stream head} will
+discard high priority messages that arrive before a previous high priority message has been acted
+upon.
+
+Because queue @command{service} procedures process messages in the order in which they appear in the
+queue, messages that are queued toward the head of the queue yield a higher scheduling priority than
+those toward the tail.  High priority messages are queue first, followed by priority messages of
+descending band numbers, finally followed by normal (band @samp{0}) messages.
+
+@dfn{STREAMS} provides independent flow control parameters for ordinary messages.  Normal message flow
+control parameters are contained in the queue structure itself (@manref{queue(9)}); priority
+parameters, in the auxiliary queue band structure (@manref{qband(9)}).  A set of flow control
+parameters exists for each band (from @samp{0} to @samp{255}).
+
+As a high priority message is defined by message type, some message types are available in
+high-priority/ordinary pairs (e.g., @msg{M_PCPROTO}/@msg{M_PROTO}) that perform the same function
+but which have differing priority.
 
 Queueing priority is described in greater detail in @ref{Queues and Priority}.
 
@@ -1588,49 +1626,74 @@ Queueing priority is described in greater detail in @ref{Queues and Priority}.
 
 This subsection provides a brief overview of @dfn{STREAMS modules}.
 
-@ignore
-A module performs intermediate transformations on messages passing between a @dfn{Stream head} and a
-driver.  There may be zero or more modules in a @dfn{Stream} (zero when the driver performs all the
-required character and device processing).
+@dfn{Modules} are components of message processing that exist as a unit within a @dfn{Stream}
+beneath the @dfn{Stream head}.  @dfn{Modules} are optional components and zero or more (up to a
+predefined limit) instances of a module can exist within a given @dfn{Stream}.  Instances of a
+@dfn{module} have a unique queue pair associated with them that permit the instance to be linked
+among the other queue pairs in a @dfn{Stream}.
 
-Each module is constructed from a pair of queue structures (see @samp{Au/Ad} and @samp{Bu/Bd} in
-@figref{48}) upstream through the module (@samp{Au} and @samp{Bu} in @figref{48}).  The other set
-(@samp{Ad} and @samp{Bd}) performs another set of functions on downstream messages.
+@figref{48} illustrates and instance each of two modules (@samp{A} and @samp{B}) that are linked
+within the same @dfn{Stream}.  Each module instance consists of a queue pair (@samp{Ad/Au} and
+@samp{Bd/Bu} in the figure).  Messages flow from the driver to the @dfn{Stream head} through the
+@dfn{upstream} queues in each queue pair (@samp{Au} and then @samp{Bu} in the figure); and from
+@dfn{Stream head} to driver through @dfn{downstream} queues (@samp{Bd} and then @samp{Ad}).
 
-Each of the two queues in a module will generally have distinct functions, that is, unrelated
-processing procedures and data.  The queues operate independently and @samp{Au} will not know if a
-message passes through @samp{Ad} unless @samp{Ad} is programmed to inform it.  Messages and data can
-be shared only if the developer specifically programs the module functions to perform the sharing.
-
-Each queue can directly access the adjacent queue in the direction of message flow (for example,
-@samp{Au} to @samp{Bu} or @samp{Bd} to @samp{Ad}).  In addition, within a module, a queue can
-readily locate its mate and access its messages and data.
+The @dfn{module} provides unique message processing procedures (@command{put} and optionally
+@command{service} procedures) for each queue in the queue pair.  One set of @command{put} and
+@command{service} procedures handles @dfn{upstream} messages; the other set, @dfn{downstream}
+messages.  Each procedure is independent of the others.  @dfn{STREAMS} handles the passing of
+messages but any other information that is to be passed between procedures must be performed
+explicitly by the procedures themselves.  Each queue provides a module private pointer that can be
+used by procedures for maintaining state information or passing other information between
+procedures.
 
 @figuresized{SPG_fig48,48,A @dfn{Stream} in More Detail,4in}
-@c [strm.strfig.gif]
 
-Each queue in a module points to messages, processing procedures, and data:
+Each procedure can pass messages directly to the adjacent queue in either direction of message flow.
+This is normally performed with the @dfn{STREAMS} @manref{putnext(9)} utility.  For example, in
+@figref{48}, procedures associated with queue @samp{Bd} can pass messages to queue @samp{Ad};
+@samp{Bu} to @samp{Au}.
+
+Also, procedures can easily locate the other queue in a queue pair and pass messages along the
+opposite direction of flow.  This is normally performed using the @dfn{STREAMS} @manref{qreply(9)}
+utility.  For example, in @figref{48}, procedures associated with queue @samp{Ad} can easily locate
+queue @samp{Au} and pass messages to @samp{Bu} using @manpage{qreply(9)}.
+
+Each queue in a module is associated with messages, processing procedures, and module private data.
+Typically, each queue in the module has a distinct set of message, processing procedures and module
+private data.
 
 @table @dfn
 
 @item Messages
-These are dynamically attached to the queue on a linked list (@dfn{message queue}, see @samp{Ad} and
-@samp{Bu} in @figref{48}) as they pass through the module.
 
-@item Processing procedures
-A put procedure processes messages and must be incorporated in each queue.  An optional
-@command{service}
-procedure can also be incorporated.  According to their function, the procedures can send messages
-upstream and/or downstream, and they can also modify the private data in their module.
+Messages can be inserted into, and removed from, the linked list message queue associated with each
+queue in the queue pair as they pass through the module.  For example, in @figref{48}, @samp{Message
+Ad} exists on the @samp{Ad} queue; @samp{Message Bu}, on the @samp{Bu} queue.
+
+@item Processing Procedures
+
+Each queue in a @dfn{module} queue pair requires that a @command{put} procedure be defined for the
+queue.  Upstream or downstream modules, drivers or the @dfn{Stream head} invoke a @command{put}
+procedure of the module when they pass messages to the module along the @dfn{Stream}.
+
+Each queue may optionally provide a @command{service} procedure that will be invoked when messages
+are placed on the queue for later processing by the @command{service} procedure.  A
+@command{service} procedure is never required if the module @command{put} procedure never enqueues a
+message to either queue in the queue pair.
+
+Either procedure in either queue in the pair can pass messages upstream or downstream and may alter
+information within the module private data associated with either queue in the pair.
 
 @item Data
-Developers may use a private field in the queue to reference private data structures (for example,
-state information and translation tables).
+
+Module processing procedures can make use of a pointer in each queue structure that is reserved for
+use by the module writer to locate module private data structures.  These data structures are
+typically attached to each queue from the module's  @command{open} procedure, and detached from then
+module's @command{close} procedure.  Module private data is useful for maintaining state information
+associated with the instance of the module and for passing information between procedures.
 
 @end table
-
-In general, each of the two queues in a module has a distinct set of all of these elements.
-@end ignore
 
 Modules are described in greater detail in @ref{Modules}.
 
@@ -1640,31 +1703,347 @@ Modules are described in greater detail in @ref{Modules}.
 
 This subsection provides a brief overview of @dfn{STREAMS drivers}.
 
-@ignore
-@dfn{STREAMS} device drivers are an initial part of a @dfn{Stream}.  They are structurally similar
-to @dfn{STREAMS} modules.  The call interfaces to driver routines are identical to the interfaces
-used for modules.
+The @dfn{Device} component of the @dfn{Stream} is an inital part of the regular @dfn{Stream}
+(positioned just below the @dfn{Stream head}).  Most @dfn{Streams} start out life as a @dfn{Stream
+head} connected to a @dfn{driver}.  The driver is positioned within the @dfn{Stream} at the
+@dfn{Stream end}.  Note that not all @dfn{Streams} require the presence of a driver: a
+@dfn{STREAMS}-based pipe or FIFO @dfn{Stream} do not contain a driver component.
 
-There are three significant differences between modules and drivers.  A driver must be able to
-handle interrupts from the device, a driver can have multiple @dfn{Streams} connected to it, and a
-driver is initialized/deinitialized via open and close.  A module is initialized/deinitialized via
-the @streamio{I_PUSH} @command{ioctl} and @streamio{I_POP} @command{ioctl}.
+A @dfn{driver} instance represented by a queue pair within the @dfn{Stream}, just as for modules.
+Also, each queue in the queue pair has a message queue, processing procedures, and private data
+associated with it in the same way as for @dfn{STREAMS} modules.  There are three differences that
+distinguish drivers from modules:
 
-Drivers and modules can pass signals, error codes, and return values to processes via message types
-provided for that purpose.
-@end ignore
+@enumerate
+
+@item Drivers are responsible for generating and consuming messages at the @dfn{Stream end}.
+
+Drivers convert @dfn{STREAMS} messages into appropriate software or hardware actions, events and
+data transfer.  As a result, drivers that are associated with a hardware device normally contain an
+interrupt service procedure that handles the external device specific actions, events and data
+transfer.  Messages are typically consumed at the @dfn{Stream end} in the driver's downstream
+@command{put} or @command{service} procedure and action take or data transferred to the hardware
+device.  Messages are typically generated at the @dfn{Stream end} in the driver's interrupt service
+procedure, and inserted upstream using the @manref{put(9)} @dfn{STREAMS} utility.
+
+Software drivers (so-called @dfn{pseudo-device drivers}) are similar to a hardware device driver
+with the exception that they typically do not contain an interrupt service routine.  Pseudo-device
+drivers are still repsonsible for consuing messages at the @dfn{Stream end} and converting them into
+actions and data output (external to @dfn{STREAMS}), as well as generating messages in response to
+events and data input (external to @dfn{STREAMS}).
+
+In constrast, @dfn{modules} are intended to operate solely within the @dfn{STREAMS} framework.
+
+@item  Because a driver sits at a @dfn{Stream} end and can support multiplexing, a driver can have
+multiple @dfn{Streams} connected to it, either upstream (fan-in) or downstream (fan-out)
+(@pxref{Multiplexing of Streams}).
+
+In contrast, an instance of a @dfn{module} is only connected within a single @dfn{Stream} and does
+not support multiplexing at the module queue pair.
+
+@item An instance of a driver (queue pair) is created and destroyed using the @manpage{open(2)} and
+@manpage{close(2)} system calls.
+
+In constrast, an instance of a @dfn{module} (queue pair) is created and destroyed using the
+@streamio{I_PUSH} and @streamio{I_POP} @dfn{STREAMS} @manpage{ioctl(2)} commands.
+
+@end enumerate
+
+Aside from these differences, the @dfn{STREAMS} @dfn{driver} is similar in most respects to the
+@dfn{STREAMS} @dfn{module}.  Both drivers and modules can pass signals, error codes, return values,
+and other information to processes in adjacent queue pairs using @dfn{STREAMS} messages of various
+message types provided for that purpose.
 
 Drivers are described in greater detail in @ref{Drivers}.
+
+@c ----------------------------------------
+@node Stream Head Component
+@subsection Stream Head
+
+This subsection provide a brief overview of @dfn{Stream heads}.
+
+The @dfn{Stream head} is the first component of a @dfn{Stream} that is allocated when a @dfn{Stream}
+is created.  All @dfn{Streams} have an associated @dfn{Stream head}.
+
+In the case of @dfn{STREAMS}-based pipes, two @dfn{Stream heads} are associated with each other.
+@dfn{STREAMS}-based FIFOs have one @dfn{Stream head} but no @dfn{Stream end} or @dfn{Driver}.
+For all other @dfn{Streams}, as illustrated in @figref{48}, there exists a @dfn{Stream head} and a
+@dfn{Stream end} or @dfn{Driver}.
+
+The @dfn{Stream head} has a queue pair associated with them, just as does any other @dfn{STREAMS}
+module or driver.  Also, just as any other module, the @dfn{Stream head} provides the processing
+procedures and private data for processing of messages passed to queues in the pair.
+
+The differences is that the processing procedures are provided by the @dfn{GNU/Linux} system rather
+than being written by the @dfn{module} or @dfn{driver} writer.  These system provided processing
+procedures perform the necessary functions to convert generate to and consume messages from the
+@dfn{Stream} in response to system calls invoked by a user process.  Also, a set of specialized
+behaviours are provided and a set of specialized message types that may be exchanged with modules
+and drivers in the @dfn{Stream} to provide the standard interface expected by the user application.
+
+@dfn{Stream heads} are described in greater detail in @ref{Mechanism}, @ref{Polling}, @ref{Pipes and
+FIFOs}, and @ref{Terminal Subsystem}.
 
 @c ----------------------------------------------------------------------------
 @node Multiplexing of Streams
 @section Multiplexing
+
+This subsection provides a brief overview of @dfn{Stream Multiplexing}.
+
+Basic @dfn{Streams} that can be created with the @manpage{open(2)} or @manpage{pipe(2)} system calls
+are linear arrangements from @dfn{Stream head} to @dfn{Driver} or @dfn{Stream head} to @dfn{Stream
+haed}.  Althoug these linear arrangements satisfy the needs of a large class of @dfn{STREAMS}
+applications, there exits a class of application that are more naturally represented by
+multiplexing: that is, an arrangements where one or more upper @dfn{Streams} feed into one or more
+lower @dfn{Streams}.  Network protocol stacks (a significant application are for @dfn{STREAMS}) are
+typically more easily represented by multiplexed arrangements.
+
+A @dfn{fan-in} multiplexing arrangement is one in which multiple upper @dfn{Streams} feed into a
+single lower @dfn{Stream} in a @dfn{many-to-one} relationship as illustrated in @figref{49}.
+
+@figuresized{SPG_fig49,49,Many-to-one Multiplexor,1.4in}
+
+A @dfn{fan-out} multiplexing arrangement is one in which a single upper @dfn{Stream} feeds into
+multiple lower @dfn{Streams} in a @dfn{one-to-many} relationship as illustrated in @figref{50}.
+(This is the more typically arrangement for communications protocol stacks.)
+
+@figuresized{SPG_fig50,50,One-to-many Multiplexor,1.4in}
+
+A @dfn{fan-in/fan-out} multiplexing arrangement is one in which multiple upper @dfn{Streams} feed
+into mutliple lower @dfn{Streams} in a @dfn{many-to-many} relationship as illustrated in
+@figref{51}.
+
+@figuresized{SPG_fig51,51,Many-to-many Multiplexor,1.4in}
+
+To support these arrangements, @dfn{STREAMS} provide a mechanism that can be used to assemble
+multiplexing arrangements in a flexible way.  An, otherwise normal, @dfn{STREAMS} pseudo-device
+driver can be specified to be a multiplexing driver.
+
+Conceptually, a multiplexing driver can perform @dfn{upper multiplexing} between multiple
+@dfn{Streams} on its @dfn{upper} side connecting the user process and the multiplexing driver, and
+@dfn{lower multiplexing} between multiple @dfn{Streams} on its @dfn{lower} side connecting the
+multiplexing driver and the device driver.
+
+As with normal @dfn{STREAMS} drivers, @dfn{multiplexing drivers} can have multiple @dfn{Streams}
+created on its @dfn{upper} side using the @manpage{open(2)} system call.  Unlike regular
+@dfn{STREAMS} drivers, however, @dfn{multiplexing drivers} have the additional capability that other
+@dfn{Streams} can be linked to the @dfn{lower} side of the driver.  The linkage is performed by
+issuing specialized @manpage{streamio(7)} commands to to the driver that are recognized by
+multiplexing drivers (@streamio{I_LINK}, @streamio{I_PLINK}, @streamio{I_UNLINK},
+@streamio{I_PUNLINK}).
+
+Any @dfn{Stream} can be linked under a multiplexing driver (provided that it is not already linked
+under another multiplexing driver).  This includes an upper @dfn{Stream} of a multiplexing driver.
+In this fashion, complex trees of multiplexing drivers and linear @dfn{Stream} segments containing
+pushed @dfn{modules} can be assembled.  Using these linkage commands, complex arrangements can be
+assembled, manipulated and dismantled by a user or daemon process to suit application needs.
+
+The @dfn{fan-in} arrangement of @figref{49} performs @dfn{upper multiplexing}; the @dfn{fan-out}
+arrangement of @figref{50}, @dfn{lower multiplexing}; and the @dfn{fan-in/fan-out} arrangement of
+@figref{51}, both @dfn{upper} and @dfn{lower multiplexing}.
+
+@subsection Fan-Out Multiplexers
+
+@figref{47} illustrates an example, closely related to the @dfn{fan-out} arrangement of @figref{50},
+where the @cite{Internet Protocol (IP)} within a networking stack is implemented as a multiplexing
+driver and independent @dfn{Streams} to three specific device drivers are linked beneath the
+@cite{IP} multiplexing driver.
+
+@figuresized{SPG_fig47,47,Internet Multiplexing @dfn{Stream},4in}
+
+The @cite{IP} multiplexing driver is capable of routing messages to the lower @dfn{Streams} on the
+basis of address and the subnet membership of each device driver.  Messages received from the lower
+@dfn{Streams} can be discriminated an sent to the appropriate user process upper @dfn{Stream} (e.g.
+on the basis of, say, protocol Id).  Each lower @dfn{Stream}, @samp{Module 1}, @samp{Module 2},
+@samp{Driver 3}, presents the same service interface to the @cite{IP} multiplexing driver,
+regardless of the specific hardware or lower level communications protocol supported by the driver.
+For example, the lower @dfn{Streams} could all support the @cite{Data Link Provider Interface
+(DLPI)}.
+
+As depicted in @figref{47}, the @cite{IP} multiplexing driver could have additional multiplexing
+drivers or modules above it.  Also, @samp{Driver 1}, @samp{Driver 2} or @samp{Driver 3} could
+themselves be multiplexing drivers (or replaced by multiplexing drivers).  In general, multiplexing
+drivers are independent in the sense that it is not necessary that a given multiplexing driver be
+aware of other multiplexing drivers upstream of its upper @dfn{Stream}, nor downstream of its lower
+@dfn{Streams}.
+
+@subsection Fan-In Multiplexers
+
+@figref{52} illustrates an example, more closely related to the @dfn{fan-in} arrangement of
+@figref{49}, where an @cite{X.25 Packet Layer Protocol} multiplexing driver is used to switch
+messages between upper @dfn{Streams} supporting @cite{Permanent Virtual Circuits (PVCs)} or
+@cite{Switch Virtual Circuits (SVCs)} and (possibly) a single lower @dfn{Stream}.
+
+@figuresized{SPG_fig52,52,Multiplexing @dfn{Stream},3in}
+
+The ability to multiplex upper @dfn{Streams} to a driver is a characteristic supported by all
+@dfn{STREAMS} drivers: not just @dfn{multiplexing drivers}.  Each @manpage{open(2)} to a minor
+device node results in another uppper @dfn{Stream} that can be associated with the device driver.
+What the @dfn{multiplexing driver} permits over the normal @dfn{STREAMS} driver is the ability to
+link one or more lower @dfn{Streams} (possibly containing modules and another multiplexing driver)
+beneath it.
+
+@subsection Complex Multiplexers
+
+When constructing multiplexers for applications, even more complicated arrangements are possible.
+Multiplexing over multiple @dfn{Streams} on both the upper and lower side of a @dfn{multiplexing
+driver} is possible.  Also, a driver the provides lower multiplexing can be linked beneath a driver
+that provide upper multiplexing as depicted by the dashed box in @figref{52}.  Each multiplexing
+driver can perform @dfn{upper} multiplexing, @dfn{lower} multiplexing, or both, providing a
+flexibility for the designer.
+
+@dfn{STREAMS} provides multiplexing as a general purpose facility that is flexible in that
+multiplexing drivers can be stacked and linked in a wide array of complex configurations.
+@dfn{STREAMS} imposes few restrictions on processing within the multiplexing driver making the
+mechanism applicable to a many classes of applications.
 
 Multiplexing is described in greater detail in @ref{Multiplexing}.
 
 @c ----------------------------------------------------------------------------
 @node Benefits of STREAMS
 @section Benefits of STREAMS
+@menu
+* Standardized Service Interfaces::
+* Manipulating Modules::
+@end menu
+
+@dfn{STREAMS} provides a flexible, scalable, portable, and resuable kernel and user level facility
+for the development of @cite{GNU/Linux} system communications services.  @dfn{STREAMS} allows the
+creation of kernel resident modules that offer standard message passing facilities and the ability
+for user level processes to manipulate and configure those modules into complex topologies.
+@dfn{STREAMS} offers a standard way for user level processes to select and interconnect
+@dfn{STREAMS} modules and drivers in a wide array of combinations without the need to alter
+@cite{Linux} kernel code, recompile or relink the kernel.
+
+@dfn{STREAMS} also assists in simplifying the user interface to device drivers and protocol stacks
+by providing powerful system calls for the passing of control information from user to driver.
+With @dfn{STREAMS} it is possible to directly implement asynchronous primitive-based service
+interfaces to protocol modules.
+
+@c ----------------------------------------
+@node Standardized Service Interfaces
+@subsection Standardized Service Interfaces
+
+Many modern communications protocols define a service primitive interface between a service user and
+a service provider.  Examples include the @cite{ISO Open Systems Interconnect (OSI)} and protocols
+based on @dfn{OSI} such as @cite{Signalling System Number 7 (SS7)}.  Protocols based on @cite{OSI}
+can be directly implemented using @dfn{STREAMS}.
+
+In contrast to other approaches, such as @dfn{BSD Sockets}, @dfn{STREAMS} does not impose a
+structured function call interface on the interaction between a user level process or kernel
+resident protocol module.  Instead, @dfn{STREAMS} permits the service interface between a service
+user and service provider (whether the service user is a user level process or kernel resident
+@dfn{STREAMS} module) to be defined in terms of @dfn{STREAMS} messages that represent service
+primitives across the interface.
+
+A service interface is defined@footnote{See ITU-T Recommendation X.200 and ITU-T Recommendation
+X.210 for more information about service primitive interfaces.} at the boundary between neighbouring
+modules.  The upper module at the boundary is termed the @dfn{service user} and the lower module at
+the boundary is termed the @dfn{service provider}.  Implemented under @dfn{STREAMS}, a service
+interface is a specified set of messages and the rules that allow passage of these messages across
+the boundary.  A @dfn{STREAMS} module or driver that implements a service interface will exchange
+messages within the defined set across the boundary and will respond to received messages in
+accordance with the actions defined for the specific message and the sequence of messages preceding
+receipt of the message (i.e., in accordance with the state of the module).
+
+Instances of protocol stacks are formed using @dfn{STREAMS} facilities for pushing modules and
+linking multiplexers.  For proper and consistent operation, protocol stacks are assembled so that
+each neighboring module, driver and multiplexer implement the same service interface.  For example,
+a module that implements the @cite{SS7 MTP} protocol layer, as shown in @figref{53}, presents a
+protocol service interface at it input and output sides.  Other modules, drivers and multiplexers
+should only be connected at the input and output sides of the @cite{SS7 MTP} protocol module if they
+provide the same interface in the symetric role (i.e., user or provider).
+
+It is the ability of @dfn{STREAMS} to implement service primitive interfaces between protocol
+modules that makes it most appropriate for implementation of protocols based on the @cite{OSI}
+service primitie interface such as @cite{X.25}, @cite{Integrated Services Digital Network (ISDN)},
+@cite{Signalling System No. 7 (SS7)}.
+
+@c ----------------------------------------
+@node Manipulating Modules
+@subsection Manipulating Modules
+@menu
+* Protocol Portability::
+* Protocol Substitution::
+* Protocol Migration::
+* Module Reusability::
+@end menu
+
+@dfn{STREAMS} provides the ability to manipulate the configuration of drivers, modules and
+multiplexers from user space, easing configuration of protocol stacks and profiles.  Modules,
+drivers and multiplexers implementing common service interfaces can be substituted with ease.  User
+level processes may access the protocol stack at various levels using the same set of standard
+system calls, while also permitting the service interface to the user process to match that of the
+topmost module.
+
+It is this flexibility that makes @dfn{STREAMS} well suited to the implementation of communications
+protocols based on the @dfn{OSI} service primitive interface model.  Additional benefits for
+communications protocols include:
+
+@itemize @bullet
+@item User level programs use a service interface that is independent of underlying protocols,
+drivers, device implementation, and physical communications media.
+
+@item Communications architecture and upper layer protocols can be independent of underlying
+protocol, drivers, device implementation, and physical communications media.
+
+@item Communications protocol profiles can be created by selecting and connection constituent lower
+layer protocols and services.
+@end itemize
+
+The benfits of the @dfn{STREAMS} approach are protocol portability, protocol substitution, protocol
+migration, and module reusability.  Examples are provided in the sections that follow.
+
+@node Protocol Portability
+@subsubsection Protocol Portability
+
+@figref{53}, shows how the same @cite{SS7 Signalling Link} protocol module can be used with
+different drivers on different machines by implementing compatible service interfaces.  The
+@cite{SS7 Signalling Link} are the @dfn{Data Link Provider Interface (DLPI)} and the
+@dfn{Communications Device Interface (CDI)}.
+
+@figuresized{SPG_fig53,53,Protocol Module Portability,4in}
+
+@node Protocol Substitution
+@subsubsection Protocol Substitution
+
+Alternate protocol modules (and device drivers) can be interchanged on the same machine if they are
+implemented to an equivalent service interface.
+
+@figuresized{SPG_fig56,300,Protocol Substitution,4in}
+
+@figref{300} illustrates how @dfn{STREAMS} can substitute upper layer protocol modules to implement
+a different protocol stack over the same @dfn{HDLC} driver.  As each module and driver support the
+same service interface at each level, it is conceivable that the resulting modules could be
+recombined to support, for example, @cite{SS7 MTP} over an @cite{ISDN LAPB} channel.@footnote{SS7
+MTP over ISDN LAPB was originally defined under ISDN as an E-Channel.}
+
+@node Protocol Migration
+@subsubsection Protocol Migration
+
+@figref{54} illustrates how @dfn{STREAMS} can move functions between kernel software and front end
+firmware.  A common downstream service interface allows the transport protocol module to be
+independent of the number or type of modules below.  The same transport module will connect without
+modification to either an X.25 module or X.25 driver that has the same service interface.
+
+@figuresized{SPG_fig54,54,Protocol Migration,4in}
+
+By shifting functions between software and firmware, developers can produce cost effective,
+functionally equivalent systems over a wide range of configurations.  They can rapidly incorporate
+technological advances.  The same transport protocol module can be used on a lower capacity machine,
+where economics may preclude the use of front-end hardware, and also on a larger scale system where
+a front-end is economically justified.
+
+@node Module Reusability
+@subsubsection Module Reusability
+
+@figref{55} shows the same canonical module (for example, one that provides
+delete and kill processing on character strings) reused in two different @dfn{Streams}.  This module
+would typically be implemented as a filter, with no downstream service interface.  In both cases, a
+tty interface is presented to the @dfn{Stream}'s user process since the module is nearest the
+@dfn{Stream head}.
+
+@figuresized{SPG_fig55,55,Module Reusability,4in}
 
 @c ============================================================================
 @node Overview

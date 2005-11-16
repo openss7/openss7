@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.46 2005/11/15 12:04:55 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.47 2005/11/16 10:30:33 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/15 12:04:55 $ by $Author: brian $
+% Last Modified $Date: 2005/11/16 10:30:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -685,6 +685,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.47  2005/11/16 10:30:33  brian
+- still working up take 2
+
 Revision 0.9.2.46  2005/11/15 12:04:55  brian
 - second run at SPG
 
@@ -1512,10 +1515,9 @@ situations.
 @node Protocol Portability
 @subsubsection Protocol Portability
 
-@figref{53}, shows how the same X.25 protocol module can be used
-with different drivers on different machines by implementing compatible service interfaces.  The
-X.25 protocol module interfaces are @dfn{Connection Oriented Network Service (CONS)} and @dfn{Link
-Access Protocol-Balanced (LAPB)}.
+@figref{53}, shows how the same X.25 protocol module can be used with different drivers on different
+machines by implementing compatible service interfaces.  The X.25 protocol module interfaces are
+@dfn{Connection Oriented Network Service (CONS)} and @dfn{Link Access Protocol-Balanced (LAPB)}.
 
 @figuresized{SPG_fig53,53,Protocol Module Portability,4in}
 @c [strm.ptcmjl.gif]
