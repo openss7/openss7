@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.1 2005/11/15 12:05:09 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.2 2005/11/16 03:20:03 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/15 12:05:09 $ by $Author: brian $
+% Last Modified $Date: 2005/11/16 03:20:03 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -674,6 +674,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.2  2005/11/16 03:20:03  brian
+- working up take 2
+
 Revision 0.9.2.1  2005/11/15 12:05:09  brian
 - second run at SPG
 
@@ -1187,7 +1190,7 @@ a push-down stack fashion.  Pushing and popping of modules can be performed usin
 @manpage{ioctl(2)} calls and can be performed by user space applications without any need for kernel
 programming, assembly, or relinking.
 
-For more information on @dfn{STREAMS Modules}, see @pxref{Module Component}.
+For more information on @dfn{STREAMS Modules}, @pxref{Module Component}.
 
 @subsubsection Driver
 
@@ -1199,7 +1202,7 @@ little processing within the @dfn{STREAMS} framework and typically only provide 
 @dfn{STREAMS} messages and hardware or software events (e.g. interrupts) and conversion between
 @dfn{STREAMS} framework data structures and device related data structures.
 
-For more information on @dfn{STREAMS Drivers}, see @pxref{Driver Component}.
+For more information on @dfn{STREAMS Drivers}, @pxref{Driver Component}.
 
 @subsubsection Queues
 
@@ -1219,7 +1222,7 @@ the @dfn{Stream head}, @dfn{Module} or @dfn{Driver} instance associated with the
 @dfn{Queue} pairs are dynamically allocated when an instance of the @dfn{driver}, @dfn{module} or
 @dfn{Stream head} is created and deallocated when the instance is destroyed.
 
-For more information on @dfn{STREAMS Queues}, see @pxref{Queue Component}.
+For more information on @dfn{STREAMS Queues}, @pxref{Queue Component}.
 
 @subsubsection Messages
 
@@ -1260,7 +1263,7 @@ to @manpage{read(2)}, @manpage{getmsg(2)}, and @manpage{getpmsg(2)} system calls
 ultimately be read by the @dfn{Stream head}; they are also consumed when written by the @dfn{Stream
 head} and ultimately arrive at the @dfn{Driver}.
 
-For more information on @dfn{STREAMS Messages}, see @pxref{Message Component}.
+For more information on @dfn{STREAMS Messages}, @pxref{Message Component}.
 
 @c ----------------------------------------------------------------------------
 @node Basic Streams Operations
@@ -1304,12 +1307,6 @@ instance.
 
 @subsection Basic Operations Example
 
-An basic example of opening, reading from and writing to a @dfn{Stream} driver is shown in
-@ref{Listing 101}, below.  The example is for a communications device that provide a communications
-channel for data transfer between two processes or hosts.   Data written to the device is
-communicated over the channel to the remote process or host.  Data read from the device was written
-by the remote process or host.
-
 @cartouche
 @iftex
 @float Listing,Listing 101
@@ -1349,6 +1346,12 @@ main()
 @set lstnum 101
 @end ifnottex
 @end cartouche
+
+An basic example of opening, reading from and writing to a @dfn{Stream} driver is shown in
+@ref{Listing 101}.  The example is for a communications device that provide a communications channel
+for data transfer between two processes or hosts.   Data written to the device is communicated over
+the channel to the remote process or host.  Data read from the device was written by the remote
+process or host.
 
 In the example in @ref{Listing 101}, a simple @dfn{Stream} is opened using the @manpage{open(2)}
 call.  @file{/dev/streams/comm/1} is the path to the character minor device node in the filesystem.
@@ -1403,6 +1406,8 @@ greater detail.
 @node Queue Component
 @subsection Queues
 
+This subsection provides a brief overview of message @dfn{queues} and their associated procedures.
+
 A @dfn{queue} provides an interface between an instance of a @dfn{STREAMS} driver, module or
 @dfn{Stream head}, and the other modules and drivers that make up a @dfn{Stream} for a direction of
 message flow (i.e., @dfn{upstream} or @dfn{downstream}).  When an instance of a @dfn{STREAMS}
@@ -1411,57 +1416,110 @@ allocated to represent the driver, module or @dfn{Stream head} within the @dfn{S
 structures are always allocated in pairs.  The first queue in the pair is the @dfn{read-side} or
 @dfn{upstream} queue in the pair; the second queue, the @dfn{write-side} or @dfn{downstream} queue.
 
-@ignore
-A queue is an interface between a @dfn{STREAMS} driver or module and the rest of the @dfn{Stream}.
-Queues are always allocated as an adjacent pair.  The queue with the lower address in the pair is a
-read queue, and the queue with the higher address is used for the write queue.
-@end ignore
+Queues are described in greater detail in @ref{Queues and Priority}.
+
+@subsubsection Queue Procedures
+
+This subsection provides a brief overview of @dfn{queue} procedures.
 
 The @dfn{STREAMS} module, driver or @dfn{Stream head} provides five procedures that are associated
 with each queue in a queue pair: the @command{put}, @command{service}, @command{open},
-@command{close} and @command{admin} routines.  Normaly the @command{open} and @command{close}
-routines are only associated with the @dfn{read-side} of the queue pair.
+@command{close} and @command{admin} procedures.  Normaly the @command{open} and @command{close}
+procedures (and possibly the optional @command{admin} procedure) are only associated with the
+@dfn{read-side} of the queue pair.
 
-A @command{put} procedure is associated with each queue in a pair.  The @command{put} procedure is
-used by @dfn{STREAMS} to present a new message to an upstream or downstream queue.  At the
-@dfn{Stream head} or @dfn{Stream end} the @dfn{Stream head} write-side, or @dfn{Stream end}
-read-side, queue @command{put} procedure is normally invoked using the @manref{put(9)} utility.
-A module within the @dfn{Stream} typically has its @command{put} procedure invoked by an adjacent
-module, driver or @dfn{Stream head} that uses the @manref{putnext(9)} utility from its own
-@command{put} or @command{service} procedure to pass message to adjacent modules.
+Each queue in the pair has a pointer to a @command{put} procedure.  The @command{put} procedure is
+used by @dfn{STREAMS} to present a new message to an upstream or downstream queue.  At the ends of
+the @dfn{Stream}, the @dfn{Stream head} write-side, or @dfn{Stream end} read-side, queue
+@command{put} procedure is normally invoked using the @manref{put(9)} utility.  A module within the
+@dfn{Stream} typically has its @command{put} procedure invoked by an adjacent module, driver or
+@dfn{Stream head} that uses the @manref{putnext(9)} utility from its own @command{put} or
+@command{service} procedure to pass message to adjacent modules.  The @command{put} procedure of the
+queue receiving the message is invoked.  The @command{put} procedure decides whether to process the
+message immediately, queue the message on the message queue for later processing by the queue's
+@command{service} procedure, or whether to pass the message to a subsequent queue using
+@manpage{putnext(9)}.
 
-@ignore
-A queue's @command{service} routine is invoked to process messages on the queue.  It usually removes
-successive messages from the queue, processes them, and calls the @command{put} routine of the next
-module in the @dfn{Stream} to give the processed message to the next queue.
+Each queue in the pair has a pointer to an optional @command{service} procedure.  The purpose of a
+@command{service} procedure process messages that were deferred by the @command{put} procedure by
+being placed on the message queue with utilities such as @manref{putq(9)}.  A @command{service}
+procedure typically loops through taking messages off of the queue and processing them.  The
+procedure normally terminates the loop when it can not process the current message (in which case it
+places the message back on the queue with @manref{putbq(9)}), or when there is no longer any
+messages left on the queue to process.  A @command{service} procedure is optional in the sense that
+if the @command{put} procedure never places any messages on the queue, a @command{service} procedure
+is unnecessary.
 
-A queue's @command{put} routine is invoked by the preceding queue's @command{put} and/or
-@command{service} routine to add a message to the current queue.  If a module does not need to
-enqueue messages, its @command{put} routine can call the neighboring queue's @command{put} routine.
-(@ref{Processing} discusses the @command{service} and @command{put} routines in more detail.)
+Each queue in the pair also has a pointer to a @command{open} and @command{close} procedure;
+however, the @var{qi_qopen} and @var{qi_qclose} pointers are only significant in the @dfn{read-side}
+queue of the queue pair.
 
-Each queue also has a pointer to an @command{open} and @command{close} routine.  The @command{open}
-routine of a driver is called when the driver is first opened and on every successive open of the
-@dfn{Stream}.  The @command{open} routine of a module is called when the module is first pushed on
-the @dfn{Stream} and on every successive open of the @dfn{Stream}.  The @command{close} routine of
-the module is called when the module is popped (removed) off the @dfn{Stream}.  The @command{close}
-routine of the driver is called when the last reference to the @dfn{Stream} is given up and the
-@dfn{Stream} is dismantled.
-@end ignore
+The queue @command{open} procedure for a driver is called each time that a driver (or @dfn{Stream
+head}) is opened, including the first open that creates a @dfn{Stream} and upon each successive open
+of the @dfn{Stream}.  The queue @command{open} procedure for a module is called when the module is
+first pushed onto (inserted into) a @dfn{Stream}, and for each successive open of a @dfn{Stream}
+upon which the module has already been pushed (inserted).
+
+The queue @command{close} procedure for a module is called whenever the module is popped (removed)
+from a @dfn{Stream}.  Modules are automatically popped from a @dfn{Stream} on the last close of the
+@dfn{Stream}.  The queue @command{close} procedure for a driver is called with the last close of the
+@dfn{Stream} or when the last reference to the @dfn{Stream} is relinquished.  If the @dfn{Stream} is
+linked under a multiplexing driver (@ioctlref{I_LINK}), or has been named with @manref{fattach(3)},
+then the @dfn{Stream} will not be dismantled on the last close and the @command{close} procedure not
+called until the @dfn{Stream} is eventually unlinked (@ioctlref{I_UNLINK}) or detached
+(@manref{fdetach(3)}).
+
+Procedures are deciribed in greater detail in @ref{Procedures}.
 
 @c ----------------------------------------
 @node Message Component
 @subsection Messages
 
-All input and output under @dfn{STREAMS} is based on messages.  The objects passed between
-@dfn{STREAMS} modules are pointers to messages.  All @dfn{STREAMS} messages use two data structures
-(msgb and datab) to refer to the message data.  These data structures describe the type of the
-message and contain pointers to the data of the message, as well as other information.  Messages are
-sent through a @dfn{Stream} by successive calls to the @command{put} procedure of each module or driver in the
-@dfn{Stream}.
+This subsection provides a brief overview of @dfn{STREAMS messages}.
+
+In fitting with the concept of function decoupling, all control and data information is passed
+between @dfn{STREAMS} modules, drivers and the @dfn{Stream head} using messages.  Utilities are
+provided to the @dfn{STREAMS} module writer for passing messages using queue and message pointers.
+@dfn{STREAMS} messages consist of a 3-type of a message block structure (@manref{msgb(9)}), a data
+block structure (@manref{datab(9)}) and a data buffer.  The message block structure is used to
+provide an instance of a reference to a data block and pointers into the data buffer.  The data
+block structure is used to provide information about the data buffer, such as message type, separate
+from the data contained in the buffer.  Messages are normally passed between @dfn{STREAMS} modules,
+drivers and the @dfn{Stream head} using utilities that invoke the target module's @command{put}
+procedure, such as @manref{put(9)}, @manref{putnext(9)}, @manref{qreply(9)}.  Messages travel along
+a @dfn{Stream} with successive invocations of each driver, module and @dfn{Stream head}'s
+@command{put} procedure.
+
+Messages are described in greater detail in @ref{Messages}.
 
 @subsubsection Message Types
 
+This subsection provides a brief overview of @dfn{STREAMS message types}.
+
+Each data block (@manref{datab(9)}) is assigned a message type.  The message type discriminates the
+use of the message by drivers, modules and the @dfn{Stream head}.  Most of the message type may be
+assigned by a module or driver when it generates a message, and the message type can be modified as
+a part of message processing.  The @dfn{Stream head} uses a wider set of message types to perform
+its function of converting the functional interface to the user process into the messaging interface
+used by @dfn{STREAMS} modules and drivers.
+
+Most of the defined message types (@pxref{Message Types}) are solely for use within the
+@dfn{STREAMS} framework.  A more limited set of message types (@msg{M_PROTO}, @msg{M_PCPROTO} and
+@msg{M_DATA}) can be used to pass control and data information to and from the user process via the
+@dfn{Stream head}.  These message type can be generated and consumed using the @manref{read(2)},
+@manref{write(2)}, @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
+system calls and some @manref{streamio(7)} @dfn{STREAMS} @manpage{ioctl(2)}.
+
+Message types are described in detail in @ref{Message Types}.
+
+@subsubsection Message Linkage
+
+Messages blocks of differing types can be linked together into chained messages as illustrated in
+@figref{104}.
+
+@figuresized{SPG_fig05,104,A Message,4in}
+
+@ignore
 All @dfn{STREAMS} messages are assigned message types to indicate their intended use by modules and
 drivers and to determine their handling by the @dfn{Stream head}.  A driver or module can assign
 most types to a message it generates, and a module can modify a message type during processing.  The
@@ -1493,9 +1551,13 @@ succeeding messages on the same message queue, in addition to the link to the se
 message (if present).  The message queue head and tail are contained in the queue.
 
 @dfn{STREAMS} utility routines enable developers to manipulate messages and message queues.
+@end ignore
 
 @subsubsection Message Queueing Priority
 
+This subsection provides a brief overview of @dfn{message queueing priority}.
+
+@ignore
 In certain cases, messages containing urgent information (such as a break or alarm conditions) must
 pass through the @dfn{Stream} quickly.  To accommodate these cases, @dfn{STREAMS} provides multiple
 classes of message queuing priority.  All messages have an associated priority field.  Normal
@@ -1516,12 +1578,17 @@ Message priority is defined by the message type; once a message is created, its 
 changed.  Certain message types come in equivalent high priority/ordinary pairs (for example,
 @msg{M_PCPROTO} and @msg{M_PROTO}), so that a module or device driver can choose between the two
 priorities when sending information.
+@end ignore
 
+Queueing priority is described in greater detail in @ref{Queues and Priority}.
 
 @c ----------------------------------------
 @node Module Component
 @subsection Modules
 
+This subsection provides a brief overview of @dfn{STREAMS modules}.
+
+@ignore
 A module performs intermediate transformations on messages passing between a @dfn{Stream head} and a
 driver.  There may be zero or more modules in a @dfn{Stream} (zero when the driver performs all the
 required character and device processing).
@@ -1563,12 +1630,17 @@ state information and translation tables).
 @end table
 
 In general, each of the two queues in a module has a distinct set of all of these elements.
+@end ignore
 
+Modules are described in greater detail in @ref{Modules}.
 
 @c ----------------------------------------
 @node Driver Component
 @subsection Drivers
 
+This subsection provides a brief overview of @dfn{STREAMS drivers}.
+
+@ignore
 @dfn{STREAMS} device drivers are an initial part of a @dfn{Stream}.  They are structurally similar
 to @dfn{STREAMS} modules.  The call interfaces to driver routines are identical to the interfaces
 used for modules.
@@ -1580,11 +1652,15 @@ the @streamio{I_PUSH} @command{ioctl} and @streamio{I_POP} @command{ioctl}.
 
 Drivers and modules can pass signals, error codes, and return values to processes via message types
 provided for that purpose.
+@end ignore
 
+Drivers are described in greater detail in @ref{Drivers}.
 
 @c ----------------------------------------------------------------------------
 @node Multiplexing of Streams
 @section Multiplexing
+
+Multiplexing is described in greater detail in @ref{Multiplexing}.
 
 @c ----------------------------------------------------------------------------
 @node Benefits of STREAMS
