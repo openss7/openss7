@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.3 2005/11/16 10:30:39 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.4 2005/11/17 01:59:26 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/16 10:30:39 $ by $Author: brian $
+% Last Modified $Date: 2005/11/17 01:59:26 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -674,6 +674,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.4  2005/11/17 01:59:26  brian
+- more workup of take 2
+
 Revision 0.9.2.3  2005/11/16 10:30:39  brian
 - still working up take 2
 
@@ -1933,8 +1936,8 @@ In contrast to other approaches, such as @dfn{BSD Sockets}, @dfn{STREAMS} does n
 structured function call interface on the interaction between a user level process or kernel
 resident protocol module.  Instead, @dfn{STREAMS} permits the service interface between a service
 user and service provider (whether the service user is a user level process or kernel resident
-@dfn{STREAMS} module) to be defined in terms of @dfn{STREAMS} messages that represent service
-primitives across the interface.
+@dfn{STREAMS} module) to be defined in terms of @dfn{STREAMS} messages that represent standardized
+service primitives across the interface.
 
 A service interface is defined@footnote{See ITU-T Recommendation X.200 and ITU-T Recommendation
 X.210 for more information about service primitive interfaces.} at the boundary between neighbouring
@@ -1992,25 +1995,47 @@ layer protocols and services.
 @end itemize
 
 The benfits of the @dfn{STREAMS} approach are protocol portability, protocol substitution, protocol
-migration, and module reusability.  Examples are provided in the sections that follow.
+migration, and module reusability.  Examples provided in the sections that follow are real-world
+examples taken from the open source @cite{Signalling System No. 7 (SS7)} stack implemented by the
+@uref{http://www.openss7.org/,OpenSS7 Project}.
 
 @node Protocol Portability
 @subsubsection Protocol Portability
 
+@figuresized{SPG_fig53,53,Protocol Module Portability,3in}
+
 @figref{53}, shows how the same @cite{SS7 Signalling Link} protocol module can be used with
 different drivers on different machines by implementing compatible service interfaces.  The
 @cite{SS7 Signalling Link} are the @dfn{Data Link Provider Interface (DLPI)} and the
-@dfn{Communications Device Interface (CDI)}.
+@dfn{Communications Device Interface (CDI)} for @dfn{High-Level Data Link Control (HDLC)}.
 
-@figuresized{SPG_fig53,53,Protocol Module Portability,4in}
+By using standard @dfn{STREAMS} mechanisms for the implementation of the @cite{SS7 Signalling Link}
+module, only the driver needs to be ported to port an entire protocol stack from one machine to
+another.  The same @cite{SS7 Signalling Link} module (and upper layer modules) can be used on both
+machines.
+
+Because the @dfn{Driver} presents a standardized service interface using @dfn{STREAMS}, porting a
+driver from the machine architecture of @samp{Machine A} to that of @samp{Machine B} consists of
+changes internal to the driver and external to the @dfn{STREAMS} environment.  Machine dependent
+issues, such as bus architectures and interrupt handling are kept independent of the primary state
+machine and service interface.  Porting a driver from one major @cite{UNIX} or @cite{UNIX}-like
+operating system and machine architecture supporting @dfn{STREAMS} to another is a straightforward
+task.
+
+With @cite{@value{PACKAGE_TITLE}}, @dfn{STREAMS} provides the ability to directly port a large body
+of existing @dfn{STREAMS} modules to the @cite{GNU/Linux} operating system.
 
 @node Protocol Substitution
 @subsubsection Protocol Substitution
 
-Alternate protocol modules (and device drivers) can be interchanged on the same machine if they are
-implemented to an equivalent service interface.
+@figuresized{SPG_fig56,300,Protocol Substitution,3in}
 
-@figuresized{SPG_fig56,300,Protocol Substitution,4in}
+@dfn{STREAMS} permits the easy substitution of protocol modules (or devic drivers) within a protocol
+stack providing a new protocol profile.  When protocol modules are implemented to a compatible
+service interface the can be recombined and substituted, providing a flexible protocol architecture.
+In some circumstances, and through proper design, protocol modules can be substituted that implement
+the same service interface, even if they were not originally intended to be combined in such a
+fashion.
 
 @figref{300} illustrates how @dfn{STREAMS} can substitute upper layer protocol modules to implement
 a different protocol stack over the same @dfn{HDLC} driver.  As each module and driver support the
@@ -2018,21 +2043,32 @@ same service interface at each level, it is conceivable that the resulting modul
 recombined to support, for example, @cite{SS7 MTP} over an @cite{ISDN LAPB} channel.@footnote{SS7
 MTP over ISDN LAPB was originally defined under ISDN as an E-Channel.}
 
+Another example would be substituting an @cite{M2PA} signalling link module for a traditional
+@cite{SS7 Signalling Link Module} to provide @cite{SS7 over IP}.
+
 @node Protocol Migration
 @subsubsection Protocol Migration
 
 @figref{54} illustrates how @dfn{STREAMS} can move functions between kernel software and front end
 firmware.  A common downstream service interface allows the transport protocol module to be
 independent of the number or type of modules below.  The same transport module will connect without
-modification to either an X.25 module or X.25 driver that has the same service interface.
+modification to either an @cite{SS7 Signalling Link} module or @cite{SS7 Signalling Link} driver
+that presents the same service interface.
 
-@figuresized{SPG_fig54,54,Protocol Migration,4in}
+@figuresized{SPG_fig54,54,Protocol Migration,3in}
+
+The @uref{http://www.openss7.org/,OpenSS7} @cite{SS7 Stack} uses this capability also to adapt the
+protocol stack to front-end hardware that supports differing degrees of @cite{SS7 Signalling Link}
+support  in firmware.  Hardware cards that support as much as a transparent bit stream can have
+@cite{SS7 Signalling Data Link}, @cite{SS7 Signalling Data Terminal} and @cite{SS7 Signalling Link}
+modules pushed to provide a complete @cite{SS7 Signalling Link} that might, on another hardware
+card, be mostly implemented in firmware.
 
 By shifting functions between software and firmware, developers can produce cost effective,
 functionally equivalent systems over a wide range of configurations.  They can rapidly incorporate
-technological advances.  The same transport protocol module can be used on a lower capacity machine,
-where economics may preclude the use of front-end hardware, and also on a larger scale system where
-a front-end is economically justified.
+technological advances.  The same upper layer protocol module can be used on a lower capacity
+machine, where economics may preclude the use of front-end hardware, and also on a larger scale
+system where a front-end is economically justified.
 
 @node Module Reusability
 @subsubsection Module Reusability
@@ -2043,7 +2079,7 @@ would typically be implemented as a filter, with no downstream service interface
 tty interface is presented to the @dfn{Stream}'s user process since the module is nearest the
 @dfn{Stream head}.
 
-@figuresized{SPG_fig55,55,Module Reusability,4in}
+@figuresized{SPG_fig55,55,Module Reusability,3in}
 
 @c ============================================================================
 @node Overview
@@ -2079,11 +2115,110 @@ tty interface is presented to the @dfn{Stream}'s user process since the module i
 * Stream Construction::		STREAMS Stream Construction
 @end menu
 
+This chapter describes how applications programs create and interact with a @dfn{Stream} using
+traditional and standardized @dfn{STREAMS} system calls.  General system call and
+@dfn{STREAMS}-specific system calls provide the interface required by user level processes when
+implementing user level applications programs.
+
 @node Mechanism Overview
 @section Mechanism Overview
 
+The system call interface provided by @dfn{STREAMS} is upward compatible with the traditional
+character device system calls.
+
+@dfn{STREAMS} devices appears as character device nodes within the file system in the
+@dfn{GNU/Linux} system.
+The @manref{open(2)} system call recognizes that a character special file is a @dfn{STREAMS} device,
+creates a @dfn{Stream} and associates it with a device in the same fashion as a character device.
+
+Once open, a user process can send and receive data to and from the @dfn{STREAMS} special file using
+the traditional @manref{write(2)} and @manref{read(2)} system calls in the same manner as is
+performed on a traditional character device special file.
+
+Character device input-output controls using the @manref{ioctl(2)} system call can also be performed
+on a @dfn{STREAMS} s[ecial file.  @dfn{STREAMS} defines a set of standard input-output control
+commands (see @manref{ioctl(2p)} and @manref{streamio(7)}) specific to @dfn{STREAMS} special files.
+Input-output controls that a defined for a specific device are also supported as they are for
+character device drivers.
+
+With support for these general character device input and output system calls, it is possible to
+implement a @dfn{STREAMS} device driver in such a way that an application is unaware that it has
+opened and is controling a @dfn{STREAMS} device driver: tne application could treat the device in
+the identical manner to a character device.  This make it possible to convert an existing character
+device driver to @dfn{STREAMS} and make possible the portability, migration, substitution and
+reusability benefits of the @dfn{STREAMS} framework.
+
+@dfn{STREAMS} provides @dfn{STREAMS}-specific system calls and @manpage{ioctl(2)} commands, in
+addition to support for the traditional character device I/O system calls and @manpage{ioctl(2)}
+commands.
+
+The @manref{poll(2)} system call@footnote{Although the @manpage{poll(2)} system call has been
+implemented in @cite{GNU/Linux}, it was historically provided only by @dfn{STREAMS}.  This is
+evident from the fact that @manpage{poll(2)} system can supports events like @constant{POLLRDBAND}
+that have no meaning outside of the @dfn{STREAMS} framework.} provides the ability for the
+application to poll multiple @dfn{Streams} for a wide range of events.
+
+The @manref{putmsg(2)} and @manref{putpmsg(2)} system calls provide the ability for applications
+programs to transfer both control and data information to the @dfn{Stream}.  The @manpage{write(2)}
+system call only supports the transfer of data to the @dfn{Stream}, whereas, @manpage{putmsg(2)} and
+@manpage{putpmsg(2)} permit the transfer of prioritized control information in addition to data.
+
+The @manref{getmsg(2)} and @manref{getpmsg(2)} system calls provide the ability for applications
+programs to receive both control and data information from the @dfn{Stream}.  The @manpage{read(2)}
+system call can only support the transfer of data (and in some cases the inline control
+information), whereas, @manpage{getmsg(2)} and @manpage{getpmsg(2)} permit the transfer of
+prioritized control information in addition to data.
+
+Implementation of standardized service primitive interfaces is enabled through the use of the
+@manpage{putmsg(2)}, @manpage{putpmsg(2)}, @manpage{getmsg(2)} and @manpage{getpmsg(2)} system
+calls.
+
+@dfn{STREAMS} also provides kernel level utilities and facilities for the development of kernel
+resident @dfn{STREAMS} modules and drivers.  Within the @dfn{STREAMS} framework, the @dfn{Stream
+head} is responsible for conversion between @dfn{STREAMS} messages passed up and down a @dfn{Stream}
+and the system call interface presented to user level applications programs.  The @dfn{Stream head}
+is common to all @dfn{STREAMS} special files and the conversion between the system call interface
+and message passed on the @dfn{Stream} does not have to be reimplemented by the module and device
+driver writer as is the case for traditional character device I/O.
+
+@subsection STREAMS System Calls
+
+The @dfn{STREAMS}-related system calls are:
+
+@multitable @columnfractions .20 .80
+@item @manpage{open(2)}
+@tab Open a @dfn{STREAMS} special file and create a @dfn{Stream}.
+@item @manpage{close(2)}
+@tab Close a @dfn{STREAMS} special file and possibly cause the destruction of a @dfn{Stream} (i.e.,
+on the last close of the @dfn{Stream}.
+@item @manpage{read(2)}
+@tab Read data from a @dfn{Stream}.
+@item @manpage{write(2)}
+@tab Write data to a @dfn{Stream}.
+@item @manpage{ioctl(2)}
+@tab Control a @dfn{Stream}.
+@item @manpage{getmsg(2)}, @manpage{getpmsg(2)}
+@tab Receive a (prioritized) message at the @dfn{Stream head}.
+@item @manpage{putmsg(2)}, @manpage{putpmsg(2)}
+@tab Send a (prioritized) message from the @dfn{Stream head}.
+@item @manpage{poll(2)}
+@tab Notify the application program when selected events occur on one or more @dfn{Streams}.
+@item @manpage{pipe(2)}
+@tab Create a channel that provides a @dfn{STREAMS}-based bidirectional communication path between
+multiple processes.
+@end multitable
+
 @node Stream Construction
 @section Stream Construction
+
+@dfn{STREAMS} constructs a @dfn{Stream} as a double linked list of kernel data structures.  Elements
+of the linked list are queue pairs that represent the instantiation of a @dfn{Stream head}, modules
+and drivers.  Linear segments of linke queue pairs can be connected to multiplexing drivers to form
+complex tree topologies.  The branches of the tree are closest to the user level process and the
+roots of the tree are closest to the device driver.
+
+The uppermost queue pair of a @dfn{Stream} represents the @dfn{Stream head}.  The lowermost queue
+pair of a @dfn{Stream} represents the @dfn{Stream end} or @dfn{driver}.  
 
 @c ============================================================================
 @node Processing
