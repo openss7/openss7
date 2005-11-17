@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.4 2005/11/17 01:59:26 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.5 2005/11/17 10:52:33 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/17 01:59:26 $ by $Author: brian $
+% Last Modified $Date: 2005/11/17 10:52:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -198,7 +198,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro tabfig {image, number, caption}
 @cartouche
 @float Table,Table \number\
-@image{\image\}
+@center @image{\image\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -207,7 +207,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro tabfigsized {image, number, caption, size}
 @cartouche
 @float Table,Table \number\
-@image{\image\,\size\}
+@center @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -216,7 +216,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro figure {image, number, caption}
 @cartouche
 @float Figure,Figure \number\
-@image{\image\}
+@center @image{\image\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -225,7 +225,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro figuresized {image, number, caption, size}
 @cartouche
 @float Figure,Figure \number\
-@image{\image\,\size\}
+@center @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -251,20 +251,28 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @ifnottex
 
 @macro tabfig {image, number, caption}
-@image{\image\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@center @image{\image\}
+@anchor{Table \number\}
+@center @emph{Table \number\.@:  \caption\}
 @end macro
 
 @macro tabfigsized {image, number, caption, size}
-@image{\image\,\size\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@center @image{\image\,\size\}
+@anchor{Table \number\}
+@center @emph{Table \number\.@:  \caption\}
 @end macro
 
 @macro figure {image, number, caption}
-@image{\image\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@center @image{\image\}
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
 @set fignum \number\
 @end macro
 
 @macro figuresized {image, number, caption, size}
-@image{\image\,\size\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@center @image{\image\,\size\}
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
 @set fignum \number\
 @end macro
 
@@ -674,6 +682,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.5  2005/11/17 10:52:33  brian
+- working up take 2
+
 Revision 0.9.2.4  2005/11/17 01:59:26  brian
 - more workup of take 2
 
@@ -819,8 +830,12 @@ An introduction to @dfn{STREAMS} and the @cite{@value{PACKAGE_TITLE}} package.
 A brief overview of @dfn{STREAMS}.
 @item @ref{Mechanism}
 A description of the @dfn{STREAMS} framework.  Describes the basic operations for constructing,
-using, and dismantling Streams.  These operations are performed using @manpage{open(2)},
-@manpage{close(2)}, @manpage{read(2)}, @manpage{write(2)}, and @manpage{ioctl(2)}.
+using, and dismantling Streams.  These operations are performed using
+@manpage{open(2)},
+@manpage{close(2)},
+@manpage{read(2)},
+@manpage{write(2)}, and
+@manpage{ioctl(2)}.
 @item @ref{Processing}
 Processing and procedures within the @dfn{STREAMS} framework.  Gives an overview of the
 @dfn{STREAMS} put and service routines.
@@ -1061,9 +1076,16 @@ The standard interface and mechanism enable modular, portable development and ea
 high performance network services and their components.  Because it is a message passing
 architecture, @dfn{STREAMS} does not impose a specific network architecture (as does the @dfn{BSD
 Sockets} kernel architecture.  The @dfn{STREAMS} user interface is uses the familiar @cite{UNIX}
-character special file input and output mechanisms @manpage{open(2)}, @manpage{read(2)},
-@manpage{write(2)}, @manpage{ioctl(2)}, @manpage{close(2)}; and provides additional system calls,
-@manpage{poll(2)}, @manpage{getmsg(2)}, @manpage{getpmsg(2)}, @manpage{putmsg(2)},
+character special file input and output mechanisms
+@manpage{open(2)},
+@manpage{read(2)},
+@manpage{write(2)},
+@manpage{ioctl(2)},
+@manpage{close(2)}; and provides additional system calls,
+@manpage{poll(2)},
+@manpage{getmsg(2)},
+@manpage{getpmsg(2)},
+@manpage{putmsg(2)},
 @manpage{putpmsg(2)}, to assist in message passing between user-level applications and
 kernel-resident modules.  Also, @dfn{STREAMS} defines a standard set of input-output controls
 (@manpage{ioctl(2)}) for manipulation and configuration of @dfn{STREAMS} by a user-space
@@ -1139,7 +1161,7 @@ hardware or other mechanisms within the @cite{Linux} kernel.
 down the @dfn{Stream}.
 @end itemize
 
-@figuresized{SPG_fig01,101,Simple Stream,3in}
+@figuresized{SPG_fig01,101,Simple Stream,4in}
 
 @subsubsection Stream head
 
@@ -1164,14 +1186,14 @@ same fashion as they can exist between a @dfn{Stream head} and a @dfn{Driver} in
 @dfn{Stream}.
 A @dfn{STREAMS}-based pipe is illustrated in @figref{102}.
 
-@figuresized{SPG_fig02,102,@dfn{STREAMS}-based Pipe,3in}
+@figuresized{SPG_fig02,102,@dfn{STREAMS}-based Pipe,4in}
 
 @dfn{STREAMS}-based FIFOs consist of a single @dfn{Stream head} that has its downstream path
 connected to its upstream path where the @dfn{Driver} would be located.  @dfn{Modules} can be pushed
 under this single @dfn{Stream Head}.
 A @dfn{STREAMS}-based FIFO is illustrated in @figref{109}.
 
-@figuresized{SPG_fig07,109,@dfn{STREAMS}-based @dfn{FIFO} (named pipe),3in}
+@figuresized{SPG_fig07,109,@dfn{STREAMS}-based @dfn{FIFO} (named pipe),4in}
 
 For more information on @dfn{STREAMS}-based pipes and FIFOs, @pxref{Pipes and FIFOs}.
 
@@ -1261,9 +1283,15 @@ is passed is responsible for processing or queueing @dfn{upstream} messages; the
 queue, for processing @dfn{downstream} messages.
 
 @dfn{STREAMS} messages are generated by the @dfn{Stream head} and passed @dfn{downstream} in
-response to @manpage{write(2)}, @manpage{putmsg(2)}, and @manpage{putpmsg(2)} system calls; they are
+response to
+@manpage{write(2)},
+@manpage{putmsg(2)}, and
+@manpage{putpmsg(2)} system calls; they are
 also consumed by the @dfn{Stream head} and converted to information passed to user space in response
-to @manpage{read(2)}, @manpage{getmsg(2)}, and @manpage{getpmsg(2)} system calls.
+to
+@manpage{read(2)},
+@manpage{getmsg(2)}, and
+@manpage{getpmsg(2)} system calls.
 
 @dfn{STREAMS} messages are also generated by the @dfn{Driver} and passed @dfn{upstream} to
 ultimately be read by the @dfn{Stream head}; they are also consumed when written by the @dfn{Stream
@@ -1285,11 +1313,14 @@ and minor device number.  In the usual situation, a @dfn{Stream} is associated w
 character device node in a similar fashion to a minor device instance for regular character device
 drivers.
 
-@dfn{STREAMS} devices are opened, as are character device drivers, with the @manpage{open(2)} system
-call.@footnote{An exception is @dfn{STREAMS}-based pipes, that are opened with the @manpage{pipe(2)}
+@dfn{STREAMS} devices are opened, as are character device drivers, with the
+@manpage{open(2)} system
+call.@footnote{An exception is @dfn{STREAMS}-based pipes, that are opened with the
+@manpage{pipe(2)}
 system call.}  Opening a minor device node accesses a separate @dfn{Stream} instance between the
 user level process and the @dfn{STREAMS} device driver.  As with normal character devices, the file
-descriptor returned from the @manpage{open(2)} call, can be used to further access the @dfn{Stream}.
+descriptor returned from the
+@manpage{open(2)} call, can be used to further access the @dfn{Stream}.
 
 Opening a minor device node for the first time results in the creation of a new instance of a
 @dfn{Stream} between the @dfn{Stream head} and the @dfn{driver}.  Subsequent opens of the same minor
@@ -1298,26 +1329,35 @@ descriptor that can be used to access the same @dfn{Stream} instance.  Only the 
 minor device node will result in the creation of a new @dfn{Stream} instance.
 
 Once it has opened a @dfn{Stream}, the user level process can send and receive data to and from the
-@dfn{Stream} with the usual @manpage{read(2)} and @manpage{write(2)} system calls that are
+@dfn{Stream} with the usual
+@manpage{read(2)} and
+@manpage{write(2)} system calls that are
 compatible with the existing character device interpretations of these system calls.  @dfn{STREAMS}
-also provides the additional system calls, @manpage{getmsg(2)} and @manpage{getpmsg(2)}, to read
-control and data information from the @dfn{Stream}, as well as @manpage{putmsg(2)} and
+also provides the additional system calls,
+@manpage{getmsg(2)} and
+@manpage{getpmsg(2)}, to read
+control and data information from the @dfn{Stream}, as well as
+@manpage{putmsg(2)} and
 @manpage{putpmsg(2)} to write control and data information.  These additional system calls provide a
-richer interface to the @dfn{Stream} than is provided by the traditional @manpage{read(2)} and
+richer interface to the @dfn{Stream} than is provided by the traditional
+@manpage{read(2)} and
 @manpage{write(2)} calls.
 
-A @dfn{Stream} is closed using the @manpage{close(2)} system call (or a call that closes file
-descriptors such as @manpage{exit(2)}).  If a number of processes have the @dfn{Stream} open, only
-the last @manpage{close(2)} of a @dfn{Stream} will result in the destruction of the @dfn{Stream}
+A @dfn{Stream} is closed using the
+@manpage{close(2)} system call (or a call that closes file
+descriptors such as
+@manpage{exit(2)}).  If a number of processes have the @dfn{Stream} open, only
+the last
+@manpage{close(2)} of a @dfn{Stream} will result in the destruction of the @dfn{Stream}
 instance.
 
 @subsection Basic Operations Example
 An basic example of opening, reading from and writing to a @dfn{Stream} driver is shown in
-@ref{Listing 101}.
+@ref{Listing 1.1}.
 
 @cartouche
 @iftex
-@float Listing,Listing 101
+@float Listing,Listing 1.1
 @end iftex
 @smallexample
 #include <sys/types.h>
@@ -1350,31 +1390,34 @@ main()
 @end float
 @end iftex
 @ifnottex
-@anchor{Listing 101} @center @emph{Listing 101.@:  Basic Operations}
-@set lstnum 101
+@anchor{Listing 1.1}
+@center @emph{Listing 1.1.@:  Basic Operations}
 @end ifnottex
 @end cartouche
 
-The example in @ref{Listing 101} is for a communications device that provide a communications
+The example in @ref{Listing 1.1} is for a communications device that provide a communications
 channel for data transfer between two processes or hosts.   Data written to the device is
 communicated over the channel to the remote process or host.  Data read from the device was written
 by the remote process or host.
 
-In the example in @ref{Listing 101}, a simple @dfn{Stream} is opened using the @manpage{open(2)}
+In the example in @ref{Listing 1.1}, a simple @dfn{Stream} is opened using the
+@manpage{open(2)}
 call.  @file{/dev/streams/comm/1} is the path to the character minor device node in the file system.
 When the device is opened, the character device node is recognized as a @dfn{STREAMS} special file,
 and the @dfn{STREAMS} subsystem creates a @dfn{Stream} (if one does not already exist for the minor
 device node) an associates it with the minor device node.  @figref{103} illustrates the state of the
-@dfn{Stream} at the point after the @manpage{open(2)} call returns.
+@dfn{Stream} at the point after the
+@manpage{open(2)} call returns.
 
-@figuresized{SPG_fig03,103,Stream to Communications Driver,3in}
+@figuresized{SPG_fig03,103,Stream to Communications Driver,4in}
 
-The @command{while} loop in @ref{Listing 101} simply reads data from the device using the
+The @command{while} loop in @ref{Listing 1.1} simply reads data from the device using the
 @manpage{read(2)} system call and then writes the data back to the device using the
 @manpage{write(2)} system call.
 
 When a @dfn{Stream} is opened for blocking operation (i.e., neither @constant{O_NONBLOCK} nor
-@constant{O_NDLEAY} were set), @manpage{read(2)} will block until some data arrives.  The
+@constant{O_NDLEAY} were set),
+@manpage{read(2)} will block until some data arrives.  The
 @manpage{read(2)} call might, however, return less that the requested @samp{1024} bytes.  When data
 is read, the routine simply writes the data back to the device.
 
@@ -1385,13 +1428,18 @@ specific to a given @dfn{Stream}.  High priority control messages are not subjec
 flow control.
 
 When a @dfn{Stream} is opened for blocking operation (i.e., neither @constant{O_NONBLOCK} nor
-@constant{O_NDLEAY} were set), @manpage{write(2)} will block while waiting for flow control to
-subside. @manpage{write(2)} will always block awaiting the availability of @dfn{STREAMS} message
+@constant{O_NDLEAY} were set),
+@manpage{write(2)} will block while waiting for flow control to
+subside.
+@manpage{write(2)} will always block awaiting the availability of @dfn{STREAMS} message
 blocks to satisfy the call, regardless of the setting of @constant{O_NONBLOCK} or
 @constant{O_NDELAY}.
 
-In the example in @ref{Listing 101}, the @manpage{exit(2)} system call is used to exit the program;
-however, the @manpage{exit(2)} results in the equivalent of a call to @manpage{close(2)} for all
+In the example in @ref{Listing 1.1}, the
+@manpage{exit(2)} system call is used to exit the program;
+however, the
+@manpage{exit(2)} results in the equivalent of a call to
+@manpage{close(2)} for all
 open file descriptors and the @dfn{Stream} is flushed and destroyed before the program is finally
 exited.
 
@@ -1488,8 +1536,8 @@ This subsection provides a brief overview of @dfn{STREAMS messages}.
 In fitting with the concept of function decoupling, all control and data information is passed
 between @dfn{STREAMS} modules, drivers and the @dfn{Stream head} using messages.  Utilities are
 provided to the @dfn{STREAMS} module writer for passing messages using queue and message pointers.
-@dfn{STREAMS} messages consist of a 3-type of a message block structure (@manref{msgb(9)}), a data
-block structure (@manref{datab(9)}) and a data buffer.  The message block structure is used to
+@dfn{STREAMS} messages consist of a 3-type of a message block structure (@mantype{msgb(9)}), a data
+block structure (@mantype{datab(9)}) and a data buffer.  The message block structure is used to
 provide an instance of a reference to a data block and pointers into the data buffer.  The data
 block structure is used to provide information about the data buffer, such as message type, separate
 from the data contained in the buffer.  Messages are normally passed between @dfn{STREAMS} modules,
@@ -1504,7 +1552,7 @@ Messages are described in greater detail in @ref{Messages}.
 
 This subsection provides a brief overview of @dfn{STREAMS message types}.
 
-Each data block (@manref{datab(9)}) is assigned a message type.  The message type discriminates the
+Each data block (@mantype{datab(9)}) is assigned a message type.  The message type discriminates the
 use of the message by drivers, modules and the @dfn{Stream head}.  Most of the message type may be
 assigned by a module or driver when it generates a message, and the message type can be modified as
 a part of message processing.  The @dfn{Stream head} uses a wider set of message types to perform
@@ -1516,7 +1564,8 @@ Most of the defined message types (@pxref{Message Types}) are solely for use wit
 @msg{M_DATA}) can be used to pass control and data information to and from the user process via the
 @dfn{Stream head}.  These message type can be generated and consumed using the @manref{read(2)},
 @manref{write(2)}, @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
-system calls and some @manref{streamio(7)} @dfn{STREAMS} @manpage{ioctl(2)}.
+system calls and some @manref{streamio(7)} @dfn{STREAMS}
+@manpage{ioctl(2)}.
 
 Message types are described in detail in @ref{Message Types}.
 
@@ -1525,7 +1574,7 @@ Message types are described in detail in @ref{Message Types}.
 Messages blocks of differing types can be linked together into composite messages as illustrated in
 @figref{104}.
 
-@figuresized{SPG_fig05,104,A Message,4in}
+@figuresized{SPG_fig05,104,A Message,5in}
 
 Messages, once allocated, or when removed from a queue, exist standalone (i.e., they are not
 attached to any queue).  Messages normally exist standalone when they have been first allocated by
@@ -1545,7 +1594,8 @@ are dropped.
 
 Only one reference to a message block (@manpage{msgb(9)}) exists within the @dfn{STREAMS} framework.
 Additional references to the same data block (@manpage{datab(9)}) and data buffer can be established
-by duplicating the messages block, @manpage{msgb(9)} (without duplicating either the data
+by duplicating the messages block,
+@manpage{msgb(9)} (without duplicating either the data
 block,(@manpage{datab(9)}, or data buffer).  The @dfn{STREAMS} @manref{dupb(9)} and
 @manref{dupmsg(9)} utilities can be used to duplicate message blocks.  Also, the entire 3-tuple of
 message block, data block and data buffer can be copied using the @manref{copyb(9)} and
@@ -1568,11 +1618,11 @@ until @dfn{STREAMS} schedules the @command{service} procedure for execution.
 Two messages linked together on a message queue is illustrated in @figref{105}.  In the figure,
 @samp{Message 2} is linked to @samp{Message 1}.
 
-@figuresized{SPG_fig06,105,Messages on a Message Queue,4in}
+@figuresized{SPG_fig06,105,Messages on a Message Queue,5in}
 
 As illustrated in @figref{105}, when a message exists on a message queue, the first message block in
 the message (which can possibly contain a chain of message blocks) is linked into a double linked
-list used by the message queue to order and track messages.  The queue structure, @manref{queue(9)},
+list used by the message queue to order and track messages.  The queue structure, @mantype{queue(9)},
 contains the head and tail pointers for the linked list of messages that reside on the queue.  Some
 of the fields in the first message block (such as the linked list pointers) are significant only in
 the first message block of the message and applies to all the message blocks in the message (such as
@@ -1613,8 +1663,8 @@ those toward the tail.  High priority messages are queue first, followed by prio
 descending band numbers, finally followed by normal (band @samp{0}) messages.
 
 @dfn{STREAMS} provides independent flow control parameters for ordinary messages.  Normal message flow
-control parameters are contained in the queue structure itself (@manref{queue(9)}); priority
-parameters, in the auxiliary queue band structure (@manref{qband(9)}).  A set of flow control
+control parameters are contained in the queue structure itself (@mantype{queue(9)}); priority
+parameters, in the auxiliary queue band structure (@mantype{qband(9)}).  A set of flow control
 parameters exists for each band (from @samp{0} to @samp{255}).
 
 As a high priority message is defined by message type, some message types are available in
@@ -1650,7 +1700,7 @@ explicitly by the procedures themselves.  Each queue provides a module private p
 used by procedures for maintaining state information or passing other information between
 procedures.
 
-@figuresized{SPG_fig48,48,A @dfn{Stream} in More Detail,4in}
+@figuresized{SPG_fig48,48,A @dfn{Stream} in More Detail,5in}
 
 Each procedure can pass messages directly to the adjacent queue in either direction of message flow.
 This is normally performed with the @dfn{STREAMS} @manref{putnext(9)} utility.  For example, in
@@ -1660,7 +1710,8 @@ This is normally performed with the @dfn{STREAMS} @manref{putnext(9)} utility.  
 Also, procedures can easily locate the other queue in a queue pair and pass messages along the
 opposite direction of flow.  This is normally performed using the @dfn{STREAMS} @manref{qreply(9)}
 utility.  For example, in @figref{48}, procedures associated with queue @samp{Ad} can easily locate
-queue @samp{Au} and pass messages to @samp{Bu} using @manpage{qreply(9)}.
+queue @samp{Au} and pass messages to @samp{Bu} using
+@manpage{qreply(9)}.
 
 Each queue in a module is associated with messages, processing procedures, and module private data.
 Typically, each queue in the module has a distinct set of message, processing procedures and module
@@ -1731,11 +1782,11 @@ procedure, and inserted upstream using the @manref{put(9)} @dfn{STREAMS} utility
 
 Software drivers (so-called @dfn{pseudo-device drivers}) are similar to a hardware device driver
 with the exception that they typically do not contain an interrupt service routine.  Pseudo-device
-drivers are still repsonsible for consuing messages at the @dfn{Stream end} and converting them into
+drivers are still responsible for consuming messages at the @dfn{Stream end} and converting them into
 actions and data output (external to @dfn{STREAMS}), as well as generating messages in response to
 events and data input (external to @dfn{STREAMS}).
 
-In constrast, @dfn{modules} are intended to operate solely within the @dfn{STREAMS} framework.
+In contrast, @dfn{modules} are intended to operate solely within the @dfn{STREAMS} framework.
 
 @item  Because a driver sits at a @dfn{Stream} end and can support multiplexing, a driver can have
 multiple @dfn{Streams} connected to it, either upstream (fan-in) or downstream (fan-out)
@@ -1744,11 +1795,13 @@ multiple @dfn{Streams} connected to it, either upstream (fan-in) or downstream (
 In contrast, an instance of a @dfn{module} is only connected within a single @dfn{Stream} and does
 not support multiplexing at the module queue pair.
 
-@item An instance of a driver (queue pair) is created and destroyed using the @manpage{open(2)} and
+@item An instance of a driver (queue pair) is created and destroyed using the
+@manpage{open(2)} and
 @manpage{close(2)} system calls.
 
-In constrast, an instance of a @dfn{module} (queue pair) is created and destroyed using the
-@streamio{I_PUSH} and @streamio{I_POP} @dfn{STREAMS} @manpage{ioctl(2)} commands.
+In contrast, an instance of a @dfn{module} (queue pair) is created and destroyed using the
+@streamio{I_PUSH} and @streamio{I_POP} @dfn{STREAMS}
+@manpage{ioctl(2)} commands.
 
 @end enumerate
 
@@ -1793,7 +1846,9 @@ FIFOs}, and @ref{Terminal Subsystem}.
 
 This subsection provides a brief overview of @dfn{Stream Multiplexing}.
 
-Basic @dfn{Streams} that can be created with the @manpage{open(2)} or @manpage{pipe(2)} system calls
+Basic @dfn{Streams} that can be created with the
+@manpage{open(2)} or
+@manpage{pipe(2)} system calls
 are linear arrangements from @dfn{Stream head} to @dfn{Driver} or @dfn{Stream head} to @dfn{Stream
 haed}.  Althoug these linear arrangements satisfy the needs of a large class of @dfn{STREAMS}
 applications, there exits a class of application that are more naturally represented by
@@ -1804,19 +1859,19 @@ typically more easily represented by multiplexed arrangements.
 A @dfn{fan-in} multiplexing arrangement is one in which multiple upper @dfn{Streams} feed into a
 single lower @dfn{Stream} in a @dfn{many-to-one} relationship as illustrated in @figref{49}.
 
-@figuresized{SPG_fig49,49,Many-to-one Multiplexor,1.4in}
+@figuresized{SPG_fig49,49,Many-to-one Multiplexor,1.5in}
 
 A @dfn{fan-out} multiplexing arrangement is one in which a single upper @dfn{Stream} feeds into
 multiple lower @dfn{Streams} in a @dfn{one-to-many} relationship as illustrated in @figref{50}.
 (This is the more typically arrangement for communications protocol stacks.)
 
-@figuresized{SPG_fig50,50,One-to-many Multiplexor,1.4in}
+@figuresized{SPG_fig50,50,One-to-many Multiplexor,1.5in}
 
 A @dfn{fan-in/fan-out} multiplexing arrangement is one in which multiple upper @dfn{Streams} feed
 into mutliple lower @dfn{Streams} in a @dfn{many-to-many} relationship as illustrated in
 @figref{51}.
 
-@figuresized{SPG_fig51,51,Many-to-many Multiplexor,1.4in}
+@figuresized{SPG_fig51,51,Many-to-many Multiplexor,1.5in}
 
 To support these arrangements, @dfn{STREAMS} provide a mechanism that can be used to assemble
 multiplexing arrangements in a flexible way.  An, otherwise normal, @dfn{STREAMS} pseudo-device
@@ -1828,10 +1883,12 @@ Conceptually, a multiplexing driver can perform @dfn{upper multiplexing} between
 multiplexing driver and the device driver.
 
 As with normal @dfn{STREAMS} drivers, @dfn{multiplexing drivers} can have multiple @dfn{Streams}
-created on its @dfn{upper} side using the @manpage{open(2)} system call.  Unlike regular
+created on its @dfn{upper} side using the
+@manpage{open(2)} system call.  Unlike regular
 @dfn{STREAMS} drivers, however, @dfn{multiplexing drivers} have the additional capability that other
 @dfn{Streams} can be linked to the @dfn{lower} side of the driver.  The linkage is performed by
-issuing specialized @manpage{streamio(7)} commands to to the driver that are recognized by
+issuing specialized
+@manpage{streamio(7)} commands to to the driver that are recognized by
 multiplexing drivers (@streamio{I_LINK}, @streamio{I_PLINK}, @streamio{I_UNLINK},
 @streamio{I_PUNLINK}).
 
@@ -1852,7 +1909,7 @@ where the @cite{Internet Protocol (IP)} within a networking stack is implemented
 driver and independent @dfn{Streams} to three specific device drivers are linked beneath the
 @cite{IP} multiplexing driver.
 
-@figuresized{SPG_fig47,47,Internet Multiplexing @dfn{Stream},4in}
+@figuresized{SPG_fig47,47,Internet Multiplexing @dfn{Stream},5in}
 
 The @cite{IP} multiplexing driver is capable of routing messages to the lower @dfn{Streams} on the
 basis of address and the subnet membership of each device driver.  Messages received from the lower
@@ -1877,10 +1934,11 @@ aware of other multiplexing drivers upstream of its upper @dfn{Stream}, nor down
 messages between upper @dfn{Streams} supporting @cite{Permanent Virtual Circuits (PVCs)} or
 @cite{Switch Virtual Circuits (SVCs)} and (possibly) a single lower @dfn{Stream}.
 
-@figuresized{SPG_fig52,52,Multiplexing @dfn{Stream},3in}
+@figuresized{SPG_fig52,52,Multiplexing @dfn{Stream},4in}
 
 The ability to multiplex upper @dfn{Streams} to a driver is a characteristic supported by all
-@dfn{STREAMS} drivers: not just @dfn{multiplexing drivers}.  Each @manpage{open(2)} to a minor
+@dfn{STREAMS} drivers: not just @dfn{multiplexing drivers}.  Each
+@manpage{open(2)} to a minor
 device node results in another uppper @dfn{Stream} that can be associated with the device driver.
 What the @dfn{multiplexing driver} permits over the normal @dfn{STREAMS} driver is the ability to
 link one or more lower @dfn{Streams} (possibly containing modules and another multiplexing driver)
@@ -2002,12 +2060,12 @@ examples taken from the open source @cite{Signalling System No. 7 (SS7)} stack i
 @node Protocol Portability
 @subsubsection Protocol Portability
 
-@figuresized{SPG_fig53,53,Protocol Module Portability,3in}
-
 @figref{53}, shows how the same @cite{SS7 Signalling Link} protocol module can be used with
 different drivers on different machines by implementing compatible service interfaces.  The
 @cite{SS7 Signalling Link} are the @dfn{Data Link Provider Interface (DLPI)} and the
 @dfn{Communications Device Interface (CDI)} for @dfn{High-Level Data Link Control (HDLC)}.
+
+@figuresized{SPG_fig53,53,Protocol Module Portability,4in}
 
 By using standard @dfn{STREAMS} mechanisms for the implementation of the @cite{SS7 Signalling Link}
 module, only the driver needs to be ported to port an entire protocol stack from one machine to
@@ -2028,14 +2086,14 @@ of existing @dfn{STREAMS} modules to the @cite{GNU/Linux} operating system.
 @node Protocol Substitution
 @subsubsection Protocol Substitution
 
-@figuresized{SPG_fig56,300,Protocol Substitution,3in}
-
 @dfn{STREAMS} permits the easy substitution of protocol modules (or devic drivers) within a protocol
 stack providing a new protocol profile.  When protocol modules are implemented to a compatible
 service interface the can be recombined and substituted, providing a flexible protocol architecture.
 In some circumstances, and through proper design, protocol modules can be substituted that implement
 the same service interface, even if they were not originally intended to be combined in such a
 fashion.
+
+@figuresized{SPG_fig56,300,Protocol Substitution,4in}
 
 @figref{300} illustrates how @dfn{STREAMS} can substitute upper layer protocol modules to implement
 a different protocol stack over the same @dfn{HDLC} driver.  As each module and driver support the
@@ -2055,7 +2113,7 @@ independent of the number or type of modules below.  The same transport module w
 modification to either an @cite{SS7 Signalling Link} module or @cite{SS7 Signalling Link} driver
 that presents the same service interface.
 
-@figuresized{SPG_fig54,54,Protocol Migration,3in}
+@figuresized{SPG_fig54,54,Protocol Migration,4in}
 
 The @uref{http://www.openss7.org/,OpenSS7} @cite{SS7 Stack} uses this capability also to adapt the
 protocol stack to front-end hardware that supports differing degrees of @cite{SS7 Signalling Link}
@@ -2079,7 +2137,7 @@ would typically be implemented as a filter, with no downstream service interface
 tty interface is presented to the @dfn{Stream}'s user process since the module is nearest the
 @dfn{Stream head}.
 
-@figuresized{SPG_fig55,55,Module Reusability,3in}
+@figuresized{SPG_fig55,55,Module Reusability,4in}
 
 @c ============================================================================
 @node Overview
@@ -2136,41 +2194,53 @@ the traditional @manref{write(2)} and @manref{read(2)} system calls in the same 
 performed on a traditional character device special file.
 
 Character device input-output controls using the @manref{ioctl(2)} system call can also be performed
-on a @dfn{STREAMS} s[ecial file.  @dfn{STREAMS} defines a set of standard input-output control
+on a @dfn{STREAMS} special file.  @dfn{STREAMS} defines a set of standard input-output control
 commands (see @manref{ioctl(2p)} and @manref{streamio(7)}) specific to @dfn{STREAMS} special files.
 Input-output controls that a defined for a specific device are also supported as they are for
 character device drivers.
 
 With support for these general character device input and output system calls, it is possible to
 implement a @dfn{STREAMS} device driver in such a way that an application is unaware that it has
-opened and is controling a @dfn{STREAMS} device driver: tne application could treat the device in
+opened and is controlling a @dfn{STREAMS} device driver: the application could treat the device in
 the identical manner to a character device.  This make it possible to convert an existing character
 device driver to @dfn{STREAMS} and make possible the portability, migration, substitution and
 reusability benefits of the @dfn{STREAMS} framework.
 
-@dfn{STREAMS} provides @dfn{STREAMS}-specific system calls and @manpage{ioctl(2)} commands, in
-addition to support for the traditional character device I/O system calls and @manpage{ioctl(2)}
+@dfn{STREAMS} provides @dfn{STREAMS}-specific system calls and
+@manpage{ioctl(2)} commands, in
+addition to support for the traditional character device I/O system calls and
+@manpage{ioctl(2)}
 commands.
 
-The @manref{poll(2)} system call@footnote{Although the @manpage{poll(2)} system call has been
+The @manref{poll(2)} system call@footnote{Although the
+@manpage{poll(2)} system call has been
 implemented in @cite{GNU/Linux}, it was historically provided only by @dfn{STREAMS}.  This is
-evident from the fact that @manpage{poll(2)} system can supports events like @constant{POLLRDBAND}
+evident from the fact that
+@manpage{poll(2)} system can supports events like @constant{POLLRDBAND}
 that have no meaning outside of the @dfn{STREAMS} framework.} provides the ability for the
 application to poll multiple @dfn{Streams} for a wide range of events.
 
 The @manref{putmsg(2)} and @manref{putpmsg(2)} system calls provide the ability for applications
-programs to transfer both control and data information to the @dfn{Stream}.  The @manpage{write(2)}
-system call only supports the transfer of data to the @dfn{Stream}, whereas, @manpage{putmsg(2)} and
+programs to transfer both control and data information to the @dfn{Stream}.  The
+@manpage{write(2)}
+system call only supports the transfer of data to the @dfn{Stream}, whereas,
+@manpage{putmsg(2)} and
 @manpage{putpmsg(2)} permit the transfer of prioritized control information in addition to data.
 
 The @manref{getmsg(2)} and @manref{getpmsg(2)} system calls provide the ability for applications
-programs to receive both control and data information from the @dfn{Stream}.  The @manpage{read(2)}
+programs to receive both control and data information from the @dfn{Stream}.  The
+@manpage{read(2)}
 system call can only support the transfer of data (and in some cases the inline control
-information), whereas, @manpage{getmsg(2)} and @manpage{getpmsg(2)} permit the transfer of
+information), whereas,
+@manpage{getmsg(2)} and
+@manpage{getpmsg(2)} permit the transfer of
 prioritized control information in addition to data.
 
 Implementation of standardized service primitive interfaces is enabled through the use of the
-@manpage{putmsg(2)}, @manpage{putpmsg(2)}, @manpage{getmsg(2)} and @manpage{getpmsg(2)} system
+@manpage{putmsg(2)},
+@manpage{putpmsg(2)},
+@manpage{getmsg(2)} and
+@manpage{getpmsg(2)} system
 calls.
 
 @dfn{STREAMS} also provides kernel level utilities and facilities for the development of kernel
@@ -2197,9 +2267,11 @@ on the last close of the @dfn{Stream}.
 @tab Write data to a @dfn{Stream}.
 @item @manpage{ioctl(2)}
 @tab Control a @dfn{Stream}.
-@item @manpage{getmsg(2)}, @manpage{getpmsg(2)}
+@item @manpage{getmsg(2)},
+@manpage{getpmsg(2)}
 @tab Receive a (prioritized) message at the @dfn{Stream head}.
-@item @manpage{putmsg(2)}, @manpage{putpmsg(2)}
+@item @manpage{putmsg(2)},
+@manpage{putpmsg(2)}
 @tab Send a (prioritized) message from the @dfn{Stream head}.
 @item @manpage{poll(2)}
 @tab Notify the application program when selected events occur on one or more @dfn{Streams}.
@@ -2210,15 +2282,732 @@ multiple processes.
 
 @node Stream Construction
 @section Stream Construction
+@menu
+* Opening a STREAMS Device File::
+* Opening a STREAMS-based FIFO::
+* Creating a STREAMS-based Pipe::
+* Adding and Removing Modules::
+* Closing the Stream::
+* Stream Construction Example::
+@end menu
 
 @dfn{STREAMS} constructs a @dfn{Stream} as a double linked list of kernel data structures.  Elements
 of the linked list are queue pairs that represent the instantiation of a @dfn{Stream head}, modules
-and drivers.  Linear segments of linke queue pairs can be connected to multiplexing drivers to form
+and drivers.  Linear segments of link queue pairs can be connected to multiplexing drivers to form
 complex tree topologies.  The branches of the tree are closest to the user level process and the
 roots of the tree are closest to the device driver.
 
 The uppermost queue pair of a @dfn{Stream} represents the @dfn{Stream head}.  The lowermost queue
-pair of a @dfn{Stream} represents the @dfn{Stream end} or @dfn{driver}.  
+pair of a @dfn{Stream} represents the @dfn{Stream end} or @dfn{device driver}, @dfn{pseudo-device
+driver}, or another @dfn{Stream head} in the case of a @dfn{STREAMS}-based pipe.
+
+The @dfn{Stream head} is responsible for conversion between a user level process using the system
+call interface  and @dfn{STREAMS} messages passed up and down the @dfn{Stream}.  The @dfn{Stream
+head} uses the same set of kernel routines available to module a driver writers to communicate with
+the @dfn{Stream} via the queue pair associated with the @dfn{Stream head}.
+
+@figref{13} illustrates the queue pairs in the most basis of @dfn{Streams}: one consisting of a
+@dfn{Stream head} and a @dfn{Stream end}.  Depicted are the upstream (read) and downstream (write)
+paths along the @dfn{Stream}.  Of the uppermost queue pair illustrated, @samp{H1} is the upstream
+(read) half of the @dfn{Stream head} queue pair; @samp{H2}, the downstream (write) half.  Of the
+lowermost queue pair illustrated, @samp{E2} is the upstream half of the @dfn{Stream end} queue pair;
+@samp{H1} the downstream half.
+
+@figuresized{SPG_fig13,13,Upstream and Downstream @dfn{Stream} Construction,2.5in}
+
+Each queue specifies an entry point (that is, a procedure) that will be used to process messages
+arriving at the queue.
+The procedures for queues @samp{H1} and @samp{H2} process messages sent to (or that arrive at) the
+@dfn{Stream head}.
+These procedures are defines by the @dfn{STREAMS} subsystem and are responsible for the interface
+between @dfn{STREAMS} related system calls and the @dfn{Stream}.
+The procedures for queues @samp{E1} and @samp{E2} process messages at the @dfn{Stream end}.
+These procedures are defined by the device driver, pseudo-device driver, or @dfn{Stream head} at the
+@dfn{Stream end} (tail).
+In accordance with the procedures defined for each queue, messages are processed by the queue and
+typically passed from queue to queue along the linked list segment.
+
+@figref{14} details the data structures involved.  The data structures are the @mantype{queue(9)},
+@mantype{qband(9)}, @mantype{qinit(9)}, @mantype{module_init} and @mantype{module_stat} structures.
+
+The
+@manpage{queue(9)} structure is the primary data structure associated with the queue.  It
+contains a double linked list (message queue) of messages contained on the queue.  It also includes
+pointers to other queues used in @dfn{Stream} linkage, queue state information and flags, and
+pointers to the
+@manpage{qband(9)} and
+@manpage{qinit(9)} structures associated with the queue.
+
+The
+@manpage{qband(9)} structure is used as an auxiliary structure to the
+@manpage{queue(9)}
+structure that contains state information and pointers in to the message list for each priority band
+within a queue (except for band @samp{0} information, which is contained in the
+@manpage{queue(9)}
+structure itself). 
+@manpage{qband(9)} structures are linked into a list and connected to the
+@manpage{queue(9)} structure to which they belong.
+
+The
+@manpage{qinit(9)} structure is defined by the module or driver and contains procedure pointers
+for the procedures associated with the queue, as well as pointers to module or driver information and
+initialization limits contained in the
+@manpage{module_info(9)} structure as well as an optional
+pointer to a
+@manpage{module_stat(9)} structure that contains collected run-time statistics for the
+entire module or driver.
+Normally, a separate
+@manpage{qinit(9)} structure exists for all of the upstream and downstream
+instances of a queue associated with a driver or module.
+
+The
+@manpage{module_info(9)} structure contains information about the module or driver, such as
+module identifier and module name, as well as minimum and maximum packet size and queue flow control
+high and low water marks.
+It is important to note that this structure is used only to initialize the corresponding limit
+values for an instance of the
+@manpage{queue(9)} structure.
+The values contained within a particular
+@manpage{queue(9)} structure can be changed in a running
+module or driver without affecting the
+@manpage{module_init(9)} structure.
+The
+@manpage{module_init(9)} structure is considered to be a read-only structure for the purpose of
+modules and drivers written for @dfn{STREAMS}.
+
+The
+@manpage{module_stat(9)} structure contains runtime counts of the entry into the various
+procedures contained in the @dfn{qinit(9)} structure as well as a pointer to any module private
+statistics that need to be collected.
+As depicted in @figref{14}, there is normally only one
+@manpage{module_stat(9)} structure per queue
+pair that collects statistics for the entire module or driver.
+@dfn{STREAMS} does not peg this counts automatically and will not manipulate this structure, even
+when one is attached.
+It is the responsibility of the module or driver writer to peg counts as required.
+@cite{@value{PACKAGE_TITLE}} does, however, provide some user level administrative tools that can be
+used to examine the statistics contained in this structure.
+The
+@manpage{module_stat(9)} structure is opaque to the @dfn{STREAMS} subsystem and can be read from
+or written to by module or driver procedures.
+
+@figuresized{SPG_fig14,14,@dfn{Stream} Queue Relationship,5.5in}
+
+Note that it is possible to have a separate
+@manpage{qinit(9)},
+@manpage{module_init(9)} and
+@manpage{module_stat(9)} structure for each queue in the queue pair; however, typically there are
+two
+@manpage{qinit(9)} structures and only one
+@manpage{module_info} and
+@manpage{module_stat}
+structure per module or driver. 
+@manpage{qinit(9)},
+@manpage{module_info} and
+@manpage{module_stat}
+structures are statically allocated by the module or driver, and the
+@manpage{queue(9)} and
+@manpage{qband(9)} structures are dynamically allocated by @dfn{STREAMS} on demand.
+
+All of these queue related data structures are in @ref{Data Structures} (and in the
+@cite{@value{PACKAGE_TITLE}} @cite{Manual Pages}).
+
+@figref{14} illustrates two adjacent queue pairs with links between them in both directions on the
+@dfn{Stream}.
+When a module is opened, @dfn{STREAMS} creates a queue pair for the module and then links the the
+queue pair into the list.
+Each queue is linked to the next queue in the direction of message flow.
+The @var{q_next} member of the
+@manpage{queue(9)} data structure is used to perform the linkage.
+@dfn{STREAMS} allocates
+@manpage{queue(9)} structures in pairs (that is, as an array containing two
+@manpage{queue(9)} structures).
+The read-side queue of the pair is the lower ordinal and the write-side the higher.
+Nevertheless, @dfn{STREAMS} provides some utility functions (or macros) that assist queue procedures
+in locating the other queue in the pair.
+The @dfn{Stream head} and @dfn{Stream end} are known to procedures only a destinations toward which
+messages are sent.@footnote{However, for the purpose of the @dfn{STREAMS} executive, most
+implementations cache a pointer to the @dfn{Stream head} in the
+@manpage{queue(9)} structure.}
+
+There are two ways for the user level process to construct a @dfn{Stream}:
+@enumerate
+@item Open a @dfn{STREAMS} device special file using the @manref{open(2)} system call.  Construction
+of a @dfn{Stream} with the @dfn{open(2)} system call is detailed in @ref{Opening a STREAMS Device
+File} and @ref{Opening a STREAMS-based FIFO} and illustrated in @figref{15}.
+@item Create a @dfn{STREAMS}-based pipe using the @manref{pipe(2)} system call.  Construction of a
+@dfn{Stream} with the @dfn{pipe(2)} system call is detailed in @ref{Creating a STREAMS-based Pipe}
+and illustrated in @figref{16}.
+@end enumerate
+
+@node Opening a STREAMS Device File
+@subsection Opening a STREAMS Device File
+
+A @dfn{Stream} is constructed when a @dfn{STREAMS}-based driver file is opened using the
+@manref{open(2)} system call.  A @dfn{Stream} constructed in this fashion is illustrated in
+@figref{15}.
+
+In the traditional @cite{UNIX} system, a @dfn{STREAMS}-based driver file is a character device
+special file within the @cite{UNIX} file system.  In the @cite{GNU/Linux} system, under
+@cite{@value{PACKAGE_TITLE}}, a @dfn{STREAMS}-based driver file is either a character device special
+file within a @cite{GNU/Linux} file system, or a character device special file within the mounted
+@dfn{Shadow Special File System (specfs)}.  When the @file{specfs} is mounted, @file{specfs} device
+nodes can be opened directly.  When the @file{specfs} is not mounted, @file{specfs} device nodes can
+only be opened indirectly via character device nodes in a @cite{GNU/Linux} file system external to
+the @file{specfs}.
+
+All @dfn{STREAMS} drivers (and modules) have their entry points defined by the @mantype{streamtab(9)}
+structure for that driver (or module).  The @type{streamtab} structure has the following format:
+
+@cartouche
+@smallexample
+struct streamtab @{
+    struct qinit *st_rdinit;
+    struct qinit *st_wrinit;
+    struct qinit *st_muxrinit;
+    struct qinit *st_muxwinit;
+@};
+@end smallexample
+@end cartouche
+
+The @type{streamtab} structure defines a module or driver.  @member{st_rdinit} points to the read
+@type{qinit} structure for the driver and @member{st_wrinit} points to the driver's write
+@type{qinit} structure.  For a multiplexing driver, the @member{st_muxrinit} and
+@member{st_muxwinit} point to the @type{qinit} structures for the lower side of the multiplexing
+driver.  For a regular non-multiplexing driver these members are @constant{NULL}.
+
+@figuresized{SPG_fig15,15,Opened @dfn{STREAMS}-based Driver,4in}
+
+@subsubsection First Open of a Stream
+
+When a @dfn{STREAMS}-based file is opened, a new @dfn{Stream} is created if one does not already
+exists for the file, or if the @code{D_CLONE} flag is set for the file indicating that a new
+@dfn{Stream} is to be created on each open of the file.  First, a file descriptor is allocated in
+the process' file descriptor table, a file pointer is allocated to represent the opened file.  The
+file pointer is initialized to point to the @type{inode} associated with the character special file
+in the external file system (see @member{f_inode} in @figref{15}).  This @type{inode} is of type
+character special (@code{S_IFCHR}).  The @cite{Linux} kernel recognizes the @type{inode} as a
+character special file and invokes the character device open routine in
+@cite{@value{PACKAGE_TITLE}}.  This @type{inode} is equivalent to the @type{vnode} used by
+@cite{UNIX System V Release 4.2}.
+
+@cite{@value{PACKAGE_TITLE}} uses the major and minor device numbers associated with the character
+special file to locate an @type{inode} within the @cite{Shadow Special File System (specfs)} that is
+also provided by @cite{@value{PACKAGE_TITLE}}, and the @member{f_inode} pointer of the file
+pointeris adjusted to point directly to this @file{specfs} @type{inode}.  This @file{specfs}
+@type{inode} is equivalent to the common @type{snode} used by @cite{UNIX System V Release 4.2}.
+
+Next, a @dfn{Stream header} is created from a @mantype{stdata(9)} data structure and a @dfn{Stream
+head} is created from a pair of @type{queue} structures.  The content of the @type{stdata} data
+structure is initialized with predetermined @dfn{STREAMS} values applicable to all character special
+@dfn{Streams}.  The content of the @type{queue} data structures in the @dfn{Stream head} are
+initialized with values from the @type{streamtab} structure statically defined for @dfn{Stream
+heads} in the same manner as any @dfn{STREAMS} module or driver.
+
+The @type{inode} within the @file{specfs} contains @dfn{STREAMS} file system dependent information.
+This @type{inode} corresponds to the common @type{snode} of @cite{UNIX System V Release 4.2}.  The
+@member{sd_inode} filed of the @type{stdata} structure is initialized to point to this @type{inode}.
+The @member{i_pipe} filed of the @type{inode} data structure is initialized to point to the
+@dfn{Stream header} (@type{stdata} structure), thus there is a forward and backward pointer between
+the @dfn{Stream header} and the @type{inode}.
+
+The @member{private_data} member of the @type{file} pointer is initialized to point to the
+@dfn{Stream header} and the @member{sd_file} member of the @code{stdata} structure is initialized to
+point to the @type{file} pointer.
+
+After the @dfn{Stream header} and @dfn{Stream head} queue pair is allocated and initialized, a
+@type{queue} structure pair is allocated and initialized for the driver.  Each @type{queue} in the
+queue pair has its @member{q_init} pointer initialized to the corresponding @type{qinit} structure
+defined in the driver's @type{streamtab}.  Limit values in each @type{queue} in the pair are
+initialized the queue's @type{module_init} structure, now accessible via the @member{q_init}
+pointer in the @type{queue} structure and the @member{qi_minfo} pointer in the @type{qinit}
+structure.
+
+The @member{q_next} pointers in each @type{queue} structure are set so that the @dfn{Stream head}
+write queue points to the driver write queue and the driver read queue points to the @dfn{Stream
+head} read queue.  The @member{q_next} pointers at the ends of the @dfn{Stream} are set to
+@constant{NULL}.  Finally, the driver open procedure (accessible via the @member{qi_qopen} member of
+the @type{qinit} structure for the read-side @type{queue}) is called.
+
+@subsubsection Subsequent Open of a Stream
+
+When the @dfn{Stream} has already been created by a call to
+@manpage{open(2)} and has not yet been
+destroyed, that is, on a subsequent open of the @dfn{Stream}, and the @dfn{STREAMS} driver is not
+marked for clone open with the @constant{D_CLONE} flag in the @mantype{cdevsw(9)} structure, the only
+actions performed are to call the driver's @command{open} procedure and the @command{open}
+procedures of all pushable modules present on the already existing @dfn{Stream}.
+
+@node Opening a STREAMS-based FIFO
+@subsection Opening a STREAMS-based FIFO
+
+A @dfn{STREAMS}-based FIFO @dfn{Stream} is also constructed with a call to
+@manpage{open(2)}. A
+@dfn{Stream} constructed in this fashion is illustrated in @figref{15b}.
+
+A @dfn{STREAMS}-based FIFO appears as a FIFO special file within a @cite{GNU/Linux} file system, as
+a character special file within a @cite{GNU/Linux} file system, or as a FIFO special file within the
+@dfn{Shadow Special File System (specfs)}.@footnote{This is different that the situation in the
+@cite{UNIX System V Release 4.2} system and other @cite{UNIX} variants in the following respects: In
+@cite{SVR 4.2} all FIFOs are @dfn{STREAMS}-based.  In other @cite{UNIX} implementations FIFOs are
+either @cite{SVR 3.2}-style or, in some systems, optionally @dfn{STREAMS}-based.  In @cite{SVR 4.2}
+FIFOs are FIFO special files.  In other @cite{UNIX} implementations (and in @cite{LiS}), FIFOs are
+character special files.  Under @cite{GNU/Linux}, system FIFOs are by default @cite{SVR 3.2}-style
+FIFOs.  To acheive the greatest possible degree of compatibility, @cite{@value{PACKAGE_TITLE}}
+provides the option of making all @cite{GNU/Linux} system FIFOs @dfn{STREAMS}-based, and also
+provides a character special file implementation of @dfn{STREAMS}-based FIFOs.}
+
+@figref{15b} illustrates an @dfn{STREAMS}-based FIFO that has been opened and a @dfn{Stream}
+created.
+
+@figuresized{SPG_fig15b,15b,Opened @dfn{STREAMS}-based FIFO,4in}
+
+The sequence of events the cause the creation of a @dfn{Stream} when a @dfn{STREAMS}-based FIFO is
+opened using the @manref{open(2)} system call are the same as that for regular @dfn{STREAMS} device
+special files with the following differences:
+
+@enumerate
+
+@item When the @dfn{Stream header} (@type{stdata} structure) is created, it is attached to the
+external @cite{GNU/Linux} file system @type{inode} instead of an @type{inode} within the
+@cite{Shadow Special File System (specfs)}.  This is also true of the @type{file} pointer: that is,
+the @type{file} pointer refers to the external file system @type{inode} instead of a @file{specfs}
+@type{inode}.  The result is illustrated in @figref{15b}.
+
+@item The @dfn{Stream header} (@type{stdata} structure) is initialized with limits and values
+appropriate for a @dfn{STREAMS}-based FIFO rather than a regular @dfn{STREAMS} driver.  This is
+because the behaviour of a @dfn{STREAMS}-based FIFO @dfn{Stream head} must be somewhat different
+from a regular @dfn{STREAMS} driver to be compliant with @cite{POSIX}.@footnote{For example, a FIFO
+opened read-only will block waiting for another process to open the FIFO for writing.}
+
+@item No driver queue pair is created or attached to the @dfn{Stream}.  The @dfn{Stream head}
+write-side queue @member{q_next} pointer is set to the read-side queue as illustrated in
+@figref{15b}.
+
+@end enumerate
+
+Aside from these differences, opening a @dfn{STREAMS}-based FIFO is structurally equivalent to
+opening a regular @dfn{STREAMS} driver.  The similarity makes it possible to also implement
+@dfn{STREAMS}-based FIFOs as character special files.
+
+@node Creating a STREAMS-based Pipe
+@subsection Creating a STREAMS-based Pipe
+
+A @dfn{Stream} is also constructed when a @dfn{STREAMS}-based pipe is created using the
+@manref{pipe(2)} system call.@footnote{Note that, by default, @cite{GNU/Linux} system pipes obtained
+with the @manref{pipe(2)} system call are @cite{SVR 3.2}-style unidirectional pipes.
+@cite{@value{PACKAGE_TITLE}} provides a
+@manpage{pipe(2)} library function in the @file{libstreams}
+library that can be used to override the normal @manref{pipe(2)} system call for some applications
+programs.  Also, @cite{@value{PACKAGE_TITLE}} provides the option of overriding all system pipes
+returned by the
+@manpage{pipe(2)} system call to be bidirectional @dfn{STREAMS}-based pipes.}
+A @dfn{Stream} constructed in this fashion is illustrated in @figref{16}.
+
+@figuresized{SPG_fig16,16,Created @dfn{STREAMS}-based Pipe,5.5in}
+
+Pipes have no @type{inode} in an external @cite{GNU/Linux} file system that can be opened with the
+@manpage{open(2)} system call and, therefore, they must be created with a call to
+@manref{pipe(2)}.@footnote{Some @cite{UNIX} implementations, notably @cite{UnixWare}, provide the
+ability to open two character special files and associate them together into a @dfn{STREAMS}-based
+pipe (see @manref{sfx(4)}).  In that case, opening each end of a @dfn{STREAMS}-based pipe is no
+different than opening a regular @dfn{STREAMS} driver.}
+When the
+@manpage{pipe(2)} system call is executed, two @dfn{Streams} are are created.  The
+construction of each @dfn{Stream} is similar to that when a @dfn{STREAMS} driver is opened with the
+following differences:
+
+@itemize @bullet
+
+@item Instead of creating one process file table entry and one @type{file} pointer, as was the case
+for regular @dfn{STREAMS} drivers,
+@manpage{pipe(2)} creates two file table entries (file
+descriptors) and two @type{file} pointers, as shown in @figref{16}.
+
+@item Because a character special device is not being opened, there is no @type{inode} in an
+external file system, so @dfn{STREAMS} allocated two @type{inode}s from the
+@file{specfs}.@footnote{Some @cite{UNIX} implementations, and @cite{UNIX System V Release 4},
+provide a separate file system, the @file{pipefs}, upon which @type{vnodes} are created.  In a
+simlar fashion, @cite{GNU/Linux} @cite{SVR 3.2}-style system pipes also allocates @type{inode}s from
+a @file{pipefs} file system.}  Each @type{inode} has a file type of @constant{S_IFIFO}.  The
+@type{file} pointer and @type{stdata} structure for each @dfn{Stream header} is attached to one of
+these @type{inode}s.
+
+@item When the @dfn{Stream header} associated with each file descriptor is initialized, the
+@type{stdata} structure is initialized with values appropriate for a @dfn{STREAMS}-based pipe
+instead of a regular @dfn{Stream}.@footnote{Examples of differences include that pipes issue
+@constant{SIGPIPE} when the @dfn{Stream} encounters an error, that is, the @constant{SNDPIPE} write
+option is enabled, and pipe cannot send zero-length data by default, that is, the @constant{SNDZERO}
+write option is disabled.  Both of these are the reverse for a regular @dfn{Stream}.}
+
+@item Instead of creating a driver queue pair for the @dfn{Stream}, the @member{q_next} pointer for
+the write-side @type{queue} of each @dfn{Stream head} is initialized to point to the read-side queue
+of the other @dfn{Stream head}.  This is illustrated in @figref{16}.
+
+@end itemize
+
+@node Adding and Removing Modules
+@subsection Adding and Removing Modules
+@menu
+* Pushing Modules::
+* Popping Modules::
+@end menu
+
+When a @dfn{Stream} has been constructed, modules can be inserted into the @dfn{Stream} between the
+@dfn{Stream head} and the @dfn{Stream end} (or between the @dfn{Stream head} and the midpoint of a
+@dfn{STREAMS}-based pipe or FIFO.)  Addition (or pushing) of modules is accomplished by inserting
+the module into the @dfn{Stream} immediately below the @dfn{Stream head}.  Removal (or poppping) of
+modules is accomplished by deleting the module immediately below the @dfn{Stream head} from the
+@dfn{Stream}.
+
+When a module is pushed onto a @dfn{Stream}, the module's @command{open} procedure is called for the
+newly inserted queue pair.  When a module is popped from the @dfn{Stream}, the module's
+@command{close} procedure is called prior to deleting the queue pair from the @dfn{Stream}.
+
+Modules are pushed onto an open @dfn{Stream} by issuing the @ioctlref{I_PUSH}
+@manpage{ioctl(2)}
+command on the file descriptor associated with the open @dfn{Stream}.  Modules are popped from a
+@dfn{Stream} with the @ioctlref{I_POP}
+@manpage{ioctl(2)} command on the file descriptor associated
+with the open @dfn{Stream}.
+
+@streamio{I_PUSH} and @streamio{I_POP} allow a user level process to dynamically reconfigure the
+ordering and type of modules on a @dfn{Stream} to meet any requirement.
+
+@node Pushing Modules
+@subsubsection Pushing Modules
+
+When the @dfn{Stream head} receives an @streamio{I_PUSH} @command{ioctl} command, @dfn{STREAMS}
+locates the module's @type{streamtab} entry and creates a new queue pair to represent the instance
+of the module.  Each queue in the pair is initialized in a similar fashion as for drivers: the
+@member{q_init} pointers are initialized to point to the @type{qinit} structures of the module's
+@type{streamtab}, and the limit values are initialized to the values found in the corresponding
+@type{module_init} structures.
+
+Next, @dfn{STREAMS} positions the module's queue pair in the @dfn{Stream} immediately beneath the
+@dfn{Stream head} and above the driver and all existing modules on the @dfn{Stream}.  Then the
+module's @command{open} procedure is called for the queue pair.  (The @command{open} procedure is
+located in the @member{qi_qopen} member of the @type{qinit} structure associated with the read-side
+queue.)
+
+Each push of a module onto a @dfn{Stream} results in the insertion of a new queue pair representing
+a new instance of the module.  If a module is (successfully) pushed twice on the same @dfn{Stream},
+two queue pairs and two instances of the module will exist on the @dfn{Stream}.
+
+To assist in identifying misbehaving applications programs that might push the same set of modules
+in an indefinite loop, swallowing an excessive amount of system resources, @dfn{STREAMS} imposes a
+limit on the number of modules that can be pushed on a given @dfn{Stream} to a practical number.
+The number is limited by the @dfn{NSTRPUSH} kernel parameter (@pxref{Configuration}) which is set to
+either @samp{16} or @samp{64} on most systems.
+
+Once an instance of a module is pushed on a @dfn{Stream}, its @command{open} procedure will be
+called each time that the @dfn{Stream} is reopened.
+
+@node Popping Modules
+@subsubsection Popping Modules
+
+When the @dfn{Stream head} receives a @streamio{I_POP} @command{ioctl} command, @dfn{STREAMS}
+locates the module directly beneath the @dfn{Stream head} and calls it's @command{close} procedure.
+(The @command{close} procedure is located by the @member{qi_qclose} member in the @type{qinit}
+structure associated with the module instance's read-side @type{queue}.)  Once the @command{close}
+procedure returns, @dfn{STREAMS} deletes the queue pair from the @dfn{Stream} and deallocates the
+queue pair.
+
+@node Closing the Stream
+@subsection Closing the Stream
+
+Relinquishing the last reference to a @dfn{Stream} dismantles the @dfn{Stream} and deallocates its
+components.  Normally, the last direct or indirect call to @manref{close(2)} for a @dfn{Stream}
+results in the @dfn{Stream} being dismantled in this fashion.@footnote{Exceptions are when the
+@dfn{Stream} has been named with @manref{fattach(8)}, that is, it is still @dfn{mounted}, or when
+the @dfn{Stream} is still linked under a multiplexing driver.} Calls to
+@manpage{close(2)} before
+the last close of a @dfn{Stream} will not result in the dismantling of the @dfn{Stream} and no
+module or driver @command{close} procedure will be called on closes prior to the last close of a
+@dfn{Stream}.
+
+Dismantling a @dfn{Stream} consists of the following sequence of actions:
+
+@enumerate
+
+@item If the @dfn{Stream} is a @dfn{STREAMS}-based pipe and the other end of the pipe is not open
+by any process, but is named (i.e., mounted by @manref{fattach(3)}), then the named end of the pipe
+is detached as with @manref{fdetach(3)} and then the @dfn{Stream} is dismantled.
+
+@item If the @dfn{Stream} is a multiplexing driver, dismantling a @dfn{Stream} first consists of
+unlinking any @dfn{Streams} that remain temporarily linked (by a previous @streamio{I_LINK} command)
+under the multiplexing driver using the @dfn{control stream} being closed.  Unlinking of temporary
+links consists of issuing an @msg{M_IOCTL} message to the driver indicating the @streamio{I_UNLINK}
+operation and entering an uninterrupted wait for an acknowledgement.  Waiting for acknowledgement to
+the @msg{M_IOCTL} command can cause the close to be delayed.  If unlinking any temporary links
+results in the last reference being released to the now unlinked @dfn{Stream}, that @dfn{Stream}
+will be dismantled before proceding.
+
+@item Each module that is present on the @dfn{Stream} being dismantled will be popped from the
+@dfn{Stream} by calling the module's @command{close} procedure and then deleting the module instance
+queue pair from the @dfn{Stream}.
+
+@item If a driver exists on the @dfn{Stream} being dismantled, the driver's @command{close}
+procedure is called and then the @dfn{Stream end} queue pairs are deallocated.
+
+If the @dfn{Stream} invoking the chain of events that resulted in the dismantling of a @dfn{Stream}
+is open for blocking operation (neither @constant{O_NDELAY} nor @constant{O_NONBLOCK} were set), no
+signal is pending for the process causing dismantling of the @dfn{Stream}, and there are messages on
+the module or driver's write-side queue, @dfn{STREAMS} may wait for an interval for the messages to
+drain before calling the module or driver's @command{close} procedure.  The maximum interval to wait
+is traditionally @samp{15} seconds.  If any of these conditions are not met, the module or driver is
+closed immediately.
+
+When each module or driver queue pair is deallocated, any messages that remain on the queue are
+flushed prior to deallocation.  Note that @dfn{STREAMS} frees only the messages contained on a
+message queue: any message or data structures used internally by the driver or module must be freed
+by the driver or module before it returns from its @command{close} procedure.
+
+@item The queue pair associated with the @dfn{Stream head} is closed@footnote{Note that the messges
+are not queued on the @dfn{Stream head} write-side queue and so no delay in closing the @dfn{Stream
+head} queue pair is considered.} and the queue pair and @dfn{Stream header} (@type{stdata}
+structure) are deallocated and the associated @type{inode}, @type{file} pointer, and file
+descriptors are released.
+@end enumerate
+
+@node Stream Construction Example
+@subsection Stream Construction Example
+@menu
+* Inserting Modules::
+* Module and Driver Control::
+@end menu
+
+This @dfn{Streams} construction example builds on the previous example (see @ref{Listing 1.1} in
+@ref{Basic Streams Operations}), by adding the pushing a module on the open @dfn{Stream}.
+
+@node Inserting Modules
+@subsubsection Inserting Modules
+
+An advantage of @dfn{STREAMS} over the traditional character I/O mechanism stems from the ability to
+insert various modules into a @dfn{Stream} to process and manipulate data that pass between a user
+process and the driver.  In the example, the character conversion module is passed a command and a
+corresponding string of characters by the user.  All data passing through the module are inspected
+for instances of characters in this string; the operation identified by the command is performed on
+all matching characters.  The necessary declarations for this program are shown below:
+
+@cartouche
+@iftex
+@float Listing,Listing 3.1
+@end iftex
+@smallexample
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/uio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/stropts.h>
+
+#define   BUFLEN      1024
+
+/*
+ *  These defines would typically be
+ *  found in a header file for the module
+ */
+#define   XCASE       1         /* change alphabetic case of char */
+#define   DELETE      2         /* delete char */
+#define   DUPLICATE   3         /* duplicate char */
+
+main()
+@{
+    char buf[BUFLE];
+    int fd, count;
+    struct strioct1 strioctl;
+@end smallexample
+@iftex
+@caption{@emph{Inserting Modules Example}}
+@end float
+@end iftex
+@ifnottex
+@anchor{Listing 3.1}
+@center @emph{Listing 3.1.@:  Inserting Modules Example}
+@end ifnottex
+@end cartouche
+
+The first step is to establish a @dfn{Stream} to the communications driver and insert the character
+conversion module.  The following sequence of system calls accomplishes this:
+
+@cartouche
+@iftex
+@float Listing,Listing 3.2
+@end iftex
+@smallexample
+    if ((fd = open("/dev/comm/01", O_RDWR)) < 0) @{
+        perror("open failed");
+        exit(1);
+    @}
+
+    if (ioctl(fd, I_PUSH, "chconv") < 0) @{
+        perror("ioctl  I_PUSH failed");
+        exit(2);
+    @}
+@end smallexample
+@iftex
+@caption{@emph{Inserting Modules Example (cont'd)}}
+@end float
+@end iftex
+@ifnottex
+@anchor{Listing 3.2}
+@center @emph{Listing 3.2.@:  Inserting Modules Example (cont'd)}
+@end ifnottex
+@end cartouche
+
+The @ioctlref{I_PUSH} @manref{ioctl(2)} call directs the @dfn{Stream} head to insert the character
+conversion module between the driver and the @dfn{Stream head}, creating the @dfn{Stream} shown in
+@figref{17}.  As with drivers, this module resides in the kernel and must have been configured into
+the system before it was booted.
+
+@figuresized{SPG_fig17,17,Case Converter Module,4in}
+
+An important difference between @dfn{STREAMS} drivers and modules is illustrated here.  Drivers are
+accessed through a node or nodes in the file system and may be opened just like any other device.
+Modules, on the other hand, do not occupy a file system node.  Instead, they are identified through
+a separate naming convention, and are inserted into a @dfn{Stream} using @streamio{I_PUSH}.  The name of
+a module is defined by the module developer.
+
+Modules are pushed onto a @dfn{Stream} and removed from a @dfn{Stream} in @dfn{Last-In-First-Out
+(LIFO)} order.  Therefore, if a second module was pushed onto this @dfn{Stream}, it would be
+inserted between the @dfn{Stream} head and the character conversion module.
+
+@node Module and Driver Control
+@subsubsection Module and Driver Control
+
+The next step in this example is to pass the commands and corresponding strings to the character
+conversion module.  This can be accomplished by issuing ioctl calls to the character conversion
+module as follows:
+
+@cartouche
+@iftex
+@float Listing,Listing 3.3
+@end iftex
+@smallexample
+/* change all uppercase vowels to lowercase */
+strioctl.ic_cmd = XCASE;
+strioctl.ic_timout = 0;         /* default timeout (15 sec) */
+strioctl.ic_dp = "AEIOU";
+strioctl.ic_len = strlen(strioctl.ic_dp);
+
+if (ioctl(fd, I_STR, &strioctl) < 0) @{
+    perror("ioctl I_STR failed");
+    exit(3);
+@}
+
+/* delete all instances of trhe chars 'x' and  'X' */
+strioctl.ic_cmd = DELETE;
+strioctl.ic_dp = "xX";
+strioctl.ic_len = strlen(strioctl.ic_dp);
+
+if (ioctl(fd, I_STR, &strioctl) < 0) @{
+    perror("ioctl I_STR failed");
+    exit(4);
+@}
+@end smallexample
+@iftex
+@caption{@emph{Module and Driver Control Example}}
+@end float
+@end iftex
+@ifnottex
+@anchor{Listing 3.3}
+@center @emph{Listing 3.3.@:  Module and Driver Control Example}
+@end ifnottex
+@end cartouche
+
+@command{ioctl} requests are issued to @dfn{STREAMS} drivers and modules indirectly, using the
+@ioctlref{I_STR} @command{ioctl} call (see
+@manpage{streamio(7)}).  The argument to @streamio{I_STR} must be a
+pointer to a @code{strioctl} structure, which specifies the request to be made to a module or
+driver.  This structure is defined in @header{sys/stropts.h} and has the following format:
+
+@cartouche
+@smallexample
+struct strioctl @{
+    int ic_cmd;                         /* ioctl request */
+    int ic_timout;                      /* ACK/NAK timeout */
+    int ic_len;                         /* length of data argument */
+    char *ic_dp;                        /* ptr to data argument */
+@};
+@end smallexample
+@end cartouche
+
+where @var{ic_cmd} identifies the command intended for a module or driver, @var{ic_timout} specifies
+the number of seconds an @streamio{I_STR} request should wait for an acknowledgement before timing out,
+@var{ic_len} is the number of bytes of data to accompany the request, and @var{ic_dp} points to that
+data.
+
+In the example, two separate commands are sent to the character conversion module.  The first sets
+@var{ic_cmd} to the command @constant{XCASE} and sends as data the string @samp{AEIOU}; it will convert
+all uppercase vowels in data passing through the module to lowercase.  The second sets ic_cmd to the
+command @constant{DELETE} and sends as data the string @samp{xX}; it will delete all occurrences of the
+characters @samp{x} and @samp{X} from data passing through the module.  For each command, the value
+of @var{ic_timout} is set to zero, which specifies the system default timeout value of @samp{15}
+seconds.  The @var{ic_dp} field points to the beginning of the data for each command; @var{ic_len}
+is set to the length of the data.
+
+@streamio{I_STR} is intercepted by the @dfn{Stream head}, which packages it into a message, using
+information contained in the @code{strioctl} structure, and sends the message downstream.  Any
+module that does not understand the command in @var{ic_cmd} will pass the message further
+downstream.  The request will be processed by the module or driver closest to the @dfn{Stream head}
+that understands the command specified by @var{ic_cmd}.  The @command{ioctl} call will block up to
+@var{ic_timout} seconds, waiting for the target module or driver to respond with either a positive
+or negative acknowledgement message.  If an acknowledgement is not received in @var{ic_timout}
+seconds, the @command{ioctl} call will fail.
+
+Only one @streamio{I_STR} request can be active on a @dfn{Stream} at one time.  Further requests will
+block until the active @streamio{I_STR} request is acknowledged and the system call completes.
+
+The @code{strioctl} structure is also used to retrieve the results, if any, of an @streamio{I_STR}
+request.  If data are returned by the target module or driver, @var{ic_dp} must point to a buffer
+large enough to hold that data, and @var{ic_len} will be set on return to indicate the amount of
+data returned.
+
+The remainder of this example is identical to the example in @ref{Modules and Drivers}:
+
+@cartouche
+@iftex
+@float Listing,Listing 3.4
+@end iftex
+@smallexample
+    while ((count = read(fd, buf, BUFLEN)) > 0) @{
+        if (write(fd, buf, count) != count) @{
+            perror("write failed");
+            break;
+        @}
+    @}
+    exit(0);
+@}
+@end smallexample
+@iftex
+@caption{@emph{Module and Driver Control Example (cont'd)}}
+@end float
+@end iftex
+@ifnottex
+@anchor{Listing 3.4}
+@center @emph{Listing 3.4.@:  Module and Driver Control Example (cont'd)}
+@end ifnottex
+@end cartouche
+
+Notice that the character conversion processing was realized with no change to the communications
+driver.
+
+The exit system call will dismantle the @dfn{Stream} before terminating the process.  The character
+conversion module will be removed from the @dfn{Stream} automatically when it is closed.
+Alternatively, modules may be removed from a @dfn{Stream} using the @streamio{I_POP} @command{ioctl} call
+described in
+@manpage{streamio(7)}.  This call removes the topmost module on the @dfn{Stream}, and
+enables a user process to alter the configuration of a @dfn{Stream} dynamically, by popping modules
+as needed.
+
+A few of the important @command{ioctl} requests supported by @dfn{STREAMS} have been discussed.
+Several other requests are available to support operations such as determining if a given module
+exists on the @dfn{Stream}, or flushing the data on a @dfn{Stream}.  These requests are described
+fully in
+@manpage{streamio(7)}.
 
 @c ============================================================================
 @node Processing
@@ -3097,7 +3886,7 @@ are reduced to the low-water mark value, the other queue is unblocked by @dfn{ST
 
 @item @dfn{write queue} @tab
 @cindex write queue
-A message qeuue in a module or driver containing messages moving downstream.  Associated with the
+A message queue in a module or driver containing messages moving downstream.  Associated with the
 @manref{write(2)} system call and output from a user process.
 
 @item @dfn{write-side} @tab
