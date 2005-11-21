@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_COPYIN.9.man,v 0.9.2.3 2005/09/18 18:44:08 brian Exp $
+.\" @(#) $Id: M_COPYIN.9.man,v 0.9.2.5 2005/11/21 12:21:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,9 +83,17 @@ sort-adjacent-labels
 .PP
 The
 .B M_COPYIN
-message is a
+message block is a
 .BR datab (9)
 structure and associated data buffer that contains unstructured data.
+.PP
+An
+.B M_COPYIN
+message consists of one
+.B M_COPYIN
+message block followed by one or more
+.BR M_DATA (9)
+message blocks.
 .\"
 .\"
 .SH DESCRIPTION
@@ -114,7 +122,7 @@ struct copyreq {
     int cq_cmd;         /* ioctl command (from ioc_cmd) */
     cred_t *cq_cr;      /* full credentials */
     uint cq_id;         /* ioctl id (from ioc_id) */
-    caddr_t cq_addr;    /* addres top copy data to/from */
+    caddr_t cq_addr;    /* address top copy data to/from */
     uint cq_size;       /* number of bytes to copy */
     int cq_flag;
     mblk_t *cq_private; /* private state information */
@@ -123,11 +131,11 @@ struct copyreq {
 \s+1\fP
 .fi
 .PP
-The first three members of the structure correspond to thos of the
+The first three members of the structure correspond to those of the
 .BR iocblk (9)
 structure in the
 .BR M_IOCTL (9)
-message which allos the same message block to be reused for both structures.  The
+message block which allows the same message block to be reused for both structures.  The
 .I Stream head
 will guarantee that the message block allocated for the
 .BR M_IOCTL (9)
@@ -158,6 +166,69 @@ will not free any message block pointed to by
 .IR cq_private .
 This is the module's responsibility.
 .PP
+The module or driver responding to a
+.I tranparent
+.BR M_IOCTL (9)
+message issues a
+.B M_COPYIN
+message when it wishes to copy data in from the user.  The message is formulated and issued
+upstream to the
+.IR "Stream head" .
+When reveived by the
+.IR "Stream head" ,
+the
+.I "Stream head"
+will attempt to copy in the requested amount of data of size
+.IR cq_size ,
+from the user address
+.IR cq_addr ,
+using the
+.BR copyin (9)
+utility.
+.PP
+If the
+.BR copyin (9)
+operation succeeds, the
+.I Stream head
+will reply with an
+.BR M_IOCDATA (9)
+message block whose
+.I cp_rval
+member is set to
+.BR "(caddr_t)(0)" ,
+and with attached
+.BR M_DATA (9)
+message blocks containing the copied in data.
+.PP
+If the
+.BR copyin (9)
+operation fails, the
+.I Stream head
+will reply with an
+.BR M_IOCDATA (9)
+message block whose
+.I cp_rval
+member is set to
+.BR "(caddr_t)(1)" ,
+to indicate the error, and then aborts the
+.BR ioctl (2)
+operation and returns
+.RB [ EFAULT ]
+to the user in
+.IR errno (3).
+This provides the module or driver with the opportunity to clean up the
+.I cq_private
+pointer when the
+.BR ioctl (2)
+operation is aborted.
+.PP
+See
+.BR M_IOCDATA (9),
+for more information.
+.\"
+.\"
+.SH USAGE
+.PP
 This message should not be queued by a module or driver unless it intends to process the data for
 the
 .BR ioctl (2).
@@ -180,7 +251,30 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.B LiS
+.[
+lis
+.]
+erroneously expects an
+.BR M_IOCNAK (9)
+message containing an error when it responds to the driver with an
+.BR M_IOCDATA (9)
+message with a
+.I cp_rval
+of
+.BR "(caddr_t)(1)" .
+See
+.BR M_IOCDATA (9),
+for more information.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+instead of
+.BR LiS .
 .IP \(em
+Binary compatiblity is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

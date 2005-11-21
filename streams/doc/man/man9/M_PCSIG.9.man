@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCSIG.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
+.\" @(#) $Id: M_PCSIG.9.man,v 0.9.2.3 2005/11/21 05:52:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/21 05:52:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,7 +85,13 @@ The
 .B M_PCSIG
 message is a
 .BR datab (9)
-structure and associated data buffer that contains unstructured data.
+structure and associated data buffer that contains structured data.
+.PP
+An
+.B M_PCSIG
+message consists of a single
+.B M_PCSIG
+message block.
 .\"
 .\"
 .SH DESCRIPTION

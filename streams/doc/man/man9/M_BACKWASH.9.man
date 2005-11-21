@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_BACKWASH.9.man,v 0.9.2.1 2005/04/28 11:36:33 brian Exp $
+.\" @(#) $Id: M_BACKWASH.9.man,v 0.9.2.3 2005/11/21 12:21:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,16 +83,25 @@ sort-adjacent-labels
 .PP
 The
 .B M_BACKWASH
-message is a
+message block is a
 .BR datab (9)
 structure and associated data buffer that contains no data.
-Attached to the
+.PP
+An
 .B M_BACKWASH
-message is a normal
-.BR M_PROTO "(9) and " M_DATA (9)
-message or
-.BR M_PCPROTO "(9) and " M_DATA (9)
-message.
+message consists of one
+.B M_BACKWASH
+message block followed by a
+.BR M_DATA (9),
+.BR M_PROTO (9),
+or
+.BR M_PCPROTO (9)
+message.  Note that the attached message can consist of one or more message blocks: see
+.BR M_DATA (9),
+.BR M_PROTO (9),
+and
+.BR M_PCPROTO (9),
+for the format of those messages.
 .\"
 .\"
 .SH DESCRIPTION
@@ -103,7 +112,9 @@ is a message used in conjunction with
 .BR M_LETSPLAY (9),
 and
 .BR M_DONTPLAY (9)
-to coordinate the establishment of direct IO from the driver, bypassing the stream head and any
+to coordinate the establishment of direct IO from the driver, bypassing the
+.I Stream head
+and any
 pushed modules, using the
 .BR wantio (9)
 utility.  See
@@ -114,24 +125,42 @@ utility.  See
 .PP
 Before calling
 .BR wantio (9)
-for an active stream, and shifting from normal stream head IO to driver direct IO,
+for an active
+.IR Stream ,
+and shifting from normal
+.I Stream
+head IO to driver direct IO,
 the following steps should be performed by the driver:
 .IP (1) \w'(0)\(em'u
 Send a
 .BR M_LETSPLAY (9)
 message upstream with a
-.B strlp
+.BR strlp (9)
 structure in the message.
 .IP ""
 Once the
 .BR M_LETSPLAY (9)
-message reaches the stream head, the stream head compares the
+message reaches the
+.IR "Stream head" ,
+the
+.I Stream head
+compares the
 .I lp_count
-count with the number of modules pushed on the stream.  If the two are equal, all modules pushed on
-the stream agree to driver direct IO, and the stream head returns an
+count with the number of modules pushed on the
+.IR Stream .
+If the two are equal, all modules pushed on
+the
+.I Stream
+agree to driver direct IO, and the
+.I Stream head
+returns an
 .BR M_BACKDONE (9)
-message.  If the two are different, some module pushed on the stream does not agree to driver direct
-IO, and the stream head returns an
+message.  If the two are different, some module pushed on the
+.I Stream
+does not agree to driver direct
+IO, and the
+.I Stream head
+returns an
 .BR M_DONTPLAY (9)
 message.
 .IP (2)
@@ -187,55 +216,65 @@ messages in a module's write-side (downstream)
 and
 .BR srv (9)
 procedure is as follows:
+.PP
+Module
+.B put
+procedure:
 .nf
 \fC\s-1
-/* module put procedure */
-int xxx_putp(queue_t *q, mblk_t *mp)
-{
-    switch (mp->b_datap->db_type) {
-    ...
-    case M_BACKWASH:
-    case M_BACKDONE:
-    case M_DONTPLAY:
-#if have_service_procedure
-        putq(q, mp);
-#else
-        putnext(q, mp);
-#endif
-        break;
-    ...
-    }
-}
+   1  /* module put procedure */
+   2  int
+   3  xxx_putp(queue_t *q, mblk_t *mp)
+   4  {
+   5      switch (mp->b_datap->db_type) {
+   6      ...
+   7      case M_BACKWASH:
+   8      case M_BACKDONE:
+   9      case M_DONTPLAY:
+  10  #if have_service_procedure
+  11          putq(q, mp);
+  12  #else
+  13          putnext(q, mp);
+  14  #endif
+  15          break;
+  16      ...
+  17      }
+  18  }
 \s+1\fP
 .fi
 .PP
+Module
+.B service
+procedure:
+.PP
 .nf
 \fC\s-1
-/* driver put procedure */
-int xxx_putp(queue_t *q, mblk_t *mp)
-{
-    switch (mp->b_datap->db_type) {
-    ...
-    case M_BACKWASH:
-#if have_service_procedure
-        putq(q, xchg(&mp->b_cont, NULL));
-#else
-        /* process message */
-#endif
-        freeb(mp);
-        break;
-    case M_BACKDONE:
-        freemsg(mp);
-        /* now direct IO can be performed */
-        wantio(...);
-        break;
-    case M_DONTPLAY:
-        freemsg(mp);
-        /* cancel wantio */
-        break;
-    ...
-    }
-}
+   1  /* driver put procedure */
+   2  int
+   3  xxx_putp(queue_t *q, mblk_t *mp)
+   4  {
+   5      switch (mp->b_datap->db_type) {
+   6      ...
+   7      case M_BACKWASH:
+   8  #if have_service_procedure
+   9          putq(q, xchg(&mp->b_cont, NULL));
+  10  #else
+  11          /* process message */
+  12  #endif
+  13          freeb(mp);
+  14          break;
+  15      case M_BACKDONE:
+  16          freemsg(mp);
+  17          /* now direct IO can be performed */
+  18          wantio(...);
+  19          break;
+  20      case M_DONTPLAY:
+  21          freemsg(mp);
+  22          /* cancel wantio */
+  23          break;
+  24      ...
+  25      }
+  26  }
 \s+1\fP
 .fi
 .\"
@@ -255,11 +294,12 @@ message is compatible with
 .IR AIX \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 .B M_BACKWASH
 is an
 .IR AIX \(rg
-specific message, provided for compatibility with
+specific message, provided by
+.B @PACKAGE_TITLE@
+for compatibility with
 .IR AIX \(rg.
 .IP ""
 Portable

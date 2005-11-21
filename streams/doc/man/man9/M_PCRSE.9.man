@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.2 2005/09/18 18:44:08 brian Exp $
+.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.3 2005/11/21 05:52:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/18 18:44:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/21 05:52:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,9 +83,15 @@ sort-adjacent-labels
 .PP
 The
 .B M_PCRSE
-message is a
+message block is a
 .BR datab (9)
 structure and associated data buffer that contains unstructured data.
+.PP
+An
+.B M_PCRSE
+message consists of one
+.B M_PCRSE
+message block followed by an unspecified number of message blocks of unspecified type.
 .\"
 .\"
 .SH DESCRIPTION

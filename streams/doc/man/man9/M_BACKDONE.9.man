@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_BACKDONE.9.man,v 0.9.2.1 2005/04/28 11:36:33 brian Exp $
+.\" @(#) $Id: M_BACKDONE.9.man,v 0.9.2.3 2005/11/21 12:21:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 11:36:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,9 +83,15 @@ sort-adjacent-labels
 .PP
 The
 .B M_BACKDONE
-message is a
+message block is a
 .BR datab (9)
 structure and associated data buffer that contains no data.
+.PP
+An
+.B M_BACKDONE
+message consists of one
+.B M_BACKDONE
+message block.
 .\"
 .\"
 .SH DESCRIPTION
@@ -96,7 +102,9 @@ is a message used in conjunction with
 .BR M_BACKWASH (9),
 and
 .BR M_DONTPLAY (9)
-to coordinate the establishment of direct IO from the driver, bypassing the stream head and any
+to coordinate the establishment of direct IO from the driver, bypassing the
+.I Stream head
+and any
 pushed modules, using the
 .BR wantio (9)
 utility.  See
@@ -107,24 +115,42 @@ utility.  See
 .PP
 Before calling
 .BR wantio (9)
-for an active stream, and shifting from normal stream head IO to driver direct IO,
+for an active
+.IR Stream ,
+and shifting from normal
+.I Stream head
+IO to driver direct IO,
 the following steps should be performed by the driver:
 .IP (1) \w'(0)\(em'u
 Send a
 .BR M_LETSPLAY (9)
 message upstream with a
-.B strlp
+.BR strlp (9)
 structure in the message.
 .IP ""
 Once the
 .BR M_LETSPLAY (9)
-message reaches the stream head, the stream head compares the
+message reaches the
+.IR "Stream head" ,
+the
+.I Stream head
+compares the
 .I lp_count
-count with the number of modules pushed on the stream.  If the two are equal, all modules pushed on
-the stream agree to driver direct IO, and the stream head returns an
+count with the number of modules pushed on the
+.IR Stream .
+If the two are equal, all modules pushed on
+the
+.I Stream
+agree to driver direct IO, and the
+.I Stream head
+returns an
 .B M_BACKDONE
-message.  If the two are different, some module pushed on the stream does not agree to driver direct
-IO, and the stream head returns an
+message.  If the two are different, some module pushed on the
+.I Stream
+does not agree to driver direct
+IO, and the
+.I Stream head
+returns an
 .BR M_DONTPLAY (9)
 message.
 .IP (2)
@@ -186,11 +212,12 @@ message is compatible with
 .IR AIX \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 .B M_BACKDONE
 is an
 .IR AIX \(rg
-specific message, provided for compatibility with
+specific message, provided by
+.B @PACKAGE_TITLE@
+for compatibility with
 .IR AIX \(rg.
 .IP ""
 Portable
