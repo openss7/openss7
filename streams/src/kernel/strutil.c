@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/08 02:49:16 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/20 22:21:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/08 02:49:16 $ by $Author: brian $
+ Last Modified $Date: 2005/11/20 22:21:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/08 02:49:16 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/20 22:21:05 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/11/08 02:49:16 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/20 22:21:05 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -3698,7 +3698,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 	}
 	return (0);
       enomem:
-	return (-ENOMEM);
+	return (-ENOMEM); /* XXX: This should probably be ENOSR or EAGAIN. */
 #endif
 }
 

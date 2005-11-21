@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.47 2005/11/16 10:30:33 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.48 2005/11/20 22:20:12 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/16 10:30:33 $ by $Author: brian $
+% Last Modified $Date: 2005/11/20 22:20:12 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -198,7 +198,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro tabfig {image, number, caption}
 @cartouche
 @float Table,Table \number\
-@image{\image\}
+@center @image{\image\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -207,7 +207,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro tabfigsized {image, number, caption, size}
 @cartouche
 @float Table,Table \number\
-@image{\image\,\size\}
+@center @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -216,7 +216,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro figure {image, number, caption}
 @cartouche
 @float Figure,Figure \number\
-@image{\image\}
+@center @image{\image\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -225,7 +225,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro figuresized {image, number, caption, size}
 @cartouche
 @float Figure,Figure \number\
-@image{\image\,\size\}
+@center @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
@@ -251,22 +251,50 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @ifnottex
 
 @macro tabfig {image, number, caption}
-@image{\image\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@center @image{\image\}
+@anchor{Table \number\}
+@center @emph{Table \number\.@:  \caption\}
 @end macro
 
 @macro tabfigsized {image, number, caption, size}
-@image{\image\,\size\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@center @image{\image\,\size\}
+@anchor{Table \number\}
+@center @emph{Table \number\.@:  \caption\}
 @end macro
 
 @macro figure {image, number, caption}
-@image{\image\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@center @image{\image\}
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
 @set fignum \number\
 @end macro
 
 @macro figuresized {image, number, caption, size}
-@image{\image\,\size\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@center @image{\image\,\size\}
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
 @set fignum \number\
 @end macro
+
+@ifhtml
+
+@macro manref {name}
+@mpindex \name\
+@code{@uref{/man2html?\name\,\name\}}
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{@uref{/man2html?\name\,\name\}}
+@end macro
+
+@macro ioctlref {name}
+@code{@uref{/man2html?2+\name\,\name\(2)} (see @uref{/man2html?7+streamio,streamio(7)})}
+@end macro
+
+@end ifhtml
+
+@ifnothtml
 
 @macro manref {name}
 @mpindex \name\
@@ -281,6 +309,8 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @macro ioctlref {name}
 @code{\name\} (@inforef{\name\(2), , *manpages*}; @inforef{streamio(7), , *manpages*})
 @end macro
+
+@end ifnothtml
 
 @end ifnottex
 
@@ -382,7 +412,6 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Portability::
 * Copying::
 * Glossary::
-* List of Figures::
 * Index::
 
  --- The Detailed Node Listing ---
@@ -685,6 +714,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.48  2005/11/20 22:20:12  brian
+- still working up documentation
+
 Revision 0.9.2.47  2005/11/16 10:30:33  brian
 - still working up take 2
 
@@ -19449,10 +19481,12 @@ and output side.
 
 @end multitable
 
+@ifnotinfo
 @node List of Figures
 @unnumbered List of Figures
 
 @listoffloats Figure
+@end ifnotinfo
 
 @node Index
 @unnumbered Index

@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.4 2005/06/22 08:57:47 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.5 2005/11/20 22:26:16 brian Exp $
 %
 % =========================================================================
 %
@@ -54,14 +54,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/06/22 08:57:47 $ by $Author: brian $
+% Last Modified $Date: 2005/11/20 22:26:16 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
 @setfilename dlpi.info
-@settitle Data Link Provider Interface Specification
+@include texi/args.texi
+@set MANUAL_TITLE Data Link Provider Interface
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenGroup
@@ -70,7 +73,10 @@
 @end direntry
 
 @include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Specification
 
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the X/Open Data Link Provider Interface.
 
@@ -116,12 +122,16 @@ another language, under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Specification
 
-@shorttitlepage Data Link Provider Interface Specification
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
 @titlepage
-@titlefont{Data Link Provider Interface}
+@titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
-@title Specification
+@title @value{MANUAL_TYPE}
 @subtitle UNIX International
 @subtitle OSI Work Group
 @subtitle Revision: 2.0.0

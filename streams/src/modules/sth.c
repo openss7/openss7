@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/04 12:32:28 $ by $Author: brian $
+ Last Modified $Date: 2005/11/20 22:21:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/11/04 12:32:28 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2377,6 +2377,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			break;
 		case M_COPYIN:
 		case M_COPYOUT:
+			err = -ENXIO; /* XXX: not specified anywhere */
 			/* wrong response */
 			ioc = (typeof(ioc)) mb->b_rptr;
 			mb->b_datap->db_type = M_IOCDATA;
@@ -5799,7 +5800,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	}
 
 	err = -ENOSR;
-	if ((err = setsq(sd->sd_rq, (struct fmodsw *) mux->sd_cdevsw))) {
+	if (setsq(sd->sd_rq, (struct fmodsw *) mux->sd_cdevsw) != 0) {
 		ptrace(("Error path taken!\n"));
 		goto unlock2_error;
 	}
@@ -7779,7 +7780,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 			clear_bit(STRDELIM_BIT, &sd->sd_flag);
 	}
 	if (so->so_flags & SO_READOPT)
-		sd->sd_rdopt = so->so_flags & (RMODEMASK | RPROTMASK);
+		sd->sd_rdopt = so->so_readopt & (RMODEMASK | RPROTMASK);
 	if (so->so_flags & SO_WROFF)
 		sd->sd_wroff = so->so_wroff;
 	if (so->so_flags & SO_MINPSZ)
