@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: write.2s.man,v 0.9.2.9 2005/08/29 10:06:30 brian Exp $
+.\" @(#) $Id: write.2s.man,v 0.9.2.10 2005/11/22 11:56:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:56:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -264,7 +264,7 @@ pipe or FIFO sends no message and zero
 .RB ( 0 )
 is returned.  The process may issue an
 .BR I_SWROPT (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 with the
 .B SNDZERO
 flag set in the argument
@@ -330,7 +330,7 @@ This write option can be enabled by setting the
 flag in the STREAM head write options using the
 .BR I_SWROPT (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 as detailed in
 .BR streamio (7).
 The setting of this write option can be examined using the
@@ -360,7 +360,7 @@ flag set.
 tty line discipline module does this.)
 The process may also issue a
 .BR I_SWROPT (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 with the
 .B SNDHOLD
 flag set in the argument to enable the hold feature on a particular stream, but this is a
@@ -689,7 +689,7 @@ Whether a zero-length message is sent depends on the setting of
 can be set or cleared with the
 .B I_SWROPT
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 for a
 .I STREAMS
 character device special file or a
@@ -976,15 +976,23 @@ but will block indefinitely awaiting the availability of a message block.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR open (2),
-.BR read (2),
+.BR open (2s),
+.BR read (2s),
 .BR fcntl (2),
 .BR close (2),
 .BR lseek (2),
 .BR select (2),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR fsync (2),
 .BR fwrite (3)
+.PP
+If your
+.B GNU/Linux
+distribution is equipped with
+.I OpenGroup
+.I POSIX/SUSv3
+manual pages, also see
+.BR write (3p).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -1146,7 +1154,7 @@ lis
 uses the
 .B I_PUTPMSG
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 to emulate the
 .BR putpmsg (2s)
 system call.

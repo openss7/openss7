@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strlog.4.man,v 0.9.2.11 2005/07/21 20:47:20 brian Exp $
+.\" @(#) $Id: strlog.4.man,v 0.9.2.12 2005/11/22 11:57:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/21 20:47:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -100,7 +100,7 @@ sort-adjacent-labels
 .PP
 .I fd
 is a file descriptor for an strlog stream opened using the
-.BR open (2)
+.BR open (2s)
 system call on one of the following devices:
 .TP
 .RI \*(lq /dev/strlog ",\*(rq \*(lq" /dev/streams/strlog \*(rq
@@ -111,7 +111,7 @@ logger, or can be used to generate log messages with
 .RI \*(lq /dev/conslog ",\*(rq \*(lq" /dev/streams/conslog \*(rq
 This non-clone device is accessble to all users.  This device can be used to generate log messages
 to the console with
-.BR putmsg "(2) or " write (2).
+.BR putmsg "(2) or " write (2s).
 .PP
 The
 .B strlog
@@ -442,7 +442,7 @@ console logger using the
 structure and the
 .BR putmsg (2)
 system call, or can simply write the data portion of the message using the
-.BR write (2)
+.BR write (2s)
 system call.
 .PP
 The
@@ -621,7 +621,7 @@ log device.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR open (2),
+.BR open (2s),
 .BR strerr (8),
 .BR strace (8),
 .BR strlogd (8),
@@ -630,7 +630,7 @@ log device.
 .BR strlog (1),
 .BR getmsg (2),
 .BR putmsg (2),
-.BR write (2).
+.BR write (2s).
 .\"
 .\"
 .SH BUGS

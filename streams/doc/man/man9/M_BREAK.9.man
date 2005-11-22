@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_BREAK.9.man,v 0.9.2.4 2005/11/21 12:21:49 brian Exp $
+.\" @(#) $Id: M_BREAK.9.man,v 0.9.2.5 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ structure and associated data buffer that contains unstructured data.
 .PP
 An
 .B M_BREAK
-message consists of one
+message is a normal priority message that consists of one
 .B M_BREAK
 message block followed by an unspecified number of message blocks of unspecified type.
 .\"
@@ -143,6 +143,33 @@ with the following portability considerations:
 The
 .B M_BREAK
 message has no portability issues.
+.IP \(em
+.B M_BREAK
+has a different constant value on
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+Binary compatibiltiy is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

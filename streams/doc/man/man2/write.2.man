@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: write.2.man,v 0.9.2.8 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: write.2.man,v 0.9.2.9 2005/11/22 11:56:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:56:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -197,12 +197,12 @@ conditions EDEADLK, ENOLCK, ENOLNK, ENOSR, ENXIO, EPIPE, or ERANGE.
 Under SVr4 a write may be interrupted and return EINTR at any point,
 not just before any data is written. 
 .SH "SEE ALSO"
-.BR open (2),
-.BR read (2),
+.BR open (2s),
+.BR read (2s),
 .BR fcntl (2),
 .BR close (2),
 .BR lseek (2),
 .BR select (2),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR fsync (2),
 .BR fwrite (3)

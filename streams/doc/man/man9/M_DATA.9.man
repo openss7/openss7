@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_DATA.9.man,v 0.9.2.3 2005/11/21 05:52:09 brian Exp $
+.\" @(#) $Id: M_DATA.9.man,v 0.9.2.4 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 05:52:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,61 +85,269 @@ The
 .B M_DATA
 message block is a
 .BR datab (9)
-structure and associated data buffer that contains unstructured data.  (Any structure imposed on the
+structure and associated data buffer that contains unstructured data.  (With a few exceptions, any
+structure imposed on the
 .B M_DATA
 data buffer is defined outside of
 .IR STREAMS .)
 .PP
 An
 .B M_DATA
-message consists of one or more
+message is a normal priority message that consists of one or more
 .B M_DATA
 message blocks.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-Intended to contain ordinary data.  Messages allocated by the
+The
+.B M_DATA
+message is intended to contain ordinary data.  Messages allocated by the
 .BR allocb (9)
 utility are type
 .B M_DATA
 by default.
 .B M_DATA
-messages are generally send bidirectionally on a
+messages are generally sent upstream or downstream on a
 .I Stream
 and their contents can be passed between a process and the
 .IR "Stream head" .
-In the
-.BR getmsg (2)
-and
-.BR putmsg (2)
-system calls, the contents of the
+.PP
+An
 .B M_DATA
-message blocks are referred to as the
+message consists of one or more
+.B M_DATA
+blocks.
+.B M_DATA
+messages are generally sent in both the downstream and upstream directions on a Stream.
+.B M_DATA
+message sent upstream and arriving at the Stream head are available to be read by user level
+processes using the
+.BR read (2s),
+.BR getmsg (2),
+or
+.BR getpmsg (2s)
+system calls.
+.B M_DATA
+messages can be sent downstream from the Stream head by a user level process using the
+.BR write (2s),
+.BR putmsg (2),
+or
+.BR putpmsg (2s)
+system calls.
+.PP
+When describing
+.IR STREAMS -specific
+system calls, the contents of an
+.B M_DATA
+messsage are referred to collectively as the
 .IR "data part" .
+For the
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR putmsg (2),
+and
+.BR putpmsg (2s)
+system calls, the control and data parts are passed separately.  Only a
+.BR putmsg (2)
+or
+.BR putpmsg (2s)
+call that does not contain a control part will generate
+.BR M_DATA
+messages.
+(For the messages resulting from calls to these system calls with a control part specified, see
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9).)
+For the
+.BR read (2s)
+and
+.BR write (2s)
+system calls, only the data part is passed.
+.PP
+.B M_DATA
+messages can be formulated using multiple
+.B M_DATA
+message blocks.  The minimum and maximum packet sizes associated with the upstream module read-side
+queue (that is, the
+.I q_minpsz
+and
+.I q_maxpsz
+fields of the upstream
+.BR queue (9)
+structure),
+provide advise to the module on the minimum and maximum amounts of data that a given
+.B M_DATA
+block in an
+.B M_DATA
+message should contain.
+The
+.I Stream head
+will compact multiple
+.B M_DATA
+blocks into a single data part, when passing them to the user process.  The
+.BR write (2s),
+.BR putmsg (2),
+and
+.BR putpmsg (2s)
+system calls use the
+.I q_minpsz
+and
+.I q_maxpsz
+fields of the write-side queue of the topmost downstream module when determining the size and number
+of
+.B M_DATA
+blocks placed in the resulting downstream
+.B M_DATA
+messages.  For a description of this procedure, see
+.BR write (2s).
+.PP
+.B M_DATA
+messages,
+by nature of the initial message block type,
+are normal (or priority) messages, and are, therefore, subject to flow control restrictions with a
+Stream.  In contrast, the non-standard
+.BR M_HPDATA (9)
+message is a high priority message serving the same purpose, that is not subject to flow control
+restrictions.
+.B M_DATA
+messages can have an assigned priority.  The priorty of an
+.B M_DATA
+message contained in the
+.I b_band
+member of the
+.BR msgb (9)
+structure of the initial
+.B M_DATA
+message block 
+in the message.
+.PP
+.B M_DATA
+messages passed upstream to be read by a user level process, or passed downstream as a result of
+being written by a user level process can support both a byte-stream view of the data path, where
+there are no message boundaries, or a packet (delimited) view, where message boundaries are
+preserved.
+To support the delimited view,
+.B M_DATA
+message blocks can optionally contain the
+.BR MSGDELIM
+flag in the
+.I b_flag
+member of the intial message block to indicate that the last byte of the message represents a
+message boundary.
+A module or driver can request that the
+.I Stream head
+support the delimited view of
+.B M_DATA
+messages using the
+.B MSGDELIM
+flag, by sending an
+.BR M_SETOPTS (9)
+message to the Stream head with the
+.B SO_DELIM
+flag set.
+For details, see
+.RI \(lq SO_DELIM \(rq
+in
+.BR M_SETOPTS (9),
+.BR read (2s)
+and
+.BR write (2s).
+Because a module or driver has no mechanism to examine Stream head options (only a mechanism to set
+them), modules and drivers should both generate and respect the
+.BR MSGDELIM
+flag in
+.B M_DATA
+messages when appropriate.
+.PP
 Messages composed of multiple message blocks will typically have
 .B M_DATA
 as the message type for all message blocks following the first.
+Examples are
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR M_IOCTL (9),
+.BR M_IOCDATA (9),
+and
+.BR M_CTL (9),
+messages.
+In the
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR putmsg (2),
+and
+.BR putpmsg (2s)
+system calls, the contents of the
+.B M_DATA
+message blocks,
+when attached to a
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+initial message block,
+are also referred to as the
+.IR "data part" .
+Rules governing the creation and form of
+.B M_DATA
+messages also applies to the
+.BR M_DATA (9)
+blocks attached to
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+messages.
+See
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+for details.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR M_DATA ,
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+messages are the work horses of a service interface under
+.IR STREAMS .
+They are generated both by user level processes as well as modules and drivers.  These messages
+normally represent a default service primitive within a service interface definition at a message
+passing boundary within a Stream.
+An
+.B M_DATA
+message is normally equivalent to a
+.BR M_PROTO (9)
+message, but with default control information associated with the message.
+The
+.B M_DATA
+message contains unstructured service interface user data.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR read (2),
-.BR write (2),
-.BR getmsg (2),
-.BR putmsg (2),
-.BR getpmsg (2s),
-.BR putpmsg (2s),
 .BR datab (9),
-.BR msgb (9).
+.BR allocb (9),
+.BR read (2s),
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR write (2s),
+.BR putmsg (2),
+.BR putpmsg (2s),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR queue (9),
+.BR M_HPDATA (9),
+.BR msgb (9),
+.BR M_SETOPTS (9),
+.BR M_IOCTL (9),
+.BR M_IOCDATA (9),
+.BR M_CTL (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -158,6 +366,8 @@ The
 message is standard across
 .I STREAMS
 implementations, and has no portability issues.
+.IP \(em
+Binary compatibiltiy is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

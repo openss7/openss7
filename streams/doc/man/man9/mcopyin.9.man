@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mcopyin.9.man,v 0.9.2.1 2005/07/02 11:23:35 brian Exp $
+.\" @(#) $Id: mcopyin.9.man,v 0.9.2.2 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/02 11:23:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -118,7 +118,7 @@ initial
 .BR M_IOCTL (9)
 of a
 .I TRANSPARENT
-.BR ioctl (2),
+.BR ioctl (2s),
 this argument must be
 .BR NULL ;
 in which case, the user address will be acquired from the passed in
@@ -138,7 +138,7 @@ message from a
 or
 .RI non- TRANSPARENT
 .RB ( I_STR )
-.BR ioctl (2)
+.BR ioctl (2s)
 received as a
 .BR M_IOCTL (9)
 or

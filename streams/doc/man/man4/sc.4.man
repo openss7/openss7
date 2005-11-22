@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sc.4.man,v 0.9.2.12 2005/10/15 10:19:45 brian Exp $
+.\" @(#) $Id: sc.4.man,v 0.9.2.13 2005/11/22 11:57:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/10/15 10:19:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,7 +99,7 @@ configuration module for
 .BR "Linux Fast-STREAMS" .
 It interprets a set of
 .B sc
-.BR ioctl (2)
+.BR ioctl (2s)
 commands and provides information about the streams configuration.
 .B sc
 does not interpret any
@@ -126,7 +126,7 @@ utility an other utilities needing to enquire about the configuration of
 .SH IOCTLS
 .PP
 This subsection details the
-.BR ioctl (2)
+.BR ioctl (2s)
 commands that are made available by pushing the
 .B sc
 module.  For general information on input-output controls for
@@ -251,7 +251,7 @@ module named
 .\"
 .SH "SEE ALSO"
 .PP
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR nuls (4),
 .BR sad (4)),
 .BR scls (8),

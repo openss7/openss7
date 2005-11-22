@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.6 2005/11/21 12:21:49 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.7 2005/11/22 11:57:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ structure and associated data buffer that contains structured data.
 .PP
 An
 .B M_IOCDATA
-message consists of one
+message is a high priority message that consists of one
 .B M_IOCDATA
 message block followed by one or more
 .BR M_DATA (9)
@@ -158,7 +158,7 @@ indicates failure.  If failure is indicated, the module should not
 generate an
 .BR M_IOCNAK (9)
 message.  It must abort all
-.BR ioctl (2)
+.BR ioctl (2s)
 processing, clean up its data structures,
 remove and free any message blocks linked to the
 .I cp_private
@@ -178,7 +178,7 @@ or
 message.  It is included in the
 .B M_IOCDATA
 message so the message can be self-describing.  This is intended to simplify
-.BR ioctl (2)
+.BR ioctl (2s)
 processing by modules and drivers.
 .PP
 If the message is in response to an
@@ -197,7 +197,7 @@ or
 .PP
 This message should not be queued by a module or driver unless it intends to process the data for
 the
-.BR ioctl (2)
+.BR ioctl (2s)
 in some way.
 .\"
 .\"
@@ -314,7 +314,7 @@ acknowledgement.
 .BR M_IOCNAK (9),
 .BR copyresp (9),
 .BR iocblk (9),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR datab (9),
 .BR msgb (9),
 .BR STREAMS (9).
@@ -358,9 +358,9 @@ When a module or driver receives an
 indicating an error
 .RI ( cp_rval
 is non-zero), it is supposed to free any private resources associated with the
-.BR ioctl (2),
+.BR ioctl (2s),
 abort the 
-.BR ioctl (2)
+.BR ioctl (2s)
 operation, free the message, and return.
 .[
 svr4spg
@@ -375,7 +375,7 @@ indicating the cause of failure of the operation.
 In the error case, the
 .I Stream head
 does not block awaiting any further
-.BR ioctl (2)
+.BR ioctl (2s)
 message blocks, and release the
 .B STRIOWAIT
 bit in the
@@ -392,8 +392,14 @@ or
 block.
 (Note however, that modules and drivers previously written to work with
 .I LiS
+.[
+lis
+.]
 will also work with
 .BR "@PACKAGE_TITLE@" ;
+.[
+lfs
+.]
 however, the extraneous
 .BR M_IOCACK (9)
 or
@@ -410,6 +416,39 @@ operation, i.e.
 and not that contained in any
 .BR M_IOCNAK (9)
 message.)
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+.B M_IOCDATA
+has a different constant value on
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and older versions of
+.IR LiS .
+.[
+lis
+.]
 .IP ""
 Portable
 .I STREAMS

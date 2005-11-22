@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fdetach.3.man,v 0.9.2.12 2005/05/14 08:34:13 brian Exp $
+.\" @(#) $Id: fdetach.3.man,v 0.9.2.13 2005/11/22 11:57:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -123,7 +123,7 @@ will also
 the
 .I STREAMS
 file if it represents the last
-.BR open (2)
+.BR open (2s)
 of that file.
 .\"
 .\"

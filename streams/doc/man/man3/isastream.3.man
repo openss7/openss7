@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: isastream.3.man,v 0.9.2.11 2005/05/14 08:34:13 brian Exp $
+.\" @(#) $Id: isastream.3.man,v 0.9.2.12 2005/11/22 11:57:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -162,7 +162,7 @@ implementations for, e.g.,
 and
 .I pipes
 (see
-.BR pipe (2)).
+.BR pipe (2s)).
 .sp
 .BR isastream ()
 is also useful in conjunction with
@@ -189,7 +189,7 @@ which only generates an error indicating that it is not implemented.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR pipe (2),
+.BR pipe (2s),
 .BR fattach (3),
 .BR fdetach (3),
 .BR fattach (8),

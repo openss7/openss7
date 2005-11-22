@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.2 2005/11/21 23:21:59 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.3 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 23:21:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -246,7 +246,7 @@ block contains
 bytes of data that was copied in from the user or was supplied by the sending module or driver.
 .PP
 Otherwise, if the input-output control derives from a transparent input-output control (see
-.BR ioctl (2))
+.BR ioctl (2s))
 from the stream head, then the value of the
 .I ioc_count
 member will be the special value,
@@ -354,7 +354,7 @@ The
 member is the value that will be stored in the
 .IR errno (3)
 variable upon return from the
-.BR ioctl (2)
+.BR ioctl (2s)
 call on both
 .BR M_IOCACK (9)
 and
@@ -364,7 +364,7 @@ responses to
 The
 .I ioc_rval
 member is the value that will be the return value of the
-.BR ioctl (2)
+.BR ioctl (2s)
 or
 .BR streamio (2)
 call on
@@ -507,11 +507,11 @@ svr42
 The
 .B iocblk
 structure was combined with the
-.B copyreq (9)
+.BR copyreq (9)
 and
-.B copyresp (9)
+.BR copyresp (9)
 structures (see
-.B ioctypes (9))
+.BR ioctypes (9))
 in
 .IR "SVR 4.0 STREAMS" .
 .PP

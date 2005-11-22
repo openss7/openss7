@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strread.9.man,v 0.9.2.3 2005/09/17 00:45:21 brian Exp $
+.\" @(#) $Id: strread.9.man,v 0.9.2.4 2005/11/22 11:57:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -201,13 +201,13 @@ message-nondiscard mode
 These modes can be examined by the user with the
 .BR I_GRDOPT (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 as described in
 .BR streamio (7).
 These modes can also be changed by the user with the
 .BR I_SRDOPT (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 as described in
 .BR streamio (7).
 .\"
@@ -291,13 +291,13 @@ control-discard mode
 These control modes can be examined by the user with the
 .BR I_GRDOPT (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 as described in
 .BR streamio (7).
 These control modes can also be changed by the user with the
 .BR I_SRDOPT (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 as described in
 .BR streamio (7).
 .\"
@@ -694,7 +694,7 @@ marked, a messages sent to the Stream head causes the Stream head to remember th
 may check to see if the message on the front of its Stream head read queue is marked with the
 .BR I_ATMARK (7)
 command to
-.BR ioctl (2).
+.BR ioctl (2s).
 If a user is reading data from the Stream head and there are multiple messages on the Stream head read queue, and one of those messages is marked,
 .BR strread ()
 and
@@ -724,7 +724,7 @@ using the
 flags of the
 .BR I_ATMARK (7)
 command to
-.BR ioctl (2).
+.BR ioctl (2s).
 A subsequent
 .BR strread ()
 will consume all contiguous marked messages that will fit into the
@@ -735,7 +735,7 @@ following the marked message.  This can be checked with the
 flag of the
 .BR I_ATMARK (7)
 command to
-.BR ioctl (2).
+.BR ioctl (2s).
 .\"
 .\"
 .SS Delimited Message Feature

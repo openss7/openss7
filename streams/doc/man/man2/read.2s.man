@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: read.2s.man,v 0.9.2.9 2005/08/29 10:06:30 brian Exp $
+.\" @(#) $Id: read.2s.man,v 0.9.2.10 2005/11/22 11:56:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:56:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -209,7 +209,7 @@ message-discard mode.  The default is byte-stream mode.  The current mode for a 
 file can be changed using the
 .B I_SRDOPT
 command to
-.BR ioctl (2),
+.BR ioctl (2s),
 and can be examined using the
 .BR I_GRDOPT
 command.
@@ -297,7 +297,7 @@ only supported control-normal mode.)  The current control mode for a particular
 file can be changes using the
 .BR I_SRDOPT (7)
 command to
-.BR ioctl (2),
+.BR ioctl (2s),
 and can be examined using the
 .BR I_GRDOPT (7)
 command.
@@ -356,7 +356,7 @@ Once marked, a message sent to the stream head causes the stream head to remembe
 user may check to see if the message on the front of its stream head read queue is marked with the
 .BR I_ATMARK (7)
 command to
-.BR ioctl (2).
+.BR ioctl (2s).
 If a user is reading data from the stream head and there are multiplex messages on the read queue,
 and one of those messages is marked,
 .BR read ()
@@ -380,7 +380,7 @@ delimited message.)  When a short read occurs, the user should test for a marked
 flag of the
 .BR I_ATMARK (7)
 command to
-.BR ioctl (2).
+.BR ioctl (2s).
 A subsequent
 .BR read ()
 will consume the marked message.  If a marked message exists, there is the possibility that there is
@@ -389,7 +389,7 @@ also a marked message following the marked message.  This can be checked with th
 flag of the
 .BR I_ATMARK (7)
 comand to
-.BR ioctl (2).
+.BR ioctl (2s).
 .\"
 .\"
 .SS Synchronous and Asynchronous I/O
@@ -726,13 +726,21 @@ will substantially increase server load and decrease performance.
 .PP
 .BR close (2),
 .BR fcntl (2),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR lseek (2),
 .BR readdir (2),
 .BR readlink (2),
 .BR select (2),
-.BR write (2),
+.BR write (2s),
 .BR fread (3)
+.PP
+If your
+.B GNU/Linux
+distribution is equipped with
+.I OpenGroup
+.I POSIX/SUSv3
+manual pages, also see
+.BR read (3p).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -1052,7 +1060,7 @@ lis
 uses the
 .B I_GETPMSG
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 to emulate the
 .BR getpmsg (2s)
 system call.

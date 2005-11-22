@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: miocack.9.man,v 0.9.2.2 2005/07/02 11:23:35 brian Exp $
+.\" @(#) $Id: miocack.9.man,v 0.9.2.3 2005/11/22 11:57:24 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/02 11:23:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:24 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,7 +111,7 @@ the count of the number of bytes of data contained in the attached message block
 .TP
 .I rval
 the return value to return from the
-.BR ioctl (2)
+.BR ioctl (2s)
 call.
 .\"
 .\"
@@ -143,12 +143,12 @@ is used in processing of
 and
 .BR M_IOCDATA (9)
 messages when performing
-.BR ioctl (2)
+.BR ioctl (2s)
 processing in a
 .I STREAMS
 module or driver write-side queue put or service procedures.  It is used to acknolwedge the
 completion of a
-.BR ioctl (2)
+.BR ioctl (2s)
 operation and return a value.
 .\"
 .\"

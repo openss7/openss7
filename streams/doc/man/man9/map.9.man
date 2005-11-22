@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: map.9.man,v 0.9.2.4 2005/05/14 08:34:25 brian Exp $
+.\" @(#) $Id: map.9.man,v 0.9.2.5 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:25 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -150,7 +150,7 @@ and can be examines with
 The number of waiters on the resource map is saved in the
 .I m_addr
 member in the first element.  This value is changed by
-.B rmsetwant (9)
+.BR rmsetwant (9)
 and
 .BR rmfree (9),
 and can be tested with

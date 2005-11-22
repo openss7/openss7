@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: nuls.4.man,v 0.9.2.14 2005/10/15 10:19:45 brian Exp $
+.\" @(#) $Id: nuls.4.man,v 0.9.2.15 2005/11/22 11:57:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/10/15 10:19:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -92,7 +92,7 @@ sort-adjacent-labels
 .PP
 .I fd
 is a file descriptor for a null stream opened using the
-.BR open (2)
+.BR open (2s)
 system call on one of the following devices:
 .TP
 .RB \*(lq /dev/nuls \*(rq
@@ -105,8 +105,8 @@ device is characterized by the following behaviour:
 All data written to  the
 .B nuls
 device with
-.BR write (2),
-.BR writev (2),
+.BR write (2s),
+.BR writev (2s),
 .BR putmsg (2)
 and
 .BR putpmsg (2s)
@@ -115,8 +115,8 @@ is discarded.
 All attempts to read the
 .B nuls
 device with
-.BR read (2),
-.BR readv (2),
+.BR read (2s),
+.BR readv (2s),
 .BR getmsg (2)
 or
 .BR getpmsg (2s)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copy_state.9.man,v 0.9.2.4 2005/07/03 17:40:14 brian Exp $
+.\" @(#) $Id: mi_copy_state.9.man,v 0.9.2.5 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -118,7 +118,7 @@ into which the pointer to the just copied in data (if applicable) is placed.
 .PP
 .BR mi_copy_state ()
 is one of a set of helper functions that support transparent input-output controls (see
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR streamio (9))
 that includes
@@ -203,7 +203,7 @@ returns minus one
 .RB ( -1 ).
 The error codes returned by
 to the
-.BR ioctl (2)
+.BR ioctl (2s)
 operation in
 .BR errno (3),
 are as follows:
@@ -239,7 +239,7 @@ Also, any error returned by the stream head in a
 response
 .RI ( cp->cp_rval )
 can also be returned to the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call.
 .\"
 .\"

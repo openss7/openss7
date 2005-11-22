@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.old.8.man,v 0.9.2.10 2005/05/14 08:34:15 brian Exp $
+.\" @(#) $Id: fattach.old.8.man,v 0.9.2.11 2005/11/22 11:57:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -221,7 +221,7 @@ opener, and the other end of which will be passed as if by the
 to the path attached to the other end (e.g., the
 .I server
 end).  Each opener of the server path could
-.BR poll (2)
+.BR poll (2s)
 for input, receive a new pipe end using the
 .B I_RECVFD
 .IR ioctl ,

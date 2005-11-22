@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: poll.2s.man,v 0.9.2.9 2005/05/11 20:08:22 brian Exp $
+.\" @(#) $Id: poll.2s.man,v 0.9.2.10 2005/11/22 11:56:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/11 20:08:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:56:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -361,7 +361,7 @@ The
 function is not affected by the
 .BR O_NONBLOCK
 file flag (see
-.BR open (2)
+.BR open (2s)
 or
 .BR fcntl (2)).
 That is,
@@ -507,7 +507,7 @@ has no known bugs.
 .BR M_ERROR (9),
 .BR M_HANGUP (9),
 .BR M_SIG (9),
-.BR open (2),
+.BR open (2s),
 .BR fcntl (2),
 .IR errno (3),
 .BR streamio (7).

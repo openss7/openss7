@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.3.man,v 0.9.2.12 2005/05/14 08:34:13 brian Exp $
+.\" @(#) $Id: fattach.3.man,v 0.9.2.13 2005/11/22 11:57:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -103,7 +103,7 @@ attaches an open
 .I STREAMS
 file to a path name in the file system.
 While the file is attached to the path name, opens (see
-.BR open (2))
+.BR open (2s))
 of the path name will instead open the
 .I STREAMS
 file.
@@ -406,8 +406,8 @@ LiS
 .BR fdetach (8),
 .BR fifo (4),
 .BR mount (8),
-.BR open (2),
-.BR pipe (2),
+.BR open (2s),
+.BR pipe (2s),
 .BR STREAMS (4).
 .\"
 .\"

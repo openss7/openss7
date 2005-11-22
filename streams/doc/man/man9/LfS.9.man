@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LfS.9.man,v 0.9.2.14 2005/05/14 08:34:16 brian Exp $
+.\" @(#) $Id: LfS.9.man,v 0.9.2.15 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -189,7 +189,7 @@ an existing pipe end
 .BR putpmsg (2s)
 \-\ put a message to a STREAMS character device
 .HP
-.BR poll (2)
+.BR poll (2s)
 \-\ wait for some event on a STREAMS character device
 .HP
 .BR fattach (3)
@@ -201,22 +201,22 @@ an existing pipe end
 .BR isastream (2)
 \-\ determine whether an open file is a STREAMS character device
 .HP
-.BR open (2)
+.BR open (2s)
 \-\ open and possibly create a file or device
 .HP
 .BR close (2)
 \-\ close a file descriptor
 .HP
-.BR read "(2), " readv (2)
+.BR read "(2), " readv (2s)
 \-\ read from a file descriptor
 .HP
-.BR write "(2), " writev (2)
+.BR write "(2), " writev (2s)
 \-\ write to a file descriptor
 .HP
-.BR pipe (2)
+.BR pipe (2s)
 \-\ create a STREAMS pipe
 .HP
-.BR ioctl (2)
+.BR ioctl (2s)
 \-\ control device
 .HP
 .BR streamio (7)
@@ -1097,8 +1097,8 @@ The default value is 2^18.
 This is the system wide maximum.  Existing allocations are unaffected by
 lowering this value.
 Changing this value can have an impact on users of
-.BR write (2),
-.BR writev (2),
+.BR write (2s),
+.BR writev (2s),
 and
 .BR putpmsg (2s).
 .TP

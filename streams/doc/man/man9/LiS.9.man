@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 0.9.2.12 2005/05/14 08:34:16 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 0.9.2.13 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -180,7 +180,7 @@ put a message to a
 .I STREAMS
 character device
 .HP
-.BR poll (2)
+.BR poll (2s)
 \-
 wait for some event on a
 .I STREAMS
@@ -204,7 +204,7 @@ determine whether an open file is a
 .I STREAMS
 character device
 .HP
-.BR open (2)
+.BR open (2s)
 \-
 open and possibly create a file or device
 .HP
@@ -212,21 +212,21 @@ open and possibly create a file or device
 \-
 close a file descriptor
 .HP
-.BR read "(2), " readv (2)
+.BR read "(2), " readv (2s)
 \-
 read from a file descriptor
 .HP
-.BR write "(2), " writev (2)
+.BR write "(2), " writev (2s)
 \-
 write to a file descriptor
 .HP
-.BR pipe (2)
+.BR pipe (2s)
 \-
 create a
 .I STREAMS
 pipe
 .HP
-.BR ioctl (2)
+.BR ioctl (2s)
 \-
 control device
 .HP

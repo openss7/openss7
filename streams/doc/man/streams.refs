@@ -2675,11 +2675,11 @@ Part 1: Protocol Specification
 %U http://www.openss7.org/
 
 %K lfs
-%L streams-0.7a.3
-%R streams-0.7a.3
+%L streams-0.7a.4
+%R streams-0.7a.4
 %A OpenSS7
 %Q OpenSS7
-%T Linux Fast-STREAMS (LfS) 0.7a.3 Source Code
+%T Linux Fast-STREAMS (LfS) 0.7a.4 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/

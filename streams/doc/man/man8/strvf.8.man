@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strvf.8.man,v 0.9.2.15 2005/07/21 20:47:21 brian Exp $
+.\" @(#) $Id: strvf.8.man,v 0.9.2.16 2005/11/22 11:57:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -108,10 +108,10 @@ Verbose output is always sent to the log file
 These subcommands make sure that the
 .I STREAMS
 kernel daemons are running and that
-.BR open (2),
+.BR open (2s),
 .BR putmsg (2),
 .BR getmsg (2),
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR close (2)
 can be performed on

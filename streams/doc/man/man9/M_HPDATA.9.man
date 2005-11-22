@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_HPDATA.9.man,v 0.9.2.2 2005/11/21 05:52:09 brian Exp $
+.\" @(#) $Id: M_HPDATA.9.man,v 0.9.2.3 2005/11/22 11:57:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 05:52:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ structure and associated data buffer that contains unstructured data.
 .PP
 An
 .B M_HPDATA
-message consists of one
+message is a high priority message that consists of one
 .B M_HPDATA
 message block followed by zero or more
 .BR M_DATA (9)
@@ -98,6 +98,49 @@ message blocks.
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B M_HPDATA
+is an
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+implementation specific message that is generated and used internally by the
+.IR OSF/1 \(rg
+implementation of
+.IR STREAMS .
+.\"
+.\"
+.SH USAGE
+.PP
+The use of the
+.B M_HPDATA
+message is poorly documented and it is not intended to be used by
+.I STREAMS
+modules and drivers.
+One can only assume that it is used by the
+.I Stream head
+to place the data part of a message back on the
+.I Stream head
+read queue that has had a high priority control part (i.e.,
+.BR M_PCPROTO (9)
+message block) removed.
+.PP
+The
+.B M_HPDATA
+message will not be passed down a Stream from the Stream head.
+.PP
+Modules or drivers receiving this message type should treat it as a high priority message of unknown
+type.  That is:
+.IP \(bu \w'\(bu\(em'u
+Modules receiving the
+.BR H_HPDATA
+message should pass it along as any unknown high priority message type.  The message is of high
+priority and should not be subject to flow control.
+.IP \(bu
+A driver reecieving the
+.BR M_HPDATA
+message should discard the message as an unknown message type.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -117,9 +160,57 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Only
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+and
+.IR "Mac OT" \(rg
+.[
+macspg
+.]
+document the
+.BR M_HPDATA (9)
+data block type.
+This data block type is provided for source compatibility with drivers written
+for
+.IR OSF/1 \(rg
+and
+.IR "Mac OT" \(rg,
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _OSF_SOURCE
+before including
+.B sys/stream.h
+to expose this symbol.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_HPDATA (9)
+data block type.
 .IP \(em
+The
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+Stream head does not use this message type and will discard it if it arrives at the Stream head.
+.IP \(em
+.B M_HPDATA
+has a different constant value under
+.IR OSF/1 \(rg
+and
+.IR MacOT \(rg.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
+.BR osfcompat (9)
+and
 .BR STREAMS (9)
 for additional compatibility information.
 .\"

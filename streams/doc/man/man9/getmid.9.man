@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmid.9.man,v 0.9.2.13 2005/05/14 08:34:24 brian Exp $
+.\" @(#) $Id: getmid.9.man,v 0.9.2.14 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -166,7 +166,7 @@ member of the
 structure pointed to by the
 .I qi_minfo
 of the
-.B qinit (9)
+.BR qinit (9)
 structure, which is usually hard coded for each driver or module.  The module
 name should be unique across drivers and modules.
 .\"

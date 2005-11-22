@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.6 2005/11/21 05:52:10 brian Exp $
+.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.7 2005/11/22 11:57:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 05:52:10 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ structure and associated data buffer that contains structured data.
 .PP
 An
 .B M_SETOPTS
-message consists of a single
+message is a normal priority message that consists of a single
 .B M_SETOPTS
 message block.
 .\"
@@ -224,7 +224,7 @@ message blocks as thought the control part did not exist.
 Read options can also be set and examined by a user program with the
 .BR I_SRDOPT "(7) or " I_GRDOPT (7)
 commands to
-.BR ioctl (2)
+.BR ioctl (2s)
 as detailed in
 .BR streamio (7).
 .\"
@@ -802,7 +802,7 @@ stucture contained in the message.  (The
 tty line discipline module does this.)  The process may also issue a
 .BR I_SWROPT (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 with the
 .B SNDHOLD
 flag set in the argument to enable the hold option on a particular Stream, but this is a
@@ -858,7 +858,7 @@ list, rather than setting a timer per Stream.
 .PP
 .IR Solaris \(rg
 .[
-soldoc
+solspg
 .]
 no longer implements this option.
 .I LiS
@@ -905,6 +905,32 @@ and implementations based on
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IP \(em
+.B M_SETOPTS
+has a different constant value on
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

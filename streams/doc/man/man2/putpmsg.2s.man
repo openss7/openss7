@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putpmsg.2s.man,v 0.9.2.6 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: putpmsg.2s.man,v 0.9.2.7 2005/11/22 11:56:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:56:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -497,9 +497,9 @@ message could not be formulated and sent immediately.
 .SH "SEE ALSO"
 .PP
 .BR intro (2),
-.BR poll (2),
+.BR poll (2s),
 .BR putmsg (2),
-.BR write (2),
+.BR write (2s),
 .BR streamio (7).
 .\"
 .\"
@@ -614,7 +614,7 @@ that are used to implement this system call.
 In addition,
 .B Linux Fast-STREAMS
 recognizes the \*(lqinvalid\*(rq buffer length to
-.BR write (2)
+.BR write (2s)
 used by LiS to emulate the
 .I __NR_getpmsg
 system call, permitting LiS libraries to be used with

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.5 2005/11/21 12:21:49 brian Exp $
+.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.6 2005/11/22 11:57:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 The
 .B M_IOCTL
-message consists of one
+message is a normal priority message that consists of one
 .B M_IOCTL
 message block followed by one or more
 .BR M_DATA (9)
@@ -112,18 +112,18 @@ in response to
 .BR I_PLINK (7),
 and
 .BR I_PUNLINK (7)
-.RB [ ioctl (2)
+.RB [ ioctl (2s)
 .I STREAMS
 system calls, see
 .BR streamio (7)],
 and in response to
-.BR ioctl (2)
+.BR ioctl (2s)
 calls that contain a command argument value not defined in
 .BR streamio (7)
 or
 .BR termios (7).
 When one of these
-.BR ioctl (2)
+.BR ioctl (2s)
 commands is received from a user process, the
 .I Stream head
 uses values supplied in the call and values from the process to create an
@@ -132,7 +132,7 @@ message containing them, and sends the message downstream.
 .PP
 .B M_IOCTL
 messages are intended to perform the general
-.BR ioctl (2)
+.BR ioctl (2s)
 functions of character device drivers, and the specific functions of
 .I STREAMS
 devices and terminals.
@@ -147,13 +147,13 @@ The user can generate a
 .BR I_STR -based
 I/O control using the
 .BR I_STR (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 command.
 Whan a user issues an
 .BR I_STR (7)
-.BR ioctl (2),
+.BR ioctl (2s),
 the user values are supplied in a structure of the following form, provided as an argument to the
-.BR ioctl (2)
+.BR ioctl (2s)
 call [see
 .BR I_STR (7)
 in
@@ -197,7 +197,7 @@ can generate an
 I/O control when a recognized terminal I/O control, from
 .BR termios (7),
 is used by the user with the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call.
 In this case,
 .TP \w'ic_timout\(em'u
@@ -231,7 +231,7 @@ I/O control in response to an
 .BR I_PLINK (7),
 or
 .BR I_PUNLINK (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 command issued by the user, or when an
 .BR I_UNLINK (7)
 is generated internally a a result of dismantling a
@@ -299,7 +299,7 @@ struct iocblk {
 .PP
 In the case of an
 .BR I_STR -based
-.BR ioctl (2),
+.BR ioctl (2s),
 that was generated from one of the three sources, above,
 .TP \w'ioc_count\(em'u
 .I ioc_cmd
@@ -313,7 +313,7 @@ structure;
 points to the credentials structure defining the user process' permissions (see
 .BR cred.h ),
 the contents of which can be tested to determine if the user issuing the
-.BR ioctl (2)
+.BR ioctl (2s)
 call is authorized to do so;
 .TP
 .I ioc_count
@@ -378,7 +378,7 @@ character devices.
 Whenever the
 .I Stream head
 does not recognize the command argument of an
-.BR ioctl (2),
+.BR ioctl (2s),
 (that is, the command is not one of the
 .BR streamio (7)
 or
@@ -415,7 +415,7 @@ block are populated as follows:
 is populated with the
 .I command
 argument from the
-.BR ioctl (2)
+.BR ioctl (2s)
 call;
 .TP
 .I ioc_cr
@@ -428,7 +428,7 @@ is set to the special value,
 .RB \(lq TRANSPARENT ,\(rq
 to indicate that this is a
 .I transparent
-.BR ioctl (2)
+.BR ioctl (2s)
 message; and,
 .TP
 .I ioc_id
@@ -441,7 +441,7 @@ A single
 message block is allocated with sufficient room to hold the value of the
 .I arg
 argument to the
-.BR ioctl (2)
+.BR ioctl (2s)
 call, the argument is placed directly in the buffer, and the block is linked to the
 .B M_IOCTL
 block to form the completed
@@ -458,7 +458,7 @@ message is then passed downstream and the calling process blocks awaiting an ack
 The response message which completes the
 .I Stream head
 processing for the
-.BR ioctl (2)
+.BR ioctl (2s)
 is an
 .BR M_IOCACK (9)
 (positive acknowledgement) or an
@@ -607,7 +607,7 @@ The differences are described in the sections below.
 .PP
 For an
 .BR I_STR (7)
-.BR ioctl (2),
+.BR ioctl (2s),
 the timeout interval if no response is received is specified by
 .I ic_timout
 in the
@@ -624,7 +624,7 @@ can also be set to the special value,
 to specify an indefinite timeout.
 For other
 .BR I_STR -based
-.BR ioctl (2),
+.BR ioctl (2s),
 such as those in response to
 .BR termios (7)
 commands, the default timeout interval
@@ -718,7 +718,7 @@ message,
 the module or driver knows that the value of the
 .I arg
 argument to the original
-.BR ioctl (2)
+.BR ioctl (2s)
 call is contained in the attached
 .BR M_DATA (9)
 block.  It can use this address to copy in data from the user using the
@@ -920,6 +920,9 @@ driver utilities directly.
 .SH NOTICES
 .PP
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 implementation cannot permit
 .BR M_IOCACK (9)
 to return an error number and a return value simultaneously.  This is because
@@ -927,6 +930,9 @@ to return an error number and a return value simultaneously.  This is because
 system calls encode the error number into the return value.
 .PP
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 uses a default of
 .BR "15 seconds" ,
 in accordance with common practise.
@@ -1096,6 +1102,9 @@ and implementations based on
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 uses
 .B 15 seconds
 as a default timeout.  This value can be altered using the
@@ -1118,7 +1127,7 @@ use the default timeout.
 Although
 .B 15 seconds
 is the traditional default value for
-.BR ioctl (2)
+.BR ioctl (2s)
 timeout for
 .IR STREAMS ,
 portable
@@ -1151,6 +1160,9 @@ structures, vary in
 from implementation to implementation.  Some implementations have different structure definitions
 depending upon the word size of a specific architecture.
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 follows the
 .IR "SVR 4.2"
 implementation as closely as possible.
@@ -1160,6 +1172,34 @@ Portable
 modules and drivers will not rely upon a specific overall size of the
 .BR ioclk (9)
 structure, or the offset or alignment of any of its members.
+See
+.BR iocblk (9)
+for additional compatibiltiy information.
+.IP \(em
+.B M_IOCTL
+has a different constant value on
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
 .IP \(em
 Binary compatiblity is not guaranteed.
 .PP

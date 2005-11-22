@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.1 2005/07/02 06:32:18 brian Exp $
+.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.2 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/02 06:32:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -120,7 +120,7 @@ the number of bytes to copy in from user space.
 .PP
 .BR mi_copyin_n ()
 is one of a set of helper functions that support transparent input-output controls (see
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR streamio (9))
 that includes
@@ -193,7 +193,7 @@ If
 fails due to an recoverable error, it issues a
 .BR M_IOCNAK (9)
 message upstream to terminate the
-.BR ioctl (2)
+.BR ioctl (2s)
 operation with the appropriate error code.
 The error code returned can be one of the follolwing values:
 .TP
@@ -207,7 +207,7 @@ The error code returned can be one of the follolwing values:
 The following example illustrates the use of
 .BR mi_copyin_n ().
 In the example, the user passes a variable length data structure to the
-.BR ioctl (2)
+.BR ioctl (2s)
 call as either a
 .B TRANSPARENT
 or

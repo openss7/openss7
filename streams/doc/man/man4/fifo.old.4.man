@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fifo.old.4.man,v 0.9.2.9 2005/05/14 08:34:13 brian Exp $
+.\" @(#) $Id: fifo.old.4.man,v 0.9.2.10 2005/11/22 11:57:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -432,7 +432,7 @@ having the same major device number.
 .BR mkfifo (1),
 .BR s_pipe (3),
 .BR socketpair (2),
-.BR open (2),
+.BR open (2s),
 .BR signal (2),
 .BR sigaction (2).
 .\"

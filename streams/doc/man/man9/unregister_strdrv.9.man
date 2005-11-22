@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_strdrv.9.man,v 0.9.2.4 2005/08/29 10:06:50 brian Exp $
+.\" @(#) $Id: unregister_strdrv.9.man,v 0.9.2.5 2005/11/22 11:57:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:25 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: unregister_strdrv.9.man,v $
+.\" Revision 0.9.2.5  2005/11/22 11:57:25  brian
+.\" - updating documentation for release
+.\"
 .\" Revision 0.9.2.4  2005/08/29 10:06:50  brian
 .\" - documentation updates during rework
 .\"
@@ -205,7 +208,7 @@ to publish the driver to the
 executive and the
 .BR specfs (5)
 file system, making the driver available to user space scripts and programs to
-.BR open (2)
+.BR open (2s)
 the device driver via the
 .BR specfs (5).
 .PP
@@ -219,7 +222,7 @@ to remove the driver from the
 executive and the
 .BR specfs (5)
 file system, making the driver no longer available to user space scripts and programs to
-.BR open (2)
+.BR open (2s)
 the device driver via the
 .BR specfs (5).
 .PP
@@ -316,7 +319,7 @@ is a module or driver termination routine.
 .SH "SEE ALSO"
 .PP
 .BR cdevsw (9),
-.BR open (2),
+.BR open (2s),
 .BR specfs (5),
 .BR cdev_del (9),
 .BR register_strdrv (9),

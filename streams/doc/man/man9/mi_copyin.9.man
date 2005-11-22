@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyin.9.man,v 0.9.2.4 2005/07/03 17:40:14 brian Exp $
+.\" @(#) $Id: mi_copyin.9.man,v 0.9.2.5 2005/11/22 11:57:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -127,7 +127,7 @@ the number of bytes to copy in from user space.
 .PP
 .BR mi_copyin ()
 is one of a set of helper functions that support transparent input-output controls (see
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR streamio (9))
 that includes

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: termio.7.man,v 0.9.2.2 2005/11/20 20:17:28 brian Exp $
+.\" @(#) $Id: termio.7.man,v 0.9.2.3 2005/11/22 11:57:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/20 20:17:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -100,7 +100,7 @@ module or driver.
 .PP
 .I STREAMS
 terminal input-output control commands are invoked using the normal
-.BR ioctl (2)
+.BR ioctl (2s)
 system call, but are defined only for
 .I STREAMS
 terminal character special files.
@@ -595,13 +595,13 @@ structure.
 .PP
 Upon success, the
 .B termio
-.BR ioctl (2)
+.BR ioctl (2s)
 command returns zero
 .RB ( 0 )
 or a positive integer.
 Upon failure, the
 .B termio
-.BR ioctl (2)
+.BR ioctl (2s)
 command returns minus one
 .RB ( -1 )
 and sets
@@ -613,7 +613,7 @@ to an appropriate error number.
 .PP
 When the
 .B termio
-.BR ioctl (2)
+.BR ioctl (2s)
 command fails, it returns minus one
 .RB ( -1 )
 and sets
@@ -622,7 +622,7 @@ to one of the following errors:
 .\"
 .PP
 In general, any
-.BR ioctl (2)
+.BR ioctl (2s)
 command can fail if:
 .TP \w'[EWOULDBLOCK]\(em'u
 .RB [ EFAULT ]
@@ -664,14 +664,14 @@ special file that accepts I/O controls.
 refers to a
 .I STREAMS
 special file that does not support the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call.
 (Under
 .BR "@PACKAGE_TITLE@" ,
 all
 .I STREAMS
 special files support the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call.)
 .TP
 .RB [ ENXIO ]
@@ -708,7 +708,7 @@ error should be generated.)
 .I fd
 refers to a Stream that is linked under a multiplexing driver.  If a Stream is
 linked under a multiplexing driver, all
-.BR ioctl (2)
+.BR ioctl (2s)
 commands other than
 .B I_UNLINK
 or
@@ -726,7 +726,7 @@ a signal was received before the operation could complete.
 the file is set for asynchronous I/O and the operation would block.  (A
 .I STREAMS
 special file is set for asynchronous I/O when
-.BR open (2)
+.BR open (2s)
 was called with the
 .B O_NDELAY
 or
@@ -753,7 +753,7 @@ message) from the module or driver.
 a message block could not be allocated during the operation and the operation
 is not permitted to block.
 Under some circumstances, an
-.BR ioctl (2)
+.BR ioctl (2s)
 command will block awaiting the availability of message blocks, regardless of the setting of
 .BR O_NDELAY " or " O_NONBLOCK .
 .PP
@@ -784,7 +784,7 @@ message issued for an
 .BR I_LINK (7),
 or
 .BR I_PLINK (7),
-.BR ioctl (2)
+.BR ioctl (2s)
 can be returned in
 .IR errno (3).
 .\"
@@ -792,7 +792,7 @@ can be returned in
 .SH NOTICES
 .PP
 .I STREAMS
-.BR ioctl (2)
+.BR ioctl (2s)
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
@@ -804,7 +804,7 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .SH "SEE ALSO"
 .PP
 .BR ioctl (3p),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR errno (3).
 .\"
 .\"
@@ -814,7 +814,7 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 has no known bugs.
 .PP
 .I STREAMS
-.BR ioctl (2)
+.BR ioctl (2s)
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
@@ -889,7 +889,7 @@ test suite.
 .\"
 .SH HISTORY
 .PP
-.BR ioctl (2)
+.BR ioctl (2s)
 for
 .I STREAMS
 first appeared in SVR 3.

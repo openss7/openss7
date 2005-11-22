@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipemod.4.man,v 0.9.2.10 2005/10/15 10:19:45 brian Exp $
+.\" @(#) $Id: pipemod.4.man,v 0.9.2.11 2005/11/22 11:57:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/10/15 10:19:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -103,7 +103,7 @@ to reverse the sense of the
 command.  (See the
 .IR I_FLUSH (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 as described in
 .BR streamio (7)).
 .PP
@@ -159,7 +159,7 @@ On a bare
 with no modules pushed, issuing the
 .IR I_FLUSH (7)
 command to
-.BR ioctl (2)
+.BR ioctl (2s)
 with the
 .BR FLUSHR
 flag will flush the read-side queues at both STREAM heads (pipe ends);
@@ -245,12 +245,12 @@ module named
 .\"
 .SH "SEE ALSO"
 .PP
-.BR pipe (2),
+.BR pipe (2s),
 .BR spx (4),
 .BR pipe (4),
 .BR I_FLUSH (7),
 .BR M_FLUSH (9),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR streamio (7).
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_PLINK.7.man,v 0.9.2.3 2005/11/20 22:20:06 brian Exp $
+.\" @(#) $Id: I_PLINK.7.man,v 0.9.2.4 2005/11/22 11:57:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/20 22:20:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_PLINK.7.man,v $
+.\" Revision 0.9.2.4  2005/11/22 11:57:13  brian
+.\" - updating documentation for release
+.\"
 .\" Revision 0.9.2.3  2005/11/20 22:20:06  brian
 .\" - still working up documentation
 .\"
@@ -118,7 +121,7 @@ is the integer file descriptor of the Stream to link.
 .PP
 The
 .B I_PLINK
-.BR ioctl (2)
+.BR ioctl (2s)
 command links one Stream, with file descriptor
 .IR arg ,
 under the multiplexing driver of another Stream, with file descriptor
@@ -126,7 +129,7 @@ under the multiplexing driver of another Stream, with file descriptor
 .PP
 .I fd
 is the file descriptor of a Stream connected to a multiplexing driver, that was returned from the
-.BR open (2)
+.BR open (2s)
 system call when the multiplexing driver was opened and the Stream created.  A multiplexing driver
 is a
 .I STREAMS
@@ -141,9 +144,9 @@ structure defining the driver are
 .PP
 .I arg
 is the file descriptor of another Stream, that was returned from the
-.BR open (2)
+.BR open (2s)
 or
-.BR pipe (2)
+.BR pipe (2s)
 system call when the Stream was created.
 In general, the Stream specified by
 .I arg
@@ -186,7 +189,7 @@ acknowledgement is expected from the driver before the operation can complete.
 .PP
 The
 .B I_PLINK
-.BR ioctl (2)
+.BR ioctl (2s)
 call will block waiting to acquire exclusive access to the Streams associated with
 .I fd
 and
@@ -253,7 +256,7 @@ throughout, all control Streams can be closed and the configuration will remain 
 .PP
 In contrast, the
 .BR I_LINK (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 causes a Stream to be regularly (non-persistently) linked under a multiplexing driver.
 .PP
 Persistent links are typically used for system initialization without the need for a daemon process.
@@ -285,11 +288,11 @@ error number.
 .PP
 Upon success, the
 .B I_PLINK
-.BR ioctl (2)
+.BR ioctl (2s)
 command returns a positive integer.
 Upon failure, the
 .B I_PLINK
-.BR ioctl (2)
+.BR ioctl (2s)
 command returns minus one
 .RB ( -1 )
 and sets
@@ -308,7 +311,7 @@ command.
 .PP
 When the
 .B I_PLINK
-.BR ioctl (2)
+.BR ioctl (2s)
 command fails, it returns minus one
 .RB ( -1 )
 and sets
@@ -322,7 +325,7 @@ does not specify a valid, open file descriptor.
 .RB [ ENODEV ]
 .I fd
 refers to a file that does not support the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call.
 .TP
 .RB [ ENOSTR ]
@@ -486,7 +489,7 @@ will be set to the error number in the message.
 .SH NOTICES
 .PP
 .I STREAMS
-.BR ioctl (2)
+.BR ioctl (2s)
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
@@ -601,14 +604,14 @@ from the first listing could have been stored in a file and used in the second l
 .BR I_LINK (7),
 .BR ioctl (3p),
 .BR streamio (7),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR errno (3).
 .\"
 .\"
 .SH BUGS
 .PP
 .I STREAMS
-.BR ioctl (2)
+.BR ioctl (2s)
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
@@ -681,7 +684,7 @@ application programs will not directly specify minus one, but will use the symbo
 for this value.
 .PP
 For general
-.BR ioctl (2)
+.BR ioctl (2s)
 compatibility, see
 .BR streamio (7).
 .PP
@@ -726,7 +729,7 @@ test suite.
 .\"
 .SH HISTORY
 .PP
-.BR ioctl (2)
+.BR ioctl (2s)
 for
 .I STREAMS
 first appeared in SVR 3.

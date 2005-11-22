@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: specfs.5.man,v 0.9.2.9 2005/05/14 08:34:14 brian Exp $
+.\" @(#) $Id: specfs.5.man,v 0.9.2.10 2005/11/22 11:57:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -109,7 +109,7 @@ filesystem is always loaded and present in the kernel when the
 kernel module is loaded.
 .PP
 When
-.BR open (2)
+.BR open (2s)
 is performed on a character special device corresponding to a
 .I STREAMS
 driver, the inode attached to the filepointer associated with the opening file
@@ -120,7 +120,7 @@ file system that represents a minor node of the
 character special device.  The original inode (as a device in the
 .B /dev
 directory) no longer plays a part until another
-.BR open (2)
+.BR open (2s)
 is performed.  This is in fitting with the description of the
 .I vnode
 and
@@ -245,7 +245,7 @@ and if that is not successful, the kernel module named
 .BI streams- devname\fR.
 .IP 2.
 Attempting to
-.BR open (2)
+.BR open (2s)
 a character special device in a device directory named
 .BI /dev/streams/ devname / nnnn
 will result in the

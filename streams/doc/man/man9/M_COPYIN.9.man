@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_COPYIN.9.man,v 0.9.2.6 2005/11/21 23:21:59 brian Exp $
+.\" @(#) $Id: M_COPYIN.9.man,v 0.9.2.7 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 23:21:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ structure and associated data buffer that contains unstructured data.
 .PP
 An
 .B M_COPYIN
-message consists of one
+message is a high priority message that consists of one
 .B M_COPYIN
 message block followed by one or more
 .BR M_DATA (9)
@@ -159,7 +159,7 @@ The
 .I cq_private
 field can be used by a module to point to a message block containing the module's state information
 relating to this
-.BR ioctl (2).
+.BR ioctl (2s).
 The
 .I Stream head
 will copy (without processing) the contents of this field to the
@@ -219,7 +219,7 @@ message block whose
 member is set to
 .BR "(caddr_t)(1)" ,
 to indicate the error, and then aborts the
-.BR ioctl (2)
+.BR ioctl (2s)
 operation and returns
 .RB [ EFAULT ]
 to the user in
@@ -227,7 +227,7 @@ to the user in
 This provides the module or driver with the opportunity to clean up the
 .I cq_private
 pointer when the
-.BR ioctl (2)
+.BR ioctl (2s)
 operation is aborted.
 .PP
 See
@@ -249,13 +249,13 @@ In any event, an intermediate module must not flush or discard an
 message.
 .IP ""
 As only one
-.BR ioctl (2)
+.BR ioctl (2s)
 operation, and therefore, one
 .B M_COPYIN
 message can be in progress on a Stream, queueing of the message would cause unnecessary delay in
 processing a
 .I transparent
-.BR ioctl (2).
+.BR ioctl (2s).
 Only one high priority message can be outstanding at the
 .IR "Stream head" ,
 so ordering of this message with respect to other high priority messages is not an issue.
@@ -264,7 +264,7 @@ Modules or drivers should only issue a
 .B M_COPYIN
 message as part of a
 .I transparent
-.BR ioctl (2)
+.BR ioctl (2s)
 operation.
 .IP \(bu
 The message should be created by transforming a received
@@ -274,7 +274,7 @@ or
 message.
 .IP \(bu
 The module or driver issuing this message should attach all state information pertaining to the
-.BR ioctl (2)
+.BR ioctl (2s)
 operation using the
 .I cq_private
 pointer in the
@@ -453,8 +453,47 @@ Portable
 .I STREAMS
 modules and drivers will use
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 instead of
 .BR LiS .
+.[
+lis
+.]
+.IP \(em
+.B M_COPYIN
+has a different constant value on
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
 .IP \(em
 Binary compatiblity is not guaranteed.
 .PP

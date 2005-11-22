@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: MPSTR_QRELE.9.man,v 0.9.2.13 2005/05/14 08:34:17 brian Exp $
+.\" @(#) $Id: MPSTR_QRELE.9.man,v 0.9.2.14 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:17 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,7 +93,7 @@ sort-adjacent-labels
 .TP \w'priority\(em'u
 .I q
 A pointer to the
-.B queue (9)
+.BR queue (9)
 structure to release from exclusive access.
 .TP
 .I priority

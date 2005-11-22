@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_BACKDONE.9.man,v 0.9.2.3 2005/11/21 12:21:49 brian Exp $
+.\" @(#) $Id: M_BACKDONE.9.man,v 0.9.2.4 2005/11/22 11:57:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 12:21:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ structure and associated data buffer that contains no data.
 .PP
 An
 .B M_BACKDONE
-message consists of one
+message is a high priority message that consists of one
 .B M_BACKDONE
 message block.
 .\"
@@ -197,9 +197,20 @@ is an
 specific message.
 .\"
 .\"
+.SH EXAMPLES
+.PP
+See the example under
+.BR M_BACKWASH (9).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR datab (9),
+.\".BR M_BACKDONE (9),
+.BR M_BACKWASH (9),
+.BR M_DONTPLAY (9),
+.BR M_LETSPLAY (9),
+.BR wantio (9),
 .BR msgb (9).
 .\"
 .\"
@@ -212,17 +223,51 @@ message is compatible with
 .IR AIX \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Only
+.IR AIX \(rg
+.[
+aixspg
+.]
+documents the
+.BR M_BACKWASH "(9), " M_LETSPLAY "(9), " M_DONTPLAY "(9) and " M_BACKDONE (9)
+data block types.
+These data block types are provided for source compatibility with drivers
+written for
+.IR AIX \(rg
+.[
+aixspg
+.]
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _AIX_SOURCE
+before including
+.B sys/stream.h
+to expose these symbols.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_BACKWASH "(9), " M_LETSPLAY "(9), " M_DONTPLAY "(9) or " M_BACKDONE (9)
+data block types.
+.IP \(em
 .B M_BACKDONE
 is an
 .IR AIX \(rg
 specific message, provided by
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 for compatibility with
 .IR AIX \(rg.
 .IP ""
 Portable
 .I STREAMS
 modules and drivers will not use this message.
+.IP \(em
+Binary compatibiltiy is not guaranteed.
 .PP
 See
 .BR aixcompat (9)
@@ -236,7 +281,7 @@ for additional compatibility information.
 .IR AIX \(rg
 documentation.
 .[
-aixdoc
+aixspg
 .]
 .\"
 .\"
@@ -247,7 +292,7 @@ The
 message first appeared in
 .IR AIX \(rg.
 .[
-aixdoc
+aixspg
 .]
 .\"
 .\"

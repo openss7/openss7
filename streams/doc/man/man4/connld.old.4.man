@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: connld.old.4.man,v 0.9.2.8 2005/05/14 08:34:13 brian Exp $
+.\" @(#) $Id: connld.old.4.man,v 0.9.2.9 2005/11/22 11:57:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -106,7 +106,7 @@ When first
 .IR pushed ,
 .B connld
 does nothing; on each subsequent
-.BR open (2),
+.BR open (2s),
 .B connld
 will generate a unique
 .I STREAMS
@@ -142,7 +142,7 @@ onto the client end, and then listens via
 .B I_RECVFD
 for new connections on the server end.
 A client wishing to connect to the server will
-.BR open (2)
+.BR open (2s)
 the path name representing the client end, and can determine via
 .BR isastream (3)
 whether or not the server process is active and attached.  If 
@@ -162,7 +162,7 @@ the point of access by calling
 before terminating.
 .sp
 It should be noted that the
-.BR poll (2)
+.BR poll (2s)
 primitive may be used to indicate when an 
 .B M_PASSFP
 representing a newly passed file is available on the original server

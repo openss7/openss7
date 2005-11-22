@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: perftest.8.man,v 0.9.2.2 2005/11/20 22:20:09 brian Exp $
+.\" @(#) $Id: perftest.8.man,v 0.9.2.3 2005/11/22 11:57:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -61,11 +61,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/20 22:20:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: perftest.8.man,v $
+.\" Revision 0.9.2.3  2005/11/22 11:57:17  brian
+.\" - updating documentation for release
+.\"
 .\" Revision 0.9.2.2  2005/11/20 22:20:09  brian
 .\" - still working up documentation
 .\"
@@ -306,23 +309,23 @@ for each read and write.  The default is
 .TP
 \fB-r\fP, \fB--readwrite\fP
 By default, the benchmark tests are performed using
-.BR getpmsg (2)
+.BR getpmsg (2s)
 and
-.BR putpmsg (2).
+.BR putpmsg (2s).
 When the
 .B -r
 option is specified,
-.BR read (2)
+.BR read (2s)
 and
-.BR write (2)
+.BR write (2s)
 will be used instead.  (Note that this is the default for
 .B Linux
 native
 .I pipe
 testing, which does not support the
-.BR getpmsg (2)
+.BR getpmsg (2s)
 or
-.BR putpmsg (2)
+.BR putpmsg (2s)
 system calls.)
 .TP
 \fB-t\fP, \fB--time\fP[=][\fIREPORT\fP]

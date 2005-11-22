@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fcntl.2.man,v 0.9.2.8 2005/05/14 08:34:12 brian Exp $
+.\" @(#) $Id: fcntl.2.man,v 0.9.2.9 2005/11/22 11:56:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:56:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -160,7 +160,7 @@ bit of
 .TP
 .B F_GETFL
 Read the descriptor's flags (all flags (as set by
-.BR open (2))
+.BR open (2s))
 are returned).
 .TP
 .B F_SETFL
@@ -175,7 +175,7 @@ The flags are shared between copies (made with
 etc.) of the same file descriptor.
 .sp
 The flags and their semantics are described in
-.BR open (2).
+.BR open (2s).
 .P
 .BR F_GETLK ", " F_SETLK " and " F_SETLKW
 are used to manage discretionary file locks.
@@ -242,7 +242,7 @@ can be used to specify a different signal instead of SIGIO).
 If you set the
 .B O_ASYNC
 status flag on a file descriptor (either by providing this flag with the
-.IR open (2)
+.IR open (2s)
 call, or by using the
 .B F_SETFL
 command of
@@ -290,8 +290,8 @@ field gives the file descriptor associated with the event.  Otherwise,
 there is no indication which file descriptors are pending, and you
 should use the usual mechanisms
 .RB ( select (2),
-.BR poll (2),
-.BR read (2)
+.BR poll (2s),
+.BR read (2s)
 with
 .B O_NONBLOCK
 set etc.) to determine which file descriptors are available for I/O.
@@ -305,7 +305,7 @@ Using these mechanisms, a program can implement fully asynchronous I/O
 without using
 .BR select (2)
 or
-.BR poll (2)
+.BR poll (2s)
 most of the time.
 .PP
 The use of
@@ -410,7 +410,7 @@ F_GETFD, F_SETFD, F_GETFL, F_SETFL, F_GETLK, F_SETLK and F_SETLKW are
 specified in POSIX.1.  F_GETOWN and F_SETOWN are BSDisms not supported
 in SVr4; F_GETSIG and F_SETSIG are specific to Linux.  The flags
 legal for F_GETFL/F_SETFL are those supported by
-.BR open (2)
+.BR open (2s)
 and vary between these systems; O_APPEND, O_NONBLOCK, O_RDONLY,
 and O_RDWR are specified in POSIX.1.  SVr4 supports several other
 options and flags not documented here.
@@ -419,5 +419,5 @@ SVr4 documents additional EIO, ENOLINK and EOVERFLOW error conditions.
 .SH "SEE ALSO"
 .BR dup2 (2),
 .BR flock (2),
-.BR open (2),
+.BR open (2s),
 .BR socket (2)

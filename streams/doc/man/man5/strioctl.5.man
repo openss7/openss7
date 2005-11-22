@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strioctl.5.man,v 0.9.2.1 2005/11/21 12:21:46 brian Exp $
+.\" @(#) $Id: strioctl.5.man,v 0.9.2.2 2005/11/22 11:57:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 12:21:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -105,7 +105,7 @@ structure contains the following members:
 .TP \w'ic_timout\(em'u
 .I ic_cmd
 the
-.BR ioctl (2)
+.BR ioctl (2s)
 command to issue.
 .TP
 .I ic_timout
@@ -130,7 +130,7 @@ The
 structure is used in a
 .IR STREAMS -based
 .BR I_STR (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 call as described in
 .BR streamio (7).
 .PP
@@ -155,13 +155,13 @@ modules and drivers, but, in particular, it is defined within the
 The program issuing an
 .BR I_STR (7)
 command using the
-.BR ioctl (2)
+.BR ioctl (2s)
 system call, passes a pointer to a
 .B strioctl
 structure as the
 .I arg
 argument of the command to the
-.BR ioctl (2)
+.BR ioctl (2s)
 call.
 .PP
 The
@@ -232,7 +232,7 @@ command being issued.
 .BR I_STR (7),
 .BR streamio (7),
 .BR M_IOCTL (9),
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR ioctl (3p).
 .\"
 .\"

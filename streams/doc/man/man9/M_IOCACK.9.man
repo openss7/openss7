@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCACK.9.man,v 0.9.2.3 2005/11/21 05:52:09 brian Exp $
+.\" @(#) $Id: M_IOCACK.9.man,v 0.9.2.4 2005/11/22 11:57:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/21 05:52:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/22 11:57:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,18 +89,84 @@ structure and associated data buffer that contains structured data.
 .PP
 An
 .B M_IOCACK
-message consists of one
+message is a high priority message that consists of one
 .B M_IOCACK
 message block followed by zero or more
 .BR M_DATA (9)
 message blocks.
+.PP
+The
+.B M_IOCACK
+message block contains a
+.BR iocblk (9)
+structure, formatted as follows:
+.PP
+.nf
+\fC\s-1\
+struct iocblk {
+        int ioc_cmd;          /* command to perform */
+        cred_t *ioc_cr;       /* credentials */
+        uint ioc_id;          /* id of this ioctl */
+        caddr_t __pad1;
+        size_t ioc_count;     /* size of the data field */
+        int ioc_error;        /* ioctl error code (for errno) */
+        int ioc_rval;         /* system call return value */
+        uint ioc_flag;
+        mblk_t *__pad2;
+};
+\s+1\fP
+.fi
+where,
+.TP \w'ioc_count\(em'u
+.I ioc_cmd
+contains the corresponding command from the
+.BR M_IOCTL (9)
+message block.
+.TP
+.I ioc_cr
+contains the corresponding user credentials pointer from the
+.BR M_IOCTL (9)
+message block.
+.TP
+.I ioc_id
+contains the corresponding IO control identifier from the
+.BR M_IOCTL (9)
+message block.
+.TP
+.I ioc_count
+contains the count of the number of bytes to be copied to the user by the
+Stream head with
+.BR copyout (9),
+contained in the attached
+.BR M_DATA (9)
+message block(s).
+.TP
+.I ioc_error
+contains the error number for the Stream head to return to the user in
+.IR errno (3).
+.TP
+.I ioc_rval
+contains the return value for the Stream head to return to the user on the
+.BR ioctl (2)
+system call that began the operation.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-Signals the positive acknowledgement of a previous
+The
+.B M_IOCACK
+message is generated and sent from the module or driver processing an
 .BR M_IOCTL (9)
-message.  The message format is one
+message.
+The
+.B M_IOCACK
+message signals to the Stream head the positive acknowlegment of the
+.BR M_IOCTL (9)
+message and completion of the
+.BR ioctl (2s)
+system call.
+.PP
+The message format is one
 .B M_IOCACK
 block (containing an
 .BR iocblk (9)
@@ -110,7 +176,7 @@ followed by zero or more
 .BR M_DATA (9)
 blocks.  The
 .BR iocblk (9)
-data structure may contain a value in
+structure may contain a value in
 .I ioc_rval
 to be returned to the user process.  It may also contain a value in
 .I ioc_error
@@ -119,25 +185,38 @@ to be returned to the user process in
 .PP
 If this message is responding to an
 .BR I_STR (7)
-.BR ioctl (2)
+.BR ioctl (2s)
 [see
 .BR streamio (7)],
-it may contain data from the receiving module or driver to be sent to the user process.  In this
+it may contain data from the receiving module or driver to be copied to the user process by the
+Stream head with
+.BR copyout (9).
+In this
 case, message format is one
 .B M_IOCACK
 block followed by one or more
 .BR M_DATA (9)
-blocks containing the user data.  The
+blocks containing the user data.
+The responding module or driver will set
+.I ioc_count
+to the number of bytes to be copied out from the attached
+.BR M_DATA (9)
+message block(s).
+.PP
+The
 .I Stream head
 returns the data to the user if there is a corresponding outstanding
 .BR M_IOCTL (9)
-request.  Otherwise, the
+request (that is, one with the same
+.IR ioc_id ).
+Otherwise, the
 .B M_IOCACK
 message is ignored and all blocks in the message are freed.
 .PP
 Data can not be returned in an
 .B M_IOCACK
-message responding to a transparent
+message responding to a
+.I transparent
 .BR M_IOCTL (9).
 The data must have been sent with preceding
 .BR M_COPYOUT (9)
@@ -148,15 +227,75 @@ blocks follow the
 block, the
 .I Stream head
 will ignore and free them.
+When the
+.I Stream head
+receives an
+.BR M_IOCACK ,
+the outstanding
+.BR ioctl (2s)
+request, if any, will succeed.
 .PP
 The format and use of this message type is described further under
 .BR M_IOCTL (9).
+.\"
+.\"
+.SH USAGE
+.PP
+Guidlines for procesing the
+.B M_IOCACK
+message are as follows:
+.IP \(bu \w'\(bu\(em'u
+Intermediate modules that do not intend to process this message will not queue the
+.B M_IOCACK
+message upstream.  In any event, an intermediate module must not flush or discard an
+.B M_IOCACK
+message.
+.IP ""
+As only one
+.BR ioctl (2s)
+operation, and therefore, one
+.B M_IOCACK
+message can be in progress on a Stream,
+queueing of the message would cause unnecessary dealy in processing an
+.BR ioctl (2s).
+Only one high-priority message can be outstanding at the Stream head, so ordering of this message
+with respect to other high priority messages is not an issue.
+.IP \(bu
+Modules or drivers should only issue a
+.BR M_IOCACK
+message containing a
+.I ioc_count
+value in response to a non-tranparent
+.BR ioctl (2s).
+.IP \(bu
+The message should be created by transforming a received
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message.
+.IP \(bu
+An intermediate module receiving an
+.B M_IOCACK
+message on its write-side queue, will pass the message along in the same manner as any unexpected
+high priority message: that is, it is passed to the next module and not subjected to flow control.
+This permits
+.BR ioctl (2s)
+handling to perform correctly across a
+.IR STREAMS -based
+.BR pipe (4).
+.IP \(bu
+A driver receiving an
+.BR M_IOCACK
+message discards the message.
 .\"
 .\"
 .SH NOTICES
 .PP
 Under
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 it is not possible to return an error and a return value at the same time.  This is due to a
 .B Linux
 limitation in this regard.
@@ -179,7 +318,54 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+The order and size of the various members of the
+.BR iocblk (9)
+structure, and the associated aligned
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures, vary in
+.I STREAMS
+from implementation to implementation.  Some implementations have different structure definitions
+depending upon the word size of a specific architecture.
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+follows the
+.IR "SVR 4.2"
+implementation as closely as possible.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon a specific overall size of the
+.BR ioclk (9)
+structure, or the offset or alignment of any of its members.
+See
+.BR iocblk (9)
+for additional compatibiltiy information.
 .IP \(em
+.B M_IOCACK
+is has the wrong message type value on older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
