@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_NOTIFY.9.man,v 0.9.2.3 2005/11/22 11:57:20 brian Exp $
+.\" @(#) $Id: M_NOTIFY.9.man,v 0.9.2.4 2005/11/23 00:27:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/23 00:27:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,7 +85,7 @@ The
 .B M_NOTIFY
 message block is a
 .BR datab (9)
-structure and associated data buffer that contains no data.
+structure and associated data buffer that contains unstructured data.
 .PP
 An
 .B M_NOTIFY
@@ -108,7 +108,27 @@ member of the first message block is read by a user level process.
 .PP
 The format of the message is a single
 .BR M_NOTIFY
-message block that contains no data.
+message block that contains unstructured data.
+The contents of the message is poorly documented.
+.PP
+The
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+.I Stream head
+places a pointer to the original message block that was marked with
+.B MSGNOTIFY
+into the data buffer of the
+.B M_NOTIFY
+message so that the receiving module or driver can match the notification to the message that was so
+marked. (???)
+.PP
+If an
+.BR M_NOTIFY
+message is received by the
+.IR "Stream head" ,
+it is discarded.
 .\"
 .\"
 .SH USAGE
@@ -130,6 +150,88 @@ and
 .[
 osfspg
 .]
+.PP
+The process used by the
+.B M_NOTIFY
+message and the behavior of the
+.IR "Stream head" ,
+modules and drivers is poorly documented, however, under
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+the following behaviour is implemented:
+.IP (1) \w'(0)\(em'u
+A module or driver wishing
+.I Stream head
+notification when a data message
+.RB ( M_PROTO (9),
+.BR M_PCPROTO (9),
+or
+.BR M_DATA (9))
+passed upstream is read by a user level process, 
+marks the message to request notification by setting the
+.B MSGNOTIFY
+flag in the
+.I b_flag
+member of the first message block of the data message, and passes the message upstream.
+.IP (2)
+When a data message marked with
+.B MSGNOTIFY
+arrives at the
+.I Stream head
+and is delivered (fully or in part) to the user level process, the
+.I Stream head
+formulates an
+.B M_NOTIFY
+message to be passed downstream as notification.
+.IP (3)
+The contents of the
+.B M_NOTIFY
+message is implementation specific, however,
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+(does what ????).
+.IP (4)
+When the requesting module or driver receives the
+.B M_NOTIFY
+message from the
+.IR "Stream head" ,
+it is notified of the fact that the oldest outstanding message that was marked with a
+.B MSGNOTIFY
+flag was delivered.  The module or driver can use the pointer from the
+.B M_NOTIFY
+message to match the outstanding message with the notification.
+.PP
+Guidelines for processing of the
+.B M_NOTIFY
+message in modules and drivers is as follows:
+.IP \(bu \w'\(bu\(em'u
+If an intermediate module recognizes, but is not processing the
+.B M_NOTIFY
+message, it passes it downstream.  As a high priority message, the
+.B M_NOTIFY
+message is not subject to flow control and should not be queued.
+.IP \(bu
+If an intermediate module does not recognize the
+.B M_NOTIFY
+message, it passes it upstream or downstream as with any unrecognized high priority message: it is
+not subject to flow control and should not be queued.
+.IP \(bu
+If a driver receives an
+.B M_NOTIFY
+message and does not recognize the message, it is discarded.  If the driver is not processing
+notifications, the message is discarded.
+.IP \(bu
+If an intermediate module or the driver recognizes the
+.B M_NOTIFY
+message and is awaiting notification for a previous message passed upstream marked with the
+.B MSGNOTIFY
+flag in
+.IR b_flag ,
+it treats the message as acknowledgement of the read and frees the message.
 .\"
 .\"
 .SH "SEE ALSO"
