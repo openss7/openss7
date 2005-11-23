@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_STOP.9.man,v 0.9.2.4 2005/11/22 11:57:21 brian Exp $
+.\" @(#) $Id: M_STOP.9.man,v 0.9.2.5 2005/11/23 12:37:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/23 12:37:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -115,7 +115,7 @@ An
 .B M_STOP
 message cannot be generated directly by a user-level process and is always discarded if passed to
 the
-.IR "Stream head" .
+Stream head.
 .\"
 .\"
 .SH "SEE ALSO"

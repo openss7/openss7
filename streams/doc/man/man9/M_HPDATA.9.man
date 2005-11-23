@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_HPDATA.9.man,v 0.9.2.3 2005/11/22 11:57:20 brian Exp $
+.\" @(#) $Id: M_HPDATA.9.man,v 0.9.2.4 2005/11/23 12:37:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/23 12:37:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -110,6 +110,16 @@ implementation specific message that is generated and used internally by the
 implementation of
 .IR STREAMS .
 .\"
+.PP
+.B M_HPDATA
+messages cannot be generated directly by a user level process.
+.B M_HPDATA
+messages arriving at the
+Stream head
+are discarded (ignored and freed).
+.B M_HPDATA
+message arriving at a driver can be discarded (ignored and freed).
+.\"
 .\"
 .SH USAGE
 .PP
@@ -119,9 +129,9 @@ message is poorly documented and it is not intended to be used by
 .I STREAMS
 modules and drivers.
 One can only assume that it is used by the
-.I Stream head
+Stream head
 to place the data part of a message back on the
-.I Stream head
+Stream head
 read queue that has had a high priority control part (i.e.,
 .BR M_PCPROTO (9)
 message block) removed.

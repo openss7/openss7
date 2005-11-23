@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.67 2005/10/22 19:58:14 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.68 2005/11/23 12:37:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 19:58:14 $ by $Author: brian $
+ Last Modified $Date: 2005/11/23 12:37:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/10/22 19:58:14 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/11/23 12:37:59 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -125,7 +125,7 @@ typedef unsigned long __streams_dev_t;
 #endif				/* __STRSCHD_EXTERN_INLINE */
 
 #ifndef FMNAMESZ
-#define FMNAMESZ    8		/* 16 on OSF, 31 on Mac, 8 on LiS, 8 on UnixWare */
+#define FMNAMESZ    8		/* 16 on OSF, 31 on Mac, 8 on LiS, 8 on UnixWare, 8 on HP-UX */
 #endif				/* FMNAMESZ */
 
 #ifndef FREAD
@@ -259,11 +259,13 @@ typedef enum msg_type {
 	M_PCEVENT = 0x93,	/* ? S(0x91) */
 	M_UNHANGUP = 0x94,	/* ^ S(0x92) O */
 	M_NOTIFY = 0x95,	/* ^ O(0x93) H(0x93) */
-	M_HPDATA = 0x96,	/* ^ H(0x8c) M(0x93) */
+	M_HPDATA = 0x96,	/* ^ O(0x8c) H(0x8c) M(0x93) */
 	M_LETSPLAY = 0x97,	/* ^ A */
 	M_DONTPLAY = 0x98,	/* v A */
 	M_BACKDONE = 0x99,	/* v A */
 	M_PCTTY = 0x9a,		/* v A */
+	M_CLOSE = 0x9b,		/* v H(0x94) */
+	M_CLOSE_REPL = 0x9c,	/* v H(0x95) */
 } msg_type_t;
 
 /* 28 bytes on 32 bit, 52 on 64 bit */
@@ -296,21 +298,25 @@ typedef struct msgb {
 #define MSGCOMPRESS	(1<<8)	/* OSF: compress like messages as space allows */
 #define MSGNOTIFY	(1<<9)	/* OSF: notify when message consumed */
 
-#define NOERROR		(-1)	/* UnixWare */
+#define NOERROR		(-1)	/* UnixWare, OSF, HP-UX */
 #define TRANSPARENT	(-1UL)
 #define MAXIOCBSZ	1024	/* Solaris */
 
-#define STRCTLSZ	256	/* Mac OT */
-#define STRMSGSZ	8192	/* Mac OT */
+#define STRCTLSZ	256	/* Mac OT */ /* variable strctlsz under OSF/HP-UX */
+#define STRMSGSZ	8192	/* Mac OT */ /* variable strmsgsz under OSF/HP-UX */
+
+#define STRLOFRAC	80
+#define STRMEDFRAC	90
+#define STRTHRESH	0
 
 struct stroptions {
-	uint so_flags;			/* options to set */
+	uint so_flags;			/* options to set (OSF ulong) */
 	short so_readopt;		/* read option */
 	ushort so_wroff;		/* write offset */
-	ssize_t so_minpsz;		/* minimum read packet size */
-	ssize_t so_maxpsz;		/* maximum read packet size */
-	size_t so_hiwat;		/* read queue hi water mark */
-	size_t so_lowat;		/* read queue lo water mark */
+	ssize_t so_minpsz;		/* minimum read packet size (OSF long) */
+	ssize_t so_maxpsz;		/* maximum read packet size (OSF long) */
+	size_t so_hiwat;		/* read queue hi water mark (OSF ulong) */
+	size_t so_lowat;		/* read queue lo water mark (OSF ulong) */
 	unsigned char so_band;		/* band for water marks */
 	unsigned char so_filler[3];	/* padding */
 	ushort so_erropt;		/* Solaris */
@@ -331,7 +337,7 @@ struct stroptions {
 #define SO_MREADOFF	(1<< 7)	/* set read notification OFF */
 #define SO_NDELON	(1<< 8)	/* old TTY semantics for NDELAY reads/writes */
 #define SO_NDELOFF	(1<< 9)	/* STREAMS semantics for NDELAY reads/writes */
-/* Note: OSF reverses IS... and TO... */
+/* Note: OSF reverses IS... and TO... or ND... and IS... depending on version */
 #define SO_ISTTY	(1<<10)	/* the stream is acting as a terminal */
 #define SO_ISNTTY	(1<<11)	/* the stream is not acting as a terminal */
 #define SO_TOSTOP	(1<<12)	/* stop on background writes to this stream */
@@ -344,6 +350,8 @@ struct stroptions {
 #define SO_LOOP		(1<<18)	/* UnixWare */
 #define SO_COPYOPT	(1<<19)	/* Solaris: user io copy options */
 #define SO_MAXBLK	(1<<20)	/* Solaris: maximum block size */
+#define SO_COWENABLE	(1<<21)	/* OSF/HPUX (1<<14) */
+#define SO_COWDISABLE	(1<<22)	/* OSF/HPUX (1<<15) */
 
 #define DEF_IOV_MAX	16	/* Solaris */
 
@@ -904,7 +912,7 @@ typedef void (*weld_fcn_t) (weld_arg_t);
 #define BPRI_MED	2
 #define BPRI_HI		3
 #define BPRI_FT		4	/* Solaris */
-#define BPRI_WAITOK	255	/* OSF */
+#define BPRI_WAITOK	255	/* OSF/HP-UX */
 
 #define DRVOPEN	    0x0
 #define MODOPEN	    0x1
@@ -915,6 +923,10 @@ typedef void (*weld_fcn_t) (weld_arg_t);
 
 #define STRHIGH	    5120	/* UnixWare/Solaris */
 #define STRLOW	    1024	/* UnixWare/Solaris */
+
+#define SHEADHIWAT  65536	/* OSF/HP-UX */
+#define SHEADLOWAT  8192	/* OSF/HP-UX */
+#define MAXIOCBLKSZ 8192	/* OSF/HP-UX */
 
 #define STRLOFRAC   80		/* SVR 3.2/4 compatability (unused) */
 #define STRMEDFRAC  90		/* SVR 3.2/4 compatability (unused) */

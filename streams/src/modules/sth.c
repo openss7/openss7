@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/20 22:21:47 $ by $Author: brian $
+ Last Modified $Date: 2005/11/23 12:38:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/11/20 22:21:47 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1001,6 +1001,21 @@ strevent(struct stdata *sd, const int events, unsigned char band)
 			}
 		}
 	}
+	/* XXX: I don't know that this is particularly correct.  POSIX doesn't define POLLSIG (but
+	 * has POLL_SIG as an si_code in siginfo_t), but Linux does (it is marked in the headers
+	 * as __USE_GNU and a Linux-specific extension), so it is not that clear the order of
+	 * things.
+	 *
+	 * For M_PCSIG, we execute strevent directly and any process sleeping in poll(2s) will get a
+	 * SIGPOLL here with POLL_SIG.  If SIGPOLL is not caught, however, the POLLSIG bit is not
+	 * set (because we don't set STRMSG bit) and perhaps the poll(2s) will not even return.
+	 *
+	 * For M_SIG we set STRMSG bit when the message reaches the head of the read queue, but
+	 * reset it after this function, meaning that SIGPOLL has the POLL_MSG bit code, but
+	 * poll(2s) still might not return.  I need some test cases for this to make sure that
+	 * things work as expected for the Linux extension, but the POSIX behaviour seesm to be
+	 * correct.
+	 */
 	/* do the BSD O_ASYNC list too */
 	kill_fasync(&sd->sd_fasync, SIGPOLL, code);
 }
@@ -8122,7 +8137,7 @@ strrput(queue_t *q, mblk_t *mp)
 #if 0
 	case M_BREAK:		/* dn - request to send "break" */
 	case M_DELAY:		/* dn - request delay on output */
-	case M_IOCDATA:	/* dn - copy data response */
+	case M_IOCDATA:		/* dn - copy data response */
 	case M_READ:		/* dn - read notification */
 	case M_STOP:		/* dn - suspend output */
 	case M_START:		/* dn - resume output */
@@ -8134,7 +8149,7 @@ strrput(queue_t *q, mblk_t *mp)
 	case M_CTL:		/* bi - control info */
 	case M_PCCTL:		/* bi - control info */
 	case M_EVENT:		/* -- - Solaris only? */
-	case M_PCEVENT:	/* -- - Solaris only? */
+	case M_PCEVENT:		/* -- - Solaris only? */
 	case M_RSE:		/* -- - reserved */
 	case M_PCRSE:		/* -- - reserved */
 #endif

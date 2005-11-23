@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.4 2005/11/22 11:57:21 brian Exp $
+.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.5 2005/11/23 12:37:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/23 12:37:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -96,8 +96,63 @@ message block followed by an unspecified number of message blocks of unspecified
 .\"
 .SH DESCRIPTION
 .PP
-Reserved for internal use.  Modules that do not recognize this message must pass it on.  Drivers
-that do not recognize it must free it.
+The
+.B M_PCRSE
+message is a high priority message reserved for internal use by module and driver writers.
+.PP
+The message format is one
+.B M_PCRSE
+message block followed by an unspecified number of message blocks of unspecified type.  The precise
+form of the message must be determined according to the internal use of the message.
+.PP
+When the
+Stream head
+receives an
+.B M_PCRSE
+message, it discards it.
+.\"
+.B M_PCRSE
+message cannot be generated directly by a user level process.
+.B M_PCRSE
+messages arriving at the
+Stream head
+will be discarded (ignored and freed).
+.B M_PCRSE
+messages can be generated and consumed by modules and drivers.
+.\"
+.\"
+.SH USAGE
+.PP
+In general, an
+.B M_PCRSE
+message should not be used where an
+.B M_PCCTL (9)
+message will do (except for the purpose of portability).
+.B M_PCRSE
+is not really intended for inter-module communication but for cases where a specialized,
+non-portable communication facility is required.  This message can also be used to distinguish
+messages that a module or driver places on its own queues (e.g, when passing messages across a
+multiplexing driver).
+.PP
+Nevertheless, to support the passing of
+.B M_PCRSE
+message between modules, or between module and driver, when necessary and appropriate, the following
+guidelines should be followed by modules and drivers with regard to the
+.B M_PCRSE
+message:
+.IP \(bu \w'\(bu\(em'u
+Intermediate modules that do not recognize an
+.B M_PCRSE
+message must pass the message along in the same manner as any high priority messages.  That
+is, they are not subject to flow control and should not be queued.
+.IP \(bu
+A driver that does not recognize an
+.B M_PCRSE
+message, discards the message.
+.IP \(bu
+A module or driver processing an
+.B M_PCRSE
+message does so with regard is own internal definition.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -117,7 +172,6 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 .B M_PCRSE
 has a different constant value on
 .IR HP-UX \(rg,

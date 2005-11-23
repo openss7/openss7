@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.17 2005/10/03 17:41:59 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.18 2005/11/23 12:37:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/03 17:41:59 $ by $Author: brian $
+ Last Modified $Date: 2005/11/23 12:37:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/03 17:41:59 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/23 12:37:59 $"
 
 #ifndef __SYS_STROPTS_H__
 #warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -100,6 +100,11 @@ typedef unsigned long int t_uscalar_t;
 #define I_PLINK		(__SID |22)
 #define I_PUNLINK	(__SID |23)
 
+#define	I_SETEV		(__SID |24)	/* Solaris (obsolete) */
+#define	I_GETEV		(__SID |25)	/* Solaris (obsolete) */
+#define	I_STREV		(__SID |26)	/* Solaris (obsolete) */
+#define	I_UNSTREV	(__SID |27)	/* Solaris (obsolete) */
+
 #define I_FLUSHBAND	(__SID |28)
 #define I_CKBAND	(__SID |29)
 #define I_GETBAND	(__SID |30)
@@ -107,6 +112,8 @@ typedef unsigned long int t_uscalar_t;
 #define I_SETCLTIME	(__SID |32)
 #define I_GETCLTIME	(__SID |33)
 #define I_CANPUT	(__SID |34)
+
+/* from here the numbering gets implementation specific */
 
 #define I_SERROPT	(__SID |35)	/* Solaris */
 #define I_GERROPT	(__SID |36)	/* Solaris */
