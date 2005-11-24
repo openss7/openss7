@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qinit.9.man,v 0.9.2.8 2005/11/24 01:40:51 brian Exp $
+.\" @(#) $Id: qinit.9.man,v 0.9.2.9 2005/11/24 10:43:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/24 01:40:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/24 10:43:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,18 +85,18 @@ sort-adjacent-labels
 \fC\s-2
 typedef int (*qi_putp_t) (queue_t *, mblk_t *);
 typedef int (*qi_srvp_t) (queue_t *);
-typedef int (*qi_open_t) (queue_t *, dev_t *, int, int, cred_t *);
-typedef int (*qi_close_t) (queue_t *, int, cred_t *);
-typedef int (*qi_admin_t) (queue_t *);
+typedef int (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
+typedef int (*qi_qclose_t) (queue_t *, int, cred_t *);
+typedef int (*qi_qadmin_t) (void);
 
 struct qinit {
-        qi_putp_t qi_putp;                      /* put procedure */
-        qi_srvp_t qi_srvp;                      /* service procedure */
-        qi_open_t qi_open;                      /* each open (read q only) */
-        qi_close_t qi_close;                    /* last close (read q only) */
-        qi_admin_t qi_admin;                    /* admin procedure (not used) */
-        struct module_info *qi_minfo;           /* module info */
-        struct module_stat *qi_mstat;           /* module stats */
+    qi_putp_t qi_putp;            /* put procedure */
+    qi_srvp_t qi_srvp;            /* service procedure */
+    qi_qopen_t qi_qopen;          /* each open (read q only) */
+    qi_qclose_t qi_qclose;        /* last close (read q only) */
+    qi_qadmin_t qi_qadmin;        /* admin procedure (not used) */
+    struct module_info *qi_minfo; /* module info */
+    struct module_stat *qi_mstat; /* module stats */
 };
 \s+2\fP
 .fi
@@ -110,7 +110,7 @@ The following are
 svr42spg
 .]
 members:
-.TP \w'qi_mstat\(em'u
+.TP \w'qi_qadmin\(em'u
 .I qi_putp
 contains a function pointer to the
 .B put
@@ -125,21 +125,21 @@ procedure for a
 .I STREAMS
 module or driver.
 .TP
-.I qi_open
+.I qi_qopen
 contains a function pointer to the
 .B open
 routine for a
 .I STREAMS
 module or driver.
 .TP
-.I qi_close
+.I qi_qclose
 contains a function pointer to the
 .B close
 routine for a
 .I STREAMS
 module or driver.
 .TP
-.I qi_admin
+.I qi_qadmin
 contains a function pointer to the
 .B admin
 routine for a
@@ -204,10 +204,10 @@ multiplexer and another for the lower multiplexer for a multiplexing driver.
 The
 .IR qi_putp ,
 .IR qi_srvp ,
-.IR qi_open ,
-.IR qi_close ,
+.IR qi_qopen ,
+.IR qi_qclose ,
 and
-.IR qi_admin
+.IR qi_qadmin
 represent the primary functional entry points into the module or driver and are invoked at the
 appropriate times by the
 .I STREAMS
@@ -222,9 +222,10 @@ fields are significant in each
 structure associated with a
 .BR queue (9).
 The
-.I qi_open
+.IR qi_qopen ,
+.IR qi_qclose ,
 and
-.I qi_close
+.I qi_qadmin
 members are only significant in the
 .B qinit
 structure associated with the read-side
@@ -232,23 +233,29 @@ structure associated with the read-side
 structure.
 .I STREAMS
 ignores the values of the
-.I qi_open
+.IR qi_qopen ,
+.IR qi_qclose ,
 and
-.I qi_close
+.IR qi_qadmin ,
 function pointers in the
 .B qinit
 structure associated with the
 write-side
-.B queue (9)
+.BR queue (9)
 structure of a queue pair.
+The
+.I qi_qadmin
+function pointer is for a module private adminstrative function that is not normally used.
 .PP
 For a description of the use and guidelines for the
-.IR qi_open ,
-.IR qi_close ,
+.IR qi_qadmin ,
+.IR qi_qopen ,
+.IR qi_qclose ,
 .IR qi_putp ,
 and
 .IR qi_srvp ,
 functions provided by a module or driver, see
+.BR admin (9s),
 .BR open (9s),
 .BR close (9s),
 .BR put (9s),
@@ -295,29 +302,275 @@ for more information.
 .\"
 .SS Statistics
 .PP
-.\"
-.\"
-.SH CONTEXT
+The
+.I qi_mstat
+member points to a
+.BR module_stat (9)
+structure that contains collected statistics for the module.  Statistics include the number of times
+that each of the procedures were called as well a private statistics.  As the read and write side
+queues can point to different
+.B qinit
+structures, a
+.BR module_stat (9)
+structure can be associated with each queue in the queue pair, or they can share one
+.BR module_stat (9)
+structure.
 .PP
+See
+.BR module_stat (9)
+for more information.
 .\"
 .\"
-.SH MP-STREAMS
+.SH USAGE
 .PP
-.\"
-.\"
-.SH NOTICES
+The
+.B qinit
+structure is statically allocated and associated with a statically allocated
+.BR streamtab (9)
+structure to define a
+.I STREAMS
+module or driver.
 .PP
+Once the associated
+.B streamtab (9)
+structure has been registered with the
+.I STREAMS
+subsystem as a module or driver, all fields in the structure must be treated as read-only by a
+module or driver.
+The following guidelines pertain to the use of the fields in the
+.B qinit
+structure:
+.IP \(bu \w'\(bu\(em'u
+Function pointers
+.IR qi_qadmin ,
+.IR qi_qopen ,
+.IR qi_qclose ,
+.IR qi_putp ,
+.IR qi_srvp ,
+must not be altered after the
+.B streamtab (9)
+structure is registered.
+.IP \(bu
+Of theses, only
+.I qi_qadmin
+can be called directly by the a module or driver.
+.I qi_qopen
+must only be called indirectly using the
+.BR open (2s)
+or
+.BR I_PUSH (7)
+.BR ioctl (2s).
+.I qi_qclose
+must only be called indirectly using the
+.BR close (2s)
+or
+.BR I_POP (7)
+.BR ioctl (2s).
+.I qi_putp
+must only be called via the appropriate
+.I STREAMS
+utility functions:
+.BR put (9)
+and
+.BR putnext (9),
+and then only in the appropriate contexts.
+.IP \(bu
+.I qi_srvp
+must only be called by the
+.I STREAMS
+scheduler; that is, invoked with the
+.I STREAMS
+utility functions:
+.BR qenable (9),
+.BR putq (9),
+.BR putbq (9),
+or any utility invoking back-enabling.
+.IP \(bu
+The
+.I qi_minfo
+pointer must not be modified after registeration.  The point can, however, be read directly to find
+the location of the
+.BR module_info (9)
+structure that corresponds to a given queue, queue pair or module.
+See
+.BR module_info (9)
+for restrictions on the use of its members.
+.IP \(bu
+The
+.I qi_mstat
+pointer must not be modified after registration.  The pointer can, however, be read directly to find
+the location of the
+.BR module_stat (9)
+structure that corresponds to a given queue pair or module.
+See
+.BR module_stat (9)
+for restrictions on the use of its members.
+.IP \(bu
+The pointers to
+.B qinit
+structure from the
+.BR streamtab (9)
+structure for a module or driver must not be altered after the
+.BR streamtab (9)
+structure has been registered.
+.IP \(bu
+The pointer to a
+.B qinit
+structure contained within the
+.BR queue (9)
+structure must only be altered by the
+Stream head.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following declarations provide an example of static declaration of
+.B qinit
+and associated structures to define a module:
+.PP
+.nf
+\fC\s-1\
+ 1  int bufmod_wput(queue_t *, mblk_t *);
+ 2  int bufmod_wsrv(queue_t *);
+ 3  
+ 4  int bufmod_rput(queue_t *, mblk_t *);
+ 5  int bufmod_rsrv(queue_t *);
+ 6  
+ 7  int bufmod_open(queue_t *, dev_t *, int, cred_t *);
+ 8  int bufmod_close(queue_t *, dev_t *, cred_t *);
+ 9  
+10  static struct module_info bufmod_minfo = {
+11      .mi_idnum = 0,
+12      .mi_idname = "bufmod",
+13      .mi_minpsz = STRMINPSZ,
+14      .mi_maxpsz = STRMAXPSZ,
+15      .mi_hiwat = STRHIGH,
+16      .mi_lowat = STRLOW,
+17  };
+18  
+19  static struct qinit bufmod_rinit = {
+20      .qi_putp = bufmod_rput,
+21      .qi_srvp = bufmod_srv,
+22      .qi_qopen = bufmod_open,
+23      .qi_qclose = bufmod_close,
+24      .qi_minfo = &bufmod_minfo,
+25  };
+26  
+27  static struct qinit bufmod_winit = {
+28      .qi_putp = bufmod_wput,
+29      .qi_srvp = bufmod_srv,
+30      .qi_minfo = &bufmod_minfo,
+31  };
+32  
+33  static struct streamtab bufmod_info = {
+34      .st_rdinit = &bufmod_rinit,
+35      .st_wrinit = &bufmod_winit,
+36  };
+\s+1\fP
+.fi
+.PP
+At lines
+.B 19
+through
+.B 25
+and lines
+.B 27
+through
+.BR 31 ,
+the
+.B qinit
+structures for the read and write queues are defined.  These
+.B qinit
+structures are referenced by the
+.BR streamtab (9)
+structure that defines the module, at lines
+.B 33
+through
+.BR 36 .
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .BR queue (9),
 .BR module_info (9),
-.BR module_stat (9).
+.BR module_stat (9),
+.BR open (2s),
+.BR pipe (2s),
+.BR streamtab (9),
+.BR admin (9s),
+.BR open (9s),
+.BR close (9s),
+.BR put (9s),
+.BR srv (9s),
+.BR I_PUSH (7),
+.BR ioctl (2s),
+.BR close (2s),
+.BR I_POP (7),
+.BR put (9),
+.BR putnext (9),
+.BR qenable (9),
+.BR putq (9),
+.BR putbq (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B qinit
+structure is compatible with
+.IR "SVR 4.2 EFT MP" .
+.[
+svr42spg
+.]
+and implementations based on
+.IR "SVR 4 EFT" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR "SVR 4"
+.[
+svr4spg
+.]
+provided two different prototypes for the
+.I qi_qopen
+function pointer, depending on whether the
+.IB xxx flag
+symbol was defined or not.  If the
+.IB xxx flag
+symbol was not defined, the prototype defaulted to
+.IR "SVR 3" -style
+for open and close procedures.  If the
+.IB xxx flag
+was defined, the prototype became
+.IR "SVR 4" -style
+for open and close procedures.
+.B @PACKAGE_TITLE@
+only provides an
+.IR "SVR 4" -style
+prototype for
+.I qi_qopen
+and
+.IR qi_qclose .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will be written to
+.BR "SVR 4"
+instead of
+.BR "SVR 3" .
+.IP \(em
+Aside from the above, the
+.B qinit
+structure is very consistent across implementations.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

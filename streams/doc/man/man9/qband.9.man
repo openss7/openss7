@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.12 2005/09/20 12:53:04 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.13 2005/11/24 10:43:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/20 12:53:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/24 10:43:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B qband
+.B qband, qband_t
 \- queue band structure
 .\"
 .\"
@@ -86,20 +86,29 @@ sort-adjacent-labels
 .nf
 \fC\s-1
 typedef struct qband {
-    struct qband *qb_next;      /* next (lower) priority band */
-    size_t qb_count;            /* number of bytes queued */
-    struct msgb *qb_first;      /* first queue message in this band */
-    struct msgb *qb_last;       /* last queued message in this band */
-    size_t qb_hiwat;            /* hi water mark for flow control */
-    size_t qb_lowat;            /* lo water mark for flow control */
-    uint qb_flag;               /* flags */
-    long qb_pad1;               /* OSF/1: reserved */
-    /* Linux fast-STREAMS specific members */
-    ssize_t qb_msgs;            /* messages in band */
-    struct qband *qb_prev;      /* prev (higher) priority band */
-    unsigned char qb_band;      /* band */
-    unsigned char __pad[sizeof(long) - 1];      /* padding */
+        struct qband *qb_next;  /* next (lower) priority band */
+        size_t qb_count;        /* number of bytes queued */
+        struct msgb *qb_first;  /* first queue message in this band */
+        struct msgb *qb_last;   /* last queued message in this band */
+        size_t qb_hiwat;        /* hi water mark for flow control */
+        size_t qb_lowat;        /* lo water mark for flow control */
+        unsigned long qb_flag;  /* flags */
+        long qb_pad1;           /* reserved */
 } qband_t;
+
+#define qb_msgs qb_pad1
+
+enum {
+        QB_FULL_BIT,            /* band full flow control */
+        QB_WANTW_BIT,           /* back enable required */
+        QB_BACK_BIT,            /* UnixWare/Solaris/UXP/V */
+};
+
+#define QB_FULL  (1<<QB_FULL_BIT )
+#define QB_WANTW (1<<QB_WANTW_BIT)
+#define QB_BACK  (1<<QB_BACK_BIT)  /* UnixWare/Solaris/UXP/V */
+
+#define NBAND       256            /* UnixWare/Solaris */
 \s+1\fP
 .fi
 .\"
@@ -168,11 +177,9 @@ compatibility.  This bit is set when the queue band is back enabled.
 .RE
 .TP
 .I qb_pad1
-Padding for compatibility with
-.IR OSF/1 \(rg.
-.[
-osfspg
-.]
+Padding to pad the structure to the size of the
+.I "SVR 4.2"
+Extended fundamental Type.
 .PP
 The following members are
 .B Linux Fast-STREAMS
@@ -183,41 +190,135 @@ specific members:
 .TP \w'\ qb_hiwat\ 'u
 .I qb_msgs
 The count of the number of messages queued to the band.
-.TP
-.I qb_prev
-A pointer to the
-.B qband
-structure corresponding to the previous higher priority band (or
-.B NULL
-if there is no previous higher priority band).
-.TP
-.I qb_band
-The priority of this band.
-.TP
-.I __pad
-Padding to pad the structure to the size of the
-.I "SVR 4.2"
-Extended fundamental Type.
+This member is a renaming of
+.I qb_pad1
+above.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+This structure contains pointers into the linked list of messages on the
+.BR queue (9).
+These pointers,
+.I qb_first
+and
+.IR qb_last ,
+denote the beginning and end of messages for the particular band.  The
+.I qb_count
+field is analogous to the
+.BR queue (9)'s
+.I q_count
+field.  However,
+.I qb_count
+only applies to the messages on the
+.BR queue (9)
+in the band of data flow represented by the corresponding
+.B qband
+structure.  In contrast,
+.I q_count
+only contains information regarding normal (priority band zero) and high priority messages.
+.PP
+Each band has a separate high and low water mark,
+.I qb_hiwat
+and
+.IR qb_lowat .
+These are initially set to the
+.BR queue (9)'s
+.I q_hiwat
+and
+.I q_lowat
+respectively.  Modules and drivers may change these values if desired through the strqset()
+function.  Three flags,
+.BR QB_FULL ,
+.BR QB_WANTW ,
+and
+.BR QB_BACK ,
+are defined for
+.IR qb_flag .
+.B QB_FULL
+denotes that the particular band is full.
+.B QB_WANTW
+indicates that someone tried to write to the band that was flow controlled.
+.B QB_BACK
+is set when the service procedure runs as a result of being back-enabled because the queue is no
+longer flow-controlled.
+.PP
+The
+.B qband
+structures are not preallocated per
+.BR queue (9).
+Rather, they are allocated when a message with
+a priority greater than zero is placed on the queue via
+.BR putq (9),
+.BR putbq (9),
+.BR insq(9),
+or
+.BR appq (9).
+When a banded message (a priority message, with a non-zero
+.IR b_band )
+is place on a queue with
+.BR putq (9)
+.BR putbq (9),
+.BR insq(9),
+or
+.BR appq (9),
+and a
+.B qband
+structure does not exist for the band corresponding to
+.IR b_band ,
+.I STREAMS
+tries to allocate
+.B qband
+structures for all non-existent bands up to and including the band of the message and places the
+resulting
+.BR qband (9)
+structures into a reverse sorted
+.I q_bandp
+list on the
+.BR queue (9).
+
+Since band allocation can fail, these routines return
+.I false
+.RB ( 0 )
+on failure and
+.I true
+.RB ( 1 )
+on success.  Once a
+.B qband
+structure is allocated, it remains associated with the queue until the queue is freed.
+.BR strqset (9)
+and
+.BR strqget (9)
+will also cause
+.B qband
+allocation to occur.
+See,
+.BR putq (9),
+.BR putbq (9),
+.BR insq(9),
+.BR appq (9),
+and
+.BR strqset (9),
+.BR strqget (9),
+for more information.
 .PP
 The following queue band utility functions are provided:
-.PP
 .TP \w'\ bcanputnext(9)\ \-\ 'u
+\fBappq\fP(9) \-
+append messages to a queue
+.PD 0
+.TP
 \fBbcanput\fP(9) \-
 test band for flow control for a queue
-.PD 0
 .TP
 \fBbcanputnext\fP(9) \-
 test band for flow control for a queue
-.TP
-\fBcanput\fP(9) \-
-test for flow control for a queue
-.TP
-\fBcanputnext\fP(9) \-
-test for flow control for next queue
+.\".TP
+.\"\fBcanput\fP(9) \-
+.\"test for flow control for a queue
+.\".TP
+.\"\fBcanputnext\fP(9) \-
+.\"test for flow control for next queue
 .TP
 \fBflushband\fP(9) \-
 flush messages from a band of a queue
@@ -225,14 +326,17 @@ flush messages from a band of a queue
 \fBflushq\fP(9) \-
 flush messages from a queue
 .TP
-\fBput\fP(9) \-
-put a message to a queue's put procedure
+\fBinsq\fP(9) \-
+insert messages into a queue
+.\".TP
+.\"\fBput\fP(9) \-
+.\"put a message to a queue's put procedure
 .TP
 \fBputbq\fP(9) \-
 put a message back on a queue
-.TP
-\fBputnext\fP(9) \-
-put a message on the next queue
+.\".TP
+.\"\fBputnext\fP(9) \-
+.\"put a message on the next queue
 .TP
 \fBputq\fP(9) \-
 put a message on a queue
@@ -307,15 +411,17 @@ structure.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR appq (9),
 .BR bcanput (9),
 .BR bcanputnext (9),
-.BR canput (9),
-.BR canputnext (9),
+.\".BR canput (9),
+.\".BR canputnext (9),
 .BR flushband (9),
 .BR flushq (9),
-.BR put (9),
+.BR insq (9),
+.\".BR put (9),
 .BR putbq (9),
-.BR putnext (9),
+.\".BR putnext (9),
 .BR putq (9),
 .BR qcountstrm (9),
 .BR strqget (9),

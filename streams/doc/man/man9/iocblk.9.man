@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.3 2005/11/22 11:57:23 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.4 2005/11/24 10:43:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/24 10:43:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -108,55 +108,50 @@ struct iocblk {
 The
 .B iocblk
 structure contains the following members:
+.\" ----------------------
 .TP \w'ioc_count\(em'u
 .I ioc_cmd
-This member is the input-output control command.
+current input-output control command;
 .PD 0
+.\" ----------------------
 .TP
 .I ioc_cr
-This member is a
-pointer to the credentials structure for the user issuing the input-output control.
+pointer to the invoking user credentials;
+.\" ----------------------
 .TP
 .I ioc_id
-This member is a unique input-output control identification number.
+current input-output control identification number;
+.\" ----------------------
+.TP
+.I __pad1
+.\" ----------------------
 .TP
 .I ioc_count
-This member is the
-count of the number of data byte in an attached
+amount of data (in bytes) in an attached
 .BR M_DATA (9)
-message block.
+message block, or the special value,
+.BR TRANSPARENT .
+.\" ----------------------
 .TP
 .I ioc_error
-This member is the
-error number.
+error number to return in
+.BR errno (3);
+.\" ----------------------
 .TP
 .I ioc_rval
-This member is the
-return value.
+return value to\
+.BR ioctl (2s)
+call;
+.\" ----------------------
 .TP
 .I ioc_flag
-This member is implementation specific.  Many implementations do not define this member.
-See
+modifier flags (see
 .IR \(lq\)COMPATIBILITY\(rq\) ,
-below.
-.PD
-.PP
-The following two fields are for backwards compatibility with 
-.IR "SVR 3.2" .
-Under
-.IR "SVR 3.2"
-these were both of type
-.B ushort
-and occupied the same space as the
-.I ioc_cr
-pointer.  These are not real members but are macros with the same name as the old members.
-.TP \w'ioc_count\(em'u
-.I ioc_uid
-This member is the user identification number of the user requesting the input-output control.
-.PD 0
+below);
+.\" ----------------------
 .TP
-.I ioc_gid
-This member is the group identification number of the user requesting the input-output control.
+.I __pad2
+padding for alignment;
 .PD
 .\"
 .\"
@@ -168,17 +163,23 @@ structure is one of a set of
 .BR ioctypes (9)
 structures including
 .BR iocblk (9),
-.BR copyreq (9)
+.BR copyreq (9),
 and
 .BR copyresp (9),
-that are used for communicating between the stream head or an internal module or driver using
+that are used for communicating between the
+Stream head
+or an internal module or driver using
 .I STREAMS
 messages.  The messages used and the placement of these structures into messages is illustrated in
-the table below.
+the table below:
+.RS 0
 .sp
 .TS
-center tab(:);
-lbllb.
+tab(:);
+lelele
+lbelelbe.
+message:direction:contains
+\_:\_:\_
 M_IOCTL\fR(9):downstream:iocblk\fR(9)
 M_COPYIN\fR(9):upstream:copyreq\fR(9)
 M_COPYOUT\fR(9):upstream:copyreq\fR(9)
@@ -187,6 +188,8 @@ M_IOCACK\fR(9):upstream:iocblk\fR(9)
 M_IOCNAK\fR(9):upstream:iocblk\fR(9)
 M_CTL\fR(9):both:iocblk\fR(9)
 .TE
+.sp
+.RE
 .PP
 When the
 .B iocblk
@@ -388,17 +391,24 @@ messages described above.
 .\"
 .SH CONTEXT
 .PP
-Functions that operate on an input-output control block can be called from any context.  However, it
-is the caller's responsibility to ensure that the calling thread has exclusive access to the
-input-output control block.  When the input-output control block is contained in an
+Functions that operate on the
+input-output control block
+structure can be called from any context.  However, it is the caller's responsibility to ensure that
+the calling thread has exclusive access to the
+input-output control block structure.
+When the
+input-output control block structure
+is contained in an
 .BR M_IOCTL (9)
 message that has just been removed from a
 .BR queue (9)
 in a
-.BR put (9)
+.BR put (9s)
 or
-.BR srv (9)
-procedure of the queue, input-output control block exclusivity is normally guaranteed.
+.BR srv (9s)
+procedure of the queue,
+input-output control block
+exclusivity is normally guaranteed.
 .\"
 .\"
 .SH MP-STREAMS
@@ -415,8 +425,15 @@ message, see
 for additional information.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
 .PP
+See
+.BR M_IOCTL (9)
+for an example.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -467,6 +484,12 @@ uw7spg
 .[
 uxpspg
 .]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not access the
+.I ioc_flags
+member.
 .IP \(em
 .IR UnixWare \(rg
 documents the
@@ -484,10 +507,59 @@ were present in
 .[
 svr3
 .]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.B ioc_uid
+nor
+.B iod_gid
+macros and will not attempt to access the old
+.I "SVR 3.2"
+members.
+.IP \(em
+The order and size of the various members of the
+.BR iocblk (9)
+structure, and the associated aligned
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures, vary in
+.I STREAMS
+from implementation to implementation.  Some implementations have different structure definitions
+depending upon the word size of a specific architecture.
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+follows the
+.IR "SVR 4.2"
+implementation as closely as possible.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon a specific overall size of the
+.BR ioclk (9)
+structure, or the offset or alignment of any of its members.
 .IP \(em
 Lining up these input-output control block data structures is tedious and uninteresting.  See
 .BR ioctypes (9)
 for more information.
+Various implementations exhibit various alignments.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon alignment of any fields except the first three fields of each
+structure, and the alignment and preservation of the
+.I cq_private
+and
+.I cp_private
+fields.
+That is all that is guaranteed by the
+.IR "SVR 4.2 SPG" .
+.[
+svr42spg
+.]
 .PP
 See
 .BR STREAMS (9)

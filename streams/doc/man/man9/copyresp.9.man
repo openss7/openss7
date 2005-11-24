@@ -1,1 +1,409 @@
-.so man9/M_IOCDATA.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: copyresp.9.man,v 0.9.2.3 2005/11/24 10:43:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/24 10:43:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH COPYRESP 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B copyresp
+\- \fISTREAMS\fP copy response block structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\fC\s-1
+.B #include <sys/stream.h>
+
+struct copyresp {
+    int cp_cmd;        /* command being performed */
+    cred_t *cp_cr;     /* credentials */
+    uint cp_id;        /* id of this ioctl */
+    caddr_t cp_rval;   /* data address */
+    size_t __pad1;     /* alignment with copyreq */
+    int __pad2;
+    int __pad3;
+    uint cp_flag;      /* response flags */
+    mblk_t *cp_private; /* private state information */
+};
+
+#define cp_uid          cp_cr->cr_uid
+#define cp_gid          cp_cr->cr_gid
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B copyresp
+structure contains the following members:
+.\" ----------------------
+.TP \w'cp_private\(em'u
+.I cp_cmd
+current input-output control command;
+.PD 0
+.\" ----------------------
+.TP
+.I cp_cr
+pointer to the invoking user credentials;
+.\" ----------------------
+.TP
+.I cp_id
+current input-output control identification number;
+.\" ----------------------
+.TP
+.I cp_rval
+return value for
+.BR copyin (9)
+or
+.BR copyout (9)
+operation:
+.B (caddr_t)(0)
+if successful;
+.B (caddr_t)(1)
+is unsuccessful;
+.\" ----------------------
+.TP
+.I __pad1
+padding for alignment;
+.\" ----------------------
+.TP
+.I __pad2
+padding for alignment;
+.\" ----------------------
+.TP
+.I __pad3
+padding for alignment;
+.\" ----------------------
+.TP
+.I cp_flag
+modifier flags (see
+.IR \(lq\)COMPATIBILITY\(rq\) ,
+below);
+.\" ----------------------
+.TP
+.I cp_private
+pointer to a private state
+.BR mblk_t (9).
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B copyresp
+structure is one of a set of
+.BR ioctypes (9)
+structures including
+.BR iocblk (9),
+.BR copyreq (9),
+and
+.BR copyresp (9),
+that are used for communicating between the
+Stream head
+or an internal module or driver using
+.I STREAMS
+messages.  The messages used and the placement of these structures into messages is illustrated in
+the table below:
+.RS 0
+.sp
+.TS
+tab(:);
+lelele
+lbelelbe.
+message:direction:contains
+\_:\_:\_
+M_IOCTL\fR(9):downstream:iocblk\fR(9)
+M_COPYIN\fR(9):upstream:copyreq\fR(9)
+M_COPYOUT\fR(9):upstream:copyreq\fR(9)
+M_IOCDATA\fR(9):downstream:copyresp\fR(9)
+M_IOCACK\fR(9):upstream:iocblk\fR(9)
+M_IOCNAK\fR(9):upstream:iocblk\fR(9)
+M_CTL\fR(9):both:iocblk\fR(9)
+.TE
+.sp
+.RE
+.\"
+.\"
+.SH CONTEXT
+.PP
+Functions that operate on the
+.B copyresp
+structure can be called from any context.  However, it is the caller's responsibility to ensure that
+the calling thread has exclusive access to the
+copy response structure.
+When the
+copy response structure
+is contained in an
+.BR M_IOCDATA (9)
+message that has just been removed from a
+.BR queue (9)
+in a
+.BR put (9s)
+or
+.BR srv (9s)
+procedure of the queue,
+copy response structure
+exclusivity is normally guaranteed.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Functions that access the
+.B copyresp
+structure are MP-safe.  However, it is the caller's responsibility to ensure exclusive access to the
+structure before altering any of the members of the structure.
+.PP
+Because the copy response structure is normally stored in a
+.I STREAMS
+message, see
+.BR datab (9)
+for additional information.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR M_COPYIN (9)
+for an example.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datab (9),
+.BR queue (9),
+.BR put (9),
+.BR srv (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B iocblk
+structure is compatible with
+.IR "SVR 4.2 MP EFT" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+documents the
+.I cp_flags
+member.
+.[
+soldoc
+.]
+.IR IRIX \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+do not document the
+.I cp_flags
+member.
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.[
+uxpspg
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not access the
+.I cp_flags
+member.
+.IP \(em
+.IR UnixWare \(rg
+documents the
+.I cp_uid
+and
+.I cp_gid
+fields for
+.IR "SCO OpenServer" \(rg
+compatibility.
+.I cp_uid
+and
+.I cp_gid
+were present in
+.IR "SVR 3.2" .
+.[
+svr3
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.B cp_uid
+nor
+.B cp_gid
+macros and will not attempt to access the old
+.I "SVR 3.2"
+members.
+.IP \(em
+The order and size of the various members of the
+.BR iocblk (9)
+structure, and the associated aligned
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures, vary in
+.I STREAMS
+from implementation to implementation.  Some implementations have different structure definitions
+depending upon the word size of a specific architecture.
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+follows the
+.IR "SVR 4.2"
+implementation as closely as possible.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon a specific overall size of the
+.BR copyresp (9)
+structure, or the offset or alignment of any of its members.
+.IP \(em
+Lining up these input-output control block data structures is tedious and uninteresting.  See
+.BR ioctypes (9)
+for more information.
+Various implementations exhibit various alignments.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon alignment of any fields except the first three fields of each
+structure, and the alignment and preservation of the
+.I cq_private
+and
+.I cp_private
+fields.
+That is all that is guaranteed by the
+.IR "SVR 4.2 SPG" .
+.[
+svr42spg
+.]
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 EFT" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B copyresp
+structure was combined with the
+.BR copyreq (9)
+and
+.BR iocblk (9)
+structures (see
+.BR ioctypes (9))
+in
+.IR "SVR 4.0 STREAMS" .
+.PP
+The
+.B copyresp
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
