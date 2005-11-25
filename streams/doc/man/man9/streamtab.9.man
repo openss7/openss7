@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamtab.9.man,v 0.9.2.8 2005/05/14 08:34:30 brian Exp $
+.\" @(#) $Id: streamtab.9.man,v 0.9.2.9 2005/11/25 00:42:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 00:42:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,39 +76,286 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B streamtab
-\-
+\- \fISTREAMS\fR module definition structure
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.nf
+\fC\s-1\
+.B #include <sys/stream.h>
+
+struct streamtab {
+    struct qinit *st_rdinit;    /* rd queue init */
+    struct qinit *st_wrinit;    /* wr queue init */
+    struct qinit *st_muxrinit;  /* mux lower rd queue init */
+    struct qinit *st_muxwinit;  /* mux lower wr queue init */
+};
+\s+1\fP
+.fi
 .\"
 .\"
 .SH MEMBERS
 .PP
+The
+.B streamtab
+structure contains the following members:
+.TP \w'st_muxwinit\(em'u
+.I st_rdinit
+read-side initialization structure.
+.PD 0
+.TP
+.I st_wrinit
+write-side initialization structure.
+.TP
+.I st_muxrinit
+lower multiplex read-side initialization structure.
+.TP
+.I st_muxwinit
+lower multiplex write-side initialization structure.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B streamtab
+structure is the principal structure used to define a
+.I STREAMS
+module or driver.  A reference to the
+.B streamtab
+structure is a unique reference to the module or driver.
+.PP
+The
+.B streamtab
+structure and associated
+.BR qinit (9),
+.BR module_info (9),
+and
+.BR module_stat (9),
+structures, provide the complete definition for a
+.I STREAMS
+module or driver.
+.PP
+All modules only specify the first two members
+.RI ( st_rdinit
+and
+.IR st_wrinit )
+of the structure and leave the remaining two
+.BR NULL .
+(The remaining two are ignored by
+.I STREAMS
+for modules, regardless of their values.)
+These two
+.BR qinit (9)
+structures are used to initialize the
+.BR queue (9)
+structures in the queue pair when an instance of the module is created with the
+.BR I_PUSH (7)
+command to the
+.BR ioctl (2s)
+system call.
+.PP
+A
+.I STREAMS
+driver without a lower multiplex specification also only specifies the first two members in the same
+manner as a module.  The first two
+.BR qinit (9)
+structures are used by
+.I STREAMS
+to initialize the
+.BR queue (9)
+strucutures in the queue pair when an instance of the driver is created using the
+.BR open (2s)
+system call.
+Drivers not supporting a lower multiplex (that is, drivers that do not support the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+operations) must specify
+.B NULL
+for the last two members
+.RI ( st_muxrinit
+and
+.IR st_muxwinit )
+of the structure.
+.PP
+A multiplexing
+.I STREAMS
+driver can have both an upper-multiplex specification that is used for Streams that are created
+using the
+.BR open (2s)
+system call, as well as a lower-multiplex specification that is used for Streams that are
+linked under the multiplexing driver using the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+commands to the
+.BR ioctl (2s)
+system call.
+Multiplexing drivers suppporting the linking of Streams to a lower multiplex must specify
+.BR qinit (9)
+structures for the
+.I st_muxrinit
+and
+.I st_muxwinit
+members.
+These
+.BR qinit (9)
+structures will be used to reinitialize the
+.BR queue (9)
+structures in the queue pair formerly associated with the Stream head of the linked Stream during
+the
+.BR I_LINK (9)
+or
+.BR I_PLINK (9)
+operation.
+.PP
+Once defined, the
+.B streamtab
+structure must be registered with the
+.I STREAMS
+subsystem for the module or driver to be available for use in the
+.BR GNU/Linux
+system.  Registration can be effected using
+.BR register_strmod (9),
+for a module;
+and,
+.BR register_strdev (9),
+for a device or pseudo-device driver.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B streamtab
+structure is statically allocated and associated with statically allocated
+.BR qinit (9)
+structures to define a
+.I STREAMS
+module or driver.
+.PP
+Once the
+.B streamtab
+has been registered with the
+.I STREAMS
+susbsystem, using a registration function such as
+.BR register_strmod (9)
+or
+.BR register_strdev (9),
+all fields in the structure must be treated as read-only by a module or driver.  The following
+guidelines pertain to the use of the fields in the
+.B streamtab
+structure:
+.IP \(bu \w'\(bu\(em'u
+Function pointers
+.IR st_rdinit ,
+.IR st_wrinit ,
+.IR st_muxrinit ,
+and
+.IR st_muxwinit ,
+must not be altered after the
+.B streamtab
+structure has been registered, and before it is unregistered.
+.IP \(bu
+The members of the structure may be read by a module or driver to locate the attached
+.BR qinit (9)
+structures when there exists no
+.BR queue (9)
+structure reference that can be used to locate them.
+For rules for accessing the members of the
+.BR qinit (9)
+structure, see
+.BR qinit (9).
+.IP \(bu
+When the
+.B streamtab
+structure is contained within a loadable kernel module, and the
+.I STREAMS
+subsystem holds a reference to the
+.B streamtab
+structure,  the loadable kernel module must not be unloaded from the system.  The registration
+functions provide a mechanism for ensuring this.  See
+.BR register_strmod (9)
+and
+.BR register_strdev (9)
+for more information.
 .\"
 .\"
 .SH CONTEXT
 .PP
+The
+.B streamtab
+structure can be read from any context.  Members of the
+.B streamtab
+structure should only be modified before registration or after de-registration of the structure with
+the
+.I STREAMS
+subsystem.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Since the
+.B streamtab
+structure must be treated as read-only, and provisions are made to disable module unloaded when
+a reference to the structure exists, functions that properly access the structure are MP-safe by
+definition.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
 .PP
+See
+.BR qinit (9)
+for an example.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR qinit (9),
+.BR register_strmod (9),
+.BR register_strdev (9),
+.BR cdevsw (9),
+.BR fmodsw (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B streamtab
+structure is compatible with
+.IR "SVR 4.2 MP EFT" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B streamtab
+structure is compatibile across all
+.I STREAMS
+implementations.  There are no portability issues.
+.IP ""
+On the other hand, mechanisms for registering the
+.B streamtab
+structure with the
+.I STREAMS
+implementation vary widely from implementation to implementation.  See
+.BR register_strmod (9)
+and
+.BR register_strdev (9)
+for more information.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -117,10 +364,21 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2 EFT STREAMS" .
+.[
+svr42spg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B streamtab
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[
