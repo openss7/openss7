@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdevsw.9.man,v 0.9.2.15 2005/11/22 11:57:22 brian Exp $
+.\" @(#) $Id: cdevsw.9.man,v 0.9.2.16 2005/11/25 23:42:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -177,9 +177,9 @@ characteristics for the driver.  This
 structure contains the stream head
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9)
+.BR putp (9)
 and
-.BR srv (9)
+.BR srvp (9)
 procedures as well as the initial read queue high and low water marks.
 .IP ""
 Most registration functions require that this member be populated by the caller:
@@ -500,7 +500,7 @@ may be set.
 .TP
 .B D_MTPUTSHARED
 specifies that the
-.BR put (9)
+.BR putp (9)
 procedure will enter the inner perimeter (if it exists) shared instead of
 (the default) exclusive.
 This flag has no effect if none of
@@ -549,7 +549,11 @@ The module handles 64-bit offsets.
 (This capability is not yet supported.)
 .TP
 .B D_NEW
-The module has an SVR4 prototype qopen and qclose procedure instead of SVR3 ones.
+The module has an SVR4 prototype
+.BR qopen (9)
+and
+.BR qclose (9)
+procedure instead of SVR3 ones.
 .B @PACKAGE_TITLE@
 does not support SVR3 opens.  If this flag is not set, it is always implied.
 .\"
@@ -666,8 +670,8 @@ structures that are registered separately.
 .BR streamtab (9),
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9),
-.BR srv (9),
+.BR putp (9),
+.BR srvp (9),
 .BR mp-streams (9),
 .BR syncq (9),
 .BR kmod (9),

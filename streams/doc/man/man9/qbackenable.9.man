@@ -2,7 +2,7 @@
 .\".so man9/undoc.9.man
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbackenable.9.man,v 0.9.2.2 2005/08/29 10:06:49 brian Exp $
+.\" @(#) $Id: qbackenable.9.man,v 0.9.2.3 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,7 +54,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -149,7 +149,7 @@ releases of
 .BR runqueues (9),
 .BR qenable (9),
 .BR noenable (9),
-.BR srv (9),
+.BR srvp (9),
 .BR scheduleq (9),
 .BR qclose (9),
 .BR freezestr (9),

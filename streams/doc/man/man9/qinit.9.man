@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qinit.9.man,v 0.9.2.10 2005/11/25 00:42:23 brian Exp $
+.\" @(#) $Id: qinit.9.man,v 0.9.2.11 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 00:42:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -113,28 +113,28 @@ members:
 .TP \w'qi_qadmin\(em'u
 .I qi_putp
 contains a function pointer to the
-.B put
+.BR putp (9)
 procedure for a
 .I STREAMS
 module or driver.
 .TP
 .I qi_srvp
 contains a function pointer to the
-.B service
+.BR srvp (9)
 procedure for a
 .I STREAMS
 module or driver.
 .TP
 .I qi_qopen
 contains a function pointer to the
-.B open
+.BR qopen (9)
 routine for a
 .I STREAMS
 module or driver.
 .TP
 .I qi_qclose
 contains a function pointer to the
-.B close
+.BR qclose (9)
 routine for a
 .I STREAMS
 module or driver.
@@ -255,12 +255,12 @@ For a description of the use and guidelines for the
 and
 .IR qi_srvp ,
 functions provided by a module or driver, see
-.BR admin (9s),
-.BR open (9s),
-.BR close (9s),
-.BR put (9s),
+.BR qi_qadmin_t (9),
+.BR qopen (9),
+.BR qclose (9),
+.BR putp (9),
 and
-.BR srv (9s).
+.BR srvp (9).
 .\"
 .SS Initialization
 .PP
@@ -501,11 +501,11 @@ through
 .BR open (2s),
 .BR pipe (2s),
 .BR streamtab (9),
-.BR admin (9s),
-.BR open (9s),
-.BR close (9s),
-.BR put (9s),
-.BR srv (9s),
+.BR qi_qadmin_t (9),
+.BR qopen (9),
+.BR qclose (9),
+.BR putp (9),
+.BR srvp (9),
 .BR I_PUSH (7),
 .BR ioctl (2s),
 .BR close (2s),
@@ -546,11 +546,19 @@ symbol was defined or not.  If the
 .IB xxx flag
 symbol was not defined, the prototype defaulted to
 .IR "SVR 3" -style
-for open and close procedures.  If the
+for
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures.  If the
 .IB xxx flag
 was defined, the prototype became
 .IR "SVR 4" -style
-for open and close procedures.
+for
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures.
 .B @PACKAGE_TITLE@
 only provides an
 .IR "SVR 4" -style

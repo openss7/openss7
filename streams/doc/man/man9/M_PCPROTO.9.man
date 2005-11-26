@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCPROTO.9.man,v 0.9.2.5 2005/11/23 12:37:56 brian Exp $
+.\" @(#) $Id: M_PCPROTO.9.man,v 0.9.2.6 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/23 12:37:56 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -239,7 +239,7 @@ restrictions.
 When an
 .B M_PCPROTO
 message is placed on a queue, that queue's
-.B service
+.BR srvp (9)
 procedure is always enabled.  The
 Stream head
 will allow only one

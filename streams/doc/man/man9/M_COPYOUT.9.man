@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_COPYOUT.9.man,v 0.9.2.7 2005/11/23 12:37:54 brian Exp $
+.\" @(#) $Id: M_COPYOUT.9.man,v 0.9.2.8 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/23 12:37:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -305,11 +305,11 @@ The module or driver design can expect that an
 reply to a
 .B M_COPYOUT
 message will arrive reliably.  The queue pair's
-.B close
+.BR qclose (9)
 procedure will not be invoked until after the
 .BR M_IOCDATA (9)
 message has been delivered to the module's
-.B put
+.BR putp (9)
 procedure.
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: miocack.9.man,v 0.9.2.3 2005/11/22 11:57:24 brian Exp $
+.\" @(#) $Id: miocack.9.man,v 0.9.2.4 2005/11/25 23:42:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,7 +94,11 @@ void \fBmiocack\fR(queue_t *\fIq\fR, mblk_t *\fImp\fR, int \fIcount\fR, int \fIr
 .PP
 .TP \w'count\ \ 'u
 .I q
-the write-side queue pointer passed to the write-side queue put or service procedure from which
+the write-side queue pointer passed to the write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedure from which
 .BR miocack ()
 is called.
 .TP
@@ -104,7 +108,11 @@ a pointer to a
 or
 .BR M_IOCDATA (9)
 message block from the input output control operation to be processed, normally passed into the
-write-side queue put or service procedure.
+write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedure.
 .TP
 .I count
 the count of the number of bytes of data contained in the attached message block.
@@ -146,7 +154,11 @@ messages when performing
 .BR ioctl (2s)
 processing in a
 .I STREAMS
-module or driver write-side queue put or service procedures.  It is used to acknolwedge the
+module or driver write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedures.  It is used to acknolwedge the
 completion of a
 .BR ioctl (2s)
 operation and return a value.
@@ -175,7 +187,11 @@ has indeterminate results and could destabilize the kernel or cause immediate or
 .BR miocack ()
 can be called from any context; however, it is normally called from a
 .I STREAMS
-module or driver write-side put or service procedure.
+module or driver write-side
+.BR putp (9)
+or
+.BR srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
@@ -186,7 +202,11 @@ in message block.  This is normally the case when
 .BR miocack ()
 is called from a
 .I STREAMS
-module or driver write-side put or service procedure with a message block that was passed to those
+module or driver write-side
+.BR putp (9)
+or
+.BR srvp (9)
+procedure with a message block that was passed to those
 procedures.
 .\"
 .\"

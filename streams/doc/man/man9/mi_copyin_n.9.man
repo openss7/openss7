@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.2 2005/11/22 11:57:23 brian Exp $
+.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.3 2005/11/25 23:42:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,14 +94,21 @@ sort-adjacent-labels
 .PP
 .TP \w'offset\ \ 'u
 .I q
-the current write-side queue whose put or service procedure within which
+the current write-side queue whose
+.BR putp (9)
+or
+.BR srvp (9)
+procedure within which
 .BR mi_copyin_n ()
 is being called.
 .TP
 .I mp
 a pointer to the message block that contains the
 .BR M_IOCDATA (9)
-message being processed.  This is the message that was passed to the write-side put or service
+message being processed.  This is the message that was passed to the write-side
+.BR putp (9)
+or
+.BR srvp (9)
 procedure within which
 .BR mi_copyin_n ()
 is invoked.
@@ -134,7 +141,10 @@ and
 .BR mi_copy_state (9).
 .PP
 .BR mi_copyin_n ()
-is used to copy data from a user-space to the kernel.  When a module or driver put or service
+is used to copy data from a user-space to the kernel.  When a module or driver
+.BR putp (9)
+or
+.BR srvp (9)
 procedure first receives a
 .BR M_IOCTL (9)
 message, the
@@ -246,7 +256,11 @@ input output control, regardless of the number of significant elements in the ar
 the purpose of this example, we assume that this restriction is relaxed and the caller can provide
 a structure sized to only the significant number of elements.
 .PP
-Following is a write-side queue put and service procedure fragment that will perform the necessary
+Following is a write-side queue
+.BR putp (9)
+and
+.BR srvp (9)
+procedure fragment that will perform the necessary
 actions using
 .BR mi_copyin_n ()
 to copy in the variable sized structure:
@@ -318,7 +332,11 @@ can be called from any context.  Internal operations use non-blocking allocation
 .PP
 .BR mi_copyin_n ()
 is MP-safe.  The caller is responsible for ensuring that it has exclusive access to the passed in
-message pointer.  When properly invoked from within the write-side queue put or service procedure,
+message pointer.  When properly invoked from within the write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedure,
 this is normally the case.
 .\"
 .\"

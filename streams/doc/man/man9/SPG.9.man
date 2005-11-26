@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.13 2005/05/14 08:34:18 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.14 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -344,6 +344,7 @@ sort-adjacent-labels
 .BR "UNIX\(rg Device Numbering" :\-
 .PP
 .RS
+.ll -7n
 In versions of
 .I UNIX\(rg System V
 previous to
@@ -373,6 +374,7 @@ and so on, give a machine independent interface to the device number mapping.
 .[
 magic
 .]
+.ll +7n
 .RE
 .PP
 (Actually, the major device number for

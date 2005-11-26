@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamtab.9.man,v 0.9.2.9 2005/11/25 00:42:23 brian Exp $
+.\" @(#) $Id: streamtab.9.man,v 0.9.2.10 2005/11/25 23:42:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 00:42:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -223,6 +223,55 @@ for a module;
 and,
 .BR register_strdev (9),
 for a device or pseudo-device driver.
+.PP
+Once registered, the
+.B streamtab
+structure is used by
+.I STREAMS
+when created an intance of a module or driver, also when linking a Stream beneath a multiplexing
+driver.
+.IP \(bu \w'\(bu\(em'u
+.I STREAMS
+creates an instance of a driver (as a result of a call to
+.BR open (2s)),
+by first creatinging and initialization the Stream head queue pair.  Next the driver (Stream end)
+queue pair is created and initialized using the
+.I st_rdinit
+and
+.I st_wrinit
+initialization structures and the queue pair is attached beneath the Stream head with
+.BR qattach (9).
+.IP \(bu
+.I STREAMS
+creates an instance of a module (as a result of a call to
+.BR ioctl (2s)
+with the
+.BR I_PUSH (7)
+command), by creating and intializing a queue pair from the
+.I st_rdinit
+and
+.I st_wrinit
+initialization structure.  The queu pair is then inserted beneath the Stream head with
+.BR qattach (9).
+.IP \(bu
+.I STREAMS
+links a Stream under a multiplexing driver (as a result of a call to
+.BR ioctl (2s)
+with the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+command), by reinitializing the Stream head queue pair of the linked Stream from the
+.I st_muxrinit
+and
+.I st_muxwinit
+initialization structures.
+.PP
+See
+.BR qinit (9)
+and
+.BR queue (9)
+for details.
 .\"
 .\"
 .SH USAGE

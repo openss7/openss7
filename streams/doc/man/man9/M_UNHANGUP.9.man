@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_UNHANGUP.9.man,v 0.9.2.4 2005/11/24 01:40:50 brian Exp $
+.\" @(#) $Id: M_UNHANGUP.9.man,v 0.9.2.5 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/24 01:40:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -201,7 +201,7 @@ The
 message is a high priority message and is not subjected to flow control.  Modules should pass the
 .B M_UNHANGUP
 message along directly from a
-.B put
+.BR putp (9)
 procedure and should not queue the message.
 .IP \(bu
 Modules and driver should only pass this message upstream.  Intermediate modules may record the fact

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.21 2005/09/24 01:12:55 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.22 2005/11/25 23:42:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/24 01:12:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -205,7 +205,7 @@ osfspg
 compatibility.
 .B BPRI_WAITOK
 is used primarily by the
-.I Stream head
+Stream head
 under conditions when it is acceptable to sleep awaiting the allocation of a message block.
 .PP
 Non-portable
@@ -221,13 +221,13 @@ procedure.
 An example of a situation where
 .B BPRI_WAITOK
 would be used from a module or driver
-.B open
+.BR qopen (9)
 procedure would be when the module needs to pre-allocate message blocks for use by
-.B put
+.BR putp (9)
 or
-.B service
+.BR srvp (9)
 procedures, and if allocation failed would otherwise have to return an error from the
-.B open
+.BR qopen (9)
 procedure.
 .PP
 For consistency with past implementations of
@@ -311,9 +311,9 @@ is
 .BR BPRI_WAITOK ,
 .BR allocb ()
 can only be called from a blocking context (process context, module
-.B open
+.BR qopen (9)
 and
-.B close
+.BR qclose (9)
 procedures).
 .\"
 .\"

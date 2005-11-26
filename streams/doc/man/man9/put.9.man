@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: put.9.man,v 0.9.2.19 2005/11/22 11:57:24 brian Exp $
+.\" @(#) $Id: put.9.man,v 0.9.2.20 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -135,29 +135,31 @@ for the band.
 .PP
 .BR put ()
 can be called from any context; however, if called from interrupt service
-routine (hard IRQ) context, in general, calling of the queue's put procedure
+routine (hard IRQ) context, in general, calling of the queue's
+.BR putp (9)
+procedure
 will be deferred and run under soft interrupt context the next time that the
 .I STREAMS
 soft interrupt is scheduled to run.
 .PP
 If the driver or module is synchronized then invocation of the
-.BR put ()
+.BR putp (9)
 procedure will be deferred and run under soft interrupt context the next time
 that the
 .I STREAMS
 scheduler is run; however, if it is not synchronized
 .RB ( SQLVL_NONE ),
 then the module's
-.BR put ()
+.BR putp (9)
 procedure will be invoked under interrupt service routine (hard IRQ) context.
 .PP
 Driver
-.BR put ()
+.BR putp (9)
 procedures that expect to be invoked under interrupt service routine context
 must never call
 .BR putnext (9)
 unless all
-.BR put ()
+.BR putp (9)
 procedures in the stream are either syncrhonized, or are not synchronized
 .RB ( SQLVL_NONE )
 but expect to be invoked under interrupt service routine context.
@@ -165,7 +167,7 @@ but expect to be invoked under interrupt service routine context.
 stream head is marked
 .BR SQLVL_NONE ,
 but its read side
-.BR put ()
+.BR putp (9)
 procedure but is also MP-safe and can be called under interrupt service routine
 context.)
 .PP
@@ -173,11 +175,14 @@ For portable
 .I STREAMS
 drivers, the foregoing condition cannot normally be guaranteed, so it is good
 practice for drivers whose
-.BR put ()
-procedures are invoked under interrupt service routine context to include a service
+.BR putp (9)
+procedures are invoked under interrupt service routine context to include a
+.BR srvp (9)
 procedure and use
 .BR putq (9)
-to defer processing to the driver's service procedure that will run later within
+to defer processing to the driver's
+.BR srvp (9)
+procedure that will run later within
 the context of the
 .I STREAMS
 scheduler.
@@ -189,17 +194,19 @@ See also
 .SH MP-STREAMS
 .PP
 .BR put ()
-is MP-safe.  The driver or module put procedures invoked must also be MP-safe.
+is MP-safe.  The driver or module
+.BR putp (9)
+procedures invoked must also be MP-safe.
 .PP
 Under
 .B @PACKAGE_TITLE@
 any
-.BR put ()
+.BR putp (9)
 procedure could be executed concurrently with any queue
 .BR qopen (9),
 .BR qclose (9),
-.BR put (),
-.BR srv (9)
+.BR putp (9),
+.BR srvp (9)
 procedure,
 .BR esbbcall (9),
 .BR bufcall (9),
@@ -209,7 +216,7 @@ procedure,
 callback function,
 or interrupt service routine.
 The
-.BR put ()
+.BR putp (9)
 procedure itself must perform its own mutual exclusion.
 .PP
 See
@@ -223,15 +230,15 @@ considerations.
 .PP
 The following guidelines provide best practice for the writing of safe and
 portable
-.RB put ()
+.BR putp (9)
 procedures for drivers an modules:
 .IP \(em \w'\(em\(em'u
 Modules and drivers should process all recognized and handled
 high-priority message types directly from the
-.BR put ()
+.BR putp (9)
 procedure without delay.  Where access to module private data is required to
 complete processing, mutual exclusion must be performed to ensure that the
-.BR put ()
+.BR putp (9)
 procedure remains MP-safe.
 .IP \(em
 Modules and drivers should process all recognized and handled
@@ -241,7 +248,7 @@ normal-priority message types other than
 and
 .BR M_DELAY (9)
 directly from the
-.BR put ()
+.BR putp (9)
 procedure, without delay, provided that consideration is given to message
 ordering, queued messages and mutual exclusion of shared module private
 state information.
@@ -253,7 +260,7 @@ normal-priority message types
 and
 .BR M_DELAY (9)
 directly from the
-.BR put ()
+.BR putp (9)
 procedure, without delay, provided that consideration is given to message
 ordering, queued messages and mutual exclusion of shared module private
 state information.
@@ -263,13 +270,13 @@ Modules should pass unrecognized or unhandled message types (and unhandled
 messages) upstream and downstream using
 .BR putnext (9)
 directly from the
-.BR put ()
+.BR putp (9)
 procedure, without delay, given that there are no queued messages.
 .IP \(em
 Drivers should delete unrecognized or unhandled message types using
 .BR freemsg (9)
 directly from the
-.BR put ()
+.BR putp (9)
 procedure without delay.
 .IP \(em
 Drivers should respond with
@@ -277,13 +284,13 @@ Drivers should respond with
 to unhandled
 .BR M_IOCTL
 messages directly from the
-.BR put ()
+.BR putp (9)
 procedure without delay.
 .IP \(em
 .BR M_FLUSH (9)
 is a high-priority message
 that should be handled directly from the
-.BR put ()
+.BR putp (9)
 procedure, without delay.
 See
 .BR M_FLUSH (9)
@@ -295,7 +302,7 @@ and
 .BR M_DELAY (9)
 are normal priority messages that
 may be handled directly from the 
-.B put ()
+.BR putp (9)
 procedure if there are no queued messages.
 .IP \(em
 .BR M_IOCTL (9),
@@ -306,7 +313,7 @@ procedure if there are no queued messages.
 and
 .BR M_COPYOUT (9)
 messages should be acted upon immediately from the
-.RB put ()
+.BR putp (9)
 procedure.
 .IP ""
 If the
@@ -327,13 +334,13 @@ and
 .BR M_COPYOUT (9)
 operations.  Final results that change module private structure state should use
 mutual exclusion mechanisms to keep the
-.BR put ()
+.BR putp (9)
 procedure MP-safe.
 .IP \(em
 .BR M_PCPROTO (9)
 is a high-priority message
 that should be handled directly from the
-.BR put ()
+.BR putp (9)
 procedure, without delay.
 See
 .BR M_PCPROTO (9)
@@ -342,7 +349,7 @@ for more information on cannonical processing of this message.
 .BR M_READ (9)
 is a high-priority message
 that should be handled directly from the
-.BR put ()
+.BR putp (9)
 procedure, without delay.
 See
 .BR M_READ (9)
@@ -354,7 +361,7 @@ and
 .BR M_BACKDONE (9)
 are high-priority messages that
 should be processed immediated from the
-.BR put ()
+.BR putp (9)
 procedure.
 See
 .BR M_LETSPLAY (9)
@@ -362,7 +369,7 @@ for more information on cannonical processing of these messages.
 .IP \(em
 .BR M_BREAK (9)
 messages should be processed immediated from the
-.BR put ()
+.BR putp (9)
 procedure.
 .IP \(em
 .BR M_STOP (9),
@@ -372,7 +379,7 @@ and
 .BR M_STARTI (9)
 are high-priority messages that
 should be processed immediated from the
-.BR put ()
+.BR putp (9)
 procedure.
 See
 .BR M_STOP (9),
@@ -387,7 +394,7 @@ and
 .BR M_HANGUP (9)
 are high-priority messages that
 should be processed immediated from the
-.BR put ()
+.BR putp (9)
 procedure.
 .\"
 .\"
@@ -429,7 +436,7 @@ defined.
 .SH EXAMPLES
 .PP
 Following is an example of canonical
-.BR put ()
+.BR putp (9)
 procedure processing for modules or drivers:
 .PP
 .nf
@@ -481,7 +488,9 @@ queue from other concurrent invocations of
 however, if such concurrent execution can occur, then the message ordering is of
 no consequence, or can already be disrupted.
 .PP
-Note that if the driver or module does not have a service procedure,
+Note that if the driver or module does not have a
+.BR srvp (9)
+procedure,
 .BR LOCK (9)
 should be used instead of
 .BR TRYLOCK (9).
@@ -497,7 +506,7 @@ non-blocking mutual exclusion mechanism could have been used.
 .BR qprocsoff (9),
 .BR freezestr (9),
 .BR unfreezestr (9),
-.BR srv (9),
+.BR srvp (9),
 .BR esbbcall (9),
 .BR bufcall (9),
 .BR qbufcall (9),
@@ -576,7 +585,9 @@ so this difference should not present a problem.
 .BR put (),
 .BR putnext (9),
 .BR qreply (9)
-will invoke a queue's put procedure shared and multi-threaded.
+will invoke a queue's
+.BR putp (9)
+procedure shared and multi-threaded.
 This is equivalent to
 .IR Solaris \(rg
 drivers with the
@@ -720,20 +731,29 @@ lfs
 .]
 .BR put ()
 should notice superior interrupt service routine latency and performance.  It
-is normally the case that put procedures are MP-safe as then normally use only
-MP-safe queue and message utility functions.  Also, most put procedures are
-inherently invoked single threaded (from a single-threaded service procedure).
+is normally the case that
+.BR putp (9)
+procedures are MP-safe as then normally use only
+MP-safe queue and message utility functions.  Also, most
+.BR putp (9)
+procedures are
+inherently invoked single threaded (from a single-threaded
+.BR srvp (9)
+procedure).
 Lack of locking should not present a problem.
 .IP ""
 Because
 .I LiS
-also uses this lock for service procedures, this means that while the
+also uses this lock for
+.BR srvp (9)
+procedures, this means that while the
 .I LiS
 scheduler is running (at kernel thread priority 50), interrupts,
 timeouts, bottom halves, hi tasklets and soft interrupts are indefinitely
 postponed.  This is not acceptable for soft-real-time performance.  Rewrite
 .I LiS
-put procedures to be MP-safe.
+.BR putp (9)
+procedures to be MP-safe.
 .IP \(em
 Symbol
 .BR lis_safe_putmsg ()

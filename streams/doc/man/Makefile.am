@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/11/01 11:20:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/11/25 23:42:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/01 11:20:54 $ by $Author: brian $
+# Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1133,6 +1133,7 @@ man_MANS = \
 	man9/dblk_t.9 \
 	man9/delay.9 \
 	man9/devnode.9 \
+	man9/dev_t.9 \
 	man9/di_alloc.9 \
 	man9/di_put.9 \
 	man9/do_fattach.9 \
@@ -1231,6 +1232,14 @@ man_MANS = \
 	man9/qi_qclose_t.9 \
 	man9/qi_qopen_t.9 \
 	man9/qi_srvp_t.9 \
+	man9/put.9s \
+	man9/admin.9s \
+	man9/close.9s \
+	man9/open.9s \
+	man9/service.9s \
+	man9/srv.9s \
+	man9/putp.9 \
+	man9/srvp.9 \
 	man9/qinit.9 \
 	man9/qinsert.9 \
 	man9/qopen.9 \
@@ -2393,6 +2402,7 @@ dist_noinst_MANS = \
 	man9/dblk_t.9.man \
 	man9/delay.9.man \
 	man9/devnode.9.man \
+	man9/dev_t.9.man \
 	man9/di_alloc.9.man \
 	man9/di_put.9.man \
 	man9/do_fattach.9.man \
@@ -2492,6 +2502,14 @@ dist_noinst_MANS = \
 	man9/qi_qclose_t.9.man \
 	man9/qi_qopen_t.9.man \
 	man9/qi_srvp_t.9.man \
+	man9/put.9s.man \
+	man9/admin.9s.man \
+	man9/close.9s.man \
+	man9/open.9s.man \
+	man9/service.9s.man \
+	man9/srv.9s.man \
+	man9/srvp.9.man \
+	man9/putp.9.man \
 	man9/qinit.9.man \
 	man9/qinsert.9.man \
 	man9/qopen.9.man \

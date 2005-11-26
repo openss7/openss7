@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setsq.9.man,v 0.9.2.1 2005/08/29 10:00:34 brian Exp $
+.\" @(#) $Id: setsq.9.man,v 0.9.2.2 2005/11/25 23:42:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:00:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -170,8 +170,14 @@ fails and returns negative
 .SH CONTEXT
 .PP
 .BR setsq ()
-can be called from any blocking context, including user context, qopen or qclose procedures, and
-some uppermost put procedures.
+can be called from any blocking context, including user context,
+.BR qopen (9)
+or
+.BR qclose (9)
+procedures, and
+some uppermost
+.BR putp (9)
+procedures.
 .\"
 .\"
 .SH MP-STREAMS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnext.9.man,v 0.9.2.18 2005/05/14 08:34:28 brian Exp $
+.\" @(#) $Id: putnext.9.man,v 0.9.2.19 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -102,13 +102,18 @@ the message to put beyond the queue.
 .BR putnext ()
 invokes the
 .I q->q_next->q_info->qi_putp
-put procedure of the queue
+.BR putp (9)
+procedure of the queue
 .I q->q_next
 with the message pointed to by
 .IR mp.
 .PP
 .BR putnext ()
-is normally invoked from within the put or service procedure belonging to
+is normally invoked from within the
+.BR putp (9)
+or
+.BR srvp (9)
+procedure belonging to
 queue
 .IR q .
 .PP
@@ -176,15 +181,17 @@ might not be prepared to be called at interrupt service routine context.
 is MP-safe; however, the caller must ensure exclusive access to the passed in
 message,
 .IR mp .
-The driver or module put procedure invoked must also be MP-safe.  Under
+The driver or module
+.BR putp (9)
+procedure invoked must also be MP-safe.  Under
 .B Linux Fast-STREAMS
 any
 .BR put (9)
 procedure can be executed concurrently with any queue
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9),
-.BR srv (9)
+.BR putp (9),
+.BR srvp (9)
 procedure,
 .BR esbbcall (9),
 .BR bufcall (9),
@@ -195,7 +202,7 @@ callback function or interrupt service routine.
 Either the module or driver muswt be synchronized using
 .I STREAMS
 synchronization levels, or the
-.BR put (9)
+.BR putp (9)
 procedure itself must perform its own mutual exclusion.
 .\"
 .\"
@@ -220,8 +227,8 @@ procedure itself must perform its own mutual exclusion.
 .BR unfreezestr (9),
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9),
-.BR srv (9),
+.BR putp (9),
+.BR srvp (9),
 .BR esbbcall (9),
 .BR bufcall (9),
 .BR qbufcall (9),
@@ -265,10 +272,16 @@ pointer of
 .BR NULL ;
 the queue pointed to by
 .I q->q_next
-has no put procedure; or the
+has no
+.BR putp (9)
+procedure; or the
 queue pointed to by
 .I q->q_next
-is closing, or the queue has had put and service routine processing turned off
+is closing, or the queue has had
+.BR putp (9)
+and
+.BR srvp (9)
+procedure processing turned off
 (e.g. with
 .BR qprocsoff (9)).
 .IP \(em
@@ -287,7 +300,9 @@ with the
 pointer.
 .IP \(em
 .BR put "(9), " putnext "(), " qreply (9)
-will invoke a queue's put procedure shared an multi-threaded.
+will invoke a queue's
+.BR putp (9)
+procedure shared an multi-threaded.
 .IP ""
 This is equivalent to
 .IR Solaris \(rg
@@ -314,19 +329,27 @@ lock out interrupts until the entire thread of execution completes.
 drivers and modules calling
 .BR putnext ()
 should notice superior interrupt service routine latency and performance.  It is normally the case
-that put procedures are MP-safe as they normally use only MP-safe queue and message utility
-functions.  Also, most put procedures are inherently invoked single threaded (from a single-threaded
-service procedure).  Lack of locking should not present a problem.
+that
+.BR putp (9)
+procedures are MP-safe as they normally use only MP-safe queue and message utility
+functions.  Also, most
+.BR putp (9)
+procedures are inherently invoked single threaded (from a single-threaded
+.BR srvp (9)
+procedure).  Lack of locking should not present a problem.
 .IP ""
 Because
 .I LiS
-also uses this lock for service procedures, this means that while the
+also uses this lock for
+.BR srvp (9)
+procedures, this means that while the
 .I LiS
 scheduler is running (at kernel thread priority 50), interrupts, timeouts, bottom halves, hi
 tasklets and soft interrupts are indefinitely postponed.  This is not acceptable for soft real-time
 performance.  Rewrite
 .I LiS
-put procedures to be MP-safe.
+.BR putp (9)
+procedures to be MP-safe.
 .IP \(em
 .IR UnixWare \(rg
 .[

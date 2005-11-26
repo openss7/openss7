@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_SIG.9.man,v 0.9.2.5 2005/11/23 12:37:56 brian Exp $
+.\" @(#) $Id: M_SIG.9.man,v 0.9.2.6 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/23 12:37:56 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -133,7 +133,7 @@ Stream head
 read queue by the
 Stream head
 read-side
-.B put
+.BR putp (9)
 procedure.
 This means that the
 .B M_SIG
@@ -183,7 +183,7 @@ In contrast, the
 message will generate a signal directly from the
 Stream head
 read queue
-.B put
+.BR putp (9)
 procedure.
 .\"
 .PP

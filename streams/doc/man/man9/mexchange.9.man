@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mexchange.9.man,v 0.9.2.2 2005/07/02 11:23:35 brian Exp $
+.\" @(#) $Id: mexchange.9.man,v 0.9.2.3 2005/11/25 23:42:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/02 11:23:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,7 +94,11 @@ mblk_t *\fBmexchange\fR(queue_t *\fIq\fR, mblk_t *\fImp\fR, size_t \fIsize\fR, i
 .PP
 .TP \w'primtype\ \ 'u
 .I q
-the write-side queue pointer passed to the write-side queue put or service procedure from which
+the write-side queue pointer passed to the write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedure from which
 .BR mexchange ()
 is called.
 .TP
@@ -256,7 +260,11 @@ is unusable, and a new message block could not be allocated.
 .BR mexchange ()
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
-module or driver write-side put or service procedure.
+module or driver write-side
+.BR putp (9)
+or
+.BR srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
@@ -267,7 +275,11 @@ message block.  This is normally the case when
 .BR mexchange ()
 is called from a
 .I STREAMS
-module or driver write-side put or service procedure and the passed in message pointer is that which
+module or driver write-side
+.BR putp (9)
+or
+.BR srvp (9)
+procedure and the passed in message pointer is that which
 was passed into the procedure.
 .\"
 .\"

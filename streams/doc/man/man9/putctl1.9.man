@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putctl1.9.man,v 0.9.2.16 2005/05/14 08:34:28 brian Exp $
+.\" @(#) $Id: putctl1.9.man,v 0.9.2.17 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -107,7 +107,9 @@ creates a one-byte control message of type
 .I type
 with the one-byte data containing the data
 .I param
-and invokes the put procedure of the queue pointed to by
+and invokes the
+.BR putp (9)
+procedure of the queue pointed to by
 .I q
 to place the message on the queue.
 If
@@ -329,9 +331,15 @@ pointer of
 .BR NULL ;
 the queue pointed to by
 .I q
-has no put procedure; or the queue pointed to by
+has no
+.BR putp (9)
+procedure; or the queue pointed to by
 .I q
-is closing, or the queue has had put and service routine processing turned off
+is closing, or the queue has had
+.BR putp (9)
+and
+.BR srvp (9)
+procedure processing turned off
 (e.g. with
 .BR qprocsoff (9)).
 .I LiS

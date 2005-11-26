@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SV_WAIT.9.man,v 0.9.2.12 2005/05/14 08:34:19 brian Exp $
+.\" @(#) $Id: SV_WAIT.9.man,v 0.9.2.13 2005/11/25 23:42:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -208,13 +208,13 @@ procedure to wait on some condition before continuing
 module initialization actions.  One typical usage is to call
 .BR qprocson (9)
 to enable
-.BR put (9)
+.BR putp (9)
 and
-.BR srv (9)
+.BR srvp (9)
 procedures, send a message downstream and await a response.  Either the
-.BR put (9)
+.BR putp (9)
 or
-.BR srv (9)
+.BR srvp (9)
 procedure would include a call to
 .BR SV_SIGNAL (9)
 to wait the process to continue the
@@ -346,8 +346,8 @@ Following is an example
 .BR SV_SIGNAL (9),
 .BR qopen (9),
 .BR qprocson (9),
-.BR put (9),
-.BR srv (9),
+.BR putp (9),
+.BR srvp (9),
 .BR qwait (9),
 .BR init_module (9),
 .BR term_module (9),

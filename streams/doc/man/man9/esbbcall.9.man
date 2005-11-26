@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esbbcall.9.man,v 0.9.2.19 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: esbbcall.9.man,v 0.9.2.20 2005/11/25 23:42:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -104,7 +104,9 @@ the argument to pass the callback function.
 .PP
 When allocation of a message block fails as a result of a failed call to
 .BR esballoc (9),
-the service routine should place a
+the
+.BR srvp (9)
+procedure should place a
 .I STREAMS
 message that invoked
 .BR esballoc (9)
@@ -112,7 +114,9 @@ call back on the queue with
 .BR putbq (9)
 and call the
 .BR esbbcall ()
-function with the queue's service routine as the
+function with the queue's
+.BR srvp (9)
+procedure as the
 .I function
 argument and a pointer to the queue as the
 .I arg
@@ -123,7 +127,9 @@ argument should be the same as the
 argument issued to the
 .BR esballoc (9).
 .PP
-In this way, the queue service routine will be recalled once there is
+In this way, the queue
+.BR srvp (9)
+procedure will be recalled once there is
 sufficient memory to allocate the requested message block.
 .PP
 The arguments to
@@ -167,15 +173,18 @@ call.
 .TP
 .I function
 The callback function to invoke when a buffer of the required size and message
-of the requested priority becomes available.  This is normally the service
-routine which failed a call to
+of the requested priority becomes available.  This is normally the
+.BR srvp (9)
+procedure which failed a call to
 .BR esballoc (9)
 or it is a function pointer to
 .BR qenable (9).
 .TP
 .I arg
 The argument to pass to the callback function.  This is normally a pointer to
-the queue whose service procedure failed the
+the queue whose
+.BR srvp (9)
+procedure failed the
 .BR esballoc (9).
 .\"
 .\"
@@ -233,8 +242,8 @@ cannot allocate the necessary internal structures.
 can be called from any context, including user context,
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9),
-.BR srv (9)
+.BR putp (9),
+.BR srvp (9)
 procedures,
 .BR bufcall (9),
 .BR qbufcall (9),
@@ -254,8 +263,8 @@ Considerations should be given when writing the callback function that a
 callback function can execute at the same time as any
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9),
-.BR srv (9),
+.BR putp (9),
+.BR srvp (9),
 procedure,
 .BR bufcall (9),
 .BR esbbcall (),

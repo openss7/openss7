@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strmod.9.man,v 0.9.2.11 2005/08/29 10:06:50 brian Exp $
+.\" @(#) $Id: register_strmod.9.man,v 0.9.2.12 2005/11/25 23:42:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -128,7 +128,7 @@ a pointer to the kernel module
 to be incremented when a the module is opened or
 .I STREAMS
 subsystem resource allocations are made,
-and decremented when the module is close or
+and decremented when the module is closed or
 .I STREAMS
 subsystems resources are freed.
 .RE

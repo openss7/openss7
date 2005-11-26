@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.23 2005/09/23 05:49:43 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.24 2005/11/25 23:42:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/23 05:49:43 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B freezestr
-\- freeze the state of a stream queue
+\- freeze the state of a Stream
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,7 +106,7 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .TP
 .I q
-the queue (and indirectly the stream) to freeze.
+the queue (and indirectly the Stream) to freeze.
 .\"
 .\"
 .SH DESCRIPTION
@@ -114,36 +114,36 @@ the queue (and indirectly the stream) to freeze.
 .BR freezestr ()
 freezes the state of the queue,
 .IR q,
-and the stream containing
+and the Stream containing
 .IR q .
 A frozen
-.I Stream
+Stream
 blocks any thread attempting to enter any
-.BR open ,
-.BR close ,
-.BR put ,
+.BR qopen (9),
+.BR qclose (9),
+.BR putp (9),
 or
-.B service
+.BR srvp (9)
 procedure belonging to any queue instance in the
-.IR Stream ,
+Stream,
 and blocks any thread currently within the
-.I Stream
+Stream
 if it attempts to put messages onto or take messages off of any queue within the
-.I Stream
+Stream
 (with the sole exception of the caller).  Threads blocked by this mechanism remain so until the
-.I Stream
+Stream
 is thawed by a call to
 .BR unfreezestr (9).
 .PP
 Freezing a
-.I Stream
+Stream
 does not automatically stop all functions that are running within the
-.IR Stream ;
+Stream;
 functions will continue to run until they attempt to perform some operation that would change the
 state of the
-.IR Stream ,
+Stream,
 at which point they will be forced to wait for the
-.I Stream
+Stream
 to be unfrozen by a call to
 .BR unfreezestr (9).
 .PP
@@ -158,9 +158,9 @@ so that its members can be accessed directly.
 .\"blocks entry to all queue procedures,
 .\".BR qopen (9)
 .\".BR qclose (9),
-.\".BR put (9)
+.\".BR putp (9)
 .\"and
-.\".BR srv (9),
+.\".BR srvp (9),
 .\"and all synchronous callbacks,
 .\".BR qtimeout (9),
 .\".BR qbufcall (9),
@@ -175,9 +175,9 @@ so that its members can be accessed directly.
 .\"waits until all other threads in
 .\".BR qopen (9),
 .\".BR qclose (9),
-.\".BR put (9)
+.\".BR putp (9)
 .\"and
-.\".BR srv (9)
+.\".BR srvp (9)
 .\"procedures,
 .\".BR qbufcall (9)
 .\"and
@@ -186,11 +186,11 @@ so that its members can be accessed directly.
 .\"and
 .\".BR qwriter (9)
 .\"callouts functions
-.\"in the stream containing
+.\"in the Stream containing
 .\".I q
 .\"exit.
 .\".BR freezestr ()
-.\"then locks the stream so that all other threads will be blocked from entering
+.\"then locks the Stream so that all other threads will be blocked from entering
 .\"those functions with the exception of the current thread.
 .\".PP
 .\"In addition, the queue specified by
@@ -215,14 +215,14 @@ so that its members can be accessed directly.
 .\".BR strqset (9)
 .\"for the locked queue and local interrupts will be suppressed.
 .PP
-A procedure that freezes a stream queue with
+A procedure that freezes a Stream queue with
 .BR freezestr ()
-must thaw the stream queue with
+must thaw the Stream queue with
 .BR unfreezestr (9)
 before returning.
 .PP
 A
-.I Stream
+Stream
 must be frozen with
 .BR freezestr ()
 accross a call to
@@ -232,9 +232,9 @@ accross a call to
 .BR strqset (9),
 .BR strqget (9).
 See the manual pages for these utilities for an example of freezing the
-.I Stream
+Stream
 across the call, and for the reasons why the
-.I Stream
+Stream
 must be frozen.
 .\"
 .\"
@@ -244,17 +244,17 @@ must be frozen.
 is intended to be used from a
 .I STREAMS
 module or driver
-.BR open ,
-.BR close ,
-.BR put ,
+.BR qopen (9),
+.BR qclose (9),
+.BR putp (9),
 or
-.BR service ,
+.BR srvp (9),
 procedure to freeze the state of the
-.I Stream
+Stream
 so that
 .I STREAMS
 utilities that directly alter the state of a queue within the
-.I Stream
+Stream
 may be called, or direct searching or maniuplation of a queue can be performed, safely
 in a Symetric Multi-Processor (SMP) environment.
 .PP
@@ -368,18 +368,18 @@ is called.
 Because
 .BR freezestr ()
 causes other processors executing threads within the
-.I Stream
+Stream
 to spin when attempting to change
-.I Stream
+Stream
 state, and because
 .BR freezestr ()
 disables local interrupts on the calling processor,
 until
 .BR unfreezestr (9)
-is called, the period for which a driver or module freezes a stream is critical and has an impact on
+is called, the period for which a driver or module freezes a Stream is critical and has an impact on
 system performance.
 The caller must not call any functions which may cause the calling thread to sleep while it holds a
-frozen stream.  Attempting to do so might panic the kernel.
+frozen Stream.  Attempting to do so might panic the kernel.
 .PP
 In the Uni-Processor (UP) environment,
 .BR splstr (9)
@@ -456,7 +456,7 @@ processor.
 .BR freezestr ()
 called with a private queue pair allocated with
 .BR allocq (9)
-will only lock the queue and cannot freeze the stream or block procedures,
+will only lock the queue and cannot freeze the Stream or block procedures,
 callouts and callbacks.  It cannot prevent
 .I q->q_next
 from being changed.  For private queue pairs, it is the caller's responsibility to protect the queue
@@ -464,7 +464,7 @@ linkage and synchronize procedures.
 .PP
 The
 .I q->q_flag
-member is never protected against writes by freezing the stream.  The
+member is never protected against writes by freezing the Stream.  The
 .I q->q_flag
 member must be considered a read-only field or must be accessed with atomic bit operations.
 .PP
@@ -472,8 +472,10 @@ A procedure calling
 .BR freezestr ()
 and returning without calling
 .BR unfreezestr (9)
-will indefinitely postpone interrupts on the calling processor, manipulation of the stream (qopen,
-qclose), and and queue procedures (insq, rmvq) on the frozen queue.
+will indefinitely postpone interrupts on the calling processor, manipulation of the Stream
+.RB [ qopen (9),
+.BR qclose (9)],
+and and queue procedures (insq, rmvq) on the frozen queue.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -482,73 +484,73 @@ qclose), and and queue procedures (insq, rmvq) on the frozen queue.
 acquires the
 .I sd_freeze
 read-write lock as a writer which prevents threads on other processors from entering
-.BR open ,
-.BR close ,
-.BR put ,
+.BR qopen (9),
+.BR qclose (9),
+.BR putp (9),
 and
-.B service
+.BR srvp (9)
 procedures, and also prevents threads on other processors from changing the state of the
-.IR Stream ,
+Stream,
 or the state of any queue in the
-.IR Stream .
+Stream.
 .PP
 Whenever a queue write lock is taken to alter the state of a queue, a read lock is first taken on the
 .I sd_freeze
 lock.  When the queue write lock is released, the read lock on
 .I sd_freeze
 is also released.  This ensures that the state of any queue in the
-.I Stream
+Stream
 cannot change while the
-.I Stream
+Stream
 is frozen
 .RI ( sd_freeze
 is write locked).
 .PP
 Whenever a
-.I Stream head
+Stream head
 write lock is taken to alter the plumbing of the
-.IR Stream ,
+Stream,
 a read lock is first taken on the
 .I sd_freeze
 lock.  When the
-.I Stream head
+Stream head
 write lock is release, the read lock on
 .I sd_freeze
 is also released.  This ensures that the plumbing of queues in the
-.I Stream
+Stream
 cannot change while the
-.I Stream
+Stream
 is frozen
 .RI ( sd_freeze
 is write locked).
 .PP
-.B open
+.BR qopen (9),
 and
-.B close
+.BR qclose (9),
 procedures acquire a
-.I Stream head
+Stream head
 write lock (to alter the
-.IR Stream ),
+Stream),
 before they execute.
 The will spin on the lock if the
-.I Stream 
+Stream 
 is frozen
 .RI ( sd_freeze
 is write locked).
 .PP
-.B put
+.BR putp (9)
 and
-.B service
+.BR srvp (9)
 procedures acquire and release the
 .I sd_freeze
 lock in read mode when they execute.  They will spin on the lock if the
-.I Stream
+Stream
 is frozen
 .RI ( sd_freeze
 is write locked).
 .PP
 Additional operations that take
-.I Stream head
+Stream head
 write locks are also blocked.  These operations are as follows:
 .BR stropen (9),
 .BR strclose (9),
@@ -578,15 +580,15 @@ lock.  This permits functions that alter queue state (such as
 .BR getq (9),
 .BR appq (9)),
 to be called while the
-.I Stream
+Stream
 is frozen with
 .BR freezestr ().
 .\".PP
 .\".BR freezestr ()
-.\"is implemented by taking a recursive write lock on the stream head with interrupt suppression.  This
+.\"is implemented by taking a recursive write lock on the Stream head with interrupt suppression.  This
 .\"protects all of the
 .\".I q->q_next
-.\"pointers in the entire stream.
+.\"pointers in the entire Stream.
 .\".BR freezestr ()
 .\"also takes a recursive write lock on the queue structure referenced by
 .\".IR q .
@@ -598,7 +600,7 @@ is frozen with
 .\".PP
 .\"Because recursive locks are taken, calling
 .\".BR freezestr ()
-.\"for a frozen stream will not result in single-part deadlock.
+.\"for a frozen Stream will not result in single-part deadlock.
 .\"
 .\"
 .SH EXAMPLES
@@ -630,14 +632,15 @@ Following is an example (but not a terribly useful one) of the use of
 The behaviour of the
 .BR tirdwr (4)
 module requires that it search the
-.I Stream head
+Stream head
 read queue for specific messages.  The detailed requirement is as follows:
 .RS
+.ll -7n
 .PP
 When the
 .BR tirdwr (4)
 module is pushed on the
-.IR Stream ,
+Stream,
 and as part of the
 .BR qopen (9)
 procedure for the module, the module checks if there are any messages with control parts that it
@@ -647,8 +650,11 @@ If such messages exist, the
 .BR tirdwr (4)
 module returns error
 .RB [ EPROTO ]
-to the module open routine and fails the push on the
-.IR Stream .
+to the module
+.BR qopen (9)
+routine and fails the push on the
+Stream.
+.ll +7n
 .RE
 .PP
 The following code fragment is a function
@@ -736,7 +742,7 @@ module after the check is performed.  See
 .BR rmvq (9),
 .BR SAMESTR (9).
 .BR setq (9),
-.BR srv (9),
+.BR srvp (9),
 .BR STREAMS (9),
 .BR strqget (9),
 .BR strqset (9),
@@ -897,20 +903,27 @@ Under
 .IR LiS ,
 .BR freezestr ()
 only sets a flag (in a non-MP-safe way) on the
-.I Stream head
+Stream head
 and queue pair,
 .IR q .
 It does not stop the
-.I Stream
+Stream
 from being closed, flushed, or other actions taken as a result of timeouts, callbacks or buffer
 calls.
 It does not keep actions from being performed on other queues in the
-.IR Stream .
+Stream.
 It incorrectly defers
-.B put
-procedure invocation (when no put or service procedure need be running).  It does not stop running
-put or service procedures from adding messages to or removing messages from any other queues in the
-.IR Stream .
+.BR putp (9)
+procedure invocation (when no
+.BR putp (9)
+or
+.BR srvp (9)
+procedure need be running).  It does not stop running
+.BR putp (9)
+or
+.BR srvp (9)
+procedures from adding messages to or removing messages from any other queues in the
+Stream.
 .IP ""
 Portable
 .I STREAMS
@@ -938,7 +951,7 @@ Portable
 .I STREAMS
 drivers and modules will not call
 .BR freezestr ()
-for a stream that the caller has already frozen.
+for a Stream that the caller has already frozen.
 .IP \(em
 Calling
 .BR bcanput (9),
@@ -967,7 +980,7 @@ Calling
 .BR qsize (9),
 or
 .BR SAMESTR (9)
-for a queue in a stream frozen by the caller will not result in single-party
+for a queue in a Stream frozen by the caller will not result in single-party
 deadlock of the calling processor.
 .IR "SVR 4.2 MP" ,
 .IR Solaris \(rg,
@@ -988,21 +1001,21 @@ suxspg
 Portable
 .I STREAMS
 drivers and modules will not attempt to call any of these restricted functions while it holds a
-stream frozen with
+Stream frozen with
 .BR freezestr ().
 .IP \(em
 .BR freezestr ()
 blocks all threads except the calling thread from putting messages onto or taking messages off of
 any queue in the
-.IR Stream .
+Stream.
 This behaviour is consistent with
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg
 and
 .IR UnixWare \(rg
 behaviour, as follows:
-Any thread currently within the stream will be blocked if it attempts to put messages
-onto or take messages off of any queue within the stream (with the sole exception of the caller).
+Any thread currently within the Stream will be blocked if it attempts to put messages
+onto or take messages off of any queue within the Stream (with the sole exception of the caller).
 .[
 soldoc
 .]
@@ -1021,7 +1034,7 @@ usldk
 .IR SUPER-UX \(rg
 and
 .IR UnixWare \(rg
-specify that the following functions cannot be called on a frozen stream:
+specify that the following functions cannot be called on a frozen Stream:
 .BR bcanput (9),
 .BR bcanputnext (9),
 .BR canput (9),
@@ -1061,14 +1074,14 @@ uw7doc
 Portable
 .I STREAMS
 modules and drivers will not call these functions while the
-.I Stream
+Stream
 is frozen by the caller.
 .IP \(em
 .IR "SVR 4.2 MP DDI/DKI" ,
 .IR SUPER-UX \(rg
 and
 .IR UnixWare \(rg
-specify that the following functions must have the stream frozen across the
+specify that the following functions must have the Stream frozen across the
 call:
 .BR insq (9),
 .BR rmvq (9),
@@ -1090,8 +1103,6 @@ functions or some other locking mechanism.
 .[
 soldoc
 .]
-.I Stream
-is frozen by the caller.
 .IP ""
 Portable
 .I STREAMS
@@ -1110,7 +1121,7 @@ and
 but not a mixture of both.
 .IP \(em
 .IR SUPER-UX \(rg
-states that the stream cannot be frozen while calling
+states that the Stream cannot be frozen while calling
 .BR rmvq (9),
 .[
 suxspg

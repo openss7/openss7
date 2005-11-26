@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.21 2005/09/24 01:12:55 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.22 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/24 01:12:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -104,13 +104,17 @@ places the message pointed to by
 .I mp
 on the queue
 .I q
-without invoking the queue's put procedure.
+without invoking the queue's
+.BR putp (9)
+procedure.
 .PP
 After placing the message on queue
 .IR q ,
 .BR putq ()
 adjusts the queue's flags and byte counts appropriately and schedules the
-queue service procedure when necessary.
+queue
+.BR srvp (9)
+procedure when necessary.
 .PP
 .BR putq ()
 queues messages based on message queueing priority.  There are three priority classes for messages:
@@ -187,7 +191,9 @@ If a
 .I High Priority
 message is placed onto the queue, the queue will always be enabled, as with
 .BR qenable (9);
-that is, the queue's service procedure will be scheduled if it exists.
+that is, the queue's
+.BR srvp (9)
+procedure will be scheduled if it exists.
 This is also true for
 .BR insq (9)
 and
@@ -195,7 +201,7 @@ and
 Because this is true, a
 .I High Priority
 message should never be placed back on a queue by the queue's
-.B service
+.BR srvp (9)
 procedure with
 .BR putbq (9),
 otherwise and infinite loop could result.
@@ -208,14 +214,16 @@ is not set) if the message is a
 message, or the
 .B QWANTR
 flag is set indicating that the
-.B service
+.BR srvp (9)
 procedure is ready to read the queue.
 .PP
 If a
 .I Priority Band
 message is placed onto ane empty queue band, the queue will be enabled, as with
 .BR enableq (9);
-that is, the queue's service procedure will be scheduled if it exists and the
+that is, the queue's
+.BR srvp (9)
+procedure will be scheduled if it exists and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
@@ -226,7 +234,9 @@ message is placed onto an empty queue and the
 .B QWANTR
 flag is set for the queue, then the queue will be enabled, as with
 .BR enableq (9);
-that is, the queue's service procedure will be scheduled if it exists and the
+that is, the queue's
+.BR srvp (9)
+procedure will be scheduled if it exists and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
@@ -246,7 +256,7 @@ When an ordinary message is enqueued by
 .BR putq (),
 .BR putq ()
 will cause the
-.B service
+.BR srvp (9)
 procedure to be scheduled only if the queue was previously empty, and a previous
 .BR getq (9)
 call returns
@@ -256,7 +266,7 @@ call returns
 flag is set).  If there are messages on the queue,
 .BR putq ()
 presumes that the
-.B service
+.BR srvp (9)
 procedure is blocked by flow control and the procedure will be rescheduled by
 .I STREAMS
 when the block is removed.
@@ -295,7 +305,7 @@ has been previously called for this queue.
 instructs
 .BR putq ()
 to enqueue the message when called by this queue, but not to schedule the
-.B service
+.BR srvp (9)
 procedure.
 .BR noenable (9)
 doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
@@ -308,20 +318,19 @@ is
 .PP
 .BR putq ()
 is intended to be used from the
-.B put
+.BR putp (9)
 procedure in the same queue in which the message will be queued.  A module should not call
 .BR putq ()
 directly to pass messages to a neighboring module.
-.BR put ()
+.BR put (9)
 may be used as the
-.I qi_putp
-.b put
+.BR putp (9)
 procedure value in either or both of a module's
 .BR qinit (9)
 structures.  This effectively bypasses any
-.B put
+.BR putp (9)
 procedure processing and uses only the module's
-.B service
+.BR srvp (9)
 procedure(s).
 .PP
 .BR putq ()
@@ -335,17 +344,17 @@ instead.
 .PP
 .BR putq ()
 is generally used in a module
-.B put
-proceduce and is used in conjunction with
+.BR putp (9)
+procedure and is used in conjunction with
 .BR getq (9)
 and
 .BR putbq (9)
 called from a module's
-.B service
+.BR srvp (9)
 procedure.
 .PP
 Normally, a module's
-.B service
+.BR srvp (9)
 procedure reads message from a queue using
 .BR getq (9)
 until there are no messages left on the queue
@@ -357,7 +366,7 @@ or
 or
 .BR bcanput (9)
 fails when attempting to pass a message along the
-.IR Stream .
+Stream.
 .PP
 When
 .BR canput (9)
@@ -366,11 +375,11 @@ or
 fails (returns
 .BR false ),
 the module
-.B service
+.BR srvp (9)
 procedure places the message that it was processing back on its queue using
 .BR putbq (9).
 At this point the
-.B service
+.BR srvp (9)
 procedure is blocked.  When
 .BR canput (9)
 or
@@ -415,7 +424,7 @@ that it is no longer blocked awaiting messages for those priority bands.
 .PP
 Because each priority band has separate high- and low-water marks and queue band counts, just
 because there are messages in the queue does not mean that a
-.B service
+.BR srvp (9)
 procedure is blocked on flow control for all bands.
 .PP
 In general, the condition in which
@@ -446,7 +455,7 @@ performed on the queue immediately following the
 .BR putq ()
 will retrieve the message that was enqueued.  It is a good policy to enable the queue when the newly
 enqueued message can be processed immediately by the
-.B service
+.BR srvp (9)
 procedure.
 .IP \(bu
 When a
@@ -463,7 +472,7 @@ the queue is enabled.  In this case,
 .BR getq (9)
 has indicated that the queue is not blocked on flow control but has blocked awaiting the
 availability of any message.  The queue
-.B service
+.BR srvp (9)
 procedure can possibly run successfully on enqueued messages, and should be enabled.
 .IP \(bu
 When a
@@ -479,7 +488,7 @@ In this case,
 .BR getq (9)
 has indicated that the message band is not blocked on equal or higher priority messages, although
 the queue may be blocked on lower priority band messages.  In this case, the queue
-.B service
+.BR srvp (9)
 procedure can possibly run successfully on messages in the message band, and should be enabled.
 .\".PP
 .\".nr tl \n[.l]u-36m
@@ -572,11 +581,11 @@ The caller is responsible for the validity of the passed in
 is valid from all procedures synchronous on
 .IR q ,
 including
-.BR open ,
-.BR close ,
-.BR put ,
+.BR qopen (9),
+.BR qclose (9),
+.BR putp (9),
 and
-.BR service ,
+.BR srvp (9),
 procedures and synchronous callback functions.
 .PP
 For process context, asynchronous callback functions, soft interrupts and interrupt service
@@ -614,7 +623,7 @@ returns.)
 .PP
 Otherwise, it is possible to derive a queue pointer from a validated queue pointer, provided that
 the
-.I Stream 
+Stream 
 is frozen with a call to
 .BR freezestr (9).
 Under
@@ -622,7 +631,7 @@ Under
 it is permissible to call
 .BR putq ()
 on a
-.I Stream
+Stream
 that is frozen with
 .BR freezestr (9),
 and
@@ -630,13 +639,13 @@ and
 can be called from any context.
 .BR putq ()
 takes a recursive freeze lock that can be acquired by the caller when the
-.I Stream
+Stream
 is frozen.  If another thread has the
-.I Stream
+Stream
 frozen with
 .BR freezestr (9),
 the calling processor will spin until the
-.I Stream
+Stream
 is thawed by the other thread with
 .BR unfreezestr (9).
 .\"
@@ -665,7 +674,7 @@ implementation is consistent with
 .I SVR 4
 in that it only enables the queue when permitted, however, it does not blindly enable the queue when
 the
-.B service
+.BR srvp (9)
 procedure has no chance of running because it is blocked on flow control on the current or higher
 priority band.
 .PP

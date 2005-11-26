@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 0.9.2.13 2005/11/22 11:57:19 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 0.9.2.14 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -208,7 +208,7 @@ character device
 \-
 open and possibly create a file or device
 .HP
-.BR close (2)
+.BR close (2s)
 \-
 close a file descriptor
 .HP

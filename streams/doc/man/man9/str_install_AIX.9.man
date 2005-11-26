@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.14 2005/05/14 08:34:30 brian Exp $
+.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.15 2005/11/25 23:42:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -167,7 +167,9 @@ structure.
 .TP
 .I sc_open_stylesc_flags
 Gosh does that ever look like a typo!
-Specifies the style of the driver or module open routine and characteristics
+Specifies the style of the driver or module
+.BR qopen (9)
+procedure and characteristics
 of the module or driver.  Possible values are:
 .RS
 .PP
@@ -225,9 +227,9 @@ if the module is not multiprocesor-safe.
 Specifies that the module accepts to run at per-stream synchronization level.
 .TP
 .B STR_Q_NOTTOSPEC
-Specifies that the module is designed to run it's service procedure
-.RB ( srvp (9))
-under process context.
+Specifies that the module is designed to run it's
+.BR srvp (9)
+procedure under process context.
 By default
 .I STREAMS
 .BR srvp (9)
@@ -241,7 +243,9 @@ procedure under process context, it needs to set this flag.
 Specifies that the module is capable of supporting 64-bit data types.
 .TP
 .B STR_NEWCLONING
-Specifies that the driver open uses new-style cloning.  Under this style, the
+Specifies that the driver
+.BR qopen (9)
+uses new-style cloning.  Under this style, the
 driver
 .BR qopen (9)
 does not check for

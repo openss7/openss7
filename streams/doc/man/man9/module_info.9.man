@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: module_info.9.man,v 0.9.2.10 2005/05/14 08:34:27 brian Exp $
+.\" @(#) $Id: module_info.9.man,v 0.9.2.11 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:27 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -128,12 +128,16 @@ The maximum packet size accepted.  This is the maximum size of a
 message that will be accepted by the stream head on write.
 .TP
 .I mi_hiwat
-The high water mark for flow control.  For modules with a service procedure,
+The high water mark for flow control.  For modules with a
+.BR srvp (9)
+procedure,
 this is the number of octets of queued messages beyond which the queue will be
 considered flow controlled.
 .TP
 .I mi_lowat
-The low water mark for flow control.  For modules with a service procedure,
+The low water mark for flow control.  For modules with a
+.BR srvp (9)
+procedure,
 this is the number of octets of queue messages beneath which the queue will
 be considered no longer flow controlled and back-enabling will occur.
 .\"

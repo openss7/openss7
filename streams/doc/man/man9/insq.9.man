@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.21 2005/09/17 00:45:21 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.22 2005/11/25 23:42:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -123,13 +123,17 @@ is equivalent to
 .PP
 If a priority message is inserted into the queue, the queue will always be enabled, as with
 .BR qenable (9);
-that is, the queue's service procedure will be scheduled if it exists.
+that is, the queue's
+.BR srvp (9)
+procedure will be scheduled if it exists.
 .PP
 If a normal message is inserted into an empty queue and the 
 .B QWANTR
 flag is set for the queue, then the queue will be enabled, as with
 .BR enableq (9);
-that is, the queue's service procedure will be scheduled if it exists and the
+that is, the queue's
+.BR srvp (9)
+procedure will be scheduled if it exists and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
@@ -486,7 +490,8 @@ osfdoc
 .]
 .IP ""
 .IR Solaris \(rg
-documents that the queue class (high priority or normal message) is ignored, and that the service
+documents that the queue class (high priority or normal message) is ignored, and that the
+.BR srvp (9)
 procedure is always enabled unless the
 .B QNOENB
 flag is set.
@@ -738,7 +743,9 @@ will always be explicitly called after successfully inserting a high priority me
 with
 .BR insq ().
 This practice might result in an extra scheduling of the queue under some circumstances, however, an
-extra scheduling of the queue's service procedure is more acceptable than the loss of enabling a
+extra scheduling of the queue's
+.BR srvp (9)
+procedure is more acceptable than the loss of enabling a
 queue: the later can cause queue scheduling to postpone indefinitely.
 .IP \(em
 .BR insq ()
@@ -981,7 +988,7 @@ local interrupts throughout the
 executive.  The only queue procedure that
 .B @PACKAGE_TITLE@
 permits to be called from an interrupt service routine context is
-.BR put (9),
+.BR putp (9),
 and that function defers until the next
 .BR runqueues (9)
 pass.

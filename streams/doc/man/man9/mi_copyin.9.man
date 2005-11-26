@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyin.9.man,v 0.9.2.5 2005/11/22 11:57:23 brian Exp $
+.\" @(#) $Id: mi_copyin.9.man,v 0.9.2.6 2005/11/25 23:42:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,7 +94,11 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
-the current write-side queue whose put or service procedure within which
+the current write-side queue whose
+.BR putp (9)
+or
+.BR srvp (9)
+procedure within which
 .BR mi_copyin ()
 is being called.
 .TP
@@ -103,7 +107,10 @@ a pointer to the message block that contains the
 .BR M_IOCTL (9)
 or
 .BR M_IOCDATA (9)
-message being processed.  This is the message that was passed to the write-side put or service
+message being processed.  This is the message that was passed to the write-side
+.BR putp (9)
+or
+.BR srvp (9)
 procedure within which
 .BR mi_copyin ()
 is invoked.
@@ -141,7 +148,10 @@ and
 .BR mi_copy_state (9).
 .PP
 .BR mi_copyin ()
-is used to copy data from a user-space to the kernel.  When a module or driver put or service
+is used to copy data from a user-space to the kernel.  When a module or driver
+.BR putp (9)
+or
+.BR srvp (9)
 procedure first receives a
 .BR M_IOCTL (9)
 message, the
@@ -149,7 +159,11 @@ message, the
 function is used, if necessary, to generate an upstream
 .BR M_COPYIN (9)
 request to the stream head.
-It may also be used by a module or driver put or service procedure when it receives a subsequent
+It may also be used by a module or driver
+.BR putp (9)
+or
+.BR srvp (9)
+procedure when it receives a subsequent
 .BR M_IOCDATA (9)
 message and has additional user-space memory areas to copy in.
 .\"
@@ -188,7 +202,11 @@ for examples of the usage of
 .BR mi_copyin ()
 can be called from any context; however, it is normally called from the
 .I STREAMS
-module or driver write-side queue put or service procedure.
+module or driver write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedure.
 .\"
 .\"
 .SH MP-STREAMS
@@ -197,7 +215,11 @@ module or driver write-side queue put or service procedure.
 is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
 in message blocks.  This is normally the case when the function is called from the
 .I STREAMS
-module or driver write-side queue put or service procedure.
+module or driver write-side queue
+.BR putp (9)
+or
+.BR srvp (9)
+procedure.
 .\"
 .\"
 .SH NOTICES

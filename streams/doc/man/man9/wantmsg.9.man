@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: wantmsg.9.man,v 0.9.2.12 2005/05/14 08:34:31 brian Exp $
+.\" @(#) $Id: wantmsg.9.man,v 0.9.2.13 2005/11/25 23:42:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -109,7 +109,10 @@ is set to
 .SH DESCRIPTION
 .PP
 .BR wantmsg ()
-is used for modules with queues without a service procedure to filter the messages calling the put
+is used for modules with queues without a
+.BR srvp (9)
+procedure to filter the messages calling the
+.BR putp (9)
 procedure of the queue.
 .BR wantmsg ()
 either installs a filter function for this purpose when the filter function pointer,
@@ -123,10 +126,13 @@ is
 .PP
 When a filter program has been installed with
 .BR wantmsg (),
-all messages passed to the queue's put procedure will first be passed to the supplied filter
+all messages passed to the queue's
+.BR putp (9)
+procedure will first be passed to the supplied filter
 function.
 .PP
-If the filter function returns true (1), then the message is passed to the queue's put
+If the filter function returns true (1), then the message is passed to the queue's
+.BR putp (9)
 procedure; if it returns false (0), then the message is passed to the next module in the stream
 bypassing the current queue.
 .PP
@@ -142,7 +148,9 @@ processing and queue synchronization for messages that do not need to be process
 .BR wantmsg ()
 is particularly useful for optimizing
 .I STREAMS
-modules with no service procedure that are solely intended to intercept IO controls such as
+modules with no
+.BR srvp (9)
+procedure that are solely intended to intercept IO controls such as
 .BR pipemod (4),
 .BR sockmod (4),
 and
@@ -167,7 +175,9 @@ false (0).
 .BR wantmsg ()
 fails when the specified queue,
 .IR q ,
-has a service procedure associated with the queue.
+has a
+.BR srvp (9)
+procedure associated with the queue.
 .\"
 .\"
 .SH CONTEXT
@@ -274,6 +284,8 @@ devices are not supported.
 .PP
 See
 .BR STREAMS (9)
+and
+.BR aixcompat (9)
 for additional compatibility considerations.
 .\"
 .\"

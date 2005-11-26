@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.17 2005/09/26 10:56:41 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.18 2005/11/25 23:42:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/26 10:56:41 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,7 +101,7 @@ in
 .B MP-STREAMS
 mode.
 .PP
-This manpage provides additional information with regards to synchronization
+This manual page provides additional information with regards to synchronization
 and serialization of events within the
 .I STREAMS
 executive, for compatibility with
@@ -146,9 +146,10 @@ specified by the following flags.
 The queue
 .BR qopen (9),
 .BR qclose (9),
-.BR put (9)
+.BR putp (9)
 and
-service procedures, as well as asynchronous callbacks and callouts of all kinds
+.BR srvp (9)
+procedures, as well as asynchronous callbacks and callouts of all kinds
 can run concurrent, particularly in a multiprocessor environment.
 Modules that set this flag must normally perform their own mutual exclusion or
 critical section protections, and all procedures must be fully MP-safe.
@@ -170,14 +171,20 @@ a thread currently within the perimeter exits.
 .IP ""
 Normally in
 .BR "@PACKAGE_TITLE@" ,
-only one thread will execute a queue's service procedure at a given time.  However, normally queue
-.BR put (9)
-procedures, as well as all asynchronous callbacks, can run concurrent with the service procedure.
-This inner perimeter causes service procedures to be run exclusive with
-.BR put (9)
+only one thread will execute a queue's
+.BR srvp (9)
+procedure at a given time.  However, normally queue
+.BR putp (9)
+procedures, as well as all asynchronous callbacks, can run concurrent with the
+.BR srvp (9)
+procedure.
+This inner perimeter causes
+.BR srvp (9)
+procedures to be run exclusive with
+.BR putp (9)
 (unless
 .B D_MTPUTSHARED
-is also set), as well as exclusive with all syncrhonous callbacks.
+is also set), as well as exclusive with all synchronous callbacks.
 .TP
 .B D_MTQPAIR
 Specifies that the module has an inner perimeter and that synchronization at
@@ -203,13 +210,13 @@ a thread currently within the perimeter exits.
 .TP
 .B D_MTPUTSHARED
 Specifies that the
-.BR put (9)
+.BR putp (9)
 procedure will be permitted to enter the inner perimeter shared.  This means
 that module
-.BR put (9)
+.BR putp (9)
 procedures must run fully re-entrant and multi-threaded.  Also, that
 calling sequence of
-.BR put (9)
+.BR putp (9)
 procedures is not guaranteed by the
 .I STREAMS
 executive.
@@ -266,35 +273,35 @@ flag, above.
 Specifies that interrupt-safe callbacks are required.
 .TP
 .B STR_PERSTREAM
-Specifies that the module agrees to per-stream synchronization for non MP-safe
+Specifies that the module agrees to per-Stream synchronization for non MP-safe
 modules.
 .TP
 .B STR_Q_NOTTOSPEC
 Specifies that the module is not to specification and runs under a process
 context.  The module might sleep in its procedures.
 .PP
-Normally when modules are not MP-safe, the default is to use per-module sychronization for the
+Normally when modules are not MP-safe, the default is to use per-module synchronization for the
 module (see
 .B SQLVL_DEFAULT
 below).  This means that only one thread is permitted into the entire module.  That is rather
-restrictive and can cause difficulties when MP-safe modules are in the stream.  (MP-safe modules
-will run more agressively and are likely to outpace per-module synchronized modules, impairing the
-performance of all streams in which the module is included.)
+restrictive and can cause difficulties when MP-safe modules are in the Stream.  (MP-safe modules
+will run more agressive and are likely to out-pace per-module synchronized modules, impairing the
+performance of all Streams in which the module is included.)
 .PP
-Another solution is to run each of the non-MP-safe module's streams at per-stream syncrhonization,
-where only a single thread is permitted per stream, but multiple threads are permitted per module.
-Unfortunately, other MP-safe modules in the stream must be prepared to accept this situation, as
+Another solution is to run each of the non-MP-safe module's Streams at per-Stream synchronization,
+where only a single thread is permitted per Stream, but multiple threads are permitted per module.
+Unfortunately, other MP-safe modules in the Stream must be prepared to accept this situation, as
 they may be relying on a different synchronization model within their modules.  Setting the
 .B STR_PERSTREAM
 flag for a module or driver indicates that, regardless of whether the module or driver is MP-safe or
-not, that it accepts being run in per-stream syncrhonization when a non-MP-safe module or driver is
-in the same stream.  As a stream is built up and includes a non-MP-safe module, if all of the
-modules and driver on the stream have the
+not, that it accepts being run in per-Stream synchronization when a non-MP-safe module or driver is
+in the same Stream.  As a Stream is built up and includes a non-MP-safe module, if all of the
+modules and driver on the Stream have the
 .B STR_PERSTREAM
-flag set, then the stream will be run with per-stream synchronization.  If any module or driver on
-the stream does not have the
+flag set, then the Stream will be run with per-Stream synchronization.  If any module or driver on
+the Stream does not have the
 .B STR_PERSTREAM
-flag set, the all non-MP-safe modules on the stream (and any of their instances in other streams)
+flag set, the all non-MP-safe modules on the Stream (and any of their instances in other Streams)
 will be forced to run in per-module synchronization.
 .\"
 .\"
@@ -360,7 +367,7 @@ that implicitly share unprotected data structures.
 Specifies that the module is run with global synchronization.  This means that
 only one
 .I STREAMS
-executive thread will be permitted to enter any syncrhonous module.  This makes
+executive thread will be permitted to enter any synchronous module.  This makes
 the entire
 .I STREAMS
 executive single threaded and is useful primarily for debugging.  This is the
@@ -412,12 +419,12 @@ Asynchronous callback functions are not normally synchronized.
 .PP
 .B @PACKAGE_TITLE@
 provides the following assurances with regard to asynchronous callbacks:
-.IP \(em \w'\(em\(em'u
+.IP \(bu \w'\(bu\(em'u
 The callback function will be invoked on the processor that initiated the
 callback.  This ensures that the callback function will not execute until
 after the function that invoked the callback returns or encounters a
 preemption point.
-.IP \(em
+.IP \(bu
 If the
 .B STR_QSAFETY
 flag is set during configuration, asynchronous callback function invoked from
@@ -428,7 +435,7 @@ executive (within a
 queue procedure, call-out or callback function),
 will be synchronized with the queue for which the callback is associated.  In
 addition, local interrupts will be suppressed on the servicing processor.
-.IP \(em
+.IP \(bu
 Asynchronous callbacks invoked from outside the
 .I STREAMS
 executive (at user context outside the
@@ -440,10 +447,10 @@ interrupt service routines)
 will never be synchronized with the
 .I STREAMS
 framework.
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
 .PP
 .SS "Asynchronous Callback Cancellation"
 .PP
@@ -487,7 +494,7 @@ The callback function can execute at any time, asynchronous with other
 .I STREAMS
 procedures.
 When the callback function is executed, no synchronization is performed on any
-module, stream, queue pair or queue before calling the function.
+module, Stream, queue pair or queue before calling the function.
 .\"
 .\"
 .SS "Synchronous Entry Points"
@@ -495,30 +502,44 @@ module, stream, queue pair or queue before calling the function.
 .TS
 tab(:);
 lbw(14n)0c0ls.
-qopen\fR(9):\ \(en\ :
-qclose\fR(9):\ \(en\ :
-put\fR(9):\ \(en\ :
-srv\fR(9):\ \(en\ :
+qopen\fR(9):\ \(en\ :the module or driver open routine
+qclose\fR(9):\ \(en\ :the module or driver close routine
+putp\fR(9):\ \(en\ :the module or driver put procedure
+srvp\fR(9):\ \(en\ :the module or driver service procedure
 .TE
 .PP
 .B @PACKAGE_TITLE@
 provides the following assurances with regard to synchronous entry points:
-.IP \(em \w'\(em\(em'u
+.IP \(bu \w'\(bu\(em'u
 Per normal
 .I STREAMS
 semantics, only one
 .BR qopen (9)
-call will be permitted to execute at a time.  However, for streams that are
+or
+.BR qclose (9)
+call will be permitted to execute at a time, per Stream.  However, for Streams that are
 already open,
 .BR qopen (9)
+and
+.BR qclose (9)
 can run concurrent with
-other syncrhonous entry points (once
+other synchronous entry points for the same Stream (once
 .BR qprocson (9)
 is called) and both synchronous and asynchronous callbacks.
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
+.IP \(bu
+.BR qopen (9)
+and
+.BR qclose (9),
+can, however, run concurrent with any synchronous entry point
+.RB ( qopen (9),
+.BR qclose (9)
+.BR putp (9),
+.BR srvp (9)),
+synchronous or asyncrhonous callback function, belonging to a separate Stream.
+
+.IP \(bu
+.IP \(bu
+.IP \(bu
 .\"
 .\"
 .SS "Synchronous Callbacks"
@@ -578,7 +599,7 @@ Macros:State:Notes
 _
 RD\fR(9):either:T{
 These macros can be called from any context.  It does not matter whether the
-.I Stream
+Stream
 is frozen by the caller or not.  The caller is responsible for the validity of the passed in
 queue pointer
 .I q
@@ -602,13 +623,13 @@ when called from a
 environment, or
 .I q
 does not belong to the same
-.I Stream
+Stream
 as the
 .I STREAMS
-procedure from which it is called (e.g, when passing messages from an upper multiplexor
-.I Stream
-to a lower multiplexor
-.IR Stream ),
+procedure from which it is called (e.g, when passing messages from an upper multiplexer
+Stream
+to a lower multiplexer
+Stream),
 and validity and exclusivity of the passed in
 message pointer
 .IR mp .
@@ -665,16 +686,16 @@ unfreezestr\fR(9):frozen:
 .PP
 In the Uni-Processor (UP) environment, it was sufficient to raise the system priority level
 to ensure that no other queue procedures or thread were accessing the
-.IR Stream .
+Stream.
 This was performed with
 .BR splstr (9)
 and
 .BR splx (9).
 .PP
-In the Symetric Multi-Processor (SMP) environment, it is also necessary to hold a lock to block
-other processors from entering the criticial section.
-This is acheived by freezing the
-.I Stream
+In the Symmetric Multi-Processor (SMP) environment, it is also necessary to hold a lock to block
+other processors from entering the critical section.
+This is achieved by freezing the
+Stream
 with
 .BR freezestr (9)
 and thawing it with
@@ -701,35 +722,40 @@ is sufficient to ensure that a valid queue pointer
 .I q
 will not invalidate across a call to any function until
 .BR splx (9)
-was called.  This is not the case in the Symetric Multi-Processor (SMP) environment.
+was called.  This is not the case in the Symmetric Multi-Processor (SMP) environment.
 .PP
 In the SMP environment, another processor may be executing
-.B put
+.BR putp (9)
 or
-.B service
-proceedures, or sychronous callbacks, concurrent with
-.B open
+.BR srvp (9)
+procedures, or synchronous callbacks, concurrent with
+.BR qopen (9)
 or
-.B close
+.BR qclose (9)
 procedures.
 Utilities called from the
 .RI non- STREAMS
 context (process context, asynchronous callbacks, soft interrupts, and interrupt service routines)
 can execute concurrent with any procedures within the
 .I STREAMS
-environment (open, close, put, service, syncrhonous callbacks, buffer free routines).
-.B open
+environment
+.RB ( qopen (9),
+.BR qclose (9),
+.BR putp (9),
+.BR srvp (9),
+synchronous callbacks, buffer free routines).
+.BR qopen (9)
 and
-.B close
+.BR qclose (9)
 procedures, in particular, can cause
 .I q_next
 pointers to change, and
-.B close
+.BR qclose (9)
 procedures can also result in the deallocation of queues.
 The only
 .I STREAMS
 utilities that are provided that permit blocking of plumbing changes to the
-.I Stream
+Stream
 are
 .BR freezestr "(9), " unfreezestr (9)
 and
@@ -799,10 +825,10 @@ we hold the
 .B inode
 semaphore while acquiring a reference to the Stream head via the
 .B file
-pointer, and also hold the sempahore while clearing the
+pointer, and also hold the semaphore while clearing the
 .I private_data
 pointer.
-(This means a fair amount of sempahore taking and releasing when performing system calls.  Perhaps
+(This means a fair amount of semaphore taking and releasing when performing system calls.  Perhaps
 the inode spinlock might have been a better idea.)
 .PP
 The Stream head has associated with it a queue pair.  While the Stream head reference is valid,
@@ -811,6 +837,16 @@ there always exists a Stream head queue pair.
 .\"
 .SH NOTICES
 .PP
+.B MP-STREAMS
+synchronization is a complex and difficult part of any
+.I STREAMS
+implementation.  Performance and implementation specifics can cause the behaviour of modules or
+drivers invoking synchronization to differ from implementation to implementation.  Portable
+.I STREAMS
+drivers and modules will, and all new projects should, be written to be fully MP-safe and will set
+the
+.B D_MP
+flag.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -819,10 +855,26 @@ there always exists a Stream head queue pair.
 .\"
 .SH BUGS
 .PP
+The
+.B MP-STREAMS
+mechanism has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B MP-STREAMS
+mechanism is compatible with
+.I "SVR 4.2 MP"
+.[
+usldk
+.]
+and implementations based on
+.I "SVR 4.1 MP"
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -831,10 +883,18 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2 MP" .
+.[
+svr42spg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+Synchronization mechanisms for
+.I STREAMS
+first appeared in
+.IR "SVR 4.1 MP" .
 .\"
 .\"
 .TI

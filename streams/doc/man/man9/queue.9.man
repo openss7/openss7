@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.18 2005/11/25 00:42:23 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.19 2005/11/25 23:42:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 00:42:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,7 +139,7 @@ downstream queue in this stream;
 .TP
 .I q_link
 next queue to have its
-.BR srv (9s)
+.BR srvp (9)
 procedure scheduled;
 .TP
 .I q_ptr
@@ -447,83 +447,508 @@ allocates a queue pair as an array of two elements, where each element is a
 .B queue
 structure.  The first queue in the array corresponds to the read-side queue in the pair; the second,
 the write-side queue.
-The first element, or read-side queue has the
-.B QREADR
-flag set in its
-.I q_flag
-member; the second, write-side queue, has the
-.B QREADR
-flag clear.
-Given a pointer to a
 .B queue
-structure, one can determine whether it is the read-side or write-side queue of the queue pair by
-examining the
-.B QREADR
-flag.
-When
-.I STREAMS
-allocates a queue pair, it sets the
-.B QUSE
-flag in both queues of the pair; when deallocating, this flag is cleared in both queues.
+pairs are deallocated with
+.BR freeq (9).
 .PP
-The number of queue pairs currently allocated by
+.I STREAMS
+keeps track of the number of queue pairs currently allocated by
 .BR allocq (9),
-and a system high water mark of allocations active since the last boot,
-are available to system administration in the
+and a system high water mark of allocations active since the last boot.
+This information is available to system administration in the
 .B /proc/streams/strinfo
 system file.
+.\"
+.SS Queue Pair Linkage
 .PP
-.I STREAMS
-allocates a queue pair, using
-.BR allocq (9),
-in two situations:
-.IP (1) \w'(0)\(em'u
-when allocating a queue pair to form an instance of a module or driver in a Stream, using
-.BR qalloc (9),
-called from
-.BR qattach (9),
-resulting from a call to
-.BR autopush (9), or a
-Stream head
-.BR I_PUSH (7)
-.BR ioctl (2s)
-operation pushing a module, an
-.BR open (2s)
-system call opening a driver.
-This is the normal case for creation of a queue pair to represent a module or driver in the Stream.
-.IP (2)
-when allocating a queue pair to form an instances of a Stream head, using
-.BR allocstr (9),
-called from
-.BR stralloc ()
-called from
-.BR stropen (),
-resulting from an
-.BR open (2s)
-system call opening a driver, or twice for a
-.BR pipe (2s)
-system call creating a pipe.
-This is a special case of creating a Stream head for a Stream when the Stream is first created.
+Queue pairs form an instance of the Stream head, module or driver within a Stream.  The Stream is a
+linear sequence of queue pairs connected in two directions by their
+.I q_next
+pointers.
+.I q_next
+pointers point to the corresponding queue in the next queue pair along the Stream and are used for
+passing messages along the Stream.
+The
+.I q_next
+pointers of the read queues in each queue pair point upstream beginning at the driver, following up
+the read queues of the module stack, and terminating at the Stream head read queue.  The
+.I q_next
+pointer of the Stream head read queue contains
+.BR NULL .
+The
+.I q_next
+pointers for the write queues in each queue pair point downstream beginning at the Stream head,
+following dosn through the write queues of the module stack, and terminating at the driver.  The
+.I q_next
+pointer of the driver write queue contains
+.BR NULL .
+.\"
+.SS Queue Pair Initialization
 .PP
-In the normal case, where a queue pair is allocated to form an instance of a module or driver within
-a Stream,
-.BR qalloc (9)
-sets the
-.B QPROCS
-and
-.B QNOENB
-flags in the
-.I q_flag
-member of each
+When a
 .B queue
-in the pair to indicate that procedures are disabled will not be run for either
-.BR queue .
-Each queue then has
+structure is allocated by
+.I STREAMS
+and linked into a Stream, elements of each queue structure in the queue pair are initialized.
+.PP
+The
+.B QUSE
+bit is set in the
+.I q_flag
+member of each queue to indicate that it is initialized.
+The
+.B QREADR
+bit is set for the read queue and cleared for the write queue.  For any given queue pointer, this
+flag indicates whether the queue referenced is a read or write queue.
+While the queue pair is still in the initialization process, and before
+.BR qprocson (9)
+is called for the queue pair, the
+.B QPROCS
+bit is set, indicating that the queue's procedures are disabled.  This is
+also the case after
+.BR qprocsoff (9)
+is called on close.
+While the queue pair is in operation,
+.B QPROCS
+is clear on both queues.
+While
+.I STREAMS
+is waiting for the write queue of a queue pair to drain on close, the
+.B QWCLOSE
+bit is set in
+.IR q_flag .
+.PP
+The
+.I q_qinfo
+pointer of the read queue is initialized to point to the
+.I st_rdinit
+pointer of the module or driver
+.BR streamtab (9)
+structure; the write queue
+.IR q_qinfo ,
+the
+.I st_wrinit
+pointer.
+These
+.BR qinit (9)
+structures contain the
+.BR putp (9)
+and
+.BR srvp (9)
+procedures associated with each queue.  The
+.BR qinit (9)
+structure associated with the read queue contains the
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures associated with the queue pair.
+.PP
+Each queue's associated
+.BR qinit (9)
+structure also contains a pointer to the
+.BR module_info (9)
+structure,
+.IR qi_minfo ,
+that is used to initialize packet size and flow control values in each queue.  The
+.IR mi_minpsz ,
+.IR mi_maxpsz ,
+.IR mi_hiwat ,
+.IR mi_lowat ,
+members of the
+.BR module_info (9)
+structure are used to initialize the corresponding
+.IR q_minpsz ,
+.IR q_maxpsz ,
+.IR q_hiwat ,
+.IR q_lowat ,
+members of the
+.B queue
+structure.
+.PP
+When the module or driver
+.BR qopen (9)
+procedure is called, the module or driver can associated module private information with each
+.B queue
+structure using the
+.I q_ptr
+member.  This use of this member is private to the module and will not be altered or examined by
+.IR STREAMS .
+When the module or driver
+.BR qclose (9)
+procedure is called, the module or driver has the opportunity to deallocate and resources that were
+associated with the
+.I q_ptr.
+This member is typically used by the module to point to an allocated structure containing module
+private state information.  It is common that the
+.I q_ptr
+members of both the read and write queues are directed at the same module private structure.
+.\"
+.SS Message Queues
+.PP
+Each queue in a queue pair contains a message queue.  The message queue is a
+.BR NULL -terminated,
+double-linked list of
+.BR msgb (9)
+structures representing messages on the queue.
+The message queue is ordered with respect to the priority of messages on the queue.
+.I q_first
+points to the head of the queue.  This is the first message on the queue awaiting processing.  When
+the message queue is empty,
+.I q_first
+contains
+.BR NULL .
+.I q_last
+points to the tail of the queue.  This is the last message on the queue available for processing.
+When the message queue is empty,
+.I q_last
+contains
+.BR NULL .
+.I q_count
+contains the byte count of all the normal (priority zero) and high priority message blocks contained
+on the message queue.
+.PP
+The message queue can also contain priority messages (messages in which the
+.I b_band
+member is non-zero).
+Each band that currently has, or has previously had, a message of that band queued to the message
+queue will also have a
+.BR qband (9)
+structure that locates the messages of the same priority within the message queue.
+.BR qband (9)
+structures are linked onto a list beginning with the
+.I q_bandp
+pointer.
+.I q_nband
+contains the band number of the highest priority
+.BR qband (9)
+structure linked to
+.IR q_bandp .
+This is also the number of
+.BR qband (9)
+structures attached.
+Each queue band structure provides a
+.I qb_first
+and
+.I qb_last
+pointers that point to messages only within the band.
+.\"
+.SS Queue Scheduling
+.PP
+Although queue
+.BR putp (9)
+procedures are directly invoked by
+.IR STREAMS ,
+a queue's
+.BR srvp (9)
+procedure can be scheduled for later execution.
+.I STREAMS
+utilities that place a message on the message queue can cause the queue's
+.BR srvp (9)
+procedures to be scheduled.
+.BR qenable (9)
+directly schedules a queue, and when scheduled, the queue is termed
+.RI \(lq enabled \(rq.
+When a queue becomes enabled, the
+.B QENAB
+flag is set in the
+.I q_flag
+member of the queue, and the queue is linked onto the tail off a list of queues awaiting
+.BR srvp (9)
+procedure execution using the
+.I q_link
+pointers in the
+.B queue
+structures forming the list.
+.PP
+The
+.I STREAMS
+.BR noenable (9)
+utility sets the
+.B QNOENB
+flag to indicate to
+.I STREAMS
+utilities placing messages on the message queue that the queue's
+.BR srvp (9)
+procedure is only to be
+scheduled for high priority messages.
+.BR enableq (9)
+clears the
+.B QNOENB
+flag, and
+.BR canenable (9)
+tests it.
+When the queue's
+.BR srvp (9)
+procedure is run by the
+.I STREAMS
+scheduler, the scheduler first sets the
+.B QSVCBUSY
+flag before runing the procedure to indicate that the queue has its
+.BR srvp (9)
+procedure executing.
 
+
+.\"
+.SS Flow Control
+.PP
+Any
+.I STREAMS
+utility function placing a normal (priority zero) or high priority message on the queue will adjust
+.I q_count
+and compare it with
+.IR q_hiwat .
+If the count exceeds the high water mark, the
+.B QFULL
+bit will be set in
+.I q_flag
+to indicate that the queue is blocked by flow control.
+Any
+.I STREAMS
+utility function placing a priority message on the queue will adjust
+.I qb_count
+for the corresponding
+.BR qband (9)
+structure,
+and compare it with
+.BR qb_hiwat .
+If the count exceeds the high water mark, the
+.B QB_FULL
+bit will be set in
+.I qb_flag
+to indicate that the queue band is blocked by flow control.  The
+.I q_blocked
+member will also be incremented if the queue band was previously unblocked.
+.PP
+Any
+.I STREAMS
+utility function removing a normal (priority zero) or high priority message from the queue will
+adjust
+.I q_count
+and compare it with
+.IR q_lowat .
+If the count drops beneath the low water mark, the
+.B QFULL
+bit will be cleared in
+.I q_flag
+to indicate that the queue is no longer blocked by flow control.
+Any
+.I STREAMS
+utility function removing a priority message from the queue will adjust
+.I qb_count
+for the corresponding
+.BR qband (9)
+structure,
+and compare it with
+.IR qb_lowat .
+If the count drops beneath the low water mark, the
+.B QB_FULL
+bit will be cleared in
+.I qb_flag
+to indicate that the queue is no longer blocked by flow control.  The
+.I q_blocked
+member will also be decremented if the queue band was previously blocked.
+.PP
+Whenever
+.BR getq (9)
+is called to removes a message from a message queue and the message queue is found to be empty,
+.I STREAMS
+sets the
+.BR QWANTR
+in the
+.I q_flag
+member of the corresponding queue.
+(Since
+.B QWANTR
+is only set on an empty queue, there is no corresponding
+.B QB_WANTR
+flag for the
+.BR qband (9)
+structure.)
+The
+.B QWANTR
+flag signals
+.I STREAMS
+utilities that place messages onto the message queue that the queue's
+.BR srvp (9)
+procedure needs to be scheduled and the flag cleared.
+.PP
+Whenever
+.BR canput (9)
+or
+.BR canputnext (9)
+is called and the queue is found to be flow controlled (i.e., the
+.B QFULL
+bit is set in
+.IR q_flag ),
+the
+.B QWANTW
+flag is set in
+.IR q_flag .
+.BR bcanput (9)
+and
+.BR bcanputnext (9)
+called for a queue band that is flow controlled (i.e., the
+.B QB_FULL
+bit is set in
+.IR qb_flag ),
+the
+.B QB_WANTW
+bit is set in the
+.I qb_flag
+member of the corresponding
+.BR qband (9)
+structure.
+The
+.B QWANTW
+and
+.B QB_WANTW
+flags are an indication that an feeding queue wishes to write to a flow controlled queue or queue
+band.
+When messages are removed from the message queue or queue band that cause its count to fall to the
+low water mark, feeding queues are back-enabled.  Back-enabling consists of locating the feeding
+queue that wanted to write (one with a
+.BR srvp (9)
+procedure) and causing its
+.BR srvp (9)
+procedure to be scheduled.
+When a Stream head write queue is back-enabled in this fashion,
+.I STREAMS
+sets the
+.B QBACK
+or
+.B QB_BACK
+flag in the
+.I q_flag
+or
+.I qb_flag
+members to indicate for which message bands the queue was backenabled.
+.\"
+.SS Specialized Flags and Members
+.PP
+Several additional flags can be set on a queue during initialization to indicate specific
+specialized features:
+.TP \w'QWELDED\(em'u
+.B QUP
+indicates that the queue is operating in uni-processor emulation mode.
+This bit is set at initialization of the queue pair.
+Uni-processor
+emulation mode is not supported by
+.BR "@PACKAGE_TITLE@" .
+.TP
+.B QOLD
+indicates that the prototype of the
+.I qi_qopen
+procedure is the old
+.IR "SVR 3" -style
+prototype.
+This bit is set at initialization of the queue pair.
+Old style
+.I qi_qopen
+prototypes are not supported by
+.BR "@PACKAGE_TITLE@" .
+.TP
+.B QHLIST
+indicates that, instead of being linked on the run queues list with
+.IR q_link ,
+a Stream head write queue is linked on the scan list with
+.IR q_link .
+As the Stream head write queue does not have a
+.BR srvp (9)
+procedure, it can only be linked on the scan
+list.  The scan list is used by the
+.B SNDHOLD
+feature (see
+.B SO_STRHOLD
+under
+.BR M_SETOPTS (9)
+for details.)
+.TP
+.B QTOENAB
+indicates that the queue needs to be enabled.
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+uses this bit for some unknown purpose.
+This bit is set while the queue pair is active.
+Its use is not supported by
+.BR "@PACKAGE_TITLE@" .
+.TP
+.B QSYNC
+set by
+.B @PACKAGE_TITLE@
+when a sycnrhonization queue has been allocated and attached to the
+.I q_syncq
+member of the structure.
+This bit is set at initialization of the queue pair.
+The use of this bit is implementation specific.
+.TP
+.B QSAFE
+indicates that the module requires safe callbacks (that is, interrupts are to
+be suppressed before calling callback functions).
+This bit is set at initialization of the queue pair.
+Its use is supported by
+.BR "@PACKAGE_TITLE@" .
+.TP
+.B QWELDED
+set when two queue pairs are welded together using the
+.BR weldq (9)
+utility function.
+Its use is supported by
+.BR "@PACKAGE_TITLE@" .
+.PP
+Also,
+.BR "@PACKAGE_TITLE@"
+provides some implementation specific members to the
+.B queue
+structure:
+.TP \w'q_ftmsg\(em'u
+.I q_msgs
+used by
+.BR "@PACKAGE_TITLE@"
+to hold a count of the number of messages on the message queue.  This is in support of the
+.BR qsize (9)
+utility.
+.TP
+.I q_lock
+read-write lock used by
+.BR "@PACKAGE_TITLE@"
+to provide shared or exclusive access to the structure.
+.TP
+.I q_ftmsg
+used by
+.BR "@PACKAGE_TITLE@"
+to support
+.IR AIX \(rg
+.[
+aixspg
+.]
+message filtering (see
+.BR wantmsg (9)
+for details).
+.TP
+.I q_syncq
+used by
+.BR "@PACKAGE_TITLE@"
+to attach synchronization queues in support of
+.I STREAMS
+synchronization levels.
 .\"
 .\"
 .SH USAGE
 .PP
+.B queue
+structures are used for a number of purposes within the
+.I STREAMS
+subsystem:
+.IP \(bu \w'\(bu\(em'u
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
 .\"
 .\"
 .SH CONTEXT
@@ -556,6 +981,479 @@ thread, or cause the invocation of another function that takes the queue write
 lock by the same thread or single-party deadlock will result.
 .\"
 .\"
+.SH IMPLEMENTATION
+.PP
+The following subsections provide implementation details with regard to the allocation and
+deallocation of queue pairs under
+.BR "@PACKAGE_TITLE@" :
+.\"
+.SS Allocation
+.PP
+When
+.B @PACKAGE_TITLE@
+allocates a queue pair with
+.BR allocq (9),
+the first element, or read-side queue has the
+.B QREADR
+flag set in its
+.I q_flag
+member; the second, write-side queue, has the
+.B QREADR
+flag clear.
+Given a pointer to a
+.B queue
+structure, one can determine whether it is the read-side or write-side queue of the queue pair by
+examining the
+.B QREADR
+flag.
+When
+.B @PACKAGE_TITLE@
+allocates a queue pair, it sets the
+.B QUSE
+flag in both queues of the pair; when deallocating, this flag is cleared in both queues.
+.PP
+.B @PACKAGE_TITLE@
+allocates a queue pair, using
+.BR allocq (9),
+in two situations:
+.\" --------
+.IP (1) \w'(0)\(em'u
+.B @PACKAGE_TITLE@
+allocates a queue pair to form an instance of a module or driver in a Stream, during
+.BR qattach (9).
+.BR qattach (9)
+is called for a queue pair forming a module instance by the
+.BR I_PUSH (7)
+.BR ioctl (2s)
+system call; for a driver instance, by the
+.BR open (2s)
+system call.
+This is the normal case for creation of a queue pair to represent a module or driver in the Stream.
+.\" --------
+.IP (2)
+.B @PACKAGE_TITLE@
+allocates a queue pair to form an instances of a Stream head, during
+.BR stropen ().
+.BR stropen ()
+is called for a queue pair forming a Stream head instance by the
+.BR open (2s)
+or
+.BR pipe (2s)
+system call.
+This is a special case of creating a Stream head for a Stream when the Stream is first created.
+.\" =====================
+.PP
+In the normal case of allocating a queue pair to form a module or driver instance,
+.BR qattach (9)
+is used to allocate, initialize and attach the queue pair.
+.BR qattach (9)
+performs the following actions:
+.\" -----------
+.IP (1) \w'(0)\(em'u
+.BR qalloc (9)
+is called to allocate and intialized the queue pair.
+.IP ""
+.BR qalloc (9)
+performs the following actions:
+.RS
+.\" -----------
+.IP a) \w'W)\(em'u
+.BR allocq (9)
+is called to allocate a queue pair from cache memory and increment the count of the number of
+currently allocated queue pairs.
+.\" -----------
+.IP b)
+The
+.B QPROCS
+and
+.B QNOENB
+bits are set in the
+.I q_flag
+member of each queue, to disable queue procedures.
+.\" -----------
+.IP c)
+.BR setsq (9)
+is called to allocate any syncrhonization queues necessary to represent the synchronization model
+under which the module or driver is running, and attaches them to the
+.I q_syncq
+private member of the
+.B queue
+structure.  See
+.BR syncq (9)
+for more information on synchronization queues.
+.\" -----------
+.IP d)
+.BR setq (9)
+is called to:
+.RS
+.\" -----------
+.IP \- \w'\-\(em'u
+locate the
+.BR qinit (9)
+structures associated with the
+.I st_rdinit
+and
+.I st_wrinit
+members of the
+.BR streamtab (9)
+structure defining the module or driver;
+.\" -----------
+.IP \-
+attach the
+.BR qinit (9)
+structures to the
+.I q_qinfo
+member of each
+.BR queue ;
+and,
+.\" -----------
+.IP \-
+initialize the packet sizes and flow control levels,
+.IR q_minpsz ,
+.IR q_maxpsz ,
+.IR q_hiwat ,
+.IR q_lowat ,
+from the corresponding
+.IR mi_minpsz ,
+.IR mi_maxpsz ,
+.IR mi_hiwat ,
+.IR mi_lowat ,
+members of the
+.BR module_info (9)
+structure associated with each
+.BR qinit (9)
+structure (via the
+.IR qi_minfo
+member).
+.RE
+.IP ""
+See
+.BR setq (9)
+for details of its operation.
+.RE
+.\" -----------
+.IP (2)
+.BR qinsert (9)
+is called to half-insert the queue pair into the Stream beneath the Stream head.
+The insertion is a half-insertion in the sense that the
+.I q_next
+pointers of the inserted queue pair point to the
+Stream head
+on the read-side and the module stack on the write-side, but the
+.I q_next
+pointers of the Stream head and the top of the module stack do no yet point to the half-inserted
+module.  Messages active in the
+Stream
+will bypass the half-inserted module.  This situation persists until
+.BR qprocson (9)
+is called, either by the module or driver
+.BR qopen (9)
+procedure, or by
+.BR qattach (9)
+later in this sequence.
+See
+.BR qinsert (9)
+for details.
+.\" -----------
+.IP (3)
+.BR qopen (9)
+is called to invoke the module or driver
+.BR qopen (9)
+procedure found in the
+.I qi_qopen
+member of the
+.BR qinit (9)
+structure associated with the read side queue pair.  An error returned from this procedure causes
+the queue pair to be deleted from the Stream and deallocated.
+The error code is used in the return to the corresponding
+.BR open (2s)
+system call, or
+.BR I_PUSH (7)
+.BR ioctl (2s).
+.\" -----------
+.IP (4)
+If the queue pair forms an instance of a driver,
+.B @PACKAGE_TITLE@
+checks whether the device number returned from the driver
+.BR qopen (9)
+procedure is different than the device number passed.
+When the returned device number differs,
+.B @PACKAGE_TITLE@
+looks up the new device number in its
+.BR cdevsw (9)
+tables, and, if the
+.BR streamtab (9)
+associated with the new device table entry differs from that of the original device table entry,
+then a
+.BR setsq (9)
+and
+.BR setq (9)
+operation is performed again on the Stream, to reinitialize the queues in the pair to values
+associated with the new
+.BR streamtab (9).
+.[
+magic
+.]
+See also
+.RI \(lq NOTICES ,\(rq
+below.
+.\" -----------
+.IP (5)
+.BR qprocson (9)
+is called which performs the following actions:
+.RS
+.\" -----------
+.IP a) \w'W)\(em'u
+If the
+.B QPROCS
+bit is clear on the read queue of the queue pair, it indicates that procedures are already enabled,
+in which case,
+.BR qprocson (9)
+takes no further action.
+If the
+.B QPROCS
+bit is set, the module or driver
+.BR qopen (9)
+procedure forgot (or was not designed to) call the
+.BR qprocson (9)
+facility, in which case, the remaining actions are performed.
+.\" -----------
+.IP b)
+The
+.B QPROCS
+and
+.B QNOENB
+bits are cleared in the
+.I q_flag
+members of each queue in the queue pair.  Clearing these flags enables procedures for each queue.
+.\" -----------
+.IP c)
+The
+.B QWANTR
+bit is set in the
+.I q_flag
+members of each queue in the queue pair.  Setting this flag causes the queue's
+.BR srvp (9)
+procedure to be scheduled on the first message that is placed on its message queue.
+.\" -----------
+.IP d)
+The half-insertion performed by
+.BR qinsert (9)
+is completed.  That is, the
+.I q_next
+pointers of the Stream head and top of the module stack are adjusted to no longer bypass the queue
+pair, but now point to the queue pair.
+.\" -----------
+.IP e)
+The
+.I sd_minpsz
+and
+.I sd_maxpsz
+fields in the
+.BR stdata (9)
+structure
+(Stream head)
+are set to the corresponding
+.I q_minspz
+and
+.I q_maxpsz
+values from the write queue of the queue pair, which now occupies the top of the module stack.
+(The
+Stream head
+caches these values to avoid problems with referencing a non-existent driver write queue.)
+.RE
+.\" -----------
+.IP (6)
+The queue pair is then active within the Stream.
+.PP
+For the special case, where a queue pair is created as an instance of a Stream head,
+.BR stropen ()
+creates the pair in a similar fashion as above.  See
+.BR stdata (9)
+for details.
+.\" =====================
+.\"
+.SS Deallocation
+.PP
+.B @PACKAGE_TITLE@
+deallocates a queue pair only after it is no longer needed by a Stream.  Queue pairs forming an
+instance of a module are released as part of the
+.BR I_POP (7)
+operation to
+.BR ioctl (2s)
+for the queue pair.
+Queue pairs forming an instance of the Stream head, or an instance of a driver, are only released as
+part of the last
+.BR close (2s)
+system call resulting in dismantling of the Stream.
+.PP
+Queue pairs forming instances of a module are removed from the Stream and deallocated by calling
+.BR qdetach (9)
+for the queue pair directly from the
+.BR I_POP (7)
+handling in the Stream head.
+Queue pairs forming instances of a driver are removed from the Stream and deallocated by calling
+.BR qdetach (9)
+also, however,
+.BR qdetach (9)
+is called from
+.BR strwaitclose ()
+which is called from
+.BR strlastclose ().
+which is normally called from
+.BR strclose ().
+.PP
+.BR strlastclose ()
+is normally called from
+.BR strclose ()
+whenever the last
+.BR close (2s)
+system call in performed on a
+Stream.
+However,
+Streams
+that are linked under a multiplexing driver and then closed will have
+.BR strlastclose ()
+called when the Stream is unlinked.
+A
+.IR STREAMS -based
+.BR pipe (4)
+that has one end mounted with
+.BR fattach (3)
+and then closed, will have
+.BR strlastclose ()
+called when the other end of the pipe is closed for the last time.
+Otherwise, a
+Stream
+that is mounted with
+.BR fattach (3)
+and then closed, will have
+.BR strlastclose ()
+called when unmounted with
+.BR fdetach (3).
+.PP
+.BR strwaitclose ()
+will wait up to
+.B 15 seconds
+for the write side of a queue to drain under certain circumstances.  See
+.BR close (2s)
+for details.
+.PP
+.BR qdetach (9)
+performs the following actions when detaching an deallocating a queue pair:
+.IP (1) \w'(0)\(em'u
+.BR qclose (9)
+is called to invoke the
+.BR qclose (9)
+procedure of the module or driver located in the
+.I qi_qclose
+member of the
+.BR qinit (9)
+structure associated with the read queue of the queue pair.
+.IP (2)
+.BR qprocsoff (9)
+is called to ensure that the module or driver writer did not forget to call
+.BR qprocsoff (9)
+from the module or driver
+.BR qclose (9)
+procedure.
+.BR qprocsoff (9)
+checks the
+.B QPROCS
+bit in the
+.I q_flag
+member of the read side queue to determine whether it has already been called for the queue pair.
+If the
+.B QPROCS
+bit is set, then procedures are disabled and no action is taken.
+If the
+.B QPROCS
+bit is clear, procedure are still enabled and the module or driver writer forgot to call
+.BR qprocsoff (9)
+from the
+.BR qclose (9)
+procedure.  (The module or driver could also have been written to uni-processor
+.IR "SVR 4" ,
+which did not have a
+.BR qprocsoff (9)
+facility.)
+.IP ""
+.BR qprocsoff (9)
+then performs the following actions:
+.RS
+.IP a) \w'W)\(em'u
+The
+.B QPROCS
+and
+.B QNOENB
+flags are set for each queue.
+.IP b)
+The
+.BR QENAB ,
+.BR QWANTR ,
+.BR QWANTW ,
+bits are cleared for each queue.
+.IP c)
+The
+.BR QB_WANTW
+bit is cleared in each queue band for each queue.
+.IP d)
+The queue pair is half-deleted from the Stream.  That is, the
+.I q_next
+pointers of the Stream head and the top of the module stack are adjusted to bypass the queue pair
+being half-deleted.
+.IP e)
+The
+.I sd_minpsz
+and
+.I sd_maxpsz
+fields in the
+.BR stdata (9)
+structure
+(Stream head)
+are ajusted to reflect the values of the module or driver now beneath the Stream head.
+.RE
+.IP (3)
+.BR qdelete (9)
+is called to complete the half-deletion of the queue pair.
+.BR qdelete (9)
+also releases the intial allocation reference to the queue pair.  This often results in the
+immediate deallocation of the queue pair; however, if the
+.B @PACKAGE_TITLE@
+scheduler is still holding a temporary reference to the queue pair, the queue pair will not be
+deallocated until that reference is released.
+When the last reference is released,
+.BR freeq (9)
+is called to deallocate the queue pair.
+.IP ""
+.BR freeq (9)
+performs the following actions:
+.RS
+.IP a) \w'W)\(em'u
+The
+.B QUSE
+bit in the
+.I q_flag
+member of each queue in the queue pair is cleared indicating that the queue pair is deallocating.
+.IP b)
+.BR flushq (9)
+is called with the
+.B FLUSHALL
+flag on each queue to flush all messages from each message queue.
+.BR freebands ()
+is called on each queue to unlink and deallocate each
+.BR qband (9)
+structure linked to the
+.I q_bandp
+member of the
+.B queue
+structure.
+.IP c)
+Finally the peg counts of the number of queue pairs allocated is decrmented, and the cache memory
+associated with the queue pair is released.
+.RE
+.\"
+.\"
 .SH NOTICES
 .PP
 Members of the
@@ -579,6 +1477,26 @@ structure used by the
 scheduler.  Additional hidden fields are present in the
 .B queinfo
 structure.
+.PP
+Note that the description in
+.I The Magic Garden Explained
+.[
+magic
+.]
+says that
+.BR setq (9)
+is called if the major device number changes in the device number returned by a driver's
+.BR qopen (9)
+procedure.  This is because
+.I "SVR 4"
+does not associate more than one
+.BR streamtab (9)
+structure with a major device number.
+.B @PACKAGE_TITLE@
+has the ability to associate a different
+.BR streamtab (9)
+structure with each minor device number as well, so the entire device number is checked under
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH EXAMPLES

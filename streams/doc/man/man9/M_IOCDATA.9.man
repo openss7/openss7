@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.8 2005/11/23 12:37:55 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.9 2005/11/25 23:42:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/23 12:37:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -231,7 +231,7 @@ message are as follows:
 If a module receives an
 .B M_IOCDATA
 message to its write-side
-.I put
+.BR putp (9)
 procedure, and the module is not processing an
 .BR M_COPYIN (9)
 or
@@ -239,14 +239,14 @@ or
 request, the module passes the
 .B M_IOCDATA
 downstream, directly from its
-.I put
+.BR putp (9)
 procedure, with a call to
 .BR putnext (9).
 .IP \(bu
 If a driver receives an
 .B M_IOCDATA
 message to its write-side
-.I put
+.BR putp (9)
 procedure, and the driver is not processing an
 .BR M_COPIN (9)
 or
@@ -258,7 +258,7 @@ message.
 If a module receives an
 .B M_IOCDATA
 message to its read-side
-.I put
+.BR putp (9)
 procedure, the module should either pass the message upstream using
 .BR putnext (9)
 or discard the message.
@@ -280,10 +280,10 @@ or
 request, and an
 .B M_IOCDATA
 message is received to the write-side
-.I put
+.BR putp (9)
 procedure, the module or driver must process the message, but may queue the message for processing
 out of the module's
-.I service
+.BR srvp (9)
 procedure.
 .IP \(bu
 When processing the message the module or driver examines the
