@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/11/26 08:40:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:23 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/11/26 08:40:20 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/11/26 08:40:20 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/07 09:34:23 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/11/26 08:40:20 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -182,6 +182,7 @@ pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		wq->q_minpsz = wq->q_next->q_minpsz;
 		wq->q_maxpsz = wq->q_next->q_maxpsz;
 		q->q_ptr = wq->q_ptr = q;	/* just set it to something */
+		qprocson(q);
 		return (0);
 	}
 	return (EIO);		/* can't be opened as driver */
@@ -193,6 +194,7 @@ pipemod_close(queue_t *q, int oflag, cred_t *crp)
 	(void) crp;
 	if (!q->q_ptr)
 		return (ENXIO);
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }

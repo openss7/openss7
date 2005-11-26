@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/11/26 08:40:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:13 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/11/26 08:40:18 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/11/26 08:40:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/10/07 09:34:13 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/11/26 08:40:18 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -331,6 +331,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&echo_lock);
+		qprocson(q);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}

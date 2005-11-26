@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/11/26 08:40:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/08 02:49:16 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/11/26 08:40:18 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/11/26 08:40:18 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/11/08 02:49:16 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/11/26 08:40:18 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -531,6 +531,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock_bh(&log_lock);
+		qprocson(q);
 		return (0);
 	}
 	}

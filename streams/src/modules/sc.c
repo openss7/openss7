@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/14 12:26:47 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:26:47 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/14 12:26:47 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/14 12:26:47 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/14 12:26:47 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -394,6 +394,7 @@ sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			return (-EACCES);
 #endif
 		q->q_ptr = WR(q)->q_ptr = (void *) 1;
+		qprocson(q);
 		return (0);
 	}
 	return (-EIO);		/* can't be opened as driver */
@@ -401,6 +402,7 @@ sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 static int
 sc_close(queue_t *q, int oflag, cred_t *crp)
 {
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }

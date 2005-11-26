@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/23 12:38:03 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/11/23 12:38:03 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -8243,6 +8243,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	/* lastly, attach our privates and return */
 	q->q_ptr = _WR(q)->q_ptr = sd;
+	qprocson(q);
       error:
 	return (err > 0 ? -err : err);
 }
@@ -8262,6 +8263,7 @@ str_close(queue_t *q, int oflag, cred_t *crp)
 {
 	if (q->q_ptr == NULL)
 		return (-ENXIO);
+	qprocsoff(q);
 	q->q_ptr = _WR(q)->q_ptr = NULL;
 	return (0);
 }

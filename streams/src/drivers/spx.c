@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/10/07 09:34:14 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/10/07 09:34:14 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/10/07 09:34:14 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/10/07 09:34:14 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -318,6 +318,7 @@ spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&spx_lock);
+		qprocson(q);
 		return (0);
 	}
 	}

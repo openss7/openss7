@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/10 18:16:32 $ by $Author: brian $
+ Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/09/10 18:16:32 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -425,6 +425,7 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = WR(q)->q_ptr = p;
 		spin_unlock_bh(&loop_lock);
+		qprocson(q);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
