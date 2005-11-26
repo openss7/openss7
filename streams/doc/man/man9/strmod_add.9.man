@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strmod_add.9.man,v 0.9.2.14 2005/05/14 08:34:30 brian Exp $
+.\" @(#) $Id: strmod_add.9.man,v 0.9.2.15 2005/11/26 11:17:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -238,11 +238,11 @@ The
 .I STREAMS
 module or driver being registered follows
 .I SVR 4
-.BR qopen (9)
+.IR qi_qopen (9)
 semantics.  If this flag is not set, the
 module or driver obeys
 .I SVR 3
-.BR qopen (9)
+.IR qi_qopen (9)
 semantics.
 .TP
 .B STR_QSAFETY
@@ -393,7 +393,7 @@ defined.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR qopen (9),
+.IR qi_qopen (9),
 .BR streamio (7),
 .BR sad (4),
 .BR autopush (8),

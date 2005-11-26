@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.4 2005/07/03 17:40:15 brian Exp $
+.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.5 2005/11/26 11:17:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -116,7 +116,7 @@ data.
 .BR mi_open_detached ()
 is typically called by modules or drivers that need to access a module or driver's instance data
 before the stream is created.  When the module or driver's
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure is later called, this instance can be used as the new queue's instance data by associating
 it with the queue using
 .BR mi_attach (9).

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 0.9.2.22 2005/11/25 23:42:04 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 0.9.2.23 2005/11/26 11:17:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,7 +139,7 @@ If
 .B QB_WANTW
 is set for the band and the flush causes the band's count to fall below the low water mark, or if
 the band's count is reduced to zero, the nearest feeding queue with a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure or that is a
 stream head or stream end (including a multiplexing driver) will be enabled.  That is, back-enabling
 will be performed.  The
@@ -336,7 +336,7 @@ pass.  The next
 .BR runqueues (9)
 pass frees message blocks from the flush to the per-CPU free blocks list for
 use by
-.BR srvp (9)
+.IR qi_srvp (9)
 procedures in the pass.
 .BR runqueues (9)
 runs at normal soft interrupt priority.

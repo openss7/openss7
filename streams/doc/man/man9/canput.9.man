@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canput.9.man,v 0.9.2.19 2005/11/25 23:42:04 brian Exp $
+.\" @(#) $Id: canput.9.man,v 0.9.2.20 2005/11/26 11:17:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -103,7 +103,7 @@ Starting at
 .IR q ,
 .BR canput ()
 looks for the next queue which has a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure or which has no next queue (i.e. the
 .I q->q_next
 pointer is
@@ -129,7 +129,7 @@ flag for that queue upon which
 stopped, indicating that the
 .I STREAMS
 scheduler should back-enable
-.BR srvp (9)
+.IR qi_srvp (9)
 procedures backward up the queues when the flow controlled
 queue is no longer flow controlled (falls to its low water mark).
 .\"
@@ -292,7 +292,7 @@ example_putp(queue_t *q, mblk_t *mp)
 Above, the example uses
 .BR canput ()
 from the lower queue
-.BR putp (9)
+.IR qi_putp (9)
 procedure (in a multiplexing driver) to test the upper queue for flow
 control.  If the upper queue is flow controlled, the message is placed on the lower queue.
 Otherwise, if the lower queue is empty and the upper queue is not flow controlled, the example
@@ -465,7 +465,7 @@ Stream
 and that
 .I q
 must have a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure.  This is inconsistent with the
 .IR "SVR 4 SPG" .
 .[
@@ -476,7 +476,7 @@ Typically, however, only a driver
 will use
 .BR canput (),
 and then only to test its own queue.  If its own queue does not have a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure,
 .BR canputnext (9)
 is more appropriate.  Some efficiencies can be taken in using
@@ -498,7 +498,7 @@ drivers and modules will only call
 for testing a driver
 .RI ( "Stream end" )
 read queue that contains a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure.
 .IP \(em
 Binary compatibility is not guaranteed.

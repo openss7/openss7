@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgutil.9.man,v 0.9.2.13 2005/11/25 23:42:06 brian Exp $
+.\" @(#) $Id: msgutil.9.man,v 0.9.2.14 2005/11/26 11:17:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -208,9 +208,9 @@ Message utility functions are MP-safe; however, it is the responsibility of
 the caller to ensure exclusive access to the passed in message(s).  Exclusive
 access to a message can normally be ensured by taking the message off of a
 message queue as part of a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure, or working with a message passed into a
-.BR putp (9)
+.IR qi_putp (9)
 procedure.
 .\"
 .\"

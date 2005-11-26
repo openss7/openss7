@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyreq.9.man,v 0.9.2.4 2005/11/25 23:42:04 brian Exp $
+.\" @(#) $Id: copyreq.9.man,v 0.9.2.5 2005/11/26 11:17:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -263,9 +263,9 @@ operation with the user.
 .\" -----------
 .PP
 While running the module's
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure, there is no user context present against which to perform a
 .BR copyin (9)
 or
@@ -544,9 +544,9 @@ or
 message that has just been removed from a
 .BR queue (9)
 in a
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure of the queue,
 copy request structure
 exclusivity is normally guaranteed.
@@ -581,8 +581,8 @@ for an example.
 .PP
 .BR datab (9),
 .BR queue (9),
-.BR putp (9),
-.BR srvp (9).
+.IR qi_putp (9),
+.IR qi_srvp (9).
 .\"
 .\"
 .SH COMPATIBILITY

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: noenable.9.man,v 0.9.2.19 2005/11/25 23:42:06 brian Exp $
+.\" @(#) $Id: noenable.9.man,v 0.9.2.20 2005/11/26 11:17:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -113,7 +113,7 @@ or which any messae is enqueued by
 .BR insq (9).
 .BR noenable ()
 has no effect on the enablig of queues (scheduling of queue
-.BR srvp (9)
+.IR qi_srvp (9)
 procedures) when the queue is
 back-enabled,
 when
@@ -146,7 +146,7 @@ can be tested with
 .PP
 .BR noenable ()
 can be used to temporarily suspend queue
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure processing for a
 queue for
 .I ordinary priority
@@ -163,26 +163,26 @@ or
 and any message to be enqueued with
 .BR insq (9),
 without enabling the queue (invoking the queue's
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure).
 .PP
 This facility can be used to provide message coallescing capabilities on read or write queues.
 For example, multiple messages can be enqueued by a queue's
-.BR putp (9)
+.IR qi_putp (9)
 procedure without invoking the queue's
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure until a criteria is met.
 Once the a sufficient time period has elapsed, or once a sufficient number of bytes have been
 enqueued, the
-.BR putp (9)
+.IR qi_putp (9)
 procedure, or a
 .BR timeout (9)
 callback, can explicity invoke the
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure with
 .BR qenable (9).
 The queue's
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure, thus invoked, may coalesce smaller messages into larger ones.
 .PP
 Canonical processing in the Line Discipline,

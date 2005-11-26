@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.23 2005/11/25 23:42:04 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.24 2005/11/26 11:17:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -120,17 +120,17 @@ the priority band within which to test for flow control.
 .\"(starting at
 .\".IR q->q_next )
 .\"until it finds a queue containing a
-.\".BR srvp (9)
+.\".IR qi_srvp (9)
 .\"procedure, or until it reaches the end of the
 .\".IR Stream .
 .\"If found, the queue containing the
-.\".BR srvp (9)
+.\".IR qi_srvp (9)
 .\"routine is tested to see if a message in priority band
 .\".I pri
 .\"can be enqueued.  If the band is full,
 .\".BR bcanputnext ()
 .\"marks the queue to automatically back-enable the caller's
-.\".BR srvp (9)
+.\".IR qi_srvp (9)
 .\"procedure when the amount of data in
 .\"messages on the queue has reached its low water mark.
 .\".PP
@@ -152,7 +152,7 @@ specified and for the
 specified,
 .BR bcanputnext ()
 looks for the next forward queue which has a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure or which has no
 further forward queue.
 .PP
@@ -179,7 +179,7 @@ flag for the specified
 indicating that the
 .I STREAMS
 scheduler should back-enable
-.BR srvp (9)
+.IR qi_srvp (9)
 procedures
 backward up the queues when the flow controlled
 .I band
@@ -199,7 +199,7 @@ queue with
 A
 .I STREAMS
 module is only required to check for flow control if it has a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure for the specified queue: otherwise, it was the responsibility of a previous
 .I STREAMS
 module,
@@ -318,7 +318,7 @@ setting the
 flag for the queue or band.  This means that, although flow controlled, no
 backenable procedure will be run.  This can lead to indefinite postponement of
 a queue
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure under LiS.
 .BR bcanputnext ()
 does not have this problem.
@@ -403,7 +403,7 @@ suxspg
 states that if the
 Stream end
 has no
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure that
 .BR bcanputnext ()
 will return (1).
@@ -415,9 +415,9 @@ svr4spg
 For example, the
 Stream head
 does not normally have a read
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure, but uses wakeups from the read side
-.BR putp (9)
+.IR qi_putp (9)
 procedure to schedule servicing of the queue.  It is still necessary for
 .BR bcanputnext ()
 to fail when the read queue passes its high water mark.
@@ -432,7 +432,7 @@ Portable
 drivers and modules should not rely on the behaviour of
 .BR bcanputnext ()
 on drivers that have no write side
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure, but which enqueue messages on their write
 queues (to be collected using
 .BR getq (9)
@@ -440,7 +440,7 @@ outside the
 .I STREAMS
 framework).
 Such drivers should provide a dummy
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure.
 .IP \(em
 Binary compatibility is not guaranteed.

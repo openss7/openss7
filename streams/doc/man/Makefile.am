@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/11/25 23:42:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/11/26 11:17:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
+# Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1232,6 +1232,11 @@ man_MANS = \
 	man9/qi_qclose_t.9 \
 	man9/qi_qopen_t.9 \
 	man9/qi_srvp_t.9 \
+	man9/qi_putp.9 \
+	man9/qi_qadmin.9 \
+	man9/qi_qclose.9 \
+	man9/qi_qopen.9 \
+	man9/qi_srvp.9 \
 	man9/put.9s \
 	man9/admin.9s \
 	man9/close.9s \
@@ -2502,6 +2507,11 @@ dist_noinst_MANS = \
 	man9/qi_qclose_t.9.man \
 	man9/qi_qopen_t.9.man \
 	man9/qi_srvp_t.9.man \
+	man9/qi_putp.9.man \
+	man9/qi_qadmin.9.man \
+	man9/qi_qclose.9.man \
+	man9/qi_qopen.9.man \
+	man9/qi_srvp.9.man \
 	man9/put.9s.man \
 	man9/admin.9s.man \
 	man9/close.9s.man \

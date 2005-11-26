@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dev_t.9.man,v 0.9.2.1 2005/11/25 23:42:08 brian Exp $
+.\" @(#) $Id: dev_t.9.man,v 0.9.2.2 2005/11/26 11:17:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -377,7 +377,7 @@ and
 When used on a
 .I devp
 argument passed to the
-.BR qopen (9)
+.IR qi_qopen (9)
 procedures of a
 .I STREAMS
 driver or module,
@@ -512,9 +512,9 @@ assigning the clone major device number and a unique minor device number to a
 \(lqclone\(rq device.  When this device is opened, the minor device number of
 the device is used as the new major device number and zero (0) is used as the
 minor device number, and the
-.BR qopen (9)
+.IR qi_qopen (9)
 is chained to the
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure of the new
 .BR streamtab (9)
 structure resulting from looking up this newly created device number.
@@ -531,7 +531,7 @@ and
 still function as as normal on the resulting
 .I devp
 argument passed to the ultimate driver's
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure.  This is true both for base and extended major device numbers.
 The following table illustrates the situation
 (assuming that the major device number assigned to the
@@ -569,7 +569,7 @@ supports the new cloning approach whereby a driver is permitted to alter the
 device number returned in the
 .I devp
 argument to
-.BR qopen (9)
+.IR qi_qopen (9)
 even though
 .I sflag
 is set to
@@ -586,7 +586,7 @@ internal (base) major device number.  That is, when calling
 to create the device to return to the
 .I devp
 argument to
-.BR qopen (9),
+.IR qi_qopen (9),
 the driver can use an external (real) major device number (returned by
 .BR getemajor (9))
 combined with an assigned external (real) minor device number (from 0 to 255);
@@ -722,7 +722,7 @@ where,
 is an octal, hexadecimal or decimal ASCII number,
 .I STREAMS
 will open the driver (call
-.BR qopen (9)
+.IR qi_qopen (9)
 for driver
 .IR devname )
 with the instance number resulting from the conversion of the device name

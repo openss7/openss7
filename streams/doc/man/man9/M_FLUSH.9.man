@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_FLUSH.9.man,v 0.9.2.9 2005/11/25 23:42:03 brian Exp $
+.\" @(#) $Id: M_FLUSH.9.man,v 0.9.2.10 2005/11/26 11:17:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -251,7 +251,7 @@ and
 are MP-safe, canonical
 .B M_FLUSH
 processing is MP-safe from the queue's
-.BR putp (9)
+.IR qi_putp (9)
 procedure.
 .PP
 In the non-MP environment, where
@@ -302,9 +302,9 @@ messages back upstream.
 .PP
 .B M_FLUSH
 messages must be addressed directly from a driver or module's
-.BR putp (9)
+.IR qi_putp (9)
 procedure and must not be deferred to the
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure with
 .BR putq (9).
 The reason that
@@ -315,7 +315,7 @@ is a high-priority message, and once queued, will have the effect of flushing al
 that arrive after the
 .B M_FLUSH
 is queued, but before the
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure is run.
 .PP
 For
@@ -369,7 +369,7 @@ flags are reversed across the twist at the midpoint of the
 The following is an example of canonical
 .B M_FLUSH
 handling from a module write side
-.BR putp (9)
+.IR qi_putp (9)
 procedure:
 .PP
 .nf
@@ -406,7 +406,7 @@ Otherwise, the module could simply pass the message along.
 The following is an example of canonical
 .B M_FLUSH
 handling from a module read side
-.BR putp (9)
+.IR qi_putp (9)
 procedure:
 .PP
 .nf
@@ -443,14 +443,14 @@ Otherwise, the module could simply pass the message along.
 Note that canonical module
 .B M_FLUSH
 processing that flushes both the write and read side queues from the write
-.B putp (9)
+.IR qi_putp (9)
 procedure are only
 applicable to the non-MP environment and are not usable in the MP environment.
 .PP
 The following is an example of canonical
 .B M_FLUSH
 handling from a driver write side
-.BR putp (9)
+.IR qi_putp (9)
 procedure:
 .PP
 .nf
@@ -486,7 +486,7 @@ procedure:
 .fi
 .PP
 Note that the driver only requires write side
-.B putp (9)
+.IR qi_putp (9)
 processing: flushing of the read side queue is
 performed from the write procedure.
 Also, if the

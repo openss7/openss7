@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.14 2005/11/25 23:42:06 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.15 2005/11/26 11:17:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -241,7 +241,7 @@ denotes that the particular band is full.
 indicates that someone tried to write to the band that was flow controlled.
 .B QB_BACK
 is set when the
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure runs as a result of being back-enabled because the queue is no
 longer flow-controlled.
 .PP

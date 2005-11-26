@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qopen.9.man,v 0.9.2.10 2005/11/25 23:42:06 brian Exp $
+.\" @(#) $Id: qopen.9.man,v 0.9.2.11 2005/11/26 11:17:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,347 +111,56 @@ pointer to the credentials of the opening user.
 .PP
 .BR qopen ()
 is an internal
-.I STREAMS
+.B @PACKAGE_TITLE@
 function which invokes the
 .I STREAMS
 module or driver
-.BR qopen
+.IR qi_qopen (9)
 routine associated with
 .IR q .
-.TP
-.I q
-is a pointer to the read queue of a newly allocated queue pair for the module
-or driver,  allocated with
-.BR allocq (9)
-and for which a
-.B qinit
-structure was associated with
-.BR setq (9).
-.TP
-.I devp
-is a pointer to a
-.BR dev_t (9)
-device number.
-For a driver,
-.B devp
-points to the device number of the
-.I STREAMS
-character special file that was
-opened that invoked the driver's
-.BR qopen
-routine.
-A driver
-.BR qopen
-routine returns the resulting device
-number to the area pointed to by
-.I devp
-using
-.BR makedevice (9).
-For a module,
-.B devp
-points to the device number of the
-.I STREAMS
-character special file under whose
-stream file the module is being pushed.  A module
-.BR qopen
-routine does not alter
-the device number but may use the passed in device number to determine which
-device the module is ultimately being pushed over.
-.TP
-.I oflag
-contains the open flags for use by the driver's
-.BR qopen
-routine and will contain
-a bitwise or of one or more of the following flags:
-.RS
-.TP \w'FNDELAY\(em'u
-.B FREAD
-the \fISTREAMS\fR special file is opened for read.
-.PD 0
-.TP
-.B FWRITE
-the \fISTREAMS\fR special file is opened for write.
-.TP
-.B FEXCL
-the \fISTREAMS\fR special file is opened with exclusive access.
-.TP
-.B FNDELAY
-the \fISTREAMS\fR special file is opened for non-blocking operation.
-.PD
-.RE
-.TP
-.I sflag
-contains \fISTREAMS\fP flags for use by the module or driver's
-.BR qopen
-routine.
-Modules are always opened with
-.I sflag
-set to
-.BR MODOPEN .
-Drivers are opened with
-.B DRVOPEN
-or
-.B CLONEOPEN
-depending upon whether they were opened via a clone driver or not.  For opens
-subsequent to the first open and before close, will always be opened with
-.BR DRVOPEN .
-.I sflag
-and will contain one of:
-.RS
-.TP \w'CLONEOPEN\(em'u
-.B DRVOPEN
-the module was opened as a
-.I STREAMS
-driver.  Drivers opened subsequent to the first open, but before close, will
-always be opened with this flag.
-.TP
-.B MODOPEN
-the module was opened as a
-.I STREAMS
-module.  Modules will always be opened with this flag.
-.TP
-.B CLONEOPEN
-the module was opened via the
-.BR clone (4)
-driver.  This flag will only be set on the initial open of a driver that was
-made via a clone driver.  This setting of
-.I sflag
-requests that the driver assign a unique minor device number to the newly
-created stream.
-.PP
-.RE
-.TP
-.I crp
-points to a
-.BR cred_t (9)
-structure which provides the credentials of the process invoking the open,
-structured as follows:
-.RS
-.nf
-\fC\s-2
-typedef struct cred {
-        uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
-        gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
-        int cr_ngroups;
-        gid_t cr_groups[NGROUPS];
-} cred_t;
-\fR\s+2
-.fi
-.RE
-.PP
-.I STREAMS
-invokes a module or driver
-.B qopen
-routine, on the first open of a module or driver, once a queue pair forming an instance of the
-module or driver has been initialized [from
-.BR qinit (9)]
-and at least half-inserted into a Stream [with
-.BR qinsert (9)].
-Each module in the module stack and driver have their
-.B qopen
-routine invoked also for each subsequent open of the driver.
-.PP
-The
-.B qopen
-routine is called in the following circumstances:
-.IP (1) \w'(1)\(em'u
-The
-.B qopen
-routine of a module is invoked by a user executing a
-.BR I_PUSH (7)
-.BR ioctl (2s)
-operation.
-.IP (2)
-The
-.B qopen
-routine of a driver is invoked by a user executing a
-.BR open (2s)
-system call for a
-.I STREAMS
-special file.
-.IP (3)
-The
-.B qopen
-routine of a Stream head is invoked by a user executing a
-.BR open (2s)
-system call for a
-.I STREAMS
-special file, or a
-.BR pipe (2s)
-system call for a
-.IR STREAMS -based
-.BR pipe (4).
-.IP (4)
-The
-.B qopen
-routine of a Stream head, each module in the module stack, and the driver is performed again for
-each subsequent
-.BR open (2s)
-of the Stream.
-.PP
-Note that the
-.B qopen
-routine of the Stream head, modules and driver already present in a Stream are not called when a
-module is pushed onto the module stack: only the
-.B qopen
-routine of the pushed module is called.
-.\"
-.\"
-.SH USAGE
-.\"
-.SS Modules and Drivers
-.PP
-The following are some design guidelines for both module and driver
-.B qopen
-routines:
-.IP \(bu \w'\(bu\(em'u
-The module or driver may use the
-.I q_ptr
-member of the
-.BR queue (9)
-structures in the queue pair reference by the
-.I q
-argument to store module private state information.
-.IP \(bu
-The module or driver should set
-.I q_ptr
-to a
-.RB non- NULL
-value to indicate that the queue pair has already been opened.  Then, if the
-.I q_ptr
-is
-.BR non- NULL
-on the call to
-.BR qopen ,
-and the module or driver is not interested in
-.B qopen
-routine calls subsequent to the initial call,
-the module or driver can simply return success.
-.IP \(bu
-.BR qprocson (9)
-must be called by the
-.B qopen
-routine before expecting to receive any messages on either queue in the
-queue pair designated by
+If there is no
+.IR qi_qopen (9)
+routine associated with
 .IR q ,
-and, in any event, before returning.
-.IP \(bu
-.B qopen
-routines may sleep.
-The process blocked will be the user process that invoked
-.BR open (2s)
-or
-.BR I_PUSH (7).
-If the routine is to sleep awaiting receipt of a message on either message
-queue, it must first call
-.BR qprocson (9)
-and should use the
-.BR qwait_sig (9)
-or
-.BR qwait (9)
-utilities.
-.\"
-.SS Modules
-.PP
-The following are some design guidelines for a module
-.B qopen
-routines:
-.IP \(bu \w'\(bu\(em'u
-For a module open, on call,
-.I devp
-points to the device number of the driver over which the module is being pushed.
-A module should not alter the
-.BR dev_t (9)
-device number pointed to by the
-.I devp
-argument on call.
-.RB ( "@PACKAGE_TITLE@"
-.[
-lfs
-.]
-will ignore the result.)
-.IP \(bu
-If the
-.I sflag
-argument is other than
-.BR MODOPEN ,
-the
-.B qopen
-routine should return
-.RB [ ENXIO ].
-.IP \(bu
-On call, the
-.I oflag
-argument contains the file flags associated with the file descriptor upon which the
-.BR I_PUSH (7)
-command was executed, or, if the module was autopushed, the driver open flags.
-.IP ""
-The module may use these flags or ignore them according to its design.  Most modules ignore these
-flags.
-One possible use of these flags is to check the
-.BR O_NDELAY " or " O_NONBLOCK
-flags to determine whether the module
-.B qopen
-routine should sleep awaiting allocation of resources.
-.\"
-.SS Drivers
-.PP
-The following are some design guidelines for a driver
-.B qopen
-routines:
-.IP \(bu \w'\(bu\(em'u
-The
-.I devp
-argument points to a
-.BR dev_t (9)
-device number that indicates the device number associated with the
-.I STREAMS
-special file device node that was opened by the
-.BR open (2s)
-call.  Depending on the setting of
-.IR sflag ,
-this device number may or may not be altered on the first open of a driver.  See below.
-.IP \(bu
-If the
-.I sflag
-argument is other than
-.BR DRVOPEN
-or
-.BR CLONEOPEN ,
-the
-.B qopen
-routine should return
-.RB [ ENXIO ].
-.IP \(bu
-On call, the
-.I oflag
-argument contains the file flags associated with the
-.BR open (2s)
-call that opened the driver.  These flags may be different for each call to the driver
-.B qopen
+then
+.BR qopen ()
+returns
+.RB [ ENOPKG ].
+If
+.BR mp-streams (9)
+synchronization has been specified for the module or driver, the inner synchronization barrier is
+entered shared or exlusive, according to the synchornization specification for the module or driver.
+Otherwise, the
+.IR qi_qopen (9)
+routine is invoked directly.
+.BR qopen ()
+then returns the value returned by the module or driver
+.IR qi_qopen (9)
 routine.
-.IP ""
-The driver may use these flags or ignore them according to its design.  Most driver ignore these
-flags.
-One possible use of these flags is to check the
-.BR O_NDELAY " or " O_NONBLOCK
-flags to determine whether the driver
-.B qopen
-routine should sleep awaiting allocation of resources or intialization of hardware.
-.IP \(bu
-When
-.I sflag
-is
-.BR CLONEOPEN ,
-(and, optionally, on the first open for a queue pair with
-.BR DRVOPEN ),
-the driver assigns a new unique device number and returns it in the
-.BR dev_t (9)
-device number using
-.BR makedevice (9)
-and the
-.B devp
-argument to the call.
+.PP
+.BR qopen ()
+accepts the same arguments as the
+.IR qi_qopen (9)
+routine defined for the module or driver,
+and, with the exception of
+.RB [ ENOPKG ],
+returns the same error numbers as the module or driver
+.IR qi_qopen (9)
+routine.
+.PP
+Since the
+.BR qopen ()
+function directly invokes the module or driver
+.IR qi_qopen (9)
+routine, the description of the
+.IR qi_qopen (9)
+is also applicable to
+.BR qopen ().
+See
+.BR qinit (9)
+and
+.IR qi_qopen (9)
+for details.
 .\"
 .\"
 .SH RETURN
@@ -467,45 +176,56 @@ returns a negative error number.
 .\"
 .\"
 .SH ERRORS
+.PP
 When
 .BR qopen ()
 fails, it returns a negative error number as follows:
 .TP \w'[EWOULDBLOCK]\(em'u
 .RB [ ENOPKG ]
 the module has no
-.BR qopen
+.IR qi_qopen (9)
 routine.
 .PP
 .BR qopen ()
 can also return any error returned by the modules
-.BR qopen
+.IR qi_qopen (9)
 routine.  In general,
 the following errors are provided by module
-.BR qopen
+.IR qi_qopen (9)
 routines:
 .TP \w'[EWOULDBLOCK]\(em'u
-.RB [ EXNIO ]
+.RB [ ENXIO ]
 the
-.BR qopen
+.IR qi_qopen ()
 routine for the module or driver failed.
 .TP
-.RB [ EIO ]
-a module was opened as a driver, or visa versa.
+.RB [ ENXIO ]
+a driver was opened as a module.
 .TP
-.RB [ EPERM ]
+.RB [ EIO ]
+a module was opened as a driver.
+.TP
+.RB [ EACCES ]
 the opening process did not have sufficient credentials to open the specified
 device or push the specified module.
+.TP
+.RB [ EPERM ]
+same as
+.RB [ EACCES ]
+above.
 .TP
 .RB [ ENOMEM ]
 memory could not be allocated to hold the module or driver's private
 structures.
 .TP
-.RB [ ENOSR ]
+.RB [ ENOBUFS ]
 a buffer could not be allocated as part of the open.
 .TP
-.RB [ ENOBUFS ]
+.RB [ ENOSR ]
 same as
-.RB [ ENOSR ],
+.RB [ ENOMEM ]
+and
+.RB [ ENOBUFS ],
 above.
 .TP
 .RB [ ENOSR ]
@@ -529,100 +249,23 @@ and no locks held.
 .\"
 .SH MP-STREAMS
 .PP
+If the module or driver has a
+.BR mp-streams (9)
+specification,
 .BR qopen ()
-is only called by
-.I STREAMS
-in user context with the
-.BR STRWOPEN
-bit held in the Stream head private structure
-.BR stdata (9),
-(to prevent other simultaneous opens and closes of the same Stream),
-and no locks held.
+will enter the inner synchronization barrier shared or exclusive (depending on the specification)
+before invoking the
+.IR qi_qopen (9)
+routine for the module or driver.  Before return,
+.BR qopen ()
+will leave the inner synchronization barrier.
 .PP
-Under
-.BR "@PACKAGE_TITLE@" ,
-driver and module
-.B qopen
-routines are always invoked single-threaded and exclusive within a Stream and (with respect to
-itself, and the
-.BR qclose (9)
-routine) in accordance
-with descriptions for SVR 4
-.[
-svr4
-.]
-as described in
-.IR "\*(lqThe Magic Garden\*(rq" .
-.[
-magic
-.]
-This is also consistent with exclusive open/close access under
-.IR Solaris \(rg.
-.[
-sunspg
-.]
-.PP
-Only one
-.I plumbing
-.RB [ qopen ,
-.BR qclose (9),
-.BR I_LINK (7),
-.BR I_PLINK (7),
-.BR I_UNLINK (7),
-.BR I_PUNLINK (7),
-.BR fattach (3),
-.BR fdetach (3)],
-operation at a time can be executing within a Stream.
-So, for example, data structures accessed only by a
-.I plumbing
-operation, and which are private within a queue pair or Stream, do not need protective locks.
-.PP
-On the other hand, each
-.B qopen
-routine must be reentrant as it can run concurrent with any
-.I plumbing
-operation on a different Stream, for a different queue pair instance,
-.IR q ,
-of the same module or driver.
-.PP
-Also, unless
-.I STREAMS
-synchronization is used, a
-.B qopen
-routine can run conncurrent with any
-.BR putp (9),
-.BR srvp (9),
-or
-synchronous or asynchronous callback functions for a separate instance of the module or driver.
-After
-.BR qprocson (9)
-has been called, 
-.BR putp (9),
-.BR srvp (9),
-or
-synchronous or asynchronous callback functions for the same instance of the module or driver may run
-concurrent with the
-.B qopen
-routine.
-Protective locks should be used on any data structures that a shared between the
-.B qopen
-routine and a different instance of a
-.I plumbing
-operation, or a different instance of a
-.BR putp (9)
-.BR srvp (9)
-or callback procedure, or the same instance of a
-.BR putp (9)
-.BR srvp (9)
-or callback procedure after
-.BR qprocson (9)
-has been called.
-.PP
-See
-.RI \(lq "EXAMPLES" ,\(rq
-below for an example use of locking within the
-.B qopen
-routine.
+Otherwise, if the module or driver does not have a
+.BR mp-streams (9)
+specification, or does not specify an inner barrier,
+the
+.IR qi_qopen (9)
+routine of the module or driver will be called directly.
 .PP
 See
 .BR mp-streams (9),
@@ -638,140 +281,78 @@ function that is not intended to be called
 directly by the module or driver writer.  See
 .BR open (2s)
 and
-.B I_PUSH
-under
-.BR streamio (7)
+.BR I_PUSH (7)
 for indirect methods of invoking this function.  This function is exported for
 use by clone drivers and stream heads.  See
 .BR register_inode (9).
 .\"
 .\"
 .SH EXAMPLES
-.\"
-.SS Example #1 - Module qopen
 .PP
-Following is an example of a module
-.BR qopen
-routine:
-.sp
-.nf
-\fC\s-2\
-static priv_t *xxx_opens = NULL;
-
-int xxx_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
-{
-    int err;
-    if (q->q_ptr != NULL)
-        return (0);             /* already open */
-    if (sflag == MODOPEN || WR(q)->q_next != NULL) {
-        int cmajor = getmajor(*devp);
-        int cminor = getminor(*devp);
-        priv_t *x;
-        /* test for multiple push */
-        for (x = xxx_opens; x; x = x->next)
-            if (x->u.dev.cmajor == cmajor && x->u.dev.cminor == cminor)
-                return (ENXIO);
-        if (!(xxx_alloc_priv(q, &xxx_opens, devp, crp)))
-            return (ENOMEM);
-        return (0);
-    }
-    return (EIO);
-}
-\fR\s+2
-.fi
-.\"
-.SS Example #2 - Driver qopen
-.PP
-Following is an example of a driver
-.BR qopen
-routine:
-.sp
-.nf
-\fC\s-2\
-int ss_majors[SS_NMAJOR] = { SS_CMAJOR, };
-int ss_open(queue_t * q, dev_t * devp, int flag, int sflag,
-            cred_t * crp)
-{
-    int flags, mindex = 0;
-    int cmajor = getmajor(*devp);
-    int cminor = getminor(*devp);
-    ss_t *ss, **ipp = &ss_opens;
-    const ss_profile_t *prof;
-    if (q->q_ptr != NULL)
-        return (0);             /* already open */
-    if (sflag == MODOPEN || WR(q)->q_next) {
-        ptrace(("%s: ERROR: can't push as module\n", SS_MOD_NAME));
-        return (EIO);
-    }
-    if (cmajor != SS_CMAJOR || cminor < ICMP_CMINOR ||
-        cminor > RAWIP_CMINOR) {
-        return (ENXIO);
-    }
-    prof = &ss_profiles[cminor - ICMP_CMINOR];
-    cminor = FREE_CMINOR;
-    spin_lock_irqsave(&ss_lock, &flags);
-    for (; *ipp; ipp = &(*ipp)->next) {
-        if (cmajor != (*ipp)->cmajor)
-            break;
-        if (cmajor == (*ipp)->cmajor) {
-            if (cminor < (*ipp)->cminor)
-                break;
-            if (cminor == (*ipp)->cminor) {
-                if (++cminor >= SS_NMINOR) {
-                    if (++mindex >= SS_NMAJOR ||
-                        !(cmajor = ss_majors[mindex]))
-                        break;
-                    cminor = 0;
-                }
-                continue;
-            }
-        }
-    }
-    if (mindex >= SS_NMAJOR || !cmajor) {
-        ptrace(("%s: ERROR: no device numbers available\n",
-                SS_MOD_NAME));
-        spin_unlock_irqrestore(&ss_lock, &flags);
-        return (ENXIO);
-    }
-    printd(("%s: opened character device %d:%d\n", SS_MOD_NAME, cmajor,
-            cminor));
-    *devp = makedevice(cmajor, cminor);
-    if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
-        ptrace(("%s: ERROR: No memory\n", SS_MOD_NAME));
-        spin_unlock_irqrestore(&ss_lock, &flags);
-        return (ENOMEM);
-    }
-    spin_unlock_irqrestore(&ss_lock, &flags);
-    return (0);
-}
-\fR\s+2
-.fi
+See
+.IR qi_qopen (9)
+for examples of module and driver open routines.
 .\"
 .\"
 .SH "SEE ALSO"
-.BR allocq (9),
-.BR setq (9),
-.BR makedevice (9),
-.BR clone (4),
-.BR cred_t (9),
+.PP
+.BR qinit (9),
+.BR qi_qopen (9),
+.BR mp-streams (9),
+.BR stdata (9),
 .BR open (2s),
-.BR streamio (7),
+.BR I_PUSH (7),
 .BR register_inode (9),
-.BR qclose (9),
-.BR qattach (9),
-.BR qdetach (9).
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
+.PP
 .BR qopen ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
+.PP
 .BR qopen ()
-is not an exported function in SVR 4.2,
-.IR Solaris \(rg
-or LiS.
+is compatible with
+.IR "SVR 4.2"
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Although
+.BR qopen ()
+is consistent with the description of the internal
+.IR "SVR 4"
+operation,
+.[
+magic
+.]
+.BR qopen ()
+is not an exported function in
+.IR "SVR 4.2"
+.[
+svr42spg
+.]
+or any implementation based on
+.IR "SVR 4" .
+.[
+svr4spg
+.]
+.IP ""
+.BR qopen ()
+will not be used by portable
+.I STREAMS
+modules and drivers, and the
+.IR qi_qopen (9)
+routine of a module or driver will not be directly invoked.
 .PP
 See
 .BR STREAMS (9)
@@ -780,7 +361,7 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.I \*(lqMagic Garden\*(rq
+.RI \*(lq "Magic Garden" \*(rq
 .[
 magic
 .]
@@ -789,15 +370,16 @@ description of internal
 .[
 svr4
 .]
-function.
+operation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR qopen ()
-first appeared as an internal function with \fISTREAMS\fP in SVR 3.
+first appears in
+.BR "@PACKAGE_TITLE@" .
 .[
-svr3
+lfs
 .]
 .\"
 .\"

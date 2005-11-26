@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmajor.9.man,v 0.9.2.11 2005/05/14 08:34:24 brian Exp $
+.\" @(#) $Id: getmajor.9.man,v 0.9.2.12 2005/11/26 11:17:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -108,7 +108,7 @@ svr4
 that are normally used by
 .I STREAMS
 device drivers in the
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure.
 .PP
 .BR getmajor ()

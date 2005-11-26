@@ -1,0 +1,378 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: qi_qclose.9.man,v 0.9.2.1 2005/11/26 11:17:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QI_QCLOSE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qi_qclose
+\- \fISTREAMS\fR module or driver close routine
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/stream.h>
+.HP
+\fBtypedef int (*\fRqi_qclose_t\fB) (queue_t *\fIq\fB, dev_t *\fIdevp\fR, int \fIoflag\fB);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'oflag\(em'u
+.I q
+pointer to the module or driver instance queue pair;
+.TP
+.I devp
+pointer to the driver device number; and,
+.TP
+.I oflag
+caller file flags.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.IR qi_qclose ()
+routine is called by
+.I STREAMS
+before a queue pair forming an instance of the module or driver is removed from the Stream and
+deallocated.  This routine permits the module or driver to perform whatever module or driver private
+cleanup or deallocation is necessary before the queue pair is deactivated and removed from the
+Stream.  Error numbers returned by this function are generally discarded.
+.RB ( GNU/Linux
+cannot return an error number to
+.BR close (2s)
+after the release operation has begun.)
+.BR
+All modules and drivers require a
+.IR qi_qclose ()
+routine to be defined.  See
+.BR qinit (9).
+.PP
+Following are the arguments to the module or driver
+.IR qi_qclose ()
+routine:
+.TP \w'oflag\(em'u
+.I q
+is a pointer to the read queue of an active queue pair forming an instance of the module or driver.
+.TP
+.I devp
+is a pointer to the
+.BR dev_t (9)
+formatted device number.
+.I devp
+points to the device number of the driver in the Stream.
+.TP
+.I oflag
+contains the current file flags (of the last closer) and will contain a bitwise OR of one or more of
+the following flags:
+.RS
+.TP \w'FNDELAY\(em'u
+.B FREAD
+the
+.I STREAMS
+special file was opened for read.
+.PD 0
+.TP
+.B FWRITE
+the
+.I STREAMS
+special file was opened for write.
+.TP
+.B FEXCL
+the
+.I STREAMS
+special file was opened for exclusive access.
+.TP
+.B FNDELAY
+the
+.I STREAMS
+special file was opened for non-blocking operation.
+.PD
+.RE
+.\"
+.PP
+.I STREAMS
+invokes a module or driver
+.IR qi_qclose ()
+routine when the last
+.BR close (2s),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+or
+.BR fdetach (3),
+operation causes the Stream to be dismantled.
+.I STREAMS
+also invokes the
+.IR qi_qclose ()
+routine of a module when popped from a Stream's module stack with the
+.BR I_POP (7)
+.BR ioctl (2s)
+system call.
+.PP
+The
+.IR qi_qclose ()
+routine is called in the following circumstances:
+.IP (1) \w'(0)\(em'u
+The
+.IR qi_qclose ()
+routine of a module is invoked by a user executing a
+.BR I_POP (7)
+.BR ioctl (2s)
+operation.
+.IP (2)
+The
+.IR qi_qclose ()
+routine of a module is invoked when the Stream is being dismantled and the module is on the Stream's
+module stack.
+.IP (3)
+The
+.IR qi_qclose ()
+routine of a driver is invoked when the Stream is being dismantled.
+.PP
+Note that Streams are dismantled when a
+.BR close (2s),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+or
+.BR fdetach (3),
+operation results in the release of the last reference to the Stream.
+.\"
+.\"
+.SH USAGE
+.PP
+The following sections provide some guidelines for the design of
+.BR qi_qclose ()
+routines for a module or driver:
+.\"
+.SS Modules and Drivers
+.PP
+Following are some design guidelines for both module and driver
+.IR qi_qclose ()
+routines:
+.IP \(bu \w'\(bu\(em'u
+Before detaching or deallocating resources required by a module or driver
+.IR qi_putp (9),
+.IR qi_srvp (9),
+procedure or callback function, the
+.IR qi_qclose ()
+routine must call
+.BR qprocsoff (9).
+.IP \(bu
+Before returning, the
+.IR qi_qclose ()
+routine must cancel all outstanding
+.BR timeout (9)
+and
+.BR bufcall (9)
+callbacks associated with the queue pair.
+.IP \(bu
+The module or driver is allowed to sleep in the
+.IR qi_close ()
+procedure, but must not sleep indefinitely.  When the routine sleeps awaiting arrival of a message
+on a message queue, it should use
+.BR qwait_sig (9)
+or
+.BR qwait (9).
+.BR qwait_sig (9)
+and
+.BR qwait (9)
+must be used before
+.BR qprocsoff (9)
+is called.
+.IP \(bu
+The
+.IR qi_qclose ()
+routine should deallocate any resources that were allocated as part of the
+.IR qi_qopen (9)
+routine, as well as any resources that where allocated while the module or driver was in operation.
+.IP \(bu
+.I q->q_ptr
+and
+.I WR(q)->q_ptr
+should be
+.B NULL
+before returning from the routine.
+.IP \(bu
+All deallocations and cancellations must occur, regardless of the return value from the routine.
+(The return value from the routine will be ignored by
+.BR "@PACKAGE_TITLE@" .)
+.\"
+.SS Modules
+Following are some design guidelines for module
+.IR qi_qclose ()
+routines:
+.IP \(bu \w'\(bu\(em'u
+Modules must follow the general guidelines listed above under
+.RI \*(lq "Modules and Drivers" \*(rq.
+.IP \(bu
+The
+.I devp
+argument points to the device number of the driver instance in the Stream from which the module is
+being removed.
+Altering this device number will have no effect.
+.IP \(bu
+The
+.I oflag
+argument contains the file flags for the file descriptor that is being used as an argument to the
+.BR ioctl (2s)
+system call invoked to
+.BR I_POP (7)
+the module, or was an argument to the call to the
+.BR close (2s),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+or
+.BR fdetach (3),
+operation that resulted in dismantling of the Stream containing the module.
+.BR 
+.\"
+.SS Drivers
+Following are some design guidelines for driver
+.IR qi_qclose ()
+routines:
+.IP \(bu \w'\(bu\(em'u
+Drivers must follow the general guidelines listed above under
+.RI \*(lq "Modules and Drivers" \*(rq.
+.IP \(bu
+The
+.I devp
+argument points to the device number of the driver instance which is being removed.
+Altering this device number will have no effect.
+.IP \(bu
+The
+.I oflag
+argument contains the file flags for the file descriptor that is being used as an argument to the
+.BR close (2s),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+or
+.BR fdetach (3),
+operation that resulted in dismantling of the Stream containing the driver.
+.\"
+.\"
+.SH RETURN
+.PP
+A module or driver
+.IR qi_qclose ()
+routines returns zero (0) for success, or a non-zero, positive (or negative), error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When a module or driver
+.IR qi_qclose ()
+routine fails, it returns a non-zero, positive (or negative), error number.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

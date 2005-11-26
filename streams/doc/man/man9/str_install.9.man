@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: str_install.9.man,v 0.9.2.8 2005/11/25 23:42:07 brian Exp $
+.\" @(#) $Id: str_install.9.man,v 0.9.2.9 2005/11/26 11:17:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -157,8 +157,8 @@ xxx
 .TS
 tab(:);
 lbw(14n)2lssss.
-STR_OLD_OPEN:SVR3 qopen semantics
-STR_NEW_OPEN:SVR4 qopen semantics
+STR_OLD_OPEN:SVR3 qi_qopen semantics
+STR_NEW_OPEN:SVR4 qi_qopen semantics
 .TE
 .TP
 .I sc_major

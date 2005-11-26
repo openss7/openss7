@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qwait.9.man,v 0.9.2.16 2005/11/25 23:42:07 brian Exp $
+.\" @(#) $Id: qwait.9.man,v 0.9.2.17 2005/11/26 11:17:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,9 +101,9 @@ int \fBqwait_sig\fR(queue_t *\fIq\fR);
 .TP
 .I q
 the read queue of the queue pair for which to wait for a
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure to run.
 .\"
 .\"
@@ -111,9 +111,9 @@ procedure to run.
 .PP
 .BR qwait ()
 is called within a module or driver's
-.BR qopen (9)
+.IR qi_qopen (9)
 or
-.BR qclose (9)
+.IR qi_qclose (9)
 procedure to await the arrival of a message at the queue pair indicated by the
 read queue pointer,
 .IR q .
@@ -136,16 +136,16 @@ the queue pair, or whether it was a result of interruption by a signal.
 returns
 .B void
 once a
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure has been executed for the queue pair.
 .PP
 .BR qwait_sig ()
 returns true (1) if a
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure has been executed for the queue pair; and returns false (0) if a
 signal interrupted the wait.
 .\"
@@ -164,9 +164,9 @@ are always successful.
 or
 .BR qwait_sig ()
 can only be called from user context, or within the
-.BR qopen (9)
+.IR qi_qopen (9)
 and
-.BR qclose (9)
+.IR qi_qclose (9)
 procedures for the queue pair.
 .BR qprocson (9)
 must be executed before calling
@@ -215,9 +215,9 @@ defined.
 Because
 .B Linux Fast-STREAMS
 only allows one thread entry to the
-.BR qopen (9)
+.IR qi_qopen (9)
 or
-.BR qclose (9)
+.IR qi_qclose (9)
 procedures, invoking
 .BR qwait ()
 might indefinitely postpone non-exclusive open or close of the
@@ -228,9 +228,9 @@ is a better choice for almost all circumstances.
 The caller of
 .BR qwait_sig ()
 should exit the
-.BR qopen (9)
+.IR qi_qopen (9)
 or
-.BR qclose (9)
+.IR qi_qclose (9)
 procedure with the error
 .RB [ EINTR ].
 .\"
@@ -243,8 +243,8 @@ procedure with the error
 .PP
 .BR SV_WAIT (9),
 .BR SV_WAIT_SIG (9),
-.BR qopen (9),
-.BR qclose (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
 .BR qprocson (9),
 .BR qprocsoff (9),
 .BR freezestr (9).

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: runqueues.9.man,v 0.9.2.4 2005/11/25 23:42:07 brian Exp $
+.\" @(#) $Id: runqueues.9.man,v 0.9.2.5 2005/11/26 11:17:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,7 +99,7 @@ None.
 is used by the stream head to run scheduled
 .I STREAMS
 queue
-.BR srvp (9)
+.IR qi_srvp (9)
 procedures and other deferred events before exiting a system call or after preparing
 to enter a wait queue awaiting a
 .I STREAMS
@@ -234,14 +234,14 @@ When a syncrhonization queue exists, they are normally deferred against that syn
 .TP
 .B SE_PUTP
 This is a deferred
-.BR putp (9)
+.IR qi_putp (9)
 callback generated from the context in which
-.BR putp (9)
+.IR qi_putp (9)
 was called, and are awaiting processing within the
 .I STREAMS
 executive.
 .IP ""
-.BR putp (9)
+.IR qi_putp (9)
 events are normally deferred in this manner when no synchronization queue exists.
 When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
 .RE
@@ -260,9 +260,9 @@ against the synchronization queue associated with the queue.
 .IP 5)
 .I Queue service procedures:-
 These are queue
-.BR srvp (9)
+.IR qi_srvp (9)
 procedures that have been enabled but which are awaiting execution of the
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure.
 .IP ""
 This may result in a further deferal against the sychronization queue associated with the queue.
@@ -311,14 +311,14 @@ resulted in the enabling of any queue.
 Calling
 .BR runqueues ()
 in this way, ensures immediate delivery of the message, or processing of the
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure, as
 well as delivery of any reply.
 In the absence of barriers (sychronization queues), it fairly much ensures that the first module or
 driver below the stream head with a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure has its
-.BR putp (9)
+.IR qi_putp (9)
 procedure called in user context.
 The best way, however, to ensure that a system call results in a user-context call to the driver or
 module is to use the
@@ -390,7 +390,7 @@ soft irq, but in the current context, and with bottom halves enabled.
 .BR streams_put (9),
 .BR qwriter (9),
 .BR put (9),
-.BR putp (9),
+.IR qi_putp (9),
 .BR wantio (9),
 .BR freeb (9),
 .BR kmem_free (9),

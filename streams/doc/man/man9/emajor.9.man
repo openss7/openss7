@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: emajor.9.man,v 0.9.2.11 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: emajor.9.man,v 0.9.2.12 2005/11/26 11:17:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -163,7 +163,7 @@ executive.
 Normally, a
 .I STREAMS
 module or driver
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure will use the
 .BR major (9)
 function to obtain the external

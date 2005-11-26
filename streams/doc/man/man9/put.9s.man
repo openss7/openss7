@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: put.9s.man,v 0.9.2.1 2005/11/25 23:42:08 brian Exp $
+.\" @(#) $Id: put.9s.man,v 0.9.2.2 2005/11/26 11:17:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B put, putp
+.B put
 \- \fISTREAMS\fP module put procedure
 .\"
 .\"
@@ -137,14 +137,14 @@ sort-adjacent-labels
 .SH BUGS
 .PP
 There are no known bugs in the call handling to queue
-.BR putp
+.IR qi_putp (9)
 procedures within
 .IR "@PACKAGE_SHORTTITLE@" .
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR putp
+.BR put
 is compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -162,7 +162,7 @@ with the following portability considerations:
 svr42spg
 .]
 did not define a type for the prototype of a queue
-.B putp
+.IR qi_putp (9)
 procedure.  This was an embellishment that first appeared in
 .IR OSF/1 \(rg " 1.1" ,
 .[
@@ -182,7 +182,7 @@ hpuxspg
 Portable
 .I STREAMS
 modules and drivers will not directly reference the
-.B qi_qputp_t
+.B qi_putp_t
 type.
 .IP \(em
 .IP \(em
@@ -204,7 +204,7 @@ usldk
 .SH HISTORY
 .PP
 The
-.B qi_qputp_t
+.B qi_putp_t
 type first appeared in
 .IR OSF/1 \(rg " 1.1" .
 .[
@@ -212,7 +212,7 @@ osfspg
 .]
 .PP
 The queue
-.B putp
+.B put
 procedure first appeared in
 .IR "SVR 3" .
 .[

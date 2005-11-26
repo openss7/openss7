@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_open_comm.9.man,v 0.9.2.19 2005/11/25 23:42:05 brian Exp $
+.\" @(#) $Id: mi_open_comm.9.man,v 0.9.2.20 2005/11/26 11:17:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -118,22 +118,22 @@ instance data.
 .I q
 A pointer to the module or driver's read queue,
 obtained directly from
-.BR qopen (9).
+.IR qi_qopen (9).
 .TP
 .I devp
 A pointer to the device number,
 obtained directly from
-.BR qopen (9).
+.IR qi_qopen (9).
 .TP
 .I oflag
 The open flags,
 obtained directly from
-.BR qopen (9).
+.IR qi_qopen (9).
 .TP
 .I sflag
 The stream flags,
 obtained directly from
-.BR qopen (9).
+.IR qi_qopen (9).
 Specifies how the
 .I devp
 argument is used as follows:
@@ -152,7 +152,7 @@ argument is
 This value should be used if
 .BR mi_open_comm ()
 is called from the
-.BR qopen (9)
+.IR qi_qopen (9)
 routine of a
 .I STREAMS
 module rather than a
@@ -168,7 +168,7 @@ are reserved as special access codes).
 .I crp
 A pointer to the credentials of the opening user,
 obtained directly from
-.BR qopen (9).
+.IR qi_qopen (9).
 .\"
 .\"
 .SH DESCRIPTION
@@ -177,11 +177,11 @@ obtained directly from
 performs housekeeping during
 .I STREAMS
 driver or module
-.BR qopen (9)
+.IR qi_qopen (9)
 operations.
 .BR mi_open_comm ()
 is intended to be called by the driver or module
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure.  It assigns a minor device number to the stream (as specified by
 the
 .I sflag
@@ -216,7 +216,7 @@ an argument to the call is invalid.
 an internal structure could not be allocated and the call should be retried.
 .PP
 These error codes are selected so that they can be returned directly from
-.BR qopen (9).
+.IR qi_qopen (9).
 .\"
 .\"
 .SH CONTEXT
@@ -227,7 +227,7 @@ can be called from User Context.
 is normally called from within a
 .I STREAMS
 module's
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure (User Context).
 .\"
 .\"
@@ -262,7 +262,7 @@ defined.
 .SH EXAMPLES
 .PP
 Following is an example of a module
-.BR qopen (9)
+.IR qi_qopen (9)
 procedure using
 .BR mi_open_comm ():
 .PP
@@ -305,7 +305,7 @@ xxx_open(queue_t *q, dev_t *devp, int oflag, int sflag,
 .\"
 .SH "SEE ALSO"
 .PP
-.BR qopen (9),
+.IR qi_qopen (9),
 .BR mi_close_comm (9),
 .BR mi_next_ptr (9),
 .BR ddi_soft_state_zalloc (9),

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.8 2005/11/25 23:42:03 brian Exp $
+.\" @(#) $Id: M_IOCTL.9.man,v 0.9.2.9 2005/11/26 11:17:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -502,7 +502,7 @@ from the driver.)
 When a module receives an
 .B M_IOCTL
 message at its write-side
-.BR putp (9)
+.IR qi_putp (9)
 procedure that contains an
 .I ic_cmd
 command value that it recognizes and responds to, it may process and acknowledge the message.
@@ -849,10 +849,10 @@ the message.
 As
 .B M_IOCTL
 messages are of normal priority, yet are often processed directly from a module or driver's
-.BR putp (9)
+.IR qi_putp (9)
 procedure, a module passing an unrecognized message downstream should, if possible, pass
 the message from the module's
-.BR putp (9)
+.IR qi_putp (9)
 procedure. (But see also below).
 .IP \(bu
 Because processing of some
@@ -927,7 +927,7 @@ method of copying data to and from the user.
 Topmost modules beneath the
 Stream head
 will not rely on the fact that the module's write-side
-.BR putp (9)
+.IR qi_putp (9)
 procedure is sometimes invoked within user context, and will not use the
 .BR copyin (9)
 nor
@@ -961,9 +961,9 @@ in accordance with common practise.
 The following code fragement exemplifies canonical
 .B M_IOCTL
 processing within the write-side
-.BR putp (9)
+.IR qi_putp (9)
 procedure of a pushable module (that also has a
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure):
 .PP
 .nf
@@ -1009,9 +1009,9 @@ above.
 The following code fragment exemplifies canonical
 .B M_IOCTL
 processing within the write-side
-.BR putp (9)
+.IR qi_putp (9)
 procedure of a driver (that has no
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure):
 .PP
 .nf

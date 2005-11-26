@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mcopymsg.9.man,v 0.9.2.4 2005/11/25 23:42:05 brian Exp $
+.\" @(#) $Id: mcopymsg.9.man,v 0.9.2.5 2005/11/26 11:17:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -146,9 +146,9 @@ could destabilize the kernel or result in a kernel panic.
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
 module or driver write-side
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure.
 .\"
 .\"
@@ -161,9 +161,9 @@ message block.  This is normally the case when
 is called from a
 .I STREAMS
 module or driver write-side
-.BR putp (9)
+.IR qi_putp (9)
 or
-.BR srvp (9)
+.IR qi_srvp (9)
 procedure and the passed in message pointer is that which
 was passed into the procedure.
 .\"
