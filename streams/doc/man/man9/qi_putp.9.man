@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_putp.9.man,v 0.9.2.1 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: qi_putp.9.man,v 0.9.2.2 2005/11/27 12:13:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/27 12:13:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -80,63 +80,1172 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.PP
+.HP
+.B #include <sys/stream.h>
+.HP
+\fBtypedef int (*\fRqi_putp_t\fB) (queue_t *\fIq\fB, mblk_t *\fImp\fB);
+
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+.TP
+.I q
+pointer to the
+.BR queue_t (9)
+to which to put a message;
+.PD 0
+.TP
+.I mp
+pointer to the
+.BR mblk_t (9)
+message to put to the queue.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.IR qi_putp ()
+is one of 5 principal syncrhonous entry points into a
+.I STREAMS
+module or driver that form part of the definition of the module or driver.  The principal entry
+points are:
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.IR qi_putp (),
+and
+.IR qi_srvp (9).
+.PP
+The
+.IR qi_putp ()
+procedure is specified in both the read and write queue
+.BR qinit (9)
+structure that is associated with each queue in an existing queue pair forming an instance of the
+module or driver from the definitions in the module- and driver-defining
+.BR streamtab (9)
+structure.
+.PP
+The
+.IR qi_putp ()
+procedure is called by
+.I STREAMS
+whenever a message is passed from a neighbouring queue procedure with
+.BR putnext (9),
+or whenever a message is passed to the Stream head write queue or Stream end (driver) read queue
+using
+.BR put (9).
+The
+.IR qi_putp ()
+procedure is the primary mechanism for passing
+.I STREAMS
+messages along a Stream.
+Although
+.IR qi_putp ()
+is defined to return a value, any returned value is ignored by
+.IR STREAMS ,
+and is not available to the caller of
+.BR putnext (9)
+nor
+.BR put (9),
+which return
+.BR void .
+.PP
+The arguments passed to the
+.IR qi_putp ()
+procedure are of the same type passed to
+.BR put (9)
+and
+.BR putnext (9);
+as follows:
+.TP
+.I q
+is a pointer to the
+.BR queue (9)
+structure representing the read or write queue to which the message is to be passed.
+.TP
+.I mp
+is a pointer to the
+.BR msgb (9)
+structure representing a message reference to a data block,
+.BR datab (9)
+and associated data buffer, that is to be passed to the queue,
+.IR q .
+.PP
+.I STREAMS
+invokes a queue
+.IR qi_putp ()
+procedure as messages are passed to, or along, a Stream with
+.BR put (9)
+or
+.BR putnext (9).
+.PP
+The
+.IR qi_putp ()
+procedure is called in the following circumstances:
+.IP (1) \w'(0)\(em'u
+.BR put (9)
+was called from the Stream head to place a message on the write queue of the module or driver on the
+top of the module stack for the Stream.
+.IP (2)
+.BR put (9)
+was called from a device driver routine (possibly an interrupt service routine, or soft interrupt
+bottom half or tasklet), to place a message on the read queue of the driver.
+.IP (3)
+.BR put (9)
+was called from a module or driver
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine to place a message on the module or driver queue a queue adjacent to the module or driver.
+.IP (4)
+.BR putnext (9)
+was called from within a Stream head, module or driver
+.IR qi_putp ()
+or
+.IR qi_srvp (9)
+procedure to pass a message to a neighbouring queue (adjacent queue, or queue across a multiplexing
+driver).
+.PP
+When the
+.IR qi_putp ()
+procedure is invoked for a queue by
+.IR STREAMS ,
+(as a result of proper invocation of
+.BR put (9)
+or
+.BR putnext (9)
+from a module or driver), the following conditions prevail:
+.IP (1) \w'(0)\(em'u
+When invoked using
+.BR put (9),
+the call will be invoked with a Stream head plumbing read lock for the Stream to which
+.I q
+belongs, guaranteeing the validity of any
+.I q_next
+pointer within the Stream.
+.IP (2)
+When invoked using
+.BR putnext (9),
+in the proper fashion,
+from another
+.IR qi_putp ()
+or
+.IR qi_srvp (9)
+procedure, the call will be invoked with a Stream head plumbing read lock for the Stream from which
+the call was invoked.  When
+.BR putnext (9)
+is used to pass messages along a single Stream, the plumbing read lock is for the same Stream and
+the validity of any
+.I q_next
+pointer within the Stream is guaranteed.
+.IP (3)
+The Stream must be in a thawed state,
+see
+.BR unfreezestr (9),
+before any
+.IR qi_putp ()
+or
+.IR qi_srvp (9)
+procedure will be entered within the Stream.  However, the Stream may become frozen after (or
+immediately before) the
+.IR qi_putp ()
+procedure is called.
+(Freezing a Stream with
+.BR freezestr (9)
+is advisory to threads entering 
+.IR qi_putp (9)
+or
+.IR qi_srvp ()
+procedures, and is mandatory for threads attempting to alter the state of the target queue.)
+.IP (4)
+Queue put and service procedures will have been enabled with
+.BR qprocson (9)
+for the queue pair containing the
+.IR qi_putp ()
+procedure before the call,
+and will not be disabled with
+.BR qprocsoff (9)
+for the queue pair until after the call.
+.IP (5)
+If an
+.BR mp-streams (9)
+syncrhonization specification has been made for the module or driver, the calling thread will enter
+the inner synchronization barrier shared or exclusive (depending on the specification) before the
+call to
+.IR qi_putp ()
+and will leave the barrier after its return.
+.PP
+In contrast to the
+.IR qi_srvp (9)
+procedure, that handles deferred processing of messages,
+the
+.IR qi_putp ()
+procedure is responsible for the immediate disposition of a message passed to the Stream end or from
+a neighbouring queue.
+.IR qi_putp ()
+procedures are responsible for the disposition of the message reference,
+.IR mp ,
+and all references held by the caller of
+.BR put (9)
+or
+.BR putnext (9)
+are invalidated by the call.
+There are three actions that a
+.IR qi_putp ()
+procedure can take with regard the disposition of the passed in message:
+.IP (1) \w'(0)\(em'u
+free the message (or part of the message) with a
+.I STREAMS
+utility such as
+.BR freeb (9)
+or
+.BR freemsg (9);
+.IP (2)
+pass the message (or part of the message) to another queue using
+.BR put (9)
+or
+.BR putnext (9);
+or,
+.IP (3)
+place the message (or part of the message) on the queue's own message queue using a
+.I STREAMS
+utility such as
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+or
+.BR putbq (9).
+.PP
+The
+.IR qi_putp ()
+procedure is allowed to modify the passed in message at its discretion before applying one of the
+above terminal dispositions to the message.
+However, the
+.IR qi_putp ()
+procedure should not modify the contents of the data buffer associated with any data block,
+.BR datab (9),
+that has a reference count,
+.IR db_refs ,
+greater than one
+.RB ( 1 )
+[see
+.BR dupmsg (9)].
+Message blocks with a data block reference greater than one should be copied and the copy altered
+instead.
+.PP
+Any other actions taken with regard to the message form part of the definition of the module or
+driver concerned.
 .\"
 .\"
 .SH USAGE
 .PP
+The module or driver
+.IR qi_putp ()
+procedure is responsible for maintaining proper operations of the Stream by handling specific
+message types in specific fashions.
+The following sections provide some guidelines for the design of
+.IR qi_putp ()
+procedures from a module or driver, and rules for handling of messages within the procedure:
+.\"
+.SS Driver and Module qi_putp() Design Rules
+.PP
+The following design rules apply to both modules and drivers:
+.IP \(bu \w'\(bu\(em'u
+Every queue must have a
+.IR qi_putp ()
+procedure defined in its associated
+.BR qinit (9)
+structure, specified by the module or driver in its defining
+.BR streamtab (9)
+structure.
+.IP \(bu
+Any
+.IR qi_putp ()
+procedure that places messages to its own queue using
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+must also have a corresponding
+.IR qi_srvp (9)
+procedure defined for the queue.
+When no corresponding
+.IR qi_srvp (9)
+procedure is defined, the
+.IR qi_putp (9)
+procedure should not place messages on its own queue and must either free them or pass them along
+using
+.BR putnext (9).
+.IP \(bu
+A
+.IR qi_putp ()
+procedure must not place messages directly on a neighbouring queue's message queue using the
+.BR putq (9)
+or
+.BR putbq (9)
+.I STREAMS
+utilities.
+It must only call
+.BR put (9)
+or
+.BR putnext (9)
+for the neighbouring queue to pass messages.
+.IP \(bu
+.IR qi_putp ()
+procedures must not sleep or preempt.
+Any
+.IR qi_put ()
+procedure must be congnisant of the fact that it can be called typically with local hardware or
+software interrupts suppressed.  This places two requirements on the procedure:
+.RS
+.IP 1) \w'0)\(em'u
+Message processing performed directly by the
+.IR qi_putp ()
+procedure must be brief.
+Any long processing required on a message will be deferred to a
+.IR qi_srvp (9)
+procedure by enqueueing the message on the message queue.
+.IP ""
+Perfoming extensive message processing directly from a
+.IR qi_putp ()
+procedure, or causing a
+.IR qi_putp ()
+to sleep, can have a detrimental impact on
+.B GNU/Linux
+system performance and latency of response to time-critical events.
+.IP 2)
+.IR qi_putp ()
+procedure called at interrupt has a limited processor stack.  Processing performed by a
+.IR qi_putp ()
+procedure should be performed directly out of the
+.IR qi_putp ()
+function, (i.e., without nesting too many subroutine calls), and must be congnisant of the fact that
+the operational stack may be limited.
+.IP ""
+Each call to
+.BR put (9)
+or
+.BR putnext (9)
+from within a
+.IR qi_putp ()
+procedure nests a direct function call to another
+.IR qi_putp ()
+procedure.  If many function calls are nested while processing
+.IR qi_putp ()
+procedures along a Stream in this fashion, the kernel or interrupt stack could be overflowed.
+Calls to
+.BR put (9)
+or
+.BR putnext (9)
+from a module or driver
+.IR qi_putp ()
+procedure should stack no local variables, and should be called within the same stack frame as the
+.IR qi_putp ()
+procedure.
+.IP ""
+Overflowing an interrupt stack may cause the
+.B GNU/Linux
+system to panic or otherwise destabilize the kernel.
+.RE
+.IP \(bu
+.IR qi_putp ()
+procedures are not allowed to access (directly or indirectly via kernel utilities) the
+.I current
+user task structure.
+The task that is
+.I current
+when a
+.IR qi_putp ()
+procedure is invoked can be any task in the
+.BR GNU/Linux
+system, and has no fixed relationship to the user that invoked the chain of events resulting in
+the procedure being called.
+.IP \(bu
+Every
+.IR qi_putp ()
+procedure is responsible for flow control within the Stream.  Message handling rules for flow
+control must be followed whenever messages are to be passed to a neighbouring queue.  Flow control
+rules are as follows:
+.RS
+.IP 1) \w'0)\(em'u
+Messages that are of high priority [see
+.BR datab (9)]
+can be passed to a neighbouring queue without regard to flow control or message ordering within the
+message queue.
+.IP 2)
+A module that has no service procedure, may pass messages to a neighbouring queue without
+regard to flow control.  Modules that have no service procedure are designed a filtering modules
+that do not normally generate or consume messages within a data stream.
+.IP 3)
+Messages that are of normal priority (ordinary or priorty messages), must be maintained in sequence
+with regard to other messages of the same priority on the message queue.  That is, if a message of
+the same priority already exists on the message queue, an arriving message must be queued in order
+behind it.  (The
+.I STREAMS
+.BR putq (9)
+utility maintains such ordering.)
+.IP 4)
+For a read queue, normal priority messages should not be passed by a module or driver while the
+message queue is empty and the
+.IR qi_srvp (9)
+procedure is processing a message.
+This is because a
+.IR qi_putp ()
+procedure on the read side can be invoked at hard or soft interrupt context, interrupting the
+.IR qi_srvp (9)
+procedure processing that runs under process or
+.I STREAMS
+context.
+This is necessary because the
+.IR qi_srvp (9)
+procedure may very well place the message it is processing
+back on the queue with
+.BR putbq (9)
+disrupting message ordering.
+.IP ""
+This is not normally the case on the write side, where the
+.IR qi_putp ()
+procedure is invoked in process or
+.I STREAMS
+context, and cannot normally interrupt a
+.IR qi_srvp (9)
+procedure.
+.IP ""
+Note that when the
+.IR qi_srvp (9)
+procedure is running, the
+.BR QSVCBUSY
+flag is set for the queue; and, when it is processing a message,
+the
+.BR QWANTR
+flag is clear for the queue.
+.IP ""
+Otherwise, the
+.IR qi_srvp (9)
+procedure can use an alternate mechanism to block the
+.IR qi_putp ()
+procedure from passing messages, or signal the
+.IR qi_putp ()
+procedure that it must queue messages (e.g., by taking basic locks, signalling via a shared
+state module private data structure, or raising its software priority level to that of the
+.IR qi_putp ()
+procedure).
+.IP 5)
+Messages that are of normal priority that are to be passed to a neighbouring queue, in accordance
+with the above, must have flow control checked for the neighbouring queue using the
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.I STREAMS
+utilities.
+When the called utility returns false, the message must not be passed, but may be enqueued to the
+local message queue using
+.BR putq (9)
+(or discarded).
+.RE
+.\"
+.SS Module qi_putp() Design Rules
+.PP
+The following design rules apply to modules:
+.IP \(bu \w'\(bu\(em'u
+If a module
+.IR qi_putp ()
+procedure is passed a message containing a message type that it does not recognize, it should pass
+the message to the next module in the Stream (in accordance with queueing and flow control rules
+appropriate to the priority of the message).
+.IP \(bu
+Modules must follow the module rules for handling specific message types.  These rules are detailed
+on the manual page describing the message type (e.g.,
+.BR M_FLUSH (9)).
+For a list of message types and their corresponding manual pages, see
+.BR datab (9).
+.\"
+.SS Driver qi_putp() Design Rules
+.PP
+The following design rules apply to drivers:
+.IP \(bu \w'\(bu\(em'u
+If a driver
+.IR qi_putp ()
+procedure is passed a message containing a message type that it does not recognize, it should
+discard (ignore and free) the message.
+.IP \(bu
+Drivers must follow the driver rules for handling specific message types.  These rules are detailed
+on the manual page describing the message type (e.g.,
+.BR M_FLUSH (9)).
+For a list of message types and their corresponding manual pages, see
+.BR datab (9).
+.\"
+.SS ISR Design Rules
+.PP
+These design rules apply to device drivers (that process read events at interrupt).
+The write side
+.IR qi_putp ()
+processing is similar to that of a module or pseudo-device driver with the additional consideration
+that device actions can be performed from either the
+.IR qi_putp ()
+or
+.IR qi_srvp (9)
+procedures.
+The read side
+.IR qi_putp ()
+processing is normally different and is described in the points that follow:
+.IP \(bu \w'\(bu\(em'u
+Messages must be placed on the read side queue from an ISR or bottom-half using the
+.BR put (9)
+utility and not the
+.BR putnext (9)
+utility.
+.B @PACKAGE_TITLE@
+defers
+.IR qi_putp ()
+processing when
+.BR put (9)
+is invoked at hard interrupt.  Messages are placed in a separate event queue to be processed later
+by the
+.I STREAMS
+scheduler.
+.IP \(bu
+Whenever it is necessary to test flow control from an ISR, the read side queue usually requires a
+.IR qi_srvp (9)
+procedure, and the
+.BR canput (9)
+or
+.BR bcanput (9)
+forms of the test should be used (and not the
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+forms of the test).
+.IP \(bu
+Designs that perform a
+.BR putnext (9)
+from the driver read side
+.IR qi_putp () 
+procedure are difficult because the module above the driver might not have properly considered that
+its read side
+.IR qi_putp ()
+procedure will be invoked at interrupt or bottom-half.
+Designs that incorporate a read side
+.IR qi_srvp (9)
+procedure work better even if the module above was so designed.
+Calling
+.BR putnext (9)
+in the
+.IR qi_putp ()
+procedure, however, may result in reduced processing latency.
+.IP \(bu
+ISRs and bottom-halves may call
+.BR putq (9)
+to place a message on the read side message queue; however, it is considered better form to provide
+a
+.IR qi_putp ()
+procedure, even if it simply calls (or is a function pointer to)
+.BR putq (9).
+.IP \(bu
+MP-safe drivers and ISRs may be difficult to design of they directly invoke functions used by the
+driver's
+.IR qi_putp ()
+or
+.IR qi_srvp (9)
+procedure.  It is easier to place queue specialized messages (such as
+.BR M_CTL (9))
+to the read side message queue with
+.BR put (9)
+and let
+.B mp-streams (9)
+syncrhonization do the work.
+This approach also works well for external asyncrhonous events (e.g., timeouts) is a psuedo-device
+driver, or even in a module.
+.PP
+In general, any kernel subsystem outside of
+.I STREAMS
+that places messages on a Stream end should follow the same rules as those for ISRs and
+bottom-halves described above.
 .\"
 .\"
 .SH RETURN
 .PP
+The
+.IR qi_putp ()
+procedure returns an integer value.  This value is ignored by
+.I STREAMS
+and should always be zero
+.RB ( 0 ).
 .\"
 .\"
 .SH ERRORS
 .PP
+Although the
+.IR qi_putp ()
+procedure is capable of returning an error code, the returned value is always ignored by
+.I STREAMS
+and cannot be passed back to the caller of
+.BR put (9)
+or
+.BR putnext (9),
+because these functions return
+.BR void .
 .\"
 .\"
 .SH CONTEXT
 .PP
+A module or driver
+.IR qi_put ()
+procedure,
+when invoked correctly,
+can be called by
+.I STREAMS
+in any context, including process,
+.IR STREAMS ,
+software interrupt,
+and
+hard interrupt contexts.
+There is no general portable way for a
+.IR qi_put ()
+procedure to determine the context in which it was called.
+The non-portable
+.BR current_context (9)
+utility can be used under
+.B @PACKAGE_TITLE@
+to determine the current context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.SS Syncrhonized Modules and Drivers
+.PP
+If
+.BR mp-streams (9)
+synchronization has been specified for the module or driver, the inner syncrhonization barrier, if
+any, is entered shared or exclusive in accordance with the synchronization specification for the
+module or driver, across the call to the
+.IR qi_putp ()
+procedure.  If syncrhonization has not been specified for the module or driver (that is, the module
+or driver is specified as MP-safe), the
+.IR qi_putp ()
+procedure is invoked without synchronization.
+.\"
+.SS MP-Safe Modules and Drivers
+.PP
+.IR qi_putp ()
+is called by
+.I STREAMS
+in the context in which the
+.BR put (9)
+or
+.BR putnext (9)
+utility was invoked.  Regardless of the context, when properly invoked,
+.I STREAMS
+is aware of which queue is being processed on a per-processor basis.
+.PP
+When invoked by
+.BR put (9),
+.I STREAMS
+acquires and holds a Stream head plumbing read lock, for the Stream within which the queue resides,
+across the call to the
+.IR qi_putp ()
+procedure.
+This permits the
+.IR qi_putp ()
+procedure, and any
+.I STREAMS
+utility functions called by the
+.IR qi_putp ()
+procedure, to dereference any
+.I q_next
+pointer in the Stream, and the dereference will remain valid for the duration of the
+.IR qi_putp ()
+call.
+Note that this does not provide any assurances of the validity of a
+.I q_next
+pointer dereference in any other Stream, such as another Stream in an upper or lower multiplex: the
+.IR qi_putp ()
+procedure is responsible for asserting its own assurances in that regard.
+(Note that freezing a Stream with
+.BR freezestr (9)
+guarantees validity of all subsequent
+.I q_next
+pointer derefernces until the Stream is thawed with
+.BR unfreezestr (9)).
+.PP
+If the Stream containing the queue,
+.IR q ,
+has been frozen with a call to
+.BR freezestr (9),
+by a processor,
+.I STREAMS
+running on another processor will not enter any
+.IR qi_putp ()
+procedure in the Stream, but will spin awaiting the thawing of the Stream by the processor that
+froze it, with a call to
+.BR unfreezestr (9).
+If the Stream was frozen after the
+.IR qi_putp ()
+procedure began execution, any attempt by the procedure to alter the state of the queue
+targetted in the
+.BR freezestr (9)
+command that froze the Stream, will spin until the Stream is thawed by
+.BR unfreezestr (9).
+.PP
+No
+.IR qi_putp ()
+procedure for a queue pair that has not yet had
+.BR qprocson (9)
+called for the queue pair, or that has not returned from its
+.BR qi_qopen (9)
+routine, will be executed by
+.IR STREAMS .
+Once a
+.IR qi_putp ()
+is executing, any call to
+.BR qprocsoff (9)
+for the queue pair will spin until the
+.BR put (9)
+call exits and releases the Stream head plumbing read lock.
+If
+.BR put (9)
+has been called, but procedures are then turned off for the queue pair with
+.BR qprocsoff (9)
+before the call has a chance to complete, when it is time to call the
+.IR qi_putp ()
+procedure,
+.BR put (9)
+will effectively perform a
+.BR putnext (9)
+if the queue belongs to a module, or
+.BR freemsg (9)
+if the queue belongs to a driver.
+.PP
+For MP-Safe modules and drivers,
+multiple threads can be executing the
+.IR qi_putp ()
+procedure concurrently for the same queue (but different messages).
+Also, other threads may be executing the
+.IR qi_srvp (9),
+.IR qi_qopen (9),
+.IR q_qclose (9),
+or
+.IR q_qadmin (9),
+procedures and routines concurrently.  It is the responsible of the writer of the
+.IR qi_putp ()
+procedure to acquire and hold the necessary locks to provide exclusive access to data structures
+shared across these calls.
+.BR freezestr (9)
+is inadequate in this case, and the procedures should use module or driver private locks.
 .\"
 .\"
 .SH NOTICES
 .PP
+A queue
+.IR qi_putp ()
+procedure is an internal
+.I STREAMS
+entry point to the module or driver, that is not intended to be called directly by the module or
+driver writer.  See
+.BR put (9)
+and
+.BR putnext (9)
+for accepted methods of invoking this procedure.
+.\"
+.\"
+.SH STYLE
+.PP
+It is common practise to name
+.IR qi_putp ()
+procedures as follows, (where
+.I prefix
+is the configuration prefix chosen for the module or driver and typically derived from the name of
+the module or driver, and which may contain a trailing underscore):
+.TP \w'\fIprefix\fBmuxwput\fR()\(em'u
+\fIprefix\fBrput\fR()
+read side of a module or upper multiplex read side of a driver;
+.PD 0
+.TP
+\fIprefix\fBwput\fR()
+write side of a module or upper multiplex write side of a driver;
+.TP
+\fIprefix\fBmuxrput\fR()
+lower multiplex read side of a driver; and,
+.TP
+\fIprefix\fBmuxwput\fR()
+lower multiplex write side of a driver.
+.PD
 .\"
 .\"
 .SH EXAMPLES
 .PP
 .\"
+.SS Example #1 \(en Module qi_putp()
+.PP
+The following example of a module
+.IR qi_putp ()
+procedure comes directly from the write side of the
+.BR bufmod (4)
+module located in
+.I src/modules/bufmod.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  bufmod_wput(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
+ 5          if (mp->b_rptr[0] & FLUSHW) {
+ 6              if (mp->b_rptr[0] & FLUSHBAND)
+ 7                  flushband(q, FLUSHALL, mp->b_rptr[1]);
+ 8              else
+ 9                  flushq(q, FLUSHALL);
+10          }
+11      }
+12      if (likely(mp->b_datap->db_type >= QPCTL
+13                 || (q->q_first == NULL
+14                     && !(q->q_flag & QSVCBUSY)
+15                     && bcanputnext(q, mp->b_band)))) {
+16          putnext(q, mp);
+17          return (0);
+18      }
+19      /* always buffer, always schedule out of service
+20         procedure for testing */
+21      if (unlikely(putq(q, mp) == 0)) {
+22          mp->b_band = 0;
+23          putq(q, mp);            /* this must succeed */
+24      }
+25      return (0);
+26  }
+\s+2\fP
+.fi
+.PP
+The operation of the
+.BR bufmod (4)
+module is described in the
+.BR bufmod (4)
+manual page.
+The write
+.IR qi_putp ()
+procedure passes all messages downstream and performs flow control and buffering.
+.IP "\fBLine 4-11\fR:" \w'\fBLine\ 00-00\fR:\(em'u
+The module performs processing of the
+.BR M_FLUSH (9)
+message for modules as described in the
+.BR M_FLUSH (9)
+manual page.
+.IP "\fBLine 12-18\fR:"
+If the the message is a high priority message it is passed to the next module or driver using
+.BR putnext (9)
+without consideration for flow control.
+If the message is a normal priority message, the message queue is empty, the service procedure
+is not running, and the message band is not flow controlled forward, the message is also passed to
+the next module or driver using
+.BR putnext (9).
+.IP "\fBLine 21-24\fR:"
+In all other situations (the message is a normal priority message, the queue is not empty or the
+service procedure is running or the message band is flow controlled forward), the message is placed
+on the  message queue to be processed by the service procedure.
+.IP "\fBLine 17,25\fR:"
+The module put procedure always returns zero.
+.PP
+See the
+.I src/modules
+directory in the
+.B @PACKAGE@-@VERSION@
+distribution for more working examples of module put procedures.
+.\"
+.SS Example #2 \(en Driver qi_putp()
+.PP
+The following example of a driver
+.IR qi_putp ()
+procedure comes directly from the lower read side of the
+.BR mux (4)
+multiplexing driver located in
+.I src/modules/mux
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  mux_muxrput(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      struct mux *mux = q->q_ptr;
+ 5  
+ 6      switch (mp->b_datap->db_type) {
+ 7      case M_FLUSH:
+ 8      {
+ 9          if (mp->b_rptr[0] & FLUSHR) {
+10              if (mp->b_rptr[0] & FLUSHBAND)
+11                  flushband(q, mp->b_rptr[1], FLUSHALL);
+12              else
+13                  flushq(q, FLUSHALL);
+14          }
+15  
+16          read_lock(&mux_lock);
+17          if (mux->other) {
+18              queue_t *rq;
+19  
+20              if ((rq = mux->other->rq)) {
+21                  putnext(rq, mp);
+22                  read_unlock(&mux_lock);
+23                  return (0);
+24              }
+25          }
+26          read_unlock(&mux_lock);
+27  
+28          if (!(mp->b_flag & MSGNOLOOP)) {
+29              if (mp->b_rptr[0] & FLUSHW) {
+30                  if (mp->b_rptr[0] & FLUSHBAND)
+31                      flushband(WR(q), mp->b_rptr[1],
+32                                FLUSHALL);
+33                  else
+34                      flushq(WR(q), FLUSHALL);
+35                  mp->b_rptr[0] &= ~FLUSHR;
+36                  /* pretend to be STREAM head */
+37                  mp->b_flag |= MSGNOLOOP;
+38                  qreply(q, mp);
+39                  return (0);
+40              }
+41          }
+42          freemsg(mp);
+43          break;
+44      }
+45      default:
+46          if (!q->q_first && !(q->q_flag & QSVCBUSY)) {
+47              read_lock(&mux_lock);
+48              if (mux->other) {
+49                  queue_t *rq;
+50  
+51                  if ((rq = mux->other->rq)
+52                      && (mp->b_datap->db_type >= QPCTL
+53                          || bcanputnext(rq, mp->b_band))) {
+54                      putnext(rq, mp);
+55                      read_unlock(&mux_lock);
+56                      return (0);
+57                  }
+58              }
+59              read_unlock(&mux_lock);
+60          }
+61          putq(q, mp);
+62          break;
+63      }
+64      return (0);
+65  }
+\s+2\fP
+.fi
+.PP
+The operation of the
+.BR mux (4)
+multiplexing driver is described in the
+.BR mux (4)
+manual page.
+.IP "\fBLine 7-44\fR:" \w'\fBLine\ 00-00\fR:\(em'u
+The driver performs
+.BR M_FLUSH (9)
+processing according to the rules for drivers as described in the
+.BR M_FLUSH (9)
+manual page, with one wrinkle: flushing across the multiplexing driver is supported.
+.IP "\fBLine 45-63\fR:"
+The driver processes all other messages by passing them across the multiplexing driver or queueing
+them on the message queue.
+.IP "\fBLine 46\fR:"
+If the message queue is not empty or the service procedure is running, messages are queued to the
+message queue to preserve order.
+.IP "\fBLine 47,59\fR:"
+A read lock is taken to protect the driver private (which is changed by ioctl operations on the
+upper side of the driver).
+.IP "\fBLine 51-57\fR:"
+If there is no path to the upper multiplex, messages are simply queued to the message queue awaiting
+assignment of an upper multiplex path.  If there is a path and the message is a high priority
+message, it is passed without flow control consideration; a normal priority message is only passed
+if the message band is not flow controlled at the upper multiplex.  Otherwise, messages are simply
+queued to the messge queue.
+.PP
+See the
+.I src/drivers
+directory in the
+.B @PACKAGE@-@VERSION@
+distribution for more working examples of driver put procedures.
+.\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR queue (9),
+.BR msgb (9),
+.BR datab (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.IR qi_srvp (9),
+.BR qinit (9),
+.BR streamtab (9),
+.BR put (9),
+.BR putnext (9),
+.BR freezestr (9),
+.BR unfreezestr (9),
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR mp-streams (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+.BR dupmsg (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR M_FLUSH (9),
+.BR M_CTL (9),
+.BR current_context (9),
+.BR bufmod (4),
+.BR mux (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.B @PACKAGE_TITLE@
+invocation of the
+.IR qi_putp ()
+entry point has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.IR qi_putp ()
+procedure is compatible with
+.IR "SVR 4.2"
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+solspg
+.]
+always defers calling the
+.IR qi_putp ()
+procedure when
+.BR put (9)
+or
+.BR putnext (9)
+is called to avoid overflowing the kernel stack.
+.B @PACKAGE_TITLE@
+only defers when
+.BR put (9)
+is called from hard interrupt context.
+.IP ""
+Portable
+.I STREAMS
+drivers will not be designed so as to expect a
+.IR qi_putp ()
+procedure to be invoked as a direct function call nested within a
+.BR put (9)
+or
+.BR putnext (9)
+call.
+.IP \(em
+Some implementations permit a wider range of
+.I STREAMS
+utilities to be called from outside of
+.IR STREAMS .
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+limits the set in a similar manner to
+.BR "@PACKAGE_TITLE@" ,
+however, 
+.BR "@PACKAGE_TITLE@"
+permits the larger set to be used in some circumstances.
+.IP ""
+Portable
+.I STREAMS
+drivers will restrict the use of
+.I STREAMS
+utilities called from outside the
+.I STREAMS
+environment to
+.BR put (9),
+.BR canput (9),
+and
+.BR bcanput (9),
+and the later two will only be used if the target driver queue has a service procedure.
+.IP \(em
+The same applies to placing messages on Stream ends across a multiplexing driver.
+.IP ""
+Portable
+.I STREAMS
+drivers will restrict the
+.I STREAMS
+utilities used to operate on a different Stream to
+.BR put (9),
+.BR canput (9),
+and
+.BR bcanput (9).
+Again, the later two will only be used if the target driver queue has a service procedure.
+.IP \(em
+Some
+.I STREAMS
+implementations do not permit
+.BR putnext (9)
+to be called at hard interrupt.
+.B @PACKAGE_TITLE@
+permits
+.BR putnext (9)
+to be called at hard interrupt.
+.IP ""
+Portable
+.I STREAMS
+drivers will not call
+.BR putnext (9)
+from a driver read
+.IR qi_putp ()
+procedure, but, rather, will call
+.BR putq (9)
+to queue the message to the message queue and call
+.BR putnext (9)
+from the
+.IR qi_srvp (9)
+procedure when it runs.
+.IP \(em
+Because a number of the primary data structure and types have different definitions on the
+.B GNU/Linux
+system, binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2 MP" .
+.[
+svr42spg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The queue put procedure first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[

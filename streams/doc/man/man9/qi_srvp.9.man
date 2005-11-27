@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_srvp.9.man,v 0.9.2.1 2005/11/26 11:17:13 brian Exp $
+.\" @(#) $Id: qi_srvp.9.man,v 0.9.2.2 2005/11/27 12:13:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/27 12:13:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -80,63 +80,1010 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.PP
+.HP
+.B #include <sys/stream.h>
+.HP
+\fBtypedef int (*\fRqi_srvp_t\fB) (queue_t *\fIq\fB);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+.TP
+.I q
+pointer to the
+.BR queue (9)
+to service.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.IR qi_srvp ()
+is one of 5 principal syncrhonous entry points into a
+.I STREAMS
+module or driver that form part of its definition.  The principal entry points are:
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.IR qi_putp (9),
+and
+.IR qi_srvp ().
+.PP
+The
+.IR qi_srvp ()
+procedure is specified in both the read and write queue
+.BR qinit (9)
+structure that is associated with each queue in an existing queue pair forming an instance of the
+module or driver from the definitions in the module- and driver-defining
+.BR streamtab (9)
+structure.
+.PP
+The
+.IR qi_srvp ()
+procedure is called by
+.I STREAMS
+whenever the queue,
+.IR q ,
+has been scheduled for service and reaches the front of the
+.I STREAMS
+scheduler run queue.
+Queues are scheduled for service either explicitly, using
+.I STREAMS
+utility functions such as
+.BR enableq (9)
+and
+.BR qenable (9);
+or, implicitly by
+.I STREAMS
+message queue functions such as
+.BR putq (9)
+and
+.BR getq (9).
+The
+.IR qi_srvp ()
+procedure is the primary mechanism for deferring message processing and handling flow control within
+the
+.I STREAMS
+framework.
+Although
+.IR qi_srvp ()
+is declared to return a value, any returned value is ignored by
+.IR STREAMS ,
+and is not available to the caller of
+.BR enableq (9),
+.BR qenable (9),
+.BR putq (9),
+or
+.BR getq (9).
+.PP
+The argument passed to the
+.IR qi_srvp ()
+procedure is as follows:
+.TP
+.I q
+is a pointer to the
+.BR queue (9)
+structure representing the read or write queue which is to be serviced.
+.PP
+.I STREAMS
+maintains a list of queues that are scheduled for service.  When a queue is scheduled that has not
+already been scheduled, it is placed on the tail of the list.  When the
+.I STREAMS
+scheduler runs [see
+.BR runqueues (9)],
+queues are taken off of the head of this run queues list and the
+.IR qi_srvp ()
+procedure of the queue is invoked with the queue pointer as the argument.  Therefore,
+.IR qi_srvp ()
+procedures are always invoked within the context of the
+.I STREAMS
+scheduler, and are invoked single-threaded for a given queue,
+.IR q .
+.PP
+Scheduling a queue's
+.IR qi_srvp ()
+procedure for execution is termed
+.RI \(lq enabling \(rq
+the queue.
+Once a queue's
+.IR qi_srvp ()
+procedure has been scheduled (i.e., the queue has been
+.IR enabled ),
+the procedure cannot be scheduled again until it has been executed.  In other words, a queue cannot
+be enabled when it is already enabled.
+If a queue does not have a
+.IR qi_srvp ()
+procedure defined (i.e., the
+.I qi_srvp
+member of the associated
+.BR qinit (9)
+structure is
+.BR NULL ),
+then the queue cannot be enabled: there is no service procedure to schedule.
+When flow control blocking by a forward queue subsides and
+.I STREAMS
+causes a feeding message queue with a defined
+.IR qi_srvp ()
+procedure to be enabled, this is termed
+.RI \(lq back-enabling \(rq.
+.PP
+The
+.IR qi_srvp ()
+procedure is scheduled for execution under the following circumstances:
+.\" -------------
+.IP (1) \w'(0)\(em'u
+A queue is explicity enabled by calling
+.BR enableq (9)
+and the queue has not previously had queue enabling suppressed with a call to
+.BR noenable (9);
+that is, when a call to
+.BR canenable (9)
+will return true.
+.\" -------------
+.IP (2)
+A queue is explicity enabled by calling
+.BR qenable (9),
+regardless of the setting of the
+.B QNOENB
+flag [see
+.BR noenable (9)].
+.\" -------------
+.IP (3)
+A queue is enabled under some circumstances when messages are placed on the message queue:
+When a high priority message is placed back on a message queue with
+.BR putbq (9)
+the queue will be enabled (again);
+a high priority message is placed on a message queue with
+.BR putq (9)
+the queue will be enabled (if it is not already enabled); or,
+a normal priority message is placed on a message queue with
+.BR putq (9),
+.BR insq (9),
+.BR qppq (9),
+and the message becomes the first message on the queue, or the
+.B QWANTR
+bit is set in the
+.I q_flag
+member of the queue indicating that
+.BR getq (9)
+emptied the queue, the queue will be enabled (if it is not already enabled, and if queue enabling
+has not been suspended with
+.BR noenable (9)).
+.\" -------------
+.IP (4)
+A queue is enabled under some circumstances when messages are removed from a forward message queue
+that was previously flow controlled (termed
+.RI \(lq "back-enabling" \(rq).
+A queue is back-enabled after a
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+call has previously failed from the queue's
+.IR qi_putp ()
+or
+.IR qi_srvp (),
+because a forward message queue is full (i.e., its
+.B QFULL
+or
+.BR QB_FULL
+flag is set for the specified message band), when the
+previously full queue's count falls beneath its low water mark, or the queue becomes empty.
+.I STREAMS
+utility functions that remove messages from a message queue can cause its queue count or queue band
+count to drop beneath its low water mark, or the queue to become empty.  These utility functions are:
+.BR getq (9),
+.BR rmvq (9),
+.BR flushband (9),
+and
+.BR flushq (9).
+Any of these functions can cause the nearest feeding queue in the Stream that has a defined
+.IR qi_srvp ()
+to become back-enabled.
+See the corresponding manual pages for details.
+.PP
+When the
+.IR qi_srvp ()
+procedure is executed for a queue by the
+.I STREAMS
+scheduler, the following conditions prevail:
+.IP (1) \w'(0)\(em'u
+The
+.IR qi_srvp ()
+procedure is run single-threaded with respect to a given queue,
+.IR q .
+That is, for any given value of the argument
+.IR q ,
+only one thread can be executing the
+.IR qi_srvp ()
+procedure with that value passed as an argument.
+.IP (2)
+The Stream containing the queue must be in a thawed state,
+see
+.BR unfreezestr (9),
+before any
+.IR qi_putp (9)
+or
+.IR qi_srvp ()
+procedure will be entered within the stream.  However, the Stream amy become frozen after (or
+immediately before) the
+.IR qi_srvp ()
+procedure is called.
+(Freezing a Stream with
+.BR freezestr (9)
+is advisory to threads entering 
+.IR qi_putp (9)
+or
+.IR qi_srvp ()
+procedures, and is mandatory for threads attempting to alter the state of the target queue.)
+.IP (3)
+A Stream head plumbing read lock will be acquired and held across the call to the
+.IR qi_srvp ()
+procedure.  The Stream head plumbing read lock held in this fashion guarantees that dereferencing of
+the
+.I q_next
+pointers for the queue, and any queue in the same Stream, will be valid through the
+.IR qi_srvp ()
+procedure (and any
+.IR qi_putp (9)
+procedure invoked by it).  This permits use of the
+.BR putnext (9),
+.BR canputnext (9),
+.BR bcanputnext (9),
+.BR putctlnext (9),
+.BR putctl1next (9),
+.BR putctl2next (9),
+.BR getq (9),
+.BR rmvq (9),
+.BR flushq (9),
+.BR flushband (9),
+.I STREAMS
+utilities that walk the Stream dereferencing
+.I q_next
+pointers.
+.IP (4)
+Queue
+.IR qi_putp (9)
+and
+.IR qi_srvp ()
+procedures will have been enabled with
+.BR qprocson (9)
+for the queue pair containing the
+.IR qi_srvp ()
+procedure before the call, and will not be disabled with
+.BR qprocsoff (9)
+for the queue pair until after the call returns.
+.IP (5)
+If an
+.BR mp-streams (9)
+synchronization specification has been made for the module or river, the calling thread will enter
+the inner synchronization barrier shared or exclusive (depending on the specification) before the
+call to
+.IR qi_srvp ()
+and will leave the barrier after its return.
+.PP
+In constrast to the
+.IR qi_putp (9)
+procedure, that handles immediate processing of messages, the
+.IR qi_srvp ()
+procedure is responsible for delayed or deferred processing of messages that were placed on the
+message queue by the
+.IR qi_putp (9)
+procedure.  Another difference is that
+.IR qi_srvp ()
+procedures run under
+.I STREAMS
+scheduler context, whereas
+.IR qi_putp (9)
+procedures run under whatever context prevailed when the
+.BR put (9)
+or
+.BR putnext (9)
+utility invoking them were called.
+The
+.IR qi_srvp ()
+procedure is responsible for taking messages from the message queue in turn, using
+.BR getq (9),
+and processing them.  There are four actions that a
+.IR qi_srvp ()
+procedure can take with regard to the disposition of message on the queue:
+.IP (1) \w'(0)\(em'u
+leave the message on the message queue;
+.IP (2)
+free the message (or part of the message) with a
+.I STREAMS
+utility such as
+.BR freeb (9)
+or
+.BR freemsg (9);
+.IP (3)
+pass the message (or part of the message) to another queue using
+.BR put (9)
+or
+.BR putnext (9);
+or,
+.IP (4)
+place the message (or part of the message) back on the message queue using the
+.I STREAMS
+utility 
+.BR putbq (9).
+.PP
+If a message is left on the queue, a message is placed back on the queue with
+.BR putbq (9),
+or, a call to
+.BR getq (9)
+to get the next message for processing returns
+.BR NULL ,
+the
+.IR qi_srvp ()
+procedure must exit.
+Otherwise, the
+.IR qi_srvp ()
+procedure continues to take messages off of the queue with
+.BR getq (9)
+and processes them in turn.
+.PP
+Just as the
+.IR qi_putp (9)
+procedure,
+.IR qi_srvp ()
+procedure is allowed to modify messages that are removed from the message queue at its discretion
+before applying one of the above terminal dispositions to the message.  However, the
+.IR qi_srvp ()
+procedure should not modify the contents of the data buffer associated with any data block,
+.BR datab (9),
+that has a reference count,
+.IR db_refs ,
+greater thatn one
+.RB ( 1 )
+[see
+.BR dupmsg (9)].
+Message blocks with a data block reference greater than one should be copied and the copy altered
+instead.
+.PP
+Any other actions taken with regard to the message form part of the definition of the module or
+driver concerned.
 .\"
 .\"
 .SH USAGE
 .PP
+The module or driver
+.IR qi_srvp ()
+procedure is responsible for maintaining proper operations of the Stream by handling specific
+message types in specific fashions.  The following sections provide some guidelines for the design
+of
+.IR qi_srvp ()
+procedures from a module or driver, and rules for handling of messages within the procedure:
+.\"
+.SS Driver and Module qi_srvp() Design Rules
+.PP
+The following design rules apply to both modules and drivers:
+.IP \(bu \w'\(bu\(em'u
+Defining a
+.IR qi_srvp ()
+procedure for a queue is optional.  Not all modules or drivers require deferral of message
+processing: some can perform all message processing directly from their
+.IR qi_putp (9)
+procedures.
+.IP \(bu
+A queue with a defined
+.IR qi_putp (9)
+procedure that never places message on its message queue must not define a
+.IR qi_srvp ()
+procedure.
+.IP \(bu
+A
+.IR qi_srvp ()
+procedure must not place messages directly on a neighbouring queue's message queue using
+.BR putq (9)
+or
+.BR putbq (9)
+.I STREAMS
+utilities.  It must only call
+.BR put (9)
+or
+.BR putnext (9)
+for the neighbouring queue to pass messages.
+.IP \(bu
+.IR qi_srvp ()
+procedures must not sleep or preempt.  Any
+.IR qi_srvp ()
+procedure must be congnisant of the fact that service procedures for other queues may be awaiting
+execution for the duration of the current call.
+Message processing performed by the
+.IR qi_srvp ()
+procedure must be finite and should be bounded.  Any extensive unbound processing, or processing
+that would benefit from sleeping, should be delegated to independent kernel threads spawned to perform
+the processing.
+.IP ""
+Performing extended and unbound message processing directly from a
+.IR qi_srvp ()
+procedure, or causing a
+.IR qi_srvp ()
+to sleep, can have detrimental impact on
+.I STREAMS
+subsystem performance and latency of response to time-critical events.
+.IP \(bu
+.IR qi_srvp ()
+procedures are not allowed to access (directly or indirectly via kernel utilities) the
+.I current
+user task structure.  The task that is
+.I current
+when a
+.IR qi_srvp ()
+procedure is invoked can be either the
+.I STREAMS
+scheduler kernel thread, or a user process executing on behalf of the
+.I STREAMS
+scheduler before exiting a system call.  The
+.I STREAMS
+scheduler has no fixed relationship to the user that invoked a chain of events resulting in the
+procedure being called.
+.IP \(bu
+Every queue with a defined
+.IR qi_srvp ()
+procedure is responsible for flow control within the Stream.  Message handling rules for flow
+control must be followed whenever messages are to be passed to a neighbouring queue.  Flow control
+rules are as follows:
+.RS
+.IP 1) \w'0)\(em'u
+Messages that are of high priority [see
+.BR datab (9)]
+can be passed to a neighbouring queue without regard to flow control or message ordering within the
+message queue.
+.IP 2)
+Messages that are of normal priority (ordinary or priorty messages), must be maintained in sequence
+with regard to other messages of the same priority on the message queue.  That is, if a message of
+the same priority already exists on the message queue, an arriving message must be queued in order
+behind it.  (The
+.I STREAMS
+.BR putbq (9)
+utility maintains such ordering.)
+.IP 3)
+Messages that are of normal priority that are to be passed to a neighbouring queue, in accordance
+with the above, must have flow control checked for the neighbouring queue using the
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.I STREAMS
+utilities.
+When the called utility returns false, the message must not be passed, but may be placed back on the
+local message queue using
+.BR putbq (9)
+(or discarded).
+.RE
+.\"
+.SS Module qi_srvp() Design Rules
+.PP
+The following design rules apply to modules:
+.IP \(bu \w'\(bu\(em'u
+If a module
+.IR qi_srvp ()
+procedure is processing a message containing a message type that it does not recognize, it should
+pass the message to the next module in the Stream (in accordance with queueing and flow control
+rules appropriate to the priority of the message).
+.IP \(bu
+Modules must follow the module rules for handling specific message types.  These rules are detailed
+on the manual page describing the message type (e.g.,
+.BR M_FLUSH (9)).
+For a list of message types and their corresponding manual pages, see
+.BR datab (9).
+.\"
+.SS Driver qi_srvp() Design Rules
+.PP
+The following design rules apply to drivers:
+.IP \(bu \w'\(bu\(em'u
+If a driver
+.IR qi_srvp ()
+procedure is processing a message containing a message type that it does not recognize, it should
+discard (ignore and free) the message.
+.IP \(bu
+Drivers must follow the driver rules for handling specific message types.  These rules are detailed
+on the manual page describing the message type (e.g.,
+.BR M_FLUSH (9)).
+For a list of message types and their corresponding manual pages, see
+.BR datab (9).
 .\"
 .\"
 .SH RETURN
 .PP
+The
+.IR qi_srvp ()
+procedure returns an integer value.  This value is ignored by
+.I STREAMS
+and should always be zero
+.RB ( 0 ).
 .\"
 .\"
 .SH ERRORS
 .PP
+Although the
+.IR qi_srvp ()
+procedure is capable of returning an error code, the returned value is always ignored by
+.I STREAMS
+and cannot be passed back to the caller of any function.
 .\"
 .\"
 .SH CONTEXT
 .PP
+A module or driver
+.IR qi_srvp ()
+procedure,
+when invoked correctly,
+can be called by
+.I STREAMS
+either in
+.I STREAMS
+scheduler context (kernel thread), or in the context of a user process executing on behalf of the
+.I STREAMS
+scheduler before returning from a system call.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .\"
+.SS Syncrhonized Modules and Drivers
+.PP
+If
+.BR mp-streams (9)
+synchronization has been specified for the module or driver, the inner syncrhonization barrier, if
+any, is entered shared or exclusive in accordance with the syncrhonization specification for the
+module or driver, across the call to the
+.IR qi_srvp ()
+procedure.  If syncrhonization has not been specified for the module or driver (that is, the module
+or driver is specified as MP-safe), the
+.IR qi_srvp ()
+procedure is invoked without synchronization.
+.\"
+.SS MP-Safe Modules and Drivers
+.PP
+.IR qi_srvp ()
+is called by
+.I STREAMS
+either in
+.I STREAMS
+scheduler context (kernel thread), or in the context of a user process executing on behalf of the
+.I STREAMS
+scheduler before returning from a system call.
+Regardless of context, when properly invoked,
+.I STREAMS
+is aware of which queue is being processed on a per-processor basis.
+.PP
+.I STREAMS
+acquires and holds a Stream head plumbing read lock, for the Stream within which the queue resides,
+across the call to the
+.IR qi_srvp ()
+procedure.
+This permits the
+.IR qi_srvp ()
+procedure, and any
+.I STREAMS
+utility functions called by the
+.IR qi_srvp ()
+procedure, to dereference any
+.I q_next
+pointer in the Stream, and the dereference will remain valid for the duration of the
+.IR qi_srvp ()
+call.
+Note that this does not provide any assurances of the validity of a
+.I q_next
+pointer dereference in any other Stream, such as another Stream in an upper or lower multiplex: the
+.IR qi_srvp ()
+procedure is responsible for asserting its own assurances in that regard.
+(Note that freezing a Stream with
+.BR freezestr (9)
+guarantees validity of all subsequent
+.I q_next
+pointer derefernces until the Stream is thawed with
+.BR unfreezestr (9)).
+.PP
+If the Stream containing the queue,
+.IR q ,
+has been frozen with a call to
+.BR freezestr (9),
+by a processor,
+.I STREAMS
+running on another processor will not enter any
+.IR qi_srvp ()
+procedure in the Stream, but will spin awaiting the thawing of the Stream by the processor that
+froze it, with a call to
+.BR unfreezestr (9).
+If the Stream was frozen after the
+.IR qi_srvp ()
+procedure began execution, any attempt by the procedure to alter the state of the queue
+targetted in the
+.BR freezestr (9)
+command that froze the Stream, will spin until the Stream is thawed by
+.BR unfreezestr (9).
+.PP
+No
+.IR qi_srvp ()
+procedure for a queue pair that has not yet had
+.BR qprocson (9)
+called for the queue pair, or that has not returned from its
+.BR qi_qopen (9)
+routine, will be executed by
+.IR STREAMS .
+Once a
+.IR qi_srvp ()
+is executing, any call to
+.BR qprocsoff (9)
+for the queue pair will spin until the
+.IR qi_srvp ()
+procedure exits and releases the Stream head plumbing read lock.
+If a
+.IR qi_srvp ()
+procedure has been scheduled for execution, has procedures turned off for its queue pair with
+.BR qprocsoff (9)
+before the procedure has a chance to execute, when it is the
+.IR qi_srvp ()
+procedure's turn to execute,
+.I STREAMS
+will cancel it and release its reference to the queue pair.
+.PP
+For MP-Safe modules and drivers,
+only one thread can be executing the
+.IR qi_srvp ()
+procedure for a given queue; however, other
+threads may be executing the
+.IR qi_putp (9),
+.IR qi_qopen (9),
+.IR q_qclose (9),
+or
+.IR q_qadmin (9),
+procedures and routines concurrently.  It is the responsible of the writer of the
+.IR qi_srvp ()
+procedure to acquire and hold the necessary locks to provide exclusive access to data structures
+shared across these calls.
+.BR freezestr (9)
+is inadequate in this case, and the procedures should use module or driver private locks.
+.\"
 .\"
 .SH NOTICES
 .PP
+A queue
+.IR qi_srvp ()
+procedure is an internal
+.I STREAMS
+entry point to the module or driver, that is not intended to be called directly by the module or
+driver writer.  See
+.BR enableq (9)
+and
+.BR qenable (9)
+for accepted methods of invoking this procedure.
+.\"
+.\"
+.SH STYLE
+.PP
+It is common practise to name
+.IR qi_srvp ()
+procedures as follows, (where
+.I prefix
+is the configuration prefix chosen for the module or driver and typically derived from the name of
+the module or driver, and which may contain a trailing underscore):
+.TP \w'\fIprefix\fBmuxwsrv\fR()\(em'u
+\fIprefix\fBrsrv\fR()
+read side of a module or upper multiplex read side of a driver;
+.PD 0
+.TP
+\fIprefix\fBwsrv\fR()
+write side of a module or upper multiplex write side of a driver;
+.TP
+\fIprefix\fBmuxrsrv\fR()
+lower multiplex read side of a driver; and,
+.TP
+\fIprefix\fBmuxwsrv\fR()
+lower multiplex write side of a driver.
+.PD
 .\"
 .\"
 .SH EXAMPLES
 .PP
 .\"
+.SS Example #1 \(en Module qi_srvp()
+.PP
+The following example of a module
+.IR qi_srvp ()
+procedure comes directly from the read and write side of the
+.BR bufmod (4)
+module located in
+.I src/modules/bufmod.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  bufmod_srv(queue_t *q)
+ 3  {
+ 4      mblk_t *mp;
+ 5  
+ 6      while ((mp = getq(q))) {
+ 7          if (likely
+ 8              (mp->b_datap->db_type >= QPCTL
+ 9               || bcanputnext(q, mp->b_band))) {
+10              putnext(q, mp);
+11              continue;
+12          }
+13          putbq(q, mp);
+14          break;
+15      }
+16      return (0);
+17  }
+\s+2\fP
+.fi
+.PP
+The operation of the
+.BR bufmod (4)
+module is described in the
+.BR bufmod (4)
+manual page.
+The write
+.IR qi_srvp ()
+procedure passes all messages downstream and performs flow control and buffering.
+.IP "\fBLine 6\fR:" \w'\fBLine\ 00-00\fR:\(em'u
+The module loops taking messages off of the message queue with
+.BR getq (9)
+and processing them.
+.IP "\fBLine 7-12\fR:"
+If the message is a high priority message or passes flow control restrictions for the message band,
+the message is passed to the next queue with
+.BR putnext (9).
+.IP "\fBLine 13-14\fR:"
+If the message is a normal priority message and the message band is flow controlled forward in the
+Stream, the message is placed back on the queue using
+.BR putbq (9)
+and the procedure breaks out of the loop and returns.  The service procedure will be back enabled
+when flow control subsides at the flow controlled queue forward in the Stream.
+.IP "\fBLine 6,15\fR:"
+If there is no more messages on the message queue,
+.BR getq (9)
+returns
+.B NULL
+and the loop terminates and the procedure exits.  The service procedure will be enabled again when a
+message is placed onto the message queue.
+.IP "\fBLine 16\fR:"
+The procedure always returns zero
+.RB ( 0 ).
+.PP
+See the
+.I src/modules
+directory in the
+.B @PACKAGE@-@VERSION@
+distribution for more working examples of module service procedures.
+.\"
+.SS Example #2 \(en Driver qi_srvp()
+.PP
+The following example of a driver
+.IR qi_srvp ()
+procedure comes directly from the lower read side of the
+.BR mux (4)
+multiplexing driver located in
+.I src/modules/mux
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution:
+.PP
+If the lower read put procedure encounters flow control on the queue beyond the accepting upper read
+queue, or if the lower read service procedure is invoked for a lower Stream that is not connected
+across the multiplexer, it places the message back on its queue and waits for the upper read queue
+service procedure to enable it when congestion has cleared, or when a connection is formed.  If the
+upper read queue disconnects from the lower read queue (or has not connected yet), the procedure
+leaves these messages on the queue to (potentially) be processed by the Stream head after unlinking,
+or to be processed by an upper read queue after connection across the multiplexer.
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  mux_lrsrv(queue_t *q)
+ 3  {
+ 4      struct mux *mux = q->q_ptr;
+ 5      queue_t *rq = NULL;
+ 6      mblk_t *mp;
+ 7  
+ 8      read_lock(&mux_lock);
+ 9      if (mux->other)
+10          rq = mux->other->rq;
+11      if (rq) {
+12          while ((mp = getq(q))) {
+13              if (mp->b_datap->db_type >= QPCTL
+14                  || bcanputnext(rq, mp->b_band)) {
+15                  putnext(rq, mp);
+16                  continue;
+17              }
+18              putbq(q, mp);
+19              break;
+20          }
+21      } else
+22          noenable(q);
+23      read_unlock(&mux_lock);
+24      return (0);
+25  }
+\s+2\fP
+.fi
+.PP
+The operation of the
+.BR mux (4)
+multiplexing driver is described in the
+.BR mux (4)
+manual page.
+.IP "\fBLine 8,23\fR:" \w'\fBLine\ 00-00\fR:\(em'u
+Because the private structure is altered by the upper write put procedure in response to an
+.BR M_IOCTL (9)
+message, the procedure takes a read lock here.
+.IP "\fBLine 11,22\fR:"
+If there is no connection across the multiplexer, the procedure disables automatic enabling of the
+queue using
+.BR noenable (9),
+and returns.  When a connection is formed, the procedure forming the connection will explicitly
+enable the queue using
+.BR enableok (9)
+and
+.BR qenable (9).
+.IP "\fBLine 12,20\fR:"
+If there is a connection across the multiplexer, the procedure loops taking messages off of the
+message queue and processing them.  When no messages are left of the message queue, the procedure
+terminates and returns zero
+.RB ( 0 ).
+.IP "\fBLine 13-17\fR:"
+If the message is a high priority message, or the message is a normal priority message and the
+message band across the multiplexer is not flow controlled for the message band, the message is
+passed to the queue across the multiplexer using
+.BR putnext (9).
+.IP "\fBLine 18-19\fR:"
+If the message is a normal priority message and the queue across the multiplexer is flow controlled
+for the message band, the message is placed back on the message queue using
+.BR putbq (9)
+and the procedure breaks out of the loop and returns.
+.IP "\fBLine 24\fR:"
+The procedure always returns zero
+.RB ( 0 ).
+.PP
+See the
+.I src/drivers
+directory in the
+.B @PACKAGE@-@VERSION@
+distribution for more working examples of driver service procedures.
+.\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR queue (9),
+.BR datab (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.IR qi_putp (9),
+.BR qinit (9),
+.BR streamtab (9),
+.BR enableq (9),
+.BR qenable (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR dupmsg (9),
+.BR put (9),
+.BR putnext (9),
+.BR putq (9),
+.BR insq (9),
+.BR qppq (9),
+.BR getq (9),
+.BR rmvq (9),
+.BR putbq (9),
+.BR flushq (9),
+.BR flushband (9),
+.BR enableq (9),
+.BR qenable (9),
+.BR noenable (9),
+.BR enableok (9),
+.BR canenable (9),
+.BR runqueues (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR freezestr (9),
+.BR unfreezestr (9),
+.BR putctlnext (9),
+.BR putctl1next (9),
+.BR putctl2next (9),
+.BR M_FLUSH (9),
+.BR bufmod (4),
+.BR mux (4),
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR mp-streams (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.B @PACKAGE_TITLE@
+invocation of the
+.IR qi_srvp ()
+entry point has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.IR qi_srvp ()
+procedure is compatible with
+.IR "SVR 4.2"
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Some implementations permit a wider range of
+.I STREAMS
+utilities to be called from outside of
+.IR STREAMS .
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+limits the set in a similar manner to
+.BR "@PACKAGE_TITLE@" ,
+however, 
+.BR "@PACKAGE_TITLE@"
+permits the larger set to be used in some circumstances.
+.IP ""
+Portable
+.I STREAMS
+drivers will restrict the use of
+.I STREAMS
+utilities called from outside the
+.I STREAMS
+environment to
+.BR put (9),
+.BR canput (9),
+and
+.BR bcanput (9),
+and the later two will only be used if the target driver queue has a service procedure.
+.IP \(em
+The same applies to placing messages on Stream ends across a multiplexing driver.
+.IP ""
+Portable
+.I STREAMS
+drivers will restrict the
+.I STREAMS
+utilities used to operate on a different Stream to
+.BR put (9),
+.BR canput (9),
+and
+.BR bcanput (9).
+Again, the later two will only be used if the target driver queue has a service procedure.
+.IP \(em
+Because a number of the primary data structure and types have different definitions on the
+.B GNU/Linux
+system, binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2 MP" .
+.[
+svr42spg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The queue service procedure first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[

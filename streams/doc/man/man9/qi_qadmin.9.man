@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_qadmin.9.man,v 0.9.2.1 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: qi_qadmin.9.man,v 0.9.2.2 2005/11/27 12:13:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/27 12:13:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -113,6 +113,18 @@ sort-adjacent-labels
 .\"
 .SH NOTICES
 .PP
+.\"
+.\"
+.SH STYLE
+.PP
+It is common practise to name
+.IR qi_qadmin ()
+routines
+\(lq\fIprefix\fBadmin\fR(),\(rq
+(where
+.I prefix
+is the configuration prefix chosen for the module or driver and typically derived from the name of
+the module or driver, and which may contain a trailing underscore).
 .\"
 .\"
 .SH EXAMPLES

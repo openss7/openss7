@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_qopen.9.man,v 0.9.2.1 2005/11/26 11:17:13 brian Exp $
+.\" @(#) $Id: qi_qopen.9.man,v 0.9.2.2 2005/11/27 12:13:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/27 12:13:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,6 +111,54 @@ pointer to the credentials of the opening user.
 .\"
 .SH DESCRIPTION
 .PP
+.IR qi_qopen ()
+is one of 5 principal synchronous entry points into a
+.I STREAMS
+module or driver that form part of the definition of the module and driver.
+The principal entry points are:
+.IR qi_qopen (),
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.IR qi_putp (9),
+and
+.IR qi_srvp (9).
+The
+.IR qi_qopen ()
+routine is specified in the read queue
+.BR qinit (9)
+structure that is associated with a new queue pair forming an instance of the module or driver from
+the definitions in the module and driver defining
+.BR streamtab (9)
+structure.
+.PP
+The
+.IR qi_qopen ()
+routine is called whenever a new queue pair forming an instance of the
+.I STREAMS
+module or driver is allocated, initialized and inserted into a Stream, or whenever an existing
+Stream is reopened, for each module and driver in the Stream.  This routine permits the module or
+driver to perform whatever module or driver private initialization is necessary before the queue
+pair becomes active in the Stream, or to respond to a subsequent openning of the Stream.  Error
+numbers returned by this function are reflected as error numbers returned to the user in
+.BR errno (3)
+from the
+.BR open (2s)
+or
+.BR I_PUSH (7)
+operation that caused the routine to be invoked.  All modules and drivers must have a
+.IR qi_qopen ()
+routine defined, otherwise the
+.I STREAMS
+.BR qopen (9)
+call will return
+.RB [ ENOPKG ].
+See
+.BR qopen (9).
+.PP
+.I STREAMS
+passes the following arguments to the
+.IR qi_qopen ()
+routine:
 .TP
 .I q
 is a pointer to the read queue of a newly allocated queue pair for the module
@@ -288,9 +336,99 @@ routine of the Stream head, modules and driver already present in a Stream are n
 module is pushed onto the module stack: only the
 .IR qi_qopen ()
 routine of the pushed module is called.
+.PP
+For an initial open of a module or driver, the following conditions prevail:
+.IP (1) \w'(0)\(em'u
+The queue pair forming a new instance of the module or driver has been allocated and half-inserted
+into the Stream beneath the Stream head.  The queue pair is half-inserted in the sense that the
+.I q_next
+pointers of each queue point to the Stream head and the top of the module stack or driver, however, the
+.I q_next
+pointers of the Stream head and the top of the module stack or driver, point to each other an bypass
+the module.
+It takes a call to
+.BR qprocson (9)
+from within the
+.IR qi_qopen ()
+routine to fully insert the newly formed queue pair.
+.IP (2)
+The
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedures for each queue in the queue pair are disabled.  The
+.B QPROCS
+bit in the
+.I q_flag
+member of each queue is set indicating that the procedure are disabled.
+It takes a call to
+.BR qprocson (9)
+to enable the
+.IR qi_putp (9)
+(put) and
+.IR qi_srvp (9)
+(service)
+procedures.
+.IP (3)
+The
+.I q_ptr
+members of the queues in the queue pair are
+.BR NULL ,
+and will not further be modified by
+.IR STREAMS .
+It is the responsibility of the
+.IR qi_qopen ()
+routine to use these module private pointers as it sees fit.
+.IP (4)
+The
+.B STRWOPEN
+bit in the
+.I sd_flags
+member of the Stream head
+.BR stdata (9)
+structure is set, precluding any other
+.IR qi_qopen ()
+or
+.IR qi_qclose (9)
+procedure from being called for any queue pair within, or to be added to, the Stream.
+.IP (5)
+The
+.IR qi_qopen ()
+procedure is called with a blockable, no locks held, user context, the user context being the user
+that cause the routine to be invoked.  That is, the same user whose credentials are pointed to by
+.IR crp .
+The file flags for the user file descriptor associated with the call are contained in the
+.I oflag
+argument.  It is possible, in a non-portable way, to obtain a reference to the file pointer and
+inode associated with the system call that invoked the routine.  This is always available in the
+.I sd_file
+and
+.I sd_inode
+members of the Stream head
+.BR stdata (9)
+structure.  The Stream head
+.BR stdata (9)
+structure can be located using the
+.BR qstream (9)
+macro.
+.IP (6)
+If an
+.BR mp-streams (9)
+synchronization specification has been made for the module or driver that includes an inner
+synchronization barrier,
+.I STREAMS
+enters the inner barrier shared or exclusive (according to the
+specification) before the
+.IR qi_qopen ()
+routine is invoked, and
+leaves the inner barrier after the call returns.
 .\"
 .\"
 .SH USAGE
+.PP
+Following are some design guidelines for module and driver writers when writing
+.IR qi_qopen ()
+routines for modules and drivers:
 .\"
 .SS Modules and Drivers
 .PP
@@ -677,6 +815,18 @@ and
 for indirect methods of invoking this routine.
 .\"
 .\"
+.SH STYLE
+.PP
+It is common practise to name
+.IR qi_qopen ()
+routines
+\(lq\fIprefix\fBopen\fR(),\(rq
+(where
+.I prefix
+is the configuration prefix chosen for the module or driver and typically derived from the name of
+the module or driver, and which may contain a trailing underscore).
+.\"
+.\"
 .SH EXAMPLES
 .PP
 .\"
@@ -761,7 +911,7 @@ routine comes directly from the
 driver located in the
 .I src/drivers/sad.c
 source file in the
-.B @PACAKGE@-@VERSION@
+.B @PACKAGE@-@VERSION@
 distribution:
 .PP
 There are two minors:
@@ -855,11 +1005,49 @@ See the
 .I src/drivers
 directory in the
 .B @PACKAGE@-@VERSION@
-distribution for more working examples of module open routines.
+distribution for more working examples of driver open routines.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.IR qi_putp (9),
+.IR qi_srvp (9).
+.BR qinit (9),
+.BR streamtab (9),
+.BR errno (3),
+.BR open (2s),
+.BR I_PUSH (7),
+.BR qopen (9),
+.BR allocq (9),
+.BR setq (9),
+.BR dev_t (9),
+.BR makedevice (9),
+.BR clone (4),
+.BR cred_t (9),
+.BR qinsert (9),
+.BR ioctl (2s),
+.BR pipe (2s),
+.BR pipe (4),
+.BR qprocson (9),
+.BR stdata (9),
+.BR qstream (9),
+.BR mp-streams (9),
+.BR qwait_sig (9),
+.BR qwait (9),
+.BR qclose (9),
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+.BR fattach (3),
+.BR fdetach (3),
+.BR pipemod (4),
+.BR sad (4),
+.BR specfs (5),
+.BR ioctl (3p),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -886,7 +1074,117 @@ svr4spg
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+passes the internal device number to the
+.IR qi_qopen ()
+procedure with the
+.I devp
+argument, not the external device number, as does
+.IR LiS .
 .IP \(em
+If a driver returns a non-unique device number in
+.I devp
+when
+.I sflag
+is set to
+.BR CLONEOPEN ,
+.B @PACKAGE_TITLE@
+will still attach the newly created Stream to the inode associated with the device number.
+Since the device number corresponds to an inode, the fact that the device number is non-unique will
+mean that multiple Streams will be attached to the same inode.
+.B @PACKAGE_TITLE@
+handles this ambiguity by associating a list of Streams with an inode.  The file pointer that
+generated the
+.IR qi_qopen ()
+routine call will reference the specific Stream that it created; however, other file pointers for
+the same inode will reference other Streams.
+Under
+.BR "@PACKAGE_TITLE@" ,
+this is referred to as
+.RI \*(lq "super cloning" \*(rq.
+The only ramification of
+.I super cloning
+is that only the most current allocated Stream can be opened by explicit device number within either
+the external file system or the
+.BR specfs (5)
+filesystem.  See
+.BR dev_t (9)
+for more information.
+.IP ""
+Portable
+.I STREAMS
+drivers will only return a unique device number when
+.I sflag
+is set to
+.BR CLONEOPEN ,
+in accordance with
+.IR "SVR 4.2"
+.[
+svr42spg
+.]
+specification,
+and
+.I super cloning
+will, therefore, not be invoked.
+.IP \(em
+.B @PACKAGE_TITLE@
+passes an error number returned from a module
+.IR qi_qopen ()
+routine to the returned
+.BR errno (3)
+value for an
+.BR I_PUSH (7)
+.BR ioctl (2s)
+call.  This does not precisely match
+.I POSIX
+behaviour [see
+.BR ioctl (3p)],
+which requires that
+.RB [ ENXIO ]
+be returned when a module
+.IR qi_qopen ()
+routine fails.
+.IP ""
+Portable
+.I STREAMS
+modules will only return
+.RB [ ENXIO ]
+when the module
+.IR qi_qopen ()
+routine fails when
+invoked with
+.I sflag
+set to
+.BR MODOPEN .
+In this way,
+.I POSIX
+compliance is met.
+.IP \(em
+.B @PACKAGE_TITLE@
+does not (yet) support the older
+.IR "SVR 3" -style
+prototype.  All
+.IR qi_qopen ()
+routines must be written to the
+.IR "SVR 4" -style
+prototype, regardless of the setting of the module or driver
+\fIxxx\fBflag\fR,
+contrary to the description in the
+.IR "SVR 4 SPG" .
+.[
+svr4spg
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use only the
+.IR "SVR 4" -style
+prototype, and will always define the
+\fIxxx\fBflag\fR.
+.IP \(em
+Because a number of the primary data structures and types have different definitions on the
+.B GNU/Linux
+system, binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -903,7 +1201,7 @@ usldk
 .\"
 .SH HISTORY
 .PP
-The queue put procedure first appeared in
+The queue open procedure first appeared in
 .IR "SVR 3" .
 .[
 svr3
