@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/20 22:21:05 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/28 13:20:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/20 22:21:05 $ by $Author: brian $
+ Last Modified $Date: 2005/11/28 13:20:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/20 22:21:05 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/28 13:20:11 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/11/20 22:21:05 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/28 13:20:11 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1264,10 +1264,10 @@ EXPORT_SYMBOL(bcanputany);	/* include/sys/streams/stream.h */
  *  bcanputnextany() checks the next queue from the specified queue to see whether a message for any
  *  (existing) message band can be written to the queue.  Message bands to which no messages have
  *  been written to at least once are not checked.  This is the same as POLLWRBAND, S_WRBAND, and
- *  I_CHKBAND with ANYBAND as an argument.
+ *  I_CANPUT with ANYBAND as an argument.
  *
  *  NOTICES: bcanputnextany() is not a standard STREAMS function, but it is used by stream heads
- *  (for POLLWRBAND, S_WRBAND and I_CKBAND) and so we export it.
+ *  (for POLLWRBAND, S_WRBAND and I_CANPUT) and so we export it.
  *
  *  CONTEXT: bcanputnextany() can be called from STREAMS scheduler context, or from any context that
  *  holds a stream head read or write lock across the call.
@@ -3975,6 +3975,9 @@ static vstrlog_t vstrlog = &vstrlog_default;
  *
  *  CONTEXT: register_strlog() is intended to be called from a STREAMS module or driver qi_qopen() or
  *  qi_qclose() procedure.  It must be called from process context.
+ *
+ *  LOCKING: This function holds a write lock on strlog_reg_lock to keep others from calling a
+ *  strlog() implementation function that is about to be unloaded for safe log driver unloading.
  */
 vstrlog_t
 register_strlog(vstrlog_t newlog)
@@ -4000,8 +4003,10 @@ EXPORT_SYMBOL(register_strlog);
  *  @...:	format specific arguments
  *
  *  CONTEXT: strlog() can be called from any context, however, the caller should be aware that this
- *  function is complex and should only be called from in_interrupt() or in_streams() context
- *  sparingly.
+ *  function is complex and should only be called from in_interrupt() context sparingly.
+ *
+ *  LOCKING: This function holds a read lock on strlog_reg_lock to keep de-registrations from
+ *  occurring while the function is being called for safe log driver unloading.
  */
 int
 strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)

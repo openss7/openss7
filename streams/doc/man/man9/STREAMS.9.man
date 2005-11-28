@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.31 2005/11/28 02:43:04 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.32 2005/11/28 13:20:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 02:43:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 13:20:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -122,7 +122,12 @@ was incorporated into the
 .[
 svr3
 .]
-operating system and improved in USL releases up to the
+operating system, replaced the terminal input-output subsystem, pipes and FIFOs in
+.IR "UNIX\(rg System V Release 4" ,
+.[
+svr4
+.]
+and was improved in the USL release of the
 .IR "UNIX\(rg System V Release 4.2"
 .[
 svr42
@@ -173,21 +178,29 @@ uxpspg
 and, including many 
 .IR UNIX -like
 operating systems and popular embedded RTOS, but with the notable exception of
-.I Berkely System Distribution
-releases, variants and offshoots.
+.I Berkley System Distribution
+releases, variants and offshoots, and
+.BR Linux .
 .PP
 .\"
 .SS What is STREAMS?
 .PP
 .I STREAMS
 is flexible framework for communication between a user level process and a kernel resident driver.
-It encompasses a set of kernel system calls providing a user-kernel interface that is backwards
+It encompasses a set of kernel system calls providing a user-kernel interface that is backward
 compatible with the traditional character device driver interface, as well as a set of
 .I STREAMS
 module and driver entry points forming a driver-kernel interface.
 .I STREAMS
 also provides a rich set of kernel utility functions for the development an implementations of
 kernel-resident modules and drivers.
+.I STREAMS
+prompted the specification of the
+.I DDI/DKI
+which is an architecture independent driver-kernel interface that provides a standardized set of
+kernel functions (beyond just
+.IR STREAMS )
+for the development of device and software drivers.
 .PP
 .I STREAMS
 provides a reconfigurable full-duplex communications path between a user level process and kernel
@@ -216,14 +229,14 @@ hardware (or pseudo-) device.
 Intermediate components within the Stream are call Modules.  Modules also consist of a queue pair
 for passing messages upstream and downstream, as well as a set of procedures for processing
 messages.  Modules can be pushed onto the module stack between the Stream head and Stream end using
-a set of standardized intput-output control commands.
+a set of standardized input-output control commands.
 .PP
 In support of topologies more complex that these simple linear segments,
 .I STREAMS
-also provides a specialized Stream end (driver) called a Mutliplexing Driver.  A Multiplexing driver
+also provides a specialized Stream end (driver) called a Multiplexing Driver.  A Multiplexing driver
 has the ability to open multiple Streams to its upper interface (multiplexer) as well as linking
 multiple Streams beneath its lower interface (multiplexer).  Again, a standardized set of
-intput-output control provide the user with the ability to configure a Multiplexing Driver.
+input-output control provide the user with the ability to configure a Multiplexing Driver.
 .PP
 These
 .I STREAMS
@@ -236,11 +249,284 @@ package.
 .PP
 With the ability to open multiple Streams to a driver, push and pop modules to an from the module
 stack on a Stream, and to link any Stream under a multiplexing driver\(emall under user control
-using standardized intput-output controls\(emallows
+using standardized input-output controls\(emallows
 .I STREAMS
-to configure complex toplogies to form protocol stacks.
-
+to configure complex topologies to form protocol stacks.
+.PP
+Almost all specialized standard telecommunications software developed since 1990 was developed to
+run on
+.IR STREAMS .
+This is for several reasons:
+.IP \(bu \w'\(bu\(em'u
+Since 1990,
+.I STREAMS
+and the associated
+.I DDI/DKI
+has been, and remains, the only way to incorporate OEM protocol stacks into mainstream
+.IR UNIX \(rg
+system kernels.
+.IP \(bu
+The original
+.I UNIX System Laboratories
+(later
+.IR X/Open
+then later the
+.IR OpenGroup )
+support for ITU-T developed OSI protocols, makes
+.I STREAMS
+amenable to a open model for development of ITU-T protocols.  (ITU-T, formerly CCITT, is the
+.I International Telecommunications Union \(em Telephone Sector
+responsible for international telephone standards, and original developers of the OSI model.)
+.PP
+As a result, there is a significant body of commercial software implementing telecommunications
+protocol stacks that was developed, tested, validated, conformance tested, field verified, to run on
+.IR STREAMS :
+and is still running on
+.IR STREAMS .
+.PP
+The cost of reimplementation, retesting, revalidation, redoing conformance testing, and field
+re-verification, would likely be prohibitive: after all, the point of
+.B Linux
+is reducing cost, is it not?
+.\"
 .SS Why STREAMS for Linux?
+.PP
+The
+.B Linux
+kernel was not developed with
+.I STREAMS
+in mind.  For
+.I TCP/IP
+networking,
+.B Linux
+originally followed in the footsteps of the
+.I BSD NET4
+release.  Currently, the implementation of
+.I TCP/IP
+in the
+.B Linux
+kernel has long departed from the classical
+.I BSD
+organization and exhibits characteristics unique to the
+.B GNU/Linux
+system.
+For character devices and terminal input-output,
+.B Linux
+follows closely the
+.I "SVR 3"
+.[
+svr3
+.]
+.RI pre- STREAMS
+approach to pipes, FIFOs and terminal subsystem.  The terminal subsystem implementation, too, has
+become unique to
+.BR GNU/Linux .
+.PP
+Therefore, from the perspective of
+.I TCP/IP
+networking and
+.IR "Terminal I/O" ,
+there would be little reason to provide
+.I STREAMS
+for
+.BR Linux .
+That is, if it were not for the body of software supporting OSI and Telecommunications protocols
+based solely on
+.IR STREAMS ,
+for which
+.B Linux
+has little or no support.
+.PP
+So, the answer to the question, \(lqWhy STREAMS for Linux?\(rq is: so that a
+.B GNU/Linux
+platform can enjoy the same wealth of Telecommunications and OSI protocol stacks otherwise only
+available to big-iron
+.IR UNIX \(rg.
+Without
+.IR STREAMS ,
+.B Linux
+is probably just another
+.IR BSD ,
+and probably not a very good one.
+.\"
+.SS History of STREAMS for Linux
+.PP
+In the mid-90's,
+.B GCOM, Inc.
+embarked on development on an open source implementation of
+.I STREAMS
+called
+.IR "Linux STREAMS (LiS)" ,
+likely driven by its use for porting existing OSI protocol stacks to
+.BR Linux .
+In 2000,
+.I The OpenSS7 Project
+abandonned using the
+.B Linux
+networking model for implementation of the
+.I Signalling System No. 7
+protocol (primarily due to the lack of support for the full
+.I BSD
+networking model under
+.BR Linux )
+and switched to using
+.I STREAMS
+as the basis for all future development.  The
+.B GCOM
+.I LiS
+release (2.2 at the time) was used as the
+.I STREAMS
+package.
+Over the span of the next 5 years, (and not surprisingly given the body of software),
+almost all
+.I Signalling System No. 7
+products released on
+.B Linux
+used
+.I LiS
+for
+.IR STREAMS .
+In 2005, Dave Goethe
+(the
+.I G
+in
+.BR GCOM )
+announced that he would no longer be maintaining or developing
+.I LiS
+subsequent to the 2.18.0 release, stranding many users of the package.
+.PP
+Later in 2005, after briefly maintaining two GPL'ed releases of
+.IR LiS ,
+(2.18.1 and 2.18.2),
+.I The OpenSS7 Project
+released (after two years of development) the
+.B streams-0.7a.4
+package: a re-implementation of
+.I "SVR 4.2 STREAMS"
+with compatibility modules for all major
+.IR UNIX \(rg
+releases, called
+.IR "@PACKAGE_TITLE@" .
+.I @PACKAGE_TITLE@
+was intended as a
+.I POSIX/SUSv3 XSR
+conforming, high performance, production grade, replacement for
+.IR LiS ,
+suitable for mainline
+.B Linux
+adoption, and a better foundation on which to base SIGTRAN, VoIP, ISDN and SS7 protocol stacks
+developed under
+.IR "The OpenSS7 Project" ,
+as well as a better foundation for porting commercial
+.IR UNIX \(rg
+OEM implementations to
+.BR Linux .
+It is the
+.B @PACKAGE@-@VERSION@
+package that contains the documentation that you are reading now.
+.\"
+.SS Why Fast?
+.PP
+After working with
+.I LiS
+releases for over 3 years, in late 2003,
+.I The OpenSS7 Project
+decided to begin implementation of a replacement for
+.IR LiS ,
+because of a number of shortcoming of the
+.I LiS
+releases:
+.IP a) \w'w)\(em'u
+unsuitable for mainline kernel adoption due to coding style and organization;
+.PD 0
+.IP b)
+poorly adapted to distribution production kernels;
+.IP c)
+is unsuitable for packaging and repetability;
+.IP d)
+portability objective unsuitable for mainline kernel adoption;
+.IP e)
+ports from the same baseline obfuscate the code;
+.IP f)
+performs poorly due to portability and coding style;
+.IP g)
+code bloat and oversized memory footprint;
+.IP h)
+redundant debug statements obscuring defects and obfuscating code;
+.IP i)
+overuse of sempahores;
+.IP j)
+contains serious races and not suitable for threaded applications;
+.IP k)
+does not conform to mainstream
+.IR UNIX \(rg
+implementations;
+.IP l)
+does not conform well to
+.I POSIX
+or any release of the
+.IR "Single UNIX Specification" ;
+.IP m)
+limited set of standard modules and drivers;
+.IP n)
+limited set of diagnostic and adminstrative utilities;
+.IP o)
+limited test programs;
+.IP p)
+poorly documented.
+.PD
+.PP
+The replacement, named
+.BR "@PACKAGE_TITLE@" ,
+was to correct all of these difficulties, and, by the initial
+.B streams-0.7a.4
+release, is:
+.IP a) \w'w)\(em'u
+completely Lindented and follows kernel coding practises;
+.PD 0
+.IP b)
+automatically adapts to production kernels with autoconf;
+.IP c)
+packages itself into LSB compliant RPMs and DEBs;
+.IP d)
+designed and implemented specifically for
+.BR GNU/Linux ;
+.IP e)
+no ports considered;
+.IP f)
+twice the performance;
+.IP g)
+an eigth of the memory footprint;
+.IP h)
+proper programming by assertion;
+.IP i)
+proper use of lightweight spinlocks;
+.IP j)
+race free locking strategies and synchronization;
+.IP k)
+compatible with all mainstream
+.IR UNIX \(rg
+implementations;
+.IP l)
+conforms to
+.IR "POSIX/SUSv3 XSR" ;
+.IP m)
+complete set of standard modules and drivers;
+.IP n)
+complete set of diagnostic and administrative utilities;
+.IP o)
+integrated set of conformance testsuites;
+.IP p)
+fully documented.
+.PD
+.PP
+Many specific difficulties encountered with
+.I LiS
+not repeated by
+.B @PACKAGE_TITLE@
+are contained in the
+.RI \(lq "COMPATIBILITY" \(rq
+section of most manual pages.
 .\"
 .\"
 .SH DESCRIPTION

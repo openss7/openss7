@@ -1,1 +1,279 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: bcanputany.9.man,v 0.9.2.2 2005/11/28 13:20:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/28 13:20:08 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BCANPUTANY 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B bcanputany
+\- check if message can be put to any (non-zero) band on a queue
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/stream.h>
+.HP
+\fBstreams_fastcall int bcanputany(queue_t *\fIq\fB);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the
+.BR queue (9)
+to check.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR bcanputany ()
+finds the first forward
+.BR queue (9)
+from the specified queue,
+.I q ,
+that has a
+.IR qi_srvp (9)
+service procedure defined, or which has a
+.B NULL
+.I q_next
+pointer.
+.PP
+For that queue, if the number of blocked queue bands,
+.IR q_blocked ,
+is less than the number of available queue bands,
+.IR q_nband ,
+then a message can be written to some non-zero message band.
+.PP
+When the number of blocked bands,
+.IR q_blocked ,
+is equal to the number of available bands,
+.IR q_nband ,
+and even if
+.I q_nband
+is zero, then there is no available non-zero message band that will accept messages.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR bcanputany ()
+is a variation of
+.BR bcanputnextany (9)
+that starts instead with the specified queue.
+.BR bcanputany ()
+is not used by the Stream head;
+.BR bcanputnextany (9),
+is.
+.\"
+.\"
+.SH RETURN
+.PP
+When there exists an available, non-zero band, that is not flow controlled at or forward from the
+queue,
+.IR q ,
+.BR bcanputany ()
+returns true
+.RB ( 1 );
+otherwise, it returns false
+.RB ( 0 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR bcanputany ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bcanputany ()
+can be called from any context; however, the caller is responsibility for the validity of the passed
+in queue pointer,
+.IR q .
+Also, if
+.BR bcanputany ()
+is called from outside of
+.IR STREAMS ,
+or from across a multiplex,
+.I q
+must have a
+.IR qi_srvp (9)
+service procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+This function does not take a Stream head plumbing read lock and, therefore, cannot be called from
+outside
+.I STREAMS
+for a queue,
+.IR q ,
+that has no
+.IR qi_srvp (9)
+service procedure.
+.PP
+If
+.I q
+has a
+.IR qi_srvp (9)
+service procedure, then no
+.I q_next
+pointer will be dereferenced and
+.BR bcanputany ()
+can be called from outside of
+.IR STREAMS ,
+or for a queue across a multiplexer.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR bcanputany ()
+is not a standard
+.I STREAMS
+function, but it is exported for use by the Stream head,
+.BR sth (4),
+particularly when the Stream head is built as a separate kernel module.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR queue (9),
+.IR qi_srvp (9),
+.BR bcanputnextany (9),
+.BR sth (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR bcanputany ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bcanputany ()
+is compatible with
+.IR "SVR 4.2 MP" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR bcanputany ()
+is roughly compatible with the internal operations described for
+.IR "SVR 4 STREAMS"
+in
+.RI \(lq "The Magic Garden Explained" \(rq.
+.[
+magic
+.]
+.IP ""
+.BR bcanputany ()
+is an internal function that will not be called by portable
+.I STREAMS
+modules or drivers.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR bcanputany ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

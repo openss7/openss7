@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.20 2005/11/26 11:17:13 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.21 2005/11/28 13:20:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 13:20:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,12 +85,12 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-.BI "void qprocsoff(queue_t *" rq );
+.BI "void qprocsoff(queue_t *" qp );
 .\"
 .\"
 .SH ARGUMENTS
 .TP
-.I rq
+.I qp
 the read queue pointer of the queue pair for which to turn queue procedures
 off.
 .\"
@@ -103,14 +103,14 @@ disables invocation of
 and
 .IR qi_srvp (9)
 procedures for the queue pair whose read queue pointer is pointed to by
-.IR rq .
+.IR qp .
 .PP
 If there are existing threads other than the calling thread executing
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
-procedures for the queue,
-.IR q ,
+procedures for either queue in the the queue pair,
+.IR qp ,
 then
 .BR qprocsoff ()
 will block until these threads exit before returning.
@@ -205,9 +205,9 @@ the caller must not directly or indirectly invoke any queue entry points.  This 
 all queue utility functions and other
 .I STREAMS
 utility functions that take
-.I q
+.I qp
 or
-.BI WR( q )
+.BI WR( qp )
 as an argument.
 .PP
 See also

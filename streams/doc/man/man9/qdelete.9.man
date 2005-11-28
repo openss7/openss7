@@ -1,1 +1,268 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: qdelete.9.man,v 0.9.2.2 2005/11/28 13:20:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/28 13:20:08 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QDELETE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qdelete
+\- delete a queue pair from a Stream
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/stream.h>
+.HP
+.BI "void qdelete(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue pair to delete.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qdelete ()
+half-deletes the queue pair identified by
+.I q
+from the Stream to which it belongs.  The
+.I q->q_next
+pointers of the queue pair to be deleted,
+.IR q ,
+are adjusted, but the Stream remains unaffected.
+.BR qprocsoff (9)
+must be called before calling
+.BR qdelete ()
+to properly remove the queue pair from the Stream.
+.BR qprocsoff (9)
+is responsible for adjusting the
+.I q_next
+pointer of the Stream head write queue and the read queue at the top of the module stack or driver
+to bypass the module.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR qdelete()
+should only be called from the
+.BR qattach (9)
+or
+.BR qdetach (9)
+procedure or a Stream head
+.BR stropen (9)
+open or
+.BR strclose (9)
+close procedure.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR qdelete ()
+returns void.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR qdelete ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qdelete()
+must only be called at process context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qdelete()
+should only be called from the
+.BR qattach (9)
+or
+.BR qdetach (9)
+procedure or a Stream head
+.BR stropen (9)
+open or
+.BR strclose (9)
+close procedure.
+.PP
+.BR qdelete ()
+takes a plumbing write lock on the Stream head before nulling the
+.I q_next
+pointers of the queue pair.
+.\"
+.\"
+.SH NOTICES
+.PP
+The queue pair,
+.IR q ,
+should have been already removed from data flow in the Stream with
+.BR qprocsoff (9)
+(but checks again anyway).
+.PP
+.I q
+must be a valid pointer or bad things will happen.
+.PP
+.BR qdelete ()
+is an internal
+.I STREAMS
+function which was not intended to be called by
+the
+.I STREAMS
+module or driver writer.
+.BR qdelete ()
+is not part of the DDI/DKI and should not be called by portable programs.
+.BR qdelete ()
+is highly implementation dependent in function and prototype.  Use of this
+function by a driver or module will guarantee that it is not portable even between
+releases of
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The functions does not do gets and puts on the Stream head when adding or removing queue pairs from
+the Stream because the Stream head reference count falling to zero is used to deallocate thte Stream
+head queue pair.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qdelete ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR qdelete ()
+is compatible with descriptions of
+.I STREAMS
+internals for
+.IR "SVR 4" ,
+.[
+magic
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR qdelete ()
+is roughly compatible with the internal operations described for
+.IR "SVR 4 STREAMS"
+in
+.RI \(lq "The Magic Garden Explained" \(rq.
+.[
+magic
+.]
+.IP ""
+.BR qdelete ()
+is an internal function that will not be called by portable
+.I STREAMS
+modules or drivers.
+.IP \(em
+.I SVR 4.2 MP
+and systems based on
+.I SVR 4
+do not export this function.
+.IP \(em
+Source and Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qdelete ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/11/28 02:43:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/11/28 13:20:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/28 02:43:00 $ by $Author: brian $
+# Last Modified $Date: 2005/11/28 13:20:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -714,7 +714,6 @@ if PKG_BUILD_INDEP
 ##	man9/putnextctl1.9 \
 ##	man9/putnextctl2.9 \
 ##	man9/strlog.9 \
-##	man9/vstrlog.9
 ##
 ##mac_compat_pages = \
 ##	man9/maccompat.9 \
@@ -1060,17 +1059,6 @@ man_MANS = \
 	man9/M_UNHANGUP.9 \
 	man9/QNORM.9 \
 	man9/QPCTL.9 \
-	man9/__bufcall.9 \
-	man9/__cdev_lookup.9 \
-	man9/__cdev_search.9 \
-	man9/__cdrv_lookup.9 \
-	man9/__cmaj_lookup.9 \
-	man9/__cmin_lookup.9 \
-	man9/__cmin_search.9 \
-	man9/__fmod_lookup.9 \
-	man9/__fmod_search.9 \
-	man9/__smod_search.9 \
-	man9/__timeout.9 \
 	man9/adjmsg.9 \
 	man9/allocb.9 \
 	man9/alloclk.9 \
@@ -1239,13 +1227,6 @@ man_MANS = \
 	man9/qi_qopen.9 \
 	man9/qi_srvp.9 \
 	man9/put.9s \
-	man9/admin.9s \
-	man9/close.9s \
-	man9/open.9s \
-	man9/service.9s \
-	man9/srv.9s \
-	man9/putp.9 \
-	man9/srvp.9 \
 	man9/qinit.9 \
 	man9/qinsert.9 \
 	man9/qopen.9 \
@@ -1264,6 +1245,7 @@ man_MANS = \
 	man9/register_strdrv.9 \
 	man9/register_strmod.9 \
 	man9/register_strnod.9 \
+	man9/register_strlog.9 \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/runqueues.9 \
@@ -1320,7 +1302,6 @@ man_MANS = \
 	man9/untimeout.9 \
 	man9/unweldq.9 \
 	man9/vcmn_err.9 \
-	man9/vstrlog.9 \
 	man9/vstrlog_t.9 \
 	man9/weld_arg_t.9 \
 	man9/weld_fcn_t.9 \
@@ -1996,7 +1977,6 @@ man_MANS = \
 ##	man9/putnextctl1.9.man \
 ##	man9/putnextctl2.9.man \
 ##	man9/strlog.9.man \
-##	man9/vstrlog.9.man
 ##
 ##dist_noinst_mac_compat_pages = \
 ##	man9/maccompat.9.man \
@@ -2335,17 +2315,6 @@ dist_noinst_MANS = \
 	man9/M_UNHANGUP.9.man \
 	man9/QNORM.9.man \
 	man9/QPCTL.9.man \
-	man9/__bufcall.9.man \
-	man9/__cdev_lookup.9.man \
-	man9/__cdev_search.9.man \
-	man9/__cdrv_lookup.9.man \
-	man9/__cmaj_lookup.9.man \
-	man9/__cmin_lookup.9.man \
-	man9/__cmin_search.9.man \
-	man9/__fmod_lookup.9.man \
-	man9/__fmod_search.9.man \
-	man9/__smod_search.9.man \
-	man9/__timeout.9.man \
 	man9/adjmsg.9.man \
 	man9/allocb.9.man \
 	man9/alloclk.9.man \
@@ -2515,13 +2484,6 @@ dist_noinst_MANS = \
 	man9/qi_qopen.9.man \
 	man9/qi_srvp.9.man \
 	man9/put.9s.man \
-	man9/admin.9s.man \
-	man9/close.9s.man \
-	man9/open.9s.man \
-	man9/service.9s.man \
-	man9/srv.9s.man \
-	man9/srvp.9.man \
-	man9/putp.9.man \
 	man9/qinit.9.man \
 	man9/qinsert.9.man \
 	man9/qopen.9.man \
@@ -2540,6 +2502,7 @@ dist_noinst_MANS = \
 	man9/register_strdrv.9.man \
 	man9/register_strmod.9.man \
 	man9/register_strnod.9.man \
+	man9/register_strlog.9.man \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/runqueues.9.man \
@@ -2596,7 +2559,6 @@ dist_noinst_MANS = \
 	man9/untimeout.9.man \
 	man9/unweldq.9.man \
 	man9/vcmn_err.9.man \
-	man9/vstrlog.9.man \
 	man9/vstrlog_t.9.man \
 	man9/weld_arg_t.9.man \
 	man9/weld_fcn_t.9.man \

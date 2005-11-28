@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.15 2005/11/26 11:17:07 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.16 2005/11/28 13:20:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 13:20:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B spg
+.B SPG
 \- \fBLinux Fast-STREAMS\fP Programmers Guide
 .\"
 .\"
@@ -94,12 +94,1168 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .\"
 .\"
-.SH ARGUMENTS
+.SH OVERVIEW
 .PP
+.I STREAMS
+is a system call interface and kernel facility for the development of configurable and reusable
+modules and drivers supporting service interfaces and organized into protocol stacks.  It supports a
+wide array of service interfaces, from character terminals to application layer networking protocols.
+.PP
+This manual page provides a roadmap to the manual pages describing specific user and kernel level
+facilities.  For a 10,000 foot overview of
+.IR STREAMS ,
+see the
+.BR STREAMS (9)
+manual page.
+.PP
+This manual page discusses
+.I STREAMS
+concepts and facilities.
+.PP
+.I STREAMS
+concepts include framework definitions, components, configuration, service interfaces, messages,
+message passing, message processing, flow control, modules, drivers, multiplexing, diagnosis, and
+administration.
+.PP
+.I STREAMS
+facilities include: user-level facilities, kernel-resident facilities, and adminstrative facilities.
+.\"
+.SS User Level Facilities
+User-level facilities include system calls and input-output controls
+available to user level programs when communicating with
+.I STREAMS
+device and pseudo-device drivers.
+.\"
+.SS Kernel Resident Facilities
+Kernel-resident facilities include the data structures and
+.I STREAMS
+utility functions that are used to implement
+.I STREAMS
+modules and drivers within the
+.I STREAMS
+kernel framework.
+.\"
+.SS Administrative Facilities
+Administrative facilities are system level utilities for use by system adminstrators that assist in the
+configuration,
+monitoring, diagnosis and tuning of the
+.I STREAMS
+subsystem.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.\"
+.SS "System Calls"
+.PP
+.IP \fBclose\fR(2) \w'\fBisastream\fR(2)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfattach\fR(3)
+\(en\ 
+.IP \fBfdetach\fR(3)
+\(en\ 
+.IP \fBgetmsg\fR(2)
+\(en\ get next message from a \fISTREAMS\fR character device
+.IP \fBgetpmsg\fR(2)
+\(en\ get next message from a \fISTREAMS\fR character device
+.IP \fBioctl\fR(2)
+\(en\ 
+.IP \fBisastream\fR(2)
+\(en\ 
+.IP \fBopen\fR(2)
+\(en\ 
+.IP \fBpipe\fR(2)
+\(en\ 
+.IP \fBpoll\fR(2)
+\(en\ wait for some event on a \fISTREAMS\fR character device
+.IP \fBputmsg\fR(2)
+\(en\ put a message to a \fISTREAMS\fR character device
+.IP \fBputpmsg\fR(2)
+\(en\ put a message to a \fISTREAMS\fR character device
+.IP \fBread\fR(2)
+\(en\ 
+.IP \fBreadv\fR(2)
+\(en\ 
+.IP \fBstreamio\fR(7)
+\(en\ 
+.IP \fBtermios\fR(7)
+\(en\ 
+.IP \fBwrite\fR(2)
+\(en\ 
+.IP \fBwritev\fR(2)
+\(en\ 
+.PD
+
+.IP \fBfattach\fR(2)
+\(en\ 
+.PD 0
+.IP \fBfcntl\fR(2)
+\(en\ 
+.IP \fBfcntl\fR(2s)
+\(en\ 
+.IP \fBgetmsg\fR(2)
+\(en\ 
+.IP \fBgetpmsg\fR(2s)
+\(en\ 
+.IP \fBioctl\fR(2s)
+\(en\ 
+.IP \fBpipe\fR(2)
+\(en\ 
+.IP \fBpipe\fR(2s)
+\(en\ 
+.IP \fBpoll\fR(2)
+\(en\ 
+.IP \fBpoll\fR(2s)
+\(en\ 
+.IP \fBputmsg\fR(2)
+\(en\ 
+.IP \fBputpmsg\fR(2s)
+\(en\ 
+.IP \fBread\fR(2)
+\(en\ 
+.IP \fBread\fR(2s)
+\(en\ 
+.IP \fBreadv\fR(2)
+\(en\ 
+.IP \fBreadv\fR(2s)
+\(en\ 
+.IP \fBsoon\fR(2)
+\(en\ 
+.IP \fBwrite\fR(2)
+\(en\ 
+.IP \fBwrite\fR(2s)
+\(en\ 
+.IP \fBwritev\fR(2)
+\(en\ 
+.IP \fBwritev\fR(2s)
+\(en\ 
+.PD
+
+.PP
+.B SYSTEM CALLS
+.PP
+.IP \fBfattach\fR(2) \w'\fBgetpmsg\fR(2s)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfcntl\fR(2s)
+\(en\ 
+.IP \fBgetmsg\fR(2)
+\(en\ 
+.IP \fBgetpmsg\fR(2s)
+\(en\ 
+.IP \fBpipe\fR(2s)
+\(en\ 
+.IP \fBpoll\fR(2s)
+\(en\ 
+.IP \fBputmsg\fR(2)
+\(en\ 
+.IP \fBputpmsg\fR(2s)
+\(en\ 
+.IP \fBread\fR(2s)
+\(en\ 
+.IP \fBreadv\fR(2s)
+\(en\ 
+.IP \fBwrite\fR(2s)
+\(en\ 
+.IP \fBwritev\fR(2s)
+\(en\ 
+.PD
+
+.PP
+.B LIBRARY CALLS
+.PP
+.IP \fBfattach\fR(3) \w'\fBlibstreams\fR(3)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfdetach\fR(3)
+\(en\ 
+.IP \fBisastream\fR(3)
+\(en\ 
+.IP \fBlibstreams\fR(3)
+\(en\ 
+.IP \fBpipe\fR(3)
+\(en\ 
+.IP \fBs_pipe\fR(3)
+\(en\ 
+.PD
+
+.PP
+.B MODULES
+.PP
+.IP \fBbufmod\fR(4) \w'\fBtestmod\fR(4)\(en'u
+\(en\ 
+.PD 0
+.IP \fBconnld\fR(4)
+\(en\ 
+.IP \fBnullmod\fR(4)
+\(en\ 
+.IP \fBpipemod\fR(4)
+\(en\ 
+.IP \fBsc\fR(4)
+\(en\ 
+.IP \fBsth\fR(4)
+\(en\ 
+.IP \fBtestmod\fR(4)
+\(en\ 
+.PD
+
+.PP
+.B DRIVERS
+.PP
+.IP \fBclone\fR(4) \w'\fBloop_clone\fR(4)\(en'u
+\(en\ 
+.PD 0
+.IP \fBconslog\fR(4)
+\(en\ 
+.IP \fBecho\fR(4)
+\(en\ 
+.IP \fBfifo\fR(4s)
+\(en\ 
+.IP \fBlog\fR(4)
+\(en\ 
+.IP \fBloop\fR(4)
+\(en\ 
+.IP \fBloop_clone\fR(4)
+\(en\ 
+.IP \fBmux\fR(4)
+\(en\ 
+.IP \fBnsdev\fR(4)
+\(en\ 
+.IP \fBnuls\fR(4)
+\(en\ 
+.IP \fBpipe\fR(4)
+\(en\ 
+.IP \fBsad\fR(4)
+\(en\ 
+.IP \fBs_fifo\fR(4)
+\(en\ 
+.IP \fBsfx\fR(4)
+\(en\ 
+.IP \fBsloop\fR(4)
+\(en\ 
+.IP \fBspx\fR(4)
+\(en\ 
+.IP \fBstrlog\fR(4)
+\(en\ 
+.PD
+
+.PP
+.B INPUT-OUTPUT CONTROLS
+.PP
+
+.IP \fBstreamio\fR(7) \w'\fBI_GETCLTIME\fR(7)\(en'u
+\(en\ 
+
+.IP \fBI_ANCHOR\fR(7) \w'\fBI_GETCLTIME\fR(7)\(en'u
+\(en\ 
+.PD 0
+.IP \fBI_ATMARK\fR(7)
+\(en\ 
+.IP \fBI_CANPUT\fR(7)
+\(en\ 
+.IP \fBI_CKBAND\fR(7)
+\(en\ 
+.IP \fBI_FATTACH\fR(7)
+\(en\ 
+.IP \fBI_FDETACH\fR(7)
+\(en\ 
+.IP \fBI_FDINSERT\fR(7)
+\(en\ 
+.IP \fBI_FIND\fR(7)
+\(en\ 
+.IP \fBI_FLUSH\fR(7)
+\(en\ 
+.IP \fBI_FLUSHBAND\fR(7)
+\(en\ 
+.IP \fBI_GERROPT\fR(7)
+\(en\ 
+.IP \fBI_GETBAND\fR(7)
+\(en\ 
+.IP \fBI_GETCLTIME\fR(7)
+\(en\ 
+.IP \fBI_GETPMSG\fR(7)
+\(en\ 
+.IP \fBI_GETSIG\fR(7)
+\(en\ 
+.IP \fBI_GRDOPT\fR(7)
+\(en\ 
+.IP \fBI_GWROPT\fR(7)
+\(en\ 
+.IP \fBI_LINK\fR(7)
+\(en\ 
+.IP \fBI_LIST\fR(7)
+\(en\ 
+.IP \fBI_LOOK\fR(7)
+\(en\ 
+.IP \fBI_NREAD\fR(7)
+\(en\ 
+.IP \fBI_PEEK\fR(7)
+\(en\ 
+.IP \fBI_PIPE\fR(7)
+\(en\ 
+.IP \fBI_PLINK\fR(7)
+\(en\ 
+.IP \fBI_POP\fR(7)
+\(en\ 
+.IP \fBI_PUNLINK\fR(7)
+\(en\ 
+.IP \fBI_PUSH\fR(7)
+\(en\ 
+.IP \fBI_PUTPMSG\fR(7)
+\(en\ 
+.IP \fBI_RECVFD\fR(7)
+\(en\ 
+.IP \fBI_SENDFD\fR(7)
+\(en\ 
+.IP \fBI_SERROPT\fR(7)
+\(en\ 
+.IP \fBI_SETCLTIME\fR(7)
+\(en\ 
+.IP \fBI_SETSIG\fR(7)
+\(en\ 
+.IP \fBI_SRDOPT\fR(7)
+\(en\ 
+.IP \fBI_STR\fR(7)
+\(en\ 
+.IP \fBI_SWROPT\fR(7)
+\(en\ 
+.IP \fBI_UNLINK\fR(7)
+\(en\ 
+.IP \fBstrioctl\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B ADMINISTRATIVE UTILITIES
+.PP
+.IP \fBstrchg\fR(1) \w'\fBstreams_mknod\fR(8)\(en'u
+\(en\ 
+.PD 0
+.IP \fBstrconf\fR(1)
+\(en\ 
+.IP \fBstrreset\fR(1)
+\(en\ 
+.IP \fBautopush\fR(5)
+\(en\ 
+.IP \fBspecfs\fR(5)
+\(en\ 
+.IP \fBstrsetup.conf\fR(5)
+\(en\ 
+.IP \fBautopush\fR(8)
+\(en\ 
+.IP \fBfattach\fR(8)
+\(en\ 
+.IP \fBfdetach\fR(8)
+\(en\ 
+.IP \fBinsf\fR(8)
+\(en\ 
+.IP \fBperftest\fR(8)
+\(en\ 
+.IP \fBperftestn\fR(8)
+\(en\ 
+.IP \fBscls\fR(8)
+\(en\ 
+.IP \fBstrace\fR(8)
+\(en\ 
+.IP \fBstrclean\fR(8)
+\(en\ 
+.IP \fBstreams_mknod\fR(8)
+\(en\ 
+.IP \fBstrerr\fR(8)
+\(en\ 
+.IP \fBstrinfo\fR(8)
+\(en\ 
+.IP \fBstrload\fR(8)
+\(en\ 
+.IP \fBstrsetup\fR(8)
+\(en\ 
+.IP \fBstrvf\fR(8)
+\(en\ 
+.PD
+
+.PP
+.B TEST PROGRAMS
+.PP
+.IP \fBtest-clone\fR(8) \w'\fBtest-streams\fR(8)\(en'u
+\(en\ 
+.PD 0
+.IP \fBtest-connld\fR(8)
+\(en\ 
+.IP \fBtest-echo\fR(8)
+\(en\ 
+.IP \fBtest-fifo\fR(8)
+\(en\ 
+.IP \fBtest-log\fR(8)
+\(en\ 
+.IP \fBtest-loop\fR(8)
+\(en\ 
+.IP \fBtest-mux\fR(8)
+\(en\ 
+.IP \fBtest-nsdev\fR(8)
+\(en\ 
+.IP \fBtest-nuls\fR(8)
+\(en\ 
+.IP \fBtest-pipe\fR(8)
+\(en\ 
+.IP \fBtest-pipemod\fR(8)
+\(en\ 
+.IP \fBtest-sad\fR(8)
+\(en\ 
+.IP \fBtest-sc\fR(8)
+\(en\ 
+.IP \fBtest-streams\fR(8)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE UTILITIES
+.PP
+.IP \fBadjmsg\fR(9) \w'\fBmsgpullup\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBallocb\fR(9)
+\(en\ 
+.IP \fB__bufcall\fR(9)
+\(en\ 
+.IP \fBbufcall\fR(9)
+\(en\ 
+.IP \fBcopyb\fR(9)
+\(en\ 
+.IP \fBcopymsg\fR(9)
+\(en\ 
+.IP \fBctlmsg\fR(9)
+\(en\ 
+.IP \fBdatamsg\fR(9)
+\(en\ 
+.IP \fBdupb\fR(9)
+\(en\ 
+.IP \fBdupmsg\fR(9)
+\(en\ 
+.IP \fBesballoc\fR(9)
+\(en\ 
+.IP \fBesbbcall\fR(9)
+\(en\ 
+.IP \fBfreeb\fR(9)
+\(en\ 
+.IP \fBfreemsg\fR(9)
+\(en\ 
+.IP \fBisdatablk\fR(9)
+\(en\ 
+.IP \fBisdatamsg\fR(9)
+\(en\ 
+.IP \fBlinkb\fR(9)
+\(en\ 
+.IP \fBlinkmsg\fR(9)
+\(en\ 
+.IP \fBmsgdsize\fR(9)
+\(en\ 
+.IP \fBmsgpullup\fR(9)
+\(en\ 
+.IP \fBmsgsize\fR(9)
+\(en\ 
+.IP \fBpcmsg\fR(9)
+\(en\ 
+.IP \fBpullupmsg\fR(9)
+\(en\ 
+.IP \fBrmvb\fR(9)
+\(en\ 
+.IP \fBtestb\fR(9)
+\(en\ 
+.IP \fBunbufcall\fR(9)
+\(en\ 
+.IP \fBunlinkb\fR(9)
+\(en\ 
+.IP \fBunlinkmsg\fR(9)
+\(en\ 
+.IP \fBxmsgsize\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE CONVENIENCE FUNCTIONS
+.PP
+.IP \fBputctl\fR(9) \w'\fBputnextctl2\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBputctl1\fR(9)
+\(en\ 
+.IP \fBputctl2\fR(9)
+\(en\ 
+.IP \fBputnextctl\fR(9)
+\(en\ 
+.IP \fBputnextctl1\fR(9)
+\(en\ 
+.IP \fBputnextctl2\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE TYPES
+.PP
+.IP \fBQNORM\fR(9) \w'\fBM_PCSETOPTS\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBQPCTL\fR(9)
+\(en\ 
+.IP \fBM_BACKDONE\fR(9)
+\(en\ 
+.IP \fBM_BACKWASH\fR(9)
+\(en\ 
+.IP \fBM_BREAK\fR(9)
+\(en\ 
+.IP \fBM_COPYIN\fR(9)
+\(en\ 
+.IP \fBM_COPYOUT\fR(9)
+\(en\ 
+.IP \fBM_CTL\fR(9)
+\(en\ 
+.IP \fBM_DATA\fR(9)
+\(en\ 
+.IP \fBM_DELAY\fR(9)
+\(en\ 
+.IP \fBM_DONTPLAY\fR(9)
+\(en\ 
+.IP \fBM_ERROR\fR(9)
+\(en\ 
+.IP \fBM_EVENT\fR(9)
+\(en\ 
+.IP \fBM_FLUSH\fR(9)
+\(en\ 
+.IP \fBM_HANGUP\fR(9)
+\(en\ 
+.IP \fBM_HPDATA\fR(9)
+\(en\ 
+.IP \fBM_IOCACK\fR(9)
+\(en\ 
+.IP \fBM_IOCDATA\fR(9)
+\(en\ 
+.IP \fBM_IOCNAK\fR(9)
+\(en\ 
+.IP \fBM_IOCTL\fR(9)
+\(en\ 
+.IP \fBM_LETSPLAY\fR(9)
+\(en\ 
+.IP \fBM_NOTIFY\fR(9)
+\(en\ 
+.IP \fBM_PASSFP\fR(9)
+\(en\ 
+.IP \fBM_PCCTL\fR(9)
+\(en\ 
+.IP \fBM_PCEVENT\fR(9)
+\(en\ 
+.IP \fBM_PCPROTO\fR(9)
+\(en\ 
+.IP \fBM_PCRSE\fR(9)
+\(en\ 
+.IP \fBM_PCSETOPTS\fR(9)
+\(en\ 
+.IP \fBM_PCSIG\fR(9)
+\(en\ 
+.IP \fBM_PROTO\fR(9)
+\(en\ 
+.IP \fBM_READ\fR(9)
+\(en\ 
+.IP \fBM_RSE\fR(9)
+\(en\ 
+.IP \fBM_SETOPTS\fR(9)
+\(en\ 
+.IP \fBM_SIG\fR(9)
+\(en\ 
+.IP \fBM_START\fR(9)
+\(en\ 
+.IP \fBM_STARTI\fR(9)
+\(en\ 
+.IP \fBM_STOP\fR(9)
+\(en\ 
+.IP \fBM_STOPI\fR(9)
+\(en\ 
+.IP \fBM_TRAIL\fR(9)
+\(en\ 
+.IP \fBM_UNHANGUP\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE STRUCTURES AND TYPES
+.PP
+.IP \fBdatab\fR(9) \w'\fBbufcall_id_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBmsgb\fR(9)
+\(en\ 
+.IP \fBalloclk\fR(9)
+\(en\ allocate a link block
+.IP \fBfreelk\fR(9)
+\(en\ free a link block
+.IP \fBcopyreq\fR(9)
+\(en\ \fBM_COPYIN\fR(9), \fBM_COPYOUT\fR(9) copy request structure
+.IP \fBcopyresp\fR(9)
+\(en\ \fBM_IOCDATA\fR(9) copy response structure
+.IP \fBiocblk\fR(9)
+\(en\ \fBM_IOCTL\fR(9), \fBM_IOCACK\fR(9), \fBM_IOCNAK\fR(9) ioctl structure
+.IP \fBlinkblk\fR(9)
+\(en\ \fBI_LINK\fR(7), \fBI_UNLINK\fR(7), \fBI_PLINK\fR(7), \fBI_PUNLINK\fR(7) structure
+.IP \fBstroptions\fR(9)
+\(en\ \fBM_SETOPTS\fR(9), \fBM_PCSETOPTS\fR(9) Stream head options structure
+.IP \fBbcid_t\fR(9)
+\(en\ 
+.IP \fBbufcall_id_t\fR(9)
+\(en\ 
+.IP \fBdblk_t\fR(9)
+\(en\ 
+.IP \fBfrtn_t\fR(9)
+\(en\ 
+.IP \fBmblk_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MODULE AND DRIVER ENTRY POINTS
+.PP
+.IP \fBsetq\fR(9) \w'\fBqi_qclose\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBsetsq\fR(9)
+\(en\ 
+.IP \fBqi_putp\fR(9)
+\(en\ 
+.IP \fBqi_qadmin\fR(9)
+\(en\ 
+.IP \fBqi_qclose\fR(9)
+\(en\ 
+.IP \fBqi_qopen\fR(9)
+\(en\ 
+.IP \fBqi_srvp\fR(9)
+\(en\ 
+.IP \fBqprocsoff\fR(9)
+\(en\ 
+.IP \fBqprocson\fR(9)
+\(en\ 
+.IP \fBadmin\fR(9s)
+\(en\ 
+.IP \fBopen\fR(9s)
+\(en\ 
+.IP \fBclose\fR(9s)
+\(en\ 
+.IP \fBputp\fR(9)
+\(en\ 
+.IP \fBservice\fR(9s)
+\(en\ 
+.IP \fBsrv\fR(9s)
+\(en\ 
+.IP \fBsrvp\fR(9)
+\(en\ 
+.IP \fBgetadmin\fR(9)
+\(en\ 
+.IP \fBgetmid\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B QUEUE STRUCTURES AND TYPES
+.PP
+.IP \fBqband\fR(9) \w'\fBqi_qclose_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBqfields\fR(9)
+\(en\ 
+.IP \fBqueue\fR(9)
+\(en\ 
+.IP \fBqi_putp_t\fR(9)
+\(en\ 
+.IP \fBqi_qadmin_t\fR(9)
+\(en\ 
+.IP \fBqi_qclose_t\fR(9)
+\(en\ 
+.IP \fBqi_qopen_t\fR(9)
+\(en\ 
+.IP \fBqi_srvp_t\fR(9)
+\(en\ 
+.IP \fBqband_t\fR(9)
+\(en\ 
+.IP \fBqfields_t\fR(9)
+\(en\ 
+.IP \fBqueue_t\fR(9)
+\(en\ 
+.IP \fBweld_arg_t\fR(9)
+\(en\ 
+.IP \fBweld_fcn_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B QUEUE UTILITIES
+.PP
+.IP \fBallocq\fR(9) \w'\fBqcountstrm\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBappq\fR(9)
+\(en\ 
+.IP \fBbackq\fR(9)
+\(en\ 
+.IP \fBflushband\fR(9)
+\(en\ 
+.IP \fBflushq\fR(9)
+\(en\ 
+.IP \fBfreeq\fR(9)
+\(en\ 
+.IP \fBgetq\fR(9)
+\(en\ 
+.IP \fBinsq\fR(9)
+\(en\ 
+.IP \fBOTHERQ\fR(9)
+\(en\ 
+.IP \fBput\fR(9)
+\(en\ 
+.IP \fBput\fR(9s)
+\(en\ 
+.IP \fBputbq\fR(9)
+\(en\ 
+.IP \fBputnext\fR(9)
+\(en\ 
+.IP \fBputq\fR(9)
+\(en\ 
+.IP \fBqcountstrm\fR(9)
+\(en\ 
+.IP \fBqreply\fR(9)
+\(en\ 
+.IP \fBqsize\fR(9)
+\(en\ 
+.IP \fBRD\fR(9)
+\(en\ 
+.IP \fBrmvq\fR(9)
+\(en\ 
+.IP \fBSAMESTR\fR(9)
+\(en\ 
+.IP \fBstrqget\fR(9)
+\(en\ 
+.IP \fBstrqset\fR(9)
+\(en\ 
+.IP \fBunweldq\fR(9)
+\(en\ 
+.IP \fBweldq\fR(9)
+\(en\ 
+.IP \fBWR\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B FLOW CONTROL UTILITIES
+.PP
+.IP \fBbcanget\fR(9) \w'\fBbcanputnextany\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBbcangetany\fR(9)
+\(en\ 
+.IP \fBbcanput\fR(9)
+\(en\ 
+.IP \fBbcanputany\fR(9)
+\(en\ 
+.IP \fBbcanputnext\fR(9)
+\(en\ 
+.IP \fBbcanputnextany\fR(9)
+\(en\ 
+.IP \fBcanenable\fR(9)
+\(en\ 
+.IP \fBcanget\fR(9)
+\(en\ 
+.IP \fBcanput\fR(9)
+\(en\ 
+.IP \fBcanputnext\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B SCHEDULING UTILITIES
+.PP
+.IP \fBenableok\fR(9) \w'\fBqbackenable\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBenableq\fR(9)
+\(en\ 
+.IP \fBnoenable\fR(9)
+\(en\ 
+.IP \fBqbackenable\fR(9)
+\(en\ 
+.IP \fBqenable\fR(9)
+\(en\ 
+.IP \fBqready\fR(9)
+\(en\ 
+.IP \fBrunqueues\fR(9)
+\(en\ 
+.IP \fBsetqsched\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B DDI/DKI STRUCTURES AND TYPES
+.PP
+
+.IP \fBcred_t\fR(9) \w'\fBtimeout_id_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBdev_t\fR(9)
+\(en\ 
+.IP \fBmajor_t\fR(9)
+\(en\ 
+.IP \fBminor_t\fR(9)
+\(en\ 
+.IP \fBtimeout_id_t\fR(9)
+\(en\ 
+.IP \fBtimo_fcn_t\fR(9)
+\(en\ 
+.IP \fBtoid_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B DDI/DKI UTILITIES
+.PP
+
+.IP \fBDDI\fR(9) \w'\fBkmem_zalloc_node\fR(9)\(en'u
+\(en\ 
+
+.IP \fBbcmp\fR(9) \w'\fBkmem_zalloc_node\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBbcopy\fR(9)
+\(en\ 
+.IP \fBbzero\fR(9)
+\(en\ 
+.IP \fBcmn_err\fR(9)
+\(en\ 
+.IP \fBcopyin\fR(9)
+\(en\ 
+.IP \fBcopyout\fR(9)
+\(en\ 
+.IP \fBdelay\fR(9)
+\(en\ 
+.IP \fBdrv_getparm\fR(9)
+\(en\ 
+.IP \fBdrv_hztomsec\fR(9)
+\(en\ 
+.IP \fBdrv_hztousec\fR(9)
+\(en\ 
+.IP \fBdrv_msectohz\fR(9)
+\(en\ 
+.IP \fBdrv_priv\fR(9)
+\(en\ 
+.IP \fBdrv_usectohz\fR(9)
+\(en\ 
+.IP \fBdrv_usecwait\fR(9)
+\(en\ 
+.IP \fBgetmajor\fR(9)
+\(en\ 
+.IP \fBgetminor\fR(9)
+\(en\ 
+.IP \fBkmem_alloc\fR(9)
+\(en\ 
+.IP \fBkmem_alloc_node\fR(9)
+\(en\ 
+.IP \fBkmem_free\fR(9)
+\(en\ 
+.IP \fBkmem_zalloc\fR(9)
+\(en\ 
+.IP \fBkmem_zalloc_node\fR(9)
+\(en\ 
+.IP \fBmakedevice\fR(9)
+\(en\ 
+.IP \fBmax\fR(9)
+\(en\ 
+.IP \fBmin\fR(9)
+\(en\ 
+.IP \fB__timeout\fR(9)
+\(en\ 
+.IP \fBtimeout\fR(9)
+\(en\ 
+.IP \fBuntimeout\fR(9)
+\(en\ 
+.IP \fBvcmn_err\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B CONFIGURATION STRUCTURES AND TYPES
+.PP
+.IP \fBcdevsw\fR(9) \w'\fBmodule_stat_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBdevnode\fR(9)
+\(en\ 
+.IP \fBfmodsw\fR(9)
+\(en\ 
+.IP \fBmodule_info\fR(9)
+\(en\ 
+.IP \fBmodule_stat\fR(9)
+\(en\ 
+.IP \fBqinit\fR(9)
+\(en\ 
+.IP \fBstreamtab\fR(9)
+\(en\ 
+.IP \fBmodID_t\fR(9)
+\(en\ 
+.IP \fBmodule_stat_t\fR(9)
+\(en\ 
+.IP \fBstreamtab_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B CONFIGURATION UTILITIES
+.PP
+.IP \fBcdev_count\fR(9) \w'\fB__cmin_search\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBcdev_find\fR(9)
+\(en\ 
+.IP \fB__cdev_lookup\fR(9)
+\(en\ 
+.IP \fBcdev_match\fR(9)
+\(en\ 
+.IP \fBcdev_minor\fR(9)
+\(en\ 
+.IP \fB__cdev_search\fR(9)
+\(en\ 
+.IP \fBcdev_str\fR(9)
+\(en\ 
+.IP \fBcdevsw_list\fR(9)
+\(en\ 
+.IP \fBcdevsw_lock\fR(9)
+\(en\ 
+.IP \fBcdrv_get\fR(9)
+\(en\ 
+.IP \fB__cdrv_lookup\fR(9)
+\(en\ 
+.IP \fBcdrv_put\fR(9)
+\(en\ 
+.IP \fBcmaj_add\fR(9)
+\(en\ 
+.IP \fBcmaj_del\fR(9)
+\(en\ 
+.IP \fBcmaj_get\fR(9)
+\(en\ 
+.IP \fB__cmaj_lookup\fR(9)
+\(en\ 
+.IP \fBcmin_add\fR(9)
+\(en\ 
+.IP \fBcmin_count\fR(9)
+\(en\ 
+.IP \fBcmin_del\fR(9)
+\(en\ 
+.IP \fBcmin_find\fR(9)
+\(en\ 
+.IP \fBcmin_get\fR(9)
+\(en\ 
+.IP \fB__cmin_lookup\fR(9)
+\(en\ 
+.IP \fB__cmin_search\fR(9)
+\(en\ 
+.IP \fBcminsw_list\fR(9)
+\(en\ 
+.IP \fBfmod_add\fR(9)
+\(en\ 
+.IP \fBfmod_count\fR(9)
+\(en\ 
+.IP \fBfmod_del\fR(9)
+\(en\ 
+.IP \fBfmod_find\fR(9)
+\(en\ 
+.IP \fBfmod_get\fR(9)
+\(en\ 
+.IP \fB__fmod_lookup\fR(9)
+\(en\ 
+.IP \fBfmod_put\fR(9)
+\(en\ 
+.IP \fB__fmod_search\fR(9)
+\(en\ 
+.IP \fBfmod_str\fR(9)
+\(en\ 
+.IP \fBfmodsw_list\fR(9)
+\(en\ 
+.IP \fBfmodsw_lock\fR(9)
+\(en\ 
+.IP \fBnodesw_lock\fR(9)
+\(en\ 
+.IP \fBsdev_add\fR(9)
+\(en\ 
+.IP \fBsdev_del\fR(9)
+\(en\ 
+.IP \fBsdev_get\fR(9)
+\(en\ 
+.IP \fBsdev_put\fR(9)
+\(en\ 
+.IP \fB__smod_search\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B REGISTRATION UTILITIES
+.PP
+.IP \fBregister_clone\fR(9) \w'\fBunregister_strmod\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBregister_cmajor\fR(9)
+\(en\ 
+.IP \fBregister_strdev\fR(9)
+\(en\ 
+.IP \fBregister_strdrv\fR(9)
+\(en\ 
+.IP \fBregister_strmod\fR(9)
+\(en\ 
+.IP \fBregister_strnod\fR(9)
+\(en\ 
+.IP \fBunregister_clone\fR(9)
+\(en\ 
+.IP \fBunregister_cmajor\fR(9)
+\(en\ 
+.IP \fBunregister_strdev\fR(9)
+\(en\ 
+.IP \fBunregister_strdrv\fR(9)
+\(en\ 
+.IP \fBunregister_strmod\fR(9)
+\(en\ 
+.IP \fBunregister_strnod\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B KERNEL ADMINSTRATION UTILITIES
+.PP
+.IP \fBautopush\fR(9) \w'\fBsysctl_str_strmsgsz\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBapush_get\fR(9)
+\(en\ 
+.IP \fBapush_set\fR(9)
+\(en\ 
+.IP \fBapush_vml\fR(9)
+\(en\ 
+.IP \fBautopush_add\fR(9)
+\(en\ 
+.IP \fBautopush_del\fR(9)
+\(en\ 
+.IP \fBautopush_find\fR(9)
+\(en\ 
+.IP \fBautopush_search\fR(9)
+\(en\ 
+.IP \fBautopush_vml\fR(9)
+\(en\ 
+.IP \fBstrlog\fR(9)
+\(en\ 
+.IP \fBsysctl_str_nstrpush\fR(9)
+\(en\ 
+.IP \fBsysctl_str_strctlsz\fR(9)
+\(en\ 
+.IP \fBsysctl_str_strmsgsz\fR(9)
+\(en\ 
+.IP \fBvstrlog\fR(9)
+\(en\ 
+.IP \fBvstrlog_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B STREAM HEAD
+.PP
+
+.IP \fBallocstr\fR(9) \w'\fBstrsendpage\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfreestr\fR(9)
+\(en\ 
+.IP \fBfreezestr\fR(9)
+\(en\ 
+.IP \fBqattach\fR(9)
+\(en\ 
+.IP \fBqclose\fR(9)
+\(en\ 
+.IP \fBqdelete\fR(9)
+\(en\ 
+.IP \fBqdetach\fR(9)
+\(en\ 
+.IP \fBqinsert\fR(9)
+\(en\ 
+.IP \fBqopen\fR(9)
+\(en\ 
+.IP \fBqscan\fR(9)
+\(en\ 
+.IP \fBstr_close\fR(9)
+\(en\ 
+.IP \fBstrgetpmsg\fR(9)
+\(en\ 
+.IP \fBstrm_f_ops\fR(9)
+\(en\ 
+.IP \fBstr_open\fR(9)
+\(en\ 
+.IP \fBstrpoll\fR(9)
+\(en\ 
+.IP \fBstrputpmsg\fR(9)
+\(en\ 
+.IP \fBstrread\fR(9)
+\(en\ 
+.IP \fBstrrput\fR(9)
+\(en\ 
+.IP \fBstrsendpage\fR(9)
+\(en\ 
+.IP \fBstrwput\fR(9)
+\(en\ 
+.IP \fBstrwrite\fR(9)
+\(en\ 
+.IP \fBstrwsrv\fR(9)
+\(en\ 
+.IP \fBunfreezestr\fR(9)
+\(en\ 
+.PD
+
+.PD 0
+.IP \fBdi_alloc\fR(9) \w'\fBspec_reparent\fR(9)\(en'u
+\(en\ 
+.IP \fBdi_put\fR(9)
+\(en\ 
+.IP \fBdo_fattach\fR(9)
+\(en\ 
+.IP \fBdo_fdetach\fR(9)
+\(en\ 
+.IP \fBdo_spipe\fR(9)
+\(en\ 
+.IP \fBIntro\fR(9)
+\(en\ 
+.IP \fBLfS\fR(9)
+\(en\ 
+.IP \fBmp-streams\fR(9)
+\(en\ 
+.IP \fBpipe\fR(9)
+\(en\ 
+.IP \fBqueinfo\fR(9)
+\(en\ 
+.IP \fBsd_get\fR(9)
+\(en\ 
+.IP \fBsd_put\fR(9)
+\(en\ 
+.IP \fBsealloc\fR(9)
+\(en\ 
+.IP \fBsefree\fR(9)
+\(en\ 
+.IP \fBspecfs_mount\fR(9)
+\(en\ 
+.IP \fBspecfs_umount\fR(9)
+\(en\ 
+.IP \fBspec_open\fR(9)
+\(en\ 
+.IP \fBspec_reparent\fR(9)
+\(en\ 
+.IP \fBSPG\fR(9)
+\(en\ 
+.IP \fBSTREAMS\fR(9)
+\(en\ 
+.IP \fBstrthread\fR(9)
+\(en\ 
+.IP \fBstrthreads\fR(9)
+\(en\ 
+.IP \fBundoc\fR(9)
+\(en\ 
+
 .\"
 .\"
 .SS "Base Functions"
