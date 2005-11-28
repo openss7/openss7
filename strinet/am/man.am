@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/11/25 23:41:35 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/11/28 10:52:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/11/25 23:41:35 $ by $Author: brian $
+## Last Modified $Date: 2005/11/28 10:52:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -219,7 +219,7 @@ $(man9_MANS): %.9: %.man
 all-manmacros:
 	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
 		if test ! -e $$macro -o $(srcdir)/$$macro -nt $$macro ; then \
-			$(ECHO) "cat $(srcdir)/$$macro | sed -e '$(MAN_SUBST_STRING)' > $$macro" ; \
+			$(ECHO) "cat $(srcdir)/$$macro | sed -e '\$$(MAN_SUBST_STRING)' > $$macro" ; \
 			cat $(srcdir)/$$macro | sed -e '$(MAN_SUBST_STRING)' > $$macro ; \
 		fi ; \
 	done
