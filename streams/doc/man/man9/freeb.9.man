@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freeb.9.man,v 0.9.2.16 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: freeb.9.man,v 0.9.2.17 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -105,13 +105,13 @@ implementation, the binding of message blocks to data blocks and whether the
 buffer is an internal or external buffer.
 .PP
 Message blocks will be detached from the data block and the data block reference count,
-.IR mp->b_datap->db_refs ,
+.IR mp->b_datap->db_ref ,
 decremented.  Message blocks that reside in a message-data block,
 .BR mdblock (9),
 in which the data block is unused will then be freed.
 .PP
 Data blocks will be detached from the data buffer when the data block reference count,
-.IR mp->b_datap->db_refs
+.IR mp->b_datap->db_ref
 drops to zero as a result of the message block being detached.
 Data blocks that reside in a message-data block,
 .BR mdblock (9),

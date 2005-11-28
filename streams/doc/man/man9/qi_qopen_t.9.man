@@ -1,1 +1,1 @@
-.so man9/qinit.9.man
+.so man9/qi_qopen.9.man

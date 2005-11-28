@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_putp.9.man,v 0.9.2.2 2005/11/27 12:13:19 brian Exp $
+.\" @(#) $Id: qi_putp.9.man,v 0.9.2.3 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/27 12:13:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B qi_putp
+.B put, qi_putp, qi_putp_t
 \- \fISTREAMS\fR module or driver put procedure
 .\"
 .\"
@@ -326,7 +326,7 @@ However, the
 procedure should not modify the contents of the data buffer associated with any data block,
 .BR datab (9),
 that has a reference count,
-.IR db_refs ,
+.IR db_ref ,
 greater than one
 .RB ( 1 )
 [see
@@ -1132,6 +1132,34 @@ svr4spg
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.I "SVR 4.2"
+.[
+svr42spg
+.]
+did not define a type for the prototype of a queue
+.IR qi_putp (9)
+procedure.  This was an embellishment that first appeared in
+.IR OSF/1 \(rg " 1.1" ,
+.[
+osfspg
+.]
+and propagated to
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR HP-UX \(rg.
+.[
+hpuxspg
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not directly reference the
+.B qi_putp_t
+type.
+.IP \(em
 .IR Solaris \(rg
 .[
 solspg
@@ -1240,6 +1268,14 @@ svr42spg
 .\"
 .\"
 .SH HISTORY
+.PP
+The
+.B qi_putp_t
+type first appeared in
+.IR OSF/1 \(rg " 1.1" .
+.[
+osfspg
+.]
 .PP
 The queue put procedure first appeared in
 .IR "SVR 3" .

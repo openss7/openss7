@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/11/26 11:17:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/11/28 02:43:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
+# Last Modified $Date: 2005/11/28 02:43:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1186,6 +1186,7 @@ man_MANS = \
 	man9/kmem_zalloc.9 \
 	man9/kmem_zalloc_node.9 \
 	man9/linkb.9 \
+	man9/linkblk.9 \
 	man9/linkmsg.9 \
 	man9/major_t.9 \
 	man9/makedevice.9 \
@@ -2460,6 +2461,7 @@ dist_noinst_MANS = \
 	man9/kmem_zalloc.9.man \
 	man9/kmem_zalloc_node.9.man \
 	man9/linkb.9.man \
+	man9/linkblk.9.man \
 	man9/linkmsg.9.man \
 	man9/major_t.9.man \
 	man9/makedevice.9.man \

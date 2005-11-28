@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.9 2005/11/25 23:42:03 brian Exp $
+.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.10 2005/11/28 02:43:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -566,6 +566,20 @@ takes precedence.
 .\"
 .SS SO_BAND
 .PP
+Specifies that the
+.IR so_minpsz ,
+.IR so_maxpsz ,
+.IR so_hiwat ,
+.IR so_lowat ,
+fields and the
+.BR SO_MINPSZ ,
+.BR SO_MAXPSZ ,
+.BR SO_HIWAT ,
+.BR SO_LOWAT ,
+flags apply to the message
+.RB band\(em qband (9)
+structure\(emspecified in
+.IR so_band .
 .\"
 .\"
 .SS SO_DELIM
@@ -952,7 +966,6 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 .B M_SETOPTS
 has a different constant value on
 older versions of

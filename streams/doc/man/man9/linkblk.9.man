@@ -1,0 +1,313 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: linkblk.9.man,v 0.9.2.1 2005/11/28 02:43:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/28 02:43:06 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LINKBLK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B linkblk
+\- \fISTREAMS\fP link block structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\fC\s-1
+.B #include <sys/stream.h>
+
+struct linkblk {
+    struct queue *l_qtop;	/* upper write queue */
+    struct queue *l_qbot;	/* lower write queue */
+    int l_index;		/* multiplexor index */
+    char __pad[4 * sizeof(int) + sizeof(size_t) + sizeof(mblk_t *)];
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B linkblk
+structure contains the following members:
+.\" ----------------------
+.TP \w'ioc_count\(em'u
+.I l_qtop
+points to the write queue of the Stream on the upper multiplex.
+.PD 0
+.\" ----------------------
+.TP
+.I l_qbot
+points to the write queue of the Stream on the lower multiplex.
+.\" ----------------------
+.TP
+.I l_index
+An index uniqely identifying the link within an entire
+.B GNU/Linux
+system on a host.
+.\" ----------------------
+.TP
+.I __pad
+padding to size the structure to the size from
+.IR "SVR 4.2" .
+.\" ----------------------
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B linkblk
+structure is used in the data portion of an
+.BR M_IOCTL (9)
+message containing an
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+or
+.BR I_PUNLINK (7),
+.BR streamio (7)
+command.
+These
+.BR M_IOCTL (9)
+message are sent to a multiplexing driver by the Stream head to allow a multiplexing driver to
+perform the necessary initialization, configuration, resource allocation or release, associated with
+linking one Stream beneath another via the multiplexing driver.
+.PP
+The members of the
+.B linkblk
+structure are interpreted as follows:
+.TP \w'l_index\(em'u
+.I l_qtop
+is a pointer to the write queue of the Stream end queue pair at the upper multiplex.  This
+identifies the queue pair at the multiplexing driver, on the upper multiplex, that terminates the
+control Stream.
+.TP
+.I l_qbot
+is a pointer to the write queue of the Stream head queue pair at the lower mutliplex  This
+identifies the queue pair at the mutliplexing driver, on the lower mutliplex, that terminates the
+linked Stream.
+.TP
+.I l_index
+is a unique index that identifies the link relation within the entire
+.B GNU/Linux
+system for a host.
+.PP
+When
+.I STREAMS
+receives a valid
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+.BR streamio (7)
+call from the user, it allocates an populates a
+.B linkblk
+structure.
+.I STREAMS
+finds the queue pair at the Stream end (diametrically opposite the Stream head on the Stream for
+which the
+.BR streamio (7)
+was issued) and places a pointer to the write queue of the pair in
+.IR l_qtop .
+Note that, although `top' appears in the name of this member, the write queue is at the bottom of
+the Stream attached to the upper multiplex.
+.PP
+.I STREAMS
+locates the Stream head queue pointer associated with the Stream that was passed as a file
+descriptor in the
+.I arg
+argument to the
+.BR ioctl (2s)
+call issuing the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+command:
+a pointer to the write queue of the pair is placed in
+.IR l_qbot .
+Note that, although `bot' appears in the name of this member, the write queue is at the top of the
+Stream to be linked to the lower multiplex.
+.PP
+A unique index number used to identify the link relation is assigned and placed into
+.IR l_index .
+(See also
+.RI \(lq COMPATIBILITY ,\(rq
+below.)
+.PP
+.I STREAMS
+then formulates an
+.B M_IOCTL (9)
+message, attaches the
+.B linkblk
+structure in an
+.BR M_DATA (9)
+message block and sends the control downstream like any other
+.BR I_STR (7)-based
+.BR M_IOCTL (9)
+message.  See
+.B M_IOCTL "(9), " M_IOCACK "(9), " M_IOCNAK "(9),
+for more information on processing of input-output controls under
+.IR STREAMS .
+.PP
+When
+.I STREAMS
+receives a valid
+.BR I_UNLINK (7)
+or
+.BR I_PUNLINK (7)
+call from the user, it allocates and populates a
+.B linblk
+structure to be attached to a
+.BR M_IOCTL (9)
+message in a similar manner to that described above.
+The difference is that the
+.I l_index
+and
+.I l_qbot
+members are populated from the link block located using the
+.I arg
+argument to the
+.BR ioctl (2s)
+call issuing the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+command.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B linkblk
+structure is compatible with
+.IR "SVR 4.2 MP EFT" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 EFT STREAMS" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B linkblk
+structure was first introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

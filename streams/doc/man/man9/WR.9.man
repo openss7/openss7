@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: WR.9.man,v 0.9.2.14 2005/05/14 08:34:19 brian Exp $
+.\" @(#) $Id: WR.9.man,v 0.9.2.15 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -102,10 +102,19 @@ pointer
 regardless of whether
 .I q
 points to the write queue or the write queue of the queue pair.
+.\"
+.\"
+.SH USAGE
 .PP
 .BR WR ()
 is typically and often used to find the write queue from a pointer to one of
 the queues in a queue pair.
+.PP
+See also
+.BR RD (9)
+for finding the read queue in the pair, and
+.BR OTHERQ (9)
+for finding the other queue in the pair.
 .\"
 .\"
 .SH RETURN
@@ -144,6 +153,29 @@ The caller must guarantee validity from call-outs, callbacks, soft interrupts
 and interrupt service routines not predicated on the queue pair to which
 .I q
 belongs.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR queue (9)
+structures are always allocated in pairs as an array of two
+.BR queue (9)
+structure elements.  The first structure in the array is always the read queue and has
+.B QREADR
+set in
+.IR q_flag ;
+the second, the write queue, with
+.B QREADR
+clear.
+Because of this relationship between queues in a pair,
+.BR WR ()
+is easily implemented as a macro as follows:
+.PP
+.nf
+\fC\s-1\
+#define WR(q) ((q->q_flag & QREADR) ? (q+1) : (q))
+\s+1\fP
+.fi
 .\"
 .\"
 .SH NOTICES
@@ -281,7 +313,10 @@ rely upon
 .BR WR ()
 being defined as a macro or a function.
 .IP \(em
-Binary compatibility is not guaranteed.
+Because the size and members of the
+.BR queue (9)
+structure vary from implementation to implementation,
+binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

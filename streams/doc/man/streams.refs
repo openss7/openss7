@@ -3703,3 +3703,15 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3910.txt
 
+%K streamio
+%Q AT&T Bell Laboratories
+%A Dennis M. Ritchie
+%J AT&T Bell Laboratories Technical Journal
+%T A Stream Input-Output System
+%V 63
+%N 8
+%P pp. 1879-1910
+%D October 1984
+%I AT&T
+%C New Jersey
+

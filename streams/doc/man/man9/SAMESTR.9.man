@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SAMESTR.9.man,v 0.9.2.15 2005/05/14 08:34:18 brian Exp $
+.\" @(#) $Id: SAMESTR.9.man,v 0.9.2.16 2005/11/28 02:43:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -106,6 +106,18 @@ belongs to a
 .BR pipe (4)
 or a
 .BR fifo (4).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR SAMESTR ()
+is not normally used by modules or drivers.  Although it can be used by a module to detect the midpoint of
+a
+.IR STREAMS -based
+.BR pipe (4)
+or
+.BR fifo (4),
+it is not often done.
 .\"
 .\"
 .SH RETURN
@@ -322,7 +334,10 @@ supports
 .IR STREAMS -based
 .BR pipe "(4) and " fifo (4).
 .IP \(em
-Binary compatibility is not guaranteed.
+Because the size and members of the
+.BR queue (9)
+structure vary from implementation to implementation,
+binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qinit.9.man,v 0.9.2.12 2005/11/26 11:17:13 brian Exp $
+.\" @(#) $Id: qinit.9.man,v 0.9.2.13 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -365,7 +365,7 @@ procedure: normally,
 is set to
 .BR NULL .
 See
-.BR getadmin (9)
+.IR qi_qadmin (9)
 for details.
 .PP
 For a description of the use and guidelines for the

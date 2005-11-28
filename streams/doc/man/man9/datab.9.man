@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datab.9.man,v 0.9.2.15 2005/11/26 11:17:08 brian Exp $
+.\" @(#) $Id: datab.9.man,v 0.9.2.16 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -100,11 +100,9 @@ typedef struct datab {
     unsigned char *db_lim;
     unsigned char db_ref;       /* shadow reference count */
     unsigned char db_type;
-    unsigned char db_iswhat;    /* Mac OT */
-    unsigned char db_filler2;   /* Mac OT */
-    uint db_size;               /* Mac OT */
-    unsigned char *db_msgaddr;  /* Mac OT */
-    long db_filler;             /* Mac OT */
+    unsigned char db_class;
+    unsigned char db_pad;
+    uint db_size;               /* SVR 3 */
     /* Linux Fast-STREAMS specific members */
     atomic_t db_users;          /* actual reference count */
 } dblk_t;
@@ -328,10 +326,10 @@ See
 .PD
 .RE
 .TP
-.I db_iswhat
+.I db_class
 Indicates whether the message is a normal or priority message.
 .TP
-.I db_filler2
+.I db_pad
 Padding.
 .TP
 .I db_size
@@ -340,12 +338,12 @@ between the
 .I db_lim
 and
 .I db_base
-members.
-.TP
-.I db_msgaddr
-.TP
-.I db_filler
-Padding.
+members, but is not always the case under
+.IR "SVR 3"
+.[
+svr3spg
+.]
+that defined the field.
 .PP
 The following members are
 .B Linux Fast-STREAMS
@@ -364,6 +362,46 @@ count, and then it is copied from here to
 .\"
 .SH DESCRIPTION
 .PP
+.I STREAMS
+messages are composed of a chain of message blocks.  Each message block in the chain corresponds to
+a 3-tuple of a
+.BR msgb (9)
+structure, a
+.B datab
+structure, and an associated data buffer.  Although there is a 1:1 relationship between a
+.B datab
+data block and a data buffer, there can be an N:1 relationship between
+.BR msgb (9)
+message blocks and
+.B datab
+data blocks.  A
+.BR msgb (9)
+structure is an instance of a reference to a
+.B datab
+data block.
+.PP
+There is a 1:1 relationship between a
+.B datab
+data block and a data buffer.  The
+.B datab
+structure holds information about the data buffer that cannot be contained in the data buffer
+itself.  Characteristics of the data buffer, such as its size,
+.IR db_size ,
+its starting address,
+.IR db_base ,
+its ending address,
+.IR db_lim ,
+the number of
+.B msgb
+message blocks refering to it,
+.IR db_ref ,
+the type of the block,
+.IR db_type ,
+and a destructor for deallocating the buffer,
+.IR db_frtnp ,
+are contained in the
+.B datab
+structure.
 .\"
 .SS Macros
 .PP
@@ -395,18 +433,107 @@ Return the data buffer type from a message block pointer.  The type returned is 
 values listed above.
 .\"
 .\"
+.SH USAGE
+.PP
+.B datab
+structured data blocks are allocated as a 3-tuple with message block allocators such as
+.BR allocb (9)
+or
+.BR esballoc (9).
+Within the
+.I STREAMS
+framework, messages are processed by the queue procedures,
+.IR qi_putp (9)
+and
+.IR qi_srvp (9).
+A queue procedure does not normally manipulate data blocks, except to change their type
+.RI ( db_type ).
+Fields that may be examined
+include
+.IR db_type ,
+.IR db_base ,
+.IR db_lim ,
+.IR db_ref .
+Of these, only
+.I db_type
+should be altered by a queue procedure.
+.PP
+When a module or driver
+.IR qi_putp (9)
+put procedure is passed a message, or
+.IR qi_srvp (9)
+service procedure takes a message off of the message queue, before processing the message, the
+.I db_type
+field is examined to determine the type of the message.  Queue procedures are required to process
+messages of a given type in accordance with the rules for processing the specific type of message.
+Rules for processing the various message types available in
+.I STREAMS
+are discussed in separate manual pages for each message type, such as
+.BR M_FLUSH (9).
+.PP
+When a module or driver
+.IR qi_putp (9)
+put or
+.IR qi_srvp (9)
+service procedure intends to modify the data in the data buffer associated with a
+.B datab
+data block, it should first check the
+.I db_ref
+member to see if more than one message block has a reference to the data buffer.  If
+.I db_ref
+is one
+.RB ( 1 ),
+then the procedure has a private reference to the data in the data buffer.  If
+.I db_ref
+is greater than one
+.RB ( >1 ),
+then the procedure does not have a private reference to the data in the data buffer, so if it
+intends to modify the data, it should copy the data with a utility such as
+.BR copyb (9)
+or
+.BR copymsg (9)
+to obtain a private reference to the data buffer, and only modify the copied data.
+.PP
+Specialized utlities that allocate or reallocate data blocks and data buffers access the
+.I db_base
+and
+.I db_lim
+fields.  In some cases, these fields might be used by a queue procedure or private utility to reset
+the message block pointers,
+.IR b_rptr
+or
+.IR b_wptr ,
+into the data buffer.  The difference between the
+.I db_lim
+and
+.I db_base
+pointers, represents the maximum size of the data buffer.
+.\"
+.\"
 .SH CONTEXT
 .PP
-Functions that operate on a message or data block can be called from any
-context.  However, it is the caller's responsibility to ensure that the
-calling thread has exclusive access to the message block.  When the message
-block and associated data block have just been removed from a
+Functions that operate on a message or data block can be called from any context.  However, it is
+the caller's responsibility to ensure that the calling thread has exclusive access to the message
+block.  When the message block and associated data block have just been removed from a
 .BR queue (9)
 in a
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
-procedure of the queue, message exclusivity is normally guaranteed.
+procedure of the queue, message block exclusivity is normally guaranteed.  If the
+.I db_ref
+argument of the data block is then one
+.RB ( 1 ),
+data block and data buffer exclusivitiy is also normally guaranteed.  Message block, data block and
+data buffer exclusivity is guaranteed for a message block freshly allocated with
+.BR allocb (9),
+or freshly copied with
+.BR copyb (9)
+or
+.BR copymsg (9).
+.BR esballoc (9)
+guarantees message block and data block exclusivity, but the caller is responsible for data buffer
+exclusivity.
 .\"
 .\"
 .SH MP-STREAMS
@@ -433,6 +560,47 @@ member can be examined to determine whether the reference count is one (1) indic
 duplication has occurred, or greater, indicating that duplication has occurred.
 .\"
 .\"
+.SH IMPLEMENTATION
+.PP
+As the message block 3-tuples allocated in a running system largely consists of an equal number of
+.BR msgb (9)
+message blocks,
+.BR datab (9)
+data blocks,
+and small buffers,
+it is efficient to allocate 3-tuples as a block.
+.BR "@PACKAGE_TITLE@" ,
+following the mechanism described for
+.IR "SVR 4"
+in
+.RI \(lq "The Magic Garden Explained" \(rq,
+.[
+magic
+.]
+defines an
+.BR mdbblock
+structure that contains an
+.BR mbinfo
+structure containing an
+.BR msgb (9)
+structure, a
+.BR dbinfo
+structure containing an
+.BR datab
+structure, and a
+.B FASTBUF
+sized, aligned data buffer.
+Allocations made by
+.BR allocb (9)
+or
+.BR esballoc (9)
+allocate a
+.BR mdbblock .
+This approach permits one memory cache allocation to occur, where three would otherwise be
+necessary, speeding the allocation of message blocks, data blocks and data buffers for the normal
+case.
+.\"
+.\"
 .SH NOTICES
 .PP
 Members of the
@@ -455,11 +623,63 @@ fields should be treated as read-only, and should not be read or written by
 portable
 .I STREAMS
 modules or drivers.
+.PP
+.I db_type
+is the only field that should be referenced or altered by portable
+.I STREAMS
+modules or drivers.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR msgb (9).
+.BR msgb (9),
+.BR allocb (9),
+.BR esballoc (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR queue (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR M_BREAK (9),
+.BR M_PASSFP (9),
+.BR M_EVENT (9),
+.BR M_SIG (9),
+.BR M_DELAY (9),
+.BR M_CTL (9),
+.BR M_IOCTL (9),
+.BR M_SETOPTS (9),
+.BR M_RSE (9),
+.BR M_TRAIL (9),
+.BR M_BACKWASH (9),
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9),
+.BR M_PCPROTO (9),
+.BR M_PCSIG (9),
+.BR M_READ (9),
+.BR M_FLUSH (9),
+.BR M_STOP (9),
+.BR M_START (9),
+.BR M_HANGUP (9),
+.BR M_ERROR (9),
+.BR M_COPYIN (9),
+.BR M_COPYOUT (9),
+.BR M_IOCDATA (9),
+.BR M_PCRSE (9),
+.BR M_STOPI (9),
+.BR M_STARTI (9),
+.BR M_PCCTL (9),
+.BR M_PCSETOPTS (9),
+.BR M_PCEVENT (9),
+.BR M_UNHANGUP (9),
+.BR M_NOTIFY (9),
+.BR M_HPDATA (9),
+.BR M_LETSPLAY (9),
+.BR M_DONTPLAY (9),
+.BR M_BACKDONE (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -478,6 +698,81 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR MacOT \(rg
+.[
+macspg
+.]
+call the
+.I db_class
+member,
+.IR db_iswhat ;
+the
+.I db_pad
+member,
+.IR db_filler2 .
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR MacOT \(rg
+.[
+macspg
+.]
+also define
+.I db_msgaddr
+and
+.I db_filler
+members that follow
+.IR db_size .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not access any of these fields.  If it is absolutely necessary to access
+the
+.I db_iswhat
+or
+.I db_filler2
+fields, the following macros should be defined:
+.IP ""
+.nf
+\fC\s-1\
+#define db_iswhat   db_class
+#define db_filler2  db_pad
+\s+1\fP
+.fi
+.IP \(em
+.IR "SVR 3.1"
+placed the internal data buffer inside the
+.B datab
+structure.  It was declared as a
+.I db_cache
+.B unsigned char
+array member containing a maximum of
+.B DB_CACHESIZE
+bytes.
+The internal data buffer has since moved out of the
+.B datab
+structure, mostly for alignment purposes.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will be written to at least
+.IR "SVR 4"
+.[
+svr4spg
+.]
+specifications and will not attempt to access a
+.I db_cache
+member of the
+.B datab
+structure.
+.IP \(em
 Only
 .IR Solaris \(rg
 .[

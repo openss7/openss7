@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: OTHERQ.9.man,v 0.9.2.13 2005/05/14 08:34:17 brian Exp $
+.\" @(#) $Id: OTHERQ.9.man,v 0.9.2.14 2005/11/28 02:43:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:17 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -147,6 +147,29 @@ and interrupt service routines not predicated on the queue pair to which
 belongs.
 .\"
 .\"
+.SH IMPLEMENTATION
+.PP
+.BR queue (9)
+structures are always allocated in pairs as an array of two
+.BR queue (9)
+structure elements.  The first structure in the array is always the read queue and has
+.B QREADR
+set in
+.IR q_flag ;
+the second, the write queue, with
+.B QREADR
+clear.
+Because of this relationship between queues in a pair,
+.BR OTHERQ ()
+is easily implemented as a macro as follows:
+.PP
+.nf
+\fC\s-1\
+#define OTHERQ(q) ((q->q_flag & QREADR) ? (q+1) : (q-1))
+\s+1\fP
+.fi
+.\"
+.\"
 .SH NOTICES
 .PP
 If the passed in queue pointer,
@@ -157,14 +180,15 @@ If the passed in queue pointer,
 .IR q ,
 is
 .BR NULL ,
-a kernel oops will occur.
+a kernel panic (oops) will occur.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .BR RD (9),
 .BR WR (9),
-.BR SAMESTR (9).
+.BR SAMESTR (9),
+.BR queue (9).
 .\"
 .\"
 .SH BUGS
@@ -184,7 +208,25 @@ usldk
 and systems based on
 .IR "SVR 4" .
 .IP \(em \w'\(em\(em'u
-Binary compatibility is not guaranteed.
+Under many implementations,
+.BR OTHERQ ()
+is implemented as a macro.  Under
+.BR "@PACKAGE_TITLE@" ,
+.BR OTHERQ ()
+is implemented as an
+.B extern inline
+function.
+.IP ""
+In general, portable
+.I STREAMS
+drivers and modules should not be affected if any
+.I STREAMS
+utility is implemented as either a macro or a function.
+.IP \(em
+Because the size and members of the
+.BR queue (9)
+structure vary from implementation to implementation,
+binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

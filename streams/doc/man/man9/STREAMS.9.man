@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.30 2005/11/26 11:17:07 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.31 2005/11/28 02:43:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -110,6 +110,137 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
+.SS Background
+.PP
+.I STREAMS
+derives from Dennis Ritchie's original paper,
+.[
+streamio
+.]
+was incorporated into the
+.IR "UNIX\(rg System V Release 3"
+.[
+svr3
+.]
+operating system and improved in USL releases up to the
+.IR "UNIX\(rg System V Release 4.2"
+.[
+svr42
+.]
+operating system.
+.PP
+Today,
+.I STREAMS
+is a part of every major branded
+.IR UNIX \(rg
+variant, such as
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR IRIX \(rg,
+.[
+irixspg
+.]
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+and, including many 
+.IR UNIX -like
+operating systems and popular embedded RTOS, but with the notable exception of
+.I Berkely System Distribution
+releases, variants and offshoots.
+.PP
+.\"
+.SS What is STREAMS?
+.PP
+.I STREAMS
+is flexible framework for communication between a user level process and a kernel resident driver.
+It encompasses a set of kernel system calls providing a user-kernel interface that is backwards
+compatible with the traditional character device driver interface, as well as a set of
+.I STREAMS
+module and driver entry points forming a driver-kernel interface.
+.I STREAMS
+also provides a rich set of kernel utility functions for the development an implementations of
+kernel-resident modules and drivers.
+.PP
+.I STREAMS
+provides a reconfigurable full-duplex communications path between a user level process and kernel
+resident driver, termed a Stream.  Modules can be inserted in the path between the user and driver
+under user level control.  Streams can be linked across multiplexers under user control to form
+complex (yet reconfigurable) topologies of user level processes and drivers.
+.PP
+Communication of control and data information along a Stream is accomplished by message passing.
+There is no direct function call interface between between components of a Stream.  A Stream exists
+within the
+.I STREAMS
+framework inside the kernel and extend from the user-kernel interface to the kernel driver
+interface.  Each component of a Stream consists of a pair of queues used to pass messages in the
+upstream direction to the kernel-user interface; or downstream, the kernel-driver interface.
+.PP
+At the kernel-user end of the the Stream is a component called the Stream head.  As with all
+components of the Stream, the Stream head consists of a queue pair and a specialized set of
+procedures.  The Stream head procedures are responsible for converting between the system call
+interface presented to users and the message passing mechanism within the Stream.
+.PP
+At the kernel-driver end of the Stream is the Stream end.  The Stream end also contains a queue pair
+and a set of procedures.  The Stream end (or simply driver) procedures are responsible for
+converting between the message passing mechanism within the Stream the actions and events of a
+hardware (or pseudo-) device.
+.PP
+Intermediate components within the Stream are call Modules.  Modules also consist of a queue pair
+for passing messages upstream and downstream, as well as a set of procedures for processing
+messages.  Modules can be pushed onto the module stack between the Stream head and Stream end using
+a set of standardized intput-output control commands.
+.PP
+In support of topologies more complex that these simple linear segments,
+.I STREAMS
+also provides a specialized Stream end (driver) called a Mutliplexing Driver.  A Multiplexing driver
+has the ability to open multiple Streams to its upper interface (multiplexer) as well as linking
+multiple Streams beneath its lower interface (multiplexer).  Again, a standardized set of
+intput-output control provide the user with the ability to configure a Multiplexing Driver.
+.PP
+These
+.I STREAMS
+components, and the elements of the user-kernel and kernel-driver interface are detailed in the
+manual pages.  The sections that follow provide a road map to the rest of the manual pages in the
+.B @PACKAGE_TITLE@
+package.
+.\"
+.SS Why STREAMS?
+.PP
+With the ability to open multiple Streams to a driver, push and pop modules to an from the module
+stack on a Stream, and to link any Stream under a multiplexing driver\(emall under user control
+using standardized intput-output controls\(emallows
+.I STREAMS
+to configure complex toplogies to form protocol stacks.
+
+.SS Why STREAMS for Linux?
 .\"
 .\"
 .SH DESCRIPTION

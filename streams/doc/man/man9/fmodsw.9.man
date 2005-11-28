@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fmodsw.9.man,v 0.9.2.12 2005/11/26 11:17:09 brian Exp $
+.\" @(#) $Id: fmodsw.9.man,v 0.9.2.13 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -147,7 +147,7 @@ module.  This is the name that will be used for the
 .BR specfs (5)
 directory entry.  If the
 .I STREAMS
-module is a loadable kernel module, the kernel module name must also be the concatentation of
+module is a loadable kernel module, the kernel module name must also be the concatenation of
 .RI \(lq streams- \(rq
 and this name for module demand loading to work correctly.  This name should also appear in the
 .I f_str->st_rdinit->qi_minfo->mi_idname
@@ -207,7 +207,7 @@ Synchronization queue level, can be one of the following:
 .BR SQLVL_QUEUE ,
 .BR SQLVL_NOP " or "
 .BR SQLVL_PERSTREAM .
-For additional information on these sycnrhonization levels, see
+For additional information on these synchronization levels, see
 .BR mp-streams (9).
 .IP ""
 These synchronization levels are not normally populated by the caller of a registration function,
@@ -220,15 +220,15 @@ Synchronization should, instead, be specified using the
 member.
 .TP
 .I f_syncq
-A pointer to a syncrhonization queue,
+A pointer to a synchronization queue,
 .BR syncq (9)
-structure the describes the outer barrier for syncrhonization.  This member is only significant when
+structure the describes the outer barrier for synchronization.  This member is only significant when
 member
 .I f_sqlvl
 is set to
 .BR SQLVL_DEFAULT ", " SQLVL_MODULE " or " SQLVL_ELSEWHERE .
 This member is not set by the caller to a registration function (it is overwritten by the
-registration function).  The registration function is reponsible for locating the outer barrier
+registration function).  The registration function is responsible for locating the outer barrier
 based on other information and populating this pointer.  This member should not be directly
 manipulated by the
 .I STREAMS
@@ -276,11 +276,11 @@ compatible:
 .TP \w'\ D_MTOUTPERIM\ 'u
 .B D_MP
 specifies that the module is MP-safe.  When this flag is set, all other synchronization flags
-(inner perimeter, outer perimiter,
+(inner perimeter, outer perimeter,
 .BR D_SAFE " and " D_UP )
 are ignored.
 .IP ""
-For more information on this  flag, or any of the syncrhonization flags, see
+For more information on this  flag, or any of the synchronization flags, see
 .BR mp-streams (9).
 .PP
 The following inner perimeter flags are
@@ -370,6 +370,9 @@ and
 .IR qi_qclose (9)
 procedure instead of SVR3 ones.
 .B @PACKAGE_TITLE@
+.[
+lfs
+.]
 does not support SVR3 opens.  If this flag is not set, it is always implied.
 .\"
 .\"
@@ -409,7 +412,7 @@ structure describing the
 module.
 .TP
 .I f_flag
-Flags specifying the syncrhonization required by the module.
+Flags specifying the synchronization required by the module.
 .TP
 .I f_kmod
 A pointer to
@@ -456,6 +459,46 @@ It is permissible, however, after registration, to read the values of some membe
 .IR f_modid ).
 .\"
 .\"
+.SH IMPLEMENTATION
+.PP
+.IR "SVR 4" ,
+as described in
+.RI \(lq "The Magic Garden Explained" \(rq,
+allocates an array of
+.B fmodsw
+structures (the module switch table), to represent
+.I STREAMS
+modules in the
+.IR UNIX \(rg
+system.
+.B @PACKAGE_TITLE@
+uses dynamic allocation and a hash list
+of
+.B fmodsw
+structures, instead of an array,
+greatly reducing the memory footprint of
+.BR "@PACKAGE_TITLE@" .
+.PP
+This reduction is particularly noticeable when
+.BR "@PACKAGE_TITLE@"
+is compared to
+.IR LiS :
+.[
+lis
+.]
+.I LiS
+allocates a large array of similar
+.B cdevsw
+and
+.B fmodsw
+structures to represent
+.I STREAMS
+character devices and modules, swallowing up an excessive and whopping 600,000 bytes of BSS.
+In contrast, the BSS for
+.B @PACKAGE_TITLE@
+is about 1400 bytes.
+.\"
+.\"
 .SH NOTICES
 .PP
 If a
@@ -467,6 +510,15 @@ pushable module and a
 device or pseudo-device driver, it should use separate and distinct
 .BR fmodsw " and " cdevsw (9)
 structures that are registered separately.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR register_strmod (9)
+for an example use of the
+.B fmodsw
+structure.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -483,6 +535,7 @@ structures that are registered separately.
 .BR mp-streams (9),
 .BR syncq (9),
 .BR kmod (9),
+.BR register_strmod (9),
 .BR STREAMS (9).
 .\"
 .\"
@@ -500,11 +553,6 @@ magic
 .]
 and implementations based on
 .IR "SVR 4" ,
-including
-.IR AIX \(rg,
-.IR Solaris \(rg,
-and
-.IR LiS ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 The
@@ -523,7 +571,7 @@ Because the
 .B fmodsw
 structure is dependent on
 .B @PACKAGE_TITLE@
-internal implementation specifics, it is not binary compatibile.
+internal implementation specifics, it is not binary compatible.
 .IP \(em
 Any use supported by the
 .B fmodsw
@@ -569,7 +617,7 @@ for additional compatibility information.
 .PP
 There are no standards for this structure.
 .B @PACKAGE_TITLE@
-is roughly conformant to
+roughly conforms to
 .I "SVR 4.2"
 .[
 svr42

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_qopen.9.man,v 0.9.2.2 2005/11/27 12:13:19 brian Exp $
+.\" @(#) $Id: qi_qopen.9.man,v 0.9.2.3 2005/11/28 02:43:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/27 12:13:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B qi_qopen
+.B open, qi_qopen, qi_qopen_t
 \- \fISTREAMS\fR module or driver open routine
 .\"
 .\"
@@ -1074,6 +1074,34 @@ svr4spg
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.I "SVR 4.2"
+.[
+svr42spg
+.]
+did not define a type for the prototype of a queue
+.IR qi_qopen (9)
+routine.  This was an embellishment that first appeared in
+.IR OSF/1 \(rg " 1.1" ,
+.[
+osfspg
+.]
+and propagated to
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR HP-UX \(rg.
+.[
+hpuxspg
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not directly reference the
+.B qi_qopen_t
+type.
+.IP \(em
 .B @PACKAGE_TITLE@
 passes the internal device number to the
 .IR qi_qopen ()
@@ -1201,7 +1229,17 @@ usldk
 .\"
 .SH HISTORY
 .PP
-The queue open procedure first appeared in
+The
+.B qi_qopen_t
+type first appeared in
+.IR OSF/1 \(rg " 1.1" .
+.[
+osfspg
+.]
+.PP
+The queue
+.IR qi_qopen ()
+open routine first appeared in
 .IR "SVR 3" .
 .[
 svr3
