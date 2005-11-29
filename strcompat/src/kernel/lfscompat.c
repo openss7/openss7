@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
+ Last Modified $Date: 2005/11/28 18:55:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.15  2005/11/28 18:55:57  brian
+ - added register_strlog function
+
  Revision 0.9.2.14  2005/07/29 07:37:51  brian
  - changes to compile with latest streams package.
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -121,7 +124,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/29 07:37:51 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -387,10 +390,13 @@ __LFS_EXTERN_INLINE void setq(queue_t *q, struct qinit *rinit, struct qinit *wri
 
 EXPORT_SYMBOL(setq);
 
+static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
+static char str_err_buf[LOGMSGSZ];
+
 /*
  *  This is a default implementation for strlog(9).  When SL_CONSOLE is set, we print directly to
  *  the console using printk(9).  For SL_ERROR and SL_TRACE, we have no STREAMS error or trace
- *  loggers running, so we marks those messages as unseen by those loggers.  We also provide a hook
+ *  loggers running, so we mark those messages as unseen by those loggers.  We also provide a hook
  *  here so that the strutil package can hook into this call.  Because we cannot filter, only
  *  SL_CONSOLE messages are printed to the system logs.  This follows the rules for setting the
  *  priority according described in log(4).
@@ -401,11 +407,10 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 	int rval = 1;
 
 	if (flag & SL_CONSOLE) {
-		static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
-		static char str_err_buf[LOGMSGSZ];
 		unsigned long flags;
 		short lev = (short) level;
 
+		/* XXX: are these strict locks necessary? */
 		spin_lock_irqsave(&str_err_lock, flags);
 		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 #define STRLOG_PFX "strlog(%hd)[%hd,%hd]: %s\n"
@@ -431,15 +436,58 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 	return (rval);
 }
 
-vstrlog_t vstrlog = &vstrlog_default;
+static rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
+static vstrlog_t vstrlog = &vstrlog_default;
+//EXPORT_SYMBOL(vstrlog);
 
-EXPORT_SYMBOL(vstrlog);
+/**
+ *  register_strlog:	- register a new STREAMS logger
+ *  @newlog:	new vstrlog function pointer
+ *
+ *  DESCRIPTION: register_strlog() registers a new STREAMS logger callback function and returns the
+ *  previous callback function.  Suitable locks are taken to protect module unloading.
+ *
+ *  CONTEXT: register_strlog() is intended to be called from a STREAMS module or driver qi_qopen() or
+ *  qi_qclose() procedure.  It must be called from process context.
+ *
+ *  LOCKING: This function holds a write lock on strlog_reg_lock to keep others from calling a
+ *  strlog() implementation function that is about to be unloaded for safe log driver unloading.
+ */
+vstrlog_t
+register_strlog(vstrlog_t newlog)
+{
+	unsigned long flags;
+	vstrlog_t oldlog;
 
+	write_lock_irqsave(&strlog_reg_lock, flags);
+	oldlog = xchg(&vstrlog, newlog);
+	write_unlock_irqrestore(&strlog_reg_lock, flags);
+	return (oldlog);
+}
+
+EXPORT_SYMBOL(register_strlog);
+
+/**
+ *  strlog:	- log a STREAMS message
+ *  @mid:	module id
+ *  @sid:	stream id
+ *  @level:	severity level
+ *  @flag:	flags controlling distribution
+ *  @fmt:	printf(3) format
+ *  @...:	format specific arguments
+ *
+ *  CONTEXT: strlog() can be called from any context, however, the caller should be aware that this
+ *  function is complex and should only be called from in_interrupt() context sparingly.
+ *
+ *  LOCKING: This function holds a read lock on strlog_reg_lock to keep de-registrations from
+ *  occurring while the function is being called for safe log driver unloading.
+ */
 int
 strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	int result = 0;
 
+	read_lock(&strlog_reg_lock);
 	if (vstrlog != NULL) {
 		va_list args;
 
@@ -447,6 +495,7 @@ strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
 		va_end(args);
 	}
+	read_unlock(&strlog_reg_lock);
 	return (result);
 }
 
