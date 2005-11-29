@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setq.9.man,v 0.9.2.12 2005/08/29 10:06:50 brian Exp $
+.\" @(#) $Id: setq.9.man,v 0.9.2.13 2005/11/29 10:46:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/08/29 10:06:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,17 +90,26 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
-the queue for which to set sizes and procedures.
+the queue for which to set sizes and procedures;
+.PD 0
 .TP
 .I rinit
-a pointer to the
+the read-side
 .BR qinit (9)
-structure associated with the read side of the queue pair.
+structure; and,
 .TP
 .I winit
-a pointer to the
+the write-wide
 .BR qinit (9)
-structure associated with the write side of the queue pair.
+structure.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

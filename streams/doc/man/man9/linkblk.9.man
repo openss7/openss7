@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: linkblk.9.man,v 0.9.2.1 2005/11/28 02:43:06 brian Exp $
+.\" @(#) $Id: linkblk.9.man,v 0.9.2.2 2005/11/29 10:46:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 02:43:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -122,6 +122,11 @@ padding to size the structure to the size from
 .IR "SVR 4.2" .
 .\" ----------------------
 .PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

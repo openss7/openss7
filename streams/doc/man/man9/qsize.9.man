@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qsize.9.man,v 0.9.2.14 2005/05/14 08:34:29 brian Exp $
+.\" @(#) $Id: qsize.9.man,v 0.9.2.15 2005/11/29 10:46:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -92,6 +92,11 @@ sort-adjacent-labels
 .I q
 a pointer to the queue for which to return the count of the number of
 messages.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

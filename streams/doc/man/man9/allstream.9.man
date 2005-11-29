@@ -1,6 +1,1 @@
 .so man9/undoc.9.man
-.\"
-.\"
-.SH INTERFACE
-.PP
-.IR STREAMS .

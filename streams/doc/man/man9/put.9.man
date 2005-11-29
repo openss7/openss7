@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: put.9.man,v 0.9.2.21 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: put.9.man,v 0.9.2.22 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,9 +90,16 @@ sort-adjacent-labels
 .TP
 .I q
 the queue to which to put the message.
+.PD 0
 .TP
 .I mp
 the message to put to the queue.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

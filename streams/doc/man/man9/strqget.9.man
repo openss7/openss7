@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqget.9.man,v 0.9.2.22 2005/11/26 11:17:13 brian Exp $
+.\" @(#) $Id: strqget.9.man,v 0.9.2.23 2005/11/29 10:46:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -102,6 +102,11 @@ the queue band for which to retrieve parameters.
 .I val
 the pointer to where the retrieved value is to be placed.
 .PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

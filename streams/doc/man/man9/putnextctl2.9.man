@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnextctl2.9.man,v 0.9.2.19 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: putnextctl2.9.man,v 0.9.2.20 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,7 @@ sort-adjacent-labels
 .TP
 .I q
 the queue from which to put the control message.
+.PD 0
 .TP
 .I type
 the type of the control message.
@@ -99,6 +100,12 @@ a one-byte parameter to place in the first byte of the control message.
 .TP
 .I param1
 a one-byte parameter to place in the second byte of the control message.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

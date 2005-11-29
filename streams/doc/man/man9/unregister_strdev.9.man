@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_strdev.9.man,v 0.9.2.9 2005/05/14 08:34:31 brian Exp $
+.\" @(#) $Id: unregister_strdev.9.man,v 0.9.2.10 2005/11/29 10:46:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,6 +111,12 @@ structure previously registered with
 the (external) character major device number to unregister, or zero (0),
 indicating that all registered character major device numbers for this driver
 are to be unregistered.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qcountstrm.9.man,v 0.9.2.11 2005/05/14 08:34:28 brian Exp $
+.\" @(#) $Id: qcountstrm.9.man,v 0.9.2.12 2005/11/29 10:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,11 @@ sort-adjacent-labels
 .TP
 .I q
 the queue to begin summing queue counts.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

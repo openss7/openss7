@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocq.9.man,v 0.9.2.19 2005/11/26 11:17:08 brian Exp $
+.\" @(#) $Id: allocq.9.man,v 0.9.2.20 2005/11/29 10:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:29 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -109,7 +109,9 @@ driver or module to which the queue pair will belong.
 .\"
 .SH INTERFACE
 .PP
-.IR STREAMS .
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

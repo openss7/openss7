@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmid.9.man,v 0.9.2.14 2005/11/22 11:57:23 brian Exp $
+.\" @(#) $Id: getmid.9.man,v 0.9.2.15 2005/11/29 10:46:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,6 +89,11 @@ modID_t \fBgetmid\fR(const char *\fIname\fR);
 .TP
 .I name
 The name of the module.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

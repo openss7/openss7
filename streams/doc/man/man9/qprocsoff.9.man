@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.21 2005/11/28 13:20:08 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.22 2005/11/29 10:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 13:20:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,6 +93,11 @@ sort-adjacent-labels
 .I qp
 the read queue pointer of the queue pair for which to turn queue procedures
 off.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

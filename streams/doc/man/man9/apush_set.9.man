@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: apush_set.9.man,v 0.9.2.16 2005/05/14 08:34:20 brian Exp $
+.\" @(#) $Id: apush_set.9.man,v 0.9.2.17 2005/11/29 10:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:29 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -102,7 +102,8 @@ structure describing the \fISTREAMS\fP driver and the autopush list to set.
 .\"
 .SH INTERFACE
 .PP
-.IR STREAMS .
+.IR STREAMS ,
+implementation extension.
 .\"
 .\"
 .SH DESCRIPTION
@@ -262,7 +263,7 @@ number.
 Upon failure,
 .BR apush_set ()
 returns one of the following negative error numbers:
-.TP
+.TP \w'[EWOULDBLOCK]'u
 .RB [ EINVAL ]
 .I sap->sap_cmd ", " sap->sap_major ", " sap->sap_minor " or " sap->sap_lasminor
 were invalid.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbackenable.9.man,v 0.9.2.5 2005/11/28 13:20:08 brian Exp $
+.\" @(#) $Id: qbackenable.9.man,v 0.9.2.6 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 13:20:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -106,6 +106,13 @@ the (highest) band number to back-enable; and,
 an optional pointer to an array of flags, one for each band, that indicates precisely which bands to
 back-enable.
 .PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

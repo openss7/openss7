@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9.2.13 2005/11/25 23:42:06 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.14 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,21 +85,20 @@ sort-adjacent-labels
 \fC\s-1
 .B #include <sys/stream.h>
 
+/* 28 bytes on 32 bit, 52 on 64 bit */
 typedef struct msgb {
-    struct msgb *b_next;        /* next msgb on queue */
-    struct msgb *b_prev;        /* prev msgb on queue */
-    struct msgb *b_cont;        /* next msgb in message */
-    unsigned char *b_rptr;      /* rd pointer into datab */
-    unsigned char *b_wptr;      /* wr pointer into datab */
-    struct datab *b_datap;      /* pointer to datab */
-    unsigned char b_band;       /* band of this message */
-    unsigned char b_pad1;       /* padding */
-    unsigned short b_flag;      /* message flags */
-    long b_pad2;                /* padding */
-    /* private Linux Fast-STREAMS specific members */
-    struct queue *b_queue;      /* queue for this message */
-    struct qband *b_bandp;      /* band for this message */
-    size_t b_size;              /* size of this message on queue */
+    struct msgb *b_next;    /* next msgb on queue */
+    struct msgb *b_prev;    /* prev msgb on queue */
+    struct msgb *b_cont;    /* next msgb in message */
+    unsigned char *b_rptr;  /* rd pointer into datab */
+    unsigned char *b_wptr;  /* wr pointer into datab */
+    struct datab *b_datap;  /* pointer to datab */
+    unsigned char b_band;   /* band of this message */
+    unsigned char b_pad1;   /* padding */
+    unsigned short b_flag;  /* message flags */
+#if 0
+    long b_pad2;            /* padding */
+#endif
 } mblk_t;
 \s+1\fP
 .fi
@@ -115,51 +114,53 @@ members:
 the next
 .B msgb
 structure on a
-.BR queue (9)
+.BR queue (9);
+.PD 0
 .TP
 .I b_prev
 the previous
 .B msgb
 structure on a
-.BR queue (9)
+.BR queue (9);
 .TP
 .I b_cont
 next
 .B msgb
-structure in the chain representing a single message
+structure in the chain representing a single message;
 .TP
 .I b_rptr
-a pointer into the data from which to read
+a pointer into the data from which to read;
 .TP
 .I b_wptr
-a pointer into the data to which to write
+a pointer into the data to which to write;
 .TP
 .I b_datap
-a pointtner to the
+a pointer to the
 .B datab
-structure representing the actual data
+structure representing the actual data;
 .TP
 .I b_band
 the
 .BR qband (9)
-to which this message belongs
+to which this message belongs;
 .TP
 .I b_pad1
-padding
+padding;
 .TP
 .I b_flag
 message flags:
+.PD
 .RS
 .TP \w'\ MSGNOTMARKNEXT\ 'u
 .B MSGMARK
-last byte of message is marked
+last byte of message is marked;
 .PD 0
 .TP
 .B MSGNOLOOP
-don't loop message at stream head
+don't loop message at stream head;
 .TP
 .B MSGDELIM
-message is delimited
+message is delimited;
 .TP
 .B MSGNOGET
 .IR UnixWare \(rg,
@@ -178,81 +179,161 @@ macspg
 .[
 uxpspg
 .]
-getq does not return message
+getq does not return message;
 .TP
 .B MSGATTEN
 .IR UXP/V \(rg:
 .[
 uxpspg
 .]
-attention to on read side
+attention to on read side;
 .TP
 .B MSGMARKNEXT
-.IR Solaris \(rg.
+.IR Solaris \(rg:
 .[
 solspg
 .]
+next message is marked;
 .TP
 .B MSGLOG
 .IR UnixWare \(rg:
 .[
 uw7spg
 .]
+log on arrival of this message;
 .TP
 .B MSGNOTMARKNEXT
-.IR Solaris \(rg.
+.IR Solaris \(rg:
 .[
 solspg
 .]
+next message is not marked;
 .TP
 .B MSGCOMPRESS
 .IR OSF/1 \(rg:
 .[
 osfspg
 .]
-compress like messages as space allows.
+compress like messages as space allows;
 .TP
 .B MSGNOTIFY
 .IR OSF/1 \(rg:
 .[
 osfspg
 .]
-notify when message consumed.
+notify when message consumed;
 .PD
 .RE
 .TP
 .I b_pad2
-padding
+padding.
+.PD 0
+.PD
+.\".PP
+.\"The following members are
+.\".B Linux Fast-STREAMS
+.\".[
+.\"lfs
+.\".]
+.\"specific members:
+.\".TP \w'\ b_bandp\ 'u
+.\".I b_queue
+.\"the
+.\".BR queue (9)
+.\"upon which this message is queued,
+.\".B NULL
+.\"otherwise
+.\".TP
+.\".I b_bandp
+.\"the
+.\".BR qband (9)
+.\"upon which this message is queued,
+.\".BR NULL
+.\"otherwise
+.\".TP
+.\".I b_size
+.\"the size of the message (in bytes) when it was placed on the
+.\".BR queue (9)
+.\"indicated by
+.\".I b_queue
+.\"
+.\"
+.SH INTERFACE
 .PP
-The following members are
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-specific members:
-.TP \w'\ b_bandp\ 'u
-.I b_queue
-the
-.BR queue (9)
-upon which this message is queued,
-.B NULL
-otherwise
-.TP
-.I b_bandp
-the
-.BR qband (9)
-upon which this message is queued,
-.BR NULL
-otherwise
-.TP
-.I b_size
-the size of the message (in bytes) when it was placed on the
-.BR queue (9)
-indicated by
-.I b_queue
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
+.PP
+.I STREAMS
+messages are composed of a 3-type consisting of message block
+.RB ( msgb
+structure), data block
+.RB ( datab (9)
+structure) and an associated internal, external, or extended, data buffer.
+.PP
+Message blocks
+.RB ( msgb
+structures) form an instance of a reference to a data block,
+.BR datab (9),
+and associated data buffer.
+As such, the
+.B msgb
+structure contains information pertaining to the reference instance.
+.PP
+.I b_datap
+points to the
+.BR datab (9)
+data block structure which has an associated data buffer.
+See
+.BR datab (9)
+for more information on data blocks.
+.PP
+.I b_rptr
+and
+.I b_wptr
+point into the data buffer to delimit the bytes of the buffer pertinent to the reference.
+.I b_rptr
+is the read-pointer and points where bytes are to be read from the buffer.
+.I b_wptr
+is the write-pointer and points where bytes are to be written to the buffer.
+.PP
+.I b_cont
+is used to link message blocks together to form a message block chain representing a
+.I STREAMS
+message.
+.PP
+.I b_next
+and
+.I b_prev
+are used to link the (initial) message block (of a message block chain) onto a message
+.BR queue (9).
+.I b_band
+indicates the queuing priority when the message is placed on a message queue.
+.I b_flag
+contains some flags that can be used to mark a set of binary conditions on a message block or
+message.
+.PP
+Typically, the
+.IR b_next ,
+.IR b_prev ,
+.IR b_band ,
+and
+.IR b_flag ,
+members are only significant in the first message block of a message block chain, and are considered
+to apply to the entire chain of message blocks along the
+.I b_cont
+member.
+The
+.IR b_cont ,
+.IR b_rptr ,
+.IR b_wptr ,
+and
+.IR b_datap ,
+members are significant in each message block in a message block chain.
+
+
+.PP
 .SS Flags
 .TP \w'MSGNOTMARKNEXT\(em'u
 .B MSGMARK
@@ -313,7 +394,8 @@ from the base pointer,
 .IR base .
 .SS "Utility Functions"
 .PP
-The following message block utility functions are provided:
+The following message block utility functions are provided,
+(each of these functions accept a message block pointer as an argument):
 .TP \w'\ msgpullup_physreq(9)\ \-\ 'u
 .BR adjmsg (9)\ \-
 .PD 0
@@ -441,6 +523,18 @@ calling thread has exclusive access to the message block.
 .\"
 .SH MP-STREAMS
 .PP
+All
+.I STREAMS
+utility functions that operate on or manipulate
+.B msgb
+message blocks, assume that the caller has exclusive access to the passed in message block pointer.
+When a message is placed to a queue, or the reference is otherwise passed to the called function,
+it is the obligation of the caller to relinquish any references invalidated by the call.
+.PP
+Most of the issues associated with messages impinge of the data block.
+See
+.BR datab (9)
+for more information.
 .\"
 .\"
 .SH NOTICES
@@ -530,6 +624,26 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.IP \(em
+.IR "SVR 4.2"
+.[
+svr42spg
+.]
+has a
+.B long
+.I b_pad2
+member at the end of the structure.  So do many implementations based on
+.IR "SVR 4.2" .
+Some implementations use this padding for its own purposes.
+.B @PACKAGE_TITLE@
+has removed the added padding so that the resulting 3-tuple can be cache-aligned on both 32-bit and
+64-bit architectures, also so that the internal buffer can be a minimum of 64-bytes on 32-bit
+architectures, and 128-bytes on 64-bit architectures.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely on the overall size of a message block, nor access fields intended
+as padding.
 .IP \(em
 The flags defined for the
 .I b_flag

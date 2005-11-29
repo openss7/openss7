@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlinkb.9.man,v 0.9.2.13 2005/05/14 08:34:30 brian Exp $
+.\" @(#) $Id: unlinkb.9.man,v 0.9.2.14 2005/11/29 10:46:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,6 +91,11 @@ mblk_t *\fBunlinkb\fR(mblk_t *\fImp\fR);
 .TP
 .I mp
 the message to unlink.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

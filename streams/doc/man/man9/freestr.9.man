@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freestr.9.man,v 0.9.2.5 2005/05/14 08:34:24 brian Exp $
+.\" @(#) $Id: freestr.9.man,v 0.9.2.6 2005/11/29 10:46:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,6 +93,13 @@ stream head
 .TP
 .I sth
 a pointer to the stream head to deallocate.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

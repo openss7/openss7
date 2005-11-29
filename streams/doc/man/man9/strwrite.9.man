@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strwrite.9.man,v 0.9.2.3 2005/09/17 00:45:22 brian Exp $
+.\" @(#) $Id: strwrite.9.man,v 0.9.2.4 2005/11/29 10:46:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/09/17 00:45:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,6 +93,7 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .TP
 .I file
+.PD 0
 .TP
 .I buf
 .TP
@@ -103,6 +104,13 @@ sort-adjacent-labels
 .I count
 .TP
 .I ppos
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION
@@ -151,7 +159,7 @@ Upon failure,
 and
 .BR strwritev ()
 return a negative error number, under the following conditions:
-.TP
+.TP \w'[\fBERESTARTSYS\fR]\(em'u
 .RB [ EBADF ]
 .I file
 is not open for writing.
@@ -236,7 +244,7 @@ and
 is appropriate for
 .I STREAMS
 character device special files.  In that case, the following additional error conditions can occur:
-.TP
+.TP \w'[\fBERESTARTSYS\fR]\(em'u
 .RB [ ENXIO ]
 .I file
 refers to a Stream head
@@ -263,7 +271,7 @@ and
 is appropriate for
 .IR STREAMS -based
 pipes and FIFOs.  In that case, the following additional error conditions can occur:
-.TP
+.TP \w'[\fBERESTARTSYS\fR]\(em'u
 .RB [ EPIPE ]
 .I file
 refers to a Stream head

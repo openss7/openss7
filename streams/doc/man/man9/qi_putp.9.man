@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_putp.9.man,v 0.9.2.3 2005/11/28 02:43:05 brian Exp $
+.\" @(#) $Id: qi_putp.9.man,v 0.9.2.4 2005/11/29 10:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,6 +101,11 @@ pointer to the
 .BR mblk_t (9)
 message to put to the queue.
 .PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
@@ -794,7 +799,7 @@ No
 procedure for a queue pair that has not yet had
 .BR qprocson (9)
 called for the queue pair, or that has not returned from its
-.BR qi_qopen (9)
+.IR qi_qopen (9)
 routine, will be executed by
 .IR STREAMS .
 Once a

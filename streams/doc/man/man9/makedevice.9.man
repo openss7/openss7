@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: makedevice.9.man,v 0.9.2.12 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: makedevice.9.man,v 0.9.2.13 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -95,6 +95,11 @@ The major device number component.
 .TP
 .I minor
 The minor device number component.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR DDI/DKI .
 .\"
 .\"
 .SH DESCRIPTION

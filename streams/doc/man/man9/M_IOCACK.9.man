@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCACK.9.man,v 0.9.2.6 2005/11/25 23:42:03 brian Exp $
+.\" @(#) $Id: M_IOCACK.9.man,v 0.9.2.7 2005/11/29 10:46:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:03 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:26 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -149,6 +149,11 @@ contains the error number for the Stream head to return to the user in
 contains the return value for the Stream head to return to the user on the
 .BR ioctl (2s)
 system call that began the operation.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

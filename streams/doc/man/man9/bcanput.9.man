@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.23 2005/11/26 11:17:08 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.24 2005/11/29 10:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:29 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,6 +94,11 @@ the queue from which to begin testing for flow control.
 .TP
 .I band
 the priority band within which to test for flow control.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

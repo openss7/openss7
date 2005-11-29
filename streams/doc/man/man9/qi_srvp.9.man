@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_srvp.9.man,v 0.9.2.3 2005/11/28 02:43:05 brian Exp $
+.\" @(#) $Id: qi_srvp.9.man,v 0.9.2.4 2005/11/29 10:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,6 +93,11 @@ sort-adjacent-labels
 pointer to the
 .BR queue (9)
 to service.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
@@ -388,6 +393,7 @@ and processing them.  There are four actions that a
 procedure can take with regard to the disposition of message on the queue:
 .IP (1) \w'(0)\(em'u
 leave the message on the message queue;
+.PD 0
 .IP (2)
 free the message (or part of the message) with a
 .I STREAMS
@@ -406,6 +412,7 @@ place the message (or part of the message) back on the message queue using the
 .I STREAMS
 utility 
 .BR putbq (9).
+.PD
 .PP
 If a message is left on the queue, a message is placed back on the queue with
 .BR putbq (9),
@@ -442,6 +449,54 @@ instead.
 .PP
 Any other actions taken with regard to the message form part of the definition of the module or
 driver concerned.
+.\"
+.\"
+.PP
+The more specific steps taken by a
+.IR qi_srvp ()
+procedure are as follows:
+.IP (1) \w'(0)\(em'u
+Remove a message from the queue with
+.BR getq (9).
+.PD 0
+.IP (2)
+If
+.BR getq (9)
+returns
+.BR NULL ,
+return from the procedure.
+.IP (3)
+If
+.BR getq (9)
+retreives a message, check if the message is a high priority mesage
+.RI ( "db_type >= QPCTL" ).
+If it is, process the message and possibly pass it to the next queue with
+.BR putnext (9).
+.IP (4)
+If the mssage is a normal priority message
+.RI ( "db_type < QPCTL" ),
+test if the message can be passed along with
+.BR bcanputnext (9),
+for the band
+.IR b_band .
+.IP (5)
+if
+.BR bcanputnext (9)
+returns true, process the message and pass the mesage along with
+.BR putnext (9).
+.IP (6)
+If
+.BR bcanputnext (9)
+returns false, place the message back on the queue with
+.BR putbq (9)
+and return from the procedure.
+.IP (7)
+Repeat at step (1).
+.PD
+.PP
+See below under
+.RI \(lq EXAMPLES \(rg
+for examples of these steps.
 .\"
 .\"
 .SH USAGE
@@ -701,7 +756,7 @@ No
 procedure for a queue pair that has not yet had
 .BR qprocson (9)
 called for the queue pair, or that has not returned from its
-.BR qi_qopen (9)
+.IR qi_qopen (9)
 routine, will be executed by
 .IR STREAMS .
 Once a

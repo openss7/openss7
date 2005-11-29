@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qdelete.9.man,v 0.9.2.2 2005/11/28 13:20:08 brian Exp $
+.\" @(#) $Id: qdelete.9.man,v 0.9.2.3 2005/11/29 10:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 13:20:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,6 +91,13 @@ sort-adjacent-labels
 .TP
 .I q
 the queue pair to delete.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION
@@ -249,9 +256,18 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 4.2" .
+.BR qdelete ()
+is consistent with the description of the internal
+.BR qdetach (9)
+function of
+.I SVR 4
 .[
-svr42spg
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
 .]
 .\"
 .\"

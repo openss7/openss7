@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.7 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.8 2005/11/29 10:46:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -153,6 +153,11 @@ below);
 .I __pad2
 padding for alignment;
 .PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

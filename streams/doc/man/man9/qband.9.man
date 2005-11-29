@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.15 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.16 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -125,6 +125,7 @@ A pointer to the
 structure corresponding to the the next lower priority band (or
 .B NULL
 if there is no lower priority band).
+.PD 0
 .TP
 .I qb_count
 The number of bytes queued to the band.
@@ -150,6 +151,7 @@ band beneath which band flow controls will be ceased.
 .I qb_flag
 Flags for the queue band.  These are a bitwise OR of any of the following
 flags:
+.PD
 .RS
 .TP \w'\ QB_WANTW\ 'u
 .B QB_FULL
@@ -158,6 +160,7 @@ This bit is set when the queue band was full
 but has not yet dropped to the low water mark
 .RI ( qb_count == 0 || qb_count < qb_lowat )
 and is subject to flow control.
+.PD 0
 .TP
 .B QB_WANTW
 This bit is set when the queue band requires a back enable.
@@ -174,12 +177,15 @@ For
 and
 .IR UXP/V \(rg
 compatibility.  This bit is set when the queue band is back enabled.
+.PD
 .RE
 .TP
 .I qb_pad1
 Padding to pad the structure to the size of the
 .I "SVR 4.2"
 Extended fundamental Type.
+.PD 0
+.PD
 .PP
 The following members are
 .B Linux Fast-STREAMS
@@ -193,6 +199,13 @@ The count of the number of messages queued to the band.
 This member is a renaming of
 .I qb_pad1
 above.
+.PD 0
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

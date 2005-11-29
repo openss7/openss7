@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcopy.9.man,v 0.9.2.14 2005/05/14 08:34:21 brian Exp $
+.\" @(#) $Id: bcopy.9.man,v 0.9.2.15 2005/11/29 10:46:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -98,6 +98,11 @@ a pointer to the destination address to which to copy.
 .I len
 the number of bytes to copy from
 .IR src " to " dest .
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR DDI/DKI .
 .\"
 .\"
 .SH DESCRIPTION

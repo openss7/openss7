@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qready.9.man,v 0.9.2.2 2005/11/28 13:20:09 brian Exp $
+.\" @(#) $Id: qready.9.man,v 0.9.2.3 2005/11/29 10:46:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 13:20:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,6 +89,13 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .PP
 None.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

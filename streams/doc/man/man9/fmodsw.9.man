@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fmodsw.9.man,v 0.9.2.13 2005/11/28 02:43:05 brian Exp $
+.\" @(#) $Id: fmodsw.9.man,v 0.9.2.14 2005/11/29 10:46:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 02:43:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -374,6 +374,12 @@ procedure instead of SVR3 ones.
 lfs
 .]
 does not support SVR3 opens.  If this flag is not set, it is always implied.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION

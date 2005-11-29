@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qdetach.9.man,v 0.9.2.11 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: qdetach.9.man,v 0.9.2.12 2005/11/29 10:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,14 +94,22 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .TP
 .I rq
-a pointer to the read queue of the queue pair for the module or drvier being
-detached.
+a pointer to the queue pair for the module or drvier being detached.
+.PD 0
 .TP
 .I flags
 the close flags.
 .TP
 .I crp
 a pointer to the credentials of the closing user.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
 .\"
 .\"
 .SH DESCRIPTION
@@ -190,6 +198,16 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
+.BR qdelete ()
+is compatible with descriptions of
+.I STREAMS
+internals for
+.IR "SVR 4" ,
+.[
+magic
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
 Symbol
 .BR lis_qdetach ()
 is provided for compatibility with LiS.  See
@@ -197,7 +215,6 @@ is provided for compatibility with LiS.  See
 .BR lis_qdetach ()
 simply calls
 .BR qdetach ().
-.IP ""
 Note that
 .BR lis_qdetach ()
 was deprecated as of
@@ -206,9 +223,21 @@ See
 .BR lisdeprec (9)
 for more information.
 .IP ""
-SVR 4.2 and
+Portable
+.I STREAMS
+modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+.I SVR 4.2
+and
 .IR Solaris \(rg
 do not export this function.
+.IP ""
+Portable
+.I STREAMS
+and drivers will not use this function.
 .PP
 See
 .BR STREAMS (9)
@@ -221,7 +250,7 @@ for additional compatibility considerations.
 is consistent with the description of the internal
 .BR qdetach ()
 function of
-SVR 4
+.I SVR 4
 .[
 svr4
 .]
@@ -235,7 +264,8 @@ magic
 .SH HISTORY
 .PP
 .BR qdetach ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3
 .]

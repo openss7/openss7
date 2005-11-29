@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strread.9.man,v 0.9.2.4 2005/11/22 11:57:25 brian Exp $
+.\" @(#) $Id: strread.9.man,v 0.9.2.5 2005/11/29 10:46:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:25 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -138,6 +138,12 @@ the file position from which to read.
 .PD
 .\"
 .\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR strread ()
@@ -211,7 +217,7 @@ command to
 as described in
 .BR streamio (7).
 .\"
-.TP
+.TP \w'{\fBRPROTNORM\fR}\(em'u
 .RB { RNORM }
 In byte-stream
 mode,
@@ -301,7 +307,7 @@ command to
 as described in
 .BR streamio (7).
 .\"
-.TP
+.TP \w'{\fBRPROTNORM\fR}\(em'u
 .RB { RPROTNORM }
 In control-normal
 mode, when a
@@ -643,7 +649,7 @@ Upon receiving a
 .BR M_READ (9)
 message, the module or driver should service the request, forwarding it downstream or acting upon
 it, directly from its
-.BR qi_putp (9)
+.IR qi_putp (9)
 procedure.
 .IP \(en
 To act upon the message, the module or driver determines whether it has sufficient data queued to
@@ -868,7 +874,7 @@ Upon failure,
 and
 .BR strreadv ()
 return a negative error number, under the following conditions:
-.TP
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
 .RB [ EBADF ]
 .I file
 is not open for reading.

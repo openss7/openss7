@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DDI.9.man,v 0.9.2.11 2005/05/14 08:34:16 brian Exp $
+.\" @(#) $Id: DDI.9.man,v 0.9.2.12 2005/11/29 10:46:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,9 +99,13 @@ sort-adjacent-labels
 .PD
 .\"
 .\"
-.SH ARGUMENTS
+.SH INTERFACE
 .PP
-Various.
+.IR DDI/DKI .
+.\"
+.\"
+.SH OVERVIEW
+.PP
 .\"
 .\"
 .SH DESCRIPTION

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SAMESTR.9.man,v 0.9.2.16 2005/11/28 02:43:04 brian Exp $
+.\" @(#) $Id: SAMESTR.9.man,v 0.9.2.17 2005/11/29 10:46:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/28 02:43:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:27 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,6 +91,11 @@ sort-adjacent-labels
 .TP
 .I q
 the queue to compare against the next queue.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

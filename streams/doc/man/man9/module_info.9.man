@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: module_info.9.man,v 0.9.2.12 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: module_info.9.man,v 0.9.2.13 2005/11/29 10:46:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -120,12 +120,12 @@ module initialization.
 .I mi_minpsz
 The minimum packet size accepted.  This is the minimum size of a
 .I STREAMS
-message that will be accepted by the stream head on write.
+message that will be accepted by the Stream head on write.
 .TP
 .I mi_maxpsz
 The maximum packet size accepted.  This is the maximum size of a
 .I STREAMS
-message that will be accepted by the stream head on write.
+message that will be accepted by the Stream head on write.
 .TP
 .I mi_hiwat
 The high water mark for flow control.  For modules with a
@@ -140,6 +140,11 @@ The low water mark for flow control.  For modules with a
 procedure,
 this is the number of octets of queue messages beneath which the queue will
 be considered no longer flow controlled and back-enabling will occur.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

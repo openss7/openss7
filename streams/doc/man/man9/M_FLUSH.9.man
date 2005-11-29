@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_FLUSH.9.man,v 0.9.2.10 2005/11/26 11:17:07 brian Exp $
+.\" @(#) $Id: M_FLUSH.9.man,v 0.9.2.11 2005/11/29 10:46:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:26 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -135,6 +135,11 @@ If
 is not set,
 the message might only contain one
 .BR "unsigned char" .
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION

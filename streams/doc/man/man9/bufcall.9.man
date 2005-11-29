@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bufcall.9.man,v 0.9.2.20 2005/11/26 11:17:08 brian Exp $
+.\" @(#) $Id: bufcall.9.man,v 0.9.2.21 2005/11/29 10:46:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -137,6 +137,11 @@ the queue whose
 .IR qi_srvp (9)
 procedure failed the
 .BR allocb (9).
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
 .\"
 .\"
 .SH DESCRIPTION
