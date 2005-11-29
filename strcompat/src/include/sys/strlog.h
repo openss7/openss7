@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.10 2005/07/19 11:21:18 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.11 2005/11/29 05:46:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/19 11:21:18 $ by $Author: brian $
+ Last Modified $Date: 2005/11/29 05:46:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRLOG_H__
 #define __SYS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/19 11:21:18 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/11/29 05:46:38 $"
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -75,6 +75,7 @@ extern int strlog(short mid, short sid, char level, unsigned short flags, char *
     __attribute__ ((format(printf, 5, 6)));
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
+extern vstrlog_t register_strlog(vstrlog_t newlog);
 extern vstrlog_t vstrlog;
 
 struct trace_ids {

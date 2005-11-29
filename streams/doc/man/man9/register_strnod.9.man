@@ -1,1 +1,605 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: register_strnod.9.man,v 0.9.2.5 2005/11/29 10:46:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH REGISTER_STRNOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_strnod
+\- register a \fISTREAMS\fR device node
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "STREAMS" ,
+implementation specific.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.RI "int \fBregister_strnod\fP(struct cdevsw *" cdev ", struct devnode *" cmin ", minor_t " minor);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I cdev
+a pointer to the
+.BR cdevsw (9)
+.I STREAMS
+character device switch table entry representing the
+.I STREAMS
+driver to which to register a minor device node.
+.TP
+.I cmin
+a pointer to a caller completed
+.BR devnode (9)
+device node structure representing the minor device node to register.
+.TP
+.I minor
+the minor device number under which to register the device node; when specified as minus one
+.RB ( -1 ),
+.I STREAMS
+is to instead select the first available minor device number.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_strnod ()
+registers the minor device node defined by
+.IR cmin ,
+to the
+.I STREAMS
+driver defined by
+.IR cdev.
+under the minor device number specified by
+.IR minor .
+.PP
+.I cdev
+points to a
+.BR cdevsw (9)
+structure
+representing the
+.I STREAMS
+device driver, and must have already been registered with
+.BR register_strdev (9).
+.PP
+.I cmin
+points to a
+.BR devnode (9)
+structure that must be allocated and completed by the caller.  The caller must complete the
+following members of the structure:
+.TP \w'\fIn_mode\fR\(em'u
+.I n_name
+the name of the minor device node.  Specifying this member is mandatory.
+.TP
+.I n_str
+the
+.BR streamtab (9)
+structure for the minor device node.  This structure does not have to be the same as that provided
+for the
+.I STREAMS
+device referenced by
+.IR cdev .
+Specifying this member is optional:
+if the
+.I n_str
+field is
+.BR NULL ,
+however,
+.I n_str
+will be inhereted from the parent
+.I cdev
+structure.
+.TP
+.I n_mode
+the device type and mode for the minor device node.
+Specifying this member is optional: if zero (no device type) is specified, the device type and mode
+will be inherited from the parent
+.I cdev
+structure.  If the parent does not define a device type,
+.BR S_IFCHR
+will be used as a device type and
+.B S_IRUGO | S_IWUGO
+will be used for the mode.
+Usable device types are:
+.RS
+.TP \w'\fBS_IFCHR\fR\(em'u
+.B S_IFCHR
+for a regular Stream;
+.PD 0
+.TP
+.B S_IFIFO
+for a named pipe;
+.TP
+.B S_IFSOCK
+for a socket.
+.PD
+.PP
+See
+.BR stat (2)
+for usable modes and other device types.
+.RE
+.PP
+All other members will be initialized and overwritten by
+.BR register_strnod ().
+.PP
+.I minor
+specifies the minor device number under which to register the device minor node.
+Instead of a specific minor device number in
+.IR minor ,
+the caller can request that
+.BR register_strnod ()
+select the first available minor device number instead.  This is done by passing minus one
+.RB ( -1 )
+for
+.IR minor .
+.BR register_strnod ()
+returns the minor device number selected (or
+.I minor
+if a minor device number is specified).
+.PP
+As only one inode in the
+.BR specfs (5)
+file system is allowed to represent a given minor device node, only one
+.BR devnode (9)
+structure,
+.IR cmin ,
+can be registered to a given minor device number,
+.IR minor ,
+for a given
+.I STREAMS
+driver,
+.IR cdev ,
+any attempt to register two
+.BR devnode (9)
+structures to the same inode will fail.
+.PP
+Because the
+.BR specfs (5)
+file system has a defined directory hierarchy, no two minor devices for the same
+.I STREAMS
+device can have the same name.  Any attempt to register two
+.BR devnode (9)
+structures to the same
+.I cdev
+with the same name will fail.
+.PP
+Aside from these restrictions,
+.BR register_strnod ()
+provides a mechanism whereby minor device nodes of almost arbitrary names can be assigned to a
+.I STREAMS
+device node.
+.PP
+Minor device nodes registered with
+.BR register_strnod ()
+in the initialization when a loadable kernel module loads, must be de-registered with
+.BR unregister_strnod (9)
+in the kernel module unloading sequence, invoked with the same values of
+.I cdev
+and
+.IR minor ,
+(or the returned minor device number, if
+.I minor
+was minus one).
+.PP
+When the
+.BR specfs (5)
+file system is mounted on
+.BR /dev/streams ,
+registering a minor device node with
+.BR register_strnod ()
+will cause a character device node with major device number
+.I cdev->d_major
+and minor device number
+.I minor
+to appear in the driver's directory: the device node name will be
+.BI /dev/streams/ dddd / nnnn \fR,
+where
+.RI \(lq dddd \(rq
+is the value of the
+.I d_name
+member of the
+.BR cdevsw (9)
+structure pointed to by
+.IR cdev ;
+and,
+.RI \(lq nnnn \(rq
+is the value of the
+.I n_name
+member of the
+.BR devnode (9)
+structure pointed to
+.IR cmin .
+The device node will have
+.I d_major
+as a major device number and
+.I n_minor
+as a minor device number, when the device type is
+.BR S_IFCHR .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR register_strnod ()
+is used to register and create specialized device minor nodes for a
+.I STREAMS
+device or psuedo-device driver.
+Minor device nodes registered with
+.BR register_strnod ()
+are accessible both from an external character device special file with the corresponding major and
+minor device number, created with
+.BR mknod (8),
+as well as directly, by name, within the mounted
+.BR specfs (5)
+file system.
+.PP
+Whenever a
+.I STREAMS
+device or pseudo-device driver is registered with
+.BR register_strdev (9),
+it is also automatically registered as a minor device node of the
+.BR clone (4)
+driver (with a device node name the same as the driver name) with an internal call to
+.BR register_strnod ().
+.PP
+The
+.I STREAMS Administrative Driver
+.BR sad (4)
+has two special minor device nodes, one named
+.RB \(lq admin \(rq,
+with a minor device number of
+.BR 0 ,
+and another named
+.RB \(lq user \(rq,
+with a minor device number of
+.BR 1 .
+The
+.BR sad (4)
+driver, as shown under
+.RI \(lq EXAMPLES \(rq,
+below,
+uses
+.BR register_strnod ()
+to register these two specialized minor device nodes with the
+.I STREAMS
+subsystem as well as creating device nodes in the mounted
+.BR specfs (5)
+file system.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR register_strnod ()
+is successful, it returns the positive, non-zero, minor device number that was assigned to the minor
+device node.
+This number will be the same as
+.I minor
+when
+.I minor
+is not specified as minus one
+.RB ( -1 ).
+When unsuccessful,
+.BR register_strnod ()
+returns a negative error number.
+.BR register_strnod ()
+will not return zero
+.RB ( 0 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_strnod ()
+fails, it returns a negative error number as follows:
+.TP \w'[\fBEINVAL\fR]\(em'u
+.RB [ EINVAL ]
+.I cdev
+or
+.I cdev->d_name
+is
+.BR NULL ;
+or
+.I cdev->d_name
+is a zero-length string.
+.TP
+.RB [ EINVAL ]
+.I cmin
+or
+.I cmin->n_name
+is
+.BR NULL ;
+or
+.I cmin->n_name
+is a zero-length string.
+.TP
+.RB [ EINVAL ]
+.I cdev
+is not properly registered.
+.TP
+.RB [ EPERM ]
+a minor device node of the same name already exists with a different minor device number.
+.TP
+.RB [ EBUSY ]
+a minor device node of the same name already exists with the same device number.
+.TP
+.RB [ ENXIO ]
+.I minor
+was specified as minus one
+.RB ( -1 )
+specifying that a free minor device number is to be selected by the call, and no minor device
+numbers remain available.
+.TP
+.RB [ EPERM ]
+a minor device node with the same device number but a different
+.BR devnode (9)
+structure already exists.
+.TP
+.RB [ EBUSY ]
+A minor device node with the same device number but a different
+.BR devnode (9)
+structure already exists.
+.TP
+.RB [ ENOMEM ]
+could not allocate an inode in the
+.BR specfs (5)
+file system to represent the device node.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_strnod ()
+can be called at blockable process context.  It is intended to be called in the kernel module
+initialization sequence or in a kernel initialization routine.
+.BR register_strnod ()
+may also be called from within a
+.I STREAMS
+module or driver
+.IR qi_qopen (9)
+routine.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strnod ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_strnod ()
+when loading
+must call
+.BR unregister_strnod (9)
+before unloading.
+.BR unregister_strnod (9)
+must be called with the same value of
+.I cdev
+and
+.I minor
+with which
+.BR register_strnod ()
+was called (or returned in the case of
+.IR minor ).
+.PP
+Drivers registered with
+.BR register_strnod ()
+will also appear as a device node under
+.BR /dev/streams ,
+when the
+.BR specfs (5)
+filesystem has been mounted on
+.BR /dev/streams .
+.\"
+.\"
+.SH EXAMPLES
+.SS Example #1 - minor device node registration
+.PP
+Following is an example of registration and de-registration of minor device nodes for the
+.IR "STREAMS Adminstrative Driver" ,
+.BR sad (4),
+abbreviated from the
+.I src/drivers/sad.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory:
+.PP
+.nf
+\fC\s-2\
+ 1  static struct cdevsw sad_cdev = {
+ 2      .d_name = "sad",
+ 3      .d_str = &sad_info,
+ 4      .d_flag = D_MP,
+ 5      .d_fop = NULL,
+ 6      .d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+ 7      .d_kmod = THIS_MODULE,
+ 8  };
+ 9  
+.B "10  static struct devnode sad_node_admin = {
+.B "11    n_name:"admin",
+.B "12    n_flag:0,
+.B "13    n_mode:S_IFCHR | S_IRUSR | S_IWUSR,
+.B "14  };
+15  
+.B "16  static struct devnode sad_node_user = {
+.B "17    n_name:"user",
+.B "18    n_flag:0,
+.B "19    n_mode:S_IFCHR | S_IRUGO | S_IWUGO,
+.B "20  };
+21  
+22  int __init
+23  sad_init(void)
+24  {
+25      int err;
+26  
+27      printk(KERN_INFO SAD_BANNER);
+28      sad_minfo.mi_idnum = modid;
+.B "29      if ((err = register_strdev(&sad_cdev, major)) < 0)
+30          return (err);
+31      if (major == 0 && err > 0)
+32          major = err;
+33      bzero(&sads, sizeof(sads));
+.B "34      register_strnod(&sad_cdev, &sad_node_admin, 0);
+.B "35      register_strnod(&sad_cdev, &sad_node_user, 1);
+36      return (0);
+37  };
+38  
+39  void __exit
+40  sad_exit(void)
+41  {
+.B "42      unregister_strnod(&sad_cdev, 1);
+.B "43      unregister_strnod(&sad_cdev, 0);
+.B "44      unregister_strdev(&sad_cdev, major);
+45  };
+\s+2\fP
+.FI
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cdevsw (9),
+.BR devnode (9),
+.BR register_strdev (9),
+.BR streamtab (9),
+.BR stat (2),
+.BR specfs (5),
+.BR unregister_strnod (9),
+.BR mknod (8),
+.BR clone (4),
+.BR sad (4),
+.IR qi_qopen (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_strnod ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_strnod ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+Registration of
+.I STREAMS
+drivers and modules in inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implementations
+and additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and de-registration of \fISTREAMS\fR drivers is implementation
+specific and not subject to standardization.
+.BR register_strnod ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strnod ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.12 2005/11/08 02:49:15 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.13 2005/11/29 05:46:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/08 02:49:15 $ by $Author: brian $
+ Last Modified $Date: 2005/11/29 05:46:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/11/08 02:49:15 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/11/29 05:46:39 $"
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
@@ -77,10 +77,10 @@
 
 extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
     __attribute__ ((format(printf, 5, 6)));
+extern int vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args);
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 extern vstrlog_t register_strlog(vstrlog_t newlog);
-//extern vstrlog_t vstrlog;
 
 struct trace_ids {
 	short ti_mid;

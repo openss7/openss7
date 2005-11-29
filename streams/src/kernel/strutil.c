@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/28 13:20:11 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/11/29 05:46:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/28 13:20:11 $ by $Author: brian $
+ Last Modified $Date: 2005/11/29 05:46:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/28 13:20:11 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/11/29 05:46:39 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/11/28 13:20:11 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/11/29 05:46:39 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -3963,8 +3963,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 }
 
 static rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
-static vstrlog_t vstrlog = &vstrlog_default;
-//EXPORT_SYMBOL(vstrlog);
+static vstrlog_t vstrlog_hook = &vstrlog_default;
 
 /**
  *  register_strlog:	- register a new STREAMS logger
@@ -3986,12 +3985,35 @@ register_strlog(vstrlog_t newlog)
 	vstrlog_t oldlog;
 
 	write_lock_irqsave(&strlog_reg_lock, flags);
-	oldlog = xchg(&vstrlog, newlog);
+	oldlog = xchg(&vstrlog_hook, newlog);
 	write_unlock_irqrestore(&strlog_reg_lock, flags);
 	return (oldlog);
 }
 
 EXPORT_SYMBOL(register_strlog);
+
+/**
+ *  vstrlog:	- log a STREAMS message
+ *  @mid:	module id
+ *  @sid:	stream id
+ *  @level:	severity level
+ *  @flag:	flags controlling distribution
+ *  @fmt:	printf(3) format
+ *  @args:	format specific arguments
+ */
+int
+vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
+{
+	int result = 0;
+	read_lock(&strlog_reg_lock);
+	if (vstrlog_hook != NULL) {
+		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
+	}
+	read_unlock(&strlog_reg_lock);
+	return (result);
+}
+
+EXPORT_SYMBOL(vstrlog);
 
 /**
  *  strlog:	- log a STREAMS message
@@ -4014,11 +4036,11 @@ strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 	int result = 0;
 
 	read_lock(&strlog_reg_lock);
-	if (vstrlog != NULL) {
+	if (vstrlog_hook != NULL) {
 		va_list args;
 
 		va_start(args, fmt);
-		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
+		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
 		va_end(args);
 	}
 	read_unlock(&strlog_reg_lock);

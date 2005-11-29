@@ -1,1 +1,365 @@
-.so man9/strlog.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: register_strlog.9.man,v 0.9.2.3 2005/11/29 10:46:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH REGISTER_STRLOG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_strlog, vstrlog_t
+\- register a new
+.I STREAMS
+log device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strlog.h>
+.HP
+\fBtypedef\fR int (*\fBvstrlog_t\fR)(short, short, char, unsigned short, char *, va_list);
+.PD 0
+.HP
+.RI "vstrlog_t \fBregister_strlog\fP(vstrlog_t " newlog );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.BR register_strlog ()
+arguments are as follows:
+.TP
+.I newlog
+a new logging function to register of type
+.BR vstrlog_t .
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_strlog ()
+provides the ability for a
+.I STREAMS
+driver to alter the behaviour of the
+.BR strlog (9)
+and
+.BR vstrlog (9)
+.I STREAMS
+utilities.
+.PP
+.BR register_strlog ()
+registers a new logging function and is used by the
+.BR log (4)
+driver.
+By default,
+when the
+.BR log (4)
+driver is not loaded,
+.BR vstrlog_hook ()
+is set to
+.BR vstrlog_default ()
+that simply prints a formatted message to the
+.B Linux
+kernel system logs ala
+.BR printk ().
+.BR register_strlog ()
+allows the
+.BR log (4)
+driver to register a full
+.I STREAMS
+.BR strlog ()
+compatible logging function against
+.BR vstrlog_hook ().
+.BR register_strlog ()
+returns the old value of the
+.BR vstrlog_hook ()
+function pointer that can be used with
+.BR register_strlog ()
+to replace the old function.
+If
+.I newlog
+is
+.BR NULL ,
+calls to
+.BR strlog ()
+and
+.BR vstrlog ()
+will do nothing and return zero
+.RB ( 0 ).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR register_strlog ()
+is a
+.B @PACKAGE_TITLE@
+implementation specific function used by the
+.BR log (4)
+driver to replace the behaviour of the
+.BR strlog (9)
+and
+.BR vstrlog (9)
+.I STREAMS
+utilities.
+.PP
+Any non-portable, specialized log driver that is to be used as a replacement for
+.BR log (4)
+driver or default function can also use this function to register to the
+.B vstrlog_t
+hook.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR register_strlog ()
+returns a function pointer to the function that was previously registered against the
+.BR strlog (9)
+utility.  In the case of the
+.BR log (4)
+driver, this will be
+.BR vstrlog_default .
+The return value can be used as the
+.I newlog
+argument in a subsequent call to
+.BR register_strlog ()
+to de-register the installed function pointer.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR register_strlog ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_strlog ()
+is intended to be called from process context in kernel module initialization procedures for the
+.BR log (4)
+driver.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strlog ()
+is MP-safe.  The
+.BR strlog (9),
+.BR vstrlog (9),
+and
+.BR register_strlog ()
+functions take read-write locks on a global
+.B vstrlog_reg_lock
+lock to protect and support
+.BR log (4)
+driver kernel module unloading.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.SS Example #1 - \fBlog\fP(4) strlog registration
+.PP
+The following example is taken directly from the
+.BR log (4)
+driver contained in the
+.I src/drivers/log.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution:
+.PP
+.nf
+\fC\s-2\
+ 1  static vstrlog_t oldlog = NULL;
+ 2  
+ 3  int __init
+ 4  log_init(void)
+ 5  {
+ 6      int err;
+ 7  
+ 8      printk(KERN_INFO LOG_BANNER);
+ 9      log_minfo.mi_idnum = modid;
+10      if ((err = register_strdev(&log_cdev, major)) < 0)
+11          return (err);
+12      if (major == 0 && err > 0)
+13          major = err;
+14      /* hook into vstrlog */
+15      oldlog = register_strlog(&log_vstrlog);
+16      return (0);
+17  }
+\s+2\fP
+.fi
+.IP "\fBLine 8-13\fR:" \w'\fBLine\ 00-00\fR:\(en'u
+The
+.BR log (4)
+driver first registers with
+.I STREAMS
+as a
+.I STREAMS
+driver.
+.IP "\fBLine 15\fR:"
+The
+.BR log (4)
+driver then hooks to the
+.BR strlog (9)
+function with
+.BR register_strlog ().
+The returned value is save for later de-registration.
+.\"
+.SS Example #2 - log(4) strlog deregistration
+.PP
+The following example is taken directly from the
+.BR log (4)
+driver contained in the
+.I src/drivers/log.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution:
+.PP
+.nf
+\fC\s-2\
+ 1  void __exit
+ 2  log_exit(void)
+ 3  {
+ 4      /* unhook from vstrlog */
+ 5      register_strlog(oldlog);
+ 6      unregister_strdev(&log_cdev, major);
+ 7  }
+\s+2\fP
+.fi
+.IP "\fBLine 5\fR:" \w'\fBLine\ 00-00\fR:\(en'u
+.BR register_strlog ()
+is called with the stored value of the previous hook function,
+.IR oldlog ,
+to de-register the hook function.  This must be performed before the
+.BR log (4)
+driver is de-registered from
+.IR STREAMS .
+.IP "\fBLine 6\fR:"
+The
+.BR log (4)
+driver unregisters as a
+.I STREAMS
+device.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR strlog (9),
+.BR strlog (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_strlog ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strlog ()
+is new for
+.BR "@PACKAGE_TITLE@ .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

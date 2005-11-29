@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/11/28 13:20:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/11/29 05:42:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/28 13:20:03 $ by $Author: brian $
+# Last Modified $Date: 2005/11/29 05:42:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1302,6 +1302,7 @@ man_MANS = \
 	man9/untimeout.9 \
 	man9/unweldq.9 \
 	man9/vcmn_err.9 \
+	man9/vstrlog.9 \
 	man9/vstrlog_t.9 \
 	man9/weld_arg_t.9 \
 	man9/weld_fcn_t.9 \
@@ -2559,6 +2560,7 @@ dist_noinst_MANS = \
 	man9/untimeout.9.man \
 	man9/unweldq.9.man \
 	man9/vcmn_err.9.man \
+	man9/vstrlog.9.man \
 	man9/vstrlog_t.9.man \
 	man9/weld_arg_t.9.man \
 	man9/weld_fcn_t.9.man \

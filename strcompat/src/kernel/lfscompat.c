@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/28 18:55:57 $ by $Author: brian $
+ Last Modified $Date: 2005/11/29 05:46:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.16  2005/11/29 05:46:39  brian
+ - straightened out register_strlog
+
  Revision 0.9.2.15  2005/11/28 18:55:57  brian
  - added register_strlog function
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -124,7 +127,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/28 18:55:57 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -437,8 +440,7 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 }
 
 static rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
-static vstrlog_t vstrlog = &vstrlog_default;
-//EXPORT_SYMBOL(vstrlog);
+static vstrlog_t vstrlog_hook = &vstrlog_default;
 
 /**
  *  register_strlog:	- register a new STREAMS logger
@@ -460,12 +462,35 @@ register_strlog(vstrlog_t newlog)
 	vstrlog_t oldlog;
 
 	write_lock_irqsave(&strlog_reg_lock, flags);
-	oldlog = xchg(&vstrlog, newlog);
+	oldlog = xchg(&vstrlog_hook, newlog);
 	write_unlock_irqrestore(&strlog_reg_lock, flags);
 	return (oldlog);
 }
 
 EXPORT_SYMBOL(register_strlog);
+
+/**
+ *  vstrlog:	- log a STREAMS message
+ *  @mid:	module id
+ *  @sid:	stream id
+ *  @level:	severity level
+ *  @flag:	flags controlling distribution
+ *  @fmt:	printf(3) format
+ *  @args:	format specific arguments
+ */
+int
+vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
+{
+	int result = 0;
+	read_lock(&strlog_reg_lock);
+	if (vstrlog_hook != NULL) {
+		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
+	}
+	read_unlock(&strlog_reg_lock);
+	return (result);
+}
+
+EXPORT_SYMBOL(vstrlog);
 
 /**
  *  strlog:	- log a STREAMS message
@@ -488,11 +513,11 @@ strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 	int result = 0;
 
 	read_lock(&strlog_reg_lock);
-	if (vstrlog != NULL) {
+	if (vstrlog_hook != NULL) {
 		va_list args;
 
 		va_start(args, fmt);
-		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
+		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
 		va_end(args);
 	}
 	read_unlock(&strlog_reg_lock);

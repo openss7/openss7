@@ -1,1 +1,512 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: register_cmajor.9.man,v 0.9.2.5 2005/11/29 10:46:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH REGISTER_CMAJOR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_cmajor
+\- register a device external major number
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.RI "int \fBregister_cmajor\fR(struct cdevsw *" cdev ", major_t " major ", struct file_operations *" fops );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fImajor\fR\(em'u
+.I cdev
+a pointer to a
+.BR cdevsw (9)
+.I STREAMS
+character device switch table entry representing the
+.I STREAMS
+driver to which to register a major device node.
+.TP
+.I major
+the device major number to register;
+.TP
+.I fops
+the file operations to register against the character device.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_cmajor ()
+registers the file operations,
+.IR fops ,
+to the
+.I STREAMS
+driver defined by
+.IR cdev
+under the major device number specified by
+.IR major .
+.PP
+.I cdev
+points to a
+.BR cdevsw (9)
+structure representing the
+.I STREAMS
+device driver that must be allocated and completed by the caller.  The caller must complete the
+folllowing members of the structure:
+.TP \w'\fId_mode\fR\(em'u
+.I d_name
+the name of the
+.I STREAMS
+driver.  Completing this member is mandatory.
+.TP
+.I d_flag
+flags specifying additional characteristics of the
+.I STREAMS
+driver.
+See
+.BR cdevsw (9)
+for format and options.
+Completing this member is mandatory.
+.TP
+.I d_fop
+the file operations used by the
+.I STREAMS
+driver.
+Completing this member is mandatory.
+.TP
+.I d_mode
+the device type and mode of the character device.
+The format of this member is equivalent to the
+.I st_mode
+member as described in
+.BR stat (2).
+Completing this member is mandatory.
+.TP
+.I d_kmod
+a pointer to the kernel module (typically
+.BR THIS_MODULE )
+whose reference count is to be incremented when the driver is opened or
+.I STREAMS
+subsystem resource allocations are made, and decremented when the driver is closed or
+.I STREAMS
+subsystem resources freed.
+Completing this member is recommended.
+.PP
+.I major
+is the external file system major device number to be assigned to the
+.I STREAMS
+driver.
+.I major
+can also be specified as zero
+.RB ( 0 )
+to indicate that
+.BR register_cmajor ()
+should instead assign an available character major device number.
+.PP
+.I fops
+is a pointer to a file operations structure that provide entry points to the Stream head.
+This is typically
+.BR strm_f_ops ,
+that is, the regular
+.I STREAMS
+Stream head file operations.
+.PP
+.BR register_cmajor ()
+registers the
+.B cdevsw (9)
+referenced by
+.IR cdev
+with the
+.BR specfs (5)
+file system using
+.BR register_strdrv (9),
+if it has not already been so registered.
+.PP
+.BR register_cmajor ()
+then allocates a
+.BR devnode (9)
+structure to represent the character major device node and populates it with values inherited from
+.IR cdev .
+The
+.I n_major
+member is set to the assigned
+.I major
+device number, and the
+.I n_minor
+member is set to zero
+.RB ( 0 ).
+.BR register_cmajor ()
+then calls the internal
+.BR register_xinode ()
+function to register an external inode with the
+.B Linux
+kernel using the kernel
+.BR register_chrdev ()
+function.  The name passed to the kernel function is
+.IR cdev->d_name ,
+the file operations are those specified by
+.IR fops ,
+and the major device number is passed directly from
+.IR major .
+.PP
+Note that the file operations,
+.IR fops ,
+are the file operations that will be used by the
+.B Linux
+kernel when opening a character device node in an external filesystem and not the file operations
+used internal to the
+.BR specfs (5)
+file system, nor directly the Stream head file operations.
+.PP
+Note that the major device number can be specified as zero
+.RB ( 0 ),
+in which case the major device number will be assigned to a free major device number by
+.BR register_chrdev ()
+and returned as a positive return value.  Any valid external major device number can be used for
+.IR major .
+.PP
+.BR register_cmajor ()
+can be called multiple times for the same registered
+.BR cdevsw (9)
+entry to register additional external major device numbers for the same entry.  On each call to
+.BR register_cmajor ()
+only one character major device number will be allocated.  If
+.I major
+is zero on each call, a new available major device number will be allocated on each call.
+.\"
+.\"
+.SH USAGE
+.PP
+This is probably not the function that your want.  See
+.BR register_strdev (9).
+.PP
+.BR register_cmajor ()
+is an internal
+.B @PACKAGE_TITLE@
+implementation specific function that will not be called directly by
+.I STREAMS
+modules or drivers.
+The symbol is exported for the use of the
+Stream head
+.BR sth (4),
+and Clone driver
+.BR clone (4).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_cmajor ()
+registers the
+.I STREAMS
+driver described by
+.I cdev
+and returns a positive number returning the specified or assigned character major device number.
+Upon failure,
+.BR register_cmajor ()
+does not effect registration and returns a negative error number.
+.PP
+.BR register_cmajor ()
+is called when appropriate by
+.BR register_strdev (9).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_cmajor ()
+fails to register the specified
+.I STREAMS
+driver, it returns an appropriate negative error number as follows:
+.TP \w'[\fBENOMEM\fR]\(em'u
+.RB [ ENOMEM ]
+memory for the required
+.BR devnode (9)
+structure could not be allocated.
+.TP
+.RB [ EINVAL ]
+.I cdev
+or
+.I cdev->d_name
+is
+.BR NULL ;
+or
+.I cdev->d_name
+is a zero-length string.
+.TP
+.RB [ EINVAL ]
+.I major
+does not contain zero
+.RB ( 0 )
+or a valid major device number.
+.TP
+.RB [ EINVAL ]
+the
+.BR cdevsw (9)
+structure referenced by
+.I cdev
+has not previously been registered internal to the
+.I STREAMS
+subsystem.
+.TP
+.RB [ EBUSY ]
+.I major
+specifies a major device number against which a driver is already registered.
+.PP
+Also,
+.BR register_cmajor ()
+can return any of the error codes returned by the
+.B Linux
+kernel
+.BR register_chrdev ()
+call.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_cmajor ()
+is intended to be called in a blockable process context during the loading of a
+.I STREAMS
+kernel module and as part of the intialization of that kernel module.  It may also be called at
+blockable process context as part of a
+.IR qi_qopen (9)
+routine.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_cmajor ()
+is MP-safe when called from the proper context.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR register_cmajor ()
+is a convenience function that simply registers
+.I cdev
+using
+.BR register_strdrv (9),
+allocates a
+.BR devnode (9)
+structure, populates it with the values from
+.IR cdev ,
+and then registers the major device number,
+.IR major ,
+with the
+.B Linux
+kernels by calling
+.BR register_chrdev ().
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR register_cmajor ()
+is an internal
+.B @PACKAGE_TITLE@
+implementation specific function that is not intended to be used directly by
+.I STREAMS
+drivers and modules.  This is certainly not the utility you need: see
+.BR register_strdrv (9)
+and
+.BR register_strdev (9).
+.PP
+Loadable kernel modules that call
+.BR register_cmajor ()
+when loading must acll
+.BR unregister_cmajor (9)
+before unloading.
+.BR unregister_cmajor (9)
+must be called with the same arguments with which
+.BR register_cmajor ()
+was called.
+.PP
+Major device nodes registered with
+.BR register_cmajor ()
+will appear as directories in the
+.BR /dev/streams
+directoy when the
+.BR specfs (5)
+file system has been mounted on
+.BR /dev/streams .
+The directory will be named
+.BI /dev/streams/ name\fR,
+where
+.RI \(lq name \(rq
+is the
+.I d_name
+field of the
+.BR cdevsw (9)
+structure referenced by
+.IR cdev .
+.PP
+.BR register_cmajor ()
+is an internal
+.B @PACKAGE_TITLE@
+function that is provided by the
+.BR specfs (5)
+kernel module and used by the
+.BR register_strdev (9)
+function.
+.PP
+If you use
+.BR register_cmajor ()
+from outside of the
+.B @PACKAGE_TITLE@
+package, your code may break on the next release.
+Do no use
+.BR register_cmajor ():
+use
+.BR register_strdrv (9)
+or
+.BR register_strdev (9)
+instead.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cdevsw (9),
+.BR stat (2),
+.BR specfs (5),
+.BR register_strdrv (9),
+.BR devnode (9),
+.BR sth (4),
+.BR clone (4),
+.BR register_strdev (9),
+.IR qi_qopen (9),
+.BR unregister_cmajor (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_cmajor ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_cmajor ()
+is a
+.B @PACKAGE_TITLE@
+implementation specific function with support for the mountable
+.BR specfs (5)
+file system.  Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementations provide different mechanisms.
+The
+.BR strcompat
+package for
+.B @PACKAGE_TITLE@
+provides additional mechanisms compatible with other implementations.
+See also
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and de-registration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR register_cmajor ()
+is a
+.B @PACKAGE_TITLE@
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_clone ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
