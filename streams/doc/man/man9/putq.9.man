@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.24 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.25 2005/11/30 00:56:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 00:56:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -120,8 +120,11 @@ adjusts the queue's flags and byte counts appropriately and schedules the
 queue
 .IR qi_srvp (9)
 procedure when necessary.
+.\"
+.\"
+.SS Message Queueing Priority
 .PP
-.BR putq ()
+.I STREAMS
 queues messages based on message queueing priority.  There are three priority classes for messages:
 .PP
 .TS
@@ -132,7 +135,7 @@ lllsss.
 3.:\fINormal\fP:(\fBdb_type < QPCTL && b_band == 0\fP)
 .TE
 .PP
-.BR putq ()
+.I STREAMS
 only examines the message class and priority band of the first message block of a message.  If a
 .I High Priority
 message is passed to
@@ -172,14 +175,14 @@ message, it is placed after other messages in the queue
 band.
 If the message is a
 .I Normal
-message, it is place after all other messages.
+message, it is placed after all other messages.
 .PP
 Placing the first message for a queue band onto the queue can result in the allocation of a
 .BR qband (9)
 structure to provide accounting for the queue band.  Failure to allocate a
 .BR qband (9)
 structure can cause
-.BR putq (9)
+.BR putq ()
 to fail.  Failure can be avoided by ensuring that a
 .BR qband (9)
 structure exists for the band,
@@ -199,8 +202,10 @@ message is placed onto the queue, the queue will always be enabled, as with
 that is, the queue's
 .IR qi_srvp (9)
 procedure will be scheduled if it exists.
-This is also true for
-.BR insq (9)
+This is true for
+.BR appq (9),
+.BR insq (9),
+.BR putq (),
 and
 .BR putbq (9).
 Because this is true, a
@@ -209,7 +214,7 @@ message should never be placed back on a queue by the queue's
 .IR qi_srvp (9)
 procedure with
 .BR putbq (9),
-otherwise and infinite loop could result.
+otherwise and indefinite loop could result.
 .PP
 .BR putq ()
 is allowed to enable the queue
@@ -224,7 +229,7 @@ procedure is ready to read the queue.
 .PP
 If a
 .I Priority Band
-message is placed onto ane empty queue band, the queue will be enabled, as with
+message is placed onto an empty queue band, the queue will be enabled, as with
 .BR enableq (9);
 that is, the queue's
 .IR qi_srvp (9)
@@ -259,8 +264,7 @@ found no message queued on its last call and no message has been queued since.
 .PP
 When an ordinary message is enqueued by
 .BR putq (),
-.BR putq ()
-will cause the
+it will cause the
 .IR qi_srvp (9)
 procedure to be scheduled only if the queue was previously empty, and a previous
 .BR getq (9)
@@ -275,6 +279,19 @@ presumes that the
 procedure is blocked by flow control and the procedure will be rescheduled by
 .I STREAMS
 when the block is removed.
+.PP
+As a general rule for
+.BR appq (9),
+.BR insq (9),
+.BR putq (),
+and
+.BR putbq (9),
+the queue is enabled whenever the message placed on the message queue becomes the
+first message on the queue, unless the message is a normal priority message and the queue has been
+disabled with
+.BR noenable (9),
+or the message was placed with
+.BR putbq (9).
 .PP
 .BR putq ()
 only looks at the priority band of the first message block.  If a high priority message is passed to
@@ -297,10 +314,11 @@ tries to allocate a new
 .BR qband (9)
 structure for each band up to and including the band of the message.
 .PP
-The above rules also apply to
-.BR putbq (9)
-and
-.BR insq (9).
+The above rules apply to
+.BR appq (9),
+.BR insq (9),
+.BR putq (),
+.BR putbq (9).
 .PP
 .BR putq ()
 will not schedule a queue if
@@ -759,7 +777,7 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR putq ()
-is compatible with 
+is compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
@@ -769,7 +787,7 @@ and implementations based on
 .[
 svr4dk
 .]
-with the following porting considerations:
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 When a banded message (a priority message, with a non-zero
 .IR b_band )
@@ -793,6 +811,8 @@ structures into a reverse sorted
 .I q_bandp
 list on the
 .BR queue (9).
+.I q_nband
+is adjusted accordingly and always reflects the highest allocated band.
 .IP ""
 This is consistent with the description in the
 .IR "SVR 4 STREAMS Programmer's Guide" ,
@@ -838,35 +858,51 @@ as does
 .I LiS
 allocates
 .BR qband (9)
-structures on demand and will also reuse
+structures on demand, links them in a sparse array,
+and will also reuse
 .BR qband (9)
 structures that were previously allocated for bands that are currently empty.  This is not a good
 approach because user established band high- and low-water marks will be reset to those of the
 .BR queue (9)
-structure when a subsequent message is place on the reused band.  This
+structure when a subsequent message is place on the reused band.
+Also, it is difficult to predict when
+.BR appq (9),
+.BR insq (9),
+.BR putq (),
+.BR putbq (9),
+will fail as a result of failure to allocate a
+.BR qband (9)
+structure.
+This
 .I LiS
 bug is not perpetuated in
 .BR "@PACKAGE_TITLE@" .
 .IP ""
 Portable
 .I STREAMS
-modules and drivers can rely on the fact that intermediate band strutures will be allocated when a
-priority message is placed on a queue using
+modules and drivers can rely on intermediate band strutures being allocated
+when a priority message is placed on a queue using
 .BR putq (),
-and can read the
+and may examine the
 .I q_nband
 member of the
 .BR queue (9)
 structure to determine whether a
 .BR qband (9)
 exists for a given band number.
+.IP ""
 Portable
 .I STREAMS
-modules and drivers will not use
-.I LiS
-but will use
-.B @PACKAGE_TITLE@
-instead.
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
 .IP \(em
 .BR putq ()
 orders the
@@ -875,10 +911,10 @@ structures in the list pointed to by the
 .I q_bandp
 member of the
 .BR queue (9)
-structure from highest band number to lowest band number.  This ensures that, during non-exhaustive
-linear searches, higher priority
+structure from highest band number to lowest band number.  This ensures that
+higher priority
 .BR qband (9)
-structures are located faster than lower priority
+structures can be accessed faster than lower priority
 .BR qband (9)
 structures.
 .IR Solaris \(rg
@@ -913,7 +949,7 @@ structure, and, will not access
 .BR qband (9)
 or
 .BR queue (9)
-members directly, but will use the more portable
+members directly, but will use the portable
 .BR strqget (9)
 and
 .BR strqset (9)

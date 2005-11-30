@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.25 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.26 2005/11/30 00:56:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 00:56:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -134,7 +134,8 @@ is executed following
 .BR getq (9)
 for the same queue, it is guaranteed to succeed.
 .\"
-.SS Flow Control
+.\"
+.SS "Flow Control"
 .PP
 .BR putbq ()
 enables the queue
@@ -597,12 +598,178 @@ is compatible with
 usldk
 .]
 and implementations based on
-.IR "SVR 4"
+.IR "SVR 4" ,
 .[
 svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+When a banded message (a priority message, with a non-zero
+.IR b_band )
+is placed on a queue with
+.BR putq (9),
+.BR putbq (9),
+.BR insq (9),
+or
+.BR appq (9),
+and a
+.BR qband (9)
+structure does not exist for the band corresponding to
+.IR b_band ,
+.BR putbq ()
+tries to allocate
+.BR qband (9)
+structures for all non-existent bands up to and including the band of the message
+and places the resulting
+.BR qband (9)
+structures into a reverse sorted
+.I q_bandp
+list on the
+.BR queue (9).
+.I q_nband
+is adjusted accordingly and always reflects the highest allocated band.
+.IP ""
+This is consistent with the description in the
+.IR "SVR 4 STREAMS Programmer's Guide" ,
+which states:
+\(lqIf a mesages is passed to
+.BR putbq ()
+with a
+.I b_band
+value that is greater than the number of
+.BR qband (9)
+structures associated with the queue [member
+.I q_nband
+in the
+.BR queue (9)
+structure],
+.BR putbq ()
+tries to allocate a new
+.BR qband (9)
+structure for each band up to and including the band of the message.\(rq
+.[
+svr4spg
+.]
+.IP ""
+.IR Solaris \(rg
+allocates
+.BR qband (9)
+structures up to an including
+.IR b_band ,
+and maintains the
+.I q_nband
+member of the
+.BR queue (9)
+structure.
+It is safe to assume that other
+.IR UNIX \(rg
+implementations based on
+.I SVR 4
+follow
+.I SVR 4
+as does
+.IR Solaris \(rg.
+.IP ""
+.I LiS
+allocates
+.BR qband (9)
+structures on demand, links them in a sparse array,
+and will also reuse
+.BR qband (9)
+structures that were previously allocated for bands that are currently empty.  This is not a good
+approach because user established band high- and low-water marks will be reset to those of the
+.BR queue (9)
+structure when a subsequent message is place on the reused band.
+Also, it is difficult to predict when
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+will fail as a result of failure to allocate a
+.BR qband (9)
+structure.
+This
+.I LiS
+bug is not perpetuated in
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers can rely on intermediate band strutures being allocated
+when a priority message is placed on a queue using
+.BR putbq (),
+and may examine the
+.I q_nband
+member of the
+.BR queue (9)
+structure to determine whether a
+.BR qband (9)
+exists for a given band number.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+.BR putq ()
+orders the
+.BR qband (9)
+structures in the list pointed to by the
+.I q_bandp
+member of the
+.BR queue (9)
+structure from highest band number to lowest band number.  This ensures that
+higher priority
+.BR qband (9)
+structures can be accessed faster than lower priority
+.BR qband (9)
+structures.
+.IR Solaris \(rg
+.[
+soldoc
+.]
+lists
+.BR qband (9)
+structures from lowest to highest priority, without gaps (see consideration of allocation above).
+.I LiS
+.[
+lis
+.]
+lists
+.BR qband (9)
+structures from most recently allocated/reused to least recently allocated/reused.
+Neither the
+.IR Solaris \(rg
+nor the
+.I LiS
+approach is very efficient.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not depend on the ordering of
+.BR qband (9)
+structures within the
+.I q_bandp
+list on the
+.BR queue (9)
+structure, and, will not access
+.BR qband (9)
+or
+.BR queue (9)
+members directly, but will use the portable
+.BR strqget (9)
+and
+.BR strqset (9)
+utilities instead.
+.IP \(em
 If
 .BR putbq ()
 is passed an invalid

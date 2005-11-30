@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.25 2005/11/29 10:46:29 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.26 2005/11/30 00:56:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 00:56:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,7 +93,7 @@ the size of the message buffer to allocate.
 .PD 0
 .TP
 .I pri
-the priority of the requested message buffer.
+the priority of the request.
 .PD
 .\"
 .\"
@@ -321,7 +321,8 @@ is other than
 .BR BPRI_WAITOK ,
 .BR allocb ()
 can be called from any context, including user context, module procedures, call outs, callbacks,
-soft interrupts and interrupt service routines.
+soft interrupts and interrupt service routines.  (As a general rule, it is not wise to perform memory
+allocations in interrupt service routines.)
 When
 .I pri
 is
@@ -342,7 +343,8 @@ is MP-safe.  The caller has exclusive access to the returned message.
 .\"
 .SH NOTICES
 .PP
-Many post-SVR 3
+Many
+.RI post- "SVR 3"
 .[
 svr3
 .]
@@ -353,22 +355,24 @@ argument to
 .BR allocb ().
 The message block
 .I pri
-was an SVR 3
+was an
+.I SVR 3
 .[
 svr3spg
 .]
 concept which was found not to be useful, primarily due to priority inversion.
 For a history of the priority mechanism, and a discussion as to why the
-mechanism was abandoned in SVR 4,
+mechanism was abandoned in
+.IR "SVR 4" ,
 .[
 svr4spg
 .]
 see
-.RI \*(lq "The Magic Garden Explained" \*(rq.
-.[
+.RI \*(lq "The Magic Garden Explained"
+.[ [\fB
 magic
 %P Section 7.2.2
-.]
+.] \fR].\(rq
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -385,10 +389,10 @@ in a single memory cache allocation of a
 implementation structure.  This is consistent with descriptions for
 .I SVR 4
 as described in
-.RI \(lq "The Magic Garden Explained" .\(rq
-.[
+.RI \(lq "The Magic Garden Explained"
+.[ [\fB
 magic
-.]
+.] \fR].\(rq
 .PP
 .B Linux Fast-STREAMS
 .[

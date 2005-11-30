@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocq.9.man,v 0.9.2.20 2005/11/29 10:46:29 brian Exp $
+.\" @(#) $Id: allocq.9.man,v 0.9.2.21 2005/11/30 00:56:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 00:56:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -118,7 +118,8 @@ implementation specific.
 .PP
 Allocate a new
 .BR NULL -initialized
-queue pair.
+queue pair,
+.BR queue (9).
 Queue pairs allocated with
 .BR allocq ()
 can be freed with
@@ -135,6 +136,64 @@ or
 procedures associated with either
 queue, will have zero maximum and minimum packet sizes and high and low water
 marks; and will have no synchronization queues associated with the queue pair.
+.\"
+.SS /proc File System
+.PP
+A
+.BR queue (9)
+structure pair is dynamically allocated for every instance of a Stream head, module or driver,
+within a Stream.
+.BR allocq ()
+monitors the number of
+.BR queue (9)
+structure pairs currently allocated, and the high water mark for allocations since the last reboot.
+The counts and high water mark can be viewed in
+.BR proc (5)
+file system under
+.BR /proc/streams/strinfo .
+See
+.BR strinfo (5)
+for details. 
+.\"
+.\"
+.SH USAGE
+.PP
+.PP
+Although this function is documented as an internal function of
+.IR "SVR 4" ,
+.[
+magic
+.]
+.BR allocq ()
+is not normally called directly by
+.I STREAMS
+modules or drivers.  This function is normally internal to the
+.I STREAMS
+subsystem, yet,
+.B Linux Fast-STREAMS
+provides an exported version of this function for use by modules and drivers
+so that private queue pairs can be allocated.
+.PP
+All
+.B Linux Fast-STREAMS
+queue functions (e.g., 
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9))
+are designed to allow them to be executed on a detached queue pair.  This function can be used to
+allocate a private queue pair for use as a message buffer by
+.I STREAMS
+modules and drivers.  The queue pair is not linked into any stream and no message size or water
+marks or queue procedures are associated with the queue.
+.PP
+Message sizes, water marks and procedures can be associated with a private queue pair using
+.BR setq (9).
+.PP
+The queue can also be pushed onto or removed from a stream using
+.BR qattach (9)
+and
+.BR qdetach (9).
 .\"
 .\"
 .SH RETURN
@@ -176,43 +235,6 @@ is MP-safe.  The caller has exclusive access to the returned queue pair.
 .\"
 .SH NOTICES
 .PP
-Although this function is documented as an internal function of
-.IR "SVR 4" ,
-.[
-magic
-.]
-.BR allocq ()
-it is not normally called directly by
-.I STREAMS
-modules or drivers.  This function is normally internal to the
-.I STREAMS
-scheduler, yet,
-.B Linux Fast-STREAMS
-provides an exported version of this function for use by modules and drivers
-so that private queue pairs can be allocated.
-.PP
-All
-.B Linux Fast-STREAMS
-queue functions (e.g., 
-.BR putq (9),
-.BR insq (9),
-.BR appq (9),
-.BR rmvq (9))
-can be executed on a detached queue pair.  This function can be used to
-allocate a private queue pair for use as a message buffer by
-.I STREAMS
-modules and drivers.  The queue pair is not linked into any stream and no
-message size or water marks or queue procedures are associated with the queue.
-.PP
-Message sizes, water marks and procedures can be associated with a private
-queue pair using
-.BR setq (9).
-.PP
-The queue can also be pushed onto or removed from a stream using
-.BR qattach (9)
-and
-.BR qdetach (9).
-.PP
 This function should not be used by portable
 .I STREAMS
 modules or drivers.
@@ -226,6 +248,8 @@ modules or drivers.
 .BR appq (9),
 .BR rmvq (9),
 .BR setq (9),
+.BR proc (5),
+.BR strinfo (5),
 .BR qattach (9),
 .BR qdetach (9).
 .\"
@@ -285,7 +309,8 @@ It is declared in some earlier
 .I <sys/stream.h>
 header files.
 .IP \(em
-Binary compatibility is not guaranteed.
+Source and binary compatibility is not guaranteed, even from version to version and release to
+release.
 .PP
 See
 .BR liscompat (9),
@@ -296,6 +321,16 @@ for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
+.PP
+Although
+.BR allocq ()
+appears in some early
+.I AT&T
+header files, it is not documented in the
+.IR "SVR 4.2 STREAMS Programmer's Guide" .
+.[
+svr42spg
+.]
 .PP
 .BR allocq ()
 is compliant with the description of the internal
@@ -320,6 +355,8 @@ macdoc
 .[
 macspg
 .]
+There is very little documentation avilable on
+.BR mi_allocq ().
 .\"
 .\"
 .SH HISTORY
@@ -342,10 +379,9 @@ svr3
 .]
 .PP
 .BR mi_allocq ()
-is probably the equivalent
+is likely the equivalent
 .I Mentat
-function.  There is very little documentation avilable on
-.BR mi_allocq ().
+function.
 .\"
 .\"
 .[

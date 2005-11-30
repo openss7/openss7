@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocstr.9.man,v 0.9.2.7 2005/11/29 10:46:29 brian Exp $
+.\" @(#) $Id: allocstr.9.man,v 0.9.2.8 2005/11/30 00:56:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 00:56:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,7 +90,7 @@ stream head
 .\"
 .SH ARGUMENTS
 .PP
-none
+None.
 .\"
 .\"
 .SH INTERFACE
@@ -103,9 +103,39 @@ implementation specific.
 .SH DESCRIPTION
 .PP
 .BR allocstr ()
-allocates an internal 
+dynamically allocates and returns a
 .I STREAMS
-stream head.
+internal Stream head,
+.BR stdata (9)
+structure.
+.BR stdata (9)
+structures allocated with
+.BR allocstr ()
+can be freed with
+.BR freestr (9).
+.PP
+Some implementations accept a queue pair as an argument.
+.BR allocstr ()
+allocates a queue pair for the Stream head using
+.BR allocq (9)
+and accepts no agruments.
+.\"
+.SS /proc File System
+.PP
+A
+.BR stdata (9)
+structure is dynamically allocated for every instance of a Stream head.
+.BR allocstr ()
+monitors the number of
+.BR stdata (9)
+structures currently allocated, and the high water mark for allocations since the last reboot.  The
+counts and high water mark can be viewed in the
+.BR proc (5)
+file system under
+.BR /proc/streams/strinfo .
+See
+.BR strinfo (5)
+for details.
 .\"
 .\"
 .\".SH USAGE
@@ -177,8 +207,18 @@ will not be called by portable
 modules and drivers.
 .\"
 .\"
-.\".SH IMPLEMENTATION
-.\".PP
+.SH IMPLEMENTATION
+.PP
+.BR allocstr ()
+simply calls
+.BR allocq (9)
+to allocate a queue pair, allocates an
+.BR stdata (9)
+structure from memory cache, and intializes the
+.BR stdata (9)
+structure to point to the allocated queue pair, and returns a pointer to the
+.BR stdata (9)
+structure.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -225,6 +265,19 @@ See
 .BR lisdeprec (9)
 for more information.
 .IP \(em
+Some older
+.I AT&T
+header files from
+.IR "SVR 3"
+show this function as accepting a
+.BR queue (9)
+pointer as an argument.  Others do not.
+.IP ""
+.BR allocstr ()
+will not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
 .BR allocstr ()
 should not be called by normal
 .I STREAMS
@@ -237,7 +290,8 @@ or any other UNIX directly.  It is declared in some earlier
 .I <sys/stream.h>
 header files.
 .IP \(em
-Binary compatibility is not guaranteed.
+Source and binary compatibility is not guaranteed, even from version to version and release to
+release.
 .PP
 See
 .BR STREAMS (9)
@@ -245,6 +299,16 @@ for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
+.PP
+Although
+.BR allocstr ()
+appears in some early
+.I AT&T
+header files, it is not documented in the
+.IR "SVR 4.2 STREAMS Programmer's Guide" .
+.[
+svr42spg
+.]
 .PP
 .BR allocstr ()
 is compliant with the description of the internal
