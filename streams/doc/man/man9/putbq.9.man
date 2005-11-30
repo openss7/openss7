@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.26 2005/11/30 00:56:13 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.27 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 00:56:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -149,27 +149,16 @@ is a high priority message;
 .IP \-
 the
 .B QWANTR
-flag is set; or
-.IP \-
-.I mp
-is a priority band message and the
-.B QB_WANTR
-flag is set for band
-.IR mp->b_band .
+flag is set.
 .PD
 .PP
 Because
 .I mp
 was typically removed from the queue with
 .BR getq (9),
-both the
+the
 .BR QWANTR
-flag will be clear (because a message was retrieved)
-and the
-.BR QB_WANTR
-for band
-.I mp->b_band
-will be clear (because the message was just retrieved from that band).
+flag will be clear (because a message was retrieved).
 The only event that will cause these flags to become set is if the current or another thread removes
 a message from the queue with
 .BR getq (9)
@@ -197,7 +186,7 @@ driver or module
 .IR qi_srvp (9)
 procedure.
 .PP
-The basic steps taken by a
+The basic steps taken by a module
 .IR qi_srvp (9)
 procedure are as follows:
 .IP (1) \w'(0)\(em'u
@@ -425,18 +414,8 @@ procedure to re-execute at the earliest opportunity resulting in
 possible indefinite looping.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
-.B @PACKAGE_TITLE@
-implements a
-.RB per- qband (9)
-structure
-.B QB_WANTR
-flag for finder control over enabling for priority band messages while maintaining compatibility
-with
-.I SVR 4.2
-flow control.  For a description of this mechanism, see
-.BR getq (9).
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
 .SH EXAMPLES
@@ -696,7 +675,9 @@ bug is not perpetuated in
 Portable
 .I STREAMS
 modules and drivers can rely on intermediate band strutures being allocated
-when a priority message is placed on a queue using
+when a
+normal priority
+message is placed on a queue using
 .BR putbq (),
 and may examine the
 .I q_nband
@@ -897,6 +878,14 @@ suxspg
 .[
 uw7spg
 .]
+(But strangely, code inspection reveals that
+.IR OpenSolaris \(rg
+permits
+.BR putq ()
+and
+.BR getq (9)
+to be called on a stream frozen with
+.BR freezestr (9).)
 .IP ""
 Portable
 .I STREAMS
@@ -906,38 +895,42 @@ on a stream currently frozen by the caller with
 .BR freezestr (9).
 .RB ( "@PACKAGE_TITLE@"
 includes an assertion to enforce this in the SMP environment.)
-.IP \(em
-.BR putbq ()
-cannot be called from an interrupt service routine.
-.IP ""
-.B @PACKAGE_TITLE@
-does not permit
-.BR putbq ()
-to be called from an interrupt service routine context to remove the need for suppressing
-local interrupts throughout the
-.I STREAMS
-executive.  The only queue procedure that
-.B @PACKAGE_TITLE@
-permits to be called from an interrupt service routine context is
-.BR put (9),
-and that function defers until the next
-.BR runqueues (9)
-pass.
-.IP ""
-Portable
-.I STREAMS
-modules and drivers will not call
-.BR putbq ()
-from any context outside a
-.I STREAMS
-queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
-other than a
-.I STREAMS
-coroutine, only
-.BR put (9)
-will be used by a portable
-.I STREAMS
-driver or module.
+.\".IP \(em
+.\".BR putbq ()
+.\"cannot be called from an interrupt service routine (hard irq).
+.\".IP ""
+.\".B @PACKAGE_TITLE@
+.\"does not permit
+.\".BR putbq ()
+.\"to be called from an interrupt service routine (hard irq) context to remove the need for suppressing
+.\"local interrupts, and greatly reducing the need to suppress local bottom halves, throughout the
+.\".I STREAMS
+.\"executive.  The only queue utilities that
+.\".B @PACKAGE_TITLE@
+.\"permits to be called from an interrupt service routine (hard irq) context are
+.\".BR qwriter (9),
+.\".BR streams_put (9),
+.\".BR mp_become_writer (9)
+.\"and
+.\".BR put (9),
+.\"and these functions defer until the next
+.\".BR runqueues (9)
+.\"pass.
+.\".IP ""
+.\"Portable
+.\".I STREAMS
+.\"modules and drivers will not call
+.\".BR putbq ()
+.\"from any context outside a
+.\".I STREAMS
+.\"queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
+.\"other than a
+.\".I STREAMS
+.\"coroutine, only
+.\".BR put (9)
+.\"will be used by a portable
+.\".I STREAMS
+.\"driver or module.
 .IP \(em
 Symbol
 .BR lis_putbq ()
@@ -979,6 +972,12 @@ first appeared in
 .IR "SVR 3" .
 .[
 svr3spg
+.]
+.PP
+.BR putbq ()
+was described in Dennis Ritchie's original paper.
+.[
+streamio
 .]
 .\"
 .\"

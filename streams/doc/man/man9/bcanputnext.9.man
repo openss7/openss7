@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.25 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.26 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,9 +91,11 @@ sort-adjacent-labels
 .TP
 .I q
 the queue after which to begin testing for flow control.
+.PD 0
 .TP
 .I band
 the priority band within which to test for flow control.
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -158,48 +160,71 @@ specified,
 .BR bcanputnext ()
 looks for the next forward queue which has a
 .IR qi_srvp (9)
-procedure or which has no
-further forward queue.
+procedure or which has no next queue (i.e. the
+.I q->q_next
+pointer is
+.BR NULL ).
 .PP
 If this forward queue has the
+.B QFULL
+.RI ( band " == 0)
+or
 .B QB_FULL
+.RI ( band " >= 1)
 flag clear indicating that it is not full for the specified
 .IR band ,
+or a
+.BR qband (9)
+structure does not yet exist for the specified band
+.RI ( band " >= 1),
+then
 .BR bcanputnext ()
 will return true (1).
 .PP
 If this forward queue has the
+.B QFULL
+.RI ( band " == 0)
+or
 .B QB_FULL
+.RI ( band " >= 1)
 flag set indicating that it is full for the specified
 .IR band ,
+and a
+.BR qband (9)
+structure exists for the specified band
+.RI ( band " >= 1),
+then
 .BR bcanputnext ()
 will return false (0).
 .PP
 When
 .BR bcanputnext ()
-return false (0), it also sets the
+returns false (0), it also sets the
+.B QWANTW
+.RI ( band " == 0)
+or
 .B QB_WANTW
+.RI ( band " >= 1)
 flag for the specified
 .IR band ,
 indicating that the
 .I STREAMS
 scheduler should back-enable
 .IR qi_srvp (9)
-procedures
-backward up the queues when the flow controlled
+procedures backward up the queues when the flow controlled
 .I band
-is no longer full.
+is no longer flow controlled (falls to its low water mark).
 .\"
 .\"
 .SH USAGE
 .PP
 It is the responsibility of a
 .I STREAMS
-module or driver putting a banded non-priority
-message to a subsequent queue to check for flow control on that queue using
+module or driver passing a banded (normal priority) data message
+.RB ( M_PROTO "(9), " M_DATA (9))
+to a subsequent queue to check for flow control using
 .BR bcanputnext ()
-for the band associated with the message before placing a message on that
-queue with
+for the band associated with the message before passing the message to the queue with
 .BR putnext (9).
 A
 .I STREAMS
@@ -222,7 +247,8 @@ will return false (0) when the specified
 message queue is flow
 controlled for the specified band, and return true (1) when the specified
 .I STREAMS
-message queue is not flow controlled for the specified band.
+message queue is not flow controlled for the specified band, or the specified band has not yet been
+written to.
 .\"
 .\"
 .SH ERRORS
@@ -234,15 +260,23 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR bcanputnext ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.BR bcanputnext ()
+must be called from a syncrhonous context [see
+.BR mp-streams (9)].
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR bcanputnext ()
-is an MP-safe version of
-.BI bcanput( q->q_next ).
+is MP-safe when called from the correct context.
+.PP
+.BR canputnext ()
+cannot be called from an asyncrhonous context, unless bracketed with
+.BR freezestr (9)
+and
+.BR unfreezestr (9).
 .PP
 It is possible, due to race conditions in a multiprocessor (MP) system, that
 .BR bcanputnext ()
@@ -258,7 +292,42 @@ is then in violation of flow-control rules; however, the extent of this violatio
 .\"
 .SH NOTICES
 .PP
+It is the responsibility of a
+.I STREAMS
+module or driver passing a banded
+.I normal priority
+message to an adjacent queue to check for flow control using
 .BR bcanputnext ()
+before passing a message to the queue with
+.BR putnext (9) .
+.PP
+.BR canputnext (9)
+and
+.BR bcanputnext ()
+should always be used instead of
+.BI canput( q->q_next )
+and
+.BI bcanput( q->q_next )
+on multiprocessor (MP) implementations.
+.PP
+.BR canput (9)
+and
+.BR canputnext (9)
+are the equivalent of
+.BR bcanput ()
+and
+.BR bcanputnext (9)
+with a zero
+.IR band :
+and in fact can be implemented as such.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
 provides the additional feature that
 .I band
 can be specified as
@@ -273,9 +342,22 @@ band exists that is not flow controlled,
 .BR bcanputnext ()
 with
 .B ANYBAND
-returns one (1).  If all existing bands are flow controlled,
+returns one (1).
+If all existing bands are flow controlled,
 .BR bacnputnext ()
 returns zero (0).
+.PP
+.BR bcanputnext ()
+uses atomic bit operations and does not require locking of the queue
+structure.  Therefore,
+.BR bcanput ()
+can be called for a
+.I q
+that is frozen with
+.BR freezestr (9).
+.\"
+.\"
+.\".SH EXAMPLES
 .\"
 .\"
 .SH "SEE ALSO"
@@ -324,9 +406,24 @@ flag for the queue or band.  This means that, although flow controlled, no
 backenable procedure will be run.  This can lead to indefinite postponement of
 a queue
 .IR qi_srvp (9)
-procedure under LiS.
+procedure under
+.IR LiS .
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
 .BR bcanputnext ()
 does not have this problem.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+instead of
+.IR LiS .
 .IP \(em
 The declaration for
 .BR bcanputnext ()
@@ -334,7 +431,13 @@ provides that
 .I band
 is of type
 .BR int .
-Under LiS,
+Under
+.IR "SVR 4.2 DDI/DKI" ,
+.[
+usldk
+.]
+and other systems based on
+.IR "SVR 4",
 .I band
 is
 .BR "unsigned char" .
@@ -345,20 +448,39 @@ protects dereferences of the
 pointer with a
 Stream head
 lock.
-Under LiS,
+Under
+.IR LiS ,
 .BR bcanputnext ()
 is simply a macro that calls
 .BR bcanput (9)
 without protection for the
 .I q->q_next
 pointer dereference.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+instead of
+.IR LiS .
 .IP \(em
 Symbol
 .BR lis_bcanputnext ()
-is provided for compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR liscompat (9).
 .BR lis_bcanputnext ()
 simply calls
+.BR bcanputnext ()
+directly.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not access these symbols, but will call
 .BR bcanputnext ()
 directly.
 .IP \(em
@@ -393,7 +515,7 @@ frozen with
 .IP ""
 Portable
 .I STREAMS
-drivers and modules should not call
+drivers and modules will not call
 .BR bcanputnext ()
 on a
 Stream
@@ -429,7 +551,7 @@ to fail when the read queue passes its high water mark.
 .IR SUPER-UX \(rg
 will not fail in such a circumstance, making its behaviour inconsistent with other
 .IR UNIX \(rg
-impelemntations of
+implementations of
 .IR STREAMS .
 .IP ""
 Portable
@@ -470,13 +592,18 @@ uslspg
 .PP
 .BR bcanputnext ()
 first appeared in
-.IR "SVR 4.0 MP" " and " "SVR 4.2 MP" .
+.IR "SVR 4.0 STREAMS" .
 .[
-svr4dk
+svr4spg
 .]
+.PP
+Earlier versions of
+.I STREAMS
+.RI (e.g. " SVR 3" )
 .[
-usldk
+svr3spg
 .]
+did not have priority bands.
 .\"
 .\"
 .[

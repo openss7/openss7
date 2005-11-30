@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.21 2005/11/29 10:46:34 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.22 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -765,7 +765,7 @@ member of the corresponding queue.
 (Since
 .B QWANTR
 is only set on an empty queue, there is no corresponding
-.B QB_WANTR
+.RB \(lq QB_WANTR \(rq
 flag for the
 .BR qband (9)
 structure.)

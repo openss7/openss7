@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/11/29 05:42:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/11/30 13:59:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/29 05:42:56 $ by $Author: brian $
+# Last Modified $Date: 2005/11/30 13:59:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -847,6 +847,7 @@ driver_pages += \
 	man4/sad.4 \
 	man8/test-sad.8 \
 	man5/autopush.5 \
+	man5/strapush.5 \
 	man8/autopush.8
 endif
 if CONFIG_STREAMS_SAD_MODULE
@@ -854,6 +855,7 @@ driver_pages += \
 	man4/sad.4 \
 	man8/test-sad.8 \
 	man5/autopush.5 \
+	man5/strapush.5 \
 	man8/autopush.8
 endif
 if CONFIG_STREAMS_SFX
@@ -1311,6 +1313,7 @@ man_MANS = \
 	man9/bcangetany.9 \
 	man9/bcanputany.9 \
 	man9/bcanputnextany.9 \
+	man5/strioctl.5 \
 	man9/strioctl.9 \
 	man9/strpoll.9 \
 	man9/strread.9 \
@@ -2108,6 +2111,7 @@ dist_noinst_driver_pages += \
 	man4/sad.4.man \
 	man8/test-sad.8.man \
 	man5/autopush.5.man \
+	man5/strapush.5.man \
 	man8/autopush.8.man
 endif
 if CONFIG_STREAMS_SAD_MODULE
@@ -2115,6 +2119,7 @@ dist_noinst_driver_pages += \
 	man4/sad.4.man \
 	man8/test-sad.8.man \
 	man5/autopush.5.man \
+	man5/strapush.5.man \
 	man8/autopush.8.man
 endif
 if CONFIG_STREAMS_SFX
@@ -2569,6 +2574,7 @@ dist_noinst_MANS = \
 	man9/bcangetany.9.man \
 	man9/bcanputany.9.man \
 	man9/bcanputnextany.9.man \
+	man5/strioctl.5.man \
 	man9/strioctl.9.man \
 	man9/strpoll.9.man \
 	man9/strread.9.man \

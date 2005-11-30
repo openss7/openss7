@@ -1,0 +1,357 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: strapush.5.man,v 0.9.2.1 2005/11/30 13:59:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/11/30 13:59:22 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRAPUSH 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.\"
+.\"
+.SH NAME
+.B strapush
+\- \fISTREAMS\fR autopush structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The
+.B strapush
+structure, defined in
+.RB < sys/sad.h >,
+is formatted as follows:
+.PP
+.nf
+\fC\s-1\
+struct strapush {
+        unsigned int sap_cmd;
+        long sap_major;
+        long sap_minor;
+        long sap_lastminor;
+        long sap_npush;
+        char sap_list[MAXAPUSH][FMNAMSZ + 1];
+        int sap_anchor;
+        char sap_module[FMNAMSZ + 1];
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B strapush
+structure contains the following members:
+.TP \w'\fBsap_lastminor\fR\(em'u
+.I sap_cmd
+the autopush command; one of:
+.RS
+.TP \w'\fBSAD_GAP_SOL\fR\(em'u
+.B SAD_SAP
+set autopush list;
+.PD 0
+.TP
+.B SAD_GAP
+get autopush list;
+.TP
+.B SAD_VML
+verify module list;
+.TP
+.B SAD_SAP_SOL
+set autopush list (with anchor),
+.IR Solaris \(rg;
+.[
+soldoc
+.]
+.TP
+.B SAD_GAP_SOL
+get autopush list (with anchor),
+.IR Solaris \(rg;
+.[
+soldoc
+.]
+.PD
+.RE
+.TP
+.I sap_major
+major device number to which command applies;
+.PD 0
+.TP
+.I sap_minor
+(first) minor device number (of range) to which command applies;
+.TP
+.I sap_lastminor
+last minor device number of range to which command applies;
+.TP
+.I sap_npush
+number of modules;
+.TP
+.I sap_list
+list of module names;
+.TP
+.I sap_anchor
+position for anchor;
+.TP
+.I sap_module
+driver name (instead of major device number).
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "STREAMS Administrative Driver" :
+.I User
+and
+.IR DDI/DKI .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strapush
+structure is a structure defined in
+.RB < sys/sad.h >
+that is used by the
+.IR "STREAMS Adminstrative Driver" ,
+see
+.BR sad (4).
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B strapush
+structure is used by a user level process that opens the
+.BR sad (4)
+driver and is the argument of a numer of input-output controls,
+.IR ioctl (2s),
+that are supported by the driver.
+See
+.BR sad (4)
+for details.
+.PP
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+also uses the
+.B strapush
+structure within the
+.I STREAMS
+subsystem in the kernel for maintaining and controlling
+.BR autopush (8)
+lists.
+See
+.BR apush_set (9),
+.BR apush_get (9),
+.BR apush_vml (9),
+for details.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.I sap_anchor
+member was added for
+.IR Solaris \(rg
+support.
+The
+.I sap_module
+member was added to support use of a driver name instead of a major device number.
+Both are
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific members.
+.\"
+.\"
+.\".SH EXAMPLES
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sad (4),
+.BR autopush (8),
+.BR apush_set (9),
+.BR apush_get (9),
+.BR apush_vml (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B strapush
+structure is compatible with
+.IR "SVR 4.2" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B strapush
+includes the additional member,
+.IR sap_anchor ,
+in support of the
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+anchor mechanism.
+.IP ""
+Portable
+.I STREAMS
+applications, modules and drivers will not access the
+.I sap_anchor
+member.
+.IP \(em
+.B strapush
+includes the additional member,
+.IR sap_module ,
+that permits drivers to be referenced by name instead of only by major device number.  Although this
+is a common extension provided by a number of implementations of the
+.BR sad (4)
+driver, it is non-portable.
+.IP ""
+Portable
+.I STREAMS
+applications will not access the
+.I sap_module
+member.
+.IP \(em
+.B strapush
+declares all members directly.  Some implementations, notably
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+implements this structure as a collection of unions and defines the members as using C pre-processor
+macros.
+.IP ""
+Portable
+.I STREAMS
+applications will not depend on any given member of the structure being directly declared or
+declared as a C pre-processor macro.
+.IP \(em
+Because there are fundamental differences between
+.IR "SVR 4.2"
+and
+.B Linux
+data types, binary compatibility is not guaranteed.
+.PP
+See
+.IR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B strapush
+data structure first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

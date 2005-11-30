@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.25 2005/11/30 00:56:13 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.26 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 00:56:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -125,19 +125,21 @@ procedure when necessary.
 .SS Message Queueing Priority
 .PP
 .I STREAMS
-queues messages based on message queueing priority.  There are three priority classes for messages:
+queues messages based on message queueing priority.  There are three priority classes for messages
+that can be tested with
+.BR pcmsg (9):
 .PP
 .TS
 tab(:);
-lllsss.
-1.:\fIHigh Priority\fP:(\fBdb_type >= QPCTL\fP)
-2.:\fIPriority Band\fP:(\fBdb_type < QPCTL && b_band > 0\fP)
-3.:\fINormal\fP:(\fBdb_type < QPCTL && b_band == 0\fP)
+lllbsss.
+1.:\fIHigh Priority\fP:\fC(pcmsg(db_type) != 0 && b_band == 0)\fP
+2.:\fINormal Priority\fP:\fC(pcmsg(db_type) == 0 && b_band >= 0)\fP
+3.:\fIOrdinary\fP:\fC(pcmsg(db_type) == 0 && b_band == 0)\fP
 .TE
 .PP
-.I STREAMS
+.BR putq ()
 only examines the message class and priority band of the first message block of a message.  If a
-.I High Priority
+high priority
 message is passed to
 .BR putq ()
 with a non-zero
@@ -146,7 +148,10 @@ value,
 .I b_band
 is reset to zero
 .RB ( 0 )
-before placing the message on the queue.  If the message is passed to
+before placing the message on the queue.
+If a
+normal priority
+message is passed to
 .BR putq ()
 with
 .I b_band
@@ -162,46 +167,63 @@ structure for each band up to and including the band of the message.
 below.)
 .PP
 The message will always be placed in order in the queue.  If the message is a
-.I High Priority
+high priority
 message, it will be placed on the queue immediately following other
-.I High Priority
+high priority
 messages and ahead of
-.I Priority Band
+normal priority
 and
-.I Normal
+ordinary
 messages.  If the message is a
-.I Priority Band
-message, it is placed after other messages in the queue
-band.
+normal priority
+message with a non-zero
+.IR b_band ,
+it is placed after other messages in the queue band.
 If the message is a
-.I Normal
-message, it is placed after all other messages.
+ordinary
+message (with a zero
+.IR b_band ),
+it is placed after all other messages.
 .PP
 Placing the first message for a queue band onto the queue can result in the allocation of a
 .BR qband (9)
-structure to provide accounting for the queue band.  Failure to allocate a
+structure to provide flow control accounting for the queue band.  Failure to allocate a
 .BR qband (9)
 structure can cause
 .BR putq ()
 to fail.  Failure can be avoided by ensuring that a
 .BR qband (9)
 structure exists for the band,
-.IR mp->b_band ,
+.IR b_band ,
 using
 .BR strqget (9)
 or
 .BR strqset (9).
+.PP
+Whether a
+.BR qband (9)
+exists for a given
+.I b_band
+can be determined by examining the
+.I q_nband
+member of the
+.BR queue (9)
+structure.  When
+.BR "q_nband\ >=\ b_band" ,
+a structure exists; when
+.BR "q_nband\ <\ b_band" ,
+one needs to be allocated.
 .\"
 .\"
 .SS "Flow Control"
 .PP
 If a
-.I High Priority
+high priority
 message is placed onto the queue, the queue will always be enabled, as with
 .BR qenable (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists.
+procedure will be scheduled if it exists (and is not already scheduled).
 This is true for
 .BR appq (9),
 .BR insq (9),
@@ -209,7 +231,7 @@ This is true for
 and
 .BR putbq (9).
 Because this is true, a
-.I High Priority
+high priority
 message should never be placed back on a queue by the queue's
 .IR qi_srvp (9)
 procedure with
@@ -220,7 +242,7 @@ otherwise and indefinite loop could result.
 is allowed to enable the queue
 .RB ( QNOENB
 is not set) if the message is a
-.I Priority Band
+normal priority
 message, or the
 .B QWANTR
 flag is set indicating that the
@@ -228,25 +250,29 @@ flag is set indicating that the
 procedure is ready to read the queue.
 .PP
 If a
-.I Priority Band
-message is placed onto an empty queue band, the queue will be enabled, as with
+normal priority
+message with a non-zero
+.I b_band
+is placed onto an empty queue band, the queue will be enabled, as with
 .BR enableq (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists and the
+procedure will be scheduled if it exists (and is not already scheduled) and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
 .PP
 If a
-.I Normal
-message is placed onto an empty queue and the
+ordinary
+message with a zero
+.I b_band
+is placed onto an empty queue and the
 .B QWANTR
 flag is set for the queue, then the queue will be enabled, as with
 .BR enableq (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists and the
+procedure will be scheduled if it exists (and is not already scheduled) and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
@@ -287,54 +313,57 @@ As a general rule for
 and
 .BR putbq (9),
 the queue is enabled whenever the message placed on the message queue becomes the
-first message on the queue, unless the message is a normal priority message and the queue has been
-disabled with
+first message on the queue, unless the message is a
+normal priority
+message and the queue has been disabled with
 .BR noenable (9),
 or the message was placed with
 .BR putbq (9).
-.PP
-.BR putq ()
-only looks at the priority band of the first message block.  If a high priority message is passed to
-.BR putq ()
-with a non-zero
-.I b_band
-value,
-.I b_band
-is reset to zero
-.RB ( 0 )
-before placing the messge on the queue.  If the message is passed to
-.BR putq ()
-with a
-.I b_band
-value that is greater than the number of
-.BR qband (9)
-structures associated with the queue,
-.BR putq ()
-tries to allocate a new
-.BR qband (9)
-structure for each band up to and including the band of the message.
-.PP
-The above rules apply to
-.BR appq (9),
-.BR insq (9),
-.BR putq (),
-.BR putbq (9).
-.PP
-.BR putq ()
-will not schedule a queue if
-.BR noenable (9)
-has been previously called for this queue.
-.BR noenable ()
-instructs
-.BR putq ()
-to enqueue the message when called by this queue, but not to schedule the
-.IR qi_srvp (9)
-procedure.
-.BR noenable (9)
-doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
-.BR noenable (9)
-is
-.BR enableok (9).
+.\".PP
+.\".BR putq ()
+.\"only looks at the priority band of the first message block.  If a
+.\"high priority
+.\"message is passed to
+.\".BR putq ()
+.\"with a non-zero
+.\".I b_band
+.\"value,
+.\".I b_band
+.\"is reset to zero
+.\".RB ( 0 )
+.\"before placing the messge on the queue.  If the message is passed to
+.\".BR putq ()
+.\"with a
+.\".I b_band
+.\"value that is greater than the number of
+.\".BR qband (9)
+.\"structures associated with the queue,
+.\".BR putq ()
+.\"tries to allocate a new
+.\".BR qband (9)
+.\"structure for each band up to and including the band of the message.
+.\".PP
+.\"The above rules apply to
+.\".BR appq (9),
+.\".BR insq (9),
+.\".BR putq (),
+.\".BR putbq (9).
+.\".PP
+.\".BR putq ()
+.\"will not schedule a queue if
+.\".BR noenable (9)
+.\"has been previously called for this queue.
+.\".BR noenable ()
+.\"instructs
+.\".BR putq ()
+.\"to enqueue the message when called by this queue, but not to schedule the
+.\".IR qi_srvp (9)
+.\"procedure.
+.\".BR noenable (9)
+.\"doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
+.\".BR noenable (9)
+.\"is
+.\".BR enableok (9).
 .\"
 .\"
 .SH USAGE
@@ -342,10 +371,48 @@ is
 .BR putq ()
 is intended to be used from the
 .IR qi_putp (9)
-procedure in the same queue in which the message will be queued.  A module should not call
+procedure in the same queue in which the message will be queued.
+.PP
+The based steps taken by a module
+.IR qi_putp (9)
+put procedure, for a module with a
+.IR qi_srvp (9)
+service procedure, are as follows:
+.IP (1) \w'(0)\(em'u
+Check if the passed message is a
+high priority
+.RI ( "db_type >="
+.BR QPCTL )
+message.  If it is, process the message and possibly pass it to the next queue with
+.BR putnext (9).
+.PD 0
+.IP (2)
+If the message is a
+normal priority
+.RI ( "db_type <"
+.BR QPCTL )
+message, test if the message can be passed along with
+.BR bcanputnext (9),
+for the band,
+.IR b_band .
+.IP (3)
+If
+.BR bcanputnext (9)
+returns true, process the message and pass the message along with
+.BR putnext (9).
+.IP (4)
+If
+.BR bcanputnext (9)
+returns false, place the message on the message queue with
+.BR putq ().
+.IP (5)
+Return.
+.PD
+.PP
+A module should not call
 .BR putq ()
 directly to pass messages to a neighboring module.
-.BR put (9)
+.BR putq ()
 may be used as the
 .IR qi_putp (9)
 procedure value in either or both of a module's
@@ -359,9 +426,11 @@ procedure(s).
 .BR putq ()
 should not be called from outside the
 .I STREAMS
-framework.  Drivers that need to put messages to their own queues from outside the
+framework, but only from within a queue
+.IR qi_putp (9)
+put procedure.  Drivers that need to put messages to their own queues from outside the
 .I STREAMS
-framework (asyncrhonously) must use
+framework (asyncrhonously) should use
 .BR put (9)
 instead.
 .PP
@@ -421,28 +490,24 @@ When
 .BR getq (9)
 fails to retrieve a message from an empty queue, it sets the
 .B QWANTR
-flag on the queue
-(and the
-.B QB_WANTR
-flag in all queue bands)
-to indicate to
-.BR putq ()
+flag on the queue to indicate to
+.BR putq (),
+[also
+.BR appq (9)
 and
-.BR insq (9)
+.BR insq (9)],
 that it is blocked awaiting messages.
 .PP
 When
 .BR getq (9)
 successfully retrieves a message from the queue, it clears the
 .B QWANTR
-flag on the queue
-(and all
-.B QB_WANTR
-flags for all queue bands equal to or lower than the band of the retrieved message)
-to indicate to
-.BR putq ()
+flag on the queue to indicate to
+.BR putq (),
+[also
+.BR appq (9)
 and
-.BR insq (9)
+.BR insq (9)],
 that it is no longer blocked awaiting messages for those priority bands.
 .PP
 Because each priority band has separate high- and low-water marks and queue band counts, just
@@ -457,19 +522,19 @@ can find the queue, and the causes of the conditions, and the action to be taken
 can be summarized as follows:
 .IP \(bu \w'\(bu\(em'u
 When a
-.I high priority
+high priority
 message is enqueued, the queue is enabled.
 .IP \(bu
 When a
-.I priority band
+normal priority
 (\fIb_band\fR>\fB0\fR)
 or
-.I ordinary priority
+ordinary
 (\fIb_band\fR=\fB0\fR)
 message is enqueued, and it becomes the first message in the queue, the queue is enabled.  Because
-.I priority band
-.and
-.I ordinary band
+normal priority
+or
+ordinary
 messages are queued in order of arrival, this means that the queue band was empty before the message
 was enqueued, and that there were no higher priority messages already on the queue.
 This also means that a
@@ -482,9 +547,9 @@ enqueued message can be processed immediately by the
 procedure.
 .IP \(bu
 When a
-.I priority band
+normal priority
 or
-.I ordinary priority
+ordinary
 message is enqueued, and the
 .B QWANTR
 flag was set by
@@ -497,22 +562,6 @@ has indicated that the queue is not blocked on flow control but has blocked awai
 availability of any message.  The queue
 .IR qi_srvp (9)
 procedure can possibly run successfully on enqueued messages, and should be enabled.
-.IP \(bu
-When a
-.I priority band
-messge is enqueued, and the corresponding band
-.B QB_WANTR
-flag was set by
-.BR rmvq (9)
-or
-.BR getq (9),
-the queue is enabled.
-In this case,
-.BR getq (9)
-has indicated that the message band is not blocked on equal or higher priority messages, although
-the queue may be blocked on lower priority band messages.  In this case, the queue
-.IR qi_srvp (9)
-procedure can possibly run successfully on messages in the message band, and should be enabled.
 .\".PP
 .\".nr tl \n[.l]u-36m
 .\".TS
@@ -526,12 +575,12 @@ procedure can possibly run successfully on messages in the message band, and sho
 .\":QENAB::
 .\"_
 .\"High:X/X/0:X:T{
-.\"When a \fIHigh Priority\fP message is queued, it always enables the queue and schedules the queue's
+.\"When a \fIhigh priority\fP message is queued, it always enables the queue and schedules the queue's
 .\"\fBservice\fP procedure, if one exists.
 .\"T}
 .\"
 .\"Band:X/0/0:X:T{
-.\"When a \fIPriority Band\fP message is queued to a queue band, it is possible that the queue's
+.\"When a \fInormal priority\fP message is queued to a queue band, it is possible that the queue's
 .\"\fBservice\fP procedure might be able to process the expedited message immediately, and the queue is
 .\"enabled if it has not been previously inhibited with \fBnoenable\fP(9); that is, the \fBQNOENB\fP
 .\"flag is clear, the \fBQENAB\fP flag is clear, and the queue has a \fBservice\fP procedure
@@ -541,7 +590,7 @@ procedure can possibly run successfully on messages in the message band, and sho
 .\"T}
 .\"
 .\"Normal:1/0/0:X:T{
-.\"When a \fINormal\fR message is queued to an empty queue and \fBQWANTR\fP is set, the queue's
+.\"When a \fInormal\fR message is queued to an empty queue and \fBQWANTR\fP is set, the queue's
 .\"\fBservice\fP procedure is ready to read messages from the queue and the queue's \fBservice\fR
 .\"procedure is enabled, if it has not already been enabled, it has not been previously inhibited with
 .\"\fBnoenable\fP(9); that is, the \fBQNOENB\fP is clear and the queue has a \fBservice\fP procedure
@@ -549,7 +598,7 @@ procedure can possibly run successfully on messages in the message band, and sho
 .\"T}
 .\"
 .\":X/0/0:\fBNULL\fP:T{
-.\"When a \fINormal\fP messae is queued to a queue that has no messages queued, and regarless of the
+.\"When a \fInormal\fP messae is queued to a queue that has no messages queued, and regarless of the
 .\"setting of \fBQWANTR\fR, the queue's \fBservice\fP procedure might be able to process the message
 .\"and the queue's \fBservice\fP procedure is enabled, if it has not already been enabled, and it has
 .\"not been previously inhibited with \fBnoenable\fP(9); that is, the \fBQNOENB\fP flag is clear, the
@@ -584,7 +633,11 @@ only fails when a
 structure could not be allocated for a banded message arriving at a first use
 empty band.
 .BR putq ()
-always succeeds for high priority and normal band zero (0) messages.
+always succeeds for
+high priority
+and
+ordinary
+band zero (0) messages.
 .\"
 .\"
 .SH CONTEXT
@@ -597,8 +650,11 @@ soft interrupts, and interrupt service routines.
 .SH MP-STREAMS
 .PP
 .BR putq ()
-is MP-safe.
-The caller is responsible for the validity of the passed in
+is MP-safe; however,
+the caller is responsible for the validity of the passed in queue and message pointers, and
+exclusive access to the passed in messages.
+.PP
+The caller is responsible for the validity of the passed in queue pointer,
 .IR q .
 .I q
 is valid from all procedures synchronous on
@@ -607,7 +663,6 @@ including
 .IR qi_qopen (9),
 .IR qi_qclose (9),
 .IR qi_putp (9),
-and
 .IR qi_srvp (9),
 procedures and synchronous callback functions.
 .PP
@@ -631,7 +686,7 @@ is called, so, if the
 .RI non- STREAMS
 code sections are passed a pointer from
 .IR q 's
-.IR qi_qopen ()
+.IR qi_qopen (9)
 procedure and invalidated by its
 .IR qi_qclose ()
 procedure, validity can be ensured.  (This is the case with
@@ -639,18 +694,23 @@ procedure, validity can be ensured.  (This is the case with
 and
 .BR bufcall (9)
 asynchronous callbacks.  These callbacks are passed a queue pointer only after
-.I qi_qopen
+.IR qi_qopen (9)
 and must be cancelled before
-.I qi_qclose
+.IR qi_qclose (9)
 returns.)
 .PP
-Otherwise, it is possible to derive a queue pointer from a validated queue pointer, provided that
+Otherwise, from outside of
+.I STREAMS
+context, it is still possible to derive a queue pointer from a validated queue pointer, provided that
 the
 Stream 
 is frozen with a call to
 .BR freezestr (9).
 Under
 .BR "@PACKAGE_TITLE@",
+.[
+@PACKAGE_TITLE@
+.]
 it is permissible to call
 .BR putq ()
 on a
@@ -672,34 +732,33 @@ Stream
 is thawed by the other thread with
 .BR unfreezestr (9).
 .\"
+.SS Validity and Exclusion for \fImp\fP
+.PP
+Validity of the
+.I mp
+pointer and exclusive access to the message pointed to by
+.I mp
+is normally assured in the usual ways:  If
+.I mp
+was just allocated using
+.BR allocb (9)
+or
+.BR esballoc (9),
+or,
+if
+.I mp
+was just removed from a message queue with
+.BR getq (9)
+or
+.BR rmvq (9),
+then exclusion and validity is assured.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
 .\"
 .SH NOTICES
-.PP
-.I SVR 4
-.[
-svr4spg
-.]
-allows the
-.I STREAMS
-implementation to enable the queue for any
-.I priority band
-message enqueued by
-.BR putq (),
-and does not describe a
-.B QB_WANTR
-flag.  Use of a
-.B QB_WANTR
-flag is a
-.B @PACKAGE_TITLE@
-extension.  The
-.B @PACKAGE_TITLE@
-implementation is consistent with
-.I SVR 4
-in that it only enables the queue when permitted, however, it does not blindly enable the queue when
-the
-.IR qi_srvp (9)
-procedure has no chance of running because it is blocked on flow control on the current or higher
-priority band.
 .PP
 It can be guaranteed that
 .BR putq ()
@@ -753,6 +812,72 @@ and take responsibility for the passed in message if
 returns failure.
 .\"
 .\"
+.SH EXAMPLES
+.PP
+The following example is an abbreviated version of the
+.IR qi_putp (9)
+procedure for the
+.BR loop (4)
+driver, from the
+.I src/drivers/loop.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory:
+.PP
+.nf
+\fC\s-2\
+ 1  int
+ 2  loop_wput(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      struct loop *p = q->q_ptr, *o;
+ 5      int err;
+ 6  
+ 7      switch (mp->b_datap->db_type) {
+ 8      case M_IOCTL:
+ 9          /* ... */
+10          break;
+11      case M_FLUSH:
+12          /* ... */
+13          break;
+14      default:
+15          spin_lock_bh(&loop_lock);
+16          if (p->other) {
+17              if (!q->q_first) {
+18                  queue_t *rq;
+19  
+20                  rq = p->other->rq;
+21                  spin_unlock_bh(&loop_lock);
+22                  if (rq) {
+23                      if (mp->b_datap->db_type >= QPCTL
+24                          || bcanputnext(rq, mp->b_band)) {
+25                          putnext(rq, mp);
+26                          break;
+27                      }
+28                  }
+29              } else
+30                  spin_unlock_bh(&loop_lock);
+.B "31              putq(q, mp);
+32          } else {
+33              spin_unlock_bh(&loop_lock);
+34              freemsg(mp);
+35              putnextctl2(OTHERQ(q), M_ERROR, ENXIO, ENXIO);
+36          }
+37          break;
+38      }
+39      return (0);
+40  }
+\s+2\fP
+.fi
+.PP
+At
+.BR "Line 31" ,
+.BR putq ()
+is used when there is no receiving queue or the Stream is flow controlled for the message, to place
+the message on the message queue and await
+.IR qi_srvp (9)
+service procedure scheduling.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR qenable (9),
@@ -789,7 +914,9 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-When a banded message (a priority message, with a non-zero
+When a banded message (a
+normal priority
+message, with a non-zero
 .IR b_band )
 is placed on a queue with
 .BR putq (),
@@ -877,11 +1004,16 @@ This
 .I LiS
 bug is not perpetuated in
 .BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
 .IP ""
 Portable
 .I STREAMS
 modules and drivers can rely on intermediate band strutures being allocated
-when a priority message is placed on a queue using
+when a
+normal priority
+message is placed on a queue using
 .BR putq (),
 and may examine the
 .I q_nband
@@ -1001,6 +1133,9 @@ do not permit
 to be called on a stream frozen with
 .BR freezestr (9).
 .[
+usldk
+.]
+.[
 solspg
 .]
 .[
@@ -1020,15 +1155,20 @@ to be called on a stream frozen with
 .IP ""
 Portable
 .I STREAMS
-drivers and modules should not call
+modules and drivers will not call
 .BR putq ()
-on a stream frozen with
+on a stream currently frozen by the caller with
 .BR freezestr (9).
+.RB ( "@PACKAGE_TITLE@"
+includes an assertion to enforce this in the SMP environment.)
 .\".IP \(em
 .\".BR putq ()
 .\"cannot be called from an interrupt service routine (hard irq).
 .\".IP ""
 .\".B @PACKAGE_TITLE@
+.\".[
+.\"@PACKAGE_TITLE@
+.\".]
 .\"does not permit
 .\".BR putq ()
 .\"to be called from an interrupt service routine (hard irq) context to remove the need for suppressing
@@ -1071,6 +1211,8 @@ See
 simply calls
 .BR putq ()
 directly.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -1099,6 +1241,12 @@ first appeared in
 .IR "SVR 3" .
 .[
 svr3spg
+.]
+.PP
+.BR putq ()
+was described in Dennis Ritchie's original paper.
+.[
+streamio
 .]
 .\"
 .\"

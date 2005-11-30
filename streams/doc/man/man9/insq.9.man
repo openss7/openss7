@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.25 2005/11/30 00:56:12 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.26 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 00:56:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -154,19 +154,21 @@ bit will be set for the queue or queue band.
 .SS Message Queueing Priority
 .PP
 .I STREAMS
-queues messages based on message queueing priority.  There are three priority classes for messages:
+queues messages based on message queueing priority.  There are three priority classes for messages
+that can be tested with
+.BR pcmsg (9):
 .PP
 .TS
 tab(:);
-lllsss.
-1.:\fIHigh Priority\fP:(\fBdb_type >= QPCTL\fP)
-2.:\fIPriority Band\fP:(\fBdb_type < QPCTL && b_band > 0\fP)
-3.:\fINormal\fP:(\fBdb_type < QPCTL && b_band == 0\fP)
+lllbsss.
+1.:\fIHigh Priority\fP:\fC(pcmsg(db_type) != 0 && b_band == 0)\fP
+2.:\fINormal Priority\fP:\fC(pcmsg(db_type) == 0 && b_band >= 0)\fP
+3.:\fIOrdinary\fP:\fC(pcmsg(db_type) == 0 && b_band == 0)\fP
 .TE
 .PP
-.I STREAMS
+.BR insq ()
 only examines the message class and priority band of the first message block of a message.  If a
-.I High Priority
+high priority
 message is passed to
 .BR insq ()
 with a non-zero
@@ -175,8 +177,11 @@ value,
 .I b_band
 is reset to zero
 .RB ( 0 )
-before placing the message on the queue.  If the message is passed to
-.BR insq ()
+before placing the message on the queue.
+If a
+normal priority
+message is passed to
+.BR appq ()
 with
 .I b_band
 value greater than the number of
@@ -190,54 +195,64 @@ structure for each band up to and including the band of the message.
 .RI \(lq COMPATIBILTY \(rq,
 below.)
 .PP
-Messages must be placed in order in the queue.  If the message is a
-.I High Priority
-message, it must be placed on the queue with other
-.I High Priority
+The message will always be placed in order in the queue.  If the message is a
+high priority
+message, it will be placed on the queue immediately following other
+high priority
 messages and ahead of
-.I Priority Band
+normal priority
 and
-.I Normal
+ordinary
 messages.  If the message is a
-.I Priority Band
-message, it must be placed with other messages in the queue
-band.
+normal priority
+message with a non-zero
+.IR b_band ,
+it is placed after other messages in the queue band.
 If the message is a
-.I Normal
-message, it must be placed with other
-.I Normal
-messages, after all other messages.
-Attempts to insert a message out of order in the queue with
-.BR insq ()
-will cause
-.BR insq ()
-to fail.
+ordinary
+message (with a zero
+.IR b_band ),
+it is placed after all other messages.
 .PP
 Placing the first message for a queue band onto the queue can result in the allocation of a
 .BR qband (9)
-structure to provide accounting for the queue band.  Failure to allocate a
+structure to provide flow control accounting for the queue band.  Failure to allocate a
 .BR qband (9)
 structure can cause
 .BR insq ()
 to fail.  Failure can be avoided by ensuring that a
 .BR qband (9)
 structure exists for the band,
-.IR mp->b_band ,
+.IR b_band ,
 using
 .BR strqget (9)
 or
 .BR strqset (9).
+.PP
+Whether a
+.BR qband (9)
+exists for a given
+.I b_band
+can be determined by examining the
+.I q_nband
+member of the
+.BR queue (9)
+structure.  When
+.BR "q_nband\ >=\ b_band" ,
+a structure exists; when
+.BR "q_nband\ <\ b_band" ,
+one needs to be allocated.
 .\"
 .\"
 .SS "Flow Control"
 .PP
 If a
-.I High Priority
+high priority
 message is placed onto the queue, the queue will always be enabled, as with
 .BR qenable (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists.
+procedure will be scheduled if it exists (and is not already scheduled).
 This is true for
 .BR appq (9),
 .BR insq (),
@@ -245,7 +260,7 @@ This is true for
 and
 .BR putbq (9).
 Because this is true, a
-.I High Priority
+high priority
 message should never be placed back on a queue by the queue's
 .IR qi_srvp (9)
 procedure with
@@ -256,7 +271,7 @@ otherwise and indefinite loop could result.
 is allowed to enable the queue
 .RB ( QNOENB
 is not set) if the message is a
-.I Priority Band
+normal priority
 message, or the
 .B QWANTR
 flag is set indicating that the
@@ -264,25 +279,29 @@ flag is set indicating that the
 procedure is ready to read the queue.
 .PP
 If a
-.I Priority Band
-message is placed onto an empty queue band, the queue will be enabled, as with
+normal priority
+message with a non-zero
+.I b_band
+is placed onto an empty queue band, the queue will be enabled, as with
 .BR enableq (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists and the
+procedure will be scheduled if it exists (and is not already scheduled) and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
 .PP
 If a
-.I Normal
-message is placed onto an empty queue and the
+ordinary
+message with a zero
+.I b_band
+is placed onto an empty queue and the
 .B QWANTR
 flag is set for the queue, then the queue will be enabled, as with
 .BR enableq (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists and the
+procedure will be scheduled if it exists (and is not already scheduled) and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
@@ -323,54 +342,57 @@ As a general rule for
 and
 .BR putbq (9),
 the queue is enabled whenever the message placed on the message queue becomes the
-first message on the queue, unless the message is a normal priority message and the queue has been
-disabled with
+first message on the queue, unless the message is a
+normal priority
+message and the queue has been disabled with
 .BR noenable (9),
 or the message was placed with
 .BR putbq (9).
-.PP
-.BR insq ()
-only looks at the priority band of the first message block.  If a high priority message is passed to
-.BR insq ()
-with a non-zero
-.I b_band
-value,
-.I b_band
-is reset to zero
-.RB ( 0 )
-before placing the messge on the queue.  If the message is passed to
-.BR insq ()
-with a
-.I b_band
-value that is greater than the number of
-.BR qband (9)
-structures associated with the queue,
-.BR insq ()
-tries to allocate a new
-.BR qband (9)
-structure for each band up to and including the band of the message.
-.PP
-The above rules apply to
-.BR appq (9),
-.BR insq (),
-.BR putq (9),
-.BR putbq (9).
-.PP
-.BR insq ()
-will not schedule a queue if
-.BR noenable (9)
-has been previously called for this queue.
-.BR noenable ()
-instructs
-.BR insq ()
-to enqueue the message when called by this queue, but not to schedule the
-.IR qi_srvp (9)
-procedure.
-.BR noenable (9)
-doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
-.BR noenable (9)
-is
-.BR enableok (9).
+.\".PP
+.\".BR insq ()
+.\"only looks at the priority band of the first message block.  If a
+.\"high priority
+.\"message is passed to
+.\".BR insq ()
+.\"with a non-zero
+.\".I b_band
+.\"value,
+.\".I b_band
+.\"is reset to zero
+.\".RB ( 0 )
+.\"before placing the messge on the queue.  If the message is passed to
+.\".BR insq ()
+.\"with a
+.\".I b_band
+.\"value that is greater than the number of
+.\".BR qband (9)
+.\"structures associated with the queue,
+.\".BR insq ()
+.\"tries to allocate a new
+.\".BR qband (9)
+.\"structure for each band up to and including the band of the message.
+.\".PP
+.\"The above rules apply to
+.\".BR appq (9),
+.\".BR insq (),
+.\".BR putq (9),
+.\".BR putbq (9).
+.\".PP
+.\".BR insq ()
+.\"will not schedule a queue if
+.\".BR noenable (9)
+.\"has been previously called for this queue.
+.\".BR noenable ()
+.\"instructs
+.\".BR insq ()
+.\"to enqueue the message when called by this queue, but not to schedule the
+.\".IR qi_srvp (9)
+.\"procedure.
+.\".BR noenable (9)
+.\"doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
+.\".BR noenable (9)
+.\"is
+.\".BR enableok (9).
 .\"
 .\"
 .SH USAGE
@@ -420,29 +442,76 @@ interrupts, and interrupt service routines.
 .SH MP-STREAMS
 .PP
 .BR insq ()
-is MP-safe;
-however, the caller must ensure validity of the
+is MP-safe; however, the caller must ensure validity of the passed in message pointers and
+exclusive access to the messages they reference.
+On uniprocessor systems, it may be sufficient to block interrupts to ensure the validity of, and
+exclusive access to,
+.IR emp ;
+for both uniprocessor and symmetric multi-processor systems, it is safer to use
+.BR freezestr (9).
+.PP
+Ensuring exclusive access to the passed in message,
+.IR emp ,
+is difficult on SMP systems, because concurrent calls to
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+can change
+.I emp->b_next
+and
+.BR rmvq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+can change
+.I emp->b_prev
+and invalidate a previous
 .I emp
-argument.  The validity of
-.I emp
-can be guaranteed by freezing the Stream with
+pointer dereference (.e.g, by removing the message from the queue and freeing it).
+.PP
+The validity of pointers to, and exclusive access to, the passed message,
+.IR emp ,
+on both UP and SMP systems can be ensured most easily by freezing the Stream from the queue,
+.IR q ,
+using
 .BR freezestr (9)
 before taking the
-.I emp 
+.I emp
 reference, and across the call to
 .BR insq ().
-Module private locks can also be used to accomplish the same purpose, so
+However, it is also possible to ensure exclusive access with
+.BR qwriter (9),
+.BR streams_put (9),
+with appropriate synchronization boundaries
+.RB ( STR_PERQUEUE " or " D_MTPERQ ),
+or with module private locks.
+Because freezing the Stream is not the only way to provide the necessary assurances,
 .B "@PACKAGE_TITLE@"
 .[
 @PACKAGE_TITLE@
 .]
 does not require that the Stream be frozen by the caller.
-.\".BR insq ()
-.\"takes a write lock on the queue, so calling
-.\".BR insq ()
-.\"while the queue is frozen with
-.\".BR freezestr (9)
-.\"will result in single-party deadlock on some systems.
+.PP
+Similar synchronization is necessary for the use of
+.BR appq (9),
+.BR insq (),
+and
+.BR rmvq (9).
+.PP
+.BR insq ()
+protects dereferencing of the
+.I emp->b_prev
+pointer with the queue write lock, making it safe to be called concurrent with
+.BR putq (9),
+.BR putbq (9),
+.BR insq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+.BR rmvq (9)
+or a concurrent call to
+.BR insq ().
 .\"
 .\"
 .SH NOTICES
@@ -462,8 +531,11 @@ applying queue flow control rules.  For additional information on flow control a
 see
 .BR noenable (9).
 .PP
-.B Linux Fast-STREAMS
-uses recursive locks, so calling
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+uses recursive freeze locks, so calling
 .BR insq ()
 while the queue is frozen with
 .BR freezestr (9)
@@ -621,6 +693,9 @@ This
 .I LiS
 bug is not perpetuated in
 .BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
 .IP ""
 Portable
 .I STREAMS

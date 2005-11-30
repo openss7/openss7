@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputany.9.man,v 0.9.2.3 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: bcanputany.9.man,v 0.9.2.4 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -128,6 +128,9 @@ is equal to the number of available bands,
 and even if
 .I q_nband
 is zero, then there is no available non-zero message band that will accept messages.
+Message bands to which no message have been written to at least once (i.e., do not have a
+.BR qband (9)
+structure) are not checked.
 .\"
 .\"
 .SH USAGE
@@ -163,10 +166,12 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR bcanputany ()
-can be called from any context; however, the caller is responsibility for the validity of the passed
-in queue pointer,
-.IR q .
-Also, if
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.BR bcanputany ()
+must be called from a syncrhonous context [see
+.BR mp-streams (9)].
+If
 .BR bcanputany ()
 is called from outside of
 .IR STREAMS ,
@@ -179,26 +184,23 @@ service procedure.
 .\"
 .SH MP-STREAMS
 .PP
-This function does not take a Stream head plumbing read lock and, therefore, cannot be called from
-outside
-.I STREAMS
-for a queue,
-.IR q ,
-that has no
-.IR qi_srvp (9)
-service procedure.
-.PP
-If
-.I q
-has a
-.IR qi_srvp (9)
-service procedure, then no
-.I q_next
-pointer will be dereferenced and
 .BR bcanputany ()
-can be called from outside of
-.IR STREAMS ,
-or for a queue across a multiplexer.
+is MP-safe when called from the correct context.
+.BR bcanputany ()
+cannot be called from an asynchronous context, unless bracketed with
+.BR freezestr (9)
+and
+.BR unfreezestr (9).
+.PP
+It is possible, due to race conditions in a multiprocessor (MP) system, that
+.BR bcanputany ()
+can be called for a queue and return true (1) and yet the Stream becomes flow controlled before a
+call to
+.BR putnext (9).
+The caller to
+.BR putnext (9).
+is then in violation of flow-control rules; however, the extent of this violation is bounded.
+
 .\"
 .\"
 .SH NOTICES

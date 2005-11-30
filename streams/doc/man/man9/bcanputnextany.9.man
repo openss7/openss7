@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnextany.9.man,v 0.9.2.3 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: bcanputnextany.9.man,v 0.9.2.4 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -104,12 +104,34 @@ implementation extension.
 .SH DESCRIPTION
 .PP
 .BR bcanputnextany ()
-checks the next queue from the specified queue,
+checks the next
+.BR queue (9)
+from the specified queue,
 .IR q ,
-to see whether a message for any (existing) message band can be written to the queue.  Message bands
-to which no message have been written to at least once (i.e., do not have a
+that has a
+.IR qi_srvp (9)
+service procedure defined, or which has a
+.B NULL
+.I q_next
+pointer.
+.PP
+For that queue, if the number of blocked queue bands,
+.IR q_blocked ,
+is less than the number of available queue bands,
+.IR q_nband ,
+then a message can be written to some non-zero message band.
+.PP
+When the number of blocked bands,
+.IR q_blocked ,
+is equal to the number of available bands,
+.IR q_nband ,
+and even if
+.I q_nband
+is zero, then there is no available non-zero message band that will accept messages.
+Message bands to which no message have been written to at least once (i.e., do not have a
 .BR qband (9)
-structure) are not checked.  This is the same as the
+structure) are not checked.
+This is the same as the
 .BR POLLWRBAND ,
 .BR S_WRBAND ,
 events or
@@ -159,29 +181,32 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR bcanputnextany ()
-can be called from any context provided that the caller holds a
-Stream head plumbing read or write lock for the Stream containing the queue,
-.IR q .
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.BR bcanputnextany ()
+must be called from a syncrhonous context [see
+.BR mp-streams (9)].
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-This function does not take a Stream head plumbing read lock and, therefore, cannot be called from
-outside
-.IR STREAMS ,
-or for a Stream across a multiplexer,
-unless a plumbing lock is first acquired on the Stream containing
-.IR q .
-Such a lock may be acquired by calling
+.BR bcanputnextany ()
+is MP-safe when called from the correct context.
+.BR bcanputnextany ()
+cannot be called from an asynchronous context, unless bracketed with
 .BR freezestr (9)
-for
-.IR q .
+and
+.BR unfreezestr (9).
 .PP
-When called from within a
-.I STREAMS
-procedure, a Stream head plumbing read lock is always held, protecting the validity of
-.I q_next
-pointer dereferencing within the Stream in which the queue procedure is running.
+It is possible, due to race conditions in a multiprocessor (MP) system, that
+.BR bcanputnextany ()
+can be called for a queue and return true (1) and yet the Stream becomes flow controlled before a
+call to
+.BR putnext (9).
+The caller to
+.BR putnext (9).
+is then in violation of flow-control rules; however, the extent of this violation is bounded.
+
 .\"
 .\"
 .SH NOTICES
@@ -200,6 +225,11 @@ particularly when the Stream head is built as a separate kernel module.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR queue (9),
+.IR qi_srvp (9),
+.BR bcanputany (9),
+.BR sth (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS

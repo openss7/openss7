@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcopy.9.man,v 0.9.2.15 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: bcopy.9.man,v 0.9.2.16 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,6 +91,7 @@ sort-adjacent-labels
 .TP
 .I src
 a pointer to the source address from which to copy.
+.PD 0
 .TP
 .I dest
 a pointer to the destination address to which to copy.
@@ -98,6 +99,7 @@ a pointer to the destination address to which to copy.
 .I len
 the number of bytes to copy from
 .IR src " to " dest .
+.PD
 .\"
 .\"
 .SH INTERFACE

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.20 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.21 2005/11/30 13:59:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -154,7 +154,7 @@ The queue
 .IR qi_putp (9)
 and
 .IR qi_srvp (9)
-procedures, as well as asynchronous callbacks and callouts of all kinds
+procedures, as well as asynchronous callbacks and call-outs of all kinds
 can run concurrent, particularly in a multiprocessor environment.
 Modules that set this flag must normally perform their own mutual exclusion or
 critical section protections, and all procedures must be fully MP-safe.
@@ -290,7 +290,7 @@ module (see
 .B SQLVL_DEFAULT
 below).  This means that only one thread is permitted into the entire module.  That is rather
 restrictive and can cause difficulties when MP-safe modules are in the Stream.  (MP-safe modules
-will run more agressive and are likely to out-pace per-module synchronized modules, impairing the
+will run more aggressive and are likely to out-pace per-module synchronized modules, impairing the
 performance of all Streams in which the module is included.)
 .PP
 Another solution is to run each of the non-MP-safe module's Streams at per-Stream synchronization,
@@ -540,7 +540,7 @@ can, however, run concurrent with any synchronous entry point
 .IR qi_qclose (9)
 .IR qi_putp (9),
 .IR qi_srvp (9)),
-synchronous or asyncrhonous callback function, belonging to a separate Stream.
+synchronous or asynchronous callback function, belonging to a separate Stream.
 
 .IP \(bu
 .IP \(bu
@@ -572,7 +572,7 @@ freeb\fR(9):\ \-\ :the message block
 .TE
 .\"
 .\"
-.SS "Syncrhonous Callback Cancellation"
+.SS "Synchronous Callback Cancellation"
 .PP
 .TS
 tab(:);
@@ -592,17 +592,178 @@ qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
 .\"
 .SH CONTEXT
 .PP
+The following contexts are of interest:
+.TP
+.B STREAMS Synchronous
+Running under
+.I STREAMS
+and synchronized against the target queue.  A Stream head plumbing lock is held in the Stream to
+which the queue belongs, or the
+.B STRWOPEN
+bit is held.
+.IP ""
+This is the case when the Stream is frozen, or when executing a queue put or service procedure, open
+or close call-out, or a synchronous callback for the target queue.
+.I q_next
+pointers can be dereferenced for any queue in the Stream without being invalidated.
+.TP
+.B STREAMS Asynchronous
+Running under
+.I STREAMS
+but not synchronized against the target queue.
+.IP ""
+This is the case when executing a synchronous procedure, call-out or callback, for a queue in one
+Stream and referencing a queue in another Stream.  It is also the case when an asynchronous callback
+(one not referenced on a queue) is being executed.
+.IP ""
+Under the special case when running under
+.I STREAMS
+where the target queue belongs to a Stream linked to a lower multiplex, the context can be
+considered as synchronous if the caller can suppress concurrent unlinking of the Stream.  This can
+normally be performed with private locks taken within a put or service procedure of a multiplexing
+driver.  But this is complex and best avoided by treating all such queues as asynchronous.
+.TP
+.B Non-STREAMS Asynchronous
+Not running under
+.I STREAMS
+and not synchronized against the target queue.
+.IP ""
+This is the case when calling any utility from outside of
+.IR STREAMS .
+This can be from process context, software interrupt, bottom-halves, tasklets,
+.B Linux
+timeouts, interrupt service routines, etc.
+.IP ""
+.RI Non- STREAMS
+asynchronous contexts can be synchronized against a queue with
+.BR freezestr (9),
+.BR qwriter (9),
+.BR streams_put (9),
+.PP
+In a synchronous context, all
+.I q_next
+pointer dereferences for any queue in the Stream to which the synchronization queue belongs is
+valid for the duration of the context.
+In an asynchronous context, no assurances of the validity of
+.I q_next
+dereferences can be made.   This is of primary concern to
+.I STREAMS
+utilities that dereference a
+.I q_next
+pointer.
+As discussed briefly above, lower multiplex Streams are of less concern that upper multiplex Streams
+(that could be closed or have modules pushed or popped at any time).
+.PP
+When in a synchronous context with respect to a queue, a plumbing read lock is held for the Stream
+head of the Stream to which the queue belongs.  Utilities that deference
+.I q_next
+without first taking a Stream head plumbing read lock can only be called in a synchronous context.
+Utilities that acquire a Stream head plumbing read lock before dereferencing
+.I q_next
+can be called from any context, but would be wasteful and scale poorly if normally called from
+synchronous context.
+Utilities that do not dereference
+.I q_next
+and only affect the queue itself, take a queue write lock and can be called from any
+context.
+.PP
+.B Validity/Exclusion for q
+.PP
+All
+.I STREAMS
+utilities that accept a queue pointer require validity of the queue pointer across the call, but not
+exclusion: exclusion is accomplished within the utility with locks.
+.PP
+When in the synchronous context, any queue in the Stream can be passed to a utility function and it
+is guaranteed valid.  However, in the asynchronous context, the caller is responsible for ensuring
+the validity of the passed in queue pointer.  A pointer to a queue remains valid from the point that
+the
+.IR qi_qopen (9)
+routine for a queue pair is entered, until just before the
+.IR qi_qopen (9)
+routine for the queue pair is exited.
+Therefore, references to a queue that are acquired in the
+.IR qi_qopen (9)
+routine and released in the
+.IR qi_qclose (9)
+routine are guaranteed valid.
+.PP
+For example, an interrupt service routine that is established and passed a read queue pointer on
+.IR qi_qopen (9)
+for the queue pair, and if the ISR is disabled in the
+.IR qi_qclose (9)
+for the queue pair, releasing the read queue pointer,
+then the read queue pointer is valid to be used in any
+.I STREAMS
+utility called during the ISR.
+.PP
+Pointers to queues in a Stream that is linked to a lower multiplex are guaranteed valid while the
+Stream remains linked (the
+.IR qi_qclose (9)
+routine cannot be called until it is unlinked).  This is also true for
+.I q_next
+pointers, in that modules cannot be pushed or popped from a Stream linked to a lower multiplex until
+it is unlinked.
+Therefore, if a multiplexing driver can guarantee, by acquiring a private lock, that no Stream will
+be unlinked until the lock is released, a pointer to any queue in any lower multiplex Stream will be
+guaranteed valid, and the context can be considered synchronous for any Stream on the lower
+multiplex.
+Pointers to queues in an upper multiplex cannot be guaranteed in this way (because modules can be
+pushed or popped from an asynchronous Stream at any time).
+.PP
+.I STREAMS
+utilities that require exclusive access to the referenced queue, take their own write locks on the
+queue.  Therefore, the caller does not have to ensure exclusion on the
+.BR queue (9)
+structure or any attached [e.g.,
+.BR qband (9)]
+structures.
+.PP
+.B Validity/Exclusion for mp
+.PP
+All
+.I STREAMS
+utilities that accept a message pointer require both validity of the message pointer across the
+call, exclusion on the message block across the call, and exclusion on the data block or buffer of
+the message altered by the utility across the call.
+.PP
+When in a synchronous context and the message has been passed to the queue's put procedure, removed
+from the the queue by its service procedure, or freshly allocated (regardless of context), the
+message pointer is guaranteed valid until passed to another put procedure.
+.PP
+Whenever a dereference of a message pointer is valid, the holder of the dereference has exclusive
+access to the
+.BR msgb (9)
+message block structure.
+If the
+.BR datab (9)
+data block structure has a reference count
+.I db_ref
+of one, the holder also has exclusive access to the data block.  If the holder has exclusive access
+to the data block and there is no extended buffer attached to the data block (i.e., it was allocated
+with
+.BR allocb (9)
+and not
+.BR esballoc (9),
+the holder also has exclusive access to the data buffer.
+When
+.I db_ref
+is greater than 1, the easiest way to obtain exclusion from the data block and data buffer is to
+copy the data block using utilities such as
+.BR copyb (9)
+or
+.BR copymsg (9). 
 
 .SS "Queue Handling Functions"
 .PP
 .TS
 tab(:);
-ltbctbltbsss
-ltbctltsss.
+ltbctbctbltbsss
+ltbctctltsss.
 _
-Macros:State:Notes
+Macros:Context:State:Notes
 _
-RD\fR(9):either:T{
+RD\fR(9):either:either:T{
 These macros can be called from any context.  It does not matter whether the
 Stream
 is frozen by the caller or not.  The caller is responsible for the validity of the passed in
@@ -610,81 +771,193 @@ queue pointer
 .I q
 across the call.
 T}
-WR\fR(9):\^:\^
-OTHERQ\fR(9):\^:\^
-SAMESTR\fR(9):\^:\^
+WR\fR(9):either:either:\^
+OTHERQ\fR(9):either:either:\^
+SAMESTR\fR(9):sync:either:
 _
 .T&
-ltbctbltbsss
-ltbctltsss.
-UP Functions:State:Notes
+ltbctbctbltbsss
+ltbctctltsss.
+UP Functions:Context:State:Notes
 _
-appq\fR(9):frozen:T{
-The caller is responsible for the validity of the passed in
-queue pointer
-.I q
-when called from a
-.RI non- STREAMS
-environment, or
-.I q
-does not belong to the same
-Stream
-as the
-.I STREAMS
-procedure from which it is called (e.g, when passing messages from an upper multiplexer
-Stream
-to a lower multiplexer
-Stream),
-and validity and exclusivity of the passed in
-message pointer
-.IR mp .
+appq\fR(9):either:frozen:T{
+Can be called from any context.  The Stream should be frozen by the caller.
+Takes ownership of the passed in message.
 T}
-insq\fR(9):\^:\^
-rmvq\fR(9):\^:\^
+insq\fR(9):either:frozen:\^
+
+rmvq\fR(9):sync:frozen:T{
+If not frozen,
+.BR rmvq (9)
+must be called from a synchronous state.
+T}
+
 .T&
-ltbctltsss.
-backq\fR(9):thawed:
-bcanput\fR(9):thawed:
-canenable\fR(9):thawed:
-canput\fR(9):thawed:
-enableok\fR(9):thawed:
-flushband\fR(9):thawed:
-flushq\fR(9):thawed:
-getq\fR(9):thawed:
-noenable\fR(9):thawed:
-putbq\fR(9):thawed:
-putctl\fR(9):thawed:
-putctl1\fR(9):thawed:
-putctl2\fR(9):thawed:
-putq\fR(9):thawed:
-qcountstrm\fR(9):thawed:
-qenable\fR(9):thawed:
-qreply\fR(9):thawed:
-qsize\fR(9):either:
+ltbctctltsss.
+bcanput\fR(9):srvp:thawed:T{
+These two can only be called from an
+asynchronous context
+when the queue that is the argument of the call has a
+.IR qi_srvp (9)
+service procedure.  Otherwise, they must be called from a
+context synchronized on the queue.
+T}
+canput\fR(9):srvp:thawed:\^
+
+canenable\fR(9):either:thawed:T{
+Can be called from any context.  The Stream may be frozen by the caller.
+T}
+enableok\fR(9):either:thawed:\^
+noenable\fR(9):either:thawed:\^
+putctl\fR(9):either:thawed:\^
+putctl1\fR(9):either:thawed:\^
+putctl2\fR(9):either:thawed:\^
+qenable\fR(9):either:thawed:\^
+qsize\fR(9):either:either:\^
+
+putbq\fR(9):either:thawed:T{
+Can be called from any context.  The Stream may be frozen by the caller.
+Takes ownership of the passed in message.
+T}
+putq\fR(9):either:thawed:\^
+
+backq\fR(9):sync:thawed:T{
+These utilities dereference a
+.I q_next
+pointer in the Stream, and must be called from a synchronous context.
+The Stream can, however, be frozen by the caller.
+.BR backq (9)
+is the worst: if not called from a synchronous context, the return value cannot be considered
+valid.
+T}
+flushband\fR(9):sync:thawed:\^
+flushq\fR(9):sync:thawed:\^
+getq\fR(9):sync:thawed:\^
+qcountstrm\fR(9):sync:thawed:\^
+qreply\fR(9):sync:thawed:\^
 _
 .T&
-ltbctbltbsss
-ltbctltsss.
-MP Functions:State:Notes
+ltbctbctbltbsss
+ltbctctltsss.
+MP Functions:Context:State:Notes
 _
-bcanputnext\fR(9):thawed:
-canputnext\fR(9):thawed:
-freezestr\fR(9):thawed:
-put\fR(9):thawed:
-putnext\fR(9):thawed:
-putnextctl\fR(9):thawed:
-putnextctl1\fR(9):thawed:
-putnextctl2\fR(9):thawed:
-qprocsoff\fR(9):thawed:
-qprocson\fR(9):thawed:
-strqset\fR(9):frozen:
-strqget\fR(9):frozen:
-unfreezestr\fR(9):frozen:
+freezestr\fR(9):either:thawed:T{
+These must be called from a thawed state and may be called from any context.
+Both of these functions enter a synchronous context on
+.IR q .
+.BR put (9)
+exits the synchronous context before returning;
+.BR freezestr (9)
+does not (it takes
+.BR unfreezestr (9)
+to exit the synchronous context).
+T}
+put\fR(9):either:thawed:T{
+Can be called from any context.  The Stream may be frozen by the caller.
+T}
+
+qprocsoff\fR(9):close:thawed:T{
+These must be called from a thawed state and must only be called from a
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine belonging to
+.IR q .
+T}
+qprocson\fR(9):open:thawed:\^
+
+bcanputnext\fR(9):sync:thawed:T{
+These utilities dereference a
+.I q_next
+pointer in the Stream,
+and must be called from a
+synchronous context.  The Stream can, however, be frozen by the caller.
+T}
+canputnext\fR(9):sync:thawed:\^
+putnext\fR(9):sync:thawed:\^
+putnextctl\fR(9):sync:thawed:\^
+putnextctl1\fR(9):sync:thawed:\^
+putnextctl2\fR(9):sync:thawed:\^
+
+strqset\fR(9):either:frozen:T{
+Can be called from any context.  The Stream should be frozen by the caller.
+T}
+strqget\fR(9):either:frozen:\^
+
+unfreezestr\fR(9):\-:frozen:T{
+Must be called with the Stream frozen by the caller.
+T}
 .TE
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.\"
+.\"
+.SS Plumbing
+.PP
+Most plumbing operations performed on a Stream are performed from user process context (i.e., in
+response to a system call).
+One exception is
+.BR welq (9)
+and
+.BR unweldq (9)
+if they were to be called from a
+.IR qi_putp (9)
+procedure instead of a
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine.
+.PP
+Plumbing operations include
+.BR open (2s),
+.BR close (2s),
+.BR I_POP (7),
+.BR I_PUSH (7),
+.BR weldq (9),
+.BR unweldq (9).
+So, generally, any operation that invokes
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+to create or destroy the queue pair instance of a module or driver in a Stream, plus any welding of
+Streams.
+.BR I_LINK (7),
+.BR I_UNLINK (7),
+.BR I_PLINK (7),
+.BR I_PUNLINK (7),
+are not plumbing operations in the sense that they do not alter
+.I q_next
+pointers.
+.PP
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+provides a specialized plumbing reader-writer lock in the Stream head to protect the
+.I q_next
+pointers (i.e., the plumbing) in a Stream.  When the plumbing reader-writer lock is acquired for
+read, any
+.I q_next
+pointer in the entire Stream can be dereferenced and the dereference will remain valid until the
+lock is released.
+The reader-writer lock is acquired for write by any plumbing operation, as was described above.
+.PP
+All queue procedures, call-outs, and synchronous callbacks associated are synchronized against a
+queue that belongs to a Stream which has a Stream head.  Before the synchronous procedure, call-out
+or callback is invoked, the
+.I STREAMS
+scheduler thread acquires the Stream head (associated with the synchronizing queue) plumbing
+reader-writer lock for read.  This means that any queue procedure, call-out, and callback,
+synchronized on a queue, can dereference any
+.I q_next
+pointer within the Stream to which the synchronizing queue belongs, without any special treatment.
+These procedures, call-outs and callbacks can use
+.I STREAMS
+utilities that require
+.BR in_streams (9)
+context.
 .\"
 .\"
 .SS Freezing
@@ -706,17 +979,36 @@ with
 and thawing it with
 .BR unfreezestr (9).
 .RS
+.ll -7n
 .PP
 .B Note:
 when
 .BR freezestr (9)
 is called in a Uni-Processor (UP) environment, it is equivalent to
 .BR splstr (9);
-when
-.BR unfreezestr (9)
-is called,
+.BR unfreezestr (9),
 .BR splx (9).
+.ll +7n
 .RE
+.PP
+Freezing a Stream results in local interrupts being suppressed and the Stream head reader-writer
+freeze lock being held for write.  The Stream head reader-writer plumbing lock is also acquired for
+read.  Thawing a Stream releases the read and write locks and restores local interrupts.
+.PP
+The Stream head plumbing reader-writer lock is acquired for write by any plumbing operation on the
+Stream that would change
+.I q_next
+pointers on either queue pair.
+Holding the Stream head plumbing read lock blocks any plumbing changes to the Stream.
+.PP
+The Stream head freeze reader-writer lock is acquired for read by any thread other than
+the freezing thread entering a queue procedure
+.RI [ qi_putp "(9) or " qi_srvp (9)].
+After being acquired, the read lock is immediately released.  This stops any queue procedure from
+being entered after the Stream is frozen by any thread other than the thread that froze the Stream,
+but allows threads already executing in a queue procedure to proceed.  This is in accordance with
+the descriptions for
+.BR freezestr (9).
 .\"
 .\"
 .SS Queue Pointers
@@ -821,20 +1113,31 @@ structure, from the
 .BR inode ,
 the
 .B inode
-semaphore is acquired before referencing from, or invalidating the reference to, the Stream head.
+.I i_sem
+semaphore
+is acquired before referencing from, or invalidating the reference to, the Stream head.
 This is also true for the
 .B file
 pointer
 .IR private_data :
 we hold the
 .B inode
-semaphore while acquiring a reference to the Stream head via the
+.I i_sem
+semaphore
+while acquiring a reference to the Stream head via the
 .B file
-pointer, and also hold the semaphore while clearing the
+pointer, and also hold the
+semaphore
+while clearing the
 .I private_data
 pointer.
-(This means a fair amount of semaphore taking and releasing when performing system calls.  Perhaps
-the inode spinlock might have been a better idea.)
+(This means a fair amount of
+semaphore
+taking and releasing when performing system calls.
+In newer kernels the
+.B inode
+.I i_lock
+spinlock can use used instead of the semaphore to reduce the locking overheads.)
 .PP
 The Stream head has associated with it a queue pair.  While the Stream head reference is valid,
 there always exists a Stream head queue pair.
