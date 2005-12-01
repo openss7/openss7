@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.25 2005/11/30 13:59:23 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.26 2005/11/30 23:18:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 23:18:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -233,7 +233,11 @@ written to.
 .SH ERRORS
 .PP
 .BR bcanput ()
-always succeeds.
+always succeeds for a valid
+.IR q .
+If
+.I q
+is invalid, the result is undefined.
 .\"
 .\"
 .SH CONTEXT

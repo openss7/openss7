@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canenable.9.man,v 0.9.2.19 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: canenable.9.man,v 0.9.2.20 2005/11/30 23:18:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/11/30 23:18:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -109,6 +109,36 @@ procedure scheduled for execution by
 .BR runqueues (9))
 by placing a (normal) message on the queue.
 .PP
+If the queue,
+.IR q ,
+has been disabled with
+.BR noenable (9),
+setting the the
+.B QNOENB
+flag in the
+.I q_flag
+member of the
+.BR queue (9)
+strucuture, then this utility will return
+.IR false
+.RB ( 0 ).
+If the queue,
+.IR q ,
+has been enabled with
+.BR enableok (9),
+clearing the
+.B QNOENB
+flag in the
+.I q_flag
+member of the
+.BR queue (9)
+structure, then this utility will return
+.I true
+.RB ( 1 ).
+.\"
+.\"
+.SH USAGE
+.PP
 This function is typically called before a call to
 .BR appq (9),
 .BR putq (9),
@@ -157,14 +187,22 @@ is always successful.
 .BR canenable ()
 can be called from any context, including user context, module procedures,
 callouts, callbacks, soft interrupts and interrupt service routines.
+It is normally called from a
+.I STREAMS
+synchronous context [see
+.BR mp-streams (9)],
+that is, within
+.IR q 's
+.IR qi_putp (9)
+put procedure.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR canenable ()
 is not MP-safe.
-Consideration should be given that the return may change before the condition
-is tested if
+Consideration should be given that the condition tested may change before the return value is used
+if
 .BR noenable (9),
 .BR enableok (9),
 .BR qprocson (9)
@@ -178,7 +216,7 @@ are allowed to execute concurrent with
 .PP
 It is questionable whether
 .BR canenable ()
-is usable in a Multiprocessor (MP) environment.
+is usable in a Symmetric Multi-Processor (SMP) environment.
 .BR canenable ()
 tests atomic flags in the
 .BR queue (9)
@@ -196,11 +234,12 @@ and
 .B QNOENB
 flag in the
 .BR queue (9)
-flags word) on MP systems.
+flags word) on SMP systems.
 .PP
 .BR canenable ()
 might have some limited use on UP systems where interrupts can be locked out
-across the call.
+across the call, or on SMP systems where the Stream is frozen by
+.BR freezestr (9).
 .PP
 Portable
 .I STREAMS
@@ -216,6 +255,11 @@ simply returns the result of testing the
 bit.
 .\"
 .\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putq (9),
@@ -225,7 +269,9 @@ bit.
 .BR noenable (9),
 .BR enableok (9),
 .BR qprocson (9),
-.BR qprocsoff (9).
+.BR qprocsoff (9),
+.BR freezestr (9),
+.IR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -252,8 +298,16 @@ with the following portability considerations:
 .BR canenable ()
 is an
 .I SVR 3 STREAMS
-macro that never made it to the DDI/DKI and has little use on an multiprocessor (MP) system.  This
-function is deprecated and is only maintained for backwards compatibility to
+.[
+svr3spg
+.]
+macro that never made it to the
+.I DDI/DKI
+.[
+usldk
+.]
+and has little use on an Symmetric Multi-Processor (SMP) system.  This function is deprecated and is
+only maintained for backwards compatibility to
 .I SVR 3
 for single threaded drivers (e.g. ones with synchronization level
 .BR SQLVL_ELSEWHERE " or " SQLVL_GLOBAL ).
@@ -306,7 +360,7 @@ or with a
 .I q
 that points to other than a valid
 .B queue_t
-structure is invalid and the result in undefined.
+structure is invalid and the result is undefined.
 When
 .I LiS
 .BR canenable ()
@@ -355,11 +409,28 @@ See
 simply calls
 .BR canenable ()
 directly.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not access these symbols.  Portable
+.I STREAMS
+modules and drivers will use
+.BR @PACKAGE_TITLE@
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
+Additional compatibility is available using the
+.I STREAMS Compatibility Modules
+.B strcompat
+package for
+.I LiS
+and
+.BR "@PACKAGE_TITLE@" .
 See
-.BR liscompat (9)
+.BR svr3compat (9),
+.BR liscompat (9),
 and
 .BR STREAMS (9)
 for additional compatibility considerations.
