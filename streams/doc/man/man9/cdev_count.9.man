@@ -1,1 +1,613 @@
-.so man9/cdevsw.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: cdev_count.9.man,v 0.9.2.3 2005/12/01 12:56:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/12/01 12:56:07 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CDEVSW\ HELPERS 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B cdev_count, cdevsw_list, cdevsw_lock, sdev_add, sdev_del, sdev_get, sdev_put, cdev_find, cdev_match, cdev_minor, cdev_str, cdev_add, cdev_del, cdev_get, cdev_put
+\- character device switch table helper functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.RB int " cdev_count" ;
+.PD 0
+.HP
+.RB "struct list_head " cdevsw_list ;
+.HP
+.RB "rwlock_t " cdevsw_lock ;
+.PD
+.HP
+int \fBsdev_add\fP(struct cdevsw *\fIcdev\fP, modID_t \fImodid\fP);
+.PD 0
+.HP
+void \fBsdev_del\fP(struct cdevsw *\fIcdev\fP);
+.HP
+struct cdevsw *\fBsdev_get\fP(major_t \fImajor\fP);
+.HP
+struct cdevsw *\fBcdev_find\fR(const char *\fIname\fR);
+.HP
+struct cdevsw *\fBcdev_match\fR(const char *\fIname\fR);
+.HP
+struct cdevsw *\fBcdev_str\fR(const struct streamtab *\fIstr\fR);
+.HP
+void \fBsdev_put\fP(struct cdevsw *\fIcdev\fP);
+.HP
+minor_t \fBcdev_minor\fR(struct cdevsw *\fIcdev\fR, major_t \fImajor\fR, minor_t \fIminor\fR);
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fImodid\fR\(em'u
+.I cdev
+a pointer to an existing character device switch table,
+.BR cdevsw (9),
+entry;
+.PD 0
+.TP
+.I modid
+a driver module identifier;
+.TP
+.I major
+a major device number;
+.TP
+.I minor
+a minor device number;
+.TP
+.I name
+a driver or device name;
+.TP
+.I str
+a pointer to a driver's defining
+.BR streamtab (9)
+structure.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+.BR DDI/DKI ,
+internal,
+implementation extensions,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+implements the character device switch table
+.BR cdevsw (9)
+of
+.IR "SVR 4"
+.[
+svr4
+.]
+as a list instead of a fixed size array.
+The helper functions described here can be used to help create an entry, acquire and release an
+entry, and search the list of entries on some criteria.
+.\" ------------------------
+.PP
+.B cdev_count
+is an integer that always contains the number of entries in the character device switch table list.
+.\" ------------------------
+.PP
+.B cdevsw_list
+is a kernel
+.B list_head
+structure that forms the head of the
+.BR cdevsw (9)
+table implemented as a list.
+.\" ------------------------
+.PP
+.B cdevsw_lock
+is a kernel
+.B rwlock_t
+reader-writer lock that protects the elements of the
+.BR cdevsw (9)
+table implemented as a list.
+.\" ------------------------
+.PP
+.BR sdev_add ()
+adds the
+.BR cdevsw (9)
+structure specified by
+.I cdev
+to the
+.BR cdevsw_list
+at the index specified by
+.IR modid ,
+or returns an error number.
+.PP
+.BR cdev_add ()
+was the old name for
+.BR sdev_add (),
+until the
+.B Linux
+kernel defined a conflicting symbol.
+.\" ------------------------
+.PP
+.BR sdev_del ()
+deletes the
+.BR cdevsw (9)
+structure specified by
+.I cdev
+from the
+.BR cdevsw_list .
+.PP
+.BR cdev_del ()
+was the old name for
+.BR sdev_del (),
+until the
+.B Linux
+kernel defined a conflicting symbol.
+.\" ------------------------
+.PP
+.BR sdev_get ()
+locates the character device switch table entry that owns the major device number
+.IR major .
+This helper function has the side-effect that if the major device number is not already assigned to
+a character device switch table entry, it will try to load a driver for the major device number.
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR sdev_put ().
+.PP
+.BR cdev_get ()
+was the old name for
+.BR sdev_get (),
+until the
+.B Linux
+kernel defined a conflicting symbol.
+.\" ------------------------
+.PP
+.BR cdev_find ()
+locates the character device switch table entry that has the same name as
+.IR name .
+This helper function has the side-effect that if the name is not found, it will try to load a device
+driver using that name.
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR sdev_put ().
+.\" ------------------------
+.PP
+.BR cdev_match ()
+locates the character device switch table entry that has root name contained in the extended name,
+.IR name .
+An extended name [see
+.BR nsdev (4)]
+is a name that includes a point, \(lq\fB.\fR\(rq.  The root name is the portion of the string before
+the point; the extension is the portion of the string after the point.
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR sdev_put ().
+.\" ------------------------
+.PP
+.BR cdev_str ()
+locates the character device switch table entry that has the same
+.BR streamtab (9)
+structure pointer as
+.IR str .
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR sdev_put ().
+.\" ------------------------
+.PP
+.BR sdev_put ()
+releases a reference to the character device switch table entry
+.IR cdev .
+.PP
+.BR cdev_put ()
+was the old name for
+.BR sdev_put (),
+until the
+.B Linux
+kernel defined a conflicting symbol.
+.\" ------------------------
+.PP
+.BR cdev_minor ()
+translates an external major device number,
+.IR major ,
+and an external minor device number ,
+.IR minor ,
+to an extended minor device number (return value) using the character device switch table
+entry
+.IR dev .
+The extended minor device number [see
+.BR dev_t (9)]
+is the minor device number plus the offset of the major device number times the number of minor
+device numbers per major.
+.\"
+.\"
+.SH USAGE
+.PP
+None of these functions are intended to be used by portable
+.I STREAMS
+modules and drivers.  They are exported primarily for use by the
+.BR clone (4),
+.BR nsdev (4),
+and
+.BR sad (4)
+.I STREAMS
+drivers when they are configured as separate loadable kernel modules.
+.PP
+.BR sdev_add ()
+is used only by
+.BR register_strdrv (9)
+to add a prepared
+.BR cdevsw (9)
+entry to the
+.BR cdevsw_list .
+.I STREAMS
+drivers and modules will use
+.BR register_strdrv (9)
+or, preferrably,
+.BR register_strdev (9)
+instead.
+.PP
+.BR sdev_del ()
+is used only by
+.BR unregister_strdrv (9)
+to remove an existing
+.BR cdevsw (9)
+entry from the
+.BR cdevsw_list .
+.I STREAMS
+drivers and modules will use
+.BR unregister_strdrv (9)
+or, preferrably,
+.BR unregsiter_strdev (9)
+instead.
+.PP
+.BR sdev_get ()
+is used by the
+.BR clone (4)
+and
+.BR sad (4)
+drivers to locate a
+.BR cdevsw (9)
+table entry using the major device number of the driver.
+.BR clone (4)
+uses it to translate clone minor device numbers into major device numbers and locate (and possibly
+load) the corresponding driver.
+.BR sad (4)
+uses it to locate a
+.BR cdevsw (9)
+table entry using the major device number passed by the user in the
+.I sap_major
+of the
+.BR strapush (5)
+structure.
+.PP
+.BR cdev_find ()
+is used by the
+.BR pipe (2s)
+system call to locate the
+.BR pipe (4)
+driver;
+used by the
+.BR getmid (9)
+.I STREAMS
+utility to translate a driver or module name into a module id;
+used by the
+.BR specfs (5)
+file system when looking up a device directory under
+.BR /dev/streams ;
+and, used by the
+.BR sad (4)
+driver to translate a driver name contained in the
+.I sap_module
+member of the
+.BR strapush (5)
+structure, into a
+.BR cdevsw (9)
+table entry and major device number.
+.PP
+.BR cdev_match ()
+is used only by the
+.BR nsdev (4)
+.I Named STREAMS Device
+driver to locate the
+.I STREAMS
+driver and
+.B cdevsw (9)
+table entry using an extended device name.
+.PP
+.BR cdev_str ()
+is currently unused.
+.PP
+.BR sdev_put ()
+is used to release a reference to a
+.BR cdevsw (9)
+entry acquired with
+.BR sdev_get (),
+.BR cdev_find (),
+.BR cdev_match (),
+or
+.BR cdev_str ().
+Any kernel module associated with the
+.BR cdevsw (9)
+entry (via the
+.I d_kmod
+member), will not be allowed to unload until the reference to the
+.BR cdevsw (9)
+entry is released.
+.PP
+.BR cdev_minor ()
+is used by clone drivers
+.BR clone (4)
+and
+.BR nsdev (4)
+to translate the external major and minor device number into an internal major (modid) and extended
+(internal) minor device number so that the corresponding
+.B snode 
+in the
+.BR specfs (5)
+file system can be located and opened.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR sdev_del ()
+and
+.BR sdev_put ()
+return void.
+.PP
+.BR sdev_add ()
+returns zero
+.RB ( 0 )
+upon success, and a negative error number upon failure.
+.PP
+.BR sdev_get (),
+.BR cdev_find (),
+.BR cdev_match (),
+and
+.BR cdev_str (),
+return a pointer to the
+.BR cdevsw (9)
+table entry upon success, and
+.B NULL
+upon failure.
+.PP
+.BR cdev_minor ()
+returns the extended (internal) minor device number on success, and the external minor device number
+on failure.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR sdev_add ()
+fails, it does not add the passed in
+.BR cdevsw (9)
+entry to the table, and returns an appropriate negative error number as follows:
+.TP \w'[\fBENOMEM\fR]\(em'u
+.RB [ ENOMEM ]
+insufficent memory was available to allocate the necessary
+.B snode
+for the
+.BR specfs (5)
+file system entry.
+.PP
+When
+.BR sdev_get (),
+.BR cdev_find (),
+.BR cdev_match (),
+or
+.BR cdev_str (),
+fail, they return
+.BR NULL .
+.PP
+When
+.BR cdev_minor ()
+fails, it returns the passed in
+.I minor
+device number argument.
+.\"
+.\"
+.SH CONTEXT
+.PP
+These helper functions (and the
+.I STREAMS
+utilities that call them)
+can only be called from a blocking process context, such as the callouts:
+.IR qi_qopen (9)
+open routine, or
+.IR qi_qclose (9)
+close routine,
+or kernel module initialization and termination sequences.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+These functions are MP-safe when called from the proper context.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.BR cdevsw (9)
+helper functions are not intended to be called by portable
+.I STREAMS
+drivers and modules.  They are only used by implementation specific drivers,
+.BR clone (4),
+.BR nsdev (4),
+.BR sad (4),
+within the
+.I "@PACKAGE_TITLE@"
+.B @PACKAGE@-@VERSION@
+distribution.
+.PP
+.I STREAMS
+drivers and modules, not part of the distribution, that call these functions are likely to break
+from version to version and release to release.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+See the source file
+.I src/kernel/strlookup.c
+for implementation details.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+See the source files
+.IR src/drivers/clone.c ,
+.IR src/drivers/nsdev.c ,
+.IR src/drivers/sad.c ,
+in the distribution for example usage.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cdevsw (9),
+.BR streamtab (9),
+.BR register_strdrv (9),
+.BR register_strdev (9),
+.BR unregister_strdrv (9),
+.bR unregsiter_strdev (9),
+.BR clone (4),
+.BR nsdev (4),
+.BR sad (4),
+.BR strapush (5),
+.BR pipe (2s),
+.BR pipe (4),
+.BR getmid (9),
+.BR specfs (5),
+.BR dev_t (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR sdev_add (),
+.BR sdev_del (),
+.BR sdev_get (),
+.BR cdev_find (),
+.BR cdev_match (),
+.BR cdev_str (),
+.BR sdev_put (),
+.BR cdev_minor (),
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.BR sdev_add (),
+.BR sdev_del (),
+.BR sdev_get (),
+.BR cdev_find (),
+.BR cdev_match (),
+.BR cdev_str (),
+.BR sdev_put (),
+.BR cdev_minor (),
+helper functions provide access to the
+.BR cdevsw (9)
+list that would otherwise be implemented directly by interating through a fixed
+.BR cdevsw (9)
+table.
+These are
+.B "@PACKAGE_TITLE@"
+implementation specific functions not intended to be used by
+.I STREAMS
+drivers and modules and not subject to standardization.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+These functions are new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

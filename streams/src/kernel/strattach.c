@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/30 03:37:11 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/01 12:56:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/12/01 12:56:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/30 03:37:11 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/01 12:56:17 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/30 03:37:11 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/01 12:56:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -139,6 +139,7 @@ do_fattach(const struct file *file, const char *file_name)
 	err = -EINVAL;
 	if (!file->f_dentry->d_inode->i_pipe)
 		goto out;	/* not a STREAM */
+	err = -ENOENT;
 	if (!file_name || !*file_name)
 		goto out;
 
@@ -203,7 +204,7 @@ do_fdetach(const char *file_name)
 	struct nameidata nd;
 	int err;
 
-	err = -EINVAL;
+	err = -ENOENT;
 	if (!file_name || !*file_name)
 		goto out;
 

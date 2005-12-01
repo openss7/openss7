@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.26 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.27 2005/12/01 12:56:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-.BI "pl_t freezestr(queue_t *" q );
+pl_t \fBfreezestr\fP(queue_t *\fIq\fP);
 .sp 2
 .PP
 .B #define _SUN_SOURCE
@@ -100,7 +100,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-.BI "void freezestr(queue_t *" q );
+void \fBfreezestr\fP(queue_t *\fIq\fP);
 .\"
 .\"
 .SH ARGUMENTS
@@ -616,20 +616,18 @@ Following are two examples of the use of
 .PP
 Following is an example (but not a terribly useful one) of the use of
 .BR freezestr ():
-.sp
+.PP
 .nf
 \fC\s-2\
-...
-     1  freezestr(q);
-     2  {
-     3      if ((mp = q->q_first) &&
-     4          mp->b_datap->db_type == M_PCPROTO &&
-     5          *((ulong *) mp->b_rptr) == T_INFO_ACK
-     6          && !mp->b_next)
-     7          qenable(q);
-     8  }
-     9  unfreezestr(q);
-...
+ 1  freezestr(q);
+ 2  {
+ 3      if ((mp = q->q_first) &&
+ 4          mp->b_datap->db_type == M_PCPROTO &&
+ 5          *((ulong *) mp->b_rptr) == T_INFO_ACK
+ 6          && !mp->b_next)
+ 7          qenable(q);
+ 8  }
+ 9  unfreezestr(q);
 \s+2\fP
 .fi
 .SS tirdwr Example
@@ -666,33 +664,33 @@ The following code fragment is a function
 .RB ( tirdwr_push ())
 that performs the check actions required of
 .BR tirdwr (4):
-.sp
+.PP
 .nf
 \fC\s-2\
-     1  static int
-     2  tirdwr_push(queue_t *q)
-     3  {
-     4      int err = 0;
-     5      mblk_t *b;
-     6      pl_t pl;
-     7  
-     8      pl = freezestr(q);
-     9      b = q->q_next->q_first;
-    10      while (b && !err) {
-    11          switch (b->b_datap->db_type) {
-    12          case M_PROTO:
-    13          case M_PCPROTO:
-    14              err = EPROTO;
-    15              break;
-    16          default:
-    17              b = b->b_next;
-    18              continue;
-    19          }
-    20          break;
-    21      }
-    22      unfreezestr(q, pl);
-    23      return (err);
-    24  }
+ 1  static int
+ 2  tirdwr_push(queue_t *q)
+ 3  {
+ 4      int err = 0;
+ 5      mblk_t *b;
+ 6      pl_t pl;
+ 7  
+ 8      pl = freezestr(q);
+ 9      b = q->q_next->q_first;
+10      while (b && !err) {
+11          switch (b->b_datap->db_type) {
+12          case M_PROTO:
+13          case M_PCPROTO:
+14              err = EPROTO;
+15              break;
+16          default:
+17              b = b->b_next;
+18              continue;
+19          }
+20          break;
+21      }
+22      unfreezestr(q, pl);
+23      return (err);
+24  }
 \s+2\fP
 .fi
 .PP

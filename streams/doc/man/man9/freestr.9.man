@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freestr.9.man,v 0.9.2.6 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: freestr.9.man,v 0.9.2.7 2005/12/01 12:56:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,7 +85,7 @@ stream head
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "void freestr(struct stdata *" sth );
+void \fBfreestr\fP(struct stdata *\fIsth\fP);
 .\"
 .\"
 .SH ARGUMENTS

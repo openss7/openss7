@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.26 2005/11/30 13:59:23 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.27 2005/12/01 12:56:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "int insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" nmp );
+int \fBinsq\fP(queue_t *\fIq\fP, mblk_t *\fIemp\fP, mblk_t *\fInmp\fP);
 .\"
 .\"
 .SH ARGUMENTS
@@ -130,7 +130,7 @@ If a priority message is inserted into the queue, the queue will always be enabl
 .BR qenable (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists.
+procedure will be scheduled if it exists (and is not already scheduled).
 .PP
 If a normal message is inserted into an empty queue and the 
 .B QWANTR
@@ -138,7 +138,7 @@ flag is set for the queue, then the queue will be enabled, as with
 .BR enableq (9);
 that is, the queue's
 .IR qi_srvp (9)
-procedure will be scheduled if it exists and the
+procedure will be scheduled if it exists (and is not already scheduled) and the
 .B QNOENB
 flag has not been set for the queue with
 .BR noenable (9).
@@ -397,6 +397,39 @@ or the message was placed with
 .\"
 .SH USAGE
 .PP
+.BR insq ()
+is used when it is necessary to place insert a message into the queue somewhere other than at the
+tail of the queue; or, when
+.I q
+has been frozen by the caller with
+.BR freezestr (9),
+and neither
+.BR putq "(9) nor " putbq (9)
+can be used.
+.PP
+.BR putq "(9) and " putbq (9)
+should not be called for a queue that has been frozen by the caller with
+.BR freezestr (9).
+Single-party deadlock can result from calling
+.BR putq "(9) or " putbq (9)
+for a queue frozen by the caller on some implementations of
+.IR STREAMS .
+.PP
+Because
+.BI insq( q ", NULL, " mp )
+is equivalent to
+.BI putq( q ", " mp ),
+.BR putq (9)
+can effectively be called on a frozen Stream by emulating it using
+.BR insq ().
+.BR putbq (9)
+is a little harder to emulate using
+.BR insq (),
+but not much: see
+.RI \(lq "Example #1" \(rq
+under
+.RI \(lq EXAMPLES \(rq,
+below.
 .\"
 .\"
 .SH RETURN
@@ -565,6 +598,43 @@ before proceeding.  Otherwise,
 .BR insq ()
 indicates failure and prints an error to the system logs.
 Some other implementations will panic in this situation.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.SS Example #1 - putq()/putbq() on a Frozen Stream
+.PP
+The following example shows how to effectively perform
+.BR putq (9)
+and
+.BR putbq (9)
+on a Stream frozen by the caller with
+.BR freezestr (9)
+using
+.BR insq ():
+.PP
+.in +2n
+.nf
+\fC\s-2\
+ 1  int
+ 2  putq_frozen(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      return insq(q, NULL, mp);
+ 5  }
+ 6  
+ 7  int
+ 8  putbq_frozen(queue_t *q, mblk_t *mp)
+ 9  {
+10      mblk_t *emp = q->q_first;
+11  
+12      if (DB_TYPE(mp) < QPCTL)
+13          for (; emp && (DB_TYPE(emp) >= QPCTL
+14                         || emp->b_band > mp->b_band);
+15               emp = emp->b_next) ;
+16      return insq(q, emp, mp);
+17  }
+\s+2\fP
+.fi
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushq.9.man,v 0.9.2.22 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: flushq.9.man,v 0.9.2.23 2005/12/01 12:56:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "void flushq(queue_t *" q ", int " flag );
+void \fBflushq\fP(queue_t *\fIq\fP, int \fIflag\fP);
 .\"
 .\"
 .SH ARGUMENTS
@@ -201,6 +201,7 @@ flushes in constant time.
 .\"
 .\"
 .SH EXAMPLES
+.SS Example #1
 .PP
 .BR flushq ()
 is normally used within the
@@ -208,86 +209,94 @@ is normally used within the
 handling procedures for a
 .I STREAMS
 module or driver as follows:
-.sp
-.in +4
+.PP
 .nf
 \fC\s-2\
-int x_w_flush(queue_t *q, mblk_t *mp)
-{
-   if (*mp->b_rptr & FLUSHW) {
-      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
-         flushband(WR(q), mp->b_rptr[1], FLUSHALL);
-      else
-         flushq(WR(q), FLUSHALL);
-      if (q->q_next) {
-         putnext(q, mp);
-         return (0);
-      }
-      *mp->b_rptr &= ~FLUSHW;
-   }
-   if (*mp->b_rptr & FLUSHR) {
-      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
-         flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-      else
-         flushq(RD(q), FLUSHALL);
-      if (!q->q_next) {
-         qreply(q, mp);
-         return (0);
-      }
-      *mp->b_rptr &= ~FLUSHR;
-   }
-   freemsg(mp);
-   return (0);
-}
-int x_r_flush(queue_t *q, mblk_t *mp)
-{
-   if (*mp->b_rptr & FLUSHR) {
-      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
-         flushband(RD(q), mp->b_rptr[1], FLUSHALL);
-      else
-         flushq(RD(q), FLUSHALL);
-      if (q->q_next) {
-         putnext(q, mp);
-         return (0);
-      }
-      *mp->b_rptr &= ~FLUSHR;
-   }
-   if (*mp->b_rptr & FLUSHW) {
-      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
-         flushband(WR(q), mp->b_rptr[1], FLUSHALL);
-      else
-         flushq(WR(q), FLUSHALL);
-      if (!q->q_next) {
-         qreply(q, mp);
-         return (0);
-      }
-      *mp->b_rptr &= ~FLUSHW;
-   }
-   freemsg(mp);
-   return (0);
-}
+ 1  int
+ 2  x_w_flush(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      if (*mp->b_rptr & FLUSHW) {
+ 5          if (*mp->b_rptr & FLUSHBAND
+ 6              && mp->b_rptr[1] != 0)
+ 7              flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+ 8          else
+ 9              flushq(WR(q), FLUSHALL);
+10          if (q->q_next) {
+11              putnext(q, mp);
+12              return (0);
+13          }
+14          *mp->b_rptr &= ~FLUSHW;
+15      }
+16      if (*mp->b_rptr & FLUSHR) {
+17          if (*mp->b_rptr & FLUSHBAND
+18              && mp->b_rptr[1] != 0)
+19              flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+20          else
+21              flushq(RD(q), FLUSHALL);
+22          if (!q->q_next) {
+23              qreply(q, mp);
+24              return (0);
+25          }
+26          *mp->b_rptr &= ~FLUSHR;
+27      }
+28      freemsg(mp);
+29      return (0);
+30  }
+31  
+32  int
+33  x_r_flush(queue_t *q, mblk_t *mp)
+34  {
+35      if (*mp->b_rptr & FLUSHR) {
+36          if (*mp->b_rptr & FLUSHBAND
+37              && mp->b_rptr[1] != 0)
+38              flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+39          else
+40              flushq(RD(q), FLUSHALL);
+41          if (q->q_next) {
+42              putnext(q, mp);
+43              return (0);
+44          }
+45          *mp->b_rptr &= ~FLUSHR;
+46      }
+47      if (*mp->b_rptr & FLUSHW) {
+48          if (*mp->b_rptr & FLUSHBAND
+49              && mp->b_rptr[1] != 0)
+50              flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+51          else
+52              flushq(WR(q), FLUSHALL);
+53          if (!q->q_next) {
+54              qreply(q, mp);
+55              return (0);
+56          }
+57          *mp->b_rptr &= ~FLUSHW;
+58      }
+59      freemsg(mp);
+60      return (0);
+61  }
 \s+2\fR
 .fi
+.SS Example #2
 .PP
 In addition,
 .BR flushq ()
 is often used when closing or
 .BR I_UNLINK ing
 a stream as follows:
-.sp
-.in +4
+.PP
 .nf
 \fC\s-2\
-void x_free_priv(queue_t *q)
-{
-   priv_t *p = (priv_t *) q->q_ptr;
-   flushq(RD(q), FLUSHALL);
-   flushq(WR(q), FLUSHALL);
-   /* free some more stuff */
-   free(p);
-   RD(q)->q_ptr = WR(q)->q_ptr = NULL;
-   return;
-}
+ 1  void
+ 2  x_free_priv(queue_t *q)
+ 3  {
+ 4      priv_t *p = (priv_t *) q->q_ptr;
+ 5  
+ 6      flushq(RD(q), FLUSHALL);
+ 7      flushq(WR(q), FLUSHALL);
+ 8      /* free some more stuff */
+ 9      free(p);
+10      RD(q)->q_ptr = WR(q)->q_ptr = NULL;
+11      return;
+12  }
 \s+2\fR
 .fi
 .\"

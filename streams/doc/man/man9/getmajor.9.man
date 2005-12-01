@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmajor.9.man,v 0.9.2.13 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: getmajor.9.man,v 0.9.2.14 2005/12/01 12:56:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,7 +85,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-.BI "major_t getmajor(dev_t " dev );
+major_t \fBgetmajor\fP(dev_t \fIdev\fP);
 .\"
 .\"
 .SH ARGUMENTS

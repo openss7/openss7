@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.54 2005/11/06 11:00:54 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.55 2005/12/01 12:56:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/06 11:00:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/01 12:56:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/11/06 11:00:54 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/01 12:56:15 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -647,8 +647,10 @@ extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
+#if 0
 extern struct devinfo *di_alloc(struct cdevsw *cdev);
 extern void di_put(struct devinfo *di);
+#endif
 
 extern struct strevent *STREAMS_FASTCALL(sealloc(void));
 extern int STREAMS_FASTCALL(sefree(struct strevent *se));

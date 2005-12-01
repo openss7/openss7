@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.19 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.20 2005/12/01 12:56:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,16 +85,18 @@ sort-adjacent-labels
 .br
 .B #include <sys/kmem.h>
 .HP
-.BI "void *kmem_zalloc(size_t " size ", int " flag );
+void *\fBkmem_zalloc\fP(size_t \fIsize\fP, int \fIflag\fP);
 .\"
 .\"
 .SH ARGUMENTS
 .TP
 .I size
 the size of the contiguous region of kernel memory to allocate.
+.PD 0
 .TP
 .I flag
 whether to sleep or not.
+.PD
 .\"
 .\"
 .SH INTERFACE

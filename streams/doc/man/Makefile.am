@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/11/30 13:59:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/12/01 12:56:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/30 13:59:22 $ by $Author: brian $
+# Last Modified $Date: 2005/12/01 12:56:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1124,8 +1124,6 @@ man_MANS = \
 	man9/delay.9 \
 	man9/devnode.9 \
 	man9/dev_t.9 \
-	man9/di_alloc.9 \
-	man9/di_put.9 \
 	man9/do_fattach.9 \
 	man9/do_fdetach.9 \
 	man9/do_spipe.9 \
@@ -1323,6 +1321,9 @@ man_MANS = \
 	$(driver_pages) \
 	$(module_pages) \
 	$(util_pages)
+
+##	man9/di_alloc.9 \
+##	man9/di_put.9 \
 
 ##dist_noinst_svr3_compat_pages = \
 ##	man9/major.9.man \
@@ -2384,8 +2385,6 @@ dist_noinst_MANS = \
 	man9/delay.9.man \
 	man9/devnode.9.man \
 	man9/dev_t.9.man \
-	man9/di_alloc.9.man \
-	man9/di_put.9.man \
 	man9/do_fattach.9.man \
 	man9/do_fdetach.9.man \
 	man9/do_spipe.9.man \
@@ -2584,6 +2583,8 @@ dist_noinst_MANS = \
 	$(dist_noinst_module_pages) \
 	$(dist_noinst_util_pages)
 
+##	man9/di_alloc.9.man \
+##	man9/di_put.9.man \
 
 ## PKG_BUILD_INDEP
 endif

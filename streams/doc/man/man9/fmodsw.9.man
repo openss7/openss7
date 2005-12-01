@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fmodsw.9.man,v 0.9.2.14 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: fmodsw.9.man,v 0.9.2.15 2005/12/01 12:56:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -612,7 +612,7 @@ and
 are provided as part of the
 .I STREAMS
 compatibility package,
-.BR strcompat ).
+.BR strcompat (5)).
 .PP
 See
 .BR STREAMS (9)

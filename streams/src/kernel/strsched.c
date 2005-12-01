@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/11/13 07:57:27 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/01 12:56:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/13 07:57:27 $ by $Author: brian $
+ Last Modified $Date: 2005/12/01 12:56:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/11/13 07:57:27 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/01 12:56:17 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/11/13 07:57:27 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/01 12:56:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -646,8 +646,10 @@ di_alloc(struct cdevsw *cdev)
 	return (di);
 }
 
+#if 0
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(di_alloc);	/* include/sys/streams/strsubr.h */
+#endif
 #endif
 struct devinfo *
 di_get(struct devinfo *di)
@@ -687,8 +689,10 @@ di_put(struct devinfo *di)
 	return;
 }
 
+#if 0
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(di_put);		/* include/sys/streams/strsubr.h */
+#endif
 #endif
 
 /* 

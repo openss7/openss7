@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 0.9.2.21 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 0.9.2.22 2005/12/01 12:56:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,6 +90,7 @@ sort-adjacent-labels
 .TP \w'\ priority\ 'u
 .I base
 the base of the user supplied message buffer.
+.PD 0
 .TP
 .I size
 the size of the user supplied message buffer.
@@ -99,6 +100,7 @@ the priority of the request.
 .TP
 .I freeinfo
 a pointer to a free routine description structure.
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -418,29 +420,35 @@ The following examples shows how a data buffer suitable for use by Direct
 Memory Access is allocated:
 .nf
 \fC\s-2
-void xxx_free_func(char *buf)
-{
-    kfree(buf);
-    MOD_DEC_USE_COUNT;
-}
-
-mblk_t *xxx_alloc_dma_buf(size_t bufsize)
-{
-    unsigned char *buf;
-    MOD_INC_USE_COUNT;
-    if ((buf = kmalloc(bufsize, GFP_ATOMIC | GFP_DMA))) {
-        mblk_t *mp;
-        frtn_t freertn = {
-            free_func:&xxx_free_func,
-            free_arg:(char *) buf,
-        };
-        if (!(mp = esballoc(buf, bufsize, BPRI_MED, &freertn)))
-            xxx_free_func(buf);
-        return (mp);
-    }
-    MOD_DEC_USE_COUNT;
-    return (NULL);
-}
+ 1  void
+ 2  xxx_free_func(char *buf)
+ 3  {
+ 4      kfree(buf);
+ 5      MOD_DEC_USE_COUNT;
+ 6  }
+ 7  
+ 8  mblk_t *
+ 9  xxx_alloc_dma_buf(size_t bufsize)
+10  {
+11      unsigned char *buf;
+12  
+13      MOD_INC_USE_COUNT;
+14      if ((buf = kmalloc(bufsize,
+15                         GFP_ATOMIC | GFP_DMA))) {
+16          mblk_t *mp;
+17          frtn_t freertn = {
+18              free_func:&xxx_free_func,
+19              free_arg:(char *) buf,
+20          };
+21  
+22          if (!(mp = esballoc(buf, bufsize,
+23                              BPRI_MED, &freertn)))
+24              xxx_free_func(buf);
+25          return (mp);
+26      }
+27      MOD_DEC_USE_COUNT;
+28      return (NULL);
+29  }
 \s+2\fP
 .fi
 .PP

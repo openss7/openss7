@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: linkmsg.9.man,v 0.9.2.9 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: linkmsg.9.man,v 0.9.2.10 2005/12/01 12:56:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,16 +83,18 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "mblk_t *linkmsg(mblk_t *" mp1 ", mblk_t *" mp2 );
+mblk_t *\fBlinkmsg\fP(mblk_t *\fImp1\fP, mblk_t *\fImp2\fP);
 .\"
 .\"
 .SH ARGUMENTS
 .TP
 .I mp1
 the message onto which to link.
+.PD 0
 .TP
 .I mp2
 the message to link.
+.PD
 .\"
 .\"
 .SH INTERFACE
@@ -146,15 +148,15 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR linkmsg ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR linkmsg ()
-is MP-safe; however, it is the callers responsibility to ensure exclusive
-access to the passed in messages.
+is MP-safe; however, it is the callers responsibility to ensure exclusive access to the passed in
+messages.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -182,6 +184,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+None.
 .\"
 .\"
 .SH HISTORY

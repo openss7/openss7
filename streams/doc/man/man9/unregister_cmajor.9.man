@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_cmajor.9.man,v 0.9.2.5 2005/11/29 10:46:36 brian Exp $
+.\" @(#) $Id: unregister_cmajor.9.man,v 0.9.2.6 2005/12/01 12:56:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -276,7 +276,7 @@ file system.  Registration of
 drivers and modules is inherently implementation specific and non-portable.
 Different implementations provide different mechanisms.
 The
-.BR strcompat
+.BR strcompat (5)
 package for
 .B @PACKAGE_TITLE@
 provides additional mechanisms compatible with other implementations.

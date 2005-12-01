@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canenable.9.man,v 0.9.2.20 2005/11/30 23:18:47 brian Exp $
+.\" @(#) $Id: canenable.9.man,v 0.9.2.21 2005/12/01 12:56:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 23:18:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/01 12:56:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -277,7 +277,9 @@ None.
 .SH BUGS
 .PP
 .BR canenable ()
-has no known bugs.
+has no known bugs, but see the limitations under
+.RI \(lq MP-STREAMS \(rq,
+above.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -380,9 +382,9 @@ for the purpose of porting
 drivers to
 .B Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B "@PACKAGE_TITLE@"
 .[
-lfs
+@PACKAGE_TITLE@
 .]
 differ from that of
 .IR "SVR 3" ,
@@ -415,7 +417,7 @@ Portable
 modules and drivers will not access these symbols.  Portable
 .I STREAMS
 modules and drivers will use
-.BR @PACKAGE_TITLE@
+.B "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
 .IP \(em
@@ -423,7 +425,7 @@ Binary compatibility is not guaranteed.
 .PP
 Additional compatibility is available using the
 .I STREAMS Compatibility Modules
-.B strcompat
+.BR strcompat (5)
 package for
 .I LiS
 and
