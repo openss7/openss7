@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_strdrv.9.man,v 0.9.2.8 2005/11/29 10:46:36 brian Exp $
+.\" @(#) $Id: unregister_strdrv.9.man,v 0.9.2.9 2005/12/02 15:15:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 15:15:51 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: unregister_strdrv.9.man,v $
+.\" Revision 0.9.2.9  2005/12/02 15:15:51  brian
+.\" - more updates
+.\"
 .\" Revision 0.9.2.8  2005/11/29 10:46:36  brian
 .\" - updating manual pages for release
 .\"
@@ -339,7 +342,7 @@ is a module or driver termination routine.
 .BR cdev_del (9),
 .BR register_strdrv (9),
 .BR unregister_strdev (9),
-.IR SPG (9),
+.BR dev_t (9),
 .IR STREAMS (9).
 .\"
 .\"

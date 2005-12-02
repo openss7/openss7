@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PROTO.9.man,v 0.9.2.6 2005/11/29 10:46:26 brian Exp $
+.\" @(#) $Id: M_PROTO.9.man,v 0.9.2.7 2005/12/02 15:15:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:26 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 15:15:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -289,22 +289,22 @@ connection request primitive, is illustrated below:
 .PP
 .RS 4n
 .nf
-\fC\s-1\
-/* 
- *  T_CONN_REQ, M_PROTO
- *
- *  This primitive requests that the transport
- *  provider make a connection to the specified
- *  destination.
- */
-struct T_conn_req {
-    t_scalar_t PRIM_type;     /* always T_CONN_REQ */
-    t_scalar_t DEST_length;   /* dest addr length */
-    t_scalar_t DEST_offset;   /* dest addr offset */
-    t_scalar_t OPT_length;    /* options length */
-    t_scalar_t OPT_offset;    /* options offset */
-};
-\s+1\fP
+\fC\s-2\
+ 1  /* 
+ 2   *  T_CONN_REQ, M_PROTO
+ 3   *
+ 4   *  This primitive requests that the transport
+ 5   *  provider make a connection to the specified
+ 6   *  destination.
+ 7   */
+ 8  struct T_conn_req {
+ 9      t_scalar_t PRIM_type;       /* always T_CONN_REQ */
+10      t_scalar_t DEST_length;     /* dest addr length */
+11      t_scalar_t DEST_offset;     /* dest addr offset */
+12      t_scalar_t OPT_length;      /* options length */
+13      t_scalar_t OPT_offset;      /* options offset */
+14  };
+\s+2\fP
 .fi
 .RE
 .PP
@@ -340,36 +340,37 @@ connection request to a Stream.
 .PP
 .RS 4n
 .nf
-\fC\s-1\
-struct {
-    struct T_conn_req prim;
-    unsigned char adds[sizeof(destaddr)];
-    unsigned char opts[sizeof(toptions)];
-} myprim;
-
-unsigned char data[DATASIZE];
-
-struct strbuf ctlbuf =
-    { -1, sizeof(myprim), (char *) &myprim };
-struct strbuf databuf =
-    { -1, sizeof(data), (char *) data };
-
-myprim.prim.PRIM_type = T_CONN_REQ;
-
-myprim.prim.DEST_length = sizeof(destaddr);
-myprim.prim.DEST_offset = sizeof(myprim.prim);
-memcpy(opts, &toptions, sizeof(toptions));
-
-myprim.prim.OPT_length = sizeof(toptions);
-myprim.prim.OPT_offset =
-    sizeof(myprim.prim) + sizeof(adds);
-memcpy(adds, &destaddr, sizeof(destaddr));
-
-if (putmsg(fd, &ctlbuf, &databuf, 0) == -1) {
-    perror("putmsg failed");
-    exit(1);
-}
-\s+1\fP
+\fC\s-2\
+ 1  struct {
+ 2      struct T_conn_req prim;
+ 3      unsigned char adds[sizeof(destaddr)];
+ 4      unsigned char opts[sizeof(toptions)];
+ 5  }
+ 6  myprim;
+ 7  
+ 8  unsigned char data[DATASIZE];
+ 9  
+10  struct strbuf ctlbuf =
+11      { -1, sizeof(myprim), (char *) &myprim };
+12  struct strbuf databuf =
+13      { -1, sizeof(data), (char *) data };
+14  
+15  myprim.prim.PRIM_type = T_CONN_REQ;
+16  
+17  myprim.prim.DEST_length = sizeof(destaddr);
+18  myprim.prim.DEST_offset = sizeof(myprim.prim);
+19  memcpy(opts, &toptions, sizeof(toptions));
+20  
+21  myprim.prim.OPT_length = sizeof(toptions);
+22  myprim.prim.OPT_offset =
+23      sizeof(myprim.prim) + sizeof(adds);
+24  memcpy(adds, &destaddr, sizeof(destaddr));
+25  
+26  if (putmsg(fd, &ctlbuf, &databuf, 0) == -1) {
+27      perror("putmsg failed");
+28      exit(1);
+29  }
+\s+2\fP
 .fi
 .RE
 .PP
@@ -378,40 +379,41 @@ downstream.  In this case, the primitive is expedited (priority band 1).
 .PP
 .RS 4n
 .nf
-\fC\s-1\
-mblk_t *mp, *dp;
-struct T_conn_req *p;
-size_t size =
-    sizeof(p) + sizeof(destaddr) + sizeof(toptions);
-
-if ((mp = allocb(size, BPRI_MED))) {
-    if ((dp = allocb(sizeof(data), BPRI_MED))) {
-        mp->b_datap->db_type = M_PROTO;
-        mp->b_band = 1; /* expedite */
-        p = (typeof(p)) mp->b_wptr;
-        p->PRIM_type = T_CONN_REQ;
-        p->DEST_length = sizeof(destaddr);
-        p->DEST_offset = sizeof(*p);
-        p->OPT_length = sizeof(toptions);
-        p->OPT_offset =
-            sizeof(*p) + sizeof(destaddr);
-        mp->b_wptr += sizeof(p);
-        bcopy(&destaddr, mp->b_wptr,
-              sizeof(destaddr));
-        mp->b_wptr += sizeof(destaddr);
-        bcopy(&toptions, mp->b_wptr,
-              sizeof(toptions));
-        mp->b_wptr += sizeof(toptions);
-        bcopy(&data, dp->b_wptr, sizeof(data));
-        dp->b_wptr += sizeof(data);
-        linkb(mp, dp);
-        putnext(q, mp);
-        return (0);
-    } else
-        freeb(mp);
-}
-return (-ENOBUFS);
-\s+1\fP
+\fC\s-2\
+ 1  mblk_t *mp, *dp;
+ 2  struct T_conn_req *p;
+ 3  size_t size =
+ 4      sizeof(p) + sizeof(destaddr) +
+ 5      sizeof(toptions);
+ 6  
+ 7  if ((mp = allocb(size, BPRI_MED))) {
+ 8      if ((dp = allocb(sizeof(data), BPRI_MED))) {
+ 9          mp->b_datap->db_type = M_PROTO;
+10          mp->b_band = 1;     /* expedite */
+11          p = (typeof(p)) mp->b_wptr;
+12          p->PRIM_type = T_CONN_REQ;
+13          p->DEST_length = sizeof(destaddr);
+14          p->DEST_offset = sizeof(*p);
+15          p->OPT_length = sizeof(toptions);
+16          p->OPT_offset =
+17              sizeof(*p) + sizeof(destaddr);
+18          mp->b_wptr += sizeof(p);
+19          bcopy(&destaddr, mp->b_wptr,
+20                sizeof(destaddr));
+21          mp->b_wptr += sizeof(destaddr);
+22          bcopy(&toptions, mp->b_wptr,
+23                sizeof(toptions));
+24          mp->b_wptr += sizeof(toptions);
+25          bcopy(&data, dp->b_wptr, sizeof(data));
+26          dp->b_wptr += sizeof(data);
+27          linkb(mp, dp);
+28          putnext(q, mp);
+29          return (0);
+30      } else
+31          freeb(mp);
+32  }
+33  return (-ENOBUFS);
+\s+2\fP
 .fi
 .RE
 .PP

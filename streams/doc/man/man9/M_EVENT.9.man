@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_EVENT.9.man,v 0.9.2.5 2005/11/29 10:46:26 brian Exp $
+.\" @(#) $Id: M_EVENT.9.man,v 0.9.2.6 2005/12/02 15:15:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:26 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 15:15:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -126,15 +126,15 @@ structure formatted as follows:
 .nf
 \fC\s-1\
 struct str_evmsg {
-        long sv_event;        /* module-specific event */
-        vnode_t *sv_vp;       /* vnode pointer of event queue */
-        long sv_eid;          /* event id */
-        long sv_evpri;        /* event priority */
-        long sv_flags;        /* event flags */
-        uid_t sv_uid;         /* user id of posting process */
-        pid_t sv_pid;         /* process id of posting process */
-        hostid_t sv_hostid;   /* host id of posting process */
-        long sv_pad[4];       /* reserved */
+    long sv_event;     /* module-specific event */
+    vnode_t *sv_vp;    /* vnode pointer of event queue */
+    long sv_eid;       /* event id */
+    long sv_evpri;     /* event priority */
+    long sv_flags;     /* event flags */
+    uid_t sv_uid;      /* user id of posting process */
+    pid_t sv_pid;      /* process id of posting process */
+    hostid_t sv_hostid; /* host id of posting process */
+    long sv_pad[4];    /* reserved */
 };
 \s+1\fP
 .fi
