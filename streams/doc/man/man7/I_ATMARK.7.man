@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_ATMARK.7.man,v 0.9.2.3 2005/11/22 11:57:11 brian Exp $
+.\" @(#) $Id: I_ATMARK.7.man,v 0.9.2.4 2005/12/02 01:22:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 01:22:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_ATMARK.7.man,v $
+.\" Revision 0.9.2.4  2005/12/02 01:22:46  brian
+.\" - more updating
+.\"
 .\" Revision 0.9.2.3  2005/11/22 11:57:11  brian
 .\" - updating documentation for release
 .\"
@@ -122,20 +125,20 @@ is an integer flag specifying what to check.
 .PP
 The
 .B I_ATMARK
-command informs the user if the current message on the STREAM head read queue is marked by a
+command informs the user if the current message on the Stream head read queue is marked by a
 downstream module or driver.  The
 .I arg
-argument determines how the checking is done when there are multiple marked messages on the STREAM
+argument determines how the checking is done when there are multiple marked messages on the Stream
 head read queue.  The possible values of the
 .I arg
 argument are as follows:
 .TP \w'LASTMARK\(em'u
 .B ANYMARK
-Determine if the message at the head of the STREAM head read queue is marked by a downstream module
+Determine if the message at the head of the Stream head read queue is marked by a downstream module
 or driver.
 .TP
 .B LASTMARK
-Determine if the message at the head of the STREAM head read queue is the last message that is
+Determine if the message at the head of the Stream head read queue is the last message that is
 marked on the queue by a downstream module or driver.
 .PP
 The bitwise inclusive OR of the flags
@@ -194,11 +197,11 @@ structure can have the flag
 set that allows as module or driver to mark a message.  This is used to support
 .BR tcp (4)'s
 ability to show the user the last byte of out-of-band data.  Once marked, a message sent to the
-stream head causes the stream head to remember the message.  A user may check to see if the message
-on the front of its stream head read queue is marked with the
+Stream head causes the Stream head to remember the message.  A user may check to see if the message
+on the front of its Stream head read queue is marked with the
 .B I_ATMARK
 .BR ioctl (2s)
-command.  If a user is reading data from the stream head and there are multiple messages on the read
+command.  If a user is reading data from the Stream head and there are multiple messages on the read
 queue, and one of those messages is marked,
 .BR read (2s)
 terminates when it reaches the marked message and returns the data only up to that marked message.
