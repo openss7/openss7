@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 0.9.2.22 2005/12/01 12:56:09 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 0.9.2.23 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -564,15 +564,15 @@ drivers and modules will only use the priority values of
 .BR BPRI_MED
 and
 .BR BPRI_HI .
-.IP \(em
-Symbol
-.BR lis_esballoc ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_esballoc ()
-simply calls
-.BR esballoc ()
-directly.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_esballoc ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_esballoc ()
+.\"simply calls
+.\".BR esballoc ()
+.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

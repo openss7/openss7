@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmid.9.man,v 0.9.2.15 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: getmid.9.man,v 0.9.2.16 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,13 +75,13 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B getmid
+.B getmid, modiD_t
 \- get the \fISTREAMS\fR module id for a name
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-modID_t \fBgetmid\fR(const char *\fIname\fR);
+.BI "modID_t getmid(const char *" name ");
 .\"
 .\"
 .SH ARGUMENTS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timeout.9.man,v 0.9.2.20 2005/11/29 10:46:35 brian Exp $
+.\" @(#) $Id: timeout.9.man,v 0.9.2.21 2005/12/02 12:05:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -469,14 +469,14 @@ This is an exhaustive linear search.  This is inefficient.
 .I STREAMS
 modules or drivers that set timers often will experience poorer performance
 than if the Linux kernel timer facility was used directly.
-.PP
-.BR lis_timeout ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_timeout ()
-calls
-.BR timeout ()
-directly.
+.\".IP \(em
+.\".BR lis_timeout ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_timeout ()
+.\"calls
+.\".BR timeout ()
+.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

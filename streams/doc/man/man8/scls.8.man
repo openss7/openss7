@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: scls.8.man,v 0.9.2.15 2005/07/21 20:47:21 brian Exp $
+.\" @(#) $Id: scls.8.man,v 0.9.2.16 2005/12/02 12:05:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/21 20:47:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -303,6 +303,24 @@ driver.
 If either one is not available, the
 .B scls
 command will not be successful.
+.PP
+Note that only the module information and module statistics associated with the write side of the
+upper multiplexer will be displayed for a module or driver.  A module or driver that has more than
+one
+.BR module_info (9)
+or
+.BR module_stat (9)
+structure in its definition, will only display the information associated with the
+.I st_wrinit
+member of the
+.BR streamtab (9)
+structure.
+See
+.BR sc (4),
+.BR module_info (9),
+.BR module_stat (9),
+.BR streamtab (9)
+for more information.
 .\"
 .\"
 .SH EXAMPLES

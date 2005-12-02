@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.26 2005/11/30 23:18:47 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.27 2005/12/02 12:05:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 23:18:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -562,27 +562,27 @@ and other systems based on
 .I band
 is
 .BR "unsigned char" .
-.IP \(em
-Symbol
-.BR lis_bcanput ()
-and
-.BR lis_bcanput_anyband ()
-are provided for compatibility with
-.IR LiS .
-See
-.BR liscompat (9).
-.BR lis_bcanput ()
-and
-.BR lis_bcanput_anyband ()
-simply call
-.BR bcanput ()
-directly.
-.IP ""
-Portable
-.I STREAMS
-modules and drivers will not access these symbols, but will call
-.BR bcanput ()
-directly.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_bcanput ()
+.\"and
+.\".BR lis_bcanput_anyband ()
+.\"are provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_bcanput ()
+.\"and
+.\".BR lis_bcanput_anyband ()
+.\"simply call
+.\".BR bcanput ()
+.\"directly.
+.\".IP ""
+.\"Portable
+.\".I STREAMS
+.\"modules and drivers will not access these symbols, but will call
+.\".BR bcanput ()
+.\"directly.
 .IP \(em
 .BR bcanput ()
 may be called on a

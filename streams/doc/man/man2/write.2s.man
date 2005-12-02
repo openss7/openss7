@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: write.2s.man,v 0.9.2.10 2005/11/22 11:56:59 brian Exp $
+.\" @(#) $Id: write.2s.man,v 0.9.2.11 2005/12/02 12:05:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:56:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -235,7 +235,7 @@ If
 .I nbytes
 does not fall within the range and the minimum packet size is zero
 .RB ( 0 ),
-.RB write ()
+.BR write ()
 will break the buffer into maximum packet size segments prior to sending the data downstream
 (the last segment may contain less than the maximum packet size).  If
 .I nbytes
@@ -282,18 +282,18 @@ are created with a priority band of zero
 .\"
 .PP
 To distinguish the situation where a partial write has occurred versus as full write to downstream
-modules and drivers, the stream head uses the
+modules and drivers, the Stream head uses the
 .BR MSGDELIM
 flag in the
 .I b_flag
 member of the
 .BR msgb (9)
 structure to indicate the delimitation of full writes.  Whenever a partial write is performed by
-the stream head, the
+the Stream head, the
 .BR MSGDELIM
 flag is not set, indicating that the message does not contain a record boundary and that a
 subsequent data message contains more of the same record.
-Whenever a full write is performed by the stream head, the
+Whenever a full write is performed by the Stream head, the
 .BR MSGDELIM
 flag is set, indicating that the message is the last message in a sequence of messages for the record.
 .\"
@@ -303,7 +303,7 @@ Also,
 .BR write ()
 and
 .BR writev ()
-will fail if the stream head had processed an asynchronous error before the call.  In this case, the
+will fail if the Stream head had processed an asynchronous error before the call.  In this case, the
 value of
 .IR errno (3)
 does not reflect the result of the
@@ -311,7 +311,7 @@ does not reflect the result of the
 or
 .BR writev (),
 but reflects the prior error.
-If the stream head is set for old TTY semantics for
+If the Stream head is set for old TTY semantics for
 .BR O_NDELAY ,
 and a portion of the buffer has already been written,
 .BR write ()
@@ -345,7 +345,7 @@ provides a hold feature that improves the performance of
 when the process issues many small writes.  The message hold feature is enabled if the system
 administrator has changed the system control
 .BR sysctl_str_strhold
-to be non-zero and if the stream head flag
+to be non-zero and if the Stream head flag
 .B STRHOLD
 is set by a module or driver.
 A downstream module or driver sets the STREAM head
@@ -363,7 +363,7 @@ The process may also issue a
 .BR ioctl (2s)
 with the
 .B SNDHOLD
-flag set in the argument to enable the hold feature on a particular stream, but this is a
+flag set in the argument to enable the hold feature on a particular Stream, but this is a
 .B "@PACKAGE_TITLE@"
 extension.
 .PP
@@ -376,9 +376,9 @@ The buffer is allocated and the data is copied into it.
 then checks to see if another
 .BR write ()
 of the same size will fit into the same buffer.  If it will, the buffer is held temporarily on the
-stream head write queue, a timeout is started (usually 10ms, but settable with the
+Stream head write queue, a timeout is started (usually 10ms, but settable with the
 .BR sysctl_str_rtime
-system control), and the stream head is linked into the
+system control), and the Stream head is linked into the
 .I scanqhead
 list in the master
 .BR strthread (9)
@@ -407,7 +407,7 @@ scans the
 .I scanqhead
 list in the
 .BR strthread (9)
-structure and sends downstream any messages held on the stream head write queues whose timeouts have
+structure and sends downstream any messages held on the Stream head write queues whose timeouts have
 expired.
 .\"
 .\"
@@ -423,14 +423,14 @@ or the old TTY semantics for
 .B O_NDELAY.
 The semantics can be changed by a module that sends a
 .BR M_SETOPTS (9)
-message to the stream head specifying
+message to the Stream head specifying
 .BR SO_NDELON " or " SO_NDELOFF .
 There is no way for the user process to interrogate whether
 .I STREAMS
 or old TTY
 semantics for
 .B O_NDELAY
-have been applied to a stream without prior knowledge about the behaviour of the modules or driver.
+have been applied to a Stream without prior knowledge about the behaviour of the modules or driver.
 .\"
 .\"
 .PP
@@ -439,7 +439,7 @@ When writing to a
 character device special file that is neither a
 .IR STREAMS -based
 pipe nor FIFO, and
-the stream is using
+the Stream is using
 .I STREAMS
 semantics for the
 .B O_NDELAY
@@ -449,7 +449,7 @@ If the
 .B O_NONBLOCK
 (or
 .BR O_NDELAY )
-file flag is clear, and the stream cannot accept data (the stream write queue is full due to
+file flag is clear, and the Stream cannot accept data (the Stream write queue is full due to
 internal flow control conditions),
 .BR write ()
 blocks until data can be accepted.
@@ -458,7 +458,7 @@ If the
 .B O_NONBLOCK
 (or
 .BR O_NDELAY )
-file flag is set, and the stream cannot accept data (the stream write queue is full due to internal
+file flag is set, and the Stream cannot accept data (the Stream write queue is full due to internal
 flow conditions),
 .BR write ()
 fails, returns minus one
@@ -472,7 +472,7 @@ If the
 .B O_NONBLOCK
 (or
 .BR O_NDELAY )
-file flag is set and part of the buffer has been written while a condition in which the stream
+file flag is set and part of the buffer has been written while a condition in which the Stream
 cannot accept additional data occurs,
 .BR write ()
 will terminate and return the number of bytes written.
@@ -489,7 +489,7 @@ When writing to a
 character device special file that is neither a
 .IR STREAMS -based
 pipe nor FIFO, and
-the stream is using
+the Stream is using
 old TTY
 semantics for the
 .BR O_NDELAY
@@ -497,21 +497,21 @@ file flag, the following occurs:
 .IP \(bu \w'\(bu\(em'u
 Regardless of the setting of the
 .BR O_NDELAY " (or " O_NONBLOCK )
-file flag, when the stream cannot accept data (the stream write queue is full due to internal flow
+file flag, when the Stream cannot accept data (the Stream write queue is full due to internal flow
 conditions),
 .BR write ()
 blocks until data can be accepted.
 .IP \(bu
 Regardless of the setting of the
 .BR O_NDELAY " (or " O_NONBLOCK )
-file flag, when part of the buffer has been written while a condition in which the stream cannot
+file flag, when part of the buffer has been written while a condition in which the Stream cannot
 accept additional data due to flow control or the availability of message blocks occurs,
 .BR write ()
 blocks until data can be accepted.
 .PP
 Regardless of the semantics used for
 .B O_NDELAY
-on the stream, or the settings of the
+on the Stream, or the settings of the
 .BR O_NDELAY " or " O_NONBLOCK
 file flags, in the same manner as
 .BR putmsg (2),
@@ -533,11 +533,11 @@ to
 .PP
 Once a portion of the buffer has been written, if the
 .BR O_NDELAY " (or " O_NONBLOCK )
-file flag is set, and the stream head is set for
+file flag is set, and the Stream head is set for
 .I STREAMS
 semantics for
 .BR O_NDELAY ,
-and the stream cannot accept further data (the stream head write queue is full due to internal flow
+and the Stream cannot accept further data (the Stream head write queue is full due to internal flow
 conditions), or a message block is not available,
 .BR write ()
 will terminate and return the number of bytes written so far.
@@ -621,7 +621,7 @@ to
 .PP
 Note that
 .IR STREAMS -based
-pipes and FIFOs will exhibit correct behavior if the following is performed on a normal stream:
+pipes and FIFOs will exhibit correct behavior if the following is performed on a normal Stream:
 .IP \(bu \w'\(bu\(em'u
 The minimum packet size is set to zero
 .RB ( 0 ).
@@ -638,11 +638,11 @@ The write size low water mark is set to zero
 .IP \(bu
 The
 .B SNDZERO
-write option flag is cleared (this is the default for all stream heads anyway).
+write option flag is cleared (this is the default for all Stream heads anyway).
 .IP \(bu
 The
 .B SNDHOLD
-write option flag is cleared (this is the default for all stream heads anyway).
+write option flag is cleared (this is the default for all Stream heads anyway).
 .PD
 .\"
 .\"
@@ -767,17 +767,18 @@ the following additional failure conditions can occur:
 .RB [ ERANGE ]
 .I nbytes
 describes a message that is larger than the system maximum on the data part of a message
-.RB ( sysctl_str_strmsgsz ), or describes a message that is outside the range provided specified by
-the minimum and maximum packet sizes of the topmost
+.RB ( sysctl_str_strmsgsz ),
+or describes a message that is outside the range provided specified by the minimum and maximum
+packet sizes of the topmost
 .I STREAMS
-module or driver in the stream.
+module or driver in the Stream.
 .TP
 .RB [ ENOSR ]
 Allocation of message blocks to meet the request failed due to internal resource limitations.
 .TP
 .RB [ EINVAL ]
 .I fd
-refers to a stream that is linked (directly or indirectly) downstream from a multiplexing driver.
+refers to a Stream that is linked (directly or indirectly) downstream from a multiplexing driver.
 .TP
 .RB [ ETIME ]
 .BR O_NONBLOCK " and " O_NDELAY
@@ -785,7 +786,7 @@ file flags are clear, and the process has blocked for an excessively long period
 .TP
 .RB [ EAGAIN ]
 .BR O_NONBLOCK " or " O_NDELAY
-file flags are set, the stream is set for
+file flags are set, the Stream is set for
 .I STREAMS
 semantics for
 .BR O_NDELAY ,
@@ -806,7 +807,7 @@ The process was interrupted by a signal before the
 operation could begin.  That is, the process has not yet blocked or written any data.
 .TP
 .RB [ EIO ]
-The stream referred to by
+The Stream referred to by
 .I fd
 has closed or is in the process of closing.
 .\"
@@ -819,12 +820,12 @@ the following additional failure conditions can occur:
 .TP \w'[EWOULDBLOCK]\(em'u
 .RB [ ENXIO ]
 .I fd
-refers to a stream
+refers to a Stream
 that has received a hangup.
 .\"
 .\"
 .PP
-Also, if an error message is received by the stream head indicating a write error, the error number
+Also, if an error message is received by the Stream head indicating a write error, the error number
 returned in
 .IR errno (3)
 will be the error number contained in the error message.
@@ -880,13 +881,13 @@ If the file is set for blocking operation (see
 .BR fcntl (2)),
 or old TTY semantics for
 .B O_NDELAY
-are set for the stream head,
+are set for the Stream head,
 .BR write ()
-will block waiting for the stream to permit sending messages under flow control.
+will block waiting for the Stream to permit sending messages under flow control.
 .\"
 .\"
 .PP
-When the file is set for non-blocking operation, and the stream is set for
+When the file is set for non-blocking operation, and the Stream is set for
 .I STREAMS
 semantics for
 .BR O_NDELAY ,
@@ -902,24 +903,24 @@ with
 .PP
 When the file is set for non-blocking operation (file flag
 .BR O_NDELAY " (or " O_NONBLOCK )
-is set), and the stream is set for
+is set), and the Stream is set for
 .I STREAMS
 semantics for
 .BR O_NDELAY ,
 .BR write ()
 will terminate and return the number of bytes written if part of the buffer has already been written
 and a flow control or unavailable buffer condition is encountered.
-When the file is set for blocking operation or the stream head is set for
+When the file is set for blocking operation or the Stream head is set for
 old TTY
 semantics for
 .BR O_NDELAY ,
 .BR write ()
 will not return a partial number of bytes written unless a fatal error (such as a closing or hung up
-stream) is encountered.
+Stream) is encountered.
 .\"
 .\"
 .PP
-Regardless of the stream head semantics for
+Regardless of the Stream head semantics for
 .BR O_NDELAY ,
 or the setting of the
 .BR O_NDELAY " and " O_NONBLOCK
@@ -964,7 +965,7 @@ uses a different approach, utilizing the non-standard
 .B BPRI_WAITOK
 flag to
 .BR allocb (9).
-This permits the stream head to block awaiting the availability of message blocks without ever
+This permits the Stream head to block awaiting the availability of message blocks without ever
 failing due to lack of internal
 .I STREAMS
 resources.  Therefore,
@@ -1100,7 +1101,7 @@ lis
 header files and is implemented per the descriptions in the Magic Garden.
 .[
 magic
-%O Section 7.9.5 \(lqWriting to a stream\(rq,
+%O Section 7.9.5 \(lqWriting to a Stream\(rq,
 %P p. 476
 .]
 .I The Magic Garden

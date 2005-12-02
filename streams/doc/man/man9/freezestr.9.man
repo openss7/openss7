@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.27 2005/12/01 12:56:10 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.28 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:10 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-pl_t \fBfreezestr\fP(queue_t *\fIq\fP);
+.BI "pl_t freezestr(queue_t *" q ");
 .sp 2
 .PP
 .B #define _SUN_SOURCE
@@ -100,7 +100,7 @@ pl_t \fBfreezestr\fP(queue_t *\fIq\fP);
 .br
 .B #include <sys/ddi.h>
 .HP
-void \fBfreezestr\fP(queue_t *\fIq\fP);
+.BI "void freezestr(queue_t *" q ");
 .\"
 .\"
 .SH ARGUMENTS

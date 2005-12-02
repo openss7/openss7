@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: min.9.man,v 0.9.2.10 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: min.9.man,v 0.9.2.11 2005/12/02 12:05:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -87,7 +87,7 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .PD
 .HP
-int \fBmin\fR(int \fIa\fR, int \fIb\fR);
+.BI "int min(int " a ", int " b ");
 .\"
 .\"
 .SH ARGUMENTS

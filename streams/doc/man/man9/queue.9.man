@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.22 2005/11/30 13:59:23 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.23 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -827,6 +827,88 @@ flag in the
 or
 .I qb_flag
 members to indicate for which message bands the queue was backenabled.
+.\"
+.SS Packet Sizes
+.PP
+A
+.I STREAMS
+module or driver specifies the minimum and maximum packet sizes that it wishes to accept for each
+queue in a queue pair by setting the
+.I q_minpsz
+and
+.I q_maxpsz
+members of the
+.B queue
+structure.  The initial values of these members is taken from the corresponding members,
+.I mi_minpsz
+and
+.I mi_maxpsz
+of the
+.BR module_info (9)
+structure pointed to by the
+.BR qinit (9)
+structure used to initialize the
+.BR queue .
+.PP
+On a write queue, 
+.I q_minpsz
+and
+.I q_maxpsz
+specify the minimum and maximum packet sizes accepted by the module or driver in the downstream
+direction.  The sizes act as advice to the upstream module.  If the upstream module is the Stream
+head, the Stream head will observe the minimum and maximum packet sizes when generating messages
+from the
+.BR write (2s),
+.BR putmsg (2s),
+.BR putpmsg (2s),
+system calls, and
+.BR ioctl (2s)
+system calls that generate messages (e.g.,
+.BR I_FDINSERT (7)).
+(Note that the Stream head does not use its write queue but, rather, places messages directly on the
+write queue at the top of the module stack.)
+.PP
+When performing a write or write-like operation, the Stream head interprets
+.I q_minpsz
+and
+.I q_maxpsz
+different, depending on the value of
+.IR q_minpsz :
+.IP \(bu \w'\(bu\(em'u
+When
+.I q_minpsz
+is zero, the write operation will fragment writes larger than
+.I q_maxpsz
+down into multiple messages of
+.I q_maxpsz
+or less.
+.IP \(bu
+When
+.I q_minpsz
+is non-zero,
+a write operation of less than
+.I q_minpsz
+or more than
+.I q_maxpsz
+will fail with
+.IR errno (3)
+set to
+.RB [ ERANGE ].
+See
+.BR write (2s)
+for details.
+.PP
+On a read queue,
+.I q_minpsz
+and
+.I q_maxpsz
+specify the minimum and maximum packet sizes accepted by the module or driver in the upstream
+driection.  The sizes act as advice to the downstream module.  At the Stream head, the read queue
+packet sizes act as advise to the top of the module stack; however, the Stream head is always
+prepared to accept a data stream message of any size.
+The Stream head read queue packet sizes can be adjusted by any module or driver by sending an
+.BR M_SETOPTS (9)
+message to the Stream head.
 .\"
 .SS Specialized Flags and Members
 .PP

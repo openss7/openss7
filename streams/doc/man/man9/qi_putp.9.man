@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_putp.9.man,v 0.9.2.4 2005/11/29 10:46:33 brian Exp $
+.\" @(#) $Id: qi_putp.9.man,v 0.9.2.5 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .HP
 .B #include <sys/stream.h>
 .HP
-\fBtypedef int (*\fRqi_putp_t\fB) (queue_t *\fIq\fB, mblk_t *\fImp\fB);
+.BI "typedef int (*qi_putp_t) (queue_t *" q ", mblk_t *" mp ");
 
 .\"
 .\"

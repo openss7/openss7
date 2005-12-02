@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnextany.9.man,v 0.9.2.4 2005/11/30 13:59:23 brian Exp $
+.\" @(#) $Id: bcanputnextany.9.man,v 0.9.2.5 2005/12/02 12:05:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .HP
 .B #include <sys/stream.h>
 .HP
-\fBstreams_fastcall int bcanputnextany(queue_t *\fIq\fB);
+.BI "int bcanputnextany(queue_t *" q ");
 .\"
 .\"
 .SH ARGUMENTS

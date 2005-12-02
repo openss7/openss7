@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strlog.9.man,v 0.9.2.3 2005/11/29 10:46:34 brian Exp $
+.\" @(#) $Id: register_strlog.9.man,v 0.9.2.4 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -87,10 +87,10 @@ log device
 .br
 .B #include <sys/strlog.h>
 .HP
-\fBtypedef\fR int (*\fBvstrlog_t\fR)(short, short, char, unsigned short, char *, va_list);
+.BI "typedef int (*vstrlog_t)(short, short, char, unsigned short, char *, va_list);
 .PD 0
 .HP
-.RI "vstrlog_t \fBregister_strlog\fP(vstrlog_t " newlog );
+.BI "vstrlog_t register_strlog(vstrlog_t " newlog );
 .PD
 .\"
 .\"

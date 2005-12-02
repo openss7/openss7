@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.34 2005/11/29 10:46:28 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.36 2005/12/02 15:15:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 15:15:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -197,7 +197,7 @@ compatible with the traditional character device driver interface, as well as a 
 .I STREAMS
 module and driver entry points forming a driver-kernel interface.
 .I STREAMS
-also provides a rich set of kernel utility functions for the development an implementations of
+also provides a rich set of kernel utility functions for the development and implementation of
 kernel-resident modules and drivers.
 .I STREAMS
 prompted the specification of the
@@ -252,7 +252,7 @@ package.
 .\"
 .SS Why STREAMS?
 .PP
-With the ability to open multiple Streams to a driver, push and pop modules to an from the module
+With the ability to open multiple Streams to a driver, push and pop modules to and from the module
 stack on a Stream, and to link any Stream under a multiplexing driver\(emall under user control
 using standardized input-output controls\(emallows
 .I STREAMS
@@ -286,7 +286,7 @@ responsible for international telephone standards, and original developers of th
 As a result, there is a significant body of commercial software implementing telecommunications
 protocol stacks that was developed, tested, validated, conformance tested, field verified, to run on
 .IR STREAMS :
-and is still running on
+and are still running on
 .IR STREAMS .
 .PP
 The cost of reimplementation, retesting, revalidation, redoing conformance testing, and field
@@ -835,11 +835,11 @@ an existing pipe end
 .HP
 .BR put "(9)\ \-\ invokes a \fISTREAMS\fP message queue put procedure
 .HP
-.BR putnext "(9)\ \-\ puts a message on the downstream \fISTREAMS\fP message queue
+.BR putnext "(9)\ \-\ puts a message on the next \fISTREAMS\fP message queue
 .HP
-.BR putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream \fISTREAMS\fP message queue
+.BR putnextctl1 "(9)\ \-\ puts a 1 byte control message on the next \fISTREAMS\fP message queue
 .HP
-.BR putnextctl "(9)\ \-\ puts a control message on the downstream \fISTREAMS\fP message queue
+.BR putnextctl "(9)\ \-\ puts a control message on the next \fISTREAMS\fP message queue
 .HP
 .BR qprocsoff "(9)\ \-\ disables \fISTREAMS\fP message queue processing for multi-processing
 .HP
@@ -932,7 +932,7 @@ usldk
 .HP
 .BR putctl2 "(9)\ \-\ puts a 2 byte control message on a \fISTREAMS\fP message queue
 .HP
-.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream \fISTREAMS\fP message queue
+.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the next \fISTREAMS\fP message queue
 .HP
 .BR weldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .HP
@@ -1171,7 +1171,7 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR lbolt "(9)\ \-\ 
 .HP
-.BR puthere "(9)\ \-\ 
+.BR puthere "(9)\ \-\ invokes a \fISTREAMS\fP message queue put procedure
 .HP
 .BR streams_open_comm "(9)\ \-\ 
 .HP
@@ -1226,11 +1226,11 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR itoemajor "(9)\ \-\ 
 .HP
-.BR msgphysreq "(9)\ \-\ 
+.BR msgphysreq "(9)\ \-\ physical alignement request structure
 .HP
-.BR msgpullup_physreq "(9)\ \-\ 
+.BR msgpullup_physreq "(9)\ \-\ pull up bytes in a \fISTREAMS\fR message with physical requirements
 .HP
-.BR msgscgth "(9)\ \-\ 
+.BR msgscgth "(9)\ \-\ message scatter-gather structure
 .HP
 .BR printf "(9)\ \-\ 
 .HP
@@ -1335,13 +1335,13 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR OFFSET "(9)\ \-\ 
 .HP
-.BR qbufcall "(9)\ \-\ 
+.BR qbufcall "(9)\ \-\ install a \fISTREAMS\fP synchronous buffer callback
 .HP
 .BR qtimeout "(9)\ \-\ 
 .HP
 .BR queclass "(9)\ \-\ return the class of a message
 .HP
-.BR qunbufcall "(9)\ \-\ 
+.BR qunbufcall "(9)\ \-\ cancel a \fISTREAMS\fP synchronous buffer callback
 .HP
 .BR quntimeout "(9)\ \-\ 
 .HP

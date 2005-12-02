@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: linkb.9.man,v 0.9.2.15 2005/12/01 12:56:12 brian Exp $
+.\" @(#) $Id: linkb.9.man,v 0.9.2.16 2005/12/02 12:05:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-void \fBlinkb\fP(struct msgb *\fImp1\fP, struct msgb *\fImp2\fP);
+.BI "void linkb(struct msgb *" mp1 ", struct msgb *" mp2 ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -218,15 +218,15 @@ based implementations discussed here.
 Portable
 .I STREAMS
 modules and drivers may use this function.
-.IP \(em
-.I LiS
-.[
-LiS
-.]
-Symbol
-.BR lis_linkb ()
-is provided for binary compatibility with
-.IR LiS .
+.\".IP \(em
+.\".I LiS
+.\".[
+.\"LiS
+.\".]
+.\"Symbol
+.\".BR lis_linkb ()
+.\"is provided for binary compatibility with
+.\".IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

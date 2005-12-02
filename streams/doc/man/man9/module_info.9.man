@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: module_info.9.man,v 0.9.2.13 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: module_info.9.man,v 0.9.2.14 2005/12/02 12:05:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,7 +99,12 @@ struct module_info {
 .\"
 .SH MEMBERS
 .PP
-The following members correspond to SVR 4.2 EFT members:
+The following members correspond to
+.IR "SVR 4.2 EFT"
+.[
+svr42spg
+.]
+members:
 .TP \w'mi_maxpsz\(em'u
 .I mi_idnum
 The module identification number.  This number is unique across all
@@ -121,11 +126,17 @@ module initialization.
 The minimum packet size accepted.  This is the minimum size of a
 .I STREAMS
 message that will be accepted by the Stream head on write.
+See
+.BR queue (9)
+for details.
 .TP
 .I mi_maxpsz
 The maximum packet size accepted.  This is the maximum size of a
 .I STREAMS
 message that will be accepted by the Stream head on write.
+See
+.BR queue (9)
+for details.
 .TP
 .I mi_hiwat
 The high water mark for flow control.  For modules with a
@@ -133,6 +144,9 @@ The high water mark for flow control.  For modules with a
 procedure,
 this is the number of octets of queued messages beyond which the queue will be
 considered flow controlled.
+See
+.BR queue (9)
+for details.
 .TP
 .I mi_lowat
 The low water mark for flow control.  For modules with a
@@ -140,6 +154,9 @@ The low water mark for flow control.  For modules with a
 procedure,
 this is the number of octets of queue messages beneath which the queue will
 be considered no longer flow controlled and back-enabling will occur.
+See
+.BR queue (9)
+for details.
 .\"
 .\"
 .SH INTERFACE
@@ -149,16 +166,202 @@ be considered no longer flow controlled and back-enabling will occur.
 .\"
 .SH DESCRIPTION
 .PP
+The 
+.B module_info
+structure, defined in
+.RB < sys/stream.h >,
+is one of four
+.RB ( 4 )
+principal structures used in the definition of a
+.I STREAMS
+module or driver.
+The principal defining structures are the
+.BR streamtab (9),
+.BR qinit (9),
+.BR module_info ,
+and
+.BR module_stat (9)
+structures.
+.PP
+The
+.BR streamtab (9)
+structure is the entry point into the defining structures for a module or driver.  It contains
+pointers to two (module or driver) or four (multiplexing driver)
+.BR qinit (9)
+structures that define the upper read and write queues in a queue pair, as well as the lower read
+and write queues in a queue pair for a multiplexing driver.
+.PP
+Each
+.BR qinit (9)
+structure contains function pointer members that provide the queue procedures
+.RI ( qi_putp "(9) and " qi_srvp (9))
+and module routines
+.RI ( qi_qopen "(9), " qi_qclose "(9) and " qi_qadmin (9)).
+Each
+.BR qinit (9)
+structure also points to a
+.BR module_info
+and optional
+.BR module_stat (9)
+structure.
+.PP
+A different
+.BR module_info
+structure can be associated with the read and write sides of both the upper and lower multiplex of a
+module or driver (through a separate
+.BR qinit (9)
+structure).
+Nevertheless, the
+.B module_info
+structure contains two members that are considered specific to the module or driver.  They are:
+.IR mi_idnum ,
+the module identification number of the module or driver; and,
+.IR mi_idname ,
+the name of the module or driver.
+.PP
+A different
+.BR module_info
+structure can be defined for each
+.BR qinit (9)
+structure defining the read- or write-side of the upper or lower multiplex of the module or driver,
+meaning that a multiplexing driver can have associated with it four
+.I mi_idnum
+and four
+.I mi_idname
+members.
+.PP
+When a
+.I STREAMS
+module or driver is registered, whether one or any of these are used to represent a module or driver
+by name or identifier is rather implementation specific.
+Some registration mechanisms provide a separate way of specifying identifier and name (as an
+argument, or otherwise outside the defining structures); some do not.  See more under
+.RI \(lq COMPATIBILITY \(rq,
+below.
+.PP
+The
+.B module_info
+structure also contains four members that are considered specific to the read-side or write-side of
+a module or driver queue pair.  They are:
+.IR mi_minpsz ,
+the minimum packet size accepted by the associated queue;
+.IR mi_maxpsz ,
+the maximum packet size accepted by the associated queue;
+.IR mi_hiwat ,
+the high water mark for the queue (above which it is considered full);
+and
+.IR mi_lowat ,
+the low water mark for the queue (beneath which it is considered no longer full).
+.PP
+Whenever
+.I STREAMS
+creates a queue pair forming an instance of the module or driver, or whenever a queue pair is linked
+beneath a multiplexing driver, a pair of
+.BR qinit (9)
+structures referenced from the
+.BR streamtab (9)
+structure defining the module or driver are passed to
+.BR setq (9)
+to initialize the queue pair.
+.BR setq (9)
+copies the
+.IR mi_minpsz ,
+.IR mi_maxpsz ,
+.IR mi_hiwat ,
+and
+.IR mi_lowat ,
+members of the
+.B module_info
+structure attached to each
+.BR qinit (9)
+structure to the corresponding
+.IR q_minpsz ,
+.IR q_maxpsz ,
+.IR q_hiwat ,
+and
+.IR q_lowat ,
+members of the
+.BR queue (9)
+structure being initialized.
+.PP
+When a module or driver wishes to alter these packet and flow control variables, it does so in the
+.BR queue (9)
+and not the
+.BR module_info
+structure.  These member of the
+.BR module_info
+structure form part of the specification of the module or driver, and are always considered
+read-only.
+.PP
+Flow control variables are described under
+.RI \(lq "Flow Control" ,\(rq
+on the
+.BR queue (9),
+manual page, and minimum and maximum packet sizes are described under
+.RI \(lq "Packet Sizes" ,\(rq
+also on the
+.BR queue (9),
+manual page.
+.\"
+.\"
+.SH USAGE
+.PP
+It is typical to only have one
+.B module_info
+structure defining a module or driver for several reasons:
+.IP (1) \w'(0)\(em'u
+Only one module identification number and name are necessary to define a module or driver.
+.IP (2)
+Most service interfaces representing peer-to-peer protocols are symmetric in terms of packet size:
+the minimum and maximum packet sizes for the read-side are also applicable to the write-side.
+.IP (3)
+Most service interfaces representing peer-to-peer protocols are also symmetric with respect to flow
+control: the high and low water marks for the read-side are also applicable to the write-side.
+.IP (4)
+Even if these parameters are not symmetric, they can be changed for a given queue in the queue pair
+using
+.BR strqset (9)
+when the queue pair is created or linked.
+.IP (5)
+The
+.BR sc (4)
+and
+.BR scls (8)
+utilities are only capable of displaying the contents of one
+.BR module_info
+structure.
+.PP
+See
+.RI \(lq EXAMPLES \(rq,
+below for examples that contain only one defining
+.BR module_info
+structure.
+.PP
+As with other defining structures,
+.B module_info
+structures are typically statically allocated within the kernel object that contains the
+.I STREAMS
+module or driver.
 .\"
 .\"
 .SH CONTEXT
 .PP
-Functions that operate on a module information structure can be called from any
-context.
+In general, functions that operate on a module information structure can be called from any
+context; however, most functions only need to operate in blocking process context.
+.PP
+Members of the
+.BR module_info
+structure are considered read-only after the module or driver has been registered until it is
+de-registered.  Nevertheless, members can be read from any context, including module procedures,
+call outs, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Because the members of the
+.B module_info
+structure are treated as read-only, no special locking is required for this structure from
+MP-safe functions.
 .\"
 .\"
 .SH NOTICES
@@ -168,7 +371,10 @@ Members of the
 structure should not be accessed directly by
 .I STREAMS
 modules or drivers after the structure has been registered with the
-.B "Linux Fast-STREAMS"
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
 executive.
 .I STREAMS
 modules or drivers should use the other facilities provided by
@@ -181,10 +387,176 @@ structure is only a subset of the implementation structure used by the
 .I STREAMS
 scheduler.  Additional hidden fields are present in the implementation
 structure.
+.PP
+Note that, although multiple
+.B module_info
+structures can be associated with a module or driver, the
+.I STREAMS Configuration
+.BR sc (4)
+module and, therefore, the
+.BR scls (8)
+administrative command,
+will only display one of them.  (The
+.B module_info
+structure displayed is that associated with the write side of the upper multiplexer.)
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.SS Example #1 - Module Definition
+.PP
+Following is an example of the defining structures, including
+.BR module_info ,
+used to define a module.  The example is an abbreviated version of the
+.BR pipemod (4)
+module from the
+.I src/modules/pipemod.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory:
+.PP
+.nf
+\fC\s-2\
+ 1  static struct module_info pipemod_minfo = {
+ 2      .mi_idnum = CONFIG_STREAMS_PIPEMOD_MODID,
+ 3      .mi_idname = CONFIG_STREAMS_PIPEMOD_NAME,
+ 4      .mi_minpsz = STRMINPSZ,
+ 5      .mi_maxpsz = STRMAXPSZ,
+ 6      .mi_hiwat = STRHIGH,
+ 7      .mi_lowat = STRLOW,
+ 8  };
+ 9  static struct qinit pipemod_qinit = {
+10      .qi_putp = pipemod_put,
+11      .qi_qopen = pipemod_open,
+12      .qi_qclose = pipemod_close,
+13      .qi_minfo = &pipemod_minfo,
+14  };
+15  static struct streamtab pipemod_info = {
+16      .st_rdinit = &pipemod_qinit,
+17      .st_wrinit = &pipemod_qinit,
+18  };
+19  static struct fmodsw pipemod_fmod = {
+20      .f_name = CONFIG_STREAMS_PIPEMOD_NAME,
+21      .f_str = &pipemod_info,
+22      .f_flag = D_MP,
+23      .f_kmod = THIS_MODULE,
+24  };
+\s+2\fP
+.fi
+.PP
+Note that the module only uses one
+.B module_info
+structure, and only uses one
+.BR qinit (9)
+structure as well.  In accordance with common practise, the
+.I mi_idname
+member at
+.B Line 3
+and the
+.I f_name
+member at
+.B Line 20
+(used to register the module)
+are the same.
+.\"
+.SS Example #2 - Multiplexing Driver Definition
+.PP
+Following is an example of the defining structures, including
+.BR module_info ,
+used to define a multiplexing driver.  The example is an abbreviated version of the
+.BR mux (4)
+driver from the
+.I src/drivers/mux.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory:
+.PP
+.nf
+\fC\s-2\
+ 1  static struct module_info mux_minfo = {
+ 2      .mi_idnum = CONFIG_STREAMS_MUX_MODID,
+ 3      .mi_idname = CONFIG_STREAMS_MUX_NAME,
+ 4      .mi_minpsz = STRMINPSZ,
+ 5      .mi_maxpsz = STRMAXPSZ,
+ 6      .mi_hiwat = STRHIGH,
+ 7      .mi_lowat = STRLOW,
+ 8  };
+ 9  static struct qinit mux_urqinit = {
+10      .qi_srvp = mux_ursrv,
+11      .qi_qopen = mux_open,
+12      .qi_qclose = mux_close,
+13      .qi_minfo = &mux_minfo,
+14  };
+15  static struct qinit mux_uwqinit = {
+16      .qi_putp = mux_uwput,
+17      .qi_srvp = mux_uwsrv,
+18      .qi_minfo = &mux_minfo,
+19  };
+20  static struct qinit mux_lrqinit = {
+21      .qi_putp = mux_lrput,
+22      .qi_srvp = mux_lrsrv,
+23      .qi_minfo = &mux_minfo,
+24  };
+25  static struct qinit mux_lwqinit = {
+26      .qi_srvp = mux_lwsrv,
+27      .qi_minfo = &mux_minfo,
+28  };
+29  static struct streamtab mux_info = {
+30      .st_rdinit = &mux_urqinit,
+31      .st_wrinit = &mux_uwqinit,
+32      .st_muxrinit = &mux_lrqinit,
+33      .st_muxwinit = &mux_lwqinit,
+34  };
+35  static struct cdevsw mux_cdev = {
+36      .d_name = CONFIG_STREAMS_MUX_NAME,
+37      .d_str = &mux_info,
+38      .d_flag = D_MP,
+39      .d_fop = NULL,
+40      .d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+41      .d_kmod = THIS_MODULE,
+42  };
+\s+2\fP
+.fi
+.PP
+Note that the driver only uses on
+.B module_info
+structure, but uses four separate
+.BR qinit (9)
+structures for each of the read- and write-sides and upper and lower multiplexers.
+Again, in accordance with common practise, the
+.I mi_idname
+member at
+.B Line 3
+and the
+.I d_name
+member at
+.B Line 36
+(used to register the driver)
+are the same.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR queue (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.BR streamtab (9),
+.BR qinit (9),
+.BR module_stat (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_qadmin (9),
+.BR setq (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR pipemod (4),
+.BR mux (4),
+.IR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -203,24 +575,75 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Some implementations (e.g.,
+.IR LiS )
+treat the
+.I mi_idnum
+and
+.I mi_idname
+members of multiple
+.B module_info
+structures used to define one module or driver in different ways.
+.IP ""
+As it is difficult to predict which of multiple
+.I mi_idnum
+or
+.I mi_idname
+definitions will be used by an implementation when multiple
+.B module_info
+structures define a module or driver, portable
+.I STREAMS
+drivers or modules will always assign the same value to each occurrence of
+.I mi_idnum
+and
+.I mi_idname
+in the defining structures.
 .IP \(em
-Some implementations (e.g.
-.IR OSF/1 " and " "Mac OT" )
+Some implementations (e.g.,
+.IR LiS )
+use the
+.I mi_idnum
+and
+.I mi_idname
+members when registering a module or driver with the
+.I STREAMS
+subsystem.
+Others provide an independent name argument to registration function.
+.IP ""
+As it is difficult to predict which name will be used when registering a module (the name from the
+argument or the name from the
+.BR module_info
+.I mi_idname
+member), portable
+.I STREAMS
+modules and drivers will register the module or driver under the same name and module identifier
+that appears in the
+.BR module_info
+.I mi_idnum
+and
+.I mi_idname
+members.
+.IP \(em
+Some implementations (e.g.,
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR MacOT \(rg
+.[ \fR[\fB
+macspg
+.] \fR])
 declare
 .IR mi_minpsz " and " mi_maxpsz
 as type
-.BR ulong .
-.IP \(em
-Some implementations (e.g.
-.IR OSF/1 " and " "Mac OT" )
-declare
+.BR ulong ,
+and
 .IR mi_hiwat " and " mi_lowat
 as type
 .BR long .
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
+.IP ""
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -229,7 +652,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 EFT MP
+.IR "SVR 4.2 EFT MP" .
 .[
 usldk
 .]

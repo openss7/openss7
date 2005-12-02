@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qcountstrm.9.man,v 0.9.2.12 2005/11/29 10:46:33 brian Exp $
+.\" @(#) $Id: qcountstrm.9.man,v 0.9.2.13 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -82,6 +82,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
+.HP
 .BI "ssize_t qcountstrm(queue_t *" q );
 .\"
 .\"
@@ -166,20 +167,31 @@ LiS
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
 .B Linux Fast-STREAMS
-keeps track of only data bytes in
+keeps track of message block sizes in
 .I q->q_count
 for a queue.
-LiS counts the absolute sizes of data blocks.
-.PP
-Symbol
-.BR lis_qcountstrm ()
-is provided for binary compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_qcountstrm ()
-calls
-.BR qcountstrm ()
-directly.
-.PP
+.I LiS
+counts the absolute sizes of data blocks.  This is an
+.I LiS
+bug.  See
+.BR msgsize (9).
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.\".PP
+.\"Symbol
+.\".BR lis_qcountstrm ()
+.\"is provided for binary compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_qcountstrm ()
+.\"calls
+.\".BR qcountstrm ()
+.\"directly.
+.IP \(em
 This function is not provided by  SVR 4.2 MP DDI/DKI or
 .IR Solaris \(rg.
 .PP

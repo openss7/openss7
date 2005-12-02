@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgpullup.9.man,v 0.9.2.19 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: msgpullup.9.man,v 0.9.2.20 2005/12/02 12:05:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "mblk_t *msgpullup(mblk_t *" mp ", int " len );
+.BI "mblk_t msgpullup(mblk_t *" mp ", int " len ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -158,8 +158,8 @@ and when allocation for the new message fails.
 .SH CONTEXT
 .PP
 .BR msgpullup ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, call outs, callbacks,
+soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -167,6 +167,8 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 .BR msgpullup ()
 is MP-safe.  It is the caller's responsibility to ensure exclusive access to
 the passed in message.
+See
+.BR mp-streams (9).
 .\"
 .\"
 .SH NOTICES
@@ -233,11 +235,19 @@ The
 .I LiS
 implementation of
 .BR msgpullup ()
-allocates blocks for the new message before it check to see whether the number of bytes in the
+allocates blocks for the new message before it checks to see whether the number of bytes in the
 passed in message is less than
 .IR len.
 This is inefficient if it is normally the case that the passed in message has less bytes than
 .IR len .
+.IP ""
+Performance conscious
+.I STREAMS
+modules and drivers will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
 .IR Solaris \(rg
 states that
 .BR msgpullup ()
@@ -327,13 +337,13 @@ Portable
 modules and drivers will no make any assumptions about the phsyical contiguity or suitability for
 worst-case DMA of data buffers allocated via
 .BR msgpullup ().
-.IP \(em
-Symbol
-.BR lis_msgpullup ()
-is provided for compatibility with
-.IR LiS .
-See
-.BR liscompat (9).
+.\".IP \(em
+.\"Symbol
+.\".BR lis_msgpullup ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
 .IP \(em
 .IR SUPER-UX \(rg
 documents
@@ -353,6 +363,10 @@ bytes of messages of the same type cannot be found,
 .BR msgpullup ()
 fails and returns
 .BR NULL .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon any expected behaviour in this corner case.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qinit.9.man,v 0.9.2.14 2005/11/29 10:46:33 brian Exp $
+.\" @(#) $Id: qinit.9.man,v 0.9.2.15 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -164,7 +164,9 @@ structure.
 .PP
 The
 .B qinit
-structure is a statically allocated structure that is used in the definition of a
+structure, defined in
+.RB < sys/stream.h >,
+is a statically allocated structure that is used in the definition of a
 .I STREAMS
 module or driver.
 When a
@@ -205,7 +207,7 @@ represent the primary functional entry points into the module or driver and are 
 appropriate times by the
 .I STREAMS
 scheduler.
-These are syncrhonous entry points in the sense that
+These are synchronous entry points in the sense that
 .BR MP-STREAMS (9)
 synchronization is performed at each entry point predicated on
 .IR q .
@@ -355,7 +357,7 @@ specifies the administrative routine return by
 for the module or driver.
 The
 .I qi_qadmin
-function pointer is for a module private adminstrative function that is not normally used.
+function pointer is for a module private administrative function that is not normally used.
 .I STREAMS
 never invokes the
 .I qi_qadmin
@@ -543,7 +545,7 @@ or any utility invoking back-enabling.
 .IP \(bu
 The
 .I qi_minfo
-pointer must not be modified after registeration.  The point can, however, be read directly to find
+pointer must not be modified after registration.  The point can, however, be read directly to find
 the location of the
 .BR module_info (9)
 structure that corresponds to a given queue, queue pair or module.

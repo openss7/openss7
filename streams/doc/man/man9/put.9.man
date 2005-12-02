@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: put.9.man,v 0.9.2.22 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: put.9.man,v 0.9.2.24 2005/12/02 15:15:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 15:15:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -119,6 +119,64 @@ or
 on the specified queue.
 .\"
 .\"
+.SH USAGE
+.PP
+.BR put ()
+is used where it is necessary to move from an asyncrhonous (MP-unsafe) context with respect to
+.I q
+to a syncrhonous (MP-safe) one.
+.B put ()
+is typically used by an interrupt service routine, or some other subsystem in the kernel outside of
+.IR STREAMS ,
+to enter the
+.I STREAMS
+subsystem an pass a message to a driver's read queue.
+Outside of
+.IR STREAMS ,
+only a limited set of
+.I STREAMS
+utiltiies can be used.
+.BR put ()
+is one of them.
+On the other hand, once within the driver's read queue
+.IR qi_putp (9)
+put procedure, all
+.I STREAMS
+utilities become available.
+.PP
+Another use for
+.BR put ()
+is to pass messages across a multiplexing driver in an MP-safe way.  When messages from one queue
+belonging to one Stream are passed to the queue of another, even from within the sending queue's put
+or service procedure, the context has not been synchornized with the receiving queue.
+.PP
+So, for example, from a lower multiplexer Stream read queue service procedure, a message cannot be
+passed to an upper multiplexer Stream using
+.BR putnext (9):
+the module above the upper multiplexer queue pair could disappear at any time (as a result of
+.BR I_POP (7)
+being executed on another processor) invalidating the
+.BR q_next
+dereference taken by
+.BR putnext (9).
+.PP
+The proper, and MP-safe way, to go about passing messages from lower mutliplexer to upper
+multiplexer is using
+.BR put ().
+In the same example, the lower multiplex read queue service procedure calls the upper read queue's
+put procedure with
+.BR put ().
+This enters a
+.I STREAMS
+syncrhonous context on the upper queue and acquires a Stream head plumbing read lock on the upper
+Stream.
+.I q_next
+pointers can no longer be invalidated, and the upper read queue's put procedure can then safely
+perform the
+.BR putnext (9)
+call.
+.\"
+.\"
 .SH RETURN
 .PP
 .BR put ()
@@ -129,30 +187,40 @@ returns
 .SH ERRORS
 .PP
 .BR put ()
-fails silently when a queue band structure cannot be allocated for the band
-specified in
-.IR mp->b_band .
-The caller can ensure that a queue band structure exists for the band in
-question by calling
-.BR strqset (9)
-for the band.
+always succeeds.  Any error conditions are handled within the invoked queue
+.IR qi_putp (9)
+put procedure.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR put ()
-can be called from any context; however, if called from interrupt service
-routine (hard IRQ) context, in general, calling of the queue's
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.PP
+.BR put ()
+can be called from any context syncrhonous or asynchronous to
+.IR STREAMS .
+Before entering the driver's
 .IR qi_putp (9)
-procedure
-will be deferred and run under soft interrupt context the next time that the
+put procedure,
+.BR put ()
+enters a
 .I STREAMS
-soft interrupt is scheduled to run.
+syncrhonous context and takes a Stream head plumbing read lock so that all
+.I q_next
+pointers in the Stream remain valid until the put procedure exists.
+This is in stark contrast to
+.BR putnext (9),
+which can only be invoked when already in a
+.I STREAMS
+syncrhonous context.
 .PP
 If the driver or module is synchronized then invocation of the
 .IR qi_putp (9)
-procedure will be deferred and run under soft interrupt context the next time
-that the
+procedure might be deferred and run under
+.I STREAMS
+scheduler context (kernel thread) the next time that the
 .I STREAMS
 scheduler is run; however, if it is not synchronized
 .RB ( SQLVL_NONE ),
@@ -167,11 +235,11 @@ must never call
 .BR putnext (9)
 unless all
 .IR qi_putp (9)
-procedures in the stream are either syncrhonized, or are not synchronized
+procedures in the Stream are either syncrhonized, or are not synchronized
 .RB ( SQLVL_NONE )
 but expect to be invoked under interrupt service routine context.
 (The
-stream head is marked
+Stream head is marked
 .BR SQLVL_NONE ,
 but its read side
 .IR qi_putp (9)
@@ -203,7 +271,8 @@ See also
 .BR put ()
 is MP-safe.  The driver or module
 .IR qi_putp (9)
-procedures invoked must also be MP-safe.
+procedures invoked must also be MP-safe, either by design or through syncrhonization [see
+.BR mp-streams (9)].
 .PP
 Under
 .B @PACKAGE_TITLE@
@@ -221,10 +290,12 @@ procedure,
 .BR timeout (9),
 .BR qtimeout (9)
 callback function,
+soft interrupt (tasklets or bottom halves),
 or interrupt service routine.
 The
 .IR qi_putp (9)
-procedure itself must perform its own mutual exclusion.
+procedure itself must perform its own mutual exclusion on data structures shared across these
+procedures.
 .PP
 See
 .BR mp-streams (9)
@@ -441,50 +512,55 @@ defined.
 .\"
 .\"
 .SH EXAMPLES
+.\"
+.SS Example #1
 .PP
 Following is an example of canonical
 .IR qi_putp (9)
 procedure processing for modules or drivers:
 .PP
 .nf
-\fC\s-1\
-int
-xxx_put(queue_t *q, mblk_t *mp)
-{
-  if (pcmsg(mp->b_datap->db_type) || q->q_count == 0) {
-    priv_t p;
-
-    p = q->q_ptr;
-    switch (mp->b_datap->db_type) {
-    case M_FLUSH:
-    {
-      /* 
-       * perform canonial M_FLUSH handling without locks
-       */
-      return (0);
-    }
-    case M_DATA:
-    case M_PROTO:
-    case M_PCPROTO:
-    {
-      pl_t pl;
-
-      if ((pl = TRYLOCK(&p->priv_lock, plstr)) == invpl)
-        putq(q, mp);
-      else {
-        /* 
-         * process message
-         */
-        UNLOCK(&p->priv_lock, pl);
-      }
-      return (0);
-    }
-    }
-  }
-  putq(q, mp);
-  return (0);
-}\
-\s+1\fP
+\fC\s-2\
+ 1  int
+ 2  xxx_put(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      if (pcmsg(mp->b_datap->db_type)
+ 5          || q->q_count == 0) {
+ 6          priv_t p;
+ 7  
+ 8          p = q->q_ptr;
+ 9          switch (mp->b_datap->db_type) {
+10          case M_FLUSH:
+11          {
+12              /* 
+13               * perform canonial M_FLUSH handling without locks
+14               */
+15              return (0);
+16          }
+17          case M_DATA:
+18          case M_PROTO:
+19          case M_PCPROTO:
+20          {
+21              pl_t pl;
+22  
+23              if ((pl =
+24                   TRYLOCK(&p->priv_lock,
+25                           plstr)) == invpl)
+26                  putq(q, mp);
+27              else {
+28                  /* 
+29                   * process message
+30                   */
+31                  UNLOCK(&p->priv_lock, pl);
+32              }
+33              return (0);
+34          }
+35          }
+36      }
+37      putq(q, mp);
+38      return (0);
+39  }
+\s+2\fP
 .fi
 .PP
 Note that checking
@@ -503,6 +579,187 @@ should be used instead of
 .BR TRYLOCK (9).
 Of course, reader writer locks, synchronization levels, or any other
 non-blocking mutual exclusion mechanism could have been used.
+.\"
+.SS Example #2 - put() across a Multiplexing Driver
+.PP
+The following example illustrates the use of
+.BR put ()
+and
+.BR bcanput (9)
+used across a multiplexing driver instead of
+.BR putnext (9)
+and
+.BR bcanputnext (9)
+that should only be invoked within one of
+.IR q 's
+procedures (put or service).
+.PP
+Following is the lower multiplex read queue put procedure:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  mux_lrput(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      struct mux *mux = q->q_ptr;
+ 5  
+ 6      switch (mp->b_datap->db_type) {
+ 7      case M_FLUSH:
+ 8          /* left as an exercise */
+ 9          /* ... */
+10          break;
+11      default:
+12          if (!q->q_first && !(q->q_flag & QSVCBUSY)) {
+13              read_lock(&mux_lock);
+14              if (mux->other) {
+15                  queue_t *rq;
+16  
+.B "17                  if ((rq = mux->other->rq)
+.B "18                      && (mp->b_datap->db_type >= QPCTL
+.B "19                          || bcanput(rq, mp->b_band))) {
+.B "20                      put(rq, mp);
+21                      read_unlock(&mux_lock);
+22                      return (0);
+23                  }
+24              }
+25              read_unlock(&mux_lock);
+26          }
+27          putq(q, mp);
+28          break;
+29      }
+30      return (0);
+31  }
+\s+2\fP
+.fi
+.PP
+Note that at
+.BR "Line 17"
+through
+.BR "Line 20" ,
+.BR bcanput (9)
+is use to test flow control on the upper multiplexer read queue (that has a service procedure).
+.BR put ()
+is used to pass the message on the upper multiplexer read
+.IR qi_putp (9)
+put procedure.
+.PP
+Following is the lower multiplex service procedure:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  mux_lrsrv(queue_t *q)
+ 3  {
+ 4      struct mux *mux = q->q_ptr;
+ 5      queue_t *rq = NULL;
+ 6      mblk_t *mp;
+ 7  
+ 8      read_lock(&mux_lock);
+ 9      if (mux->other && (rq = mux->other->rq)) {
+10          while ((mp = getq(q))) {
+.B "11              if (mp->b_datap->db_type >= QPCTL
+.B "12                  || bcanput(rq, mp->b_band)) {
+.B "13                  put(rq, mp);
+.B "14                  continue;
+15              }
+16              putbq(q, mp);
+17              break;
+18          }
+19      } else
+20          noenable(q);
+21      read_unlock(&mux_lock);
+22      return (0);
+23  }
+\s+2\fP
+.fi
+.PP
+Note also that at
+.BR "Line 11"
+through
+.BR "Line 14" ,
+.BR bcanput (9)
+and
+.BR put ()
+are used again to test and pass messages across the multiplexing driver.
+.PP
+The following is the upper multiplex read put procedure:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  mux_urput(queue_t *q, mblk_t *mp)
+ 3  {
+.B " 4      if (mp->b_datap->db_type >= QPCTL ||
+.B " 5          (!q->q_first && !(q->q_flag & QSVCBUSY)
+.B " 6           && bcanputnext(q, mp->b_band))) {
+.B " 7          putnext(q, mp);
+.B " 8          return (0);
+.B " 9      }
+10      putq(q, mp);
+11      return (0);
+12  }
+\s+2\fP
+.fi
+.PP
+Now, within the upper Stream procedures, sychronous to the upper Stream, the procedure can use the
+.BR bcanputnext (9)
+and
+.BR putnext (9)
+utilities.
+.PP
+Following is the upper multiplex read service procedure:
+.PP
+.nf
+\fC\s-2\
+ 1  static int
+ 2  mux_ursrv(queue_t *q)
+ 3  {
+ 4      {
+ 5          mblk_t *mp;
+ 6  
+ 7          /* first drain the queue */
+ 8          while ((mp = getq(q))) {
+.B " 9              if (mp->b_datap->db_type >= QPCTL
+.B "10                  || bcanputnext(q, mp->b_band)) {
+.B "11                  putnext(q, mp);
+.B "12                  continue;
+.B "13              }
+14              putbq(q, mp);
+15              return (0);
+16          }
+17      }
+18      {
+19          struct mux *mux = q->q_ptr;
+20          struct mux *bot;
+21          bool found = false;
+22  
+23          /* Find the lower queues feeding this one and 
+24             enable them. */
+25          read_lock(&mux_lock);
+26          for (bot = mux_links; bot; bot = bot->next)
+27              if (bot->other == mux) {
+28                  qenable(bot->rq);
+29                  found = true;
+30              }
+31          read_unlock(&mux_lock);
+32  
+33          /* echo behaviour otherwise */
+34          if (!found)
+35              qenable(WR(q));
+36  
+37          return (0);
+38      }
+39  }
+\s+2\fP
+.fi
+.PP
+The service procedure can also use
+.BR bcanputnext (9)
+and
+.BR putnext (9).
+The lower part of the procedure above is used to enable flow control across the multiplexing driver.
+If the upper read queue service procedure ever runs until the message queue is empty, it will
+manually enable the lower multiplex read queue.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -604,7 +861,7 @@ flag set or with the
 flag set.
 .IP \(em
 .BR put ()
-may be called on a stream frozen with
+may be called on a Stream frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -625,13 +882,13 @@ uw7spg
 .]
 do not permit
 .BR put ()
-to be called on a stream frozen with
+to be called on a Stream frozen with
 .BR freezestr (9).
 Portable
 .I STREAMS
 drivers and modules should not call
 .BR put ()
-on a stream frozen with
+on a Stream frozen with
 .BR freezestr (9).
 .IP \(em
 Under
@@ -761,17 +1018,17 @@ postponed.  This is not acceptable for soft-real-time performance.  Rewrite
 .I LiS
 .IR qi_putp (9)
 procedures to be MP-safe.
-.IP \(em
-Symbol
-.BR lis_safe_putmsg ()
-is provided for compatibility with
-.IR LiS .
-See
-.BR liscompat (9).
-.BR lis_safe_putmsg ()
-simply calls
-.BR put ()
-directly.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_safe_putmsg ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_safe_putmsg ()
+.\"simply calls
+.\".BR put ()
+.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: appq.9.man,v 0.9.2.24 2005/11/30 13:59:22 brian Exp $
+.\" @(#) $Id: appq.9.man,v 0.9.2.25 2005/12/02 12:05:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -1021,17 +1021,17 @@ with
 .\"will be used by a portable
 .\".I STREAMS
 .\"driver or module.
-.IP \(em
-Symbol
-.BR lis_appq ()
-is provided for compatibility with
-.IR LiS .
-See
-.BR liscompat (9).
-.BR lis_appq ()
-simply calls
-.BR appq ()
-directly.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_appq ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_appq ()
+.\"simply calls
+.\".BR appq ()
+.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbackenable.9.man,v 0.9.2.6 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: qbackenable.9.man,v 0.9.2.7 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,11 +85,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/strsubr.h>
 .HP
-.BI "streams_fastcall void"
-.PD 0
-.HP
-.BI "qbackenable(queue_t *" q ", const unsigned char " band ", const char " bands []);
-.PD
+.BI "void qbackenable(queue_t *" q ", const unsigned char " band ", const char " bands []);
 .\"
 .\"
 .SH ARGUMENTS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.22 2005/11/29 10:46:33 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.23 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -493,14 +493,14 @@ drivers and modules will not call
 .BR qprocsoff ()
 on a stream frozen with
 .BR freezestr (9).
-.IP \(em
-Symbol
-.BR lis_qprocsoff ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_qprocsoff ()
-simply calls
-.BR qprocsoff ().
+.\".IP \(em
+.\"Symbol
+.\".BR lis_qprocsoff ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_qprocsoff ()
+.\"simply calls
+.\".BR qprocsoff ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

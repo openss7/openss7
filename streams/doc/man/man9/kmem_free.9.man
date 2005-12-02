@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_free.9.man,v 0.9.2.16 2005/12/01 12:56:11 brian Exp $
+.\" @(#) $Id: kmem_free.9.man,v 0.9.2.17 2005/12/02 12:05:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/kmem.h>
 .HP
-void \fBkmem_free\fP(char *\fIptr\fP, size_t \fIsize\fP);
+.BI "void kmem_free(char *" ptr ", size_t " size ");
 .\"
 .\"
 .SH ARGUMENTS

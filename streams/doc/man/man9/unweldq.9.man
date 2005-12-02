@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: unweldq.9.man,v 0.9.2.17 2005/11/29 10:46:36 brian Exp $
+.\" @(#) $Id: unweldq.9.man,v 0.9.2.18 2005/12/02 12:05:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -87,13 +87,11 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .PP
-typedef void *\fBweld_arg_t\fR;
+.BI "typedef void *weld_arg_t;
 .br
-typedef void (*\fBweld_fcn_t\fR)(\fBweld_arg_t\fR);
+.BI "typedef void (*weld_fcn_t)(weld_arg_t);
 .HP
-int \fBunweldq\fR(queue_t *\fIq1\fR, queue_t *\fIq2\fR, queue_t *\fIq3\fR,
-queue_t *\fIq4\fR, \fBweld_fcn_t\fR \fIfunc\fR, \fBweld_arg_t\fR \fIarg\fR,
-queue_t *\fIprotect_q\fR);
+.BI "int unweldq(queue_t *" q1 ", queue_t *" q2 ", queue_t *" q3 ", queue_t *" q4 ", weld_fcn_t " func ", weld_arg_t " arg ", queue_t *" protect_q ");
 .\"
 .\"
 .SH ARGUMENTS

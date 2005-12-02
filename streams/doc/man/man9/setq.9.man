@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setq.9.man,v 0.9.2.13 2005/11/29 10:46:35 brian Exp $
+.\" @(#) $Id: setq.9.man,v 0.9.2.14 2005/12/02 12:05:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -178,22 +178,22 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .IP \(em \w'\(em\(em'u
-Symbol
-.BR lis_setq ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_setq ()
-simply calls
-.BR setq ().
-.IP \(em
-Note that
-.BR lis_setq ()
-was deprecated as of
-.IR "LiS 2.18.0" .
-See
-.BR lisdeprec (9)
-for more information.
-.IP \(em
+.\"Symbol
+.\".BR lis_setq ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_setq ()
+.\"simply calls
+.\".BR setq ().
+.\".IP \(em
+.\"Note that
+.\".BR lis_setq ()
+.\"was deprecated as of
+.\".IR "LiS 2.18.0" .
+.\"See
+.\".BR lisdeprec (9)
+.\"for more information.
+.\".IP \(em
 This function is not exported by SVR 4.2 MP DDI/DKI or
 .IR Solaris \(rg.
 

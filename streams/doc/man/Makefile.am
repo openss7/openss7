@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/12/01 12:56:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/12/02 12:05:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/01 12:56:04 $ by $Author: brian $
+# Last Modified $Date: 2005/12/02 12:05:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1108,7 +1108,6 @@ man_MANS = \
 	man9/cmin_del.9 \
 	man9/cmin_find.9 \
 	man9/cmin_get.9 \
-	man9/cminsw_list.9 \
 	man9/cmn_err.9 \
 	man9/copyb.9 \
 	man9/copyin.9 \
@@ -1190,7 +1189,6 @@ man_MANS = \
 	man9/msgdsize.9 \
 	man9/msgpullup.9 \
 	man9/msgsize.9 \
-	man9/nodesw_lock.9 \
 	man9/noenable.9 \
 	man9/pcmsg.9 \
 	man9/pipe.9 \
@@ -2369,7 +2367,6 @@ dist_noinst_MANS = \
 	man9/cmin_del.9.man \
 	man9/cmin_find.9.man \
 	man9/cmin_get.9.man \
-	man9/cminsw_list.9.man \
 	man9/cmn_err.9.man \
 	man9/copyb.9.man \
 	man9/copyin.9.man \
@@ -2452,7 +2449,6 @@ dist_noinst_MANS = \
 	man9/msgdsize.9.man \
 	man9/msgpullup.9.man \
 	man9/msgsize.9.man \
-	man9/nodesw_lock.9.man \
 	man9/noenable.9.man \
 	man9/pcmsg.9.man \
 	man9/pipe.9.man \

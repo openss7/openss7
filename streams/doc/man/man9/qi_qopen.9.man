@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qi_qopen.9.man,v 0.9.2.4 2005/11/29 10:46:33 brian Exp $
+.\" @(#) $Id: qi_qopen.9.man,v 0.9.2.5 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .HP
 .B #include <sys/stream.h>
 .HP
-\fBtypedef int (*\fRqi_qopen_t\fB) (queue_t *\fIq\fB, dev_t *\fIdevp\fB, int \fIoflag\fB, int \fIsflag\fB, cred_t *\fIcrp\fB);
+.BI "typedef int (*qi_qopen_t) (queue_t *" q ", dev_t *" devp ", int " oflag ", int " sflag ", cred_t *" crp ");
 .ad b
 .\"
 .\"

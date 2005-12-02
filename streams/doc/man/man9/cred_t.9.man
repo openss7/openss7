@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cred_t.9.man,v 0.9.2.11 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: cred_t.9.man,v 0.9.2.12 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -146,28 +146,28 @@ Same layout as embedded in
 structure.
 .\"
 .\"
-.SH NOTICES
-.PP
-The credentials structure really messes up binary compatibility with
-.I LiS
-.[
-LiS
-.]
-because credentials pointers are passed to 
-.IR qi_qopen (9)
-and
-.IR qi_qclose (9)
-driver and module procedures.  Because of this,
-.I STREAMS
-drivers and modules that are registered with
-.I Linux Fast-STREAMS
-using the LiS compatible
-.BR lis_register_strdev (9)
-and
-.BR lis_register_strmod (9)
-LiS compatibility functions, will have
-.B lis_cred_t
-structure pointers passed instead.
+.\".SH NOTICES
+.\".PP
+.\"The credentials structure really messes up binary compatibility with
+.\".I LiS
+.\".[
+.\"LiS
+.\".]
+.\"because credentials pointers are passed to 
+.\".IR qi_qopen (9)
+.\"and
+.\".IR qi_qclose (9)
+.\"driver and module procedures.  Because of this,
+.\".I STREAMS
+.\"drivers and modules that are registered with
+.\".I Linux Fast-STREAMS
+.\"using the LiS compatible
+.\".BR lis_register_strdev (9)
+.\"and
+.\".BR lis_register_strmod (9)
+.\"LiS compatibility functions, will have
+.\".B lis_cred_t
+.\"structure pointers passed instead.
 .\"
 .\"
 .SH "SEE ALSO"

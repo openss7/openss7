@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qattach.9.man,v 0.9.2.15 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: qattach.9.man,v 0.9.2.16 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -260,14 +260,14 @@ magic
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Symbol
-.BR lis_qattach ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_qattach ()
-simply calls
-.BR qattach ().
-.IP \(em
+.\"Symbol
+.\".BR lis_qattach ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_qattach ()
+.\"simply calls
+.\".BR qattach ().
+.\".IP \(em
 .I SVR 4.2 MP
 and systems based on
 .I SVR 4

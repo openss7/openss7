@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushq.9.man,v 0.9.2.23 2005/12/01 12:56:09 brian Exp $
+.\" @(#) $Id: flushq.9.man,v 0.9.2.24 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-void \fBflushq\fP(queue_t *\fIq\fP, int \fIflag\fP);
+.BI "void flushq(queue_t *" q ", int " flag ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -428,20 +428,27 @@ drivers and modules should not call
 on a stream frozen with
 .BR freezestr (9).
 .IP \(em
-Symbol
-.BR lis_flushq ()
-is provided for compatibility with
-.IR LiS .
-See
-.BR liscompat (9).
-.BR lis_flushq ()
-calls
-.BR flushq ()
-directly.
+.\"Symbol
+.\".BR lis_flushq ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_flushq ()
+.\"calls
+.\".BR flushq ()
+.\"directly.
 .I LiS
-appears to be rather buggy with regard to flushing queues and the compatible
-.BR lis_flushq ()
+appears to be rather buggy with regard to flushing queues and
+.BR flushq ()
 may behave rather different from that of
+.IR LiS .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B "@PACKAGE_TITLE@"
+instead of
 .IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.

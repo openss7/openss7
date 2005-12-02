@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fmod_count.9.man,v 0.9.2.3 2005/12/01 12:56:09 brian Exp $
+.\" @(#) $Id: fmod_count.9.man,v 0.9.2.4 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,26 +85,26 @@ sort-adjacent-labels
 .br
 .B #include <sys/strsubr.h>
 .HP
-.RB int " fmod_count" ;
+.B int " fmod_count" ;
 .PD 0
 .HP
-.RB "struct list_head " fmodsw_list ;
+.B "struct list_head " fmodsw_list ;
 .HP
-.RB "rwlock_t " fmodsw_lock ;
+.B "rwlock_t " fmodsw_lock ;
 .PD
 .HP
-void \fBfmod_add\fP(struct fmodsw *\fIfmod\fP, modID_t \fImodid\fP);
+.BI "void fmod_add(struct fmodsw *" fmod ", modID_t " modid ");
 .PD 0
 .HP
-void \fBfmod_del\fP(struct fmodsw *\fIfmod\fP);
+.BI "void fmod_del(struct fmodsw *" fmod ");
 .HP
-struct fmodsw *\fBfmod_get\fP(modID_t \fImodid\fP);
+.BI "struct fmodsw *fmod_get(modID_t " modid ");
 .HP
-struct fmodsw *\fBfmod_find\fP(const char *\fIname\fP);
+.BI "struct fmodsw *fmod_find(const char *" name ");
 .HP
-struct fmodsw *\fBfmod_str\fP(const struct streamtab *\fIstr\fP);
+.BI "struct fmodsw *fmod_str(const struct streamtab *" str ");
 .HP
-void \fBfmod_put\fP(struct fmodsw *\fIfmod\fP);
+.BI "void fmod_put(struct fmodsw *" fmod ");
 .PD
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyout.9.man,v 0.9.2.16 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: copyout.9.man,v 0.9.2.17 2005/12/02 12:05:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -189,23 +189,23 @@ with the following exceptions:
 .IP \(em \w'\(em\(em'u
 .BR copyout ()
 runs faster than the LiS equivalent.
-.PP
-Symbol
-.BR lis_copyout ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_copyout ()
-calls
-.BR copyout ()
-directly.
-.IP ""
-Note that
-.BR lis_copyout ()
-was deprecated as of
-.IR "LiS 2.18.0" .
-See
-.BR lisdeprec (9)
-for more information.
+.\".PP
+.\"Symbol
+.\".BR lis_copyout ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_copyout ()
+.\"calls
+.\".BR copyout ()
+.\"directly.
+.\".IP ""
+.\"Note that
+.\".BR lis_copyout ()
+.\"was deprecated as of
+.\".IR "LiS 2.18.0" .
+.\"See
+.\".BR lisdeprec (9)
+.\"for more information.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

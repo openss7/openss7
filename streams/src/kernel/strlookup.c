@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/19 11:08:21 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/02 12:05:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/19 11:08:21 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/02 12:05:18 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/10/19 11:08:21 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/02 12:05:18 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -132,11 +132,15 @@ static char const ident[] =
 
 rwlock_t cdevsw_lock = RW_LOCK_UNLOCKED;
 rwlock_t fmodsw_lock = RW_LOCK_UNLOCKED;
-rwlock_t nodesw_lock = RW_LOCK_UNLOCKED;
+#if 0
+rwlock_t cminsw_lock = RW_LOCK_UNLOCKED;
+#endif
 
 struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here */
 struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
+#if 0
 struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
+#endif
 
 #if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL(cdevsw_lock);
@@ -147,8 +151,10 @@ EXPORT_SYMBOL(fmodsw_lock);
 EXPORT_SYMBOL(fmodsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
-EXPORT_SYMBOL(nodesw_lock);
+#if 0
+EXPORT_SYMBOL(cminsw_lock);
 EXPORT_SYMBOL(cminsw_list);
+#endif
 #endif
 
 struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };

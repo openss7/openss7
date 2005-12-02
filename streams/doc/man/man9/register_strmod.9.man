@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strmod.9.man,v 0.9.2.13 2005/11/29 10:46:34 brian Exp $
+.\" @(#) $Id: register_strmod.9.man,v 0.9.2.14 2005/12/02 12:05:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,7 +85,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/strconf.h>
 .HP
-.RI "int \fBregister_strmod\fP(modID_t " modid ", struct fmodsw *" fmod );
+.BI "int register_strmod(modID_t " modid ", struct fmodsw *" fmod );
 .\"
 .\"
 .SH ARGUMENTS

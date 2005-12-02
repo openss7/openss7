@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strlog.9.man,v 0.9.2.20 2005/11/29 10:46:35 brian Exp $
+.\" @(#) $Id: strlog.9.man,v 0.9.2.21 2005/12/02 12:05:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,10 +85,10 @@ sort-adjacent-labels
 .br
 .B #include <sys/strlog.h>
 .HP
-int \fBstrlog\fR(short \fImid\fR, short \fIsid\fR, char \fIlevel\fR, unsigned short \fIflags\fR, char *\fIfmt\fR, \fI...\fR);
+.BI "int strlog(short " mid ", short " sid ", char " level ", unsigned short " flags ", char *" fmt ", " ... ");
 .PD 0
 .HP
-int \fBvstrlog\fR(short \fImid\fR, short \fIsid\fR, char \fIlevel\fR, unsigned short \fIflags\fR, char *\fIfmt\fR, va_list \fIargs\fR);
+.BI "int vstrlog(short " mid ", short " sid ", char " level ", unsigned short " flags ", char *" fmt ", va_list " args ");
 .PD
 .\"
 .\"

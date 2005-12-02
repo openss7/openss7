@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sc.4.man,v 0.9.2.13 2005/11/22 11:57:06 brian Exp $
+.\" @(#) $Id: sc.4.man,v 0.9.2.14 2005/12/02 12:05:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -216,6 +216,14 @@ Contains the
 structure associated with the driver with the
 .I major
 device number specified.
+Note that if the driver definition contains more than one
+.BR module_info (9)
+structure in the definition, only that associated with the write side of the upper multiplexer
+(i.e.,
+.I st_wrinit
+in
+.BR streamtab (9))
+will be retrieved.
 For details of the
 .B module_info
 structure, see
@@ -227,11 +235,38 @@ Contains the
 structure associated with the driver with the
 .I major
 device number specified.
+Note that if the driver definition contains more than one
+.BR module_stat (9)
+structure in the definition, only that associated with the write side of the upper multiplexer
+(i.e.,
+.I st_wrinit
+in
+.BR streamtab (9))
+will be retrieved.
 For details of the
 .B module_stat
 structure, see
 .BR module_stat (9).
 .RE
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that the
+.B sc
+module is not yet capable of copying and providing access to the private statistics area indicated
+by the
+.I ms_xprt
+and
+.I ms_xsize
+members of the
+.BR module_stat (9)
+structure.  This is an unnecessary limitation.
+At some point it would make sense to add a
+.B SC_IOC_STATS
+command that would retrieve both the
+.BR module_stat (9)
+structure and the private statistics for a single module or driver.
 .\"
 .\"
 .SH EXAMPLES
@@ -258,6 +293,7 @@ module named
 .BR streamio (7),
 .BR autopush (8),
 .BR scls (8),
+.BR streamtab (9),
 .BR module_info (9),
 .BR module_stat (9).
 .\"

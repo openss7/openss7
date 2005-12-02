@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnext.9.man,v 0.9.2.21 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: putnext.9.man,v 0.9.2.23 2005/12/02 15:15:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 15:15:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -79,6 +79,13 @@ sort-adjacent-labels
 \- put a message on the downstream \fISTREAMS\fR message queue
 .\"
 .\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void putnext(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .TP
 .I q
@@ -88,13 +95,6 @@ the queue beyond which to put the message.
 .I mp
 the message to put beyond the queue.
 .PD
-.\"
-.\"
-.SH SYNOPSIS
-.PP
-.B #include <sys/stream.h>
-.HP
-.BI "void putnext(queue_t *" q ", mblk_t *" mp );
 .\"
 .\"
 .SH INTERFACE
@@ -376,16 +376,16 @@ modules and drivers will not call
 .BR putnext ()
 on a stream frozen by the caller with
 .BR freezestr (9).
-.IP \(em
-Symbol
-.BR lis_safe_putnext ()
-is provided for binary compatibility with
-.IR LiS .
-See
-.BR liscompat (9).
-.BR lis_safe_putnext ()
-simply calls
-.BR putnext ().
+.\".IP \(em
+.\"Symbol
+.\".BR lis_safe_putnext ()
+.\"is provided for binary compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_safe_putnext ()
+.\"simply calls
+.\".BR putnext ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -396,7 +396,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.IR SVR 4.2 MP DDI/DKI" .
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]

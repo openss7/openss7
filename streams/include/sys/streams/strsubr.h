@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.55 2005/12/01 12:56:15 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.56 2005/12/02 12:05:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/01 12:56:15 $ by $Author: brian $
+ Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/01 12:56:15 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/02 12:05:18 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -579,7 +579,9 @@ extern void qscan(queue_t *q);
 /* from strlookup.c */
 extern struct list_head cdevsw_list;	/* Drivers go here */
 extern struct list_head fmodsw_list;	/* Modules go here */
+#if 0
 extern struct list_head cminsw_list;	/* Minors go here */
+#endif
 extern int cdev_count;			/* Driver count */
 extern int fmod_count;			/* Module count */
 extern int cmin_count;			/* Node count */
@@ -620,6 +622,9 @@ extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
 extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
 extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
 extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
+#if 0
+extern rwlock_t cminsw_lock;
+#endif
 
 extern long do_fattach(const struct file *file, const char *file_name);
 extern long do_fdetach(const char *file_name);
@@ -628,8 +633,6 @@ extern long do_spipe(int *fds);
 extern void fmod_add(struct fmodsw *fmod, modID_t modid);
 extern void fmod_del(struct fmodsw *fmod);
 extern rwlock_t fmodsw_lock;
-
-extern rwlock_t nodesw_lock;
 
 extern int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
 extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);

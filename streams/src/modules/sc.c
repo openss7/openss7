@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/26 08:40:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/11/26 08:40:20 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -281,7 +281,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 							cdev =
 							    list_entry(pos, struct cdevsw, d_list);
 
-							qinit = cdev->d_str->st_rdinit;
+							qinit = cdev->d_str->st_wrinit;
 							mlist->major = cdev->d_major;
 							mlist->mi = *qinit->qi_minfo;
 							strncpy(mlist->name, mlist->mi.mi_idname,
@@ -310,7 +310,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 							fmod =
 							    list_entry(pos, struct fmodsw, f_list);
 
-							qinit = fmod->f_str->st_rdinit;
+							qinit = fmod->f_str->st_wrinit;
 							mlist->major = 0;
 							mlist->mi = *qinit->qi_minfo;
 							strncpy(mlist->name, mlist->mi.mi_idname,

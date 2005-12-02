@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdev_count.9.man,v 0.9.2.3 2005/12/01 12:56:07 brian Exp $
+.\" @(#) $Id: cdev_count.9.man,v 0.9.2.4 2005/12/02 12:05:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/01 12:56:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -85,30 +85,30 @@ sort-adjacent-labels
 .br
 .B #include <sys/strsubr.h>
 .HP
-.RB int " cdev_count" ;
+.B int " cdev_count" ;
 .PD 0
 .HP
-.RB "struct list_head " cdevsw_list ;
+.B "struct list_head " cdevsw_list ;
 .HP
-.RB "rwlock_t " cdevsw_lock ;
+.B "rwlock_t " cdevsw_lock ;
 .PD
 .HP
-int \fBsdev_add\fP(struct cdevsw *\fIcdev\fP, modID_t \fImodid\fP);
+.BI "int sdev_add(struct cdevsw *" cdev ", modID_t " modid ");
 .PD 0
 .HP
-void \fBsdev_del\fP(struct cdevsw *\fIcdev\fP);
+.BI "void sdev_del(struct cdevsw *" cdev ");
 .HP
-struct cdevsw *\fBsdev_get\fP(major_t \fImajor\fP);
+.BI "struct cdevsw *sdev_get(major_t " major ");
 .HP
-struct cdevsw *\fBcdev_find\fR(const char *\fIname\fR);
+.BI "struct cdevsw *cdev_find(const char *" name ");
 .HP
-struct cdevsw *\fBcdev_match\fR(const char *\fIname\fR);
+.BI "struct cdevsw *cdev_match(const char *" name ");
 .HP
-struct cdevsw *\fBcdev_str\fR(const struct streamtab *\fIstr\fR);
+.BI "struct cdevsw *cdev_str(const struct streamtab *" str ");
 .HP
-void \fBsdev_put\fP(struct cdevsw *\fIcdev\fP);
+.BI "void sdev_put(struct cdevsw *" cdev ");
 .HP
-minor_t \fBcdev_minor\fR(struct cdevsw *\fIcdev\fR, major_t \fImajor\fR, minor_t \fIminor\fR);
+.BI "minor_t cdev_minor(struct cdevsw *" cdev ", major_t " major ", minor_t " minor ");
 .PD
 .\"
 .\"
