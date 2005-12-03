@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: loop.4.man,v 0.9.2.4 2005/10/15 10:19:45 brian Exp $
+.\" @(#) $Id: loop.4.man,v 0.9.2.5 2005/12/03 00:49:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/10/15 10:19:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 00:49:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -252,7 +252,8 @@ LiS
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Although this driver is described in the SVR4 SPG
+Although this driver is described in the
+.IR "SVR4 SPG"
 .[
 svr4spg
 .]
@@ -292,7 +293,8 @@ verification test suite.
 .SH HISTORY
 .PP
 .B loop
-is described as an example loop-around driver in the SVR4 SPG.
+is described as an example loop-around driver in the
+.IR "SVR4 SPG" .
 .[
 svr4spg
 .]

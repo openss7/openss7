@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/11/13 07:56:22 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/13 07:56:22 $ by $Author: brian $
+ Last Modified $Date: 2005/12/03 00:49:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/11/13 07:56:22 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/11/13 07:56:22 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/11/13 07:56:22 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -260,7 +260,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				/* hang up all upper streams that feed this lower stream */
 				for (top = mux_opens; top; top = top->next) {
 					if (top->other == bot) {
-						putnextctl(top->rq, M_HANGUP);
+						putctl(top->rq, M_HANGUP);
 						top->other = NULL;
 					}
 				}
@@ -365,7 +365,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			queue_t *wq;
 
 			if ((wq = mux->other->wq)) {
-				putnext(wq, mp);
+				put(wq, mp);
 				read_unlock_bh(&mux_lock);
 				return (0);
 			}
@@ -401,13 +401,37 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		/* Check the QSVCBUSY flag in MP drivers to avoid missequencing of messages when
 		   service procedure is running concurrent with put procedure */
 		if (mp->b_datap->db_type < QPCTL
-		    && (q->q_first || (q->q_flag & QSVCBUSY) || !bcanputnext(wq, mp->b_band)))
+		    && (q->q_first || (q->q_flag & QSVCBUSY) || !bcanput(wq, mp->b_band)))
 			putq(q, mp);
 		else
-			putnext(wq, mp);
+			put(wq, mp);
 		break;
 	}
 	}
+	return (0);
+}
+
+STATIC int
+mux_urput(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_datap->db_type >= QPCTL ||
+	    (!q->q_first && !(q->q_flag & QSVCBUSY) && bcanputnext(q, mp->b_band))) {
+		putnext(q, mp);
+		return (0);
+	}
+	putq(q, mp);
+	return (0);
+}
+
+STATIC int
+mux_lwput(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_datap->db_type >= QPCTL ||
+	    (!q->q_first && !(q->q_flag & QSVCBUSY) && bcanputnext(q, mp->b_band))) {
+		putnext(q, mp);
+		return (0);
+	}
+	putq(q, mp);
 	return (0);
 }
 
@@ -431,7 +455,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 			queue_t *rq;
 
 			if ((rq = mux->other->rq)) {
-				putnext(rq, mp);
+				put(rq, mp);
 				read_unlock_bh(&mux_lock);
 				return (0);
 			}
@@ -463,9 +487,8 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				queue_t *rq;
 
 				if ((rq = mux->other->rq)
-				    && (mp->b_datap->db_type >= QPCTL
-					|| bcanputnext(rq, mp->b_band))) {
-					putnext(rq, mp);
+				    && (mp->b_datap->db_type >= QPCTL || bcanput(rq, mp->b_band))) {
+					put(rq, mp);
 					read_unlock_bh(&mux_lock);
 					return (0);
 				}
@@ -491,16 +514,31 @@ mux_lrput(queue_t *q, mblk_t *mp)
 STATIC int
 mux_lwsrv(queue_t *q)
 {
-	struct mux *mux = q->q_ptr;
-	struct mux *top;
+	{
+		mblk_t *mp;
 
-	/* Find the upper queues feeding this one and enable them. */
-	read_lock_bh(&mux_lock);
-	for (top = mux_opens; top; top = top->next)
-		if (top->other == mux)
-			qenable(top->wq);
-	read_unlock_bh(&mux_lock);
-	return (0);
+		/* first drain queue */
+		while ((mp = getq(q))) {
+			if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+				putnext(q, mp);
+				continue;
+			}
+			putbq(q, mp);
+			return (0);
+		}
+	}
+	{
+		struct mux *mux = q->q_ptr;
+		struct mux *top;
+
+		/* Find the upper queues feeding this one and enable them. */
+		read_lock_bh(&mux_lock);
+		for (top = mux_opens; top; top = top->next)
+			if (top->other == mux)
+				qenable(top->wq);
+		read_unlock_bh(&mux_lock);
+		return (0);
+	}
 }
 
 /*
@@ -523,21 +561,18 @@ mux_uwsrv(queue_t *q)
 	mblk_t *mp;
 
 	read_lock_bh(&mux_lock);
-	if (mux->other)
-		wq = mux->other->wq;
-	read_unlock_bh(&mux_lock);
-
-	if (!wq)
-		wq = RD(q);
-
-	while ((mp = getq(q))) {
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(wq, mp->b_band)) {
-			putnext(wq, mp);
-			continue;
+	if ((mux->other && (wq = mux->other->wq)) || (wq = RD(q))) {
+		while ((mp = getq(q))) {
+			if (mp->b_datap->db_type >= QPCTL || bcanput(wq, mp->b_band)) {
+				put(wq, mp);
+				continue;
+			}
+			putbq(q, mp);
+			break;
 		}
-		putbq(q, mp);
-		break;
-	}
+	} else
+		noenable(q);
+	read_unlock_bh(&mux_lock);
 	return (0);
 }
 
@@ -553,24 +588,39 @@ mux_uwsrv(queue_t *q)
 STATIC int
 mux_ursrv(queue_t *q)
 {
-	struct mux *mux = q->q_ptr;
-	struct mux *bot;
-	bool found = false;
+	{
+		mblk_t *mp;
 
-	/* Find the lower queues feeding this one and enable them. */
-	read_lock_bh(&mux_lock);
-	for (bot = mux_links; bot; bot = bot->next)
-		if (bot->other == mux) {
-			qenable(bot->rq);
-			found = true;
+		/* first drain the queue */
+		while ((mp = getq(q))) {
+			if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+				putnext(q, mp);
+				continue;
+			}
+			putbq(q, mp);
+			return (0);
 		}
-	read_unlock_bh(&mux_lock);
+	}
+	{
+		struct mux *mux = q->q_ptr;
+		struct mux *bot;
+		bool found = false;
 
-	/* echo behaviour otherwise */
-	if (!found)
-		qenable(WR(q));
+		/* Find the lower queues feeding this one and enable them. */
+		read_lock_bh(&mux_lock);
+		for (bot = mux_links; bot; bot = bot->next)
+			if (bot->other == mux) {
+				qenable(bot->rq);
+				found = true;
+			}
+		read_unlock_bh(&mux_lock);
 
-	return (0);
+		/* echo behaviour otherwise */
+		if (!found)
+			qenable(WR(q));
+
+		return (0);
+	}
 }
 
 /*
@@ -591,12 +641,10 @@ mux_lrsrv(queue_t *q)
 	mblk_t *mp;
 
 	read_lock_bh(&mux_lock);
-	if (mux->other)
-		rq = mux->other->rq;
-	if (rq) {
+	if (mux->other && (rq = mux->other->rq)) {
 		while ((mp = getq(q))) {
-			if (mp->b_datap->db_type >= QPCTL || bcanputnext(rq, mp->b_band)) {
-				putnext(rq, mp);
+			if (mp->b_datap->db_type >= QPCTL || bcanput(rq, mp->b_band)) {
+				put(rq, mp);
 				continue;
 			}
 			putbq(q, mp);
@@ -691,6 +739,7 @@ mux_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 STATIC struct qinit mux_urqinit = {
+	.qi_srvp = mux_urput,
 	.qi_srvp = mux_ursrv,
 	.qi_qopen = mux_open,
 	.qi_qclose = mux_close,
@@ -710,6 +759,7 @@ STATIC struct qinit mux_lrqinit = {
 };
 
 STATIC struct qinit mux_lwqinit = {
+	.qi_putp = mux_lwput,
 	.qi_srvp = mux_lwsrv,
 	.qi_minfo = &mux_minfo,
 };

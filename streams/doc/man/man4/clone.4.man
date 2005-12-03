@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: clone.4.man,v 0.9.2.14 2005/11/22 11:57:06 brian Exp $
+.\" @(#) $Id: clone.4.man,v 0.9.2.15 2005/12/03 00:49:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 00:49:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -301,8 +301,7 @@ overlapping minor device ranges.
 See the
 .RI \(lq "Device Numbering" \(rq
 section of the
-.BR "Linux Fast-STREAMS Programmer's Guide" ,
-.BR SPG (9),
+.BR dev_t (9),
 for additional information on device numbering schemes supported by
 .BR "Linux Fast-STREAMS" .
 .PP
