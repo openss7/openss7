@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.28 2005/12/02 12:05:15 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.29 2005/12/03 06:51:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -165,16 +165,34 @@ a message from the queue with
 or
 .BR rmvq (9).
 .PP
+Because only one thread can be executing a queue's
+.IR qi_srvp (9)
+service procedure at a time, if messages are removed from the message queue only in the queue's
+.IR qi_srvp (9)
+service procedure, and
+.BR putbq ()
+is also only called from the procedure, which is normally the case,
+.BR QWANTR
+will never be set when
+.BR putbq ()
+is called.
+.PP
 So, usually,
 .I q
 is only enabled if a high priority message is placed back on the queue with
 .BR putbq ().
 Because normal flow control procedures from the
 .IR qi_srvp (9)
-procedure prohibit placing a high priority message back on the queue, it is unlikely that placing
-any message back on a queue with
-.BR putbq (9)
-will result in the queue being enabled.
+procedure prohibit placing a high priority message back on the queue, properly placing a message
+back on a queue with
+.BR putbq ()
+will not result in the queue being enabled.
+.PP
+This is in fitting with the purpose of the
+.BR putbq ()
+utility which is to suspsend operation of a queue
+.IR qi_srvp (9)
+service procedure until the queue is back-enabled by a forward flow controlled queue.
 .\"
 .\"
 .SH USAGE
@@ -216,12 +234,16 @@ for the band
 .IP (5)
 If
 .BR bcanputnext (9)
-returns true, process the message and pass the message along with
+returns
+.IR true ,
+process the message and pass the message along with
 .BR putnext (9).
 .IP (6)
 If
 .BR bcanputnext (9)
-returns false, place the message back on the queue with
+returns
+.IR false ,
+place the message back on the queue with
 .BR putbq ()
 and return.
 .IP (7)
@@ -241,17 +263,17 @@ when a message is placed back on a queue with
 .BR putbq (),
 the
 .IR qi_srvp (9)
-procedure is considered blocked.  Some event is required to re-enabled the queue when it is possible
+procedure is considered blocked.  Some event is required to re-enable the queue when it is possible
 to resume processing messages.
 .PP
 In the typical flow control case (see
-.RI \(lq "Example 1" ,\(rq below),
-a back-enable is scheduled by a forward queue when
+.RI \(lq "Example #1" ,\(rq
+below), a back-enable is scheduled by a forward queue when
 .BR bcanputnext (9)
 fails; however, this is not the only mechanism possible.
 Another example (see
-.RI \(lq "Example 2" ,\(rq below)
-would be when a buffer cannot be allocated to perform processing (i.e.,
+.RI \(lq "Example #2" ,\(rq
+below), would be when a buffer cannot be allocated to perform processing (i.e.,
 .BR allocb (9)
 fails), an explicit call to
 .BR qenable (9)
@@ -267,12 +289,18 @@ allocated the buffer necessary for processing.
 .PP
 Upon success,
 .BR putbq ()
-returns true (1) after placing the message
+returns
+.I true
+.RB ( 1 )
+after placing the message
 .I mp
 back on the head of the queue.
 Upon failure,
 .BR putbq ()
-returns false (0) and the message pointed to by
+returns
+.I false
+.RB ( 0 )
+and the message pointed to by
 .I mp
 is unaltered.
 The return value from
@@ -284,7 +312,10 @@ should always be examined.
 .PP
 Upon failure,
 .BR putbq ()
-returns false (0) and the message pointed to by
+returns
+.I false
+.RB ( 0 )
+and the message pointed to by
 .I mp
 is unaltered.  It is the caller's responsibility to free
 .I mp
@@ -295,13 +326,23 @@ if the caller so desires.
 .PP
 .BR putbq ()
 can be called from any context, including process context, module procedures, callouts, callbacks,
-soft interrupts, and interrupt service routines.
+soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.PP
+.BR putbq ()
+can be called from a context asynchronous to
+.IR STREAMS ,
+such as an asynchronous callback, tasklet, bottom half, or interrupt service routine.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR putbq ()
-is MP-safe.
+is MP-safe; however,
+the caller is responsible for the validity of the passed in queue and message pointers, and
+exclusive access to the passed in messages.
+.\"
+.SS Validity for \fIq\fP
+.PP
 The caller is responsible for the validity of the passed in
 .IR q .
 .I q
@@ -315,8 +356,8 @@ and
 .IR qi_srvp (9),
 procedures and synchronous callback functions.
 .PP
-For process context, asynchronous callback functions, soft interrupts and interrupt service
-routines, that is, when calling
+For process context, asynchronous callback functions, soft interrupts (tasklets and bottom halves),
+and interrupt service routines, that is, when calling
 .BR putbq ()
 from a
 .RI non- STREAMS
@@ -348,7 +389,9 @@ and must be cancelled before
 .I qi_qclose
 returns.)
 .PP
-Otherwise, it is possible to derive a queue pointer from a validated queue pointer, provided that
+Otherwise, from outside of
+.I STREAMS
+context, it is possible to derive a queue pointer from a validated queue pointer, provided that
 the
 Stream 
 is frozen with a call to
@@ -376,12 +419,33 @@ Stream
 is thawed by the other thread with
 .BR unfreezestr (9).
 .\"
+.SS Validity and Exclusion for \fImp\fP
+.PP
+Validity of the
+.I mp
+pointer and exclusive access to the message pointed to by
+.I mp
+is normally assured in the usual ways:  If
+.I mp
+was just allocated using
+.BR allocb (9)
+or
+.BR esballoc (9),
+or,
+if
+.I mp
+was just removed from a message queue with
+.BR getq (9)
+or
+.BR rmvq (9),
+then exclusion and validity is assured.
+.\"
 .\"
 .SH NOTICES
 .PP
 .BR putbq ()
 only fails if a queue band for
-.BR mp->b_band
+.BI mp-> b_band
 does not yet exist and the necessary queue band structures could not be allocated.  It can be
 ensured that
 .BR putbq ()
@@ -404,11 +468,11 @@ then the band has already been allocated.
 .PP
 Care should be taken not to return with
 .BR putbq ()
-a priority message taken off of a queue in a
+a high priority message taken off of a queue in a
 .IR qi_srvp (9)
 procedure with
 .BR getq (9).
-This is because placing the priority message back on the queue will cause the
+This is because placing the high priority message back on the queue will cause the
 .IR qi_srvp (9)
 procedure to re-execute at the earliest opportunity resulting in
 possible indefinite looping.
@@ -431,7 +495,7 @@ The second is an example of
 where enabling of the queue is scheduled by
 .BR bufcall (9).
 .\"
-.SS Example 1
+.SS Example #1
 .PP
 Following is a stereotypical example of a null module
 .IR qi_srvp (9)
@@ -440,30 +504,30 @@ along to the next queue without processing:
 .sp
 .nf
 \fC\s-2\
-     1  static int
-     2  xxxsrv(queue_t *q)
-     3  {
-     4      mblk_t *mp;
-     5  
-     6      while ((mp = getq(q))) {
-     7          if (mp->b_datap->db_type >= QPCTL)
-     8              putnext(q, mp);
-     9          else {
-    10              if (bcanputnext(q, mp->b_band))
-    11                  putnext(q, mp);
-    12              else {
-    13                  putbq(q, mp);
-    14                  break;
-    15              }
-    16          }
-    17      }
-    18      return (0);
-    19  }
+ 1  static int
+ 2  xxxsrv(queue_t *q)
+ 3  {
+ 4      mblk_t *mp;
+ 5  
+ 6      while ((mp = getq(q))) {
+ 7          if (mp->b_datap->db_type >= QPCTL)
+ 8              putnext(q, mp);
+ 9          else {
+10              if (bcanputnext(q, mp->b_band))
+11                  putnext(q, mp);
+12              else {
+13                  putbq(q, mp);
+14                  break;
+15              }
+16          }
+17      }
+18      return (0);
+19  }
 \s+1\fP
 .fi
 .PP
 Notice that at
-.IR "line 13" ,
+.BR "Line 13" ,
 the return value from
 .BR putbq ()
 is not examined.  This is because the message was removed from the queue using
@@ -484,7 +548,7 @@ procedure will not normally enable the queue in this situation.  The queue will 
 blocked on flow control until it is back-enabled by the forward queue that failed
 .BR bcanput (9).
 .\"
-.SS Example 2
+.SS Example #2
 .PP
 Following is an example of how to handle a buffer allocation failure using
 .BR bufcall (9)
@@ -493,53 +557,53 @@ and
 .sp
 .nf
 \fC\s-2\
-     1  static int
-     2  xxxsrv(queue_t *q)
-     3  {
-     4      mblk_t *mp;
-     5  
-     6      while ((mp = getq(q))) {
-     7          if (mp->b_datap->db_type >= QPCTL)
-     8              putnext(q, mp);
-     9          else {
-    10              if (bcanputnext(q, mp->b_band)) {
-    11                  mblk_t *db;
-    12  
-    13                  if ((db = allocb(64, BPRI_MED)) == NULL) {
-    14                      priv_t *p = (priv_t *) q->q_ptr;
-    15  
-    16                      putbq(q, mp);
-    17                      p->bcid = bufcall(64, BPRI_MED,
-    18                                        (void (*)(long))
-    19                                        &qenable, (long) q);
-    20                      break;
-    21                  }
-    22                  /* process mp with db */
-    23                  linkb(mp, db);
-    24                  putnext(q, mp);
-    25              } else {
-    26                  putbq(q, mp);
-    27                  break;
-    28              }
-    29          }
-    30      }
-    31      return (0);
-    32  }
+ 1  static int
+ 2  xxxsrv(queue_t *q)
+ 3  {
+ 4      mblk_t *mp;
+ 5  
+ 6      while ((mp = getq(q))) {
+ 7          if (mp->b_datap->db_type >= QPCTL)
+ 8              putnext(q, mp);
+ 9          else {
+10              if (bcanputnext(q, mp->b_band)) {
+11                  mblk_t *db;
+12  
+13                  if (!(db = allocb(64, BPRI_MED))) {
+14                      priv_t *p = (priv_t *) q->q_ptr;
+15  
+16                      putbq(q, mp);
+17                      p->bcid = bufcall(64, BPRI_MED,
+18                                        (void (*)(long))
+19                                        &qenable, (long) q);
+20                      break;
+21                  }
+22                  /* process mp with db */
+23                  linkb(mp, db);
+24                  putnext(q, mp);
+25              } else {
+26                  putbq(q, mp);
+27                  break;
+28              }
+29          }
+30      }
+31      return (0);
+32  }
 \s+2\fP
 .fi
 .PP
 If the allocation using
 .BR allocb (9)
 fails at
-.IR "line 13" ,
+.BR "Line 13" ,
 then the message is placed back on the queue using
 .BR putbq ()
 at
-.IR "line 16" ,
+.BR "Line 16" ,
 and a buffer call is issued to enable the queue when a buffer becomes available using
 .BR bufcall (9)
 at
-.IR "line 17" .
+.BR "Line 17" .
 .PP
 When the buffer callback is called, the queue will be enabled with
 .BR qenable (9),
@@ -691,14 +755,8 @@ Portable
 .I STREAMS
 drivers and modules will use
 .B "@PACKAGE_TITLE@"
-.[
-@PACKAGE_TITLE@
-.]
 instead of
 .IR LiS .
-.[
-lis
-.]
 .IP \(em
 .BR putq ()
 orders the
@@ -721,9 +779,6 @@ lists
 .BR qband (9)
 structures from lowest to highest priority, without gaps (see consideration of allocation above).
 .I LiS
-.[
-lis
-.]
 lists
 .BR qband (9)
 structures from most recently allocated/reused to least recently allocated/reused.
@@ -756,7 +811,6 @@ If
 is passed an invalid
 .IR q " or " mp
 argument, the result is undefined.
-.IP ""
 Under
 .IR LiS ,
 .BR putbq ()
@@ -787,7 +841,6 @@ or invalid pointers to
 only fails if
 .I mp->b_band
 refers to a non-existent queue band and a queue band structure could not be allocated.
-.IP ""
 When
 .BR putbq ()
 returns failure,
@@ -813,7 +866,6 @@ uw7doc
 .BR putbq ()
 is not bug for bug compatible with
 .IR LiS .
-.IP ""
 Under older versions of
 .IR LiS ,
 regardless of whether
@@ -835,9 +887,6 @@ bug.
 Current versions of
 .I LiS
 do not free the message.
-.[
-lis
-.]
 .IP ""
 Portable
 .I STREAMS
@@ -942,6 +991,31 @@ includes an assertion to enforce this in the SMP environment.)
 .\"simply calls
 .\".BR putbq ()
 .\"directly.
+.IP \(em
+All versions of
+.I LiS
+contain the bug that they keep track of message queue counts,
+.IR q_count ,
+.IR qb_count ,
+in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
+.RB ( "db_lim - db_base" ),
+and not the sizes of the message blocks themselves,
+.RB ( "b_wptr - b_rptr" ),
+which does not conform to
+.IR "SVR 4.2 STREAMS" .
+.[
+svr42spg
+.]
+See
+.BR msgsize (9).
+No other implementation has this bug.
+.IP ""
+Portable
+.I STREAMS
+applications programs, modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

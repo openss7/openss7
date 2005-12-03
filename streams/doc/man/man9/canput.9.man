@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canput.9.man,v 0.9.2.24 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: canput.9.man,v 0.9.2.25 2005/12/03 06:51:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -768,6 +768,31 @@ for testing a driver
 read queue that contains a
 .IR qi_srvp (9)
 service procedure.
+.IP \(em
+All versions of
+.I LiS
+contain the bug that they keep track of message queue counts,
+.IR q_count ,
+.IR qb_count ,
+in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
+.RB ( "db_lim - db_base" ),
+and not the sizes of the message blocks themselves,
+.RB ( "b_wptr - b_rptr" ),
+which does not conform to
+.IR "SVR 4.2 STREAMS" .
+.[
+svr42spg
+.]
+See
+.BR msgsize (9).
+No other implementation has this bug.
+.IP ""
+Portable
+.I STREAMS
+applications programs, modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

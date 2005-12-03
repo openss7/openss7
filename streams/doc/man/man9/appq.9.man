@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: appq.9.man,v 0.9.2.25 2005/12/02 12:05:11 brian Exp $
+.\" @(#) $Id: appq.9.man,v 0.9.2.26 2005/12/03 06:51:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -900,7 +900,6 @@ called with a
 .B NULL
 .IR q " or " nmp
 argument will panic or destabilize the kernel.
-.IP ""
 .BR appq ()
 called with a
 .B NULL
@@ -926,7 +925,6 @@ called with a
 .I q
 pointer that does not point to a valid queue structure will result in
 destabilization of the kernel.
-.IP ""
 Under
 .IR LiS ,
 .BR appq ()
@@ -952,7 +950,6 @@ will schedule the queue
 procedure if a
 high priority
 message is appended.
-.IP ""
 .I LiS
 does not schedule the queue
 .IR qi_srvp (9)
@@ -974,7 +971,6 @@ protects dereferencing of the
 pointer with the queue write lock, making it safe to be called concurrent
 with
 .BR putq (9).
-.IP ""
 Under
 .IR LiS ,
 .BR appq ()
@@ -983,6 +979,13 @@ does not protect dereferencing of the
 pointer with the queue spin lock making it unsafe to be called concurrent
 with
 .BR putq (9).
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .\".IP \(em
 .\".BR appq ()
 .\"cannot be called from an interrupt service routine.
@@ -1032,6 +1035,31 @@ with
 .\"simply calls
 .\".BR appq ()
 .\"directly.
+.IP \(em
+All versions of
+.I LiS
+contain the bug that they keep track of message queue counts,
+.IR q_count ,
+.IR qb_count ,
+in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
+.RB ( "db_lim - db_base" ),
+and not the sizes of the message blocks themselves,
+.RB ( "b_wptr - b_rptr" ),
+which does not conform to
+.IR "SVR 4.2 STREAMS" .
+.[
+svr42spg
+.]
+See
+.BR msgsize (9).
+No other implementation has this bug.
+.IP ""
+Portable
+.I STREAMS
+applications programs, modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

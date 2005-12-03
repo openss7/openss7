@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnextctl.9.man,v 0.9.2.23 2005/12/02 12:05:15 brian Exp $
+.\" @(#) $Id: putnextctl.9.man,v 0.9.2.24 2005/12/03 06:51:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -107,9 +107,9 @@ the type of the control message.
 .BR putnextctl ()
 creates a zero-length control message of type
 .I type
-and invokes the
-.IR qi_putp (9)
-procedure of the queue next to the queue pointed to by
+and calls
+.BR putnext (9)
+for the queue pointed to by
 .I q
 to place the message on the subsequent queue.
 If
@@ -125,24 +125,54 @@ can succeed for message type
 .BR M_DELAY (9),
 which is normally a data message type according to
 .BR datamsg (9).
+.PP
+.BR putnextctl ()
+allocates the message block for the message with priority
+.BR BPRI_HI ,
+[see
+.BR allocb (9)].
+.BR putnextctl ()
+fails if message block allocation fails.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR putnextctl ()
+is used by
+.I STREAMS
+modules and drivers to pass simple messages that contain a zero-length data buffer [e.g.,
+.BR M_HANGUP (9)]
+along a Stream.  However,
+.BR putnextctl ()
+is not normally used by the Stream head because it will not block awaiting the availability of a
+message block.  For passing messages to a Stream end,
+.BR putctl (9)
+should be used instead.
 .\"
 .\"
 .SH RETURN
 .PP
 Upon success,
 .BR putnextctl ()
-returns true (1).
+returns
+.I true
+.RB ( 1 ).
 Upon failure,
 .BR putnextctl ()
-returns false (0).
+returns
+.I false
+.RB ( 0 ).
 .\"
 .\"
 .SH ERRORS
 .PP
 .BR putnextctl ()
-fails and returns false (0) if the specified
+fails and returns
+.I false
+.RB ( 0 )
+if the specified
 .I type
-is not a control message type or if allocation of the necessary message blocks fails.
+is not a control message type, or if the allocation of the necessary message blocks fails.
 .\"
 .\"
 .SH CONTEXT
@@ -152,13 +182,24 @@ can be called from any context, including user context, module procedures,
 callouts, callbacks, soft interrupts and interrupt service routines;
 however, see the considerations listed under
 .BR putnext (9).
+.PP
+.BR putnextctl ()
+must be called from a
+.I STREAMS
+synchronous context for the Stream containing
+.IR q .
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR putnextctl ()
-is MP-safe; however, see the considerations listed under
-.BR putnext (9).
+is MP-safe when called from the proper context.  However, the caller is responsible for ensuring the
+validity of the passed in queue pointer,
+.IR q .
+See also the considerations listed under
+.BR putnext (9),
+and
+.BR mp-streams (9).
 .\"
 .\"
 .SH NOTICES
@@ -175,14 +216,16 @@ argument of
 Message blocks allocated by
 .BR putnextctl ()
 are allocated with priority
-.BR BPRI_HI .
+.BR BPRI_HI ,
+and passed along the Stream with
+.BR putnext (9).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .BR datamsg (9),
 .BR freezestr (9),
-.BR put (9),
+.BR putnext (9),
 .BR putctl (9),
 .BR putctl1 (9),
 .BR putnextctl1 (9).
@@ -311,7 +354,7 @@ is not bug for bug compatible with
 .IR LiS .
 .IP ""
 .BR putnextctl ()
-returns failure when the operations fails.
+returns failure when the operation fails.
 Under
 .IR LiS ,
 .BR putnextctl ()

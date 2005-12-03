@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.23 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.24 2005/12/03 06:51:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -1811,29 +1811,68 @@ is sometimes called
 is sometimes called
 .BR QPROCSON " or " QPROCSOFF .
 .IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
-LiS uses a
+.I LiS
+uses a
 .I q_other
-member which is not present.  LiS modules or drivers that manipulate this queue
-field directly will not be binary compatible.  LiS modules or drivers that use
-only
+member which is not present.
+.I LiS
+modules or drivers that manipulate this queue field directly will not be binary compatible.
+.I LiS
+modules or drivers that use only
 .BR RD (9),
 .BR WR (9),
 .BR OTHERQ (9),
 will be compatible because they call external symbols provided by the
-LiS compatibility module.  See,
+.I LiS
+compatibility module.  See,
 .BR liscompat (9).
 .IP \(em
 Any direct manipulation of any of the implementation specific members of the
-LiS structure by an LiS module or driver will result in binary incompatibility.
+.I LiS
+structure by an
+.I LiS
+module or driver will result in binary incompatibility.
 .IP \(em
-LiS does not provide the SVR 4.2 EFT
+.I LiS
+does not provide the
+.IR "SVR 4.2 EFT"
+.[
+svr42spg
+.]
 .I q_nband
 member.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+All versions of
+.I LiS
+contain the bug that they keep track of message queue counts,
+.IR q_count ,
+.IR qb_count ,
+in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
+.RB ( "db_lim - db_base" ),
+and not the sizes of the message blocks themselves,
+.RB ( "b_wptr - b_rptr" ),
+which does not conform to
+.IR "SVR 4.2 STREAMS" .
+.[
+svr42spg
+.]
+See
+.BR msgsize (9).
+No other implementation has this bug.
+.IP ""
+Portable
+.I STREAMS
+applications programs, modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

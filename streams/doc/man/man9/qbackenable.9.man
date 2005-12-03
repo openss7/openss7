@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbackenable.9.man,v 0.9.2.7 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: qbackenable.9.man,v 0.9.2.8 2005/12/03 06:51:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -172,6 +172,38 @@ signal can have the appropriate band number populated in the
 .I POSIX
 extended signal information,
 .IR si_band .
+.\"
+.SS Back-Enabling
+.PP
+Back-enabling occurs in
+.I STREAMS
+when a previously flow controlled queue or queue band, becomes unblocked.
+A flow controlled queue or queue band is one for which
+.B QFULL
+or
+.B QB_FULL
+was set by
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+because the
+.IR q_count " or " qb_count
+for the queue exceeded the
+.IR q_hiwat " or " qb_hiwat
+high water thresholds.
+A queue or queue band becomes unblocked, when
+.B QFULL
+or
+.B QB_FULL
+is cleared by
+.BR rmvq (9),
+.BR getq (9),
+because the
+.IR q_count " or " qb_count
+falls beneath the
+.IR q_lowat " or " qb_lowat
+low water thresholds, or the queue or queue band becomes empty.
 .\"
 .\"
 .SH RETURN

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.16 2005/11/29 10:46:32 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.17 2005/12/03 06:51:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -485,13 +485,35 @@ usldk
 .B Extended Fundamental Types
 are supported.
 .IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
 The
 .B qband
 structure is provided for source compatibility with
 .IR "SVR 4.2 EFT" .
+.IP \(em
+All versions of
+.I LiS
+contain the bug that they keep track of message queue counts,
+.IR q_count ,
+.IR qb_count ,
+in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
+.RB ( "db_lim - db_base" ),
+and not the sizes of the message blocks themselves,
+.RB ( "b_wptr - b_rptr" ),
+which does not conform to
+.IR "SVR 4.2 STREAMS" .
+.[
+svr42spg
+.]
+See
+.BR msgsize (9).
+No other implementation has this bug.
+.IP ""
+Portable
+.I STREAMS
+applications programs, modules and drivers will use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
