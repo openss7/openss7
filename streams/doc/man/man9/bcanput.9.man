@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.28 2005/12/03 06:51:21 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.29 2005/12/03 19:52:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -131,20 +131,22 @@ the priority band within which to test for flow control.
 .BR bcanput ()
 checks whether the
 Stream
-is flow controlled starting at the specified queue,
+is flow controlled starting at the
+specified queue,
 .IR q ,
 and for the specified
 .IR band .
 Starting at the
-.IR q ,
-specified and for the
+.I q
+specified,
+and for the
 .IR band ,
 specified,
 .BR bcanput ()
-looks for the next queue which has a
+looks for the next queue with a
 .IR qi_srvp (9)
-procedure or which has no next queue (i.e. the
-.I q->q_next
+service procedure, or no next queue (i.e. the
+.I q_next
 pointer is
 .BR NULL ).
 .PP
@@ -154,7 +156,8 @@ If this queue has the
 or
 .B QB_FULL
 .RI ( band " >= 1)
-flag clear indicating that it is not full for the specified
+flag clear indicating that it is not full
+for the specified
 .IR band ,
 or a
 .BR qband (9)
@@ -162,7 +165,9 @@ structure does not yet exist for the specified band
 .RI ( band " >= 1),
 then
 .BR bcanput ()
-will return true (1).
+will return
+.I true
+.RB ( 1 ).
 .PP
 If this queue has the
 .B QFULL
@@ -170,7 +175,8 @@ If this queue has the
 or
 .B QB_FULL
 .RI ( band " >= 1)
-flag set indicating that it is full for the specified
+flag set indicating that it is full
+for the specified
 .IR band ,
 and a
 .BR qband (9)
@@ -178,11 +184,16 @@ structure exists for the specified band
 .RI ( band " >= 1),
 then
 .BR bcanput ()
-will return false (0).
+will return
+.I false
+.RB ( 0 ).
 .PP
 When
 .BR bcanput ()
-returns false (0), it also sets the
+returns
+.I false
+.RB ( 0 ),
+it also sets the
 .B QWANTW
 .RI ( band " == 0)
 or
@@ -192,42 +203,110 @@ flag for the specified
 .IR band ,
 indicating that the
 .I STREAMS
-scheduler should back-enable
+scheduler should back-enable the
 .IR qi_srvp (9)
-procedures backward up the queues when the flow controlled
-.I band
-is no longer flow controlled (falls to its low water mark).
+procedure feeding the flow controlled
+queue or queue band
+once the flow controlled
+queue or queue band
+is no longer full (i.e. messages have been read from the queue to reduce the
+queue or queue band
+count beneath the low water mark for the
+queue or queue band,
+or emptying the queue, clearing the
+.BR QFULL " or " QB_FULL
+flag).
 .\"
 .\"
 .SH USAGE
 .PP
-It is the responsibility of a
+It is the responsibility of all
 .I STREAMS
-driver putting a banded (normal priority) data message
+drivers putting
+a normal priority data message
 .RB ( M_PROTO "(9), " M_DATA (9))
 to a message queue to check for flow control using
-.BR bcanput ()
-for the band associated with the message before placing a message on the queue with
+.BR canput (9)
+or
+.BR bcanput (9)
+for the
+.I b_band
+of the message
+before placing a message on the queue with
 .BR put (9)
 or
 .BR putq (9).
+Each
+Stream head,
+Stream end
+and multiplexing driver
+is responsible for checking flow control before passing a message onto a
+Stream.
+Flow control is checked using one of
+.BR canput (9)
+or
+.BR bcanput (9).
 .I STREAMS
 modules have different responsibilities, see
 .RI \(lq USAGE \(rq
 under
+.BR canputnext (9)
+or
 .BR bcanputnext (9).
+.PP
+.BR canput (9)
+and
+.BR bcanput (9)
+will perform actions on a forward queue with no queue
+.IR qi_srvp (9)
+service procedure, but for which there is not forward queue.
+The reason for this is that a write queue at the Stream end (driver) might remove messages from the
+message queue under conditions other than a service procedure.
+For example, a driver write queue
+.IR qi_putp (9)
+put procedure could be designed to place all messages from the data stream onto the message queue.
+When a transmit interrupt service routine runs, it can take message off of the queue using
+.BR rmvq (9)
+and use the messages so removed to fill the device's transmit buffer.  For flow control to work
+correctly in this situation,
+.BR canput (9)
+and
+.BR bcanput (9)
+must still set the
+.B QWANTW
+or
+.B QB_WANTW
+flag when it encounters a driver write queue or queue band with the
+.B QFULL
+or
+.B QB_FULL
+flag set, so that
+.BR getq (9),
+.BR rmvq (9),
+.BR flushq (9),
+.BR flushband (9),
+called from the interrupt service routine will still back-enable the Stream,
+[see
+.BR qbackenable (9)].
 .\"
 .\"
 .SH RETURN
 .PP
 .BR bcanput ()
-will return false (0) when the specified
+will return
+.I false
+.RB ( 0 )
+when the specified
 .I STREAMS
-message queue is flow
-controlled for the specified band, and return true (1) when the specified
+message queue is flow controlled
+for the specified band,
+and returns
+.I true
+.RB ( 1 )
+when the specified
 .I STREAMS
-message queue is not flow controlled for the specified band, or the specified band has not yet been
-written to.
+message queue is not flow controlled
+for the specified band, or the specified band has not yet been written to.
 .\"
 .\"
 .SH ERRORS
@@ -266,16 +345,20 @@ service procedure defined for the read queue, call
 instead and test flow control from within the read queue's
 .IR qi_putp (9)
 put procedure.
-Another alternative is to bracket the call to
+Another, less portable, alternative is to bracket the call to
 .BR bcanput ()
 with
 .BR freezestr (9)
 and
 .BR unfreezestr (9).
 .PP
-It is possible, due to race conditions in a multiprocessor (MP) system, that
+It is possible, due to race conditions in a
+multiprocessor (MP) system, that
 .BR bcanput ()
-can be called for a queue and return true (1) and yet the
+can be called for a queue and return
+.I true
+.RB ( 1 )
+and yet the
 Stream
 becomes flow controlled before a
 call to
@@ -283,6 +366,27 @@ call to
 The caller to
 .BR putnext (9)
 is then in violation of flow-control rules; however, the extent of this violation is bounded.
+.PP
+Although
+.BI bcanput( q->q_next ", " band )
+is functionally equivalent to
+.BI bcanputnext( q ", " band ),
+for the
+.BR bcanput (9)
+form, the dereference of the
+.I q_next
+pointer is not protected on MP architectures and may change as a result of a
+concurrent reconfiguration of the
+Stream
+(e.g. an
+.BR I_PUSH " or " I_POP
+.BR streamio (7)
+operation).
+For MP operation,
+.BI bcanput( q->q_next ", " band )
+should not be called and
+.BR bcanputnext (9)
+should always be called instead.
 .\"
 .\"
 .SH NOTICES
@@ -303,9 +407,9 @@ and
 .BR bcanputnext (9)
 should always be used instead of
 .BI canput( q->q_next )
-and
+or
 .BI bcanput( q->q_next )
-on multiprocessor (MP) implementations.
+on multiprocessor (MP) systems.
 .PP
 .BR canput (9)
 and
@@ -355,6 +459,7 @@ that is frozen with
 .\"
 .\"
 .SH EXAMPLES
+.\"
 .SS Example #1 \(em Put Procedure
 .PP
 .BR bcanput ()
@@ -363,7 +468,7 @@ is normally called before a call to
 as follows:
 .sp
 .nf
-\fC\s-1\
+\fC\s-2\
  1  void
  2  example_putp(queue_t *q, mblk_t *mp)
  3  {
@@ -381,7 +486,7 @@ as follows:
 15          putq(q, mp);
 16      }
 17  }
-\s+1\fR
+\s+2\fR
 .fi
 .PP
 Above, the example uses
@@ -403,7 +508,7 @@ is typically called before a call to
 in a driver interrupt service routine as follows:
 .sp
 .nf
-\fC\s-1
+\fC\s-2\
  1  int
  2  example_putp(queue_t *q, mblk_t *mp)
  3  {
@@ -431,10 +536,69 @@ in a driver interrupt service routine as follows:
 25      }
 26      return (0);
 27  }
-\s+1\fR
+\s+2\fR
 .fi
 .PP
 The above example is left as an exercise to the reader.
+.\"
+.SS Example #3
+.PP
+Another alternative for the ISR is to give the read side a service procedure and test before
+.BR put (9)
+as follows:
+.PP
+.nf
+\fC\s-2\
+ 1  int
+ 2  example_srvp(queue_t *q)
+ 3  {
+ 4      mblk_t *mp;
+ 5  
+ 6      while ((mp = getq(q))) {
+ 7          if (mp->b_datap->db_type >= QPCTL
+ 8              || (!q->q_first && !(q->q_flag & QSVCBUSY)
+ 9                  && bcanputnext(q, b->b_band))) {
+10              putnext(q, mp);
+11              continue;
+12          }
+13          putbq(q, mp);
+14          return (0);
+15      }
+16  }
+17  
+18  int
+19  example_putp(queue_t *q, mblk_t *mp)
+20  {
+21      if (mp->b_datap->db_type >= QPCTL
+22          || (!q->q_first && !(q->q_flag & QSVCBUSY)
+23              && bcanputnext(q, b->b_band))) {
+24          putnext(q, mp);
+25          return (0);
+26      }
+27      putq(q, mp);
+28      return (0);
+29  }
+30  
+31  int
+32  example_isr_handler(queue_t *q, caddr_t buf,
+33                      size_t len, int band)
+34  {
+35      mblk_t *mp;
+36  
+37      if (!bcanput(q, band))
+38          return (0);
+39      if ((mp = allocb(len, BPRI_HI))) {
+40          bcopy(buf, mp->b_wptr, len);
+41          mp->b_wptr += len;
+42          put(q, mp);
+43          return (1);
+44      }
+45      return (0);
+46  }
+\s+2\fP
+.fi
+.PP
+The above example is also left as an excercise to the reader.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -444,8 +608,9 @@ The above example is left as an exercise to the reader.
 .BR canputnext (9),
 .BR bcanputnext (9),
 .BR freezestr (9),
-.BR noenable "(9), and
-.BR enableok (9).
+.BR noenable (9),
+.BR enableok (9),
+.IR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -464,6 +629,9 @@ usldk
 .]
 and implementations based on
 .IR "SVR 4" ,
+.[
+svr4spg
+.]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR AIX \(rg
@@ -476,7 +644,9 @@ structure does not exist for
 .I band
 that
 .BR bcanput ()
-returns true (1).
+returns
+.I true
+.RB ( 1 ).
 .IP \(em
 .IR HP-UX \(rg
 .[
@@ -662,7 +832,7 @@ on drivers that have no write side
 .IR qi_srvp (9)
 procedure, but which enqueue messages on their write
 queues (to be collected using
-.BR getq (9)
+.BR rmvq (9)
 outside the
 .I STREAMS
 framework).
@@ -699,7 +869,7 @@ Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
-for additional compatibility considerations.
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

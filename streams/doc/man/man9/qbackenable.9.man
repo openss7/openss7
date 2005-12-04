@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbackenable.9.man,v 0.9.2.8 2005/12/03 06:51:22 brian Exp $
+.\" @(#) $Id: qbackenable.9.man,v 0.9.2.9 2005/12/03 19:52:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -114,9 +114,9 @@ implementation specific.
 .SH DESCRIPTION
 .PP
 .BR qbackenable ()
-performs the back-enabling operations of
+performs back-enabling operations for the
 .I STREAMS
-utilities such as
+utilities
 .BR getq (9),
 .BR rmvq (9),
 .BR flushq (9),
@@ -124,32 +124,76 @@ and
 .BR flushband (9).
 When any of these functions is called and the call results in a queue or queue band becoming
 unblocked with regard to flow control,
+and the
+.B QWANTW
+or
+.B QB_WANTW
+flag is set in
+.I q_flag
+or
+.I qb_flag
+indicating that a backward queue with a
+.IR qi_srvp (9)
+service procedure wished to write to the queue or queue band,
 .BR qbackenable ()
-will be called to effect the back-enabling of the queue.
+will be called to effect the back-enabling of the backward queue.
 .PP
+Because
+.BR getq (9)
+and
+.BR rmvq (9)
+remove only one message from the message queue,
+.BR getq (9)
+and
+.BR rmvq (9)
+can only unblock one queue or queue band.
 For
 .BR getq (9)
 and
 .BR rmvq (9),
-only one queue or queue band can become unblocked (since only one message is removed from the
-message queue).  For these operations the
+the
+.I band
+argument passed to
+.BR qbackenable ()
+indicates the band number that has become unblocked, and the
 .I bands
-argument is
+argument passed to
+.BR qbackenable ()
+is
 .BR NULL .
+.PP
+Because
+.BR flushq (9)
+and
+.BR flushband (9)
+can remove many messages from the message queue,
+.BR flushq (9)
+and
+.BR flushband (9)
+can unblock the queue and multiple queue bands.
 For
 .BR flushq (9)
 and
 .BR flushband (9),
-multiple queue bands can become unblocked.  For these functions,
+the
 .I band
-indicates the highest band number that has become unblocked, and
+argument passed to
+.BR qbackenable ()
+indicates the highest band number that has become unblocked, and the
 .I bands
+argument passed to
+.BR qbackenable ()
 is an array of
 .B NBAND
 elements of type
 .BR "unsigned char" ,
 each containing a single flag that is set when the corresponding band has become unblocked.
 .PP
+.BR qbackenable ()
+searches backward in the Stream for a feeding queue that has a
+.IR qi_srvp (9)
+service procedure, or for which there is no further backward queue (it is a Stream head write queue
+or a Stream end read queue).
 If the queue to be back-enabled is anything but a
 Stream head write queue, the queue is simply enabled with
 .BR qenable (9).
@@ -159,51 +203,113 @@ sets the corresponding
 .B QBACK
 or
 .B QB_BACK
-bit for every queue or queue band for which flow control has subsided.  This is so that the Stream
-head write service procedure can indicate
-.B S_WRNORM
+bit for every queue or queue band for which flow control has subsided using the
+.I band
 and
+.I bands
+arguments.
+.PP
+The
+.B QBACK
+and
+.B QB_BACK
+bits are set in the Stream head write queue so that the Stream head write queue
+.IR qi_srvp (9)
+service procedure,
+.BR strwsrv (9),
+thus enabled, can determine whether to indicate
+.B S_WRNORM
+or
 .B S_WRBAND
 events under the proper situations [see
 .BR I_SETSIG (7)],
-and also so the corresponding
+.BR strwsrv (9)
+also uses these flages to determine whether to send
 .RI { SIGPOLL }
-signal can have the appropriate band number populated in the
+or
+.RI { SIGURG }
+signals, and so that these signals can have the appropriate band number populated in the
 .I POSIX
 extended signal information,
 .IR si_band .
+See
+.BR strwsrv (9)
+for more information.
 .\"
 .SS Back-Enabling
 .PP
 Back-enabling occurs in
 .I STREAMS
-when a previously flow controlled queue or queue band, becomes unblocked.
-A flow controlled queue or queue band is one for which
+when a previously flow controlled (blocked) queue or queue band, becomes unblocked.
+.PP
+A flow controlled (blocked) queue or queue band is one for which
 .B QFULL
 or
 .B QB_FULL
 was set by
-.BR canput (9),
-.BR canputnext (9),
-.BR bcanput (9),
-.BR bcanputnext (9),
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+.BR appq (9),
 because the
 .IR q_count " or " qb_count
 for the queue exceeded the
 .IR q_hiwat " or " qb_hiwat
-high water thresholds.
-A queue or queue band becomes unblocked, when
-.B QFULL
+high water thresholds, as a result of placing a message on the queue.
+.PP
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+look for the first forward queue with a
+.IR qi_srvp (9)
+service procedure, or which has no further forward queue (it is a Stream head read queue or Stream
+end write queue).
+If the
+.BR QFULL
 or
-.B QB_FULL
-is cleared by
-.BR rmvq (9),
-.BR getq (9),
-because the
+.BR QB_FULL
+bit is set for the queue or queue band, these functions return
+.I false
+.RB ( 0 )
+and set the
+.BR QWANTW
+or
+.BR QB_WANTW
+bit on the queue or queue band to indicate that a feeding queue wishes to write to a queue or queue
+band and encountered it full.
+.PP
+A queue or queue band becomes unblocked, when
 .IR q_count " or " qb_count
 falls beneath the
 .IR q_lowat " or " qb_lowat
-low water thresholds, or the queue or queue band becomes empty.
+low water thresholds, or the queue or queue band becomes empty, as a result of removing a message,
+or messages, from the queue with
+.BR rmvq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+and the
+.B QFULL
+or
+.B QB_FULL
+flags are cleared.
+When a queue or queue band becomes unblocked, and the
+.B QWANTW
+or
+.B QB_WANTW
+bit is set indicating that a backward queue
+.IR qi_srvp (9)
+service procedure wanted to write to the queue or queue band when it was blocked,
+these functions call
+.BR qbackenable ().
+.PP
+.BR qbackenable ()
+searches for the first backward queue that has a
+.IR qi_srvp (9)
+definition, or which has no further backward queue (it is a Stream head write queue or Stream end
+read queue).
 .\"
 .\"
 .SH RETURN

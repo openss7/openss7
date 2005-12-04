@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.28 2005/12/03 06:51:21 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.29 2005/12/03 19:52:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -357,7 +357,123 @@ that is frozen with
 .BR freezestr (9).
 .\"
 .\"
-.\".SH EXAMPLES
+.SH EXAMPLES
+.PP
+.\"
+.SS Example #4
+.PP
+The following is an example of a transmit ISR that takes messages directly off of the write queue
+using
+.BR rmvq (9):
+.PP
+Following is the write queue put procedure for the driver:
+.PP
+.nf
+\fC\s-2\
+ 1  int
+ 2  example_wput(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      switch (mp->b_datap->db_type) {
+ 5      case M_FLUSH:
+ 6          /* ... */
+ 7          break;
+ 8      case M_IOCTL:
+ 9          /* ... */
+10          break;
+11      case M_DATA:
+.B "12          putq(q, mp);
+13          break;
+14      default:
+15          freemsg(mp);
+16          break;
+17      }
+18      return (0);
+19  }
+\s+2\fP
+.fi
+.PP
+Data messages are simply placed onto the message queue at
+.BR "Line 12" .
+.PP
+Following is the transmit ISR:
+.PP
+.nf
+\fC\s-2\
+ 1  void
+ 2  example_xmit_isr_handler(queue_t *q)
+ 3  {
+ 4      pl_t pl;
+ 5  
+ 6      /* q is a write queue of the driver */
+ 7      pl = freezestr(q);
+ 8      {
+ 9          mblk_t *mp, *bp;
+10          int count = 0;
+11  
+12          while ((bp = mp = q->q_first)) {
+.B "13              rmvq(q, mp);
+14              do {
+15                  while ((mp->b_rptr < mp->b_wptr)) {
+.B "16                      outb(mp->b_rptr[0], OUTPUT_PORT);
+17                      mp->b_rptr++;
+18                      count++;
+19                      if (count == XMIT_BUF_DEPTH) {
+.B "20                          insq(q, q->q_first, mp);
+21                          goto done;
+22                      }
+23                  }
+24              } while ((bp = bp->b_cont));
+.B "25              freemsg(mp);
+26          }
+27          if (count < XMIT_BUF_DEPTH) {
+28              /* xmit buffer underrun */
+29          }
+30        done:
+31      }
+32      unfreezestr(q, pl);
+33  }
+\s+2\fP
+.fi
+.PP
+The transmit ISR operates much like a service procedure, it removes
+messages from the write queue at
+.BR "Line 13" ,
+writes data out to the device transmit FIFO at
+.BR "Line 16" ,
+and either places messages with more data back on the queue at
+.BR "Line 20" ,
+or frees empty messages at
+.BR "Line 25" ,
+.PP
+For
+.BR rmvq (9)
+at
+.BR "Line 13"
+to properly back-enable the queue,
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+must set the
+.BR QWANTW
+flag on this queue when
+.BR QFULL
+is set, regardless of whether it has a service procedure or not.
+Of course, it is possible to provide a dummy service procedure as follows:
+.PP
+.nf
+\fC\s-2\
+ 1  int
+ 2  example_wsrv(queue_t *q)
+ 3  {
+ 4      return (0);
+ 5  }
+\s+2\fP
+.fi
+.PP
+But, that is rather pointless. (Nevertheless, see situations under which this is advised under
+.RI \(lq COMPATIBILITY ,\(rq
+below.)
+.\"
 .\"
 .\"
 .SH "SEE ALSO"

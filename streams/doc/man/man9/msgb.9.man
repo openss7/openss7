@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9.2.16 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.17 2005/12/03 19:52:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -258,6 +258,182 @@ padding.
 .\".I b_queue
 .\"
 .\"
+.SH FUNCTIONS
+.PP
+The following message block utility functions are provided,
+(each of these functions accept a message block pointer as an argument, or are otherwise useful in
+manipulating the data buffer):
+.TP \w'\ msgpullup_physreq(9)\ \-\ 'u
+.BR adjmsg "(9)\ \-\ 
+trim bytes from the front or back of a message
+.PD 0
+.TP
+.BR allocb "(9)\ \-\ 
+allocate a message and data block
+.TP
+.BR allocb_physreq "(9)\ \-\ 
+allocate a message and data block
+.TP
+.BR alloc_proto "(9)\ \-\ 
+allocate a PROTO message
+.TP
+.BR appq "(9)\ \-\ 
+append a message after another
+.TP
+.BR bcopy "(9)\ \-\ 
+copy byte strings
+.TP
+.BR bufcall "(9)\ \-\ 
+install a buffer callback
+.TP
+.BR bzero "(9)\ \-\ 
+zero a byte string
+.TP
+.BR copyb "(9)\ \-\ 
+copy a message block
+.TP
+.BR copyin "(9)\ \-\ 
+copy bytes from user to kernel
+.TP
+.BR copymsg "(9)\ \-\ 
+copy a message
+.TP
+.BR copyout "(9)\ \-\ 
+copy bytes from kernel to user
+.TP
+.BR datamsg "(9)\ \-\ 
+tests a message type for data
+.TP
+.BR dupb "(9)\ \-\ 
+duplicate a message block
+.TP
+.BR dupmsg "(9)\ \-\ 
+duplicate a message
+.TP
+.BR esballoc "(9)\ \-\ 
+allocate a message and data block with a caller supplied data buffer
+.TP
+.BR esbbcall "(9)\ \-\ 
+installs a buffer callback for an extended message block
+.TP
+.BR freeb "(9)\ \-\ 
+frees a message block
+.TP
+.BR freemsg "(9)\ \-\ 
+frees a message
+.TP
+.BR getq "(9)\ \-\ 
+gets a message from a message queue
+.TP
+.BR insq "(9)\ \-\ 
+inserts a message into a message queue
+.TP
+.BR isdatablk "(9)\ \-\ 
+tests a data block for data type
+.TP
+.BR isdatamsg "(9)\ \-\ 
+tests a data block for data type
+.TP
+.BR linkb "(9)\ \-\ 
+link a message block to a message
+.TP
+.BR linkmsg "(9)\ \-\ 
+link a message block to a message
+.TP
+.BR mi_bufcall "(9)\ \-\ 
+reliable alternative to \fBbufcall\fP(9)
+.TP
+.BR msgdsize "(9)\ \-\ 
+calculate the size of the data in a message
+.TP
+.BR msgphysreq "(9)\ \-\ 
+physical alignement request structure
+.TP
+.BR msgpullup "(9)\ \-\ 
+pull up bytes in a message
+.TP
+.BR msgpullup_physreq "(9)\ \-\ 
+pull up bytes in a message with physical requirements
+.TP
+.BR msgscgth "(9)\ \-\ 
+message scatter-gather structure
+.TP
+.BR msgsize "(9)\ \-\ 
+calculate the size of the message blocks in a message
+.TP
+.BR pcmsg "(9)\ \-\ 
+determine priority of a message
+.TP
+.BR pullupmsg "(9)\ \-\ 
+pull up the bytes in a message
+.TP
+.BR put "(9)\ \-\ 
+invokes a message queue put procedure
+.TP
+.BR putbq "(9)\ \-\ 
+puts a message back on a message queue
+.TP
+.BR putctl1 "(9)\ \-\ 
+puts a 1 byte control message on a message queue
+.TP
+.BR putctl2 "(9)\ \-\ 
+puts a 2 byte control message on a message queue
+.TP
+.BR putctl "(9)\ \-\ 
+puts a control message on a message queue
+.TP
+.BR puthere (9)\ \-\ 
+invokes a message queue put procedure
+.TP
+.BR putnext "(9)\ \-\ 
+puts a message on the next message queue
+.TP
+.BR putnextctl1 "(9)\ \-\ 
+puts a 1 byte control message on the next message queue
+.TP
+.BR putnextctl2 "(9)\ \-\ 
+puts a 2 byte control message on the next message queue
+.TP
+.BR putnextctl "(9)\ \-\ 
+puts a control message on the next message queue
+.TP
+.BR putq "(9)\ \-\ 
+puts a message on a message queue
+.TP
+.BR qbufcall "(9)\ \-\ 
+install a synchronous buffer callback
+.TP
+.BR queclass "(9)\ \-\ 
+return the class of a message
+.TP
+.BR qunbufcall "(9)\ \-\ 
+cancel a synchronous buffer callback
+.TP
+.BR rmvb "(9)\ \-\ 
+remove a message block from a message
+.TP
+.BR rmvq "(9)\ \-\ 
+remove a message from a message queue
+.TP
+.BR testb "(9)\ \-\ 
+test is a message can be allocated
+.TP
+.BR unbufcall "(9)\ \-\ 
+removes a buffer callback
+.TP
+.BR unlinkb "(9)\ \-\ 
+unlink a message block from a message
+.TP
+.BR wantmsg "(9)\ \-\ 
+provide a filter of wanted messages for a module
+.TP
+.BR xmsgsize "(9)\ \-\ 
+calculate the size of message blocks in a message
+.PD
+.PP
+See the corresponding manual page for each utility for more information.
+.\"
+.\"
 .SH INTERFACE
 .PP
 .IR STREAMS .
@@ -287,8 +463,6 @@ The
 and
 .IR b_cont ,
 members are significant in each message block in a message block chain.
-.RS 4n
-.ll -4n
 .PP
 .I b_datap
 points to the
@@ -311,8 +485,6 @@ is the write-pointer and points where bytes are to be written to the buffer.
 is used to link message blocks together to form a message block chain representing a
 .I STREAMS
 message.
-.ll +4n
-.RE
 .PP
 Typically, the
 .IR b_next ,
@@ -324,8 +496,6 @@ members are only significant in the first message block of a message block chain
 to apply to the entire chain of message blocks along the
 .I b_cont
 member.
-.RS 4n
-.ll -4n
 .PP
 .I b_next
 and
@@ -346,12 +516,10 @@ indicates the queuing priority when the message is placed on a message queue.
 .PP
 .I b_flag
 contains some flags that can be used to mark a set of binary conditions on a message block or
-message;
-see the description of these flags under
+message.
+See the description of these flags under
 .RI \(lq Flags \(rq,
 below.
-.ll +4n
-.RE
 .SS Flags
 Message flags are significant in the first message block of a message, and are contained in the
 .I b_flag
@@ -402,7 +570,7 @@ The Stream head ignores the
 flag on messages of type other than
 .BR M_FLUSH (9).
 .IP ""
-This flag should not be altered by modules and drivers.
+This flag should not be modified by modules and drivers.
 For details, see
 .BR M_FLUSH (9).
 .TP
@@ -581,9 +749,73 @@ Although
 defines the flag, the Stream head does not recognize it.
 For details, see
 .BR M_NOTIFY (9).
+.\"
+.\"
+.SH USAGE
+.PP
+Ever modifying the
+.IR b_datap
+pointer, can have dire consequences.  Modifying the
+.IR b_next ,
+.IR b_prev ,
+.IR b_cont ,
+.IR b_rptr ,
+.IR b_wptr ,
+.IR b_band ,
+or
+.IR b_flag ,
+members of a message block while the message exists on a message queue, can have dire consequences.
+These members must be treated as read-only by modules and drivers whenever the message is on a
+message queue.  To modify these members, the message must first be removed from any message queue.
+.PP
+The
+.I b_next
+and
+.I b_prev
+pointers can be modified while the message exists stand-alone; however, any values the module or
+driver may have assigned to these pointers in the first message block of a message will be
+overwritten when the message is placed on a message queue.
+The
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9),
+utility functions place a message on a message queue.
+.PP
+The
+.I b_wptr
+and
+.I b_rptr
+pointers can be modified on stand-alone messages.
+The
+.BR pullupmsg (9),
+.BR msgpullup (9),
+.BR msgsize (9),
+.BR msgdsize (9),
+.BR xmsgsize (9),
+message utility functions are useful for manipulating or examining these pointers.
+.PP
+THe
+.I b_cont
+pointer can be modified on stand-alone messages to link message chains.
+The
+.BR rmvb (9),
+.BR linkb (9),
+.BR unlinkb (9),
+.BR linkmsg (9),
+and
+.BR unlinkmsg (9),
+message utilities are useful for manipulating the
+.I b_cont
+pointer.
+.PP
+.I b_band
+may be modified while the message exists stand-alone; however, when a high priority message is
+placed on a message queue, this member will always be overwritten with zero
+.RB ( 0 ).
 .SS "Macros"
 The following macros are available in
-.B <sys/strsun.h>
+.RB < sys/strsun.h >
 and are
 .IR Solaris \(rg
 macros that are used to perform some simple operations on message blocks:
@@ -618,180 +850,6 @@ Returns the offset of pointer,
 .IR  p ,
 from the base pointer,
 .IR base .
-.SS "Utility Functions"
-.PP
-The following message block utility functions are provided,
-(each of these functions accept a message block pointer as an argument, or are otherwise useful in
-manipulating the data buffer):
-.TP \w'\ msgpullup_physreq(9)\ \-\ 'u
-.BR adjmsg "(9)\ \-\ 
-trim bytes from the front or back of a message
-.PD 0
-.TP
-.BR allocb "(9)\ \-\ 
-allocate a message and data block
-.TP
-.BR allocb_physreq "(9)\ \-\ 
-allocate a message and data block
-.TP
-.BR alloc_proto "(9)\ \-\ 
-allocate a PROTO message
-.TP
-.BR appq "(9)\ \-\ 
-append a message after another
-.TP
-.BR bcopy "(9)\ \-\ 
-copy byte strings
-.TP
-.BR bufcall "(9)\ \-\ 
-install a buffer callback
-.TP
-.BR bzero "(9)\ \-\ 
-zero a byte string
-.TP
-.BR copyb "(9)\ \-\ 
-copy a message block
-.TP
-.BR copyin "(9)\ \-\ 
-copy bytes from user to kernel
-.TP
-.BR copymsg "(9)\ \-\ 
-copy a message
-.TP
-.BR copyout "(9)\ \-\ 
-copy bytes from kernel to user
-.TP
-.BR datamsg "(9)\ \-\ 
-tests a message type for data
-.TP
-.BR dupb "(9)\ \-\ 
-duplicate a message block
-.TP
-.BR dupmsg "(9)\ \-\ 
-duplicate a message
-.TP
-.BR esballoc "(9)\ \-\ 
-allocate a message and data block with a caller supplied data buffer
-.TP
-.BR esbbcall "(9)\ \-\ 
-installs a buffer callback for an extended message block
-.TP
-.BR freeb "(9)\ \-\ 
-frees a message block
-.TP
-.BR freemsg "(9)\ \-\ 
-frees a message
-.TP
-.BR getq "(9)\ \-\ 
-gets a message from a message queue
-.TP
-.BR insq "(9)\ \-\ 
-inserts a message into a message queue
-.TP
-.BR isdatablk "(9)\ \-\ 
-tests a data block for data type
-.TP
-.BR isdatamsg "(9)\ \-\ 
-tests a data block for data type
-.TP
-.BR linkb "(9)\ \-\ 
-link a message block to a message
-.TP
-.BR linkmsg "(9)\ \-\ 
-link a message block to a message
-.TP
-.BR mi_bufcall "(9)\ \-\ 
-reliable alternative to \fBbufcall\fP(9)
-.TP
-.BR msgdsize "(9)\ \-\ 
-calculate the size of the data in a message
-.TP
-.BR msgphysreq "(9)\ \-\ 
-physical alignement request structure
-.TP
-.BR msgpullup "(9)\ \-\ 
-pull up bytes in a message
-.TP
-.BR msgpullup_physreq "(9)\ \-\ 
-pull up bytes in a message with physical requirements
-.TP
-.BR msgscgth "(9)\ \-\ 
-message scatter-gather structure
-.TP
-.BR msgsize "(9)\ \-\ 
-calculate the size of the message blocks in a message
-.TP
-.BR pcmsg "(9)\ \-\ 
-determine priority of a message
-.TP
-.BR pullupmsg "(9)\ \-\ 
-pull up the bytes in a message
-.TP
-.BR put "(9)\ \-\ 
-invokes a message queue put procedure
-.TP
-.BR putbq "(9)\ \-\ 
-puts a message back on a message queue
-.TP
-.BR putctl1 "(9)\ \-\ 
-puts a 1 byte control message on a message queue
-.TP
-.BR putctl2 "(9)\ \-\ 
-puts a 2 byte control message on a message queue
-.TP
-.BR putctl "(9)\ \-\ 
-puts a control message on a message queue
-.TP
-.BR puthere (9)\ \-\ 
-invokes a message queue put procedure
-.TP
-.BR putnext "(9)\ \-\ 
-puts a message on the next message queue
-.TP
-.BR putnextctl1 "(9)\ \-\ 
-puts a 1 byte control message on the next message queue
-.TP
-.BR putnextctl2 "(9)\ \-\ 
-puts a 2 byte control message on the next message queue
-.TP
-.BR putnextctl "(9)\ \-\ 
-puts a control message on the next message queue
-.TP
-.BR putq "(9)\ \-\ 
-puts a message on a message queue
-.TP
-.BR qbufcall "(9)\ \-\ 
-install a synchronous buffer callback
-.TP
-.BR queclass "(9)\ \-\ 
-return the class of a message
-.TP
-.BR qunbufcall "(9)\ \-\ 
-cancel a synchronous buffer callback
-.TP
-.BR rmvb "(9)\ \-\ 
-remove a message block from a message
-.TP
-.BR rmvq "(9)\ \-\ 
-remove a message from a message queue
-.TP
-.BR testb "(9)\ \-\ 
-test is a message can be allocated
-.TP
-.BR unbufcall "(9)\ \-\ 
-removes a buffer callback
-.TP
-.BR unlinkb "(9)\ \-\ 
-unlink a message block from a message
-.TP
-.BR wantmsg "(9)\ \-\ 
-provide a filter of wanted messages for a module
-.TP
-.BR xmsgsize "(9)\ \-\ 
-calculate the size of message blocks in a message
-.PD
-.PP
-See the corresponding manual page for each utility for more information.
 .\"
 .\"
 .SH CONTEXT

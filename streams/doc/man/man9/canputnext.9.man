@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canputnext.9.man,v 0.9.2.26 2005/12/03 06:51:21 brian Exp $
+.\" @(#) $Id: canputnext.9.man,v 0.9.2.27 2005/12/03 19:52:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -344,8 +344,12 @@ and in fact can be implemented as such.
 .\"
 .SH EXAMPLES
 .PP
+.BR canputnext ()
+functions identically to
+.BI bcanputnext( q ", 0)"\fR.
 See
-.BR bcanputnext (9).
+.BR bcanputnext (9)
+for examples.
 
 .SH "SEE ALSO"
 .PP

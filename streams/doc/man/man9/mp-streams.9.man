@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.21 2005/11/30 13:59:23 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.22 2005/12/03 19:52:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -541,7 +541,6 @@ can, however, run concurrent with any synchronous entry point
 .IR qi_putp (9),
 .IR qi_srvp (9)),
 synchronous or asynchronous callback function, belonging to a separate Stream.
-
 .IP \(bu
 .IP \(bu
 .IP \(bu
@@ -593,52 +592,54 @@ qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
 .SH CONTEXT
 .PP
 The following contexts are of interest:
-.TP
-.B STREAMS Synchronous
+.\"
+.SS STREAMS Synchronous
 Running under
 .I STREAMS
 and synchronized against the target queue.  A Stream head plumbing lock is held in the Stream to
 which the queue belongs, or the
 .B STRWOPEN
 bit is held.
-.IP ""
+.PP
 This is the case when the Stream is frozen, or when executing a queue put or service procedure, open
 or close call-out, or a synchronous callback for the target queue.
 .I q_next
 pointers can be dereferenced for any queue in the Stream without being invalidated.
-.TP
-.B STREAMS Asynchronous
+.\"
+.SS STREAMS Asynchronous
 Running under
 .I STREAMS
 but not synchronized against the target queue.
-.IP ""
+.PP
 This is the case when executing a synchronous procedure, call-out or callback, for a queue in one
 Stream and referencing a queue in another Stream.  It is also the case when an asynchronous callback
 (one not referenced on a queue) is being executed.
-.IP ""
+.PP
 Under the special case when running under
 .I STREAMS
 where the target queue belongs to a Stream linked to a lower multiplex, the context can be
 considered as synchronous if the caller can suppress concurrent unlinking of the Stream.  This can
 normally be performed with private locks taken within a put or service procedure of a multiplexing
 driver.  But this is complex and best avoided by treating all such queues as asynchronous.
-.TP
-.B Non-STREAMS Asynchronous
+.\"
+.SS Non-STREAMS Asynchronous
 Not running under
 .I STREAMS
 and not synchronized against the target queue.
-.IP ""
+.PP
 This is the case when calling any utility from outside of
 .IR STREAMS .
 This can be from process context, software interrupt, bottom-halves, tasklets,
 .B Linux
 timeouts, interrupt service routines, etc.
-.IP ""
+.PP
 .RI Non- STREAMS
 asynchronous contexts can be synchronized against a queue with
 .BR freezestr (9),
 .BR qwriter (9),
 .BR streams_put (9),
+.\"
+.SS Validity and Exclusion
 .PP
 In a synchronous context, all
 .I q_next
@@ -753,7 +754,276 @@ copy the data block using utilities such as
 .BR copyb (9)
 or
 .BR copymsg (9). 
-
+.\"
+.SS "Stream Ends and Multiplexing"
+.PP
+Passing of messages along a Stream using
+.I q_next
+pointers and the
+.RI \(lq next \(rq
+versions of the
+.I STREAMS
+utilities
+.RB ( putnext (9),
+.BR canputnext (9),
+.BR bcanputnext (9),
+.BR qreply (9))
+is simple and straightforward.  These functions are always invoked from within one of queue pair's
+procedures, and Stream synchronization is performed before entering the procedure within which they
+are called.  These are
+.I STREAMS
+synchronous contexts.
+.PP
+.IR "Stream ends" ,
+(Stream head, Driver, Upper Multiplexer, Lower Multiplexer), on the other hand are more problematic
+because they interface with contexts within which Stream synchronization has not been performed.
+These are asynchronous contexts and are more problematic.
+.PP
+A Stream end exists at the queue pair forming the Stream head, Driver, or Upper or Lower Multiplexer;
+each is separately discussed:
+.PP
+Interaction between user process context and the Stream head is performed by the
+specialized functions of the Stream head.  Modules and drivers do not normally need to provide any
+of these procedures.
+.\"
+.SS Driver Read Queue
+.PP
+For the driver read queue there are two approaches as well.  Again, the first is not problematic,
+the second is.
+.PP
+.B Approach #1.
+.PP
+Under the first approach, the driver read queue has both a put and a service procedure.
+For driver read queues with service procedures, the non-MP approach used to be not even define a put
+procedure, but to place messages directly on the read queue, using
+.BR putq (9).
+All actions would then be taken out of the driver read queue's service procedure.
+Some variations, however, would use
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+when determining whether to use
+.BR putq (9)
+or
+.BR putnext (9).
+.PP
+The pure
+.BR putq (9)
+variation is still a viable approach for
+.BR "@PACKAGE_TITLE@" .
+.BR putq (9)
+does not dereference any
+.I q_next
+pointer, and takes the queue write locks necessary to protect the queue structure both inside and
+outside of
+.IR STREAMS .
+A more portable MP approach is to provide a put procedure that simply does a
+.BR putq (9)
+and use the
+.BR put (9)
+call to invoke it.
+.PP
+Calling
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+however, does dereference a
+.I q_next
+pointer and are not MP-safe from an asynchronous context.
+Drivers using these variations must define a put procedure and invoke it with
+.BR put (9)
+to enter a
+.I STREAMS
+synchronous context (the put procedure), before calling any of the
+.RI \(lq next \(rq
+versions of functions such as
+.BR putnext (9),
+.BR canputnext (9),
+or
+.BR bcanputnext (9).
+.PP
+If an ISR feeding a driver read queue with a service procedure needs to determine whether the queue
+is full for a given band,
+before calling
+.BR put (9),
+the ISR or bottom half can call
+.BR canput (9)
+or
+.BR bcanput (9)
+from outside of
+.I STREAMS
+synchronization. Under all implementation this seems acceptable as long as the driver read queue has
+a service procedure (otherwise, these functions might try to scan upstream for a queue with a
+service procedure, dereferencing
+.I q_next
+pointers along the way).
+.PP
+.B Approach #2.
+.PP
+The second approach defines a put procedure but no service procedure for the driver read queue.  The 
+classical non-MP approach was to either call the put procedure directly using the
+.I qi_putp
+function pointer, or to not define a put procedure and make calls to
+.BR putnext (9)
+directly from the ISR or bottom half.
+This approach cannot work on MP.
+.BR putnext (9)
+cannot be called from outside
+.I STREAMS
+synchronous context.
+.PP
+For MP, the proper technique is to define a put procedure and use
+.BR put (9)
+to invoke it.  Once within the put procedure,
+.BR putnext (9)
+can be called safely.
+.PP
+.B Summary.
+.PP
+All implementations of
+.I STREAMS
+use
+.BR put (9)
+to enter a
+.I STREAMS
+synchronous context and invoke the put procedure for the specified queue.  All driver read qeues
+must define a put procedure, and
+.BR put (9)
+is the only way that messages should be passed to the queue from outside of
+.IR STREAMS .
+Driver must be aware, however, that the put procedure of the driver read queue might not be directly
+invoked as a function call, but might be deferred for later execution in a different context.
+On the other hand, when invoke directly from an ISR, the put procedure might run in ISR context.
+Whether the driver read queue has a service procedure or not is according to its own design,
+however, it is more portable to provide one and never call
+.BR putnext (9)
+from the driver read queue put procedure, only the service procedure.  This is because calling
+.BR putnext (9)
+will invoke the upstream module's put procedure in ISR context and on the ISR stack.  The upstream
+module might not be prepared for this.
+.\"
+.SS Driver Write Queue.
+.PP
+The driver write queue can be implemented in one of two ways.  The first is not problematic.  The
+second is.
+.PP
+.B Method #1.
+.PP
+In the first method, the driver write queue has both a put and a service procedure.  The put
+procedure responds to critical or immediate messages and places all data messages onto the message
+queue.  The service procedure removes messages from the message queue and outputs them to the hardware.
+If there is too much data for the hardware to accept, the service procedure places the message back
+on the queue and returns.  When a hardware interrupt makes it possible for the service procedure to
+again write data, the transmit ISR enables the write queue by calling
+.BR enableq (9)
+or
+.BR qenable (9).
+.PP
+A similar approach can be taken if the driver is a pseudo-device (software) driver rather than a
+hardware device driver.  Instead of outputing to the hardware, the service procedure takes the data
+from messages and passes in some manner to the external subsystem.
+.PP
+This first method is quite portable.
+.PP
+.B Method #2.
+.PP
+In the second method, the driver write queue has only a put procedure.  The put procedure responds
+to critical or immediate messages and places all data messages onto the message queue.  The transmit
+ISR (or a bottom half of the transmit ISR) directly performs the functions performed by the service
+procedure in the first method above.
+.PP
+The routine would like to use
+.BR getq (9)
+and
+.BR putbq (9)
+in the same fashion as service procedure; however,
+.BR getq (9)
+requires a
+.I STREAMS
+synchronous context.  The most portable way for an ISR or bottom half to read from the driver write
+queue is by freezing the queue with
+.BR freezestr (9)
+and using the
+.BR rmvq (9)
+utility instead of
+.BR getq (9).
+However, with the Stream frozen,
+.BR putbq (9)
+cannot be used.  This is because, under some implementations,
+.BR putbq (9)
+cannot be called on a queue in a Stream frozen by the caller.
+Therfore,
+.BR insq (9)
+should be used.
+Once the operations are complete, the ISR or bottom half can use
+.BR unfreezestr (9)
+to thaw the Stream.
+.PP
+This method relies on
+.BR canputnext (9)
+and
+.BR bcanputnext (9)
+setting the
+.BR QWANTW
+and
+.BR QB_WANTW
+bits on the driver write queue even though it does not have a service procedure.  This is provided
+for under
+.IR "SVR 4 STREAMS" .
+.[
+svr4spg
+.]
+.BR canputnext (9)
+and
+.BR bcanputnext (9)
+will operate on a queue that has no next queue regardless of whether it has a service procedure or
+not.
+.PP
+This second method creates portability concerns.
+.PP
+.B Summary.
+.PP
+Because the first method, for all intents and purposes, should perform just as well as the second
+method, it is recommended that portable
+.I STREAMS
+modules and drivers only use the first method for driver write queues.  Under the first method, only
+.BR enableq (9)
+or
+.BR qenable (9)
+are called from outside of the
+.I STREAMS
+syncrhonous context.
+.\"
+.SS Upper Multiplexer Read Queue
+.PP
+Passing messages between upper multiplexer Streams, or from a lower multiplexer Stream to an upper
+on is problematic, because the procedure passing the message is not in a synchronous context with
+respect to the Stream to which messages are being passed.  Each upper multiplexer Stream, when used
+in this fashion, should be treated like the driver read queue described above.  That is, each upper
+multiplexer Stream must have a read queue put procedure, and that procedure must be invoked using
+.BR put (9).
+.BR canput (9)
+and
+.BR bcanput (9)
+can be used on any upper multiplexer Stream read queue provided that the caller can ensure that the
+passed in queue pointer will remain valid across the call (e.g, the Stream will not close).
+.\"
+.SS Upper Multiplexer Write Queue
+.PP
+The upper multiplexer write queue should follow the procedures and recommendations decribed for the
+driver write queue.  The upper multiplexer write queue can be implemented with or without a service
+procedure.
+.\"
+.SS Lower Multiplexer Write Queue
+.PP
+.\"
+.SS Lower Multiplexer Read Queue
+.PP
+The lower multiplexer read queue should follow the procedures and recommendations decribed for the
+driver write queue, except in an upside-down sense.  The lower multiplexer read queue can be
+implemented with or without a service procedure.
+.PP
+.\"
 .SS "Queue Handling Functions"
 .PP
 .TS
@@ -1057,7 +1327,6 @@ are
 .BR freezestr "(9), " unfreezestr (9)
 and
 .BR MPSTR_STPLOCK "(9), " MPSTR_STPRELE (9).
-
 .\"
 .\"
 .SS Message Pointers
