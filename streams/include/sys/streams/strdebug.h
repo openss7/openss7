@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.22 2005/09/26 10:08:37 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.23 2005/12/04 04:38:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/26 10:08:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/04 04:38:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/09/26 10:08:37 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/04 04:38:46 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -76,23 +76,23 @@ do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LIN
 
 #undef  __usual
 #define __usual(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: usual(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: usual(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __normal
 #define __normal(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: normal(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: normal(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __assert
 #define __assert(__exp) \
-do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); *(int *)0 = 0; } } while(0)
+do { if (unlikely(!(__exp))) { printk(KERN_EMERG "%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); *(int *)0 = 0; } } while(0)
 
 #undef  __assure
 #define __assure(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
 
 #undef  __ensure
 #define __ensure(__exp,__sta) \
-do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); __sta; } } while(0)
+do { if (unlikely(!(__exp))) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); __sta; } } while(0)
 
 #undef  __unless
 #define __unless(__exp,__sta) \
@@ -139,8 +139,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define _abnormal(__exp)	do { } while(0)
 #define   _assert(__exp)	do { } while(0)
 #define   _assure(__exp)	do { } while(0)
-#define   _ensure(__exp,__sta)	do { if (!(__exp)) { __sta; } } while(0)
-#define   _unless(__exp,__sta)	do { if ((__exp)) { __sta; } } while(0)
+#define   _ensure(__exp,__sta)	do { if (unlikely(!(__exp))) { __sta; } } while(0)
+#define   _unless(__exp,__sta)	do { if (unlikely( (__exp))) { __sta; } } while(0)
 #define    _trace()		do { } while(0)
 #define   _ptrace(__pks)	do { } while(0)
 #define   _ctrace(__fnc)	(__fnc)
@@ -172,6 +172,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  unusual(__exp)		__usual(!(__exp))
 #define   normal(__exp)		__normal(__exp)
 #define abnormal(__exp)		__normal(!(__exp))
+#define  dassert(__exp)		__assert(__exp)
 #define   assert(__exp)		__assert(__exp)
 #define   assure(__exp)		__assure(__exp)
 #define   ensure(__exp,__sta)	__ensure(__exp,__sta)
@@ -218,6 +219,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  unusual(__exp)		__usual(!(__exp))
 #define   normal(__exp)		__normal(__exp)
 #define abnormal(__exp)		__normal(!(__exp))
+#define  dassert(__exp)		__assert(__exp)
 #define   assert(__exp)		__assert(__exp)
 #define   assure(__exp)		__assure(__exp)
 #define   ensure(__exp,__sta)	__ensure(__exp,__sta)
@@ -263,7 +265,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  unusual(__exp)		_unusual(__exp)
 #define   normal(__exp)		_normal(__exp)
 #define abnormal(__exp)		_abnormal(__exp)
-#define   assert(__exp)		{ if (!(__exp)) *(int *)0 = 0; } while(0)
+#define  dassert(__exp)		_assert(__exp)
+#define   assert(__exp)		{ if (unlikely(!(__exp))) *(int *)0 = 0; } while(0)
 #define   assure(__exp)		__assure(__exp)
 #define   ensure(__exp,__sta)	__ensure(__exp,__sta)
 #define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
@@ -308,6 +311,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  unusual(__exp)		_unusual(__exp)
 #define   normal(__exp)		_normal(__exp)
 #define abnormal(__exp)		_abnormal(__exp)
+#define  dassert(__exp)		_assert(__exp)
 #define   assert(__exp)		_assert(__exp)
 #define   assure(__exp)		_assure(__exp)
 #define   ensure(__exp,__sta)	_ensure(__exp,__sta)

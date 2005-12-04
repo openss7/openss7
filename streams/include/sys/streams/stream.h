@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.68 2005/11/23 12:37:59 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.69 2005/12/04 04:38:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/23 12:37:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/04 04:38:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/11/23 12:37:59 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/12/04 04:38:47 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1186,21 +1186,21 @@ unlinkmsg(mblk_t *mp, mblk_t *bp)
 __STRUTIL_EXTERN_INLINE int
 canget(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return bcanget(q, 0);
 }
 
 __STRUTIL_EXTERN_INLINE int
 canput(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return bcanput(q, 0);
 }
 
 __STRUTIL_EXTERN_INLINE int
 canputnext(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return bcanputnext(q, 0);
 }
 
@@ -1213,7 +1213,7 @@ esbbcall(int priority, void (*function) (long), long arg)
 __STRUTIL_EXTERN_INLINE int
 SAMESTR(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return ((q->q_next != NULL) && ((q->q_flag & QREADR) == (q->q_next->q_flag & QREADR)));
 }
 #ifndef SAMESTR
@@ -1223,7 +1223,7 @@ SAMESTR(queue_t *q)
 __STRUTIL_EXTERN_INLINE int
 canenable(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return (!(q->q_flag & QNOENB));
 }
 
@@ -1240,7 +1240,7 @@ extern int putnextctl2(queue_t *q, int type, int param1, int param2);
 __STRUTIL_EXTERN_INLINE queue_t *
 OTHERQ(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return ((q->q_flag & QREADR) ? q + 1 : q - 1);
 }
 #ifndef OTHERQ
@@ -1250,7 +1250,7 @@ OTHERQ(queue_t *q)
 __STRUTIL_EXTERN_INLINE queue_t *
 RD(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return (q->q_flag & QREADR) ? q : q - 1;
 }
 #ifndef RD
@@ -1260,7 +1260,7 @@ RD(queue_t *q)
 __STRUTIL_EXTERN_INLINE queue_t *
 WR(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return ((q->q_flag & QREADR) ? q + 1 : q);
 }
 #ifndef WR
@@ -1272,14 +1272,14 @@ backq(queue_t *q)
 {
 	queue_t *bq;
 
-	assert(q);
+	dassert(q);
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
 }
 
 __STRUTIL_EXTERN_INLINE ssize_t
 qsize(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	return (q->q_msgs);
 }
 
@@ -1291,16 +1291,14 @@ qreply(queue_t *q, mblk_t *mp)
 {
 	queue_t *oq;
 
-	assert(mp);
-	assert(q);
+	dassert(mp);
+	dassert(q);
 
 	oq = OTHERQ(q);
 
-	assert(oq);
+	dassert(oq);
 
-	trace();
 	putnext(oq, mp);
-	trace();
 	return;
 }
 

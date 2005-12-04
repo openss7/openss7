@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbackenable.9.man,v 0.9.2.9 2005/12/03 19:52:50 brian Exp $
+.\" @(#) $Id: qbackenable.9.man,v 0.9.2.10 2005/12/04 04:39:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 19:52:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/04 04:39:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -329,7 +329,32 @@ is always successful.
 .PP
 .BR qbackenable ()
 can be called from any context, including user context, module procedures, call-outs, callbacks, soft
-interrupts, and interrupt service routines.
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.PP
+.BR qbackenable ()
+must be called in
+.I STREAMS
+synchronous context for an intermediate queue pair, but may be called from an asyncrhonous context
+for a queue ending a Stream at a Stream end.  That is,
+for intermediate modules,
+.BR qbackenable ()
+must be called from within a queue or module procedure,
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+for a queue in the queue pair for which the procedure belongs,
+or for any queue in a Stream frozen by the caller with
+.BR freezestr (9).
+For queues ending a Stream, those for which
+.I q->q_next
+is
+.BR NULL ,
+.BR qbackenable ()
+can be called for the queue from an asynchronous context.
+See
+.BR mp-streams (9)
+for more information on synchronous and asynchronous contexts.
 .\"
 .\"
 .SH MP-STREAMS
@@ -370,6 +395,28 @@ is highly implementation dependent in function and prototype.  Use of this
 function by a driver or module will guarantee that it is not portable even between
 releases of
 .BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR qbackenable ()
+is optimized to only take a Stream head plumbing read lock when necessary.  When
+.I q
+has a
+.I q_next
+pointer, (that is, it is an intermediate module), no Stream head plumbing read lock is acquired
+This is because, for a module on the trunk,
+.BR qbackenable ()
+should only be invoked from a Stream syncrhonous context.  That is, from a put or service procedure
+(that already has acquired a Stream head plumbing read lock), or an open or close routine (that have
+acquired the
+.B STRWOPEN
+bit on the Stream head suppressing, other plumbing activities on the Stream).
+When
+.I q
+has no
+.I q_next
+pointer, (that is, a terminal queue at a Stream end), a Stream head plumbing read lock is acquired.
 .\"
 .\"
 .SH "SEE ALSO"

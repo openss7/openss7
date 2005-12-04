@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/03 00:49:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/04 04:38:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/03 00:49:53 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -739,7 +739,7 @@ mux_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 STATIC struct qinit mux_urqinit = {
-	.qi_srvp = mux_urput,
+	.qi_putp = mux_urput,
 	.qi_srvp = mux_ursrv,
 	.qi_qopen = mux_open,
 	.qi_qclose = mux_close,

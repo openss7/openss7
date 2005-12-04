@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/10/22 19:58:17 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/04 04:38:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 19:58:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/04 04:38:51 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -309,7 +309,11 @@ not_frozen_by_caller(queue_t *q)
 	assert(sd);
 	return (sd->sd_freezer != current);
 }
-
+static inline int
+in_procedure_of(queue_t *q)
+{
+	return (this_thread->currentq == q);
+}
 static inline void
 zlockinit(struct stdata *sd)
 {
