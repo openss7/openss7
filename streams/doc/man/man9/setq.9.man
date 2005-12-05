@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setq.9.man,v 0.9.2.14 2005/12/02 12:05:17 brian Exp $
+.\" @(#) $Id: setq.9.man,v 0.9.2.15 2005/12/05 01:42:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:17 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/05 01:42:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,8 +139,8 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR setq ()
-can be called from any non-ISR context, including user context, module procedures, callouts,
-callbacks, soft interrupts (tasklets and bottom halves), but excluding interrupt service routines.
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

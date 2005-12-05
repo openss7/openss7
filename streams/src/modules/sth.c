@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/05 01:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/26 08:40:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/05 01:43:44 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/05 01:43:44 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/11/26 08:40:21 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/05 01:43:44 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -214,7 +214,7 @@ struct streamtab str_info = {
  *  @file:	file pointer for stream
  *  @sd:	stream head
  */
-STATIC INLINE void
+STATIC streams_fastcall void
 stri_insert(struct file *file, struct stdata *sd)
 {
 	struct inode *inode = sd->sd_inode;
@@ -236,7 +236,7 @@ stri_insert(struct file *file, struct stdata *sd)
  *  stri_acquire:   - acquire a reference to a stream head from a file pointer
  *  @file:	file pointer to stream
  */
-STATIC INLINE struct stdata *
+STATIC streams_fastcall struct stdata *
 stri_acquire(struct file *file)
 {
 	struct stdata *sd;
@@ -259,7 +259,7 @@ stri_acquire(struct file *file)
  *
  *  Call this with the inode sempahore already held.
  */
-STATIC INLINE struct stdata *
+STATIC streams_fastcall struct stdata *
 stri_remove(struct file *file)
 {
 	struct stdata *sd;
@@ -290,7 +290,7 @@ stri_remove(struct file *file)
  *
  *  Hold the inode semaphore while calling this function.
  */
-STATIC INLINE int
+STATIC streams_fastcall int
 strinsert(struct inode *inode, struct stdata *sd)
 {
 	assert(inode);
@@ -325,7 +325,7 @@ strinsert(struct inode *inode, struct stdata *sd)
  *  Hold the inode semaphore while calling this function.  Don't forget to put the inode once the
  *  semaphore is released.
  */
-STATIC INLINE void
+STATIC streams_fastcall void
 strremove_locked(struct inode *inode, struct stdata *sd)
 {
 	assert(sd);
@@ -360,7 +360,7 @@ strremove_locked(struct inode *inode, struct stdata *sd)
  *
  *  Called before strlastclose() on a detached Stream.
  */
-STATIC INLINE void
+STATIC streams_fastcall void
 strremove(struct stdata *sd)
 {
 	struct inode *inode;
@@ -383,7 +383,7 @@ strremove(struct stdata *sd)
  *
  *  LOCKING: Caller must hold a stream head write lock (or have a private stream head).
  */
-STATIC INLINE dev_t
+STATIC streams_fastcall dev_t
 strinccounts(struct file *file, struct stdata *sd, int oflag)
 {
 	sd->sd_opens++;
@@ -395,7 +395,7 @@ strinccounts(struct file *file, struct stdata *sd, int oflag)
 	return (sd->sd_dev);
 }
 
-STATIC INLINE bool
+STATIC streams_fastcall bool
 strdetached(struct stdata *sd)
 {
 	/* test for detached close needed */
@@ -424,7 +424,7 @@ strdetached(struct stdata *sd)
  *  that the link/unlink code knows what is going on. Another open in the meantime might boost the
  *  count.
  */
-STATIC INLINE bool
+STATIC streams_fastcall bool
 strdeccounts(struct stdata *sd, int oflag)
 {
 	bool last = false;
@@ -461,7 +461,7 @@ strdeccounts(struct stdata *sd, int oflag)
  *  -------------------------------------------------------------------------
  */
 
-STATIC inline pid_t
+STATIC inline streams_fastcall pid_t
 task_session(struct task_struct *t)
 {
 #if HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGNAL
@@ -471,7 +471,7 @@ task_session(struct task_struct *t)
 #endif
 }
 
-STATIC inline pid_t
+STATIC inline streams_fastcall pid_t
 task_pgrp(struct task_struct *t)
 {
 #if HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGNAL
@@ -481,7 +481,7 @@ task_pgrp(struct task_struct *t)
 #endif
 }
 
-STATIC inline pid_t
+STATIC inline streams_fastcall pid_t
 pgrp_session(pid_t pgrp)
 {
 #if HAVE_SESSION_OF_PGRP_ADDR
@@ -667,24 +667,24 @@ straccess_unlocked(struct stdata *sd, const int access)
 }
 
 /* Two lock checking versions - do this yourself if you want straccess inlined */
-STATIC inline streams_fastcall int
+STATIC streams_fastcall int
 straccess_rlock(struct stdata *sd, const int access)
 {
 	int err;
 
 	srlock(sd);
-	if ((err = straccess(sd, access)))
+	if ((err = straccess_slow(sd, access)))
 		srunlock(sd);
 	return (err);
 }
 
-STATIC inline streams_fastcall int
+STATIC streams_fastcall int
 straccess_wlock(struct stdata *sd, const int access)
 {
 	int err;
 
 	swlock(sd);
-	if ((err = straccess(sd, access)))
+	if ((err = straccess_slow(sd, access)))
 		swunlock(sd);
 	return (err);
 }
@@ -766,7 +766,7 @@ alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
  *  STREAM will be closed, and we will unregister from the thread group leader.  When we send
  *  SIGPOLL, we use kill_proc which selects a viable thread in the thread group.
  */
-STATIC inline struct task_struct *
+STATIC inline streams_fastcall struct task_struct *
 str_find_thread_group_leader(const struct task_struct *procp)
 {
 	const struct task_struct *p = procp;
@@ -795,7 +795,7 @@ str_find_thread_group_leader(const struct task_struct *procp)
  *  from the file pointer by walking the process' open file descriptor list.  Unfortunately fasync
  *  does this for us, but ioctl does not.
  */
-STATIC inline int
+STATIC inline streams_fastcall int
 str_find_file_descriptor(const struct task_struct *procp, const struct file *file)
 {
 	struct files_struct *files = procp->files;
@@ -909,7 +909,7 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
  *  POSIX says that if the argument (events) is zero it means to remove the calling process from the
  *  list.  If the calling process is not on the list, return [EINVAL].
  */
-STATIC INLINE int
+STATIC streams_fastcall int
 strevent_register(const struct file *file, struct stdata *sd, const unsigned long events)
 {
 	int err;
@@ -920,7 +920,7 @@ strevent_register(const struct file *file, struct stdata *sd, const unsigned lon
 	swunlock(sd);
 	return (err);
 }
-STATIC INLINE int
+STATIC streams_fastcall int
 strevent_unregister(const struct file *file, struct stdata *sd)
 {
 	printd(("%s: unregistering streams events\n", __FUNCTION__));
@@ -1070,7 +1070,7 @@ strevent(struct stdata *sd, const int events, unsigned char band)
  *   Stream head so the Stream can generate signals even if it is not a controlling tty."
  *  
  */
-STATIC inline void
+STATIC streams_fastcall void
 strsignal(struct stdata *sd, mblk_t *mp)
 {
 	int sig = mp->b_rptr[0];
@@ -1089,7 +1089,7 @@ strsignal(struct stdata *sd, mblk_t *mp)
  *  Stream frozen.  This separate version is so that we do not release and reacquire locks if not
  *  necessary.  Return true if we had to release locks.
  */
-STATIC inline bool
+STATIC streams_fastcall bool
 strsignal_locked(struct stdata *sd, mblk_t *mp, unsigned long *plp)
 {
 	if ((mp->b_rptr[0] == SIGPOLL) || test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0) {
@@ -1187,7 +1187,7 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 	return (b);
 }
 
-STATIC inline void
+STATIC streams_fastcall void
 strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Like putbq() but handles STRPRI bit and under queue locks */
@@ -1458,7 +1458,7 @@ strwaitgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 	return (mp);
 }
 
-STATIC inline mblk_t *
+STATIC inline streams_fastcall mblk_t *
 strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags, unsigned long *plp)
 {
 	mblk_t *mp;
@@ -1495,7 +1495,7 @@ strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags, unsigned long *pl
  *
  *  LOCKING: Must be called with a single read lock held on the STREAM head.
  */
-STATIC int
+STATIC inline streams_fastcall int
 __strwaitband(struct stdata *sd, int band)
 {
 	/* wait for band to become available */
@@ -1555,7 +1555,7 @@ __strwaitband(struct stdata *sd, int band)
  *
  *  LOCKING: must hold a read lock on the stream head.
  */
-STATIC inline streams_fastcall int
+STATIC streams_fastcall int
 strwaitband(struct stdata *sd, const int f_flags, const int band, const int flags)
 {
 	if (flags == MSG_HIPRI)
@@ -1585,7 +1585,7 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
  *
  *  LOCKING: call with no locks held.
  */
-STATIC int
+STATIC inline streams_fastcall int
 __strwaitopen(struct stdata *sd, const int access)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -1619,7 +1619,7 @@ __strwaitopen(struct stdata *sd, const int access)
  *
  *  LOCKING: acquires a STREAM head write lock that will be held on success and dropped on failure.
  */
-STATIC inline int
+STATIC streams_fastcall int
 strwaitopen(struct stdata *sd, const int access)
 {
 	int err;
@@ -1637,7 +1637,7 @@ strwaitopen(struct stdata *sd, const int access)
 
 STATIC void strlastclose(struct stdata *sd, int oflag);
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakeopen_swunlock(struct stdata *sd)
 {
 	bool detached;
@@ -1658,7 +1658,7 @@ strwakeopen_swunlock(struct stdata *sd)
  *  strwakeopen: - wake waiters waiting to open a stream
  *  @sd: stream head
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakeopen(struct stdata *sd)
 {
 	/* release open bit */
@@ -1666,14 +1666,14 @@ strwakeopen(struct stdata *sd)
 	strwakeopen_swunlock(sd);
 }
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakepoll(struct stdata *sd)
 {
 	if (waitqueue_active(&sd->sd_polllist))
 		wake_up_interruptible(&sd->sd_polllist);
 }
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakeread(struct stdata *sd)
 {
 	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
@@ -1681,7 +1681,7 @@ strwakeread(struct stdata *sd)
 	strwakepoll(sd);
 }
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakewrite(struct stdata *sd)
 {
 	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag))
@@ -1689,14 +1689,14 @@ strwakewrite(struct stdata *sd)
 	strwakepoll(sd);
 }
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakeiocwait(struct stdata *sd)
 {
 	if (test_bit(IOCWAIT_BIT, &sd->sd_flag))
 		wake_up_interruptible(&sd->sd_waitq);
 }
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakeall(struct stdata *sd)
 {
 	bool wake = false;
@@ -1745,7 +1745,7 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 	return (err);
 }
 
-STATIC inline int
+STATIC inline streams_fastcall int
 strwaitfifo(struct stdata *sd, const int oflag)
 {
 	if ((oflag & (FREAD | FWRITE)) == (FREAD | FWRITE))
@@ -1763,7 +1763,7 @@ strwaitfifo(struct stdata *sd, const int oflag)
 	return __strwaitfifo(sd, oflag);
 }
 
-STATIC void
+STATIC streams_fastcall void
 strwaitqueue(struct stdata *sd, queue_t *q)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -1796,7 +1796,7 @@ strwaitqueue(struct stdata *sd, queue_t *q)
  *  so, start with the stream head write queue instead of the stream below the stream head write
  *  queue.
  */
-STATIC INLINE streams_fastcall void
+STATIC inline streams_fastcall void
 strwaitclose(struct stdata *sd, int oflag)
 {
 	cred_t *crp;
@@ -1871,7 +1871,7 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	return (err);
 }
 
-STATIC inline int
+STATIC streams_fastcall int
 strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 {
 	int err;
@@ -1885,7 +1885,7 @@ strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	return (err);
 }
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strwakeioctl(struct stdata *sd)
 {
 	mblk_t *mp;
@@ -1903,7 +1903,7 @@ strwakeioctl(struct stdata *sd)
 	srunlock(sd);		/* to balance strwaitioctl */
 }
 
-STATIC mblk_t *
+STATIC inline streams_fastcall mblk_t *
 __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -1942,7 +1942,7 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	return (mp);
 }
 
-STATIC inline mblk_t *
+STATIC streams_fastcall mblk_t *
 strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 {
 	mblk_t *mp;
@@ -1985,7 +1985,7 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC int
+STATIC inline streams_fastcall int
 strbcopyin(const void *from, void *to, size_t len, bool user)
 {
 	if (user)
@@ -1994,7 +1994,7 @@ strbcopyin(const void *from, void *to, size_t len, bool user)
 	return (0);
 }
 
-STATIC int
+STATIC inline streams_fastcall int
 strbcopyout(const void *from, void *to, size_t len, bool user)
 {
 	if (user)
@@ -2003,7 +2003,7 @@ strbcopyout(const void *from, void *to, size_t len, bool user)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 strcopyinb(const caddr_t uaddr, mblk_t **dpp, size_t len, bool user)
 {
 	mblk_t *dp;
@@ -2026,7 +2026,7 @@ strcopyinb(const caddr_t uaddr, mblk_t **dpp, size_t len, bool user)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 strcopyoutb(mblk_t *dp, caddr_t uaddr, size_t len, int user)
 {
 	if (!len)
@@ -2057,7 +2057,7 @@ strcopyoutb(mblk_t *dp, caddr_t uaddr, size_t len, int user)
  *  RETURN: Returns the number of bytes copyied out.  All message blocks in the passed in message
  *  are freed.
  */
-STATIC size_t
+STATIC inline streams_fastcall size_t
 strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 {
 	mblk_t *b, *b_cont;
@@ -2457,7 +2457,7 @@ strirput(queue_t *q, mblk_t *mp)
  *  with no locks held and with the STRCLOSE bit set on the control STREAM head.  All normal ioctl
  *  operations MUST check the STRCLOSE flag when exiting a wait.
  */
-STATIC inline void
+STATIC void
 strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 {
 	union ioctypes *ioc;
@@ -2561,7 +2561,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
  *
  *  NOTICES: Make @type and explicit constant for efficient inlining.
  */
-STATIC inline streams_fastcall ssize_t
+STATIC streams_fastcall ssize_t
 strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {
 	if (type == M_DATA) {
@@ -2644,7 +2644,7 @@ strwsizecheck(const struct stdata *sd, const struct iovec *iov, const unsigned l
  *  to be written, for putmsg(), putpmsg() and %I_FDINSERT.  If there is just a data part, we apply
  *  write() rules to q_maxpsz.
  */
-STATIC inline ssize_t
+STATIC inline streams_fastcall ssize_t
 strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
 	      const int user)
 {
@@ -2698,7 +2698,7 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
  *  operations (that can also sleep) and then reacquire the Stream head read lock, rechecking write
  *  access permissions.
  */
-STATIC inline mblk_t *
+STATIC inline streams_fastcall mblk_t *
 strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
 	     const int band, const int flags, const int user)
 {
@@ -2905,7 +2905,7 @@ kill_sl(pid_t sess, int sig, int priv)
 #endif
 #endif
 
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 strhangup(struct stdata *sd)
 {
 	/* If we are a pipe and are fattached, and the other end of the pipe is closing or has
@@ -4775,7 +4775,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
  *  @file: file pointer for stream
  *  @path: path to which to fattach the stream
  */
-STATIC inline int
+STATIC inline streams_fastcall int
 strfattach(struct file *file, const char *path)
 {
 #if HAVE_KERNEL_FATTACH_SUPPORT
@@ -4789,7 +4789,7 @@ strfattach(struct file *file, const char *path)
  *  strfdetach: - fdetach system call
  *  @path: path from which to fdetach the stream
  */
-STATIC int
+STATIC inline streams_fastcall int
 strfdetach(const char *path)
 {
 #if HAVE_KERNEL_FATTACH_SUPPORT

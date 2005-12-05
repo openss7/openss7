@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qsize.9.man,v 0.9.2.16 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: qsize.9.man,v 0.9.2.17 2005/12/05 01:42:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/05 01:42:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -241,6 +241,33 @@ drivers and modules will not call
 .BR qsize ()
 on a stream frozen with
 .BR freezestr (9).
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR qsize ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+also lists
+.BR qsize ()
+as a utility that cannot be called from user functions or
+.RI non- STREAMS
+code; that is, contexts asynchronous to the Stream containing
+.IR q .
+.IP ""
+.IR HP-UX \(rg
+compatible modules and drivers will not call
+.BR qsize ()
+from outside of a
+.BR qinit (9)
+routine for the queue pair of
+.IR q .
 .\".IP \(em
 .\"Symbol
 .\".BR lis_qsize ()

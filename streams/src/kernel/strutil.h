@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/04 04:38:51 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/05 01:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/04 04:38:51 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -265,15 +265,132 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 
 #else
 
+#undef USE_INLINE_FUNCTIONS_FOR_STREAMS_LOCKS
+
+#ifndef USE_INLINE_FUNCTIONS_FOR_STREAMS_LOCKS
+
+/*
+ *  OK.  Here are the latest set of locks, as macros for speed, and so that much disappears when
+ *  CONFIG_SMP is not defined.
+ */
+
+#define in_procedure_of(__q)		(bool)({ (this_thread->currentq == (__q)); })
+
+/* The following are like _bh, but _str for STREAMS scheduler.  These lock out the STREAMS scheduler
+ * from interrupting the current thread and attempting to take a plumbing write lock for a weldq(9)
+ * or unweldq(9) operation while the current context is holding a plumbing read lock.  Because the
+ * STREAMS scheduler can only interrupt a process context when it runs at bottom half, there is no
+ * need to lock out the STREAMS scheduler when running as a kernel thread.  This is good for kernel
+ * threads on UP because taking a plumbing read lock becomes a no-op. */
+
+#if defined CONFIG_STREAMS_KTHREADS
+
+#define read_str_disable()		do { } while (0)
+#define read_str_enable()		do { } while (0)
+
+#else				/* defined CONFIG_STREAMS_KTHREADS */
+
+#define read_str_disable()		do { local_str_disable(); } while (0)
+#define read_str_enable()		do { local_str_enable();  } while (0)
+
+#endif				/* defined CONFIG_STREAMS_KTHREADS */
+
+#define read_lock_str(__lk)		do { read_str_disable();  read_lock((__lk)); } while (0)
+#define read_unlock_str(__lk)		do { read_unlock((__lk)); read_str_enable(); } while (0)
+
+/* freeze locks */
+
+/* Freeze locks are for the freezestr(9)/unfreezestr(9) mechanism.  Threads entering a put or
+ * service procedure take and release a read lock.  Read or write locks of a queue structure
+ * take a freeze read lock.  freezestr(9) takes a freeze write lock, blocking other threads
+ * from entering a put or service procedure and keeping other threads from reading or writing
+ * any queue structure in the Stream.  These locks are recursive in the sense that the caller of the
+ * write lock can acquire the read lock as well, permitting many functions that would otherwise
+ * not be able to be called on a frozen Stream, may be called under Linux Fast-STREAMS.
+ *
+ * Note that locking out interrupts and the STREAMS scheduler prevents concurrent attempts on the
+ * same processor to reaqcuire the lock.
+ */
+
+#define frozen_by_caller(__q)		(bool)({ ((qstream((__q)))->sd_freezer == current); })
+#define not_frozen_by_caller(__q)	(bool)({ ((qstream((__q)))->sd_freezer != current); })
+
+#define zlockinit(__sd)			do { rwlock_init(&(__sd)->sd_freeze); } while (0)
+#define zwlock(__sd)			(unsigned long)({ unsigned long __pl; write_lock_irqsave(&(__sd)->sd_freeze, __pl); (__sd)->sd_freezer = current; __pl; })
+#define zwunlock(__sd,__pl)		do { (__sd)->sd_freezer = NULL; write_unlock_irqrestore(&(__sd)->sd_freeze, (__pl)); } while (0)
+#define zrlock(__sd)			(unsigned long)({ unsigned long __pl; local_irq_save(__pl); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); __pl; })
+#define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); local_irq_restore((__pl)); } while (0)
+
+#define stream_barrier(__sd)		do { unsigned long __pl; __pl = zrlock((__sd)); zrunlock((__sd),__pl); } while (0)
+#define freeze_barrier(__q)		do { struct stdata *__sd = qstream((__q)); stream_barrier(__sd); } while (0)
+
+/* plumbing locks */
+
+/* Plumbing locks protect the q_next pointers in a Stream.  All utilities that need q_next
+ * protection take a read lock.  A read lock is taken before a put or service procedure is called
+ * and released afterward.  Stream head open()/close(), I_(P)LINK/I_(P)UNLINK operations take a
+ * plumbing write lock (at user context) before replumbing a Stream.  (Note that open()/close(),
+ * I_(P)LINK/I_(P)UNLINK operations effective have a read lock because they hold the STRWOPEN bit so
+ * that no other open()/close(), I_(P)LINK/I_(P)UNLINK operations can occur on the Stream.)
+ *
+ * Unfortunately, there are two instances where a plumbing write lock will be taken by the STREAMS
+ * scheduler: those are when performing weldq(9)/unweldq(9) operations.  Therefore, whenever we take
+ * a plumbing read lock, we need to lockout the STREAMS scheduler temporarily.
+ */
+
+#define plockinit(__sd)			do { rwlock_init(&(__sd)->sd_plumb); } while (0)
+#define pwlock(__sd)			(unsigned long)({ unsigned long __pl; __pl = zrlock((__sd)); write_lock(&(__sd)->sd_plumb); __pl; })
+#define pwunlock(__sd,__pl)		do { write_unlock(&(__sd)->sd_plumb); zrunlock((__sd),(__pl)); } while (0)
+#define prlock(__sd)			do { read_lock_str(&(__sd)->sd_plumb);   } while (0)
+#define prunlock(__sd)			do { read_unlock_str(&(__sd)->sd_plumb); } while (0)
+
+/* stream head structure locks */
+
+#define slockinit(__sd)			do { rwlock_init(&(__sd)->sd_lock);  } while (0)
+#define swlock(__sd)			do { write_lock(&(__sd)->sd_lock);   } while (0)
+#define swunlock(__sd)			do { write_unlock(&(__sd)->sd_lock); } while (0)
+#define srlock(__sd)			do { read_lock(&(__sd)->sd_lock);    } while (0)
+#define srunlock(__sd)			do { read_unlock(&(__sd)->sd_lock);  } while (0)
+
+/* queue structure locks */
+
+/* Queue structure locks are basic reader-writer locks with the exception that a freeze read lock is
+ * acquired while we hold a write lock.  This allows a freeze write lock to block any other thread
+ * from putting messages on or off a queue or otherwise affecting the state of a queue in the frozen
+ * Stream.
+ *
+ * Whether queue read locks should take a freeze read lock is a matter of whether freezestr(9)
+ * really allows the caller to manipulate thing about a queue other than simply putting messages on
+ * and off it.  Because strqset(9) cannot change much, and it is the only recommended way of
+ * accessing queue or queue band data structures, we don't take a freeze read lock. */
+
+#define qlockinit(__q)			do { rwlock_init(&(__q)->q_lock); } while (0)
+#define qwlock(__q)			(unsigned long)({ unsigned long __pl; struct stdata *__sd = qstream((__q)); __pl = zrlock(__sd); write_lock(&(__q)->q_lock); __pl; })
+#define qwunlock(__q,__pl)		do { struct stdata *__sd = qstream((__q)); write_unlock(&(__q)->q_lock); zrunlock((__sd),(__pl)); }  while (0)
+#define qrlock(__q)			(unsigned long)({ unsigned long __pl; read_lock_irqsave(&(__q)->q_lock, __pl);  __pl;  })
+#define qrunlock(__q,__pl)		do { read_unlock_irqrestore(&(__q)->q_lock,(__pl)); }  while (0)
+
+#else
+
+
+static inline int
+in_procedure_of(queue_t *q)
+{
+	return (this_thread->currentq == q);
+}
 static inline void
 read_str_disable(void)
 {
+#if !defined CONFIG_STREAMS_KTHREADS
 	local_str_disable();
+#endif				/* !defined CONFIG_STREAMS_KTHREADS */
 }
 static inline void
 read_str_enable(void)
 {
+#if !defined CONFIG_STREAMS_KTHREADS
 	local_str_enable();
+#endif				/* !defined CONFIG_STREAMS_KTHREADS */
 }
 
 static inline void
@@ -294,9 +411,9 @@ frozen_by_caller(queue_t *q)
 {
 	struct stdata *sd;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 	return (sd->sd_freezer == current);
 }
 static inline int
@@ -304,20 +421,15 @@ not_frozen_by_caller(queue_t *q)
 {
 	struct stdata *sd;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 	return (sd->sd_freezer != current);
-}
-static inline int
-in_procedure_of(queue_t *q)
-{
-	return (this_thread->currentq == q);
 }
 static inline void
 zlockinit(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	rwlock_init(&sd->sd_freeze);
 }
 static inline unsigned long
@@ -325,7 +437,7 @@ zwlock(struct stdata *sd)
 {
 	unsigned long pl;
 
-	assert(sd);
+	dassert(sd);
 	write_lock_irqsave(&sd->sd_freeze, pl);
 	sd->sd_freezer = current;
 	return (pl);
@@ -333,7 +445,7 @@ zwlock(struct stdata *sd)
 static inline void
 zwunlock(struct stdata *sd, unsigned long pl)
 {
-	assert(sd);
+	dassert(sd);
 	sd->sd_freezer = NULL;
 	write_unlock_irqrestore(&sd->sd_freeze, pl);
 }
@@ -342,7 +454,7 @@ zrlock(struct stdata *sd)
 {
 	unsigned long pl;
 
-	assert(sd);
+	dassert(sd);
 	local_irq_save(pl);
 	if (sd->sd_freezer != current)
 		read_lock(&sd->sd_freeze);
@@ -351,7 +463,7 @@ zrlock(struct stdata *sd)
 static inline void
 zrunlock(struct stdata *sd, unsigned long pl)
 {
-	assert(sd);
+	dassert(sd);
 	if (sd->sd_freezer != current)
 		read_unlock(&sd->sd_freeze);
 	local_irq_restore(pl);
@@ -362,7 +474,7 @@ stream_barrier(struct stdata *sd)
 {
 	unsigned long pl;
 
-	assert(sd);
+	dassert(sd);
 	pl = zrlock(sd);
 	zrunlock(sd, pl);
 }
@@ -371,16 +483,16 @@ freeze_barrier(queue_t *q)
 {
 	struct stdata *sd;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 	stream_barrier(sd);
 }
 
 static inline void
 plockinit(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	rwlock_init(&sd->sd_plumb);
 }
 static inline unsigned long
@@ -388,7 +500,7 @@ pwlock(struct stdata *sd)
 {
 	unsigned long pl;
 
-	assert(sd);
+	dassert(sd);
 	pl = zrlock(sd);
 	write_lock(&sd->sd_plumb);
 	return (pl);
@@ -396,58 +508,58 @@ pwlock(struct stdata *sd)
 static inline void
 pwunlock(struct stdata *sd, unsigned long pl)
 {
-	assert(sd);
+	dassert(sd);
 	write_unlock(&sd->sd_plumb);
 	zrunlock(sd, pl);
 }
 static inline void
 prlock(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	read_lock_str(&sd->sd_plumb);
 }
 static inline void
 prunlock(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	read_unlock_str(&sd->sd_plumb);
 }
 
 static inline void
 slockinit(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	rwlock_init(&sd->sd_lock);
 }
 static inline void
 swlock(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	write_lock(&sd->sd_lock);
 }
 static inline void
 swunlock(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	write_unlock(&sd->sd_lock);
 }
 static inline void
 srlock(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	read_lock(&sd->sd_lock);
 }
 static inline void
 srunlock(struct stdata *sd)
 {
-	assert(sd);
+	dassert(sd);
 	read_unlock(&sd->sd_lock);
 }
 
 static inline void
 qlockinit(queue_t *q)
 {
-	assert(q);
+	dassert(q);
 	rwlock_init(&q->q_lock);
 }
 static inline unsigned long
@@ -456,9 +568,9 @@ qwlock(queue_t *q)
 	unsigned long pl;
 	struct stdata *sd;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 	pl = zrlock(sd);
 	write_lock(&q->q_lock);
 	return (pl);
@@ -468,9 +580,9 @@ qwunlock(queue_t *q, unsigned long pl)
 {
 	struct stdata *sd;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 	write_unlock(&q->q_lock);
 	zrunlock(sd, pl);
 }
@@ -479,16 +591,18 @@ qrlock(queue_t *q)
 {
 	unsigned long pl;
 
-	assert(q);
+	dassert(q);
 	read_lock_irqsave(&q->q_lock, pl);
 	return (pl);
 }
 static inline void
 qrunlock(queue_t *q, unsigned long pl)
 {
-	assert(q);
+	dassert(q);
 	read_unlock_irqrestore(&q->q_lock, pl);
 }
+
+#endif
 
 #endif
 

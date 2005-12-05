@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/12/04 04:38:50 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/12/05 01:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/04 04:38:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/12/04 04:38:50 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/12/05 01:43:44 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/12/04 04:38:50 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/12/05 01:43:44 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1360,9 +1360,27 @@ __get_qband(queue_t *q, unsigned char band)
 }
 
 /*
- *  Version without locks.
+ *  _bcanput:
+ *
+ *  A version without locks, called by bcanput() and bcanputnext() after locks taken.
+ *
+ *  Some confusion here.  UnixWare and other say when we hit the end of the logical stream bcanput
+ *  returns 1.  Others (Solaris and the SVR 4 STREAMS Programmer's Guide) says that bcanput uses the
+ *  queue and the end of the logical Stream.  It might be moot.  If a queue and the end of the
+ *  Stream does not have a service procedure and never queues messages to the message queue with
+ *  putq(9) then bcanput will always return 1.  SVR 4 SPG also says that any qi_putp(9) procedure
+ *  that does putq(9) must have a qi_srvp(9) procedure.  
+ *
+ *  LOCKING: _bcanput() takes a queue read lock so that it can walk queue bands.
+ *
+ *  MP-STREAMS: Of course, because the locks are released before retuning, the result of the test
+ *  can change before the result is used.  If the result is true (1) and the queue becomes full, we
+ *  will pass an extra message: no problem.  If the result is false (0) and getq(9) on another
+ *  processor back-enables and runs our service procedure before we call putq(9) no problem: putq(9)
+ *  will enable the queue if necessary.  If it back-enables before we call putbq(9) then the service
+ *  procedure will go for another run anyway.
  */
-static streams_fastcall inline int
+static streams_fastcall int
 _bcanput(queue_t *q, unsigned char band)
 {
 	int result = 1;
@@ -1371,7 +1389,7 @@ _bcanput(queue_t *q, unsigned char band)
 	/* find first queue with service procedure or no q_next pointer */
 	for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
 
-	pl = qwlock(q);
+	pl = qrlock(q);
 
 	if (band == 0) {
 		if (test_bit(QFULL_BIT, &q->q_flag)) {
@@ -1390,7 +1408,7 @@ _bcanput(queue_t *q, unsigned char band)
 		/* Note: a non-existent band is considered empty */
 	}
 
-	qwunlock(q, pl);
+	qrunlock(q, pl);
 
 	return (result);
 }
@@ -1402,11 +1420,18 @@ _bcanput(queue_t *q, unsigned char band)
  *
  *  CONTEXT: Any.
  *
+ *  NOTICES: The q or q->q_next pointer can be passed from a callout or syncrhonous callback for q.
+ *  A driver can pass an upper multiplex read queue pointer or a lower mutliplex write queue
+ *  pointer, provided that it guarantees the validity of @q across the call: that is that @q will
+ *  neither be closed, nor unlinked.  The caller can pass any other @q whose validity it can
+ *  guarantee across the call.
+ *
  *  LOCKING: Takes a Stream head plumb read lock to permit this function to be called from outside a
  *  queue procedure belonging to @q and from process context.  The Stream head plumb read lock
- *  prevents any queue pair from either being inserted into or deleted from the stream while held.
+ *  prevents any queue pair from either being inserted into or deleted from the stream while held
+ *  allowing MP-safe walking of the Stream.
  *
- *  MP-STREAMS: bcanput() is complicated because it really needs a Stream head plumb read lock to
+ *  MP-STREAMS: bcanput() needs a Stream head plumb read lock to
  *  walk the stream as well as a queue read lock to walk the band structure.  Permitting this
  *  function to take these locks from an ISR or bottom-half would require that the Stream head plumb
  *  write locks and queue write locks suppress all interrupts, which is too strict for the most
@@ -1432,28 +1457,18 @@ _bcanput(queue_t *q, unsigned char band)
 streams_fastcall int
 bcanput(queue_t *q, unsigned char band)
 {
-#if 0
 	struct stdata *sd;
-#endif
 	int result;
 
 	dassert(q);
-	dassert(q->q_qinfo);
-	assert(q->q_info->qi_srvp);
-	usual(backq(q) == NULL);
-
-#if 0
 	sd = qstream(q);
-	dassert(sd);
 
+	dassert(sd);
 	prlock(sd);
-#endif
 
 	result = _bcanput(q, band);
 
-#if 0
 	prunlock(sd);
-#endif
 
 	return (result);
 }
@@ -1486,25 +1501,30 @@ EXPORT_SYMBOL(bcanput);
  *  state of the Stream.  From outside the STREAMS context, the caller an bracket freezestr(q) and
  *  unfreezestr(q) around the call.  The result will reflect the actual state of the Stream until
  *  unfreezestr(q) is called.
+ *
+ *  Again.
+ *
+ *  Solaris allows bcanputnext() to be called from an asyncrhonous context.  HP-UX does not.  For
+ *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
+ *  context by taking a plumb read lock.
  */
 streams_fastcall int
 bcanputnext(queue_t *q, unsigned char band)
 {
-#if 0
 	struct stdata *sd;
-#endif
 	int result;
 
 	dassert(q);
-#if 0
 	sd = qstream(q);
+
 	dassert(sd);
 	prlock(sd);
-#endif
+
+	dassert(q->q_next);
 	result = _bcanput(q->q_next, band);
-#if 0
+
 	prunlock(sd);
-#endif
+
 	return (result);
 }
 
@@ -2096,7 +2116,7 @@ EXPORT_SYMBOL(putnextctl2);
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-static inline streams_fastcall int
+static streams_fastcall int
 __putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
@@ -2231,7 +2251,7 @@ EXPORT_SYMBOL(putq);
 /*
  *  __insq:
  */
-static inline streams_fastcall int
+static streams_fastcall int
 __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int enable = 0;
@@ -2560,7 +2580,7 @@ qdelete(queue_t *q)
 	(q + 0)->q_next = NULL;
 	(q + 1)->q_next = NULL;
 
-	_ctrace(pwunlock(sd, pl));
+	pwunlock(sd, pl);
 
 	printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
 	_ctrace(qput(&q));	/* cancel initial allocation reference */
@@ -2912,7 +2932,7 @@ EXPORT_SYMBOL(RD);
  *  control restrictions, another priority band message of the same or lower priority being enqueued
  *  will not enable the queue, however, a higher priority message will.
  */
-static inline streams_fastcall bool
+static streams_fastcall bool
 __rmvq(queue_t *q, mblk_t *mp)
 {
 	bool backenable = false;

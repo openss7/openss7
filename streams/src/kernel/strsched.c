@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/04 04:38:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/05 01:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/04 04:38:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/04 04:38:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/05 01:43:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/04 04:38:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/05 01:43:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1270,7 +1270,7 @@ strsched_mfunc(mblk_t *mp)
  *   scheduler threads.  Process context threads exiting the outer perimeter will pass the
  *   synchronization queue back to the STREAMS scheduler for backlog processing.
  */
-STATIC long
+static streams_fastcall long
 strsched_event(struct strevent *se)
 {
 	long id;
@@ -1292,7 +1292,7 @@ strsched_event(struct strevent *se)
  * kmem_free() frees memory of @size or greater, it sets the flag to run buffer callbacks and wakes
  * the scheduler thread.
  */
-STATIC long
+static inline streams_fastcall long
 strsched_bufcall(struct strevent *se)
 {
 	long id;
@@ -1342,7 +1342,7 @@ timeout_function(unsigned long arg)
  * strsched_timeout:	- schedule a timer for the STREAMS scheduler
  * @se:			the timer to schedule
  */
-STATIC long
+static inline streams_fastcall long
 strsched_timeout(struct strevent *se)
 {
 	long id;
@@ -1355,7 +1355,7 @@ strsched_timeout(struct strevent *se)
 }
 
 #if 0
-STATIC long
+static inline streams_fastcall long
 defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 {
 	long id = 0;
@@ -1369,7 +1369,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	return (id);
 }
 #endif
-STATIC long
+static inline streams_fastcall long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long), long arg)
 {
 	long id = 0;
@@ -1384,7 +1384,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long)
 	}
 	return (id);
 }
-STATIC long
+static inline streams_fastcall long
 defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
 		    int cpu)
 {
@@ -1402,7 +1402,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	}
 	return (id);
 }
-STATIC long
+static inline streams_fastcall long
 defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		  weld_arg_t arg, queue_t *q)
 {
@@ -1421,7 +1421,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	}
 	return (id);
 }
-STATIC long
+static inline streams_fastcall long
 defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		    weld_arg_t arg, queue_t *q)
 {
@@ -1575,7 +1575,7 @@ EXPORT_SYMBOL(untimeout);	/* include/sys/streams/stream.h */
  *
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
-STATIC int
+static inline streams_fastcall int
 __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	weld_arg_t arg, queue_t *protq)
 {
@@ -1594,7 +1594,7 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  *
  *  Issues the STREAMS event necessary to unweld two queue pairs apart with synchronization.
  */
-STATIC int
+static inline streams_fastcall int
 __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	  weld_arg_t arg, queue_t *protq)
 {

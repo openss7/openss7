@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqset.9.man,v 0.9.2.20 2005/12/02 12:05:18 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 0.9.2.21 2005/12/05 01:42:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/05 01:42:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -276,8 +276,8 @@ but which is invalid for
 .SH CONTEXT
 .PP
 .BR strqset ()
-can be called from any non-ISR context, including user context, module procedures, callouts,
-callbacks, soft interrupts (tasklets and bottom halves), but excluding interrupt service routines.
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -336,6 +336,33 @@ require that a stream be frozen with
 .BR freezestr (9)
 for the duration of the call to
 .BR strqset ().
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR strqset ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+also lists
+.BR strqset ()
+as a utility that cannot be called from user functions or
+.RI non- STREAMS
+code; that is, contexts asynchronous to the Stream containing
+.IR q .
+.IP ""
+.IR HP-UX \(rg
+compatible modules and drivers will not call
+.BR strqset ()
+from outside of a
+.BR qinit (9)
+routine for the queue pair of
+.IR q .
 .\".IP \(em
 .\"Symbol
 .\".BR lis_strqset ()
