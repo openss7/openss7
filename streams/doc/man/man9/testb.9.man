@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: testb.9.man,v 0.9.2.16 2005/11/29 10:46:35 brian Exp $
+.\" @(#) $Id: testb.9.man,v 0.9.2.17 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -164,7 +164,7 @@ always succeeds.
 .PP
 .BR testb ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -175,8 +175,8 @@ is MP-safe.
 .\"
 .SH NOTICES
 .PP
-As with other post SVR 3
-.I STREAMS
+As with other post
+.I SVR 3 STREAMS
 .[
 svr3
 .]
@@ -191,14 +191,16 @@ argument to
 .BR testb () .
 The message block
 .I priority
-was an SVR 3
+was an
+.I SVR 3
 .[
 svr3
 .]
 concept which was found not to be useful, primarily due to
 priority inversion.  For a history of the
 .I priority
-mechanism and a discussion as to why the mechanism was abandoned in SVR 4.2,
+mechanism and a discussion as to why the mechanism was abandoned in
+.IR "SVR 4.2" ,
 .[
 svr42
 .]

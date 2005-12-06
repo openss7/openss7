@@ -1,1 +1,346 @@
-.so man9/undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: strputpmsg.9.man,v 0.9.2.5 2005/12/06 14:09:17 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/12/06 14:09:17 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRPUTPMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strputpmsg
+\- perform a \fBputpmsg\fR(2s) operation on a Stream head
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.BI "int strputpmsg(struct file *" file ", struct strbuf *" ctlp ", struct strbuf *" datp ", int " band ", int " flags ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIflagsp\fR\(em'u
+.I file
+a file pointer for a
+.I STREAMS
+file.
+.TP
+.I ctlp
+a pointer to an
+.B strbuf
+structure representing the control part of the message with the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+ignored;
+.PD 0
+.TP
+.I len
+the length of the control part; minus one for no control part;
+.TP
+.I buf
+a pointer to the user buffer containing the control part.
+.PD
+.RE
+.TP
+.I datp
+a pointer to an
+.B strbuf
+structure representing the data part of the message with the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+ignored;
+.PD 0
+.TP
+.I len
+the length of the data part; minus one for no data part;
+.TP
+.I buf
+a pointer to the user buffer containing the data part.
+.PD
+.RE
+.TP
+.I band
+queueing priority band for the message;
+.TP
+.I flags
+flags for the message; when called from
+.BR putmsg (2s),
+.I band
+is minus one
+.RB ( -1 )
+and the flags are as follows:
+.RS
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B 0
+specifies a normal priority message;
+.PD 0
+.TP
+.B RS_HIPRI
+specifies a high priority message;
+.PD
+.PP
+when called from
+.BR putpmsg (2s),
+.I band
+is zero or positive and the flags are as follows:
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B MSG_BAND
+specifies a normal priority message with band number
+.IR band ;
+.PD 0
+.TP
+.B MSG_HIPRI
+specifies a high priority message;
+.PD
+.RE
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strputpmsg ()
+performs the
+.BR putmsg (2s)
+and
+.BR putpmsg (2s)
+functions on a Stream head.
+.BR strputpmsg ()
+provides the implementation for both
+.BR putmsg (2s)
+and
+.BR putpmsg (2s).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR strputpmsg ()
+is not intended to be used directly by
+.I STREAMS
+drivers or modules except as part of the
+.IR AIX \(rg
+.[
+aixspg
+.]
+.BR wantio (9)
+capability.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR strputpmsg ()
+returns zero or a positive value on success, and a negative error number on failure.
+.\"
+.\"
+.SH ERRORS
+.PP
+See
+.BR putmsg (2s)
+and
+.BR putpmsg (2s).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR strputpmsg ()
+is called by the kernel in process context in response to a
+.BR putmsg (2s)
+or
+.BR putpmsg (2s)
+system call issued by a process.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strputpmsg ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.IR AIX \(rg
+.[
+aixspg
+.]
+implements a
+.BR wantio (9)
+capability where a cooperating downstream driver or module can intercept file operations for
+.I STREAMS
+files and
+.IR STREAMS -based
+pipes and FIFOs.  If the
+.BR wantio (9)
+capability is utilized by a downstream driver or module, that module's provided
+.BR strputpmsg ()
+procedures will be used instead of those described here.  The procedures described here are still
+available to the cooperating driver or module for callout.  Use of the
+.BR wantio (9)
+capability will affect the behaviour of
+.BR putmsg (2s)
+and
+.BR putpmsg (2s),
+making it potentially incompatible.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+For
+.BR strputpmsg ()
+implementation details, see the
+.I src/modules/sth.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putmsg (2s),
+.BR putpmsg (2s),
+.BR wantio (9),
+.BR test-streams (8),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strputpmsg ()
+has no known bugs.
+.BR strputpmsg ()
+is rigorously tested with the
+.BR test-streams (8)
+conformance test program.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strputpmsg ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+See
+.BR putmsg (2s)
+and
+.BR putpmsg (2s)
+for specific compatibility information.
+.IP \(em
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strputmsg ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR strputmsg ()
+first appeared in 
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

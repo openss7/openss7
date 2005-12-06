@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: apush_vml.9.man,v 0.9.2.13 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: apush_vml.9.man,v 0.9.2.14 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -212,20 +212,20 @@ package,
 .\".BR apush_vml ()
 .\"should not be used by portable
 .\".I STREAMS
-.\"modules and drivers.
+.\"drivers and modules.
 .PP
 .BR apush_vml ()
 is an internal implementation specific function, and will not be used directly by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .PP
 Calling
 .BR apush_vml ()
-has the kernel module side-effect that if a \fISTREAMS\fP module or driver associated
+has the kernel module side-effect that if a \fISTREAMS\fP driver or module associated
 with
 .I slp
 does not currently exists in the system, an attempt will be made to load the
-module or driver associated with the module or driver name in
+driver or module associated with the driver or module name in
 .I slp
 before return.
 No attempt, however, is made to load any kernel modules associated with the
@@ -293,11 +293,11 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2
+.IR "SVR 4.2"
 .[
 svr42
 .]
-SAD
+.I SAD
 .RI ( STREAMS
 Administrative Driver).  See
 .BR sad (4).

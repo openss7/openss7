@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: appq.9.man,v 0.9.2.26 2005/12/03 06:51:21 brian Exp $
+.\" @(#) $Id: appq.9.man,v 0.9.2.27 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -319,7 +319,7 @@ will enable the queue if the queue is not inhibited with
 .BR noenable (9)
 and one of the following conditions also holds true:
 .IP \(bu \w'\(bu\(em'u
-The module or driver has just been opened for the first time: that is, the queue is empty and has
+The driver or module has just been opened for the first time: that is, the queue is empty and has
 always been empty.
 .IP \(bu
 .BR getq (9)
@@ -410,8 +410,8 @@ is an
 .IR LiS -specific
 function that should not be called by portable
 .I STREAMS
-modules and drivers.
-Instead, the module or drivers should use the
+drivers and modules.
+Instead, the driver or modules should use the
 .I DDI/DKI
 defined
 .BR insq (9).
@@ -475,7 +475,7 @@ including
 .IR qi_srvp (9),
 procedures and synchronous callback functions.
 .PP
-For process context, asynchronous callback functions, soft interrupts and interrupt service
+For process context, asynchronous callback functions, soft interrupts (tasklets and bottom halves), and interrupt service
 routines, that is, when calling
 .BR appq ()
 from a
@@ -809,7 +809,7 @@ bug is not perpetuated in
 .IP ""
 Portable
 .I STREAMS
-modules and drivers can rely on intermediate band strutures being allocated when a
+drivers and modules can rely on intermediate band strutures being allocated when a
 normal priority
 message is placed on a queue using
 .BR appq (),
@@ -869,7 +869,7 @@ approach is very efficient.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not depend on the ordering of
+drivers and modules will not depend on the ordering of
 .BR qband (9)
 structures within the
 .I q_bandp
@@ -982,7 +982,7 @@ with
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -1012,7 +1012,7 @@ instead of
 .\".IP ""
 .\"Portable
 .\".I STREAMS
-.\"modules and drivers will not call
+.\"drivers and modules will not call
 .\".BR appq ()
 .\"from any context outside a
 .\".I STREAMS
@@ -1056,7 +1056,7 @@ No other implementation has this bug.
 .IP ""
 Portable
 .I STREAMS
-applications programs, modules and drivers will use
+applications programs, drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .

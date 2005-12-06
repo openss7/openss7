@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnextany.9.man,v 0.9.2.5 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: bcanputnextany.9.man,v 0.9.2.6 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -184,7 +184,7 @@ always succeeds.
 can be called from any context, including user context, module procedures, callouts, callbacks, soft
 interrupts (tasklets and bottom halves), and interrupt service routines.
 .BR bcanputnextany ()
-must be called from a syncrhonous context [see
+must be called from a synchronous context [see
 .BR mp-streams (9)].
 .\"
 .\"
@@ -265,7 +265,7 @@ magic
 .BR bcanputnextany ()
 is an internal function that will not be called by portable
 .I STREAMS
-modules or drivers.
+drivers or modules.
 .PP
 See
 .BR STREAMS (9)

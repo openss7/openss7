@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyreq.9.man,v 0.9.2.6 2005/11/29 10:46:30 brian Exp $
+.\" @(#) $Id: copyreq.9.man,v 0.9.2.7 2005/12/06 09:39:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -183,7 +183,7 @@ and
 .BR copyresp (9),
 that are used for communicating between the
 Stream head
-or an internal module or driver using
+or an internal driver or module using
 .I STREAMS
 messages.  The messages used and the placement of these structures into messages is illustrated in
 the table below:
@@ -255,7 +255,7 @@ or
 .BR M_COPYOUT (9)
 message is sent upstream to the
 Stream head
-from a module or driver actively processing a received
+from a driver or module actively processing a received
 .I transparent
 .BR M_IOCTL (9)
 message, requesting the
@@ -359,7 +359,7 @@ The
 field contains implementation specific flags.
 .B @PACKAGE_TITLE@
 neither defines nor recognizes any flags.  It also does not alter the flags field in any structure.
-This field can be used by modules and drivers to pass limited state information.
+This field can be used by drivers and modules to pass limited state information.
 .\" -----------
 .TP
 .I cq_addr
@@ -633,7 +633,7 @@ uxpspg
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not access the
+drivers and modules will not access the
 .I cq_flags
 member.
 .IP \(em
@@ -656,7 +656,7 @@ svr3
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .B cq_uid
 nor
 .B cq_gid
@@ -684,7 +684,7 @@ implementation as closely as possible.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not rely upon a specific overall size of the
+drivers and modules will not rely upon a specific overall size of the
 .BR copyreq (9)
 structure, or the offset or alignment of any of its members.
 .IP \(em
@@ -695,7 +695,7 @@ Various implementations exhibit various alignments.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not rely upon alignment of any fields except the first three fields of each
+drivers and modules will not rely upon alignment of any fields except the first three fields of each
 structure, and the alignment and preservation of the
 .I cq_private
 and

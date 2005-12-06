@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushq.9.man,v 0.9.2.26 2005/12/05 01:42:48 brian Exp $
+.\" @(#) $Id: flushq.9.man,v 0.9.2.27 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -105,7 +105,8 @@ how to flush the queue.
 .SH DESCRIPTION
 .PP
 .BR flushq ()
-is used to flush messages from a message queue.  It is typically called in a
+is used to flush messages from a message queue.
+It is typically called in a
 .BR M_FLUSH (9)
 handling routine to flush the requested messages from a queue.
 .PP
@@ -160,46 +161,36 @@ always succeeds.
 .BR flushq ()
 can be called from any context, including user context, module procedures, callouts, callbacks, soft
 interrupts (tasklets and bottom halves), and interrupt service routines.
-.PP
-.BR flushq ()
-must be called from a
-.I STREAMS
-synchronous context (i.e.,
-.IR qi_putp (9),
-.IR qi_srvp (9),
-.IR qi_qopen (9),
-.IR qi_qclose (9)),
-for an intermediate module, however, it may be called from an asynchronous context for a Stream end
-(i.e., no
-.I q->q_next
-pointer).
-See
-.BR qbackenable (9).
-.PP
-Because
-.BR flushq ()
-can take some time to process if there are many messages on the queue or
-.I flags
-is
-.BR FLUSHDATA ,
-.BR flushq ()
-should not be called from interrupt service routines or functions with
-interrupts disabled or global locks held.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR flushq ()
-is MP-safe.
-.BR flushq ()
-takes a recursive write lock on the queue being flushed.  This means that calling
-.BR flushq ()
-on a stream that has been frozen with
-.BR freezestr (9)
-will not result in single-party deadlock.
+is MP-safe when called from any context; however, the caller is responsibility for the validity of
+the passed in
+.I q
+pointer across the call.
+.PP
+The validity of either queue in the pair, and either
+.I q_next
+pointer for a queue in the pair, for the queue pointer passed to a module
+procedure, callout or synchronous callback functions, is guaranteed by
+.BR "@PACKAGE_TITLE@" .
+Any queue pointer in the pair passed as an argument to an asynchronous callback
+function are also valid, providing the driver or module observes the rules for
+cancellation of asynchronous callbacks on close.
+.BR "@PACKAGE_TITLE@"
+also provides that a queue pointer in the pair within whose procedures an
+asynchronous callback was invoked, and either
+.I q_next
+pointer, are also valid in an asynchronous callback.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
 .PP
 .BR flushq ()
 performs fast flushes by linking all band messages into the per-thread free
@@ -223,7 +214,7 @@ is normally used within the
 .BR M_FLUSH (9)
 handling procedures for a
 .I STREAMS
-module or driver as follows:
+driver or module as follows:
 .PP
 .nf
 \fC\s-2\
@@ -292,7 +283,6 @@ module or driver as follows:
 .fi
 .SS Example #2
 .PP
-In addition,
 .BR flushq ()
 is often used when closing or
 .BR I_UNLINK ing
@@ -364,6 +354,13 @@ the flush is complete.
 .BR flushq ()
 should have far less of an impact on system latency and performance as that of
 .IR LiS .
+.IP ""
+Performing
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 .BR flushq ()
 holds the queue write lock while removing selected messages or unlinking
@@ -396,6 +393,13 @@ from the queue,
 .BR rmvq (9),
 is no more difficult than inserting them,
 .BR insq (9).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 .BR flushq ()
 does not clear the
@@ -411,6 +415,13 @@ clears the
 flag when flushing an empty queue.  This means that the next call to
 .BR getq (9)
 for the empty queue will perform an extra back-enable.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 .BR flushq ()
 may be called on a stream frozen with
@@ -436,11 +447,12 @@ do not permit
 .BR flushq ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should not call
+drivers and modules will not call
 .BR flushq ()
-on a stream frozen with
+on a Stream frozen by the caller with
 .BR freezestr (9).
 .IP \(em
 .IR HP-UX \(rg
@@ -463,12 +475,31 @@ code; that is, contexts asynchronous to the Stream containing
 .IR q .
 .IP ""
 .IR HP-UX \(rg
-compatible modules and drivers will not call
+compatible drivers and modules will not call
 .BR flushq ()
 from outside of a
 .BR qinit (9)
 routine for the queue pair of
 .IR q .
+As
+.B "@PACKAGE_TITLE@"
+permits this more restricted operation as a subset of its capabilities, there are no portability
+issues.
+.IP \(em
+.IR Solaris \(rg
+.[
+solspg
+.]
+permits
+.BR flushq ()
+to be called from outside of
+.I STREAMS
+(e.g., by a driver flushing its own write queue from an ISR, or across a multiplexing
+driver).
+.IP ""
+As
+.B "@PACKAGE_TITLE@"
+permits the same, there are no portability issues.
 .IP \(em
 .\"Symbol
 .\".BR lis_flushq ()
@@ -488,7 +519,7 @@ may behave rather different from that of
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B "@PACKAGE_TITLE@"
 instead of
 .IR LiS .

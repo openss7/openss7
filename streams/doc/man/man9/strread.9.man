@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strread.9.man,v 0.9.2.5 2005/11/29 10:46:35 brian Exp $
+.\" @(#) $Id: strread.9.man,v 0.9.2.6 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -433,14 +433,14 @@ or
 .I old TTY
 semantics are used for
 .B O_NDELAY
-can be controlled by a downstream module or driver using the
+can be controlled by a downstream driver or module using the
 .BR M_SETOPTS (9)
 message to the stream head with the
 .BR SO_NDELON " or " SO_NDELOFF
 flags set.
 There is no method for the application program to examine or set the asynchronous input-output
 semantics.  The application program must know from prior knowledge of the modules and driver within
-the stream which set of asyncrhonous input-output semantics to expect.
+the stream which set of asynchronous input-output semantics to expect.
 The default is
 .I STREAMS
 semantics for
@@ -582,7 +582,7 @@ message.  It is disabled in the same fashion with the
 .B SO_MREADOFF
 flag.
 .PP
-The read notification feature can only be enabled or disabled by a downstream module or driver.  The
+The read notification feature can only be enabled or disabled by a downstream driver or module.  The
 user or application program has no mechanism for activating or deactivating the feature, nor
 for determining whether the feature is activated or not.
 .PP
@@ -620,7 +620,7 @@ and
 when the
 .BR M_READ (9)
 feature is activated,
-depends upon the non-blocking semantics used by the Stream head and cooperating modules and drivers.
+depends upon the non-blocking semantics used by the Stream head and cooperating drivers and modules.
 .PP
 When the Stream head is set for
 .I STREAMS
@@ -630,7 +630,7 @@ and the stream is set for blocking operation (the
 file flag is set),
 .BR strread (),
 .BR strreadv ()
-and cooperating modules and drivers behave as follows:
+and cooperating drivers and modules behave as follows:
 .IP \(en \w'\(en\(em'u
 When the Stream head has no data to service the
 .BR strread ()
@@ -643,19 +643,19 @@ containing the number of byte,
 in the request downstream, and blocks awaiting a reply.
 The
 .BR M_READ (9)
-message is a high priority message requiring a response from the module or driver.
+message is a high priority message requiring a response from the driver or module.
 .IP \(en
 Upon receiving a
 .BR M_READ (9)
-message, the module or driver should service the request, forwarding it downstream or acting upon
+message, the driver or module should service the request, forwarding it downstream or acting upon
 it, directly from its
 .IR qi_putp (9)
 procedure.
 .IP \(en
-To act upon the message, the module or driver determines whether it has sufficient data queued to
+To act upon the message, the driver or module determines whether it has sufficient data queued to
 service the request.
 .IP \(en
-If there is sufficient queued data to meet the request, the module or driver transforms the
+If there is sufficient queued data to meet the request, the driver or module transforms the
 .BR M_READ (9)
 message into an
 .BR M_DATA (9)
@@ -667,23 +667,23 @@ Upon receiving the
 .BR M_DATA (9)
 message, the Stream head unblocks the user and transfers the data to satisfy the request.
 .IP \(en
-If there is insufficient data queued to meet the request, the module or driver
+If there is insufficient data queued to meet the request, the driver or module
 frees the
 .BR M_READ (9)
 message and takes no other action.
 .PP
-When the Stream head is set for
-.RI non- STREAMS
-tty semantics for non-blocking operation,
-yet regardless of the setting of the
-.BR O_NDELAY " (or " O_NONBLOCK )
-file flags,
-.BR strread (),
-.BR strreadv ()
-and cooperating modules and drivers behave as follows:
-.IP \(en \w'\(en\(em'u
-.IP \(en
-.IP \(en
+.\"When the Stream head is set for
+.\".RI non- STREAMS
+.\"tty semantics for non-blocking operation,
+.\"yet regardless of the setting of the
+.\".BR O_NDELAY " (or " O_NONBLOCK )
+.\"file flags,
+.\".BR strread (),
+.\".BR strreadv ()
+.\"and cooperating drivers and modules behave as follows:
+.\".IP \(en \w'\(en\(em'u
+.\".IP \(en
+.\".IP \(en
 .\"
 .\"
 .SS Marked Message Feature
@@ -695,7 +695,7 @@ feature is always enabled on a Stream.  This feature is used by setting the
 flag in messages passed upstream to the Stream head.
 .PP
 .I STREAMS
-messages can be marked by a downstream module or driver in support of TCP's out-of-band data.  Once
+messages can be marked by a downstream driver or module in support of TCP's out-of-band data.  Once
 marked, a messages sent to the Stream head causes the Stream head to remember the message.  A user
 may check to see if the message on the front of its Stream head read queue is marked with the
 .BR I_ATMARK (7)
@@ -768,7 +768,7 @@ The default behaviour is to not delimit messages
 .RB ( STRDELIM
 flag is clear).
 .PP
-The delimited message feature can only be enabled or disabled by a downstream module or driver.  The
+The delimited message feature can only be enabled or disabled by a downstream driver or module.  The
 user or application program has no mechanism for activating or deactivating the feature, nor
 for determining whether the feature is activated or not.
 .PP
@@ -796,7 +796,7 @@ set), and a zero-length delimited message arrives (it has
 set), then the zero-length message will cause the read to terminate and the zero-length message will
 be consumed rather than placed back on the read queue.
 .PP
-In this way, it is possible for a downstream module or driver to set
+In this way, it is possible for a downstream driver or module to set
 .B STRDELIM
 on the Stream head and then send delimited messages upstream (including zero-length messages) that
 will simply terminate the read in byte-stream mode and will not signal an end-of-file for
@@ -833,16 +833,20 @@ functions supporting the
 system call.  See those manual pages for details.
 .\"
 .\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
 .SH USAGE
 .PP
+.BR strread ()
+and
+.BR strreadv ()
+are not intended to be used directly by
+.I STREAMS
+drivers or modules except as part of the
+.IR AIX \(rg
+.[
+aixspg
+.]
+.BR wantio (9)
+capability.
 .\"
 .\"
 .SH RETURN
@@ -959,7 +963,7 @@ and
 is appropriate for
 .I STREAMS
 character device special files.  In that case, the following additional error conditions can occur:
-.TP
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
 .RB [ ENXIO ]
 .I file
 refers to a Stream head
@@ -970,51 +974,72 @@ message.  (That is, the Stream head has the
 .BR STRHUP
 bit set.)
 .\"
-.PP
-When the
-.BR STRISFIFO " or " STRISPIPE
-flags are set in the
-.I sd_flags
-member of the Stream head
-.BR stdata (9)
-structure associated with
-.IR file ,
-the behaviour of
-.BR strread ()
-and
-.BR strreadv ()
-is appropriate for
-.IR STREAMS -based
-pipes of FIFOs.  In that case, the following additional error conditions can occur:
-.TP
-.RB [ EPIPE ]
+.\".PP
+.\"When the
+.\".BR STRISFIFO " or " STRISPIPE
+.\"flags are set in the
+.\".I sd_flags
+.\"member of the Stream head
+.\".BR stdata (9)
+.\"structure associated with
+.\".IR file ,
+.\"the behaviour of
+.\".BR strread ()
+.\"and
+.\".BR strreadv ()
+.\"is appropriate for
+.\".IR STREAMS -based
+.\"pipes of FIFOs.  In that case, the following additional error conditions can occur:
+.\".TP \w'[\fBEWOULDBLOCK\fR]\(em'u
+.\".RB [ EPIPE ]
+.\"attempt to write to a
+.\".IR STREAMS -based
+.\".BR pipe (4)
+.\"with no readers.
+.\".RI { SIGPIPE }
+.\"will also be issued.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR strread ()
+and
+.BR strreadv ()
+are called by the kernel in process context in response to a
+.BR read (2s)
+or
+.BR readv (2s)
+system call issued by a process.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR strread ()
+and
+.BR strreadv ()
+are MP-safe.
 .\"
 .\"
 .SH NOTICES
 .PP
 .IR AIX \(rg
+.[
+aixspg
+.]
 implements a
 .BR wantio (9)
-capability where a cooperating downstream module or driver can intercept file operations for
+capability where a cooperating downstream driver or module can intercept file operations for
 .I STREAMS
 files and
 .IR STREAMS -based
 pipes and FIFOs.  If the
 .BR wantio (9)
-capability is utilized by a downstream module or driver, that module's provided
+capability is utilized by a downstream driver or module, that module's provided
 .BR strread ()
 or
 .BR strreadv ()
 procedures will be used instead of those described here.  The procedures described here are still
-available to the cooperating module or driver for callout.  Use of the
+available to the cooperating driver or module for callout.  Use of the
 .BR wantio (9)
 capability will affect the behaviour of
 .BR read (2s),
@@ -1047,6 +1072,21 @@ character device special files, the
 and
 .BR getpmsg (2s)
 system calls being used instead.
+.PP
+For
+.BR strread ()
+and
+.BR strreadv ()
+implementation details, see the
+.I src/modules/sth.c
+source file in the
+.B @PACKAGE@-@VERSION@
+distribution directory.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -1068,10 +1108,15 @@ system calls being used instead.
 and
 .BR strreadv ()
 have no known bugs.
+.BR strread ()
+and
+.BR strreadv ()
+are rigorously tested with the
+.BR test-streams (8)
+conformance test program.
 .\"
 .\"
 .SH COMPATIBILITY
-.\"
 .PP
 .BR strread ()
 is compatible with
@@ -1080,7 +1125,6 @@ and systems based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 Some
 .I STREAMS
 implementations treat the
@@ -1160,9 +1204,6 @@ flag and only use the
 flag and not the
 .B O_NDELAY
 flag.
-.IP \(em
-.IP \(em
-.IP \(em
 .\"
 .PP
 See

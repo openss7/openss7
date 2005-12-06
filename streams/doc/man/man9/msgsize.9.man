@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgsize.9.man,v 0.9.2.14 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: msgsize.9.man,v 0.9.2.15 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -173,7 +173,7 @@ or to include
 to access this symbol.
 However, portable
 .I STREAMS
-modules and drivers will not access this function.
+drivers and modules will not access this function.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -215,11 +215,11 @@ is also provided by
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not access this function.
+drivers and modules will not access this function.
 .IR Solaris \(rg
 compatible
 .I STREAMS
-modules and drivers may access this function.
+drivers and modules may access this function.
 .IP \(em
 The
 .IR Solaris \(rg
@@ -236,7 +236,7 @@ behaviour and will treat negative length message blocks as zero length.
 .IR Solaris \(rg
 compatible
 .I STREAMS
-modules and drivers will never pass messages where the difference between
+drivers and modules will never pass messages where the difference between
 .I b_wptr
 and
 .I b_rptr
@@ -269,7 +269,7 @@ svr4spg
 .IR Solaris \(rg
 compatible
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -283,7 +283,7 @@ instead of
 .\".IP ""
 .\"Portable
 .\".I STREAMS
-.\"modules and drivers will not directly access
+.\"drivers and modules will not directly access
 .\".I LiS
 .\"symbols.
 .IP \(em

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: RW_WRLOCK.9.man,v 0.9.2.12 2005/05/14 08:34:18 brian Exp $
+.\" @(#) $Id: RW_WRLOCK.9.man,v 0.9.2.13 2005/12/06 09:39:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -147,7 +147,7 @@ indeterminate.
 .PP
 .BR RW_WRLOCK ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .PP
 It is not necessary to raise the priority level using the
 .I pl

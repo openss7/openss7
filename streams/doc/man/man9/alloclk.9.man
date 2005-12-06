@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: alloclk.9.man,v 0.9.2.13 2005/11/30 00:56:12 brian Exp $
+.\" @(#) $Id: alloclk.9.man,v 0.9.2.15 2005/12/06 14:09:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 00:56:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 14:09:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,8 +75,8 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B alloclk
-\- allocate a
+.B alloclk, freelk
+\- allocate or free a
 .I STREAMS
 link block
 .\"
@@ -84,13 +84,23 @@ link block
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
 .HP
 .B struct linkblk *alloclk(void)
+.PD 0
+.HP
+.BI "void freelk(struct linkblk *" l ");
+.PD
 .\"
 .\"
 .SH ARGUMENTS
 .PP 
-None.
+.TP
+.I l
+the
+.BR linkblk (9)
+structure to free.
 .\"
 .\"
 .SH INTERFACE
@@ -112,13 +122,21 @@ or
 .BR I_PLINK (7)
 .BR ioctl (2s)
 operation.
+.PP
+.BR freelk ()
+frees the
+.BR linkblk (9)
+structure allocated with
+.BR alloclk ().
 .SS /proc File System
 .PP
 A
 .BR linkblk (9)
 is dynamically allocated for every Stream linked under a multiplexing driver.
 .BR alloclk ()
-monitors the number of
+and
+.BR freelk ()
+monitor the number of
 .BR linkblk (9)
 link blocks currently allocated, and the high water mark for allocations since the last reboot.
 The counts and high water mark can be viewed in
@@ -133,9 +151,11 @@ for details.
 .SH USAGE
 .PP
 .BR alloclk ()
-is an internal function, and is not recommended for direct use by
+and
+.BR freelk ()
+are internal functions, and are not recommended for direct use by
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .PP
 .BR alloclk ()
 is used by the
@@ -151,6 +171,9 @@ and
 input-output controls, as well as for tracking
 Streams
 that are linked under a multiplexing driver.
+.BR freelk ()
+is used to free the link block allocated with
+.BR alloclk ().
 .PP
 For details of the link block structure,
 see
@@ -167,6 +190,10 @@ Upon failure,
 will return a 
 .BR NULL
 pointer.
+.PP
+.BR freelk ()
+returns
+.BR void .
 .\"
 .\"
 .SH ERRORS
@@ -178,31 +205,55 @@ will return a
 pointer.
 .BR alloclk ()
 fails when there is insufficient cache memory to satisfy the allocation request.
+.PP
+.BR freelk ()
+always succeeds when passed a valid
+.I l
+link block pointer.
+When passed an invalid link block pointer, the results of
+.BR freelk ()
+are indeterminate.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR alloclk ()
+and
+.BR freelk ()
 can be called from any context, including user context, module procedures, call outs, callbacks,
-soft interrupts and interrupt service routines.
+soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.PP
+Care should be taken before calling
+.BR alloclk ()
+or
+.BR freelk ()
+from an ISR.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR alloclk ()
-is MP-safe.  The caller has exclusive access to the returned link block.
+and
+.BR freelk ()
+are MP-safe.  The caller has exclusive access to the returned link block.
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR alloclk ()
-is an internal function, and is not recommended for usage by
+and
+.BR freelk ()
+are internal functions, and are not recommended for direct use by
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .\"
 .\"
-.\".SH IMPLEMENTATION
-.\".PP
+.SH IMPLEMENTATION
+.PP
+.BR alloclk ()
+and
+.BR freelk ()
+allocate from and free to a private memory cache.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -220,13 +271,17 @@ modules and drivers.
 .SH BUGS
 .PP
 .BR alloclk ()
-has no known bugs.
+and
+.BR freelk ()
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
 .BR alloclk ()
-is compatible with descriptions of
+and
+.BR freelk ()
+are compatible with descriptions of
 .I STREAMS
 internals for
 .IR "SVR 4" ,
@@ -242,12 +297,14 @@ and systems based on
 do not export this function.
 .IP ""
 .BR alloclk ()
-is a
+and
+.BR freelk ()
+are
 .I STREAMS
-internal implementation specific function and will not be used directly by
+internal implementation specific functions and will not be used directly by
 portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .IP \(em
 Source and binary compatibility is not guaranteed, even from version to version, or release to
 release.
@@ -260,18 +317,22 @@ for additional compatibility considerations.
 .SH CONFORMANCE
 .PP
 .BR alloclk ()
-is an internal function specific to
+and
+.BR freelk ()
+are internal functions specific to
 .BR "@PACKAGE_TITLE@"
 .[
 @PACKAGE_TITLE@
 .]
-and has not be subjected to standardization.
+and have not be subjected to standardization.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR alloclk ()
-is specific to
+and
+.BR freelk ()
+are specific to
 .BR "@PACKAGE_TITLE@" .
 .[
 @PACKAGE_TITLE@

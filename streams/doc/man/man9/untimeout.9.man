@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: untimeout.9.man,v 0.9.2.19 2005/12/02 12:05:18 brian Exp $
+.\" @(#) $Id: untimeout.9.man,v 0.9.2.20 2005/12/06 09:39:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -254,7 +254,7 @@ stops a timer, it
 checks the list for the integer timer identifier with interrupts disabled.
 This is an exhaustive linear search.  This is inefficient.
 .I STREAMS
-modules or drivers that stop timers often will experience poorer performance
+drivers or modules that stop timers often will experience poorer performance
 than if the Linux kernel timer facility was used directly.
 .\".IP \(em
 .\"Symbol

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: weldq.9.man,v 0.9.2.19 2005/12/02 12:05:18 brian Exp $
+.\" @(#) $Id: weldq.9.man,v 0.9.2.20 2005/12/06 09:39:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -153,7 +153,7 @@ an optional queue to use for synchronization to protect the callback function.
 .\"and
 .\".BR unweldq (9)
 .\"utilities, respectively, establish and remove connections between one or two
-.\"pairs of module or driver queues.  Because the actual operation is done
+.\"pairs of driver or module queues.  Because the actual operation is done
 .\"asynchronously, the utilities specify a callback function and its argument.
 .\"The callback function is typically the
 .\".BR qenable (9)
@@ -291,7 +291,7 @@ error number.
 .PP
 .BR weldq ()
 can be called from any context, including user context, module procedures,
-call-outs, callbacks, soft interrupts and interrupt service routines.
+call-outs, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

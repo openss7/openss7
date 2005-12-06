@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.5 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.6 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -103,7 +103,7 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 .BR mi_open_detached ()
-creates an instance data structure and chains it into the list of module or driver instances.
+creates an instance data structure and chains it into the list of driver or module instances.
 In contrast to
 .BR mi_open_comm (9),
 .BR mi_open_detached ()
@@ -114,8 +114,8 @@ data.
 .SH USAGE
 .PP
 .BR mi_open_detached ()
-is typically called by modules or drivers that need to access a module or driver's instance data
-before the stream is created.  When the module or driver's
+is typically called by drivers or modules that need to access a driver or module's instance data
+before the stream is created.  When the driver or module's
 .IR qi_qopen (9)
 procedure is later called, this instance can be used as the new queue's instance data by associating
 it with the queue using
@@ -126,7 +126,7 @@ it with the queue using
 .PP
 When
 .BR mi_open_detached ()
-succeeds, it returns a pointer to the newly created module or driver instance data;
+succeeds, it returns a pointer to the newly created driver or module instance data;
 when it fails, it returns
 .BR NULL .
 .\"
@@ -138,7 +138,7 @@ When
 fails, it returns
 .BR NULL .
 .BR mi_open_detached ()
-fails when it cannot allocate memory for module or driver instance data.
+fails when it cannot allocate memory for driver or module instance data.
 .\"
 .\"
 .SH CONTEXT

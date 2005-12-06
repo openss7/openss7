@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mcopymsg.9.man,v 0.9.2.5 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mcopymsg.9.man,v 0.9.2.6 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -145,7 +145,7 @@ could destabilize the kernel or result in a kernel panic.
 .BR mcopymsg ()
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -160,7 +160,7 @@ message block.  This is normally the case when
 .BR mcopymsg ()
 is called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)

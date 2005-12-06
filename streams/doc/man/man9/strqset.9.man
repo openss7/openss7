@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqset.9.man,v 0.9.2.21 2005/12/05 01:42:49 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 0.9.2.22 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -177,7 +177,7 @@ must be zero (0).
 .BR strqset ()
 provides a mechanism whereby a
 .IR STREAMS (4)
-module or driver can change information
+driver or module can change information
 about a queue or queue band without directly accessing the
 .B queue
 or
@@ -357,7 +357,7 @@ code; that is, contexts asynchronous to the Stream containing
 .IR q .
 .IP ""
 .IR HP-UX \(rg
-compatible modules and drivers will not call
+compatible drivers and modules will not call
 .BR strqset ()
 from outside of a
 .BR qinit (9)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 0.9.2.23 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 0.9.2.24 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -268,7 +268,7 @@ message size.
 .PP
 .BR esballoc ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 The priority
 .B BPRI_WAITOK
 must only be used from a blocking context.
@@ -282,7 +282,8 @@ is MP-safe.  The caller has exclusive access to the returned message.
 .\"
 .SH NOTICES
 .PP
-Many post-SVR 4.2
+Many
+.RI post- "SVR 4.2"
 .[
 svr42
 .]
@@ -294,14 +295,16 @@ argument to
 .BR esballoc ().
 The message block
 .I priority
-was an SVR 3
+was an
+.I SVR 3
 .[
 svr3
 .]
 concept which was found not to be useful, primarily due to priority inversion.
 For a history of the
 .I priority
-mechanism and a discussion as to why the mechanism was abandoned in SVR 4.2,
+mechanism and a discussion as to why the mechanism was abandoned in
+.IR "SVR 4.2" ,
 .[
 svr42
 .]
@@ -583,7 +586,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]

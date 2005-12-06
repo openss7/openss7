@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qscan.9.man,v 0.9.2.3 2005/11/29 10:46:34 brian Exp $
+.\" @(#) $Id: qscan.9.man,v 0.9.2.4 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,11 +101,95 @@ implementation specific.
 .\"
 .SH DESCRIPTION
 .PP
-These are undocumented function that still need a manual page written for them.
+The
+Stream head,
+.BR sth (4),
+uses
+.BR qscan ()
+to place one its write queues on the scan list
+.I scanqhead
+for coallescing writes with the
+.B SO_STRHOLD
+feature (see
+.BR M_SETOPTS (9)).
 .\"
 .\"
 .SH USAGE
 .PP
+.I STREAMS
+provides a hold option that improves performance of
+.I STREAMS
+when the process issues many small writes.  The message hold option is enabled if the system
+adminstrator has changed the system control,
+.BR sys.streams.strhold ,
+to be non-zero and if the Stream head flag
+.B STRHOLD
+is set by a driver or module.
+A downstream driver or module sets the Stream head
+.B STRHOLD
+bit by issuing a
+.BR M_SETOPTS (9)
+message upstream with the
+.BR SO_STRHOLD
+flags bit set in the
+.I so_flags
+member of the
+.BR stroptions (9)
+structure contained in the message.  (The
+.BR ldterm (4)
+tty line discipline module does this.)  The process may also issue a
+.BR I_SWROPT (7)
+command to
+.BR ioctl (2s)
+with the
+.BR STRHOLD
+flag set in the argument to enable the hold option on a particular Stream, but this is a
+.B "@PACKAGE_TITLE@"
+extension.  Normally the hold option can only be activated and deactivated by a downstream module or
+driver.
+.PP
+The message hold option exploits the fact that
+.BR allocb (9)
+allocates a buffer with a data size that is always equal to or greater than
+.BR FASTBUF .
+The buffer is allocated and the data is copied into it.
+.BR write (2s)
+then checks to see if another
+.BR write (2s)
+of the same size will fit into the same buffer.  If it will, the buffer is held temporarily on the
+Stream head write queue, a timer is started (usually, 10 milliseconds, but settable with the
+.BR sys.streams.rtime
+system control), and the Stream head is linked onto the
+.I scanqhead
+list in the
+.I STREAMS
+scheduler by calling
+.BR qscan ().
+.PP
+One of three things will then happen:
+.IP (1) \w'(0)\(em'u
+A second
+.BR write (2s)
+occurs with a data part that is small enough to fit into the remaining portion of the saved buffer.
+The data is put into the buffer and sent downstream.  Since two writes have been sent downstream in
+one message, the optimization is successful.
+.IP (2)
+A second
+.BR write (2s)
+occurs with a data portion that is too big to fit into the remaining portion of the saved buffer.
+The saved message is sent downstream followed by another message holding the data of the second
+.BR write (2s).
+.IP (3)
+No second
+.BR write (2s)
+occurs so the timer expires.  The timeout processing performed by
+.BR queuerun (9)
+scans the
+.I scanqhead
+list in the
+.I STREAMS
+scheduler and sends downstream any messages held on the Stream head write queue whose timeouts have
+expired.
 .\"
 .\"
 .SH RETURN
@@ -125,32 +209,108 @@ is always successful.
 .PP
 .BR qscan ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR qscan ()
+is processor-specific and inherently MP-safe.
 .\"
 .\"
 .SH NOTICES
 .PP
+.BR qscan ()
+is an internal
+.I STREAMS
+function that was not intended to be called by the
+.I STREAMS
+driver or module writer.
+.BR qscan ()
+is not part of the DDI/DKI and should not be called by portable programs.
+.BR qscan ()
+is highly implementation dependent in function and prototype.  Use of this function by a driver or
+module will guarantee that it is not portable even between release of
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+In implementation it is not too difficult to multiplex a single timer against the
+.I scanqhead list, rather than setting a timer per Stream.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR sth (4),
+.BR M_SETOPTS (9),
+.BR stroptions (9),
+.BR ldterm (4),
+.BR I_SWROPT (7),
+.BR ioctl (2s),
+.BR allocb (9),
+.BR write (2s),
+.BR queuerun (9),
+.IR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
-These functions need a manual page.
+.BR qscan ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.IP \(em \w'\(em\(em'u
+.BR qscan ()
+is roughly compatible with the internal operations described for
+.IR "SVR 4 STREAMS"
+in
+.RI \(lq "The Magic Garden Explained"
+.[[\fB
+magic
+.]\fR].\(rq
+.IP ""
+.BR qscan ()
+is an internal function that will not be called by portable
+.I STREAMS
+drivers or modules.
+.IP \(em
+.IR Solaris \(rg
+.[
+solspg
+.]
+no longer implements this option.
+.IP \(em
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+and
+.IR LiS
+.[
+lis
+.]
+implement this option.
+.I LiS
+chooses the expensive route of running a 10 millisecond timer per Stream
+with the feature.  Since 10 milliseconds is a single tick on older
+.B Linux
+kernels, it is a particularly bad idea to run may single-tick timers.
+.IP ""
+.I STREAMS
+drivers and modules expecting performance from the system should use
+.BR "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+.IR "SVR 4.2 MP"
+and systems based on
+.I "SVR 4"
+do not export this function.
+.IP \(em
+Source and Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -159,10 +319,17 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2" .
+.[
+svr42spg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR qscan ()
+is new for
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

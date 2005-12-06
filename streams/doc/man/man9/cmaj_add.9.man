@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cmaj_add.9.man,v 0.9.2.4 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: cmaj_add.9.man,v 0.9.2.5 2005/12/06 09:39:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -300,7 +300,7 @@ returns
 .PP
 None of these functions are intended to be used by portable
 .I STREAMS
-modules and drivers.  They are exported primarily for use by
+drivers and modules.  They are exported primarily for use by
 .BR register_strdev (9)
 and
 .BR register_strnod (9)

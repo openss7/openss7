@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unbufcall.9.man,v 0.9.2.17 2005/12/02 12:05:18 brian Exp $
+.\" @(#) $Id: unbufcall.9.man,v 0.9.2.18 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -145,7 +145,7 @@ is invalid.
 .PP
 .BR unbufcall ()
 can be called from any context, including user context, module procedures,
-call outs, callbacks, soft interrupts and interrupt service routines.
+call outs, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -237,7 +237,7 @@ lis
 .]
 As buffer callbacks should be rare in most
 .I STREAMS
-module and driver designs, this is of little moment.
+driver and module designs, this is of little moment.
 .IP \(em
 In
 .I SVR 4

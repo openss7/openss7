@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: miocnak.9.man,v 0.9.2.5 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: miocnak.9.man,v 0.9.2.6 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -156,7 +156,7 @@ messages when performing
 .BR ioctl (2s)
 processing in a
 .I STREAMS
-module or driver write-side queue
+driver or module write-side queue
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -189,7 +189,7 @@ has indeterminate results and could destabilize the kernel or cause immediate or
 .BR miocnak ()
 can be called from any context; however, it is normally called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -204,7 +204,7 @@ in message block.  This is normally the case when
 .BR miocnak ()
 is called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)

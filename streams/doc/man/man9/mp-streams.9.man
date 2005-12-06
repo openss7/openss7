@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.23 2005/12/04 04:39:07 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.24 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/04 04:39:07 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -298,12 +298,12 @@ where only a single thread is permitted per Stream, but multiple threads are per
 Unfortunately, other MP-safe modules in the Stream must be prepared to accept this situation, as
 they may be relying on a different synchronization model within their modules.  Setting the
 .B STR_PERSTREAM
-flag for a module or driver indicates that, regardless of whether the module or driver is MP-safe or
-not, that it accepts being run in per-Stream synchronization when a non-MP-safe module or driver is
+flag for a driver or module indicates that, regardless of whether the driver or module is MP-safe or
+not, that it accepts being run in per-Stream synchronization when a non-MP-safe driver or module is
 in the same Stream.  As a Stream is built up and includes a non-MP-safe module, if all of the
 modules and driver on the Stream have the
 .B STR_PERSTREAM
-flag set, then the Stream will be run with per-Stream synchronization.  If any module or driver on
+flag set, then the Stream will be run with per-Stream synchronization.  If any driver or module on
 the Stream does not have the
 .B STR_PERSTREAM
 flag set, the all non-MP-safe modules on the Stream (and any of their instances in other Streams)
@@ -507,10 +507,10 @@ module, Stream, queue pair or queue before calling the function.
 .TS
 tab(:);
 lbw(14n)0c0ls.
-qi_qopen\fR(9):\ \(en\ :the module or driver open routine
-qi_qclose\fR(9):\ \(en\ :the module or driver close routine
-qi_putp\fR(9):\ \(en\ :the module or driver put procedure
-qi_srvp\fR(9):\ \(en\ :the module or driver service procedure
+qi_qopen\fR(9):\ \(en\ :the driver or module open routine
+qi_qclose\fR(9):\ \(en\ :the driver or module close routine
+qi_putp\fR(9):\ \(en\ :the driver or module put procedure
+qi_srvp\fR(9):\ \(en\ :the driver or module service procedure
 .TE
 .PP
 .B @PACKAGE_TITLE@
@@ -948,8 +948,8 @@ in the same fashion as a service procedure would.  Under
 .BR getq (9),
 .BR flushq (9),
 .BR flushband (9),
-are safe to be called asyncrhonously on a Stream end.  The difference with this approach, however,
-is that the method is only applicable to MP-safe drivers, because syncrhonization with the framework
+are safe to be called asynchronously on a Stream end.  The difference with this approach, however,
+is that the method is only applicable to MP-safe drivers, because synchronization with the framework
 is not peformed for an interrupt service routine.
 .PP
 This method relies on
@@ -980,7 +980,7 @@ This second method is not as portable
 Because the first method, for all intents and purposes, should perform just as well as the second
 method, it is recommended that portable
 .I STREAMS
-modules and drivers only use the first method for driver write queues.  Under the first method, only
+drivers and modules only use the first method for driver write queues.  Under the first method, only
 .BR enableq (9)
 or
 .BR qenable (9)
@@ -1050,30 +1050,30 @@ ltbctbctbltbsss
 ltbctctltsss.
 UP Functions:Context:State:Notes
 _
-appq\fR(9):\(en:frozen:T{
+appq\fR(9):either:frozen:T{
 Can be called from any context.  The Stream should be frozen by the caller.
 Takes ownership of the passed in message on success, not on failure.
 T}
-insq\fR(9):\(en:frozen:\^
+insq\fR(9):either:frozen:\^
 putq\fR(9):either:thawed:\^
 putbq\fR(9):either:thawed:\^
 
-rmvq\fR(9):\(en:frozen:T{
+rmvq\fR(9):either:frozen:T{
 These utilities dereference a
 .I q_next
 pointer in the Stream, and must be called from a synchronous context for in intermediate module, but
-may be called in asyncrhonous context for a Stream end.  The Stream can also, however, be
+may be called in asynchronous context for a Stream end.  The Stream can also, however, be
 frozen by the caller.
 .BR rmvq (9)
 must be called with the Stream frozen by the caller.
 T}
-getq\fR(9):end:thawed:\^
-flushq\fR(9):end:thawed:\^
-flushband\fR(9):end:thawed:\^
+getq\fR(9):either:thawed:\^
+flushq\fR(9):either:thawed:\^
+flushband\fR(9):either:thawed:\^
 
 .T&
 ltbctctltsss.
-bcanput\fR(9):srvp:thawed:T{
+bcanput\fR(9):either:thawed:T{
 These two can only be called from an
 asynchronous context
 when the queue that is the argument of the call has a
@@ -1081,7 +1081,7 @@ when the queue that is the argument of the call has a
 service procedure.  Otherwise, they must be called from a
 context synchronized on the queue.
 T}
-canput\fR(9):srvp:thawed:\^
+canput\fR(9):either:thawed:\^
 
 canenable\fR(9):either:thawed:T{
 Can be called from any context.  The Stream may be frozen by the caller.
@@ -1105,7 +1105,7 @@ is the worst: if not called from a synchronous context, the return value cannot 
 valid.
 T}
 qcountstrm\fR(9):sync:thawed:\^
-qreply\fR(9):sync:thawed:\^
+qreply\fR(9):either:thawed:\^
 _
 .T&
 ltbctbctbltbsss
@@ -1137,24 +1137,24 @@ routine belonging to
 T}
 qprocson\fR(9):open:thawed:\^
 
-bcanputnext\fR(9):sync:thawed:T{
+bcanputnext\fR(9):either:thawed:T{
 These utilities dereference a
 .I q_next
 pointer in the Stream,
 and must be called from a
 synchronous context.  The Stream can, however, be frozen by the caller.
 T}
-canputnext\fR(9):sync:thawed:\^
-putnext\fR(9):sync:thawed:\^
-putnextctl\fR(9):sync:thawed:\^
-putnextctl1\fR(9):sync:thawed:\^
-putnextctl2\fR(9):sync:thawed:\^
+canputnext\fR(9):either:thawed:\^
+putnext\fR(9):either:thawed:\^
+putnextctl\fR(9):either:thawed:\^
+putnextctl1\fR(9):either:thawed:\^
+putnextctl2\fR(9):either:thawed:\^
 
-strqset\fR(9):\(en:frozen:T{
+strqset\fR(9):either:frozen:T{
 Can be called from any context.  They take or return a queue state variable and, therefore, the
 Stream must be frozen by the caller.
 T}
-strqget\fR(9):\(en:frozen:\^
+strqget\fR(9):either:frozen:\^
 
 unfreezestr\fR(9):\(en:frozen:T{
 Must be called with the Stream frozen by the caller.
@@ -1169,7 +1169,8 @@ and
 .BR unfreezestr (9),
 permits an otherwize asynchronous code sequence to run within an exclusive, synchronous context on
 .IR q .
-However, portable
+.IP ""
+Portable
 .I STREAMS
 drivers and modules will only call
 .BR appq (9),
@@ -1188,38 +1189,57 @@ In general,
 must be called with the Stream, containing
 .IR q ,
 frozen by the caller.
+.B "@PACKAGE_TITLE@"
+permits all utilities
+(except
+.BR freezestr (9),
+.BR qprocson (9),
+.BR qprocsoff (9))
+to be called on a Stream frozen by the caller, because it uses caller
+recursive freeze locks, however, some implementations will lock the kernel.
+.IP ""
 Portable
 .I STREAMS
-modules and drivers will not call any other queue utilities with the Stream frozen
+drivers and modules will not call any other queue utilities with the Stream frozen
 by the caller.
-.IP ""
-.B "@PACKAGE_TITLE@"
-permits all utilities to be called on a Stream frozen by the caller, because it uses caller
-recursive freeze locks, however, some implementations will lock the kernel.
 .IP \(bu
+Some implementations place restrictions on
 .BR putq (9),
 .BR putbq (9),
-utilities that place messages on the queue,
-should only be called from within a procedure belonging to
+and utilities that place messages on the queue.
+.B "@PACKAGE_TITLE@"
+permits all utilities that place mesages on or remove message from a queue to be called from outside
+a procedure of
 .IR q ,
-but may be called from an asyncrhonous context as well.
+providing that the caller ensures the validity of
+.I q
+across the call.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will call utilities the places messages on the queue (other than
+.BR putq (9))
+only from within a procedure belonging to
+.IR q .
 .IP \(bu
+Some implementations place restrictions on
 .BR getq (9),
 .BR flushq (9),
 .BR flushband (9),
-queue utilities that remove messages from the queue,
-must be called from within a procedure belonging to
+and queue utilities that remove messages from the queue.
+.B "@PACKAGE_TITLE@"
+permits all utilities that place mesages on or remove message from a queue to be called from outside
+a procedure of
+.IR q ,
+providing that the caller ensures the validity of
 .I q
-for intermediate modules, but may be called from a context asynchronous to
-.I q
-provided that
-.I q
-is a Stream end.
-These utilities might back-enable the Stream and must, therefore, be synchronized to the Stream.
-.BR qbackenable (9)
-performs syncrhonization before back-enabling when
-.I q
-belongs to a Stream end.
+across the call.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will call utilities the remove messages from the queue
+only from within a procedure belonging to
+.IR q .
 .IP \(bu
 For testing flow control and passing messages to a put procedure,
 .BR canput (9),
@@ -1229,14 +1249,15 @@ For testing flow control and passing messages to a put procedure,
 .BR putctl1 (9),
 .BR putctl2 (9),
 can be called from an asynchronous context and passed a queue from a Stream end queue pair.
+.IP ""
 Portable
 .I STREAMS
-modules and drivers will only call these functions
+drivers and modules will only call these functions
 with a Stream end queue pointer,
 .IR q .
 Portable
 .I STREAMS
-modules and drivers will also only call
+drivers and modules will also only call
 .BR canput (9)
 and
 .BR bcanput (9)
@@ -1259,13 +1280,16 @@ synchronous context on
 that is, from
 .IR q 's
 put or service procedure.
-.IP ""
 .B "@PACKAGE_TITLE@"
-allows these to be called on a Stream frozen by the caller as well, however, portable
+allows these to be called from an asynchronous context, and on a Stream frozen by the caller, as
+well.
+.IP ""
+Portable
 .I STREAMS
-modules and drivers will only call these on thawed Streams, and only from a module or driver put or
-service procedure for
-.IR q .
+drivers and modules can call these functions from an asynchronous context, but must ensure the
+validity of the
+.I q
+pointer passed to them across the call.
 .\"
 .\"
 .SH MP-STREAMS
@@ -1299,7 +1323,7 @@ So, generally, any operation that invokes
 .IR qi_qopen (9)
 or
 .IR qi_qclose (9)
-to create or destroy the queue pair instance of a module or driver in a Stream, plus any welding of
+to create or destroy the queue pair instance of a driver or module in a Stream, plus any welding of
 Streams.
 .BR I_LINK (7),
 .BR I_UNLINK (7),
@@ -1331,11 +1355,109 @@ reader-writer lock for read.  This means that any queue procedure, call-out, and
 synchronized on a queue, can dereference any
 .I q_next
 pointer within the Stream to which the synchronizing queue belongs, without any special treatment.
-These procedures, call-outs and callbacks can use
+.PP
+Some other implementations (e.g.,
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+place restrictions upon which queue pointers can be passed to which utility functions and which
+utility functions can be called from within the
 .I STREAMS
-utilities that require
-.BR in_streams (9)
-context.
+framework and which can be called from outside the
+.I STREAMS
+framework.
+.PP
+.B "@PACKAGE_TITLE@"
+does not place such restrictions on most
+.I STREAMS
+utilities.  The only
+.I STREAMS
+utilities that are restricted are
+.BR qprocson (9),
+and
+.BR qprocsoff (9),
+which must be called from a
+.IR qi_qopen (9)
+open, or
+.IR qi_qclose (9)
+close routine for a driver or module.
+The remaining utilities can be called from outside of
+.I STREAMS
+provided that the caller can ensure the validity of any passed in queue pointer,
+.IR q ,
+and exclusive access to any passed in message,
+.IR mp .
+.PP
+The validity of a passed in queue pointer, or its
+.I q_next
+pointer is guaranteed by
+.B "@PACKAGE_TITLE@"
+whenever it (or its pair) was passed to a module procedure, callout, or synchronous callback.
+Asynchronous callbacks passed
+.I q
+(or its pair) as an argument from a module procedure, callout, or synchronous callback, may
+also use
+.I q
+or
+.IR q->q_next .
+.PP
+From outside of a module procedure, callout, or callback that meets the above criteria, the caller
+must ensure the validity of the passed in
+.I q
+pointer.  From an asynchronous callback associated with
+.IR q ,
+provided that the driver or module follows rules for cancelling asyncrhonous callbacks in the driver
+or modules
+.IR qi_qclose (9)
+close routine,
+.I q
+is valid within the asyncrhonous callback.
+.PP
+Within a device, pseudo-device or multiplexing driver, either the driver's upper multiplex read
+queue or the driver's lower multiplex write queue can be passed to most functions, provided that the
+driver will not offer any reference to
+.I q
+to asynchronous  procedures before
+.BR qprocson (9)
+has returned, and will
+cancel any reference to
+.I q
+available to these asychronous procedures (e.g., interrupt service routines) before the call to
+.BR qprocsoff (9).
+Also, the multiplexing driver can pass the
+.I q
+pointer of a lower mutliplexer write queue, provided that the driver can make the same assurances
+with regard to the
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7)
+operations.
+.PP
+Under
+.B "@PACKAGE_TITLE@"
+it is always safe to use the form,
+.BI canput( q->q_next )
+as well as
+.BI canputnext( q ),
+even
+.BI put( q->q_next )
+instead of
+.BI putnext( q ),
+from within a module procedure, callout, synchronous callback, or asynchronous callback invoked from
+within a context synchronous on
+.IR q .
+From a purely asynchronous module procedure, callback, or subsystem outside of
+.IR STREAMS ,
+the
+.I q->q_next
+form is forbidden.  From these asynchronous contexts, use the
+.RB \(lq next \(rq
+versions of the functions when referring to the next queue instead.
+.PP
+.B "@PACKAGE_TITLE@"
+provides maximum portability and compatibility in this regard.
 .\"
 .\"
 .SS Freezing
@@ -1387,6 +1509,55 @@ being entered after the Stream is frozen by any thread other than the thread tha
 but allows threads already executing in a queue procedure to proceed.  This is in accordance with
 the descriptions for
 .BR freezestr (9).
+.PP
+Many other implementations require that a Stream (and queue) be frozen by the caller with
+.BR freezestr (9),
+across a call to
+.BR appq (9),
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9),
+and require that a Stream (and queue)
+.B not
+be frozen by the caller with
+.BR freezestr (9),
+across a call to
+.BR putq (9),
+.BR putbq (9),
+.BR getq (9),
+.BR put (9),
+.BR putnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+and a host of others.
+The precise functions vary from implementation to implementation.  See
+.BR freezestr (9)
+for more information.
+.PP
+.B "@PACKAGE_TITLE@"
+permits all queue functions other than
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR freezestr (9),
+to be called on a Stream frozen by the caller.
+.B "@PACKAGE_TITLE@"
+also permits
+.BR appq (9),
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9),
+to be called on a thawed Stream provided that the caller provides some other mutual exclusion to
+guarantee the validity of any arguments that reference a message on the queue.
+For example, a driver's read queue can only have messages placed on the queue and taken off of the
+the queue by a driver procedure.  With driver-private locks, it is possible to ensure that at a
+given point in time the queue state is frozen even though the Stream is thawed.
+.PP
+.B "@PACKAGE_TITLE@"
+provides maximum portability and compatibility in this regard.
 .\"
 .\"
 .SS Queue Pointers

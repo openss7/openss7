@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamtab.9.man,v 0.9.2.12 2005/12/02 12:05:18 brian Exp $
+.\" @(#) $Id: streamtab.9.man,v 0.9.2.13 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -129,9 +129,9 @@ structure, defined in
 .RB < sys/stream.h >,
 is the principal structure used to define a
 .I STREAMS
-module or driver.  A reference to the
+driver or module.  A reference to the
 .B streamtab
-structure is a unique reference to the module or driver.
+structure is a unique reference to the driver or module.
 .PP
 The
 .B streamtab
@@ -142,7 +142,7 @@ and
 .BR module_stat (9),
 structures, provide the complete definition for a
 .I STREAMS
-module or driver.
+driver or module.
 .PP
 All modules only specify the first two members
 .RI ( st_rdinit
@@ -222,7 +222,7 @@ Once defined, the
 .B streamtab
 structure must be registered with the
 .I STREAMS
-subsystem for the module or driver to be available for use in the
+subsystem for the driver or module to be available for use in the
 .BR GNU/Linux
 system.  Registration can be effected using
 .BR register_strmod (9),
@@ -235,7 +235,7 @@ Once registered, the
 .B streamtab
 structure is used by
 .I STREAMS
-when created an instance of a module or driver, also when linking a Stream beneath a multiplexing
+when created an instance of a driver or module, also when linking a Stream beneath a multiplexing
 driver.
 .IP \(bu \w'\(bu\(em'u
 .I STREAMS
@@ -289,7 +289,7 @@ structure is statically allocated and associated with statically allocated
 .BR qinit (9)
 structures to define a
 .I STREAMS
-module or driver.
+driver or module.
 .PP
 Once the
 .B streamtab
@@ -299,7 +299,7 @@ subsystem, using a registration function such as
 .BR register_strmod (9)
 or
 .BR register_strdev (9),
-all fields in the structure must be treated as read-only by a module or driver.  The following
+all fields in the structure must be treated as read-only by a driver or module.  The following
 guidelines pertain to the use of the fields in the
 .B streamtab
 structure:
@@ -314,7 +314,7 @@ must not be altered after the
 .B streamtab
 structure has been registered, and before it is unregistered.
 .IP \(bu
-The members of the structure may be read by a module or driver to locate the attached
+The members of the structure may be read by a driver or module to locate the attached
 .BR qinit (9)
 structures when there exists no
 .BR queue (9)

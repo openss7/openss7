@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: alloc_proto.9.man,v 0.9.2.14 2005/05/14 08:34:19 brian Exp $
+.\" @(#) $Id: alloc_proto.9.man,v 0.9.2.15 2005/12/06 09:39:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -190,11 +190,11 @@ svr3
 .]
 remnant and should not be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .PP
 Portable
 .I STREAMS
-modules and drivers should not rely on the behaviour of the implementation in
+drivers and modules should not rely on the behaviour of the implementation in
 response to a particular setting of the
 .I bpri
 argument.
@@ -250,7 +250,7 @@ or a related callback.
 .PP
 .BR alloc_proto ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .PP
 The priority
 .B BPRI_WAITOK

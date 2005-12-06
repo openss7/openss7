@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.28 2005/12/03 06:51:22 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.29 2005/12/06 09:39:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -282,7 +282,7 @@ will enable the queue if the queue is not inhibited with
 .BR noenable (9)
 and one of the following conditions also holds true:
 .IP \(bu \w'\(bu\(em'u
-The module or driver has just been opened for the first time: that is, the queue is empty and has
+The driver or module has just been opened for the first time: that is, the queue is empty and has
 always been empty.
 .IP \(bu
 .BR getq (9)
@@ -430,7 +430,7 @@ framework, but only from within a queue
 .IR qi_putp (9)
 put procedure.  Drivers that need to put messages to their own queues from outside the
 .I STREAMS
-framework (asyncrhonously) should use
+framework (asynchronously) should use
 .BR put (9)
 instead.
 .PP
@@ -649,7 +649,7 @@ soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .BR putq ()
 can be called from a context asynchronous to
 .IR STREAMS ,
-such as an asyncrhonous callback, tasklet, bottom half, or interrupt service routine.
+such as an asynchronous callback, tasklet, bottom half, or interrupt service routine.
 .\"
 .\"
 .SH MP-STREAMS
@@ -813,7 +813,7 @@ Because the caller is responsible for the message upon failure, the return value
 should alway be examined.
 Portable
 .I STREAMS
-modules and drivers will always examine the return value from
+drivers and modules will always examine the return value from
 .BR putq ()
 and take responsibility for the passed in message if
 .BR putq ()
@@ -1018,7 +1018,7 @@ bug is not perpetuated in
 .IP ""
 Portable
 .I STREAMS
-modules and drivers can rely on intermediate band strutures being allocated
+drivers and modules can rely on intermediate band strutures being allocated
 when a
 normal priority
 message is placed on a queue using
@@ -1079,7 +1079,7 @@ approach is very efficient.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not depend on the ordering of
+drivers and modules will not depend on the ordering of
 .BR qband (9)
 structures within the
 .I q_bandp
@@ -1123,7 +1123,7 @@ is in effect or if the stream is closing.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use releases of
+drivers and modules will not use releases of
 .I LiS
 prior to
 .IR "OpenSS7 Release LiS-2.16.18-17" .
@@ -1163,7 +1163,7 @@ to be called on a stream frozen with
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR putq ()
 on a stream currently frozen by the caller with
 .BR freezestr (9).
@@ -1196,7 +1196,7 @@ includes an assertion to enforce this in the SMP environment.)
 .\".IP ""
 .\"Portable
 .\".I STREAMS
-.\"modules and drivers will not call
+.\"drivers and modules will not call
 .\".BR putq ()
 .\"from any context outside a
 .\".I STREAMS
@@ -1240,7 +1240,7 @@ No other implementation has this bug.
 .IP ""
 Portable
 .I STREAMS
-applications programs, modules and drivers will use
+applications programs, drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .

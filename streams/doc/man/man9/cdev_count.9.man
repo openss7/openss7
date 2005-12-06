@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdev_count.9.man,v 0.9.2.4 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: cdev_count.9.man,v 0.9.2.5 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -301,7 +301,7 @@ device numbers per major.
 .PP
 None of these functions are intended to be used by portable
 .I STREAMS
-modules and drivers.  They are exported primarily for use by the
+drivers and modules.  They are exported primarily for use by the
 .BR clone (4),
 .BR nsdev (4),
 and

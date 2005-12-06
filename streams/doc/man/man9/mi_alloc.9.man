@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_alloc.9.man,v 0.9.2.2 2005/07/03 17:40:14 brian Exp $
+.\" @(#) $Id: mi_alloc.9.man,v 0.9.2.3 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -225,11 +225,11 @@ q = mi_alloc(sizeof(*q), BPRI_HI);
 This is because sizes of fundamental system data structures may change and yet binary compatibility
 of
 .I STREAMS
-modules and drivers can be maintained.  Also, the implementation of a fundamental structure might be
+drivers and modules can be maintained.  Also, the implementation of a fundamental structure might be
 larger than the public declaration of that structure: that is, there are additional members hidden
 from the system programmer.  Portable
 .I STREAMS
-modules and drivers will not allocate fundamental system data structures using
+drivers and modules will not allocate fundamental system data structures using
 .BR mi_alloc (),
 .BR mi_alloc_sleep (),
 .BR mi_zalloc ()

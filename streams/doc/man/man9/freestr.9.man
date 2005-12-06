@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freestr.9.man,v 0.9.2.8 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: freestr.9.man,v 0.9.2.9 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -134,7 +134,7 @@ is always successful.
 .PP
 .BR freestr ()
 can be called from any context, including user context, module procedures, call outs, callbacks,
-soft interrupts and interrupt service routines.
+soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -149,7 +149,7 @@ is MP-safe; however, the caller must ensure exclusive access to the passed in st
 .BR freestr ()
 is an internal function, and is not recommended for usage by
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .BR freestr ()
 is only made available for use by specialized modules distributed with this
 .I STREAMS
@@ -167,7 +167,7 @@ poses no useful portable purpose.
 .BR freestr ()
 will not be called by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .\"
 .\"
 .\".SH IMPLEMENTATION
@@ -221,7 +221,7 @@ with the following portability considerations:
 .BR freestr ()
 should not be called by normal
 .I STREAMS
-modules or drivers and is implementation specific.
+drivers or modules and is implementation specific.
 .IP \(em
 This function is not exported by
 .I "SVR 4.2 MP DDI/DKI"

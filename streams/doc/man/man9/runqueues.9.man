@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: runqueues.9.man,v 0.9.2.7 2005/12/02 12:05:17 brian Exp $
+.\" @(#) $Id: runqueues.9.man,v 0.9.2.8 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:17 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -115,13 +115,13 @@ event.
 .BR runqueues ()
 processes outstanding events in the following order:
 .IP 1) \w'0)\(em'u
-.I Syncrhonization queue events:-
+.I Synchronization queue events:-
 Processes backlogged
 .I STREAMS
 events awaiting access to sychronization queues (barriers).
 .IP ""
 This is a funny one, because if there exists a synchronization queue, there exists a queue against
-which to defer these events.  I still have to convert the entire process to execute syncrhonization
+which to defer these events.  I still have to convert the entire process to execute synchronization
 queue events waiting outside barriers when a task leaves the barrier instead of with
 .I STREAMS
 scheduling in this manner.
@@ -198,7 +198,7 @@ executive.
 .IP ""
 .BR weldq (9)
 events are normally deferred in this manner when no synchronization queue exists.
-When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
+When a synchronization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_UNWELDQ
 This is a deferred
@@ -211,7 +211,7 @@ executive.
 .IP ""
 .BR unweldq (9)
 events are normally deferred in this manner when no synchronization queue exists.
-When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
+When a synchronization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_STRPUT
 This is a deferred
@@ -224,7 +224,7 @@ executive.
 .IP ""
 .BR streams_put (9)
 events are normally deferred in this manner when no synchronization queue exists.
-When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
+When a synchronization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_WRITER
 This is a deferred
@@ -237,7 +237,7 @@ executive.
 .IP ""
 .BR qwriter (9)
 events are normally deferred in this manner when no synchronization queue exists.
-When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
+When a synchronization queue exists, they are normally deferred against that synchronization queue.
 .TP
 .B SE_PUTP
 This is a deferred
@@ -250,7 +250,7 @@ executive.
 .IP ""
 .IR qi_putp (9)
 events are normally deferred in this manner when no synchronization queue exists.
-When a syncrhonization queue exists, they are normally deferred against that synchronization queue.
+When a synchronization queue exists, they are normally deferred against that synchronization queue.
 .RE
 .IP 4)
 .I Buffer callbacks:-
@@ -295,7 +295,7 @@ is an internal
 .I STREAMS
 function that should not be used by
 .I STREAMS
-modules and drivers directly.
+drivers and modules directly.
 It is intended for use by specialized
 .I STREAMS
 modules that implement a specialized stream head.
@@ -369,7 +369,7 @@ only runs outstanding tasks queued against the current processor.
 .SH NOTICES
 .PP
 .BR runqueues ()
-does not invoke syncrhonization queue events that are waiting outside the outer or inner barrier due
+does not invoke synchronization queue events that are waiting outside the outer or inner barrier due
 to the current thread of execution being inside one of those barriers.  It requires the calling
 thread to leave the barrier before those events will be processed.  See
 .BR mp-streams (9).

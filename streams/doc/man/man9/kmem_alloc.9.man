@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_alloc.9.man,v 0.9.2.21 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: kmem_alloc.9.man,v 0.9.2.22 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -174,12 +174,12 @@ q = kmem_alloc(sizeof(*q), KM_SLEEP);
 This is because sizes of fundamental system data structures may change and yet binary compatibility
 of
 .I STREAMS
-modules and drivers can be maintained.
+drivers and modules can be maintained.
 Also, the implementation of a fundamental structure might be larger than the public declaration of
 that structure: that is, there are additional fields hidden from the system programmer.
 Portable
 .I STREAMS
-modules and drivers will not allocate fundamental system datastructures using
+drivers and modules will not allocate fundamental system datastructures using
 .BR kmem_alloc (),
 but will instead use the system-provided structure-specific allocator.
 .\"
@@ -254,7 +254,7 @@ allocates to the enclosing power of two size.  Also,
 will not allocate less than 32 bytes.
 Portable
 .I STREAMS
-modules and drivers will not make assuptions about the excess memory allocated by
+drivers and modules will not make assuptions about the excess memory allocated by
 .BR kmem_alloc ().
 .PP
 .BR kmem_alloc ()
@@ -273,12 +273,12 @@ of 120 bytes is requested, 128 bytes will be allocated and the 128 bytes will be
 aligned.
 Portable
 .I STREAMS
-modules and drivers, however, will make no assumptions about the excess or the alignment of the
+drivers and modules, however, will make no assumptions about the excess or the alignment of the
 memory returned by
 .BR kmem_alloc (),
 except that the
 .I STREAMS
-module or driver is assured that the alignment of the returned memory will be suitable for holding
+driver or module is assured that the alignment of the returned memory will be suitable for holding
 any basic data type or structure.
 .PP
 .BR kmem_alloc ()
@@ -289,7 +289,7 @@ allocates memory in power of two chunks between 32 bytes and 131072 bytes.
 allocations are physically contiguous memory.
 Portable
 .I STREAMS
-modules and drivers make no assumptions about the physical contiguousness of memory allocated with
+drivers and modules make no assumptions about the physical contiguousness of memory allocated with
 .BR kmem_alloc ().
 .PP
 .BR kmem_alloc ()
@@ -302,7 +302,7 @@ the memory should be set to known contents or allocated using
 instead.  (Secure functions should know better than to deallocate memory without wiping it clean.)
 Portable
 .I STREAMS
-modules and drivers will always initialize the contents of the memory returned by
+drivers and modules will always initialize the contents of the memory returned by
 .BR kmem_alloc ().
 .\"
 .\"
@@ -399,7 +399,7 @@ lis
 .IP ""
 Portable
 .I STREAMS
-modules and drivers may use
+drivers and modules may use
 .BR kmem_alloc ()
 for kernel memory allocation.
 .IP \(em
@@ -437,7 +437,7 @@ lis
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not pass a size of zero (0) in the
+drivers and modules will not pass a size of zero (0) in the
 .I size
 argument to
 .BR kmem_alloc ().
@@ -455,7 +455,7 @@ No other implementation mentions these.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will only use the flags
+drivers and modules will only use the flags
 .BR KM_SLEEP " and " KM_NOSLEEP
 when calling
 .BR kmem_alloc ().
@@ -470,7 +470,7 @@ and should not be used by portable programs.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will only use the flags
+drivers and modules will only use the flags
 .BR KM_SLEEP " and " KM_NOSLEEP
 when calling
 .BR kmem_alloc ().
@@ -532,7 +532,7 @@ as a macro.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B Linux Fast-STREAMS
 in place of
 .IR LiS .

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.30 2005/12/05 01:42:48 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.31 2005/12/06 09:39:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -738,7 +738,7 @@ bug is not perpetuated in
 .IP ""
 Portable
 .I STREAMS
-modules and drivers can rely on intermediate band strutures being allocated
+drivers and modules can rely on intermediate band strutures being allocated
 when a
 normal priority
 message is placed on a queue using
@@ -790,7 +790,7 @@ approach is very efficient.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not depend on the ordering of
+drivers and modules will not depend on the ordering of
 .BR qband (9)
 structures within the
 .I q_bandp
@@ -826,7 +826,7 @@ code; that is, contexts asynchronous to the Stream containing
 .IR q .
 .IP ""
 .IR HP-UX \(rg
-compatible modules and drivers will not call
+compatible drivers and modules will not call
 .BR putbq ()
 from outside of a
 .BR qinit (9)
@@ -859,7 +859,7 @@ procedure processing has been turned off (e.g. with
 .IP ""
 Porable
 .I STREAMS
-modules and drivers will not pass
+drivers and modules will not pass
 .B NULL
 or invalid pointers to
 .BR putbq ().
@@ -917,7 +917,7 @@ do not free the message.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B Linux Fast-STREAMS
 in place of
 .IR LiS .
@@ -965,7 +965,7 @@ to be called on a stream frozen with
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR putbq ()
 on a stream currently frozen by the caller with
 .BR freezestr (9).
@@ -995,7 +995,7 @@ includes an assertion to enforce this in the SMP environment.)
 .\".IP ""
 .\"Portable
 .\".I STREAMS
-.\"modules and drivers will not call
+.\"drivers and modules will not call
 .\".BR putbq ()
 .\"from any context outside a
 .\".I STREAMS
@@ -1039,7 +1039,7 @@ No other implementation has this bug.
 .IP ""
 Portable
 .I STREAMS
-applications programs, modules and drivers will use
+applications programs, drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .

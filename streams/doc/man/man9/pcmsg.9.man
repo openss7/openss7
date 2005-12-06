@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pcmsg.9.man,v 0.9.2.15 2005/12/02 12:05:15 brian Exp $
+.\" @(#) $Id: pcmsg.9.man,v 0.9.2.16 2005/12/06 09:39:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -142,7 +142,7 @@ always succeeds.
 .PP
 .BR pcmsg ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -265,7 +265,7 @@ over testing against
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will test
+drivers and modules will test
 .I b_datap->db_type
 against
 .B QPCTL

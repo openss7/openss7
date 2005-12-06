@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.6 2005/11/29 10:46:26 brian Exp $
+.\" @(#) $Id: M_PCRSE.9.man,v 0.9.2.7 2005/12/06 09:39:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:26 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -103,7 +103,7 @@ message block followed by an unspecified number of message blocks of unspecified
 .PP
 The
 .B M_PCRSE
-message is a high priority message reserved for internal use by module and driver writers.
+message is a high priority message reserved for internal use by driver and module writers.
 .PP
 The message format is one
 .B M_PCRSE
@@ -123,7 +123,7 @@ messages arriving at the
 Stream head
 will be discarded (ignored and freed).
 .B M_PCRSE
-messages can be generated and consumed by modules and drivers.
+messages can be generated and consumed by drivers and modules.
 .\"
 .\"
 .SH USAGE
@@ -136,13 +136,13 @@ message will do (except for the purpose of portability).
 .B M_PCRSE
 is not really intended for inter-module communication but for cases where a specialized,
 non-portable communication facility is required.  This message can also be used to distinguish
-messages that a module or driver places on its own queues (e.g, when passing messages across a
+messages that a driver or module places on its own queues (e.g, when passing messages across a
 multiplexing driver).
 .PP
 Nevertheless, to support the passing of
 .B M_PCRSE
-message between modules, or between module and driver, when necessary and appropriate, the following
-guidelines should be followed by modules and drivers with regard to the
+message between modules, or between driver and module, when necessary and appropriate, the following
+guidelines should be followed by drivers and modules with regard to the
 .B M_PCRSE
 message:
 .IP \(bu \w'\(bu\(em'u
@@ -155,7 +155,7 @@ A driver that does not recognize an
 .B M_PCRSE
 message, discards the message.
 .IP \(bu
-A module or driver processing an
+A driver or module processing an
 .B M_PCRSE
 message does so with regard is own internal definition.
 .\"
@@ -199,7 +199,7 @@ lis
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B @PACKAGE_TITLE@
 .[
 lfs

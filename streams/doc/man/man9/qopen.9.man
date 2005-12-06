@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qopen.9.man,v 0.9.2.12 2005/11/29 10:46:33 brian Exp $
+.\" @(#) $Id: qopen.9.man,v 0.9.2.13 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B qopen
-\- call a \fISTREAMS\fR module or driver open routine
+\- call a \fISTREAMS\fR driver or module open routine
 .\"
 .\"
 .SH SYNOPSIS
@@ -90,7 +90,7 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
-pointer to the module or driver's read queue.
+pointer to the driver or module's read queue.
 .PD 0
 .TP
 .I devp
@@ -121,7 +121,7 @@ is an internal
 .B @PACKAGE_TITLE@
 function which invokes the
 .I STREAMS
-module or driver
+driver or module
 .IR qi_qopen (9)
 routine associated with
 .IR q .
@@ -135,29 +135,29 @@ returns
 .RB [ ENOPKG ].
 If
 .BR mp-streams (9)
-synchronization has been specified for the module or driver, the inner synchronization barrier is
-entered shared or exlusive, according to the synchornization specification for the module or driver.
+synchronization has been specified for the driver or module, the inner synchronization barrier is
+entered shared or exlusive, according to the synchornization specification for the driver or module.
 Otherwise, the
 .IR qi_qopen (9)
 routine is invoked directly.
 .BR qopen ()
-then returns the value returned by the module or driver
+then returns the value returned by the driver or module
 .IR qi_qopen (9)
 routine.
 .PP
 .BR qopen ()
 accepts the same arguments as the
 .IR qi_qopen (9)
-routine defined for the module or driver,
+routine defined for the driver or module,
 and, with the exception of
 .RB [ ENOPKG ],
-returns the same error numbers as the module or driver
+returns the same error numbers as the driver or module
 .IR qi_qopen (9)
 routine.
 .PP
 Since the
 .BR qopen ()
-function directly invokes the module or driver
+function directly invokes the driver or module
 .IR qi_qopen (9)
 routine, the description of the
 .IR qi_qopen (9)
@@ -168,6 +168,24 @@ See
 and
 .IR qi_qopen (9)
 for details.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR qopen ()
+is an internal
+.I STREAMS
+function that is not intended to be called
+directly by the driver or module writer.  See
+.BR open (2s)
+and
+.BR I_PUSH (7)
+for indirect methods of invoking this function.  See
+.IR qi_qopen (9)
+for design guidelines for writing driver or module open routines.
+This function is exported for
+use by clone drivers and stream heads.  See
+.BR register_inode (9).
 .\"
 .\"
 .SH RETURN
@@ -204,7 +222,7 @@ routines:
 .RB [ ENXIO ]
 the
 .IR qi_qopen ()
-routine for the module or driver failed.
+routine for the driver or module failed.
 .TP
 .RB [ ENXIO ]
 a driver was opened as a module.
@@ -222,7 +240,7 @@ same as
 above.
 .TP
 .RB [ ENOMEM ]
-memory could not be allocated to hold the module or driver's private
+memory could not be allocated to hold the driver or module's private
 structures.
 .TP
 .RB [ ENOBUFS ]
@@ -256,23 +274,23 @@ and no locks held.
 .\"
 .SH MP-STREAMS
 .PP
-If the module or driver has a
+If the driver or module has a
 .BR mp-streams (9)
 specification,
 .BR qopen ()
 will enter the inner synchronization barrier shared or exclusive (depending on the specification)
 before invoking the
 .IR qi_qopen (9)
-routine for the module or driver.  Before return,
+routine for the driver or module.  Before return,
 .BR qopen ()
 will leave the inner synchronization barrier.
 .PP
-Otherwise, if the module or driver does not have a
+Otherwise, if the driver or module does not have a
 .BR mp-streams (9)
 specification, or does not specify an inner barrier,
 the
 .IR qi_qopen (9)
-routine of the module or driver will be called directly.
+routine of the driver or module will be called directly.
 .PP
 See
 .BR mp-streams (9),
@@ -284,21 +302,18 @@ for more information.
 .BR qopen ()
 is an internal
 .I STREAMS
-function that is not intended to be called
-directly by the module or driver writer.  See
-.BR open (2s)
-and
-.BR I_PUSH (7)
-for indirect methods of invoking this function.  This function is exported for
-use by clone drivers and stream heads.  See
-.BR register_inode (9).
+function which was not intended to be called directly by
+.I STREAMS
+drivers or modules.
+.BR qopen ()
+is not part of the DDI/DKI and should not be called by portable programs.
 .\"
 .\"
 .SH EXAMPLES
 .PP
 See
 .IR qi_qopen (9)
-for examples of module and driver open routines.
+for examples of driver and module open routines.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -357,9 +372,9 @@ svr4spg
 .BR qopen ()
 will not be used by portable
 .I STREAMS
-modules and drivers, and the
+drivers and modules, and the
 .IR qi_qopen (9)
-routine of a module or driver will not be directly invoked.
+routine of a driver or module will not be directly invoked.
 .PP
 See
 .BR STREAMS (9)

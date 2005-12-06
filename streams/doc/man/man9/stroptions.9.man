@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: stroptions.9.man,v 0.9.2.3 2005/11/29 10:46:35 brian Exp $
+.\" @(#) $Id: stroptions.9.man,v 0.9.2.4 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -106,7 +106,8 @@ struct stroptions {
 .SH MEMBERS
 .PP
 The following members correspond to
-SVR 4.2 EFT members:
+.IR "SVR 4.2 EFT"
+members:
 .TP \w'\fIso_readopt\fR\(em'u
 .I so_flags
 .RS
@@ -316,7 +317,7 @@ Flags and members of the
 .BR stdata (9)
 structure should not be manipulated directly by
 .I STREAMS
-modules and drivers.
+drivers and modules.
 See also the
 .BR stdata (9)
 for details on the Stream head structure.
@@ -331,9 +332,9 @@ Members of the
 .BR stdata (9)
 structure should not be access directly by
 .I STREAMS
-modules and drivers.  Portable
+drivers and modules.  Portable
 .I STREAMS
-modules and drivers should use the facilities provide by the
+drivers and modules should use the facilities provide by the
 .BR M_SETOPTS (9)
 message containing this
 .B stroptions
@@ -448,7 +449,7 @@ magic
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will avoid use of the
+drivers and modules will avoid use of the
 .BR SO_DELIM ", " SO_NODELIM ", " SO_STRHOLD
 flags and will not use the
 .BR SO_LOOP ", " SO_ERROPT ", " SO_COPYOPT " or " SO_MAXBLK
@@ -480,7 +481,8 @@ documentation.
 .PP
 The
 .B stroptions
-structure was introduced in SVR 4.
+structure was introduced in
+.IR "SVR 4" .
 .[
 svr4spg
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.19 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.20 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -181,7 +181,7 @@ always succeed.
 and
 .BR drv_msectohz ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -225,7 +225,7 @@ function, as coverted value can easily overflow a
 .BR clock_t .
 Portable
 .I STREAMS
-modules and drivers will only convert differences between successive calls to
+drivers and modules will only convert differences between successive calls to
 .BR drv_getparm (9)
 or retrieval of
 .BR lbolt (9)
@@ -293,7 +293,7 @@ and
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -337,7 +337,8 @@ specific.
 .SH HISTORY
 .PP
 .BR drv_hztousec "() and " drv_usectohz ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_first_dev_ptr.9.man,v 0.9.2.3 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mi_first_dev_ptr.9.man,v 0.9.2.4 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -107,7 +107,7 @@ is a
 .IR MPS \(rg-specific
 convenience function that assists without housekeeping during
 .I STREAMS
-module or driver
+driver or module
 .IR qi_qopen (9),
 .BR I_LINK (7),
 .BR I_PLINK (7),
@@ -124,7 +124,7 @@ and
 .BR mi_close_comm (9),
 maintain a list of
 .I STREAMS
-module or driver instances in a list global to the module or driver.
+driver or module instances in a list global to the driver or module.
 Both pushable module instances as well as device driver instances can be maintained in the same list.
 .PP
 Pushable module instances are those instances that were added to the list with
@@ -154,7 +154,7 @@ can then be used to iterate through the device driver instances in the list.
 .BR mi_first_dev_ptr ()
 is used when the caller wishes to iterate through only the device driver instances on a
 .I STREAMS
-module or driver global instance list.
+driver or module global instance list.
 .BR mi_first_dev_ptr ()
 is passed the same statically allocated
 .I head

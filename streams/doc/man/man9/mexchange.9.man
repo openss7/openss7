@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mexchange.9.man,v 0.9.2.4 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mexchange.9.man,v 0.9.2.5 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -211,7 +211,7 @@ In general, buffer calls using
 should be used instead of the rather dubious practice of attempting to reuse message blocks.
 This practice may permit a
 .I STREAMS
-module or driver to continue in the face of a system buffer leak that has exhausted the buffer pool;
+driver or module to continue in the face of a system buffer leak that has exhausted the buffer pool;
 however, it is still dubious.
 .PP
 .BR mexchange ()
@@ -260,7 +260,7 @@ is unusable, and a new message block could not be allocated.
 .BR mexchange ()
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -275,7 +275,7 @@ message block.  This is normally the case when
 .BR mexchange ()
 is called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)

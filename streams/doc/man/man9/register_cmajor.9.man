@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_cmajor.9.man,v 0.9.2.7 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: register_cmajor.9.man,v 0.9.2.8 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -264,7 +264,7 @@ is an internal
 .B @PACKAGE_TITLE@
 implementation specific function that will not be called directly by
 .I STREAMS
-modules or drivers.
+drivers or modules.
 The symbol is exported for the use of the
 Stream head
 .BR sth (4),

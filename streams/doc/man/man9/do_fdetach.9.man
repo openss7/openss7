@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: do_fdetach.9.man,v 0.9.2.5 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: do_fdetach.9.man,v 0.9.2.6 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -138,7 +138,7 @@ call.
 .BR do_fdetach ()
 has no other use or purpose, and will not be used by
 .I STREAMS
-modules and drivers other than the Stream head,
+drivers and modules other than the Stream head,
 .BR sth (4)
 module.
 .\"
@@ -227,7 +227,7 @@ was not searchable.
 can only be invoked in user process context.  Note that this does include kernel module
 initialization and termination routines as well as
 .I STREAMS
-module or driver
+driver or module
 .IR qi_qopen (9)
 open routines
 and
@@ -262,9 +262,9 @@ is configured as a separate loadable kernel module.  (The symbol need not be exp
 .BR do_fdetach ()
 will not be called by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .I STREAMS
-modules and drivers calling this function that exist outside the
+drivers and modules calling this function that exist outside the
 .B @PACKAGE@-@VERSION@
 package, might be broken from verion to version and release to release.
 .\"

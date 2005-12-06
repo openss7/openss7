@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: srvp.9.man,v 0.9.2.1 2005/11/25 23:42:08 brian Exp $
+.\" @(#) $Id: srvp.9.man,v 0.9.2.2 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/25 23:42:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B srvp
-\- invoke a \fISTREAMS\fR module or driver service procedure
+\- invoke a \fISTREAMS\fR driver or module service procedure
 .\"
 .\"
 .SH SYNOPSIS

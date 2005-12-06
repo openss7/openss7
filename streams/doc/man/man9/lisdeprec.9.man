@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lisdeprec.9.man,v 0.9.2.1 2005/04/13 07:51:11 brian Exp $
+.\" @(#) $Id: lisdeprec.9.man,v 0.9.2.2 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -150,8 +150,8 @@ is no longer an exported symbol, and has been removed from the compatibility mod
 .SS lis_allocq
 .PP
 .BR lis_allocq ()
-has no known bugs but has a different argument declaration that the SVR 4.2
-.I STREAMS
+has no known bugs but has a different argument declaration that the
+.I SVR 4.2 STREAMS
 .[
 svr42
 .]

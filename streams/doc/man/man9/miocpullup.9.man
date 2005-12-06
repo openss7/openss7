@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: miocpullup.9.man,v 0.9.2.5 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: miocpullup.9.man,v 0.9.2.6 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -169,7 +169,7 @@ resource could not be allocated to complete the operation.
 .BR miocpullup ()
 can be called from any non-interrupt context, but is normally called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -184,7 +184,7 @@ message block.  This is normally the case when
 .BR miocpullup ()
 is called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)

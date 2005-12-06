@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DDI.9.man,v 0.9.2.12 2005/11/29 10:46:25 brian Exp $
+.\" @(#) $Id: DDI.9.man,v 0.9.2.13 2005/12/06 09:39:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:25 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -390,7 +390,9 @@ sort-adjacent-labels
 .PP
 .B Implemented Functions
 .PP
-The following SVR 4 functions are implemented in the base functionality of
+The following
+.I SVR 4
+functions are implemented in the base functionality of
 .B Linux Fast-STREAMS
 to support simple \fISTREAMS\fR programming techniques:
 .PP
@@ -446,7 +448,13 @@ to support simple \fISTREAMS\fR programming techniques:
 .\"
 .SS "SVR 4.2 MP DDI/DKI Compatibility Functions"
 .PP
-The following SVR 3, SVR 4 and SVR 4.2 functions are implemented when SVR 4.2
+The following
+.IR "SVR 3" ,
+.I SVR 4
+and
+.I SVR 4.2
+functions are implemented when
+.I SVR 4.2
 compatibility is selected when building the kernel.
 .PP
 .B Implemented Functions
@@ -525,8 +533,15 @@ compatibility is selected when building the kernel.
 .PP
 .B Unimplemented Functions
 .PP
-The following SVR 4 functions are not implemented here although they are
-mentioned in the \fISTREAMS\fR Programming Guide for SVR 4.  Each of these
+The following
+.I SVR 4
+functions are not implemented here although they are
+mentioned in the \fISTREAMS\fR Programming Guide for
+.IR "SVR 4" .
+.[
+svr4spg
+.]
+Each of these
 functions has a suitable
 .B Linux
 Kernel API function.  Use the 
@@ -587,19 +602,22 @@ Kernel API function were possible instead:
 .\"
 .SS "AIX\(rg 5L Version 5.1 Compatibility Functions"
 .PP
-SVR 4.2 MP DDI/DKI compatible functions should be selected above for AIX
+.IR "SVR 4.2 MP DDI/DKI"
+compatible functions should be selected above for AIX
 \fISTREAMS\fR compatibility.
 .\"
 .\"
 .SS "HP-UX\(rg 11.0i v2 Compatibility Functions"
 .PP
-SVR 4.2 MP DDI/DKI compatible functions should be selected above for HP-UX
+.IR "SVR 4.2 MP DDI/DKI"
+compatible functions should be selected above for HP-UX
 \fISTREAMS\fR compatibility.
 .\"
 .\"
 .SS "OSF/1 1.2\(emDigial UNIX\(rg Compatibility Functions"
 .PP
-SVR 4.2 MP DDI/DKI compatible functions should be selected above for OSF
+.IR "SVR 4.2 MP DDI/DKI"
+compatible functions should be selected above for OSF
 \fISTREAMS\fR compatibility.
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_STOPI.9.man,v 0.9.2.6 2005/11/29 10:46:27 brian Exp $
+.\" @(#) $Id: M_STOPI.9.man,v 0.9.2.7 2005/12/06 09:39:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:27 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -130,7 +130,7 @@ messages arriving at the
 Stream head
 will be discarded (ignored and freed).
 .B M_STOP
-messages can be generated and consumed by modules and drivers.
+messages can be generated and consumed by drivers and modules.
 .\"
 .\"
 .SH USAGE
@@ -195,7 +195,7 @@ lis
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B @PACKAGE_TITLE@
 .[
 lfs

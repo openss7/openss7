@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getminor.9.man,v 0.9.2.20 2005/12/02 15:15:51 brian Exp $
+.\" @(#) $Id: getminor.9.man,v 0.9.2.21 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 15:15:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -211,7 +211,7 @@ always succeeds.
 .PP
 .BR getminor ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -392,13 +392,15 @@ documentation.
 .SH HISTORY
 .PP
 .BR getminor ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]
 .BR minor (9)
 first appeared as
-in SVR 3.
+in
+.IR "SVR 3" .
 .[
 svr3
 .]

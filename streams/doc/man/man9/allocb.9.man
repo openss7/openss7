@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.27 2005/12/02 12:05:11 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.28 2005/12/06 09:39:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -217,7 +217,7 @@ under conditions when it is acceptable to sleep awaiting the allocation of a mes
 .PP
 Non-portable
 .I STREAMS
-modules and drivers must only use
+drivers and modules must only use
 .BR BPRI_WAITOK
 from a blocking context; that is, it is acceptable to use this priority from within a module or
 driver
@@ -227,7 +227,7 @@ open or
 close routine.
 An example of a situation where
 .B BPRI_WAITOK
-would be used from a module or driver
+would be used from a driver or module
 .IR qi_qopen (9)
 open routine would be when the module needs to pre-allocate message blocks for use by
 .IR qi_putp (9)
@@ -239,7 +239,7 @@ open routine.
 .PP
 For consistency with past implementations of
 .IR STREAMS ,
-it is common practise for a module or driver to specify
+it is common practise for a driver or module to specify
 .B BPRI_MED
 for all message allocations with
 .BR allocb ().
@@ -625,7 +625,7 @@ procedure (which run in user context and may sleep).
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .BR BPRI_WAITOK
 priority.
 .IP \(em

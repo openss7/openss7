@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.19 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.20 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -166,7 +166,7 @@ is the preferred method of accessing these primary variables.
 .PP
 .BR drv_getparm ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 The credentials returned by
 .B UCRED
 and the task structure returned by

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.4 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.5 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -141,7 +141,7 @@ and
 .BR mi_copy_state (9).
 .PP
 .BR mi_copyin_n ()
-is used to copy data from a user-space to the kernel.  When a module or driver
+is used to copy data from a user-space to the kernel.  When a driver or module
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgutil.9.man,v 0.9.2.14 2005/11/26 11:17:12 brian Exp $
+.\" @(#) $Id: msgutil.9.man,v 0.9.2.15 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -199,7 +199,7 @@ returns zero.
 .PP
 Message utility functions
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -238,7 +238,8 @@ These functions should probably return \fIsize_t\fR instead of \fIint\fR.
 .\"
 .SH COMPATIBILITY
 .PP
-These message functions are source-level compatible with SVR 4.2 DDI/DKI,
+These message functions are source-level compatible with
+.IR "SVR 4.2 DDI/DKI" ,
 .[
 usldk
 .]
@@ -262,15 +263,15 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 DDI/DKI,
+.IR "SVR 4.2 DDI/DKI" ,
 .[
 usldk
 .]
-SVID,
+.IR "SVID" ,
 .[
 svid
 .]
-XID.
+.IR "XID" .
 .[
 xbd5
 .]
@@ -279,7 +280,8 @@ xbd5
 .SH HISTORY
 .PP
 Most of these message utility functions first appeared
-in SVR 4 DDI/DKI.
+in
+.IR "SVR 4 DDI/DKI" .
 .[
 svr4dk
 .]

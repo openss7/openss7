@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.21 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.22 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -282,7 +282,7 @@ argument is set to 0.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not pass a size of zero (0) in the
+drivers and modules will not pass a size of zero (0) in the
 .I size
 argument to
 .BR kmem_alloc ().
@@ -296,7 +296,7 @@ flags.  No other implementation mentions these.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will only use the flags
+drivers and modules will only use the flags
 .BR KM_SLEEP " and " KM_NOSLEEP
 when calling
 .BR kmem_zalloc ().

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qready.9.man,v 0.9.2.3 2005/11/29 10:46:34 brian Exp $
+.\" @(#) $Id: qready.9.man,v 0.9.2.4 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -156,7 +156,7 @@ is an internal
 function which was not intended to be called by
 the
 .I STREAMS
-module or driver writer.
+driver or module writer.
 .BR qready ()
 is not part of the DDI/DKI and should not be called by portable programs.
 .BR qready ()
@@ -207,7 +207,7 @@ magic
 .BR qready ()
 is an internal function that will not be called by portable
 .I STREAMS
-modules or drivers.
+drivers or modules.
 .IP \(em
 .I SVR 4.2 MP
 and systems based on

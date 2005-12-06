@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cmn_err.9.man,v 0.9.2.19 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: cmn_err.9.man,v 0.9.2.20 2005/12/06 09:39:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -235,7 +235,7 @@ incorrect format strings and arguments at compile time.)
 and
 .BR icmn_err ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -326,7 +326,8 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-SVR 4 systems normally print a newline at before the information provided to
+.I "SVR 4"
+systems normally print a newline at before the information provided to
 .BR cmn_err ()
 unless the
 .B CE_CONT
@@ -382,7 +383,7 @@ nor
 .BR vcmn_err ()
 will be used by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .IP \(em
 .IR IRIX \(rg
 .[
@@ -396,7 +397,7 @@ breaks locks under panic, so this is not the case for
 .BR "Linux Fast-STREAMS" .
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR cmn_err ()
 with a level of
 .B CE_PANIC
@@ -412,7 +413,7 @@ documents a limited set of format specifiers for the format string.  These are:
 also documents that length specifiers are not permitted on these format specifiers.
 Portable
 .I STREAMS
-modules and drivers will not use format specifiers that include length specifications and will
+drivers and modules will not use format specifiers that include length specifications and will
 restrict the format string to use only the format specifiers
 .BR %s ", " %u ", " %d ", " %o ",  and " %x .
 .IP \(em
@@ -462,7 +463,11 @@ usldk
 .SH HISTORY
 .PP
 .BR cmn_err ()
-is a System V function that first appeared in SVR 2.
+is a System V function that first appeared in
+.IR "SVR 2" .
+.[
+svr2
+.]
 .\"
 .\"
 .[

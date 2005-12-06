@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush.9.man,v 0.9.2.9 2005/11/30 13:59:23 brian Exp $
+.\" @(#) $Id: autopush.9.man,v 0.9.2.10 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 13:59:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: autopush.9.man,v $
+.\" Revision 0.9.2.10  2005/12/06 09:39:10  brian
+.\" - finalizing more manual pages
+.\"
 .\" Revision 0.9.2.9  2005/11/30 13:59:23  brian
 .\" - updating manpages
 .\"
@@ -169,7 +172,7 @@ is only used by the Stream head,
 .BR sth (4),
 and should not be used by any portable
 .I STREAMS
-module or driver.
+driver or module.
 .\"
 .\"
 .SH RETURN
@@ -230,7 +233,7 @@ is only exported for use by the Stream head,
 .BR sth (4),
 when loaded as a separate kernel module.  This function should never be invoked directly by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .\"
 .\"
 .\".SH IMPLEMENTATION
@@ -283,7 +286,7 @@ magic
 .BR autopush ()
 is an internal function that will not be called by portable
 .I STREAMS
-modules or drivers.
+drivers or modules.
 .PP
 See
 .BR STREAMS (9)

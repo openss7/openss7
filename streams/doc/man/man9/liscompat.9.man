@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: liscompat.9.man,v 0.9.2.5 2005/05/14 08:34:25 brian Exp $
+.\" @(#) $Id: liscompat.9.man,v 0.9.2.6 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:25 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,8 +139,8 @@ symbols for performance and efficiency.
 .\"
 .\"
 .PP
-Many of the SVR 4.2
-.I STREAMS
+Many of the
+.I SVR 4.2 STREAMS
 functions provided by
 .I LiS
 .[

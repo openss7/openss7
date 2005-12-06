@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strmod_add.9.man,v 0.9.2.15 2005/11/26 11:17:13 brian Exp $
+.\" @(#) $Id: strmod_add.9.man,v 0.9.2.16 2005/12/06 09:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -122,7 +122,7 @@ module.  This structure does not have to be statically allocated.
 .BR strmod_add ()
 is used to configure
 .I STREAMS
-modules and drivers into the kernel.  It allows
+drivers and modules into the kernel.  It allows
 .I STREAMS
 drivers to add entry points in character device switch tables.  Modules are
 added to the
@@ -165,13 +165,13 @@ The
 .B streamadm
 structure defines additional configuration information for
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .IR OSF/1 \(rg
 uses this structure in addition to the traditional
 .B streamtab
 structure when configuring a
 .I STREAMS
-module or driver.
+driver or module.
 .PP
 .nf
 \fC\s-1
@@ -199,7 +199,7 @@ lfs
 .]
 .TP
 .B sa_flags
-Flags specifying additional characteristics of the module or driver being
+Flags specifying additional characteristics of the driver or module being
 added.  The flags are a bitwise OR of one or more of the following flags:
 .RS
 .TP
@@ -236,17 +236,17 @@ can be specified.
 .B STR_SYSV4_OPEN
 The
 .I STREAMS
-module or driver being registered follows
+driver or module being registered follows
 .I SVR 4
 .IR qi_qopen (9)
 semantics.  If this flag is not set, the
-module or driver obeys
+driver or module obeys
 .I SVR 3
 .IR qi_qopen (9)
 semantics.
 .TP
 .B STR_QSAFETY
-When this flag is set, it indicates that the module or driver requires
+When this flag is set, it indicates that the driver or module requires
 interrupt-safe callback functions.  Setting this flag causes the
 .I STREAMS
 executive to suppress interrupts while executing all asynchronous callback
@@ -254,7 +254,7 @@ functions.
 .RE
 .TP
 .B sa_name
-The unique name of the module or driver.  Modules and drivers share a common
+The unique name of the driver or module.  Modules and drivers share a common
 name space.  The maximum length for a name is set by
 .BR FMNAMESZ ,
 which is typically set to eight (8) characters.
@@ -265,7 +265,7 @@ name that must be used as the argument of an
 IO control
 .RB (see streamio (7))
 for a pushable module.  It is also used as the name for verification of module
-presence for both modules and drivers with the
+presence for both drivers and modules with the
 .BR sad (4)
 driver and the
 .BR autopush (8)
@@ -274,7 +274,7 @@ utility.
 .B sa_ttys
 A pointer to the
 .BR ttys ()
-routine that wil be used by the module or driver.  When the module or driver
+routine that wil be used by the driver or module.  When the driver or module
 is added with
 .BR strmod_add (),
 this pointer will be placed in the
@@ -295,7 +295,7 @@ drivers.  The synchronization level specifies the number of concurrent thread
 of execution that can be within a scope.
 For additional information concerning the synchronization of
 .I STREAMS
-modules and drivers, see
+drivers and modules, see
 .BR mt-streams (9).
 The scope can be specified at one of
 a number of levels as follows:

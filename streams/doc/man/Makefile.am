@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/12/03 06:51:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/12/06 14:09:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/03 06:51:21 $ by $Author: brian $
+# Last Modified $Date: 2005/12/06 14:09:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1232,7 +1232,6 @@ man_MANS = \
 	man9/qreply.9 \
 	man9/qscan.9 \
 	man9/qsize.9 \
-	man9/queinfo.9 \
 	man9/queue.9 \
 	man9/queue_t.9 \
 	man9/register_clone.9 \
@@ -1285,7 +1284,6 @@ man_MANS = \
 	man9/timo_fcn_t.9 \
 	man9/toid_t.9 \
 	man9/unbufcall.9 \
-	man9/undoc.9 \
 	man9/unfreezestr.9 \
 	man9/unlinkb.9 \
 	man9/unlinkmsg.9 \
@@ -2490,7 +2488,6 @@ dist_noinst_MANS = \
 	man9/qreply.9.man \
 	man9/qscan.9.man \
 	man9/qsize.9.man \
-	man9/queinfo.9.man \
 	man9/queue.9.man \
 	man9/queue_t.9.man \
 	man9/register_clone.9.man \
@@ -2543,7 +2540,6 @@ dist_noinst_MANS = \
 	man9/timo_fcn_t.9.man \
 	man9/toid_t.9.man \
 	man9/unbufcall.9.man \
-	man9/undoc.9.man \
 	man9/unfreezestr.9.man \
 	man9/unlinkb.9.man \
 	man9/unlinkmsg.9.man \

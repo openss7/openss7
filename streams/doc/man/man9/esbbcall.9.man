@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esbbcall.9.man,v 0.9.2.24 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: esbbcall.9.man,v 0.9.2.25 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -159,14 +159,16 @@ The message block needed is for a high priority buffer.
 .PP
 The
 .I priority
-argument is ignored by SVR 4.2
+argument is ignored by
+.I SVR 4.2
 .[
 svr42
 .]
 and later
 .I STREAMS
 implementations.  This
-argument is only used by SVR 3
+argument is only used by
+.I SVR 3
 .[
 svr3
 .]
@@ -468,7 +470,8 @@ to set the
 when memory becomes available.
 The bufcall list is thus scheduled to run on the next invocation of
 .BR runqueues (9).
-This procedure is consistent with that described for SVR 4.
+This procedure is consistent with that described for
+.IR "SVR 4" .
 .[
 magic
 .]

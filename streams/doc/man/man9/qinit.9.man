@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qinit.9.man,v 0.9.2.15 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: qinit.9.man,v 0.9.2.16 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -112,38 +112,38 @@ svr42spg
 members:
 .TP \w'qi_qadmin\(em'u
 .I qi_putp
-module or driver
+driver or module
 .IR qi_putp (9)
 procedure.
 .PD 0
 .TP
 .I qi_srvp
-module or driver
+driver or module
 .IR qi_srvp (9)
 procedure
 .TP
 .I qi_qopen
-module or driver
+driver or module
 .IR qi_qopen (9)
 routine.
 .TP
 .I qi_qclose
-module or driver
+driver or module
 .IR qi_qclose (9)
 routine.
 .TP
 .I qi_qadmin
-module or driver
+driver or module
 .IR qi_qadmin (9)
 routine.
 .TP
 .I qi_minfo
-module or driver defining
+driver or module defining
 .BR module_info (9)
 structure.
 .TP
 .I qi_mstat
-module or driver statistics
+driver or module statistics
 .BR module_stat (9)
 structure.
 .PD
@@ -168,7 +168,7 @@ structure, defined in
 .RB < sys/stream.h >,
 is a statically allocated structure that is used in the definition of a
 .I STREAMS
-module or driver.
+driver or module.
 When a
 Stream
 is created as a result of a call to
@@ -184,7 +184,7 @@ Pointers to two or four
 .B qinit
 structures are used as the primary definition of a
 .I STREAMS
-module or driver in the
+driver or module in the
 .BR streamtab (9)
 structure.
 Two
@@ -203,7 +203,7 @@ The
 .IR qi_qclose ,
 and
 .IR qi_qadmin
-represent the primary functional entry points into the module or driver and are invoked at the
+represent the primary functional entry points into the driver or module and are invoked at the
 appropriate times by the
 .I STREAMS
 scheduler.
@@ -247,13 +247,13 @@ structure of a queue pair.
 .I qi_qopen
 specifies the
 .IR qi_qopen (9)
-routine for the module or driver.
+routine for the driver or module.
 The
 .IR qi_qopen (9)
-routine is called whenever a new queue pair forming an instance of the module or driver is
+routine is called whenever a new queue pair forming an instance of the driver or module is
 allocated, initialized and inserted into a Stream, or whenever existing Stream is reopened, for each
-module and driver in the Stream.  This routine permits the module or driver to perform whatever
-module or driver private initialization is necessary before the queue pair becomes active in the
+driver and module in the Stream.  This routine permits the driver or module to perform whatever
+driver or module private initialization is necessary before the queue pair becomes active in the
 Stream, or to respond to a subsequent opening of the Stream.  Error numbers returned by this function
 are reflected as error numbers returned in
 .BR errno (3)
@@ -262,7 +262,7 @@ from the
 or
 .BR I_PUSH (2s)
 operation that invoked the routine.
-All modules and drivers must have a
+All drivers and modules must have a
 .BI qi_qopen
 routine defined.
 See
@@ -272,15 +272,15 @@ for details.
 .I qi_qclose
 specifies the
 .IR qi_qclose (9)
-routine for the module or driver.
+routine for the driver or module.
 The
 .IR qi_qclose (9)
-routine is called before a queue pair forming an instance of the module or driver is
-removed from the Stream and deallocated.  This routine permits the module or driver to perform
-whatever module or driver private cleanup or deallocation is necessary before the queue pair is
+routine is called before a queue pair forming an instance of the driver or module is
+removed from the Stream and deallocated.  This routine permits the driver or module to perform
+whatever driver or module private cleanup or deallocation is necessary before the queue pair is
 deactivated and removed from the Stream.  Error numbers returned by this function are generally
 discarded.
-All modules and drivers must have a
+All drivers and modules must have a
 .BI qi_qclose
 routine defined.
 See
@@ -290,7 +290,7 @@ for details.
 .I qi_putp
 specifies the
 .IR qi_putp (9)
-procedure for the module or driver.
+procedure for the driver or module.
 The
 .IR qi_putp (9)
 procedure is invoked during active use of the queue pair whenever a message is passed to either
@@ -309,7 +309,7 @@ The return value of the
 .IR qi_putp (9)
 procedure is ignored by
 .IR STREAMS .
-All modules and drivers must have a
+All drivers and modules must have a
 .BI qi_putp
 procedure defined.
 See
@@ -319,10 +319,10 @@ for details.
 .I qi_srvp
 specifies the
 .IR qi_srvp (9)
-procedure for the module or driver.
+procedure for the driver or module.
 The
 .IR qi_srvp (9)
-procedure for a module or driver services the messages that are placed on the corresponding message
+procedure for a driver or module services the messages that are placed on the corresponding message
 queue.
 The
 .IR qi_srvp (9)
@@ -341,7 +341,7 @@ The return value of the
 .IR qi_srvp (9)
 procedure is ignored by
 .IR STREAMS .
-It is optional for a module or driver to define a
+It is optional for a driver or module to define a
 .IR qi_srvp (9)
 procedure: if one is not defined,
 .I qi_srvp
@@ -354,7 +354,7 @@ for details.
 .I qi_qadmin
 specifies the administrative routine return by
 .BR getadmin (9)
-for the module or driver.
+for the driver or module.
 The
 .I qi_qadmin
 function pointer is for a module private administrative function that is not normally used.
@@ -363,9 +363,9 @@ never invokes the
 .I qi_qadmin
 function; however, the
 .BR getadmin (9)
-utility can be used to locate this function and it may be invoked by a module or driver procedure,
+utility can be used to locate this function and it may be invoked by a driver or module procedure,
 or by any other kernel subsystem at the module designer's option.
-It is optional for a module or driver to define a
+It is optional for a driver or module to define a
 .BR getadmin (9)
 procedure: normally,
 .I qi_qadmin
@@ -382,7 +382,7 @@ For a description of the use and guidelines for the
 .IR qi_putp ,
 and
 .IR qi_srvp ,
-functions provided by a module or driver, see
+functions provided by a driver or module, see
 .BR getadmin (9),
 .IR qi_qopen (9),
 .IR qi_qclose (9),
@@ -396,7 +396,7 @@ The
 .I qi_minfo
 member points to a
 .BR module_info (9)
-structure that contains the name and identifier for the module or driver.  The
+structure that contains the name and identifier for the driver or module.  The
 .I qi_minfo
 .BR module_info (9)
 structure also contains the initialization queue packet size and flow control limits used to
@@ -434,7 +434,7 @@ and
 .IR mi_idname ,
 provide read-only information concerning the module identification number [see
 .BR getmid (9)]
-and module name, associated with the module or driver.
+and module name, associated with the driver or module.
 .PP
 See
 .BR queue (9)
@@ -466,7 +466,7 @@ member is set to
 .PP
 .I STREAMS
 will not maintain the statistics in this structure whether it is provided or not.  It is the
-responsibility of the module or driver designer to increment counts in this structure as is
+responsibility of the driver or module designer to increment counts in this structure as is
 appropriate to the module.
 Nevertheless, if an
 .BR module_stat (9)
@@ -486,14 +486,14 @@ structure is statically allocated and associated with a statically allocated
 .BR streamtab (9)
 structure to define a
 .I STREAMS
-module or driver.
+driver or module.
 .PP
 Once the associated
 .BR streamtab (9)
 structure has been registered with the
 .I STREAMS
-subsystem as a module or driver, all fields in the structure must be treated as read-only by a
-module or driver.
+subsystem as a driver or module, all fields in the structure must be treated as read-only by a
+driver or module.
 The following guidelines pertain to the use of the fields in the
 .B qinit
 structure:
@@ -510,7 +510,7 @@ structure is registered.
 .IP \(bu
 Of theses, only
 .I qi_qadmin
-can be called directly by the a module or driver.
+can be called directly by the a driver or module.
 .I qi_qopen
 must only be called indirectly using the
 .BR open (2s)
@@ -567,7 +567,7 @@ The pointers to
 .B qinit
 structure from the
 .BR streamtab (9)
-structure for a module or driver must not be altered after the
+structure for a driver or module must not be altered after the
 .BR streamtab (9)
 structure has been registered.
 .IP \(bu
@@ -656,7 +656,7 @@ structure that defines the module, at lines
 through
 .BR 36 .
 .PP
-For more examples of declarations, see any of the modules or drivers in the
+For more examples of declarations, see any of the drivers or modules in the
 .B @PACKAGE@-@VERSION@
 distribution source code directories:
 .I src/modules
@@ -740,7 +740,7 @@ and
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will be written to
+drivers and modules will be written to
 .BR "SVR 4"
 instead of
 .BR "SVR 3" .

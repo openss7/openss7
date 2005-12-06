@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: adjmsg.9.man,v 0.9.2.20 2005/11/30 00:56:11 brian Exp $
+.\" @(#) $Id: adjmsg.9.man,v 0.9.2.21 2005/12/06 09:39:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/30 00:56:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -228,7 +228,7 @@ will fail and return false (0).
 .PP
 .BR adjmsg ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -307,7 +307,7 @@ message blocks;
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not pass
+drivers and modules will not pass
 .B NULL
 or invalid message pointers to
 .BR adjmsg ().
@@ -336,7 +336,7 @@ LiS
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not pass a zero (0) length to
+drivers and modules will not pass a zero (0) length to
 .BR adjmsg ().
 .IP \(em
 .BR adjmsg ()
@@ -365,7 +365,7 @@ LiS
 .IP ""
 Portable
 .I STREAMS
-modules and drivers should be designed so that they will not be affected if message blocks are
+drivers and modules should be designed so that they will not be affected if message blocks are
 freed, or left as zero-length message blocks, interior to the message.
 .IP \(em
 Binary compatibility is not guaranteed.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: min.9.man,v 0.9.2.11 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: min.9.man,v 0.9.2.12 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,7 +139,7 @@ always succeeds.
 .PP
 .BR min ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -159,7 +159,7 @@ should not be used to compare unsigned sequence numbers.
 .PP
 Portable
 .I STREAMS
-modules and drivers will only use
+drivers and modules will only use
 .BR min ()
 to compare two integers.
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.8 2005/11/29 10:46:31 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.9 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -173,7 +173,7 @@ and
 .BR copyresp (9),
 that are used for communicating between the
 Stream head
-or an internal module or driver using
+or an internal driver or module using
 .I STREAMS
 messages.  The messages used and the placement of these structures into messages is illustrated in
 the table below:
@@ -251,7 +251,7 @@ from the stream head.  The data in the
 .BR M_DATA (9)
 block contains
 .I ioc_count
-bytes of data that was copied in from the user or was supplied by the sending module or driver.
+bytes of data that was copied in from the user or was supplied by the sending driver or module.
 .PP
 Otherwise, if the input-output control derives from a transparent input-output control (see
 .BR ioctl (2s))
@@ -274,7 +274,7 @@ data structures.
 .\".PP
 .\"The
 .\".BR M_COPYIN (9)
-.\"message is sent upstream from the module or driver to the originator of the
+.\"message is sent upstream from the driver or module to the originator of the
 .\".BR M_IOCTL (9)
 .\"request, to request that the stream head copy in an amount of data from the user.  The same
 .\".I ioc_id
@@ -290,7 +290,7 @@ data structures.
 .\".PP
 .\"The
 .\".BR M_COPYOUT (9)
-.\"message is sent upstream from the module or driver to the originator of the
+.\"message is sent upstream from the driver or module to the originator of the
 .\".BR M_IOCTL (9)
 .\"request, to request that the stream head copy out an amount of data to the user.  The same
 .\".I ioc_cmd
@@ -492,7 +492,7 @@ uxpspg
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not access the
+drivers and modules will not access the
 .I ioc_flags
 member.
 .IP \(em
@@ -515,7 +515,7 @@ svr3
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not use the
+drivers and modules will not use the
 .B ioc_uid
 nor
 .B iod_gid
@@ -543,7 +543,7 @@ implementation as closely as possible.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not rely upon a specific overall size of the
+drivers and modules will not rely upon a specific overall size of the
 .BR ioclk (9)
 structure, or the offset or alignment of any of its members.
 .IP \(em
@@ -554,7 +554,7 @@ Various implementations exhibit various alignments.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not rely upon alignment of any fields except the first three fields of each
+drivers and modules will not rely upon alignment of any fields except the first three fields of each
 structure, and the alignment and preservation of the
 .I cq_private
 and

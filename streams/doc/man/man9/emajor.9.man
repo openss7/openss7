@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: emajor.9.man,v 0.9.2.12 2005/11/26 11:17:08 brian Exp $
+.\" @(#) $Id: emajor.9.man,v 0.9.2.13 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -162,7 +162,7 @@ executive.
 .PP
 Normally, a
 .I STREAMS
-module or driver
+driver or module
 .IR qi_qopen (9)
 procedure will use the
 .BR major (9)
@@ -205,7 +205,7 @@ is always successful.
 .PP
 .BR emajor ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

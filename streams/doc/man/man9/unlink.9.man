@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlink.9.man,v 0.9.2.13 2005/05/14 08:34:30 brian Exp $
+.\" @(#) $Id: unlink.9.man,v 0.9.2.14 2005/12/06 09:39:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,7 +111,7 @@ that can be called from the kernel.
 .PP
 The purpose of this function being called from the kernel is to permit
 .IR STREAMS (4)
-module or driver when the
+driver or module when the
 .B Linux
 kernel module loads (i.e. within the
 .BR init_module (9)

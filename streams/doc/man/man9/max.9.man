@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: max.9.man,v 0.9.2.12 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: max.9.man,v 0.9.2.13 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -159,7 +159,7 @@ should not be used to compare unsigned sequence numbers.
 .PP
 Portable
 .I STREAMS
-modules and drivers will only use
+drivers and modules will only use
 .BR max ()
 to compare two integers.
 .\"

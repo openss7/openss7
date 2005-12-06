@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setq.9.man,v 0.9.2.15 2005/12/05 01:42:49 brian Exp $
+.\" @(#) $Id: setq.9.man,v 0.9.2.16 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -194,7 +194,9 @@ has no known bugs.
 .\".BR lisdeprec (9)
 .\"for more information.
 .\".IP \(em
-This function is not exported by SVR 4.2 MP DDI/DKI or
+This function is not exported by
+.I "SVR 4.2 MP DDI/DKI"
+or
 .IR Solaris \(rg.
 
 .\"
@@ -204,7 +206,8 @@ This function is not exported by SVR 4.2 MP DDI/DKI or
 .BR setq ()
 is compliant with the description of the internal
 .BR setq ()
-function of SVR 4
+function of
+.I SVR 4
 .[
 svr4
 .]
@@ -218,7 +221,8 @@ magic
 .SH HISTORY
 .PP
 .BR setq ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3
 .]

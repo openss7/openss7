@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.24 2005/12/03 06:51:22 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.25 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/03 06:51:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -464,9 +464,13 @@ This information is available to system administration in the
 .B /proc/streams/strinfo
 system file.
 .\"
+.\"
+.SH USAGE
+.PP
+.\"
 .SS Queue Pair Linkage
 .PP
-Queue pairs form an instance of the Stream head, module or driver within a Stream.  The Stream is a
+Queue pairs form an instance of the Stream head, driver or module within a Stream.  The Stream is a
 linear sequence of queue pairs connected in two directions by their
 .I q_next
 pointers.
@@ -527,7 +531,7 @@ The
 .I q_qinfo
 pointer of the read queue is initialized to point to the
 .I st_rdinit
-pointer of the module or driver
+pointer of the driver or module
 .BR streamtab (9)
 structure; the write queue
 .IR q_qinfo ,
@@ -570,17 +574,17 @@ members of the
 .B queue
 structure.
 .PP
-When the module or driver
+When the driver or module
 .IR qi_qopen (9)
-procedure is called, the module or driver can associated module private information with each
+procedure is called, the driver or module can associated module private information with each
 .B queue
 structure using the
 .I q_ptr
 member.  This use of this member is private to the module and will not be altered or examined by
 .IR STREAMS .
-When the module or driver
+When the driver or module
 .IR qi_qclose (9)
-procedure is called, the module or driver has the opportunity to deallocate and resources that were
+procedure is called, the driver or module has the opportunity to deallocate and resources that were
 associated with the
 .I q_ptr.
 This member is typically used by the module to point to an allocated structure containing module
@@ -832,7 +836,7 @@ members to indicate for which message bands the queue was backenabled.
 .PP
 A
 .I STREAMS
-module or driver specifies the minimum and maximum packet sizes that it wishes to accept for each
+driver or module specifies the minimum and maximum packet sizes that it wishes to accept for each
 queue in a queue pair by setting the
 .I q_minpsz
 and
@@ -854,7 +858,7 @@ On a write queue,
 .I q_minpsz
 and
 .I q_maxpsz
-specify the minimum and maximum packet sizes accepted by the module or driver in the downstream
+specify the minimum and maximum packet sizes accepted by the driver or module in the downstream
 direction.  The sizes act as advice to the upstream module.  If the upstream module is the Stream
 head, the Stream head will observe the minimum and maximum packet sizes when generating messages
 from the
@@ -902,11 +906,11 @@ On a read queue,
 .I q_minpsz
 and
 .I q_maxpsz
-specify the minimum and maximum packet sizes accepted by the module or driver in the upstream
+specify the minimum and maximum packet sizes accepted by the driver or module in the upstream
 driection.  The sizes act as advice to the downstream module.  At the Stream head, the read queue
 packet sizes act as advise to the top of the module stack; however, the Stream head is always
 prepared to accept a data stream message of any size.
-The Stream head read queue packet sizes can be adjusted by any module or driver by sending an
+The Stream head read queue packet sizes can be adjusted by any driver or module by sending an
 .BR M_SETOPTS (9)
 message to the Stream head.
 .\"
@@ -1022,22 +1026,6 @@ to attach synchronization queues in support of
 synchronization levels.
 .\"
 .\"
-.SH USAGE
-.PP
-.B queue
-structures are used for a number of purposes within the
-.I STREAMS
-subsystem:
-.IP \(bu \w'\(bu\(em'u
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.\"
-.\"
 .SH CONTEXT
 .PP
 Functions that operate on a queue or queue pair can be called from any
@@ -1106,7 +1094,7 @@ in two situations:
 .\" --------
 .IP (1) \w'(0)\(em'u
 .B @PACKAGE_TITLE@
-allocates a queue pair to form an instance of a module or driver in a Stream, during
+allocates a queue pair to form an instance of a driver or module in a Stream, during
 .BR qattach (9).
 .BR qattach (9)
 is called for a queue pair forming a module instance by the
@@ -1115,7 +1103,7 @@ is called for a queue pair forming a module instance by the
 system call; for a driver instance, by the
 .BR open (2s)
 system call.
-This is the normal case for creation of a queue pair to represent a module or driver in the Stream.
+This is the normal case for creation of a queue pair to represent a driver or module in the Stream.
 .\" --------
 .IP (2)
 .B @PACKAGE_TITLE@
@@ -1130,7 +1118,7 @@ system call.
 This is a special case of creating a Stream head for a Stream when the Stream is first created.
 .\" =====================
 .PP
-In the normal case of allocating a queue pair to form a module or driver instance,
+In the normal case of allocating a queue pair to form a driver or module instance,
 .BR qattach (9)
 is used to allocate, initialize and attach the queue pair.
 .BR qattach (9)
@@ -1160,8 +1148,8 @@ member of each queue, to disable queue procedures.
 .\" -----------
 .IP c)
 .BR setsq (9)
-is called to allocate any syncrhonization queues necessary to represent the synchronization model
-under which the module or driver is running, and attaches them to the
+is called to allocate any synchronization queues necessary to represent the synchronization model
+under which the driver or module is running, and attaches them to the
 .I q_syncq
 private member of the
 .B queue
@@ -1183,7 +1171,7 @@ and
 .I st_wrinit
 members of the
 .BR streamtab (9)
-structure defining the module or driver;
+structure defining the driver or module;
 .\" -----------
 .IP \-
 attach the
@@ -1233,7 +1221,7 @@ module.  Messages active in the
 Stream
 will bypass the half-inserted module.  This situation persists until
 .BR qprocson (9)
-is called, either by the module or driver
+is called, either by the driver or module
 .IR qi_qopen (9)
 procedure, or by
 .BR qattach (9)
@@ -1244,7 +1232,7 @@ for details.
 .\" -----------
 .IP (3)
 .IR qi_qopen (9)
-is called to invoke the module or driver
+is called to invoke the driver or module
 .IR qi_qopen (9)
 procedure found in the
 .I qi_qopen
@@ -1299,7 +1287,7 @@ in which case,
 takes no further action.
 If the
 .B QPROCS
-bit is set, the module or driver
+bit is set, the driver or module
 .IR qi_qopen (9)
 procedure forgot (or was not designed to) call the
 .BR qprocson (9)
@@ -1432,16 +1420,16 @@ performs the following actions when detaching an deallocating a queue pair:
 .IR qi_qclose (9)
 is called to invoke the
 .IR qi_qclose (9)
-procedure of the module or driver located in the
+procedure of the driver or module located in the
 .I qi_qclose
 member of the
 .BR qinit (9)
 structure associated with the read queue of the queue pair.
 .IP (2)
 .BR qprocsoff (9)
-is called to ensure that the module or driver writer did not forget to call
+is called to ensure that the driver or module writer did not forget to call
 .BR qprocsoff (9)
-from the module or driver
+from the driver or module
 .IR qi_qclose (9)
 procedure.
 .BR qprocsoff (9)
@@ -1455,11 +1443,11 @@ If the
 bit is set, then procedures are disabled and no action is taken.
 If the
 .B QPROCS
-bit is clear, procedure are still enabled and the module or driver writer forgot to call
+bit is clear, procedure are still enabled and the driver or module writer forgot to call
 .BR qprocsoff (9)
 from the
 .IR qi_qclose (9)
-procedure.  (The module or driver could also have been written to uni-processor
+procedure.  (The driver or module could also have been written to uni-processor
 .IR "SVR 4" ,
 which did not have a
 .BR qprocsoff (9)
@@ -1498,7 +1486,7 @@ fields in the
 .BR stdata (9)
 structure
 (Stream head)
-are ajusted to reflect the values of the module or driver now beneath the Stream head.
+are ajusted to reflect the values of the driver or module now beneath the Stream head.
 .RE
 .IP (3)
 .BR qdelete (9)
@@ -1547,9 +1535,9 @@ Members of the
 .B queue
 structure should not be accessed directly by
 .I STREAMS
-modules or drivers.  Portable
+drivers or modules.  Portable
 .I STREAMS
-modules and drivers should use the facilities provided by
+drivers and modules should use the facilities provided by
 .BR strqget (9)
 and
 .BR strqset (9)
@@ -1586,8 +1574,8 @@ structure with each minor device number as well, so the entire device number is 
 .BR "@PACKAGE_TITLE@" .
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -1816,9 +1804,9 @@ uses a
 .I q_other
 member which is not present.
 .I LiS
-modules or drivers that manipulate this queue field directly will not be binary compatible.
+drivers or modules that manipulate this queue field directly will not be binary compatible.
 .I LiS
-modules or drivers that use only
+drivers or modules that use only
 .BR RD (9),
 .BR WR (9),
 .BR OTHERQ (9),
@@ -1831,7 +1819,7 @@ Any direct manipulation of any of the implementation specific members of the
 .I LiS
 structure by an
 .I LiS
-module or driver will result in binary incompatibility.
+driver or module will result in binary incompatibility.
 .IP \(em
 .I LiS
 does not provide the
@@ -1844,7 +1832,7 @@ member.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -1869,7 +1857,7 @@ No other implementation has this bug.
 .IP ""
 Portable
 .I STREAMS
-applications programs, modules and drivers will use
+applications programs, drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -1883,7 +1871,7 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 EFT MP,
+.IR "SVR 4.2 EFT MP" ,
 .[
 svr42
 .]
@@ -1898,7 +1886,8 @@ documentation.
 .PP
 The
 .B queue
-structure was introduced in SVR 3.
+structure was introduced in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

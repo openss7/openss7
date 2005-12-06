@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: apush_get.9.man,v 0.9.2.19 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: apush_get.9.man,v 0.9.2.20 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -264,12 +264,12 @@ package,
 .\".BR apush_get ()
 .\"should not be used by portable
 .\".I STREAMS
-.\"modules and drivers.
+.\"drivers and modules.
 .PP
 .BR apush_get ()
 is an internal implementation specific function, and will not be used directly by portable
 .I STREAMS
-modules and drivers.
+drivers and modules.
 .PP
 Calling
 .BR apush_get ()
@@ -345,11 +345,11 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2
+.IR "SVR 4.2"
 .[
 svr42
 .]
-SAD
+.I SAD
 .RI ( STREAMS
 Administrative Driver).  See
 .BR sad (4).

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qcountstrm.9.man,v 0.9.2.13 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: qcountstrm.9.man,v 0.9.2.14 2005/12/06 09:39:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -128,21 +128,29 @@ always succeeds.
 .PP
 .BR qcountstrm ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR qcountstrm ()
-is MP-safe.
-Because
-.BR qcountstrm ()
-freezes the stream, calling
-.BR qcountstrm ()
-on a frozen stream (regardless of which queue from the stream is provided in
-the
+is MP-safe; however, the caller is responsible for the validity of the passed in
 .I q
-argument), could result in single-party deadlock.
+pointer across the call.
+.PP
+The validity of either queue in the pair, and either
+.I q_next
+pointer for a queue in the pair, for the queue pointer passed to a module
+procedure, callout or synchronous callback functions, is guaranteed by
+.BR "@PACKAGE_TITLE@" .
+Any queue pointer in the pair passed as an argument to an asynchronous callback
+function are also valid, providing the driver or module observes the rules for
+cancellation of asynchronous callbacks on close.
+.BR "@PACKAGE_TITLE@"
+also provides that a queue pointer in the pair within whose procedures an
+asynchronous callback was invoked, and either
+.I q_next
+pointer, are also valid in an asynchronous callback.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -160,9 +168,10 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR qcountstrm ()
-is compatible with LiS
+is compatible with
+.I LiS
 .[
-LiS
+lis
 .]
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
@@ -178,7 +187,7 @@ bug.  See
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -192,7 +201,9 @@ instead of
 .\".BR qcountstrm ()
 .\"directly.
 .IP \(em
-This function is not provided by  SVR 4.2 MP DDI/DKI or
+This function is not provided by
+.I SVR 4.2 MP DDI/DKI
+or
 .IR Solaris \(rg.
 .PP
 See
@@ -206,17 +217,16 @@ for additional compatibility considerations.
 is an
 .IR LiS -specific
 function.
-.[
-LiS
-.]
 .BR qcountstrm ()
-is provided for source and binary compatibility with LiS.
+is provided for source and binary compatibility with
+.IR LiS .
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR qcountstrm ()
-first appeared in LiS.
+first appeared in
+.IR LiS .
 .\"
 .\"
 .[

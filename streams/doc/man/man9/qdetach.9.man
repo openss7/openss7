@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qdetach.9.man,v 0.9.2.13 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: qdetach.9.man,v 0.9.2.14 2005/12/06 09:39:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -132,6 +132,25 @@ procedure, unlinking the queue pair from the stream, and calling
 to deallocate the queue pair.
 .\"
 .\"
+.SH USAGE
+.PP
+.BR qdetach ()
+is not intended to be called by
+.I STREAMS
+drivers or modules.
+.PP
+.BR qdetach ()
+should only be called from the
+.BR I_POP (7)
+or
+.BR qattach (9)
+procedure or a Stream head
+.BR stropen (9)
+open or
+.BR strclose (9)
+close procedure.
+.\"
+.\"
 .SH RETURN
 .PP
 Upon succes,
@@ -176,9 +195,9 @@ is an internal
 .I STREAMS
 function which was not intended to be called by the
 .I STREAMS
-module or driver writer.
+driver or module writer.
 .BR qdetach ()
-is not part of the DDI/DKI adn should not be called by portable programs.
+is not part of the DDI/DKI and should not be called by portable programs.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -225,7 +244,7 @@ with the following portability considerations:
 .\".IP ""
 .\"Portable
 .\".I STREAMS
-.\"modules and drivers will use
+.\"drivers and modules will use
 .\".BR "@PACKAGE_TITLE@"
 .\"instead of
 .\".IR LiS .

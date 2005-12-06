@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent tw=80
 .\"
-.\" @(#) $Id: putnext.9.man,v 0.9.2.24 2005/12/05 01:42:48 brian Exp $
+.\" @(#) $Id: putnext.9.man,v 0.9.2.25 2005/12/06 09:39:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -173,10 +173,10 @@ for the band.
 .PP
 .BR putnext ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
-Consideration must be given when calling
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt
+service routines.  Consideration must be given when calling
 .BR putnext ()
-from interrupt service routine context that the next module in the stream
+from interrupt service routine context that the next module in the Stream
 might not be prepared to be called at interrupt service routine context.
 .\"
 .\"
@@ -203,8 +203,8 @@ procedure,
 .BR qbufcall (9),
 .BR timeout (9),
 .BR qtimeout (9),
-callback function or interrupt service routine.
-Either the module or driver muswt be synchronized using
+callback function, software interrrupt, tasklet, bottom half, or interrupt
+service routine.  Either the driver or module must be synchronized using
 .I STREAMS
 synchronization levels, or the
 .IR qi_putp (9)
@@ -291,10 +291,10 @@ procedure processing turned off
 .BR qprocsoff (9)).
 .IP \(em
 .BR putnext ()
-is MP-safe across pushes and pops of modules and other stream reconfiguration
+is MP-safe across pushes and pops of modules and other Stream reconfiguration
 because it protects dereference of the
 .I q->q_next
-pointer with the stream head read lock.
+pointer with the Stream head read lock.
 Under
 .IR LiS ,
 .BR putnext ()
@@ -324,7 +324,7 @@ code; that is, contexts asynchronous to the Stream containing
 .IR q .
 .IP ""
 .IR HP-UX \(rg
-compatible modules and drivers will not call
+compatible drivers and modules will not call
 .BR putnext ()
 from outside of a
 .BR qinit (9)
@@ -394,14 +394,14 @@ suxspg
 .]
 do not permit
 .BR putnext ()
-to be called on a stream frozen with
+to be called on a Stream frozen with
 .BR freezestr (9).
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR putnext ()
-on a stream frozen by the caller with
+on a Stream frozen by the caller with
 .BR freezestr (9).
 .\".IP \(em
 .\"Symbol
@@ -444,8 +444,11 @@ first appeared in
 .[
 svr3spg
 .]
-In SVR 3,
-4 and 4.2,
+In
+.IR "SVR 3" ,
+.I SVR 4
+and
+.IR "SVR 4.2" ,
 .BR putnext ()
 returned
 .BR int .

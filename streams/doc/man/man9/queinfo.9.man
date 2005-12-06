@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queinfo.9.man,v 0.9.2.10 2005/11/29 10:46:34 brian Exp $
+.\" @(#) $Id: queinfo.9.man,v 0.9.2.11 2005/12/06 09:39:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,9 +83,17 @@ sort-adjacent-labels
 .PP
 .nf
 \fC\s-1
-.B #include <sys.stream.h>
+.B "#include <sys/strsubr.h>
 .sp
 struct queinfo {
+    queue_t rq;                 /* read queue */
+    queue_t wq;                 /* write queue */
+    struct stdata *qu_str;      /* stream head for this queue pair */
+    wait_queue_head_t qu_qwait; /* wait queue for qwait */
+    atomic_t qu_refs;           /* references to this structure */
+#if defined CONFIG_STREAMS_DEBUG
+    struct list_head qu_list;
+#endif
 };
 \s+1\fP
 .fi
@@ -93,6 +101,33 @@ struct queinfo {
 .\"
 .SH MEMBERS
 .PP
+.TP \w'\fIqu_qwait\fR\(em'u
+.I rq
+the read queue in the pair.
+.PD 0
+.TP
+.I wq
+the write queue in the pair.
+.TP
+.I qu_str
+the Stream head,
+.BR stdata (9)
+structure, to which this pair belongs.
+.TP
+.I qu_qwait
+a wait queue for
+.BR qwait (9)
+and
+.BR qwait_sig (9).
+.TP
+.I qu_refs
+the number of references to this structure.
+.TP
+.I qu_list
+a list of all
+.B queinfo
+structures for debugging.
+.PD
 .\"
 .\"
 .SH INTERFACE

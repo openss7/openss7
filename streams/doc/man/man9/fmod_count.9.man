@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fmod_count.9.man,v 0.9.2.4 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: fmod_count.9.man,v 0.9.2.5 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -237,7 +237,7 @@ releases a reference to the file module switch table entry
 .PP
 None of these functions are intended to be used by portable
 .I STREAMS
-modules and drivers.  They are exported primarly for use by the Stream head,
+drivers and modules.  They are exported primarly for use by the Stream head,
 .BR sth (4)
 .I STREAMS
 module when it is configured as a separate loadable kernel module.

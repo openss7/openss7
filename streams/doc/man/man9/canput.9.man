@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canput.9.man,v 0.9.2.27 2005/12/05 01:42:47 brian Exp $
+.\" @(#) $Id: canput.9.man,v 0.9.2.28 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,13 +101,14 @@ the queue from which to begin testing for flow control.
 .PP
 It is the responsibility of a
 .I STREAMS
-driver putting a band zero (0)
-normal message to the driver's read queue (e.g. with
-.BR put "(9) or " putq (9))
-to check for flow control using
+driver passing a normal priority, band zero (0),
+message to
+a
+Stream end
+queue, to check for flow control using
 .BR canput ()
-before placing a message on the queue with
-.BR put "(9) or " putq (9).
+before passing the message with
+.BR put (9).
 .PP
 .BR canput ()
 checks whether the
@@ -115,14 +116,14 @@ Stream
 is flow controlled starting at
 .IR q .
 .BR canput ()
-looks for the next queue with a
+looks for the first queue with a
 .IR qi_srvp (9)
 service procedure, or no next queue (i.e. the
 .I q_next
 pointer is
 .BR NULL ).
 .PP
-If this queue has the
+If the first queue has the
 .B QFULL
 flag clear indicating that it is not full,
 then
@@ -131,7 +132,7 @@ will return
 .I true
 .RB ( 1 ).
 .PP
-If this queue has the
+If the first queue has the
 .B QFULL
 flag set indicating that it is full,
 then
@@ -170,20 +171,27 @@ flag).
 .PP
 It is the responsibility of all
 .I STREAMS
-drivers putting
-a normal, band zero, data message
+drivers with a
+.IR qi_srvp (9)
+service procedure
+passing
+a normal priority, data message
 .RB ( M_PROTO "(9), " M_DATA (9))
-to a message queue to check for flow control using
+to
+a
+Stream end
+queue, to check for flow control using
 .BR canput (9)
 or
-.BR bcanput (9)
+.BR bcanput (9),
 for the
 .I b_band
-of the message
-before placing a message on the queue with
-.BR put (9)
-or
-.BR putq (9).
+of the message,
+before passing a message to the queue with
+.BR put (9).
+Drivers without a
+.IR qi_srvp (9)
+service procedure do not check flow control.
 Each
 Stream head,
 Stream end
@@ -203,24 +211,12 @@ or
 .BR bcanputnext (9).
 .PP
 .BR canput ()
-can be passed any queue pointer,
-.IR q .
-However, the caller is responsible for guaranteeing the validity of
-.I q
-across the call.
-A pointer to either queue in a queue pair passed to callouts are guaranteed valid by
-.IR STREAMS .
-A pointer to either queue in a queue pair passed to callbacks, soft interrupts (tasklets and bottom
-halves), and interrupt service routines, and valid if the rules for cancellation of these callbacks
-and routines are followed upon close and unlinking.
-.PP
-.BR canput ()
 and
 .BR bcanput (9)
 will perform actions on a forward queue with no queue
 .IR qi_srvp (9)
 service procedure, but for which there is no forward queue
-.RI ( q->q_next
+.RI ( q_next
 is
 .BR NULL ).
 The reason for this is that a write queue at the Stream end (driver) might remove messages from the
@@ -297,15 +293,16 @@ across the call.
 .PP
 The validity of either queue in the pair, and either
 .I q_next
-pointer for a queue in the pair, for the the queue pointer passed to a module procedure, callout
-or syncrhonous callback functions, is guaranteed by
-.IR STREAMS .
+pointer for a queue in the pair, for the queue pointer passed to a module procedure, callout
+or synchronous callback functions, is guaranteed by
+.BR "@PACKAGE_TITLE@" .
 Any queue pointer in the pair passed as an argument to an asynchronous callback function
-is also valid, providing the module or driver observes the rules for cancellation of asyncrhonous
+is also valid, providing the driver or module observes the rules for cancellation of asynchronous
 callbacks on close.
 .PP
-When wishing to test flow control on a driver's read queue from an interrupt service routine, where
-there is no
+When wishing to test flow control on
+a driver's read queue
+from an interrupt service routine, where there is no
 .IR qi_srvp (9)
 service procedure defined for the read queue, a more portable approach is to call
 .BR put (9)
@@ -327,6 +324,7 @@ call to
 The caller to
 .BR putnext (9)
 is then in violation of flow-control rules; however, the extent of this violation is bounded.
+.PP
 It is also possible, that
 .BR canput ()
 can be called for a queue and return
@@ -347,21 +345,21 @@ or
 is called from a
 .IR qi_srvp (9)
 service procedure).
-In the case that the service procedure run before
+In the case that the service procedure runs before
 .BR putq (9),
 placing the message on the queue will invoke the service procedure again, when necessary.
 In the case that the queue was enabled before
 .BR putbq (9),
-execution of the service procedure will occur after the current service procedure exists.
+execution of the service procedure will occur after the current service procedure exits.
 .PP
 Although
 .BI canput( q->q_next )
 is functionally equivalent to
 .BI canputnext( q ),
 for the
-.BR canput (9)
+.BR canput ()
 form, the dereference of the
-.I q_next
+.I q->q_next
 pointer is not protected on some implementations of
 .I STREAMS
 for MP architectures: on which
@@ -376,7 +374,7 @@ operation).
 For MP operation,
 portable
 .I STREAMS
-modules and drivers will always call
+drivers and modules will always call
 .BR canputnext (9)
 instead of
 .BI canput( q->q_next ).
@@ -389,15 +387,20 @@ is always MP-safe from a module procedure or callout, or synchronous callback fu
 passed
 .IR q ,
 or the queue pair containing
-.IR q .
+.IR q ,
+(and is even safe for an asynchronous callback function passing
+.I q
+or
+.I q->q_next
+that was invoked from a procedure, callout or synchronous callback on
+.IR q ).
 .\"
 .\"
 .SH NOTICES
 .PP
 It is the responsibility of a
 .I STREAMS
-driver putting a band zero (0)
-.I normal
+driver putting a normal priority, band zero,
 message to a message queue to check for flow control using
 .BR canput ()
 before placing a message on the queue with
@@ -412,6 +415,9 @@ will always be used instead of
 .BI canput( q->q_next )
 or
 .BI bcanput( q->q_next )
+by portable
+.I STREAMS
+drivers and modules
 on multiprocessor (MP) systems.
 .PP
 .BR canput ()
@@ -425,7 +431,7 @@ with a zero
 .IR band :
 and are implemented as such.
 .PP
-Note that the is some conflict in the documentation as to what happens when
+Note that there is some conflict in the documentation as to what happens when
 .BR canput ()
 hits the queue at end of the Stream
 .RI ( q->q_next
@@ -521,15 +527,8 @@ that is frozen with
 .\"
 .\"
 .SH EXAMPLES
-.\".PP
-.\".BR canput ()
-.\"functions identically to
-.\".BI bcanput( q ", 0)"\fR.
-.\"See
-.\".BR bcanput (9)
-.\"for examples.
 .\"
-.SS Example #1
+.SS Example #1 \(em Put Procedure
 .PP
 .BR canput ()
 is normally called before a call to
@@ -568,7 +567,7 @@ places the message directly on the upper queue.
 .PP
 Note that the upper queue must have a service procedure.
 .\"
-.SS Example #2
+.SS Example #2 \(em Interrupt Service Routine
 .PP
 .BR canput ()
 is typically called before a call to
@@ -608,7 +607,7 @@ in a driver interrupt service routine as follows:
 .PP
 The above example is left as an exercise to the reader.
 .\"
-.SS Example #3
+.SS Example #3 \(em Alternative ISR
 .PP
 Another alternative for the ISR is to give the read side a service procedure and test before
 .BR put (9)
@@ -667,6 +666,45 @@ as follows:
 .PP
 The above example is also left as an excercise to the reader.
 .\"
+.SS Example #4 \(em Cannonical Module
+.PP
+Following is an example of the cannonical module non-band-aware, non-MP, put and service procedure
+(for a proper, band-aware, MP-safe example, see
+.BR bcanputnext (9)):
+.PP
+.nf
+\fC\s-2\
+ 1  int
+ 2  example_putp(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      if (mp->b_datap->db_type >= QPCTL) {
+ 5          putnext(q, mp);
+ 6      } else if (!q->q_first && canput(q->q_next)) {
+ 7          putnext(q, mp);
+ 8      } else {
+ 9          putq(q, mp);
+10      }
+11      return (0);
+12  }
+13  int
+14  example_srvp(queue_t *q)
+15  {
+16      mblk_t *mp;
+17  
+18      while ((mp = getq(q))) {
+19          if (canput(q->q_next)) {
+20              putnext(q, mp);
+21          } else {
+22              putbq(q, mp);
+23              break;
+24          }
+25      }
+26      return (0);
+27  }
+\s+2\fP
+.fi
+.PP
+.\"
 .\"
 .SH "SEE ALSO"
 .PP
@@ -710,7 +748,7 @@ is not very useful and the band aware
 .BR bcanput (9)
 will be used instead.
 .BR canput ()
-is only provided for use by modules and drivers that either have no need to support queue bands
+is only provided for use by drivers and modules that either have no need to support queue bands
 (e.g., on a driver read queue for a driver that never places non-zero priority messages on the
 queue), or were written to the earlier
 .I "SVR 3"
@@ -738,7 +776,9 @@ called with a
 or invalid
 .I q
 pointer will have undefined results and may crash or destabilize the kernel.
-Under LiS, if
+Under
+.IR LiS ,
+if
 .BR canput ()
 suffers an internal error,
 .I q
@@ -758,6 +798,12 @@ drivers and modules will not pass
 or invalid arguments to
 .I STREAMS
 functions.
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
 .IP \(em
 Although a call to
 .BI bcanput( q ", " 0 )
@@ -767,13 +813,25 @@ is functionally equivalent to
 is implemented separately from
 .BR bcanput ()
 for speed.
-LiS implements
+.I LiS
+implements
 .BI canput( q ),
 .BI canputnext( q )
 and
 .BI bcanputnext( q ", " band )
 with macros that call
 .BI bcanput( q ", " band ).
+This means that the
+.I LiS
+implementation of
+.BR canput ()
+suffers all of the same difficulties as its implementation of
+.BR bcanput (9).
+See
+.RI \(lq COMPATIBILITY ,\(rq
+under
+.BR bcanput (9),
+for details.
 .IP ""
 Portable
 .I STREAMS
@@ -790,7 +848,8 @@ Stream head
 read lock that prevents reconfiguration of the
 Stream
 during the call.
-LiS does not explicitly protect this dereference.
+.I LiS
+does not explicitly protect this dereference.
 .IP ""
 Portable
 .I STREAMS
@@ -807,9 +866,10 @@ pointer or a
 pointer that has an invalid
 .I q->q_next
 pointer, will have undefined results and may crash or destabilize the kernel.
-LiS will return false (0) under the same conditions.
+.I LiS
+will return false (0) under the same conditions.
 .IR STREAMS (4)
-modules and drivers that always obtain
+drivers and modules that always obtain
 .I q
 from a pointer passed by the
 .I STREAMS
@@ -819,6 +879,56 @@ scheduler via
 .IR qi_putp (9),
 .IR qi_srvp (9),
 (as is normal) will not encounter this problem.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+allows
+.BR canput ()
+(but not
+.BR canputnext (9))
+to be called from outside the
+.I STREAMS
+framework, but it cannot be passed a
+.IR q->q_next
+pointer, even from within the framework.
+This is the reverse of
+.IR Solaris \(rg,
+below.
+.IR HP-UX \(rg,
+documented rules
+.[
+hpuxspg
+.]
+are more restrictive than
+.BR "@PACKAGE_TITLE@" ,
+so there are no portability issues.
+.IP ""
+.IR Solaris \(rg,
+.[
+solspg
+.]
+on the other hand, allows
+.IR canputnext (9)
+(but not
+.BR canput ())
+to be called from outside the
+.I STREAMS
+framework, but it cannot be passed a
+.IR q->q_next
+pointer, even from within the framework.
+This is the reverse of
+.IR HP-UX \(rg,
+above.
+.IR Solaris \(rg,
+documented rules
+.[
+solspg
+.]
+are more restrictive than
+.BR "@PACKAGE_TITLE@" ,
+so there are no portability issues.
 .IP \(em
 .BR canput ()
 may be called on a
@@ -858,7 +968,9 @@ Stream
 frozen with
 .BR freezestr (9).
 .\".IP \(em
-.\"Under LiS, if
+.\"Under
+.\".IR LiS ,
+.\"if
 .\".BR canputnext ()
 .\"suffers an internal error, it will return false (0).
 .IP \(em
@@ -868,11 +980,24 @@ is an
 function, not a macro.
 .I LiS
 implements
-\fB\)canput(\fI\)q\fB\))\fR\),
-\fB\)canputnext(\fI\)q\fB\))\fR\) and
-\fB\)bcanputnext(\fI\)q\fB\), \fI\)band\fB\))\fR\)
-with a macros that call
-\fB\)bcanput(\fI\)q\fB\), \fI\)band\fB\))\fR\).
+.BI canput( q )\c
+,
+.BI canputnext( q )\c
+,
+.BI bcanput( q ", " band )\c
+, and
+.BI bcanputnext( q ", " band )\c
+, with a macros that call
+.BI bcanput( q ", "  band )\c
+ or
+.BI bcanput( q->q_next ", " 0 ).
+This makes
+.BR canputnext (9)
+and
+.BR bcanputnext (9)
+unsafe under
+.I LiS
+across a multiplexing driver.
 .IP ""
 Portable
 .I STREAMS
@@ -937,18 +1062,18 @@ suxspg
 .BR bcanput (9)
 in this fashion.
 .IP ""
+As these
+.IR SUPER-UX \(rg
+rules are more restrictive than those of
+.BR "@PACKAGE_TITLE@" ,
+there are no portability issues.
 .BR canput ()
 and
 .BR bcanput (9)
 under
 .B "@PACKAGE_TITLE@"
-imposes a similar restriction for MP-safety when called from outside of
-.I STREAMS
-syncrhonous context; however,
-.BR canput ()
-and
-.BR bcanput (9)
-can always be called from a the driver
+can be passed a Stream end queue pointer from outside the framework
+but can always be called from a the driver
 .IR qi_putp (9)
 put procedure, even if the queue does not have a
 .IR qi_srvp (9)
@@ -956,7 +1081,7 @@ service procedure.
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will only call
+drivers and modules for multiprocessor (MP) architectures will only call
 .BR canput ()
 for testing a driver
 .RI ( "Stream end" )
@@ -984,7 +1109,7 @@ No other implementation has this bug.
 .IP ""
 Portable
 .I STREAMS
-applications programs, modules and drivers will use
+applications programs, drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .
@@ -1017,7 +1142,8 @@ svr4spg
 .]
 .PP
 .BR canput ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

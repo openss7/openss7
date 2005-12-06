@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mcopyin.9.man,v 0.9.2.4 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mcopyin.9.man,v 0.9.2.5 2005/12/06 09:39:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -109,7 +109,7 @@ is being called.
 .I private
 private data that the
 .I STREAMS
-module or driver wants associated with the
+driver or module wants associated with the
 .BR copyreq (9)
 structure.
 .TP
@@ -161,7 +161,7 @@ message or a pointer to a
 message.  This message block should not be manipulated in any way by the caller and should be used
 as passed to the
 .I STREAMS
-module or driver's write-side
+driver or module's write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -201,7 +201,7 @@ message block.
 .BR mcopyin ()
 is used to generate a properly formed
 .BR M_COPYIN (9)
-message upstream from a module or drivers
+message upstream from a driver or modules
 write-side
 .IR qi_putp (9)
 or
@@ -234,7 +234,7 @@ is passed invalid pointers or arguments, kernel instability or a panic may resul
 .BR mcopyin ()
 should be called from a
 .I STREAMS
-module or driver write-side
+driver or module write-side
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -251,7 +251,7 @@ or
 .IR qi_srvp (9)
 procedure of the
 .I STREAMS
-module or driver.
+driver or module.
 .\"
 .\"
 .SH NOTICES

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmajor.9.man,v 0.9.2.16 2005/12/02 15:15:51 brian Exp $
+.\" @(#) $Id: getmajor.9.man,v 0.9.2.17 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 15:15:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,7 +139,8 @@ on the other hand, will return the external (real) major device number
 associated with the device
 .IR dev .
 .BR major (9)
-was the SVR 3
+was the
+.I SVR 3
 .[
 svr3
 .]
@@ -221,7 +222,7 @@ has no corresponding internal major device number.
 .PP
 .BR getmajor ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -388,12 +389,14 @@ documentation.
 .SH HISTORY
 .PP
 .BR getmajor ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]
 .BR major (9)
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dtimeout.9.man,v 0.9.2.13 2005/05/14 08:34:23 brian Exp $
+.\" @(#) $Id: dtimeout.9.man,v 0.9.2.14 2005/12/06 09:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -201,7 +201,7 @@ assurance, the return value should always be checked.
 .PP
 .BR dtimeout ()
 can be called from any context including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -309,7 +309,7 @@ declaration under
 .RI \(lq SYNOPSIS \(rq
 above.  Portable
 .I STREAMS
-modules and drivers will not use this function.
+drivers and modules will not use this function.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

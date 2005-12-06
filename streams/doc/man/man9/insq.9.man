@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.30 2005/12/05 01:42:48 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.31 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/05 01:42:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -311,7 +311,7 @@ will enable the queue if the queue is not inhibited with
 .BR noenable (9)
 and one of the following conditions also holds true:
 .IP \(bu \w'\(bu\(em'u
-The module or driver has just been opened for the first time: that is, the queue is empty and has
+The driver or module has just been opened for the first time: that is, the queue is empty and has
 always been empty.
 .IP \(bu
 .BR getq (9)
@@ -769,7 +769,7 @@ bug is not perpetuated in
 .IP ""
 Portable
 .I STREAMS
-modules and drivers can rely on intermediate band strutures being allocated
+drivers and modules can rely on intermediate band strutures being allocated
 when a priority message is placed on a queue using
 .BR insq (),
 and may examine the
@@ -828,7 +828,7 @@ approach is very efficient.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not depend on the ordering of
+drivers and modules will not depend on the ordering of
 .BR qband (9)
 structures within the
 .I q_bandp
@@ -1154,11 +1154,11 @@ That is, scheduling is only suppressed for normal messages enqueued with
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not insert high priority messages into queues.  If it is absolutely
+drivers and modules will not insert high priority messages into queues.  If it is absolutely
 necessary to insert a high priority message into a queue,
 portable
 .I STREAMS
-modules and drivers will not rely upon
+drivers and modules will not rely upon
 .BR insq ()
 to schedule a queue when a high priority message is inserted into the queue:
 instead
@@ -1214,7 +1214,7 @@ osfdoc
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will consider that
+drivers and modules will consider that
 .BR insq ()
 may fail if an attempt is made to miss-order the queue; but, that an attempt may succeed if the
 miss-ordering is with regard to queue class.
@@ -1239,7 +1239,7 @@ code; that is, contexts asynchronous to the Stream containing
 .IR q .
 .IP ""
 .IR HP-UX \(rg
-compatible modules and drivers will not call
+compatible drivers and modules will not call
 .BR insq ()
 from outside of a
 .BR qinit (9)
@@ -1269,7 +1269,7 @@ pointer will return failure (0).
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not pass
+drivers and modules will not pass
 .BR insq ()
 a
 .B NULL
@@ -1366,7 +1366,7 @@ bug.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers concerned about portability to
+drivers and modules concerned about portability to
 .I LiS
 will not use
 .BR insq ()
@@ -1397,7 +1397,7 @@ uw7doc
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will only pass
+drivers and modules will only pass
 .RB non- NULL
 .I emp
 pointers that does point to a valid message that is already on the queue specified by
@@ -1419,7 +1419,7 @@ suxdoc
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will freeze a stream with
+drivers and modules will freeze a stream with
 .BR freezestr (9)
 before calling
 .BR insq ().
@@ -1451,7 +1451,7 @@ No other implementation has this bug.
 .IP ""
 Portable
 .I STREAMS
-applications programs, modules and drivers will use
+applications programs, drivers and modules will use
 .BR "@PACKAGE_TITLE@"
 instead of
 .IR LiS .

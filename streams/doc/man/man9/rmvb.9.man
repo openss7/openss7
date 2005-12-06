@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmvb.9.man,v 0.9.2.19 2005/12/02 12:05:16 brian Exp $
+.\" @(#) $Id: rmvb.9.man,v 0.9.2.21 2005/12/06 14:09:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 14:09:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -114,7 +114,7 @@ If the block pointer,
 .IR bp ,
 points to the only message block that existed in the message,
 .IR mp ,
-whe
+when
 .BR rmvb ()
 was called, then
 .BR rmvb ()
@@ -164,7 +164,7 @@ was not in the message.
 .PP
 .BR rmvb ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -224,7 +224,7 @@ in the same situation.  This is an LiS bug.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not pass
+drivers and modules will not pass
 .B NULL
 pointers to
 .BR rmvb ().
@@ -238,7 +238,7 @@ No other implementation documents this behaviour.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not rely upon
+drivers and modules will not rely upon
 .BR rmvb ()
 setting the removed block's continuation pointer,
 .I bp->b_cont

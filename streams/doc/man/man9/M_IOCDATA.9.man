@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.11 2005/11/29 10:46:26 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.12 2005/12/06 09:39:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/29 10:46:26 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -184,7 +184,7 @@ message.  It is included in the
 .B M_IOCDATA
 message so the message can be self-describing.  This is intended to simplify
 .BR ioctl (2s)
-processing by modules and drivers.
+processing by drivers and modules.
 .PP
 If the message is in response to an
 .BR M_COPYIN (9)
@@ -200,7 +200,7 @@ block is reused, any unused fields defined for the resultant message block shoul
 or
 .BR M_IOCNAK ).
 .PP
-This message should not be queued by a module or driver unless it intends to process the data for
+This message should not be queued by a driver or module unless it intends to process the data for
 the
 .BR ioctl (2s)
 in some way.
@@ -220,7 +220,7 @@ or
 .BR M_COPYOUT (9)
 messages.
 .B M_IOCDATA
-messages must be consumed by the module or driver that issued the
+messages must be consumed by the driver or module that issued the
 .BR M_COPYIN (9)
 or
 .BR M_COPYOUT (9)
@@ -278,7 +278,7 @@ message is received at the
 Stream head,
 the message is discarded.
 .IP \(bu
-If a module or driver is processing an
+If a driver or module is processing an
 .BR M_COPYIN (9)
 or
 .BR M_COPYOUT (9)
@@ -286,12 +286,12 @@ request, and an
 .B M_IOCDATA
 message is received to the write-side
 .IR qi_putp (9)
-procedure, the module or driver must process the message, but may queue the message for processing
+procedure, the driver or module must process the message, but may queue the message for processing
 out of the module's
 .IR qi_srvp (9)
 procedure.
 .IP \(bu
-When processing the message the module or driver examines the
+When processing the message the driver or module examines the
 .I cp_rval
 member of the contained
 .BR copyresp (9)
@@ -315,7 +315,7 @@ If successful and a
 request was being performed,
 only success is indicated.
 .IP \(bu
-When successful, the module or driver may continue the
+When successful, the driver or module may continue the
 .BR M_IOCTL (9)
 operation with additional
 .BR M_COPYIN (9)
@@ -371,7 +371,7 @@ implementations of
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not rely upon the ordering or overlap of members within the
+drivers and modules will not rely upon the ordering or overlap of members within the
 .BR copyresp (9)
 structure, and will only examine and modify members in accordance with the
 .IR "SVR 4 STREAMS Programmer's Guide" .
@@ -379,7 +379,7 @@ structure, and will only examine and modify members in accordance with the
 svr4spg
 .]
 .IP \(em
-When a module or driver receives an
+When a driver or module receives an
 .B M_IOCDATA
 indicating an error
 .RI ( cp_rval
@@ -416,7 +416,7 @@ has the bug that it waits for a subsequent
 or
 .BR M_IOCNAK (9)
 block.
-(Note however, that modules and drivers previously written to work with
+(Note however, that drivers and modules previously written to work with
 .I LiS
 .[
 lis
@@ -445,7 +445,7 @@ message.)
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B @PACKAGE_TITLE@
 .[
 lfs
@@ -478,7 +478,7 @@ lis
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will use
+drivers and modules will use
 .B @PACKAGE_TITLE@
 .[
 lfs

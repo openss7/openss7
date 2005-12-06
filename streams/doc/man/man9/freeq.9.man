@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freeq.9.man,v 0.9.2.14 2005/12/02 12:05:13 brian Exp $
+.\" @(#) $Id: freeq.9.man,v 0.9.2.15 2005/12/06 09:39:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -133,7 +133,7 @@ always succeeds.
 .PP
 .BR freeq ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 Because the queue is flushed before freeing, the same considerations as are given in
 .BR flushq (9)
 must be taken before calling
@@ -154,7 +154,7 @@ Although this function is documented in
 .I STREAMS
 it is not normally called directly by
 .I STREAMS
-modules or drivers.
+drivers or modules.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -189,7 +189,9 @@ does not check to see that the queue pair is not still connected in a stream.
 .\"simply calls
 .\".BR freeq ()
 .\"directly.
-This function is not exported by SVR 4.2 MP DDI/DKI or
+This function is not exported by
+.IR "SVR 4.2 MP DDI/DKI"
+or
 .IR Solaris \(rg.
 .PP
 See
@@ -202,7 +204,8 @@ for additional compatibility information.
 .BR freeq ()
 is compliant to the description of the internal
 .BR freeq ()
-function in SVR 4
+function in
+.I SVR 4
 .[
 svr4
 .]
@@ -216,7 +219,8 @@ magic
 .SH HISTORY
 .PP
 .BR freeq ()
-is an internal SVR 4
+is an internal
+.I SVR 4
 .I STREAMS
 function described in
 .IR "\*(lqThe Magic Garden\*(rq" .

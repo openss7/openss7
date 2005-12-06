@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.7 2005/11/26 11:17:11 brian Exp $
+.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.8 2005/12/06 09:39:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/26 11:17:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -136,7 +136,7 @@ and
 .BR mi_copy_state (9).
 .PP
 .BR mi_copyout ()
-is used to copy data from the kernel to user-space.  When a module or driver
+is used to copy data from the kernel to user-space.  When a driver or module
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -235,7 +235,7 @@ for examples of the usage of
 .BR mi_copyout ()
 can be called from any context; however, it is normally called from the
 .I STREAMS
-module or driver write-side queue
+driver or module write-side queue
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -248,7 +248,7 @@ procedure.
 is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
 in message blocks.  This is normally the case when the function is called from the
 .I STREAMS
-module or driver write-side queue
+driver or module write-side queue
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)

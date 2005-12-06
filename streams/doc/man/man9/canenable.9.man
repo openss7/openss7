@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canenable.9.man,v 0.9.2.22 2005/12/02 12:05:12 brian Exp $
+.\" @(#) $Id: canenable.9.man,v 0.9.2.23 2005/12/06 09:39:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 09:39:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -186,7 +186,7 @@ is always successful.
 .PP
 .BR canenable ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
 It is normally called from a
 .I STREAMS
 synchronous context [see
@@ -243,7 +243,7 @@ across the call, or on SMP systems where the Stream is frozen by
 .PP
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR canenable ().
 .\"
 .\"
@@ -316,7 +316,7 @@ for single threaded drivers (e.g. ones with synchronization level
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR canenable ().
 .IP \(em
 None of
@@ -335,7 +335,7 @@ document
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR canenable ().
 .IP \(em
 .BR canenable ()
@@ -349,7 +349,7 @@ as a macro.
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not try to take a function pointer to
+drivers and modules will not try to take a function pointer to
 .BR canenable ().
 .IP \(em
 A call to
@@ -370,7 +370,7 @@ encounters such an error, it will return false (0).
 .IP ""
 Portable
 .I STREAMS
-modules and drivers will not call
+drivers and modules will not call
 .BR canenable ()
 with invalid queue pointers.
 .IP \(em
@@ -414,9 +414,9 @@ devices are not supported.
 .\".IP ""
 .\"Portable
 .\".I STREAMS
-.\"modules and drivers will not access these symbols.  Portable
+.\"drivers and modules will not access these symbols.  Portable
 .\".I STREAMS
-.\"modules and drivers will use
+.\"drivers and modules will use
 .\".B "@PACKAGE_TITLE@"
 .\"instead of
 .\".IR LiS .
