@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/06 10:25:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/06 10:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/06 10:25:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/05 22:49:05 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/06 10:25:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -202,7 +202,7 @@ allocqb(void)
 
 	/* Queue bands are allocated as part of the normal STREAMS module or driver procedures and
 	   must be allocated SLAB_ATOMIC. */
-	if ((qb = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+	if (likely((qb = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
 		struct qbinfo *qbi = (struct qbinfo *) qb;
 
 		atomic_set(&qbi->qbi_refs, 1);
@@ -314,7 +314,7 @@ ap_alloc(struct strapush *sap)
 
 	/* Note: this function is called (indirectly) by the SAD driver put procedure and,
 	   therefore, needs atomic allocations. */
-	if ((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+	if (likely((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail(&api->api_list, &si->si_head);
@@ -389,6 +389,7 @@ devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
+
 #if 0
 BIG_STATIC struct devinfo *
 di_alloc(struct cdevsw *cdev)
@@ -399,7 +400,7 @@ di_alloc(struct cdevsw *cdev)
 	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from
 	   fast streams.  Chances are it will only be called at registration time, but I will leave
 	   this at SLAB_ATOMIC until the compatibility module can be checked. */
-	if ((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+	if (likely((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
@@ -488,6 +489,7 @@ mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
+
 #if 0
 BIG_STATIC struct mdlinfo *
 modi_alloc(struct fmodsw *fmod)
@@ -498,7 +500,7 @@ modi_alloc(struct fmodsw *fmod)
 	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from
 	   fast streams.  Chances are it will only be called at registration time, but I will leave
 	   this at SLAB_ATOMIC until the compatibility module can be checked. */
-	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+	if (likely((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
@@ -596,7 +598,7 @@ allocq(void)
 	/* Note: we only allocate queue pairs in the stream head which is called at user context
 	   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL instead of
 	   SLAB_ATOMIC.  Allocate your private queue pairs in qopen/qclose or module init. */
-	if ((rq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+	if (likely((rq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 		queue_t *wq = rq + 1;
 		struct queinfo *qu = (struct queinfo *) rq;
 
@@ -691,6 +693,7 @@ freeq_fast(queue_t *rq)
 		freechain(mp, mpp);
 #endif
 }
+
 void
 freeq(queue_t *rq)
 {
@@ -764,7 +767,7 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  but, if we are at irq, then we will only use the supplied value, even if %NULL.
  */
 
-STATIC queue_t *
+STATIC streams_inline streams_fastcall queue_t *
 queue_guess(queue_t *q)
 {
 	queue_t *guess;
@@ -803,50 +806,52 @@ mdbblock_alloc(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 	mblk_t *mp = NULL;
-	int slab_flags;
+	int slab_flags = SLAB_ATOMIC;
 
 	trace();
 	if (atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs)
 		goto fail;
-	switch (priority) {
-	case BPRI_HI:
+	if (unlikely(priority != BPRI_MED)) {
+		switch (priority) {
+		case BPRI_HI:
 #if 0
-		/* testing theory about BPRI_HI allocation errors */
-	{
-		struct strthread *t = this_thread;
-		unsigned long flags;
+			/* testing theory about BPRI_HI allocation errors */
+		{
+			struct strthread *t = this_thread;
+			unsigned long flags;
 
-		local_irq_save(flags);	/* MP-SAFE */
-		/* This atomic exchange sequence could break if an ISR is freeing blocks at the
-		   same time as this is executing, and we allow freeb() to be called from ISR, so
-		   we suppress interrupts. */
-		if ((mp = xchg(&t->freemblk_head, NULL)))
-			t->freemblk_head = xchg(&mp->b_next, NULL);
-		local_irq_restore(flags);
-		if (mp != NULL) {
-			struct mdbblock *md = (struct mdbblock *) mp;
+			local_irq_save(flags);	/* MP-SAFE */
+			/* This atomic exchange sequence could break if an ISR is freeing blocks at 
+			   the same time as this is executing, and we allow freeb() to be called
+			   from ISR, so we suppress interrupts. */
+			if ((mp = xchg(&t->freemblk_head, NULL)))
+				t->freemblk_head = xchg(&mp->b_next, NULL);
+			local_irq_restore(flags);
+			if (mp != NULL) {
+				struct mdbblock *md = (struct mdbblock *) mp;
 
-			ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
-			mp->b_prev = NULL;
-			md->msgblk.m_func = func;
-			ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
-			return (mp);
+				ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
+				mp->b_prev = NULL;
+				md->msgblk.m_func = func;
+				ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
+				return (mp);
+			}
+		}
+#endif
+		case BPRI_MED:
+			slab_flags = SLAB_ATOMIC;
+			break;
+		default:
+		case BPRI_LO:
+			slab_flags = SLAB_ATOMIC | SLAB_NO_GROW;
+			break;
+		case BPRI_WAITOK:
+			slab_flags = SLAB_KERNEL;
+			break;
 		}
 	}
-#endif
-	case BPRI_MED:
-		slab_flags = SLAB_ATOMIC;
-		break;
-	default:
-	case BPRI_LO:
-		slab_flags = SLAB_ATOMIC | SLAB_NO_GROW;
-		break;
-	case BPRI_WAITOK:
-		slab_flags = SLAB_KERNEL;
-		break;
-	}
 	trace();
-	if ((mp = kmem_cache_alloc(sdi->si_cache, slab_flags))) {
+	if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
 
@@ -978,7 +983,7 @@ freeblocks(struct strthread *t)
 	register mblk_t *mp, *mp_next;
 
 	clear_bit(freeblks, &t->flags);
-	if ((mp_next = xchg(&t->freemblk_head, NULL))) {	/* MP-SAFE */
+	if (likely((mp_next = xchg(&t->freemblk_head, NULL)) != NULL)) {	/* MP-SAFE */
 		t->freemblk_tail = &t->freemblk_head;
 		while ((mp = mp_next)) {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -1043,7 +1048,7 @@ alloclk(void)
 	/* linkblk's are only allocated by the STREAM head when performing an I_LINK or I_PLINK
 	   operation, and this function is only called in user context with no locks held.
 	   Therefore, we can sleep and SLAB_KERNEL is used instead of SLAB_ATOMIC. */
-	if ((l = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+	if (likely((l = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 #if defined CONFIG_STREAMS_DEBUG
 		struct linkinfo *li = (struct linkinfo *) l;
 
@@ -1118,7 +1123,7 @@ sq_alloc(void)
 
 	/* Note: sq_alloc() is only called by qattach() that is only called by the STREAM head at
 	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
-	if ((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+	if (likely((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 		_ptrace(("syncq %p is allocated\n", sq));
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
@@ -1234,7 +1239,7 @@ event_alloc(int type, queue_t *q)
 	if (atomic_read(&si->si_cnt) < EVENT_LIMIT) {
 		/* Note: Events are allocated in the normal course of STREAMS driver and module
 		   procedures and must be called with SLAB_ATOMIC. */
-		if ((se = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+		if (likely((se = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC)) != NULL)) {
 			struct seinfo *s = (struct seinfo *) se;
 
 			s->s_type = type;
@@ -3506,7 +3511,7 @@ domfuncs(struct strthread *t)
 				do_mblk_func(b);
 			}
 		}
-	} while (test_bit(strmfuncs, &t->flags));
+	} while (unlikely(test_bit(strmfuncs, &t->flags) != 0));
 }
 
 /*
@@ -3530,7 +3535,7 @@ timeouts(struct strthread *t)
 				do_timeout_event(se);
 			}
 		}
-	} while (test_bit(strtimout, &t->flags));
+	} while (unlikely(test_bit(strtimout, &t->flags) != 0));
 }
 
 STATIC void
@@ -3585,7 +3590,7 @@ scanqueues(struct strthread *t)
 			if (q)
 				t->scanqhead = q;
 		}
-	} while (test_bit(scanqflag, &t->flags));
+	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
 }
 
 void
@@ -3643,7 +3648,7 @@ doevents(struct strthread *t)
 				}
 			}
 		}
-	} while (test_bit(strevents, &t->flags));
+	} while (unlikely(test_bit(strevents, &t->flags) != 0));
 }
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -3765,7 +3770,7 @@ backlog(struct strthread *t)
 				runsyncq(sq);
 			}
 		}
-	} while (test_bit(qsyncflag, &t->flags));
+	} while (unlikely(test_bit(qsyncflag, &t->flags) != 0));
 }
 #endif
 
@@ -3796,7 +3801,7 @@ bufcalls(struct strthread *t)
 				do_bufcall_event(se);
 			}
 		}
-	} while (test_bit(strbcwait, &t->flags));
+	} while (unlikely(test_bit(strbcwait, &t->flags) != 0));
 }
 
 /**
@@ -3812,7 +3817,7 @@ queuerun(struct strthread *t)
 
 	do {
 		clear_bit(qrunflag, &t->flags);
-		if ((q_link = xchg(&t->qhead, NULL))) {	/* MP-SAFE */
+		if (likely((q_link = xchg(&t->qhead, NULL)) != NULL)) {	/* MP-SAFE */
 			t->qtail = &t->qhead;
 			while ((q = q_link)) {
 				q_link = xchg(&q->q_link, NULL);
@@ -3823,7 +3828,7 @@ queuerun(struct strthread *t)
 #endif
 			}
 		}
-	} while (test_bit(qrunflag, &t->flags));
+	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
 }
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -3949,10 +3954,10 @@ _runqueues(struct softirq_action *unused)
 	trace();
 	t = this_thread;
 
-	if (!(t->flags & (QRUNFLAGS)))
+	if (unlikely(!(t->flags & (QRUNFLAGS))))
 		return;
 
-	if (atomic_read(&t->lock) != 0)
+	if (unlikely(atomic_read(&t->lock) != 0))
 		return ctrace(set_bit(qwantrun, &t->flags));
 
 	atomic_inc(&t->lock);
@@ -3961,39 +3966,40 @@ _runqueues(struct softirq_action *unused)
 		if (unlikely((t->flags & (STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG
 					  | STREVENTS | STRBCFLAG | STRBCWAIT)) != 0)) {
 			/* do deferred m_func's first */
-			if (test_bit(strmfuncs, &t->flags))
+			if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
 				ctrace(domfuncs(t));
 #if defined CONFIG_STREAMS_SYNCQS
 			/* catch up on backlog first */
-			if (test_bit(qsyncflag, &t->flags))
+			if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
 				ctrace(backlog(t));
 #endif
 			/* do timeouts */
-			if (test_bit(strtimout, &t->flags))
+			if (unlikely(test_bit(strtimout, &t->flags) != 0))
 				ctrace(timeouts(t));
 			/* do stream head write queue scanning */
-			if (test_bit(scanqflag, &t->flags))
+			if (unlikely(test_bit(scanqflag, &t->flags) != 0))
 				ctrace(scanqueues(t));
 			/* do pending events */
-			if (test_bit(strevents, &t->flags))
+			if (unlikely(test_bit(strevents, &t->flags) != 0))
 				ctrace(doevents(t));
 			/* do buffer calls if necessary */
-			if (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags))
+			if (unlikely
+			    (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
 				ctrace(bufcalls(t));
 		}
 		/* run queue service procedures if necessary */
-		if (test_bit(qrunflag, &t->flags))
+		if (likely(test_bit(qrunflag, &t->flags) != 0))
 			ctrace(queuerun(t));
-		if (unlikely((t->flags & (FLUSHWORK | FREEBLKS)) != 0)) {
+		if (likely((t->flags & (FLUSHWORK | FREEBLKS)) != 0)) {
 			/* free flush chains if necessary */
-			if (test_bit(flushwork, &t->flags))
+			if (unlikely(test_bit(flushwork, &t->flags) != 0))
 				ctrace(freechains(t));
 			/* free mdbblocks to cache, if memory needed */
-			if (test_bit(freeblks, &t->flags))
+			if (likely(test_bit(freeblks, &t->flags) != 0))
 				ctrace(freeblocks(t));
 		}
 		clear_bit(qwantrun, &t->flags);
-	} while (t->flags & (QRUNFLAGS));
+	} while (unlikely(t->flags & (QRUNFLAGS)));
 
 	atomic_dec(&t->lock);
 }
@@ -4080,7 +4086,7 @@ allocstr(void)
 		/* Note: we only allocate stream heads in stropen which is called in user context
 		   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL
 		   instead of SLAB_ATOMIC. */
-		if ((sd = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+		if (likely((sd = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 			struct shinfo *sh = (struct shinfo *) sd;
 
 			atomic_set(&sh->sh_refs, 1);
@@ -4460,7 +4466,7 @@ kill_kstreamd(void)
 #endif
 #if defined HAVE_DO_EXIT_ADDR
 static asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
-= (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
+    = (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
 #undef do_exit
 #define do_exit do_exit_
 #endif

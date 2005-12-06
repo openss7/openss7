@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/05 22:49:06 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/06 10:25:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
+ Last Modified $Date: 2005/12/06 10:25:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/05 22:49:06 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/06 10:25:40 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/05 22:49:06 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/06 10:25:40 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1323,7 +1323,7 @@ _bcanput(queue_t *q, unsigned char band)
 
 	pl = qrlock(q);
 
-	if (band == 0) {
+	if (likely(band == 0)) {
 		if (test_bit(QFULL_BIT, &q->q_flag)) {
 			set_bit(QWANTW_BIT, &q->q_flag);
 			result = 0;
@@ -1331,7 +1331,7 @@ _bcanput(queue_t *q, unsigned char band)
 	} else {
 		struct qband *qb;
 
-		if (band <= q->q_nband && q->q_blocked > 0) {
+		if (likely(band <= q->q_nband && q->q_blocked > 0)) {
 			if ((qb = __find_qband(q, band)) && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 				set_bit(QB_WANTW_BIT, &qb->qb_flag);
 				result = 0;
@@ -1389,18 +1389,23 @@ _bcanput(queue_t *q, unsigned char band)
 streams_fastcall int
 bcanput(queue_t *q, unsigned char band)
 {
-	struct stdata *sd;
 	int result;
+
+#ifdef CONFIG_SMP
+	struct stdata *sd;
 
 	dassert(q);
 	sd = qstream(q);
 
 	dassert(sd);
 	prlock(sd);
+#endif
 
 	result = _bcanput(q, band);
 
+#ifdef CONFIG_SMP
 	prunlock(sd);
+#endif
 
 	return (result);
 }
@@ -1444,6 +1449,7 @@ streams_fastcall int
 bcanputnext(queue_t *q, unsigned char band)
 {
 	int result;
+
 #ifdef CONFIG_SMP
 	struct stdata *sd;
 
@@ -1672,7 +1678,7 @@ qschedule(queue_t *q)
 streams_fastcall void
 qenable(queue_t *q)
 {
-	if (q->q_qinfo->qi_srvp)
+	if (likely(q->q_qinfo->qi_srvp != NULL))
 		qschedule(q);
 }
 
@@ -1689,7 +1695,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
 int
 enableq(queue_t *q)
 {
-	if (q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag)) {
+	if (likely(q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag))) {
 		qenable(q);
 		return (1);
 	}
@@ -1860,27 +1866,31 @@ putbq(queue_t *q, mblk_t *mp)
 	pl = qwlock(q);
 	result = __putbq(q, mp);
 	qwunlock(q, pl);
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		qenable(q);
-		return (1);
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-	case 1:		/* success - don't enable */
-		return (1);
-	default:
-		assert(result == 0);
-	case 0:		/* failure */
-		assert(0);
-		/* This should never happen, because it takes a qband structure allocation failure
-		   to get here, and since we are putting the message back on the queue, there
-		   should already be a qband structure. Unless, however, putbq() is just used to
-		   insert messages ahead of others rather than really putting them back.
-		   Nevertheless, a way to avoid this error is to always ensure that a qband
-		   structure exists (e.g., with strqset) before calling putbq on a band for the
-		   first time. */
-		return (0);
+	if (unlikely(result != 1)) {
+		switch (result) {
+		case 3:	/* success - high priority enable */
+			qenable(q);
+			break;
+		case 2:	/* success - enable if not noenabled */
+			enableq(q);
+			break;
+		case 1:	/* success - don't enable */
+			break;
+		default:
+			assert(result == 0);
+		case 0:	/* failure */
+			assert(0);
+			/* This should never happen, because it takes a qband structure allocation
+			   failure to get here, and since we are putting the message back on the
+			   queue, there should already be a qband structure. Unless, however,
+			   putbq() is just used to insert messages ahead of others rather than
+			   really putting them back. Nevertheless, a way to avoid this error is to
+			   always ensure that a qband structure exists (e.g., with strqset) before
+			   calling putbq on a band for the first time. */
+			return (0);
+		}
 	}
+	return (1);
 }
 
 EXPORT_SYMBOL(putbq);
@@ -2161,24 +2171,28 @@ putq(queue_t *q, mblk_t *mp)
 	pl = qwlock(q);
 	result = __putq(q, mp);
 	qwunlock(q, pl);
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		qenable(q);
-		return (1);
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-	case 1:		/* success - don't enable */
-		return (1);
-	default:
-		assert(result == 0);
-	case 0:		/* failure */
-		assert(mp->b_band != 0);
-		/* This can happen and it is bad.  We use the return value to putq but it is
-		   typically ignored by the module.  One way to ensure that this never happens is
-		   to call strqset() for the band before calling putq on the band for the first
-		   time. (See also putbq()) */
-		return (0);
+	if (unlikely(result != 1)) {
+		switch (result) {
+		case 3:	/* success - high priority enable */
+			qenable(q);
+			break;
+		case 2:	/* success - enable if not noenabled */
+			enableq(q);
+			break;
+		case 1:	/* success - don't enable */
+			break;
+		default:
+			assert(result == 0);
+		case 0:	/* failure */
+			assert(mp->b_band != 0);
+			/* This can happen and it is bad.  We use the return value to putq but it
+			   is typically ignored by the module.  One way to ensure that this never
+			   happens is to call strqset() for the band before calling putq on the
+			   band for the first time. (See also putbq()) */
+			return (0);
+		}
 	}
+	return (1);
 }
 
 EXPORT_SYMBOL(putq);
@@ -2305,20 +2319,24 @@ insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	pl = qwlock(q);
 	result = __insq(q, emp, nmp);
 	qwunlock(q, pl);
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		assert(0);
-		qenable(q);
-		return (1);
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-	case 1:		/* success - don't enable */
-		return (1);
-	default:
-		never();
-	case 0:		/* failure */
-		return (0);
+	if (unlikely(result != 1)) {
+		switch (result) {
+		case 3:	/* success - high priority enable */
+			assert(0);
+			qenable(q);
+			break;
+		case 2:	/* success - enable if not noenabled */
+			enableq(q);
+			break;
+		case 1:	/* success - don't enable */
+			break;
+		default:
+			never();
+		case 0:	/* failure */
+			return (0);
+		}
 	}
+	return (1);
 }
 
 EXPORT_SYMBOL(insq);
@@ -2351,20 +2369,24 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
 	qwunlock(q, pl);
 	/* do enabling outside the locks */
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		assert(0);
-		qenable(q);
-		return (1);
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-	case 1:		/* success - don't enable */
-		return (1);
-	default:
-		never();
-	case 0:		/* failure */
-		return (0);
+	if (unlikely(result != 1)) {
+		switch (result) {
+		case 3:	/* success - high priority enable */
+			assert(0);
+			qenable(q);
+			break;
+		case 2:	/* success - enable if not noenabled */
+			enableq(q);
+			break;
+		case 1:	/* success - don't enable */
+			break;
+		default:
+			never();
+		case 0:	/* failure */
+			return (0);
+		}
 	}
+	return (1);
 }
 
 EXPORT_SYMBOL(appq);
@@ -2600,13 +2622,17 @@ qinsert(struct stdata *sd, queue_t *irq)
 
 	ptrace(("initial  half-insert of stream %p queue pair %p\n", sd, irq));
 
+#ifdef CONFIG_SMP
 	prlock(sd);
+#endif
 	srq = sd->sd_rq;
 	iwq = OTHERQ(irq);
 	swq = OTHERQ(srq);
 	irq->q_next = srq;
 	iwq->q_next = (swq->q_next != srq) ? swq->q_next : irq;
+#ifdef CONFIG_SMP
 	prunlock(sd);
+#endif
 }
 
 EXPORT_SYMBOL(qinsert);
@@ -2819,16 +2845,20 @@ qcountstrm(queue_t *q)
 	ssize_t count = 0;
 
 	if (q) {
+#ifdef CONFIG_SMP
 		struct stdata *sd;
 
 		sd = qstream(q);
 		assert(sd);
 		prlock(sd);
+#endif
 
 		for (; q && SAMESTR(q); q = q->q_next)
 			count += q->q_count;
 
+#ifdef CONFIG_SMP
 		prunlock(sd);
+#endif
 	}
 	return (count);
 }
@@ -3014,7 +3044,7 @@ rmvq(queue_t *q, mblk_t *mp)
 	qwunlock(q, pl);
 
 	/* Backenabling under locks is not so severe when write locks only suppress soft irq. */
-	if (backenable)
+	if (unlikely(backenable != 0))
 		qbackenable(q, mp->b_band, NULL);
 }
 
@@ -3165,12 +3195,14 @@ flushband(queue_t *q, int band, int flag)
 	pl = qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
 	qwunlock(q, pl);
-	if (backenable)
+
+	if (unlikely(backenable != 0))
 		qbackenable(q, band, NULL);
+
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
-	if (mp)
+	if (unlikely(mp != 0))
 		freechain(mp, mpp);
 }
 
@@ -3291,13 +3323,13 @@ flushq(queue_t *q, int flag)
 	backenable = __flushq(q, flag, &mpp, back);
 	qwunlock(q, pl);
 
-	if (backenable)
+	if (unlikely(backenable != 0))
 		qbackenable(q, q_nband, back);
 
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
-	if (mp)
+	if (unlikely(mp != 0))
 		freechain(mp, mpp);
 }
 
@@ -3453,7 +3485,7 @@ getq(queue_t *q)
 	pl = qwlock(q);
 	mp = __getq(q, &backenable);
 	qwunlock(q, pl);
-	if (backenable) {
+	if (unlikely(backenable != 0)) {
 		unsigned char b_band;
 
 		b_band = mp ? mp->b_band : 0;
@@ -3669,7 +3701,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 	}
 	return (0);
       enomem:
-	return (-ENOMEM); /* XXX: This should probably be ENOSR or EAGAIN. */
+	return (-ENOMEM);	/* XXX: This should probably be ENOSR or EAGAIN. */
 #endif
 }
 
@@ -3976,6 +4008,7 @@ int
 vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	int result = 0;
+
 	read_lock(&strlog_reg_lock);
 	if (vstrlog_hook != NULL) {
 		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
