@@ -1,1 +1,1 @@
-.so man9/undoc.9.man
+.so man5/specfs.5.man

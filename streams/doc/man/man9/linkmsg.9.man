@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: linkmsg.9.man,v 0.9.2.11 2005/12/02 12:05:14 brian Exp $
+.\" @(#) $Id: linkmsg.9.man,v 0.9.2.12 2005/12/06 14:09:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/02 12:05:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 14:09:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -161,6 +161,7 @@ messages.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR unlinkmsg (9),
 .BR linkb (9).
 .\"
 .\"

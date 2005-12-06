@@ -1,1 +1,1 @@
-.so man9/undoc.9.man
+.so man9/alloclk.9.man

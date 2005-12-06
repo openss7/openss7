@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_FATTACH.7.man,v 0.9.2.3 2005/11/22 11:57:11 brian Exp $
+.\" @(#) $Id: I_FATTACH.7.man,v 0.9.2.4 2005/12/06 14:09:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:11 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/06 14:09:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_FATTACH.7.man,v $
+.\" Revision 0.9.2.4  2005/12/06 14:09:16  brian
+.\" - manpages close to complete
+.\"
 .\" Revision 0.9.2.3  2005/11/22 11:57:11  brian
 .\" - updating documentation for release
 .\"
@@ -115,10 +118,53 @@ always
 .BR I_FATTACH .
 .TP
 .I arg
+a pointer to a string giving the path to the file to which to attach.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B I_FATTACH
+provides an
+.BR ioctl (2s)
+emulation of the
+.BR fattach (2s)
+system call.
+.B I_FATTACH
+is emulated in this way due to the
+.B Linux
+kernel's failure to provide any means to implement standard system calls.
+.PP
+Under the emulation,
+.I fd
+is the same as the
+.I fd
+argument to
+.BR fattach (2s);
+.I arg
+is the same as the
+.I path
+argument to
+.BR fattach (2s).
+.I cmd
+is always
+.BR I_FATTACH .
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B I_FATTACH
+input-output control is not intended to be invoked directly with the
+.BR ioctl (2s)
+interface, but rather via the
+.BR fattach (2s)
+library call.
+.PP
+See
+.BR fattach (2s)
+for details on the operation of the system call this
+.BR ioctl (2s)
+emulates, and usage information.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -149,12 +195,61 @@ command fails, it returns
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[\fBENAMETOOLONG\fR]\(em'u
+.RB [ EACCES ]
+Write access to the file specified by
+.I path
+is not allowed, or one of the directories in
+.I path
+did not allow search (execute) permission.
+.TP
+.RB [ EBADF ]
+The file descriptor,
+.IR fd ,
+is invalid.
+.TP
+.RB [ EBUSY ]
+The file specified by
+.I path
+is currently a mount point or already has a
+.I STREAMS
+special file attached to it.
+.TP
+.RB [ ELOOP ]
+Too many symbolic links were encountered resolving
+.IR path .
+.TP
+.RB [ ENAMETOOLONG ]
+.I path
+was too long or a resolved symbolic link contained a pathname that was too
+long.
+.TP
+.RB [ ENOENT ]
+A directory component in
+.I path
+does not exists or is a dangling symbolic link.
+.TP
+.RB [ ENOTDIR ]
+A component used as a directory in
+.I path
+is not a directory.
+.TP
+.RB [ EPERM ]
+The effective user ID of the process is not the owner of the file specified by
+.I path
+and the process does not have appropriate privileges.
+.TP
+.RB [ EINVAL ]
+.I fd
+does not refer to a
+.I STREAMS
+special file.
 .\"
 .PP
 In general, any
 .BR ioctl (2s)
 command can fail if:
-.TP \w'[EWOULDBLOCK]\(em'u
+.TP \w'[\fBENAMETOOLONG\fR]\(em'u
 .RB [ EFAULT ]
 .IR arg ,
 or a pointer member of a structure pointed to by
@@ -323,6 +418,7 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR fattach (3p),
 .BR ioctl (3p),
 .BR streamio (7),
 .BR ioctl (2s),
@@ -357,6 +453,12 @@ LiS
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+It is fairly common practice to emulate system calls with 
+.BR ioctl (2s)
+commands.
+.IP \(em
+.B I_FATTACH
+should not be invoked directly, but, rather, via the appropriate library call.
 .PP
 For general
 .BR ioctl (2s)
