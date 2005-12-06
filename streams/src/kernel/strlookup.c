@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/02 12:05:18 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/02 12:05:18 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/05 22:49:05 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/02 12:05:18 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/05 22:49:05 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -1271,7 +1271,7 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 
 EXPORT_SYMBOL(cmin_del);
 
-int
+BIG_STATIC int
 strlookup_init(void)
 {
 	init_fmod_hash();
@@ -1280,7 +1280,7 @@ strlookup_init(void)
 	return (0);
 }
 
-void
+BIG_STATIC void
 strlookup_exit(void)
 {
 	return;

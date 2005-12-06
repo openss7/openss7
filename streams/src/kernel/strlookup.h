@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlookup.h,v 0.9.2.11 2005/08/31 19:03:10 brian Exp $
+ @(#) $Id: strlookup.h,v 0.9.2.12 2005/12/05 22:49:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/31 19:03:10 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -73,8 +73,10 @@ extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 extern struct fmodsw *STREAMS_FASTCALL(fmod_str(const struct streamtab *str));
 extern struct cdevsw *STREAMS_FASTCALL(cdev_str(const struct streamtab *str));
 
+#ifndef BIG_COMPILE
 /* initialization for specfs */
 extern int strlookup_init(void);
 extern void strlookup_exit(void);
+#endif
 
 #endif				/* __LOCAL_STRLOOKUP_H__ */

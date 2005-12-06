@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/05 01:43:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/05 01:43:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/05 22:49:05 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/05 01:43:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/05 22:49:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -90,7 +90,9 @@ static char const ident[] =
 #include <linux/major.h>
 // #include <asm/atomic.h>
 
+#ifndef __STRSCHD_EXTERN_INLINE
 #define __STRSCHD_EXTERN_INLINE inline
+#endif
 
 #include "sys/strdebug.h"
 
@@ -108,7 +110,7 @@ static char const ident[] =
 #include "src/kernel/strsched.h"	/* verification of externs */
 
 struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
-struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
+BIG_STATIC struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(strthreads);
@@ -124,7 +126,7 @@ __raise_streams(void)
 	wake_up_process(t->proc);
 }
 
-static inline streams_fastcall void
+static streams_fastcall void
 cpu_raise_streams(unsigned int cpu)
 {
 	struct strthread *t = &strthreads[cpu];
@@ -162,7 +164,7 @@ __raise_streams(void)
 #endif
 #endif
 
-static inline streams_fastcall void
+static streams_fastcall void
 cpu_raise_streams(unsigned int cpu)
 {
 	cpu_raise_softirq(cpu, STREAMS_SOFTIRQ);
@@ -171,6 +173,564 @@ cpu_raise_streams(unsigned int cpu)
 #endif				/* defined CONFIG_STREAMS_KTHREADS */
 
 EXPORT_SYMBOL(__raise_streams);
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  QBAND ctors and dtors
+ *
+ *  -------------------------------------------------------------------------
+ *  Keep the cache ctors and the object ctors and dtors close to each other.
+ */
+STATIC void
+qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+{
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+		struct qbinfo *qbi = obj;
+
+		bzero(qbi, sizeof(*qbi));
+#if defined CONFIG_STREAMS_DEBUG
+		INIT_LIST_HEAD(&qbi->qbi_list);
+#endif
+	}
+}
+BIG_STATIC struct qband *
+allocqb(void)
+{
+	struct qband *qb;
+	struct strinfo *si = &Strinfo[DYN_QBAND];
+
+	/* Queue bands are allocated as part of the normal STREAMS module or driver procedures and
+	   must be allocated SLAB_ATOMIC. */
+	if ((qb = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+		struct qbinfo *qbi = (struct qbinfo *) qb;
+
+		atomic_set(&qbi->qbi_refs, 1);
+#if defined CONFIG_STREAMS_DEBUG
+		write_lock(&si->si_rwlock);
+		list_add_tail(&qbi->qbi_list, &si->si_head);
+		write_unlock(&si->si_rwlock);
+#endif
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+	}
+	return (qb);
+}
+
+BIG_STATIC void
+freeqb(struct qband *qb)
+{
+	struct strinfo *si = &Strinfo[DYN_QBAND];
+
+#if defined CONFIG_STREAMS_DEBUG
+	struct qbinfo *qbi = (struct qbinfo *) qb;
+
+	write_lock(&si->si_rwlock);
+	list_del_init(&qbi->qbi_list);
+	write_unlock(&si->si_rwlock);
+#endif
+	atomic_dec(&si->si_cnt);
+	/* clean it up before putting it back in the cache */
+	bzero(qb, sizeof(*qb));
+	kmem_cache_free(si->si_cache, qb);
+}
+STATIC streams_fastcall void
+__freebands(queue_t *rq)
+{
+	struct qband *qb, *qb_next;
+	queue_t *q;
+
+	for (q = rq; q < rq + 1; q++) {
+		if ((qb_next = xchg(&q->q_bandp, NULL))) {
+			while ((qb = qb_next)) {
+				qb_next = qb->qb_next;
+				freeqb(qb);
+			}
+			q->q_nband = 0;
+			q->q_blocked = 0;
+		}
+	}
+}
+
+#if 0
+/* queue band gets and puts */
+BIG_STATIC streams_fastcall qband_t *
+bget(qband_t *qb)
+{
+	struct qbinfo *qbi;
+
+	if (qb) {
+		qbi = (typeof(qbi)) qb;
+		if (atomic_read(&qbi->qbi_refs) < 1)
+			swerr();
+		atomic_inc(&qbi->qbi_refs);
+	}
+	return (qb);
+}
+BIG_STATIC streams_fastcall void
+bput(qband_t **bp)
+{
+	qband_t *qb;
+
+	if ((qb = xchg(bp, NULL))) {
+		struct qbinfo *qbi = (typeof(qbi)) qb;
+
+		if (atomic_read(&qbi->qbi_refs) >= 1) {
+			if (unlikely(atomic_dec_and_test(&qbi->qbi_refs) != 0))
+				freeqb(qb);
+		} else
+			swerr();
+	}
+}
+#endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  APUSH ctors and dtors
+ *
+ *  -------------------------------------------------------------------------
+ *  keep the cache ctors and the object ctors and dtors close to each other.
+ */
+STATIC void
+apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+{
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+		struct apinfo *api = obj;
+
+		bzero(api, sizeof(*api));
+		INIT_LIST_HEAD(&api->api_more);
+#if defined CONFIG_STREAMS_DEBUG
+		INIT_LIST_HEAD(&api->api_list);
+#endif
+	}
+}
+BIG_STATIC struct apinfo *
+ap_alloc(struct strapush *sap)
+{
+	struct apinfo *api;
+	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
+
+	/* Note: this function is called (indirectly) by the SAD driver put procedure and,
+	   therefore, needs atomic allocations. */
+	if ((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+#if defined CONFIG_STREAMS_DEBUG
+		write_lock(&si->si_rwlock);
+		list_add_tail(&api->api_list, &si->si_head);
+		write_unlock(&si->si_rwlock);
+#endif
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+		atomic_set(&api->api_refs, 1);
+		api->api_sap = *sap;
+	}
+	return (api);
+}
+STATIC void
+ap_free(struct apinfo *api)
+{
+	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
+
+#if defined CONFIG_STREAMS_DEBUG
+	write_lock(&si->si_rwlock);
+	list_del_init(&api->api_list);
+	write_unlock(&si->si_rwlock);
+#endif
+	atomic_dec(&si->si_cnt);
+	list_del_init(&api->api_more);
+	/* clean it up before putting it back in the cache */
+	bzero(api, sizeof(*api));
+	INIT_LIST_HEAD(&api->api_more);
+#if defined CONFIG_STREAMS_DEBUG
+	INIT_LIST_HEAD(&api->api_list);
+#endif
+	kmem_cache_free(si->si_cache, api);
+}
+BIG_STATIC struct apinfo *
+ap_get(struct apinfo *api)
+{
+	if (api) {
+		assert(atomic_read(&api->api_refs) >= 1);
+		atomic_inc(&api->api_refs);
+	}
+	return (api);
+}
+
+BIG_STATIC void
+ap_put(struct apinfo *api)
+{
+	assert(api != NULL);
+
+	if (unlikely(atomic_dec_and_test(&api->api_refs) != 0))
+		ap_free(api);
+	return;
+}
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  DEVINFO ctors and dtors
+ *
+ *  -------------------------------------------------------------------------
+ */
+STATIC void
+devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+{
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+		struct devinfo *di = obj;
+
+		bzero(di, sizeof(*di));
+		INIT_LIST_HEAD(&di->di_list);
+		INIT_LIST_HEAD(&di->di_hash);
+#if defined CONFIG_STREAMS_DEBUG
+		INIT_LIST_HEAD((struct list_head *) &di->di_next);
+#endif
+	}
+}
+#if 0
+BIG_STATIC struct devinfo *
+di_alloc(struct cdevsw *cdev)
+{
+	struct devinfo *di;
+	struct strinfo *si = &Strinfo[DYN_DEVINFO];
+
+	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from
+	   fast streams.  Chances are it will only be called at registration time, but I will leave
+	   this at SLAB_ATOMIC until the compatibility module can be checked. */
+	if ((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+#if defined CONFIG_STREAMS_DEBUG
+		write_lock(&si->si_rwlock);
+		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
+		write_unlock(&si->si_rwlock);
+#endif
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+		atomic_set(&di->di_refs, 1);
+		di->di_dev = cdev;
+		atomic_set(&di->di_count, 0);
+		di->di_info = cdev->d_str->st_rdinit->qi_minfo;
+	}
+	return (di);
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
+EXPORT_SYMBOL(di_alloc);	/* include/sys/streams/strsubr.h */
+#endif
+
+STATIC void
+di_free(struct devinfo *di)
+{
+	struct strinfo *si = &Strinfo[DYN_DEVINFO];
+
+#if defined CONFIG_STREAMS_DEBUG
+	write_lock(&si->si_rwlock);
+	list_del_init((struct list_head *) &di->di_next);
+	write_unlock(&si->si_rwlock);
+#endif
+	atomic_dec(&si->si_cnt);
+	list_del_init(&di->di_list);
+	list_del_init(&di->di_hash);
+	/* clean it up before putting it back in the cache */
+	bzero(di, sizeof(*di));
+	INIT_LIST_HEAD(&di->di_list);
+	INIT_LIST_HEAD(&di->di_hash);
+#if defined CONFIG_STREAMS_DEBUG
+	INIT_LIST_HEAD((struct list_head *) &di->di_next);
+#endif
+	kmem_cache_free(si->si_cache, di);
+}
+
+BIG_STATIC struct devinfo *
+di_get(struct devinfo *di)
+{
+	if (di) {
+		assert(atomic_read(&di->di_refs) >= 1);
+		atomic_inc(&di->di_refs);
+	}
+	return (di);
+}
+
+BIG_STATIC void
+di_put(struct devinfo *di)
+{
+	assert(di != NULL);
+
+	if (unlikely(atomic_dec_and_test(&di->di_refs) != 0))
+		di_free(di);
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
+EXPORT_SYMBOL(di_put);		/* include/sys/streams/strsubr.h */
+#endif
+#endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  MODINFO ctors and dtors
+ *
+ *  -------------------------------------------------------------------------
+ */
+STATIC void
+mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+{
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+		struct mdlinfo *mi = obj;
+
+		bzero(mi, sizeof(*mi));
+		INIT_LIST_HEAD(&mi->mi_list);
+		INIT_LIST_HEAD(&mi->mi_hash);
+#if defined CONFIG_STREAMS_DEBUG
+		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
+#endif
+	}
+}
+#if 0
+BIG_STATIC struct mdlinfo *
+modi_alloc(struct fmodsw *fmod)
+{
+	struct mdlinfo *mi;
+	struct strinfo *si = &Strinfo[DYN_MODINFO];
+
+	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from
+	   fast streams.  Chances are it will only be called at registration time, but I will leave
+	   this at SLAB_ATOMIC until the compatibility module can be checked. */
+	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+#if defined CONFIG_STREAMS_DEBUG
+		write_lock(&si->si_rwlock);
+		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
+		write_unlock(&si->si_rwlock);
+#endif
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+		atomic_set(&mi->mi_refs, 1);
+		mi->mi_mod = fmod;
+		atomic_set(&mi->mi_count, 0);
+		mi->mi_info = fmod->f_str->st_rdinit->qi_minfo;
+	}
+	return (mi);
+}
+STATIC void
+modi_free(struct mdlinfo *mi)
+{
+	struct strinfo *si = &Strinfo[DYN_MODINFO];
+
+#if defined CONFIG_STREAMS_DEBUG
+	write_lock(&si->si_rwlock);
+	list_del_init((struct list_head *) &mi->mi_next);
+	write_unlock(&si->si_rwlock);
+#endif
+	atomic_dec(&si->si_cnt);
+	list_del_init(&mi->mi_list);
+	list_del_init(&mi->mi_hash);
+	/* clean it up before putting it back in the cache */
+	bzero(mi, sizeof(*mi));
+	INIT_LIST_HEAD(&mi->mi_list);
+	INIT_LIST_HEAD(&mi->mi_hash);
+#if defined CONFIG_STREAMS_DEBUG
+	INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
+#endif
+	kmem_cache_free(si->si_cache, mi);
+}
+BIG_STATIC struct mdlinfo *
+modi_get(struct mdlinfo *mi)
+{
+	if (mi) {
+		assert(atomic_read(&mi->mi_refs) >= 1);
+		atomic_inc(&mi->mi_refs);
+	}
+	return (mi);
+}
+
+BIG_STATIC void
+modi_put(struct mdlinfo *mi)
+{
+	assert(mi != NULL);
+	if (unlikely(atomic_dec_and_test(&mi->mi_refs) != 0))
+		modi_free(mi);
+}
+#endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  QUEUE ctors and dtors
+ *
+ *  -------------------------------------------------------------------------
+ *  Keep the cache ctors and the object ctors and dtors close to each other.
+ */
+STATIC void
+queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+{
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
+		struct queinfo *qu = obj;
+
+		bzero(qu, sizeof(*qu));
+		/* initialize queue locks */
+		qlockinit(&qu->rq);
+		qlockinit(&qu->wq);
+		qu->rq.q_flag = QREADR;
+		qu->wq.q_flag = 0;
+		init_waitqueue_head(&qu->qu_qwait);
+#if defined CONFIG_STREAMS_DEBUG
+		INIT_LIST_HEAD(&qu->qu_list);
+#endif
+	}
+}
+
+/**
+ *  allocq:	- allocate a queue pair
+ *
+ *  Can be called by the module writer to get a private queue pair.
+ */
+queue_t *
+allocq(void)
+{
+	queue_t *rq;
+	struct strinfo *si = &Strinfo[DYN_QUEUE];
+
+	/* Note: we only allocate queue pairs in the stream head which is called at user context
+	   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL instead of
+	   SLAB_ATOMIC.  Allocate your private queue pairs in qopen/qclose or module init. */
+	if ((rq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
+		queue_t *wq = rq + 1;
+		struct queinfo *qu = (struct queinfo *) rq;
+
+		atomic_set(&qu->qu_refs, 1);
+#if defined CONFIG_STREAMS_DEBUG
+		write_lock(&si->si_rwlock);
+		list_add_tail(&qu->qu_list, &si->si_head);
+		write_unlock(&si->si_rwlock);
+#endif
+		atomic_inc(&si->si_cnt);
+		if (atomic_read(&si->si_cnt) > si->si_hwl)
+			si->si_hwl = atomic_read(&si->si_cnt);
+		rq->q_flag = QUSE | QREADR;
+		wq->q_flag = QUSE;
+	}
+	return (rq);
+}
+
+EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
+
+/*
+ *  __freeq:	- free a queue pair
+ *  @rq:	read queue of queue pair
+ *
+ *  Frees a queue pair allocated with allocq().  Does not flush messages or clear use bits.
+ */
+STATIC streams_fastcall void
+__freeq(queue_t *rq)
+{
+	queue_t *wq = rq + 1;
+	struct strinfo *si = &Strinfo[DYN_QUEUE];
+	struct queinfo *qu = (struct queinfo *) rq;
+
+#if defined CONFIG_STREAMS_DEBUG
+	write_lock(&si->si_rwlock);
+	list_del_init(&qu->qu_list);
+	write_unlock(&si->si_rwlock);
+#endif
+	atomic_dec(&si->si_cnt);
+	assert(!waitqueue_active(&qu->qu_qwait));
+	/* put STREAM head - if not already */
+	ctrace(sd_put(&qu->qu_str));
+	/* clear flags */
+	rq->q_flag = QREADR;
+	wq->q_flag = 0;
+	/* break locks */
+	qlockinit(rq);
+	qlockinit(wq);
+	/* put back in cache */
+	kmem_cache_free(si->si_cache, rq);
+}
+
+/**
+ *  freeq:	- free a queue pair
+ *  @rq:	read queue of queue pair
+ *
+ *  Can be called by the module writer on private queue pairs allocated with allocq().  All message
+ *  blocks will be flushed.  freeq() is normally called at process context.  If we have flushed
+ *  M_PASSFP messages from the queue before closing, we want to do the fput()s now instead of
+ *  deferring to Stream context that will cause a might_sleep() to fire on the fput().  So, instead
+ *  of doing freechain here we actually free each message.  (freechain() now frees blocks
+ *  immediately.)
+ */
+STATIC streams_inline streams_fastcall void
+freeq_fast(queue_t *rq)
+{
+	queue_t *wq = rq + 1;
+	mblk_t *mp = NULL, **mpp = &mp;
+
+	clear_bit(QUSE_BIT, &rq->q_flag);
+	clear_bit(QUSE_BIT, &wq->q_flag);
+	__flushq(rq, FLUSHALL, &mpp, NULL);
+	__flushq(wq, FLUSHALL, &mpp, NULL);
+	__freebands(rq);
+	__freeq(rq);
+#if 0
+	if (mp) {
+		mblk_t *b, *b_next = mp;
+
+		while ((b = b_next)) {
+			b_next = b->b_next;
+#if 0
+			/* fake out freeb */
+			ctrace(qput(&mp->b_queue));
+#endif
+			b->b_next = b->b_prev = NULL;
+			freemsg(b);
+		}
+	}
+#else
+	if (mp)
+		freechain(mp, mpp);
+#endif
+}
+void
+freeq(queue_t *rq)
+{
+	freeq_fast(rq);
+}
+
+EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
+
+/* queue gets and puts */
+BIG_STATIC streams_fastcall queue_t *
+qget(queue_t *q)
+{
+	struct queinfo *qu;
+
+	if (q) {
+		qu = (typeof(qu)) RD(q);
+		if (atomic_read(&qu->qu_refs) < 1)
+			swerr();
+		atomic_inc(&qu->qu_refs);
+		printd(("%s: queue pair %p ref count is now %d\n",
+			__FUNCTION__, qu, atomic_read(&qu->qu_refs)));
+	}
+	return (q);
+}
+BIG_STATIC streams_fastcall void
+qput(queue_t **qp)
+{
+	queue_t *q;
+
+	if ((q = xchg(qp, NULL))) {
+		queue_t *rq = RD(q);
+		struct queinfo *qu = (typeof(qu)) rq;
+
+		assert(atomic_read(&qu->qu_refs) >= 1);
+		printd(("%s: queue pair %p ref count is now %d\n",
+			__FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
+		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))
+			freeq(rq);
+	}
+}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -238,7 +798,7 @@ queue_guess(queue_t *q)
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
  */
-mblk_t *
+BIG_STATIC streams_fastcall mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -317,7 +877,7 @@ mdbblock_alloc(uint priority, void *func)
 /*
  *  raise_local_bufcalls: - raise buffer callbacks on the local STREAMS scheduler thread.
  */
-STATIC void
+STATIC streams_fastcall void
 raise_local_bufcalls(void)
 {
 	struct strthread *t = this_thread;
@@ -345,7 +905,7 @@ raise_local_bufcalls(void)
  *  is not called before the bufcall or timeout function returns.  Well, maybe for timeouts, but not
  *  for bufcalls.
  */
-STATIC void
+STATIC streams_fastcall void
 raise_bufcalls(void)
 {
 	struct strthread *t;
@@ -380,7 +940,7 @@ raise_bufcalls(void)
  *  Also the current msgb and datab counts are not decremented until the blocks are returned to the
  *  memory cache.
  */
-void
+BIG_STATIC streams_fastcall void
 mdbblock_free(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
@@ -443,482 +1003,6 @@ freeblocks(struct strthread *t)
 		raise_bufcalls();
 	}
 }
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  QBAND ctors and dtors
- *
- *  -------------------------------------------------------------------------
- *  Keep the cache ctors and the object ctors and dtors close to each other.
- */
-STATIC void
-qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct qbinfo *qbi = obj;
-
-		bzero(qbi, sizeof(*qbi));
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD(&qbi->qbi_list);
-#endif
-	}
-}
-struct qband *
-allocqb(void)
-{
-	struct qband *qb;
-	struct strinfo *si = &Strinfo[DYN_QBAND];
-
-	/* Queue bands are allocated as part of the normal STREAMS module or driver procedures and
-	   must be allocated SLAB_ATOMIC. */
-	if ((qb = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-		struct qbinfo *qbi = (struct qbinfo *) qb;
-
-		atomic_set(&qbi->qbi_refs, 1);
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_add_tail(&qbi->qbi_list, &si->si_head);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_inc(&si->si_cnt);
-		if (atomic_read(&si->si_cnt) > si->si_hwl)
-			si->si_hwl = atomic_read(&si->si_cnt);
-	}
-	return (qb);
-}
-
-void
-freeqb(struct qband *qb)
-{
-	struct strinfo *si = &Strinfo[DYN_QBAND];
-
-#if defined CONFIG_STREAMS_DEBUG
-	struct qbinfo *qbi = (struct qbinfo *) qb;
-
-	write_lock(&si->si_rwlock);
-	list_del_init(&qbi->qbi_list);
-	write_unlock(&si->si_rwlock);
-#endif
-	atomic_dec(&si->si_cnt);
-	/* clean it up before putting it back in the cache */
-	bzero(qb, sizeof(*qb));
-	kmem_cache_free(si->si_cache, qb);
-}
-STATIC void
-__freebands(queue_t *q)
-{
-	struct qband *qb, *qb_next;
-
-	if ((qb_next = xchg(&q->q_bandp, NULL))) {
-		while ((qb = qb_next)) {
-			qb_next = qb->qb_next;
-			freeqb(qb);
-		}
-		q->q_nband = 0;
-		q->q_blocked = 0;
-	}
-}
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  APUSH ctors and dtors
- *
- *  -------------------------------------------------------------------------
- *  keep the cache ctors and the object ctors and dtors close to each other.
- */
-STATIC void
-apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct apinfo *api = obj;
-
-		bzero(api, sizeof(*api));
-		INIT_LIST_HEAD(&api->api_more);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD(&api->api_list);
-#endif
-	}
-}
-struct apinfo *
-ap_alloc(struct strapush *sap)
-{
-	struct apinfo *api;
-	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
-
-	/* Note: this function is called (indirectly) by the SAD driver put procedure and,
-	   therefore, needs atomic allocations. */
-	if ((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_add_tail(&api->api_list, &si->si_head);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_inc(&si->si_cnt);
-		if (atomic_read(&si->si_cnt) > si->si_hwl)
-			si->si_hwl = atomic_read(&si->si_cnt);
-		atomic_set(&api->api_refs, 1);
-		api->api_sap = *sap;
-	}
-	return (api);
-}
-struct apinfo *
-ap_get(struct apinfo *api)
-{
-	if (api) {
-		assert(atomic_read(&api->api_refs) >= 1);
-		atomic_inc(&api->api_refs);
-	}
-	return (api);
-}
-
-void
-ap_put(struct apinfo *api)
-{
-	assert(api != NULL);
-
-	if (atomic_dec_and_test(&api->api_refs)) {
-		struct strinfo *si = &Strinfo[DYN_STRAPUSH];
-
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_del_init(&api->api_list);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_dec(&si->si_cnt);
-		list_del_init(&api->api_more);
-		/* clean it up before putting it back in the cache */
-		bzero(api, sizeof(*api));
-		INIT_LIST_HEAD(&api->api_more);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD(&api->api_list);
-#endif
-		kmem_cache_free(si->si_cache, api);
-	}
-	return;
-}
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  DEVINFO ctors and dtors
- *
- *  -------------------------------------------------------------------------
- */
-STATIC void
-devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct devinfo *di = obj;
-
-		bzero(di, sizeof(*di));
-		INIT_LIST_HEAD(&di->di_list);
-		INIT_LIST_HEAD(&di->di_hash);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &di->di_next);
-#endif
-	}
-}
-struct devinfo *
-di_alloc(struct cdevsw *cdev)
-{
-	struct devinfo *di;
-	struct strinfo *si = &Strinfo[DYN_DEVINFO];
-
-	/* Note: devinfo is only used by Solaris compatiblity modules that have been extracted from
-	   fast streams.  Chances are it will only be called at registration time, but I will leave
-	   this at SLAB_ATOMIC until the compatibility module can be checked. */
-	if ((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_inc(&si->si_cnt);
-		if (atomic_read(&si->si_cnt) > si->si_hwl)
-			si->si_hwl = atomic_read(&si->si_cnt);
-		atomic_set(&di->di_refs, 1);
-		di->di_dev = cdev;
-		atomic_set(&di->di_count, 0);
-		di->di_info = cdev->d_str->st_rdinit->qi_minfo;
-	}
-	return (di);
-}
-
-#if 0
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(di_alloc);	/* include/sys/streams/strsubr.h */
-#endif
-#endif
-struct devinfo *
-di_get(struct devinfo *di)
-{
-	if (di) {
-		assert(atomic_read(&di->di_refs) >= 1);
-		atomic_inc(&di->di_refs);
-	}
-	return (di);
-}
-
-void
-di_put(struct devinfo *di)
-{
-	assert(di != NULL);
-
-	if (atomic_dec_and_test(&di->di_refs)) {
-		struct strinfo *si = &Strinfo[DYN_DEVINFO];
-
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_del_init((struct list_head *) &di->di_next);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_dec(&si->si_cnt);
-		list_del_init(&di->di_list);
-		list_del_init(&di->di_hash);
-		/* clean it up before putting it back in the cache */
-		bzero(di, sizeof(*di));
-		INIT_LIST_HEAD(&di->di_list);
-		INIT_LIST_HEAD(&di->di_hash);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &di->di_next);
-#endif
-		kmem_cache_free(si->si_cache, di);
-	}
-	return;
-}
-
-#if 0
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(di_put);		/* include/sys/streams/strsubr.h */
-#endif
-#endif
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  MODINFO ctors and dtors
- *
- *  -------------------------------------------------------------------------
- */
-STATIC void
-mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct mdlinfo *mi = obj;
-
-		bzero(mi, sizeof(*mi));
-		INIT_LIST_HEAD(&mi->mi_list);
-		INIT_LIST_HEAD(&mi->mi_hash);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
-#endif
-	}
-}
-struct mdlinfo *
-modi_alloc(struct fmodsw *fmod)
-{
-	struct mdlinfo *mi;
-	struct strinfo *si = &Strinfo[DYN_MODINFO];
-
-	/* Note: mdlinfo is only used by Solaris compatiblity modules that have been extracted from
-	   fast streams.  Chances are it will only be called at registration time, but I will leave
-	   this at SLAB_ATOMIC until the compatibility module can be checked. */
-	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_inc(&si->si_cnt);
-		if (atomic_read(&si->si_cnt) > si->si_hwl)
-			si->si_hwl = atomic_read(&si->si_cnt);
-		atomic_set(&mi->mi_refs, 1);
-		mi->mi_mod = fmod;
-		atomic_set(&mi->mi_count, 0);
-		mi->mi_info = fmod->f_str->st_rdinit->qi_minfo;
-	}
-	return (mi);
-}
-struct mdlinfo *
-modi_get(struct mdlinfo *mi)
-{
-	if (mi) {
-		assert(atomic_read(&mi->mi_refs) >= 1);
-		atomic_inc(&mi->mi_refs);
-	}
-	return (mi);
-}
-
-void
-modi_put(struct mdlinfo *mi)
-{
-	assert(mi != NULL);
-	if (atomic_dec_and_test(&mi->mi_refs)) {
-		struct strinfo *si = &Strinfo[DYN_MODINFO];
-
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_del_init((struct list_head *) &mi->mi_next);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_dec(&si->si_cnt);
-		list_del_init(&mi->mi_list);
-		list_del_init(&mi->mi_hash);
-		/* clean it up before putting it back in the cache */
-		bzero(mi, sizeof(*mi));
-		INIT_LIST_HEAD(&mi->mi_list);
-		INIT_LIST_HEAD(&mi->mi_hash);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
-#endif
-		kmem_cache_free(si->si_cache, mi);
-	}
-	return;
-}
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  QUEUE ctors and dtors
- *
- *  -------------------------------------------------------------------------
- *  Keep the cache ctors and the object ctors and dtors close to each other.
- */
-STATIC void
-queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct queinfo *qu = obj;
-
-		bzero(qu, sizeof(*qu));
-		/* initialize queue locks */
-		qlockinit(&qu->rq);
-		qlockinit(&qu->wq);
-		qu->rq.q_flag = QREADR;
-		qu->wq.q_flag = 0;
-		init_waitqueue_head(&qu->qu_qwait);
-#if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD(&qu->qu_list);
-#endif
-	}
-}
-
-/**
- *  allocq:	- allocate a queue pair
- *
- *  Can be called by the module writer to get a private queue pair.
- */
-queue_t *
-allocq(void)
-{
-	queue_t *rq;
-	struct strinfo *si = &Strinfo[DYN_QUEUE];
-
-	/* Note: we only allocate queue pairs in the stream head which is called at user context
-	   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL instead of
-	   SLAB_ATOMIC.  Allocate your private queue pairs in qopen/qclose or module init. */
-	if ((rq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL))) {
-		queue_t *wq = rq + 1;
-		struct queinfo *qu = (struct queinfo *) rq;
-
-		atomic_set(&qu->qu_refs, 1);
-#if defined CONFIG_STREAMS_DEBUG
-		write_lock(&si->si_rwlock);
-		list_add_tail(&qu->qu_list, &si->si_head);
-		write_unlock(&si->si_rwlock);
-#endif
-		atomic_inc(&si->si_cnt);
-		if (atomic_read(&si->si_cnt) > si->si_hwl)
-			si->si_hwl = atomic_read(&si->si_cnt);
-		rq->q_flag = QUSE | QREADR;
-		wq->q_flag = QUSE;
-	}
-	return (rq);
-}
-
-EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
-
-/*
- *  __freeq:	- free a queue pair
- *  @rq:	read queue of queue pair
- *
- *  Frees a queue pair allocated with allocq().  Does not flush messages or clear use bits.
- */
-STATIC void
-__freeq(queue_t *rq)
-{
-	queue_t *wq = rq + 1;
-	struct strinfo *si = &Strinfo[DYN_QUEUE];
-	struct queinfo *qu = (struct queinfo *) rq;
-
-#if defined CONFIG_STREAMS_DEBUG
-	write_lock(&si->si_rwlock);
-	list_del_init(&qu->qu_list);
-	write_unlock(&si->si_rwlock);
-#endif
-	atomic_dec(&si->si_cnt);
-	assert(!waitqueue_active(&qu->qu_qwait));
-	/* put STREAM head - if not already */
-	ctrace(sd_put(&qu->qu_str));
-	/* clear flags */
-	rq->q_flag = QREADR;
-	wq->q_flag = 0;
-	/* break locks */
-	qlockinit(rq);
-	qlockinit(wq);
-	/* put back in cache */
-	kmem_cache_free(si->si_cache, rq);
-}
-
-void freechain(mblk_t *mp, mblk_t **mpp);
-
-/**
- *  freeq:	- free a queue pair
- *  @rq:	read queue of queue pair
- *
- *  Can be called by the module writer on private queue pairs allocated with allocq().  All message
- *  blocks will be flushed.  freeq() is normally called at process context.  If we have flushed
- *  M_PASSFP messages from the queue before closing, we want to do the fput()s now instead of
- *  deferring to Stream context that will cause a might_sleep() to fire on the fput().  So, instead
- *  of doing freechain here we actually free each message.  (freechain() now frees blocks
- *  immediately.)
- */
-void
-freeq(queue_t *rq)
-{
-	queue_t *wq = rq + 1;
-	mblk_t *mp = NULL, **mpp = &mp;
-
-	clear_bit(QUSE_BIT, &rq->q_flag);
-	clear_bit(QUSE_BIT, &wq->q_flag);
-	__flushq(rq, FLUSHALL, &mpp, NULL);
-	__flushq(wq, FLUSHALL, &mpp, NULL);
-	__freebands(rq);
-	__freebands(wq);
-	__freeq(rq);
-#if 0
-	if (mp) {
-		mblk_t *b, *b_next = mp;
-
-		while ((b = b_next)) {
-			b_next = b->b_next;
-#if 0
-			/* fake out freeb */
-			ctrace(qput(&mp->b_queue));
-#endif
-			b->b_next = b->b_prev = NULL;
-			freemsg(b);
-		}
-	}
-#else
-	if (mp)
-		freechain(mp, mpp);
-#endif
-}
-
-EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1026,7 +1110,7 @@ syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		INIT_LIST_HEAD((struct list_head *) &sq->sq_next);
 	}
 }
-struct syncq *
+BIG_STATIC struct syncq *
 sq_alloc(void)
 {
 	struct syncq *sq;
@@ -1046,7 +1130,40 @@ sq_alloc(void)
 	}
 	return (sq);
 }
-struct syncq *
+STATIC void
+sq_free(struct syncq *sq)
+{
+	struct strinfo *si = &Strinfo[DYN_SYNCQ];
+
+	_ptrace(("syncq %p is being deleted\n", sq));
+
+	write_lock(&si->si_rwlock);
+	list_del_init((struct list_head *) &sq->sq_next);
+	write_unlock(&si->si_rwlock);
+	/* clean it up before puting it back in the cache */
+	sq_put(&sq->sq_outer);	/* recurse once */
+
+	assert(spin_trylock(&sq->sq_lock));
+	spin_lock_init(&sq->sq_lock);
+
+	assert(sq->sq_ehead == NULL);
+	sq->sq_ehead = NULL;
+	sq->sq_etail = &sq->sq_ehead;
+
+	assert(sq->sq_qhead == NULL);
+	sq->sq_qhead = NULL;
+	sq->sq_qtail = &sq->sq_qhead;
+
+	assert(sq->sq_mhead == NULL);
+	sq->sq_mhead = NULL;
+	sq->sq_mtail = &sq->sq_mhead;
+
+	assert(!waitqueue_active(&sq->sq_waitq));
+	wake_up_all(&sq->sq_waitq);
+	init_waitqueue_head(&sq->sq_waitq);
+	kmem_cache_free(si->si_cache, sq);
+}
+BIG_STATIC struct syncq *
 sq_get(struct syncq *sq)
 {
 	if (sq) {
@@ -1057,44 +1174,15 @@ sq_get(struct syncq *sq)
 	}
 	return (sq);
 }
-
-void
+BIG_STATIC void
 sq_put(struct syncq **sqp)
 {
 	struct syncq *sq;
 
 	if ((sq = xchg(sqp, NULL))) {
-		if (atomic_dec_and_test(&sq->sq_refs)) {
-			struct strinfo *si = &Strinfo[DYN_SYNCQ];
-
-			_ptrace(("syncq %p is being deleted\n", sq));
-
-			write_lock(&si->si_rwlock);
-			list_del_init((struct list_head *) &sq->sq_next);
-			write_unlock(&si->si_rwlock);
-			/* clean it up before puting it back in the cache */
-			sq_put(&sq->sq_outer);	/* recurse once */
-
-			assert(spin_trylock(&sq->sq_lock));
-			spin_lock_init(&sq->sq_lock);
-
-			assert(sq->sq_ehead == NULL);
-			sq->sq_ehead = NULL;
-			sq->sq_etail = &sq->sq_ehead;
-
-			assert(sq->sq_qhead == NULL);
-			sq->sq_qhead = NULL;
-			sq->sq_qtail = &sq->sq_qhead;
-
-			assert(sq->sq_mhead == NULL);
-			sq->sq_mhead = NULL;
-			sq->sq_mtail = &sq->sq_mhead;
-
-			assert(!waitqueue_active(&sq->sq_waitq));
-			wake_up_all(&sq->sq_waitq);
-			init_waitqueue_head(&sq->sq_waitq);
-			kmem_cache_free(si->si_cache, sq);
-		} else
+		if (unlikely(atomic_dec_and_test(&sq->sq_refs) != 0))
+			sq_free(sq);
+		else
 			_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 }
@@ -1228,7 +1316,7 @@ EXPORT_SYMBOL(sefree);		/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 
-STATIC inline streams_fastcall void
+STATIC streams_inline streams_fastcall void
 strsched_mfunc_fast(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
@@ -1292,7 +1380,7 @@ strsched_event(struct strevent *se)
  * kmem_free() frees memory of @size or greater, it sets the flag to run buffer callbacks and wakes
  * the scheduler thread.
  */
-static inline streams_fastcall long
+static streams_fastcall long
 strsched_bufcall(struct strevent *se)
 {
 	long id;
@@ -1342,7 +1430,7 @@ timeout_function(unsigned long arg)
  * strsched_timeout:	- schedule a timer for the STREAMS scheduler
  * @se:			the timer to schedule
  */
-static inline streams_fastcall long
+static streams_inline streams_fastcall long
 strsched_timeout(struct strevent *se)
 {
 	long id;
@@ -1355,7 +1443,7 @@ strsched_timeout(struct strevent *se)
 }
 
 #if 0
-static inline streams_fastcall long
+static streams_inline streams_fastcall long
 defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 {
 	long id = 0;
@@ -1369,7 +1457,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	return (id);
 }
 #endif
-static inline streams_fastcall long
+static streams_inline streams_fastcall long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long), long arg)
 {
 	long id = 0;
@@ -1384,7 +1472,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long)
 	}
 	return (id);
 }
-static inline streams_fastcall long
+static streams_inline streams_fastcall long
 defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
 		    int cpu)
 {
@@ -1402,7 +1490,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	}
 	return (id);
 }
-static inline streams_fastcall long
+static streams_inline streams_fastcall long
 defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		  weld_arg_t arg, queue_t *q)
 {
@@ -1421,7 +1509,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	}
 	return (id);
 }
-static inline streams_fastcall long
+static streams_inline streams_fastcall long
 defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		    weld_arg_t arg, queue_t *q)
 {
@@ -1575,7 +1663,7 @@ EXPORT_SYMBOL(untimeout);	/* include/sys/streams/stream.h */
  *
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
-static inline streams_fastcall int
+static streams_inline streams_fastcall int
 __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	weld_arg_t arg, queue_t *protq)
 {
@@ -1594,7 +1682,7 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  *
  *  Issues the STREAMS event necessary to unweld two queue pairs apart with synchronization.
  */
-static inline streams_fastcall int
+static streams_inline streams_fastcall int
 __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	  weld_arg_t arg, queue_t *protq)
 {
@@ -1696,24 +1784,28 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
 STATIC void
 strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 {
+	queue_t *qold;
+
+#ifdef CONFIG_SMP
 	struct stdata *sd;
 
-	dassert(q);
 	dassert(func);
+	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		queue_t *qold;
-
+#endif
 		qold = xchg(&this_thread->currentq, q);
 		func(q, mp);
 		this_thread->currentq = qold;
+#ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
 		swerr();
 	}
 	prunlock(sd);
+#endif
 }
 
 /*
@@ -1729,42 +1821,44 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
  *  - strfunc() returns void
  *  - strfunc() does not perform any synchronization
  */
-STATIC inline streams_fastcall void
+STATIC streams_inline streams_fastcall void
 strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
+	queue_t *qold;
+
+#ifdef CONFIG_SMP
 	struct stdata *sd;
 
-	dassert(q);
 	dassert(func);
+	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		queue_t *qold;
-
+#endif
 		qold = xchg(&this_thread->currentq, q);
 		func(arg, mp);
 		this_thread->currentq = qold;
+#ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
 		swerr();
 	}
 	prunlock(sd);
+#endif
 }
 
-#ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	strfunc_fast(func, q, mp, arg);
 }
-#endif
 
 /*
  *  qwakeup:	- wake waiters on a queue pair
  *  @q:		one queue of the queue pair to wake
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 qwakeup(queue_t *q)
 {
 	struct queinfo *qu = ((struct queinfo *) RD(q));
@@ -1773,6 +1867,7 @@ qwakeup(queue_t *q)
 		wake_up_all(&qu->qu_qwait);
 }
 
+#if 0
 /*
  *  freezechk: - check if put procedure can run
  *  @q:		the queue to check
@@ -1784,12 +1879,13 @@ qwakeup(queue_t *q)
  *  caller is the freezing thread, zrlock() will always be successful.  If the caller is another
  *  thread, the thread will spin on zrlock() until the Stream is thawed.
  */
-STATIC inline streams_fastcall void
+STATIC streams_fastcall void
 freezechk(queue_t *q)
 {
 	/* spin here until stream unfrozen */
 	freeze_barrier(q);
 }
+#endif
 
 /*
  *  putp:	- execute a queue's put procedure
@@ -1801,7 +1897,7 @@ freezechk(queue_t *q)
  *  - putp() returns the integer result from the modules put procedure.
  *  - putp() does not perform any synchronization
  */
-STATIC inline streams_fastcall void
+STATIC streams_inline streams_fastcall void
 putp_fast(queue_t *q, mblk_t *mp)
 {
 	queue_t *qold;
@@ -1810,16 +1906,23 @@ putp_fast(queue_t *q, mblk_t *mp)
 	dassert(q->q_qinfo);
 	dassert(q->q_qinfo->qi_putp);
 
+#ifdef CONFIG_SMP
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
 
 	/* procs can't be turned off */
-	__assert(test_bit(QPROCS_BIT, &q->q_flag) == 0);
-
-	qold = xchg(&this_thread->currentq, q);
-	(void) q->q_qinfo->qi_putp(q, mp);
-	this_thread->currentq = qold;
-	qwakeup(q);
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+#endif
+		qold = xchg(&this_thread->currentq, q);
+		(void) q->q_qinfo->qi_putp(q, mp);
+		this_thread->currentq = qold;
+		qwakeup(q);
+#ifdef CONFIG_SMP
+	} else {
+		freemsg(mp);
+		swerr();
+	}
+#endif
 }
 STATIC void
 putp(queue_t *q, mblk_t *mp)
@@ -1860,7 +1963,8 @@ putp(queue_t *q, mblk_t *mp)
  *  service procedure.  In safe mode, this will cause kernel assertions to fail and will panic the
  *  kernel.
  */
-STATIC inline streams_fastcall void
+#if 0
+STATIC streams_inline streams_fastcall void
 srvp_fast(queue_t *q)
 {
 	dassert(q);
@@ -1928,6 +2032,44 @@ srvp_fast(queue_t *q)
 	}
 	ctrace(qput(&q));	/* cancel qget from qschedule */
 }
+#else
+STATIC streams_inline streams_fastcall void
+srvp_fast(queue_t *q)
+{
+	dassert(q);
+	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
+
+#ifdef CONFIG_SMP
+		struct stdata *sd;
+
+		/* spin here if Stream frozen by other than caller */
+		freeze_barrier(q);
+
+		sd = qstream(q);
+
+		dassert(sd);
+		prlock(sd);
+		/* check if procs are turned off */
+		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+#endif
+			queue_t *qold;
+
+			qold = xchg(&this_thread->currentq, q);
+			set_bit(QSVCBUSY_BIT, &q->q_flag);
+			dassert(q->q_qinfo);
+			dassert(q->q_qinfo->qi_srvp);
+			(void) q->q_qinfo->qi_srvp(q);
+			clear_bit(QSVCBUSY_BIT, &q->q_flag);
+			this_thread->currentq = qold;
+#ifdef CONFIG_SMP
+		}
+		prunlock(sd);
+#endif
+		qwakeup(q);
+	}
+	ctrace(qput(&q));	/* cancel qget from qschedule */
+}
+#endif
 
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -2414,8 +2556,8 @@ leave_syncq(struct syncq_cookie *sc)
  *  existing queue.
  *
  */
-STATIC inline streams_fastcall void
-qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+STATIC streams_inline streams_fastcall void
+qstrwrit_fast(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
@@ -2432,9 +2574,9 @@ qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 }
 
 STATIC void
-qstrwrit_slow(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 {
-	return qstrwrit(q, mp, func, perim);
+	return qstrwrit_fast(q, mp, func, perim);
 }
 
 /**
@@ -2448,8 +2590,8 @@ qstrwrit_slow(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int pe
  *  instead of the queue's put procedure.  qstrfunc() events always need a valid queue reference
  *  against which to synchronize.
  */
-STATIC inline streams_fastcall void
-qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+STATIC streams_inline streams_fastcall void
+qstrfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
@@ -2462,13 +2604,13 @@ qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 		return;
 	}
 #endif
-	strfunc_fast(func, q, mp, arg);
+	strfunc(func, q, mp, arg);
 }
 
 STATIC void
-qstrfunc_slow(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
-	return qstrfunc(func, q, mp, arg);
+	return qstrfunc_fast(func, q, mp, arg);
 }
 
 /**
@@ -2487,7 +2629,7 @@ qstrfunc_slow(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-STATIC inline streams_fastcall void
+STATIC streams_inline streams_fastcall void
 qputp(queue_t *q, mblk_t *mp)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2501,7 +2643,7 @@ qputp(queue_t *q, mblk_t *mp)
 		return;
 	}
 #endif
-	ctrace(putp_fast(q, mp));
+	ctrace(putp(q, mp));
 	trace();
 }
 
@@ -2510,77 +2652,6 @@ qputp_slow(queue_t *q, mblk_t *mp)
 {
 	qputp(q, mp);
 }
-
-/**
- *  putnext:	- put a message on the queue next to this one
- *  @q:		this queue
- *  @mp:	message to put
- *
- *  CONTEXT: STREAMS context (stream head locked).
- *
- *  MP-STREAMS: Calling this function is MP-safe provided that it is called from the correct
- *  context, or if the caller can guarantee the validity of the q->q_next pointer.
- *
- *  NOTICES: If this function is called from an interrupt service routine (hard irq), use
- *  MPSTR_STPLOCK(9) and MPSTR_STPRELE(9) to hold a stream head write lock across the call.  The
- *  put(9) function will be called on the next queue invoking the queue's put procedure if
- *  syncrhonization has passed.  This can also happer for the next queue if the put procedure also
- *  does a putnext().  It might be necessary for the put procedure of all queues in the stream to
- *  know that they might be called at hard irq, if only so that they do not perform excessively long
- *  operations and impact system performance.
- *
- *  For a driver interrupt service routine, put(9) is a better choice, with a brief put procedure
- *  that does little more than a put(q).  Operations on the message can them be performed from the
- *  queue's service procedure, that is guaranteed to run at STREAMS scheduler context, with
- *  hard interrupts enabled.
- *
- *  CONTEXT: Any. putnext() takes a Stream head plumb read lock so that the function can be called
- *  from outside of STREAMS context.  Caller is responsible for the validity of the q pointer across
- *  the call.  The put() procedure of the next queue will be executed in the same context as
- *  putnext() was called.
- *
- *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
- *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
- */
-streams_fastcall void
-putnext(queue_t *q, mblk_t *mp)
-{
-	dassert(mp);
-	dassert(q);
-	dassert(q->q_next);
-#ifdef CONFIG_STREAMS_SYNCQS
-	ctrace(qputp(q->q_next, mp));
-#else
-      bypass:
-	if ((q = q->q_next) != NULL) {
-
-		/* copy of putp_fast() */
-		dassert(q);
-		dassert(q->q_qinfo);
-		dassert(q->q_qinfo->qi_putp);
-
-		/* spin here if Stream frozen by other than caller */
-		freeze_barrier(q);
-
-		/* procs can't be turned off */
-		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-			queue_t *qold;
-
-			qold = xchg(&this_thread->currentq, q);
-			(void) q->q_qinfo->qi_putp(q, mp);
-			this_thread->currentq = qold;
-			qwakeup(q);
-		} else
-			goto bypass;
-	} else {
-		freemsg(mp);
-		swerr();
-	}
-#endif
-	trace();
-}
-
-EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
 
 /**
  *  put:	- call a queue's qi_putq() procedure
@@ -2630,58 +2701,57 @@ put(queue_t *q, mblk_t *mp)
 	dassert(q->q_qinfo);
 	dassert(q->q_qinfo->qi_putp);
 
-	trace();
+	/* All of STREAMS is irq-safe now.  If your module or driver isn't, pass mp to a service
+	   procedure. */
+#if 0
 	if (!in_irq()) {
-		struct stdata *sd;
-
-		sd = qstream(q);
-		dassert(sd);
-		prlock(sd);
-
-		/* This AIX message filtering thing is really bad for performance when done the old 
-		   way (from qputp()). Consider that if there are 100 modules on the Stream, the
-		   old way will check 5000 times.  This can be done by put(), but NOT by putnext()! 
-		   Also, we should only do this when not in an irq(). */
-		trace();
-		while (q && q->q_ftmsg && !q->q_ftmsg(mp))
-			q = q->q_next;
-		if (likely(q != NULL)) {
-#ifdef CONFIG_STREAMS_SYNCQS
-			ctrace(qputp(q, mp));
-#else
-			{
-				queue_t *qold;
-
-				/* copy of putp_fast() */
-				dassert(q);
-				dassert(q->q_qinfo);
-				dassert(q->q_qinfo->qi_putp);
-
-			      bypass:
-				/* spin here if Stream frozen by other than caller */
-				freeze_barrier(q);
-
-				/* procs can't be turned off */
-				if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-
-					qold = xchg(&this_thread->currentq, q);
-					(void) q->q_qinfo->qi_putp(q, mp);
-					this_thread->currentq = qold;
-					qwakeup(q);
-				} else if ((q = q->q_next) != NULL)
-					goto bypass;
-				else {
-					freemsg(mp);
-					swerr();
-				}
-			}
 #endif
-		} else {
-			ptrace(("message filtered, discarding\n"));
-			/* no queue wants the message - throw it away */
-			freemsg(mp);
+#ifdef CONFIG_SMP
+		/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on 
+		   a Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for 
+		   that matter) on the stack.  Note that these are a no-op on UP. */
+		{
+			struct stdata *sd;
+
+			sd = qstream(q);
+			dassert(sd);
+			prlock(sd);
 		}
-		prunlock(sd);
+#endif
+
+		if (unlikely(q->q_ftmsg != NULL)) {
+			/* This AIX message filtering thing is really bad for performance when done 
+			   the old way (from qputp()). Consider that if there are 100 modules on
+			   the Stream, the old way will check 5000 times.  This can be done by
+			   put(), but NOT by putnext()! */
+			while (q && q->q_ftmsg && !q->q_ftmsg(mp))
+				q = q->q_next;
+			if (unlikely(q == NULL)) {
+				ptrace(("message filtered, discarding\n"));
+				/* no queue wants the message - throw it away */
+				freemsg(mp);
+				goto done;
+			}
+		}
+#ifdef CONFIG_STREAMS_SYNCQS
+		ctrace(qputp(q, mp));
+#else
+		putp_fast(q, mp);
+#endif
+	      done:
+#ifdef CONFIG_SMP
+		/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on 
+		   a Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for 
+		   that matter) on the stack.  Note that these are a no-op on UP. */
+		{
+			struct stdata *sd;
+
+			sd = qstream(q);
+			dassert(sd);
+			prunlock(sd);
+		}
+#endif
+#if 0
 	} else {
 		/* defer for execution inside STREAMS */
 		struct mbinfo *m = (typeof(m)) mp;
@@ -2693,12 +2763,86 @@ put(queue_t *q, mblk_t *mp)
 		ctrace(m->m_queue = qget(q));	/* don't let it get away */
 		m->m_private = NULL;
 		/* schedule for execution inside STREAMS */
-		strsched_mfunc_fast(mp);
+		strsched_mfunc(mp);
 	}
+#endif
+	return;
 }
 
 EXPORT_SYMBOL(put);
 
+/**
+ *  putnext:	- put a message on the queue next to this one
+ *  @q:		this queue
+ *  @mp:	message to put
+ *
+ *  CONTEXT: STREAMS context (stream head locked).
+ *
+ *  MP-STREAMS: Calling this function is MP-safe provided that it is called from the correct
+ *  context, or if the caller can guarantee the validity of the q->q_next pointer.
+ *
+ *  NOTICES: If this function is called from an interrupt service routine (hard irq), use
+ *  MPSTR_STPLOCK(9) and MPSTR_STPRELE(9) to hold a stream head write lock across the call.  The
+ *  put(9) function will be called on the next queue invoking the queue's put procedure if
+ *  syncrhonization has passed.  This can also happer for the next queue if the put procedure also
+ *  does a putnext().  It might be necessary for the put procedure of all queues in the stream to
+ *  know that they might be called at hard irq, if only so that they do not perform excessively long
+ *  operations and impact system performance.
+ *
+ *  For a driver interrupt service routine, put(9) is a better choice, with a brief put procedure
+ *  that does little more than a put(q).  Operations on the message can them be performed from the
+ *  queue's service procedure, that is guaranteed to run at STREAMS scheduler context, with
+ *  hard interrupts enabled.
+ *
+ *  CONTEXT: Any. putnext() takes a Stream head plumb read lock so that the function can be called
+ *  from outside of STREAMS context.  Caller is responsible for the validity of the q pointer across
+ *  the call.  The put() procedure of the next queue will be executed in the same context as
+ *  putnext() was called.
+ *
+ *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
+ *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
+ */
+streams_fastcall void
+putnext(queue_t *q, mblk_t *mp)
+{
+	dassert(mp);
+	dassert(q);
+	dassert(q->q_next);
+#ifdef CONFIG_SMP
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	{
+		struct stdata *sd;
+
+		sd = qstream(q);
+		dassert(sd);
+		prlock(sd);
+	}
+#endif
+#ifdef CONFIG_STREAMS_SYNCQS
+	ctrace(qputp(q->q_next, mp));
+#else
+	putp_fast(q->q_next, mp);
+#endif
+#ifdef CONFIG_SMP
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	{
+		struct stdata *sd;
+
+		sd = qstream(q);
+		dassert(sd);
+		prunlock(sd);
+	}
+#endif
+	trace();
+}
+
+EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
+
+#ifdef CONFIG_STREAMS_SYNCQS
 /**
  *  qsrvp:	- execute a queue's service procedure synchronized
  *  @q:		the queue whose service procedure is to be executed
@@ -2712,10 +2856,9 @@ EXPORT_SYMBOL(put);
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-STATIC inline streams_fastcall void
+STATIC streams_inline streams_fastcall void
 qsrvp(queue_t *q)
 {
-#ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
 
@@ -2725,9 +2868,9 @@ qsrvp(queue_t *q)
 		leave_syncq(sc);
 		return;
 	}
-#endif
-	srvp_fast(q);
+	srvp(q);
 }
+#endif
 
 /**
  *  qopen:	- call a module's qi_qopen entry point
@@ -2941,24 +3084,33 @@ do_bufcall_synced(struct strevent *se)
 		struct strthread *t = this_thread;
 		unsigned long flags = 0;
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-		queue_t *qold;
+
+#ifdef CONFIG_SMP
 		struct stdata *sd;
 
 		dassert(q);
 		sd = qstream(q);
 		dassert(sd);
+#endif
 
 		if (unlikely(safe))
 			local_irq_save(flags);
+#ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prlock(sd);
+#endif
+		{
+			queue_t *qold;
 
-		qold = xchg(&t->currentq, q);
-		func(se->x.b.arg);
-		t->currentq = qold;
+			qold = xchg(&t->currentq, q);
+			func(se->x.b.arg);
+			t->currentq = qold;
+		}
 
+#ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prunlock(sd);
+#endif
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
@@ -2999,24 +3151,32 @@ do_timeout_synced(struct strevent *se)
 		struct strthread *t = this_thread;
 		unsigned long flags = 0;
 		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
-		queue_t *qold;
+
+#ifdef CONFIG_SMP
 		struct stdata *sd;
 
 		dassert(q);
 		sd = qstream(q);
 		dassert(sd);
+#endif
 
 		if (unlikely(safe))
 			local_irq_save(flags);
+#ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prlock(sd);
+#endif
+		{
+			queue_t *qold;
 
-		qold = xchg(&t->currentq, q);
-		func(se->x.t.arg);
-		t->currentq = qold;
-
+			qold = xchg(&t->currentq, q);
+			func(se->x.t.arg);
+			t->currentq = qold;
+		}
+#ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prunlock(sd);
+#endif
 		if (unlikely(safe))
 			local_irq_restore(flags);
 	}
@@ -3152,10 +3312,10 @@ do_mblk_func(mblk_t *b)
 		/* deferred function is a qstrwrit function */
 		/* only unfortunate thing is that we have lost the original perimeter request, so
 		   we upgrade it to outer */
-		(void) qstrwrit_slow(m_queue, b, (void *) xchg(&m->m_private, NULL), PERIM_OUTER);
+		(void) qstrwrit(m_queue, b, (void *) xchg(&m->m_private, NULL), PERIM_OUTER);
 	else
 		/* deferred function is a qstrfunc function */
-		(void) qstrfunc_slow(m_func, m_queue, b, xchg(&m->m_private, NULL));
+		(void) qstrfunc(m_func, m_queue, b, xchg(&m->m_private, NULL));
 	ctrace(qput(&m_queue));
 }
 
@@ -3419,11 +3579,8 @@ scanqueues(struct strthread *t)
 				} else
 					q_link = xchg(&q->q_link, NULL);
 				/* let the message go */
-				if ((b = getq(q))) {
-					prlock(sd);
+				if ((b = getq(q)))
 					putnext(q, b);
-					prunlock(sd);
-				}
 			}
 			if (q)
 				t->scanqhead = q;
@@ -3662,38 +3819,7 @@ queuerun(struct strthread *t)
 #ifdef CONFIG_STREAMS_SYNCQS
 				qsrvp(q);
 #else
-				/* hand inline copy of srvp_fast() */
-				dassert(q);
-				if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
-					queue_t *qold;
-
-					/* spin here if Stream frozen by other than caller */
-					freeze_barrier(q);
-
-					dassert(q->q_qinfo);
-
-					qold = xchg(&this_thread->currentq, q);
-					{
-						struct stdata *sd = qstream(q);
-
-						dassert(sd);
-						prlock(sd);
-						/* check if procs are turned off */
-						if (!test_bit(QPROCS_BIT, &q->q_flag)) {
-							int (*qi_srvp) (queue_t *);
-
-							if ((qi_srvp = q->q_qinfo->qi_srvp)) {
-								set_bit(QSVCBUSY_BIT, &q->q_flag);
-								(void) qi_srvp(q);
-								clear_bit(QSVCBUSY_BIT, &q->q_flag);
-							}
-						}
-						prunlock(sd);
-					}
-					this_thread->currentq = qold;
-					qwakeup(q);
-				}
-				ctrace(qput(&q));	/* cancel qget from qschedule */
+				srvp_fast(q);
 #endif
 			}
 		}
@@ -3713,7 +3839,7 @@ queuerun(struct strthread *t)
  *  concurrency and other exclusion measures are not necessary here.  This function must be called
  *  with the syncrhonization queue spin lock held and interrupts disabled.
  */
-void
+BIG_STATIC void
 sqsched(syncq_t *sq)
 {
 	/* called with sq locked */
@@ -3765,7 +3891,7 @@ freechains(struct strthread *t)
  *  chain of message blocks formed by concatenating these freed chains.  They will be dealt with at
  *  the end of the STREAMS scheduler SOFTIRQ run.
  */
-void
+BIG_STATIC void
 freechain(mblk_t *mp, mblk_t **mpp)
 {
 	struct strthread *t;
@@ -3789,7 +3915,7 @@ freechain(mblk_t *mp, mblk_t **mpp)
  *  them later, because of M_PASSFP problems, we want to free them now, they will, however, not be
  *  freed back to the memory caches until the end of the STREAMS scheduler SOFTIRQ run.
  */
-void
+BIG_STATIC streams_fastcall void
 freechain(mblk_t *mp, mblk_t **mpp)
 {
 	mblk_t *b, *b_next = mp;
@@ -4006,6 +4132,26 @@ freestr(struct stdata *sd)
 
 EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 
+STATIC void
+sd_free(struct stdata *sd)
+{
+	/* the last reference is gone, there should be nothing left (but a queue pair) */
+	assert(sd->sd_inode == NULL);
+	assert(sd->sd_clone == NULL);
+	assert(sd->sd_iocblk == NULL);
+	assert(sd->sd_cdevsw == NULL);
+	assert(sd->sd_rq);
+	/* zero stream reference on queue pair to avoid double put on sd */
+	qstream(sd->sd_rq) = NULL;
+	/* these are left valid until last reference released */
+	assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
+	ptrace(("queue references qu_refs = %d\n",
+		atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
+	ctrace(qput(&sd->sd_wq));
+	ctrace(qput(&sd->sd_rq));	/* should be last put */
+	/* initial qget is balanced in qdetach()/qdelete() */
+	__freestr(sd);
+}
 streams_fastcall struct stdata *
 sd_get(struct stdata *sd)
 {
@@ -4035,25 +4181,8 @@ sd_put(struct stdata **sdp)
 			atomic_read(&sh->sh_refs) - 1));
 
 		assert(atomic_read(&sh->sh_refs) >= 1);
-		if (atomic_dec_and_test(&sh->sh_refs)) {
-			/* the last reference is gone, there should be nothing left (but a queue
-			   pair) */
-			assert(sd->sd_inode == NULL);
-			assert(sd->sd_clone == NULL);
-			assert(sd->sd_iocblk == NULL);
-			assert(sd->sd_cdevsw == NULL);
-			assert(sd->sd_rq);
-			/* zero stream reference on queue pair to avoid double put on sd */
-			qstream(sd->sd_rq) = NULL;
-			/* these are left valid until last reference released */
-			assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
-			ptrace(("queue references qu_refs = %d\n",
-				atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
-			ctrace(qput(&sd->sd_wq));
-			ctrace(qput(&sd->sd_rq));	/* should be last put */
-			/* initial qget is balanced in qdetach()/qdelete() */
-			__freestr(sd);
-		}
+		if (unlikely(atomic_dec_and_test(&sh->sh_refs) != 0))
+			sd_free(sd);
 	}
 	return;
 }
@@ -4479,7 +4608,7 @@ term_strsched(void)
  *  This is an initialization function for STREAMS scheduler items in this file.  It is invoked by
  *  the STREAMS kernel module or kernel initialization function.
  */
-int
+BIG_STATIC int
 strsched_init(void)
 {
 	int result, i;
@@ -4529,7 +4658,7 @@ strsched_init(void)
  *  This is a termination function for the STREAMS scheduler items in this file.  It is invoked by
  *  the STREAMS kernel module or kernel termination function.
  */
-void
+BIG_STATIC void
 strsched_exit(void)
 {
 	del_timer(&scan_timer);

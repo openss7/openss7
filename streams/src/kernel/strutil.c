@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/12/05 01:43:44 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/05 22:49:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/12/05 01:43:44 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/05 22:49:06 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/12/05 01:43:44 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/12/05 22:49:06 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -74,7 +74,9 @@ static char const ident[] =
 
 #include <stdbool.h>		/* for bool, true and false */
 
+#ifndef __STRUTIL_EXTERN_INLINE
 #define __STRUTIL_EXTERN_INLINE inline
+#endif
 
 #include "sys/strdebug.h"
 
@@ -283,69 +285,6 @@ krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
 }
 #endif
 #endif
-
-/* queue band gets and puts */
-streams_fastcall qband_t *
-bget(qband_t *qb)
-{
-	struct qbinfo *qbi;
-
-	if (qb) {
-		qbi = (typeof(qbi)) qb;
-		if (atomic_read(&qbi->qbi_refs) < 1)
-			swerr();
-		atomic_inc(&qbi->qbi_refs);
-	}
-	return (qb);
-}
-streams_fastcall void
-bput(qband_t **bp)
-{
-	qband_t *qb;
-
-	if ((qb = xchg(bp, NULL))) {
-		struct qbinfo *qbi = (typeof(qbi)) qb;
-
-		if (atomic_read(&qbi->qbi_refs) >= 1) {
-			if (atomic_dec_and_test(&qbi->qbi_refs))
-				freeqb(qb);
-		} else
-			swerr();
-	}
-}
-
-/* queue gets and puts */
-streams_fastcall queue_t *
-qget(queue_t *q)
-{
-	struct queinfo *qu;
-
-	if (q) {
-		qu = (typeof(qu)) RD(q);
-		if (atomic_read(&qu->qu_refs) < 1)
-			swerr();
-		atomic_inc(&qu->qu_refs);
-		printd(("%s: queue pair %p ref count is now %d\n",
-			__FUNCTION__, qu, atomic_read(&qu->qu_refs)));
-	}
-	return (q);
-}
-streams_fastcall void
-qput(queue_t **qp)
-{
-	queue_t *q;
-
-	if ((q = xchg(qp, NULL))) {
-		queue_t *rq = RD(q);
-		struct queinfo *qu = (typeof(qu)) rq;
-
-		assert(atomic_read(&qu->qu_refs) >= 1);
-		printd(("%s: queue pair %p ref count is now %d\n",
-			__FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
-		if (atomic_dec_and_test(&qu->qu_refs))
-			freeq(rq);
-	}
-}
 
 static int
 db_ref(dblk_t * db)
@@ -1076,30 +1015,26 @@ static struct qband *__get_qband(queue_t *q, unsigned char band);
 streams_fastcall void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
+#ifdef CONFIG_SMP
 	struct stdata *sd;
-	bool stream_end;
 
 	dassert(q);
-
 	sd = qstream(q);
-
 	dassert(sd);
-
-	if (unlikely(stream_end = (q->q_next == NULL)))
-		prlock(sd);
-
+	prlock(sd);
+#endif
+	dassert(q);
 	{
 		queue_t *q_back;
 
 		for (q_back = backq(q);
 		     (q = q_back) && (q_back = backq(q)) && !q->q_qinfo->qi_srvp;) ;
 	}
-
 	if (likely(q != NULL)) {
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
-		if (unlikely(stream_end)) {
+		if (unlikely(q->q_next == NULL)) {
 			unsigned long pl;
 			struct qband *qb;
 
@@ -1120,14 +1055,13 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 			}
 			qwunlock(q, pl);
 		}
-
 		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
 		   control */
 		qenable(q);	/* always enable if a service procedure exists */
 	}
-
-	if (unlikely(stream_end))
-		prunlock(sd);
+#ifdef CONFIG_SMP
+	prunlock(sd);
+#endif
 }
 
 EXPORT_SYMBOL(qbackenable);
@@ -1240,22 +1174,21 @@ bcanputany(queue_t *q)
 {
 	bool result;
 
-#if 0
+#ifdef CONFIG_SMP
 	struct stdata *sd;
-#endif
 
 	dassert(q);
-#if 0
 	sd = qstream(q);
 	dassert(sd);
 
 	prlock(sd);
 #endif
+
 	result = _bcanputany(q);
-#if 0
+
+#ifdef CONFIG_SMP
 	prunlock(sd);
 #endif
-
 	return (result);
 }
 
@@ -1281,21 +1214,20 @@ bcanputnextany(queue_t *q)
 {
 	int result;
 
-#if 0
+#ifdef CONFIG_SMP
 	struct stdata *sd;
-#endif
 
 	dassert(q);
-#if 0
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
 #endif
+
 	result = _bcanputany(q->q_next);
-#if 0
+
+#ifdef CONFIG_SMP
 	prunlock(sd);
 #endif
-
 	return (result);
 }
 
@@ -1511,20 +1443,23 @@ EXPORT_SYMBOL(bcanput);
 streams_fastcall int
 bcanputnext(queue_t *q, unsigned char band)
 {
-	struct stdata *sd;
 	int result;
+#ifdef CONFIG_SMP
+	struct stdata *sd;
 
 	dassert(q);
 	sd = qstream(q);
-
 	dassert(sd);
 	prlock(sd);
+#endif
 
+	dassert(q);
 	dassert(q->q_next);
 	result = _bcanput(q->q_next, band);
 
+#ifdef CONFIG_SMP
 	prunlock(sd);
-
+#endif
 	return (result);
 }
 
@@ -1715,7 +1650,7 @@ EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
  *  @q:		queue to schedule for service
  *
  */
-static inline streams_fastcall void
+static streams_inline streams_fastcall void
 qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
@@ -1821,7 +1756,7 @@ EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 /*
  *  __putbq:
  */
-static inline streams_fastcall int
+static streams_inline streams_fastcall int
 __putbq(queue_t *q, mblk_t *mp)
 {
 	int enable = 0;
@@ -2444,7 +2379,7 @@ static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *
  *  Allocates and initializes a queue pair for use by STREAMS.
  */
-STATIC inline streams_fastcall queue_t *
+STATIC streams_inline streams_fastcall queue_t *
 qalloc(struct stdata *sd, struct fmodsw *fmod)
 {
 	queue_t *q;
@@ -3381,7 +3316,7 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
  *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
  *  no message on the queue.
  */
-static inline streams_fastcall mblk_t *
+static streams_inline streams_fastcall mblk_t *
 __getq(queue_t *q, bool *be)
 {
 	mblk_t *mp;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/09/08 05:52:40 $
+ @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/05 22:49:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/08 05:52:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSYSCTL_H__
 #define __LOCAL_STRSYSCTL_H__
+
+#ifndef BIG_STATIC
+#define BIG_STATIC
+#endif
+
+#ifndef BIG_STATIC_INLINE
+#define BIG_STATIC_INLINE
+#endif
 
 /* /proc/streams */
 enum {
@@ -83,27 +91,27 @@ enum {
 	STREAMS_MSG_PRIORITY = 21,
 };
 
-extern int sysctl_str_maxpsz;		/* stream head default max packet size */
-extern int sysctl_str_minpsz;		/* stream head default min packet size */
-extern int sysctl_str_hiwat;		/* stream head default hi water mark */
-extern int sysctl_str_lowat;		/* stream head default lo water mark */
-extern int sysctl_str_cltime;		/* close wait time in msec (save in ticks) */
-extern int sysctl_str_rtime;		/* msec to wait to forward held msg (save in ticks) */
-extern int sysctl_str_ioctime;		/* msec to wait for ioctl() acknowledgement (save in ticks) */
+BIG_STATIC int sysctl_str_maxpsz;	/* stream head default max packet size */
+BIG_STATIC int sysctl_str_minpsz;	/* stream head default min packet size */
+BIG_STATIC int sysctl_str_hiwat;	/* stream head default hi water mark */
+BIG_STATIC int sysctl_str_lowat;	/* stream head default lo water mark */
+BIG_STATIC int sysctl_str_cltime;	/* close wait time in msec (save in ticks) */
+BIG_STATIC int sysctl_str_rtime;	/* msec to wait to forward held msg (save in ticks) */
+BIG_STATIC int sysctl_str_ioctime;	/* msec to wait for ioctl() acknowledgement (save in ticks) */
 extern int sysctl_str_nstrpush;		/* max pushed modules */
-extern int sysctl_str_strthresh;	/* memory limit */
-extern int sysctl_str_strhold;		/* active stream hold feature */
+BIG_STATIC int sysctl_str_strthresh;	/* memory limit */
+BIG_STATIC int sysctl_str_strhold;	/* active stream hold feature */
 extern int sysctl_str_strctlsz;		/* maximum stream control size */
 extern int sysctl_str_strmsgsz;		/* maximum stream message size */
-extern int sysctl_str_nstrmsgs;		/* maximum number of streams messages */
-extern int sysctl_str_nband;		/* number of queue bands */
-extern int sysctl_str_reuse_fmodsw;	/* reuse fmodsw entries */
-extern int sysctl_str_max_apush;	/* max autopushed mods per str */
-extern int sysctl_str_max_stramod;	/* max autopushed modules */
-extern int sysctl_str_max_strdev;	/* max streams devices */
-extern int sysctl_str_max_strmod;	/* max streams modules */
-extern int sysctl_str_max_mblk;		/* max of headers on free list */
-extern int sysctl_str_msg_priority;	/* observer message allocation priority */
+BIG_STATIC int sysctl_str_nstrmsgs;	/* maximum number of streams messages */
+BIG_STATIC int sysctl_str_nband;	/* number of queue bands */
+BIG_STATIC int sysctl_str_reuse_fmodsw;	/* reuse fmodsw entries */
+BIG_STATIC int sysctl_str_max_apush;	/* max autopushed mods per str */
+BIG_STATIC int sysctl_str_max_stramod;	/* max autopushed modules */
+BIG_STATIC int sysctl_str_max_strdev;	/* max streams devices */
+BIG_STATIC int sysctl_str_max_strmod;	/* max streams modules */
+BIG_STATIC int sysctl_str_max_mblk;	/* max of headers on free list */
+BIG_STATIC int sysctl_str_msg_priority;	/* observer message allocation priority */
 
 /* initialization for main */
 extern int strsysctl_init(void);

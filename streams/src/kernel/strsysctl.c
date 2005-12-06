@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/20 08:18:57 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/05 22:49:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/20 08:18:57 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/20 08:18:57 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/05 22:49:06 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/10/20 08:18:57 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/05 22:49:06 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,27 +74,27 @@ static char const ident[] =
 #include "src/modules/sth.h"	/* for str_minfo */
 #include "strsysctl.h"		/* extern verification */
 
-int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
-int sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
-int sysctl_str_hiwat = STRHIGH;		/* stream head default hi water mark */
-int sysctl_str_lowat = STRLOW;		/* stream head default lo water mark */
-int sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in ticks) */
-int sysctl_str_rtime = (10 * HZ) / 1000;/* msec to wait to forward held msg (saved in ticks) */
-int sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved in ticks) */
-int sysctl_str_nstrpush = 64;		/* maximum number of pushed modules */
-int sysctl_str_strthresh = (1 << 20);	/* memory limit */
-int sysctl_str_strhold = 0;		/* active stream hold feature */
-int sysctl_str_strctlsz = (1 << 12);	/* maximum stream control size */
-int sysctl_str_strmsgsz = (1 << 18);	/* maximum stream message size */
-int sysctl_str_nstrmsgs = (1 << 18);	/* maximum number of streams messages */
-int sysctl_str_nband = 256;		/* number of queue bands */
-int sysctl_str_reuse_fmodsw = 0;	/* reuse fmodsw entries if true */
-int sysctl_str_max_apush = MAX_APUSH;	/* max no autopushed mods per stream */
-int sysctl_str_max_stramod = 8;		/* max no autopushed modules */
-int sysctl_str_max_strdev = MAX_STRDEV;	/* max no streams devices */
-int sysctl_str_max_strmod = MAX_STRMOD;	/* max no streams modules */
-int sysctl_str_max_mblk = 10;		/* max no of headers on free list */
-int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
+BIG_STATIC int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
+BIG_STATIC int sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
+BIG_STATIC int sysctl_str_hiwat = STRHIGH;	/* stream head default hi water mark */
+BIG_STATIC int sysctl_str_lowat = STRLOW;	/* stream head default lo water mark */
+BIG_STATIC int sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in ticks) */
+BIG_STATIC int sysctl_str_rtime = (10 * HZ) / 1000;/* msec to wait to forward held msg (saved in ticks) */
+BIG_STATIC int sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved in ticks) */
+int sysctl_str_nstrpush = 64;			/* maximum number of pushed modules */
+BIG_STATIC int sysctl_str_strthresh = (1 << 20);/* memory limit */
+BIG_STATIC int sysctl_str_strhold = 0;		/* active stream hold feature */
+int sysctl_str_strctlsz = (1 << 12);		/* maximum stream control size */
+int sysctl_str_strmsgsz = (1 << 18);		/* maximum stream message size */
+BIG_STATIC int sysctl_str_nstrmsgs = (1 << 18);	/* maximum number of streams messages */
+BIG_STATIC int sysctl_str_nband = 256;		/* number of queue bands */
+BIG_STATIC int sysctl_str_reuse_fmodsw = 0;	/* reuse fmodsw entries if true */
+BIG_STATIC int sysctl_str_max_apush = MAX_APUSH;/* max no autopushed mods per stream */
+BIG_STATIC int sysctl_str_max_stramod = 8;	/* max no autopushed modules */
+BIG_STATIC int sysctl_str_max_strdev = MAX_STRDEV;/* max no streams devices */
+BIG_STATIC int sysctl_str_max_strmod = MAX_STRMOD;/* max no streams modules */
+BIG_STATIC int sysctl_str_max_mblk = 10;	/* max no of headers on free list */
+BIG_STATIC int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
 
 EXPORT_SYMBOL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH

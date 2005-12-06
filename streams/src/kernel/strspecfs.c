@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/10/19 11:08:23 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -272,7 +272,7 @@ STATIC struct vfsmount *specfs_mnt = NULL;
  *  -------------------------------------------------------------------------
  */
 
-struct inode *
+BIG_STATIC struct inode *
 spec_snode(dev_t dev, struct cdevsw *cdev)
 {
 	struct inode *snode;

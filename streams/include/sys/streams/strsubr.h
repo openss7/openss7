@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.56 2005/12/02 12:05:18 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.57 2005/12/05 22:49:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/02 12:05:18 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/05 22:49:05 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -260,6 +260,7 @@ struct stdata {
 
 #define STRHIGH		5120	/* default hi water mark */
 #define STRLOW		1024	/* default lo water mark */
+
 #define STRMAXPSZ	(1<<12)	/* default max psz */
 #define STRMINPSZ	0	/* default max psz */
 

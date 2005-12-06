@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/11/01 11:20:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/05 22:48:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/01 11:20:51 $ by $Author: brian $
+# Last Modified $Date: 2005/12/05 22:48:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -229,15 +229,17 @@ noinst_LIBRARIES		= \
 				libLfS-modules.a
 
 libLfS_specfs_a_SOURCES		= \
-				src/kernel/strspecfs.c \
 				src/kernel/strspecfs.h \
-				src/kernel/strlookup.c \
 				src/kernel/strlookup.h \
-				src/kernel/strattach.c \
 				src/kernel/strattach.h \
-				src/kernel/strpipe.c \
 				src/kernel/strpipe.h \
-				src/kernel/strargs.h
+				src/kernel/strargs.h \
+				src/kernel/specfs.c
+
+##				src/kernel/strspecfs.c \
+##				src/kernel/strlookup.c \
+##				src/kernel/strattach.c \
+##				src/kernel/strpipe.c \
 
 libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLfS_specfs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=specfs $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
@@ -247,21 +249,23 @@ $(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
 
 
 libLfS_streams_a_SOURCES		= \
-				src/kernel/strmain.c \
-				src/kernel/strreg.c \
 				src/kernel/strreg.h \
-				src/kernel/strprocfs.c \
 				src/kernel/strprocfs.h \
-				src/kernel/strsched.c \
 				src/kernel/strsched.h \
-				src/kernel/strsysctl.c \
 				src/kernel/strsysctl.h \
-				src/kernel/strsyms.c \
-				src/kernel/strutil.c \
 				src/kernel/strutil.h \
-				src/kernel/strsad.c \
 				src/kernel/strsad.h \
-				src/kernel/strargs.h
+				src/kernel/strargs.h \
+				src/kernel/streams.c
+
+##				src/kernel/strmain.c \
+##				src/kernel/strreg.c \
+##				src/kernel/strprocfs.c \
+##				src/kernel/strsched.c \
+##				src/kernel/strsysctl.c \
+##				src/kernel/strsyms.c \
+##				src/kernel/strutil.c \
+##				src/kernel/strsad.c \
 
 if CONFIG_STREAMS_STH
 libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
@@ -700,16 +704,20 @@ AUTOCONFIG_H			= include/sys/config.h
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 EXPORT_SRCFILES			= \
-				  src/kernel/strattach.c \
-				  src/kernel/strlookup.c \
-				  src/kernel/strpipe.c \
-				  src/kernel/strreg.c \
-				  src/kernel/strsad.c \
-				  src/kernel/strsched.c \
-				  src/kernel/strspecfs.c \
-				  src/kernel/strsysctl.c \
-				  src/kernel/strutil.c \
-				  src/kernel/strsyms.c
+				  src/kernel/specfs.c \
+				  src/kernel/streams.c
+
+##				  src/kernel/strattach.c \
+##				  src/kernel/strlookup.c \
+##				  src/kernel/strpipe.c \
+##				  src/kernel/strreg.c \
+##				  src/kernel/strsad.c \
+##				  src/kernel/strsched.c \
+##				  src/kernel/strspecfs.c \
+##				  src/kernel/strsysctl.c \
+##				  src/kernel/strutil.c \
+##				  src/kernel/strsyms.c
+
 if CONFIG_STREAMS_CLONE
 EXPORT_SRCFILES			+= src/drivers/clone.c
 endif
@@ -724,16 +732,20 @@ EXPORT_SRCFILES			+= src/modules/sth.c
 endif
 
 EXPORT_VERFILES			= \
-				  $(PKGINCL)/versions/strattach.ver \
-				  $(PKGINCL)/versions/strlookup.ver \
-				  $(PKGINCL)/versions/strpipe.ver \
-				  $(PKGINCL)/versions/strreg.ver \
-				  $(PKGINCL)/versions/strsad.ver \
-				  $(PKGINCL)/versions/strsched.ver \
-				  $(PKGINCL)/versions/strspecfs.ver \
-				  $(PKGINCL)/versions/strsysctl.ver \
-				  $(PKGINCL)/versions/strutil.ver \
-				  $(PKGINCL)/versions/strsyms.ver
+				  $(PKGINCL)/versions/specfs.ver \
+				  $(PKGINCL)/versions/streams.ver
+
+##				  $(PKGINCL)/versions/strattach.ver \
+##				  $(PKGINCL)/versions/strlookup.ver \
+##				  $(PKGINCL)/versions/strpipe.ver \
+##				  $(PKGINCL)/versions/strreg.ver \
+##				  $(PKGINCL)/versions/strsad.ver \
+##				  $(PKGINCL)/versions/strsched.ver \
+##				  $(PKGINCL)/versions/strspecfs.ver \
+##				  $(PKGINCL)/versions/strsysctl.ver \
+##				  $(PKGINCL)/versions/strutil.ver \
+##				  $(PKGINCL)/versions/strsyms.ver
+
 if CONFIG_STREAMS_CLONE
 EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
 endif

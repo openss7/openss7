@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.23 2005/12/04 04:38:46 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.24 2005/12/05 22:49:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/04 04:38:46 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/04 04:38:46 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/05 22:49:05 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -205,6 +205,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STREAMS_FASTCALL(__x) __x
 #undef streams_fastcall
 #define streams_fastcall
+#undef streams_inline
+#define streams_inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern inline
@@ -251,6 +253,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #else
 #define STREAMS_FASTCALL(__x) __x
 #endif
+#undef streams_inline
+#define streams_inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern inline
@@ -297,6 +301,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #else
 #define STREAMS_FASTCALL(__x) __x
 #endif
+#undef streams_inline
+#define streams_inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE static inline
@@ -319,11 +325,11 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    trace()		_trace()
 #define   ptrace(__pks)		_ptrace(__pks)
 #define   ctrace(__fnc)		_ctrace(__fnc)
-#define    fixme(__pks)		__fixme(__pks)
+#define    fixme(__pks)		_fixme(__pks)
 #define     todo(__pks)		_todo(__pks)
 #define   printd(__pks)		_printd(__pks)
-#define    swerr()		__swerr()
-#define   pswerr(__pks)		__pswerr(__pks)
+#define    swerr()		_swerr()
+#define   pswerr(__pks)		_pswerr(__pks)
 
 #undef STATIC
 #define STATIC static
@@ -343,6 +349,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #else
 #define STREAMS_FASTCALL(__x) __x
 #endif
+#undef streams_inline
+#define streams_inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE static inline fastcall

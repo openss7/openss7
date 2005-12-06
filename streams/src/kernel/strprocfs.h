@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strprocfs.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,15 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRPROCFS_H__
 #define __LOCAL_STRPROCFS_H__
 
+#ifndef BIG_STATIC
+#define BIG_STATIC
+#endif
+
+#ifndef BIG_STATIC_INLINE
+#define BIG_STATIC_INLINE
+#endif
+
 /* initialization for main */
-extern int strprocfs_init(void);
-extern void strprocfs_exit(void);
+BIG_STATIC int strprocfs_init(void);
+BIG_STATIC void strprocfs_exit(void);
 
 #endif				/* __LOCAL_STRPROCFS_H__ */

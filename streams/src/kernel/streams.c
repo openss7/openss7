@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/05 22:49:06 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,39 +46,54 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: streams.c,v $
+ Revision 0.9.2.1  2005/12/05 22:49:05  brian
+ - some sneaky tricks for a single compilation unit build to help compiler
+   with optimization
+ - reworked plumbing read locks to be taken all the time (they are only for
+   SMP anyway).
+ - got 80% pipe performance @64-byes --with-k-optimize=speed on FC4.
 
  *****************************************************************************/
 
-#ifndef __LOCCAL_STRSPECFS_H__
-#define __LOCCAL_STRSPECFS_H__
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $"
 
-#define SPEC_SBI_MAGIC 0XFEEDDEAF
-struct spec_sb_info {
-	u32 sbi_magic;
-	int sbi_setuid;
-	int sbi_setgid;
-	int sbi_setmod;
-	uid_t sbi_uid;
-	gid_t sbi_gid;
-	umode_t sbi_mode;
-};
+static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $";
 
-// extern struct file_operations spec_dev_f_ops;
+/* can we just include these into one big compilation unit? */
 
-extern struct vfsmount *STREAMS_FASTCALL(specfs_mount(void));
-extern void STREAMS_FASTCALL(specfs_umount(void));
+#define BIG_COMPILE 1
+#define BIG_STATIC static
+#define BIG_STATIC_INLINE static streams_inline
 
-extern int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
-extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
-#ifndef BIG_COMPILE
-extern struct inode *spec_snode(dev_t dev, struct cdevsw *cdev);
-#endif
+#define __STRSCHED_EXTERN_INLINE inline
+#define __STRUTIL_EXTERN_INLINE inline
 
-#if 0
-/* initialization for main */
-extern int strspecfs_init(void);
-extern void strspecfs_exit(void);
-#endif
-
-#endif				/* __LOCCAL_STRSPECFS_H__ */
+#undef ident
+#define ident ident_strreg
+#include "strreg.c"
+#undef ident
+#define ident ident_strsysctl
+#include "strsysctl.c"
+#undef ident
+#define ident ident_strsched
+#include "strsched.c"
+#undef ident
+#define ident ident_strutil
+#include "strutil.c"
+#undef ident
+#define ident ident_strsad
+#include "strsad.c"
+#undef ident
+#define ident ident_strprocfs
+#include "strprocfs.c"
+#undef ident
+#define ident ident_strsyms
+#include "strsyms.c"
+#undef ident
+#define ident ident_strmain
+#include "strmain.c"

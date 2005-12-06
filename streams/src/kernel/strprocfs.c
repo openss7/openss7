@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/30 08:26:56 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/30 08:26:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/30 08:26:56 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/05 22:49:05 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/09/30 08:26:56 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/05 22:49:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1524,7 +1524,7 @@ struct proc_dir_entry *proc_str = NULL;
 
 #endif				/* CONFIG_PROC_FS */
 
-int
+BIG_STATIC int
 strprocfs_init(void)
 {
 #ifdef CONFIG_PROC_FS
@@ -1557,7 +1557,7 @@ strprocfs_init(void)
 	return (0);
 }
 
-void
+BIG_STATIC void
 strprocfs_exit(void)
 {
 #ifdef CONFIG_PROC_FS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/11/06 11:00:58 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/05 22:49:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/06 11:00:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSCHED_H__
 #define __LOCAL_STRSCHED_H__
+
+#ifndef BIG_STATIC
+#define BIG_STATIC
+#endif
+
+#ifndef BIG_STATIC_INLINE
+#define BIG_STATIC_INLINE
+#endif
 
 #undef STR
 #include <linux/interrupt.h>	/* for in_irq() and friends */
@@ -68,12 +76,21 @@
 #endif
 
 /* ctors and dtors for mdbblocks */
-extern mblk_t *mdbblock_alloc(uint priority, void *func);
-extern void mdbblock_free(mblk_t *mp);
+BIG_STATIC mblk_t *STREAMS_FASTCALL(mdbblock_alloc(uint priority, void *func));
+BIG_STATIC void STREAMS_FASTCALL(mdbblock_free(mblk_t *mp));
+
+/* queue gets and puts */
+BIG_STATIC queue_t *STREAMS_FASTCALL(qget(queue_t *q));
+BIG_STATIC void STREAMS_FASTCALL(qput(queue_t **qp));
 
 /* ctors and dtors for queue bands */
-extern struct qband *allocqb(void);
-extern void freeqb(struct qband *qb);
+BIG_STATIC struct qband *allocqb(void);
+BIG_STATIC void freeqb(struct qband *qb);
+#if 0
+/* queue band gets and puts */
+BIG_STATIC qband_t *STREAMS_FASTCALL(bget(qband_t *qb));
+BIG_STATIC void STREAMS_FASTCALL(bput(qband_t **bp));
+#endif
 
 /* ctors and dtors for stream heads */
 extern struct stdata *allocstr(void);
@@ -82,21 +99,24 @@ extern struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
 extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
 
 /* ctors and dtors for autopush entries */
-extern struct apinfo *ap_alloc(struct strapush *sap);
-extern struct apinfo *ap_get(struct apinfo *api);
-extern void ap_put(struct apinfo *api);
+BIG_STATIC struct apinfo *ap_alloc(struct strapush *sap);
+BIG_STATIC struct apinfo *ap_get(struct apinfo *api);
+BIG_STATIC void ap_put(struct apinfo *api);
+/* XXX: not even in strsched.c */
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
+#if 0
 /* ctors and dtors for devinfo */
-extern struct devinfo *di_alloc(struct cdevsw *cdev);
-extern struct devinfo *di_get(struct devinfo *di);
-extern void di_put(struct devinfo *di);
+BIG_STATIC struct devinfo *di_alloc(struct cdevsw *cdev);
+BIG_STATIC struct devinfo *di_get(struct devinfo *di);
+BIG_STATIC void di_put(struct devinfo *di);
 
 /* ctors and dtors for mdlinfo */
-extern struct mdlinfo *modi_alloc(struct fmodsw *fmod);
-extern struct mdlinfo *modi_get(struct mdlinfo *mi);
-extern void modi_put(struct mdlinfo *mi);
+BIG_STATIC struct mdlinfo *modi_alloc(struct fmodsw *fmod);
+BIG_STATIC struct mdlinfo *modi_get(struct mdlinfo *mi);
+BIG_STATIC void modi_put(struct mdlinfo *mi);
+#endif
 
 /* ctors and dtors for linkblk */
 extern struct linkblk *alloclk(void);
@@ -104,24 +124,24 @@ extern void freelk(struct linkblk *l);
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* ctors and dtors for syncq */
-extern struct syncq *sq_alloc(void);
-extern struct syncq *sq_get(struct syncq *sq);
-extern void sq_put(struct syncq **sqp);
+BIG_STATIC struct syncq *sq_alloc(void);
+BIG_STATIC struct syncq *sq_get(struct syncq *sq);
+BIG_STATIC void sq_put(struct syncq **sqp);
 #endif
 
 /* freeing chains of message blocks */
-extern void freechain(mblk_t *mp, mblk_t **mpp);
+BIG_STATIC void STREAMS_FASTCALL(freechain(mblk_t *mp, mblk_t **mpp));
 
 /* force scheduling queues */
 // extern void qschedule(queue_t *q);
 
 #if defined CONFIG_STREAMS_SYNCQS
-/* synq functions */
+/* synq functions */ /* XXX: not even in strsched.c */
 extern void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
 #endif
 
 /* stuff for examining streams information lists */
-extern struct strinfo Strinfo[DYN_SIZE];
+BIG_STATIC struct strinfo Strinfo[DYN_SIZE];
 extern struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 
 #define this_thread (&strthreads[smp_processor_id()])
@@ -172,7 +192,7 @@ do { \
 } while (0)
 #endif				/* defined CONFIG_STREAMS_KTHREADS */
 
-__SCHED_EXTERN_INLINE context_t
+__SCHED_EXTERN_INLINE streams_fastcall context_t
 current_context(void)
 {
 	if (in_irq())
@@ -189,9 +209,9 @@ current_context(void)
 }
 
 /* for initialization */
-extern int strsched_init(void);
-extern void strsched_exit(void);
+BIG_STATIC int strsched_init(void);
+BIG_STATIC void strsched_exit(void);
 #if defined CONFIG_STREAMS_SYNCQS
-extern void sqsched(syncq_t *sq);
+BIG_STATIC void sqsched(syncq_t *sq);
 #endif
 #endif				/* __LOCAL_STRSCHED_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/05 01:43:44 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/05 22:49:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 01:43:44 $ by $Author: brian $
+ Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
+
+#ifndef BIG_STATIC
+#define BIG_STATIC
+#endif
+
+#ifndef BIG_STATIC_INLINE
+#define BIG_STATIC_INLINE
+#endif
 
 #include <stdbool.h>
 
@@ -62,14 +70,6 @@ extern struct syncq *global_syncq;
 extern bool __rmvq(queue_t *q, mblk_t *mp);
 #endif
 extern bool __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[]);
-
-/* queue band gets and puts */
-extern qband_t *STREAMS_FASTCALL(bget(qband_t *qb));
-extern void STREAMS_FASTCALL(bput(qband_t **bp));
-
-/* queue gets and puts */
-extern queue_t *STREAMS_FASTCALL(qget(queue_t *q));
-extern void STREAMS_FASTCALL(qput(queue_t **qp));
 
 #if 0
 /* kernel locks */
