@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/11/01 11:21:11 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/07 11:14:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/01 11:21:11 $ by $Author: brian $
+ Last Modified $Date: 2005/12/07 11:14:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.8  2005/12/07 11:14:12  brian
+ - fixed bug keeping getmsg/putmsg from working.
+
  Revision 0.9.2.7  2005/11/01 11:21:11  brian
  - updates for testing and documentation
 
@@ -90,10 +93,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/11/01 11:21:11 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/07 11:14:12 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/11/01 11:21:11 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/07 11:14:12 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -276,7 +279,7 @@ test_sync(int fds[])
 						break;
 				}
 			} else {
-				int flags;
+				int flags = 0;
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { msgsize, 0, my_msg };
 
@@ -363,7 +366,7 @@ read_child(int fd)
 						goto dead;
 				}
 			} else {
-				int flags;
+				int flags = 0;
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { msgsize, 0, my_msg };
 

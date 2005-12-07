@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_FLUSH.7.man,v 0.9.2.3 2005/11/22 11:57:12 brian Exp $
+.\" @(#) $Id: I_FLUSH.7.man,v 0.9.2.4 2005/12/07 11:13:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/07 11:13:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_FLUSH.7.man,v $
+.\" Revision 0.9.2.4  2005/12/07 11:13:36  brian
+.\" - final updates
+.\"
 .\" Revision 0.9.2.3  2005/11/22 11:57:12  brian
 .\" - updating documentation for release
 .\"
@@ -130,12 +133,14 @@ is an integer containing one of the following flags:
 .TP \w'FLUSHRW\(em'u
 .B FLUSHR
 flush the read (upstream) queues in the Stream.
+.PD 0
 .TP
 .B FLUSHW
 flush the write (downstream) queues in the Stream.
 .TP
 .B FLUSHRW
 flush both the read (upstream) and write (downstream) queues in the Stream.
+.PD
 .PP
 Note that on a bare
 .IR STREAMS -based

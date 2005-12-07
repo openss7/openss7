@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_GETPMSG.7.man,v 0.9.2.3 2005/11/22 11:57:12 brian Exp $
+.\" @(#) $Id: I_GETPMSG.7.man,v 0.9.2.4 2005/12/07 11:13:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/07 11:13:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_GETPMSG.7.man,v $
+.\" Revision 0.9.2.4  2005/12/07 11:13:36  brian
+.\" - final updates
+.\"
 .\" Revision 0.9.2.3  2005/11/22 11:57:12  brian
 .\" - updating documentation for release
 .\"
@@ -115,10 +118,159 @@ always
 .BR I_GETPMSG .
 .TP
 .I arg
+is a pointer to a
+.B strpmsg
+structure formatted as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct strpmsg {
+    struct strbuf ctlbuf;
+    struct strbuf databuf;
+    int band;
+    int flags;          /* actually long for Mac OT */
+};
+\s+1\fP
+.fi
+.TP
+.I ctlbuf
+a
+.B strbuf
+structure representing the control part, containing the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+the size of the user buffer;
+.PD 0
+.TP
+.I len
+on return, the number of bytes copied into the user buffer; and,
+.TP
+.I buf
+a pointer to the user buffer.
+.PD
+.RE
+.TP
+.I databuf
+a
+.B strbuf
+structure representing the data part, containing the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+the size of the user buffer;
+.PD 0
+.TP
+.I len
+on return, the number of bytes copied into the user buffer; and,
+.TP
+.I buf
+a pointer to the user buffer.
+.PD
+.RE
+.TP
+.I band
+an integer band number specifying the band of the message to retreive on call, and returning the
+band of the retreived message on return.
+.TP
+.I flags
+integer flags specifying which messaes to retreive on call, and returning the priority of the
+retreived message on return.
+.I flags
+can be one of the following for
+.BR getmsg (2s)
+emulation:
+.RS
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B 0
+.PD 0
+retrieve any message (retrieved message was normal priority); or,
+.TP
+.B RS_HIPRI
+retrieve only high priority messages (retrieved message was high priority).
+.PD
+.PP
+or one of the following for
+.BR getpmsg (2s)
+emulation:
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B MSG_ANY
+.PD 0
+retrieve any message (not set on return);
+.TP
+.B MSG_BAND
+retrieve only normal priority messages with a priority band greater than or equal to
+.I band
+(retrieved message was a normal priority message with priority band
+.IR band );
+.TP
+.B MSG_HIPRI
+retrieve only high priority messages (retrieved message was high priority).
+.PD
+.RE
+.RE
+
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B I_GETPMSG
+provides an
+.BR ioctl (2s)
+emulation of the
+.BR getmsg (2s)
+and
+.BR getpmsg (2s)
+system calls.
+.B I_GETPMSG
+is emulated in this way due to the
+.B Linux
+kernel's failure to provide any means to implement standard system calls.
+.PP
+Under the emulation,
+.I fd
+is the same as the
+.I fd
+argument to
+.BR getmsg (2s)
+or
+.BR getpmsg (2s);
+.I arg
+points to a structure containing the remaining arguments for
+.BR getmsg (2s)
+and
+.BR getpmsg (2s).
+.I cmd
+is always
+.BR I_GETPMSG .
+.PP
+See
+.BR getmsg (2s)
+and
+.BR getpmsg (2s)
+for the purpose and function of the arguments.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B I_GETPMSG
+input-output control is not intended to be invoked directly with the
+.BR ioctl (2s)
+interface, but rather via the
+.BR getmsg (2s)
+and
+.BR getpmsg (2s)
+library calls.
+.PP
+See
+.BR getmsg (2s)
+and
+.BR getpmsg (2s)
+for details on the operation of the system call this
+.BR ioctl (2s)
+emulates, and usage information.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -126,9 +278,23 @@ always
 Upon success, the
 .B I_GETPMSG
 .BR ioctl (2s)
-command returns zero
-.RB ( 0 )
-or a positive integer.
+will return a non-negative value with any of the following flags set:
+.TP \w'\fBMOREDATA\fR\(em'u
+.B MORECTL
+indicates that more control information belonging to the same message is
+waiting to be retrieved from the stream head read queue with a subsequent
+.BR getmsg (2s)
+operation.
+.TP
+.B MOREDATA
+indicates that more data belonging to the same message is waiting to be
+retrieved from the stream head read queue with a subsequent
+.B I_GETPMSG
+operation.
+.TP
+.B 0
+indicates that the entire message was received successfully.
+.PP
 Upon failure, the
 .B I_GETPMSG
 .BR ioctl (2s)
@@ -149,12 +315,227 @@ command fails, it returns
 and sets
 .IR errno (3)
 to one of the following errors:
+.PP
+The following errors are returned for the
+.BR getmsg (2s)
+emulation:
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid file descriptor or is not open for reading.
+.TP
+.RB [ EFAULT ]
+A specified address is outside the user's accessible address space.
+Specified addresses include,
+.IR ctlptr ", " datptr ", " flagsp ,
+and the
+.I buf
+fields of the
+.B strbuf
+structure pointed to by
+.IR cttlptr " and " datptr .
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.BR getmsg (2s)
+system call.
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.TP
+.RB [ EIO ]
+I/O error, or,
+.I fd
+refers to a stream that is open but is in the process of closing.
+.\".TP
+.\".RB [ EPERM ]
+.\".I fd
+.\"points to a dynamic device and read permission on the device is denied.
+.\"
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.I fd
+is linked under a multiplexing driver; or,
+.BR getmsg (2s)
+is not supported; or, the flags pointed to by
+.I flagsp
+were invalid for
+.BR getmsg (2s).
+.TP
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation and
+.BR getmsg (2s)
+would block: that is, no message of the requested type and priority band is
+available to be read.
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ],
+above.
+(For most architectures under
+.BR Linux ,
+.RB [ EAGAIN ]
+and
+.RB [ EWOULDBLOCK ]
+have the same value.)
+.TP
+.RB [ EINTR ]
+A signal was caught, or an
+.BR M_SIG (9)
+message processed, before the call to
+.BR getmsg (2s)
+could return any data.
+.TP
+.RB [ ENOSTR ]
+.I fd
+has no stream associated with the file descriptor.
+.TP
+.RB [ EBADMSG ]
+The message at the head of the queue is of an invalid message type (valid
+message types include:
+.BR M_DATA ", " M_PROTO " and " M_PCPROTO );
+or, the message at head of the of the queue is not of the requested type
+as specified by
+.IR flagsp .
+.PP
+Other errors may be returned by
+.BR getmsg (2s).
+If the
+.I STREAMS
+module sends a
+.BR M_ERROR (9)
+message to the stream head, the error returned on all subsequent read
+operations, including
+.BR getmsg (2s),
+is specified in the
+.BR M_ERROR (9)
+message by the
+.I STREAMS
+module.
+Which errors are returned under which conditions form part of the
+necessary documentation of the
+.I STREAMS
+module.
+
+.PP
+The following errors are returned for the
+.BR getpmsg (2s)
+emulation:
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid file descriptor or is not open for reading.
+.TP
+.RB [ EFAULT ]
+A specified address is outside the user's accessible address space.
+Specified addresses include,
+.IR ctlptr ", " datptr ", " bandp ", " flagsp ,
+and the
+.I buf
+fields of the
+.B strbuf
+structure pointed to by
+.IR cttlptr " and " datptr .
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.BR getpmsg (2s)
+system call.
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.TP
+.RB [ EIO ]
+I/O error, or,
+.I fd
+refers to a stream that is open but is in the process of closing.
+.\".TP
+.\".RB [ EPERM ]
+.\".I fd
+.\"points to a dynamic device and read permission on the device is denied.
+.\"
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.I fd
+is linked under a multiplexing driver; or,
+.BR getpmsg (2s)
+is not supported; or, the flags were invalid for
+.BR getpmsg (2s)
+(not
+.BR MSG_HIPRI ", " MSG_ANY " or " MSG_BAND ).
+.TP
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation and
+.BR getpmsg (2s)
+would block: that is, no message of the requested type and priority band is
+available to be read.
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ],
+above.
+(For most architectures under
+.BR Linux ,
+.RB [ EAGAIN ]
+and
+.RB [ EWOULDBLOCK ]
+have the same value.)
+.TP
+.RB [ EINTR ]
+A signal was caught, or an
+.BR M_SIG (9)
+message processed, before the call to
+.BR getpmsg (2s)
+could return any data.
+.TP
+.RB [ ENOSTR ]
+.I fd
+has no stream associated with the file descriptor.
+.TP
+.RB [ EBADMSG ]
+The message at the head of the queue is of an invalid message type (valid
+message types include:
+.BR M_DATA ", " M_PROTO " and " M_PCPROTO );
+or, the message at head of the of the queue is not of the requested type
+as specified by
+.IR flagsp ,
+or priority band as specified by
+.IR bandp .
+.PP
+Other errors may be returned by
+.BR getpmsg (2s).
+If the protocol module sends a
+.B M_ERROR
+message to the stream head, the error returned on all subsequent read
+operations, including
+.BR getpmsg (2s),
+is specified in the
+.B M_ERROR
+message by the protocol module.
+Which errors are returned under which conditions form part of the
+necessary documentation of the protocol module.
 .\"
 .PP
 In general, any
 .BR ioctl (2s)
 command can fail if:
-.TP \w'[EWOULDBLOCK]\(em'u
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
 .RB [ EFAULT ]
 .IR arg ,
 or a pointer member of a structure pointed to by
@@ -265,7 +646,7 @@ See
 .BR Linux ,
 .RB [ EAGAIN ]
 and
-.BR [ EWOULDBLOCK ]
+.RB [ EWOULDBLOCK ]
 have the same value.)
 .TP
 .RB [ ETIME ]
@@ -368,6 +749,13 @@ Portable
 .I STREAMS
 applications programs will expect conformance to
 .IR POSIX/SUSv3 .
+.IP \(em
+It is fairly common practice to emulate system calls with
+.BR ioctl (2s)
+commands.
+.IP \(em
+.B I_GETPMSG
+should not be invoked directly, but, rather, via the appropriate library call.
 .PP
 For general
 .BR ioctl (2s)

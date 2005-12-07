@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/06 10:25:40 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/07 11:16:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/06 10:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/07 11:16:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/06 10:25:40 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/07 11:16:54 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/06 10:25:40 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/07 11:16:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -173,6 +173,16 @@ cpu_raise_streams(unsigned int cpu)
 #endif				/* defined CONFIG_STREAMS_KTHREADS */
 
 EXPORT_SYMBOL(__raise_streams);
+
+#if 0
+STATIC streams_fastcall void
+strblocking(void)
+{
+	/* before every system call return or sleep -- saves a context switch */
+	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
+		runqueues();
+}
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -595,6 +605,7 @@ allocq(void)
 	queue_t *rq;
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
 
+	// strblocking(); /* before we sleep */
 	/* Note: we only allocate queue pairs in the stream head which is called at user context
 	   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL instead of
 	   SLAB_ATOMIC.  Allocate your private queue pairs in qopen/qclose or module init. */
@@ -806,56 +817,34 @@ mdbblock_alloc(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 	mblk_t *mp = NULL;
-	int slab_flags = SLAB_ATOMIC;
+	int slab_flags;
 
-	trace();
-	if (atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs)
+	/* might be able to do this first for other than BRPI_HI and BPRI_FT.  Another thing to do
+	   is the percentage of thewall trick: BPRI_LO => 80%, BPRI_MED => 90%, BPRI_HI => 100% */
+	if (unlikely(atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs))
 		goto fail;
-	if (unlikely(priority != BPRI_MED)) {
-		switch (priority) {
-		case BPRI_HI:
+	slab_flags = (priority == BPRI_WAITOK) ? SLAB_KERNEL : SLAB_ATOMIC;
 #if 0
-			/* testing theory about BPRI_HI allocation errors */
-		{
-			struct strthread *t = this_thread;
-			unsigned long flags;
-
-			local_irq_save(flags);	/* MP-SAFE */
-			/* This atomic exchange sequence could break if an ISR is freeing blocks at 
-			   the same time as this is executing, and we allow freeb() to be called
-			   from ISR, so we suppress interrupts. */
-			if ((mp = xchg(&t->freemblk_head, NULL)))
-				t->freemblk_head = xchg(&mp->b_next, NULL);
-			local_irq_restore(flags);
-			if (mp != NULL) {
-				struct mdbblock *md = (struct mdbblock *) mp;
-
-				ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
-				mp->b_prev = NULL;
-				md->msgblk.m_func = func;
-				ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
-				return (mp);
-			}
-		}
-#endif
-		case BPRI_MED:
-			slab_flags = SLAB_ATOMIC;
-			break;
-		default:
-		case BPRI_LO:
-			slab_flags = SLAB_ATOMIC | SLAB_NO_GROW;
-			break;
-		case BPRI_WAITOK:
-			slab_flags = SLAB_KERNEL;
-			break;
-		}
+	switch (priority) {
+	case BPRI_WAITOK:
+		// strblocking(); /* before we sleep */
+		slab_flags = SLAB_KERNEL;
+		break;
+	case BPRI_HI:
+	case BPRI_MED:
+		slab_flags = SLAB_ATOMIC;
+	default:
+	case BPRI_LO:
+		slab_flags |= SLAB_NO_GROW;
+		break;
 	}
+#endif
 	trace();
 	if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
-		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
 
 #if defined CONFIG_STREAMS_DEBUG
+		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		unsigned long flags;
 #endif
 
@@ -867,9 +856,11 @@ mdbblock_alloc(uint priority, void *func)
 		list_add_tail(&md->datablk.db_list, &sdi->si_head);
 		write_unlock_irqrestore(&smi->si_rwlock, flags);
 #endif
+#if 0
 		atomic_inc(&smi->si_cnt);
 		if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 			smi->si_hwl = atomic_read(&smi->si_cnt);
+#endif
 		atomic_inc(&sdi->si_cnt);
 		if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 			sdi->si_hwl = atomic_read(&sdi->si_cnt);
@@ -878,7 +869,41 @@ mdbblock_alloc(uint priority, void *func)
       fail:
 	return (mp);
 }
+#if 0
+/* Amazing how much this slows pipe tests down.  We never have free blocks waiting on the list. */
+STATIC streams_fastcall mblk_t *
+mdbblock_alloc_fast(uint priority, void *func)
+{
+	struct strthread *t = this_thread;
+	unsigned long flags;
+	mblk_t *mp;
 
+	trace();
+	/* Very first order of business: check free list.  Every priority is allowed to get a block
+	   from the free list now.  It is just a matter of speed.  If blocks are cached on the
+	   per-cpu free list we want to use them, not free them later. */
+
+	/* This atomic exchange sequence could break if an ISR is freeing blocks at the same time
+	   as this is executing, and we allow freeb() to be called from ISR, so we suppress
+	   interrupts. */
+	local_irq_save(flags);	/* MP-SAFE */
+	if (unlikely((mp = xchg(&t->freemblk_head, NULL)) != NULL))
+		t->freemblk_head = xchg(&mp->b_next, NULL);
+	local_irq_restore(flags);
+
+	if (unlikely(mp != NULL)) {
+		struct mdbblock *md = (struct mdbblock *) mp;
+
+		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
+		md->msgblk.m_func = func;
+		ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
+		return (mp);
+	}
+	return mdbblock_alloc(priority, func);
+}
+#endif
+
+#if 0
 /*
  *  raise_local_bufcalls: - raise buffer callbacks on the local STREAMS scheduler thread.
  */
@@ -887,10 +912,11 @@ raise_local_bufcalls(void)
 {
 	struct strthread *t = this_thread;
 
-	if (test_bit(strbcwait, &t->flags))
+	if (unlikely(test_bit(strbcwait, &t->flags) != 0))
 		if (!test_and_set_bit(strbcflag, &t->flags))
 			__raise_streams();
 }
+#endif
 
 /*
  *  raise_bufcalls: - raise buffer callbacks on all STREAMS scheduler threads
@@ -917,7 +943,7 @@ raise_bufcalls(void)
 	unsigned int cpu;
 
 	for (cpu = 0, t = &strthreads[0]; cpu < NR_CPUS; cpu++, t++)
-		if (test_bit(strbcwait, &t->flags))
+		if (unlikely(test_bit(strbcwait, &t->flags) != 0))
 			if (!test_and_set_bit(strbcflag, &t->flags))
 				cpu_raise_streams(cpu);
 }
@@ -945,6 +971,7 @@ raise_bufcalls(void)
  *  Also the current msgb and datab counts are not decremented until the blocks are returned to the
  *  memory cache.
  */
+#if 0
 BIG_STATIC streams_fastcall void
 mdbblock_free(mblk_t *mp)
 {
@@ -952,22 +979,52 @@ mdbblock_free(mblk_t *mp)
 	struct mdbblock *md = (typeof(md)) mp;
 
 	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+	/* all this perambulation is to keep the block on the lists and maintain counts */
 	/* don't zero hidden list structures */
 	bzero(&md->datablk.d_dblock, sizeof(md->datablk.d_dblock));
 	bzero(&md->msgblk.m_mblock, sizeof(md->msgblk.m_mblock));
 	/* avoid exposing data from previous use */
-	bzero(&md->databuf, sizeof(md->databuf));
+//	bzero(&md->databuf, sizeof(md->databuf)); /* too costly */
 	md->msgblk.m_func = NULL;
-	ctrace(qput(&md->msgblk.m_queue));
 	md->msgblk.m_private = NULL;
-//      bzero(md, sizeof(*md)); /* reset mdbblock */
+	ctrace(qput(&md->msgblk.m_queue));
 	*xchg(&t->freemblk_tail, &mp->b_next) = mp;	/* MP-SAFE */
-	if (!test_and_set_bit(freeblks, &t->flags))
+	if (test_and_set_bit(freeblks, &t->flags) == 0)
 		__raise_streams();
 	raise_local_bufcalls();
 	return;
 }
+#else
+BIG_STATIC streams_fastcall void
+mdbblock_free(mblk_t *mp)
+{
+	/* The old approach didn't run too fast.  We might as well free them back to the memory
+	   caches immediately.  This way freeblocks never runs. */
+	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
+	struct mdbblock *md = (typeof(md)) mp;
 
+#if defined CONFIG_STREAMS_DEBUG
+	struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
+	unsigned long flags;
+
+	write_lock_irqsave(&smi->si_rwlock, flags);
+	list_del(&md->msgblk.m_list);
+	list_del(&md->datablk.db_list);
+	write_unlock_irqrestore(&smi->si_rwlock, flags);
+#endif
+	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+	ctrace(qput(&md->msgblk.m_queue));
+	mdbblock_ctor(md, sdi->si_cache, SLAB_CTOR_CONSTRUCTOR);
+#if 0
+	atomic_dec(&smi->si_cnt);
+#endif
+	kmem_cache_free(sdi->si_cache, mp);
+	atomic_dec(&sdi->si_cnt);
+	raise_bufcalls();
+}
+#endif
+
+#if 0
 /* 
  *  freeblocks: - free message blocks
  *  @t:	    the STREAMS executive thread
@@ -990,8 +1047,8 @@ freeblocks(struct strthread *t)
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 
 #if defined CONFIG_STREAMS_DEBUG
-			unsigned long flags;
 			struct mdbblock *md = (struct mdbblock *) mp;
+			unsigned long flags;
 
 			write_lock_irqsave(&smi->si_rwlock, flags);
 			list_del_init(&md->msgblk.m_list);
@@ -1001,13 +1058,13 @@ freeblocks(struct strthread *t)
 			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 			atomic_dec(&smi->si_cnt);
 			mp_next = xchg(&mp->b_next, NULL);
-			mp->b_prev = NULL;
 			kmem_cache_free(sdi->si_cache, mp);
 			atomic_dec(&sdi->si_cnt);
 		}
 		raise_bufcalls();
 	}
 }
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1045,6 +1102,7 @@ alloclk(void)
 	struct linkblk *l;
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 
+	// strblocking(); /* before we sleep */
 	/* linkblk's are only allocated by the STREAM head when performing an I_LINK or I_PLINK
 	   operation, and this function is only called in user context with no locks held.
 	   Therefore, we can sleep and SLAB_KERNEL is used instead of SLAB_ATOMIC. */
@@ -1121,6 +1179,7 @@ sq_alloc(void)
 	struct syncq *sq;
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
 
+	// strblocking(); /* before we sleep */
 	/* Note: sq_alloc() is only called by qattach() that is only called by the STREAM head at
 	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
 	if (likely((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
@@ -3946,8 +4005,13 @@ freechain(mblk_t *mp, mblk_t **mpp)
  *
  *  This is the internal softirq version of runqueues().
  */
+#if defined CONFIG_STREAMS_KTHREADS
+STATIC streams_fastcall void
+_runqueues(void)
+#else
 STATIC void
 _runqueues(struct softirq_action *unused)
+#endif
 {
 	struct strthread *t;
 
@@ -3990,13 +4054,15 @@ _runqueues(struct softirq_action *unused)
 		/* run queue service procedures if necessary */
 		if (likely(test_bit(qrunflag, &t->flags) != 0))
 			ctrace(queuerun(t));
-		if (likely((t->flags & (FLUSHWORK | FREEBLKS)) != 0)) {
+		if (unlikely((t->flags & (FLUSHWORK | FREEBLKS)) != 0)) {
 			/* free flush chains if necessary */
 			if (unlikely(test_bit(flushwork, &t->flags) != 0))
 				ctrace(freechains(t));
+#if 0
 			/* free mdbblocks to cache, if memory needed */
-			if (likely(test_bit(freeblks, &t->flags) != 0))
+			if (unlikely(test_bit(freeblks, &t->flags) != 0))
 				ctrace(freeblocks(t));
+#endif
 		}
 		clear_bit(qwantrun, &t->flags);
 	} while (unlikely(t->flags & (QRUNFLAGS)));
@@ -4022,7 +4088,11 @@ runqueues(void)
 	preempt_disable();
 #endif
 	enter_streams();	/* simulate STREAMS context */
+#if defined CONFIG_STREAMS_KTHREADS
+	_runqueues();
+#else
 	_runqueues(NULL);
+#endif
 	leave_streams();	/* go back to user context */
 #if HAVE_KINC_LINUX_KTHREAD_H
 	preempt_enable();
@@ -4083,6 +4153,7 @@ allocstr(void)
 	queue_t *q;
 
 	if ((q = allocq())) {
+		// strblocking(); /* before we sleep */
 		/* Note: we only allocate stream heads in stropen which is called in user context
 		   without any locks held.  This allocation can sleep.  We now use SLAB_KERNEL
 		   instead of SLAB_ATOMIC. */
@@ -4319,7 +4390,7 @@ kstreamd(void *__bind_cpu)
 		preempt_disable();
 		if (cpu_is_offline((long) __bind_cpu))
 			goto wait_to_die;
-		_runqueues(NULL);
+		_runqueues();
 		preempt_enable();
 		cond_resched();
 		set_current_state(TASK_INTERRUPTIBLE);
@@ -4503,7 +4574,7 @@ kstreamd(void *__bind_cpu)
 				break;
 		}
 		__set_current_state(TASK_RUNNING);
-		_runqueues(NULL);
+		_runqueues();
 		if (current->need_resched)
 			schedule();
 		if (signal_pending(current)

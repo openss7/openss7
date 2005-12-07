@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: I_GERROPT.7.man,v 0.9.2.3 2005/11/22 11:57:12 brian Exp $
+.\" @(#) $Id: I_GERROPT.7.man,v 0.9.2.4 2005/12/07 11:13:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/11/22 11:57:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/12/07 11:13:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: I_GERROPT.7.man,v $
+.\" Revision 0.9.2.4  2005/12/07 11:13:36  brian
+.\" - final updates
+.\"
 .\" Revision 0.9.2.3  2005/11/22 11:57:12  brian
 .\" - updating documentation for release
 .\"
@@ -115,10 +118,64 @@ always
 .BR I_GERROPT .
 .TP
 .I arg
+a pointer to an
+.B int
+into which to get the error options.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B I_GERROPT
+.BR ioctl (2s)
+command retrieves the error options for the Stream associated with
+.IR fd .
+.PP
+The error options consist of one of the following flags:
+.TP \w'\fBWERRNONPERSIST\fR\(em'u
+.B RERRNORMAL
+Read errors received in an
+.BR M_ERROR (9)
+message are persistent.  That is, the error is returned to every
+.BR read (2s)
+like system call until an
+.B M_ERROR (9)
+message with a
+.B NOERROR
+value in the read (or only) position is received.
+.TP
+.B RERRNONPERSIST
+Read errors received in an
+.BR M_ERROR (9)
+message a non-persistent.  That is, the error is reported only once, to the first
+.BR read (2s)
+like system call and then is reset back to
+.BR NOERROR .
+.PP
+logically OR'ed with one of the following flags:
+.TP \w'\fBWERRNONPERSIST\fR\(em'u
+.B WERRNORMAL
+Write errors received in an
+.BR M_ERROR (9)
+message are persistent.  That is, the error is returned to every
+.BR write (2s)
+like system call until an
+.B M_ERROR (9)
+message with a
+.B NOERROR
+value in the write (or only) position is received.
+.TP
+.B WERRNONPERSIST
+Write errors received in an
+.BR M_ERROR (9)
+message a non-persistent.  That is, the error is reported only once, to the first
+.BR write (2s)
+like system call and then is reset back to
+.BR NOERROR .
+.PP
+Error options remain in effect until changed with the
+.BR I_SERROPT (7)
+command.
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -149,6 +206,18 @@ command fails, it returns
 and sets
 .IR errno (3)
 to one of the following errors:
+.TP \w'[EWOULDBLOCK]\(em'u
+.RB [ EFAULT ]
+.I arg
+points to an area that extends outside the caller's valid address space.
+.PP
+Note that the
+.B I_GERROPT
+command will not return an error if the Stream head has received an
+.BR M_HANGUP (9)
+or
+.BR M_ERROR (9)
+message.
 .\"
 .PP
 In general, any
@@ -319,6 +388,20 @@ can be returned in
 .BR ioctl (2s)
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
+.PP
+The
+.B I_GERROPT
+command is a
+.IR Solaris \(rg
+specific command provided to assist portability from
+.IR Solaris \(rg
+to
+.BR "@PACKAGE_TITLE@" .
+Portable
+.I STREAMS
+applications will not use the
+.B I_GERROPT
+command.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -350,6 +433,15 @@ solspg
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.B I_GERROPT
+is a
+.IR Solaris \(rg
+specific input-output control command.  The default settings are as though the option did not exist.
+Therefore, there are no portability issues in not using this command.
+.IP ""
+Portable
+.I STREAMS
+applications will not use this input-output control command.
 .PP
 For general
 .BR ioctl (2s)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/06 10:25:40 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/07 11:16:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/06 10:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/07 11:16:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/06 10:25:40 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/07 11:16:10 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/06 10:25:40 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/07 11:16:10 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -448,15 +448,15 @@ allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
 
-	if ((mp = mdbblock_alloc(priority, &allocb))) {
+	if (likely((mp = mdbblock_alloc(priority, &allocb)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		unsigned char *base = md->databuf;
 		dblk_t *db = &md->datablk.d_dblock;
 
-		if (size <= FASTBUF)
+		if (likely(size <= FASTBUF))
 			size = FASTBUF;
-		else if (!(base = kmem_alloc(size, (priority == BPRI_WAITOK)
-					     ? KM_SLEEP : KM_NOSLEEP)))
+		else if (unlikely((base = kmem_alloc(size, (priority == BPRI_WAITOK)
+					     ? KM_SLEEP : KM_NOSLEEP)) == NULL))
 			goto buf_alloc_error;
 		/* set up data block */
 		db->db_base = base;
@@ -645,7 +645,7 @@ freeb(mblk_t *mp)
 	assert(db->db_ref > 0);
 
 	/* message block marked free above */
-	if (db_dec_and_test(db)) {
+	if (likely(db_dec_and_test(db) != 0)) {
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
 
@@ -657,13 +657,13 @@ freeb(mblk_t *mp)
 				db->db_frtnp->free_func(db->db_frtnp->free_arg);
 		}
 		/* the entire mdbblock can go if the associated msgb is also unused */
-		if (!mb->b_datap)
+		if (likely(mb->b_datap == NULL))
 			mdbblock_free(mb);
 	}
 	/* if the message block refers to the associated data block then we have already freed the
 	   mdbblock above when necessary; otherwise the entire mdbblock can go if the datab is also 
 	   unused */
-	if (db != (dp = mb_to_db(mp)) && !db_ref(dp))
+	if (unlikely(db != (dp = mb_to_db(mp)) && !db_ref(dp)))
 		mdbblock_free(mp);
 	return;
 }
