@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/11/01 11:21:12 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/08 02:16:59 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/01 11:21:12 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 02:16:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.56  2005/12/08 02:16:59  brian
+ - got a couple more test cases working
+
  Revision 0.9.2.55  2005/11/01 11:21:12  brian
  - updates for testing and documentation
 
@@ -239,9 +242,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/11/01 11:21:12 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/08 02:16:59 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/11/01 11:21:12 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/08 02:16:59 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -18460,6 +18463,45 @@ struct test_stream test_3_7_18 = { &preamble_0, &test_case_3_7_18, &postamble_0 
 #define test_case_3_7_18_stream_1 (NULL)
 #define test_case_3_7_18_stream_2 (NULL)
 
+#define tgrp_case_3_7_19 test_group_3_7
+#define numb_case_3_7_19 "3.7.19"
+#define name_case_3_7_19 "Perform putmsg."
+#define sref_case_3_7_19 sref_case_3_7
+#define desc_case_3_7_19 "\
+Check that putmsg() can be performed on a Stream.  Check that ENOSTR\n\
+is returned when putmsg() is performed on a file descriptor that does\n\
+not correspond to a Stream."
+
+int
+test_case_3_7_19(int child)
+{
+#ifndef HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+	return (__RESULT_SKIPPED);
+#else
+	/* unfortunately the below just spits crap to standard out using read/write overloading */
+	char buf[16] = { 0, };
+	struct strbuf pctl = { -1, sizeof(buf), buf };
+	struct strbuf pdat = { -1, sizeof(buf), buf };
+	int pflags = RS_HIPRI;
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 1;
+	start_tt(100);
+	if (test_putmsg(child, &pctl, &pdat, pflags) == __RESULT_SUCCESS || last_errno != ENOSTR) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+#endif
+}
+struct test_stream test_3_7_19 = { &preamble_0, &test_case_3_7_19, &postamble_0 };
+
+#define test_case_3_7_19_stream_0 (&test_3_7_19)
+#define test_case_3_7_19_stream_1 (NULL)
+#define test_case_3_7_19_stream_2 (NULL)
+
 static const char test_group_3_8[] = "Perform PUTPMSG on one Stream";
 static const char sref_case_3_8[] = "POSIX 1003.1 2003/SUSv3 putpmsg(2p) reference page.";
 
@@ -19253,6 +19295,46 @@ struct test_stream test_3_8_18 = { &preamble_0, &test_case_3_8_18, &postamble_0 
 #define test_case_3_8_18_stream_0 (&test_3_8_18)
 #define test_case_3_8_18_stream_1 (NULL)
 #define test_case_3_8_18_stream_2 (NULL)
+
+#define tgrp_case_3_8_19 test_group_3_8
+#define numb_case_3_8_19 "3.8.19"
+#define name_case_3_8_19 "Perform putpmsg."
+#define sref_case_3_8_19 sref_case_3_8
+#define desc_case_3_8_19 "\
+Check that putpmsg() can be performed on a Stream.  Check that ENOSTR\n\
+is returned when putmsg() is performed on a file descriptor that does\n\
+not correspond to a Stream."
+
+int
+test_case_3_8_19(int child)
+{
+#ifndef HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
+	return (__RESULT_SKIPPED);
+#else
+	/* unfortunately the below just spits crap to standard out using read/write overloading */
+	char buf[16] = { 0, };
+	struct strbuf pctl = { -1, sizeof(buf), buf };
+	struct strbuf pdat = { -1, sizeof(buf), buf };
+	int pband = 0;
+	int pflags = MSG_HIPRI;
+	int oldfd = test_fd[child];
+
+	test_fd[child] = 0;
+	start_tt(100);
+	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) == __RESULT_SUCCESS || last_errno != ENOSTR) {
+		test_fd[child] = oldfd;
+		return (__RESULT_FAILURE);
+	}
+	state++;
+	test_fd[child] = oldfd;
+	return (__RESULT_SUCCESS);
+#endif
+}
+struct test_stream test_3_8_19 = { &preamble_0, &test_case_3_8_19, &postamble_0 };
+
+#define test_case_3_8_19_stream_0 (&test_3_8_19)
+#define test_case_3_8_19_stream_1 (NULL)
+#define test_case_3_8_19_stream_2 (NULL)
 
 static const char test_group_3_9[] = "Perform ISASTREAM on one Stream";
 static const char sref_case_3_9[] = "POSIX 1003.1 2003/SUSv3 isastream(2p) reference page.";
@@ -21338,6 +21420,8 @@ struct test_case {
 	test_case_3_7_17_stream_0, test_case_3_7_17_stream_1, test_case_3_7_17_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_7_18, tgrp_case_3_7_18, name_case_3_7_18, desc_case_3_7_18, sref_case_3_7_18, {
 	test_case_3_7_18_stream_0, test_case_3_7_18_stream_1, test_case_3_7_18_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_19, tgrp_case_3_7_19, name_case_3_7_19, desc_case_3_7_19, sref_case_3_7_19, {
+	test_case_3_7_19_stream_0, test_case_3_7_19_stream_1, test_case_3_7_19_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_1, tgrp_case_3_8_1, name_case_3_8_1, desc_case_3_8_1, sref_case_3_8_1, {
 	test_case_3_8_1_stream_0, test_case_3_8_1_stream_1, test_case_3_8_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_2, tgrp_case_3_8_2, name_case_3_8_2, desc_case_3_8_2, sref_case_3_8_2, {
@@ -21374,6 +21458,8 @@ struct test_case {
 	test_case_3_8_17_stream_0, test_case_3_8_17_stream_1, test_case_3_8_17_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_8_18, tgrp_case_3_8_18, name_case_3_8_18, desc_case_3_8_18, sref_case_3_8_18, {
 	test_case_3_8_18_stream_0, test_case_3_8_18_stream_1, test_case_3_8_18_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_8_19, tgrp_case_3_8_19, name_case_3_8_19, desc_case_3_8_19, sref_case_3_8_19, {
+	test_case_3_8_19_stream_0, test_case_3_8_19_stream_1, test_case_3_8_19_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_9_1, tgrp_case_3_9_1, name_case_3_9_1, desc_case_3_9_1, sref_case_3_9_1, {
 	test_case_3_9_1_stream_0, test_case_3_9_1_stream_1, test_case_3_9_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_3_9_2, tgrp_case_3_9_2, name_case_3_9_2, desc_case_3_9_2, sref_case_3_9_2, {

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/12/06 14:09:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/12/08 02:16:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/06 14:09:15 $ by $Author: brian $
+# Last Modified $Date: 2005/12/08 02:16:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -990,6 +990,7 @@ man_MANS = \
 	man7/I_GETSIG.7 \
 	man7/I_GRDOPT.7 \
 	man7/I_GWROPT.7 \
+	man7/I_ISASTREAM.7 \
 	man7/I_LINK.7 \
 	man7/I_LIST.7 \
 	man7/I_LOOK.7 \
@@ -2242,6 +2243,7 @@ dist_noinst_MANS = \
 	man7/I_GETSIG.7.man \
 	man7/I_GRDOPT.7.man \
 	man7/I_GWROPT.7.man \
+	man7/I_ISASTREAM.7.man \
 	man7/I_LINK.7.man \
 	man7/I_LIST.7.man \
 	man7/I_LOOK.7.man \
