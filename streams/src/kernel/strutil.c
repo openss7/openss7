@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/07 11:16:10 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/08 00:59:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/07 11:16:10 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 00:59:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/07 11:16:10 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/08 00:59:59 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/12/07 11:16:10 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/08 00:59:59 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1015,6 +1015,7 @@ static struct qband *__get_qband(queue_t *q, unsigned char band);
 streams_fastcall void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
+	queue_t *q_back;
 #ifdef CONFIG_SMP
 	struct stdata *sd;
 
@@ -1024,17 +1025,14 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 	prlock(sd);
 #endif
 	dassert(q);
-	{
-		queue_t *q_back;
 
-		for (q_back = backq(q);
-		     (q = q_back) && (q_back = backq(q)) && !q->q_qinfo->qi_srvp;) ;
-	}
+	for (q_back = backq(q); (q = q_back) && (q_back = backq(q)) && !q->q_qinfo->qi_srvp;) ;
+
 	if (likely(q != NULL)) {
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
-		if (unlikely(q->q_next == NULL)) {
+		if (unlikely(q_back == NULL)) {
 			unsigned long pl;
 			struct qband *qb;
 

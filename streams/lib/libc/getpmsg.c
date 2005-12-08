@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/03 17:42:03 $
+ @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/08 02:16:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/03 17:42:03 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 02:16:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/03 17:42:03 $"
+#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/08 02:16:52 $"
 
 static char const ident[] =
-    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/03 17:42:03 $";
+    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/08 02:16:52 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -65,6 +65,7 @@ static char const ident[] =
 #include <stropts.h>
 
 #include <pthread.h>
+#include <errno.h>
 
 extern void __pthread_testcancel(void);
 
@@ -122,6 +123,13 @@ __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int 
 			*bandp = args.band;
 		if (flagsp)
 			*flagsp = args.flags;
+	} else {
+		int __olderrno;
+		/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case
+		   this is not a Stream, so we need to check if it is a Stream and fix up the error
+		   code.  We get EINTR for a controlling terminal. */
+		if ((__olderrno = errno) == EINVAL || __olderrno == EINTR)
+			errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
 	}
 	return (err);
 }

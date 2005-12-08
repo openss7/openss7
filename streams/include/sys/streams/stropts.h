@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.18 2005/11/23 12:37:59 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.20 2005/12/08 02:16:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/23 12:37:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 02:16:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/23 12:37:59 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/08 02:16:50 $"
 
 #ifndef __SYS_STROPTS_H__
 #warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -130,6 +130,7 @@ typedef unsigned long int t_uscalar_t;
 #define I_PUTPMSG	(__SID |43)	/* HP-UX, OSF, LiS 250, Mac OT 41 */
 #define I_PIPE		(__SID |44)	/* HP-UX, OSF, LiS 254/243, Mac OT 49 */
 #define I_FIFO		(__SID |45)	/* HP-UX, OSF, Mac OT 51 */
+#define I_ISASTREAM	(__SID |46)
 
 #define I_AUTOPUSH	(__SID |48)	/* Mac OT */
 #define I_HEAP_REPORT	(__SID |50)	/* Mac OT */
@@ -292,6 +293,8 @@ struct strputpmsg {
 };
 #endif
 
+/* 2.6.8 thinks this stupid number is legitimate, but doesn't have unlocked_ioctl */
+/* upgrade your kernel please! */
 #define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678)
 
 #endif				/* __SYS_STREAMS_STROPTS_H__ */

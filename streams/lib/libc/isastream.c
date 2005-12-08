@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/04 11:39:03 $
+ @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/08 00:59:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/04 11:39:03 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 00:59:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/04 11:39:03 $"
+#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/08 00:59:58 $"
 
 static char const ident[] =
-    "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/10/04 11:39:03 $";
+    "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/08 00:59:58 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -76,7 +76,7 @@ static char const ident[] =
 int
 isastream(int fd)
 {
-	if (ioctl(fd, I_CANPUT, 0) == -1) {
+	if (ioctl(fd, I_ISASTREAM) == -1) {
 		if (errno == EBADF)
 			return (-1);
 		return (0);

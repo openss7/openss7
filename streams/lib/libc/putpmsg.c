@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/03 17:42:03 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/08 02:16:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/03 17:42:03 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 02:16:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/03 17:42:03 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/08 02:16:52 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/10/03 17:42:03 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/08 02:16:52 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -64,6 +64,7 @@ static char const ident[] =
 #include <stropts.h>
 
 #include <pthread.h>
+#include <errno.h>
 
 extern void __pthread_testcancel(void);
 
@@ -98,6 +99,7 @@ pthread_testcancel(void)
 static int
 __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
+	int err;
 	struct strpmsg args;
 
 	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) {
@@ -107,10 +109,19 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 	args.band = band;
 	args.flags = flags;
 #if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_UNLOCKED_IOCTL
-	return (ioctl(fd, I_PUTPMSG, &args));
+	if ((err = ioctl(fd, I_PUTPMSG, &args)) == -1)
 #else
-	return (write(fd, &args, LFS_GETMSG_PUTMSG_ULEN));
+	if ((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) == -1)
 #endif
+	{
+		int __olderrno;
+		/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case
+		   this is not a Stream, so we need to check if it is a Stream and fix up the error
+		   code.  We get EINTR for a controlling terminal. */
+		if ((__olderrno = errno) == EINVAL || __olderrno == EINTR)
+			errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
+	}
+	return (err);
 }
 
 int

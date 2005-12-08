@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/07 11:16:54 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 00:59:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/07 11:16:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 00:59:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/07 11:16:54 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 00:59:58 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/07 11:16:54 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 00:59:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -251,7 +251,7 @@ __freebands(queue_t *rq)
 	struct qband *qb, *qb_next;
 	queue_t *q;
 
-	for (q = rq; q < rq + 1; q++) {
+	for (q = rq; q <= rq + 1; q++) {
 		if ((qb_next = xchg(&q->q_bandp, NULL))) {
 			while ((qb = qb_next)) {
 				qb_next = qb->qb_next;

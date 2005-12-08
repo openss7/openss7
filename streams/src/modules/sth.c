@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/07 11:15:10 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/08 00:59:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/07 11:15:10 $ by $Author: brian $
+ Last Modified $Date: 2005/12/08 00:59:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/07 11:15:10 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/08 00:59:59 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/07 11:15:10 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/08 00:59:59 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/07 11:15:10 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/08 00:59:59 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -6988,6 +6988,18 @@ str_i_fdetach(struct file *file, struct stdata *sd, unsigned long arg)
 	return strfdetach(path);
 }
 
+/**
+ *  str_i_isastream - perform isastream(2) system call emulation as streamio(7) ioctl
+ *  @file: file pointer for a stream
+ *  @sd: stream head
+ *  @arg: ignored
+ */
+STATIC int
+str_i_isastream(struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return (1);
+}
+
 #if 0
 /**
  *  str_i_pipe: - perform pipe(2) system call emulation as streamio(7) ioctl
@@ -7259,6 +7271,9 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
 			printd(("%s: got I_FDETACH\n", __FUNCTION__));
 			return str_i_fdetach(file, sd, arg);
+		case _IOC_NR(I_ISASTREAM):
+			printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
+			return str_i_isastream(file, sd, arg);
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCGETS))
 		}
 		break;
