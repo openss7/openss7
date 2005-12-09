@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/11/07 03:01:56 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/09 04:49:37 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/11/07 03:01:56 $ by $Author: brian $
+dnl Last Modified $Date: 2005/12/09 04:49:37 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 1.1.2.4  2005/12/09 04:49:37  brian
+dnl - new test cases
+dnl
 dnl Revision 1.1.2.3  2005/11/07 03:01:56  brian
 dnl - marked expected failures
 dnl
@@ -2578,7 +2581,7 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.5.18])
 AT_KEYWORDS([streams getmsg ENOSTR])
 AT_CHECK([test_streams 3.5.18], [], [ignore], [], [], [])
-AT_XFAIL_IF(true)
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.5.19])
@@ -2760,7 +2763,7 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.6.23])
 AT_KEYWORDS([streams getpmsg ENOSTR])
 AT_CHECK([test_streams 3.6.23], [], [ignore], [], [], [])
-AT_XFAIL_IF(true)
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.6.24])
@@ -2874,6 +2877,12 @@ AT_KEYWORDS([streams putmsg ERANGE])
 AT_CHECK([test_streams 3.7.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([posix streams test 3.7.19])
+AT_KEYWORDS([streams putmsg ENOSTR])
+AT_CHECK([test_streams 3.7.19], [], [ignore], [], [], [])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
+AT_CLEANUP
+
 AT_SETUP([posix streams test 3.8.1])
 AT_KEYWORDS([streams putpmsg ENXIO HUP])
 AT_CHECK([test_streams 3.8.1], [], [ignore], [], [], [])
@@ -2966,6 +2975,12 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.8.18])
 AT_KEYWORDS([streams putpmsg ERANGE])
 AT_CHECK([test_streams 3.8.18], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([posix streams test 3.8.19])
+AT_KEYWORDS([streams putpmsg ENOSTR])
+AT_CHECK([test_streams 3.8.19], [], [ignore], [], [], [])
+AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.9.1])
