@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/11/08 03:05:39 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 19:40:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/08 03:05:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/08 19:40:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1223,7 +1223,9 @@ dnl
 	    else
 		linux_cv_k_compiler_match=no
 		linux_c1=`echo "$linux_cv_k_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
+		case "$linux_c1" in [[34]].*.*) linux_c1=`echo $linux_c1 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
 		linux_c2=`echo "$linux_cv_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
+		case "$linux_c2" in [[34]].*.*) linux_c2=`echo $linux_c2 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
 		if test "$linux_c1" = "$linux_c2"
 		then
 		    linux_cv_k_compiler_vmatch=yes
