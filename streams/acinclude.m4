@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/11/05 22:54:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/05 22:54:53 $ by $Author: brian $
+# Last Modified $Date: 2005/12/09 00:27:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -250,6 +250,29 @@ AC_DEFUN([_LFS_SETUP_UTILS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _LFS_SETUP_COMPILE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_COMPILE], [dnl
+    AC_ARG_ENABLE([big-compile],
+	AS_HELP_STRING([--disable-big-compile],
+	    [disable compiling as one big computational unit,
+	    @<:@default=enabled@:>@]),
+	    [enable_big_compile="$enableval"],
+	    [enable_big_comiple='yes'])
+    AC_CACHE_CHECK([for STREAMS big compile], [lfs_big_compile], [dnl
+	lfs_big_compile="${enable_big_compile:-yes}"
+	])
+    case ${lfs_big_compile:-yes} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SEPARATE_COMPILE], [], [When defined,]
+	    AC_PACKAGE_TITLE [will compile streams objects separately.])
+	    ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SEPARATE_COMPILE], [test :${lfs_big_compile:-yes} != :yes])
+])# _LFS_SETUP_COMPILE
+# =============================================================================
+
+# =============================================================================
 # _LFS_SETUP_MODULES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_MODULES], [dnl
@@ -258,7 +281,7 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    [enable module sth for linkage with STREAMS.
 	    @<:@default=module@:>@]),
 	    [enable_module_sth="$enableval"],
-	    [enable_module_sth='module'])
+	    [if test :${lfs_big_compile:-yes} = :yes ; then enable_module_sth='yes' ; else enable_module_sth='module' ; fi])
     AC_ARG_ENABLE([module-bufmod],
 	AS_HELP_STRING([--enable-module-bufmod],
 	    [enable bufmod module for linkage with STREAMS.
@@ -449,7 +472,7 @@ AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
 	    [enable clone driver for linkage with STREAMS.
 	    @<:@default=module@:>@]),
 	    [enable_driver_clone="$enableval"],
-	    [enable_driver_clone='module'])
+	    [if test :${lfs_big_compile:-yes} = :yes ; then enable_driver_clone='yes' ; else enable_driver_clone='module' ; fi])
     AC_ARG_ENABLE([driver-echo],
 	AS_HELP_STRING([--enable-driver-echo],
 	    [enable echo driver for linkage with STREAMS.
@@ -795,6 +818,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_SETUP_SYNCQS
     _LFS_SETUP_KTHREADS
     _LFS_SETUP_UTILS
+    _LFS_SETUP_COMPILE
     _LFS_SETUP_MODULES
     _LFS_SETUP_DRIVERS
     _LFS_SETUP_FIFOS
@@ -1011,7 +1035,9 @@ dnl
 			  struct kstatfs.f_type,
 			  struct kobject.kref,
 			  struct file_operations.unlocked_ioctl,
-			  struct inode.i_lock], [:], [:], [
+			  struct inode.i_lock,
+			  struct files_struct.max_fdset,
+			  struct files_struct.fdtab], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1024,6 +1050,7 @@ dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
 #if HAVE_KINC_LINUX_STATFS_H

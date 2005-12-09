@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/08 00:59:59 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/08 00:59:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/08 00:59:59 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:56 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/12/08 00:59:59 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:56 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -366,7 +366,7 @@ mb_to_mdb(mblk_t *mb)
  *
  *  Return Values: (1) - success; (0) - failure
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 adjmsg(mblk_t *mp, ssize_t length)
 {
 	mblk_t *b, *bp;
@@ -443,7 +443,7 @@ EXPORT_SYMBOL(adjmsg);		/* include/sys/streams/stream.h */
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-streams_fastcall mblk_t *
+streams_fastcall __hot_write mblk_t *
 allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -485,7 +485,7 @@ EXPORT_SYMBOL(allocb);
  *
  *  Notices: Unlike LiS we do not align the copy.  The driver must me wary of alignment.
  */
-extern streams_fastcall mblk_t *
+extern streams_fastcall __unlikely mblk_t *
 copyb(mblk_t *mp)
 {
 	mblk_t *b = NULL;
@@ -520,7 +520,7 @@ EXPORT_SYMBOL(copymsg);		/* include/sys/streams/stream.h */
  *  ctlmsg:	- test for control message type
  *  @type:	type to test
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 ctlmsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
@@ -535,7 +535,7 @@ EXPORT_SYMBOL(ctlmsg);		/* include/sys/streams/stream.h */
  *  datamsg:	- test for data message type
  *  @type:	type to test
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 datamsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
@@ -552,7 +552,7 @@ EXPORT_SYMBOL(datamsg);
  *  dupb:	- duplicates a message block
  *  @bp:	message block to duplicate
  */
-streams_fastcall mblk_t *
+streams_fastcall __unlikely mblk_t *
 dupb(mblk_t *bp)
 {
 	mblk_t *mp;
@@ -622,7 +622,7 @@ EXPORT_SYMBOL(esballoc);
  *  freeb:	- free a message block
  *  @mp:	message block to free
  */
-streams_fastcall void
+streams_fastcall __hot_read void
 freeb(mblk_t *mp)
 {
 	dblk_t *dp, *db;
@@ -736,7 +736,7 @@ EXPORT_SYMBOL(msgdsize);
  *  Pulls up @length  bytes into the returned message.  This is for handling headers as a contiguous
  *  range of bytes.
  */
-streams_fastcall mblk_t *
+streams_fastcall __unlikely mblk_t *
 msgpullup(mblk_t *mp, ssize_t length)
 {
 	mblk_t *msg = NULL, **bp = &msg;
@@ -816,7 +816,7 @@ EXPORT_SYMBOL(msgsize);
  *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling headers
  *  as a contiguous range of bytes.
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 pullupmsg(mblk_t *mp, ssize_t len)
 {
 	dblk_t *db, *dp;
@@ -929,7 +929,7 @@ EXPORT_SYMBOL(rmvb);
  *  @size:	size of buffer for which to test
  *  @priority:	allocation priority to test
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 testb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -963,7 +963,7 @@ EXPORT_SYMBOL(unlinkmsg);
  *  not.  This implementation does not wrap the size, and skips initial zero-length message blocks.
  *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
-streams_fastcall size_t
+streams_fastcall __unlikely size_t
 xmsgsize(mblk_t *mp)
 {
 	register mblk_t *bp = mp;
@@ -1012,7 +1012,7 @@ static struct qband *__get_qband(queue_t *q, unsigned char band);
  *  takes a Stream head read lock.  This is a little bit overkill for intermediate modules, so we
  *  now only take a Stream head read lock if the queue is a Stream end (i.e., no q->q_next pointer).
  */
-streams_fastcall void
+streams_fastcall __hot_read void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	queue_t *q_back;
@@ -1076,7 +1076,7 @@ EXPORT_SYMBOL(qbackenable);
  *  IMPLEMENTATION: The current implementation is much faster than the older method of walking the
  *  queue bands, even considering that there were probably few, if any, queue bands.
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 bcangetany(queue_t *q)
 {
 	int found = 0;
@@ -1115,7 +1115,7 @@ EXPORT_SYMBOL(bcangetany);
  *
  *  LOCKING: No locks are required across the call.
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 bcanget(queue_t *q, unsigned char band)
 {
 	int found = 0;
@@ -1310,7 +1310,7 @@ __get_qband(queue_t *q, unsigned char band)
  *  will enable the queue if necessary.  If it back-enables before we call putbq(9) then the service
  *  procedure will go for another run anyway.
  */
-static streams_fastcall int
+static streams_fastcall __hot_write int
 _bcanput(queue_t *q, unsigned char band)
 {
 	int result = 1;
@@ -1443,7 +1443,7 @@ EXPORT_SYMBOL(bcanput);
  *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
  *  context by taking a plumb read lock.
  */
-streams_fastcall int
+streams_fastcall __hot_write int
 bcanputnext(queue_t *q, unsigned char band)
 {
 	int result;
@@ -1531,7 +1531,7 @@ EXPORT_SYMBOL(canputnext);
  *  The purpose of this function is only to protect the queue members and block put and service
  *  procedures from manipulating the queue so that rmvq and insq functions can be called.
  */
-unsigned long
+__unlikely unsigned long
 freezestr(queue_t *q)
 {
 	struct stdata *sd;
@@ -1559,7 +1559,7 @@ EXPORT_SYMBOL(freezestr);
  *  the side-effect that the identified module may be loaded by module identifier.  The kernel
  *  module demand loaded will have the module name or alias "streams-modid-%u".
  */
-qi_qadmin_t
+__unlikely qi_qadmin_t
 getadmin(modID_t modid)
 {
 	qi_qadmin_t qadmin = NULL;
@@ -1591,7 +1591,7 @@ EXPORT_SYMBOL(getadmin);
  *  the side-effect that the named module may be loaded by module name.  The kernel module demand
  *  loaded will have the module name or alias "streams-%s".
  */
-modID_t
+__unlikely modID_t
 getmid(const char *name)
 {
 	struct fmodsw *fmod;
@@ -1625,7 +1625,7 @@ EXPORT_SYMBOL(OTHERQ);
 /**
  *  qready:	- test if queue procedures are scheduled
  */
-int
+__unlikely int
 qready(void)
 {
 	struct strthread *t = this_thread;
@@ -1638,7 +1638,7 @@ EXPORT_SYMBOL(qready);		/* include/sys/streams/stream.h */
 /**
  *  setqsched:	- schedule execution of queue procedures
  */
-void
+__hot void
 setqsched(void)
 {
 	struct strthread *t = this_thread;
@@ -1654,7 +1654,7 @@ EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
  *  @q:		queue to schedule for service
  *
  */
-static streams_inline streams_fastcall void
+static streams_inline streams_fastcall __hot void
 qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
@@ -1673,7 +1673,7 @@ qschedule(queue_t *q)
  *  Another name for qschedule(9), qenable() schedules a queue for service regardless of the setting
  *  of the %QNOENB_BIT, but has to check for the existence of a service procedure.
  */
-streams_fastcall void
+streams_fastcall __hot void
 qenable(queue_t *q)
 {
 	if (likely(q->q_qinfo->qi_srvp != NULL))
@@ -1690,7 +1690,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
  *  procedure if a service procedure exists for @q, and if the queue has not been previously
  *  noenabled with noenable() (i.e. the %QNOENB flag is set on the queue).
  */
-int
+__hot int
 enableq(queue_t *q)
 {
 	if (likely(q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag))) {
@@ -1710,7 +1710,7 @@ EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
  *  That must be done with a separate call to enableq() or qenable().  It is not supposed to be
  *  called by a thread that froze the Stream with freezestr(9); but, it will still work.
  */
-void
+__unlikely void
 enableok(queue_t *q)
 {
 	struct stdata *sd;
@@ -1737,7 +1737,7 @@ EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
  *  This function simply sets the %QNOENB flag on the queue.  It is not supposed to be called by a
  *  thread that froze the Stream with freezestr(9); but, it will still work.
  */
-void
+__unlikely void
 noenable(queue_t *q)
 {
 	struct stdata *sd;
@@ -1760,7 +1760,7 @@ EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 /*
  *  __putbq:
  */
-static streams_inline streams_fastcall int
+static streams_inline streams_fastcall __hot_write int
 __putbq(queue_t *q, mblk_t *mp)
 {
 	int enable = 0;
@@ -1849,7 +1849,7 @@ __putbq(queue_t *q, mblk_t *mp)
  *  @q:		queue to place back message
  *  @mp:	message to place back
  */
-streams_fastcall int
+streams_fastcall __hot_write int
 putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -2059,14 +2059,14 @@ EXPORT_SYMBOL(putnextctl2);
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-static streams_fastcall int
+static inline streams_fastcall __hot_write int
 __putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
 	mblk_t *b_prev, *b_next;
 
 	/* fast path for normal messages */
-	if (likely(mp->b_datap->db_type < QPCTL && mp->b_band == 0)) {
+	if (likely(mp->b_datap->db_type < QPCTL) && likely(mp->b_band == 0)) {
 		b_prev = q->q_last;
 		b_next = NULL;
 		/* enable if will be first message in queue, or requested by getq() */
@@ -2077,18 +2077,18 @@ __putq(queue_t *q, mblk_t *mp)
 		if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
 			set_bit(QFULL_BIT, &q->q_flag);
 #else
-		if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 #endif
 	      banded:
-		if (q->q_last == b_prev)
+		if (likely(q->q_last == b_prev))
 			q->q_last = mp;
-		if (q->q_first == b_next)
+		if (unlikely(q->q_first == b_next))
 			q->q_first = mp;
 		q->q_msgs++;
-		if ((mp->b_next = b_next))
+		if (unlikely((mp->b_next = b_next) != NULL))
 			b_next->b_prev = mp;
-		if ((mp->b_prev = b_prev))
+		if (likely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 #if 0
 		_ctrace(mp->b_queue = qget(q));
@@ -2126,9 +2126,9 @@ __putq(queue_t *q, mblk_t *mp)
 		enable = ((q->q_first == b_next)
 			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 #endif
-		if (qb->qb_last == b_prev || qb->qb_last == NULL)
+		if (likely(qb->qb_last == b_prev || qb->qb_last == NULL))
 			qb->qb_last = mp;
-		if (qb->qb_first == b_next || qb->qb_first == NULL)
+		if (unlikely(qb->qb_first == b_next || qb->qb_first == NULL))
 			qb->qb_first = mp;
 		assert(qb->qb_first != NULL);
 		assert(qb->qb_last != NULL);
@@ -2154,7 +2154,7 @@ __putq(queue_t *q, mblk_t *mp)
  *  CONTEXT: Any.  It is safe to call this function directly from an ISR to place messages on a
  *  driver's lowest read queue.  Should not be frozen by the caller.
  */
-streams_fastcall int
+streams_fastcall __hot_write int
 putq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -2198,7 +2198,7 @@ EXPORT_SYMBOL(putq);
 /*
  *  __insq:
  */
-static streams_fastcall int
+static streams_fastcall __hot_write int
 __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int enable = 0;
@@ -2303,7 +2303,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
  *
  *  LOCKING: The caller must lock the queue with MPSTR_QLOCK() or freezestr() across the call.
  */
-streams_fastcall int
+streams_fastcall __hot_write int
 insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -2352,7 +2352,7 @@ EXPORT_SYMBOL(insq);
  *  MP-STREAMS: The Stream needs to be frozen by the caller with freezestr() or the call will fail
  *  under assertions.
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -2399,7 +2399,7 @@ static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *
  *  Allocates and initializes a queue pair for use by STREAMS.
  */
-STATIC streams_inline streams_fastcall queue_t *
+STATIC streams_inline streams_fastcall __unlikely queue_t *
 qalloc(struct stdata *sd, struct fmodsw *fmod)
 {
 	queue_t *q;
@@ -2447,7 +2447,7 @@ void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *  qopen() is not the same as the major number passed, that we need to do a setq on the queue from
  *  the streamtab associated with the new major device number.
  */
-streams_fastcall int
+streams_fastcall __unlikely int
 qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct streamtab *st;
@@ -2518,7 +2518,7 @@ EXPORT_SYMBOL(qattach);
  *  because the Stream head reference count falling to zero is used to deallocate the Stream head
  *  queue pair.
  */
-void
+__unlikely void
 qdelete(queue_t *q)
 {
 	struct stdata *sd;
@@ -2569,7 +2569,7 @@ EXPORT_SYMBOL(qdelete);
  *  be called with no locks held so that the procedure may sleep.
  *
  */
-streams_fastcall int
+__unlikely streams_fastcall int
 qdetach(queue_t *q, int flags, cred_t *crp)
 {
 	int err;
@@ -2613,7 +2613,7 @@ EXPORT_SYMBOL(qdetach);
  *  before qprocson() is called, from its qi_qclose() procedure after qprocsoff() is called, or
  *  using weldq() or unweldq().
  */
-void
+__unlikely void
 qinsert(struct stdata *sd, queue_t *irq)
 {
 	queue_t *iwq, *srq, *swq;
@@ -2659,7 +2659,7 @@ EXPORT_SYMBOL(qinsert);
  *  holding the STRCLOSE bit, so no other close can occur, and all other operations on the Stream
  *  will fail.
  */
-void
+__unlikely void
 qprocsoff(queue_t *q)
 {
 	queue_t *bq;
@@ -2755,7 +2755,7 @@ EXPORT_SYMBOL(qprocsoff);
  *  holding STWOPEN bit, so no other open can occur.  Because the Stream head has not yet been
  *  published to a file pointer or inode, no other operation can occur on the Stream.
  */
-void
+__unlikely void
 qprocson(queue_t *q)
 {
 	queue_t *bq;
@@ -2837,7 +2837,7 @@ EXPORT_SYMBOL(qsize);
  *  LOCKING:  Take a Stream head plumb read lock to protect q_next pointers while walking the
  *  Stream.
  */
-streams_fastcall ssize_t
+streams_fastcall __unlikely ssize_t
 qcountstrm(queue_t *q)
 {
 	ssize_t count = 0;
@@ -2895,7 +2895,7 @@ EXPORT_SYMBOL(RD);
  *  control restrictions, another priority band message of the same or lower priority being enqueued
  *  will not enable the queue, however, a higher priority message will.
  */
-static streams_fastcall bool
+static streams_fastcall __hot_read bool
 __rmvq(queue_t *q, mblk_t *mp)
 {
 	bool backenable = false;
@@ -3018,7 +3018,7 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  NOTICES: rmvq() panics when passed null pointers.  rmvq() panics if a write lock has not been
  *  taken on the queue.  rmvq() panics if the message is not a queue, or not on the specified queue.
  */
-streams_fastcall void
+streams_fastcall __hot_read void
 rmvq(queue_t *q, mblk_t *mp)
 {
 	bool backenable;
@@ -3028,7 +3028,7 @@ rmvq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(frozen_by_caller(q));
-	usual(in_procedure_of(q));
+	_usual(in_procedure_of(q)); /* not so usual, Stream head does this all the time */
 
 	pl = qwlock(q);
 
@@ -3062,7 +3062,7 @@ EXPORT_SYMBOL(rmvq);
  *  freechains() task under the STREAMS scheduler.  Flushing of long chains is more efficient for
  *  %FLUSHALL than for %FLUSHDATA.
  */
-static bool
+static __unlikely bool
 __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 {
 	bool backenable = false;
@@ -3177,7 +3177,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
  *
  *  This function is not supposed to be called on a Stream that is frozen by the calling thread.
  */
-streams_fastcall void
+streams_fastcall __unlikely void
 flushband(queue_t *q, int band, int flag)
 {
 	bool backenable;
@@ -3230,7 +3230,7 @@ EXPORT_SYMBOL(flushband);
  *
  *  Note that the putq() deferral chain is flushed as well.
  */
-bool
+__unlikely bool
 __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 {
 	bool backenable = false;
@@ -3301,7 +3301,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
  *  MP-STREAMS: Note that qbackenable() will take its own Stream head read lock for Stream ends
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
-streams_fastcall void
+streams_fastcall __unlikely void
 flushq(queue_t *q, int flag)
 {
 	bool backenable;
@@ -3346,7 +3346,7 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
  *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
  *  no message on the queue.
  */
-static streams_inline streams_fastcall mblk_t *
+static streams_inline streams_fastcall __hot_read mblk_t *
 __getq(queue_t *q, bool *be)
 {
 	mblk_t *mp;
@@ -3468,7 +3468,7 @@ __getq(queue_t *q, bool *be)
  *  MP-STREAMS: Note that qbackenable() will take its own Stream head read lock for Stream ends
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
-streams_fastcall mblk_t *
+streams_fastcall __hot_read mblk_t *
 getq(queue_t *q)
 {
 	mblk_t *mp;
@@ -3510,7 +3510,7 @@ EXPORT_SYMBOL(SAMESTR);
 /*
  *  __setq:
  */
-static void
+static __unlikely void
 __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	q->q_qinfo = rinit;
@@ -3545,7 +3545,7 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
  *  is to allocate the syncrhonization queues with setsq() and the set the queues with setq().
  *  Syncrhonization queues from a multiplexed queue pair can be removed with setsq(q, NULL).
  */
-void
+__unlikely void
 setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	struct stdata *sd;
@@ -3586,7 +3586,7 @@ struct syncq *global_syncq = NULL;
  *  independent of this function.  Although this function could allocate synchronization queues for
  *  the SQLVL_MODULE case, to avoid races it should only be performed in the registration functions.
  */
-static int
+static __unlikely int
 __setsq(queue_t *q, struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
@@ -3717,7 +3717,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
  *  Locking: A stream head write lock should be maintained across the call to ensure that there are
  *  no STREAMS coroutines running while the queues are being manipulated.
  */
-int
+__unlikely int
 setsq(queue_t *q, struct fmodsw *fmod)
 {
 	int result;
@@ -3746,7 +3746,7 @@ EXPORT_SYMBOL(setsq);		/* for stream head include/sys/streams/strsubr.h */
  *  @band:	from which queue band
  *  @val:	location of return value
  */
-int
+__unlikely int
 strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
 	int err = 0;
@@ -3843,7 +3843,7 @@ EXPORT_SYMBOL(strqget);
  *  function.  On UP it is not necessary unless strqset(9) is to be called from outside of the
  *  STREAMS context.
  */
-int
+__unlikely int
 strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
 	int err = 0;
@@ -3928,7 +3928,7 @@ static char str_err_buf[LOGMSGSZ];
  *  SL_CONSOLE messages are printed to the system logs.  This follows the rules for setting the
  *  priority according described in log(4).
  */
-static int
+static __unlikely int
 vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	int rval = 1;
@@ -3979,7 +3979,7 @@ static vstrlog_t vstrlog_hook = &vstrlog_default;
  *  LOCKING: This function holds a write lock on strlog_reg_lock to keep others from calling a
  *  strlog() implementation function that is about to be unloaded for safe log driver unloading.
  */
-vstrlog_t
+__unlikely vstrlog_t
 register_strlog(vstrlog_t newlog)
 {
 	unsigned long flags;
@@ -4056,7 +4056,7 @@ EXPORT_SYMBOL(strlog);
  *  @q:			the queue in the stream to thaw
  *  @flags:		spl flags
  */
-void
+__unlikely void
 unfreezestr(queue_t *q, unsigned long flags)
 {
 	struct stdata *sd;

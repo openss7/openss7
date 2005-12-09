@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/04 20:23:10 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/09 00:28:06 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -60,7 +60,8 @@ done
 
 # Specify defaults
 
-STREAMS_MODULES="streams streams-clone streams-sth"
+#STREAMS_MODULES="streams streams-clone streams-sth"
+STREAMS_MODULES="streams"
 STREAMS_MAKEDEVICES="no"
 STREAMS_REMOVEDEVICES="no"
 STREAMS_MOUNTSPECFS="yes"
@@ -226,7 +227,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/04 20:23:10 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/09 00:28:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -272,7 +273,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:23:10 $ by $Author: brian $
+# Last Modified $Date: 2005/12/09 00:28:06 $ by $Author: brian $
 #
 # =============================================================================
 

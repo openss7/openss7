@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.12 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.13 2005/12/09 00:27:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/09 00:27:48 $"
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
@@ -104,7 +104,7 @@ kmem_zalloc(size_t size, int flags)
 	void *mem;
 
 	if ((mem = kmem_alloc(size, flags)))
-#if HAVE_KFUNC_KSIZE
+#if defined HAVE_KFUNC_KSIZE
 		/* newer kernels can tell us how big a memory object truly is */
 		memset(mem, 0, ksize(mem));
 #else

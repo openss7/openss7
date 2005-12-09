@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/05 22:48:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2005/12/09 00:27:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/05 22:48:57 $ by $Author: brian $
+# Last Modified $Date: 2005/12/09 00:27:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -236,10 +236,13 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strargs.h \
 				src/kernel/specfs.c
 
-##				src/kernel/strspecfs.c \
-##				src/kernel/strlookup.c \
-##				src/kernel/strattach.c \
-##				src/kernel/strpipe.c \
+if CONFIG_STREAMS_SEPARATE_COMPILE
+libLfS_specfs_a_SOURCES		+= \
+				src/kernel/strspecfs.c \
+				src/kernel/strlookup.c \
+				src/kernel/strattach.c \
+				src/kernel/strpipe.c
+endif
 
 libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLfS_specfs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=specfs $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
@@ -248,7 +251,7 @@ libLfS_specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
 
 
-libLfS_streams_a_SOURCES		= \
+libLfS_streams_a_SOURCES	= \
 				src/kernel/strreg.h \
 				src/kernel/strprocfs.h \
 				src/kernel/strsched.h \
@@ -258,18 +261,21 @@ libLfS_streams_a_SOURCES		= \
 				src/kernel/strargs.h \
 				src/kernel/streams.c
 
-##				src/kernel/strmain.c \
-##				src/kernel/strreg.c \
-##				src/kernel/strprocfs.c \
-##				src/kernel/strsched.c \
-##				src/kernel/strsysctl.c \
-##				src/kernel/strsyms.c \
-##				src/kernel/strutil.c \
-##				src/kernel/strsad.c \
-
-if CONFIG_STREAMS_STH
-libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
+if CONFIG_STREAMS_SEPARATE_COMPILE
+libLfS_streams_a_SOURCES	+= \
+				src/kernel/strmain.c \
+				src/kernel/strreg.c \
+				src/kernel/strprocfs.c \
+				src/kernel/strsched.c \
+				src/kernel/strsysctl.c \
+				src/kernel/strsyms.c \
+				src/kernel/strutil.c \
+				src/kernel/strsad.c
 endif
+
+##if CONFIG_STREAMS_STH
+##libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
+##endif
 if CONFIG_STREAMS_BUFMOD
 libLfS_streams_a_SOURCES	+= src/modules/bufmod.c
 endif
@@ -286,9 +292,9 @@ if CONFIG_STREAMS_SC
 libLfS_streams_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
 endif
 
-if CONFIG_STREAMS_CLONE
-libLfS_streams_a_SOURCES	+= src/drivers/clone.c src/drivers/clone.h
-endif
+##if CONFIG_STREAMS_CLONE
+##libLfS_streams_a_SOURCES	+= src/drivers/clone.c src/drivers/clone.h
+##endif
 if CONFIG_STREAMS_FIFO
 libLfS_streams_a_SOURCES	+= src/drivers/fifo.c src/drivers/fifo.h
 endif
@@ -707,25 +713,29 @@ EXPORT_SRCFILES			= \
 				  src/kernel/specfs.c \
 				  src/kernel/streams.c
 
-##				  src/kernel/strattach.c \
-##				  src/kernel/strlookup.c \
-##				  src/kernel/strpipe.c \
-##				  src/kernel/strreg.c \
-##				  src/kernel/strsad.c \
-##				  src/kernel/strsched.c \
-##				  src/kernel/strspecfs.c \
-##				  src/kernel/strsysctl.c \
-##				  src/kernel/strutil.c \
-##				  src/kernel/strsyms.c
+if CONFIG_STREAMS_SEPARATE_COMPILE
+EXPORT_SRCFILES			+= \
+				  src/kernel/strattach.c \
+				  src/kernel/strlookup.c \
+				  src/kernel/strpipe.c \
+				  src/kernel/strreg.c \
+				  src/kernel/strsad.c \
+				  src/kernel/strsched.c \
+				  src/kernel/strspecfs.c \
+				  src/kernel/strsysctl.c \
+				  src/kernel/strutil.c \
+				  src/kernel/strsyms.c
 
 if CONFIG_STREAMS_CLONE
 EXPORT_SRCFILES			+= src/drivers/clone.c
 endif
-if CONFIG_STREAMS_CLONE_MODULE
-EXPORT_SRCFILES			+= src/drivers/clone.c
-endif
 if CONFIG_STREAMS_STH
 EXPORT_SRCFILES			+= src/modules/sth.c
+endif
+endif
+
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_SRCFILES			+= src/drivers/clone.c
 endif
 if CONFIG_STREAMS_STH_MODULE
 EXPORT_SRCFILES			+= src/modules/sth.c
@@ -735,25 +745,28 @@ EXPORT_VERFILES			= \
 				  $(PKGINCL)/versions/specfs.ver \
 				  $(PKGINCL)/versions/streams.ver
 
-##				  $(PKGINCL)/versions/strattach.ver \
-##				  $(PKGINCL)/versions/strlookup.ver \
-##				  $(PKGINCL)/versions/strpipe.ver \
-##				  $(PKGINCL)/versions/strreg.ver \
-##				  $(PKGINCL)/versions/strsad.ver \
-##				  $(PKGINCL)/versions/strsched.ver \
-##				  $(PKGINCL)/versions/strspecfs.ver \
-##				  $(PKGINCL)/versions/strsysctl.ver \
-##				  $(PKGINCL)/versions/strutil.ver \
-##				  $(PKGINCL)/versions/strsyms.ver
-
+if CONFIG_STREAMS_SEPARATE_COMPILE
+EXPORT_VERFILES			+= \
+				  $(PKGINCL)/versions/strattach.ver \
+				  $(PKGINCL)/versions/strlookup.ver \
+				  $(PKGINCL)/versions/strpipe.ver \
+				  $(PKGINCL)/versions/strreg.ver \
+				  $(PKGINCL)/versions/strsad.ver \
+				  $(PKGINCL)/versions/strsched.ver \
+				  $(PKGINCL)/versions/strspecfs.ver \
+				  $(PKGINCL)/versions/strsysctl.ver \
+				  $(PKGINCL)/versions/strutil.ver \
+				  $(PKGINCL)/versions/strsyms.ver
 if CONFIG_STREAMS_CLONE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
-endif
-if CONFIG_STREAMS_CLONE_MODULE
 EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
 endif
 if CONFIG_STREAMS_STH
 EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
+endif
+endif
+
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
 endif
 if CONFIG_STREAMS_STH_MODULE
 EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver

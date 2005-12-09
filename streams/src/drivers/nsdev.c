@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/10/19 11:08:19 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -258,7 +258,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 	dev_t dev;
 
-#if HAVE_KFUNC_TO_KDEV_T
+#if defined HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else

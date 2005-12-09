@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.10 2005/07/09 21:54:17 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.11 2005/12/09 00:27:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:54:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:48 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -87,7 +87,7 @@
 
 #undef HAVE_KFUNC_READ_TRYLOCK
 #undef HAVE_KMACRO_READ_TRYLOCK
-#if HAVE_KFUNC_READ_TRYLOCK || HAVE_KMACRO_READ_TRYLOCK
+#if defined HAVE_KFUNC_READ_TRYLOCK || defined HAVE_KMACRO_READ_TRYLOCK
 #define HAVE_READ_TRYLOCK 1
 #endif
 
@@ -99,7 +99,7 @@
 
 #undef HAVE_KFUNC_WRITE_TRYLOCK
 #undef HAVE_KMACRO_WRITE_TRYLOCK
-#if HAVE_KFUNC_WRITE_TRYLOCK || HAVE_KMACRO_WRITE_TRYLOCK
+#if defined HAVE_KFUNC_WRITE_TRYLOCK || defined HAVE_KMACRO_WRITE_TRYLOCK
 #define HAVE_WRITE_TRYLOCK 1
 #endif
 

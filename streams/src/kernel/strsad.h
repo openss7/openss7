@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/09 00:27:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSAD_H__
 #define __LOCAL_STRSAD_H__
+
+#ifndef BIG_STATIC_STH
+#define BIG_STATIC_STH
+#endif
 
 // defined in sys/strconf.h
 //extern int autopush_add(struct strapush *sap);
@@ -62,7 +66,7 @@
 //extern int apush_get(struct strapush *sap);
 //extern int apush_vml(struct str_list *slp);
 
-extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
+BIG_STATIC_STH int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
 #endif				/* __LOCAL_STRSAD_H__ */

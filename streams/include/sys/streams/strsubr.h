@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.57 2005/12/05 22:49:05 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.58 2005/12/09 00:27:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/12/09 00:27:49 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -401,7 +401,9 @@ struct strthread {
 	struct strevent **freeevnt_tail;	/* tail of free stream events cached */
 } __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
+#ifndef BIG_COMPILE
 extern struct strthread strthreads[];
+#endif
 
 extern void STREAMS_FASTCALL(__raise_streams(void));
 
@@ -640,16 +642,20 @@ extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sfla
 extern struct vfsmount *STREAMS_FASTCALL(specfs_mount(void));
 extern void STREAMS_FASTCALL(specfs_umount(void));
 
+#ifndef BIG_COMPILE
 extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
+#endif
 
 extern struct stdata *allocstr(void);
 extern void freestr(struct stdata *sd);
+#ifndef BIG_COMPILE
 extern struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
 extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
 
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
+#endif
 
 #if 0
 extern struct devinfo *di_alloc(struct cdevsw *cdev);
@@ -659,8 +665,10 @@ extern void di_put(struct devinfo *di);
 extern struct strevent *STREAMS_FASTCALL(sealloc(void));
 extern int STREAMS_FASTCALL(sefree(struct strevent *se));
 
+#ifndef BIG_COMPILE
 extern int sysctl_str_nstrpush;
 extern int sysctl_str_strctlsz;
+#endif
 
 extern int register_clone(struct cdevsw *cdev);
 extern int unregister_clone(struct cdevsw *cdev);

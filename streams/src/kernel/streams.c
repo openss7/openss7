@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 0.9.2.2  2005/12/09 00:27:54  brian
+ - updates to clock 95% on FC4
+
  Revision 0.9.2.1  2005/12/05 22:49:05  brian
  - some sneaky tricks for a single compilation unit build to help compiler
    with optimization
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $"
 
-static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $";
+static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $";
 
 /* can we just include these into one big compilation unit? */
 
@@ -70,7 +73,23 @@ static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.
 #define BIG_STATIC static
 #define BIG_STATIC_INLINE static streams_inline
 
-#define __STRSCHED_EXTERN_INLINE inline
+#ifdef CONFIG_STREAMS_STH
+#define BIG_STATIC_STH static
+#define BIG_STATIC_INLINE_STH static streams_inline
+#else
+#define BIG_STATIC_STH
+#define BIG_STATIC_INLINE_STH
+#endif
+
+#ifdef CONFIG_STREAMS_CLONE
+#define BIG_STATIC_CLONE static
+#define BIG_STATIC_INLINE_CLONE static streams_inline
+#else
+#define BIG_STATIC_CLONE
+#define BIG_STATIC_INLINE_CLONE
+#endif
+
+#define __STRSCHD_EXTERN_INLINE inline
 #define __STRUTIL_EXTERN_INLINE inline
 
 #undef ident
@@ -85,6 +104,16 @@ static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.
 #undef ident
 #define ident ident_strutil
 #include "strutil.c"
+#ifdef CONFIG_STREAMS_STH
+#undef ident
+#define ident ident_sth
+#include "src/modules/sth.c"
+#endif
+#ifdef CONFIG_STREAMS_CLONE
+#undef ident
+#define ident ident_clone
+#include "src/drivers/clone.c"
+#endif
 #undef ident
 #define ident ident_strsad
 #include "strsad.c"

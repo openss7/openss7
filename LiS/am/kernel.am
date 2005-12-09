@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/07 11:33:56 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/09 00:27:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/07 11:33:56 $ by $Author: brian $
+## Last Modified $Date: 2005/12/09 00:27:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -472,6 +472,19 @@ post-preload:
 	cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
 	rm -f -- $$prel_new
 
+if WITH_KO_MODULES
+##
+# If we have a usable depmod command and the modules.dep file already exists in the modules
+# directory, and the system map file is available, then perform the depmod on the modules.  We had
+# to change the -ae flag to -Ae for compatibility with 2.5.48+, but that should not cause a problem
+# (it should just run quicker).  New depmod could care less about modules.conf.
+##
+post-depmod:
+	@$(ECHO) "Making $@ in `pwd`"
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+else
 ##
 # If we have a usable depmod command and the modules.dep file already exists in the modules
 # directory, and the system map file is available, then perform the depmod on the modules.  We had
@@ -483,6 +496,7 @@ post-depmod:
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
 	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
 	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+endif
 
 ##
 # Pull the trick of linking /usr/src/PACKAGE_TARNAME to the source directory on autoconf installs.
@@ -610,18 +624,34 @@ postun-preload:
 	cp -fb --suffix=$(KMODCONF_EXT).bak -- $$prel_new $$prel_fil ; \
 	rm -f -- $$prel_new
 
+if WITH_KO_MODULES
 ##
 # If we have a usable system map file and an executable depmod, we perform the depmod.
 ##
 # We run depmod -Ae instead of -ae on autoconf install because installed files have current
 # timestamps.  For rpm intalls, installed binary files have original timestamps and -Ae will not
-# result in updated files.
+# result in updated files.  New depmods care less about modules.conf and likes -Ae.  But for
+# uninstall we need -ae.
+##
+postun-depmod:
+	@$(ECHO) "Making $@ in `pwd`"
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+else
+##
+# If we have a usable system map file and an executable depmod, we perform the depmod.
+##
+# We run depmod -Ae instead of -ae on autoconf install because installed files have current
+# timestamps.  For rpm intalls, installed binary files have original timestamps and -Ae will not
+# result in updated files.  For uninstalls, old depmod likes -ae.
 ##
 postun-depmod:
 	@$(ECHO) "Making $@ in `pwd`"
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
-	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
-	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+endif
 
 postun-source:
 	@$(ECHO) "Making $@ in `pwd`"

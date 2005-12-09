@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.24 2005/12/05 22:49:05 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.25 2005/12/09 00:27:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/09 00:27:49 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -212,6 +212,13 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define __EXTERN_INLINE extern inline
 #endif
 
+#define __hot
+#define __hot_read
+#define __hot_write
+#define __hot_put
+#define __hot_get
+#define __unlikely
+
 #elif defined(CONFIG_STREAMS_TEST)
 
 #define    never()		__never()
@@ -254,11 +261,18 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STREAMS_FASTCALL(__x) __x
 #endif
 #undef streams_inline
-#define streams_inline
+#define streams_inline inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern inline
 #endif
+
+#define __hot
+#define __hot_read
+#define __hot_write
+#define __hot_put
+#define __hot_get
+#define __unlikely
 
 #elif defined(CONFIG_STREAMS_SAFE)
 
@@ -302,11 +316,18 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STREAMS_FASTCALL(__x) __x
 #endif
 #undef streams_inline
-#define streams_inline
+#define streams_inline inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE static inline
 #endif
+
+#define __hot __attribute__((section(".text.hot")))
+#define __hot_read  __attribute__((section(".text.hot.read")))
+#define __hot_write __attribute__((section(".text.hot.write")))
+#define __hot_put  __attribute__((section(".text.hot.put")))
+#define __hot_get __attribute__((section(".text.hot.get")))
+#define __unlikely __attribute__((section(".text.unlikely")))
 
 #else
 
@@ -350,11 +371,18 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STREAMS_FASTCALL(__x) __x
 #endif
 #undef streams_inline
-#define streams_inline
+#define streams_inline inline
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE static inline fastcall
 #endif
+
+#define __hot __attribute__((section(".text.hot")))
+#define __hot_read  __attribute__((section(".text.hot.read")))
+#define __hot_write __attribute__((section(".text.hot.write")))
+#define __hot_put  __attribute__((section(".text.hot.put")))
+#define __hot_get __attribute__((section(".text.hot.get")))
+#define __unlikely __attribute__((section(".text.unlikely")))
 
 #endif
 

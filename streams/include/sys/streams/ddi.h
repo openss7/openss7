@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.29 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.30 2005/12/09 00:27:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/09 00:27:48 $"
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -206,10 +206,10 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(unsigned long *) value_p = jiffies;
 		return (0);
 	case PPGP:
-#if HAVE_KFUNC_PROCESS_GROUP
+#if defined HAVE_KFUNC_PROCESS_GROUP
 		*(pid_t *) value_p = process_group(current);
 #else
-#if HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
+#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 		*(pid_t *) value_p = current->pgrp;
 #else
 		*(pid_t *) value_p = current->signal->pgrp;
@@ -223,7 +223,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->pid;
 		return (0);
 	case PSID:
-#if HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 		*(pid_t *) value_p = current->session;
 #else
 		*(pid_t *) value_p = current->signal->session;

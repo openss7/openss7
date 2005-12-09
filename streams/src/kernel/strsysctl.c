@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/05 22:49:06 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/09 00:27:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/05 22:49:06 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/09 00:27:56 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/05 22:49:06 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/09 00:27:56 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,10 +81,10 @@ BIG_STATIC int sysctl_str_lowat = STRLOW;	/* stream head default lo water mark *
 BIG_STATIC int sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in ticks) */
 BIG_STATIC int sysctl_str_rtime = (10 * HZ) / 1000;/* msec to wait to forward held msg (saved in ticks) */
 BIG_STATIC int sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved in ticks) */
-int sysctl_str_nstrpush = 64;			/* maximum number of pushed modules */
+BIG_STATIC_STH int sysctl_str_nstrpush = 64;			/* maximum number of pushed modules */
 BIG_STATIC int sysctl_str_strthresh = (1 << 20);/* memory limit */
 BIG_STATIC int sysctl_str_strhold = 0;		/* active stream hold feature */
-int sysctl_str_strctlsz = (1 << 12);		/* maximum stream control size */
+BIG_STATIC_STH int sysctl_str_strctlsz = (1 << 12);		/* maximum stream control size */
 int sysctl_str_strmsgsz = (1 << 18);		/* maximum stream message size */
 BIG_STATIC int sysctl_str_nstrmsgs = (1 << 18);	/* maximum number of streams messages */
 BIG_STATIC int sysctl_str_nband = 256;		/* number of queue bands */

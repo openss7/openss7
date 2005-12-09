@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/02 11:13:40 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 00:27:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/02 11:13:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/02 11:13:40 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 00:27:55 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/02 11:13:40 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 00:27:55 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -441,7 +441,7 @@ EXPORT_SYMBOL(apush_vml);
  *  @sflag: stream flag (%MODOPEN or %CLONEOPEN or %DRVOPEN)
  *  @crp: pointer to user credentials structure
  */
-int
+BIG_STATIC_STH int
 autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct apinfo *api;
@@ -489,9 +489,6 @@ autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sfl
 	}
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH || \
-    defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO || \
-    defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE || \
-    defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
+#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(autopush);
 #endif

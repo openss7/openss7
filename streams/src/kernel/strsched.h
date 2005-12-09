@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/09 00:27:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -61,9 +61,17 @@
 #define BIG_STATIC_INLINE
 #endif
 
+#ifndef BIG_STATIC_STH
+#define BIG_STATIC_STH
+#endif
+
+#ifndef BIG_STATIC_INLINE_STH
+#define BIG_STATIC_INLINE_STH
+#endif
+
 #undef STR
 #include <linux/interrupt.h>	/* for in_irq() and friends */
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#if defined HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 
@@ -95,15 +103,15 @@ BIG_STATIC void STREAMS_FASTCALL(bput(qband_t **bp));
 /* ctors and dtors for stream heads */
 extern struct stdata *allocstr(void);
 extern void freestr(struct stdata *sd);
-extern struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
-extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
+BIG_STATIC_STH struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
+BIG_STATIC_STH void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
 
 /* ctors and dtors for autopush entries */
 BIG_STATIC struct apinfo *ap_alloc(struct strapush *sap);
 BIG_STATIC struct apinfo *ap_get(struct apinfo *api);
 BIG_STATIC void ap_put(struct apinfo *api);
 /* XXX: not even in strsched.c */
-extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
+BIG_STATIC_STH int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
 #if 0
@@ -119,8 +127,8 @@ BIG_STATIC void modi_put(struct mdlinfo *mi);
 #endif
 
 /* ctors and dtors for linkblk */
-extern struct linkblk *alloclk(void);
-extern void freelk(struct linkblk *l);
+BIG_STATIC_STH struct linkblk *alloclk(void);
+BIG_STATIC_STH void freelk(struct linkblk *l);
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* ctors and dtors for syncq */
@@ -142,7 +150,7 @@ extern void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
 
 /* stuff for examining streams information lists */
 BIG_STATIC struct strinfo Strinfo[DYN_SIZE];
-extern struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
+BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 
 #define this_thread (&strthreads[smp_processor_id()])
 
@@ -201,7 +209,7 @@ current_context(void)
 		return (CTX_STREAMS);
 	if (in_interrupt())
 		return (CTX_INT);
-#if HAVE_KFUNC_IN_ATOMIC
+#if defined HAVE_KFUNC_IN_ATOMIC
 	if (in_atomic())
 		return (CTX_ATOMIC);
 #endif

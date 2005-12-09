@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -63,7 +63,7 @@ static char const ident[] =
 #include <linux/compiler.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#if defined HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 //#include <linux/locks.h>
@@ -83,18 +83,18 @@ static char const ident[] =
 
 #include <linux/kernel.h>	/* for simple_strtoul, FASTCALL(), fastcall */
 #include <linux/pagemap.h>	/* for PAGE_CACHE_SIZE */
-#if HAVE_KINC_LINUX_NAMEI_H
+#if defined HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>	/* for lookup_hash on 2.6 */
 #endif
 #include <linux/mount.h>	/* for mntget and friends */
 
-#if HAVE_KINC_LINUX_STATFS_H
+#if defined HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
 
 #include "sys/strdebug.h"
 
-#if ! HAVE_KFUNC_MODULE_PUT
+#if ! defined HAVE_KFUNC_MODULE_PUT
 #define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
 #endif
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/05 22:49:05 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -281,7 +281,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 	assert(specfs_mnt);
 	sb = specfs_mnt->mnt_sb;
 
-#if HAVE_KFUNC_IGET_LOCKED
+#if defined HAVE_KFUNC_IGET_LOCKED
 	if (!(snode = iget_locked(sb, dev))) {
 		ptrace(("couldn't allocate inode\n"));
 		return ERR_PTR(-ENOMEM);
@@ -400,7 +400,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	struct vfsmount *mnt;
 	int err;
 
-#ifdef HAVE_FILE_MOVE_ADDR
+#if defined HAVE_FILE_MOVE_ADDR
 	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
 #define file_move(__f, __l) _file_move(__f, __l)
 #endif
@@ -642,7 +642,7 @@ struct file_operations spec_dev_f_ops = {
  *  Directory inodes can exist after the module has been unloaded, so we cannot use the u.generic_ip
  *  pointer, we need to get the cdev entry from the inode number again.
  */
-#if HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
+#if defined HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
 STATIC struct dentry *
 spec_dir_i_lookup(struct inode *dir, struct dentry *new, struct nameidata *dummy)
 #else
@@ -962,7 +962,7 @@ STATIC struct dentry_operations spec_dir_d_ops ____cacheline_aligned = {
  *  If we cannot find a corresponding cdevsw entry and we are configured for kernel module loading,
  *  we request a module of the name streams-%s, where %s is the name requested.
  */
-#if HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
+#if defined HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA
 STATIC struct dentry *
 spec_root_i_lookup(struct inode *dir, struct dentry *new, struct nameidata *dummy)
 #else
@@ -1374,9 +1374,9 @@ spec_read_inode(struct inode *inode)
 	if (!cdev)
 		goto bad_inode;
 	else {
-#if HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
+#if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
 		struct spec_sb_info *sbi = inode->i_sb->s_fs_info;
-#elif HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
+#elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
 		struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
 #else
 #error HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO or HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP must be defined.
@@ -1410,7 +1410,7 @@ spec_read_inode(struct inode *inode)
 		/* for device nodes, the major component of the i_ino is the module id */
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
 		inode->i_mode &= ~S_IXUGO;
-#if HAVE_KFUNC_TO_KDEV_T
+#if defined HAVE_KFUNC_TO_KDEV_T
 		inode->i_rdev = to_kdev_t(dev);
 #else
 		inode->i_rdev = dev;
@@ -1440,7 +1440,7 @@ spec_read_inode(struct inode *inode)
 	return;
 }
 
-#if HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
 /**
  *  spec_read_inode2: - read a inode from the filesystem
  *  @inode:	initialized inode to read
@@ -1488,7 +1488,7 @@ spec_put_inode(struct inode *inode)
 	if (inode->i_nlink != 0) {
 		/* This should not happen because we decrement i_nlink when we remove the STREAM
 		   head.  The inode should never be able to go away with a STREAM head attached. */
-#if HAVE_KFUNC_FORCE_DELETE
+#if defined HAVE_KFUNC_FORCE_DELETE
 		force_delete(inode);
 #else
 		if (atomic_read(&inode->i_count) == 1) {
@@ -1602,9 +1602,9 @@ STATIC void
 spec_put_super(struct super_block *sb)
 {
 	/* just free our optional mount information */
-#if HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
+#if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
 	spec_sbi_free(xchg(&sb->s_fs_info, NULL));
-#elif HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
+#elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
 	spec_sbi_free(xchg(&sb->u.generic_sbp, NULL));
 #endif
 }
@@ -1616,7 +1616,7 @@ spec_put_super(struct super_block *sb)
  *  @sb:	super block
  *  @buf:	buffer for statfs data
  */
-#if HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE
+#if defined HAVE_KMEMB_STRUCT_KSTATFS_F_TYPE
 STATIC int
 spec_statfs(struct super_block *sb, struct kstatfs *buf)
 #else
@@ -1642,16 +1642,16 @@ spec_statfs(struct super_block *sb, struct statfs *buf)
 STATIC int
 spec_remount_fs(struct super_block *sb, int *flags, char *data)
 {
-#if HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
+#if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
 	struct spec_sb_info *sbi = sb->s_fs_info;
-#elif HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
+#elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
 	struct spec_sb_info *sbi = sb->u.generic_sbp;
 #endif
 	(void) flags;
 	return (data ? spec_parse_options(data, sbi) : 0);
 }
 
-#ifdef HAVE_KMEMB_STRUCT_INODE_I_LOCK
+#if defined HAVE_KMEMB_STRUCT_INODE_I_LOCK
 #define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
 #define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
 #define stri_unlock(__i)    spin_unlock(&(__i)->i_lock);
@@ -1693,7 +1693,7 @@ spec_umount_begin(struct super_block *sb)
 
 STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 	.read_inode = spec_read_inode,
-#if HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
 	.read_inode2 = spec_read_inode2,
 #endif
 //      .dirty_inode = NULL,
@@ -1754,9 +1754,9 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 #if 0
 	sb->s_root->d_op = &spec_root_d_ops;
 #endif
-#if HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
+#if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
 	sb->s_fs_info = sbi;
-#elif HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
+#elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
 	sb->u.generic_sbp = sbi;
 #endif
 	return (0);
@@ -1770,7 +1770,7 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	return (err);
 }
 
-#if HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
+#if defined HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
 STATIC struct super_block *
 specfs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
 {
@@ -1790,7 +1790,7 @@ struct file_system_type spec_fs_type = {
 	.get_sb = specfs_get_sb,
 	.kill_sb = specfs_kill_sb,
 };
-#elif HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_READ_SUPER
+#elif defined HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_READ_SUPER
 /**
  *  specfs_read_super: - create a shadow special filesystem super block
  *  @sb:	superblock for which to read a superblock inode
@@ -1833,7 +1833,7 @@ specfs_mount(void)
 
 EXPORT_SYMBOL(specfs_mount);
 
-#if ! HAVE_KFUNC_KERN_UMOUNT
+#if ! defined HAVE_KFUNC_KERN_UMOUNT
 #undef kern_umount
 #define kern_umount mntput
 #endif

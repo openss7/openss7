@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: specfs.c,v $
+ Revision 0.9.2.2  2005/12/09 00:27:54  brian
+ - updates to clock 95% on FC4
+
  Revision 0.9.2.1  2005/12/05 22:49:05  brian
  - some sneaky tricks for a single compilation unit build to help compiler
    with optimization
@@ -60,15 +63,31 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $"
 
-static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/05 22:49:05 $";
+static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $";
 
 /* can we just include these into one big compilation unit? */
 
 #define BIG_COMPILE 1
 #define BIG_STATIC static
 #define BIG_STATIC_INLINE static streams_inline
+
+#ifdef CONFIG_STREAMS_STH
+#define BIG_STATIC_STH static
+#define BIG_STATIC_INLINE_STH static streams_inline
+#else
+#define BIG_STATIC_STH
+#define BIG_STATIC_INLINE_STH
+#endif
+
+#ifdef CONFIG_STREAMS_CLONE
+#define BIG_STATIC_CLONE static
+#define BIG_STATIC_INLINE_CLONE static streams_inline
+#else
+#define BIG_STATIC_CLONE
+#define BIG_STATIC_INLINE_CLONE
+#endif
 
 /* initialization for specfs */
 BIG_STATIC int strlookup_init(void);

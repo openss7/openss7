@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:54 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/05 22:49:05 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:54 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -906,9 +906,7 @@ cdrv_put(struct cdevsw *cdev)
 	sdev_put(cdev);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(cdrv_put);
-#endif
 
 /**
  *  fmod_get: - get a reference to a STREAMS module
@@ -988,9 +986,7 @@ cdev_find(const char *name)
 	return cdev_search(name, !in_interrupt());
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(cdev_find);
-#endif
 
 /**
  *  cdev_match: - find a STREAMS device by extended name

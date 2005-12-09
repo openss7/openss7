@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 00:59:58 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/09 00:27:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/08 00:59:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 00:59:58 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/09 00:27:55 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 00:59:58 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/09 00:27:55 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -65,13 +65,13 @@ static char const ident[] =
 #include <linux/spinlock.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#if defined HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
-#if HAVE_KINC_LINUX_LOCKS_H
+#if defined HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_KTHREAD_H
+#if defined HAVE_KINC_LINUX_KTHREAD_H
 #include <linux/kthread.h>	/* for kthread_create and friends */
 #include <linux/cpu.h>		/* for cpu_online, cpu_is_offline */
 #include <linux/notifier.h>	/* for CPU notifier callbacks */
@@ -109,7 +109,7 @@ static char const ident[] =
 #include "src/kernel/strutil.h"	/* for q locking and puts and gets */
 #include "src/kernel/strsched.h"	/* verification of externs */
 
-struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
+BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 BIG_STATIC struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
@@ -118,7 +118,7 @@ EXPORT_SYMBOL(strthreads);
 
 #if defined CONFIG_STREAMS_KTHREADS
 
-streams_fastcall void
+streams_fastcall __hot void
 __raise_streams(void)
 {
 	struct strthread *t = this_thread;
@@ -126,7 +126,7 @@ __raise_streams(void)
 	wake_up_process(t->proc);
 }
 
-static streams_fastcall void
+static streams_fastcall __hot void
 cpu_raise_streams(unsigned int cpu)
 {
 	struct strthread *t = &strthreads[cpu];
@@ -136,8 +136,8 @@ cpu_raise_streams(unsigned int cpu)
 
 #else				/* defined CONFIG_STREAMS_KTHREADS */
 
-#if HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! HAVE_RAISE_SOFTIRQ_EXPORT
-void fastcall
+#if defined HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! defined HAVE_RAISE_SOFTIRQ_EXPORT
+__hot void fastcall
 raise_softirq(unsigned int nr)
 {
 	unsigned long flags;
@@ -148,7 +148,7 @@ raise_softirq(unsigned int nr)
 }
 #endif
 
-streams_fastcall void
+streams_fastcall __hot void
 __raise_streams(void)
 {
 	raise_softirq(STREAMS_SOFTIRQ);
@@ -164,7 +164,7 @@ __raise_streams(void)
 #endif
 #endif
 
-static streams_fastcall void
+static streams_fastcall __hot void
 cpu_raise_streams(unsigned int cpu)
 {
 	cpu_raise_softirq(cpu, STREAMS_SOFTIRQ);
@@ -192,7 +192,7 @@ strblocking(void)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC void
+STATIC __unlikely void
 qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -204,7 +204,7 @@ qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-BIG_STATIC struct qband *
+BIG_STATIC __unlikely struct qband *
 allocqb(void)
 {
 	struct qband *qb;
@@ -228,7 +228,7 @@ allocqb(void)
 	return (qb);
 }
 
-BIG_STATIC void
+BIG_STATIC __unlikely void
 freeqb(struct qband *qb)
 {
 	struct strinfo *si = &Strinfo[DYN_QBAND];
@@ -245,7 +245,7 @@ freeqb(struct qband *qb)
 	bzero(qb, sizeof(*qb));
 	kmem_cache_free(si->si_cache, qb);
 }
-STATIC streams_fastcall void
+STATIC streams_fastcall __unlikely void
 __freebands(queue_t *rq)
 {
 	struct qband *qb, *qb_next;
@@ -265,7 +265,7 @@ __freebands(queue_t *rq)
 
 #if 0
 /* queue band gets and puts */
-BIG_STATIC streams_fastcall qband_t *
+BIG_STATIC streams_fastcall __unlikely qband_t *
 bget(qband_t *qb)
 {
 	struct qbinfo *qbi;
@@ -278,7 +278,7 @@ bget(qband_t *qb)
 	}
 	return (qb);
 }
-BIG_STATIC streams_fastcall void
+BIG_STATIC streams_fastcall __unlikely void
 bput(qband_t **bp)
 {
 	qband_t *qb;
@@ -303,7 +303,7 @@ bput(qband_t **bp)
  *  -------------------------------------------------------------------------
  *  keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC void
+STATIC __unlikely void
 apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -316,7 +316,7 @@ apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-BIG_STATIC struct apinfo *
+BIG_STATIC __unlikely struct apinfo *
 ap_alloc(struct strapush *sap)
 {
 	struct apinfo *api;
@@ -338,7 +338,7 @@ ap_alloc(struct strapush *sap)
 	}
 	return (api);
 }
-STATIC void
+STATIC __unlikely void
 ap_free(struct apinfo *api)
 {
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
@@ -358,7 +358,7 @@ ap_free(struct apinfo *api)
 #endif
 	kmem_cache_free(si->si_cache, api);
 }
-BIG_STATIC struct apinfo *
+BIG_STATIC __unlikely struct apinfo *
 ap_get(struct apinfo *api)
 {
 	if (api) {
@@ -368,7 +368,7 @@ ap_get(struct apinfo *api)
 	return (api);
 }
 
-BIG_STATIC void
+BIG_STATIC __unlikely void
 ap_put(struct apinfo *api)
 {
 	assert(api != NULL);
@@ -385,7 +385,7 @@ ap_put(struct apinfo *api)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC __unlikely void
 devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -401,7 +401,7 @@ devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 }
 
 #if 0
-BIG_STATIC struct devinfo *
+BIG_STATIC_STH struct __unlikely devinfo *
 di_alloc(struct cdevsw *cdev)
 {
 	struct devinfo *di;
@@ -431,7 +431,7 @@ di_alloc(struct cdevsw *cdev)
 EXPORT_SYMBOL(di_alloc);	/* include/sys/streams/strsubr.h */
 #endif
 
-STATIC void
+STATIC __unlikely void
 di_free(struct devinfo *di)
 {
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
@@ -454,7 +454,7 @@ di_free(struct devinfo *di)
 	kmem_cache_free(si->si_cache, di);
 }
 
-BIG_STATIC struct devinfo *
+BIG_STATIC_STH __unlikely struct devinfo *
 di_get(struct devinfo *di)
 {
 	if (di) {
@@ -464,7 +464,7 @@ di_get(struct devinfo *di)
 	return (di);
 }
 
-BIG_STATIC void
+BIG_STATIC __unlikely void
 di_put(struct devinfo *di)
 {
 	assert(di != NULL);
@@ -485,7 +485,7 @@ EXPORT_SYMBOL(di_put);		/* include/sys/streams/strsubr.h */
  *
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC __unlikely void
 mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -501,7 +501,7 @@ mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 }
 
 #if 0
-BIG_STATIC struct mdlinfo *
+BIG_STATIC __unlikely struct mdlinfo *
 modi_alloc(struct fmodsw *fmod)
 {
 	struct mdlinfo *mi;
@@ -526,7 +526,7 @@ modi_alloc(struct fmodsw *fmod)
 	}
 	return (mi);
 }
-STATIC void
+STATIC __unlikely void
 modi_free(struct mdlinfo *mi)
 {
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
@@ -548,7 +548,7 @@ modi_free(struct mdlinfo *mi)
 #endif
 	kmem_cache_free(si->si_cache, mi);
 }
-BIG_STATIC struct mdlinfo *
+BIG_STATIC __unlikely struct mdlinfo *
 modi_get(struct mdlinfo *mi)
 {
 	if (mi) {
@@ -558,7 +558,7 @@ modi_get(struct mdlinfo *mi)
 	return (mi);
 }
 
-BIG_STATIC void
+BIG_STATIC __unlikely void
 modi_put(struct mdlinfo *mi)
 {
 	assert(mi != NULL);
@@ -575,7 +575,7 @@ modi_put(struct mdlinfo *mi)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC void
+STATIC __unlikely void
 queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -630,6 +630,8 @@ allocq(void)
 
 EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
 
+BIG_STATIC_STH streams_fastcall void sd_put_slow(struct stdata **sdp);
+
 /*
  *  __freeq:	- free a queue pair
  *  @rq:	read queue of queue pair
@@ -651,7 +653,7 @@ __freeq(queue_t *rq)
 	atomic_dec(&si->si_cnt);
 	assert(!waitqueue_active(&qu->qu_qwait));
 	/* put STREAM head - if not already */
-	ctrace(sd_put(&qu->qu_str));
+	ctrace(sd_put_slow(&qu->qu_str));
 	/* clear flags */
 	rq->q_flag = QREADR;
 	wq->q_flag = 0;
@@ -714,7 +716,7 @@ freeq(queue_t *rq)
 EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
 
 /* queue gets and puts */
-BIG_STATIC streams_fastcall queue_t *
+BIG_STATIC streams_fastcall __hot_write queue_t *
 qget(queue_t *q)
 {
 	struct queinfo *qu;
@@ -729,7 +731,7 @@ qget(queue_t *q)
 	}
 	return (q);
 }
-BIG_STATIC streams_fastcall void
+BIG_STATIC streams_fastcall __hot_read void
 qput(queue_t **qp)
 {
 	queue_t *q;
@@ -754,7 +756,7 @@ qput(queue_t **qp)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC void
+STATIC __hot void
 mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -778,7 +780,7 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  but, if we are at irq, then we will only use the supplied value, even if %NULL.
  */
 
-STATIC streams_inline streams_fastcall queue_t *
+STATIC streams_inline streams_fastcall __hot_write queue_t *
 queue_guess(queue_t *q)
 {
 	queue_t *guess;
@@ -812,7 +814,7 @@ queue_guess(queue_t *q)
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
  */
-BIG_STATIC streams_fastcall mblk_t *
+BIG_STATIC streams_fastcall __hot_write mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -936,7 +938,7 @@ raise_local_bufcalls(void)
  *  is not called before the bufcall or timeout function returns.  Well, maybe for timeouts, but not
  *  for bufcalls.
  */
-STATIC streams_fastcall void
+STATIC streams_fastcall __hot_read void
 raise_bufcalls(void)
 {
 	struct strthread *t;
@@ -995,7 +997,7 @@ mdbblock_free(mblk_t *mp)
 	return;
 }
 #else
-BIG_STATIC streams_fastcall void
+BIG_STATIC streams_fastcall inline __hot_read void
 mdbblock_free(mblk_t *mp)
 {
 	/* The old approach didn't run too fast.  We might as well free them back to the memory
@@ -1014,7 +1016,12 @@ mdbblock_free(mblk_t *mp)
 #endif
 	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 	ctrace(qput(&md->msgblk.m_queue));
-	mdbblock_ctor(md, sdi->si_cache, SLAB_CTOR_CONSTRUCTOR);
+	bzero(md, sizeof(*md));
+	atomic_set(&md->datablk.d_dblock.db_users, 0);
+#if defined CONFIG_STREAMS_DEBUG
+	INIT_LIST_HEAD(&md->msgblk.m_list);
+	INIT_LIST_HEAD(&md->datablk.db_list);
+#endif
 #if 0
 	atomic_dec(&smi->si_cnt);
 #endif
@@ -1074,7 +1081,7 @@ freeblocks(struct strthread *t)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC void
+STATIC __unlikely void
 linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -1096,7 +1103,7 @@ linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		spin_unlock(&link_index_lock);
 	}
 }
-struct linkblk *
+BIG_STATIC_STH struct __unlikely linkblk *
 alloclk(void)
 {
 	struct linkblk *l;
@@ -1125,7 +1132,7 @@ alloclk(void)
 EXPORT_SYMBOL(alloclk);		/* include/sys/streams/strsubr.h */
 #endif
 
-void
+BIG_STATIC_STH __unlikely void
 freelk(struct linkblk *l)
 {
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
@@ -1154,7 +1161,7 @@ EXPORT_SYMBOL(freelk);		/* include/sys/streams/strsubr.h */
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 
-STATIC void
+STATIC __unlikely void
 syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
@@ -1173,7 +1180,7 @@ syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		INIT_LIST_HEAD((struct list_head *) &sq->sq_next);
 	}
 }
-BIG_STATIC struct syncq *
+BIG_STATIC __unlikely struct syncq *
 sq_alloc(void)
 {
 	struct syncq *sq;
@@ -1194,7 +1201,7 @@ sq_alloc(void)
 	}
 	return (sq);
 }
-STATIC void
+STATIC __unlikely void
 sq_free(struct syncq *sq)
 {
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
@@ -1227,7 +1234,7 @@ sq_free(struct syncq *sq)
 	init_waitqueue_head(&sq->sq_waitq);
 	kmem_cache_free(si->si_cache, sq);
 }
-BIG_STATIC struct syncq *
+BIG_STATIC __unlikely struct syncq *
 sq_get(struct syncq *sq)
 {
 	if (sq) {
@@ -1238,7 +1245,7 @@ sq_get(struct syncq *sq)
 	}
 	return (sq);
 }
-BIG_STATIC void
+BIG_STATIC __unlikely void
 sq_put(struct syncq **sqp)
 {
 	struct syncq *sq;
@@ -1474,7 +1481,7 @@ timeout_function(unsigned long arg)
 {
 	struct strevent *se = (struct strevent *) arg;
 
-#if defined CONFIG_STREAMS_KTHREADS || HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 	struct strthread *t = &strthreads[se->x.t.cpu];
 #else
 	struct strthread *t = this_thread;
@@ -1482,7 +1489,7 @@ timeout_function(unsigned long arg)
 
 	*xchg(&t->strtimout_tail, &se->se_next) = se;	/* MP-SAFE */
 	if (!test_and_set_bit(strtimout, &t->flags))
-#if defined CONFIG_STREAMS_KTHREADS || HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		/* bind timeout back to the CPU that called for it */
 		cpu_raise_streams(se->x.t.cpu);
 #else
@@ -1922,7 +1929,7 @@ strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
  *  qwakeup:	- wake waiters on a queue pair
  *  @q:		one queue of the queue pair to wake
  */
-STATIC streams_fastcall void
+STATIC streams_fastcall __hot void
 qwakeup(queue_t *q)
 {
 	struct queinfo *qu = ((struct queinfo *) RD(q));
@@ -1961,7 +1968,7 @@ freezechk(queue_t *q)
  *  - putp() returns the integer result from the modules put procedure.
  *  - putp() does not perform any synchronization
  */
-STATIC streams_inline streams_fastcall void
+STATIC inline streams_fastcall __hot_write void
 putp_fast(queue_t *q, mblk_t *mp)
 {
 	queue_t *qold;
@@ -2097,7 +2104,7 @@ srvp_fast(queue_t *q)
 	ctrace(qput(&q));	/* cancel qget from qschedule */
 }
 #else
-STATIC streams_inline streams_fastcall void
+STATIC inline streams_fastcall __hot void
 srvp_fast(queue_t *q)
 {
 	dassert(q);
@@ -2757,7 +2764,7 @@ qputp_slow(queue_t *q, mblk_t *mp)
  *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
  *  queue's private structure).
  */
-streams_fastcall void
+streams_fastcall __hot_write void
 put(queue_t *q, mblk_t *mp)
 {
 	dassert(mp);
@@ -2866,7 +2873,7 @@ EXPORT_SYMBOL(put);
  *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
  *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
  */
-streams_fastcall void
+streams_fastcall __hot_write void
 putnext(queue_t *q, mblk_t *mp)
 {
 	dassert(mp);
@@ -2950,7 +2957,7 @@ qsrvp(queue_t *q)
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
-int
+__unlikely int
 qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int (*q_open) (queue_t *, dev_t *, int, int, cred_t *);
@@ -2986,7 +2993,7 @@ EXPORT_SYMBOL(qopen);
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
-int
+__unlikely int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	int (*q_close) (queue_t *, int, cred_t *);
@@ -3511,7 +3518,7 @@ EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/streams/kmem.h */
  *  memory, we also want to raise pending buffer callbacks on all STREAMS scheduler threads so that
  *  they can attempt to use the memory.
  */
-void
+__hot_read void
 kmem_free(void *addr, size_t size)
 {
 	kfree(addr);
@@ -3597,7 +3604,7 @@ timeouts(struct strthread *t)
 	} while (unlikely(test_bit(strtimout, &t->flags) != 0));
 }
 
-STATIC void
+STATIC __unlikely void
 scan_timeout_function(unsigned long arg)
 {
 	struct strthread *t = this_thread;
@@ -3616,7 +3623,7 @@ struct timer_list scan_timer;
  *
  *  Note that the only queues on this list are stream head write queues.
  */
-STATIC streams_fastcall void
+STATIC streams_fastcall __unlikely void
 scanqueues(struct strthread *t)
 {
 	register struct queue *q, *q_link;
@@ -3652,7 +3659,7 @@ scanqueues(struct strthread *t)
 	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
 }
 
-void
+__unlikely void
 qscan(queue_t *q)
 {
 	struct strthread *t = this_thread;
@@ -3869,7 +3876,7 @@ bufcalls(struct strthread *t)
  *
  *  Run queue service procedures.
  */
-STATIC streams_fastcall void
+STATIC streams_fastcall __hot void
 queuerun(struct strthread *t)
 {
 	queue_t *q, *q_link;
@@ -4006,10 +4013,10 @@ freechain(mblk_t *mp, mblk_t **mpp)
  *  This is the internal softirq version of runqueues().
  */
 #if defined CONFIG_STREAMS_KTHREADS
-STATIC streams_fastcall void
+STATIC streams_fastcall __hot void
 _runqueues(void)
 #else
-STATIC void
+STATIC __hot void
 _runqueues(struct softirq_action *unused)
 #endif
 {
@@ -4078,13 +4085,13 @@ _runqueues(struct softirq_action *unused)
  *  system call.  All stream heads (regular stream head, fifo/pipe stream head, socket stream
  *  head) need this function exported so that they can be called at the end of a system call.
  */
-void
+__hot void
 runqueues(void)
 {
 #if 0
 	return;
 #else
-#if HAVE_KINC_LINUX_KTHREAD_H
+#if defined HAVE_KINC_LINUX_KTHREAD_H
 	preempt_disable();
 #endif
 	enter_streams();	/* simulate STREAMS context */
@@ -4094,7 +4101,7 @@ runqueues(void)
 	_runqueues(NULL);
 #endif
 	leave_streams();	/* go back to user context */
-#if HAVE_KINC_LINUX_KTHREAD_H
+#if defined HAVE_KINC_LINUX_KTHREAD_H
 	preempt_enable();
 	cond_resched();
 #endif
@@ -4111,7 +4118,7 @@ EXPORT_SYMBOL(runqueues);	/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC void
+STATIC __unlikely void
 clear_shinfo(struct shinfo *sh)
 {
 	struct stdata *sd = &sh->sh_stdata;
@@ -4136,13 +4143,13 @@ clear_shinfo(struct shinfo *sh)
 	INIT_LIST_HEAD(&sd->sd_list);	/* doesn't matter really */
 //      init_MUTEX(&sd->sd_mutex);
 }
-STATIC void
+STATIC __unlikely void
 shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 		clear_shinfo(obj);
 }
-struct stdata *
+__unlikely struct stdata *
 allocstr(void)
 {
 	/* TODO: this function should take a queue pair (read queue) pointer as an argument.  We
@@ -4183,7 +4190,7 @@ allocstr(void)
 
 EXPORT_SYMBOL(allocstr);	/* include/sys/streams/strsubr.h */
 
-STATIC void
+STATIC __unlikely void
 __freestr(struct stdata *sd)
 {
 	struct strinfo *si = &Strinfo[DYN_STREAM];
@@ -4200,16 +4207,9 @@ __freestr(struct stdata *sd)
 	kmem_cache_free(si->si_cache, sh);
 }
 
-void
-freestr(struct stdata *sd)
-{
-	/* FIXME: need to deallocate anything attached to the stream head */
-	ctrace(sd_put(&sd));
-}
-
 EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 
-STATIC void
+STATIC __unlikely void
 sd_free(struct stdata *sd)
 {
 	/* the last reference is gone, there should be nothing left (but a queue pair) */
@@ -4229,10 +4229,10 @@ sd_free(struct stdata *sd)
 	/* initial qget is balanced in qdetach()/qdelete() */
 	__freestr(sd);
 }
-streams_fastcall struct stdata *
+BIG_STATIC_INLINE_STH streams_fastcall __hot struct stdata *
 sd_get(struct stdata *sd)
 {
-	if (sd) {
+	if (likely(sd != NULL)) {
 		struct shinfo *sh = (struct shinfo *) sd;
 
 		assert(atomic_read(&sh->sh_refs) > 0);
@@ -4246,12 +4246,12 @@ sd_get(struct stdata *sd)
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sd_get);		/* include/sys/streams/strsubr.h */
 #endif
-streams_fastcall void
+BIG_STATIC_INLINE_STH streams_fastcall __hot void
 sd_put(struct stdata **sdp)
 {
 	struct stdata *sd;
 
-	if ((sd = xchg(sdp, NULL))) {
+	if (likely((sd = xchg(sdp, NULL)) != NULL)) {
 		struct shinfo *sh = (struct shinfo *) sd;
 
 		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
@@ -4267,6 +4267,20 @@ sd_put(struct stdata **sdp)
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL(sd_put);		/* include/sys/streams/strsubr.h */
 #endif
+
+BIG_STATIC_STH streams_fastcall __hot void
+sd_put_slow(struct stdata **sdp)
+{
+	sd_put(sdp);
+}
+
+
+__unlikely void
+freestr(struct stdata *sd)
+{
+	/* FIXME: need to deallocate anything attached to the stream head */
+	ctrace(sd_put(&sd));
+}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -4308,7 +4322,7 @@ STATIC struct cacheinfo {
 /*
  *  str_term_caches:	- terminate caches
  */
-STATIC void
+STATIC __unlikely void
 str_term_caches(void)
 {
 	int j;
@@ -4341,7 +4355,7 @@ str_term_caches(void)
  *  %DYN_MSGBLOCK - 
  *
  */
-STATIC int
+STATIC __unlikely int
 str_init_caches(void)
 {
 	int j;
@@ -4372,8 +4386,8 @@ str_init_caches(void)
 }
 
 #if defined CONFIG_STREAMS_KTHREADS
-#if HAVE_KINC_LINUX_KTHREAD_H
-static int
+#if defined HAVE_KINC_LINUX_KTHREAD_H
+static __hot int
 kstreamd(void *__bind_cpu)
 {
 #if 0
@@ -4409,7 +4423,7 @@ kstreamd(void *__bind_cpu)
 }
 
 #if defined CONFIG_HOTPLUG_CPU
-static void
+static __unlikely void
 takeover_strsched(unsigned int cpu)
 {
 	struct strthread *t = this_thread;
@@ -4499,7 +4513,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 static struct notifier_block __devinitdata str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
-static int
+static __unlikely int
 spawn_kstreamd(void)
 {
 	void *cpu = (void *) (long) smp_processor_id();
@@ -4509,7 +4523,7 @@ spawn_kstreamd(void)
 	register_cpu_notifier(&str_cpu_nfb);
 	return (0);
 }
-static void
+static __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
@@ -4528,11 +4542,11 @@ kill_kstreamd(void)
 	/* FIXME: need to clean out outstanding events now that everything is stopped */
 	return;
 }
-#else				/* HAVE_KINC_LINUX_KTHREAD_H */
-#if !HAVE_KFUNC_SET_USER_NICE
+#else				/* defined HAVE_KINC_LINUX_KTHREAD_H */
+#if !defined HAVE_KFUNC_SET_USER_NICE
 #define set_user_nice(__p, __val) (__p)->nice = (__val)
 #endif
-#if !HAVE_KFUNC_SET_CPUS_ALLOWED
+#if !defined HAVE_KFUNC_SET_CPUS_ALLOWED
 #define set_cpus_allowed(__p, __mask) (__p)->cpus_allowed = (__mask)
 #endif
 #if defined HAVE_DO_EXIT_ADDR
@@ -4541,7 +4555,7 @@ static asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
 #undef do_exit
 #define do_exit do_exit_
 #endif
-static int
+static __hot int
 kstreamd(void *__bind_cpu)
 {
 	int bind_cpu = (int) (long) __bind_cpu;
@@ -4590,7 +4604,7 @@ kstreamd(void *__bind_cpu)
 #ifndef CLONE_KERNEL
 #define CLONE_KERNEL (CLONE_FS|CLONE_FILES|CLONE_SIGNAL)
 #endif
-static int
+static __unlikely int
 spawn_kstreamd(void)
 {
 	int cpu;
@@ -4607,7 +4621,7 @@ spawn_kstreamd(void)
 	}
 	return (0);
 }
-static void
+static __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
@@ -4627,14 +4641,14 @@ kill_kstreamd(void)
 }
 #endif				/* HAVE_KINC_LINUX_KTHREAD_H */
 
-static void
+static __unlikely void
 init_strsched(void)
 {
 	spawn_kstreamd();
 	return;
 }
 
-static void
+static __unlikely void
 term_strsched(void)
 {
 	kill_kstreamd();
@@ -4644,7 +4658,7 @@ term_strsched(void)
 #else				/* defined CONFIG_STREAMS_KTHREADS */
 
 #ifndef open_softirq
-#ifdef HAVE_OPEN_SOFTIRQ_ADDR
+#if defined HAVE_OPEN_SOFTIRQ_ADDR
 /**
  *  open_softirq:   - open a soft irq kernel function
  *  @action:	    the function to invoke
@@ -4653,7 +4667,7 @@ term_strsched(void)
  *  This function is used when the kernel does not export the open_softirq() kernel function.  We
  *  hook this function to the address ripped from the kernel symbol table.
  */
-void
+__unlikely void
 open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
 	static void (*func) (int, void (*)(struct softirq_action *), void *) =
@@ -4663,14 +4677,14 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 #endif
 #endif
 
-static void
+static __unlikely void
 init_strsched(void)
 {
 	open_softirq(STREAMS_SOFTIRQ, _runqueues, NULL);
 	return;
 }
 
-static void
+static __unlikely void
 term_strsched(void)
 {
 	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
@@ -4685,7 +4699,7 @@ term_strsched(void)
  *  This is an initialization function for STREAMS scheduler items in this file.  It is invoked by
  *  the STREAMS kernel module or kernel initialization function.
  */
-BIG_STATIC int
+BIG_STATIC __unlikely int
 strsched_init(void)
 {
 	int result, i;
@@ -4735,7 +4749,7 @@ strsched_init(void)
  *  This is a termination function for the STREAMS scheduler items in this file.  It is invoked by
  *  the STREAMS kernel module or kernel termination function.
  */
-BIG_STATIC void
+BIG_STATIC __unlikely void
 strsched_exit(void)
 {
 	del_timer(&scan_timer);

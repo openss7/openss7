@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/02 11:14:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 00:27:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/11/02 11:14:00 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -105,22 +105,25 @@ MODULE_ALIAS("streams-clone");
 #error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
 #endif
 
-modID_t modid = CONFIG_STREAMS_CLONE_MODID;
+modID_t clone_modid = CONFIG_STREAMS_CLONE_MODID;
 
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 #ifndef module_param
-MODULE_PARM(modid, "h");
+MODULE_PARM(clone_modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(clone_modid, ushort, 0);
 #endif
-MODULE_PARM_DESC(modid, "Module id number for CLONE driver.");
+MODULE_PARM_DESC(clone_modid, "Module id number for CLONE driver.");
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLONE_MODID));
 MODULE_ALIAS("streams-driver-clone");
 #endif
+#endif
 
 major_t major = CONFIG_STREAMS_CLONE_MAJOR;
 
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -137,6 +140,7 @@ MODULE_ALIAS("/dev/clone");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("/dev/streams/clone");
 MODULE_ALIAS("/dev/streams/clone/*");
+#endif
 #endif
 #endif
 
@@ -275,7 +279,7 @@ cdev_open(struct inode *inode, struct file *file)
 	dev_t dev;
 	int sflag;
 
-#if HAVE_KFUNC_TO_KDEV_T
+#if defined HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else
@@ -499,7 +503,7 @@ clone_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 
 	ptrace(("%s: opening clone device\n", __FUNCTION__));
-#if HAVE_KFUNC_TO_KDEV_T
+#if defined HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else
@@ -554,7 +558,7 @@ clone_init(void)
 #else
 	printk(KERN_INFO CLONE_SPLASH);
 #endif
-	clone_minfo.mi_idnum = modid;
+	clone_minfo.mi_idnum = clone_modid;
 	if ((err = register_cmajor(&clone_cdev, major, &clone_f_ops)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
