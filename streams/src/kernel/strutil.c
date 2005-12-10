@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:56 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/09 18:01:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:56 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/09 18:01:44 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:56 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/09 18:01:44 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -286,18 +286,18 @@ krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
 #endif
 #endif
 
-static int
+STATIC int
 db_ref(dblk_t * db)
 {
 	return (db->db_ref = atomic_read(&db->db_users));
 }
-static void
+STATIC void
 db_set(dblk_t * db, int val)
 {
 	atomic_set(&db->db_users, val);
 	db_ref(db);
 }
-static void
+STATIC void
 db_inc(dblk_t * db)
 {
 	atomic_inc(&db->db_users);
@@ -305,14 +305,14 @@ db_inc(dblk_t * db)
 }
 
 #if 0
-static void
+STATIC void
 db_dec(dblk_t * db)
 {
 	atomic_dec(&db->db_users);
 	db_ref(db);
 }
 #endif
-static int
+STATIC int
 db_dec_and_test(dblk_t * db)
 {
 	int ret = atomic_dec_and_test(&db->db_users);
@@ -328,30 +328,30 @@ db_dec_and_test(dblk_t * db)
 #define databuf_offset \
 	(((unsigned char *)&((struct mdbblock *)0)->databuf[0]) - ((unsigned char *)0))
 
-static mblk_t *
+STATIC mblk_t *
 db_to_mb(dblk_t * db)
 {
 	return ((mblk_t *) ((unsigned char *) db - datablk_offset + msgblk_offset));
 }
-static unsigned char *
+STATIC unsigned char *
 db_to_buf(dblk_t * db)
 {
 	return ((unsigned char *) db - datablk_offset + databuf_offset);
 }
 
 #if 0
-static unsigned char *
+STATIC unsigned char *
 mb_to_buf(mblk_t *mb)
 {
 	return ((unsigned char *) mb - msgblk_offset + databuf_offset);
 }
 #endif
-static dblk_t *
+STATIC dblk_t *
 mb_to_db(mblk_t *mb)
 {
 	return ((dblk_t *) ((unsigned char *) mb - msgblk_offset + datablk_offset));
 }
-static struct mdbblock *
+STATIC struct mdbblock *
 mb_to_mdb(mblk_t *mb)
 {
 	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
@@ -998,7 +998,7 @@ __STRUTIL_EXTERN_INLINE queue_t *backq(queue_t *q);
 
 EXPORT_SYMBOL(backq);
 
-static struct qband *__get_qband(queue_t *q, unsigned char band);
+STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
 
 /**
  *  qbackenable: - backenable a queue
@@ -1142,7 +1142,7 @@ bcanget(queue_t *q, unsigned char band)
 
 EXPORT_SYMBOL(bcanget);		/* include/sys/streams/stream.h */
 
-static streams_fastcall int
+STATIC streams_fastcall int
 _bcanputany(queue_t *q)
 {
 	bool result;
@@ -1236,7 +1236,7 @@ EXPORT_SYMBOL(bcanputnextany);	/* include/sys/streams/stream.h */
  *
  * Find a queue band.  This must be called with the queue read or write locked.
  */
-static struct qband *
+STATIC struct qband *
 __find_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
@@ -1265,7 +1265,7 @@ __find_qband(queue_t *q, unsigned char band)
  *  necessary qband structure and leave the rest unallocated.  This needs to be documented in
  *  putq(9), putbq(9), insq(9), strqset(9) and strqget(9).
  */
-static struct qband *
+STATIC struct qband *
 __get_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
@@ -1310,14 +1310,19 @@ __get_qband(queue_t *q, unsigned char band)
  *  will enable the queue if necessary.  If it back-enables before we call putbq(9) then the service
  *  procedure will go for another run anyway.
  */
-static streams_fastcall __hot_write int
+STATIC streams_fastcall __hot_write int
 _bcanput(queue_t *q, unsigned char band)
 {
 	int result = 1;
 	unsigned long pl;
+	queue_t *q_next;
+
+	/* It might be an idea to cache the forward queue with a service procedure as Solaris does.
+	 * Solaris uses a q_nfsrv pointer for this that is adjusted when the driver is attached and
+	 * when modules are pushed or popped.  It's just so much trouble to go to... */
 
 	/* find first queue with service procedure or no q_next pointer */
-	for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
+	for (q_next = q; !q->q_qinfo->qi_srvp && (q_next = q->q_next); q = q_next) ;
 
 	pl = qrlock(q);
 
@@ -1654,7 +1659,7 @@ EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
  *  @q:		queue to schedule for service
  *
  */
-static streams_inline streams_fastcall __hot void
+STATIC streams_fastcall __hot void
 qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
@@ -1760,7 +1765,7 @@ EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 /*
  *  __putbq:
  */
-static streams_inline streams_fastcall __hot_write int
+STATIC streams_inline streams_fastcall __hot_write int
 __putbq(queue_t *q, mblk_t *mp)
 {
 	int enable = 0;
@@ -2059,7 +2064,7 @@ EXPORT_SYMBOL(putnextctl2);
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-static inline streams_fastcall __hot_write int
+STATIC streams_inline streams_fastcall __hot_write int
 __putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
@@ -2198,7 +2203,7 @@ EXPORT_SYMBOL(putq);
 /*
  *  __insq:
  */
-static streams_fastcall __hot_write int
+STATIC streams_fastcall __hot_write int
 __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int enable = 0;
@@ -2389,8 +2394,8 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 EXPORT_SYMBOL(appq);
 
-static int __setsq(queue_t *q, struct fmodsw *fmod);
-static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
+STATIC int __setsq(queue_t *q, struct fmodsw *fmod);
+STATIC void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 
 /**
  *  qalloc: - allocate and initialize a queue pair
@@ -2399,7 +2404,7 @@ static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *
  *  Allocates and initializes a queue pair for use by STREAMS.
  */
-STATIC streams_inline streams_fastcall __unlikely queue_t *
+STATIC streams_fastcall __unlikely queue_t *
 qalloc(struct stdata *sd, struct fmodsw *fmod)
 {
 	queue_t *q;
@@ -2895,7 +2900,7 @@ EXPORT_SYMBOL(RD);
  *  control restrictions, another priority band message of the same or lower priority being enqueued
  *  will not enable the queue, however, a higher priority message will.
  */
-static streams_fastcall __hot_read bool
+STATIC streams_fastcall __hot_read bool
 __rmvq(queue_t *q, mblk_t *mp)
 {
 	bool backenable = false;
@@ -3062,7 +3067,7 @@ EXPORT_SYMBOL(rmvq);
  *  freechains() task under the STREAMS scheduler.  Flushing of long chains is more efficient for
  *  %FLUSHALL than for %FLUSHDATA.
  */
-static __unlikely bool
+STATIC __unlikely bool
 __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 {
 	bool backenable = false;
@@ -3346,7 +3351,7 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
  *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
  *  no message on the queue.
  */
-static streams_inline streams_fastcall __hot_read mblk_t *
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
 __getq(queue_t *q, bool *be)
 {
 	mblk_t *mp;
@@ -3510,7 +3515,7 @@ EXPORT_SYMBOL(SAMESTR);
 /*
  *  __setq:
  */
-static __unlikely void
+STATIC __unlikely void
 __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	q->q_qinfo = rinit;
@@ -3586,7 +3591,7 @@ struct syncq *global_syncq = NULL;
  *  independent of this function.  Although this function could allocate synchronization queues for
  *  the SQLVL_MODULE case, to avoid races it should only be performed in the registration functions.
  */
-static __unlikely int
+STATIC __unlikely int
 __setsq(queue_t *q, struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
@@ -3917,8 +3922,8 @@ strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 
 EXPORT_SYMBOL(strqset);
 
-static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
-static char str_err_buf[LOGMSGSZ];
+STATIC spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
+STATIC char str_err_buf[LOGMSGSZ];
 
 /*
  *  This is a default implementation for strlog(9).  When SL_CONSOLE is set, we print directly to
@@ -3928,7 +3933,7 @@ static char str_err_buf[LOGMSGSZ];
  *  SL_CONSOLE messages are printed to the system logs.  This follows the rules for setting the
  *  priority according described in log(4).
  */
-static __unlikely int
+STATIC __unlikely int
 vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	int rval = 1;
@@ -3963,8 +3968,8 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 	return (rval);
 }
 
-static rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
-static vstrlog_t vstrlog_hook = &vstrlog_default;
+STATIC rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
+STATIC vstrlog_t vstrlog_hook = &vstrlog_default;
 
 /**
  *  register_strlog:	- register a new STREAMS logger

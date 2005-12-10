@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/09 00:27:56 $
+ @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/09 18:01:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:44 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -118,7 +118,7 @@ BIG_STATIC int sysctl_str_max_mblk;	/* max of headers on free list */
 BIG_STATIC int sysctl_str_msg_priority;	/* observer message allocation priority */
 
 /* initialization for main */
-extern int strsysctl_init(void);
-extern void strsysctl_exit(void);
+BIG_STATIC int strsysctl_init(void);
+BIG_STATIC void strsysctl_exit(void);
 
 #endif				/* __LOCAL_STRSYSCTL_H__ */

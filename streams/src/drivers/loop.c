@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:41 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:41 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/11/26 08:40:18 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:41 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -165,7 +165,7 @@ typedef struct loop {
 STATIC struct loop *loop_opens = NULL;
 STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
 
-STATIC int
+STATIC streams_fastcall int
 loop_wput(queue_t *q, mblk_t *mp)
 {
 	struct loop *p = q->q_ptr, *o;
@@ -302,7 +302,7 @@ loop_wput(queue_t *q, mblk_t *mp)
  *  the other read queue.  When flow control subsides, the read service procedure on the othe STREAM
  *  will explicitly enable us.
  */
-STATIC int
+STATIC streams_fastcall int
 loop_wsrv(queue_t *q)
 {
 	struct loop *p = q->q_ptr;
@@ -335,7 +335,7 @@ loop_wsrv(queue_t *q)
  *  message to tbe put (back) to the other STREAM's write queue so the driver needs to explicitly
  *  enable that write queue now.
  */
-STATIC int
+STATIC streams_fastcall int
 loop_rsrv(queue_t *q)
 {
 	struct loop *p = q->q_ptr;

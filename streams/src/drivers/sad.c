@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/26 08:40:18 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/26 08:40:18 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/26 08:40:18 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/11/26 08:40:18 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -157,7 +157,7 @@ struct sad {
 	struct str_list sl;
 } sads[2];
 
-static int
+static streams_fastcall int
 sad_put(queue_t *q, mblk_t *mp)
 {
 	struct sad *sad = q->q_ptr;

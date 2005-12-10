@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/09 00:27:56 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/09 18:01:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/09 00:27:56 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/09 18:01:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/09 00:27:56 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/09 18:01:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -102,9 +102,9 @@ EXPORT_SYMBOL(sysctl_str_strctlsz);
 EXPORT_SYMBOL(sysctl_str_nstrpush);
 #endif
 
-static struct ctl_table_header *streams_sysctl_handle;
+STATIC struct ctl_table_header *streams_sysctl_handle;
 
-static ctl_table streams_table[] = {
+STATIC ctl_table streams_table[] = {
 	/* stream head default maximum packet size */
 	{STREAMS_MAXPSZ, "maxpsz",
 	 &sysctl_str_maxpsz, sizeof(ulong), 0644, NULL,
@@ -188,12 +188,12 @@ static ctl_table streams_table[] = {
 	{0}
 };
 
-static ctl_table streams_root_table[] = {
+STATIC ctl_table streams_root_table[] = {
 	{CTL_STREAMS, "streams", NULL, 0, 0555, streams_table},
 	{0}
 };
 
-int
+BIG_STATIC int
 strsysctl_init(void)
 {
 	sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
@@ -205,7 +205,7 @@ strsysctl_init(void)
 	return (-EIO);
 }
 
-void
+BIG_STATIC void
 strsysctl_exit(void)
 {
 	unregister_sysctl_table(xchg(&streams_sysctl_handle, NULL));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/26 08:40:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/11/26 08:40:18 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -156,7 +156,7 @@ typedef struct spx {
 static spinlock_t spx_lock = SPIN_LOCK_UNLOCKED;
 static struct spx *spx_list = NULL;
 
-static int
+static streams_fastcall int
 spx_rput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -173,7 +173,7 @@ spx_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+static streams_fastcall int
 spx_wput(queue_t *q, mblk_t *mp)
 {
 	struct spx *p = q->q_ptr;

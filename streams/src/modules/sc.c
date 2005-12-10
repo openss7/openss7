@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 18:01:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/02 12:05:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 18:01:47 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 18:01:47 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/02 12:05:18 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 18:01:47 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -141,7 +141,7 @@ static struct module_info sc_minfo = {
  *  
  *  -------------------------------------------------------------------------
  */
-static int
+static streams_fastcall int
 sc_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc;
@@ -368,7 +368,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
-static int
+static streams_fastcall int
 sc_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);

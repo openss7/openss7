@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/09 18:01:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/05 22:49:05 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/09 18:01:43 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/05 22:49:05 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/09 18:01:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,9 +85,9 @@ extern struct proc_dir_entry *proc_str;
 #undef snprintf
 #define snprintf safe_snprintf
 
-static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
+STATIC int snprintf(char *buf, ssize_t size, const char *fmt, ...)
     __attribute__ ((format(printf, 3, 4)));
-static int
+STATIC int
 snprintf(char *buf, ssize_t size, const char *fmt, ...)
 {
 	int count = 0;
@@ -103,7 +103,7 @@ snprintf(char *buf, ssize_t size, const char *fmt, ...)
 }
 
 #if 0
-static int
+STATIC int
 get_streams_driver(char *page, ssize_t maxlen, struct cdevsw *d)
 {
 	int len = 0;
@@ -115,7 +115,7 @@ get_streams_driver(char *page, ssize_t maxlen, struct cdevsw *d)
 }
 
 /* called by proc file system to list the registered STREAMS devices */
-static int
+STATIC int
 get_streams_drivers_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -153,7 +153,7 @@ get_streams_drivers_list(char *page, char **start, off_t offset, int length)
 	return (len);
 }
 
-static int
+STATIC int
 get_streams_module(char *page, ssize_t maxlen, struct cdevsw *d)
 {
 	int len = 0;
@@ -165,7 +165,7 @@ get_streams_module(char *page, ssize_t maxlen, struct cdevsw *d)
 }
 
 /* called by proc file system to list the registered STREAMS modules */
-static int
+STATIC int
 get_streams_modules_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -204,7 +204,7 @@ get_streams_modules_list(char *page, char **start, off_t offset, int length)
 }
 #endif
 
-static int
+STATIC int
 get_streams_module_info_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -218,7 +218,7 @@ get_streams_module_info_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", mi_lowat");
 	return (len);
 }
-static int
+STATIC int
 get_streams_module_info(char *page, ssize_t maxlen, struct module_info *mi)
 {
 	int len = 0;
@@ -235,7 +235,7 @@ get_streams_module_info(char *page, ssize_t maxlen, struct module_info *mi)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_module_stat_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -251,7 +251,7 @@ get_streams_module_stat_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", ms_flags");
 	return (len);
 }
-static int
+STATIC int
 get_streams_module_stat(char *page, ssize_t maxlen, struct module_stat *ms)
 {
 	int len = 0;
@@ -270,7 +270,7 @@ get_streams_module_stat(char *page, ssize_t maxlen, struct module_stat *ms)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_qinit_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -288,7 +288,7 @@ get_streams_qinit_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_qinit(char *page, ssize_t maxlen, struct qinit *qi)
 {
 	int len = 0;
@@ -309,7 +309,7 @@ get_streams_qinit(char *page, ssize_t maxlen, struct qinit *qi)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -326,7 +326,7 @@ get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamtab *st)
 {
 	int len = 0;
@@ -346,7 +346,7 @@ get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamtab *st)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_strapush_list_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -354,7 +354,7 @@ get_streams_strapush_list_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sap [, sap]");
 	return (len);
 }
-static int
+STATIC int
 get_streams_strapush_list(char *page, ssize_t maxlen, struct list_head *list)
 {
 	int len = 0;
@@ -369,7 +369,7 @@ get_streams_strapush_list(char *page, ssize_t maxlen, struct list_head *list)
 	}
 	return (len);
 }
-static int
+STATIC int
 get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -393,7 +393,7 @@ get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 {
 	int len = 0;
@@ -422,7 +422,7 @@ get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 }
 
 /* called by proc file system to list the registered STREAMS devices */
-static int
+STATIC int
 get_streams_cdevsw_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -460,7 +460,7 @@ get_streams_cdevsw_list(char *page, char **start, off_t offset, int length)
 	return (len);
 }
 
-static int
+STATIC int
 get_streams_streamtab_mod_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -473,7 +473,7 @@ get_streams_streamtab_mod_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_streamtab_mod(char *page, ssize_t maxlen, struct streamtab *st)
 {
 	int len = 0;
@@ -489,7 +489,7 @@ get_streams_streamtab_mod(char *page, ssize_t maxlen, struct streamtab *st)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -506,7 +506,7 @@ get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", f_kmod");
 	return (len);
 }
-static int
+STATIC int
 get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 {
 	int len = 0;
@@ -528,7 +528,7 @@ get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 }
 
 /* called by proc file system to list the registered STREAMS modules */
-static int
+STATIC int
 get_streams_fmodsw_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -566,7 +566,7 @@ get_streams_fmodsw_list(char *page, char **start, off_t offset, int length)
 	return (len);
 }
 
-static char *dyn_name[DYN_SIZE] = {
+STATIC char *dyn_name[DYN_SIZE] = {
 	"DYN_STREAM:",
 	"DYN_QUEUE:",
 	"DYN_MSGBLOCK:",
@@ -583,7 +583,7 @@ static char *dyn_name[DYN_SIZE] = {
 };
 
 /* list the strinfo structure counts */
-static int
+STATIC int
 get_streams_strinfo_data(char *page, ssize_t maxlen)
 {
 	int j, len = 0;
@@ -595,7 +595,7 @@ get_streams_strinfo_data(char *page, ssize_t maxlen)
 				atomic_read(&Strinfo[j].si_cnt), Strinfo[j].si_hwl);
 	return len;
 }
-static int
+STATIC int
 get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len;
@@ -616,7 +616,7 @@ get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
 }
 
 #if defined CONFIG_STREAMS_DEBUG
-static int
+STATIC int
 get_streams_stdata_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -663,7 +663,7 @@ get_streams_stdata_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_linkblk");
 	return (len);
 }
-static int
+STATIC int
 get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 {
 	int len = 0;
@@ -713,7 +713,7 @@ get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_shinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -724,7 +724,7 @@ get_streams_shinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_shinfo_data(char *page, ssize_t maxlen, struct shinfo *sh)
 {
 	int len = 0;
@@ -740,7 +740,7 @@ get_streams_shinfo_data(char *page, ssize_t maxlen, struct shinfo *sh)
 }
 
 /* list stream head information for allocated streams */
-static int
+STATIC int
 get_streams_shinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -777,7 +777,7 @@ get_streams_shinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_queue_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -802,7 +802,7 @@ get_streams_queue_hdr(char *page, ssize_t maxlen)
 	// len += snprintf(page + len, maxlen - len, ", q_iflags");
 	return (len);
 }
-static int
+STATIC int
 get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
 {
 	int len = 0;
@@ -830,7 +830,7 @@ get_streams_queue(char *page, ssize_t maxlen, queue_t *q)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_queinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -847,7 +847,7 @@ get_streams_queinfo_data_hdr(char *page, ssize_t maxlen)
 	// len += snprintf(page + len, maxlen - len, ", qu_nest");
 	return (len);
 }
-static int
+STATIC int
 get_streams_queinfo_data(char *page, ssize_t maxlen, struct queinfo *qu)
 {
 	int len = 0;
@@ -869,7 +869,7 @@ get_streams_queinfo_data(char *page, ssize_t maxlen, struct queinfo *qu)
 }
 
 /* list stream head information for allocated queues */
-static int
+STATIC int
 get_streams_queinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -906,7 +906,7 @@ get_streams_queinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_msgb_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -926,7 +926,7 @@ get_streams_msgb_hdr(char *page, ssize_t maxlen)
 #endif
 	return (len);
 }
-static int
+STATIC int
 get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
 {
 	int len = 0;
@@ -949,7 +949,7 @@ get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_mbinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -961,7 +961,7 @@ get_streams_mbinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", m_queue");
 	return (len);
 }
-static int
+STATIC int
 get_streams_mbinfo_data(char *page, ssize_t maxlen, struct mbinfo *m)
 {
 	int len = 0;
@@ -978,7 +978,7 @@ get_streams_mbinfo_data(char *page, ssize_t maxlen, struct mbinfo *m)
 }
 
 /* list stream head information for allocated message blocks */
-static int
+STATIC int
 get_streams_mbinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -1015,7 +1015,7 @@ get_streams_mbinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_datab_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1031,7 +1031,7 @@ get_streams_datab_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", db_users");
 	return (len);
 }
-static int
+STATIC int
 get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
 {
 	int len = 0;
@@ -1050,7 +1050,7 @@ get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_dbinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1061,7 +1061,7 @@ get_streams_dbinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_dbinfo_data(char *page, ssize_t maxlen, struct dbinfo *db)
 {
 	int len = 0;
@@ -1077,7 +1077,7 @@ get_streams_dbinfo_data(char *page, ssize_t maxlen, struct dbinfo *db)
 }
 
 /* list stream head information for allocated data blocks */
-static int
+STATIC int
 get_streams_dbinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -1114,7 +1114,7 @@ get_streams_dbinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_linkblk_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1125,7 +1125,7 @@ get_streams_linkblk_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", l_index");
 	return (len);
 }
-static int
+STATIC int
 get_streams_linkblk(char *page, ssize_t maxlen, struct linkblk *l)
 {
 	int len = 0;
@@ -1139,7 +1139,7 @@ get_streams_linkblk(char *page, ssize_t maxlen, struct linkblk *l)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_linkinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1150,7 +1150,7 @@ get_streams_linkinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_linkinfo_data(char *page, ssize_t maxlen, struct linkinfo *li)
 {
 	int len = 0;
@@ -1166,7 +1166,7 @@ get_streams_linkinfo_data(char *page, ssize_t maxlen, struct linkinfo *li)
 }
 
 /* list stream head information for allocated link blocks */
-static int
+STATIC int
 get_streams_linkinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -1203,7 +1203,7 @@ get_streams_linkinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_strevent_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1224,7 +1224,7 @@ get_streams_strevent_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", se_seq");
 	return (len);
 }
-static int
+STATIC int
 get_streams_strevent(char *page, ssize_t maxlen, int type, struct strevent *se)
 {
 	int len = 0;
@@ -1253,7 +1253,7 @@ get_streams_strevent(char *page, ssize_t maxlen, int type, struct strevent *se)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_seinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1265,7 +1265,7 @@ get_streams_seinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", s_queue");
 	return (len);
 }
-static int
+STATIC int
 get_streams_seinfo_data(char *page, ssize_t maxlen, struct seinfo *s)
 {
 	int len = 0;
@@ -1282,7 +1282,7 @@ get_streams_seinfo_data(char *page, ssize_t maxlen, struct seinfo *s)
 }
 
 /* list stream head information for allocated strevents */
-static int
+STATIC int
 get_streams_seinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -1319,7 +1319,7 @@ get_streams_seinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_qband_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1336,7 +1336,7 @@ get_streams_qband_hdr(char *page, ssize_t maxlen)
 	// len += snprintf(page + len, maxlen - len, ", qb_band");
 	return (len);
 }
-static int
+STATIC int
 get_streams_qband(char *page, ssize_t maxlen, struct qband *qb)
 {
 	int len = 0;
@@ -1356,7 +1356,7 @@ get_streams_qband(char *page, ssize_t maxlen, struct qband *qb)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_qbinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1367,7 +1367,7 @@ get_streams_qbinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }, qbi_refs");
 	return (len);
 }
-static int
+STATIC int
 get_streams_qbinfo_data(char *page, ssize_t maxlen, struct qbinfo *qbi)
 {
 	int len = 0;
@@ -1383,7 +1383,7 @@ get_streams_qbinfo_data(char *page, ssize_t maxlen, struct qbinfo *qbi)
 }
 
 /* list stream head information for allocated qbands */
-static int
+STATIC int
 get_streams_qbinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;
@@ -1420,7 +1420,7 @@ get_streams_qbinfo_list(char *page, char **start, off_t offset, int length)
 	return len;
 }
 
-static int
+STATIC int
 get_streams_strapush_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1435,7 +1435,7 @@ get_streams_strapush_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_strapush(char *page, ssize_t maxlen, struct strapush *sap)
 {
 	int i, len = 0;
@@ -1455,7 +1455,7 @@ get_streams_strapush(char *page, ssize_t maxlen, struct strapush *sap)
       done:
 	return (len);
 }
-static int
+STATIC int
 get_streams_apinfo_data_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1466,7 +1466,7 @@ get_streams_apinfo_data_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
-static int
+STATIC int
 get_streams_apinfo_data(char *page, ssize_t maxlen, struct apinfo *api)
 {
 	int len = 0;
@@ -1482,7 +1482,7 @@ get_streams_apinfo_data(char *page, ssize_t maxlen, struct apinfo *api)
 }
 
 /* list stream head information for allocate strapush structures */
-static int
+STATIC int
 get_streams_apinfo_list(char *page, char **start, off_t offset, int length)
 {
 	int len = 0;

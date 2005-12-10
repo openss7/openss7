@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/09 00:27:55 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/09 18:01:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:55 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/09 00:27:55 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/09 18:01:43 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/09 00:27:55 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/09 18:01:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -126,7 +126,7 @@ __raise_streams(void)
 	wake_up_process(t->proc);
 }
 
-static streams_fastcall __hot void
+STATIC streams_fastcall __hot void
 cpu_raise_streams(unsigned int cpu)
 {
 	struct strthread *t = &strthreads[cpu];
@@ -164,7 +164,7 @@ __raise_streams(void)
 #endif
 #endif
 
-static streams_fastcall __hot void
+STATIC streams_fastcall __hot void
 cpu_raise_streams(unsigned int cpu)
 {
 	cpu_raise_softirq(cpu, STREAMS_SOFTIRQ);
@@ -675,7 +675,7 @@ __freeq(queue_t *rq)
  *  of doing freechain here we actually free each message.  (freechain() now frees blocks
  *  immediately.)
  */
-STATIC streams_inline streams_fastcall void
+STATIC streams_fastcall void
 freeq_fast(queue_t *rq)
 {
 	queue_t *wq = rq + 1;
@@ -997,7 +997,7 @@ mdbblock_free(mblk_t *mp)
 	return;
 }
 #else
-BIG_STATIC streams_fastcall inline __hot_read void
+BIG_STATIC_INLINE streams_fastcall __hot_read void
 mdbblock_free(mblk_t *mp)
 {
 	/* The old approach didn't run too fast.  We might as well free them back to the memory
@@ -1387,7 +1387,7 @@ EXPORT_SYMBOL(sefree);		/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_inline streams_fastcall void
+STATIC streams_fastcall void
 strsched_mfunc_fast(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
@@ -1429,7 +1429,7 @@ strsched_mfunc(mblk_t *mp)
  *   scheduler threads.  Process context threads exiting the outer perimeter will pass the
  *   synchronization queue back to the STREAMS scheduler for backlog processing.
  */
-static streams_fastcall long
+STATIC streams_fastcall long
 strsched_event(struct strevent *se)
 {
 	long id;
@@ -1451,7 +1451,7 @@ strsched_event(struct strevent *se)
  * kmem_free() frees memory of @size or greater, it sets the flag to run buffer callbacks and wakes
  * the scheduler thread.
  */
-static streams_fastcall long
+STATIC streams_fastcall long
 strsched_bufcall(struct strevent *se)
 {
 	long id;
@@ -1501,7 +1501,7 @@ timeout_function(unsigned long arg)
  * strsched_timeout:	- schedule a timer for the STREAMS scheduler
  * @se:			the timer to schedule
  */
-static streams_inline streams_fastcall long
+STATIC streams_fastcall long
 strsched_timeout(struct strevent *se)
 {
 	long id;
@@ -1514,7 +1514,7 @@ strsched_timeout(struct strevent *se)
 }
 
 #if 0
-static streams_inline streams_fastcall long
+STATIC streams_fastcall long
 defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 {
 	long id = 0;
@@ -1528,7 +1528,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	return (id);
 }
 #endif
-static streams_inline streams_fastcall long
+STATIC streams_fastcall long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long), long arg)
 {
 	long id = 0;
@@ -1543,7 +1543,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long)
 	}
 	return (id);
 }
-static streams_inline streams_fastcall long
+STATIC streams_fastcall long
 defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
 		    int cpu)
 {
@@ -1561,7 +1561,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	}
 	return (id);
 }
-static streams_inline streams_fastcall long
+STATIC streams_fastcall long
 defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		  weld_arg_t arg, queue_t *q)
 {
@@ -1580,7 +1580,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	}
 	return (id);
 }
-static streams_inline streams_fastcall long
+STATIC streams_fastcall long
 defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		    weld_arg_t arg, queue_t *q)
 {
@@ -1734,7 +1734,7 @@ EXPORT_SYMBOL(untimeout);	/* include/sys/streams/stream.h */
  *
  *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
-static streams_inline streams_fastcall int
+STATIC streams_fastcall int
 __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	weld_arg_t arg, queue_t *protq)
 {
@@ -1753,7 +1753,7 @@ __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  *
  *  Issues the STREAMS event necessary to unweld two queue pairs apart with synchronization.
  */
-static streams_inline streams_fastcall int
+STATIC streams_fastcall int
 __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	  weld_arg_t arg, queue_t *protq)
 {
@@ -1892,7 +1892,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
  *  - strfunc() returns void
  *  - strfunc() does not perform any synchronization
  */
-STATIC streams_inline streams_fastcall void
+STATIC streams_fastcall void
 strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	queue_t *qold;
@@ -1929,7 +1929,7 @@ strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
  *  qwakeup:	- wake waiters on a queue pair
  *  @q:		one queue of the queue pair to wake
  */
-STATIC streams_fastcall __hot void
+STATIC streams_inline streams_fastcall __hot void
 qwakeup(queue_t *q)
 {
 	struct queinfo *qu = ((struct queinfo *) RD(q));
@@ -1968,8 +1968,8 @@ freezechk(queue_t *q)
  *  - putp() returns the integer result from the modules put procedure.
  *  - putp() does not perform any synchronization
  */
-STATIC inline streams_fastcall __hot_write void
-putp_fast(queue_t *q, mblk_t *mp)
+STATIC streams_inline streams_fastcall __hot_write void
+putp_fast(struct strthread *t, queue_t *q, mblk_t *mp)
 {
 	queue_t *qold;
 
@@ -1984,9 +1984,9 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* procs can't be turned off */
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
-		qold = xchg(&this_thread->currentq, q);
+		qold = xchg(&t->currentq, q);
 		(void) q->q_qinfo->qi_putp(q, mp);
-		this_thread->currentq = qold;
+		t->currentq = qold;
 		qwakeup(q);
 #ifdef CONFIG_SMP
 	} else {
@@ -1998,7 +1998,9 @@ putp_fast(queue_t *q, mblk_t *mp)
 STATIC void
 putp(queue_t *q, mblk_t *mp)
 {
-	putp_fast(q, mp);
+	struct strthread *t = this_thread;
+	__builtin_prefetch(t,1,3);
+	putp_fast(t, q, mp);
 }
 
 /**
@@ -2035,7 +2037,7 @@ putp(queue_t *q, mblk_t *mp)
  *  kernel.
  */
 #if 0
-STATIC streams_inline streams_fastcall void
+STATIC streams_fastcall void
 srvp_fast(queue_t *q)
 {
 	dassert(q);
@@ -2104,9 +2106,10 @@ srvp_fast(queue_t *q)
 	ctrace(qput(&q));	/* cancel qget from qschedule */
 }
 #else
-STATIC inline streams_fastcall __hot void
-srvp_fast(queue_t *q)
+STATIC streams_inline streams_fastcall __hot void
+srvp_fast(struct strthread *t, queue_t *q)
 {
+	__builtin_prefetch(t,1,3);
 	dassert(q);
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
 
@@ -2125,13 +2128,13 @@ srvp_fast(queue_t *q)
 #endif
 			queue_t *qold;
 
-			qold = xchg(&this_thread->currentq, q);
+			qold = xchg(&t->currentq, q);
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
 			(void) q->q_qinfo->qi_srvp(q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
-			this_thread->currentq = qold;
+			t->currentq = qold;
 #ifdef CONFIG_SMP
 		}
 		prunlock(sd);
@@ -2144,9 +2147,9 @@ srvp_fast(queue_t *q)
 
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
-srvp(queue_t *q)
+srvp(struct strthread *t, queue_t *q)
 {
-	srvp_fast(q);
+	srvp_fast(t, q);
 }
 #endif
 
@@ -2627,7 +2630,7 @@ leave_syncq(struct syncq_cookie *sc)
  *  existing queue.
  *
  */
-STATIC streams_inline streams_fastcall void
+STATIC streams_fastcall void
 qstrwrit_fast(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2661,7 +2664,7 @@ qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
  *  instead of the queue's put procedure.  qstrfunc() events always need a valid queue reference
  *  against which to synchronize.
  */
-STATIC streams_inline streams_fastcall void
+STATIC streams_fastcall void
 qstrfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2700,8 +2703,8 @@ qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-STATIC streams_inline streams_fastcall void
-qputp(queue_t *q, mblk_t *mp)
+STATIC streams_fastcall void
+qputp(struct strthread *t, queue_t *q, mblk_t *mp)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
@@ -2709,19 +2712,21 @@ qputp(queue_t *q, mblk_t *mp)
 
 		if (unlikely(enter_inner_syncq_putp(sc) == 0))
 			return;
-		putp(q, mp);
+		putp_fast(t, q, mp);
 		leave_syncq(sc);
 		return;
 	}
 #endif
-	ctrace(putp(q, mp));
+	ctrace(putp_fast(t, q, mp));
 	trace();
 }
 
 STATIC void
 qputp_slow(queue_t *q, mblk_t *mp)
 {
-	qputp(q, mp);
+	struct strthread *t = this_thread;
+	__builtin_prefetch(t,1,3);
+	qputp(t, q, mp);
 }
 
 /**
@@ -2767,6 +2772,8 @@ qputp_slow(queue_t *q, mblk_t *mp)
 streams_fastcall __hot_write void
 put(queue_t *q, mblk_t *mp)
 {
+	struct strthread *t = this_thread;
+
 	dassert(mp);
 	dassert(q);
 	dassert(q->q_qinfo);
@@ -2789,6 +2796,7 @@ put(queue_t *q, mblk_t *mp)
 			prlock(sd);
 		}
 #endif
+		__builtin_prefetch(t,1,3);
 
 		if (unlikely(q->q_ftmsg != NULL)) {
 			/* This AIX message filtering thing is really bad for performance when done 
@@ -2805,9 +2813,9 @@ put(queue_t *q, mblk_t *mp)
 			}
 		}
 #ifdef CONFIG_STREAMS_SYNCQS
-		ctrace(qputp(q, mp));
+		ctrace(qputp(t, q, mp));
 #else
-		putp_fast(q, mp);
+		putp_fast(t, q, mp);
 #endif
 	      done:
 #ifdef CONFIG_SMP
@@ -2876,6 +2884,10 @@ EXPORT_SYMBOL(put);
 streams_fastcall __hot_write void
 putnext(queue_t *q, mblk_t *mp)
 {
+	struct strthread *t = this_thread;
+
+	__builtin_prefetch(t,1,3);
+
 	dassert(mp);
 	dassert(q);
 	dassert(q->q_next);
@@ -2892,9 +2904,9 @@ putnext(queue_t *q, mblk_t *mp)
 	}
 #endif
 #ifdef CONFIG_STREAMS_SYNCQS
-	ctrace(qputp(q->q_next, mp));
+	ctrace(qputp(t, q->q_next, mp));
 #else
-	putp_fast(q->q_next, mp);
+	putp_fast(t, q->q_next, mp);
 #endif
 #ifdef CONFIG_SMP
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
@@ -2927,19 +2939,19 @@ EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
  *  will block until it can enter the barrier.  If this function is called from interrupt context
  *  (soft or hard irq) the event will be deferred and the thread will return.
  */
-STATIC streams_inline streams_fastcall void
-qsrvp(queue_t *q)
+STATIC streams_fastcall void
+qsrvp(struct strthread *t, queue_t *q)
 {
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
 
 		if (unlikely(enter_inner_syncq_srvp(sc) == 0))
 			return;
-		srvp(q);
+		srvp(t, q);
 		leave_syncq(sc);
 		return;
 	}
-	srvp(q);
+	srvp(t, q);
 }
 #endif
 
@@ -3109,9 +3121,9 @@ sq_doput_synced(mblk_t *mp)
 }
 
 STATIC void
-sq_dosrv_synced(queue_t *q)
+sq_dosrv_synced(struct strthread *t, queue_t *q)
 {
-	srvp(q);
+	srvp(t, q);
 }
 
 /*
@@ -3769,13 +3781,16 @@ runsyncq(struct syncq *sq)
 		}
 		{
 			register queue_t *q, *q_link;
+			struct strthread *t = this_thread;
+
+			__builtin_prefetch(t,1,3);
 
 			/* process queue service */
 			while ((q_link = xchg(&sq->sq_qhead, NULL))) {	/* MP-SAFE */
 				sq->sq_qtail = &sq->sq_qhead;
 				while ((q = q_link)) {
 					q_link = xchg(&q->q_link, NULL);
-					sq_dosrv_synced(q);
+					sq_dosrv_synced(t, q);
 				}
 			}
 		}
@@ -3876,7 +3891,7 @@ bufcalls(struct strthread *t)
  *
  *  Run queue service procedures.
  */
-STATIC streams_fastcall __hot void
+STATIC streams_inline streams_fastcall __hot void
 queuerun(struct strthread *t)
 {
 	queue_t *q, *q_link;
@@ -3888,11 +3903,13 @@ queuerun(struct strthread *t)
 			while ((q = q_link)) {
 				q_link = xchg(&q->q_link, NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
-				qsrvp(q);
+				qsrvp(t, q);
 #else
-				srvp_fast(q);
+				srvp_fast(t, q);
 #endif
+				__builtin_prefetch(q->q_link,1,1);
 			}
+			__builtin_prefetch(t->qhead,1,1);
 		}
 	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
 }
@@ -4387,7 +4404,7 @@ str_init_caches(void)
 
 #if defined CONFIG_STREAMS_KTHREADS
 #if defined HAVE_KINC_LINUX_KTHREAD_H
-static __hot int
+STATIC __hot int
 kstreamd(void *__bind_cpu)
 {
 #if 0
@@ -4423,7 +4440,7 @@ kstreamd(void *__bind_cpu)
 }
 
 #if defined CONFIG_HOTPLUG_CPU
-static __unlikely void
+STATIC __unlikely void
 takeover_strsched(unsigned int cpu)
 {
 	struct strthread *t = this_thread;
@@ -4479,7 +4496,7 @@ takeover_strsched(unsigned int cpu)
 	local_irq_restore(flags);
 }
 #endif				/* defined CONFIG_HOTPLUG_CPU */
-static int __devinit
+STATIC int __devinit
 str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 {
 	int hotcpu = (unsigned long) hcpu;
@@ -4510,10 +4527,10 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	}
 	return (NOTIFY_OK);
 }
-static struct notifier_block __devinitdata str_cpu_nfb = {
+STATIC struct notifier_block __devinitdata str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
-static __unlikely int
+STATIC __unlikely int
 spawn_kstreamd(void)
 {
 	void *cpu = (void *) (long) smp_processor_id();
@@ -4523,7 +4540,7 @@ spawn_kstreamd(void)
 	register_cpu_notifier(&str_cpu_nfb);
 	return (0);
 }
-static __unlikely void
+STATIC __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
@@ -4550,12 +4567,12 @@ kill_kstreamd(void)
 #define set_cpus_allowed(__p, __mask) (__p)->cpus_allowed = (__mask)
 #endif
 #if defined HAVE_DO_EXIT_ADDR
-static asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
+STATIC asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
     = (typeof(do_exit_)) HAVE_DO_EXIT_ADDR;
 #undef do_exit
 #define do_exit do_exit_
 #endif
-static __hot int
+STATIC __hot int
 kstreamd(void *__bind_cpu)
 {
 	int bind_cpu = (int) (long) __bind_cpu;
@@ -4583,6 +4600,7 @@ kstreamd(void *__bind_cpu)
 			do_exit(0);
 		if (!(t->flags & (QRUNFLAGS))) {
 			schedule();
+			__builtin_prefetch(t,1,3);
 			if (signal_pending(current)
 			    && sigismember(&current->pending.signal, SIGKILL))
 				break;
@@ -4591,6 +4609,7 @@ kstreamd(void *__bind_cpu)
 		_runqueues();
 		if (current->need_resched)
 			schedule();
+		__builtin_prefetch(t,1,3);
 		if (signal_pending(current)
 		    && sigismember(&current->pending.signal, SIGKILL))
 			break;
@@ -4604,7 +4623,7 @@ kstreamd(void *__bind_cpu)
 #ifndef CLONE_KERNEL
 #define CLONE_KERNEL (CLONE_FS|CLONE_FILES|CLONE_SIGNAL)
 #endif
-static __unlikely int
+STATIC __unlikely int
 spawn_kstreamd(void)
 {
 	int cpu;
@@ -4621,7 +4640,7 @@ spawn_kstreamd(void)
 	}
 	return (0);
 }
-static __unlikely void
+STATIC __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
@@ -4641,14 +4660,14 @@ kill_kstreamd(void)
 }
 #endif				/* HAVE_KINC_LINUX_KTHREAD_H */
 
-static __unlikely void
+STATIC __unlikely void
 init_strsched(void)
 {
 	spawn_kstreamd();
 	return;
 }
 
-static __unlikely void
+STATIC __unlikely void
 term_strsched(void)
 {
 	kill_kstreamd();
@@ -4677,14 +4696,14 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 #endif
 #endif
 
-static __unlikely void
+STATIC __unlikely void
 init_strsched(void)
 {
 	open_softirq(STREAMS_SOFTIRQ, _runqueues, NULL);
 	return;
 }
 
-static __unlikely void
+STATIC __unlikely void
 term_strsched(void)
 {
 	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);

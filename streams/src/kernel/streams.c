@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 0.9.2.3  2005/12/09 18:01:43  brian
+ - profiling copy
+
  Revision 0.9.2.2  2005/12/09 00:27:54  brian
  - updates to clock 95% on FC4
 
@@ -63,34 +66,34 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:43 $"
 
-static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/09 00:27:54 $";
+static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:43 $";
 
 /* can we just include these into one big compilation unit? */
 
 #define BIG_COMPILE 1
-#define BIG_STATIC static
-#define BIG_STATIC_INLINE static streams_inline
+#define BIG_STATIC STATIC
+#define BIG_STATIC_INLINE STATIC streams_inline
 
 #ifdef CONFIG_STREAMS_STH
-#define BIG_STATIC_STH static
-#define BIG_STATIC_INLINE_STH static streams_inline
+#define BIG_STATIC_STH STATIC
+#define BIG_STATIC_INLINE_STH STATIC streams_inline
 #else
 #define BIG_STATIC_STH
 #define BIG_STATIC_INLINE_STH
 #endif
 
 #ifdef CONFIG_STREAMS_CLONE
-#define BIG_STATIC_CLONE static
-#define BIG_STATIC_INLINE_CLONE static streams_inline
+#define BIG_STATIC_CLONE STATIC
+#define BIG_STATIC_INLINE_CLONE STATIC streams_inline
 #else
 #define BIG_STATIC_CLONE
 #define BIG_STATIC_INLINE_CLONE
 #endif
 
-#define __STRSCHD_EXTERN_INLINE inline
-#define __STRUTIL_EXTERN_INLINE inline
+#define __STRSCHD_EXTERN_INLINE	__EXTERN_INLINE
+#define __STRUTIL_EXTERN_INLINE __EXTERN_INLINE
 
 #undef ident
 #define ident ident_strreg

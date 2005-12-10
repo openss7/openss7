@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 00:27:55 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:55 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 00:27:55 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:43 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 00:27:55 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -83,9 +83,9 @@ static char const ident[] =
 #undef makedevice
 #define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
 
-static spinlock_t apush_lock = SPIN_LOCK_UNLOCKED;
+STATIC spinlock_t apush_lock = SPIN_LOCK_UNLOCKED;
 
-static struct apinfo *
+STATIC struct apinfo *
 __autopush_find(struct cdevsw *cdev, unsigned char minor)
 {
 	struct list_head *pos;
@@ -102,7 +102,7 @@ __autopush_find(struct cdevsw *cdev, unsigned char minor)
 	return (api);
 }
 
-static int
+STATIC int
 __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 {
 	struct apinfo *api;
@@ -125,7 +125,7 @@ __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 	return (err);
 }
 
-static int
+STATIC int
 __autopush_del(struct cdevsw *cdev, struct strapush *sap)
 {
 	struct apinfo *api;

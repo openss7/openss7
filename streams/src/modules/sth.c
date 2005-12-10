@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/09 00:28:00 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:28:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/09 00:28:00 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/09 00:28:00 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/09 00:28:00 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -177,7 +177,7 @@ struct module_info str_minfo = {
 int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 int str_close(queue_t *q, int oflag, cred_t *crp);
 
-int strrput(queue_t *q, mblk_t *mp);
+int STREAMS_FASTCALL(strrput(queue_t *q, mblk_t *mp));
 
 static struct qinit str_rinit = {
 	.qi_putp = strrput,
@@ -186,8 +186,8 @@ static struct qinit str_rinit = {
 	.qi_minfo = &str_minfo,
 };
 
-int strwput(queue_t *q, mblk_t *mp);
-int strwsrv(queue_t *q);
+int STREAMS_FASTCALL(strwput(queue_t *q, mblk_t *mp));
+int STREAMS_FASTCALL(strwsrv(queue_t *q));
 
 static struct qinit str_winit = {
 	.qi_putp = strwput,
@@ -478,33 +478,16 @@ strschedule(void)
 }
 
 STATIC streams_inline streams_fastcall __hot_write void
-strput(queue_t *q, mblk_t *mp)
+strput(struct stdata *sd, mblk_t *mp)
 {
-	put(q, mp);
+	if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {
+		ctrace(putnext(sd->sd_wq, mp));
+		trace();
+		return;
+	}
+	ctrace(put(sd->sd_wq, mp));
+	trace();
 	return;
-	/* after putting message to Stream -- saves a context switch */
-	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
-}
-
-STATIC streams_inline streams_fastcall __hot_write void
-strputnext(queue_t *q, mblk_t *mp)
-{
-	putnext(q, mp);
-	return;
-	/* after putting message to Stream -- saves a context switch */
-	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
-}
-
-STATIC streams_inline streams_fastcall __hot_read void
-strqreply(queue_t *q, mblk_t *mp)
-{
-	qreply(q, mp);
-	return;
-	/* after putting message to Stream -- saves a context switch */
-	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
 }
 
 /* 
@@ -515,7 +498,7 @@ strqreply(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_inline streams_fastcall pid_t
+STATIC streams_fastcall pid_t
 task_session(struct task_struct *t)
 {
 #if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGNAL
@@ -525,7 +508,7 @@ task_session(struct task_struct *t)
 #endif
 }
 
-STATIC streams_inline streams_fastcall pid_t
+STATIC streams_fastcall pid_t
 task_pgrp(struct task_struct *t)
 {
 #if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGNAL
@@ -535,7 +518,7 @@ task_pgrp(struct task_struct *t)
 #endif
 }
 
-STATIC streams_inline streams_fastcall pid_t
+STATIC streams_fastcall pid_t
 pgrp_session(pid_t pgrp)
 {
 #if defined HAVE_SESSION_OF_PGRP_ADDR
@@ -820,7 +803,7 @@ alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
  *  STREAM will be closed, and we will unregister from the thread group leader.  When we send
  *  SIGPOLL, we use kill_proc which selects a viable thread in the thread group.
  */
-STATIC streams_inline streams_fastcall __unlikely struct task_struct *
+STATIC streams_fastcall __unlikely struct task_struct *
 str_find_thread_group_leader(const struct task_struct *procp)
 {
 	const struct task_struct *p = procp;
@@ -849,7 +832,7 @@ str_find_thread_group_leader(const struct task_struct *procp)
  *  from the file pointer by walking the process' open file descriptor list.  Unfortunately fasync
  *  does this for us, but ioctl does not.
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_find_file_descriptor(const struct task_struct *procp, const struct file *file)
 {
 	struct files_struct *files = procp->files;
@@ -871,7 +854,7 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 	return (fd > max ? ~0 : fd);
 }
 
-STATIC streams_inline streams_fastcall __unlikely struct strevent *
+STATIC streams_fastcall __unlikely struct strevent *
 __strevent_find(const struct stdata *sd)
 {
 	struct task_struct *p, *c = current;
@@ -1330,9 +1313,8 @@ strsendmread(struct stdata *sd, const unsigned long len, unsigned long *plp)
 			b->b_datap->db_type = M_READ;
 			*((unsigned long *) b->b_rptr) = len;
 			b->b_wptr = b->b_rptr + sizeof(&len);
-			if (!(err = straccess_rlock(sd, FREAD))) {
-				/* XXX: should not call under locks */
-				ctrace(strput(sd->sd_wq, b));
+			if (!(err = straccess(sd, FREAD))) {
+				ctrace(strput(sd, b));
 				trace();
 			} else
 				freemsg(b);
@@ -1452,7 +1434,7 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
  *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
  *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
  */
-STATIC streams_inline __unlikely mblk_t *
+STATIC __unlikely mblk_t *
 strgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 {
 	mblk_t *b = NULL;
@@ -1529,7 +1511,7 @@ strwaitgetfp(struct stdata *sd, queue_t *q, unsigned long *plp)
 	return (mp);
 }
 
-STATIC streams_inline streams_fastcall __unlikely mblk_t *
+STATIC streams_fastcall __unlikely mblk_t *
 strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags, unsigned long *plp)
 {
 	mblk_t *mp;
@@ -1566,7 +1548,7 @@ strtestgetfp(struct stdata *sd, queue_t *q, const int f_flags, unsigned long *pl
  *
  *  LOCKING: Must be called with a single read lock held on the STREAM head.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 __strwaitband(struct stdata *sd, int band)
 {
 	/* wait for band to become available */
@@ -1655,7 +1637,7 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
  *
  *  LOCKING: call with no locks held.
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 __strwaitopen(struct stdata *sd, const int access)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -1815,7 +1797,7 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 	return (err);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 strwaitfifo(struct stdata *sd, const int oflag)
 {
 	if ((oflag & (FREAD | FWRITE)) == (FREAD | FWRITE))
@@ -1867,7 +1849,7 @@ strwaitqueue(struct stdata *sd, queue_t *q)
  *  so, start with the stream head write queue instead of the stream below the stream head write
  *  queue.
  */
-STATIC streams_inline streams_fastcall __unlikely void
+STATIC streams_fastcall __unlikely void
 strwaitclose(struct stdata *sd, int oflag)
 {
 	cred_t *crp;
@@ -1976,7 +1958,7 @@ strwakeioctl(struct stdata *sd)
 	srunlock(sd);		/* to balance strwaitioctl */
 }
 
-STATIC streams_inline streams_fastcall mblk_t *
+STATIC streams_fastcall mblk_t *
 __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -2214,7 +2196,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
-		ctrace(strput(sd->sd_wq, mb));
+		ctrace(strput(sd, mb));
 		trace();
 
 		ptrace(("waiting for response\n"));
@@ -2272,7 +2254,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 			}
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd->sd_wq, mb));
+			ctrace(strput(sd, mb));
 			trace();
 			goto abort;
 		default:
@@ -2330,7 +2312,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	ioc->iocblk.ioc_id = sd->sd_iocid;
 
 	do {
-		ctrace(strput(sd->sd_wq, mb));
+		ctrace(strput(sd, mb));
 		trace();
 
 		mb = strwaitiocack(sd, &timeo, access);
@@ -2370,7 +2352,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 			}
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd->sd_wq, mb));
+			ctrace(strput(sd, mb));
 			trace();
 			goto abort;
 		default:
@@ -2446,7 +2428,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 
 	do {
 		/* could we place it directly to qtop? */
-		ctrace(strput(sd->sd_wq, mb));
+		ctrace(strput(sd, mb));
 		trace();
 
 		mb = strwaitiocack(sd, NULL, access);
@@ -2473,7 +2455,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 			mb->b_datap->db_type = M_IOCDATA;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd->sd_wq, mb));
+			ctrace(strput(sd, mb));
 			trace();
 			goto abort;
 		default:
@@ -2498,7 +2480,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
  *  Intercpet M_IOCACK, M_IOCNAK messages on a multiplexed queue pair.  When sending the M_IOCTL for
  *  an I_UNLINK or I_PUNLINK operation, there is no stream head attached to process the response.
  */
-STATIC __hot int
+STATIC streams_fastcall __hot int
 strirput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
@@ -2591,7 +2573,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 
 	do {
 		/* place it directly to qtop, don't trust modules in between */
-		ctrace(strput(l->l_qtop, mb));
+		ctrace(put(l->l_qtop, mb));
 		trace();
 
 		mb = strwaitiocack(sd, NULL, FTRUNC);	/* no errors please */
@@ -2609,7 +2591,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 			mb->b_datap->db_type = M_IOCDATA;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			ctrace(strput(sd->sd_wq, mb));
+			ctrace(strput(sd, mb));
 			trace();
 			goto abort;
 		default:
@@ -4083,7 +4065,7 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 					err = nbytes;
 				}
 				/* write locked and verified */
-				strputnext(sd->sd_wq, b);
+				putnext(sd->sd_wq, b);
 			}
 		}
 	}
@@ -4192,7 +4174,7 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 		/* send off the message block */
 		if (likely(err == 0)) {
 			/* We don't really queue these, see strwput(). */
-			ctrace(strput(sd->sd_wq, b));
+			ctrace(strput(sd, b));
 			trace();
 			written += block;
 			/* subsequent access checks should return -ESTRPIPE instead of generating
@@ -4389,7 +4371,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		if (!more)
 			mp->b_flag |= MSGDELIM;
 		/* use put instead of putnext because of STRHOLD feature */
-		ctrace(strput(sd->sd_wq, mp));
+		ctrace(strput(sd, mp));
 		trace();
 		return (size);
 	}
@@ -4501,7 +4483,7 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 		srunlock(sd);
 		if (!IS_ERR(mp)) {
 			/* use put instead of putnext because of STRHOLD feature */
-			ctrace(strput(sd->sd_wq, mp));
+			ctrace(strput(sd, mp));
 			trace();
 		} else
 			err = PTR_ERR(mp);
@@ -4855,7 +4837,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
  *  @file: file pointer for stream
  *  @path: path to which to fattach the stream
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 strfattach(struct file *file, const char *path)
 {
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
@@ -4869,7 +4851,7 @@ strfattach(struct file *file, const char *path)
  *  strfdetach: - fdetach system call
  *  @path: path from which to fdetach the stream
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 strfdetach(const char *path)
 {
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
@@ -4914,7 +4896,7 @@ strpipe(int fds[2])
 /**
  *  stty_tiocgsid:  - get the session id for a controlling terminal
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 tty_tiocgsid(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (!test_bit(STRISTTY_BIT, &sd->sd_flag))
@@ -4927,7 +4909,7 @@ tty_tiocgsid(const struct file *file, struct stdata *sd, unsigned long arg)
 /*
  *  Get the process group that receives other than %SIGPOLL signals.
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 tty_tiocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -4952,7 +4934,7 @@ tty_tiocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 /*
  *  Set the process group to receive other than %SIGPOLL signals.
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	pid_t pgrp, *valp = (typeof(valp)) arg;
@@ -4993,7 +4975,7 @@ STATIC int
  *  with the %ANYMARK flag.  Note that this ioctl is pointless if we cannot read and so FREAD access
  *  is tested in strioctl() with straccess().
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 sock_siocatmark(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -5003,7 +4985,7 @@ sock_siocatmark(const struct file *file, struct stdata *sd, unsigned long arg)
 	return put_user(&err, (int *) arg);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 sock_siocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
@@ -5021,7 +5003,7 @@ sock_siocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	pid_t pgrp, *valp = (typeof(valp)) arg;
@@ -5043,7 +5025,7 @@ sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (test_bit(STRISTTY_BIT, &sd->sd_flag))
@@ -5067,7 +5049,7 @@ file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 	}
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (test_bit(STRISTTY_BIT, &sd->sd_flag))
@@ -5359,7 +5341,7 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 				bcopy(&token, mp->b_rptr + fdi.offset, sizeof(token));
 				srunlock(sd);
 				/* use put instead of putnext because of STRHOLD feature */
-				ctrace(strput(sd->sd_wq, mp));
+				ctrace(strput(sd, mp));
 				trace();
 				return (0);
 			} else
@@ -5412,7 +5394,7 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct bandinfo bi;
@@ -5441,8 +5423,9 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
-		ctrace(strput(sd->sd_wq, mp));
+		ctrace(strput(sd, mp));
 		trace();
+		return (0);
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
 		freeb(mp);
@@ -5466,7 +5449,7 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
  *  flag when replying downstream with a M_FLUSH that arrived on the read side.  This helps with
  *  STREAMS-based pipes whose other STREAM head will not reply with the M_FLUSH if we set it now.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	mblk_t *mp;
@@ -5489,7 +5472,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
 		ptrace(("putting message %p\n", mp));
-		ctrace(strput(sd->sd_wq, mp));
+		ctrace(strput(sd, mp));
 		trace();
 	} else {
 		ptrace(("Error path taken! err = %d\n", err));
@@ -5505,7 +5488,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	queue_t *q = sd->sd_rq;
@@ -5997,7 +5980,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
  *  In addition, an error code can be returned in the positive or negative acknowledgement message.
  *  For these cases, %I_LINK failes with errno(3) set tot he value in the message.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_link(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_xlink(file, sd, arg, I_LINK);
@@ -6047,7 +6030,7 @@ str_i_link(const struct file *file, struct stdata *sd, unsigned long arg)
  *  addition, an error code can be returned in the positive or negative acknowledgement message.
  *  For these cases, %I_PLINK shall fail with errno(3) set to the value in the message.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_plink(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_xlink(file, sd, arg, I_PLINK);
@@ -6176,7 +6159,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
  *  addition, an error code can be returned in the positive or negative acknowledgement message.
  *  For these cases, %I_UNLINK shall faile with errno(3) set to the value in the message.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_unlink(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_xunlink(file, sd, arg, I_UNLINK);
@@ -6191,7 +6174,7 @@ str_i_unlink(struct file *file, struct stdata *sd, unsigned long arg)
  *  This command uses an implementation-defined default timeout interval.  The
  *  implementation-defined timeout interval for STREAMShas historically been 15 seconds.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_punlink(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	return str_i_xunlink(file, sd, arg, I_PUNLINK);
@@ -6306,7 +6289,7 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err, msgs, bytes;
@@ -6336,7 +6319,7 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  FIXME: This is a tough one.  Rework this code.
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err, rtn = 0;
@@ -6618,7 +6601,7 @@ freefd_func(caddr_t arg)
  *  @sd: stream head
  *  @arg: ioctl argument
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct stdata *s2;
@@ -6681,7 +6664,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		mp->b_rptr = mp->b_wptr = (unsigned char *) &mp->b_datap->db_frtnp->free_arg;
 		mp->b_wptr += sizeof(caddr_t);
 		/* XXX: put with locks held is a bad idea */
-		strput(s2->sd_rq, mp);
+		strput(s2, mp);
 		err = 0;
 	}
 
@@ -6708,7 +6691,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
  *  the Stream is hung up, strtestgetfp() will return -ESTRPIPE that we convert into ENXIO.  This is
  *  consistent with read() and getpmsg() behavior and makes sense here.
  */
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	struct strrecvfd *srp = (typeof(srp)) arg;
@@ -6948,11 +6931,13 @@ str_i_putpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 	int band, flags;
 	int err;
 
-	if ((err = copyin(&sp->band, &band, sizeof(&sp->band))))
-		return (err);
-	if ((err = copyin(&sp->flags, &flags, sizeof(&sp->flags))))
-		return (err);
+	if (unlikely((err = copyin(&sp->band, &band, sizeof(&sp->band))) != 0))
+		goto error;
+	if (unlikely((err = copyin(&sp->flags, &flags, sizeof(&sp->flags))) != 0))
+		goto error;
 	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
+      error:
+	return (err);
 }
 
 /**
@@ -6967,13 +6952,14 @@ str_i_fattach(struct file *file, struct stdata *sd, unsigned long arg)
 	char path[256];
 	int err;
 
-	if ((err = strncpy_from_user(path, (const char *) arg, 256)) < 0)
-		return (err);
+	if (unlikely((err = strncpy_from_user(path, (const char *) arg, 256)) < 0))
+		goto error;
 
 	if ((err = straccess_wlock(sd, FEXCL))) {
 		err = strfattach(file, path);
 		swunlock(sd);
 	}
+      error:
 	return (err);
 }
 
@@ -7638,7 +7624,7 @@ EXPORT_SYMBOL(strm_f_ops);
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
  *  check a bunch of things here, before attempting a putnext().
  */
-__hot_write int
+streams_fastcall __hot_write int
 strwput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
@@ -7656,7 +7642,7 @@ strwput(queue_t *q, mblk_t *mp)
 		swerr();
 	} else if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {
 		/* fast path */
-		ctrace(strputnext(q, mp));
+		ctrace(putnext(q, mp));
 		trace();
 	} else {
 		unsigned long pl;
@@ -7668,7 +7654,7 @@ strwput(queue_t *q, mblk_t *mp)
 			zwunlock(sd, pl);
 			/* delayed one has to go - can't delay the other */
 			ctrace(putnext(q, bp));
-			ctrace(strputnext(q, mp));
+			ctrace(putnext(q, mp));
 		} else if (test_bit(STRDELIM_BIT, &sd->sd_flag)
 			   || !test_bit(STRHOLD_BIT, &sd->sd_flag)
 			   || bp == mp
@@ -7681,7 +7667,7 @@ strwput(queue_t *q, mblk_t *mp)
 			   delimited, or longer than one block or a zero-length message, or can't
 			   hold another write same size. */
 			zwunlock(sd, pl);
-			ctrace(strputnext(q, mp));
+			ctrace(putnext(q, mp));
 			trace();
 		} else {
 			/* new M_DATA message with more room */
@@ -7712,7 +7698,7 @@ EXPORT_SYMBOL(strwput);
  *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
  *  for signalling streams events.
  */
-__hot_read int
+__hot_read streams_fastcall int
 strwsrv(queue_t *q)
 {
 	struct stdata *sd;
@@ -7750,7 +7736,7 @@ strwsrv(queue_t *q)
  *  =========================================================================
  */
 
-STATIC streams_inline streams_fastcall __hot_write int
+STATIC streams_fastcall __hot_write int
 str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
@@ -7774,18 +7760,44 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+#ifdef BIG_COMPILE
+STATIC streams_inline streams_fastcall __hot_write int
+str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
+{
+	int band = mp->b_band;
+	unsigned long pl;
+	int enable;
+
+	pl = qwlock(q);
+	enable = __putq(q, mp);
+	qwunlock(q, pl);
+	if (enable > 1) {
+		strwakeread(sd);
+		strevent(sd, (S_INPUT | (band ? S_RDBAND : S_RDNORM)), band);
+	}
+	return (0);
+}
+#else
 STATIC streams_inline streams_fastcall __hot_write int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	int band = mp->b_band;
 
 	putq(q, mp);
-	strwakeread(sd);
-	strevent(sd, (S_INPUT | (band ? S_RDBAND : S_RDNORM)), band);
+	if (mp == q->q_first) {
+		strwakeread(sd);
+		strevent(sd, (S_INPUT | (band ? S_RDBAND : S_RDNORM)), band);
+	}
 	return (0);
 }
+#endif
+STATIC streams_fastcall int
+str_m_data_slow(struct stdata *sd, queue_t *q, mblk_t *mp)
+{
+	return str_m_data(sd, q, mp);
+}
 
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Notes: OpenSolaris has this RFLUSHPCPROT read option to not flush M_PCPROTO messages
@@ -7832,7 +7844,7 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 			else
 				flushq(_WR(q), FLUSHALL);
 			mp->b_flag |= MSGNOLOOP;
-			ctrace(strqreply(q, mp));
+			ctrace(strput(sd, mp));
 			trace();
 			return (0);
 		}
@@ -7850,7 +7862,7 @@ str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 #define WERRMASK (WERRNORM|WERRNONPERSIST)
 #endif
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	struct stroptions *so = (typeof(so)) mp->b_rptr;
@@ -7918,7 +7930,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
@@ -7939,14 +7951,14 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_pcsig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	strsignal(sd, mp);
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_ERROR -- when this message type is received, the first byte of the message 
@@ -8009,7 +8021,7 @@ str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 			mp->b_rptr[0] = what;
 			mp->b_rptr[1] = 0;
 			mp->b_flag = 0;
-			strqreply(q, mp);
+			strput(sd, mp);
 			return (0);
 		}
 	}
@@ -8017,7 +8029,7 @@ str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_HANGUP -- if this message is received, the stream head is marked hung up.
@@ -8040,7 +8052,7 @@ str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 #if 0
@@ -8053,7 +8065,7 @@ str_m_unhangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!ctrace(strwakeiocack(sd, mp))) {
@@ -8065,7 +8077,7 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 			mp->b_datap->db_type = M_IOCDATA;
 			mp->b_wptr = mp->b_rptr + sizeof(ioc->copyresp);
 			ioc->copyresp.cp_rval = (caddr_t) 1;
-			strqreply(q, mp);
+			strput(sd, mp);
 		} else {
 			swerr();
 			freemsg(mp);
@@ -8074,7 +8086,7 @@ str_m_copy(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (!ctrace(strwakeiocack(sd, mp)))
@@ -8082,7 +8094,7 @@ str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall int
+STATIC streams_fastcall int
 str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_IOCTL -- It does not make sense to receive on of these messages at the
@@ -8099,14 +8111,14 @@ str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 		ioc->iocblk.ioc_count = 0;
 		ioc->iocblk.ioc_error = EINVAL;
 		ioc->iocblk.ioc_rval = -1;
-		strqreply(q, mp);
+		strput(sd, mp);
 		return (0);
 	}
 	freemsg(mp);
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	struct strlp *lp = (typeof(lp)) mp->b_rptr;
@@ -8115,19 +8127,19 @@ str_m_letsplay(struct stdata *sd, queue_t *q, mblk_t *mp)
 		if (_WR(q)->q_next) {
 			/* we don't queue data in the stream head write queue */
 			mp->b_datap->db_type = M_BACKDONE;
-			strqreply(q, mp);
+			strput(sd, mp);
 			return (0);
 		}
 		freemsg(mp);
 	} else {
 		mp->b_datap->db_type = M_DONTPLAY;
-		ctrace(strput(lp->lp_queue, mp));
+		ctrace(put(lp->lp_queue, mp));
 		trace();
 	}
 	return (0);
 }
 
-STATIC streams_inline streams_fastcall __unlikely int
+STATIC streams_fastcall __unlikely int
 str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Other messages are silently discarded */
@@ -8158,10 +8170,11 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  In stead of putting everything in one big case statement (as is the practice for STREAMS), we
  *  do it with inlines so that we have a call stack in debug mode.
  */
-__hot_write int
+__hot_write streams_fastcall int
 strrput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
+	int db_type;
 	int err;
 
 	assert(q);
@@ -8171,12 +8184,16 @@ strrput(queue_t *q, mblk_t *mp)
 
 	assert(sd);
 
-	switch (mp->b_datap->db_type) {
+	/* data fast path */
+	if (likely(((db_type = mp->b_datap->db_type) & ~1) == 0))
+		return str_m_data(sd, q, mp);
+
+	switch (db_type) {
 	case M_DATA:		/* bi - data */
 	case M_PROTO:		/* bi - protocol info */
 	case M_PASSFP:		/* bi - pass file pointer */
 		printd(("%s: got M_DATA, M_PROTO or M_PASSFP\n", __FUNCTION__));
-		err = str_m_data(sd, q, mp);
+		err = str_m_data_slow(sd, q, mp);
 		break;
 	case M_PCPROTO:	/* bi - protocol info */
 		printd(("%s: got M_PCPROTO\n", __FUNCTION__));

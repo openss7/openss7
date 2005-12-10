@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.58 2005/12/09 00:27:49 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.59 2005/12/09 18:01:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:49 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/12/09 00:27:49 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/12/09 18:01:37 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -692,9 +692,9 @@ extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 extern int strioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
 /* stream head read put and write service procedures, and open/close for use by replacement stream heads */
-extern int strrput(queue_t *q, mblk_t *mp);
-extern int strwput(queue_t *q, mblk_t *mp);
-extern int strwsrv(queue_t *q);
+extern int STREAMS_FASTCALL(strrput(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(strwput(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(strwsrv(queue_t *q));
 extern int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 extern int str_close(queue_t *q, int oflag, cred_t *crp);
 

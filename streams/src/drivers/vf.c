@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/07 09:34:14 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.3  2005/12/09 18:01:41  brian
+ - profiling copy
+
  Revision 0.9.2.2  2005/10/07 09:34:14  brian
  - more testing and corrections
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:41 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:41 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2005/10/07 09:34:14 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:41 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
@@ -182,7 +185,7 @@ STATIC struct vf *vf_links = NULL;
 #define MUX_UP 1
 #define MUX_DOWN 2
 
-STATIC int
+STATIC streams_fastcall int
 vf_uwput(queue_t *q, mblk_t *mp)
 {
 	struct vf *vf = q->q_ptr, *bot, *top;
@@ -549,7 +552,7 @@ vf_uwput(queue_t *q, mblk_t *mp)
  *  The upper write service procedure is invoked only by the connected lower write or connected
  *  upper read service procedure when the queue is back enabled.  This causes the backlog to clear.
  */
-STATIC int
+STATIC streams_fastcall int
 vf_uwsrv(queue_t *q)
 {
 	struct vf *vf = q->q_ptr;
@@ -576,7 +579,7 @@ vf_uwsrv(queue_t *q)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 vf_ursrv(queue_t *q)
 {
 	struct vf *vf = q->q_ptr, *top, *bot;
@@ -593,7 +596,7 @@ vf_ursrv(queue_t *q)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 vf_lrput(queue_t *q, mblk_t *mp)
 {
 	struct vf *vf = q->q_ptr;
@@ -669,7 +672,7 @@ vf_lrput(queue_t *q, mblk_t *mp)
 	}
 }
 
-STATIC int
+STATIC streams_fastcall int
 vf_lrsrv(queue_t *q)
 {
 	struct vf *vf = q->q_ptr;
@@ -696,7 +699,7 @@ vf_lrsrv(queue_t *q)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 vf_lwsrv(queue_t *q)
 {
 	struct vf *vf = q->q_ptr, *top, *bot;

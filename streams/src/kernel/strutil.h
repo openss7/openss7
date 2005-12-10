@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/05 22:49:06 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:45 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -373,19 +373,19 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #else
 
 
-static inline int
+STATIC streams_inline int
 in_procedure_of(queue_t *q)
 {
 	return (this_thread->currentq == q);
 }
-static inline void
+STATIC streams_inline void
 read_str_disable(void)
 {
 #if !defined CONFIG_STREAMS_KTHREADS
 	local_str_disable();
 #endif				/* !defined CONFIG_STREAMS_KTHREADS */
 }
-static inline void
+STATIC streams_inline void
 read_str_enable(void)
 {
 #if !defined CONFIG_STREAMS_KTHREADS
@@ -393,20 +393,20 @@ read_str_enable(void)
 #endif				/* !defined CONFIG_STREAMS_KTHREADS */
 }
 
-static inline void
+STATIC streams_inline void
 read_lock_str(rwlock_t *lk)
 {
 	read_str_disable();
 	read_lock(lk);
 }
-static inline void
+STATIC streams_inline void
 read_unlock_str(rwlock_t *lk)
 {
 	read_unlock(lk);
 	read_str_enable();
 }
 
-static inline int
+STATIC streams_inline int
 frozen_by_caller(queue_t *q)
 {
 	struct stdata *sd;
@@ -416,7 +416,7 @@ frozen_by_caller(queue_t *q)
 	dassert(sd);
 	return (sd->sd_freezer == current);
 }
-static inline int
+STATIC streams_inline int
 not_frozen_by_caller(queue_t *q)
 {
 	struct stdata *sd;
@@ -426,13 +426,13 @@ not_frozen_by_caller(queue_t *q)
 	dassert(sd);
 	return (sd->sd_freezer != current);
 }
-static inline void
+STATIC streams_inline void
 zlockinit(struct stdata *sd)
 {
 	dassert(sd);
 	rwlock_init(&sd->sd_freeze);
 }
-static inline unsigned long
+STATIC streams_inline unsigned long
 zwlock(struct stdata *sd)
 {
 	unsigned long pl;
@@ -442,14 +442,14 @@ zwlock(struct stdata *sd)
 	sd->sd_freezer = current;
 	return (pl);
 }
-static inline void
+STATIC streams_inline void
 zwunlock(struct stdata *sd, unsigned long pl)
 {
 	dassert(sd);
 	sd->sd_freezer = NULL;
 	write_unlock_irqrestore(&sd->sd_freeze, pl);
 }
-static inline unsigned long
+STATIC streams_inline unsigned long
 zrlock(struct stdata *sd)
 {
 	unsigned long pl;
@@ -460,7 +460,7 @@ zrlock(struct stdata *sd)
 		read_lock(&sd->sd_freeze);
 	return (pl);
 }
-static inline void
+STATIC streams_inline void
 zrunlock(struct stdata *sd, unsigned long pl)
 {
 	dassert(sd);
@@ -469,7 +469,7 @@ zrunlock(struct stdata *sd, unsigned long pl)
 	local_irq_restore(pl);
 }
 
-static inline void
+STATIC streams_inline void
 stream_barrier(struct stdata *sd)
 {
 	unsigned long pl;
@@ -478,7 +478,7 @@ stream_barrier(struct stdata *sd)
 	pl = zrlock(sd);
 	zrunlock(sd, pl);
 }
-static inline void
+STATIC streams_inline void
 freeze_barrier(queue_t *q)
 {
 	struct stdata *sd;
@@ -489,13 +489,13 @@ freeze_barrier(queue_t *q)
 	stream_barrier(sd);
 }
 
-static inline void
+STATIC streams_inline void
 plockinit(struct stdata *sd)
 {
 	dassert(sd);
 	rwlock_init(&sd->sd_plumb);
 }
-static inline unsigned long
+STATIC streams_inline unsigned long
 pwlock(struct stdata *sd)
 {
 	unsigned long pl;
@@ -505,64 +505,64 @@ pwlock(struct stdata *sd)
 	write_lock(&sd->sd_plumb);
 	return (pl);
 }
-static inline void
+STATIC streams_inline void
 pwunlock(struct stdata *sd, unsigned long pl)
 {
 	dassert(sd);
 	write_unlock(&sd->sd_plumb);
 	zrunlock(sd, pl);
 }
-static inline void
+STATIC streams_inline void
 prlock(struct stdata *sd)
 {
 	dassert(sd);
 	read_lock_str(&sd->sd_plumb);
 }
-static inline void
+STATIC streams_inline void
 prunlock(struct stdata *sd)
 {
 	dassert(sd);
 	read_unlock_str(&sd->sd_plumb);
 }
 
-static inline void
+STATIC streams_inline void
 slockinit(struct stdata *sd)
 {
 	dassert(sd);
 	rwlock_init(&sd->sd_lock);
 }
-static inline void
+STATIC streams_inline void
 swlock(struct stdata *sd)
 {
 	dassert(sd);
 	write_lock(&sd->sd_lock);
 }
-static inline void
+STATIC streams_inline void
 swunlock(struct stdata *sd)
 {
 	dassert(sd);
 	write_unlock(&sd->sd_lock);
 }
-static inline void
+STATIC streams_inline void
 srlock(struct stdata *sd)
 {
 	dassert(sd);
 	read_lock(&sd->sd_lock);
 }
-static inline void
+STATIC streams_inline void
 srunlock(struct stdata *sd)
 {
 	dassert(sd);
 	read_unlock(&sd->sd_lock);
 }
 
-static inline void
+STATIC streams_inline void
 qlockinit(queue_t *q)
 {
 	dassert(q);
 	rwlock_init(&q->q_lock);
 }
-static inline unsigned long
+STATIC streams_inline unsigned long
 qwlock(queue_t *q)
 {
 	unsigned long pl;
@@ -575,7 +575,7 @@ qwlock(queue_t *q)
 	write_lock(&q->q_lock);
 	return (pl);
 }
-static inline void
+STATIC streams_inline void
 qwunlock(queue_t *q, unsigned long pl)
 {
 	struct stdata *sd;
@@ -586,7 +586,7 @@ qwunlock(queue_t *q, unsigned long pl)
 	write_unlock(&q->q_lock);
 	zrunlock(sd, pl);
 }
-static inline unsigned long
+STATIC streams_inline unsigned long
 qrlock(queue_t *q)
 {
 	unsigned long pl;
@@ -595,7 +595,7 @@ qrlock(queue_t *q)
 	read_lock_irqsave(&q->q_lock, pl);
 	return (pl);
 }
-static inline void
+STATIC streams_inline void
 qrunlock(queue_t *q, unsigned long pl)
 {
 	dassert(q);

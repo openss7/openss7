@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/01 12:56:17 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/01 12:56:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/01 12:56:17 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:43 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/01 12:56:17 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,25 +92,25 @@ static char const ident[] =
 #endif
 
 #if defined HAVE_CLONE_MNT_ADDR
-static struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * root)
+STATIC struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * root)
 = (typeof(clone_mnt)) HAVE_CLONE_MNT_ADDR;
 #endif
 #if defined HAVE_CHECK_MNT_ADDR
-static int (*check_mnt) (struct vfsmount * mnt)
+STATIC int (*check_mnt) (struct vfsmount * mnt)
 = (typeof(check_mnt)) HAVE_CHECK_MNT_ADDR;
 #else
-static int
+STATIC int
 check_mnt(struct vfsmount *mnt)
 {
 	return mnt->mnt_namespace == current->namespace;
 }
 #endif
 #if defined HAVE_GRAFT_TREE_ADDR
-static int (*graft_tree) (struct vfsmount * mnt, struct nameidata * nd)
+STATIC int (*graft_tree) (struct vfsmount * mnt, struct nameidata * nd)
 = (typeof(graft_tree)) HAVE_GRAFT_TREE_ADDR;
 #endif
 #if defined HAVE_DO_UMOUNT_ADDR
-static int (*do_umount) (struct vfsmount * mnt, int flags)
+STATIC int (*do_umount) (struct vfsmount * mnt, int flags)
 = (typeof(do_umount)) HAVE_DO_UMOUNT_ADDR;
 #endif
 

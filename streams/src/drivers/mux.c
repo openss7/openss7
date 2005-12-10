@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/09 18:01:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/04 04:38:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/09 18:01:41 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/09 18:01:41 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/04 04:38:50 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/09 18:01:41 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -179,7 +179,7 @@ STATIC struct mux *mux_links = NULL;
 #define MUX_UP 1
 #define MUX_DOWN 2
 
-STATIC int
+STATIC streams_fastcall int
 mux_uwput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr, *bot;
@@ -411,7 +411,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 mux_urput(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_datap->db_type >= QPCTL ||
@@ -423,7 +423,7 @@ mux_urput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 mux_lwput(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_datap->db_type >= QPCTL ||
@@ -435,7 +435,7 @@ mux_lwput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 mux_lrput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr;
@@ -511,7 +511,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
  *  Note: This would be more efficient if we kept a separate list of feeding STREAMS instead of
  *  walking the entire list of upper STREAMS.
  */
-STATIC int
+STATIC streams_fastcall int
 mux_lwsrv(queue_t *q)
 {
 	{
@@ -553,7 +553,7 @@ mux_lwsrv(queue_t *q)
  *  The upper write service procedure is invoked only by the lower write serivce procedure when the
  *  lower write queue is back enabled.  This causes the backlog to clear.
  */
-STATIC int
+STATIC streams_fastcall int
 mux_uwsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
@@ -585,7 +585,7 @@ mux_uwsrv(queue_t *q)
  *  Note: This would be more efficient if we kept a separate list of feeding STREAMS instead of
  *  walking the entire list of upper STREAMS.
  */
-STATIC int
+STATIC streams_fastcall int
 mux_ursrv(queue_t *q)
 {
 	{
@@ -633,7 +633,7 @@ mux_ursrv(queue_t *q)
  *  head after unlinking, or to be processed by an upper read queue after connection across the
  *  multiplexer.
  */
-STATIC int
+STATIC streams_fastcall int
 mux_lrsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
