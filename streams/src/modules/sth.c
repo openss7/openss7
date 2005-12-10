@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:47 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 11:33:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/09 18:01:47 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -244,7 +244,7 @@ stri_insert(struct file *file, struct stdata *sd)
  *  stri_acquire:   - acquire a reference to a stream head from a file pointer
  *  @file:	file pointer to stream
  */
-STATIC streams_fastcall __hot struct stdata *
+STATIC streams_inline streams_fastcall __hot struct stdata *
 stri_acquire(struct file *file)
 {
 	struct stdata *sd;
@@ -461,26 +461,34 @@ strdeccounts(struct stdata *sd, int oflag)
 	return (last);
 }
 
+/*
+ *  PROFILING NOTE:- For top-end performance through a pipe it is highly unlikely that we need to
+ *  call runqueues(): normally the message is placed directly on the other Stream head and there is
+ *  nothing to schedule.  We do need to check, though, and if something needs running we will still
+ *  call runqueues().
+ */
 STATIC streams_inline streams_fastcall __hot void
 strsyscall(void)
 {
 	/* before every system call return or sleep -- saves a context switch */
-	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
+	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	runqueues();
 }
 
-STATIC streams_inline streams_fastcall __hot void
+STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
 	/* before every system call return or sleep -- saves a context switch */
-	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
-		runqueues();
+	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	runqueues();
 }
 
-STATIC streams_inline streams_fastcall __hot_write void
+STATIC streams_inline streams_fastcall __hot_out void
 strput(struct stdata *sd, mblk_t *mp)
 {
-	if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {
+	if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {	/* PROFILED */
 		ctrace(putnext(sd->sd_wq, mp));
 		trace();
 		return;
@@ -572,7 +580,7 @@ pgrp_session(pid_t pgrp)
  *
  */
 STATIC streams_inline streams_fastcall __hot int
-straccess(struct stdata *sd, const int access)
+straccess(struct stdata *sd, const register int access)
 {
 #if defined HAVE_IS_IGNORED_ADDR
 	static int (*is_ignored) (int sig) = (typeof(is_ignored)) HAVE_IS_IGNORED_ADDR;
@@ -583,77 +591,30 @@ straccess(struct stdata *sd, const int access)
 #endif
 	register int flags = sd->sd_flag;
 
-	if ((access & (FREAD | FWRITE))) {
-		/* POSIX semantics for pipes and FIFOs */
-		if (flags & (STRISFIFO | STRISPIPE)) {
-			if (flags & STRISPIPE) {
-				if ((access & (FREAD | FWRITE)) && sd->sd_wq->q_next != sd->sd_rq
-				    && (sd->sd_other == NULL || (sd->sd_other->sd_flag & STRCLOSE)))
-					goto estrpipe;
-			}
-			if (flags & STRISFIFO) {
-				if ((access & FREAD) && sd->sd_writers == 0)
-					goto estrpipe;
-				if ((access & FWRITE) && sd->sd_readers == 0)
-					goto estrpipe;
-			}
-		}
+	/* POSIX semantics for pipes and FIFOs */
+	if (likely((flags & STRISPIPE) != 0)) {
+		if (likely((access & (FREAD | FWRITE)) != 0))
+		    if (unlikely(sd->sd_other == NULL || (sd->sd_other->sd_flag & STRCLOSE) != 0))
+			goto estrpipe;
+	} else if ((unlikely(flags & STRISFIFO) != 0)) {
+		if (likely((access & FREAD) != 0))
+			if (unlikely(sd->sd_writers == 0))
+				goto estrpipe;
+		if (likely((access & FWRITE) != 0))
+			if (unlikely(sd->sd_readers == 0))
+				goto estrpipe;
 	}
 	/* no errors for close */
-	if (!(access & FTRUNC)) {
-		if ((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP))) {
-			if (flags & STPLEX)
-				if (!(access & FCREAT))
-					return (-EINVAL);
-			if (flags & STRCLOSE) {
-				if (!(flags & STRISTTY))
-					return (-EIO);
-				return (-ENOTTY);
-			}
-			if (!(access & FAPPEND)) {
-				if (flags & STRHUP) {
-					/* POSIX: open(): "[EIO] The path argument names a STREAMS
-					   file and a hangup or error occured during the open()." */
-					if (access & FWRITE)
-						return (-ENXIO);	/* for TTY's too? */
-					if (access & FCREAT)
-						return (-EIO);
-					if (!(access & FREAD))
-						return (-ENXIO);
-					if (!(access & FNDELAY))
-						return (-ESTRPIPE);
-				}
-				if (flags & STRDERR) {
-					if (access & FREAD) {
-						if (sd->sd_eropt & RERRNONPERSIST)
-							clear_bit(STRDERR_BIT, &sd->sd_flag);
-						return (-sd->sd_rerror);
-					} else if (!(access & FWRITE))
-						return (-EIO);
-				}
-				if (flags & STWRERR) {
-					if (access & FWRITE) {
-						if (sd->sd_eropt & WERRNONPERSIST)
-							clear_bit(STWRERR_BIT, &sd->sd_flag);
-						if (sd->sd_wropt & SNDPIPE)
-							send_sig_info(SIGPIPE, (struct siginfo *) 1,
-								      current);
-						return (-sd->sd_werror);
-					} else if (!(access & FREAD))
-						return (-EIO);
-				}
-			}
-		}
-	}
-	if (!(access & (FREAD | FWRITE | FEXCL)))
+	if (likely((access & FTRUNC) == 0))	/* PROFILED */
+		if (unlikely((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP)) != 0))
+			goto errors;
+	if (likely((flags & STRISTTY) == 0))	/* PROFILED */
 		return (0);
-	if (!(flags & (STRISFIFO | STRISPIPE | STRISTTY)))
-		return (0);
-	/* POSIX semantics for controlling terminals */
-	if (flags & STRISTTY) {
+	if (likely((access & (FREAD | FWRITE | FEXCL)) != 0)) {	/* PROFILED */
+		/* POSIX semantics for controlling terminals */
 		pid_t pgrp = task_pgrp(current);
 
-		if (pgrp == sd->sd_pgrp)
+		if (likely(pgrp == sd->sd_pgrp))
 			return (0);
 		/* not in forground process group */
 		if (access & FREAD) {
@@ -664,7 +625,8 @@ straccess(struct stdata *sd, const int access)
 			kill_pg(pgrp, SIGTTIN, 1);
 			return (-ERESTARTSYS);
 		}
-		if ((access & (FWRITE | FEXCL)) && ((access & FEXCL) || (flags & STRTOSTOP))) {
+		if ((access & (FWRITE | FEXCL))
+		    && ((access & FEXCL) || (flags & STRTOSTOP))) {
 			if (is_ignored(SIGTTOU))
 				return (0);
 			if (is_orphaned_pgrp(pgrp))
@@ -675,26 +637,69 @@ straccess(struct stdata *sd, const int access)
 	}
 	return (0);
       estrpipe:
-	if (!(access & FNDELAY))
+	/* About to block on a STREAMS-based pipe or FIFO. */
+	if ((access & FNDELAY) == 0)
 		return (-ESTRPIPE);
-	if (!(access & FWRITE))
+	if ((access & FWRITE) == 0)
 		return (0);
 	/* Note: we want to send the signal to the current thread in a thread group, because this
 	   write belongs only to that thread.  In that way, threads handle this signal separately
 	   and only receive signals for their own actions. */
 	send_sig(SIGPIPE, current, 1);
 	return (-EPIPE);
+      errors:
+	if ((flags & STPLEX) != 0)
+		if (!(access & FCREAT))
+			return (-EINVAL);
+	if ((flags & STRCLOSE) != 0) {
+		if ((flags & STRISTTY) == 0)
+			return (-EIO);
+		return (-ENOTTY);
+	}
+	if ((access & FAPPEND) == 0) {
+		if ((flags & STRHUP) != 0) {
+			/* POSIX: open(): "[EIO] The path argument names a STREAMS file and a
+			   hangup or error occured during the open()." */
+			if ((access & FWRITE) != 0)
+				return (-ENXIO);	/* for TTY's too? */
+			if ((access & FCREAT) != 0)
+				return (-EIO);
+			if ((access & FREAD) == 0)
+				return (-ENXIO);
+			if ((access & FNDELAY) == 0)
+				return (-ESTRPIPE);
+		}
+	if ((flags & STRDERR) != 0) {
+			if ((access & FREAD) != 0) {
+				if (sd->sd_eropt & RERRNONPERSIST)
+					clear_bit(STRDERR_BIT, &sd->sd_flag);
+				return (-sd->sd_rerror);
+			} else if (!(access & FWRITE))
+				return (-EIO);
+		}
+		if ((flags & STWRERR) != 0) {
+			if ((access & FWRITE) != 0) {
+				if (sd->sd_eropt & WERRNONPERSIST)
+					clear_bit(STWRERR_BIT, &sd->sd_flag);
+				if (sd->sd_wropt & SNDPIPE)
+					send_sig_info(SIGPIPE, (struct siginfo *) 1, current);
+				return (-sd->sd_werror);
+			} else if ((access & FREAD) == 0)
+				return (-EIO);
+		}
+	}
+	return (0);
 }
 
-STATIC streams_fastcall __hot int
+STATIC streams_fastcall int
 straccess_slow(struct stdata *sd, int access)
-{
+{				/* PROFILED */
 	return straccess(sd, access);
 }
 
-STATIC streams_inline streams_fastcall __hot int
+STATIC streams_fastcall int
 straccess_unlocked(struct stdata *sd, const int access)
-{
+{				/* PROFILED */
 	int err;
 
 	srlock(sd);
@@ -710,14 +715,15 @@ straccess_rlock(struct stdata *sd, const int access)
 	int err;
 
 	srlock(sd);
-	if ((err = straccess(sd, access)))
-		srunlock(sd);
+	if (likely((err = straccess(sd, access)) == 0))	/* PROFILED */
+		return (err);
+	srunlock(sd);
 	return (err);
 }
 
-STATIC streams_inline streams_fastcall __hot int
+STATIC streams_fastcall int
 straccess_wlock(struct stdata *sd, const int access)
-{
+{				/* PROFILED */
 	int err;
 
 	swlock(sd);
@@ -739,7 +745,7 @@ straccess_wlock(struct stdata *sd, const int access)
  */
 STATIC int
 straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int access)
-{
+{				/* PROFILED */
 	int err;
 
 	if (unlikely((err = straccess_slow(sd, access)) != 0))
@@ -751,32 +757,32 @@ straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int ac
 	return (0);
 }
 
-STATIC __hot_write mblk_t *
+STATIC streams_inline streams_fastcall __hot_put mblk_t *
 alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
 {
 	mblk_t *mp = NULL, *dp = NULL;
 
 	/* yes, POSIX says we can send zero length control parts */
-	if (psize >= 0) {
+	if (unlikely(psize >= 0)) {	/* PROFILED */
 		ptrace(("Allocating cntl part %d bytes\n", psize));
-		if ((mp = allocb(psize, bpri))) {
+		if (likely((mp = allocb(psize, bpri)) != NULL)) {
 			mp->b_datap->db_type = type;
 			mp->b_wptr = mp->b_rptr + psize;
 		} else
 			return (mp);
 	}
-	if (dsize >= 0) {
+	if (likely(dsize >= 0)) {	/* PROFILED */
 		ptrace(("Allocating data part %d bytes\n", dsize));
-		if ((dp = allocb(dsize + wroff, bpri))) {
-			dp->b_datap->db_type = M_DATA;
+		if (likely((dp = allocb(dsize + wroff, bpri)) != NULL)) {
+			// dp->b_datap->db_type = M_DATA; /* trust allocb() */
 			dp->b_rptr += wroff;
 			dp->b_wptr = dp->b_rptr + dsize;
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
-			if (psize < 0)
+			if (likely(psize < 0))	/* PROFILED */
 				dp->b_flag |= MSGDELIM;
 		} else {
-			if (mp)
+			if (unlikely(mp != NULL))
 				freemsg(mp);
 			return (dp);
 		}
@@ -838,19 +844,23 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 	struct files_struct *files = procp->files;
 	int fd, max;
 
-	spin_lock(&files->file_lock);
 #if defined HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET
+	read_lock(&files->file_lock);
 	max = files->max_fdset;
 	for (fd = 0; fd <= max && files->fd[fd] != file; fd++) ;
+	if (fd > max)
+		fd = ~0;
+	read_unlock(&files->file_lock);
 #elif defined HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB
+	spin_lock(&files->file_lock);
 	max = files->fdtab.max_fdset;
 	for (fd = 0; fd <= max && files->fdtab.fd[fd] != file; fd++) ;
-#else
-#error HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET or HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB must be defined
-#endif
 	if (fd > max)
 		fd = ~0;
 	spin_unlock(&files->file_lock);
+#else
+#error HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET or HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB must be defined
+#endif
 	return (fd > max ? ~0 : fd);
 }
 
@@ -971,6 +981,41 @@ strevent_unregister(const struct file *file, struct stdata *sd)
 	return strevent_register(file, sd, 0);
 }
 
+STATIC __unlikely void
+strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
+{
+#if defined HAVE_KILL_PROC_INFO_ADDR
+	static int (*kill_proc_info) (int sig, struct siginfo * sip, pid_t pid) =
+	    (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
+#endif
+	struct strevent *se;
+	struct siginfo si;
+	int bits, sig;
+	pid_t pid;
+
+	for (se = sd->sd_siglist; se; se = se->se_next) {
+		if (likely((bits = (se->se_events & events)) == 0))
+			continue;
+		prefetch(se->se_next);
+		if (likely(!(bits & S_RDBAND) || !(se->se_events & S_BANDURG))) {
+			si.si_signo = sig = SIGPOLL;
+			si.si_code = code;
+			si.si_band = band;
+			si.si_fd = se->se_fd;
+		} else {
+			si.si_signo = sig = SIGURG;
+			si.si_code = SI_KERNEL;
+		}
+
+		pid = se->se_procp->pid;
+
+		/* kill_proc_info will do the right thing visa vi thread groups */
+		if (likely(kill_proc_info(sig, &si, pid) == 0))
+			continue;
+		kill_proc(pid, sig, 1);	/* force */
+	}
+}
+
 /**
  *  strevent:	- signal events to requesting processes
  *  @sd:	the stream head
@@ -981,87 +1026,49 @@ strevent_unregister(const struct file *file, struct stdata *sd)
  *
  *  Note the oddity that S_OUTPUT and S_WRNORM and the same bit.
  */
-streams_fastcall STATIC __hot void
+STATIC streams_inline streams_fastcall __hot void
 strevent(struct stdata *sd, const int events, unsigned char band)
 {
 	int code;
 
-	switch (events) {
-	case (S_HIPRI):
-		code = POLL_PRI;
-		break;
-	case (S_INPUT | S_RDNORM):
-	case (S_INPUT | S_RDBAND):
+	prefetch(sd);
+	if (likely((events & (S_INPUT | S_RDNORM | S_RDBAND)) != 0))	/* PROFILED */
 		code = POLL_IN;
-		break;
-	case (S_WRNORM):
-	case (S_WRBAND):
+	else if (likely((events & (S_OUTPUT | S_WRNORM | S_WRBAND)) != 0))	/* PROFILED */
 		code = POLL_OUT;
-		break;
-	case (S_MSG):
+	else if (likely((events & (S_HIPRI)) != 0))
+		code = POLL_PRI;
+	else if (likely((events & (S_MSG)) != 0))
 		code = POLL_MSG;
-		break;
-	case (S_ERROR):
+	else if (likely((events & (S_ERROR)) != 0))
 		code = POLL_ERR;
-		break;
-	case (S_HANGUP):
+	else if (likely((events & (S_HANGUP)) != 0))
 		code = POLL_HUP;
-		break;
-	default:
+	else {
 		swerr();
 		return;
 	}
 	/* check cache */
-	if (sd->sd_sigflags & events) {
-		struct strevent *se;
-		struct siginfo si;
-		int bits, sig;
-		pid_t pid;
-
-		for (se = sd->sd_siglist; se; se = se->se_next) {
-			if ((bits = (se->se_events & events)) == 0)
-				continue;
-			if (!(bits & S_RDBAND) || !(se->se_events & S_BANDURG)) {
-				si.si_signo = sig = SIGPOLL;
-				si.si_code = code;
-				si.si_band = band;
-				si.si_fd = se->se_fd;
-			} else {
-				si.si_signo = sig = SIGURG;
-				si.si_code = SI_KERNEL;
-			}
-
-			pid = se->se_procp->pid;
-
-			{
-#if defined HAVE_KILL_PROC_INFO_ADDR
-				static int (*kill_proc_info) (int sig, struct siginfo * sip,
-							      pid_t pid) =
-				    (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
-#endif
-				/* kill_proc_info will do the right thing visa vi thread groups */
-				if (kill_proc_info(sig, &si, pid))
-					kill_proc(pid, sig, 1);	/* force */
-			}
-		}
+	if (likely((sd->sd_sigflags & events) == 0)) {	/* PROFILED */
+		/* XXX: I don't know that this is particularly correct.  POSIX doesn't define
+		   POLLSIG (but has POLL_SIG as an si_code in siginfo_t), but Linux does (it is
+		   marked in the headers as __USE_GNU and a Linux-specific extension), so it is not 
+		   that clear the order of things. For M_PCSIG, we execute strevent directly and
+		   any process sleeping in poll(2s) will get a SIGPOLL here with POLL_SIG.  If
+		   SIGPOLL is not caught, however, the POLLSIG bit is not set (because we don't set 
+		   STRMSG bit) and perhaps the poll(2s) will not even return. For M_SIG we set
+		   STRMSG bit when the message reaches the head of the read queue, but reset it
+		   after this function, meaning that SIGPOLL has the POLL_MSG bit code, but
+		   poll(2s) still might not return.  I need some test cases for this to make sure
+		   that things work as expected for the Linux extension, but the POSIX behaviour
+		   seesm to be correct. */
+		/* do the BSD O_ASYNC list too */
+	      async:
+		kill_fasync(&sd->sd_fasync, SIGPOLL, code);
+		return;
 	}
-	/* XXX: I don't know that this is particularly correct.  POSIX doesn't define POLLSIG (but
-	 * has POLL_SIG as an si_code in siginfo_t), but Linux does (it is marked in the headers
-	 * as __USE_GNU and a Linux-specific extension), so it is not that clear the order of
-	 * things.
-	 *
-	 * For M_PCSIG, we execute strevent directly and any process sleeping in poll(2s) will get a
-	 * SIGPOLL here with POLL_SIG.  If SIGPOLL is not caught, however, the POLLSIG bit is not
-	 * set (because we don't set STRMSG bit) and perhaps the poll(2s) will not even return.
-	 *
-	 * For M_SIG we set STRMSG bit when the message reaches the head of the read queue, but
-	 * reset it after this function, meaning that SIGPOLL has the POLL_MSG bit code, but
-	 * poll(2s) still might not return.  I need some test cases for this to make sure that
-	 * things work as expected for the Linux extension, but the POSIX behaviour seesm to be
-	 * correct.
-	 */
-	/* do the BSD O_ASYNC list too */
-	kill_fasync(&sd->sd_fasync, SIGPOLL, code);
+	strsiglist(sd, events, band, code);
+	goto async;
 }
 
 /**
@@ -1178,10 +1185,13 @@ strsignal_locked(struct stdata *sd, mblk_t *mp, unsigned long *plp)
  *  set because we need to release locks between taking the message off and putting it back.
  *  strread() and strgetpmsg() will clear the bit if necessary after the final disposition of the
  *  message is known.
+ *
+ *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
+ *  used timer interrupts.  The rest are guesses.
  */
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned long *plp)
-{
+{				/* IRQ SUPPRESSED */
 	mblk_t *b = NULL;
 
 	/* like a mini service procedure */
@@ -1229,7 +1239,7 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned
 
 STATIC streams_fastcall void
 strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
-{
+{				/* IRQ SUPPRESSED */
 	/* Like putbq() but handles STRPRI bit and under queue locks */
 	if (mp->b_datap->db_type >= QPCTL)
 		set_bit(STRPRI_BIT, &sd->sd_flag);
@@ -1242,7 +1252,7 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 
 STATIC streams_fastcall mblk_t *
 strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band, unsigned long *plp)
-{
+{				/* IRQ SUPPRESSED */
 	return strgetq(sd, q, flags, band, plp);
 }
 
@@ -1374,7 +1384,7 @@ strsendmread(struct stdata *sd, const unsigned long len, unsigned long *plp)
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, const int band,
 	    const unsigned long len, unsigned long *plp)
-{
+{				/* IRQ SUPPRESSED */
 	mblk_t *mp;
 	int err;
 
@@ -1605,29 +1615,23 @@ __strwaitband(struct stdata *sd, int band)
  *
  *  LOCKING: must hold a read lock on the stream head.
  */
-STATIC streams_fastcall __hot_write int
+STATIC streams_fastcall __hot_out int
 strwaitband(struct stdata *sd, const int f_flags, const int band, const int flags)
 {
-	if (flags == MSG_HIPRI)
-		goto ok;
+	if (unlikely(flags == MSG_HIPRI))	/* PROFILED */
+		return (0);
 
 	/* have read lock and access was ok */
-	if (likely(bcanputnext(sd->sd_wq, band) != 0))
-		goto ok;
+	if (likely(bcanputnext(sd->sd_wq, band) != 0))	/* PROFILED */
+		return (0);
 
-	if ((f_flags & FNDELAY) && likely(test_bit(STRNDEL_BIT, &sd->sd_flag) == 0))
-		goto eagain;
+	if (unlikely((f_flags & FNDELAY) && test_bit(STRNDEL_BIT, &sd->sd_flag) == 0))
+		return (-EAGAIN);
 
-	if (unlikely(signal_pending(current)))
-		goto erestartsys;
+	if (likely(signal_pending(current)))	/* PROFILED */
+		return (-ERESTARTSYS);
 
 	return __strwaitband(sd, band);
-      ok:
-	return (0);
-      eagain:
-	return (-EAGAIN);
-      erestartsys:
-	return (-ERESTARTSYS);
 }
 
 /*
@@ -1719,47 +1723,48 @@ strwakeopen(struct stdata *sd)
 	strwakeopen_swunlock(sd);
 }
 
-STATIC streams_fastcall void
+STATIC streams_inline streams_fastcall __hot void
 strwakepoll(struct stdata *sd)
 {
-	if (waitqueue_active(&sd->sd_polllist))
-		wake_up_interruptible(&sd->sd_polllist);
+	if (likely(waitqueue_active(&sd->sd_polllist) == 0))	/* PROFILED */
+		return;
+	wake_up_interruptible(&sd->sd_polllist);
 }
 
-STATIC streams_fastcall __hot_read void
+STATIC streams_inline streams_fastcall __hot_out void
 strwakeread(struct stdata *sd)
-{
-	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag) &&
-	    likely(waitqueue_active(&sd->sd_waitq) != 0))
-		wake_up_interruptible(&sd->sd_waitq);
+{				/* PROFILED */
+	if (unlikely(test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag)))	/* PROFILED */
+		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
+			wake_up_interruptible(&sd->sd_waitq);
 	strwakepoll(sd);
 }
 
-STATIC streams_fastcall __hot_write void
+STATIC streams_inline streams_fastcall __hot_in void
 strwakewrite(struct stdata *sd)
-{
-	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag) &&
-	    likely(waitqueue_active(&sd->sd_waitq) != 0))
-		wake_up_interruptible(&sd->sd_waitq);
+{				/* PROFILED */
+	if (unlikely(test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag)))	/* PROFILED */
+		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
+			wake_up_interruptible(&sd->sd_waitq);
 	strwakepoll(sd);
 }
 
 STATIC streams_fastcall void
 strwakeiocwait(struct stdata *sd)
 {
-	if (test_bit(IOCWAIT_BIT, &sd->sd_flag) &&
-	    likely(waitqueue_active(&sd->sd_waitq) != 0))
-		wake_up_interruptible(&sd->sd_waitq);
+	if (likely(test_bit(IOCWAIT_BIT, &sd->sd_flag)))
+		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
+			wake_up_interruptible(&sd->sd_waitq);
 }
 
 STATIC streams_fastcall void
 strwakeall(struct stdata *sd)
 {
-	if ((test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag) ||
-	     test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag) ||
-	     test_bit(IOCWAIT_BIT, &sd->sd_flag)) &&
-	    likely(waitqueue_active(&sd->sd_waitq) != 0))
-		wake_up_interruptible(&sd->sd_waitq);
+	if (unlikely(test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag) ||
+		     test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag) ||
+		     test_bit(IOCWAIT_BIT, &sd->sd_flag)))
+		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
+			wake_up_interruptible(&sd->sd_waitq);
 	strwakepoll(sd);
 }
 
@@ -1888,7 +1893,7 @@ strwaitclose(struct stdata *sd, int oflag)
  *
  *  LOCKING: call with no locks held.
  */
-STATIC int
+STATIC streams_fastcall int
 __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -2042,9 +2047,9 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_inline streams_fastcall __hot_write int
+STATIC streams_fastcall int
 strbcopyin(const void *from, void *to, size_t len, bool user)
-{
+{				/* PROFILED */
 	if (user)
 		return copyin(from, to, len);
 	bcopy(from, to, len);
@@ -2054,15 +2059,15 @@ strbcopyin(const void *from, void *to, size_t len, bool user)
 STATIC streams_inline streams_fastcall __hot_read int
 strbcopyout(const void *from, void *to, size_t len, bool user)
 {
-	if (user)
+	if (likely(user))	/* PROFILED */
 		return copyout(from, to, len);
 	bcopy(from, to, len);
 	return (0);
 }
 
-STATIC streams_fastcall __hot_write int
+STATIC streams_fastcall int
 strcopyinb(const caddr_t uaddr, mblk_t **dpp, size_t len, bool user)
-{
+{				/* PROFILED */
 	mblk_t *dp;
 
 	if (!len)
@@ -2083,9 +2088,9 @@ strcopyinb(const caddr_t uaddr, mblk_t **dpp, size_t len, bool user)
 	return (0);
 }
 
-STATIC streams_fastcall __hot_read int
+STATIC streams_fastcall int
 strcopyoutb(mblk_t *dp, caddr_t uaddr, size_t len, int user)
-{
+{				/* PROFILED */
 	if (!len)
 		return (0);
 	if (!dp)
@@ -2117,24 +2122,29 @@ strcopyoutb(mblk_t *dp, caddr_t uaddr, size_t len, int user)
 STATIC streams_inline streams_fastcall __hot_read size_t
 strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 {
-	mblk_t *b, *b_cont;
+	mblk_t *b;
 	size_t copied = 0;
 
-	for (b_cont = mp; (b = b_cont); b_cont = unlinkb(b), freeb(b)) {
+	if (likely((b = mp) != NULL)) {
+		mblk_t *b_cont;
 		ssize_t blen, dlen;
 
-		b_cont = b->b_cont;
-		if ((blen = b->b_wptr - b->b_rptr) <= 0)
-			continue;
-		if (protdis && b->b_datap->db_type != M_DATA)
-			continue;
-		if ((dlen = min(blen, len - copied)) > 0) {
-			const caddr_t b_rptr = (caddr_t) b->b_rptr;
+		do {
+			prefetchw(b->b_cont);
+			if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))	/* PROFILED */
+				continue;
+			if (unlikely(protdis && b->b_datap->db_type != M_DATA))
+				continue;
+			if (likely((dlen = min(blen, len - copied)) > 0)) {	/* PROFILED */
+				const caddr_t b_rptr = (caddr_t) b->b_rptr;
 
-			strbcopyout(b_rptr, uaddr, dlen, user);
-			uaddr += dlen;
-			copied += dlen;
-		}
+				strbcopyout(b_rptr, uaddr, dlen, user);
+				uaddr += dlen;
+				copied += dlen;
+			}
+			b_cont = unlinkb(b);
+			freeb(b);
+		} while (unlikely((b = b_cont) != NULL));
 	}
 	return (copied);
 }
@@ -2480,9 +2490,9 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
  *  Intercpet M_IOCACK, M_IOCNAK messages on a multiplexed queue pair.  When sending the M_IOCTL for
  *  an I_UNLINK or I_PUNLINK operation, there is no stream head attached to process the response.
  */
-STATIC streams_fastcall __hot int
+STATIC streams_fastcall int
 strirput(queue_t *q, mblk_t *mp)
-{
+{				/* PROFILED */
 	struct stdata *sd;
 
 	assert(q);
@@ -2618,17 +2628,17 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
  *
  *  NOTICES: Make @type and explicit constant for efficient inlining.
  */
-STATIC streams_inline streams_fastcall __hot_write ssize_t
+STATIC streams_inline streams_fastcall __hot_out ssize_t
 strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 {
-	if (type == M_DATA) {
+	if (likely(type == M_DATA)) {	/* PROFILED */
 		ssize_t sd_maxpsz;
 
-		if (unlikely(size < sd->sd_minpsz))
+		if (unlikely(size < sd->sd_minpsz))	/* PROFILED */
 			return (-ERANGE);
-		if ((sd_maxpsz = sd->sd_maxpsz) < 0)
+		if (unlikely((sd_maxpsz = sd->sd_maxpsz) < 0))	/* PROFILED */
 			sd_maxpsz = INT_MAX;
-		if (unlikely(size > sd_maxpsz)) {
+		if (unlikely(size > sd_maxpsz)) {	/* PROFILED */
 			if (likely(sd->sd_minpsz == 0))
 				size = sd_maxpsz;
 			else
@@ -2642,9 +2652,9 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 	}
 	return ((ssize_t) size);
 }
-STATIC streams_fastcall ssize_t
+STATIC streams_fastcall __hot_put ssize_t
 strsizecheck_slow(const struct stdata *sd, const msg_type_t type, ssize_t size)
-{
+{				/* PROFILED */
 	return strsizecheck(sd, type, size);
 }
 
@@ -2712,31 +2722,41 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
 {
 	ssize_t clen = -1;
 	ssize_t dlen = -1;
+	ssize_t err;
 
-	if (ctlp && (clen = ctlp->len) > 0 && user && !access_ok(VERIFY_READ, ctlp->buf, clen))
-		return (-EFAULT);
-	if (datp && (dlen = datp->len) > 0 && user && !access_ok(VERIFY_READ, datp->buf, dlen))
-		return (-EFAULT);
-	{
-		ssize_t err;
-
-		if (clen >= 0) {
-			if ((err = strsizecheck_slow(sd, M_PROTO, clen)) < -1)
-				return (err);
-		}
-		if (dlen >= 0) {
-			if ((err = strsizecheck_slow(sd, M_DATA, dlen)) < -1)
-				return (err);
-			if ((size_t) dlen > (size_t) err) {
-				/* control part apply putpmsg() rules */
-				if (clen >= 0)
-					return (-ERANGE);
-				/* just a data part apply write() rules */
-				dlen = err;
-			}
+	if (likely(ctlp != NULL))
+		if (unlikely((clen = ctlp->len) > 0))
+			if (likely(user))
+				if (unlikely(!access_ok(VERIFY_READ, ctlp->buf, clen)))
+					goto efault;
+	if (likely(datp != NULL))
+		if (likely((dlen = datp->len) > 0))
+			if (likely(user))
+				if (unlikely(!access_ok(VERIFY_READ, datp->buf, dlen)))
+					goto efault;
+	if (unlikely(clen >= 0))
+		if (unlikely((err = strsizecheck_slow(sd, M_PROTO, clen)) < -1))
+			goto error;
+	if (likely(dlen >= 0)) {
+		if (unlikely((err = strsizecheck_slow(sd, M_DATA, dlen)) < -1))
+			goto error;
+		if (unlikely((size_t) dlen > (size_t) err)) {
+			/* control part apply putpmsg() rules */
+			if (unlikely(clen >= 0))
+				goto erange;
+			/* just a data part apply write() rules */
+			dlen = err;
 		}
 	}
 	return (dlen);
+      erange:
+	err = -ERANGE;
+	goto error;
+      efault:
+	err = -EFAULT;
+	goto error;
+      error:
+	return (err);
 }
 
 /**
@@ -2760,7 +2780,7 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
  *  operations (that can also sleep) and then reacquire the Stream head read lock, rechecking write
  *  access permissions.
  */
-STATIC streams_inline streams_fastcall __hot_write mblk_t *
+STATIC streams_inline streams_fastcall __hot_put mblk_t *
 strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
 	     const int band, const int flags, const int user)
 {
@@ -2779,18 +2799,22 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 		if ((mp = alloc_proto(clen, dlen, sd->sd_wroff, type, BPRI_WAITOK))) {
 			dp = mp;
 			/* copyin can sleep */
-			if (clen > 0) {
-				if (!user)
-					bcopy(ctlp->buf, dp->b_rptr, clen);
-				else if ((err = copyin(ctlp->buf, dp->b_rptr, clen)))
-					break;
+			if (unlikely(clen > 0)) {	/* PROFILED */
+				if (likely(user)) {	/* PROFILED */
+					if ((err = copyin(ctlp->buf, dp->b_rptr, clen)))
+						break;
+					else
+						bcopy(ctlp->buf, dp->b_rptr, clen);
+				}
 				dp = dp->b_cont;
 			}
-			if (dlen > 0) {
-				if (!user)
-					bcopy(datp->buf, dp->b_rptr, dlen);
-				else if ((err = copyin(datp->buf, dp->b_rptr, dlen)))
-					break;
+			if (likely(dlen > 0)) {	/* PROFILED */
+				if (likely(user)) {	/* PROFILED */
+					if ((err = copyin(datp->buf, dp->b_rptr, dlen)))
+						break;
+					else
+						bcopy(datp->buf, dp->b_rptr, dlen);
+				}
 				dp = dp->b_cont;
 			}
 			mp->b_band = norm ? band : 0;
@@ -2799,8 +2823,8 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 	} while (0);
 	srlock(sd);
 
-	if (mp) {
-		if (!err && !(err = straccess(sd, FWRITE)))
+	if (likely(mp != NULL)) {	/* PROFILED */
+		if (likely(!err) && likely(!(err = straccess(sd, FWRITE))))	/* PROFILED */
 			return (mp);
 		freemsg(mp);
 	}
@@ -2819,18 +2843,20 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
  *  messages, strputpmst_common() with no control part should function the same as the initial
  *  checks for write().
  */
-STATIC __hot_put mblk_t *
+STATIC streams_inline streams_fastcall __hot_put mblk_t *
 strputpmsg_common(const struct file *file, const struct strbuf *ctlp, const struct strbuf *datp,
 		  const int band, const int flags)
 {
 	struct stdata *sd = stri_lookup(file);
 	int err = 0;
 
-	if ((err = strpsizecheck(sd, ctlp, datp, 1)) < -1)
-		return ERR_PTR(err);
-	if ((err = strwaitband(sd, file->f_flags, band, flags)))
-		return ERR_PTR(err);
+	if (unlikely((err = strpsizecheck(sd, ctlp, datp, 1)) < -1))	/* PROFILED */
+		goto error;
+	if (unlikely((err = strwaitband(sd, file->f_flags, band, flags))))	/* PROFILED */
+		goto error;
 	return strallocpmsg(sd, ctlp, datp, band, flags, 1);
+      error:
+	return ERR_PTR(err);
 }
 
 #if 0
@@ -3109,13 +3135,13 @@ strllseek(struct file *file, loff_t off, int whence)
  *  @file: user file pointer for the open stream
  *  @poll: poll table pointer
  */
-unsigned int
+unsigned __hot_in int
 strpoll(struct file *file, struct poll_table_struct *poll)
 {
 	struct stdata *sd;
 	unsigned int mask;
 
-	if ((sd = stri_lookup(file))) {
+	if (likely((sd = stri_lookup(file)) != NULL)) { /* PROFILED */
 		mask = 0;
 		strschedule();
 		poll_wait(file, &sd->sd_polllist, poll);
@@ -3144,17 +3170,15 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 
 EXPORT_SYMBOL(strpoll);
 
-STATIC unsigned int
+STATIC __hot_in unsigned int
 _strpoll(struct file *file, struct poll_table_struct *poll)
 {
 	struct stdata *sd;
 	unsigned int mask;
 
 	/* VFS doesn't check this */
-	if (!(file->f_mode & (FREAD | FWRITE)))
-		mask = POLLNVAL;
-	else if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (straccess_rlock(sd, (FCREAT | FAPPEND)) == 0) {
+	if (likely((file->f_mode & (FREAD | FWRITE))) && likely((sd = stri_acquire(file)) != NULL)) {
+		if (likely(straccess_rlock(sd, (FCREAT | FAPPEND)) == 0)) {
 			if (likely(!sd->sd_directio || !sd->sd_directio->poll))
 				mask = strpoll(file, poll);
 			else
@@ -3165,7 +3189,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 		ctrace(sd_put(&sd));
 	} else
 		mask = POLLNVAL;
-	strsyscall(); /* save context switch */
+	strsyscall();		/* save context switch */
 	return (mask);
 }
 
@@ -3619,7 +3643,7 @@ strfasync(int fd, struct file *file, int on)
 
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strlinkmsg(mblk_t *first, mblk_t *mp)
-{
+{				/* IRQ DISABLED */
 	mblk_t **bp;
 
 	for (bp = &first; (*bp); bp = &(*bp)->b_cont) ;
@@ -3629,7 +3653,7 @@ strlinkmsg(mblk_t *first, mblk_t *mp)
 
 STATIC streams_inline streams_fastcall __hot_read ssize_t
 strmsgcount(mblk_t *b, bool protdis)
-{
+{				/* IRQ DISABLED */
 	ssize_t count = 0;
 
 	for (; b; b = b->b_cont)
@@ -3784,8 +3808,8 @@ strmsgcount(mblk_t *b, bool protdis)
  *  In this way we never return zero, which could be confused with an end-of-file.
  *
  */
-__hot_read ssize_t
-strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
+STATIC streams_inline streams_fastcall __hot_read ssize_t
+strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
 	queue_t *q = sd->sd_rq;
@@ -3829,13 +3853,14 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 			type = mp->b_datap->db_type;
 
-			if (type != M_DATA && protnorm)
-				goto ebadmsg;
+			if (unlikely(type != M_DATA))
+				if (likely(protnorm))
+					goto ebadmsg;
 
 			{
 				ssize_t count = strmsgcount(mp, protdis);
 
-				if (type == M_DATA) {
+				if (likely(type == M_DATA)) {
 					/* Only look at MSGMARK and MSGDELIM on M_DATA messages. */
 					if (unlikely((mp->b_flag & MSGMARK) != 0))
 						stop = true;
@@ -3854,7 +3879,10 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			}
 
 			if (xferd >= nbytes) {
-				if (xferd > nbytes && !discard) {
+				/* All read modes stop once the request is satisfied. */
+				if (likely(xferd == nbytes) || discard)
+					goto stop;
+				{
 					mblk_t *dp, *b;
 					ssize_t position, blen;
 
@@ -3865,9 +3893,10 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 						goto enosr;
 					/* trim head of original */
 					for (position = 0, b = mp; b; b = b->b_cont) {
-						if ((blen = b->b_wptr - b->b_rptr) <= 0)
+						if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 							continue;
-						if (protdis && b->b_datap->db_type != M_DATA)
+						if (unlikely
+						    (protdis && b->b_datap->db_type != M_DATA))
 							continue;
 						if ((position += blen) >= nbytes) {
 							b->b_rptr += nbytes - (position - blen);
@@ -3922,35 +3951,18 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	}
 
 	/* Per current POSIX specs, only return and error when no read data has been transferred. */
-	if (likely(xferd > 0))
+	if (likely(xferd > 0)) {
 		return (xferd);
-
-	if (unlikely(err != 0)) {
-		switch (err) {
-		case -EAGAIN:
-			ptrace(("ndelay is %d\n", (int) ndelay));
-			if (!ndelay)
-				break;
-			trace();
-			/* For old TTY semantics we are supposed to return zero (0) instead of
-			   [EAGAIN]. */
+	} else if (likely(err == -EAGAIN)) {
+		/* For old TTY semantics we are supposed to return zero (0) instead of [EAGAIN]. */
+		if (ndelay)
 			err = 0;
-			break;
-		case -ESTRPIPE:
-			trace();
-			/* If we have hit the end of a pipe or FIFO return zero (0) instead of
-			   [ESTRPIPE]. */
-			err = 0;
-			break;
-		case 0:
-			trace();
-			break;
-		default:
-			ptrace(("error is %d\n", err));
-			break;
-		}
+	} else if (unlikely(err = -ESTRPIPE)) {
+		/* If we have hit the end of a pipe or FIFO return zero (0) instead of [ESTRPIPE]. */
+		err = 0;
 	}
       error:
+	ptrace(("error is %d\n", err));
 	return (err);
       espipe:
 	err = -ESPIPE;
@@ -3960,10 +3972,22 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	goto error;
 }
 
+STATIC streams_fastcall __hot_read ssize_t
+strread_slow(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
+{
+	return strread_fast(file, buf, nbytes, ppos);
+}
+
+__hot_read ssize_t
+strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
+{
+	return strread_slow(file, buf, nbytes, ppos);
+}
+
 EXPORT_SYMBOL(strread);
 
-STATIC int _strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *,
-		       int __user *);
+STATIC int STREAMS_FASTCALL(_strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *,
+		       int __user *));
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -4002,8 +4026,8 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 		err = -EBADF;
 	else
 #endif
-	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (likely(!sd->sd_directio || !sd->sd_directio->read))
+	if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
+		if (likely(!sd->sd_directio || !sd->sd_directio->read))	/* PROFILED */
 			err = strread(file, buf, len, ppos);
 		else
 			err = sd->sd_directio->read(file, buf, len, ppos);
@@ -4013,7 +4037,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 	goto exit;
       exit:
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall(); /* save context switch */
+	strsyscall();		/* save context switch */
 	return (err);
 }
 
@@ -4073,7 +4097,7 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 	return (err);
 }
 
-STATIC int _strputpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int, int);
+STATIC int STREAMS_FASTCALL(_strputpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int, int));
 
 /**
  *  strwrite: - write file operation for a stream
@@ -4106,29 +4130,29 @@ STATIC int _strputpmsg(struct file *, struct strbuf __user *, struct strbuf __us
  *  it will break delimited messages anyway.  So why not just assume that delimited messages doesn't
  *  work with writev() and leave it at that?
  */
-__hot_write ssize_t
-strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
+STATIC streams_inline streams_fastcall __hot_write ssize_t
+strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
 	ssize_t err, q_maxpsz, written = 0;
 	int access;
 
 	/* gotos to try to get into the loop faster */
-	if (unlikely(access_ok(VERIFY_READ, buf, nbytes) == 0))
+	if (unlikely(access_ok(VERIFY_READ, buf, nbytes) == 0))	/* PROFILED */
 		goto efault;
 
-	if (unlikely((q_maxpsz = err = strsizecheck(sd, M_DATA, nbytes)) < 0))
+	if (unlikely((q_maxpsz = err = strsizecheck(sd, M_DATA, nbytes)) < 0))	/* PROFILED */
 		goto error;
 
-	if (unlikely(q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO)))
+	if (unlikely(q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO)))	/* PROFILED */
 		goto error;	/* but err is zero */
 
-	if (unlikely(test_bit(STRHOLD_BIT, &sd->sd_flag) != 0)) {
+	if (unlikely(test_bit(STRHOLD_BIT, &sd->sd_flag) != 0)) {	/* PROFILED */
 		if ((err = strhold(sd, file->f_flags, buf, nbytes)) != 0)
 			goto error;
 	}
 	/* first access check is with FNDELAY to generate pipe signals */
-	access = FWRITE | FNDELAY;
+	access = (FWRITE) | (FNDELAY);
 
 	do {
 		mblk_t *b;
@@ -4157,8 +4181,8 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 			/* locks on */
 			if (likely((err = straccess_rlock(sd, access)) == 0)) {
 
-				if (written + block >= nbytes
-				    && test_bit(STRDELIM_BIT, &sd->sd_flag))
+				if (likely(written + block >= nbytes)
+				    && unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
 					/* If we performed a full write of the requested number of
 					   bytes, we set the MSGDELIM flag to indicate that a full
 					   write was performed.  If we perform a partial write this 
@@ -4192,6 +4216,18 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
       efault:
 	err = -EFAULT;
 	goto error;
+}
+
+STATIC streams_fastcall __hot_write ssize_t
+strwrite_slow(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
+{
+	return strwrite_fast(file, buf, nbytes, ppos);
+}
+
+__hot_write ssize_t
+strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
+{
+	return strwrite_slow(file, buf, nbytes, ppos);
 }
 
 EXPORT_SYMBOL(strwrite);
@@ -4238,8 +4274,8 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 		err = -EBADF;
 	else
 #endif
-	if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (likely(!sd->sd_directio || !sd->sd_directio->write))
+	if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
+		if (likely(!sd->sd_directio || !sd->sd_directio->write))	/* PROFILED */
 			err = strwrite(file, buf, len, ppos);
 		else
 			err = sd->sd_directio->write(file, buf, len, ppos);
@@ -4249,7 +4285,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 	goto exit;
       exit:
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall(); /* save context switch */
+	strsyscall();		/* save context switch */
 	return (err);
 }
 
@@ -4420,80 +4456,85 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp;
 	struct strbuf ctl, dat;
-	int err;
+	int err = 0;
 
-	if (band != -1) {
-		if (flags != MSG_HIPRI && flags != MSG_BAND)
-			return (-EINVAL);
-		if (flags == MSG_HIPRI) {
-			if (band != 0)
-				return (-EINVAL);
-		} else {
-			if (band < 0 || band > 255)
-				return (-EINVAL);
-		}
-	} else {
-		if (flags != RS_HIPRI && flags != 0)	/* RS_NORM */
-			return (-EINVAL);
+	if (likely(band == -1)) {
+		if (unlikely(flags != RS_HIPRI && flags != 0))	/* RS_NORM */
+			goto einval;
 		band = 0;
-		if (flags == 0)
+		if (likely(flags == 0))
 			flags = MSG_BAND;
+	} else {
+		if (unlikely(flags != MSG_HIPRI && flags != MSG_BAND))
+			goto einval;
+		if (likely(flags != MSG_HIPRI)) {
+			if (unlikely(band < 0 || band > 255))
+				goto einval;
+		} else {
+			if (unlikely(band != 0))
+				goto einval;
+		}
 	}
 	/* Now band and flags are both correct according to putpmsg() */
 
-	if (ctlp) {
-		if ((err = copyin(ctlp, &ctl, sizeof(*ctlp))))
-			return (err);
+	if (likely(ctlp != NULL)) {
+		if (unlikely(err = copyin(ctlp, &ctl, sizeof(*ctlp))))
+			goto error;
 	} else {
 		ctl.buf = NULL;
 		ctl.len = -1;
 		ctl.maxlen = -1;
 	}
-	if (datp) {
-		if ((err = copyin(datp, &dat, sizeof(*datp))))
-			return (err);
+	if (likely(datp != NULL)) {
+		if (unlikely(err = copyin(datp, &dat, sizeof(*datp))))
+			goto error;
 	} else {
 		dat.buf = NULL;
 		dat.len = -1;
 		dat.maxlen = -1;
 	}
 
-	if (flags == MSG_HIPRI) {
-		/* need an M_PCPROTO block and zero or more M_DATA message blocks */
-		if (ctl.len < 0)
-			/* POSIX says: "If no control part is specified and flags is set to
-			   RS_HIPRI (MSG_HIPRI), ... fail and set errno to [EINVAL]." */
-			return (-EINVAL);
-	} else {
+	if (likely(flags != MSG_HIPRI)) {
 		/* need zero or one M_PROTO block and zero or more M_DATA message blocks */
-		if (ctl.len < 0) {
+		if (likely(ctl.len < 0)) {
 			/* no control part */
-			if (dat.len < 0)
+			if (unlikely(dat.len < 0))
 				/* no data part */
 				/* POSIX says: "If a control part part and data part are not
 				   specified and flags is set to MSG_BAND, no message shall be sent
 				   and 0 shall be returned." */
-				return (0);
-			if ((dat.len == 0) && !(sd->sd_wropt & SNDZERO))
-				return (0);
+				goto done;
+			if (unlikely((dat.len == 0) && !(sd->sd_wropt & SNDZERO)))
+				goto done;
 		}
+	} else {
+		/* need an M_PCPROTO block and zero or more M_DATA message blocks */
+		if (ctl.len < 0)
+			/* POSIX says: "If no control part is specified and flags is set to
+			   RS_HIPRI (MSG_HIPRI), ... fail and set errno to [EINVAL]." */
+			goto einval;
 	}
-	if ((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0) {
+	if (likely((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0)) {
 		mp = strputpmsg_common(file, &ctl, &dat, band, flags);
 		srunlock(sd);
-		if (!IS_ERR(mp)) {
+		if (likely(!IS_ERR(mp))) {
 			/* use put instead of putnext because of STRHOLD feature */
 			ctrace(strput(sd, mp));
 			trace();
 		} else
 			err = PTR_ERR(mp);
 	}
+      error:
+      done:
 	return (err);
+      einval:
+	err = -EINVAL;
+	goto error;
 }
 
 EXPORT_SYMBOL(strputpmsg);
 
-STATIC __hot_put int
+STATIC streams_fastcall __hot_put int
 _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
 	    int flags)
 {
@@ -4501,18 +4542,20 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	int err;
 
 	/* not checked when coming though ioctl */
-	if (!(file->f_mode & FWRITE))
-		err = -EBADF;
-	else if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (likely(!sd->sd_directio || !sd->sd_directio->putpmsg))
-			err = strputpmsg(file, ctlp, datp, band, flags);
-		else
-			err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
-		ctrace(sd_put(&sd));
+	if (likely(file->f_mode & FWRITE)) {	/* PROFILED */
+		if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
+			if (likely(!sd->sd_directio || !sd->sd_directio->putpmsg))	/* PROFILED 
+											 */
+				err = strputpmsg(file, ctlp, datp, band, flags);
+			else
+				err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
+			ctrace(sd_put(&sd));
+		} else
+			err = -ENOSTR;
 	} else
-		err = -ENOSTR;
+		err = -EBADF;
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall(); /* save context switch */
+	strsyscall();		/* save context switch */
 	return (err);
 }
 
@@ -4544,73 +4587,60 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	int retval = 0;
 	int err;
 
-	if (!flagsp)
-		return (-EINVAL);
-	if (!access_ok(VERIFY_WRITE, flagsp, sizeof(*flagsp)))
-		return (-EFAULT);
-	if ((err = copyin(flagsp, &flags, sizeof(*flagsp))))
-		return (err);
-	if (bandp) {
-		if (!access_ok(VERIFY_WRITE, bandp, sizeof(*bandp)))
-			return (-EFAULT);
-		if ((err = copyin(bandp, &band, sizeof(*bandp))))
-			return (err);
+	if (unlikely(!flagsp))
+		goto einval;
+	if (unlikely(!access_ok(VERIFY_WRITE, flagsp, sizeof(*flagsp))))
+		goto efault;
+	if (unlikely((err = copyin(flagsp, &flags, sizeof(*flagsp)))))
+		goto error;
+	if (likely(bandp != NULL)) {
+		if (unlikely(!access_ok(VERIFY_WRITE, bandp, sizeof(*bandp))))
+			goto efault;
+		if (unlikely((err = copyin(bandp, &band, sizeof(*bandp)))))
+			goto error;
 		/* operate as getpmsg(2s) */
-		switch (flags) {
-		case MSG_HIPRI:	/* also RS_HIPRI */
-			if (band != 0 && band != -1)
-				return (-EINVAL);
-			if (band == -1) {
-				band = 0;
-				bandp = NULL;	/* signal lower down that this is getmsg() */
-			}
-			break;
-		case 0:
+		if (likely(flags == 0)) {
 			/* careful, our library puts getmsg() flags in getpmsg() but then puts -1
 			   in band */
-			if (band != -1)
-				return (-EINVAL);
-			else {
-				flags = MSG_ANY;
+			if (unlikely(band != -1))
+				goto einval;
+			flags = MSG_ANY;
+			band = 0;
+			bandp = NULL;	/* signal lower down that this is getmsg() */
+		} else if (likely(flags == MSG_ANY)) {
+			if (unlikely(band != 0))
+				goto einval;
+		} else if (likely(flags == MSG_BAND)) {
+			if (unlikely(0 > band || band > 255))
+				goto einval;
+		} else if (likely(flags == MSG_HIPRI)) {	/* also RS_HIPRI */
+			if (unlikely(band != 0 && band != -1))
+				goto einval;
+			if (likely(band == -1)) {
 				band = 0;
 				bandp = NULL;	/* signal lower down that this is getmsg() */
 			}
-			break;
-		case MSG_ANY:
-			if (band != 0)
-				return (-EINVAL);
-			break;
-		case MSG_BAND:
-			if (0 > band || band > 255)
-				return (-EINVAL);
-			break;
-		default:
-			return (-EINVAL);
-		}
+		} else
+			goto einval;
 	} else {
 		/* operate as getmsg(2) */
-		switch (flags) {
-		case RS_HIPRI:
-		case 0:	/* RS_NORM */
-			break;
-		default:
-			return (-EINVAL);
-		}
+		if (unlikely(flags != RS_HIPRI && flags != 0))	/* RS_NORM */
+			goto einval;
 	}
 
-	if (ctlp) {
-		if (!access_ok(VERIFY_WRITE, ctlp, sizeof(*ctlp)))
-			return (-EFAULT);
-		if ((err = copyin(ctlp, &ctl, sizeof(*ctlp))))
-			return (err);
+	if (likely(ctlp != 0)) {
+		if (unlikely(!access_ok(VERIFY_WRITE, ctlp, sizeof(*ctlp))))
+			goto efault;
+		if (unlikely((err = copyin(ctlp, &ctl, sizeof(*ctlp)))))
+			goto error;
 		printd(("%s: ctl.len = %d\n", __FUNCTION__, ctl.len));
 		printd(("%s: ctl.maxlen = %d\n", __FUNCTION__, ctl.maxlen));
-		if (ctl.maxlen < 0)
+		if (likely(ctl.maxlen < 0))
 			ctl.maxlen = -1;
 		else {
 			printd(("%s: ctl.buf = %p\n", __FUNCTION__, ctl.buf));
-			if (!access_ok(VERIFY_WRITE, ctl.buf, ctl.maxlen))
-				return (-EFAULT);
+			if (unlikely(!access_ok(VERIFY_WRITE, ctl.buf, ctl.maxlen)))
+				goto efault;
 			trace();
 		}
 	} else {
@@ -4619,19 +4649,19 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	}
 	ctl.len = -1;
 
-	if (datp) {
-		if (!access_ok(VERIFY_WRITE, datp, sizeof(*datp)))
-			return (-EFAULT);
-		if ((err = copyin(datp, &dat, sizeof(*datp))))
-			return (err);
+	if (likely(datp != 0)) {
+		if (unlikely(!access_ok(VERIFY_WRITE, datp, sizeof(*datp))))
+			goto efault;
+		if (unlikely((err = copyin(datp, &dat, sizeof(*datp)))))
+			goto error;
 		printd(("%s: dat.len = %d\n", __FUNCTION__, dat.len));
 		printd(("%s: dat.maxlen = %d\n", __FUNCTION__, dat.maxlen));
-		if (dat.maxlen < 0)
+		if (unlikely(dat.maxlen < 0))
 			dat.maxlen = -1;
 		else {
 			printd(("%s: dat.buf = %p\n", __FUNCTION__, dat.buf));
-			if (!access_ok(VERIFY_WRITE, dat.buf, dat.maxlen))
-				return (-EFAULT);
+			if (unlikely(!access_ok(VERIFY_WRITE, dat.buf, dat.maxlen)))
+				goto efault;
 			trace();
 		}
 	} else {
@@ -4640,7 +4670,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	}
 	dat.len = -1;
 
-	if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
+	if (likely(!(err = straccess_rlock(sd, (FREAD | FNDELAY))))) {
 		mblk_t *chp = NULL, *dhp = NULL;
 		unsigned long pl;
 
@@ -4749,8 +4779,9 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 
 		switch (err) {
 		case -EAGAIN:
-			if (!test_bit(STRNDEL_BIT, &sd->sd_flag))
-				break;
+			if (likely(!test_bit(STRNDEL_BIT, &sd->sd_flag)))
+				goto error;
+
 			/* fall through */
 		case -ESTRPIPE:	/* STREAM (PIPE, FIFO, TTY) hung up */
 
@@ -4775,7 +4806,8 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			for (len = 0, b = chp; b; b_cont = unlinkb(b), freeb(b), b = b_cont) {
 				ssize_t blen;
 
-				if ((blen = b->b_wptr - b->b_rptr) <= 0)
+				prefetchw(b->b_cont);
+				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
 				ptrace(("Copying out cntl part %d bytes\n", blen));
 				copyout(b->b_rptr, ctl.buf + len, blen);
@@ -4785,31 +4817,39 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 			for (len = 0, b = dhp; b; b_cont = unlinkb(b), freeb(b), b = b_cont) {
 				ssize_t blen;
 
-				if ((blen = b->b_wptr - b->b_rptr) <= 0)
+				prefetchw(b->b_cont);
+				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
 				ptrace(("Copying out data part %d bytes\n", blen));
 				copyout(b->b_rptr, dat.buf + len, blen);
 				len += blen;
 			}
 			/* copy out return values */
-			if (ctlp)
+			if (likely(ctlp != NULL))
 				put_user(ctl.len, &ctlp->len);
-			if (datp)
+			if (likely(datp != NULL))
 				put_user(dat.len, &datp->len);
-			if (bandp)
+			if (likely(bandp != NULL))
 				put_user(band, bandp);
-			if (flagsp)
+			if (likely(flagsp != NULL))
 				put_user(flags, flagsp);
 			return (retval);
 		}
 		}
 	}
+      error:
 	return (err);
+      einval:
+	err = -EINVAL;
+	goto error;
+      efault:
+	err = -EFAULT;
+	goto error;
 }
 
 EXPORT_SYMBOL(strgetpmsg);
 
-STATIC __hot_get int
+STATIC streams_fastcall __hot_get int
 _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
 	    int __user *bandp, int __user *flagsp)
 {
@@ -4817,18 +4857,20 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 	int err;
 
 	/* not checked when we come in through ioctl */
-	if (!(file->f_mode & FREAD))
-		err = -EBADF;
-	else if (likely((sd = stri_acquire(file)) != NULL)) {
-		if (likely(!sd->sd_directio || !sd->sd_directio->getpmsg))
-			err = strgetpmsg(file, ctlp, datp, bandp, flagsp);
-		else
-			err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
-		ctrace(sd_put(&sd));
+	if (likely(file->f_mode & FREAD)) {	/* PROFILED */
+		if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
+			if (likely(!sd->sd_directio || !sd->sd_directio->getpmsg))	/* PROFILED 
+											 */
+				err = strgetpmsg(file, ctlp, datp, bandp, flagsp);
+			else
+				err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
+			ctrace(sd_put(&sd));
+		} else
+			err = -ENOSTR;
 	} else
-		err = -ENOSTR;
+		err = -EBADF;
 	/* We want to give the driver queues an opportunity to run. */
-	strsyscall(); /* save context switch */
+	strsyscall();		/* save context switch */
 	return (err);
 }
 
@@ -6931,7 +6973,7 @@ str_i_putpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 	int band, flags;
 	int err;
 
-	if (unlikely((err = copyin(&sp->band, &band, sizeof(&sp->band))) != 0))
+	if (unlikely((err = copyin(&sp->band, &band, sizeof(&sp->band))) != 0))	/* PROFILED */
 		goto error;
 	if (unlikely((err = copyin(&sp->flags, &flags, sizeof(&sp->flags))) != 0))
 		goto error;
@@ -7138,8 +7180,8 @@ str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsi
  *  used to point to the stream head at the other end of a pipe (i.e., when %STRISPIPE is
  *  set).
  */
-__hot int
-strioctl(struct file *file, unsigned int cmd, unsigned long arg)
+STATIC streams_inline streams_fastcall __hot int
+strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
 	int access = FNDELAY;		/* default access check is for io */
@@ -7149,6 +7191,16 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 	if (unlikely(!sd))
 		return (-EIO);
+
+	/* Fast path for data -- PROFILED */
+	if (likely(cmd == I_GETPMSG)) {	/* getpmsg syscall emulation */
+		printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+		return str_i_getpmsg(file, sd, arg);
+	}
+	if (likely(cmd == I_PUTPMSG)) {	/* putpmsg syscall emulation */
+		printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+		return str_i_putpmsg(file, sd, arg);
+	}
 
 	switch (_IOC_TYPE(cmd)) {
 	case _IOC_TYPE(I_STR):
@@ -7552,9 +7604,21 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	return (err);
 }
 
+STATIC streams_fastcall __hot int
+strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
+{
+	return strioctl_fast(file, cmd, arg);
+}
+
+__hot int
+strioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{
+	return strioctl_slow(file, cmd, arg);
+}
+
 EXPORT_SYMBOL(strioctl);
 
-STATIC long
+STATIC __hot long
 _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd;
@@ -7562,7 +7626,7 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 	if (likely((sd = stri_acquire(file)) != NULL)) {
 		if (likely(!sd->sd_directio || !sd->sd_directio->ioctl))
-			err = strioctl(file, cmd, arg);
+			err = strioctl_fast(file, cmd, arg);
 		else
 			err = sd->sd_directio->ioctl(file, cmd, arg);
 		ctrace(sd_put(&sd));
@@ -7624,9 +7688,9 @@ EXPORT_SYMBOL(strm_f_ops);
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
  *  check a bunch of things here, before attempting a putnext().
  */
-streams_fastcall __hot_write int
+int
 strwput(queue_t *q, mblk_t *mp)
-{
+{				/* PROFILED -- never happens any more */
 	struct stdata *sd;
 
 	assert(q);
@@ -7698,7 +7762,7 @@ EXPORT_SYMBOL(strwput);
  *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
  *  for signalling streams events.
  */
-__hot_read streams_fastcall int
+streams_fastcall __hot_in int
 strwsrv(queue_t *q)
 {
 	struct stdata *sd;
@@ -7721,11 +7785,13 @@ strwsrv(queue_t *q)
 			be[band] = 1;
 	qrunlock(q, pl);
 
-	if (be[0])
+	if (likely(be[0]))	/* PROFILED */
 		strevent(sd, S_WRNORM, 0);
-	for (band = q->q_nband; band > 0; band--)
-		if (be[band])
-			strevent(sd, S_WRBAND, band);
+	for (band = q->q_nband; unlikely(band > 0); band--) {	/* PROFILED */
+		if (likely(be[band] == 0))
+			continue;
+		strevent(sd, S_WRBAND, band);
+	}
 
 	strwakewrite(sd);
 	return (0);
@@ -7736,7 +7802,7 @@ strwsrv(queue_t *q)
  *  =========================================================================
  */
 
-STATIC streams_fastcall __hot_write int
+STATIC streams_fastcall int
 str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
@@ -7761,7 +7827,7 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 }
 
 #ifdef BIG_COMPILE
-STATIC streams_inline streams_fastcall __hot_write int
+STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	int band = mp->b_band;
@@ -7771,20 +7837,20 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 	pl = qwlock(q);
 	enable = __putq(q, mp);
 	qwunlock(q, pl);
-	if (enable > 1) {
+	if (likely(enable > 1)) { /* PROFILED */
 		strwakeread(sd);
 		strevent(sd, (S_INPUT | (band ? S_RDBAND : S_RDNORM)), band);
 	}
 	return (0);
 }
 #else
-STATIC streams_inline streams_fastcall __hot_write int
+STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	int band = mp->b_band;
 
 	putq(q, mp);
-	if (mp == q->q_first) {
+	if (likely(mp == q->q_first)) {
 		strwakeread(sd);
 		strevent(sd, (S_INPUT | (band ? S_RDBAND : S_RDNORM)), band);
 	}
@@ -8170,7 +8236,7 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  In stead of putting everything in one big case statement (as is the practice for STREAMS), we
  *  do it with inlines so that we have a call stack in debug mode.
  */
-__hot_write streams_fastcall int
+streams_fastcall __hot_out int
 strrput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
@@ -8185,7 +8251,7 @@ strrput(queue_t *q, mblk_t *mp)
 	assert(sd);
 
 	/* data fast path */
-	if (likely(((db_type = mp->b_datap->db_type) & ~1) == 0))
+	if (likely(((db_type = mp->b_datap->db_type) & ~1) == 0))	/* PROFILED */
 		return str_m_data(sd, q, mp);
 
 	switch (db_type) {
@@ -8251,7 +8317,7 @@ strrput(queue_t *q, mblk_t *mp)
 #if 0
 	case M_BREAK:		/* dn - request to send "break" */
 	case M_DELAY:		/* dn - request delay on output */
-	case M_IOCDATA:		/* dn - copy data response */
+	case M_IOCDATA:	/* dn - copy data response */
 	case M_READ:		/* dn - read notification */
 	case M_STOP:		/* dn - suspend output */
 	case M_START:		/* dn - resume output */
@@ -8263,7 +8329,7 @@ strrput(queue_t *q, mblk_t *mp)
 	case M_CTL:		/* bi - control info */
 	case M_PCCTL:		/* bi - control info */
 	case M_EVENT:		/* -- - Solaris only? */
-	case M_PCEVENT:		/* -- - Solaris only? */
+	case M_PCEVENT:	/* -- - Solaris only? */
 	case M_RSE:		/* -- - reserved */
 	case M_PCRSE:		/* -- - reserved */
 #endif

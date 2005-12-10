@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.26 2005/12/09 18:01:36 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.27 2005/12/10 11:33:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/09 18:01:36 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/12/10 11:33:57 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -61,6 +61,184 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
+
+/*
+ *  First optimizations, then assertions.
+ */
+
+#if __GNUC__ < 3
+#define __builtin_prefetch(addr, rw, level) ((void)(addr))
+#endif
+
+#if defined FASTCALL && !defined fastcall
+#define fastcall FASTCALL()
+#endif
+
+#if !defined FASTCALL
+#define FASTCALL(__x) __x
+#define fastcall
+#endif
+
+#if !defined fastcall
+#define fastcall FASTCALL()
+#endif
+
+#ifndef likely
+#define likely(__exp) (__exp)
+#endif
+
+#ifndef unlikely
+#define unlikely(__exp) (__exp)
+#endif
+
+#if defined(CONFIG_STREAMS_OPTIMIZE_NONE) || defined(CONFIG_STREAMS_DEBUG)
+
+#undef prefetchw
+#define prefetchw(__a) ((void)(__a))
+
+#undef prefetch
+#define prefetch(__a) ((void)(__a))
+
+#undef likely
+#define likely(__exp) (__exp)
+
+#undef unlikely
+#define unlikely(__exp) (__exp)
+
+#define __hot
+#define __hot_read
+#define __hot_write
+#define __hot_put
+#define __hot_get
+#define __hot_out
+#define __hot_in
+#define __unlikely
+
+#undef STATIC
+#define STATIC
+
+#undef INLINE
+#define INLINE
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) __x
+
+#undef streams_fastcall
+#define streams_fastcall STREAMS_FASTCALL()
+
+#undef streams_inline
+#define streams_inline
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE
+#endif
+
+#elif defined(CONFIG_STREAMS_OPTIMIZE_SIZE)
+
+#undef prefetchw
+#define prefetchw(__a) __builtin_prefetch((__a),1,3)
+
+#undef prefetch
+#define prefetch(__a) __builtin_prefetch((__a),0,3)
+
+/* these don't affect size, just position */
+#define __hot __attribute__((section(".text.hot")))
+#define __hot_read  __attribute__((section(".text.hot.read")))
+#define __hot_write __attribute__((section(".text.hot.write")))
+#define __hot_put  __attribute__((section(".text.hot.put")))
+#define __hot_get __attribute__((section(".text.hot.get")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
+#undef STATIC
+#define STATIC static
+
+#undef INLINE
+#define INLINE
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) FASTCALL(__x)
+
+#undef streams_fastcall
+#define streams_fastcall STREAMS_FASTCALL()
+
+#undef streams_inline
+#define streams_inline
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern
+#endif
+
+#elif defined(CONFIG_STREAMS_OPTIMIZE_SPEED)
+
+#undef prefetchw
+#define prefetchw(__a) __builtin_prefetch((__a),1,3)
+
+#undef prefetch
+#define prefetch(__a) __builtin_prefetch((__a),0,3)
+
+/* these don't affect size, just position */
+#define __hot __attribute__((section(".text.hot")))
+#define __hot_read  __attribute__((section(".text.hot.read")))
+#define __hot_write __attribute__((section(".text.hot.write")))
+#define __hot_put  __attribute__((section(".text.hot.put")))
+#define __hot_get __attribute__((section(".text.hot.get")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
+#undef STATIC
+#define STATIC static
+
+#undef INLINE
+#define INLINE inline
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) FASTCALL(__x)
+
+#undef streams_fastcall
+#define streams_fastcall STREAMS_FASTCALL()
+
+#undef streams_inline
+#define streams_inline inline
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE inline
+#endif
+
+#else /* defined(CONFIG_STREAMS_OPTIMIZE_NORMAL) */
+
+#undef prefetchw
+#define prefetchw(__a) __builtin_prefetch((__a),1,3)
+
+#undef prefetch
+#define prefetch(__a) __builtin_prefetch((__a),0,3)
+
+/* these don't affect size, just position */
+#define __hot __attribute__((section(".text.hot")))
+#define __hot_read  __attribute__((section(".text.hot.read")))
+#define __hot_write __attribute__((section(".text.hot.write")))
+#define __hot_put  __attribute__((section(".text.hot.put")))
+#define __hot_get __attribute__((section(".text.hot.get")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
+#undef STATIC
+#define STATIC static
+
+#undef INLINE
+#define INLINE inline
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) FASTCALL(__x)
+
+#undef streams_fastcall
+#define streams_fastcall STREAMS_FASTCALL()
+
+#undef streams_inline
+#define streams_inline inline
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern inline
+#endif
+
+#endif
 
 #undef  __never
 #define __never() \
@@ -150,19 +328,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
-#if defined FASTCALL && !defined fastcall
-#define fastcall FASTCALL()
-#endif
-
-#if !defined FASTCALL
-#define FASTCALL(__x) __x
-#define fastcall
-#endif
-
-#if !defined fastcall
-#define fastcall FASTCALL()
-#endif
-
 #if defined(CONFIG_STREAMS_DEBUG)
 
 #define    never()		__never()
@@ -185,39 +350,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define   printd(__pks)		__printd(__pks)
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
-
-#undef STATIC
-#define STATIC static
-
-#undef INLINE
-#define INLINE
-
-/* can't undef these or it will break linux headers */
-//#undef inline
-//#define inline
-//#undef __inline__
-//#define __inline__
-//#undef __inline
-//#define __inline
-
-/* for debugging we want a proper stack */
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) __x
-#undef streams_fastcall
-#define streams_fastcall
-#undef streams_inline
-#define streams_inline
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE
-#endif
-
-#define __hot
-#define __hot_read
-#define __hot_write
-#define __hot_put
-#define __hot_get
-#define __unlikely
 
 #elif defined(CONFIG_STREAMS_TEST)
 
@@ -242,30 +374,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#undef STATIC
-#define STATIC static
-
-#undef INLINE
-#define INLINE
-
-#undef streams_fastcall
-#define streams_fastcall
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) __x
-#undef streams_inline
-#define streams_inline
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE
-#endif
-
-#define __hot
-#define __hot_read
-#define __hot_write
-#define __hot_put
-#define __hot_get
-#define __unlikely
-
 #elif defined(CONFIG_STREAMS_SAFE)
 
 #define    never()		do { *(int *)0 = 0; } while(0)
@@ -289,38 +397,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#undef STATIC
-#define STATIC static
-
-#undef INLINE
-#define INLINE inline
-
-#undef streams_fastcall
-#if defined fastcall
-#define streams_fastcall fastcall
-#else
-#define streams_fastcall
-#endif
-#undef STREAMS_FASTCALL
-#if defined FASTCALL
-#define STREAMS_FASTCALL(__x) FASTCALL(__x)
-#else
-#define STREAMS_FASTCALL(__x) __x
-#endif
-#undef streams_inline
-#define streams_inline inline
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE static inline
-#endif
-
-#define __hot __attribute__((section(".text.hot")))
-#define __hot_read  __attribute__((section(".text.hot.read")))
-#define __hot_write __attribute__((section(".text.hot.write")))
-#define __hot_put  __attribute__((section(".text.hot.put")))
-#define __hot_get __attribute__((section(".text.hot.get")))
-#define __unlikely __attribute__((section(".text.unlikely")))
-
 #else
 
 #define    never()		_never()
@@ -343,38 +419,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define   printd(__pks)		_printd(__pks)
 #define    swerr()		_swerr()
 #define   pswerr(__pks)		_pswerr(__pks)
-
-#undef STATIC
-#define STATIC static
-
-#undef INLINE
-#define INLINE inline
-
-#undef streams_fastcall
-#if defined fastcall
-#define streams_fastcall fastcall
-#else
-#define streams_fastcall
-#endif
-#undef STREAMS_FASTCALL
-#if defined FASTCALL
-#define STREAMS_FASTCALL(__x) FASTCALL(__x)
-#else
-#define STREAMS_FASTCALL(__x) __x
-#endif
-#undef streams_inline
-#define streams_inline inline
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE static inline fastcall
-#endif
-
-#define __hot __attribute__((section(".text.hot")))
-#define __hot_read  __attribute__((section(".text.hot.read")))
-#define __hot_write __attribute__((section(".text.hot.write")))
-#define __hot_put  __attribute__((section(".text.hot.put")))
-#define __hot_get __attribute__((section(".text.hot.get")))
-#define __unlikely __attribute__((section(".text.unlikely")))
 
 #endif
 

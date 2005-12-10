@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/09 18:01:43 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/10 11:33:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/09 18:01:43 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/10 11:33:57 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/09 18:01:43 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/10 11:33:57 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -118,7 +118,7 @@ EXPORT_SYMBOL(strthreads);
 
 #if defined CONFIG_STREAMS_KTHREADS
 
-streams_fastcall __hot void
+streams_fastcall void
 __raise_streams(void)
 {
 	struct strthread *t = this_thread;
@@ -126,7 +126,7 @@ __raise_streams(void)
 	wake_up_process(t->proc);
 }
 
-STATIC streams_fastcall __hot void
+STATIC streams_fastcall void
 cpu_raise_streams(unsigned int cpu)
 {
 	struct strthread *t = &strthreads[cpu];
@@ -137,7 +137,7 @@ cpu_raise_streams(unsigned int cpu)
 #else				/* defined CONFIG_STREAMS_KTHREADS */
 
 #if defined HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! defined HAVE_RAISE_SOFTIRQ_EXPORT
-__hot void fastcall
+void fastcall
 raise_softirq(unsigned int nr)
 {
 	unsigned long flags;
@@ -148,7 +148,7 @@ raise_softirq(unsigned int nr)
 }
 #endif
 
-streams_fastcall __hot void
+streams_fastcall void
 __raise_streams(void)
 {
 	raise_softirq(STREAMS_SOFTIRQ);
@@ -164,7 +164,7 @@ __raise_streams(void)
 #endif
 #endif
 
-STATIC streams_fastcall __hot void
+STATIC streams_fastcall void
 cpu_raise_streams(unsigned int cpu)
 {
 	cpu_raise_softirq(cpu, STREAMS_SOFTIRQ);
@@ -716,34 +716,33 @@ freeq(queue_t *rq)
 EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
 
 /* queue gets and puts */
-BIG_STATIC streams_fastcall __hot_write queue_t *
+BIG_STATIC streams_fastcall __hot_out queue_t *
 qget(queue_t *q)
 {
 	struct queinfo *qu;
 
-	if (q) {
+	if (unlikely(q != NULL)) {	/* PROFILED */
 		qu = (typeof(qu)) RD(q);
-		if (atomic_read(&qu->qu_refs) < 1)
-			swerr();
-		atomic_inc(&qu->qu_refs);
+		assert(atomic_read(&qu->qu_refs) >= 1);
 		printd(("%s: queue pair %p ref count is now %d\n",
-			__FUNCTION__, qu, atomic_read(&qu->qu_refs)));
+			__FUNCTION__, qu, atomic_read(&qu->qu_refs) + 1));
+		atomic_inc(&qu->qu_refs);
 	}
 	return (q);
 }
-BIG_STATIC streams_fastcall __hot_read void
+BIG_STATIC streams_fastcall __hot_in void
 qput(queue_t **qp)
 {
 	queue_t *q;
 
-	if ((q = xchg(qp, NULL))) {
+	if (likely((q = xchg(qp, NULL)) != NULL)) {	/* PROFILED */
 		queue_t *rq = RD(q);
 		struct queinfo *qu = (typeof(qu)) rq;
 
 		assert(atomic_read(&qu->qu_refs) >= 1);
 		printd(("%s: queue pair %p ref count is now %d\n",
 			__FUNCTION__, qu, atomic_read(&qu->qu_refs) - 1));
-		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))
+		if (unlikely(atomic_dec_and_test(&qu->qu_refs) != 0))	/* PROFILED */
 			freeq(rq);
 	}
 }
@@ -756,9 +755,9 @@ qput(queue_t **qp)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
-STATIC __hot void
+STATIC __hot_out void
 mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{
+{ /* IRQ DISABLED? */
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct mdbblock *md = obj;
 
@@ -780,12 +779,12 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *  but, if we are at irq, then we will only use the supplied value, even if %NULL.
  */
 
-STATIC streams_inline streams_fastcall __hot_write queue_t *
+STATIC streams_inline streams_fastcall __hot_out queue_t *
 queue_guess(queue_t *q)
 {
 	queue_t *guess;
 
-	if ((guess = q) == NULL && in_streams())
+	if (unlikely((guess = q) == NULL && in_streams()))	/* PROFILED */
 		guess = this_thread->currentq;
 	return (guess);
 }
@@ -814,7 +813,7 @@ queue_guess(queue_t *q)
  *  we also return an allocation failure if the number of message blocks exceeds a tunable
  *  threshold.
  */
-BIG_STATIC streams_fastcall __hot_write mblk_t *
+BIG_STATIC streams_fastcall __hot_out mblk_t *
 mdbblock_alloc(uint priority, void *func)
 {
 	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
@@ -823,7 +822,7 @@ mdbblock_alloc(uint priority, void *func)
 
 	/* might be able to do this first for other than BRPI_HI and BPRI_FT.  Another thing to do
 	   is the percentage of thewall trick: BPRI_LO => 80%, BPRI_MED => 90%, BPRI_HI => 100% */
-	if (unlikely(atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs))
+	if (unlikely(atomic_read(&sdi->si_cnt) > sysctl_str_nstrmsgs))	/* PROFILED */
 		goto fail;
 	slab_flags = (priority == BPRI_WAITOK) ? SLAB_KERNEL : SLAB_ATOMIC;
 #if 0
@@ -938,7 +937,7 @@ raise_local_bufcalls(void)
  *  is not called before the bufcall or timeout function returns.  Well, maybe for timeouts, but not
  *  for bufcalls.
  */
-STATIC streams_fastcall __hot_read void
+STATIC streams_inline streams_fastcall __hot_in void
 raise_bufcalls(void)
 {
 	struct strthread *t;
@@ -997,7 +996,7 @@ mdbblock_free(mblk_t *mp)
 	return;
 }
 #else
-BIG_STATIC_INLINE streams_fastcall __hot_read void
+BIG_STATIC_INLINE streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
 	/* The old approach didn't run too fast.  We might as well free them back to the memory
@@ -1968,7 +1967,7 @@ freezechk(queue_t *q)
  *  - putp() returns the integer result from the modules put procedure.
  *  - putp() does not perform any synchronization
  */
-STATIC streams_inline streams_fastcall __hot_write void
+STATIC streams_inline streams_fastcall __hot_out void
 putp_fast(struct strthread *t, queue_t *q, mblk_t *mp)
 {
 	queue_t *qold;
@@ -1999,7 +1998,7 @@ STATIC void
 putp(queue_t *q, mblk_t *mp)
 {
 	struct strthread *t = this_thread;
-	__builtin_prefetch(t,1,3);
+	prefetchw(t);
 	putp_fast(t, q, mp);
 }
 
@@ -2106,10 +2105,10 @@ srvp_fast(queue_t *q)
 	ctrace(qput(&q));	/* cancel qget from qschedule */
 }
 #else
-STATIC streams_inline streams_fastcall __hot void
+STATIC streams_inline streams_fastcall __hot_in void
 srvp_fast(struct strthread *t, queue_t *q)
 {
-	__builtin_prefetch(t,1,3);
+	prefetchw(t);
 	dassert(q);
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
 
@@ -2133,6 +2132,7 @@ srvp_fast(struct strthread *t, queue_t *q)
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
 			(void) q->q_qinfo->qi_srvp(q);
+			prefetchw(t);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
 			t->currentq = qold;
 #ifdef CONFIG_SMP
@@ -2182,7 +2182,7 @@ defer_syncq(struct syncq_cookie *sc, int exclus)
 	if (current_context() < CTX_STREAMS) {
 		/* refuse to defer in process context */
 		struct syncq *sq = sc->sc_sq;
-		queue_t *q = sc->sc_q;
+		ueue_t *q = sc->sc_q;
 		int rval = 0;
 
 		DECLARE_WAITQUEUE(wait, current);
@@ -2725,7 +2725,7 @@ STATIC void
 qputp_slow(queue_t *q, mblk_t *mp)
 {
 	struct strthread *t = this_thread;
-	__builtin_prefetch(t,1,3);
+	prefetchw(t);
 	qputp(t, q, mp);
 }
 
@@ -2769,9 +2769,9 @@ qputp_slow(queue_t *q, mblk_t *mp)
  *  procedures.  Care should be taken if the filtering function accesses shared state (e.g. the
  *  queue's private structure).
  */
-streams_fastcall __hot_write void
+streams_fastcall void
 put(queue_t *q, mblk_t *mp)
-{
+{ /* PROFILED */
 	struct strthread *t = this_thread;
 
 	dassert(mp);
@@ -2796,7 +2796,7 @@ put(queue_t *q, mblk_t *mp)
 			prlock(sd);
 		}
 #endif
-		__builtin_prefetch(t,1,3);
+		prefetchw(t);
 
 		if (unlikely(q->q_ftmsg != NULL)) {
 			/* This AIX message filtering thing is really bad for performance when done 
@@ -2881,12 +2881,12 @@ EXPORT_SYMBOL(put);
  *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
  *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
  */
-streams_fastcall __hot_write void
+streams_fastcall __hot_out void
 putnext(queue_t *q, mblk_t *mp)
 {
 	struct strthread *t = this_thread;
 
-	__builtin_prefetch(t,1,3);
+	prefetchw(t);
 
 	dassert(mp);
 	dassert(q);
@@ -3530,7 +3530,7 @@ EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/streams/kmem.h */
  *  memory, we also want to raise pending buffer callbacks on all STREAMS scheduler threads so that
  *  they can attempt to use the memory.
  */
-__hot_read void
+__hot_in void
 kmem_free(void *addr, size_t size)
 {
 	kfree(addr);
@@ -3783,7 +3783,7 @@ runsyncq(struct syncq *sq)
 			register queue_t *q, *q_link;
 			struct strthread *t = this_thread;
 
-			__builtin_prefetch(t,1,3);
+			prefetchw(t);
 
 			/* process queue service */
 			while ((q_link = xchg(&sq->sq_qhead, NULL))) {	/* MP-SAFE */
@@ -3891,7 +3891,7 @@ bufcalls(struct strthread *t)
  *
  *  Run queue service procedures.
  */
-STATIC streams_inline streams_fastcall __hot void
+STATIC streams_inline streams_fastcall __hot_in void
 queuerun(struct strthread *t)
 {
 	queue_t *q, *q_link;
@@ -3900,16 +3900,18 @@ queuerun(struct strthread *t)
 		clear_bit(qrunflag, &t->flags);
 		if (likely((q_link = xchg(&t->qhead, NULL)) != NULL)) {	/* MP-SAFE */
 			t->qtail = &t->qhead;
-			while ((q = q_link)) {
+			prefetchw(q_link->q_link);
+			q = q_link;
+			do {
 				q_link = xchg(&q->q_link, NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
 				qsrvp(t, q);
 #else
 				srvp_fast(t, q);
 #endif
-				__builtin_prefetch(q->q_link,1,1);
-			}
-			__builtin_prefetch(t->qhead,1,1);
+				prefetchw(q->q_link);
+			} while (unlikely((q = q_link)));
+			prefetchw(t->qhead);
 		}
 	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
 }
@@ -4030,22 +4032,22 @@ freechain(mblk_t *mp, mblk_t **mpp)
  *  This is the internal softirq version of runqueues().
  */
 #if defined CONFIG_STREAMS_KTHREADS
-STATIC streams_fastcall __hot void
+STATIC streams_fastcall __hot_in void
 _runqueues(void)
 #else
-STATIC __hot void
+STATIC __hot_in void
 _runqueues(struct softirq_action *unused)
 #endif
-{
+{				/* PROFILED */
 	struct strthread *t;
 
 	trace();
 	t = this_thread;
 
-	if (unlikely(!(t->flags & (QRUNFLAGS))))
+	if (unlikely(!(t->flags & (QRUNFLAGS))))	/* PROFILED */
 		return;
 
-	if (unlikely(atomic_read(&t->lock) != 0))
+	if (unlikely(atomic_read(&t->lock) != 0))	/* PROFILED */
 		return ctrace(set_bit(qwantrun, &t->flags));
 
 	atomic_inc(&t->lock);
@@ -4076,7 +4078,7 @@ _runqueues(struct softirq_action *unused)
 				ctrace(bufcalls(t));
 		}
 		/* run queue service procedures if necessary */
-		if (likely(test_bit(qrunflag, &t->flags) != 0))
+		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
 			ctrace(queuerun(t));
 		if (unlikely((t->flags & (FLUSHWORK | FREEBLKS)) != 0)) {
 			/* free flush chains if necessary */
@@ -4102,9 +4104,9 @@ _runqueues(struct softirq_action *unused)
  *  system call.  All stream heads (regular stream head, fifo/pipe stream head, socket stream
  *  head) need this function exported so that they can be called at the end of a system call.
  */
-__hot void
+__hot_in void
 runqueues(void)
-{
+{ /* PROFILED */
 #if 0
 	return;
 #else
@@ -4285,7 +4287,7 @@ sd_put(struct stdata **sdp)
 EXPORT_SYMBOL(sd_put);		/* include/sys/streams/strsubr.h */
 #endif
 
-BIG_STATIC_STH streams_fastcall __hot void
+BIG_STATIC_STH streams_fastcall void
 sd_put_slow(struct stdata **sdp)
 {
 	sd_put(sdp);
@@ -4404,7 +4406,7 @@ str_init_caches(void)
 
 #if defined CONFIG_STREAMS_KTHREADS
 #if defined HAVE_KINC_LINUX_KTHREAD_H
-STATIC __hot int
+STATIC int
 kstreamd(void *__bind_cpu)
 {
 #if 0
@@ -4572,7 +4574,7 @@ STATIC asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
 #undef do_exit
 #define do_exit do_exit_
 #endif
-STATIC __hot int
+STATIC int
 kstreamd(void *__bind_cpu)
 {
 	int bind_cpu = (int) (long) __bind_cpu;
@@ -4600,7 +4602,7 @@ kstreamd(void *__bind_cpu)
 			do_exit(0);
 		if (!(t->flags & (QRUNFLAGS))) {
 			schedule();
-			__builtin_prefetch(t,1,3);
+			prefetchw(t);
 			if (signal_pending(current)
 			    && sigismember(&current->pending.signal, SIGKILL))
 				break;
@@ -4609,7 +4611,7 @@ kstreamd(void *__bind_cpu)
 		_runqueues();
 		if (current->need_resched)
 			schedule();
-		__builtin_prefetch(t,1,3);
+		prefetchw(t);
 		if (signal_pending(current)
 		    && sigismember(&current->pending.signal, SIGKILL))
 			break;

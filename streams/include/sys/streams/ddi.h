@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.30 2005/12/09 00:27:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.31 2005/12/10 11:33:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:48 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/09 00:27:48 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/10 11:33:57 $"
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -132,16 +132,16 @@ int unlink(char *pathname);
 __STRUTIL_EXTERN_INLINE int
 copyin(const void *from, void *to, size_t len)
 {
-	if (copy_from_user(to, from, len))
-		return (-EFAULT);
-	return (0);
+	if (!copy_from_user(to, from, len))
+		return (0);
+	return (-EFAULT);
 }
 __STRUTIL_EXTERN_INLINE int
 copyout(const void *from, void *to, size_t len)
 {
-	if (copy_to_user(to, from, len))
-		return (-EFAULT);
-	return (0);
+	if (!copy_to_user(to, from, len))
+		return (0);
+	return (-EFAULT);
 }
 
 /* FIXME: There are faster ways to do these... */

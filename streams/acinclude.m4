@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/12/09 00:27:42 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/10 11:33:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/09 00:27:42 $ by $Author: brian $
+# Last Modified $Date: 2005/12/10 11:33:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -146,7 +146,38 @@ AC_DEFUN([_LFS_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _LFS_SETUP_OPTIMIZE
+# -----------------------------------------------------------------------------
+# Optimizations and assertions are set up differently now.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_OPTIMIZE], [dnl
+    case "$linux_cv_optimize" in
+	(size)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OPTIMIZE_SIZE], [], [Define when
+		optimizing for size.  That is -Os was passed to the compiler.])
+	    ;;
+	(speed)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OPTIMIZE_SPEED], [], [Define when
+		optimizing for speed.  That is -O3 was passed to the compiler.])
+	    ;;
+	(quick)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OPTIMIZE_NONE], [], [Define when
+		optimizing for profiling.  That is -O0 -g was passed to the
+		compiler.])
+	    ;;
+	(normal | *)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OPTIMIZE_NORMAL], [], [Define
+		when performing normal optimization.  That is -O2 was passed to
+		the compiler.])
+	    ;;
+    esac
+])# _LFS_SETUP_OPTIMIZE
+# =============================================================================
+
+# =============================================================================
 # _LFS_SETUP_DEBUG
+# -----------------------------------------------------------------------------
+# Optimizations and assertions are set up differently now.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
     case "$linux_cv_debug" in
@@ -813,6 +844,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _LFS_CHECK_KERNEL
+    _LFS_SETUP_OPTIMIZE
     _LFS_SETUP_DEBUG
     _LFS_SETUP_MODULE
     _LFS_SETUP_SYNCQS

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/08 19:40:35 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 11:33:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/08 19:40:35 $ by $Author: brian $
+# Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1578,12 +1578,28 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 		[specify optimization, normal, size, speed or quick.
 		@<:@default=normal@:>@]),
 	    [with_k_optimize="$withval"],
-	    [with_k_optimize='normal'])
+	    [with_k_optimize=''])
 	case "${with_k_optimize:-normal}" in
-	    (size)   linux_cflags="$linux_cflags${linux_cflags:+ }-Os" ;;
-	    (speed)  linux_cflags="$linux_cflags${linux_cflags:+ }-O3" ;;
-	    (quick)  linux_cflags="$linux_cflags${linux_cflags:+ }-O0" ;;
-	    (*)      linux_cflags="$linux_cflags${linux_cflags:+ }-O2" ;;
+	    (size)
+		linux_cflags="$linux_cflags${linux_cflags:+ }-Os"
+		linux_cv_debug="_NONE"
+		linux_cv_optimize='size'
+		;;
+	    (speed)
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g"
+		linux_cv_debug="_NONE"
+		linux_cv_optimize='speed'
+		;;
+	    (normal)
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g"
+		linux_cv_debug="_SAFE"
+		linux_cv_optimize='normal'
+		;;
+	    (quick)
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g"
+		linux_cv_debug="_TEST"
+		linux_cv_optimize='quick'
+		;;
 	esac
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
@@ -1651,6 +1667,28 @@ dnl
 	linux_cv_k_cflags="$linux_cflags"
 	linux_cv_k_more_cppflags="$linux_cppflags"
     ])
+    case "${linux_cv_optimize:-normal}" in
+	(size)
+	    AC_DEFINE([_OPTIMIZE_SIZE], [1], [Define for kernel image size
+		optimizations.  This has the effect of -Os and no -g, and
+		disabling all assertions.])
+	    ;;
+	(speed)
+	    AC_DEFINE([_OPTIMIZE_SPEED], [1], [Define for kernel image
+		speed optimizations.  This has the effect of -O3 -g, and
+		disabling all assertions.])
+	    ;;
+	(normal)
+	    AC_DEFINE([_OPTIMIZE_NORMAL], [1], [Define for kernel image
+		normal optimization.  This has the effect of -O2 -g, and
+		setting assertions to SAFE.])
+	    ;;
+	(quick)
+	    AC_DEFINE([_OPTIMIZE_NONE], [1], [Define for kernel image
+		testing (profiling).  This has the effect of -O0 -g, and
+		setting assertions to TEST.])
+	    ;;
+    esac
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
 	cp -f "$kconfig" .config
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check`"
@@ -1711,7 +1749,6 @@ dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
     AC_MSG_CHECKING([for kernel debugging])
-    linux_cv_debug='_NONE'
     AC_ARG_ENABLE([k-safe],
 	AS_HELP_STRING([--enable-k-safe],
 	    [enable kernel module run-time safety checks.

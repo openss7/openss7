@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/09 18:01:44 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/10 11:33:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:44 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 11:33:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/09 18:01:44 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/10 11:33:58 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/09 18:01:44 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/10 11:33:58 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -286,12 +286,12 @@ krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
 #endif
 #endif
 
-STATIC int
+STATIC streams_inline streams_fastcall __hot int
 db_ref(dblk_t * db)
 {
 	return (db->db_ref = atomic_read(&db->db_users));
 }
-STATIC void
+STATIC streams_inline streams_fastcall __hot_out void
 db_set(dblk_t * db, int val)
 {
 	atomic_set(&db->db_users, val);
@@ -312,7 +312,7 @@ db_dec(dblk_t * db)
 	db_ref(db);
 }
 #endif
-STATIC int
+STATIC streams_inline streams_fastcall __hot_in int
 db_dec_and_test(dblk_t * db)
 {
 	int ret = atomic_dec_and_test(&db->db_users);
@@ -328,12 +328,12 @@ db_dec_and_test(dblk_t * db)
 #define databuf_offset \
 	(((unsigned char *)&((struct mdbblock *)0)->databuf[0]) - ((unsigned char *)0))
 
-STATIC mblk_t *
+STATIC streams_inline streams_fastcall __hot_in mblk_t *
 db_to_mb(dblk_t * db)
 {
 	return ((mblk_t *) ((unsigned char *) db - datablk_offset + msgblk_offset));
 }
-STATIC unsigned char *
+STATIC streams_inline streams_fastcall __hot_in unsigned char *
 db_to_buf(dblk_t * db)
 {
 	return ((unsigned char *) db - datablk_offset + databuf_offset);
@@ -346,12 +346,12 @@ mb_to_buf(mblk_t *mb)
 	return ((unsigned char *) mb - msgblk_offset + databuf_offset);
 }
 #endif
-STATIC dblk_t *
+STATIC streams_inline streams_fastcall __hot_in dblk_t *
 mb_to_db(mblk_t *mb)
 {
 	return ((dblk_t *) ((unsigned char *) mb - msgblk_offset + datablk_offset));
 }
-STATIC struct mdbblock *
+STATIC streams_inline streams_fastcall __hot_out struct mdbblock *
 mb_to_mdb(mblk_t *mb)
 {
 	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
@@ -443,7 +443,7 @@ EXPORT_SYMBOL(adjmsg);		/* include/sys/streams/stream.h */
  *  @size:	size of message block in bytes
  *  @priority:	priority of the allocation
  */
-streams_fastcall __hot_write mblk_t *
+streams_fastcall __hot_out mblk_t *
 allocb(size_t size, uint priority)
 {
 	mblk_t *mp;
@@ -463,7 +463,7 @@ allocb(size_t size, uint priority)
 		db->db_lim = base + size;
 		db->db_size = size;
 		db_set(db, 1);
-		db->db_type = M_DATA;	/* not necessary if zeroed */
+		// db->db_type = M_DATA;	/* not necessary if zeroed */
 		/* set up message block */
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
@@ -622,7 +622,7 @@ EXPORT_SYMBOL(esballoc);
  *  freeb:	- free a message block
  *  @mp:	message block to free
  */
-streams_fastcall __hot_read void
+streams_fastcall __hot_in void
 freeb(mblk_t *mp)
 {
 	dblk_t *dp, *db;
@@ -649,7 +649,7 @@ freeb(mblk_t *mp)
 		/* free data block */
 		mblk_t *mb = db_to_mb(db);
 
-		if (db->db_base != db_to_buf(db)) {
+		if (unlikely(db->db_base != db_to_buf(db))) {
 			/* handle external data buffer */
 			if (!db->db_frtnp)
 				kmem_free(db->db_base, db->db_size);
@@ -1012,7 +1012,7 @@ STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
  *  takes a Stream head read lock.  This is a little bit overkill for intermediate modules, so we
  *  now only take a Stream head read lock if the queue is a Stream end (i.e., no q->q_next pointer).
  */
-streams_fastcall __hot_read void
+streams_fastcall void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	queue_t *q_back;
@@ -1076,7 +1076,7 @@ EXPORT_SYMBOL(qbackenable);
  *  IMPLEMENTATION: The current implementation is much faster than the older method of walking the
  *  queue bands, even considering that there were probably few, if any, queue bands.
  */
-streams_fastcall __unlikely int
+streams_inline streams_fastcall __hot_in int
 bcangetany(queue_t *q)
 {
 	int found = 0;
@@ -1115,7 +1115,7 @@ EXPORT_SYMBOL(bcangetany);
  *
  *  LOCKING: No locks are required across the call.
  */
-streams_fastcall __unlikely int
+streams_inline streams_fastcall __hot_in int
 bcanget(queue_t *q, unsigned char band)
 {
 	int found = 0;
@@ -1142,7 +1142,7 @@ bcanget(queue_t *q, unsigned char band)
 
 EXPORT_SYMBOL(bcanget);		/* include/sys/streams/stream.h */
 
-STATIC streams_fastcall int
+STATIC streams_inline streams_fastcall __hot_in int
 _bcanputany(queue_t *q)
 {
 	bool result;
@@ -1207,7 +1207,7 @@ EXPORT_SYMBOL(bcanputany);	/* include/sys/streams/stream.h */
  *  CONTEXT: bcanputnextany() can be called from STREAMS scheduler context, or from any context that
  *  holds a stream head read or write lock across the call.
  */
-streams_fastcall int
+streams_inline streams_fastcall __hot_in int
 bcanputnextany(queue_t *q)
 {
 	int result;
@@ -1310,7 +1310,7 @@ __get_qband(queue_t *q, unsigned char band)
  *  will enable the queue if necessary.  If it back-enables before we call putbq(9) then the service
  *  procedure will go for another run anyway.
  */
-STATIC streams_fastcall __hot_write int
+STATIC streams_inline streams_fastcall __hot_out int
 _bcanput(queue_t *q, unsigned char band)
 {
 	int result = 1;
@@ -1448,7 +1448,7 @@ EXPORT_SYMBOL(bcanput);
  *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
  *  context by taking a plumb read lock.
  */
-streams_fastcall __hot_write int
+streams_inline streams_fastcall __hot_out int
 bcanputnext(queue_t *q, unsigned char band)
 {
 	int result;
@@ -1643,7 +1643,7 @@ EXPORT_SYMBOL(qready);		/* include/sys/streams/stream.h */
 /**
  *  setqsched:	- schedule execution of queue procedures
  */
-__hot void
+void
 setqsched(void)
 {
 	struct strthread *t = this_thread;
@@ -1659,7 +1659,7 @@ EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
  *  @q:		queue to schedule for service
  *
  */
-STATIC streams_fastcall __hot void
+STATIC streams_fastcall void
 qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
@@ -1678,7 +1678,7 @@ qschedule(queue_t *q)
  *  Another name for qschedule(9), qenable() schedules a queue for service regardless of the setting
  *  of the %QNOENB_BIT, but has to check for the existence of a service procedure.
  */
-streams_fastcall __hot void
+streams_fastcall void
 qenable(queue_t *q)
 {
 	if (likely(q->q_qinfo->qi_srvp != NULL))
@@ -1695,7 +1695,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
  *  procedure if a service procedure exists for @q, and if the queue has not been previously
  *  noenabled with noenable() (i.e. the %QNOENB flag is set on the queue).
  */
-__hot int
+int
 enableq(queue_t *q)
 {
 	if (likely(q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag))) {
@@ -1765,9 +1765,9 @@ EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 /*
  *  __putbq:
  */
-STATIC streams_inline streams_fastcall __hot_write int
+STATIC streams_fastcall int
 __putbq(queue_t *q, mblk_t *mp)
-{
+{ /* IRQ DISABLED */
 	int enable = 0;
 	mblk_t *b_next, *b_prev;
 
@@ -1854,7 +1854,7 @@ __putbq(queue_t *q, mblk_t *mp)
  *  @q:		queue to place back message
  *  @mp:	message to place back
  */
-streams_fastcall __hot_write int
+streams_fastcall int
 putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -2064,7 +2064,7 @@ EXPORT_SYMBOL(putnextctl2);
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-STATIC streams_inline streams_fastcall __hot_write int
+STATIC streams_fastcall int
 __putq(queue_t *q, mblk_t *mp)
 {
 	int enable;
@@ -2159,7 +2159,7 @@ __putq(queue_t *q, mblk_t *mp)
  *  CONTEXT: Any.  It is safe to call this function directly from an ISR to place messages on a
  *  driver's lowest read queue.  Should not be frozen by the caller.
  */
-streams_fastcall __hot_write int
+streams_fastcall int
 putq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -2203,7 +2203,7 @@ EXPORT_SYMBOL(putq);
 /*
  *  __insq:
  */
-STATIC streams_fastcall __hot_write int
+STATIC streams_fastcall int
 __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int enable = 0;
@@ -2308,7 +2308,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
  *
  *  LOCKING: The caller must lock the queue with MPSTR_QLOCK() or freezestr() across the call.
  */
-streams_fastcall __hot_write int
+streams_fastcall int
 insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -3023,9 +3023,9 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  NOTICES: rmvq() panics when passed null pointers.  rmvq() panics if a write lock has not been
  *  taken on the queue.  rmvq() panics if the message is not a queue, or not on the specified queue.
  */
-streams_fastcall __hot_read void
+streams_fastcall __hot_in void
 rmvq(queue_t *q, mblk_t *mp)
-{
+{ /* IRQ DISABLED */
 	bool backenable;
 	unsigned long pl;
 
@@ -3351,7 +3351,7 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
  *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
  *  no message on the queue.
  */
-STATIC streams_inline streams_fastcall __hot_read mblk_t *
+STATIC streams_fastcall mblk_t *
 __getq(queue_t *q, bool *be)
 {
 	mblk_t *mp;
@@ -3473,7 +3473,7 @@ __getq(queue_t *q, bool *be)
  *  MP-STREAMS: Note that qbackenable() will take its own Stream head read lock for Stream ends
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
-streams_fastcall __hot_read mblk_t *
+streams_fastcall mblk_t *
 getq(queue_t *q)
 {
 	mblk_t *mp;

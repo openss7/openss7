@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:45 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/10 11:33:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:45 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 11:33:58 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -315,11 +315,20 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define frozen_by_caller(__q)		(bool)({ ((qstream((__q)))->sd_freezer == current); })
 #define not_frozen_by_caller(__q)	(bool)({ ((qstream((__q)))->sd_freezer != current); })
 
+/* no IRQ suppression for profiling */
+#ifdef CONFIG_STREAMS_TEST
+#define zlockinit(__sd)			do { rwlock_init(&(__sd)->sd_freeze); } while (0)
+#define zwlock(__sd)			(unsigned long)({ write_lock(&(__sd)->sd_freeze); (__sd)->sd_freezer = current; 0; })
+#define zwunlock(__sd,__pl)		do { (__sd)->sd_freezer = NULL; write_unlock(&(__sd)->sd_freeze); (void)(__pl); } while (0)
+#define zrlock(__sd)			(unsigned long)({ if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); 0; })
+#define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); (void)(__pl); } while (0)
+#else
 #define zlockinit(__sd)			do { rwlock_init(&(__sd)->sd_freeze); } while (0)
 #define zwlock(__sd)			(unsigned long)({ unsigned long __pl; write_lock_irqsave(&(__sd)->sd_freeze, __pl); (__sd)->sd_freezer = current; __pl; })
 #define zwunlock(__sd,__pl)		do { (__sd)->sd_freezer = NULL; write_unlock_irqrestore(&(__sd)->sd_freeze, (__pl)); } while (0)
 #define zrlock(__sd)			(unsigned long)({ unsigned long __pl; local_irq_save(__pl); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); __pl; })
 #define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); local_irq_restore((__pl)); } while (0)
+#endif
 
 #define stream_barrier(__sd)		do { unsigned long __pl; __pl = zrlock((__sd)); zrunlock((__sd),__pl); } while (0)
 #define freeze_barrier(__q)		do { struct stdata *__sd = qstream((__q)); stream_barrier(__sd); } while (0)
@@ -367,8 +376,14 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #define qlockinit(__q)			do { rwlock_init(&(__q)->q_lock); } while (0)
 #define qwlock(__q)			(unsigned long)({ unsigned long __pl; struct stdata *__sd = qstream((__q)); __pl = zrlock(__sd); write_lock(&(__q)->q_lock); __pl; })
 #define qwunlock(__q,__pl)		do { struct stdata *__sd = qstream((__q)); write_unlock(&(__q)->q_lock); zrunlock((__sd),(__pl)); }  while (0)
+
+#ifdef CONFIG_STREAMS_TEST
+#define qrlock(__q)			(unsigned long)({ read_lock(&(__q)->q_lock); 0; })
+#define qrunlock(__q,__pl)		do { read_unlock(&(__q)->q_lock); (void)(__pl); }  while (0)
+#else
 #define qrlock(__q)			(unsigned long)({ unsigned long __pl; read_lock_irqsave(&(__q)->q_lock, __pl);  __pl;  })
 #define qrunlock(__q,__pl)		do { read_unlock_irqrestore(&(__q)->q_lock,(__pl)); }  while (0)
+#endif
 
 #else
 
