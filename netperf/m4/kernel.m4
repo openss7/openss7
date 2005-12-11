@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 11:33:57 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/11 13:06:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
+# Last Modified $Date: 2005/12/11 13:06:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -167,9 +167,6 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_BOOT
     _LINUX_CHECK_KERNEL_BUILDDIR
     _LINUX_CHECK_KERNEL_SRCDIR
-    _LINUX_CHECK_KERNEL_VERSIONS
-    _LINUX_CHECK_KERNEL_MODVERSIONS
-    _LINUX_CHECK_KERNEL_MODVER
     _LINUX_CHECK_KERNEL_SYSMAP
     _LINUX_CHECK_KERNEL_KSYMS
     _LINUX_CHECK_KERNEL_KALLSYMS
@@ -184,6 +181,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_REGPARM
     _LINUX_CHECK_KERNEL_VERSIONS
     _LINUX_CHECK_KERNEL_MODVERSIONS
+    _LINUX_CHECK_KERNEL_MODVER
     _LINUX_CHECK_KERNEL_UPDATE_MODULES
     _LINUX_CHECK_KERNEL_MODULE_PRELOAD
     PACKAGE_KNUMBER="${knumber}"
