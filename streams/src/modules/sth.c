@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2005/12/11 09:02:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 20:21:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 09:02:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2005/12/11 09:02:20 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2005/12/11 09:02:20 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2005/12/11 09:02:20 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -164,14 +164,8 @@ struct module_info str_minfo = {
 	.mi_idname = CONFIG_STREAMS_STH_NAME,
 	.mi_minpsz = STRMINPSZ,
 	.mi_maxpsz = STRMAXPSZ,
-#if 1
-	/* smaller buffers are faster for some reason... */
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
-#else
-	.mi_hiwat = SHEADHIWAT,
-	.mi_lowat = SHEADLOWAT,
-#endif
 };
 
 int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
@@ -1952,8 +1946,11 @@ strwakeioctl(struct stdata *sd)
 
 	/* outdate old id */
 	++sd->sd_iocid;
+
+	mp = sd->sd_iocblk;
+	sd->sd_iocblk = NULL;
 	/* clean out remaining blocks */
-	if ((mp = xchg(&sd->sd_iocblk, NULL))) {
+	if (likely(mp != NULL)) {
 		swerr();
 		ctrace(freemsg(mp));
 	}
@@ -1980,22 +1977,34 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 				mp = ERR_PTR(err);
 				break;
 			}
-			if ((mp = xchg(&sd->sd_iocblk, NULL)))
+			mp = sd->sd_iocblk;
+			prefetchw(mp);
+			if (likely(mp != NULL)) {
+				prefetch(mp->b_datap);
+				sd->sd_iocblk = NULL;
 				break;
+			}
 			srunlock(sd);
 			strschedule(); /* save context switch */
 			*timeo = schedule_timeout(*timeo);
+			prefetchw(sd);
 			srlock(sd);
 		} while (1);
 	} else {
 		/* timeo is NULL for no timeout no signals */
 		do {
 			set_current_state(TASK_UNINTERRUPTIBLE);
-			if ((mp = xchg(&sd->sd_iocblk, NULL)))
+			mp = sd->sd_iocblk;
+			prefetchw(mp);
+			if (likely(mp != NULL)) {
+				prefetch(mp->b_datap);
+				sd->sd_iocblk = NULL;
 				break;
+			}
 			srunlock(sd);
 			strschedule(); /* save context switch */
 			schedule();
+			prefetchw(sd);
 			srlock(sd);
 		} while (1);
 	}
@@ -2010,9 +2019,13 @@ strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	mblk_t *mp;
 
 	/* might already have a response */
-	if ((mp = xchg(&sd->sd_iocblk, NULL)))
+	mp = sd->sd_iocblk;
+	prefetchw(mp);
+	if (likely(mp != NULL)) {
+		prefetch(mp->b_datap);
+		sd->sd_iocblk = NULL;
 		return (mp);
-
+	}
 	return __strwaitiocack(sd, timeo, access);
 }
 
@@ -2024,9 +2037,14 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
 		if (ioc->iocblk.ioc_id == sd->sd_iocid) {
-			if ((mp = xchg(&sd->sd_iocblk, mp))) {
+			mblk_t *db;
+			db = sd->sd_iocblk;
+			prefetchw(db);
+			sd->sd_iocblk = mp;
+			if (unlikely(db != NULL)) {
+				prefetch(db->b_datap);
 				swerr();
-				ctrace(freemsg(mp));
+				ctrace(freemsg(db));
 			}
 			/* might not be sleeping yet */
 			if (waitqueue_active(&sd->sd_waitq))
@@ -2126,7 +2144,7 @@ strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 	size_t copied = 0;
 
 	if (likely((b = mp) != NULL)) {
-		mblk_t *b_cont = b;
+		mblk_t *b_cont = NULL;
 		ssize_t blen, dlen;
 
 		do {
@@ -7728,7 +7746,7 @@ EXPORT_SYMBOL(strm_f_ops);
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
  *  check a bunch of things here, before attempting a putnext().
  */
-int
+int streams_fastcall
 strwput(queue_t *q, mblk_t *mp)
 {				/* PROFILED -- never happens any more */
 	struct stdata *sd;

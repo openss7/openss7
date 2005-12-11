@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 20:21:40 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/11 09:01:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 20:21:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 09:01:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 20:21:40 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/11 09:01:58 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 20:21:40 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/11 09:01:58 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -286,22 +286,40 @@ krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
 #endif
 #endif
 
+STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
+
 STATIC streams_inline streams_fastcall __hot int
 db_ref(dblk_t * db)
 {
+#if 0
 	return (db->db_ref = atomic_read(&db->db_users));
+#else
+	return (db->db_ref);
+#endif
 }
 STATIC streams_inline streams_fastcall __hot_out void
 db_set(dblk_t * db, int val)
 {
+#if 0
 	atomic_set(&db->db_users, val);
 	db_ref(db);
+#else
+	db->db_ref = val;
+#endif
 }
 STATIC void
 db_inc(dblk_t * db)
 {
+#if 0
 	atomic_inc(&db->db_users);
 	db_ref(db);
+#else
+	unsigned long flags;
+
+	spin_lock_irqsave(&db_ref_lock, flags);
+	++db->db_ref;
+	spin_unlock_irqrestore(&db_ref_lock, flags);
+#endif
 }
 
 #if 0
@@ -315,10 +333,20 @@ db_dec(dblk_t * db)
 STATIC streams_inline streams_fastcall __hot_in int
 db_dec_and_test(dblk_t * db)
 {
+#if 0
 	int ret = atomic_dec_and_test(&db->db_users);
 
 	db_ref(db);
 	return ret;
+#else
+	unsigned long flags;
+	bool ret;
+
+	spin_lock_irqsave(&db_ref_lock, flags);
+	ret = (--db->db_ref == 0);
+	spin_unlock_irqrestore(&db_ref_lock, flags);
+	return ret;
+#endif
 }
 
 #define msgblk_offset \
@@ -459,14 +487,18 @@ allocb(size_t size, uint priority)
 					     ? KM_SLEEP : KM_NOSLEEP)) == NULL))
 			goto buf_alloc_error;
 		/* set up data block */
+		db->db_frtnp = NULL;
 		db->db_base = base;
 		db->db_lim = base + size;
-		db->db_size = size;
 		db_set(db, 1);
-		// db->db_type = M_DATA;	/* not necessary if zeroed */
+		db->db_type = M_DATA;
+		db->db_size = size;
 		/* set up message block */
+		mp->b_next = mp->b_prev = mp->b_cont = NULL;
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_flag = 0;
 	}
 	printd(("%s: allocated mblk %p, refs %d\n", __FUNCTION__, mp, (int) mp->b_datap->db_ref));
 	return (mp);
@@ -606,12 +638,15 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		db->db_frtnp = (struct free_rtn *) md->databuf;
 		db->db_base = base;
 		db->db_lim = base + size;
-		db->db_size = size;
 		db_set(db, 1);
-		db->db_type = M_DATA;	/* not necessary if zeroed */
+		db->db_type = M_DATA;
+		db->db_size = size;
 		/* set up message block */
+		mp->b_next = mp->b_prev = mp->b_cont = NULL;
 		mp->b_rptr = mp->b_wptr = db->db_base;
 		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_flag = 0;
 	}
 	return (mp);
 }
@@ -636,7 +671,8 @@ freeb(mblk_t *mp)
 	dassert(mp->b_prev == NULL);
 	dassert(mp->b_next == NULL);
 #endif
-	db = xchg(&mp->b_datap, NULL);
+	db = mp->b_datap;
+	mp->b_datap = NULL;
 
 	printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
 
@@ -663,7 +699,7 @@ freeb(mblk_t *mp)
 	/* if the message block refers to the associated data block then we have already freed the
 	   mdbblock above when necessary; otherwise the entire mdbblock can go if the datab is also 
 	   unused */
-	if (unlikely(db != (dp = mb_to_db(mp)) && !db_ref(dp)))
+	if (unlikely(db != (dp = mb_to_db(mp)) && !dp->db_ref))
 		mdbblock_free(mp);
 	return;
 }
@@ -853,21 +889,24 @@ pullupmsg(mblk_t *mp, ssize_t len)
 		goto error;
 	if (!(base = kmem_alloc(size, KM_NOSLEEP | KM_CACHEALIGN | KM_DMA)))
 		goto free_error;
-	/* msgb unused */
+	/* mark msgb unused */
+	md->msgblk.m_mblock.b_datap = NULL;
+	/* fill out data block */
 	dp = &md->datablk.d_dblock;
+	db->db_frtnp = NULL;
 	dp->db_base = base;
 	dp->db_lim = base + size;
-	dp->db_size = size;
 	db_set(dp, 1);
 	dp->db_type = db->db_type;
+	dp->db_size = size;
 	/* copy from old initial datab */
 	if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0)) {
 		bcopy(mp->b_rptr, base, blen);
 		size -= blen;
 	}
 	/* point old msgb at new datab */
-	mp->b_rptr = dp->db_base;
-	mp->b_wptr = mp->b_rptr + blen;
+	mp->b_rptr = mp->b_wptr = db->db_base;
+	mp->b_wptr += blen;
 	mp->b_datap = dp;
 	/* remove a reference from old initial datab */
 	if (db_dec_and_test(db)) {
@@ -1277,7 +1316,8 @@ __get_qband(queue_t *q, unsigned char band)
 		do {
 			if (!(qb = allocqb()))
 				break;
-			qb->qb_next = xchg(&q->q_bandp, qb);
+			qb->qb_next = q->q_bandp;
+			q->q_bandp = qb;
 			qb->qb_hiwat = q->q_hiwat;
 			qb->qb_lowat = q->q_lowat;
 #if 0
@@ -1643,7 +1683,7 @@ EXPORT_SYMBOL(qready);		/* include/sys/streams/stream.h */
 /**
  *  setqsched:	- schedule execution of queue procedures
  */
-void
+streams_inline void
 setqsched(void)
 {
 	struct strthread *t = this_thread;
@@ -1659,14 +1699,22 @@ EXPORT_SYMBOL(setqsched);	/* include/sys/streams/stream.h */
  *  @q:		queue to schedule for service
  *
  */
-STATIC streams_fastcall void
+STATIC streams_inline streams_fastcall void
 qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		struct strthread *t = this_thread;
+		unsigned long flags;
+		queue_t **qtail;
 
 		/* put ourselves on the run list */
-		_ctrace(*xchg(&t->qtail, &q->q_link) = qget(q));	/* MP-SAFE */
+		prefetchw(t);
+		local_irq_save(flags);
+		qtail = t->qtail;
+		prefetchw(*qtail);
+		t->qtail = &q->q_link;
+		*qtail = qget(q);
+		local_irq_restore(flags);
 		setqsched();
 	}
 }
@@ -1695,7 +1743,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
  *  procedure if a service procedure exists for @q, and if the queue has not been previously
  *  noenabled with noenable() (i.e. the %QNOENB flag is set on the queue).
  */
-int
+streams_fastcall int
 enableq(queue_t *q)
 {
 	if (likely(q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag))) {
@@ -1723,7 +1771,9 @@ enableok(queue_t *q)
 
 	assert(q);
 	assure(not_frozen_by_caller(q));
+#if 0
 	assure(in_procedure_of(q));
+#endif
 	sd = qstream(q);
 	assert(sd);
 
@@ -1750,7 +1800,9 @@ noenable(queue_t *q)
 
 	assert(q);
 	assure(not_frozen_by_caller(q));
+#if 0
 	assure(in_procedure_of(q));
+#endif
 	sd = qstream(q);
 	assert(sd);
 
@@ -1864,7 +1916,9 @@ putbq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(not_frozen_by_caller(q));
+#if 0
 	assure(in_procedure_of(q));
+#endif
 
 	pl = qwlock(q);
 	result = __putbq(q, mp);
@@ -2169,7 +2223,9 @@ putq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(not_frozen_by_caller(q));
+#if 0
 	assure(in_procedure_of(q));
+#endif
 
 	pl = qwlock(q);
 	result = __putq(q, mp);
@@ -2671,7 +2727,9 @@ qprocsoff(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
+#if 0
 	assert(current_context() <= CTX_STREAMS);
+#endif
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct queinfo *qu = ((typeof(qu)) rq);
@@ -3033,7 +3091,9 @@ rmvq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(frozen_by_caller(q));
+#if 0
 	_usual(in_procedure_of(q)); /* not so usual, Stream head does this all the time */
+#endif
 
 	pl = qwlock(q);
 
@@ -3193,7 +3253,9 @@ flushband(queue_t *q, int band, int flag)
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
 	assure(not_frozen_by_caller(q));
+#if 0
 	assure(in_procedure_of(q));
+#endif
 
 	pl = qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
@@ -3319,7 +3381,9 @@ flushq(queue_t *q, int flag)
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
 	assure(not_frozen_by_caller(q));
+#if 0
 	assure(in_procedure_of(q));
+#endif
 
 	pl = qwlock(q);
 	q_nband = q->q_nband;
@@ -3483,7 +3547,9 @@ getq(queue_t *q)
 	assert(q);
 
 	assure(not_frozen_by_caller(q));
+#if 0
 	usual(in_procedure_of(q));
+#endif
 
 	pl = qwlock(q);
 	mp = __getq(q, &backenable);
@@ -3991,7 +4057,8 @@ register_strlog(vstrlog_t newlog)
 	vstrlog_t oldlog;
 
 	write_lock_irqsave(&strlog_reg_lock, flags);
-	oldlog = xchg(&vstrlog_hook, newlog);
+	oldlog = vstrlog_hook;
+	vstrlog_hook = newlog;
 	write_unlock_irqrestore(&strlog_reg_lock, flags);
 	return (oldlog);
 }

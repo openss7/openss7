@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.70 2005/12/09 18:01:37 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.72 2005/12/11 09:01:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 09:01:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/12/09 18:01:37 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/12/11 09:01:41 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -166,7 +166,7 @@ typedef struct free_rtn {
 	caddr_t free_arg;
 } frtn_t;
 
-/* 24 bytes on 32 bit, 44 on 64 bit */
+/* 20 bytes on 32 bit, 36 on 64 bit */
 typedef struct datab {
 	union {
 		struct datab *freep;
@@ -185,11 +185,13 @@ typedef struct datab {
 	unsigned char db_cache[DB_CACHESIZE]; /* where SVR3.1 stuck the internal data buffer */
 #endif
 #if 0
-	unsigned char *db_msgaddr;	/* Mac OT, OSF/1, DGUX, used internally */
+	caddr_t db_msgaddr;		/* Mac OT, OSF/1, DGUX, used internally */
 	long db_filler;			/* Mac OT, OSF/1, DGUX, used internally */
 #endif
+#if 0
 	/* Linux Fast-STREAMS specific members */
 	atomic_t db_users;		/* actual reference count */
+#endif
 } dblk_t;
 
 /* 18 bytes on 32 bit, 30 on 64 bit */
@@ -281,6 +283,8 @@ typedef struct msgb {
 	unsigned short b_flag;		/* message flags */
 #if 0
 	long b_pad2;			/* padding */
+#endif
+#if 0
 	/* private Linux Fast-STREAMS specific members */
 	struct queue *b_queue;		/* queue for this message */
 	size_t b_size;			/* size of this message on queue */
@@ -914,23 +918,30 @@ typedef void (*weld_fcn_t) (weld_arg_t);
 #define BPRI_FT		4	/* Solaris */
 #define BPRI_WAITOK	255	/* OSF/HP-UX */
 
-#define DRVOPEN	    0x0
-#define MODOPEN	    0x1
-#define CLONEOPEN   0x2
-#define CONSOPEN    0x4		/* Solaris */
+#define DRVOPEN		0x0
+#define MODOPEN		0x1
+#define CLONEOPEN	0x2
+#define CONSOPEN	0x4		/* Solaris */
 
-#define OPENFAIL    (-1)
+#define OPENFAIL	(-1)
 
-#define STRHIGH	    5120	/* UnixWare/Solaris */
-#define STRLOW	    1024	/* UnixWare/Solaris */
+#define SHEADHIWAT	65536	/* OSF/HP-UX */
+#define SHEADLOWAT	8192	/* OSF/HP-UX */
+#define MAXIOCBLKSZ	8192	/* OSF/HP-UX */
 
-#define SHEADHIWAT  65536	/* OSF/HP-UX */
-#define SHEADLOWAT  8192	/* OSF/HP-UX */
-#define MAXIOCBLKSZ 8192	/* OSF/HP-UX */
+#if 1
+#define STRHIGH		5120	/* UnixWare/Solaris */
+#define STRLOW		1024	/* UnixWare/Solaris */
+#else
+#define STRHIGH		SHEADHIWAT
+#define STRLOW		SHEADLOWAT
+#endif
+#define STRMAXPSZ	(1<<12)	/* default max psz */
+#define STRMINPSZ	0	/* default max psz */
 
-#define STRLOFRAC   80		/* SVR 3.2/4 compatability (unused) */
-#define STRMEDFRAC  90		/* SVR 3.2/4 compatability (unused) */
-#define STRTHRESH   0		/* SVR 3.2/4 compatability (unused) */
+#define STRLOFRAC	80		/* SVR 3.2/4 compatability (unused) */
+#define STRMEDFRAC	90		/* SVR 3.2/4 compatability (unused) */
+#define STRTHRESH	0		/* SVR 3.2/4 compatability (unused) */
 
 #define STRUIOT_NONE	    -1	/* Solaris */
 #define STRUIOT_DONTCARE     0	/* Solaris */
@@ -1227,7 +1238,7 @@ canenable(queue_t *q)
 	return (!(q->q_flag & QNOENB));
 }
 
-extern int enableq(queue_t *q);
+extern int STREAMS_FASTCALL(enableq(queue_t *q));
 
 extern int putctl(queue_t *q, int type);
 extern int putctl1(queue_t *q, int type, int param);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.59 2005/12/09 18:01:37 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.61 2005/12/11 09:01:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 09:01:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/12/09 18:01:37 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/11 09:01:41 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -258,12 +258,6 @@ struct stdata {
 };
 #endif
 
-#define STRHIGH		5120	/* default hi water mark */
-#define STRLOW		1024	/* default lo water mark */
-
-#define STRMAXPSZ	(1<<12)	/* default max psz */
-#define STRMINPSZ	0	/* default max psz */
-
 enum {
 	IOCWAIT_BIT,
 	RSLEEP_BIT,
@@ -376,15 +370,22 @@ struct strthread {
 	volatile unsigned long flags;	/* flags */
 	struct task_struct *proc;	/* task */
 	atomic_t lock;			/* thread lock */
+#if 0
+	queue_t *currentq;		/* current queue being processed */
+#endif
+	mblk_t *freemblk_head;		/* head of free mdbblocks cached */
+	mblk_t **freemblk_tail;		/* tail of free mdbblocks cached */
+	int freemblks;			/* number of mblks on the free list */
 	queue_t *qhead;			/* first queue in scheduled queues */
 	queue_t **qtail;		/* last queue in scheduled queues */
-	queue_t *currentq;		/* current queue being processed */
 #if defined CONFIG_STREAMS_SYNCQS
 	syncq_t *sqhead;		/* first syncq in scheduled syncqs */
 	syncq_t **sqtail;		/* last sycnq in scheduled sycnqs */
 #endif
 	mblk_t *strmfuncs_head;		/* head of m_func pending exec */
 	mblk_t **strmfuncs_tail;	/* tail of m_func pending exec */
+	struct strevent *freeevnt_head;	/* head of free stream events cached */
+	struct strevent **freeevnt_tail;	/* tail of free stream events cached */
 	struct strevent *strbcalls_head;	/* head of bufcalls pending exec */
 	struct strevent **strbcalls_tail;	/* tail of bufcalls pending exec */
 	struct strevent *strtimout_head;	/* head of timeouts pending exec */
@@ -395,10 +396,6 @@ struct strthread {
 	queue_t **scanqtail;		/* tail of STREAMS scan queue */
 	mblk_t *freemsg_head;		/* head of flushed messages to free */
 	mblk_t **freemsg_tail;		/* tail of flushed messages to free */
-	mblk_t *freemblk_head;		/* head of free mdbblocks cached */
-	mblk_t **freemblk_tail;		/* tail of free mdbblocks cached */
-	struct strevent *freeevnt_head;	/* head of free stream events cached */
-	struct strevent **freeevnt_tail;	/* tail of free stream events cached */
 } __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 #ifndef BIG_COMPILE
@@ -559,8 +556,8 @@ struct mdlinfo {
 #define HDRSZ	(sizeof(struct mbinfo)+sizeof(struct dbinfo))
 #define BUFSZ	(was128-HDRSZ)
 #define FASTBUF ((BUFSZ >= 128) ? 128 : ((BUFSZ >= 64) ? 64 : 32))
-/* 128 - (12 + 28) - 24 = 64 bytes fastbuf on 32-bit (32 bytes in debug mode) */
-/* 256 - (24 + 52) - 44 = 136 => 128 bytes fastbuf on 64-bit (104 => 64 bytes in debug mode) */
+/* 128 - (28 + 12) - 20 = 60 => 64 bytes fastbuf on 32-bit (32 butes in debug mode) */
+/* 256 - (52 + 24) - 36 = 144 => 128 bytes fastbuf on 64-bit (104 => 64 bytes in debug mode) */
 /* having a bunch more for 64-bit is a good idea because elements of M_PROTO blocks will be larger
    as well. */
 

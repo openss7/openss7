@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/12/11 05:46:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 05:46:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/12/11 05:46:08 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/12/11 05:46:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/09 00:27:56 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/12/11 05:46:08 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1603,9 +1603,11 @@ spec_put_super(struct super_block *sb)
 {
 	/* just free our optional mount information */
 #if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
-	spec_sbi_free(xchg(&sb->s_fs_info, NULL));
+	spec_sbi_free(sb->s_fs_info);
+	sb->s_fs_info = NULL;
 #elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
-	spec_sbi_free(xchg(&sb->u.generic_sbp, NULL));
+	spec_sbi_free(sb->u.generic_sbp);
+	sb->u.generic_sbp = NULL;
 #endif
 }
 
@@ -1845,7 +1847,8 @@ specfs_umount(void)
 		mntput(specfs_mnt);
 		spin_lock(&specfs_lock);
 		if (atomic_read(&specfs_mnt->mnt_count) == 1) {
-			kern_umount(xchg(&specfs_mnt, NULL));
+			kern_umount(specfs_mnt);
+			specfs_mnt = NULL;
 		}
 		spin_unlock(&specfs_lock);
 	}

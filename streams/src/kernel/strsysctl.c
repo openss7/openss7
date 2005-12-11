@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/09 18:01:44 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/11 05:46:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:44 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 05:46:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/09 18:01:44 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/11 05:46:08 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/09 18:01:44 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/11 05:46:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -208,5 +208,6 @@ strsysctl_init(void)
 BIG_STATIC void
 strsysctl_exit(void)
 {
-	unregister_sysctl_table(xchg(&streams_sysctl_handle, NULL));
+	unregister_sysctl_table(streams_sysctl_handle);
+	streams_sysctl_handle = NULL;
 }
