@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/10 11:33:58 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/11 09:01:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 11:33:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/11 09:01:59 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -274,7 +274,9 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
  *  CONFIG_SMP is not defined.
  */
 
+#if 0
 #define in_procedure_of(__q)		(bool)({ (this_thread->currentq == (__q)); })
+#endif
 
 /* The following are like _bh, but _str for STREAMS scheduler.  These lock out the STREAMS scheduler
  * from interrupting the current thread and attempting to take a plumbing write lock for a weldq(9)
@@ -388,11 +390,13 @@ extern void STREAMS_FASTCALL(krunlock_irqrestore(klock_t *kl, unsigned long *fla
 #else
 
 
+#if 0
 STATIC streams_inline int
 in_procedure_of(queue_t *q)
 {
 	return (this_thread->currentq == q);
 }
+#endif
 STATIC streams_inline void
 read_str_disable(void)
 {
