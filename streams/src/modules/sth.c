@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 11:33:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 20:21:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/10 11:33:58 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/10 20:21:40 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2126,7 +2126,7 @@ strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 	size_t copied = 0;
 
 	if (likely((b = mp) != NULL)) {
-		mblk_t *b_cont;
+		mblk_t *b_cont = b;
 		ssize_t blen, dlen;
 
 		do {
@@ -3135,8 +3135,8 @@ strllseek(struct file *file, loff_t off, int whence)
  *  @file: user file pointer for the open stream
  *  @poll: poll table pointer
  */
-unsigned __hot_in int
-strpoll(struct file *file, struct poll_table_struct *poll)
+unsigned streams_inline streams_fastcall __hot_in int
+strpoll_fast(struct file *file, struct poll_table_struct *poll)
 {
 	struct stdata *sd;
 	unsigned int mask;
@@ -3168,6 +3168,18 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 	return (mask);
 }
 
+unsigned streams_fastcall int
+strpoll_slow(struct file *file, struct poll_table_struct *poll)
+{
+	return strpoll_fast(file, poll);
+}
+
+unsigned int
+strpoll(struct file *file, struct poll_table_struct *poll)
+{
+	return strpoll_slow(file, poll);
+}
+
 EXPORT_SYMBOL(strpoll);
 
 STATIC __hot_in unsigned int
@@ -3180,7 +3192,7 @@ _strpoll(struct file *file, struct poll_table_struct *poll)
 	if (likely((file->f_mode & (FREAD | FWRITE))) && likely((sd = stri_acquire(file)) != NULL)) {
 		if (likely(straccess_rlock(sd, (FCREAT | FAPPEND)) == 0)) {
 			if (likely(!sd->sd_directio || !sd->sd_directio->poll))
-				mask = strpoll(file, poll);
+				mask = strpoll_fast(file, poll);
 			else
 				mask = sd->sd_directio->poll(file, poll);
 			srunlock(sd);
@@ -3972,13 +3984,13 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	goto error;
 }
 
-STATIC streams_fastcall __hot_read ssize_t
+STATIC ssize_t
 strread_slow(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strread_fast(file, buf, nbytes, ppos);
 }
 
-__hot_read ssize_t
+ssize_t
 strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strread_slow(file, buf, nbytes, ppos);
@@ -4028,7 +4040,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 #endif
 	if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
 		if (likely(!sd->sd_directio || !sd->sd_directio->read))	/* PROFILED */
-			err = strread(file, buf, len, ppos);
+			err = strread_fast(file, buf, len, ppos);
 		else
 			err = sd->sd_directio->read(file, buf, len, ppos);
 		ctrace(sd_put(&sd));
@@ -4218,13 +4230,13 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	goto error;
 }
 
-STATIC streams_fastcall __hot_write ssize_t
+STATIC streams_fastcall ssize_t
 strwrite_slow(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strwrite_fast(file, buf, nbytes, ppos);
 }
 
-__hot_write ssize_t
+ssize_t
 strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strwrite_slow(file, buf, nbytes, ppos);
@@ -4276,7 +4288,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 #endif
 	if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
 		if (likely(!sd->sd_directio || !sd->sd_directio->write))	/* PROFILED */
-			err = strwrite(file, buf, len, ppos);
+			err = strwrite_fast(file, buf, len, ppos);
 		else
 			err = sd->sd_directio->write(file, buf, len, ppos);
 		ctrace(sd_put(&sd));
@@ -4449,8 +4461,8 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
  *
  *  NOTICES: GLIBC2 puts -1 in band when it is called as putmsg().
  */
-__hot_put int
-strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
+STATIC streams_inline streams_fastcall __hot_put int
+strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
 	   int flags)
 {
 	struct stdata *sd = stri_lookup(file);
@@ -4532,6 +4544,20 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	goto error;
 }
 
+STATIC streams_fastcall int
+strputpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
+	   int flags)
+{
+	return strputpmsg_fast(file, ctlp, datp, band, flags);
+}
+
+int
+strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
+	   int flags)
+{
+	return strputpmsg_slow(file, ctlp, datp, band, flags);
+}
+
 EXPORT_SYMBOL(strputpmsg);
 
 STATIC streams_fastcall __hot_put int
@@ -4546,7 +4572,7 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 		if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
 			if (likely(!sd->sd_directio || !sd->sd_directio->putpmsg))	/* PROFILED 
 											 */
-				err = strputpmsg(file, ctlp, datp, band, flags);
+				err = strputpmsg_fast(file, ctlp, datp, band, flags);
 			else
 				err = sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
 			ctrace(sd_put(&sd));
@@ -4575,8 +4601,8 @@ _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
  *
  *  GLIBC2 puts NULL in bandp for getmsg().
  */
-__hot_get int
-strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
+STATIC streams_inline streams_fastcall __hot_get int
+strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
 	   int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd = stri_lookup(file);
@@ -4847,6 +4873,20 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	goto error;
 }
 
+STATIC streams_fastcall int
+strgetpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
+	   int __user *bandp, int __user *flagsp)
+{
+	return strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
+}
+
+int
+strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
+	   int __user *bandp, int __user *flagsp)
+{
+	return strgetpmsg_slow(file, ctlp, datp, bandp, flagsp);
+}
+
 EXPORT_SYMBOL(strgetpmsg);
 
 STATIC streams_fastcall __hot_get int
@@ -4861,7 +4901,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 		if (likely((sd = stri_acquire(file)) != NULL)) {	/* PROFILED */
 			if (likely(!sd->sd_directio || !sd->sd_directio->getpmsg))	/* PROFILED 
 											 */
-				err = strgetpmsg(file, ctlp, datp, bandp, flagsp);
+				err = strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
 			else
 				err = sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
 			ctrace(sd_put(&sd));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/10 11:33:58 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 20:21:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 11:33:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 20:21:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/10 11:33:58 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 20:21:40 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/10 11:33:58 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/10 20:21:40 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1115,7 +1115,7 @@ EXPORT_SYMBOL(bcangetany);
  *
  *  LOCKING: No locks are required across the call.
  */
-streams_inline streams_fastcall __hot_in int
+streams_fastcall __hot_in int
 bcanget(queue_t *q, unsigned char band)
 {
 	int found = 0;
@@ -1448,7 +1448,7 @@ EXPORT_SYMBOL(bcanput);
  *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
  *  context by taking a plumb read lock.
  */
-streams_inline streams_fastcall __hot_out int
+streams_fastcall __hot_out int
 bcanputnext(queue_t *q, unsigned char band)
 {
 	int result;

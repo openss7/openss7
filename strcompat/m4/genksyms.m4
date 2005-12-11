@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/10 20:21:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/10 20:21:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -131,6 +131,13 @@ dnl
 	AC_MSG_WARN([Could not find executable nm program in $PATH.])
 	NM=/usr/bin/nm
     fi
+    if test -f $ac_aux_dir/hot.lds
+    then
+	PKG_LDS="$ac_aux_dir/hot.lds"
+    else
+	PKG_LDS=''
+    fi
+    AC_SUBST([PKG_LDS])
 ])# _KSYMS_SETUP
 # =============================================================================
 

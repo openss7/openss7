@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/10 11:33:57 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/10 21:52:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
+ Last Modified $Date: 2005/12/10 21:52:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/10 11:33:57 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/10 21:52:03 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/10 11:33:57 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/10 21:52:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -733,9 +733,11 @@ qget(queue_t *q)
 BIG_STATIC streams_fastcall __hot_in void
 qput(queue_t **qp)
 {
-	queue_t *q;
+	queue_t *q = *qp;
 
-	if (likely((q = xchg(qp, NULL)) != NULL)) {	/* PROFILED */
+	prefetchw(q);
+	*qp = NULL;
+	if (likely(q != NULL)) {	/* PROFILED */
 		queue_t *rq = RD(q);
 		struct queinfo *qu = (typeof(qu)) rq;
 
@@ -850,7 +852,9 @@ mdbblock_alloc(uint priority, void *func)
 #endif
 
 		md->msgblk.m_func = func;
+#if 0
 		ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
+#endif
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock_irqsave(&smi->si_rwlock, flags);
 		list_add_tail(&md->msgblk.m_list, &smi->si_head);
@@ -1014,7 +1018,9 @@ mdbblock_free(mblk_t *mp)
 	write_unlock_irqrestore(&smi->si_rwlock, flags);
 #endif
 	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+#if 0
 	ctrace(qput(&md->msgblk.m_queue));
+#endif
 	bzero(md, sizeof(*md));
 	atomic_set(&md->datablk.d_dblock.db_users, 0);
 #if defined CONFIG_STREAMS_DEBUG
@@ -3789,7 +3795,8 @@ runsyncq(struct syncq *sq)
 			while ((q_link = xchg(&sq->sq_qhead, NULL))) {	/* MP-SAFE */
 				sq->sq_qtail = &sq->sq_qhead;
 				while ((q = q_link)) {
-					q_link = xchg(&q->q_link, NULL);
+					q_link = q->q_link;
+					q->q_link = NULL;
 					sq_dosrv_synced(t, q);
 				}
 			}
@@ -3801,7 +3808,8 @@ runsyncq(struct syncq *sq)
 			while ((se_next = xchg(&sq->sq_ehead, NULL))) {	/* MP-SAFE */
 				sq->sq_etail = &sq->sq_ehead;
 				while ((se = se_next)) {
-					se_next = xchg(&se->se_next, NULL);
+					se_next = se->se_next;
+					se->se_next = NULL;
 					sq_doevent_synced(se);
 				}
 			}
@@ -3847,7 +3855,8 @@ backlog(struct strthread *t)
 		if ((sq_link = xchg(&t->sqhead, NULL))) {	/* MP-SAFE */
 			t->sqtail = &t->sqhead;
 			while ((sq = sq_link)) {
-				sq_link = xchg(&sq->sq_link, NULL);
+				sq_link = sq->sq_link;
+				sq->sq_link = NULL;
 				runsyncq(sq);
 			}
 		}
@@ -3877,7 +3886,8 @@ bufcalls(struct strthread *t)
 		if ((se_next = xchg(&t->strbcalls_head, NULL))) {	/* MP-SAFE */
 			t->strbcalls_tail = &t->strbcalls_head;
 			while ((se = se_next)) {
-				se_next = xchg(&se->se_next, NULL);
+				se_next = se->se_next;
+				se->se_next = NULL;
 				/* this might further defer against a synchronization queue */
 				do_bufcall_event(se);
 			}
@@ -3903,13 +3913,14 @@ queuerun(struct strthread *t)
 			prefetchw(q_link->q_link);
 			q = q_link;
 			do {
-				q_link = xchg(&q->q_link, NULL);
+				q_link = q->q_link;
+				q->q_link = NULL;
 #ifdef CONFIG_STREAMS_SYNCQS
 				qsrvp(t, q);
 #else
 				srvp_fast(t, q);
 #endif
-				prefetchw(q->q_link);
+				prefetchw(q_link);
 			} while (unlikely((q = q_link)));
 			prefetchw(t->qhead);
 		}
@@ -4268,10 +4279,12 @@ EXPORT_SYMBOL(sd_get);		/* include/sys/streams/strsubr.h */
 BIG_STATIC_INLINE_STH streams_fastcall __hot void
 sd_put(struct stdata **sdp)
 {
-	struct stdata *sd;
+	struct stdata *sd = *sdp;
+	struct shinfo *sh = (struct shinfo *) sd;
 
-	if (likely((sd = xchg(sdp, NULL)) != NULL)) {
-		struct shinfo *sh = (struct shinfo *) sd;
+	prefetchw(&sh->sh_refs);
+	*sdp = NULL;
+	if (likely(sd != NULL)) {
 
 		printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
 			atomic_read(&sh->sh_refs) - 1));
