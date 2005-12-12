@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/10 20:21:39 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/11 23:03:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/12/10 20:21:39 $ by $Author: brian $
+## Last Modified $Date: 2005/12/11 23:03:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -352,11 +352,15 @@ BUILD_SPECIFIC_FILES = $(AUTOCONFIG_H) $(MODVERSIONS_H)
 ## !KERNEL_VERSIONS
 endif
 
+##
+# Older linkers need the -T.
+##
 stamp-verobjs: $(KERNEL_OBJECTS)
 	@list="$?" ; for obj in $$list ; do \
 		a=`$(ECHO) "$$obj" | sed -e 's|^lib.*_a-|$(kpre)|'` ; \
-		$(ECHO) "$(LD) -r -o a.$$$$.out $(PKG_LDS) $$obj && mv -f -- a.$$$$.out $$a" ; \
-		$(LD) -r -o a.$$$$.out $(PKG_LDS) $$obj && mv -f -- a.$$$$.out $$a ; \
+		test -n '$(PKG_LDS)' && pkg_lds='-T $(PKG_LDS)' ; \
+		$(ECHO) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a" ; \
+		$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a ; \
 	done ; \
 	touch stamp-verobjs
 
