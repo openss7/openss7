@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/12/10 11:33:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/12 08:33:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/10 11:33:56 $ by $Author: brian $
+# Last Modified $Date: 2005/12/12 08:33:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -218,9 +218,14 @@ AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
 	    @<:@default=disabled@:>@]),
 	    [enable_streams_syncqs="$enableval"],
 	    [enable_streams_syncqs='no'])
+    _LINUX_CHECK_KERNEL_CONFIG([for STREAMS smp kernel], [CONFIG_SMP])dnl
     AC_CACHE_CHECK([for STREAMS synchronization], [lfs_streams_syncqs], [dnl
-	lfs_streams_syncqs="${enable_streams_syncqs:-no}"
-	])
+	if test :${linux_cv_CONFIG_SMP:-no} = :yes
+	then
+	    lfs_streams_syncqs="${enable_streams_syncqs:-no}"
+	else
+	    lfs_streams_syncqs='no'
+	fi])
     case ${lfs_streams_syncqs:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SYNCQS], [], [When defined]

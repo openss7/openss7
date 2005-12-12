@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/10 20:21:39 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/12 08:33:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/10 20:21:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/12 08:33:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,11 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     if test :"${linux_cv_CONFIG_SMP:-no}" = :yes ; then
 	GENKSYMS_SMP_PREFIX='-p smp_'
     fi
-    _LINUX_CHECK_KERNEL_CONFIG([for genksyms SuSE production kernel], [CONFIG_REGPARM])
+    _LINUX_CHECK_KERNEL_CONFIG([for genksyms preempt kernel], [CONFIG_PREEMPT])
+    if test :"${linux_cv_CONFIG_PREEMPT:-no}" = :yes ; then
+	GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }preempt_"
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for genksyms regparms kernel], [CONFIG_REGPARM])
     if test :"${linux_cv_CONFIG_REGPARM:-no}" = :yes ; then
 	GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
@@ -239,6 +243,9 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     _LINUX_CHECK_KERNEL_CONFIG([for modpost -m option], [CONFIG_MODVERSIONS])
     _LINUX_CHECK_KERNEL_CONFIG([for modpost -u option], [CONFIG_MODULE_UNLOAD])
     _LINUX_CHECK_KERNEL_CONFIG([for modpost -a option], [CONFIG_MODULE_SRCVERSION_ALL])
+    _LINUX_CHECK_KERNEL_CONFIG([for modpost -U option], [CONFIG_MODULE_FORCE_UNLOAD])
+    _LINUX_CHECK_KERNEL_CONFIG([for modpost -s option], [CONFIG_MODULE_SIG])
+    _LINUX_CHECK_KERNEL_CONFIG([for modpost -S option], [CONFIG_MODULE_SIG_FORCE])
     AC_CACHE_CHECK([for modpost options], [ksyms_cv_modpost_options], [dnl
 	ksyms_cv_modpost_options=
 	if test :${linux_cv_CONFIG_MODVERSIONS:-no} = :yes ; then

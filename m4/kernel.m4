@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/11 13:06:36 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/12 08:33:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/11 13:06:36 $ by $Author: brian $
+# Last Modified $Date: 2005/12/12 08:33:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -93,12 +93,14 @@ linux_kernel_env_push() {
     linux_flags_push
 dnl We need safe versions of these flags without warnings or strange optimizations
 dnl but with module flags included
-    CPPFLAGS=`echo " $KERNEL_MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
+dnl But we need to skip -DMODVERSIONS and -include /blah/blah/modversion.h on rh systems.
+    MODFLAGS=`echo " $KERNEL_MODFLAGS " | sed -e 's| -DMOVERSIONS||g;s| -include [[^ ]]*||g'`
+    CPPFLAGS=`echo " $MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS="$CFLAGS -Werror"
 dnl careful about -Wno warnings which we must keep, so put them back one at a time
-    for i in $KERNEL_MODFLAGS $KERNEL_CPPFLAGS ; do
+    for i in $MODFLAGS $KERNEL_CPPFLAGS ; do
 	case "$i" in
 	    -Wno-*)
 		CPPFLAGS="$CPPFLAGS $i" ;;
@@ -113,21 +115,21 @@ dnl careful about -Wno warnings which we must keep, so put them back one at a ti
     for i in $KERNEL_LDFLAGS ; do
 	case "$i" in
 	    -Wno-*)
-		LDCFLAGS="$LDCFLAGS $i" ;;
+		LDFLAGS="$LDFLAGS $i" ;;
 	esac
     done
 }
 ])# _LINUX_KERNEL_ENV_FUNCTIONS
-
 # =============================================================================
+
 # =============================================================================
 # _LINUX_KERNEL_ENV_BARE([COMMANDS])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
-    AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
-    linux_kernel_env_push
+AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
+linux_kernel_env_push
 $1
-    linux_flags_pop
+linux_flags_pop
 ])# _LINUX_KERNEL_ENV_BARE
 # =============================================================================
 
@@ -178,6 +180,8 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_FILES
     _LINUX_SETUP_KERNEL_CFLAGS
     _LINUX_SETUP_KERNEL_DEBUG
+    _LINUX_CHECK_KERNEL_SMP
+    _LINUX_CHECK_KERNEL_PREEMPT
     _LINUX_CHECK_KERNEL_REGPARM
     _LINUX_CHECK_KERNEL_VERSIONS
     _LINUX_CHECK_KERNEL_MODVERSIONS
@@ -2148,17 +2152,32 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG], [dnl
 # _LINUX_CHECK_KERNEL_REGPARM
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
-    _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel SuSE production kernel],
-	[CONFIG_REGPARM], [linux_cv_k_regparm=yes], [linux_cv_k_regparm=no])dnl
+    _LINUX_CHECK_KERNEL_CONFIG_internal([], [CONFIG_REGPARM])dnl
 ])# _LINUX_CHECK_KERNEL_REGPARM
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_SMP
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_SMP], [dnl
+    _LINUX_CHECK_KERNEL_CONFIG_internal([], [CONFIG_SMP])dnl
+])# _LINUX_CHECK_KERNEL_SMP
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_PREEMPT
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_PREEMPT], [dnl
+    _LINUX_CHECK_KERNEL_CONFIG_internal([], [CONFIG_PREEMPT])dnl
+])# _LINUX_CHECK_KERNEL_PREEMPT
 # =========================================================================
 
 # =========================================================================
 # _LINUX_CHECK_KERNEL_VERSIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
-    _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel symbol versioning],
-	[CONFIG_MODVERSIONS], [linux_cv_k_versions=yes], [linux_cv_k_versions=no])
+    _LINUX_CHECK_KERNEL_CONFIG_internal([], [CONFIG_MODVERSIONS],
+    [linux_cv_k_versions=yes], [linux_cv_k_versions=no])dnl
 ])# _LINUX_CHECK_KERNEL_VERSIONS
 # =========================================================================
 
