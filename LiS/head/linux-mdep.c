@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.13 $) $Date: 2005/07/13 12:01:16 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.14 $) $Date: 2005/07/18 11:51:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:16 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.13 $) $Date: 2005/07/13 12:01:16 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.14 $) $Date: 2005/07/18 11:51:24 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.13 2005/07/13 12:01:16 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.14 2005/07/18 11:51:24 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -4169,7 +4169,7 @@ lis_thread_runqueues(void *p)
 	current->rt_priority = 50;	/* middle value real-time priority */
 	sigfillset(&MY_BLKS);	/* block all signals */
 	sigdelset(&MY_BLKS, SIGKILL);	/* enable KILL */
-#if CONFIG_SMP
+#ifdef CONFIG_SMP
 #if defined(SET_CPUS_ALLOWED)
 # if defined(KERNEL_2_5)
 	set_cpus_allowed(current, cpumask_of_cpu(cpu_id));
@@ -4217,7 +4217,7 @@ lis_thread_runqueues(void *p)
 			static int msg_cnt;
 			char buf[200];
 
-#if HAVE_KFUNC_CPUMASK_SCNPRINTF || HAVE_KMACRO_CPUMASK_SCNPRINTF
+#if defined HAVE_KFUNC_CPUMASK_SCNPRINTF || defined HAVE_KMACRO_CPUMASK_SCNPRINTF
 			cpumask_scnprintf(buf, sizeof(buf), current->cpus_allowed);
 #else
 			sprintf(buf, "0x%lx", current->cpus_allowed);

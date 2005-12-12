@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/13 07:54:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:26:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/11/13 07:54:17 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -159,7 +159,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-mux driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR) "-*");
 MODULE_ALIAS("/dev/mux");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mux");
 MODULE_ALIAS("/dev/streams/mux/*");

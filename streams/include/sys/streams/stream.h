@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.72 2005/12/11 09:01:41 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.73 2005/12/12 12:28:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 09:01:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:28:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/12/11 09:01:41 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/12/12 12:28:29 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -270,7 +270,7 @@ typedef enum msg_type {
 	M_CLOSE_REPL = 0x9c,	/* v H(0x95) */
 } msg_type_t;
 
-/* 28 bytes on 32 bit, 52 on 64 bit */
+/* 32 bytes on 32 bit, 60 on 64 bit */
 typedef struct msgb {
 	struct msgb *b_next;		/* next msgb on queue */
 	struct msgb *b_prev;		/* prev msgb on queue */
@@ -283,11 +283,6 @@ typedef struct msgb {
 	unsigned short b_flag;		/* message flags */
 #if 0
 	long b_pad2;			/* padding */
-#endif
-#if 0
-	/* private Linux Fast-STREAMS specific members */
-	struct queue *b_queue;		/* queue for this message */
-	size_t b_size;			/* size of this message on queue */
 #endif
 } mblk_t;
 
@@ -377,17 +372,11 @@ enum {
 	QB_FULL_BIT,			/* band full flow control */
 	QB_WANTW_BIT,			/* back enable required */
 	QB_BACK_BIT,			/* UnixWare/Solaris/UXP/V */
-#if 0
-	QB_WANTR_BIT,			/* this one is mine */
-#endif
 };
 
 #define QB_FULL	    (1 << QB_FULL_BIT	)
 #define QB_WANTW    (1 << QB_WANTW_BIT	)
 #define QB_BACK	    (1 << QB_BACK_BIT	)	/* UnixWare/Solaris */
-#if 0
-#define QB_WANTR    (1 << QB_WANTR_BIT	)
-#endif
 
 #define NBAND	    256		/* UnixWare/Solaris */
 

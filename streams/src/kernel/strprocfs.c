@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/09 18:01:43 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/12 12:28:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:28:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/09 18:01:43 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/12 12:28:34 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/09 18:01:43 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/12 12:28:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -920,10 +920,6 @@ get_streams_msgb_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", b_datap");
 	len += snprintf(page + len, maxlen - len, ", b_band");
 	len += snprintf(page + len, maxlen - len, ", b_flag");
-#if 0
-	len += snprintf(page + len, maxlen - len, ", b_queue");
-	len += snprintf(page + len, maxlen - len, ", b_size");
-#endif
 	return (len);
 }
 STATIC int
@@ -942,10 +938,6 @@ get_streams_msgb(char *page, ssize_t maxlen, struct msgb *b)
 	len += snprintf(page + len, maxlen - len, ", %p", b->b_datap);
 	len += snprintf(page + len, maxlen - len, ", %hhu", b->b_band);
 	len += snprintf(page + len, maxlen - len, ", %hu", b->b_flag);
-#if 0
-	len += snprintf(page + len, maxlen - len, ", %p", b->b_queue);
-	len += snprintf(page + len, maxlen - len, ", %d", b->b_size);
-#endif
       done:
 	return (len);
 }

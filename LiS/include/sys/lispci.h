@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: lispci.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -65,7 +65,7 @@
 #ifndef SYS_LISPCI_H
 #define SYS_LISPCI_H	1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lispci.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:19 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -132,7 +132,7 @@ typedef struct lis_pci_dev {
 lis_pci_dev_t *lis_pci_find_device(unsigned vendor, unsigned device,
 				   lis_pci_dev_t *previous_struct);
 
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 #ifdef __LIS_INTERNAL__
 lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct);
 #endif
@@ -216,7 +216,7 @@ int lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
 #define LIS_SYNC_FOR_DMA	2	/* direction value */
 #define LIS_SYNC_FOR_BOTH	3	/* direction value */
 
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 #ifdef __LIS_INTERNAL__
 void lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size, int direction);
 #endif

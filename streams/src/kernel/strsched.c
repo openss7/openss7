@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/11 09:01:58 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/12 12:28:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 09:01:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:28:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/11 09:01:58 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/12 12:28:34 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/11 09:01:58 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/12 12:28:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -694,24 +694,8 @@ freeq_fast(queue_t *rq)
 	__flushq(wq, FLUSHALL, &mpp, NULL);
 	__freebands(rq);
 	__freeq(rq);
-#if 0
-	if (mp) {
-		mblk_t *b, *b_next = mp;
-
-		while ((b = b_next)) {
-			b_next = b->b_next;
-#if 0
-			/* fake out freeb */
-			ctrace(qput(&mp->b_queue));
-#endif
-			b->b_next = b->b_prev = NULL;
-			freemsg(b);
-		}
-	}
-#else
 	if (mp)
 		freechain(mp, mpp);
-#endif
 }
 
 void
@@ -784,29 +768,6 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	}
 }
 
-/*
- *  queue_guess: - guess the current queue being processed
- *  @q: current queue, if known, NULL otherwise
- *
- *  Use the current queue being processed by the thread as a guess as to which queue the thing
- *  (message block, bufcall callback, timout callback) belongs to if the supplied queue is %NULL,
- *  but, if we are at irq, then we will only use the supplied value, even if %NULL.
- */
-
-STATIC streams_inline streams_fastcall __hot_out queue_t *
-queue_guess(queue_t *q)
-{
-#if 0
-	queue_t *guess;
-
-	if (unlikely((guess = q) == NULL && in_streams()))	/* PROFILED */
-		guess = this_thread->currentq;
-	return (guess);
-#else
-	return (q);
-#endif
-}
-
 /**
  *  mdbblock_alloc: - allocate a combined message/data block
  *  @q: the queue with which to associate the allocation for debugging
@@ -868,22 +829,22 @@ mdbblock_alloc_slow(uint priority, void *func)
 
 #if 0
 		md->msgblk.m_func = func;
-		ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
+		ctrace(md->msgblk.m_queue = NULL;
 #endif
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock_irqsave(&smi->si_rwlock, flags);
 		list_add_tail(&md->msgblk.m_list, &smi->si_head);
 		list_add_tail(&md->datablk.db_list, &sdi->si_head);
 		write_unlock_irqrestore(&smi->si_rwlock, flags);
-#endif
-#if 0
 		atomic_inc(&smi->si_cnt);
 		if (atomic_read(&smi->si_cnt) > smi->si_hwl)
 			smi->si_hwl = atomic_read(&smi->si_cnt);
 #endif
 		atomic_inc(&sdi->si_cnt);
+#if !defined CONFIG_STREAMS_NONE
 		if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 			sdi->si_hwl = atomic_read(&sdi->si_cnt);
+#endif
 		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 	}
       fail:
@@ -919,7 +880,7 @@ mdbblock_alloc(uint priority, void *func)
 		struct mdbblock *md = (struct mdbblock *) mp;
 
 		md->msgblk.m_func = func;
-		ctrace(md->msgblk.m_queue = qget(queue_guess(NULL)));
+		ctrace(md->msgblk.m_queue = NULL;
 #endif
 		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		return (mp);
@@ -982,8 +943,8 @@ raise_bufcalls(void)
  *  there are streams waiting on buffers, we raise the softirq to ensure that another runqueues()
  *  pass will occur.
  *
- *  This function uses the fact that it is using a per-cpu list to avoid locking.  It uses the
- *  atomic xchg() function to ensure the integrity of the list while interrupts are still enabled.
+ *  This function uses the fact that it is using a per-cpu list to avoid locking.  It only
+ *  suppresses local interrupts to maintain integrity of the list.
  *  
  *  To reduce latency on allocation to a minimum, we null the state of the blocks when they are
  *  placed to the free list rather than when they are allocated.
@@ -993,69 +954,25 @@ raise_bufcalls(void)
  *  Also the current msgb and datab counts are not decremented until the blocks are returned to the
  *  memory cache.
  */
-
-#if 0
-BIG_STATIC_INLINE streams_fastcall __hot_in void
-mdbblock_free_slow(mblk_t *mp)
-{
-	/* The old approach didn't run too fast.  We might as well free them back to the memory
-	   caches immediately.  This way freeblocks never runs. */
-	struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
-	struct mdbblock *md = (typeof(md)) mp;
-
-#if defined CONFIG_STREAMS_DEBUG
-	struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
-	unsigned long flags;
-
-	write_lock_irqsave(&smi->si_rwlock, flags);
-	list_del(&md->msgblk.m_list);
-	list_del(&md->datablk.db_list);
-	write_unlock_irqrestore(&smi->si_rwlock, flags);
-#endif
-	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
-#if 0
-	ctrace(qput(&md->msgblk.m_queue));
-#endif
-	bzero(md, sizeof(*md));
-	atomic_set(&md->datablk.d_dblock.db_users, 0);
-#if defined CONFIG_STREAMS_DEBUG
-	INIT_LIST_HEAD(&md->msgblk.m_list);
-	INIT_LIST_HEAD(&md->datablk.db_list);
-#endif
-#if 0
-	atomic_dec(&smi->si_cnt);
-#endif
-	kmem_cache_free(sdi->si_cache, mp);
-	atomic_dec(&sdi->si_cnt);
-	raise_bufcalls();
-}
-#endif
 BIG_STATIC_INLINE streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
 	struct strthread *t = this_thread;
-	unsigned long flags;
-	bool free;
 
 	printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 
 	prefetchw(t);
 	prefetchw(mp);
 
-	local_irq_save(flags);
-	{
-		*t->freemblk_tail = mp;
-		t->freemblk_tail = &mp->b_next;
-		mp->b_next = NULL;
-		free = (++t->freemblks > (sysctl_str_nstrmsgs >> 4));
-	}
-	local_irq_restore(flags);
+	mp->b_next = NULL;
+	*XCHG(&t->freemblk_tail, &mp->b_next) = mp;
 
 	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
 	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
 	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
 	   later... */
-	if (unlikely(free && test_and_set_bit(freeblks, &t->flags) == 0))
+	if (unlikely((++t->freemblks > (sysctl_str_nstrmsgs >> 4))
+		     && test_and_set_bit(freeblks, &t->flags) == 0))
 		__raise_streams();
 	raise_local_bufcalls();
 	/* other processors will just have to fight over the remaining memory */
@@ -1073,24 +990,15 @@ mdbblock_free(mblk_t *mp)
 STATIC streams_fastcall void
 freeblocks(struct strthread *t)
 {
-	register mblk_t *mp, *mp_next;
-	unsigned long flags;
+	mblk_t *mp, *mp_next;
 
 	clear_bit(freeblks, &t->flags);
 
-	prefetchw(t);
-	local_irq_save(flags);
-	{
-		mp_next = t->freemblk_head;
-		prefetchw(mp_next);
-		t->freemblk_head = NULL;
+	if (likely((mp_next = XCHG(&t->freemblk_head, NULL)) != NULL)) {
 		t->freemblk_tail = &t->freemblk_head;
-		t->freemblks = 0;
-	}
-	local_irq_restore(flags);
-
-	if (likely((mp = mp_next) != NULL)) {
-		while (likely((mp = mp_next) != NULL)) {
+		t->freemblks = 0;	/* doesn't need to be protected, just a monitor */
+		mp = mp_next;
+		do {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
 #if defined CONFIG_STREAMS_DEBUG
@@ -1102,17 +1010,16 @@ freeblocks(struct strthread *t)
 			list_del_init(&md->msgblk.m_list);
 			list_del_init(&md->datablk.db_list);
 			write_unlock_irqrestore(&smi->si_rwlock, flags);
-#endif
-			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
-#if 0
 			atomic_dec(&smi->si_cnt);
 #endif
+			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
+			prefetchw(sdi);
 			mp_next = mp->b_next;
 			prefetchw(mp_next);
 			mp->b_next = NULL;
-			kmem_cache_free(sdi->si_cache, mp);
 			atomic_dec(&sdi->si_cnt);
-		}
+			kmem_cache_free(sdi->si_cache, mp);
+		} while (likely((mp = mp_next) != NULL));
 		/* raise global bufcalls if we free anything to the cache */
 		raise_bufcalls();
 	}
@@ -1374,7 +1281,7 @@ event_alloc(int type, queue_t *q)
 
 			s->s_type = type;
 #if defined CONFIG_STREAMS_DEBUG
-			ctrace(s->s_queue = qget(queue_guess(q)));
+			s->s_queue = NULL;
 			write_lock(&si->si_rwlock);
 			list_add_tail(&s->s_list, &si->si_head);
 			write_unlock(&si->si_rwlock);
@@ -1455,16 +1362,14 @@ STATIC streams_fastcall void
 strsched_mfunc_fast(mblk_t *mp)
 {
 	struct strthread *t;
-	unsigned long flags;
 
 	prefetchw(mp);
 	t = this_thread;
 	prefetchw(t);
+
 	mp->b_next = NULL;
-	local_irq_save(flags);
-	*t->strmfuncs_tail = mp;
-	t->strmfuncs_tail = &mp->b_next;
-	local_irq_restore(flags);
+	*XCHG(&t->strmfuncs_tail, &mp->b_next) = mp;
+
 	if (!test_and_set_bit(strmfuncs, &t->flags))
 		__raise_streams();
 }
@@ -1506,17 +1411,15 @@ strsched_event(struct strevent *se)
 {
 	long id;
 	struct strthread *t;
-	unsigned long flags;
 
 	prefetchw(se);
 	t = this_thread;
 	prefetchw(t);
 	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
+
 	se->se_next = NULL;
-	local_irq_save(flags);
-	*t->strevents_tail = se;
-	t->strevents_tail = &se->se_next;
-	local_irq_restore(flags);
+	*XCHG(&t->strevents_tail, &se->se_next) = se;
+
 	if (!test_and_set_bit(strevents, &t->flags))
 		__raise_streams();
 	return (id);
@@ -1536,17 +1439,15 @@ strsched_bufcall(struct strevent *se)
 {
 	long id;
 	struct strthread *t;
-	unsigned long flags;
 
 	prefetchw(se);
 	t = this_thread;
 	prefetchw(t);
 	id = ((se->se_id << EVENT_ID_SHIFT) | (se->se_seq & EVENT_SEQ_MASK));
+
 	se->se_next = NULL;
-	local_irq_save(flags);
-	*t->strbcalls_tail = se;
-	t->strbcalls_tail = &se->se_next;
-	local_irq_restore(flags);
+	*XCHG(&t->strbcalls_tail, &se->se_next) = se;
+
 	set_bit(strbcwait, &t->flags);
 	return (id);
 }
@@ -1575,7 +1476,11 @@ timeout_function(unsigned long arg)
 	struct strthread *t = this_thread;
 #endif
 
-	*xchg(&t->strtimout_tail, &se->se_next) = se;	/* MP-SAFE */
+	prefetchw(t);
+
+	se->se_next = NULL;
+	*XCHG(&t->strtimout_tail, &se->se_next) = se;
+
 	if (!test_and_set_bit(strtimout, &t->flags))
 #if defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		/* bind timeout back to the CPU that called for it */
@@ -1718,7 +1623,7 @@ EXPORT_SYMBOL(__bufcall);	/* include/sys/streams/strsubr.h */
 streams_fastcall bcid_t
 bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
-	return __bufcall(queue_guess(NULL), size, priority, function, arg);
+	return __bufcall(NULL, size, priority, function, arg);
 }
 
 EXPORT_SYMBOL(bufcall);		/* include/sys/streams/stream.h */
@@ -1781,7 +1686,7 @@ EXPORT_SYMBOL(__timeout);	/* include/sys/streams/strsubr.h */
 toid_t
 timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 {
-	return __timeout(queue_guess(NULL), timo_fcn, arg, ticks, 0, smp_processor_id());
+	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 
 EXPORT_SYMBOL(timeout);		/* include/sys/streams/stream.h */
@@ -1957,16 +1862,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
-#if 0
-		struct strthread *t = this_thread;
-
-		qold = t->currentq;
-		t->currentq = q;
-#endif
 		func(q, mp);
-#if 0
-		t->currentq = qold;
-#endif
 #ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
@@ -2006,16 +1902,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
-#if 0
-		struct strthread *t = this_thread;
-
-		qold = t->currentq;
-		t->currentq = q;
-#endif
 		func(arg, mp);
-#if 0
-		t->currentq = qold;
-#endif
 #ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
@@ -2092,27 +1979,8 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* procs can't be turned off */
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
-#if 0
-		struct strthread *t = this_thread;
-
-		prefetchw(t);
-		{
-			unsigned long flags;
-
-			local_irq_save(flags);
-			qold = t->currentq;
-			t->currentq = q;
-			local_irq_restore(flags);
-		}
-#endif
 		(void) q->q_qinfo->qi_putp(q, mp);
-#if 0
-		prefetchw(t);
-#endif
 		prefetchw(q);
-#if 0
-		t->currentq = qold;
-#endif
 		qwakeup(q);
 #ifdef CONFIG_SMP
 	} else {
@@ -2164,76 +2032,6 @@ putp(queue_t *q, mblk_t *mp)
  *  service procedure.  In safe mode, this will cause kernel assertions to fail and will panic the
  *  kernel.
  */
-#if 0
-STATIC streams_fastcall void
-srvp_fast(queue_t *q)
-{
-	dassert(q);
-	if (test_and_clear_bit(QENAB_BIT, &q->q_flag)) {
-		struct stdata *sd;
-
-		dassert(q->q_qinfo);
-
-		sd = qstream(q);
-		dassert(sd);
-		prlock(sd);
-		/* check if procs are turned off */
-		if (!test_bit(QPROCS_BIT, &q->q_flag)) {
-#if 0
-			{
-				mblk_t *b, *b_next;
-
-				if ((b_next = xchg(&q->q_putq_head, NULL))) {	/* MP-SAFE */
-					q->q_putq_tail = &q->q_putq_head;
-					while ((b = b_next)) {
-						b_next = xchg(&b->b_next, NULL);
-						if (!putq(q, b)) {
-							/* If ISRs and other non-STREAMS contexts
-							   are going to do a putq() they darn well
-							   better ensure that a queue band is
-							   available. */
-							swerr();
-							freemsg(b);
-						}
-					}
-				}
-			}
-			/* If this queue was scheduled as a result of deferred putq rather than
-			   queue service, we loose enable state, so while here, the queue service
-			   procedure might as well be run as well.  XXX: This could result in some
-			   false enables. */
-#endif
-			/* spin here if Stream frozen by other than caller */
-			freeze_barrier(q);
-
-			if (q->q_qinfo->qi_srvp) {
-				queue_t *qold;
-
-				qold = xchg(&this_thread->currentq, q);
-				set_bit(QSVCBUSY_BIT, &q->q_flag);
-				(void) q->q_qinfo->qi_srvp(q);
-				clear_bit(QSVCBUSY_BIT, &q->q_flag);
-				this_thread->currentq = qold;
-			}
-		} else {
-#if 0
-			mblk_t *b, *b_next;
-
-			if ((b_next = xchg(&q->q_putq_head, NULL))) {	/* MP-SAFE */
-				q->q_putq_tail = &q->q_putq_head;
-				while ((b = b_next)) {
-					b_next = xchg(&b->b_next, NULL);
-					freemsg(b);
-				}
-			}
-#endif
-		}
-		prunlock(sd);
-		qwakeup(q);
-	}
-	ctrace(qput(&q));	/* cancel qget from qschedule */
-}
-#else
 STATIC streams_inline streams_fastcall __hot_in void
 srvp_fast(queue_t *q)
 {
@@ -2253,22 +2051,12 @@ srvp_fast(queue_t *q)
 		/* check if procs are turned off */
 		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
-#if 0
-			queue_t *qold;
-			struct strthread *t = this_thread;
-
-			qold = t->currentq;
-			t->currentq = q;
-#endif
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
 			(void) q->q_qinfo->qi_srvp(q);
 			prefetchw(q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
-#if 0
-			t->currentq = qold;
-#endif
 #ifdef CONFIG_SMP
 		}
 		prunlock(sd);
@@ -2277,7 +2065,6 @@ srvp_fast(queue_t *q)
 	}
 	ctrace(qput(&q));	/* cancel qget from qschedule */
 }
-#endif
 
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -2312,112 +2099,27 @@ struct syncq_cookie {
 STATIC int
 defer_syncq(struct syncq_cookie *sc, int exclus)
 {
-#if 0				/* only called in CTX_STREAMS now */
-	if (current_context() < CTX_STREAMS) {
-		/* refuse to defer in process context */
-		struct syncq *sq = sc->sc_sq;
-		ueue_t *q = sc->sc_q;
-		int rval = 0;
+	struct strevent *se;
 
-		DECLARE_WAITQUEUE(wait, current);
-		add_wait_queue(&sq->sq_waitq, &wait);
-		for (;;) {
-			struct stdata *sd;
+	if ((se = sc->sc_se)) {
+		se->se_next = NULL;
+		*XCHG(&sc->sc_sq->sq_etail, &se->se_next) = se;
+	} else {
+		mblk_t *mp;
 
-			set_current_state(TASK_INTERRUPTIBLE);
-			sd = qstream(q);
-			dassert(sd);
-			if (!sd) {
-				rval = -ENOSTR;
-				break;
-			}
-			if (sd->sd_flag & (STPLEX | STRCLOSE | STRHUP)) {
-				if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
-					rval = -EINVAL;
-					break;
-				}
-				if (test_bit(STRCLOSE_BIT, &sd->sd_flag)) {
-					rval = -EIO;
-					break;
-				}
-				if (test_bit(STRHUP_BIT, &sd->sd_flag)) {
-					if (sd->sd_flag & (STRISFIFO | STRISPIPE))
-						rval = -EPIPE;
-					else
-						rval = -ENXIO;
-					break;
-				}
-			}
-			if (sd->sd_flag & (STRISFIFO | STRISPIPE)) {
-				if (sd->sd_other == NULL) {
-					rval = -EPIPE;
-					break;
-				}
-				if (test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)) {
-					rval = -EPIPE;
-					break;
-				}
-			}
-			if (signal_pending(current)) {
-				rval = -EINTR;
-				break;
-			}
-			if (!sq->sq_link) {
-				/* backlog clear */
-				if (exclus) {
-					if (sq->sq_count == 0
-					    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
-						/* available or left for us by leave function */
-						/* set exclusive */
-						sq->sq_owner = current;
-						sq->sq_count = -1;
-						rval = 1;
-						break;
-					}
-				} else {
-					if (sq->sq_count >= 0
-					    || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
-						/* available or left for us by leave function */
-						/* set shared */
-						sq->sq_owner = NULL;
-						if (sq->sq_count == -1)
-							sq->sq_count = 1;
-						else
-							sq->sq_count++;
-						rval = 1;
-						break;
-					}
-				}
-			}
-			spin_unlock(&sq->sq_lock);
-			schedule();
-			spin_lock(&sq->sq_lock);
-		}
-		set_current_state(TASK_RUNNING);
-		remove_wait_queue(&sq->sq_waitq, &wait);
-		return (rval);
-	} else
-#endif
-	{
-		/* always defer if not in process context */
-		struct strevent *se;
+		if ((mp = sc->sc_mp)) {
+			mp->b_next = NULL;
+			*XCHG(&sc->sc_sq->sq_mtail, &mp->b_next) = mp;
+		} else {
+			queue_t *q;
 
-		if ((se = sc->sc_se))
-			*xchg(&sc->sc_sq->sq_etail, &se->se_next) = se;
-		else {
-			mblk_t *mp;
-
-			if ((mp = sc->sc_mp))
-				*xchg(&sc->sc_sq->sq_mtail, &mp->b_next) = mp;
-			else {
-				queue_t *q;
-
-				if ((q = sc->sc_q))
-					*xchg(&sc->sc_sq->sq_qtail, &q->q_link) = q;
+			if ((q = sc->sc_q)) {
+				q->q_link = NULL;
+				*XCHG(&sc->sc_sq->sq_qtail, &q->q_link) = q;
 			}
 		}
-		return (0);
 	}
+	return (0);
 }
 STATIC int
 find_syncq(struct syncq_cookie *sc)
@@ -2682,37 +2384,6 @@ void runsyncq(struct syncq *);
 STATIC void
 clear_backlog(syncq_t *sq)
 {
-#if 0				/* only called from within streams now */
-	/* using current_context() is faster that rechecking in_irq and others repeatedly */
-	switch (current_context()) {
-	case CTX_PROC:
-	case CTX_ATOMIC:
-		/* Fake out that we are the STREAMS scheduler. */
-		enter_streams();
-		runsyncq(sq);
-		leave_streams();
-		break;
-	case CTX_INT:
-		local_str_disable();
-		runsyncq(sq);
-		local_str_enable();
-		break;
-	case CTX_STREAMS:
-		/* If we are already in STREAMS context, just process the backlog. */
-		runsyncq(sq);
-		break;
-	case CTX_ISR:
-		/* If we are at hard irq context we do not want to process the backlog in hard
-		   interrupts, so we always schedule it for later backlog clearing by the STREAMS
-		   scheduler (or another process that picks up its duties). */
-		sq->sq_nest = 0;
-		sq->sq_owner = NULL;
-		sq->sq_count = 0;
-		sqsched(sq);
-		break;
-	}
-	return;
-#endif
 	runsyncq(sq);
 }
 
@@ -3237,18 +2908,26 @@ STATIC void
 sq_doput_synced(mblk_t *mp)
 {
 	struct mbinfo *m = (typeof(m)) mp;
-	void *m_func = (void *) xchg(&m->m_func, NULL);
-	queue_t *m_queue = xchg(&m->m_queue, NULL);
+	void *m_func;
+	queue_t *m_queue;
+	void *m_private;
+
+	m_func = m->m_func;
+	m->m_func = NULL;
+	m_queue = m->m_queue;
+	m->m_queue = NULL;
+	m_private = m->m_private;
+	m->m_private = NULL;
 
 	if (m_func == (void *) &putp)
 		/* deferred function is a qputp function */
 		(void) putp(m_queue, mp);
 	else if (m_func == (void *) &strwrit)
 		/* deferred function is a qstrwrit function */
-		strwrit(m_queue, mp, (void *) xchg(&m->m_private, NULL));
+		strwrit(m_queue, mp, m_private);
 	else
 		/* deferred function is a qstrfunc function */
-		strfunc(m_func, m_queue, mp, xchg(&m->m_private, NULL));
+		strfunc(m_func, m_queue, mp, m_private);
 	ctrace(qput(&m_queue));
 }
 
@@ -3313,19 +2992,7 @@ do_bufcall_synced(struct strevent *se)
 		if (likely(q != NULL))
 			prlock(sd);
 #endif
-#if 0
-		{
-			struct strthread *t = this_thread;
-			queue_t *qold;
-
-			qold = xchg(&t->currentq, q);
-#endif
-			func(se->x.b.arg);
-#if 0
-			t->currentq = qold;
-		}
-#endif
-
+		func(se->x.b.arg);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prunlock(sd);
@@ -3384,18 +3051,7 @@ do_timeout_synced(struct strevent *se)
 		if (likely(q != NULL))
 			prlock(sd);
 #endif
-#if 0
-		{
-			struct strthread *t = this_thread;
-			queue_t *qold;
-
-			qold = xchg(&t->currentq, q);
-#endif
-			func(se->x.t.arg);
-#if 0
-			t->currentq = qold;
-		}
-#endif
+		func(se->x.t.arg);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prunlock(sd);
@@ -3464,12 +3120,7 @@ do_weldq_synced(struct strevent *se)
 	ctrace(qput(&qn3));
 	if (se->x.w.func) {
 		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-#if 0
-		struct strthread *t = this_thread;
-		queue_t *qold;
 
-		qold = xchg(&t->currentq, q);
-#endif
 		if (safe) {
 			struct stdata *sd;
 
@@ -3489,9 +3140,6 @@ do_weldq_synced(struct strevent *se)
 			dassert(sd);
 			zwunlock(sd, flags);
 		}
-#if 0
-		t->currentq = qold;
-#endif
 	}
 	ctrace(qput(&q));
 }
@@ -3529,8 +3177,16 @@ STATIC void
 do_mblk_func(mblk_t *b)
 {
 	struct mbinfo *m = (typeof(m)) b;
-	void *m_func = (void *) xchg(&m->m_func, NULL);
-	queue_t *m_queue = xchg(&m->m_queue, NULL);
+	void *m_func;
+	queue_t *m_queue;
+	void *m_private;
+
+	m_func = m->m_func;
+	m->m_func = NULL;
+	m_queue = m->m_queue;
+	m->m_queue = NULL;
+	m_private = m->m_private;
+	m->m_private = NULL;
 
 	if (m_func == (void *) &putp)
 		/* deferred function is a qputp function */
@@ -3539,10 +3195,10 @@ do_mblk_func(mblk_t *b)
 		/* deferred function is a qstrwrit function */
 		/* only unfortunate thing is that we have lost the original perimeter request, so
 		   we upgrade it to outer */
-		(void) qstrwrit(m_queue, b, (void *) xchg(&m->m_private, NULL), PERIM_OUTER);
+		(void) qstrwrit(m_queue, b, m_private, PERIM_OUTER);
 	else
 		/* deferred function is a qstrfunc function */
-		(void) qstrfunc(m_func, m_queue, b, xchg(&m->m_private, NULL));
+		(void) qstrfunc(m_func, m_queue, b, m_private);
 	ctrace(qput(&m_queue));
 }
 
@@ -3721,17 +3377,21 @@ EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
 STATIC streams_fastcall void
 domfuncs(struct strthread *t)
 {
-	register mblk_t *b, *b_next;
-
 	do {
+		mblk_t *b, *b_next;
+
+		prefetchw(t);
 		clear_bit(strmfuncs, &t->flags);
-		if ((b_next = xchg(&t->strmfuncs_head, NULL))) {	/* MP-SAFE */
+		if (likely((b_next = XCHG(&t->strmfuncs_head, NULL)) != NULL)) {
 			t->strmfuncs_tail = &t->strmfuncs_head;
-			while ((b = b_next)) {
-				b_next = xchg(&b->b_next, NULL);
+			b = b_next;
+			do {
+				b_next = b->b_next;
+				b->b_next = NULL;
 				/* this might further defer against a syncrhoniation queue */
 				do_mblk_func(b);
-			}
+				prefetchw(b_next);
+			} while (unlikely((b = b_next) != NULL));
 		}
 	} while (unlikely(test_bit(strmfuncs, &t->flags) != 0));
 }
@@ -3745,17 +3405,21 @@ domfuncs(struct strthread *t)
 STATIC streams_fastcall void
 timeouts(struct strthread *t)
 {
-	register struct strevent *se, *se_next;
-
 	do {
+		struct strevent *se, *se_next;
+
+		prefetchw(t);
 		clear_bit(strtimout, &t->flags);
-		if ((se_next = xchg(&t->strtimout_head, NULL))) {	/* MP-SAFE */
+		if (likely((se_next = XCHG(&t->strtimout_head, NULL)) != NULL)) {
 			t->strtimout_tail = &t->strtimout_head;
-			while ((se = se_next)) {
-				se_next = xchg(&se->se_next, NULL);
+			se = se_next;
+			do {
+				se_next = se->se_next;
+				se->se_next = NULL;
 				/* this might further defer against a synchronization queue */
 				do_timeout_event(se);
-			}
+				prefetchw(se_next);
+			} while (unlikely((se = se_next) != NULL));
 		}
 	} while (unlikely(test_bit(strtimout, &t->flags) != 0));
 }
@@ -3771,6 +3435,27 @@ scan_timeout_function(unsigned long arg)
 
 struct timer_list scan_timer;
 
+__unlikely void
+qscan(queue_t *q)
+{
+	struct strthread *t = this_thread;
+
+	prefetchw(q);
+	prefetchw(t);
+
+	/* put ourselves on scan list */
+	q->q_link = NULL;
+	*XCHG(&t->scanqtail, &q->q_link) = qget(q);
+
+	if (!test_and_set_bit(scanqflag, &t->flags))
+		__raise_streams();
+}
+
+EXPORT_SYMBOL(qscan);		/* for stream head in include/sys/streams/strsubr.h */
+
+
+
+
 /*
  *  scanqueues:	- scan held queues
  *  @t:		STREAMS execution thread
@@ -3782,16 +3467,18 @@ struct timer_list scan_timer;
 STATIC streams_fastcall __unlikely void
 scanqueues(struct strthread *t)
 {
-	register struct queue *q, *q_link;
-
 	do {
+		struct queue *q, *q_link;
+
+		prefetchw(t);
 		clear_bit(scanqflag, &t->flags);
-		if ((q_link = xchg(&t->scanqhead, NULL))) {	/* MP-SAFE */
-			while ((q = q_link)) {
-				struct stdata *sd;
+		if (likely((q_link = XCHG(&t->scanqhead, NULL)) != NULL)) {
+			t->scanqtail = &t->scanqhead;
+			q = q_link;
+			do {
+				struct stdata *sd = qstream(q);
 				mblk_t *b;
 
-				sd = (struct stdata *) q->q_ptr;
 				/* FIXME: sd_rtime doesn't work this way. */
 				if ((sd->sd_rtime > jiffies)) {
 					mod_timer(&scan_timer, sd->sd_rtime);
@@ -3799,34 +3486,22 @@ scanqueues(struct strthread *t)
 				}
 				if (&q->q_link == t->scanqtail) {
 					t->scanqtail = &t->scanqhead;
-					if ((q_link = xchg(&q->q_link, NULL))) {
+					q->q_link = NULL;
+					if ((q_link = XCHG(&q->q_link, NULL))) {
 						t->scanqhead = q_link;
 						q_link = NULL;
 					}
 				} else
-					q_link = xchg(&q->q_link, NULL);
+					q_link = XCHG(&q->q_link, NULL);
 				/* let the message go */
 				if ((b = getq(q)))
 					putnext(q, b);
-			}
+			} while (unlikely((q = q_link) != NULL));
 			if (q)
 				t->scanqhead = q;
 		}
 	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
 }
-
-__unlikely void
-qscan(queue_t *q)
-{
-	struct strthread *t = this_thread;
-
-	/* put ourselves on scan list */
-	ctrace(*xchg(&t->scanqtail, &q->q_link) = qget(q));	/* MP-SAFE */
-	if (!test_and_set_bit(scanqflag, &t->flags))
-		__raise_streams();
-}
-
-EXPORT_SYMBOL(qscan);		/* for stream head in include/sys/streams/strsubr.h */
 
 /*
  *  doevents:	- process STREAMS events
@@ -3835,16 +3510,18 @@ EXPORT_SYMBOL(qscan);		/* for stream head in include/sys/streams/strsubr.h */
 STATIC streams_fastcall void
 doevents(struct strthread *t)
 {
-	register struct strevent *se, *se_next;
+	struct strevent *se, *se_next;
 
 	do {
 		clear_bit(strevents, &t->flags);
-		if ((se_next = xchg(&t->strevents_head, NULL))) {	/* MP-SAFE */
+		if ((se_next = XCHG(&t->strevents_head, NULL))) {	/* MP-SAFE */
 			t->strevents_tail = &t->strevents_head;
-			while ((se = se_next)) {
+			se = se_next;
+			do {
 				struct seinfo *s = (typeof(s)) se;
 
-				se_next = xchg(&se->se_next, NULL);
+				se_next = se->se_next;
+				se->se_next = NULL;
 
 				/* these might further defer against a synchronization queue */
 				switch (s->s_type) {
@@ -3868,7 +3545,7 @@ doevents(struct strthread *t)
 					sefree(se);
 					continue;
 				}
-			}
+			} while (unlikely((se = se_next) != NULL));
 		}
 	} while (unlikely(test_bit(strevents, &t->flags) != 0));
 }
@@ -3912,44 +3589,48 @@ runsyncq(struct syncq *sq)
 
 	do {
 		{
-			register mblk_t *b, *b_next;
+			mblk_t *b, *b_next;
 
 			/* process messages */
-			while ((b_next = xchg(&sq->sq_mhead, NULL))) {	/* MP-SAFE */
+			while (likely((b_next = XCHG(&sq->sq_mhead, NULL)) != NULL)) {	/* MP-SAFE */
 				sq->sq_mtail = &sq->sq_mhead;
-				while ((b = b_next)) {
-					b_next = xchg(&b->b_next, NULL);
+				b = b_next;
+				do {
+					b_next = b->b_next;
+					b->b_next = NULL;
 					sq_doput_synced(b);
-				}
+				} while (unlikely((b = b_next) != NULL));
 			}
 		}
 		{
-			register queue_t *q, *q_link;
+			queue_t *q, *q_link;
 			struct strthread *t = this_thread;
 
 			prefetchw(t);
 
 			/* process queue service */
-			while ((q_link = xchg(&sq->sq_qhead, NULL))) {	/* MP-SAFE */
+			while (likely((q_link = XCHG(&sq->sq_qhead, NULL)) != NULL)) {	/* MP-SAFE */
 				sq->sq_qtail = &sq->sq_qhead;
-				while ((q = q_link)) {
+				q = q_link;
+				do {
 					q_link = q->q_link;
 					q->q_link = NULL;
 					sq_dosrv_synced(q);
-				}
+				} while (unlikely((q = q_link) != NULL));
 			}
 		}
 		{
-			register struct strevent *se, *se_next;
+			struct strevent *se, *se_next;
 
 			/* process stream events */
-			while ((se_next = xchg(&sq->sq_ehead, NULL))) {	/* MP-SAFE */
+			while (likely((se_next = XCHG(&sq->sq_ehead, NULL)) != NULL)) {	/* MP-SAFE */
 				sq->sq_etail = &sq->sq_ehead;
-				while ((se = se_next)) {
+				se = se_next;
+				do {
 					se_next = se->se_next;
 					se->se_next = NULL;
 					sq_doevent_synced(se);
-				}
+				} while (unlikely((se = se_next) != NULL));
 			}
 		}
 	} while (sq->sq_mhead || sq->sq_qhead || sq->sq_ehead);
@@ -3986,17 +3667,18 @@ runsyncq(struct syncq *sq)
 STATIC streams_fastcall void
 backlog(struct strthread *t)
 {
-	register syncq_t *sq, *sq_link;
+	syncq_t *sq, *sq_link;
 
 	do {
 		clear_bit(qsyncflag, &t->flags);
-		if ((sq_link = xchg(&t->sqhead, NULL))) {	/* MP-SAFE */
+		if ((sq_link = XCHG(&t->sqhead, NULL))) {	/* MP-SAFE */
 			t->sqtail = &t->sqhead;
-			while ((sq = sq_link)) {
+			sq = sq_link;
+			do {
 				sq_link = sq->sq_link;
 				sq->sq_link = NULL;
 				runsyncq(sq);
-			}
+			} while (unlikely((sq = sq_link) != NULL));
 		}
 	} while (unlikely(test_bit(qsyncflag, &t->flags) != 0));
 }
@@ -4017,18 +3699,19 @@ backlog(struct strthread *t)
 STATIC streams_fastcall void
 bufcalls(struct strthread *t)
 {
-	register struct strevent *se, *se_next;
+	struct strevent *se, *se_next;
 
 	do {
 		clear_bit(strbcwait, &t->flags);
-		if ((se_next = xchg(&t->strbcalls_head, NULL))) {	/* MP-SAFE */
+		if ((se_next = XCHG(&t->strbcalls_head, NULL))) {	/* MP-SAFE */
 			t->strbcalls_tail = &t->strbcalls_head;
-			while ((se = se_next)) {
+			se = se_next;
+			do {
 				se_next = se->se_next;
 				se->se_next = NULL;
 				/* this might further defer against a synchronization queue */
 				do_bufcall_event(se);
-			}
+			} while (unlikely((se = se_next) != NULL));
 		}
 	} while (unlikely(test_bit(strbcwait, &t->flags) != 0));
 }
@@ -4045,17 +3728,9 @@ queuerun(struct strthread *t)
 	queue_t *q, *q_link;
 
 	do {
-		unsigned long flags;
-
 		clear_bit(qrunflag, &t->flags);
-		local_irq_save(flags);
-		q_link = t->qhead;
-		prefetchw(q_link);
-		if (likely(q_link != NULL)) {
-			prefetchw(q_link->q_link);
-			t->qhead = NULL;
+		if (likely((q_link = XCHG(&t->qhead, NULL)) != NULL)) {
 			t->qtail = &t->qhead;
-			local_irq_restore(flags);
 			q = q_link;
 			do {
 				q_link = q->q_link;
@@ -4068,8 +3743,7 @@ queuerun(struct strthread *t)
 				prefetchw(q_link);
 			} while (unlikely((q = q_link) != NULL));
 			prefetchw(t->qhead);
-		} else
-			local_irq_restore(flags);
+		}
 	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
 }
 
@@ -4094,7 +3768,7 @@ sqsched(syncq_t *sq)
 		struct strthread *t = this_thread;
 
 		/* put ourselves on the run list */
-		*xchg(&t->sqtail, &sq->sq_link) = sq_get(sq);	/* MP-SAFE */
+		*XCHG(&t->sqtail, &sq->sq_link) = sq_get(sq);	/* MP-SAFE */
 		if (!test_and_set_bit(qsyncflag, &t->flags))
 			__raise_streams();
 	}
@@ -4111,47 +3785,21 @@ sqsched(syncq_t *sq)
 STATIC streams_fastcall void
 freechains(struct strthread *t)
 {
-	register mblk_t *mp, *mp_next;
+	mblk_t *mp, *mp_next;
 
 	clear_bit(flushwork, &t->flags);
-	if ((mp_next = xchg(&t->freemsg_head, NULL))) {	/* MP-SAFE */
+	if ((mp_next = XCHG(&t->freemsg_head, NULL))) {	/* MP-SAFE */
 		t->freemsg_tail = &t->freemsg_head;
-		while ((mp = mp_next)) {
-			mp_next = xchg(&mp->b_next, NULL);
-#if 0
-			/* fake out freeb */
-			ctrace(qput(&mp->b_queue));
-#endif
+		mp = mp_next;
+		do {
+			mp_next = mp->b_next;
+			mp->b_next = NULL;
 			mp->b_next = mp->b_prev = NULL;
 			freemsg(mp);
-		}
+		} while (unlikely((mp = mp_next) != NULL));
 	}
 }
 
-#if 0
-/*
- *  freechain:	- place a chain of message blocks on the free list
- *  @mp:	head of message block chain
- *  @mpp:	
- *
- *  Frees a chain of message blocks to the freechains list.  The freechains list contians one big
- *  chain of message blocks formed by concatenating these freed chains.  They will be dealt with at
- *  the end of the STREAMS scheduler SOFTIRQ run.
- */
-BIG_STATIC void
-freechain(mblk_t *mp, mblk_t **mpp)
-{
-	struct strthread *t;
-
-	dassert(mp);
-	dassert(mpp != &mp);
-
-	t = this_thread;
-	*xchg(&t->freemsg_tail, mpp) = mp;	/* MP-SAFE */
-	if (!test_and_set_bit(flushwork, &t->flags))
-		__raise_streams();
-}
-#else
 /*
  *  freechain:	- place a chain of message blocks on the free list
  *  @mp:	head of message block chain
@@ -4172,15 +3820,10 @@ freechain(mblk_t *mp, mblk_t **mpp)
 
 	while ((b = b_next)) {
 		b_next = b->b_next;
-#if 0
-		/* fake out freeb */
-		ctrace(qput(&mp->b_queue));
-#endif
 		b->b_next = b->b_prev = NULL;
 		freemsg(b);
 	}
 }
-#endif
 
 /*
  *  _runqueues:	- run scheduled STRAMS events on the current processor
@@ -4504,13 +4147,16 @@ str_term_caches(void)
 	struct cacheinfo *ci = Cacheinfo;
 
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
-		if (!si->si_cache)
+		kmem_cache_t *cache;
+
+		if (unlikely((cache = si->si_cache) == NULL))
 			continue;
 #if defined CONFIG_STREAMS_DEBUG
 		/* if we are tracking the allocations we can kill things whether they refer to each 
 		   other or not. I hope we don't have any inodes kicking around... */
 #endif
-		if (kmem_cache_destroy(xchg(&si->si_cache, NULL)) == 0)
+		si->si_cache = NULL;
+		if (kmem_cache_destroy(cache) == 0)
 			continue;
 		printk(KERN_ERR "%s: could not destroy %s cache\n", __FUNCTION__, ci->name);
 	}
@@ -4606,47 +4252,47 @@ takeover_strsched(unsigned int cpu)
 
 	local_irq_save(flags);
 	if (o->qhead) {
-		*xchg(&t->qtail, o->qtail) = o->qhead;
+		*XCHG(&t->qtail, o->qtail) = o->qhead;
 		o->qhead = NULL;
 		o->qtail = &o->qhead;
 	}
 	if (o->strmfuncs_head) {
-		*xchg(&t->strmfuncs_tail, o->strmfuncs_tail) = o->strmfuncs_head;
+		*XCHG(&t->strmfuncs_tail, o->strmfuncs_tail) = o->strmfuncs_head;
 		o->strmfuncs_head = NULL;
 		o->strmfuncs_tail = &o->strmfuncs_head;
 	}
 	if (o->strbcalls_head) {
-		*xchg(&t->strbcalls_tail, o->strbcalls_tail) = o->strbcalls_head;
+		*XCHG(&t->strbcalls_tail, o->strbcalls_tail) = o->strbcalls_head;
 		o->strbcalls_head = NULL;
 		o->strbcalls_tail = &o->strbcalls_head;
 	}
 	if (o->strtimout_head) {
-		*xchg(&t->strtimout_tail, o->strtimout_tail) = o->strtimout_head;
+		*XCHG(&t->strtimout_tail, o->strtimout_tail) = o->strtimout_head;
 		o->strtimout_head = NULL;
 		o->strtimout_tail = &o->strtimout_head;
 	}
 	if (o->strevents_head) {
-		*xchg(&t->strevents_tail, o->strevents_tail) = o->strevents_head;
+		*XCHG(&t->strevents_tail, o->strevents_tail) = o->strevents_head;
 		o->strevents_head = NULL;
 		o->strevents_tail = &o->strevents_head;
 	}
 	if (o->scanqhead) {
-		*xchg(&t->scanqtail, o->scanqtail) = o->scanqhead;
+		*XCHG(&t->scanqtail, o->scanqtail) = o->scanqhead;
 		o->scanqhead = NULL;
 		o->scanqtail = &o->scanqhead;
 	}
 	if (o->freemsg_head) {
-		*xchg(&t->freemsg_tail, o->freemsg_tail) = o->freemsg_head;
+		*XCHG(&t->freemsg_tail, o->freemsg_tail) = o->freemsg_head;
 		o->freemsg_head = NULL;
 		o->freemsg_tail = &o->freemsg_head;
 	}
 	if (o->freemblk_head) {
-		*xchg(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
+		*XCHG(&t->freemblk_tail, o->freemblk_tail) = o->freemblk_head;
 		o->freemblk_head = NULL;
 		o->freemblk_tail = &o->freemblk_head;
 	}
 	if (o->freeevnt_head) {
-		*xchg(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
+		*XCHG(&t->freeevnt_tail, o->freeevnt_tail) = o->freeevnt_head;
 		o->freeevnt_head = NULL;
 		o->freeevnt_tail = &o->freeevnt_head;
 	}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2005/12/11 23:03:48 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 23:03:48 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:28:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2005/12/11 23:03:48 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2005/12/11 23:03:48 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2005/12/11 23:03:48 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -496,7 +496,7 @@ STATIC streams_inline streams_fastcall __hot_in int
 strcopyout(const void *from, void *to, size_t len)
 {
 	/* before every system call return or sleep -- saves a context switch */
-	if (unlikely((this_thread->flags & (QRUNFLAGS)) != 0))
+	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
 		runqueues();
 	/* might sleep */
 	return copyout(from, to, len);
@@ -6220,6 +6220,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 				goto ioctl_error;
 
 			/* protected by STWOPEN bit */
+			/* XXX: not that well protected, this is dangerous */
 			*sdp = xchg(&sd->sd_link_next, NULL);
 			freelk(xchg(&sd->sd_linkblk, NULL));
 

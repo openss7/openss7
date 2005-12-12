@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/11 09:01:58 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/12 12:28:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 09:01:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:28:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/11 09:01:58 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/12 12:28:35 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/11 09:01:58 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/12 12:28:35 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -100,245 +100,21 @@ static char const ident[] =
 #define _WR(__rq) ((__rq) + 1)
 #define _RD(__wq) ((__wq) - 1)
 
-#if 0
-/*
- *  This file (also) contains a set of specialized STREAMS kernel locks that have the following
- *  charactersistics:
- *
- *  - they are read/write locks
- *  - taking a write lock suppresses local soft interrupts
- *  - taking a read lock suppresses suppresses local STREAMS soft interrupts
- *  - a processor can take a write lock on a lock that it has already write locked and it remains
- *    write locked for that processor
- *  - a processor can take a read lock on a lock that it has already write locked and it remains
- *    write locked for that processor
- *  - a processor can take a read lock on a lock that is unlocked or already read locked
- *  - the caller does not have to supply a "flags" argument, flags are saved internally
- *  - a blockable process can choose to wait on a write lock rather than spinning.
- *  - a blockable process can choose to wait on a write lock or signals rather than spinning.
- *
- *  These characteristics meet the needs of STREAMS as follows:
- *
- *  - write locks can be taken from all contexts except hard irq
- *  - read locks can be taken from all contexts except hard irq
- *
- *  Write locks are expensive, seldom used and not held for long.
- */
-
-streams_fastcall void
-klockinit(klock_t *kl)
-{
-//      kl->kl_isrflags = 0;
-	rwlock_init(&kl->kl_lock);
-	kl->kl_owner = NULL;
-	kl->kl_nest = 0;
-	init_waitqueue_head(&kl->kl_waitq);
-}
-streams_fastcall void
-kwlock(klock_t *kl)
-{
-	if (kl->kl_owner == current)
-		kl->kl_nest++;
-	else {
-//              unsigned long flags;
-
-//              local_irq_save(flags);
-		local_bh_disable();
-//              local_str_disable();
-		write_lock(&kl->kl_lock);
-//              kl->kl_isrflags = flags;
-		kl->kl_owner = current;
-		kl->kl_nest = 0;
-	}
-}
-streams_fastcall int
-kwtrylock(klock_t *kl)
-{
-	int locked = 1;
-
-	if (kl->kl_owner == current)
-		kl->kl_nest++;
-	else {
-//              unsigned long flags;
-
-//              local_irq_save(flags);
-		local_bh_disable();
-//              local_str_disable();
-		if (write_trylock(&kl->kl_lock)) {
-//                      kl->kl_isrflags = flags;
-			kl->kl_owner = current;
-			kl->kl_nest = 0;
-		} else {
-//                      local_irq_restore(flags);
-//                      local_str_enable();
-			local_bh_enable();
-			locked = 0;
-		}
-	}
-	return (locked);
-}
-streams_fastcall void
-kwlock_wait(klock_t *kl)
-{
-	if (kl->kl_owner == current)
-		kl->kl_nest++;
-	else if (!kwtrylock(kl)) {
-		DECLARE_WAITQUEUE(wait, current);
-		add_wait_queue_exclusive(&kl->kl_waitq, &wait);
-		for (;;) {
-			set_current_state(TASK_UNINTERRUPTIBLE);
-			if (kwtrylock(kl))
-				break;
-			schedule();
-		}
-		set_current_state(TASK_RUNNING);
-		remove_wait_queue(&kl->kl_waitq, &wait);
-	}
-}
-streams_fastcall int
-kwlock_wait_sig(klock_t *kl)
-{
-	int err = 0;
-
-	if (kl->kl_owner == current)
-		kl->kl_nest++;
-	else if (!kwtrylock(kl)) {
-		DECLARE_WAITQUEUE(wait, current);
-		add_wait_queue_exclusive(&kl->kl_waitq, &wait);
-		for (;;) {
-			set_current_state(TASK_INTERRUPTIBLE);
-			if (signal_pending(current)) {
-				err = -EINTR;
-				break;
-			}
-			if (kwtrylock(kl))
-				break;
-			schedule();
-		}
-		set_current_state(TASK_RUNNING);
-		remove_wait_queue(&kl->kl_waitq, &wait);
-	}
-	return (err);
-}
-streams_fastcall void
-kwunlock(klock_t *kl)
-{
-	if (kl->kl_nest > 0)
-		kl->kl_nest--;
-	else {
-//              unsigned long flags = kl->kl_isrflags;
-
-		kl->kl_owner = NULL;
-		kl->kl_nest = 0;
-		if (waitqueue_active(&kl->kl_waitq))
-			wake_up(&kl->kl_waitq);
-		write_unlock(&kl->kl_lock);
-//              local_str_enable();
-		local_bh_enable();
-//              local_irq_restore(flags);
-	}
-}
-streams_fastcall void
-krlock(klock_t *kl)
-{
-	if (kl->kl_owner == current)
-		kl->kl_nest++;
-	else {
-		local_str_disable();
-		read_lock(&kl->kl_lock);
-	}
-}
-streams_fastcall void
-krunlock(klock_t *kl)
-{
-	if (kl->kl_nest > 0)
-		kl->kl_nest--;
-	else {
-		if (waitqueue_active(&kl->kl_waitq))
-			wake_up(&kl->kl_waitq);
-		read_unlock(&kl->kl_lock);
-		local_str_enable();
-	}
-}
-
-#if 0
-void
-krlock_irqsave(klock_t *kl, unsigned long *flagsp)
-{
-	if (kl->kl_owner == current) {
-		kl->kl_nest++;
-		*flagsp = 0;
-	} else
-		read_lock_irqsave(&kl->kl_lock, *flagsp);
-}
-
-void
-krunlock_irqrestore(klock_t *kl, unsigned long *flagsp)
-{
-	if (kl->kl_nest > 0)
-		kl->kl_nest--;
-	else {
-		if (waitqueue_active(&kl->kl_waitq))
-			wake_up(&kl->kl_waitq);
-		read_unlock_irqrestore(&kl->kl_lock, *flagsp);
-	}
-}
-#endif
-#endif
-
 STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
 
-STATIC streams_inline streams_fastcall __hot int
-db_ref(dblk_t * db)
-{
-#if 0
-	return (db->db_ref = atomic_read(&db->db_users));
-#else
-	return (db->db_ref);
-#endif
-}
-STATIC streams_inline streams_fastcall __hot_out void
-db_set(dblk_t * db, int val)
-{
-#if 0
-	atomic_set(&db->db_users, val);
-	db_ref(db);
-#else
-	db->db_ref = val;
-#endif
-}
 STATIC void
 db_inc(dblk_t * db)
 {
-#if 0
-	atomic_inc(&db->db_users);
-	db_ref(db);
-#else
 	unsigned long flags;
 
 	spin_lock_irqsave(&db_ref_lock, flags);
 	++db->db_ref;
 	spin_unlock_irqrestore(&db_ref_lock, flags);
-#endif
 }
 
-#if 0
-STATIC void
-db_dec(dblk_t * db)
-{
-	atomic_dec(&db->db_users);
-	db_ref(db);
-}
-#endif
 STATIC streams_inline streams_fastcall __hot_in int
 db_dec_and_test(dblk_t * db)
 {
-#if 0
-	int ret = atomic_dec_and_test(&db->db_users);
-
-	db_ref(db);
-	return ret;
-#else
 	unsigned long flags;
 	bool ret;
 
@@ -346,7 +122,6 @@ db_dec_and_test(dblk_t * db)
 	ret = (--db->db_ref == 0);
 	spin_unlock_irqrestore(&db_ref_lock, flags);
 	return ret;
-#endif
 }
 
 #define msgblk_offset \
@@ -367,13 +142,6 @@ db_to_buf(dblk_t * db)
 	return ((unsigned char *) db - datablk_offset + databuf_offset);
 }
 
-#if 0
-STATIC unsigned char *
-mb_to_buf(mblk_t *mb)
-{
-	return ((unsigned char *) mb - msgblk_offset + databuf_offset);
-}
-#endif
 STATIC streams_inline streams_fastcall __hot_in dblk_t *
 mb_to_db(mblk_t *mb)
 {
@@ -490,7 +258,7 @@ allocb(size_t size, uint priority)
 		db->db_frtnp = NULL;
 		db->db_base = base;
 		db->db_lim = base + size;
-		db_set(db, 1);
+		db->db_ref = 1;
 		db->db_type = M_DATA;
 		db->db_size = size;
 		/* set up message block */
@@ -598,7 +366,7 @@ dupb(mblk_t *bp)
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
 		/* mark datab unused */
 		db = &md->datablk.d_dblock;
-		db_set(db, 0);
+		db->db_ref = 0;
 	}
 	return (mp);
 }
@@ -638,7 +406,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		db->db_frtnp = (struct free_rtn *) md->databuf;
 		db->db_base = base;
 		db->db_lim = base + size;
-		db_set(db, 1);
+		db->db_ref = 1;
 		db->db_type = M_DATA;
 		db->db_size = size;
 		/* set up message block */
@@ -664,13 +432,10 @@ freeb(mblk_t *mp)
 
 	/* check null ptr, message still on queue */
 	dassert(mp);
-#if 0
-	dassert(!mp->b_queue);
-#else
 	/* we always null these when we take a message off a queue */
 	dassert(mp->b_prev == NULL);
 	dassert(mp->b_next == NULL);
-#endif
+
 	db = mp->b_datap;
 	mp->b_datap = NULL;
 
@@ -896,7 +661,7 @@ pullupmsg(mblk_t *mp, ssize_t len)
 	db->db_frtnp = NULL;
 	dp->db_base = base;
 	dp->db_lim = base + size;
-	db_set(dp, 1);
+	db->db_ref = 1;
 	dp->db_type = db->db_type;
 	dp->db_size = size;
 	/* copy from old initial datab */
@@ -1320,9 +1085,6 @@ __get_qband(queue_t *q, unsigned char band)
 			q->q_bandp = qb;
 			qb->qb_hiwat = q->q_hiwat;
 			qb->qb_lowat = q->q_lowat;
-#if 0
-			qb->qb_flag = QB_WANTR;
-#endif
 			++q->q_nband;
 		} while (band > q->q_nband);
 	}
@@ -1704,17 +1466,11 @@ qschedule(queue_t *q)
 {
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		struct strthread *t = this_thread;
-		unsigned long flags;
-		queue_t **qtail;
 
 		/* put ourselves on the run list */
 		prefetchw(t);
-		local_irq_save(flags);
-		qtail = t->qtail;
-		prefetchw(*qtail);
-		t->qtail = &q->q_link;
-		*qtail = qget(q);
-		local_irq_restore(flags);
+		q->q_link = NULL;
+		*XCHG(&t->qtail, &q->q_link) = qget(q);
 		setqsched();
 	}
 }
@@ -1771,9 +1527,7 @@ enableok(queue_t *q)
 
 	assert(q);
 	assure(not_frozen_by_caller(q));
-#if 0
-	assure(in_procedure_of(q));
-#endif
+
 	sd = qstream(q);
 	assert(sd);
 
@@ -1800,9 +1554,7 @@ noenable(queue_t *q)
 
 	assert(q);
 	assure(not_frozen_by_caller(q));
-#if 0
-	assure(in_procedure_of(q));
-#endif
+
 	sd = qstream(q);
 	assert(sd);
 
@@ -1840,13 +1592,8 @@ __putbq(queue_t *q, mblk_t *mp)
 		if (likely(mp->b_band == 0)) {
 			enable = test_bit(QWANTR_BIT, &q->q_flag) ? 1 : 0;
 		      hipri:
-#if 0
-			if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
-				set_bit(QFULL_BIT, &q->q_flag);
-#else
 			if ((q->q_count += msgsize(mp)) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
-#endif
 		      banded:
 			if (q->q_last == b_prev)
 				q->q_last = mp;
@@ -1857,21 +1604,13 @@ __putbq(queue_t *q, mblk_t *mp)
 				b_next->b_prev = mp;
 			if ((mp->b_prev = b_prev))
 				b_prev->b_next = mp;
-#if 0
-			_ctrace(mp->b_queue = qget(q));
-#endif
 			return (1 + enable);
 		} else {
 			struct qband *qb;
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
-#if 0
-			enable = (test_bit(QWANTR_BIT, &q->q_flag)
-				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
-#else
 			enable = (test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
-#endif
 			if (qb->qb_last == b_prev || qb->qb_last == NULL)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next || qb->qb_first == NULL)
@@ -1879,15 +1618,9 @@ __putbq(queue_t *q, mblk_t *mp)
 			assert(qb->qb_first != NULL);
 			assert(qb->qb_last != NULL);
 			qb->qb_msgs++;
-#if 0
-			if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
-				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
-					++q->q_blocked;
-#else
 			if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
 				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 					++q->q_blocked;
-#endif
 			goto banded;
 		}
 	} else {
@@ -1916,9 +1649,6 @@ putbq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(not_frozen_by_caller(q));
-#if 0
-	assure(in_procedure_of(q));
-#endif
 
 	pl = qwlock(q);
 	result = __putbq(q, mp);
@@ -2132,13 +1862,8 @@ __putq(queue_t *q, mblk_t *mp)
 		enable = ((q->q_first == b_next)
 			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 	      hipri:
-#if 0
-		if ((q->q_count += (mp->b_size = msgsize(mp))) > q->q_hiwat)
-			set_bit(QFULL_BIT, &q->q_flag);
-#else
 		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
-#endif
 	      banded:
 		if (likely(q->q_last == b_prev))
 			q->q_last = mp;
@@ -2149,9 +1874,6 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next->b_prev = mp;
 		if (likely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
-#if 0
-		_ctrace(mp->b_queue = qget(q));
-#endif
 		return (1 + enable);	/* success */
 	}
 	/* find position of priority messages */
@@ -2177,14 +1899,8 @@ __putq(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 		/* enable if will be first message in queue, or requested by getq() */
-#if 0
-		enable = ((q->q_first == b_next)
-			  || test_bit(QWANTR_BIT, &q->q_flag)
-			  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
-#else
 		enable = ((q->q_first == b_next)
 			  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
-#endif
 		if (likely(qb->qb_last == b_prev || qb->qb_last == NULL))
 			qb->qb_last = mp;
 		if (unlikely(qb->qb_first == b_next || qb->qb_first == NULL))
@@ -2192,15 +1908,9 @@ __putq(queue_t *q, mblk_t *mp)
 		assert(qb->qb_first != NULL);
 		assert(qb->qb_last != NULL);
 		qb->qb_msgs++;
-#if 0
-		if ((qb->qb_count += (mp->b_size = msgsize(mp))) > qb->qb_hiwat)
-			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
-				++q->q_blocked;
-#else
 		if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
 			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 				++q->q_blocked;
-#endif
 		goto banded;
 	}
 }
@@ -2223,9 +1933,6 @@ putq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(not_frozen_by_caller(q));
-#if 0
-	assure(in_procedure_of(q));
-#endif
 
 	pl = qwlock(q);
 	result = __putq(q, mp);
@@ -2268,10 +1975,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	if (!emp)
 		goto putq;
-#if 0
-	if (q != emp->b_queue)
-		goto bug;
-#endif
 	/* ingnore message class for insq() */
 	enable = ((q->q_first == emp)
 		  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
@@ -2290,14 +1993,8 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (unlikely(nmp->b_band)) {
 			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
-#if 0
-			enable = ((q->q_first == emp)
-				  || test_bit(QWANTR_BIT, &q->q_flag)
-				  || test_bit(QB_WANTR_BIT, &qb->qb_flag)) ? 1 : 0;
-#else
 			enable = ((q->q_first == emp)
 				  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
-#endif
 			if (qb->qb_last == emp || qb->qb_last == NULL)
 				qb->qb_last = nmp;
 			if (qb->qb_first == emp->b_next || qb->qb_first == NULL)
@@ -2312,9 +2009,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		nmp->b_prev->b_next = nmp;
 	nmp->b_next = emp;
 	emp->b_prev = nmp;
-#if 0
-	_ctrace(nmp->b_queue = qget(q));
-#endif
 	/* some adding to do */
 	q->q_msgs++;
 	size = msgsize(nmp);
@@ -2328,9 +2022,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 				++q->q_blocked;
 		}
 	}
-#if 0
-	nmp->b_size = size;
-#endif
 	return (1 + enable);	/* success */
 #if 0
       bug:
@@ -2758,18 +2449,10 @@ qprocsoff(queue_t *q)
 		{
 			struct qband *qb;
 
-			for (qb = rq->q_bandp; qb; qb = qb->qb_next) {
-#if 0
-				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
-#endif
+			for (qb = rq->q_bandp; qb; qb = qb->qb_next)
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
-			}
-			for (qb = wq->q_bandp; qb; qb = qb->qb_next) {
-#if 0
-				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
-#endif
+			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
-			}
 		}
 
 		ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
@@ -2843,16 +2526,6 @@ qprocson(queue_t *q)
 		/* schedule service procedure on first message */
 		set_bit(QWANTR_BIT, &rq->q_flag);
 		set_bit(QWANTR_BIT, &wq->q_flag);
-#if 0
-		{
-			struct qband *qb;
-
-			for (qb = rq->q_bandp; qb; qb = qb->qb_next)
-				set_bit(QB_WANTR_BIT, &qb->qb_flag);
-			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
-				set_bit(QB_WANTR_BIT, &qb->qb_flag);
-		}
-#endif
 
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq)))
@@ -2947,16 +2620,6 @@ EXPORT_SYMBOL(RD);
  *  RETURN VALUE: Returns an integer indicating whether back enabling should be performed.  A return
  *  value of zero (0) indicates that back enabling is not necessary.  A return value of one (1)
  *  indicates that back enabling of queues is required.
- *
- *  IMPLEMENTATION: A slight variation on the them of SVR QWANTR, we also set and clear QB_WANTR for
- *  queue bands.  When a message is removed from the queue, the QWANTR flag is reset, and the
- *  QB_WANTR flag is reset for the band retrieved and all lower priority bands.  The QB_WANTR flag
- *  is set for all the priority bands higher than the message retrieved.  This indicates to putq(),
- *  putbq() and insq() when to enable the queue on priority band messages being added to the queue.
- *
- *  This way, if a priority band message is placed back on the queue with putbq() due to flow
- *  control restrictions, another priority band message of the same or lower priority being enqueued
- *  will not enable the queue, however, a higher priority message will.
  */
 STATIC streams_fastcall __hot_read bool
 __rmvq(queue_t *q, mblk_t *mp)
@@ -2966,11 +2629,6 @@ __rmvq(queue_t *q, mblk_t *mp)
 
 	assert(q);
 	assert(mp);
-
-#if 0
-	/* We know which queue the message belongs too, make sure its still there. */
-	assert(q == mp->b_queue);
-#endif
 
 	b_prev = mp->b_prev;	/* NULL for getq */
 	b_next = mp->b_next;
@@ -2986,21 +2644,8 @@ __rmvq(queue_t *q, mblk_t *mp)
 	q->q_msgs--;
 	assert(q->q_msgs >= 0);
 	if (likely(mp->b_band == 0)) {
-#if 0
-		if (mp->b_datap->db_type < QPCTL) {
-			struct qband *qb;
-
-			/* wanted to read all bands other than band zero */
-			for (qb = q->q_bandp; qb;
-			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next) ;
-		}
-#endif
-#if 0
-		q->q_count -= mp->b_size;
-#else
 		q->q_count -= msgsize(mp);
 		assert(q->q_count >= 0);
-#endif
 		if (q->q_count == 0) {
 			clear_bit(QFULL_BIT, &q->q_flag);
 			clear_bit(QWANTW_BIT, &q->q_flag);
@@ -3018,15 +2663,8 @@ __rmvq(queue_t *q, mblk_t *mp)
 		{
 			unsigned char q_nband, band;
 
-#if 0
-			/* wanted to read all bands of higher priority than this */
-			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
-			     qb && q_nband > band;
-			     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next, --q_nband) ;
-#else
 			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
 			     qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
-#endif
 		}
 		assert(qb);
 		if (qb->qb_first == mp && qb->qb_last == mp)
@@ -3039,29 +2677,17 @@ __rmvq(queue_t *q, mblk_t *mp)
 		}
 		qb->qb_msgs--;
 		assert(qb->qb_msgs >= 0);
-#if 0
-		qb->qb_count -= mp->b_size;
-#else
 		qb->qb_count -= msgsize(mp);
 		assert(qb->qb_count >= 0);
-#endif
 		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 				q->q_blocked--;
 			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 				backenable = true;
 		}
-#if 0
-		/* no longer want to read this or lower bands */
-		for (; qb; qb = qb->qb_next)
-			clear_bit(QB_WANTR_BIT, &qb->qb_flag);
-#endif
-		/* including band zero */
+		/* no longer want to read */
 		clear_bit(QWANTR_BIT, &q->q_flag);
 	}
-#if 0
-	_ctrace(qput(&mp->b_queue));
-#endif
 	return (backenable);
 }
 
@@ -3091,19 +2717,9 @@ rmvq(queue_t *q, mblk_t *mp)
 	assert(mp);
 
 	assure(frozen_by_caller(q));
-#if 0
-	_usual(in_procedure_of(q)); /* not so usual, Stream head does this all the time */
-#endif
 
 	pl = qwlock(q);
-
-#if 0
-	assert(mp->b_queue);
-	assert(q == mp->b_queue);
-#endif
-
 	backenable = __rmvq(q, mp);
-
 	qwunlock(q, pl);
 
 	/* Backenabling under locks is not so severe when write locks only suppress soft irq. */
@@ -3253,9 +2869,6 @@ flushband(queue_t *q, int band, int flag)
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
 	assure(not_frozen_by_caller(q));
-#if 0
-	assure(in_procedure_of(q));
-#endif
 
 	pl = qwlock(q);
 	backenable = __flushband(q, flag, band, &mpp);
@@ -3325,9 +2938,6 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 					--q->q_blocked;
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
-#if 0
-				set_bit(QB_WANTR_BIT, &qb->qb_flag);
-#endif
 			}
 			q->q_blocked = 0;
 			backenable = true;	/* always backenable when queue empty */
@@ -3381,9 +2991,6 @@ flushq(queue_t *q, int flag)
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
 
 	assure(not_frozen_by_caller(q));
-#if 0
-	assure(in_procedure_of(q));
-#endif
 
 	pl = qwlock(q);
 	q_nband = q->q_nband;
@@ -3408,10 +3015,6 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
  *
  *  CONTEXT:	This function must be called with the queue write locked.
  *
- *  IMPLEMENTATION: A slight variation on the SVR 4 QWANTR theme: getq() sets QB_WANTR flag in bands
- *  as well when it did not find a message of a higher priority band.  This indicates to putq(),
- *  putbq() and insq() finer control of enabling on priority band messages.
- *
  *  RETURN VALUE: Returns a pointer to the next message, removed from the queue, or NULL if there is
  *  no message on the queue.
  */
@@ -3423,9 +3026,6 @@ __getq(queue_t *q, bool *be)
 	if (likely((mp = q->q_first) != NULL)) {
 		mblk_t *b_next;
 
-#if 0
-		*be = __rmvq(q, mp);
-#else
 		*be = false;
 		/* hand optimized version of above */
 		if ((b_next = mp->b_next))
@@ -3437,21 +3037,8 @@ __getq(queue_t *q, bool *be)
 		q->q_msgs--;
 		assert(q->q_msgs >= 0);
 		if (likely(mp->b_band == 0)) {
-#if 0
-			if (mp->b_datap->db_type < QPCTL) {
-				struct qband *qb;
-
-				/* wanted to read all bands other than band zero */
-				for (qb = q->q_bandp; qb;
-				     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb = qb->qb_next) ;
-			}
-#endif
-#if 0
-			q->q_count -= mp->b_size;
-#else
 			q->q_count -= msgsize(mp);
 			assert(q->q_count >= 0);
-#endif
 			if (q->q_count == 0) {
 				clear_bit(QFULL_BIT, &q->q_flag);
 				clear_bit(QWANTW_BIT, &q->q_flag);
@@ -3469,16 +3056,8 @@ __getq(queue_t *q, bool *be)
 			{
 				unsigned char q_nband, band;
 
-#if 0
-				/* wanted to read all bands of higher priority than this */
-				for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
-				     qb && q_nband > band;
-				     set_bit(QB_WANTR_BIT, &qb->qb_flag), qb =
-				     qb->qb_next, --q_nband) ;
-#else
 				for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
 				     qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
-#endif
 			}
 			assert(qb);
 			qb->qb_first = b_next;
@@ -3486,44 +3065,21 @@ __getq(queue_t *q, bool *be)
 				qb->qb_last = NULL;
 			qb->qb_msgs--;
 			assert(qb->qb_msgs >= 0);
-#if 0
-			qb->qb_count -= mp->b_size;
-#else
 			qb->qb_count -= msgsize(mp);
 			assert(qb->qb_count >= 0);
-#endif
 			if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 					q->q_blocked--;
 				if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 					*be = true;
 			}
-#if 0
-			/* no longer want to read this or lower bands */
-			for (; qb; qb = qb->qb_next)
-				clear_bit(QB_WANTR_BIT, &qb->qb_flag);
-#endif
 			/* including band zero */
 			clear_bit(QWANTR_BIT, &q->q_flag);
 		}
-#if 0
-		_ctrace(qput(&mp->b_queue));
-#endif
-#endif
 	} else {
-#if 0
-		struct qband *qb;
-#endif
-
 		*be = false;
 		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
 			*be = true;
-#if 0
-		/* wanted to read all bands */
-		for (qb = q->q_bandp; qb; qb = qb->qb_next)
-			if (!test_and_set_bit(QB_WANTR_BIT, &qb->qb_flag))
-				*be = true;
-#endif
 	}
 	return (mp);
 }
@@ -3547,9 +3103,6 @@ getq(queue_t *q)
 	assert(q);
 
 	assure(not_frozen_by_caller(q));
-#if 0
-	usual(in_procedure_of(q));
-#endif
 
 	pl = qwlock(q);
 	mp = __getq(q, &backenable);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/07/13 12:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/07/13 12:01:18 $"
 
 /************************************************************************
 *                          LiS PCI Interface                            *
@@ -172,7 +172,7 @@ lis_pci_find_device(unsigned vendor, unsigned device, lis_pci_dev_t *previous_st
 
 }				/* lis_pci_find_device */
 
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 /************************************************************************
 *                          lis_pci_find_class                           *
 *************************************************************************
@@ -497,7 +497,7 @@ lis_pci_unmap_single(lis_dma_addr_t * dma_handle)
 	return (NULL);
 }
 
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 /************************************************************************
 *                      lis_pci_dma_sync_single                          *
 *************************************************************************

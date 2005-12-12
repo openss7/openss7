@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/04/12 22:45:00 $
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/07/13 12:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/04/12 22:45:00 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/07/13 12:01:18 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -280,7 +280,7 @@ lis_osif_pci_find_device(unsigned int vendor, unsigned int device, struct pci_de
 	return (pci_find_device(vendor, device, from));
 }
 
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 struct pci_dev *
 lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
 {
@@ -432,7 +432,7 @@ lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, 
 	pci_unmap_sg(hwdev, sg, nents, direction);
 }
 
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 void
 lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
 			     int direction)
@@ -441,7 +441,7 @@ lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_
 }
 #endif
 
-#if HAVE_KFUNC_PCI_DMA_SYNC_SG
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SG
 void
 lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems, int direction)
 {
@@ -481,7 +481,7 @@ lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address, size_t si
 	pci_unmap_page(hwdev, dma_address, size, direction);
 }
 
-#if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
+#ifdef HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 int
 lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
@@ -521,7 +521,7 @@ lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 	return (pci_dac_dma_to_offset(pdev, dma_addr));
 }
 
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 void
 lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 				 int direction)
@@ -985,7 +985,7 @@ lis_vsprintf(char *bfr, const char *fmt, va_list args)
 /************************************************************************
 *                      Sleep/Wakeup Routines                            *
 ************************************************************************/
-#if HAVE_KFUNC_SLEEP_ON
+#ifdef HAVE_KFUNC_SLEEP_ON
 void
 lis_sleep_on(OSIF_WAIT_Q_ARG)
 {
@@ -993,7 +993,7 @@ lis_sleep_on(OSIF_WAIT_Q_ARG)
 }
 #endif
 
-#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#ifdef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 void
 lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
 {
@@ -1001,7 +1001,7 @@ lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
 }
 #endif
 
-#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
+#ifdef HAVE_KFUNC_SLEEP_ON_TIMEOUT
 void
 lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
 {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.61 2005/12/11 09:01:41 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.62 2005/12/12 12:28:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 09:01:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:28:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/11 09:01:41 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/12 12:28:29 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -370,9 +370,6 @@ struct strthread {
 	volatile unsigned long flags;	/* flags */
 	struct task_struct *proc;	/* task */
 	atomic_t lock;			/* thread lock */
-#if 0
-	queue_t *currentq;		/* current queue being processed */
-#endif
 	mblk_t *freemblk_head;		/* head of free mdbblocks cached */
 	mblk_t **freemblk_tail;		/* tail of free mdbblocks cached */
 	int freemblks;			/* number of mblks on the free list */
@@ -696,5 +693,27 @@ extern int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 extern int str_close(queue_t *q, int oflag, cred_t *crp);
 
 extern struct file_operations strm_f_ops;
+
+/*
+ *  There are two ways of handling atomicity in per-cpu kernel threads, suppressing interrupts or
+ *  using atomic exchanges.  For SMP it is probably better to suppress interrupts to avoid locking
+ *  the bus.  Probably for UP too, because it kills the cache.  These macros also allow performance
+ *  testing of the difference.
+ */
+#if 0
+#define XCHG(__a,__b) xchg((__a),(__b))
+#else
+#define XCHG(__a,__b) \
+((typeof(__b))({ \
+	unsigned long __flags; \
+	typeof(__b) __result; \
+	local_irq_save(__flags); \
+	__result = *(__a); \
+	prefetchw(__result); \
+	*(__a) = (__b); \
+	local_irq_restore(__flags); \
+	__result; \
+}))
+#endif
 
 #endif				/* __SYS_STREAMS_STRSUBR_H__ */

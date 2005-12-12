@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:26:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 1.1.2.2  2005/12/12 12:26:27  brian
+ - changes for warningless compile on gcc 4.0.2.
+
  Revision 1.1.2.1  2005/10/23 05:01:26  brian
  - test programs and modules for POSIX testing
 
@@ -74,9 +77,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/23 05:01:26 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -143,7 +146,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for TESTMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TESTMOD_MODID));
 MODULE_ALIAS("streams-module-testmod");
 #endif

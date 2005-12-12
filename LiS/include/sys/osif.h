@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: osif.h,v 1.1.1.4.4.7 2005/07/13 12:01:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -67,7 +67,7 @@
 #if defined(LINUX) && !defined(OSIF_H)
 #define OSIF_H			/* file included */
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: osif.h,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/07/13 12:01:19 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -167,7 +167,7 @@
 #undef pci_find_device
 #endif
 #define	pci_find_device			lis_osif_pci_find_device
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 #ifdef pci_find_class
 #undef pci_find_class
 #endif
@@ -259,13 +259,13 @@
 #undef pci_unmap_sg
 #endif
 #define pci_unmap_sg lis_osif_pci_unmap_sg
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 #ifdef pci_dma_sync_single
 #undef pci_dma_sync_single
 #endif
 #define pci_dma_sync_single lis_osif_pci_dma_sync_single
 #endif
-#if HAVE_KFUNC_PCI_DMA_SYNC_SG
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SG
 #ifdef pci_dma_sync_sg
 #undef pci_dma_sync_sg
 #endif
@@ -465,19 +465,19 @@
 #endif
 #define	vsprintf			lis_vsprintf
 
-#if HAVE_KFUNC_SLEEP_ON
+#ifdef HAVE_KFUNC_SLEEP_ON
 #ifdef sleep_on
 #undef sleep_on
 #endif
 #define	sleep_on			lis_sleep_on
 #endif
-#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#ifdef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 #ifdef interruptible_sleep_on
 #undef interruptible_sleep_on
 #endif
 #define	interruptible_sleep_on		lis_interruptible_sleep_on
 #endif
-#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
+#ifdef HAVE_KFUNC_SLEEP_ON_TIMEOUT
 #ifdef sleep_on_timeout
 #undef sleep_on_timeout
 #endif
@@ -541,7 +541,7 @@ const char *lis_pcibios_strerror(int error);
 struct pci_dev *lis_osif_pci_find_device(unsigned int vendor, unsigned int device,
 					 struct pci_dev *from);
 
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 #ifdef __LIS_INTERNAL__
 struct pci_dev *lis_osif_pci_find_class(unsigned int class, struct pci_dev *from);
 #endif
@@ -581,13 +581,13 @@ extern int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg, in
 extern void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents,
 				  int direction);
 
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 #ifdef __LIS_INTERNAL__
 extern void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
 					 int direction);
 #endif
 #endif
-#if HAVE_KFUNC_PCI_DMA_SYNC_SG
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SG
 #ifdef __LIS_INTERNAL__
 extern void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems,
 				     int direction);
@@ -764,17 +764,17 @@ void lis_osif_do_settimeofday(struct timeval *tp);
  */
 #define	OSIF_WAIT_Q_ARG		wait_queue_head_t *wq
 #define	OSIF_WAIT_E_ARG		wait_queue_head_t  wq
-#if HAVE_KFUNC_SLEEP_ON
+#ifdef HAVE_KFUNC_SLEEP_ON
 #ifdef __LIS_INTERNAL__
 void lis_sleep_on(OSIF_WAIT_Q_ARG);
 #endif
 #endif
-#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#ifdef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 #ifdef __LIS_INTERNAL__
 void lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG);
 #endif
 #endif
-#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
+#ifdef HAVE_KFUNC_SLEEP_ON_TIMEOUT
 #ifdef __LIS_INTERNAL__
 void lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout);
 #endif

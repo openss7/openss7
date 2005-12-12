@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/22 20:00:26 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 20:00:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:26:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/22 20:00:26 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/22 20:00:26 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/10/22 20:00:26 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/12 12:26:27 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -123,7 +123,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for NULLMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULLMOD_MODID));
 MODULE_ALIAS("streams-module-nullmod");
 #endif

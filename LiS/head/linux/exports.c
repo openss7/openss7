@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.13 $) $Date: 2005/07/18 11:51:26 $
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.14 $) $Date: 2005/07/21 20:47:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:51:26 $ by $Author: brian $
+ Last Modified $Date: 2005/07/21 20:47:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.13 $) $Date: 2005/07/18 11:51:26 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.14 $) $Date: 2005/07/21 20:47:17 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -181,7 +181,7 @@ EXPORT_SYMBOL(lis_gettimeofday);
 EXPORT_SYMBOL(lis_hitime);
 EXPORT_SYMBOL(lis_insq);
 EXPORT_SYMBOL(lis_in_interrupt);
-#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#ifdef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 EXPORT_SYMBOL(lis_interruptible_sleep_on);
 #endif
 EXPORT_SYMBOL(lis_interruptible_sleep_on_timeout);
@@ -219,7 +219,7 @@ EXPORT_SYMBOL(lis_osif_do_gettimeofday);
 EXPORT_SYMBOL(lis_osif_do_settimeofday);
 EXPORT_SYMBOL(lis_osif_pci_disable_device);
 EXPORT_SYMBOL(lis_osif_pci_enable_device);
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 EXPORT_SYMBOL(lis_osif_pci_find_class);
 #endif
 EXPORT_SYMBOL(lis_osif_pci_find_device);
@@ -252,11 +252,11 @@ EXPORT_SYMBOL(lis_pci_disable_device);
 EXPORT_SYMBOL(lis_pci_dma_handle_to_32);
 EXPORT_SYMBOL(lis_pci_dma_handle_to_64);
 EXPORT_SYMBOL(lis_pci_dma_supported);
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 EXPORT_SYMBOL(lis_pci_dma_sync_single);
 #endif
 EXPORT_SYMBOL(lis_pci_enable_device);
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 EXPORT_SYMBOL(lis_pci_find_class);
 #endif
 EXPORT_SYMBOL(lis_pci_find_device);
@@ -336,10 +336,10 @@ EXPORT_SYMBOL(lis_sem_alloc);
 EXPORT_SYMBOL(lis_sem_destroy);
 EXPORT_SYMBOL(lis_sem_init);
 EXPORT_SYMBOL(lis_setq); /* for clone and friends */
-#if HAVE_KFUNC_SLEEP_ON
+#ifdef HAVE_KFUNC_SLEEP_ON
 EXPORT_SYMBOL(lis_sleep_on);
 #endif
-#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
+#ifdef HAVE_KFUNC_SLEEP_ON_TIMEOUT
 EXPORT_SYMBOL(lis_sleep_on_timeout);
 #endif
 EXPORT_SYMBOL(lis_wait_event);
@@ -394,10 +394,10 @@ EXPORT_SYMBOL(lis_zmalloc);
 
 EXPORT_SYMBOL(lis_osif_pci_alloc_consistent);
 EXPORT_SYMBOL(lis_osif_pci_dma_supported);
-#if HAVE_KFUNC_PCI_DMA_SYNC_SG
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SG
 EXPORT_SYMBOL(lis_osif_pci_dma_sync_sg);
 #endif
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 EXPORT_SYMBOL(lis_osif_pci_dma_sync_single);
 #endif
 EXPORT_SYMBOL(lis_osif_pci_free_consistent);
@@ -409,13 +409,13 @@ EXPORT_SYMBOL(lis_osif_pci_unmap_single);
 EXPORT_SYMBOL(lis_osif_sg_dma_address);
 EXPORT_SYMBOL(lis_osif_sg_dma_len);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
-#if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
+#ifdef HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 EXPORT_SYMBOL(lis_osif_pci_dac_set_dma_mask);
 #endif
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_supported);
 EXPORT_SYMBOL(lis_osif_pci_unmap_page);
 EXPORT_SYMBOL(lis_osif_pci_map_page);
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_sync_single);
 #endif
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU

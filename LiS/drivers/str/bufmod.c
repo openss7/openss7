@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/22 20:00:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/12 12:26:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/10/22 20:00:26 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -123,7 +123,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for BUFMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_BUFMOD_MODID));
 MODULE_ALIAS("streams-module-bufmod");
 #endif
