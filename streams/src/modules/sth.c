@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:28:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/13 11:33:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/12 12:28:39 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -523,7 +523,7 @@ strcopyin(const void *from, void *to, size_t len)
 STATIC streams_fastcall pid_t
 task_session(struct task_struct *t)
 {
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGNAL
+#if !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 	return (t->signal->session);
 #else
 	return (t->session);
@@ -533,7 +533,7 @@ task_session(struct task_struct *t)
 STATIC streams_fastcall pid_t
 task_pgrp(struct task_struct *t)
 {
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGNAL
+#if !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 	return (t->signal->pgrp);
 #else
 	return (t->pgrp);
@@ -828,9 +828,9 @@ alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
  *  SIGPOLL, we use kill_proc which selects a viable thread in the thread group.
  */
 STATIC streams_fastcall __unlikely struct task_struct *
-str_find_thread_group_leader(const struct task_struct *procp)
+str_find_thread_group_leader(struct task_struct *procp)
 {
-	const struct task_struct *p = procp;
+	struct task_struct *p = procp;
 
 	if (!thread_group_leader(p)) {
 		read_lock(&tasklist_lock);
@@ -4007,7 +4007,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 		/* For old TTY semantics we are supposed to return zero (0) instead of [EAGAIN]. */
 		if (ndelay)
 			err = 0;
-	} else if (unlikely(err = -ESTRPIPE)) {
+	} else if (unlikely(err == -ESTRPIPE)) {
 		/* If we have hit the end of a pipe or FIFO return zero (0) instead of [ESTRPIPE]. */
 		err = 0;
 	}

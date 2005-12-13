@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.123 $) $Date: 2005/12/09 00:27:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2005/12/13 11:59:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/09 00:27:42 $ by $Author: brian $
+# Last Modified $Date: 2005/12/13 11:59:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -233,8 +233,7 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strlookup.h \
 				src/kernel/strattach.h \
 				src/kernel/strpipe.h \
-				src/kernel/strargs.h \
-				src/kernel/specfs.c
+				src/kernel/strargs.h
 
 if CONFIG_STREAMS_SEPARATE_COMPILE
 libLfS_specfs_a_SOURCES		+= \
@@ -242,6 +241,9 @@ libLfS_specfs_a_SOURCES		+= \
 				src/kernel/strlookup.c \
 				src/kernel/strattach.c \
 				src/kernel/strpipe.c
+else
+libLfS_specfs_a_SOURCES		+= \
+				src/kernel/specfs.c
 endif
 
 libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -258,8 +260,7 @@ libLfS_streams_a_SOURCES	= \
 				src/kernel/strsysctl.h \
 				src/kernel/strutil.h \
 				src/kernel/strsad.h \
-				src/kernel/strargs.h \
-				src/kernel/streams.c
+				src/kernel/strargs.h
 
 if CONFIG_STREAMS_SEPARATE_COMPILE
 libLfS_streams_a_SOURCES	+= \
@@ -271,6 +272,9 @@ libLfS_streams_a_SOURCES	+= \
 				src/kernel/strsyms.c \
 				src/kernel/strutil.c \
 				src/kernel/strsad.c
+else
+libLfS_streams_a_SOURCES	+= \
+				src/kernel/streams.c
 endif
 
 ##if CONFIG_STREAMS_STH
@@ -709,12 +713,8 @@ AUTOCONFIG_H			= include/sys/config.h
 
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
-EXPORT_SRCFILES			= \
-				  src/kernel/specfs.c \
-				  src/kernel/streams.c
-
 if CONFIG_STREAMS_SEPARATE_COMPILE
-EXPORT_SRCFILES			+= \
+EXPORT_SRCFILES			= \
 				  src/kernel/strattach.c \
 				  src/kernel/strlookup.c \
 				  src/kernel/strpipe.c \
@@ -732,6 +732,10 @@ endif
 if CONFIG_STREAMS_STH
 EXPORT_SRCFILES			+= src/modules/sth.c
 endif
+else
+EXPORT_SRCFILES			= \
+				  src/kernel/specfs.c \
+				  src/kernel/streams.c
 endif
 
 if CONFIG_STREAMS_CLONE_MODULE
@@ -741,12 +745,8 @@ if CONFIG_STREAMS_STH_MODULE
 EXPORT_SRCFILES			+= src/modules/sth.c
 endif
 
-EXPORT_VERFILES			= \
-				  $(PKGINCL)/versions/specfs.ver \
-				  $(PKGINCL)/versions/streams.ver
-
 if CONFIG_STREAMS_SEPARATE_COMPILE
-EXPORT_VERFILES			+= \
+EXPORT_VERFILES			= \
 				  $(PKGINCL)/versions/strattach.ver \
 				  $(PKGINCL)/versions/strlookup.ver \
 				  $(PKGINCL)/versions/strpipe.ver \
@@ -763,6 +763,10 @@ endif
 if CONFIG_STREAMS_STH
 EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
 endif
+else
+EXPORT_VERFILES			= \
+				  $(PKGINCL)/versions/specfs.ver \
+				  $(PKGINCL)/versions/streams.ver
 endif
 
 if CONFIG_STREAMS_CLONE_MODULE
@@ -777,6 +781,9 @@ GENKSYMS_CPPFLAGS		= \
 				  -I./src/drivers -I$(srcdir)/src/drivers \
 				  -I./src/modules -I$(srcdir)/src/modules \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+EXTRA_DIST			+= \
+				  $(top_srcdir)/scripts/hot.lds
 
 ##
 ## Rules for generating versioned kernel symbols

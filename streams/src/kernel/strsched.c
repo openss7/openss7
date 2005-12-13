@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/12 12:28:34 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/13 11:33:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:28:34 $ by $Author: brian $
+ Last Modified $Date: 2005/12/13 11:33:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/12 12:28:34 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/13 11:33:09 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/12 12:28:34 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/13 11:33:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -4366,7 +4366,7 @@ kill_kstreamd(void)
 #if !defined HAVE_KFUNC_SET_USER_NICE
 #define set_user_nice(__p, __val) (__p)->nice = (__val)
 #endif
-#if !defined HAVE_KFUNC_SET_CPUS_ALLOWED
+#if !defined set_cpus_allowed && !defined HAVE_KFUNC_SET_CPUS_ALLOWED
 #define set_cpus_allowed(__p, __mask) (__p)->cpus_allowed = (__mask)
 #endif
 #if defined HAVE_DO_EXIT_ADDR
