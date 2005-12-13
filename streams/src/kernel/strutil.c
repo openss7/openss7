@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/12 12:28:35 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/13 12:37:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:28:35 $ by $Author: brian $
+ Last Modified $Date: 2005/12/13 12:37:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/12 12:28:35 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/13 12:37:37 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/12 12:28:35 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/13 12:37:37 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2508,7 +2508,9 @@ qprocson(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
+#if 0
 	assert(current_context() <= CTX_STREAMS);
+#endif
 	/* only one qprocson() happens at a time */
 	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct queinfo *qu = ((typeof(qu)) rq);

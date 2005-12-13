@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.73 2005/12/12 12:28:29 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.74 2005/12/13 12:39:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/12/13 12:39:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/12/12 12:28:29 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/12/13 12:39:14 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -566,8 +566,8 @@ typedef struct module_stat {
 	uint ms_flags;			/* bool stats -- for future use */
 } module_stat_t;
 
-typedef int STREAMS_FASTCALL((*qi_putp_t) (queue_t *, mblk_t *));
-typedef int STREAMS_FASTCALL((*qi_srvp_t) (queue_t *));
+typedef int (*qi_putp_t) STREAMS_FASTCALL((queue_t *, mblk_t *));
+typedef int (*qi_srvp_t) STREAMS_FASTCALL((queue_t *));
 typedef int (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
 typedef int (*qi_qclose_t) (queue_t *, int, cred_t *);
 typedef int (*qi_qadmin_t) (void);
