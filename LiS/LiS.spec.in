@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.37 $) $Date: 2005/11/13 11:00:30 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.38 $) $Date: 2005/12/13 13:42:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/13 11:00:30 $ by $Author: brian $
+# Last Modified $Date: 2005/12/13 13:42:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,7 +76,8 @@
 %global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
-%global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC4.*|1|;s|[^1].*|0|')
+%global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC4.*$|1|;s|[^1].*$|0|')
+%global kernel_others %(echo %{_kversion} | sed -e 's|.*FC4.*$|0|;s|[^0].*$|1|')
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
 %global majbase     @STRCONF_MAJBASE@
@@ -160,6 +161,8 @@
 %else
 %global FILES_modules       0
 %global FILES_ko_modules    0
+%global kernel_fedora       0
+%global kernel_others       0
 %endif
 
 %if %{BUILD_tools}
@@ -276,13 +279,15 @@ ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
-%if %{BUILD_modules}
 # TODO: FC4 wants kernel-devel not kernel-source
+# older rpm can't handle nested ifs
 %if %{kernel_fedora}
 BuildRequires:  kernel-devel = %{kernel_source}
-%else
+%endif
+%if %{kernel_others}
 BuildRequires:  kernel-source = %{kernel_source}
 %endif
+%if %{BUILD_modules}
 BuildRequires:  modutils >= 2.4.12
 %endif
 
@@ -1566,12 +1571,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.37  2005/11/13 11:00:30  brian
-# - FC4 wants kernel-devel instead of kernel-source
+# Revision 1.1.6.38  2005/12/13 13:42:15  brian
+# - corrected nested ifs unusable by rpm
 #
-# Revision 1.1.6.36  2005/11/06 10:59:06  brian
-# - updates
-#
+
+* Sun Nov 13 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.37  2005/11/13 11:00:30  brian
+- FC4 wants kernel-devel instead of kernel-source
+
+* Sun Nov  6 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.36  2005/11/06 10:59:06  brian
+- updates
 
 * Wed Sep 14 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.35  2005/09/14 23:40:51  brian
@@ -1584,7 +1594,6 @@ fi
 * Wed Jul  6 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.33  2005/07/06 04:14:25  brian
 - added requirement for strcompat package
-
 
 * Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.32  2005/06/25 07:01:47  brian
