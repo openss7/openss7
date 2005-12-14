@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.11 $) $Date: 2005/11/07 10:54:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.12 $) $Date: 2005/12/14 11:32:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/07 10:54:54 $ by $Author: brian $
+# Last Modified $Date: 2005/12/14 11:32:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.12  2005/12/14 11:32:06  brian
+# - added way to pass options to testsuite from make installcheck
+#
 # Revision 1.1.4.11  2005/11/07 10:54:54  brian
 # - added SAD testing
 #
@@ -153,7 +156,7 @@ INSTALLCHECK_TESTS =
 
 # my rule
 installcheck-test: $(TESTSUITE)
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
 
 INSTALLCHECK_TESTS += installcheck-test
 

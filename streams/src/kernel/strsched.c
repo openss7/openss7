@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/13 11:33:09 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/14 11:43:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/13 11:33:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/14 11:43:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/13 11:33:09 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/14 11:43:19 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/13 11:33:09 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/14 11:43:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -880,8 +880,24 @@ mdbblock_alloc(uint priority, void *func)
 		struct mdbblock *md = (struct mdbblock *) mp;
 
 		md->msgblk.m_func = func;
-		ctrace(md->msgblk.m_queue = NULL;
+		ctrace(md->msgblk.m_queue = NULL);
 #endif
+		{
+			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
+
+#if defined CONFIG_STREAMS_DEBUG
+			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
+
+			atomic_inc(&smi->si_cnt);
+			if (atomic_read(&smi->si_cnt) > smi->si_hwl)
+				smi->si_hwl = atomic_read(&smi->si_cnt);
+#endif
+			atomic_inc(&sdi->si_cnt);
+#if !defined CONFIG_STREAMS_NONE
+			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
+				sdi->si_hwl = atomic_read(&sdi->si_cnt);
+#endif
+		}
 		ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		return (mp);
 	}
@@ -966,7 +982,16 @@ mdbblock_free(mblk_t *mp)
 
 	mp->b_next = NULL;
 	*XCHG(&t->freemblk_tail, &mp->b_next) = mp;
+	{
+		struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 
+#if defined CONFIG_STREAMS_DEBUG
+		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
+
+		atomic_dec(&smi->si_cnt);
+#endif
+		atomic_dec(&sdi->si_cnt);
+	}
 	/* Decide when to invoke freeblocks.  Current policy is to free blocks when then number of
 	   blocks on the free list exceeds some (per-cpu) threshold.  Currently I set this to just
 	   1/16th of the maximum.  That should be ok for now.  I will create a sysctl for it
@@ -1010,14 +1035,18 @@ freeblocks(struct strthread *t)
 			list_del_init(&md->msgblk.m_list);
 			list_del_init(&md->datablk.db_list);
 			write_unlock_irqrestore(&smi->si_rwlock, flags);
+#if 0
 			atomic_dec(&smi->si_cnt);
+#endif
 #endif
 			printd(("%s: freeing mblk %p\n", __FUNCTION__, mp));
 			prefetchw(sdi);
 			mp_next = mp->b_next;
 			prefetchw(mp_next);
 			mp->b_next = NULL;
+#if 0
 			atomic_dec(&sdi->si_cnt);
+#endif
 			kmem_cache_free(sdi->si_cache, mp);
 		} while (likely((mp = mp_next) != NULL));
 		/* raise global bufcalls if we free anything to the cache */

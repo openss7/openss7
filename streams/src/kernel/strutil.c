@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/13 12:37:37 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/12/14 11:43:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/13 12:37:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/14 11:43:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/13 12:37:37 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/12/14 11:43:19 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2005/12/13 12:37:37 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/12/14 11:43:19 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1973,11 +1973,10 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	struct qband *qb = NULL;
 	size_t size;
 
-	if (!emp)
+	if (likely(emp == NULL))
 		goto putq;
 	/* ingnore message class for insq() */
-	enable = ((q->q_first == emp)
-		  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+	enable = ((q->q_first == emp) || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
@@ -1999,8 +1998,8 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 				qb->qb_last = nmp;
 			if (qb->qb_first == emp->b_next || qb->qb_first == NULL)
 				qb->qb_first = nmp;
-			assert(qb->qb_first != NULL);
-			assert(qb->qb_last != NULL);
+			dassert(qb->qb_first != NULL);
+			dassert(qb->qb_last != NULL);
 		}
 	}
 	if (q->q_first == emp)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/13 11:33:14 $ by $Author: brian $
+ Last Modified $Date: 2005/12/14 16:31:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.127 $) $Date: 2005/12/13 11:33:14 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -476,6 +476,7 @@ strschedule(void)
 	/* before every system call return or sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
+	set_current_state(TASK_RUNNING);
 	runqueues();
 }
 
@@ -1158,16 +1159,21 @@ strsignal(struct stdata *sd, mblk_t *mp)
  *  Stream frozen.  This separate version is so that we do not release and reacquire locks if not
  *  necessary.  Return true if we had to release locks.
  */
-STATIC streams_fastcall bool
-strsignal_locked(struct stdata *sd, mblk_t *mp)
+STATIC streams_fastcall int
+strsignal_locked(struct stdata *sd, mblk_t *mp, const int access)
 {
 	if ((mp->b_rptr[0] == SIGPOLL) || test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0) {
+		int err;
+
 		srunlock(sd);
 		strsignal(sd, mp);
 		srlock(sd);
-		return (true);
+		if ((err = straccess(sd, access)))
+			return (err);
+		if (signal_pending(current))
+			return (-EINTR);
 	}
-	return (false);
+	return (0);
 }
 
 /* 
@@ -1186,7 +1192,7 @@ strsignal_locked(struct stdata *sd, mblk_t *mp)
  *  @band: band from which to retrieve message
  *  @plp: pointer to save irq flags.
  *
- *  LOCKING: This function must be called with the Stream head read locked and the Stream frozen.
+ *  LOCKING: This function must be called with the Stream head read locked.
  *
  *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
  *  another (or search the queue and use rmvq()) without races with other procedures acting on the
@@ -1205,57 +1211,71 @@ strsignal_locked(struct stdata *sd, mblk_t *mp)
  *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
  *  used timer interrupts.  The rest are guesses.
  */
-STATIC streams_inline streams_fastcall __hot_read mblk_t *
+STATIC streams_inline streams_fastcall __hot_in mblk_t *
 strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	mblk_t *b = NULL;
+	unsigned long pl;
+	int err;
 
+	pl = zwlock(sd);
 	/* like a mini service procedure */
-	while ((b = q->q_first)) {
-		switch (b->b_datap->db_type) {
+	while (likely((b = q->q_first) != NULL)) {
+		int type = b->b_datap->db_type;
+
+		/* fast path for data */
+		if (likely(type == M_DATA) || likely(type == M_PROTO)) {
+			if (unlikely(flags == MSG_HIPRI || b->b_band < band))
+				goto ebadmsg;
+			if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
+				set_bit(STRMSIG_BIT, &sd->sd_flag);
+			rmvq(q, b);
+			zwunlock(sd, pl);
+			return (b);
+		}
+		switch (type) {
 		case M_PROTO:
 		case M_DATA:
-			if (flags == MSG_HIPRI)
-				return ERR_PTR(-EBADMSG);
-			if (b->b_band < band)
-				return ERR_PTR(-EBADMSG);
+			if (unlikely(flags == MSG_HIPRI || b->b_band < band))
+				goto ebadmsg;
 			break;
 		case M_PCPROTO:
-			if (flags == MSG_BAND)
-				return ERR_PTR(-EBADMSG);
+			if (unlikely(flags == MSG_BAND))
+				goto ebadmsg;
 			clear_bit(STRPRI_BIT, &sd->sd_flag);
 			break;
 		case M_SIG:
-		{
-			int err;
-
 			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
 				clear_bit(STRMSIG_BIT, &sd->sd_flag);
 			rmvq(q, b);
-			if (strsignal_locked(sd, b)) {
-				/* released and reacquired locks, recheck access */
-				if ((err = straccess(sd, FREAD)))
-					return (ERR_PTR(err));
-				if (signal_pending(current))
-					return ERR_PTR(-EINTR);
-			}
+			zwunlock(sd, pl);
+			if (unlikely((err = strsignal_locked(sd, b, FREAD))))
+				return (ERR_PTR(err));
+			pl = zwlock(sd);
 			continue;
-		}
 		default:
 		case M_PASSFP:
-			return ERR_PTR(-EBADMSG);
+			goto ebadmsg;
 		}
 		if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
 			set_bit(STRMSIG_BIT, &sd->sd_flag);
 		rmvq(q, b);
 		break;
 	}
+      error:
+	zwunlock(sd, pl);
 	return (b);
+      ebadmsg:
+	b = ERR_PTR(-EBADMSG);
+	goto error;
 }
 
 STATIC streams_fastcall void
 strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {				/* IRQ SUPPRESSED */
+	unsigned long pl;
+
+	pl = zwlock(sd);
 	/* Like putbq() but handles STRPRI bit and under queue locks */
 	if (mp->b_datap->db_type >= QPCTL)
 		set_bit(STRPRI_BIT, &sd->sd_flag);
@@ -1263,7 +1283,8 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 		set_bit(STRMSIG_BIT, &sd->sd_flag);
 	else
 		clear_bit(STRMSIG_BIT, &sd->sd_flag);
-	putbq(q, mp);
+	insq(q, q->q_first, mp);
+	zwunlock(sd, pl);
 }
 
 STATIC streams_fastcall mblk_t *
@@ -1290,10 +1311,11 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 	mblk_t *mp;
 	int err;
 
+	srunlock(sd);
 	add_wait_queue(&sd->sd_waitq, &wait);
 	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		set_bit(RSLEEP_BIT, &sd->sd_flag);
+		strschedule();	/* save context switch */
+		srlock(sd);
 		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
 			mp = ERR_PTR(err);
 			break;
@@ -1302,12 +1324,12 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 			mp = ERR_PTR(-EINTR);
 			break;
 		}
+		set_current_state(TASK_INTERRUPTIBLE);
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetq_slow(sd, q, flags, band)) != NULL))
 			break;
 		srunlock(sd);
-		strschedule();	/* save context switch */
 		schedule();
-		srlock(sd);	/* Note access checked above. */
 	}
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&sd->sd_waitq, &wait);
@@ -1393,10 +1415,10 @@ strsendmread(struct stdata *sd, const unsigned long len)
  *  on or free the M_READ message.  Modules that do not recognize this message must pass it on.  All
  *  other drivers may or may not take action and then free the message."
  */
-STATIC streams_inline streams_fastcall __hot_read mblk_t *
+STATIC streams_inline streams_fastcall __hot_in mblk_t *
 strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, const int band,
 	    const unsigned long len)
-{				/* IRQ SUPPRESSED */
+{
 	mblk_t *mp;
 	int err;
 
@@ -1446,7 +1468,7 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
  *  @q: stream head read queue
  *  @plp: pointer to save irq flags.
  *
- *  LOCKING: This function must be called with the Stream head read locked and the Stream frozen.
+ *  LOCKING: This function must be called with the Stream head read locked.
  *
  *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
  *  another (or search the queue and use rmvq()) without races with other procedures acting on the
@@ -1465,30 +1487,36 @@ strgetfp(struct stdata *sd, queue_t *q)
 
 	pl = zwlock(sd);
 	/* like a mini service procedure */
-	while ((b = q->q_first)) {
-		switch (b->b_datap->db_type) {
-		case M_SIG:
-			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
-				clear_bit(STRMSIG_BIT, &sd->sd_flag);
+	while (likely((b = q->q_first) != NULL)) {
+		int type = b->b_datap->db_type;
+
+		/* fast path for file pointer */
+		if (likely(type == M_PASSFP)) {
 			rmvq(q, b);
-			if (strsignal_locked(sd, b)) {
-				/* release and reacquire locks, recheck access */
-				if ((err = straccess(sd, FREAD))) {
-					b = ERR_PTR(err);
-					goto error;
-				}
-				if (signal_pending(current))
-					goto eintr;
-			}
-			continue;
+			zwunlock(sd, pl);
+			return (b);
+		}
+
+		switch (b->b_datap->db_type) {
 		case M_PASSFP:
 			break;
+		case M_SIG:
+			if (!b->b_next || likely(b->b_next->b_datap->db_type != M_SIG))
+				clear_bit(STRMSIG_BIT, &sd->sd_flag);
+			rmvq(q, b);
+			zwunlock(sd, pl);
+			if (unlikely((err = strsignal_locked(sd, b, FREAD))))
+				return (ERR_PTR(err));
+			pl = zwlock(sd);
+			continue;
 		default:
 		case M_PCPROTO:
 		case M_PROTO:
 		case M_DATA:
 			goto ebadmsg;
 		}
+		if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
+			set_bit(STRMSIG_BIT, &sd->sd_flag);
 		rmvq(q, b);
 		break;
 	}
@@ -1497,9 +1525,6 @@ strgetfp(struct stdata *sd, queue_t *q)
 	return (b);
       ebadmsg:
 	b = ERR_PTR(-EBADMSG);
-	goto error;
-      eintr:
-	b = ERR_PTR(-EINTR);
 	goto error;
 }
 
@@ -1516,10 +1541,11 @@ strwaitgetfp(struct stdata *sd, queue_t *q)
 	mblk_t *mp;
 	int err;
 
+	srunlock(sd);
 	add_wait_queue(&sd->sd_waitq, &wait);
 	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		set_bit(RSLEEP_BIT, &sd->sd_flag);
+		strschedule();	/* save context switch */
+		srlock(sd);
 		if ((err = straccess(sd, FREAD))) {
 			mp = ERR_PTR(err);
 			break;
@@ -1528,12 +1554,12 @@ strwaitgetfp(struct stdata *sd, queue_t *q)
 			mp = ERR_PTR(-EINTR);
 			break;
 		}
+		set_current_state(TASK_INTERRUPTIBLE);
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if ((mp = strgetfp_slow(sd, q)))
 			break;
 		srunlock(sd);
-		strschedule();	/* save context switch */
 		schedule();
-		srlock(sd);	/* Note access checked above. */
 	}
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&sd->sd_waitq, &wait);
@@ -1584,23 +1610,24 @@ __strwaitband(struct stdata *sd, int band)
 	DECLARE_WAITQUEUE(wait, current);
 	int err = 0;
 
+	srunlock(sd);
 	add_wait_queue(&sd->sd_waitq, &wait);
 	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
+		strschedule();	/* save context switch */
+		srlock(sd);
 		if (unlikely((err = straccess(sd, FWRITE)) != 0))
 			break;
 		if (unlikely(signal_pending(current)) != 0) {
 			err = -EINTR;
 			break;
 		}
+		set_current_state(TASK_INTERRUPTIBLE);
+		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		/* have read lock and access is ok */
 		if (likely(bcanputnext(sd->sd_wq, band)))
 			break;
-		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
-		strschedule();	/* save context switch */
 		schedule();
-		srlock(sd);
 	}
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&sd->sd_waitq, &wait);
@@ -1666,23 +1693,24 @@ __strwaitopen(struct stdata *sd, const int access)
 	DECLARE_WAITQUEUE(wait, current);
 	int err;
 
+	swunlock(sd);
 	add_wait_queue(&sd->sd_waitq, &wait);
 	/* Wait for the STWOPEN bit.  Only one open can be performed on a stream at a time. See
 	   Magic Garden. */
 	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
+		strschedule();	/* save context switch */
+		swlock(sd);
 		if ((err = straccess_slow(sd, access)))
 			break;
 		if (signal_pending(current)) {
 			err = -EINTR;
 			break;
 		}
+		set_current_state(TASK_INTERRUPTIBLE);
 		if (!test_and_set_bit(STWOPEN_BIT, &sd->sd_flag))
 			break;
 		swunlock(sd);
-		strschedule();	/* save context switch */
 		schedule();
-		swlock(sd);
 	}
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&sd->sd_waitq, &wait);
@@ -1804,16 +1832,16 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 
 	add_wait_queue(&sd->sd_waitq, &wait);
 	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
+		strschedule();	/* save context switch */
 		if ((err = straccess(sd, FCREAT)))
 			break;
 		if (signal_pending(current)) {
 			err = -EINTR;
 			break;
 		}
+		set_current_state(TASK_INTERRUPTIBLE);
 		if (sd->sd_readers >= 1 && sd->sd_writers >= 1)
 			break;
-		strschedule();	/* save context switch */
 		schedule();
 	}
 	set_current_state(TASK_RUNNING);
@@ -1824,17 +1852,18 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 STATIC streams_fastcall __unlikely int
 strwaitfifo(struct stdata *sd, const int oflag)
 {
-	if ((oflag & (FREAD | FWRITE)) == (FREAD | FWRITE))
+	if ((oflag & FREAD) && (oflag & FWRITE))
 		return (0);
 
 	if (sd->sd_readers >= 1 && sd->sd_writers >= 1)
 		return (0);
 
-	if ((oflag & (FNDELAY | FREAD)) == (FNDELAY | FREAD))
-		return (0);
-
-	if ((oflag & (FNDELAY | FWRITE)) == (FNDELAY | FWRITE))
-		return (-ENXIO);
+	if (oflag & FNDELAY) {
+		if (oflag & FREAD)
+			return (0);
+		if (oflag & FWRITE)
+			return (-ENXIO);
+	}
 
 	return __strwaitfifo(sd, oflag);
 }
@@ -1849,14 +1878,14 @@ strwaitqueue(struct stdata *sd, queue_t *q)
 	set_bit(QWCLOSE_BIT, &q->q_flag);
 	add_wait_queue(&qu->qu_qwait, &wait);
 	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
+		strschedule();	/* save context switch */
 		if (timeo == 0)
-			break;
-		if (!q->q_first)
 			break;
 		if (signal_pending(current))
 			break;
-		strschedule();	/* save context switch */
+		if (!q->q_first)
+			break;
+		set_current_state(TASK_INTERRUPTIBLE);
 		timeo = schedule_timeout(timeo);
 	}
 	set_current_state(TASK_RUNNING);
@@ -1918,31 +1947,32 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	DECLARE_WAITQUEUE(wait, current);
 	int err = 0;
 
+	srunlock(sd);
 	add_wait_queue(&sd->sd_waitq, &wait);
 	/* Wait for the IOCWAIT bit.  Only one ioctl can be performed on a stream at a time. See
 	   Magic Garden.  However, only wait as long as we would have waited for a response to our
 	   input output control. */
 	if (timeo) {
 		for (;;) {
-			set_current_state(TASK_INTERRUPTIBLE);
+			strschedule();	/* save context switch */
+			srlock(sd);
 			if ((err = straccess_wakeup(sd, 0, timeo, access)))
 				break;
+			set_current_state(TASK_INTERRUPTIBLE);
 			if (!test_and_set_bit(IOCWAIT_BIT, &sd->sd_flag))
 				break;
 			srunlock(sd);
-			strschedule();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
-			srlock(sd);
 		}
 	} else {
 		for (;;) {
+			strschedule();	/* save context switch */
+			srlock(sd);
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			if (!test_and_set_bit(IOCWAIT_BIT, &sd->sd_flag))
 				break;
 			srunlock(sd);
-			strschedule();	/* save context switch */
 			schedule();
-			srlock(sd);
 		}
 	}
 	set_current_state(TASK_RUNNING);
@@ -1992,16 +2022,19 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	mblk_t *mp;
 	int err;
 
+	srunlock(sd);
 	/* We are waiting for a response to our downwards ioctl message.  Wait until the message
 	   arrives or the io check fails. */
 	add_wait_queue(&sd->sd_waitq, &wait);
 	if (timeo) {
 		do {
-			set_current_state(TASK_INTERRUPTIBLE);
+			strschedule();	/* save context switch */
+			srlock(sd);
 			if ((err = straccess_wakeup(sd, 0, timeo, access))) {
 				mp = ERR_PTR(err);
 				break;
 			}
+			set_current_state(TASK_INTERRUPTIBLE);
 			mp = sd->sd_iocblk;
 			prefetchw(mp);
 			if (likely(mp != NULL)) {
@@ -2010,14 +2043,14 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 				break;
 			}
 			srunlock(sd);
-			strschedule();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
 			prefetchw(sd);
-			srlock(sd);
 		} while (1);
 	} else {
 		/* timeo is NULL for no timeout no signals */
 		do {
+			strschedule();	/* save context switch */
+			srlock(sd);
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			mp = sd->sd_iocblk;
 			prefetchw(mp);
@@ -2027,10 +2060,8 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 				break;
 			}
 			srunlock(sd);
-			strschedule();	/* save context switch */
 			schedule();
 			prefetchw(sd);
-			srlock(sd);
 		} while (1);
 	}
 	set_current_state(TASK_RUNNING);
@@ -2176,9 +2207,9 @@ strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 		do {
 			prefetchw(b->b_cont);
 			if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))	/* PROFILED */
-				continue;
+				goto unlink;
 			if (unlikely(protdis && b->b_datap->db_type != M_DATA))
-				continue;
+				goto unlink;
 			if (likely((dlen = min(blen, len - copied)) > 0)) {	/* PROFILED */
 				const caddr_t b_rptr = (caddr_t) b->b_rptr;
 
@@ -2186,6 +2217,7 @@ strmcopyout(mblk_t *mp, caddr_t uaddr, size_t len, bool protdis, bool user)
 				uaddr += dlen;
 				copied += dlen;
 			}
+		      unlink:
 			b_cont = unlinkb(b);
 			freeb(b);
 		} while (unlikely((b = b_cont) != NULL));
@@ -3699,23 +3731,36 @@ strfasync(int fd, struct file *file, int on)
 
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strlinkmsg(mblk_t *first, mblk_t *mp)
-{				/* IRQ DISABLED */
-	mblk_t **bp;
+{
+	dassert(mp != NULL);
 
-	for (bp = &first; (*bp); bp = &(*bp)->b_cont) ;
-	(*bp) = mp;
-	return (first);
+	if (likely(first == NULL))
+		return (mp);
+	else {
+		mblk_t **bp;
+
+		for (bp = &first; (*bp); bp = &(*bp)->b_cont) ;
+		(*bp) = mp;
+		return (first);
+	}
 }
 
 STATIC streams_inline streams_fastcall __hot_read ssize_t
 strmsgcount(mblk_t *b, bool protdis)
-{				/* IRQ DISABLED */
+{
 	ssize_t count = 0;
 
-	for (; b; b = b->b_cont)
-		if ((b->b_wptr > b->b_rptr)
-		    && (protdis || b->b_datap->db_type == M_DATA))
-			count += b->b_wptr - b->b_rptr;
+	dassert(b != NULL);
+
+	do {
+		prefetch(b);
+		if (likely(!protdis) || likely(b->b_datap->db_type == M_DATA)) {
+			ssize_t blen;
+
+			if (likely((blen = b->b_wptr - b->b_rptr) > 0))
+				count += blen;
+		}
+	} while (unlikely((b = b->b_cont) != NULL));
 	return (count);
 }
 
@@ -3890,24 +3935,30 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	{
 		/* ensure that compiler sees these as loop invariant */
 		const bool svr4mode = (test_bit(STRDELIM_BIT, &sd->sd_flag) != 0);
-		const bool pcktmode = ((sd->sd_rdopt & (RMSGN | RMSGD)) != 0);
+		const bool bytemode = ((sd->sd_rdopt & (RMSGN | RMSGD)) == 0);
 		const bool discard = ((sd->sd_rdopt & RMSGD) != 0);
 		const bool protnorm = ((sd->sd_rdopt & (RPROTDAT | RPROTDIS)) == 0);
 		const bool protdis = ((sd->sd_rdopt & RPROTDIS) != 0);
 
-		/* Block if there is no data to be read (and generate M_READ if required). */
+		mp = NULL;
+		first = NULL;
+		xferd = 0;
+		stop = false;
 
-		for (mp = NULL, first = NULL, xferd = 0, stop = false;
-		     !stop && (mp = strtestgetq(sd, q, file->f_flags, MSG_BAND, 0, mread))
-		     && !IS_ERR(mp); mread = 0, first = strlinkmsg(first, mp)) {
+		for (;;) {
 			/* remember first block flag and band */
 			msg_type_t type;
 
+			/* Block if there is no data to be read (and generate M_READ if required). */
+			mp = strtestgetq(sd, q, file->f_flags, MSG_BAND, 0, mread);
+
+			if (unlikely(mp == NULL) || unlikely(IS_ERR(mp)))
+				break;
+
 			type = mp->b_datap->db_type;
 
-			if (unlikely(type != M_DATA))
-				if (likely(protnorm))
-					goto ebadmsg;
+			if (unlikely(type != M_DATA) && likely(protnorm))
+				goto ebadmsg;
 
 			{
 				ssize_t count = strmsgcount(mp, protdis);
@@ -3917,7 +3968,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 					if (unlikely((mp->b_flag & MSGMARK) != 0))
 						stop = true;
 					else if ((mp->b_flag & MSGDELIM) || !svr4mode)
-						stop = pcktmode;
+						stop = !bytemode;
 					if (unlikely(count == 0)) {
 						if (!stop && xferd)
 							/* terminal end of file, put it back */
@@ -3926,7 +3977,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 						goto stop;
 					}
 				} else
-					stop = pcktmode;
+					stop = !bytemode;
 				xferd += count;
 			}
 
@@ -3947,8 +3998,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 					for (position = 0, b = mp; b; b = b->b_cont) {
 						if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 							continue;
-						if (unlikely
-						    (protdis && b->b_datap->db_type != M_DATA))
+						if (unlikely(protdis && b->b_datap->db_type != M_DATA))
 							continue;
 						if ((position += blen) >= nbytes) {
 							b->b_rptr += nbytes - (position - blen);
@@ -3968,6 +4018,11 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			/* Terminate read when and a message boundary has been reached in message
 			   mode, a zero-length data message is received, or the count is
 			   satistfied. */
+			if (unlikely(stop))
+				goto stop;
+
+			mread = 0;
+			first = strlinkmsg(first, mp);
 			continue;
 		      enosr:
 			err = -ENOSR;
@@ -3979,8 +4034,8 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			strputbq(sd, q, mp);
 			break;
 		      stop:
-			stop = true;
-			continue;
+			first = strlinkmsg(first, mp);
+			break;
 		}
 
 		if (unlikely(IS_ERR(mp) != 0)) {
@@ -4003,11 +4058,13 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	/* Per current POSIX specs, only return and error when no read data has been transferred. */
 	if (likely(xferd > 0)) {
 		return (xferd);
-	} else if (likely(err == -EAGAIN)) {
+	}
+	if (likely(err == -EAGAIN)) {
 		/* For old TTY semantics we are supposed to return zero (0) instead of [EAGAIN]. */
 		if (ndelay)
 			err = 0;
-	} else if (unlikely(err == -ESTRPIPE)) {
+	}
+	if (unlikely(err == -ESTRPIPE)) {
 		/* If we have hit the end of a pipe or FIFO return zero (0) instead of [ESTRPIPE]. */
 		err = 0;
 	}
@@ -4391,10 +4448,11 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 			/* wait for band to become available */
 			DECLARE_WAITQUEUE(wait, current);
 
+			srunlock(sd);
 			add_wait_queue(&sd->sd_waitq, &wait);
 			for (;;) {
-				set_current_state(TASK_INTERRUPTIBLE);
-				set_bit(WSLEEP_BIT, &sd->sd_flag);
+				strschedule();	/* save context switch */
+				srlock(sd);
 				if ((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)))
 					break;
 				if (type == M_DATA
@@ -4403,13 +4461,13 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 					err = -ERANGE;
 					break;
 				}
+				set_current_state(TASK_INTERRUPTIBLE);
+				set_bit(WSLEEP_BIT, &sd->sd_flag);
 				if (bcanputnext(sd->sd_wq, band)) {
 					break;
 				}
 				srunlock(sd);
-				strschedule();	/* save context switch */
 				*timeo = schedule_timeout(*timeo);
-				srlock(sd);
 			}
 			set_current_state(TASK_RUNNING);
 			remove_wait_queue(&sd->sd_waitq, &wait);
@@ -4783,7 +4841,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 
 				ptrace(("Processing %s block\n", data ? "M_DATA" : "M_(PC)PROTO"));
 
-				if ((blen = b->b_wptr - b->b_rptr) <= 0)
+				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					blen = 0;
 
 				dlen = (part->len > 0) ? part->maxlen - part->len : part->maxlen;
@@ -6497,7 +6555,7 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 			for (; b; b = b->b_cont) {
 				ssize_t blen, copylen;
 
-				if ((blen = b->b_wptr - b->b_rptr) <= 0)
+				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
 				if (b->b_datap->db_type == M_DATA) {
 
@@ -6783,8 +6841,9 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		mp->b_datap->db_type = M_PASSFP;
 		mp->b_rptr = mp->b_wptr = (unsigned char *) &mp->b_datap->db_frtnp->free_arg;
 		mp->b_wptr += sizeof(caddr_t);
-		/* XXX: put with locks held is a bad idea */
-		strput(s2, mp);
+		/* XXX: put with locks held gernally is a bad idea */
+		/* XXX: but this places the M_PASSFP on the other Stream head's read queue */
+		put(s2->sd_rq, mp);
 		err = 0;
 	}
 
@@ -8069,7 +8128,7 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   I_SETSIG ioctl.  Other signals are sent to a process only if the stream is associated
 	   with the control terminal (see 7.11.2)." */
 	pl = zwlock(sd);
-	putq(q, mp);		/* ok when frozen */
+	putq(q, mp);		/* ok when frozen - faster than insq */
 	if (q->q_first->b_datap->db_type == M_SIG)
 		set_bit(STRMSIG_BIT, &sd->sd_flag);
 	zwunlock(sd, pl);

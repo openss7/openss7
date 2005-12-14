@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.74 2005/12/13 12:39:14 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.75 2005/12/14 11:43:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/13 12:39:14 $ by $Author: brian $
+ Last Modified $Date: 2005/12/14 11:43:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/12/13 12:39:14 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/12/14 11:43:21 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -96,10 +96,12 @@ typedef unsigned long __streams_dev_t;
 #define __streams_dev_t __streams_dev_t
 #endif
 
+#if 0
 #include <asm/system.h>		/* for xchg */
 #include <asm/bitops.h>		/* for set_bit */
-#include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
+#endif
+#include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/poll.h>		/* for poll_table_struct */
 
 #include "sys/streams/config.h"	/* build specific configuration file */
@@ -1158,7 +1160,8 @@ rmvb(mblk_t *mp, mblk_t *bp)
 	if (likely(bp != NULL)) {
 		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
 		if (likely(*mpp != NULL)) {
-			*mpp = xchg(&bp->b_cont, NULL);
+			*mpp = bp->b_cont;
+			bp->b_cont = NULL;
 			return (mp);
 		}
 	}
@@ -1168,7 +1171,13 @@ rmvb(mblk_t *mp, mblk_t *bp)
 __STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
 unlinkb(mblk_t *mp)
 {
-	return (mp ? xchg(&mp->b_cont, NULL) : NULL);
+	mblk_t *b;
+
+	if (likely((b = mp) != NULL)) {
+		b = mp->b_cont;
+		mp->b_cont = NULL;
+	}
+	return (b);
 }
 
 __STRUTIL_EXTERN_INLINE mblk_t *

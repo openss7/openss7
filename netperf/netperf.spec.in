@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.38 $) $Date: 2005/11/06 10:59:08 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.39 $) $Date: 2005/12/14 11:40:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/06 10:59:08 $ by $Author: brian $
+# Last Modified $Date: 2005/12/14 11:40:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -548,7 +548,7 @@ if [ $1 = 1 ] ; then : # fresh install
         done
     fi
     if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
 fi
 
@@ -573,7 +573,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
 fi
 
@@ -636,9 +636,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.38  2005/11/06 10:59:08  brian
-# - updates
+# Revision 1.1.2.39  2005/12/14 11:40:50  brian
+# - quiet rpm -ihv output
 #
+
+* Sun Nov  6 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.38  2005/11/06 10:59:08  brian
+- updates
 
 * Wed Sep 14 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.37  2005/09/14 23:41:00  brian

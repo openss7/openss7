@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.38 $) $Date: 2005/12/13 13:42:15 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.39 $) $Date: 2005/12/14 11:40:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/13 13:42:15 $ by $Author: brian $
+# Last Modified $Date: 2005/12/14 11:40:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1098,7 +1098,7 @@ if [ $1 = 1 ] ; then : # fresh install
         done
     fi
     if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
 fi
 
@@ -1123,7 +1123,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
 fi
 
@@ -1313,7 +1313,7 @@ if [ $arg = 1 ] ; then : # fresh install
     if [ -x /sbin/chkconfig ] ; then
         for i in specfs streams strerr strace strms_up strms_dn ; do
             if [ -f %_initrddir/$i ] ; then
-                /sbin/chkconfig --del $i || :
+                /sbin/chkconfig --del $i 2>&1 || :
             fi
         done
     fi
@@ -1417,7 +1417,7 @@ if [ $1 = 2 ] ; then : # upgrade
     # This is the end of a fresh install, add init scripts if we have chkconfig.
     if which chkconfig >/dev/null 2>&1 ; then
         list='%{initfiles}' ; for i in $list ; do
-            chkconfig --add $i || :
+            chkconfig --add $i 2>&1 || :
         done
     fi
 %endif
@@ -1470,7 +1470,7 @@ if [ $1 = 0 ] ; then : # final removal
             if [ -f %_initrddir/$i ] ; then
                 # rpm is not too good about the order of removal
                 [ -x /sbin/service ] && /sbin/service $i stop || :
-                chkconfig --del $i || :
+                chkconfig --del $i 2>&1 || :
             fi
         done
     fi
@@ -1571,9 +1571,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.38  2005/12/13 13:42:15  brian
-# - corrected nested ifs unusable by rpm
+# Revision 1.1.6.39  2005/12/14 11:40:50  brian
+# - quiet rpm -ihv output
 #
+
+* Tue Dec 13 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.38  2005/12/13 13:42:15  brian
+- corrected nested ifs unusable by rpm
 
 * Sun Nov 13 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.37  2005/11/13 11:00:30  brian

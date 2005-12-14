@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/04 19:29:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/14 11:32:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:29:29 $ by $Author: brian $
+# Last Modified $Date: 2005/12/14 11:32:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2005/12/14 11:32:06  brian
+# - added way to pass options to testsuite from make installcheck
+#
 # Revision 0.9.2.1  2005/07/04 19:29:29  brian
 # - first cut at streams compatibility package
 #
@@ -138,7 +141,7 @@ INSTALLCHECK_TESTS =
 
 # my rule
 installcheck-test: $(TESTSUITE)
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
 
 INSTALLCHECK_TESTS += installcheck-test
 

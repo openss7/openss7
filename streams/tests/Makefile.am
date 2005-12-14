@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/10/11 10:45:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/14 11:32:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/10/11 10:45:53 $ by $Author: brian $
+# Last Modified $Date: 2005/12/14 11:32:06 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.28  2005/12/14 11:32:06  brian
+# - added way to pass options to testsuite from make installcheck
+#
 # Revision 0.9.2.27  2005/10/11 10:45:53  brian
 # - STREAMS-based pipes are working on RH 7.2 and FC4
 # - starting test suites for STREAMS-based pipes
@@ -243,7 +246,7 @@ INSTALLCHECK_TESTS =
 
 # my rule
 installcheck-test: $(TESTSUITE)
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
 
 INSTALLCHECK_TESTS += installcheck-test
 
