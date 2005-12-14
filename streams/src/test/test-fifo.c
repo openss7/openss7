@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/01 11:21:11 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/14 16:30:47 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/01 11:21:11 $ by $Author: brian $
+ Last Modified $Date: 2005/12/14 16:30:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.22  2005/12/14 16:30:47  brian
+ - added delay before close to one test case
+
  Revision 0.9.2.21  2005/11/01 11:21:11  brian
  - updates for testing and documentation
 
@@ -140,9 +143,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/01 11:21:11 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/14 16:30:47 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/01 11:21:11 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/14 16:30:47 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -4295,6 +4298,9 @@ test_case_3_3_1_w1(int child)
 			return (__RESULT_FAILURE);
 		state++;
 	}
+	/* wait for reader to close */
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_3_3_1_w1 = { &preamble_0, &test_case_3_3_1_w1, &postamble_0 };
@@ -4312,6 +4318,9 @@ test_case_3_3_1_w2(int child)
 		test_putpmsg(child, NULL, &dat, 0, MSG_BAND);
 		state++;
 	} while (last_errno == EAGAIN);
+	state++;
+	/* wait for reader to close */
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
 }

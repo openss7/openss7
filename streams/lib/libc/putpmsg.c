@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/08 02:16:52 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/14 16:30:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/08 02:16:52 $ by $Author: brian $
+ Last Modified $Date: 2005/12/14 16:30:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/08 02:16:52 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/14 16:30:05 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/08 02:16:52 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/14 16:30:05 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -118,7 +118,7 @@ __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int 
 		/* If we get an EINVAL error back it is likely due to a bad ioctl, in which case
 		   this is not a Stream, so we need to check if it is a Stream and fix up the error
 		   code.  We get EINTR for a controlling terminal. */
-		if ((__olderrno = errno) == EINVAL || __olderrno == EINTR)
+		if ((__olderrno = errno) == EINVAL || __olderrno == EINTR || __olderrno == ENOTTY)
 			errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
 	}
 	return (err);
