@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/15 12:03:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/15 12:03:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -110,19 +110,25 @@ dnl
 dnl     fallback is to go looking for it in the usual places
 dnl
 	if test ":${init_cv_script:-no}" = :no ; then
+	    AC_MSG_RESULT([searching...])
 	    eval "init_search_path=\"
 		${DESTDIR}${sysconfdir}/init.d/rcS
 		${DESTDIR}${sysconfdir}/rc.d/rc.sysinit\""
 	    init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    for init_tmp in $init_search_path ; do
+		AC_MSG_CHECKING([for init SysV script $init_tmp])
 		if test -f $init_tmp ; then
 		    init_cv_script="$init_tmp"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 	    done
+	    AC_MSG_CHECKING([for init SysV script])
 	fi
     ])
     AC_CACHE_CHECK([for init SysV rcS.d directory], [init_cv_rcs_dir], [dnl
+	AC_MSG_RESULT([searching...])
 	init_cv_rcs_dir='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/rcS.d
@@ -130,11 +136,15 @@ dnl
 	    /etc/rcS.d\""
 	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	for init_tmp in $init_search_path ; do
+	    AC_MSG_CHECKING([for init SysV rcS.d directory $init_tmp])
 	    if test -d $init_tmp ; then
 		init_cv_rcs_dir="$init_tmp"
+		AC_MSG_RESULT([yes])
 		break
 	    fi
+	    AC_MSG_RESULT([no])
 	done
+	AC_MSG_CHECKING([for init SysV rcS.d directory])
     ])
     AC_CACHE_CHECK([for init SysV rc.d directory], [init_cv_rc_dir], [dnl
 	init_cv_rc_dir='no'
@@ -183,17 +193,22 @@ dnl This is where we are going to have to generate symbolic links if chkconfig
 dnl does not exist
 dnl
     AC_CACHE_CHECK([for init SysV rcX.d directory], [init_cv_rcx_dir], [dnl
+	AC_MSG_RESULT([searching...])
 	init_cv_rcx_dir='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/rc.d/rc[[S0-6]].d
 	    ${DESTDIR}${sysconfdir}/rc[[S0-6]].d\""
 	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	for init_tmp in $init_search_path ; do
+	    AC_MSG_CHECKING([for init SysV rcX.d directory $init_tmp])
 	    if test -d $init_tmp ; then
 		init_cv_rcx_dir="$init_tmp"
+		AC_MSG_RESULT([yes])
 		break
 	    fi
+	    AC_MSG_RESULT([no])
 	done
+	AC_MSG_CHECKING([for init SysV rcX.d directory])
     ])
     AC_ARG_VAR([CHKCONFIG], [Chkconfig command])
     AC_PATH_TOOL([CHKCONFIG], [chkconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
@@ -205,35 +220,45 @@ dnl
 dnl initrddir is where we are going to put init scripts
 dnl
     AC_CACHE_CHECK([for init SysV init.d directory], [init_cv_initrddir], [dnl
+	AC_MSG_RESULT([searching...])
 	init_cv_initrddir='no'
-	init_search_path='
-	    '"${DESTDIR}"'${sysconfdir}/rc.d/init.d
-	    '"${DESTDIR}"'${sysconfdir}/init.d'
+	eval "init_search_path=\"
+	    ${DESTDIR}${sysconfdir}/rc.d/init.d
+	    ${DESTDIR}${sysconfdir}/init.d\""
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
 	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_CHECKING([for init SysV init.d directory $init_dir])
 	    if test -d $init_dir -a ! -L $init_dir ; then
 		init_cv_initrddir="$init_tmp"
+		AC_MSG_RESULT([yes])
 		break
 	    fi
+	    AC_MSG_RESULT([no])
 	done
+	AC_MSG_CHECKING([for init SysV init.d directory])
     ])
 dnl
 dnl configdir is where we are going to put init script default files
 dnl
     AC_CACHE_CHECK([for init SysV config directory], [init_cv_configdir], [dnl
+	AC_MSG_RESULT([searching...])
 	init_cv_configdir='no'
-	init_search_path='
-	    '"${DESTDIR}"'${sysconfdir}/sysconfig
-	    '"${DESTDIR}"'${sysconfdir}/default'
+	eval "init_search_path=\"
+	    ${DESTDIR}${sysconfdir}/sysconfig
+	    ${DESTDIR}${sysconfdir}/default\""
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
 	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    AC_MSG_CHECKING([for init SysV config directory $init_dir])
 	    if test -d $init_dir ; then
 		init_cv_configdir="$init_tmp"
+		AC_MSG_RESULT([yes])
 		break
 	    fi
+	    AC_MSG_RESULT([no])
 	done
+	AC_MSG_CHECKING([for init SysV config directory])
     ])
     AC_CACHE_CHECK([for init SysV installation], [init_cv_install], [dnl
 	init_cv_install='yes'
