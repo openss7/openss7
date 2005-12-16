@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/07/06 11:11:03 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/12/16 12:35:54 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 11:11:03 $ by $Author: brian $
+## Last Modified $Date: 2005/12/16 12:35:54 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -316,7 +316,7 @@ sign srpm-sign: $(redhat_src_file)
 #!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
-	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
+	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
 	for t in $$targets ;  do \
 		for k in $$kernels ; do \
