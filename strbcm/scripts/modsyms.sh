@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 07:48:25 $
+# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/16 09:43:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 07:48:25 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:43:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ SED='sed'
 if test "X$1" = X--no-reexec; then
     # Discard the --no-reexec flag, and continue
     shift
-elif test "X`($ECHO '\t')` 2>/dev/null " = 'X\t'; then
+elif test "X`($ECHO '\t') 2>/dev/null`" = 'X\t'; then
     :
 else
     exec $SHELL "$0" --no-reexec ${1+"$@"}
@@ -78,7 +78,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 07:48:25 $'
+ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/16 09:43:48 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.

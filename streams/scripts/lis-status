@@ -59,7 +59,7 @@ SED='sed'
 if test "X$1" = X--no-reexec ; then
     # Discard the --no-reexec flag, and continue
     shift
-elif test "X`(echo '\t')` 2>/dev/null " = 'X\t' ; then
+elif test "X`(echo '\t') 2>/dev/null`" = 'X\t' ; then
     :
 else
     exec $SHELL "$0" --no-reexec ${1+"$@"}

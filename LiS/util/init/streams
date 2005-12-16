@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/06/28 03:17:24 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/16 09:26:07 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,25 +28,70 @@
 #
 ### BEGIN INIT INFO
 # Provides: streams
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
+# X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop streams subsystem
 # License: GPL
 # Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
 #	reponsible for ensuring that the necessary STREAMS character devices are
 #	present in the /dev directory and that the STREAMS subsystem is
-#	configured and loaded.  It is also responsible for starting the STREAMS
-#	log and trace facilities.
+#	configured and loaded.
 ### END INIT INFO
 
 # Source init script functions library.
-. /etc/init.d/functions
+init_mode="standalone"
+if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
+if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig" ; fi
+if [ -r /etc/rc.status          ] ; then init_mode="insserv"   ; fi
+else
+if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
+if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+fi
+
+case "$init_mode" in
+    (chkconfig)
+	;;
+    (insserv)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"}
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"}
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $?
+	}
+	;;
+    (standalone|*)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"}
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
 
 name='streams'
 lockfile="/var/lock/subsys/$name"
 config="/etc/sysconfig/$name"
 
-[ -f /proc/modules ] || exit 0
+if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
 for STREAMS_MKNOD in /sbin/strmakenodes /usr/sbin/strmakenodes /bin/strmakenodes /usr/bin/strmakenodes ; do
     if [ -x $STREAMS_MKNOD ] ; then
@@ -58,6 +103,8 @@ done
 
 # Specify defaults
 
+#STREAMS_MODULES="streams streams-liskmod streams-mtdrv streams-pipemod"
+STREAMS_MODULES="streams"
 STREAMS_MAKEDEVICES="no"
 STREAMS_REMOVEDEVICES="no"
 STREAMS_MOUNTSPECFS="yes"
@@ -76,7 +123,7 @@ RETVAL=0
 umask 077
 
 start() {
-    for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
+    for module in $STREAMS_MODULES ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
@@ -88,9 +135,9 @@ start() {
 	action $"Reconfiguring kernel parameters: " \
 	    sysctl -e -p /etc/sysctl.conf || :
     fi
-    if [ -f /etc/streams.conf ] ; then
+    if [ -f /etc/${name}.conf ] ; then
 	action $"Configuring STREAMS parameters: " \
-	    sysctl -e -p /etc/streams.conf || :
+	    sysctl -e -p /etc/${name}.conf || :
     fi
     if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
 	action $"Making STREAMS devices: " \
@@ -112,6 +159,7 @@ remove_modules() {
 		rmmod $modules
 	RETVAL=$?
     fi
+    RETVAL=0
     return $RETVAL
 }
 
@@ -146,7 +194,7 @@ case "$1" in
 	;;
     (status)
 	LOADED='yes'
-	for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
+	for module in $STREAMS_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -167,12 +215,12 @@ case "$1" in
 	    fi
 	fi
 	;;
-    (condrestart)
+    (force-reload|try-restart|condrestart)
 	[ -f $lockfile ] && restart || RETVAL=$?
 	;;
     (probe)
 	LOADED='yes'
-	for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
+	for module in $STREAMS_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -214,7 +262,7 @@ case "$1" in
 	RETVAL=$?
 	;;
     (*)
-	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
+	echo "Usage: $0 (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe)"
 	;;
 esac
 
@@ -222,7 +270,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/06/28 03:17:24 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/16 09:26:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -268,7 +316,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/28 03:17:24 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:07 $ by $Author: brian $
 #
 # =============================================================================
 

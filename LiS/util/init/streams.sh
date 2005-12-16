@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/12 00:05:38 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/16 09:26:07 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -41,6 +41,8 @@ done
 
 # Specify defaults
 
+#STREAMS_MODULES="streams streams-liskmod streams-mtdrv streams-pipemod"
+STREAMS_MODULES="streams"
 STREAMS_MAKEDEVICES="no"
 STREAMS_REMOVEDEVICES="no"
 STREAMS_MOUNTSPECFS="yes"
@@ -71,7 +73,7 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
-    for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
+    for module in $STREAMS_MODULES ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
@@ -184,7 +186,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/12 00:05:38 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/16 09:26:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -230,7 +232,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/12 00:05:38 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:07 $ by $Author: brian $
 #
 # =============================================================================
 

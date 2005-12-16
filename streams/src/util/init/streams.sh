@@ -1,33 +1,66 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/09 00:28:06 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/16 09:26:09 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
 # permissions.
+#
+# These are arguments to update-rc.d ala chkconfig and lsb.  They are recognized
+# by openss7 install_initd and remove_initd scripts.  Each line specifies
+# arguments to add and remove links after the the name argument:
+#
+# streams:	start and stop streams subsystem
+# update-rc.d:	start 33 S . stop 33 0 6 .
+# config:	/etc/default/streams
+# probe:	false
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
+#		It is responsible for ensuring that the necessary STREAMS \
+#		character devices are present in the /dev directory and \
+#		that the STREAMS subsystem is configured and loaded.
+#
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-name='specfs'
+name='streams'
 config="/etc/default/$name"
 desc="the STREAMS subsystem"
 
 [ -e /proc/modules ] || exit 0
 
+for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
+    if [ -x $STREAMS_MKNOD ] ; then
+	break
+    else
+	STREAMS_MKNOD=
+    fi
+done
+
 # Specify defaults
 
 #STREAMS_MODULES="streams streams-clone streams-sth"
 STREAMS_MODULES="streams"
+STREAMS_MAKEDEVICES="no"
+STREAMS_REMOVEDEVICES="no"
+STREAMS_MOUNTSPECFS="yes"
+STREAMS_MOUNTPOINT="/dev/streams"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES='no'
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES='no'
+
 RETVAL=0
 
-if [ "$VERBOSE" -ne 0 ] ; then
+umask 077
+
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -35,12 +68,13 @@ fi
 
 build_options() {
     # Build up the options string
+    :
 }
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
     for module in $STREAMS_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -56,11 +90,61 @@ start() {
     else
 	echo "(failed.)"
     fi
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
+	echo -n "Reconfiguring kernel parameters: "
+	sysctl -p /etc/sysctl.conf $redir
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    if [ -f /etc/${name}.conf ] ; then
+	echo -n "Configuring STREAMS parameters: "
+	sysctl -p /etc/${name}.conf $redir
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	echo -n "Making STREAMS devices: "
+	$STREAMS_MKNOD
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	echo -n "Removing STREAMS modules: "
+	rmmod $modules
+	RETVAL=$?
+    fi
     return $RETVAL
 }
 
 stop() {
     echo -n "Stopping $desc: $name "
+    RETVAL=$?
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	echo -n "Removing STREAMS devices: "
+	$STREAMS_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
@@ -102,7 +186,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/09 00:28:06 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/16 09:26:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -148,7 +232,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/09 00:28:06 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:09 $ by $Author: brian $
 #
 # =============================================================================
 

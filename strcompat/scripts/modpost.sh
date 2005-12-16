@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/06 03:28:49 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/16 09:49:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 03:28:49 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:49:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,7 +63,7 @@ SED='sed'
 if test "X$1" = X--no-reexec; then
     # Discard the --no-reexec flag, and continue
     shift
-elif test "X`($ECHO '\t')` 2>/dev/null " = 'X\t'; then
+elif test "X`($ECHO '\t') 2>/dev/null`" = 'X\t'; then
     :
 else
     exec $SHELL "$0" --no-reexec ${1+"$@"}
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/06 03:28:49 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/16 09:49:25 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1075,7 +1075,7 @@ function process_command()
 	    write_cache >"$cachefile"
 	elif test ! -f "$cachefile" ; then
 	    command_info "creating cache file $cachefile"
-	    echo /dev/null >"$cachefile"
+	    cat /dev/null >"$cachefile"
 	    touch "$cachefile"
 	fi
     fi

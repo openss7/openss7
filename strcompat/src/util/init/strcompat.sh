@@ -1,12 +1,28 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/04 19:29:20 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/16 09:26:08 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
 # permissions.
+#
+# These are arguments to update-rc.d ala chkconfig and lsb.  They are recognized
+# by openss7 install_initd and remove_initd scripts.  Each line specifies
+# arguments to add and remove links after the the name argument:
+#
+# streams:	start and stop streams compatibility subsystem
+# update-rc.d:	start 33 S . stop 33 0 6 .
+# config:	/etc/default/streams
+# probe:	false
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
+#		It is responsible for ensuring that the necessary STREAMS \
+#		character devices are present in the /dev directory and \
+#		that the STREAMS compat subsystem is configured and loaded.
+#
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strcompat'
@@ -15,18 +31,34 @@ desc="the STREAMS Compatibility subsystem"
 
 [ -e /proc/modules ] || exit 0
 
+for STRCOMPAT_MKNOD in /sbin/strcompat_mknod /usr/sbin/strcompat_mknod /bin/strcompat_mknod /usr/bin/strcompat_mknod ; do
+    if [ -x $STRCOMPAT_MKNOD ] ; then
+	break
+    else
+	STRCOMPAT_MKNOD=
+    fi
+done
+
 # Specify defaults
 
-STREAMS_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
+#STRCOMPAT_MODULES="streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat"
+STRCOMPAT_MODULES=""
+STRCOMPAT_MAKEDEVICES="no"
+STRCOMPAT_REMOVEDEVICES="no"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
+[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_MAKEDEVICES='no'
+[ -z "$STRCOMPAT_MKNOD" ] && STRCOMPAT_REMOVEDEVICES='no'
+
 RETVAL=0
 
-if [ "$VERBOSE" -ne 0 ] ; then
+umask 077
+
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -76,12 +108,13 @@ function modprobe_name() {
 
 build_options() {
     # Build up the options string
+    :
 }
 
 start() {
-    echo -n "Loading STREAMS kernel modules: "
-    for module in $STREAMS_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+    echo -n "Loading STREAMS Compatibility kernel modules: "
+    for module in $STRCOMPAT_MODULES ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
 	    modprobe_name $module
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -97,11 +130,28 @@ start() {
     else
 	echo "(failed.)"
     fi
+    if [ -n "$STRCOMPAT_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	echo -n "Making STREAMS Compatibility devices: "
+	$STRCOMPAT_MKNOD
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
     return $RETVAL
 }
 
 stop() {
     echo -n "Stopping $desc: $name "
+    RETVAL=$?
+    if [ -n "$STRCOMPAT_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	echo -n "Removing STREAMS devices: "
+	$STRCOMPAT_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
@@ -143,7 +193,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/04 19:29:20 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/16 09:26:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -189,7 +239,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:29:20 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:08 $ by $Author: brian $
 #
 # =============================================================================
 

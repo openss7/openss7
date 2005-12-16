@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.39 $) $Date: 2005/12/14 11:40:50 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.41 $) $Date: 2005/12/16 12:13:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/14 11:40:50 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 12:13:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -332,7 +332,7 @@ BuildRequires:  /sbin/genksyms
 #BuildRequires: tetex >= 1.0
 #BuildRequires: ghostscript >= 6.51
 # to install documentation
-BuildRequires: texinfo >= 4.0
+#BuildRequires: texinfo >= 4.0
 # find the rest automagically
 Autoreq:        true
 
@@ -650,13 +650,15 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         /sbin/depmod -ae
 %if %{have_initscripts}
         # Running kernels do need init scripts run.
-        if [ -x /sbin/service ] ; then
-            list="%{initfiles}" ; for i in $list ; do
-                if [ -f %_initrddir/$i ] ; then
+        list='%{initfiles}' ; for i in $list ; do
+            if [ -f %_initrddir/$i ] ; then
+                if [ -x /sbin/service ] ; then
                     /sbin/service $i start || :
+                else
+                    %_initrddir/$i start || :
                 fi
-            done
-        fi
+            fi
+        done
 %endif
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
         # Non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway, but
@@ -675,16 +677,18 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         # modules are running
 %if %{have_initscripts}
         # First lets try shutting down using any init script first in reverse order
-        if [ -x /sbin/service ] ; then
-            list="%{initfiles}" ; for i in $list ; do
-                reverse="$i${reverse:+ $reverse}"
-            done
-            for i in $reverse ; do
-                if [ -f %_initrddir/$i ] ; then
+        list='%{initfiles}' ; for i in $list ; do
+            reverse="$i${reverse:+ $reverse}"
+        done
+        for i in $reverse ; do
+            if [ -f %_initrddir/$i ] ; then
+                if [ -x /sbin/service ] ; then
                     /sbin/service $i stop || :
+                else
+                    %_initrddir/$i stop || :
                 fi
-            done
-        fi
+            fi
+        done
 %endif
         mods="%{modules}" ; for m in $mods ; do
             if ( /sbin/lsmod | grep -q "^$m" ) ; then
@@ -1309,11 +1313,20 @@ if [ $arg = 1 ] ; then : # fresh install
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
         rm -f -- $prel_new
     fi
+    # Find the best init script removal tool
+    rminit=''
+    if [ -x /usr/lib/lsb/remove_initd ] ; then
+        rminit='/usr/lib/lsb/remove_initd'
+    elif [ -x /sbin/insserv ] ; then
+        rminit='/sbin/insserv -r'
+    elif [ -x /sbin/chkconfig ; then
+        rminit='/sbin/chkconfig --del'
+    fi
     # Fresh install, go looking for non-rpm initscripts and remove them.
-    if [ -x /sbin/chkconfig ] ; then
-        for i in specfs streams strerr strace strms_up strms_dn ; do
+    if [ -n "$rminit" ] ; then
+        list='%{initfiles}' ; for i in $list strms_up strms_dn ; do
             if [ -f %_initrddir/$i ] ; then
-                /sbin/chkconfig --del $i 2>&1 || :
+                $rminit $i 2>&1 || :
             fi
         done
     fi
@@ -1414,10 +1427,19 @@ if [ $1 = 2 ] ; then : # upgrade
     fi
 %endif
 %if %{have_initscripts}
-    # This is the end of a fresh install, add init scripts if we have chkconfig.
-    if which chkconfig >/dev/null 2>&1 ; then
+    # Find the best init script installation tool
+    insinit=''
+    if [ -x /usr/lib/lsb/install_initd ] ; then
+        insinit='/usr/lib/lsb/install_initd'
+    elif [ -x /sbin/insserv ] ; then
+        insinit='/sbin/insserv'
+    elif [ -x /sbin/chkconfig ; then
+        insinit='/sbin/chkconfig --add'
+    fi
+    # This is the end of a fresh install, add init scripts if we can
+    if [ -n "$insinit" ] ; then
         list='%{initfiles}' ; for i in $list ; do
-            chkconfig --add $i 2>&1 || :
+            $insinit $i 2>&1 || :
         done
     fi
 %endif
@@ -1464,13 +1486,26 @@ if [ $1 = 0 ] ; then : # final removal
     fi
 %endif
 %if %{have_initscripts}
-    # Uninstalling for good, remove init scripts if we have chkconfig
-    if which chkconfig >/dev/null 2>&1 ; then
+    # Find the best init script removal tool
+    rminit=''
+    if [ -x /usr/lib/lsb/remove_initd ] ; then
+        rminit='/usr/lib/lsb/remove_initd'
+    elif [ -x /sbin/insserv ] ; then
+        rminit='/sbin/insserv -r'
+    elif [ -x /sbin/chkconfig ; then
+        rminit='/sbin/chkconfig --del'
+    fi
+    # Uninstalling for good, remove init scripts if we can
+    if [ -n "$rminit" ] ; then
         list='%{initfiles}' ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
                 # rpm is not too good about the order of removal
-                [ -x /sbin/service ] && /sbin/service $i stop || :
-                chkconfig --del $i 2>&1 || :
+                if [ -x /sbin/service ] ; then
+                    /sbin/service $i stop || :
+                else
+                    %_initrddir/$i stop || :
+                fi
+                $rminit $i 2>&1 || :
             fi
         done
     fi
@@ -1571,9 +1606,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.39  2005/12/14 11:40:50  brian
-# - quiet rpm -ihv output
+# Revision 1.1.6.41  2005/12/16 12:13:49  brian
+# - build does not require texinfo
 #
+
+* Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.40  2005/12/16 09:23:59  brian
+- updated to support SuSE/UL and LSB init scripts
+
+* Wed Dec 14 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.39  2005/12/14 11:40:50  brian
+- quiet rpm -ihv output
 
 * Tue Dec 13 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.38  2005/12/13 13:42:15  brian

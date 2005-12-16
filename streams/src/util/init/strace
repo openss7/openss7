@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/16 09:26:08 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -11,7 +11,7 @@
 # Redhat chkconfig init script conventions
 #
 # strace:	start and stop strace facility
-# chkconfig:	- 55 88
+# chkconfig:	- 04 95
 # lockfile:	/var/lock/subsys/strace
 # config:	/etc/default/strace
 # processname:	strace
@@ -31,6 +31,8 @@
 # Provides: strace
 # Required-Start: streams
 # Required-Stop: streams
+# Should-Start: strerr
+# Should-Stop: strerr
 # Default-Start: 
 # Default-Stop: 0 1 2 3 4 5 6
 # X-UnitedLinux-Default-Enabled: no
@@ -44,21 +46,37 @@
 
 # Source init script functions library
 init_mode="standalone"
-[ -r /lib/lsb/init-functions ] && { . /lib/lsb/init-functions ; init_mode="lsb"
-    [ -r /etc/init.d/functions ] && init_mode="chkconfig"
-    [ -r /etc/rc.status        ] && init_mode="insserv"
-} || {
-    [ -r /etc/init.d/functions ] && { . /etc/init.d/functions ; init_mode="chkconfig" } || \
-    [ -r /etc/rc.status        ] && { . /etc/rc.status        ; init_mode="insserv"   }
-}
+if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
+if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig-lsb" ; fi
+if [ -r /etc/rc.status          ] ; then init_mode="insserv-lsb"   ; fi
+else
+if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
+if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+fi
 
 case "$init_mode" in
     (chkconfig)
+	start_daemon() {
+	    local force= nicelevel=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="--force" ; shift 1 ;;
+		    (-n) nicelevel="$2"  ; shift 2 ;;
+		esac
+	    done
+	    daemon $force $nicelevel $*
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$1
+	    return $RETVAL
+	}
 	;;
-    (insserv)
+    (chkconfig-lsb)
+	;;
+    (insserv|insserv-lsb)
 	action() {
 	    echo -en "$1"
-	    $@
+	    shift 1
+	    ${1+"$@"}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
 	    rc_status -v
@@ -69,27 +87,60 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    $@
+	    ${1+"$@"}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
 	    return $?
 	}
 	;;
     (standalone|*)
+	start_daemon() {
+	    local force= nicecmd=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="--force"       ; shift 1 ;;
+		    (-n) nicecmd="nice -n $2"  ; shift 2 ;;
+		esac
+	    done
+	    ( $* >/dev/null 2>&1 </dev/null & )
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$1
+	    return $RETVAL
+	}
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    $@
+	    ${1+"$@"}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
 	    return $?
 	}
-	pidofproc() {
-	    /sbin/pidof $@
-	}
-	killproc() {
-	    /usr/bin/killall "$2" "$1"
-	}
+	if [ -x /sbin/pidof ] ; then
+	    pidofproc() {
+		/sbin/pidof $@
+	    }
+	elif [ -x /sbin/pidofproc ] ; then
+	    pidofproc() {
+		/sbin/pidofproc $@
+	    }
+	else
+	    pidofproc() {
+		[ -r $pidfile ] && cat $pidfile
+	    }
+	fi
+	if [ -x /sbin/killproc ] ; then
+	    killproc() {
+		/sbin/killproc $@
+	    }
+	elif [ -x /usr/bin/killall ] ; then
+	    killproc() {
+		/usr/bin/killall $@
+	    }
+	else
+	    killproc() {
+		[ -r $pidfile ] && kill "$2" `cat $pidfile`
+	    }
+	fi
 	;;
 esac
 
@@ -100,7 +151,11 @@ processname="$name"
 pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
 
-[ -x $execfile ] || exit 0
+if [ ! -x $execfile ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+
+# Disable for the moment
+
+if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi
 
 # Specify defaults
 
@@ -122,8 +177,28 @@ RETVAL=0
 
 umask 077
 
+build_options() {
+    # Build up the options string
+    STRACE_OPTIONS="-p $pidfile"
+    [ -n "$STRACEOPTIONS" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACEOPTIONS}"
+    [ -n "$STRACE_DIRECTORY" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-d ${STRACE_DIRECTORY}"
+    [ -n "$STRACE_BASENAME" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-b ${STRACE_BASENAME}"
+    [ -n "$STRACE_OUTFILE" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-o ${STRACE_OUTFILE}"
+    [ -n "$STRACE_ERRFILE" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-e ${STRACE_ERRFILE}"
+    [ -n "$STRACE_LOGDEVICE" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-l ${STRACE_LOGDEVICE}"
+    [ -n "$STRACE_MODULES" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACE_MODULES}"
+}
+
 start() {
-    daemon $processname $STRACE_OPTIONS
+    build_options
+    start_daemon $processname $STRACE_OPTIONS
     RETVAL=$?
     [ $RETVAL -eq 0 ] && touch $lockfile
     RETVAL=$?
@@ -150,35 +225,14 @@ reload() {
     return $?
 }
 
-build_options() {
-    # Build up the options string
-    STRACE_OPTIONS="-p $pidfile"
-    [ -n "$STRACEOPTIONS" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACEOPTIONS}"
-    [ -n "$STRACE_DIRECTORY" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-d ${STRACE_DIRECTORY}"
-    [ -n "$STRACE_BASENAME" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-b ${STRACE_BASENAME}"
-    [ -n "$STRACE_OUTFILE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-o ${STRACE_OUTFILE}"
-    [ -n "$STRACE_ERRFILE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-e ${STRACE_ERRFILE}"
-    [ -n "$STRACE_LOGDEVICE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-l ${STRACE_LOGDEVICE}"
-    [ -n "$STRACE_MODULES" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACE_MODULES}"
-}
-
 case "$1" in
     (start|stop|reload|restart)
-	build_options
 	$1 || RETVAL=$?
 	;;
     (status)
 	$1 $name || RETVAL=$?
 	;;
     (condrestart)
-	build_options
 	[ -f $lockfile ] && restart || RETVAL=$?
 	;;
     (probe)
@@ -225,7 +279,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/16 09:26:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -271,7 +325,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:08 $ by $Author: brian $
 #
 # =============================================================================
 

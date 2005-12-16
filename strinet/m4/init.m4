@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/16 09:24:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:24:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -210,11 +210,20 @@ dnl
 	done
 	AC_MSG_CHECKING([for init SysV rcX.d directory])
     ])
+dnl
+dnl I suppose we really don't care about these.
+dnl
     AC_ARG_VAR([CHKCONFIG], [Chkconfig command])
     AC_PATH_TOOL([CHKCONFIG], [chkconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${CHKCONFIG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find chkconfig program in PATH.])
-	CHKCONFIG=/sbin/chkconfig
+	CHKCONFIG=''
+    fi
+    AC_ARG_VAR([INSSERV], [Insserv command])
+    AC_PATH_TOOL([INSSERV], [insserv], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "${INSSERV:-no}" = :no ; then
+	AC_MSG_WARN([Could not find insserv program in PATH.])
+	INSSERV=''
     fi
 dnl
 dnl initrddir is where we are going to put init scripts
@@ -274,7 +283,7 @@ AC_DEFUN([_INIT_SCRIPTS_OUTPUT], [dnl
     AM_CONDITIONAL([INSTALL_INITSCRIPTS], [test :"${init_cv_install:-yes}" = :yes])dnl
     AM_CONDITIONAL([WITH_RCSD_DIRECTORY], [test :${init_cv_rcs_dir:-no} != :no])dnl
 dnl
-dnl initrddir is where we are going to put init scripts
+dnl initrddir is where we are going to put init scripts relative to DESTDIR
 dnl
     if test :"${init_cv_initrddir:-no}" != :no ; then
 	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
@@ -290,7 +299,7 @@ dnl         debian style
     fi
     AC_SUBST([initrddir])
 dnl
-dnl configdir is where we are going to put init script default files
+dnl configdir is where we are going to put init script default files relative to DESTDIR
 dnl
     if test :"${init_cv_configdir:-no}" != :no ; then
 	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`

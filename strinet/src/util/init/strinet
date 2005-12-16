@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/22 09:44:17 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/16 09:26:09 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -26,10 +26,11 @@
 #
 ### BEGIN INIT INFO
 # Provides: strinet
-# Required-Start: streams
-# Required-Stop: streams
+# Required-Start: streams $network
+# Required-Stop: streams $network
 # Default-Start: 3 4 5
 # Default-Stop: 0 1 2 6
+# X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop STREAMS INET subsystem
 # License: GPL
 # Description:	This STREAMS INET init script is part of Linux Fast-STREAMS.
@@ -39,13 +40,56 @@
 ### END INIT INFO
 
 # Source init script functions library.
-. /etc/init.d/functions
+init_mode="standalone"
+if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
+if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig" ; fi
+if [ -r /etc/rc.status          ] ; then init_mode="insserv"   ; fi
+else
+if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
+if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+fi
+
+case "$init_mode" in
+    (chkconfig)
+	;;
+    (insserv)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"}
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"}
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $?
+	}
+	;;
+    (standalone|*)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"}
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
 
 name='strinet'
 lockfile="/var/lock/subsys/$name"
 config="/etc/sysconfig/$name"
 
-[ -f /proc/modules ] || exit 0
+if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
 for STRINET_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
     if [ -x $STRINET_MKNOD ] ; then
@@ -73,6 +117,7 @@ done
 
 # Specify defaults
 
+STRINET_MODULES="streams-inet"
 STRINET_MAKEDEVICES="no"
 STRINET_REMOVEDEVICES="no"
 
@@ -89,7 +134,7 @@ RETVAL=0
 umask 077
 
 start() {
-    for module in streams-inet ; do
+    for module in $STRINET_MODULES ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
@@ -97,13 +142,13 @@ start() {
 	    [ $RETVAL -eq 0 ] || return $RETVAL
 	fi
     done
-    if grep '^[[:space:]]*'$name'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
 	action $"Reconfiguring kernel parameters: " \
 	    sysctl -e -p /etc/sysctl.conf || :
     fi
-    if [ -f /etc/$name.conf ] ; then
+    if [ -f /etc/${name}.conf ] ; then
 	action $"Configuring STREAMS INET parameters: " \
-	    sysctl -e -p /etc/$name.conf || :
+	    sysctl -e -p /etc/${name}.conf || :
     fi
     if [ -n "$STRINET_MKNOD" -o -n "$INET_MKDEV" ] ; then
 	if [ ":$STRINET_MAKEDEVICES" = ":yes" ] ; then
@@ -178,7 +223,7 @@ case "$1" in
 	;;
     (status)
 	LOADED='yes'
-	for module in streams-inet ; do
+	for module in $STRINET_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -199,12 +244,12 @@ case "$1" in
 	    fi
 	fi
 	;;
-    (condrestart)
+    (force-reload|try-restart|condrestart)
 	[ -f $lockfile ] && restart || RETVAL=$?
 	;;
     (probe)
 	LOADED='yes'
-	for module in streams-inet ; do
+	for module in $STRINET_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -246,7 +291,7 @@ case "$1" in
 	RETVAL=$?
 	;;
     (*)
-	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
+	echo "Usage: $0 (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe)"
 	;;
 esac
 
@@ -254,7 +299,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/22 09:44:17 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/16 09:26:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -300,7 +345,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/22 09:44:17 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:09 $ by $Author: brian $
 #
 # =============================================================================
 

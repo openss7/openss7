@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/16 09:26:09 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -20,9 +20,7 @@
 # description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
 #		It is responsible for ensuring that the necessary STREAMS \
 #		character devices are present in the /dev directory and \
-#		that the STREAMS subsystem is configured and loaded.  It \
-#		is also responsible for starting the STREAMS log and trace \
-#		facilities.
+#		that the STREAMS subsystem is configured and loaded.
 #
 # LSB init script conventions
 #
@@ -38,19 +36,18 @@
 # Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
 #	reponsible for ensuring that the necessary STREAMS character devices are
 #	present in the /dev directory and that the STREAMS subsystem is
-#	configured and loaded.  It is also responsible for starting the STREAMS
-#	log and trace facilities.
+#	configured and loaded.
 ### END INIT INFO
 
 # Source init script functions library.
 init_mode="standalone"
-[ -r /lib/lsb/init-functions ] && { . /lib/lsb/init-functions ; init_mode="lsb"
-    [ -r /etc/init.d/functions ] && init_mode="chkconfig"
-    [ -r /etc/rc.status        ] && init_mode="insserv"
-} || {
-    [ -r /etc/init.d/functions ] && { . /etc/init.d/functions ; init_mode="chkconfig" } || \
-    [ -r /etc/rc.status        ] && { . /etc/rc.status        ; init_mode="insserv"   }
-}
+if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
+if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig" ; fi
+if [ -r /etc/rc.status          ] ; then init_mode="insserv"   ; fi
+else
+if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
+if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+fi
 
 case "$init_mode" in
     (chkconfig)
@@ -58,7 +55,8 @@ case "$init_mode" in
     (insserv)
 	action() {
 	    echo -en "$1"
-	    $@
+	    shift 1
+	    ${1+"$@"}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
 	    rc_status -v
@@ -69,7 +67,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    $@
+	    ${1+"$@"}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
 	    return $?
@@ -79,7 +77,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    $@
+	    ${1+"$@"}
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
 	    return $?
@@ -91,7 +89,7 @@ name='streams'
 lockfile="/var/lock/subsys/$name"
 config="/etc/sysconfig/$name"
 
-[ -f /proc/modules ] || exit 0
+if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
 for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
     if [ -x $STREAMS_MKNOD ] ; then
@@ -131,7 +129,7 @@ start() {
 	    [ $RETVAL -eq 0 ] || return $RETVAL
 	fi
     done
-    if grep '^[[:space:]]*streams[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
 	action $"Reconfiguring kernel parameters: " \
 	    sysctl -e -p /etc/sysctl.conf || :
     fi
@@ -169,7 +167,7 @@ stop() {
 	    $STREAMS_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-]?' /proc/modules 2>/dev/null | remove_modules
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
@@ -270,7 +268,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/15 23:11:18 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/16 09:26:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -316,7 +314,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:09 $ by $Author: brian $
 #
 # =============================================================================
 

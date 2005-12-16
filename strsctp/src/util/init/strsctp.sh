@@ -1,12 +1,28 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 21:06:11 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/16 09:26:10 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
 # permissions.
+#
+# These are arguments to update-rc.d ala chkconfig and lsb.  They are recognized
+# by openss7 install_initd and remove_initd scripts.  Each line specifies
+# arguments to add and remove links after the the name argument:
+#
+# streams:	start and stop strinet subsystem
+# update-rc.d:	start 33 S . stop 33 0 6 .
+# config:	/etc/default/streams
+# probe:	false
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
+#		It is responsible for ensuring that the necessary STREAMS \
+#		character devices are present in the /dev directory and \
+#		that the STREAMS SCTP subsystem is configured and loaded.
+#
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strsctp'
@@ -15,16 +31,34 @@ desc="the STREAMS SCTP subsystem"
 
 [ -e /proc/modules ] || exit 0
 
+for STRSCTP_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
+    if [ -x $STRSCTP_MKNOD ] ; then
+	break
+    else
+	STRSCTP_MKNOD=
+    fi
+done
+
 # Specify defaults
+
+#STRSCTP_MODULES="streams-sctp"
+STRSCTP_MODULES="streams-sctp"
+STRSCTP_MAKEDEVICES="no"
+STRSCTP_REMOVEDEVICES="no"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
+[ -z "$STRSCTP_MKNOD" ] && STRSCTP_MAKEDEVICES='no'
+[ -z "$STRSCTP_MKNOD" ] && STRSCTP_REMOVEDEVICES='no'
+
 RETVAL=0
 
-if [ "$VERBOSE" -ne 0 ] ; then
+umask 077
+
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -32,12 +66,13 @@ fi
 
 build_options() {
     # Build up the options string
+    :
 }
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
-    for module in streams-sctp ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+    for module in $STRSCTP_MODULES ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -53,11 +88,61 @@ start() {
     else
 	echo "(failed.)"
     fi
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
+	echo -n "Reconfiguring kernel parameters: "
+	sysctl -p /etc/sysctl.conf $redir
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    if [ -f /etc/${name}.conf ] ; then
+	echo -n "Configuring STREAMS SCTP parameters: "
+	sysctl -p /etc/${name}.conf $redir
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    if [ -n "$STRINET_MKNOD" -a ":$STRINET_MAKEDEVICES" = ":yes" ] ; then
+	echo -n "Making STREAMS SCTP devices: "
+	$STRSCTP_MKNOD
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	echo -n "Removing STREAMS SCTP modules: "
+	rmmod $modules
+	RETVAL=$?
+    fi
     return $RETVAL
 }
 
 stop() {
     echo -n "Stopping $desc: $name "
+    RETVAL=$?
+    if [ -n "$STRSCTP_MKNOD" -a ":$STRSCTP_REMOVEDEVICES" = ":yes" ] ; then
+	echo -n "Removing STREAMS SCTP devices: "
+	$STRSCTP_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]inet' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
@@ -99,7 +184,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 21:06:11 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/12/16 09:26:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -145,7 +230,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/16 21:06:11 $ by $Author: brian $
+# Last Modified $Date: 2005/12/16 09:26:10 $ by $Author: brian $
 #
 # =============================================================================
 
