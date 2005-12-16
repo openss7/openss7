@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/15 12:03:17 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/15 23:11:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/15 12:03:17 $ by $Author: brian $
+# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,7 +116,7 @@ dnl
 		${DESTDIR}${sysconfdir}/rc.d/rc.sysinit\""
 	    init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    for init_tmp in $init_search_path ; do
-		AC_MSG_CHECKING([for init SysV script $init_tmp])
+		AC_MSG_CHECKING([for init SysV script... $init_tmp])
 		if test -f $init_tmp ; then
 		    init_cv_script="$init_tmp"
 		    AC_MSG_RESULT([yes])
@@ -136,7 +136,7 @@ dnl
 	    /etc/rcS.d\""
 	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	for init_tmp in $init_search_path ; do
-	    AC_MSG_CHECKING([for init SysV rcS.d directory $init_tmp])
+	    AC_MSG_CHECKING([for init SysV rcS.d directory... $init_tmp])
 	    if test -d $init_tmp ; then
 		init_cv_rcs_dir="$init_tmp"
 		AC_MSG_RESULT([yes])
@@ -200,7 +200,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/rc[[S0-6]].d\""
 	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	for init_tmp in $init_search_path ; do
-	    AC_MSG_CHECKING([for init SysV rcX.d directory $init_tmp])
+	    AC_MSG_CHECKING([for init SysV rcX.d directory... $init_tmp])
 	    if test -d $init_tmp ; then
 		init_cv_rcx_dir="$init_tmp"
 		AC_MSG_RESULT([yes])
@@ -228,7 +228,7 @@ dnl
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
 	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    AC_MSG_CHECKING([for init SysV init.d directory $init_dir])
+	    AC_MSG_CHECKING([for init SysV init.d directory... $init_dir])
 	    if test -d $init_dir -a ! -L $init_dir ; then
 		init_cv_initrddir="$init_tmp"
 		AC_MSG_RESULT([yes])
@@ -250,7 +250,7 @@ dnl
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
 	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    AC_MSG_CHECKING([for init SysV config directory $init_dir])
+	    AC_MSG_CHECKING([for init SysV config directory... $init_dir])
 	    if test -d $init_dir ; then
 		init_cv_configdir="$init_tmp"
 		AC_MSG_RESULT([yes])

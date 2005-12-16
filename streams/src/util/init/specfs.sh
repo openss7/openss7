@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/24 02:11:04 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/15 23:11:18 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -31,6 +31,7 @@ config="/etc/default/$name"
 desc="the STREAMS special shadow filesystem"
 
 [ -e /proc/modules ] || exit 0
+[ -e /proc/filesystems ] || exit 0
 
 # Specify defaults
 
@@ -167,7 +168,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/24 02:11:04 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/15 23:11:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -213,7 +214,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:04 $ by $Author: brian $
+# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
 #
 # =============================================================================
 

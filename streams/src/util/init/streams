@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/09 00:28:06 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/15 23:11:18 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -32,6 +32,7 @@
 # Required-Stop: specfs
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
+# X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop streams subsystem
 # License: GPL
 # Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
@@ -42,7 +43,49 @@
 ### END INIT INFO
 
 # Source init script functions library.
-. /etc/init.d/functions
+init_mode="standalone"
+[ -r /lib/lsb/init-functions ] && { . /lib/lsb/init-functions ; init_mode="lsb"
+    [ -r /etc/init.d/functions ] && init_mode="chkconfig"
+    [ -r /etc/rc.status        ] && init_mode="insserv"
+} || {
+    [ -r /etc/init.d/functions ] && { . /etc/init.d/functions ; init_mode="chkconfig" } || \
+    [ -r /etc/rc.status        ] && { . /etc/rc.status        ; init_mode="insserv"   }
+}
+
+case "$init_mode" in
+    (chkconfig)
+	;;
+    (insserv)
+	action() {
+	    echo -en "$1"
+	    $@
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    $@
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $?
+	}
+	;;
+    (standalone|*)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    $@
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
 
 name='streams'
 lockfile="/var/lock/subsys/$name"
@@ -172,7 +215,7 @@ case "$1" in
 	    fi
 	fi
 	;;
-    (condrestart)
+    (force-reload|try-restart|condrestart)
 	[ -f $lockfile ] && restart || RETVAL=$?
 	;;
     (probe)
@@ -219,7 +262,7 @@ case "$1" in
 	RETVAL=$?
 	;;
     (*)
-	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
+	echo "Usage: $0 (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe)"
 	;;
 esac
 
@@ -227,7 +270,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/09 00:28:06 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/15 23:11:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -273,7 +316,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/09 00:28:06 $ by $Author: brian $
+# Last Modified $Date: 2005/12/15 23:11:18 $ by $Author: brian $
 #
 # =============================================================================
 
