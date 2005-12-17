@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.6 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.7 2005/12/17 08:39:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:21 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -67,9 +67,9 @@ extern int ss7_r_flush(queue_t *q, mblk_t *mp);
 extern int ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *),
 		    void (*wakeup) (queue_t *));
 extern int ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *));
-extern int ss7_oput(queue_t *q, mblk_t *mp);
-extern int ss7_osrv(queue_t *q);
-extern int ss7_iput(queue_t *q, mblk_t *mp);
-extern int ss7_isrv(queue_t *q);
+extern int STREAMS_FASTCALL(ss7_oput(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(ss7_osrv(queue_t *q));
+extern int STREAMS_FASTCALL(ss7_iput(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(ss7_isrv(queue_t *q));
 
 #endif				/* __OS7_QUEUE_H__ */

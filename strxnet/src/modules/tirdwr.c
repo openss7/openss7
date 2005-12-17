@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/04 07:36:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:36 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -131,8 +131,8 @@ static struct module_info tirdwr_minfo = {
 static int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
 static int tirdwr_close(queue_t *, int, cred_t *);
 
-static int tirdwr_rput(queue_t *q, mblk_t *mp);
-static int tirdwr_wput(queue_t *q, mblk_t *mp);
+static int STREAMS_FASTCALL(tirdwr_rput(queue_t *q, mblk_t *mp));
+static int STREAMS_FASTCALL(tirdwr_wput(queue_t *q, mblk_t *mp));
 
 static struct qinit tirdwr_rinit = {
 	.qi_putp = tirdwr_rput,		/* Read put (message from below) */
@@ -373,7 +373,7 @@ tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 	return;
 }
 
-static int
+static streams_fastcall int
 tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
@@ -526,7 +526,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+static streams_fastcall int
 tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;

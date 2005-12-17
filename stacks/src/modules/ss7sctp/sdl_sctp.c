@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/17 08:39:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/17 08:39:20 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/17 08:39:20 $";
 
 #include <sys/os7/compat.h>
 
@@ -68,7 +68,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:39 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/17 08:39:20 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -137,8 +137,8 @@ STATIC struct module_info sdl_minfo = {
 STATIC int sdl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sdl_close(queue_t *, int, cred_t *);
 
-STATIC int sdl_rput(queue_t *, mblk_t *);
-STATIC int sdl_rsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(sdl_rput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(sdl_rsrv(queue_t *));
 
 STATIC struct qinit sdl_rinit = {
 	qi_putp:sdl_rput,		/* Read put (msg from below) */
@@ -148,8 +148,8 @@ STATIC struct qinit sdl_rinit = {
 	qi_minfo:&sdl_minfo,		/* Information */
 };
 
-STATIC int sdl_wput(queue_t *, mblk_t *);
-STATIC int sdl_wsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(sdl_wput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(sdl_wsrv(queue_t *));
 
 STATIC struct qinit sdl_winit = {
 	qi_putp:sdl_wput,		/* Write put (msg from above) */
@@ -1837,7 +1837,7 @@ sdl_m_other(queue_t *q, mblk_t *mp)
 /*
  *  SDL Write Put and Service
  */
-STATIC int
+STATIC streams_fastcall int
 sdl_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1902,7 +1902,7 @@ sdl_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 sdl_wsrv(queue_t *q)
 {
 	int rtn;
@@ -1975,7 +1975,7 @@ sdl_wsrv(queue_t *q)
 /*
  *  SCTP Read Put and Service
  */
-STATIC int
+STATIC streams_fastcall int
 sdl_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -2041,7 +2041,7 @@ sdl_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_fastcall int
 sdl_rsrv(queue_t *q)
 {
 	int rtn;

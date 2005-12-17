@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.48 $) $Date: 2005/12/16 12:13:50 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.49 $) $Date: 2005/12/17 08:39:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 12:13:50 $ by $Author: brian $
+# Last Modified $Date: 2005/12/17 08:39:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -152,6 +152,9 @@
 # a macro to build require one package of the same version as another
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+
+# doesn't work well with this spec file
+%define _unpackaged_files_terminate_build 0
 
 Summary:        %{title} for OpenSS7 SCTP
 Name:           @PACKAGE@
@@ -679,6 +682,9 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.49  2005/12/17 08:39:19  brian
+# - modifications for master build
+#
 # Revision 1.1.2.48  2005/12/16 12:13:50  brian
 # - build does not require texinfo
 #

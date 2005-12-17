@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/17 08:39:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:27:04 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/17 08:39:25 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/17 08:39:25 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2005/09/19 10:27:04 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.26 $) $Date: 2005/12/17 08:39:25 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -144,9 +144,9 @@ STATIC struct module_stat ldl_wrmstat = { };
 STATIC int ldl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int ldl_close(queue_t *, int, cred_t *);
 
-STATIC int ldl_rsrv(queue_t *);
-STATIC int ldl_wput(queue_t *, mblk_t *);
-STATIC int ldl_wsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(ldl_rsrv(queue_t *));
+STATIC int STREAMS_FASTCALL(ldl_wput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(ldl_wsrv(queue_t *));
 
 STATIC struct qinit ldl_rinit = {
 	.qi_srvp = ldl_rsrv,		/* Read service */
@@ -4466,7 +4466,7 @@ do_ioctl(struct dl *dl, mblk_t *mp)
 /*
  *  Write queue put routine
  */
-STATIC int
+STATIC streams_fastcall int
 ldl_wput(queue_t *q, mblk_t *mp)
 {
 	unsigned char msg_type = mp->b_datap->db_type;
@@ -4526,7 +4526,7 @@ ldl_wput(queue_t *q, mblk_t *mp)
 /*
  *  Write queue service routine
  */
-STATIC int
+STATIC streams_fastcall int
 ldl_wsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -4559,7 +4559,7 @@ ldl_wsrv(queue_t *q)
 /*
  *  Read queue service routine
  */
-STATIC int
+STATIC streams_fastcall int
 ldl_rsrv(queue_t *q)
 {
 	mblk_t *mp;

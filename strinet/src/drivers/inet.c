@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/13 07:58:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -439,7 +439,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/11/13 07:58:26 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -587,8 +587,8 @@ STATIC struct module_info ss_minfo = {
 STATIC int ss_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int ss_close(queue_t *, int, cred_t *);
 
-STATIC int ss_rput(queue_t *, mblk_t *);
-STATIC int ss_rsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(ss_rput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(ss_rsrv(queue_t *));
 
 STATIC struct qinit ss_rinit = {
 	.qi_putp = ss_rput,		/* Read put (msg from below) */
@@ -598,8 +598,8 @@ STATIC struct qinit ss_rinit = {
 	.qi_minfo = &ss_minfo,		/* Information */
 };
 
-STATIC int ss_wput(queue_t *, mblk_t *);
-STATIC int ss_wsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(ss_wput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(ss_wsrv(queue_t *));
 
 STATIC struct qinit ss_winit = {
 	.qi_putp = ss_wput,		/* Write put (msg from above) */
@@ -15356,25 +15356,25 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (rtn);
 }
 
-STATIC int
+STATIC streams_fastcall int
 ss_rput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_r_prim);
 }
 
-STATIC int
+STATIC streams_fastcall int
 ss_rsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_r_prim);
 }
 
-STATIC int
+STATIC streams_fastcall int
 ss_wput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_w_prim);
 }
 
-STATIC int
+STATIC streams_fastcall int
 ss_wsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_w_prim);

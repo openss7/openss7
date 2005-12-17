@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/19 10:26:59 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/19 10:26:59 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:20 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/09/19 10:26:59 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:20 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -134,8 +134,8 @@ STATIC struct module_info sl_minfo = {
 STATIC int sl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sl_close(queue_t *, int, cred_t *);
 
-STATIC int sl_rput(queue_t *, mblk_t *);
-STATIC int sl_rsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(sl_rput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(sl_rsrv(queue_t *));
 
 STATIC struct qinit sl_rinit = {
 	qi_putp:sl_rput,		/* Read put (msg from below) */
@@ -144,8 +144,8 @@ STATIC struct qinit sl_rinit = {
 	qi_qclose:sl_close,		/* Last close */
 	qi_minfo:&sl_minfo,		/* Information */
 };
-STATIC int sl_wput(queue_t *, mblk_t *);
-STATIC int sl_wsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(sl_wput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(sl_wsrv(queue_t *));
 
 STATIC struct qinit sl_winit = {
 	qi_putp:sl_wput,		/* Write put (msg from above) */
@@ -8218,22 +8218,22 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 	return (rtn);
 }
 
-STATIC int
+STATIC streams_fastcall int
 sl_rput(queue_t *q, mblk_t *mp)
 {
 	return sl_putq(q, mp, &sl_r_prim, &sl_rx_wakeup);
 }
-STATIC int
+STATIC streams_fastcall int
 sl_rsrv(queue_t *q)
 {
 	return sl_srvq(q, &sl_r_prim, &sl_rx_wakeup);
 }
-STATIC int
+STATIC streams_fastcall int
 sl_wput(queue_t *q, mblk_t *mp)
 {
 	return sl_putq(q, mp, &sl_w_prim, &sl_tx_wakeup);
 }
-STATIC int
+STATIC streams_fastcall int
 sl_wsrv(queue_t *q)
 {
 	return sl_srvq(q, &sl_w_prim, &sl_tx_wakeup);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/17 08:39:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/04 07:36:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/17 08:39:25 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/17 08:39:25 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/11/04 07:36:36 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/17 08:39:25 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -143,8 +143,8 @@ static struct module_info timod_minfo = {
 static int timod_open(queue_t *, dev_t *, int, int, cred_t *);
 static int timod_close(queue_t *, int, cred_t *);
 
-static int timod_rput(queue_t *, mblk_t *);
-static int timod_wput(queue_t *, mblk_t *);
+static int STREAMS_FASTCALL(timod_rput(queue_t *, mblk_t *));
+static int STREAMS_FASTCALL(timod_wput(queue_t *, mblk_t *));
 
 static struct qinit timod_rinit = {
 	.qi_putp = timod_rput,		/* Read put (message from below) */
@@ -291,7 +291,7 @@ split_buffer(mblk_t *mp, int offset)
  *  
  *  -------------------------------------------------------------------------
  */
-static int
+static streams_fastcall int
 timod_rput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
@@ -538,7 +538,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+static streams_fastcall int
 timod_wput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:40:29 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -127,10 +127,15 @@ STATIC struct module_info ip_to_streams_minfo = {
 STATIC int ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int ip_to_streams_close(queue_t *, int, cred_t *);
 
-STATIC int ip_to_streams_rput(queue_t *, mblk_t *);
-STATIC int ip_to_streams_rsrv(queue_t *);
-STATIC int ip_to_streams_wput(queue_t *, mblk_t *);
-STATIC int ip_to_streams_wsrv(queue_t *);
+#ifndef LFS
+#define streams_fastcall
+#define STREAMS_FASTCALL(__x) __x
+#endif
+
+STATIC int STREAMS_FASTCALL(ip_to_streams_rput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(ip_to_streams_rsrv(queue_t *));
+STATIC int STREAMS_FASTCALL(ip_to_streams_wput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(ip_to_streams_wsrv(queue_t *));
 
 STATIC struct qinit ip_to_streams_rinit = {
 	.qi_putp = ip_to_streams_rput,	/* Read put (message from below) */
@@ -474,7 +479,7 @@ ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 *									*
 ************************************************************************/
 
-STATIC int
+STATIC streams_fastcall int
 ip_to_streams_wput(queue_t *q, mblk_t *mp)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -840,7 +845,7 @@ ip_to_streams_ok_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long ok_prim
 *									*
 ************************************************************************/
 
-STATIC int
+STATIC streams_fastcall int
 ip_to_streams_rsrv(queue_t *q)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -896,7 +901,7 @@ ip_to_streams_rsrv(queue_t *q)
 *									*
 ************************************************************************/
 
-STATIC int
+STATIC streams_fastcall int
 ip_to_streams_wsrv(queue_t *q)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -1012,7 +1017,7 @@ ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 * Handle a message from below.						*
 *									*
 ************************************************************************/
-STATIC int
+STATIC streams_fastcall int
 ip_to_streams_rput(queue_t *q, mblk_t *mp)
 {
 	ip_to_streams_minor_t *minor_ptr = q->q_ptr;

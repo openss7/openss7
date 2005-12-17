@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:26:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/17 08:39:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:58 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -146,8 +146,8 @@ STATIC struct module_info spm_rinfo = {
 STATIC int spm_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int spm_close(queue_t *, int, cred_t *);
 
-STATIC int spm_wput(queue_t *, mblk_t *);
-STATIC int spm_wsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(spm_wput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(spm_wsrv(queue_t *));
 
 STATIC struct qinit spm_winit = {
 	spm_wput,			/* Write put (message from above) */
@@ -159,8 +159,8 @@ STATIC struct qinit spm_winit = {
 	NULL				/* Statistics */
 };
 
-STATIC int spm_rput(queue_t *, mblk_t *);
-STATIC int spm_rsrv(queue_t *);
+STATIC int STREAMS_FASTCALL(spm_rput(queue_t *, mblk_t *));
+STATIC int STREAMS_FASTCALL(spm_rsrv(queue_t *));
 
 STATIC struct qinit spm_rinit = {
 	spm_rput,			/* Read put (message from below) */
@@ -1279,12 +1279,12 @@ STATIC void
 spm_rx_wakeup(queue_t *q)
 {
 }
-STATIC int
+STATIC streams_fastcall int
 spm_rput(queue_t *q, mblk_t *mp)
 {
 	return (int) ss7_putq(q, mp, &spm_r_prim, &spm_rx_wakeup);
 }
-STATIC int
+STATIC streams_fastcall int
 spm_rsrv(queue_t *q)
 {
 	return (int) ss7_srvq(q, &spm_r_prim, &spm_rx_wakeup);
@@ -1293,12 +1293,12 @@ STATIC void
 spm_tx_wakeup(queue_t *q)
 {
 }
-STATIC int
+STATIC streams_fastcall int
 spm_wput(queue_t *q, mblk_t *mp)
 {
 	return (int) ss7_putq(q, mp, &spm_w_prim, &spm_tx_wakeup);
 }
-STATIC int
+STATIC streams_fastcall int
 spm_wsrv(queue_t *q)
 {
 	return (int) ss7_srvq(q, &spm_w_prim, &spm_tx_wakeup);
