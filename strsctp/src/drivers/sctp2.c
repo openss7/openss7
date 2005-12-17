@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 01:19:52 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/16 20:53:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 01:19:52 $ by $Author: brian $
+ Last Modified $Date: 2005/12/16 20:53:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 01:19:52 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/16 20:53:21 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 01:19:52 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/16 20:53:21 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/09/24 01:19:52 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/16 20:53:21 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3175,7 +3175,7 @@ __sctp_free_saddrs(sctp_t * sp)
 		__sctp_saddr_free(ss);
 	}
 	unless(sp->sanum, sp->sanum = 0);
-	unless(sp->saddr, sp->saddr = NULL);
+	unless(sp->saddr != NULL, sp->saddr = NULL);
 }
 
 /*
