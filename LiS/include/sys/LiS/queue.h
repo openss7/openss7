@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 1.1.1.5.4.5 2005/07/13 12:01:20 brian Exp $
+ @(#) $Id: queue.h,v 1.1.1.5.4.7 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.h,v 1.1.1.5.4.5 2005/07/13 12:01:20 brian Exp $
+ * RCS Id          : $Id: queue.h,v 1.1.1.5.4.7 2005/12/18 05:41:24 brian Exp $
  * Purpose         : here you have utilites to handle str queues.
  * ----------------______________________________________________
  *
@@ -68,7 +68,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 1
 
-#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/07/13 12:01:20 $"
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -278,18 +278,23 @@ extern void lis_clr_q_flags(ulong flags, int both_qs, ...);
  *  "int" form.  It seems that all the other Unix streams.h files use "int".
  *  Use "return(0)" in the functions.  The return value is ignored by LiS.
  */
+#if defined(USE_VOID_PUT_PROC)
+typedef void (*qi_putp_t) STREAMS_REGPARMS((queue_t *, mblk_t *));
+typedef void (*qi_srvp_t) STREAMS_REGPARMS((queue_t *));
+#else
+typedef int (*qi_putp_t) STREAMS_REGPARMS((queue_t *, mblk_t *));
+typedef int (*qi_srvp_t) STREAMS_REGPARMS((queue_t *));
+#endif
+typedef int (*qi_qopen_t) STREAMS_REGPARMS((queue_t *, dev_t *, int, int, cred_t *));
+typedef int (*qi_qclose_t) STREAMS_REGPARMS((queue_t *, int, cred_t *));
+typedef int (*qi_qadmin_t) STREAMS_REGPARMS((void));
 
 typedef struct qinit {
-#if defined(USE_VOID_PUT_PROC)
-	void (*qi_putp) (queue_t *, mblk_t *);	/* put procedure */
-	void (*qi_srvp) (queue_t *);	/* service procedure */
-#else
-	int (*qi_putp) (queue_t *, mblk_t *);	/* put procedure */
-	int (*qi_srvp) (queue_t *);	/* service procedure */
-#endif
-	int (*qi_qopen) (queue_t *, dev_t *, int, int, cred_t *);
-	int (*qi_qclose) (queue_t *, int, cred_t *);	/* close procedure */
-	int (*qi_qadmin) (void);	/* debugging */
+	qi_putp_t qi_putp;		/* put procedure */
+	qi_srvp_t qi_srvp;		/* service procedure */
+	qi_qopen_t qi_qopen;
+	qi_qclose_t qi_qclose;		/* close procedure */
+	qi_qadmin_t qi_qadmin;		/* debugging */
 	struct lis_module_info *qi_minfo;	/* module information structure */
 	struct module_stat *qi_mstat;	/* module statistics structure */
 } qinit_t;
@@ -333,13 +338,13 @@ extern void lis_terminate_queues(void);
  * return NULL on failure 
  *
  */
-extern queue_t *lis_allocq(const char *name);
+extern queue_t *STREAMS_REGPARMS(lis_allocq(const char *name));
 
 /* Deallocate a new queue pair
  * return NULL on failure
  *
  */
-extern void lis_freeq(queue_t *q);
+extern void STREAMS_REGPARMS(lis_freeq(queue_t *q));
 
 #endif				/* __KERNEL__ */
 
@@ -349,38 +354,38 @@ extern void lis_freeq(queue_t *q);
  *
  */
 #ifdef __KERNEL__
-extern queue_t *lis_backq_fcn(queue_t *q, char *f, int l);
-extern queue_t *lis_backq(queue_t *q);
+extern queue_t *STREAMS_REGPARMS(lis_backq_fcn(queue_t *q, char *f, int l));
+extern queue_t *STREAMS_REGPARMS(lis_backq(queue_t *q));
 #endif				/* __KERNEL__ */
 
 /* lis_backenable - enable back queue if QWANTW is set, i.e.
  *	if a back queue is full.
  */
 #ifdef __KERNEL__
-extern void lis_backenable(queue_t *q);
+extern void STREAMS_REGPARMS(lis_backenable(queue_t *q));
 #endif				/* __KERNEL__ */
 
 /* lis_getq - get message from head of queue
  *
  */
 #ifdef __KERNEL__
-extern mblk_t *lis_getq(queue_t *q);
+extern mblk_t *STREAMS_REGPARMS(lis_getq(queue_t *q));
 #endif				/* __KERNEL__ */
 
 /* putq- put a message into a queue
  *
  */
 #ifdef __KERNEL__
-extern int lis_putq(queue_t *q, mblk_t *mp);
-extern void lis_putqf(queue_t *q, mblk_t *mp);
+extern int STREAMS_REGPARMS(lis_putq(queue_t *q, mblk_t *mp));
+extern void STREAMS_REGPARMS(lis_putqf(queue_t *q, mblk_t *mp));
 #endif				/* __KERNEL__ */
 
 /* putbq - return a message to a queue
  *
  */
 #ifdef __KERNEL__
-extern int lis_putbq(queue_t *q, mblk_t *mp);
-extern void lis_putbqf(queue_t *q, mblk_t *mp);
+extern int STREAMS_REGPARMS(lis_putbq(queue_t *q, mblk_t *mp));
+extern void STREAMS_REGPARMS(lis_putbqf(queue_t *q, mblk_t *mp));
 #endif				/* __KERNEL__ */
 
 /*insq - insert nmp before emp. If emp is NULL, insert at end
@@ -389,7 +394,7 @@ extern void lis_putbqf(queue_t *q, mblk_t *mp);
  *
  */
 #ifdef __KERNEL__
-extern int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp);
+extern int STREAMS_REGPARMS(lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp));
 #endif				/* __KERNEL__ */
 
 /* rmvq - remove a message from a queue. If the message
@@ -397,14 +402,14 @@ extern int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp);
  *
  */
 #ifdef __KERNEL__
-extern void lis_rmvq(queue_t *q, mblk_t *mp);
+extern void STREAMS_REGPARMS(lis_rmvq(queue_t *q, mblk_t *mp));
 #endif				/* __KERNEL__ */
 
 /* lis_qenable - schedule a queue for service
  *
  */
 #ifdef __KERNEL__
-extern void lis_qenable(queue_t *q);
+extern void STREAMS_REGPARMS(lis_qenable(queue_t *q));
 
 #ifdef __LIS_INTERNAL__
 extern void lis_retry_qenable(queue_t *q);
@@ -415,7 +420,7 @@ extern void lis_retry_qenable(queue_t *q);
  *
  */
 #ifdef __KERNEL__
-extern void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
+extern void STREAMS_REGPARMS(lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit));
 #endif				/* __KERNEL__ */
 
 /* lis_flushband - flush messages in a specified priority band.
@@ -424,7 +429,7 @@ extern void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
  *
  */
 #ifdef __KERNEL__
-extern void lis_flushband(queue_t *q, unsigned char band, int flag);
+extern void STREAMS_REGPARMS(lis_flushband(queue_t *q, unsigned char band, int flag));
 #endif				/* __KERNEL__ */
 
 /* lis_flushq - free messages from a queue, enabling upstream/downstream
@@ -433,7 +438,7 @@ extern void lis_flushband(queue_t *q, unsigned char band, int flag);
  *
  */
 #ifdef __KERNEL__
-extern void lis_flushq(queue_t *q, int flag);
+extern void STREAMS_REGPARMS(lis_flushq(queue_t *q, int flag));
 #endif				/* __KERNEL__ */
 
 /* putctl - allocate a message block, set the type,
@@ -443,24 +448,26 @@ extern void lis_flushq(queue_t *q, int flag);
  *
  */
 #ifdef __KERNEL__
-extern int lis_putctl(queue_t *q, int type, char *file_name, int line_nr);
-extern int lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr);
+extern int STREAMS_REGPARMS(lis_putctl(queue_t *q, int type, char *file_name, int line_nr));
+extern int STREAMS_REGPARMS(lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr));
 #endif				/* __KERNEL__ */
 
 /* lis_putctl1 - as for lis_putctl, but with a one byte parameter
  *
  */
 #ifdef __KERNEL__
-extern int lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr);
+extern int
+ STREAMS_REGPARMS(lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr));
 
-extern int lis_putnextctl1(queue_t *q, int type, int param, char *file_name, int line_nr);
+extern int
+ STREAMS_REGPARMS(lis_putnextctl1(queue_t *q, int type, int param, char *file_name, int line_nr));
 #endif				/* __KERNEL__ */
 
 /* lis_qsize - returns the number of messages on a queue
  *
  */
 #ifdef __KERNEL__
-extern int lis_qsize(queue_t *q);
+extern int STREAMS_REGPARMS(lis_qsize(queue_t *q));
 
 #define	qsize		lis_qsize
 #endif				/* __KERNEL__ */
@@ -472,7 +479,7 @@ extern int lis_qsize(queue_t *q);
  *
  */
 #ifdef __KERNEL__
-extern int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val);
+extern int STREAMS_REGPARMS(lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val));
 #endif				/* __KERNEL__ */
 
 /* lis_strqset - change information about a (band of a) queue.
@@ -482,7 +489,7 @@ extern int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val
  *
  */
 #ifdef __KERNEL__
-extern int lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val);
+extern int STREAMS_REGPARMS(lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val));
 #endif				/* __KERNEL__ */
 
 #ifdef __KERNEL__
@@ -490,20 +497,20 @@ extern int lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
  * Note:  Any routines that manipulate q_flag field of a queue need
  *        to use the "safe" versions for interrupt protection.
  */
-extern void lis_safe_noenable(queue_t *q, char *f, int l);
-extern void lis_safe_enableok(queue_t *q, char *f, int l);
+extern void STREAMS_REGPARMS(lis_safe_noenable(queue_t *q, char *f, int l));
+extern void STREAMS_REGPARMS(lis_safe_enableok(queue_t *q, char *f, int l));
 
 #define lis_noenable(q)	 lis_safe_noenable(q, __FILE__, __LINE__)
 #define lis_enableok(q)	 lis_safe_enableok(q, __FILE__, __LINE__)
 
-extern int lis_safe_canenable(queue_t *q, char *f, int l);
+extern int STREAMS_REGPARMS(lis_safe_canenable(queue_t *q, char *f, int l));
 
 #define lis_canenable(q) lis_safe_canenable(q, __FILE__, __LINE__)
 
-extern queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l);
-extern queue_t *lis_safe_RD(queue_t *q, char *f, int l);
-extern queue_t *lis_safe_WR(queue_t *q, char *f, int l);
-extern int lis_safe_SAMESTR(queue_t *q, char *f, int l);
+extern queue_t *STREAMS_REGPARMS(lis_safe_OTHERQ(queue_t *q, char *f, int l));
+extern queue_t *STREAMS_REGPARMS(lis_safe_RD(queue_t *q, char *f, int l));
+extern queue_t *STREAMS_REGPARMS(lis_safe_WR(queue_t *q, char *f, int l));
+extern int STREAMS_REGPARMS(lis_safe_SAMESTR(queue_t *q, char *f, int l));
 
 #define LIS_OTHERQ(q)	lis_safe_OTHERQ(q, __FILE__, __LINE__)
 #define LIS_RD(q)	lis_safe_RD(q, __FILE__, __LINE__)
@@ -514,8 +521,8 @@ extern int lis_safe_SAMESTR(queue_t *q, char *f, int l);
 extern void lis_defer_msg(queue_t *q, mblk_t *mp, int retry, lis_flags_t * psw);
 extern void lis_do_deferred_puts(queue_t *q);
 #endif
-extern void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l);
-extern void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l);
+extern void STREAMS_REGPARMS(lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l));
+extern void STREAMS_REGPARMS(lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l));
 
 #define lis_putnext(q,mp) 	lis_safe_putnext(q, mp, __FILE__, __LINE__)
 #define lis_qreply(q,mp) 	lis_safe_qreply(q, mp, __FILE__, __LINE__)
@@ -524,13 +531,13 @@ extern void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l);
 /* Count messages on a queue 
  */
 #ifdef __KERNEL__
-extern int lis_qsize(queue_t *);
+extern int STREAMS_REGPARMS(lis_qsize(queue_t *));
 #endif				/* __KERNEL__ */
 
 /* Insert message(3) after message(2) or at start 
  */
 #ifdef __KERNEL__
-extern int lis_appq(queue_t *, mblk_t *, mblk_t *);
+extern int STREAMS_REGPARMS(lis_appq(queue_t *, mblk_t *, mblk_t *));
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
@@ -543,8 +550,8 @@ extern int lis_appq(queue_t *, mblk_t *, mblk_t *);
  * the others are for internal use.
  */
 
-void lis_qprocson(queue_t *rdq);	/* SVR4 routine */
-void lis_qprocsoff(queue_t *rdq);	/* SVR4 routine */
+void STREAMS_REGPARMS(lis_qprocson(queue_t *rdq));	/* SVR4 routine */
+void STREAMS_REGPARMS(lis_qprocsoff(queue_t *rdq));	/* SVR4 routine */
 
 /*
  * lis_freezestr, lis_unfreezestr
@@ -552,8 +559,8 @@ void lis_qprocsoff(queue_t *rdq);	/* SVR4 routine */
  * Incomplete implementations of SVR4 freezestr/unfreezestr.  The LiS
  * implementation inhibits calling put/srv but not putq, getq, open or close.
  */
-void lis_freezestr(queue_t *q);
-void lis_unfreezestr(queue_t *q);
+void STREAMS_REGPARMS(lis_freezestr(queue_t *q));
+void STREAMS_REGPARMS(lis_unfreezestr(queue_t *q));
 
 #define	freezestr	lis_freezestr
 #define unfreezestr	lis_unfreezestr
@@ -570,7 +577,7 @@ void lis_unfreezestr(queue_t *q);
  * returns STR_OK if msg can be put(), STR_ERR (0) if not.
  *
  */
-extern int lis_bcanput(queue_t *q, unsigned char band);
+extern int STREAMS_REGPARMS(lis_bcanput(queue_t *q, unsigned char band));
 
 /*  -------------------------------------------------------------------  */
 /* lis_bcanputnext - search the stream starting from the queue after q
@@ -582,7 +589,7 @@ extern int lis_bcanput(queue_t *q, unsigned char band);
  * returns STR_OK if msg can be put(), STR_ERR (0) if not.
  *
  */
-extern int lis_bcanputnext(queue_t *q, unsigned char band);
+extern int STREAMS_REGPARMS(lis_bcanputnext(queue_t *q, unsigned char band));
 
 /*  -------------------------------------------------------------------  */
 /* lis_bcanput_anyband - search the stream starting from the queue q
@@ -592,7 +599,7 @@ extern int lis_bcanputnext(queue_t *q, unsigned char band);
  * returns STR_OK if msg can be put(), STR_ERR (0) if not.
  *
  */
-extern int lis_bcanput_anyband(queue_t *q);
+extern int STREAMS_REGPARMS(lis_bcanput_anyband(queue_t *q));
 
 /*  -------------------------------------------------------------------  */
 /* lis_qcountstrm - return the accumulated q_count fields of all the
@@ -601,7 +608,7 @@ extern int lis_bcanput_anyband(queue_t *q);
  *		    queue that it encounters.  It is used only by the
  *		    close logic to drain queues.
  */
-extern int lis_qcountstrm(queue_t *q);
+extern int STREAMS_REGPARMS(lis_qcountstrm(queue_t *q));
 
 #endif				/* __KERNEL__ */
 /*  -------------------------------------------------------------------  */

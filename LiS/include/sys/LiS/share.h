@@ -116,9 +116,9 @@ enum { STR_ERR = 0, STR_OK = 1 };
 
 #ifdef __KERNEL__
 /* extract values from a char pointer and advance the pointer */
-int lis_getint(unsigned char **p);	/* msg.c */
+int STREAMS_REGPARMS(lis_getint(unsigned char **p));	/* msg.c */
 
-void lis_putbyte(unsigned char **p, unsigned char byte);	/* msg.c */
+void STREAMS_REGPARMS(lis_putbyte(unsigned char **p, unsigned char byte));	/* msg.c */
 
 #if 0
 void lis_bzero(void *ptr, int cnt);	/* head.c */

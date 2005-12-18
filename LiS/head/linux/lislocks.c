@@ -778,7 +778,7 @@ lis_print_spl_track(void)
 * Disable interrupts, return the previous state.			*
 *									*
 ************************************************************************/
-lis_flags_t
+streams_regparms lis_flags_t
 lis_splstr_fcn(char *file, int line)
 {
 	lis_flags_t prev;
@@ -795,7 +795,7 @@ lis_splstr_fcn(char *file, int line)
 * Restore state.							*
 *									*
 ************************************************************************/
-void
+streams_regparms void
 lis_splx_fcn(lis_flags_t x, char *file, int line)
 {
 	lis_spin_unlock_irqrestore_fcn(&lis_spl_lock, &x, file, line);
@@ -809,7 +809,7 @@ lis_splx_fcn(lis_flags_t x, char *file, int line)
 * Go all the way back to base level.					*
 *									*
 ************************************************************************/
-void
+streams_regparms void
 lis_spl0_fcn(char *file, int line)
 {
 	while (lis_own_spl())
@@ -839,7 +839,7 @@ lis_spl_init(void)
 * Return true if this task owns the global lis_spin_lock.		*
 *									*
 ************************************************************************/
-int
+streams_regparms int
 lis_own_spl(void)
 {
 	return (lis_spin_is_locked(&lis_spl_lock) && lis_spl_lock.taskp == current);
@@ -866,7 +866,7 @@ lis_own_spl(void)
 *									*
 ************************************************************************/
 
-int
+streams_regparms int
 lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
 {
 	DCL_l;
@@ -881,7 +881,7 @@ lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
 #endif
 }
 
-void
+streams_regparms void
 lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -903,7 +903,7 @@ lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
 	LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
 }
 
-void
+streams_regparms void
 lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -923,7 +923,7 @@ lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
 	}
 }
 
-int
+streams_regparms int
 lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 {
 	int ret;
@@ -947,7 +947,7 @@ lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 	return (1);		/* already held */
 }
 
-void
+streams_regparms void
 lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -970,7 +970,7 @@ lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 	LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
 }
 
-void
+streams_regparms void
 lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -990,7 +990,7 @@ lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
 	}
 }
 
-void
+streams_regparms void
 lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL)
 {
 	lis_flags_t prev;
@@ -1013,7 +1013,7 @@ lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL)
 	LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
 }
 
-void
+streams_regparms void
 lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL)
 {
 	lis_flags_t prev;
@@ -1055,14 +1055,14 @@ lis_spin_lock_fill(lis_spin_lock_t *lock, const char *name)
 	spin_lock_init(l);	/* kernel's init function */
 }
 
-void
+streams_regparms void
 lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL)
 {
 	memset((void *) lock, 0, sizeof(*lock));
 	SPIN_FILL;
 }
 
-lis_spin_lock_t *
+streams_regparms lis_spin_lock_t *
 lis_spin_lock_alloc_fcn(const char *name, FL)
 {
 	lis_spin_lock_t *lock;
@@ -1079,7 +1079,7 @@ lis_spin_lock_alloc_fcn(const char *name, FL)
 	return (lock);
 }
 
-lis_spin_lock_t *
+streams_regparms lis_spin_lock_t *
 lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL)
 {
 	if (lock == NULL)
@@ -1106,7 +1106,7 @@ lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL)
 *									*
 ************************************************************************/
 
-void
+streams_regparms void
 lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1119,7 +1119,7 @@ lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 
 	lock->taskp = (void *) current;
 	SET_OWNER LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
-} void
+} streams_regparms void
 lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1132,7 +1132,7 @@ lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 
 	lock->taskp = (void *) current;
 	SET_OWNER LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
-} void
+} streams_regparms void
 lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1147,7 +1147,7 @@ lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 	SET_SPIN_UNLOCK read_unlock(r);
 }
 
-void
+streams_regparms void
 lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1162,7 +1162,7 @@ lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 	SET_SPIN_UNLOCK write_unlock(r);
 }
 
-void
+streams_regparms void
 lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1176,7 +1176,7 @@ lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 
 	THELOCK->taskp = (void *) current;
 	SET_OWNER LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
-} void
+} streams_regparms void
 lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1190,7 +1190,7 @@ lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 
 	THELOCK->taskp = (void *) current;
 	SET_OWNER LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
-} void
+} streams_regparms void
 lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1205,7 +1205,7 @@ lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 	SET_SPIN_UNLOCK read_unlock_irq(r);
 }
 
-void
+streams_regparms void
 lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 	lis_flags_t prev;
@@ -1220,7 +1220,7 @@ lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 	SET_SPIN_UNLOCK write_unlock_irq(r);
 }
 
-void
+streams_regparms void
 lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 	lis_flags_t prev;
@@ -1234,7 +1234,7 @@ lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 
 	THELOCK->taskp = (void *) current;
 	SET_OWNER LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
-} void
+} streams_regparms void
 lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 	lis_flags_t prev;
@@ -1248,7 +1248,7 @@ lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 
 	THELOCK->taskp = (void *) current;
 	SET_OWNER LOCK_ENTRY(lock, TRACK_LOCK, file, line, prev)
-} void
+} streams_regparms void
 lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 	lis_flags_t prev;
@@ -1263,7 +1263,7 @@ lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 	SET_SPIN_UNLOCK read_unlock_irqrestore(r, (*flags));
 }
 
-void
+streams_regparms void
 lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 	lis_flags_t prev;
@@ -1300,14 +1300,14 @@ lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name)
 	rwlock_init(r);		/* kernel's init function */
 }
 
-void
+streams_regparms void
 lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
 {
 	memset((void *) lock, 0, sizeof(*lock));
 	RW_LOCK_FILL;
 }
 
-lis_rw_lock_t *
+streams_regparms lis_rw_lock_t *
 lis_rw_lock_alloc_fcn(const char *name, FL)
 {
 	lis_rw_lock_t *lock;
@@ -1324,7 +1324,7 @@ lis_rw_lock_alloc_fcn(const char *name, FL)
 	return (lock);
 }
 
-lis_rw_lock_t *
+streams_regparms lis_rw_lock_t *
 lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 {
 	if (lock->allocated)
@@ -1353,7 +1353,7 @@ lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 # endif
 #endif
 
-void
+streams_regparms void
 lis_up_fcn(lis_semaphore_t *lsem, FL)
 {
 	struct semaphore *sem = (struct semaphore *) lsem->sem_mem;
@@ -1366,7 +1366,7 @@ lis_up_fcn(lis_semaphore_t *lsem, FL)
 	up(sem);
 }
 
-int
+streams_regparms int
 lis_down_fcn(lis_semaphore_t *lsem, FL)
 {
 	struct semaphore *sem = (struct semaphore *) lsem->sem_mem;
@@ -1418,7 +1418,7 @@ lis_down_fcn(lis_semaphore_t *lsem, FL)
 		       spin_unlock_irq(&current->sighand->siglock)
 #endif
 
-void
+streams_regparms void
 lis_down_nosig_fcn(lis_semaphore_t *lsem, FL)
 {
 	sigset_t save_sigs;
@@ -1445,7 +1445,7 @@ lis_sem_fill(lis_semaphore_t *lsem, int count)
 	lsem->owner_cntr = ++lis_seq_cntr;
 }
 
-void
+streams_regparms void
 lis_sem_init(lis_semaphore_t *lsem, int count)
 {
 	static lis_semaphore_t lis_sem_template;	/* blank semaphore */
@@ -1455,7 +1455,7 @@ lis_sem_init(lis_semaphore_t *lsem, int count)
 	lsem->allocated = 2;	/* initialized static */
 }
 
-lis_semaphore_t *
+streams_regparms lis_semaphore_t *
 lis_sem_destroy(lis_semaphore_t *lsem)
 {
 	int allocated;
@@ -1479,7 +1479,7 @@ lis_sem_destroy(lis_semaphore_t *lsem)
 	return (NULL);
 }
 
-lis_semaphore_t *
+streams_regparms lis_semaphore_t *
 lis_sem_alloc(int count)
 {
 	lis_semaphore_t *lsem;

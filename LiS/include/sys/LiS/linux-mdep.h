@@ -277,7 +277,7 @@ typedef unsigned int lis_dev_t;
 extern long lis_time_till(long target_time);
 extern long lis_target_time(long milli_sec);
 #endif
-extern long lis_milli_to_ticks(long milli_sec);
+extern long STREAMS_REGPARMS(lis_milli_to_ticks(long milli_sec));
 
 extern char lis_kernel_version[];
 extern char lis_version[];
@@ -336,8 +336,9 @@ typedef struct cred {
 /*
  *  The ASSERT macro.
  */
-extern void lis_assert_fail(const char *expr, const char *objname, const char *file,
-			    unsigned int line);
+extern void
+ STREAMS_REGPARMS(lis_assert_fail
+		  (const char *expr, const char *objname, const char *file, unsigned int line));
 
 #ifdef LIS_OBJNAME
 #define ___ASSERT_XSTR(s) ___ASSERT_STR(s)
@@ -388,13 +389,13 @@ typedef volatile long lis_atomic_t;
  */
 #define lis_atomic_t lis_atomic_t
 
-void lis_atomic_set(lis_atomic_t *atomic_addr, int valu);
-int lis_atomic_read(lis_atomic_t *atomic_addr);
-void lis_atomic_add(lis_atomic_t *atomic_addr, int amt);
-void lis_atomic_sub(lis_atomic_t *atomic_addr, int amt);
-void lis_atomic_inc(lis_atomic_t *atomic_addr);
-void lis_atomic_dec(lis_atomic_t *atomic_addr);
-int lis_atomic_dec_and_test(lis_atomic_t *atomic_addr);
+void STREAMS_REGPARMS(lis_atomic_set(lis_atomic_t *atomic_addr, int valu));
+int STREAMS_REGPARMS(lis_atomic_read(lis_atomic_t *atomic_addr));
+void STREAMS_REGPARMS(lis_atomic_add(lis_atomic_t *atomic_addr, int amt));
+void STREAMS_REGPARMS(lis_atomic_sub(lis_atomic_t *atomic_addr, int amt));
+void STREAMS_REGPARMS(lis_atomic_inc(lis_atomic_t *atomic_addr));
+void STREAMS_REGPARMS(lis_atomic_dec(lis_atomic_t *atomic_addr));
+int STREAMS_REGPARMS(lis_atomic_dec_and_test(lis_atomic_t *atomic_addr));
 
 /*
  * Internally we can use these direct access macros for speed since LiS
@@ -410,7 +411,7 @@ int lis_atomic_dec_and_test(lis_atomic_t *atomic_addr);
 #define	K_ATOMIC_SUB(lis_atomic_addr,v)		\
 				atomic_sub((v),(atomic_t *)(lis_atomic_addr))
 
-extern int lis_in_interrupt(void);
+extern int STREAMS_REGPARMS(lis_in_interrupt(void));
 
 /*
  * Now include lislocks.h
@@ -420,15 +421,15 @@ extern int lis_in_interrupt(void);
 /*
  *  lis_gettimeofday -  used by lis_hitime and similar functions
  */
-void lis_gettimeofday(struct timeval *tv);
+void STREAMS_REGPARMS(lis_gettimeofday(struct timeval *tv));
 
 /* lock inodes...
  *
  * Must use kernel semaphore routine directly since the inode semaphore is a
  * kernel semaphore and not an LiS semaphore.
  */
-int lis_kernel_down(struct semaphore *sem);
-void lis_kernel_up(struct semaphore *sem);
+int STREAMS_REGPARMS(lis_kernel_down(struct semaphore *sem));
+void STREAMS_REGPARMS(lis_kernel_up(struct semaphore *sem));
 
 #if 0				/* don't need to hold inode semaphore for I/O oprns */
 #define	LOCK_INO(i)	lis_kernel_down(&((i)->i_sem))
@@ -506,8 +507,8 @@ extern int lis_strflush(struct file *);
 /*
  * Device node support
  */
-int lis_mknod(char *name, int mode, dev_t dev);
-int lis_unlink(char *name);
+int STREAMS_REGPARMS(lis_mknod(char *name, int mode, dev_t dev));
+int STREAMS_REGPARMS(lis_unlink(char *name));
 
 /*
  *  FIFO/pipe support
@@ -638,9 +639,9 @@ typedef unsigned lis_minor_t;
 #define	major_t		lis_major_t
 #define	minor_t		lis_minor_t
 
-extern major_t lis_getmajor(dev_t dev);
-extern minor_t lis_getminor(dev_t dev);
-extern dev_t lis_makedevice(major_t majr, minor_t minr);
+extern major_t STREAMS_REGPARMS(lis_getmajor(dev_t dev));
+extern minor_t STREAMS_REGPARMS(lis_getminor(dev_t dev));
+extern dev_t STREAMS_REGPARMS(lis_makedevice(major_t majr, minor_t minr));
 
 #ifdef __LIS_INTERNAL__
 extern dev_t lis_kern_to_lis_dev(dev_t dev);
@@ -746,8 +747,8 @@ extern dev_t lis_i_rdev(struct inode *);
  * this returned value.  It particular, it is not visible to the thread that
  * started the new thread.
  */
-pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name);
-int lis_thread_stop(pid_t pid);
+pid_t STREAMS_REGPARMS(lis_thread_start(int (*fcn) (void *), void *arg, const char *name));
+int STREAMS_REGPARMS(lis_thread_stop(pid_t pid));
 
 #else				/* __KERNEL__ */
 
@@ -906,8 +907,8 @@ extern void lis_memfree(void);
 #ifdef __LIS_INTERNAL__
 extern int lis_copyin_str(struct file *fp, const char *ustr, char **kstr, int max);
 #endif
-int lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len);
-int lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len);
+int STREAMS_REGPARMS(lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len));
+int STREAMS_REGPARMS(lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len));
 
 #ifdef __LIS_INTERNAL__
 int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth);

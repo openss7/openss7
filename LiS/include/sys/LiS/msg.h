@@ -263,27 +263,32 @@ extern void lis_terminate_msg(void);
  * allocb_physreq: allocate M_DATA in a memory block with specific
  *      physical characteristics.
  */
-struct msgb *lis_allocb(int size, unsigned int priority, char *file_name, int line_nr);
-struct msgb *lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *file_name,
-				int line_nr);
+struct msgb
+*STREAMS_REGPARMS(lis_allocb(int size, unsigned int priority, char *file_name, int line_nr));
+struct msgb
+*STREAMS_REGPARMS(lis_allocb_physreq
+		  (int size, unsigned int priority, void *physreq_ptr, char *file_name,
+		   int line_nr));
 
 /* testb: see if an allocation can actually be done.
  *
  */
-extern int lis_testb(int size, unsigned int priority);
+extern int STREAMS_REGPARMS(lis_testb(int size, unsigned int priority));
 
 /*
  * esballoc: allocate a message block, using a user-provided data buffer
  *
  */
-extern mblk_t *lis_esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo,
-			    char *file_name, int line_nr);
+extern mblk_t
+*STREAMS_REGPARMS(lis_esballoc
+		  (unsigned char *base, int size, int priority, frtn_t *freeinfo,
+		   char *file_name, int line_nr));
 
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  *
  */
-extern void lis_freeb(mblk_t *bp);
+extern void STREAMS_REGPARMS(lis_freeb(mblk_t *bp));
 
 #ifdef __LIS_INTERNAL__
 extern void lis_freedb(mblk_t *bp, int free_hdr);
@@ -292,7 +297,7 @@ extern void lis_freedb(mblk_t *bp, int free_hdr);
 /* freemsg - free a whole message
  *
  */
-void lis_freemsg(mblk_t *mp);
+void STREAMS_REGPARMS(lis_freemsg(mblk_t *mp));
 
 #endif				/* __KERNEL__ */
 

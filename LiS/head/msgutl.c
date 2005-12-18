@@ -153,7 +153,7 @@ tmsgsize(mblk_t *mp, mblk_t **first)
 
 /* lis_msgsize - count sizes of blocks of message
  */
-int
+streams_regparms int
 lis_msgsize(mblk_t *mp)
 {
 	int rtn = 0;
@@ -168,7 +168,7 @@ lis_msgsize(mblk_t *mp)
 /*  -------------------------------------------------------------------  */
 /* lis_msgdsize - return number of data bytes in M_DATA blocks in message
  */
-int
+streams_regparms int
 lis_msgdsize(mblk_t *mp)
 {
 	int rtn = 0;
@@ -190,7 +190,7 @@ lis_msgdsize(mblk_t *mp)
 /* xmsgsize - count sizes of consecutive blocks of the same
  *	type as the first
  */
-int
+streams_regparms int
 lis_xmsgsize(mblk_t *mp)
 {
 	int rtn = 0;
@@ -219,7 +219,7 @@ lis_xmsgsize(mblk_t *mp)
  *	rptrs set to their wptrs.
  *	Returns 1 on success; 0 otherwise.
  */
-int
+streams_regparms int
 lis_adjmsg(mblk_t *mp, int length)
 {
 	if (mp == NULL)
@@ -273,7 +273,7 @@ lis_adjmsg(mblk_t *mp, int length)
 /*  -------------------------------------------------------------------  */
 /* lis_copyb - create and return a copy of a message block
  */
-mblk_t *
+streams_regparms mblk_t *
 lis_copyb(mblk_t *mp)
 {
 	mblk_t *bp;
@@ -298,7 +298,7 @@ lis_copyb(mblk_t *mp)
 
 /* lis_copymsg - create and return a copy of a message
  */
-mblk_t *
+streams_regparms mblk_t *
 lis_copymsg(mblk_t *mp)
 {
 	mblk_t *rtn, *bp;
@@ -322,7 +322,7 @@ lis_copymsg(mblk_t *mp)
  *	The data block and data buffer are reused.
  */
 
-mblk_t *
+streams_regparms mblk_t *
 lis_dupb(mblk_t *mp)
 {
 	if (mp) {
@@ -345,7 +345,7 @@ lis_dupb(mblk_t *mp)
 /* lis_dupmsg - duplicate a message by duplicating the constituent
  *	data blocks.
  */
-mblk_t *
+streams_regparms mblk_t *
 lis_dupmsg(mblk_t *mp)
 {
 	mblk_t *bp, *rtn = lis_dupb(mp);
@@ -369,7 +369,7 @@ lis_dupmsg(mblk_t *mp)
 /* lis_linkb - concatenate mp1 and mp2.
  */
 
-void
+streams_regparms void
 lis_linkb(mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1 && mp2) {
@@ -383,7 +383,7 @@ lis_linkb(mblk_t *mp1, mblk_t *mp2)
 /* unlinkb - remove first message block from a message. Return the
  *	next message block pointer, or NULL if no further blocks.
  */
-mblk_t *
+streams_regparms mblk_t *
 lis_unlinkb(mblk_t *mp)
 {
 	mblk_t *rtn;
@@ -405,7 +405,7 @@ lis_unlinkb(mblk_t *mp)
  *	Returns 1 on success; 0 otherwise.
  */
 #define ALIGN_MOD	(sizeof(char *) - 1)
-int
+streams_regparms int
 lis_pullupmsg(mblk_t *mp, int length)
 {
 	mblk_t *tmpbp, *newbp;
@@ -519,7 +519,7 @@ lis_pullupmsg(mblk_t *mp, int length)
  *
  * len of -1 means concatenate all bytes of the passed-in msg.
  */
-mblk_t *
+streams_regparms mblk_t *
 lis_msgpullup(mblk_t *mp, int len)
 {
 	unsigned char msg_type;
@@ -599,7 +599,7 @@ lis_msgpullup(mblk_t *mp, int len)
  *	pointer to the modified message, or NULL if bp was the
  *	only block, or -1 if bp wasn't in the message
  */
-mblk_t *
+streams_regparms mblk_t *
 lis_rmvb(mblk_t *mp, mblk_t *bp)
 {
 	mblk_t *rtn = mp;

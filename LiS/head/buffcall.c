@@ -240,7 +240,7 @@ bc_ulink(bcinfo_t * bcinfo)
 /* lis_bufcall - schedule recovery from alloc failure
  *
  */
-int
+streams_regparms int
 lis_bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
 	LisUpCount(BUFCALLS);	/* stats array */
@@ -260,7 +260,7 @@ lis_bufcall(unsigned size, int priority, void (*function) (long), long arg)
  *	will be called when there is a `good chance' that the
  *	lis_esballoc will succeed.
  */
-int
+streams_regparms int
 lis_esbbcall(int priority, void (*function) (long), long arg)
 {
 	LisUpCount(BUFCALLS);	/* stats array */
@@ -279,7 +279,7 @@ lis_esbbcall(int priority, void (*function) (long), long arg)
 /* unbufcall - cancels a bufcall/esbbcall
  *
  */
-void
+streams_regparms void
 lis_unbufcall(int bcid)
 {
 	bcinfo_t *bcinfo;

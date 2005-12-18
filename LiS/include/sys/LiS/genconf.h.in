@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: genconf.h.in,v 1.1.6.4 2005/05/14 08:35:09 brian Exp $
+ @(#) $Id: genconf.h.in,v 1.1.6.5 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,35 +45,74 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:35:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_GENCONF_H__
 #define __SYS_LIS_GENCONF_H__
 
-#ifndef GET_EMPTY_INODE
-#define GET_EMPTY_INODE(_sb) @LIS_GET_EMPTY_INODE@
-#endif
+/* in case you want to use LiS headers for binary compatibility modules */
 
-#if @INT_PSW@
-#ifndef INT_PSW
-#define INT_PSW 1
-#endif
-#endif
+/* If you have a regparms kernel, define to the the number of register
+   parameters passed to functions that LiS exports. This is for binary
+   compatibility. */
+#undef STREAMS_REGPARM
 
-#if @ATOMIC_STATS@
-#ifndef LIS_ATOMIC_STATS
-#define LIS_ATOMIC_STATS 1
-#endif
-#endif
+/* Use this macro like fastcall. It is set to an attribute with the number of
+   parameters passed to exported LiS functions when there is a regparms
+   kernel. This is for binary compatibility. */
+#undef streams_regparms
+
+/* Use this macro like FASTCALL(). It is set to postfix an attribute with the
+   number of parameters passed to exported LiS functions when there is a
+   regparms kernel. This is for binary compatibility. */
+#undef STREAMS_REGPARMS
+
+/* This is the old LiS 2.18.0 version of streams_regparms and
+   STREAMS_REGPARMS(). */
+#undef _RP
+
+/* following are foolishly referenced by headers */
+
+/* This is necessary due to RedHat mangling of kernel header files. RedHat
+   removes get_empty_inode() from <linux/fs.h> and makes new_inode()
+   non-inline and removes it from the header file (now a function call).
+   Autoconf will check your header files. The code will try to use whatever is
+   defined here to get an empty inode. Neither a check of the header files nor
+   a running kernel symbol table will guarantee that those symbols are
+   exported and usable by LiS. If you get depmod errors on instalation
+   mentioning either of these functions, then this is probably the cause. */
+#undef GET_EMPTY_INODE
+
+/* Define if you want interrupt flags stored as int instead of unsigned long.
+   The kernel always uses unsigned long. It is generally a bad idea to use int
+   when the kernel uses unsigned long. If in doubt, leave this undefined. */
+#undef INT_PSW
+
+/* Define if you want atomic_t for statistics elements. Otherwise the LiS uses
+   int. It is generally a bad idea to use atomic_t as many drivers are unaware
+   of this enhancement. */
+#undef LIS_ATOMIC_STATS
 
 /* following are for osif */
+
+/* Define to 1 if kernel function pci_find_class() exists. */
 #undef HAVE_KFUNC_PCI_FIND_CLASS
+
+/* Define to 1 if kernel function pci_dma_sync_single() exists. */
 #undef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+
+/* Define to 1 if kernel function pci_dma_sync_sg() exists. */
 #undef HAVE_KFUNC_PCI_DMA_SYNC_SG
+
+/* Define to 1 if kernel function sleep_on() exists. */
 #undef HAVE_KFUNC_SLEEP_ON
+
+/* Define to 1 if kernel function interruptible_sleep_on() exists. */
 #undef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+
+/* Define to 1 if kernel function sleep_on_timeout() exists. */
 #undef HAVE_KFUNC_SLEEP_ON_TIMEOUT
 
 #endif				/* __SYS_LIS_GENCONF_H__ */

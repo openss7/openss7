@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/07/04 20:07:15 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/12/18 05:41:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,21 +48,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:07:15 $ by $Author: brian $
+# Last Modified $Date: 2005/12/18 05:41:22 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 1.1.6.3 2005/07/04 20:07:15 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 1.1.6.4 2005/12/18 05:41:22 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([LiS],[2.18],[bugs@openss7.org],[LiS])
 
 _OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([config.h.in])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h include/sys/LiS/genconf.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
@@ -157,7 +157,6 @@ AC_CHECK_FUNCS([atexit bzero gettimeofday memset select strchr strerror strrchr 
 AC_LIS
 
 AC_CONFIG_FILES([Makefile
-		 include/sys/LiS/genconf.h
 		 include/Makefile
 		 man/Makefile
 		 manual/Makefile

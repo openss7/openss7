@@ -79,14 +79,14 @@
  * value for the convenience of constructs such as ptr = lis_free_mem(ptr).
  * Also, the mem_area argument to lis_free_mem can be NULL.
  */
-void *lis_alloc_atomic_fcn(int nbytes, char *file, int line);
-void *lis_alloc_kernel_fcn(int nbytes, char *file, int line);
-void *lis_alloc_dma_fcn(int nbytes, char *file, int line);
-void *lis_free_mem_fcn(void *mem_area, char *file, int line);
-void *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line);
-void *lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line);
-void *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line);
-void *lis_free_pages_fcn(void *ptr, char *file, int line);
+void *STREAMS_REGPARMS(lis_alloc_atomic_fcn(int nbytes, char *file, int line));
+void *STREAMS_REGPARMS(lis_alloc_kernel_fcn(int nbytes, char *file, int line));
+void *STREAMS_REGPARMS(lis_alloc_dma_fcn(int nbytes, char *file, int line));
+void *STREAMS_REGPARMS(lis_free_mem_fcn(void *mem_area, char *file, int line));
+void *STREAMS_REGPARMS(lis_get_free_pages_fcn(int nbytes, int class, char *file, int line));
+void *STREAMS_REGPARMS(lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line));
+void *STREAMS_REGPARMS(lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line));
+void *STREAMS_REGPARMS(lis_free_pages_fcn(void *ptr, char *file, int line));
 
 #ifdef __LIS_INTERNAL__
 void lis_free_all_pages(void);		/* internal cleanup routine */

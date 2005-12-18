@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.34 $) $Date: 2005/08/29 10:18:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.35 $) $Date: 2005/12/18 05:41:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:18:41 $ by $Author: brian $
+# Last Modified $Date: 2005/12/18 05:41:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -430,7 +430,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h], [:], [:], [
+			  asm/uaccess.h asm/linkage.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -965,18 +965,16 @@ AC_DEFUN([_LIS_GET_EMPTY_INODE], [dnl
 *** source and try again.
 *** ])
     fi dnl
-dnl
-dnl This definition goes in include/sys/LiS/genconf.h
-dnl
-dnl AC_DEFINE_UNQUOTED([GET_EMPTY_INODE], [$LIS_GET_EMPTY_INODE], [This is necessary
-dnl     due to RedHat mangling of kernel header files. RedHat removes
-dnl     get_empty_inode() from <linux/fs.h> and makes new_inode() non-inline and
-dnl     removes it from the header file (now a function call).  Autoconf will check
-dnl     your header files.  The code will try to use whatever is defined here to get
-dnl     an empty inode.  Neither a check of the header files nor a running kernel
-dnl     symbol table will guarantee that those symbols are exported and usable by
-dnl     LiS.  If you get depmod errors on instalation mentioning either of these
-dnl     functions, then this is probably the cause.])
+    AH_TEMPLATE([GET_EMPTY_INODE], [This is necessary due to RedHat mangling of
+	kernel header files.  RedHat removes get_empty_inode() from <linux/fs.h>
+	and makes new_inode() non-inline and removes it from the header file
+	(now a function call).  Autoconf will check your header files.  The code
+	will try to use whatever is defined here to get an empty inode.  Neither
+	a check of the header files nor a running kernel symbol table will
+	guarantee that those symbols are exported and usable by LiS.  If you get
+	depmod errors on instalation mentioning either of these functions, then
+	this is probably the cause.])
+    AC_DEFINE_UNQUOTED([GET_EMPTY_INODE(_sb)], [$LIS_GET_EMPTY_INODE])
 ])# _LIS_GET_EMPTY_INODE
 # =============================================================================
 
@@ -1014,12 +1012,7 @@ dnl
     LIS_CONFIG_STREAMS=m
 dnl LIS_TARGET="$LIS_TARGET"
     _LIS_CONFIG_DEV
-dnl
-dnl I don't know why these are for all architectures...  We don't need 'em.
-dnl
-    LIS_CCREGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=3' | sed -r -e 's|.*(-mregparm=3).*|\1|'`
-    LIS_STREAMS_REGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=[[0-9]]*' | sed -r -e 's|.*-mregparm=([[0-9]]*).*|\1|'`
-    LIS_STREAMS_REGPARM="${LIS_STREAMS_REGPARM:-0}"
+    _LIS_REGPARMS
     _LIS_OLD_CONSTS
     _LIS_SOLARIS_STYLE_CMN_ERR
     _LIS_DBG_OPT
@@ -1108,14 +1101,11 @@ AC_DEFUN([_LIS_INT_PSW],[dnl
     else
 	LIS_INT_PSW='y'
 	INT_PSW=1
-#
-#       This definition goes in include/sys/LiS/genconf.h
-#
-#       AC_DEFINE([INT_PSW], [1], [Define if you want interrupt flags stored as
-#                  int instead of unsigned long.  The kernel always uses
-#                  unsigned long.  It is generally a bad idea to use int when
-#                  the kernel uses unsigned long.  If in doubt, leave this
-#                  undefined.])
+	AC_DEFINE([INT_PSW], [1], [Define if you want interrupt flags stored as
+		  int instead of unsigned long.  The kernel always uses
+		  unsigned long.  It is generally a bad idea to use int when
+		  the kernel uses unsigned long.  If in doubt, leave this
+		  undefined.])
 	AC_MSG_RESULT([yes])
     fi
     AC_SUBST([INT_PSW])dnl
@@ -1147,6 +1137,53 @@ AC_DEFUN([_LIS_CONFIG_DEV], [dnl
     fi
     AC_MSG_RESULT([${enable_lis_development:-no}])
 ])# _LIS_CONFIG_DEV
+# =============================================================================
+
+# =============================================================================
+# _LIS_REGPARMS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LIS_REGPARMS], [dnl
+    LIS_CCREGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=3' | sed -r -e 's|.*(-mregparm=3).*|\1|'`
+    AC_ARG_WITH([lis-regparms],
+	AS_HELP_STRING([--with-lis-regparms],
+	    [configure to set the regparms for exported symbols
+	     @<:@default=0@:>@]),
+	[with_lis_regparms="$withval"],
+	[with_lis_regparms='0'])
+    AH_TEMPLATE([STREAMS_REGPARM], [If you have a regparms kernel, define to the
+		 the number of register parameters passed to functions that LiS
+		 exports.  This is for binary compatibility.])
+    AH_TEMPLATE([streams_regparms], [Use this macro like fastcall.  It is set to
+		 an attribute with the number of parameters passed to exported
+		 LiS functions when there is a regparms kernel.  This is for
+		 binary compatibility.])
+    AH_TEMPLATE([STREAMS_REGPARMS], [Use this macro like FASTCALL().  It is set
+		 to postfix an attribute with the number of parameters passed to
+		 exported LiS functions when there is a regparms kernel.  This
+		 is for binary compatibility.])
+    AH_TEMPLATE([_RP], [This is the old LiS 2.18.0 version of streams_regparms
+		 and STREAMS_REGPARMS().])
+    AC_MSG_CHECKING([for lis regparms])
+    LIS_STREAMS_REGPARM="${with_lis_regparms:-0}"
+    if test :"${linux_cv_header_asm_linkage_h:-no}" = :no
+    then
+	LIS_CCREGPARM=''
+	AC_DEFINE_UNQUOTED([streams_regparms], [])
+	AC_DEFINE_UNQUOTED([STREAMS_REGPARMS(__x)], [__x])
+	AC_DEFINE_UNQUOTED([_RP], [])
+    else
+	AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
+	LIS_CCREGPARM="${LIS_CCREGPARM:--mregparm=0}"
+	AC_DEFINE_UNQUOTED([streams_regparms], [__attribute__((regparm(STREAMS_REGPARM)))])
+	AC_DEFINE_UNQUOTED([STREAMS_REGPARMS(__x)], [__x streams_regparms])
+	AC_DEFINE_UNQUOTED([_RP], [streams_regparms])
+    fi
+    AC_MSG_RESULT([$LIS_STREAMS_REGPARM])
+dnl
+dnl I don't know why these are for all architectures...  We don't need 'em.
+dnl
+dnl LIS_STREAMS_REGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=[[0-9]]*' | sed -r -e 's|.*-mregparm=([[0-9]]*).*|\1|'`
+])# _LIS_REGPARMS
 # =============================================================================
 
 # =============================================================================
@@ -1355,13 +1392,10 @@ AC_DEFUN([_LIS_ATOMIC_STATS], [dnl
     AC_MSG_CHECKING([for lis atomic stats])
     if test :"${enable_atomic_stats:-no}" = :yes
     then
-#
-#       This definition goes in include/sys/LiS/genconf.h
-#
-#       AC_DEFINE([LIS_ATOMIC_STATS], [1], [Define if you want atomic_t for
-#       statistics elements.  Otherwise the LiS uses int. It is generally a
-#       bad idea to use atomic_t as many drivers are unaware of this
-#       enhancement.])
+	AC_DEFINE([LIS_ATOMIC_STATS], [1], [Define if you want atomic_t for
+	statistics elements.  Otherwise the LiS uses int. It is generally a
+	bad idea to use atomic_t as many drivers are unaware of this
+	enhancement.])
 	ATOMIC_STATS=1
 	AC_MSG_RESULT([yes])
     else

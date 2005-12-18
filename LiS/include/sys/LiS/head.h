@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: head.h,v 1.1.1.4.4.5 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: head.h,v 1.13 1996/01/28 21:59:25 dave Exp $
+ * RCS Id          : $Id: head.h,v 1.1.1.4.4.5 2005/12/18 05:41:24 brian Exp $
  * Purpose         : here you have utilites to handle str heads.
  * ----------------______________________________________________
  *
@@ -70,7 +70,7 @@
 #ifndef _HEAD_H
 #define _HEAD_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: head.h,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -444,9 +444,9 @@ extern void lis_run_queues(int cpu);
 /*
  *  for stream head qinit structures
  */
-extern int lis_strrput(queue_t *, mblk_t *);
-extern int lis_strwsrv(queue_t *);
-extern int lis_strrsrv(queue_t *);
+extern int STREAMS_REGPARMS(lis_strrput(queue_t *, mblk_t *));
+extern int STREAMS_REGPARMS(lis_strwsrv(queue_t *));
+extern int STREAMS_REGPARMS(lis_strrsrv(queue_t *));
 
 /*
  *  I_SENFD/I_RECVFD ioctl support
@@ -479,7 +479,7 @@ extern void lis_restore_sigs(stdata_t *hd);
  * Return the major device number of the LiS clone device.  Useful for
  * dynamically loading drivers to synthesis clone major/minors.
  */
-extern int lis_clone_major(void);
+extern int STREAMS_REGPARMS(lis_clone_major(void));
 
 /*
  * Set an errno in the stream head and wake up relevant processes
@@ -493,11 +493,11 @@ void lis_stream_error(stdata_t *shead, int rderr, int wrerr);
 /*
  *  timing functions - these are available outside the kernel also
  */
-extern unsigned long lis_hitime(void);	/* usec res; 64s cycle */
-extern unsigned long lis_usecs(void);	/* usec res; ulong cycle */
-extern unsigned long lis_msecs(void);	/* msec res; ulong cycle */
-extern unsigned long lis_dsecs(void);	/* 1/10sec res; ulong cycle */
-extern unsigned long lis_secs(void);	/* sec res; ulong cycle */
+extern unsigned long STREAMS_REGPARMS(lis_hitime(void));	/* usec res; 64s cycle */
+extern unsigned long STREAMS_REGPARMS(lis_usecs(void));	/* usec res; ulong cycle */
+extern unsigned long STREAMS_REGPARMS(lis_msecs(void));	/* msec res; ulong cycle */
+extern unsigned long STREAMS_REGPARMS(lis_dsecs(void));	/* 1/10sec res; ulong cycle */
+extern unsigned long STREAMS_REGPARMS(lis_secs(void));	/* sec res; ulong cycle */
 
 /*  -------------------------------------------------------------------  */
 #endif				/* !_HEAD_H */

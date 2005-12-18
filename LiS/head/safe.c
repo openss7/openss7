@@ -87,7 +87,7 @@
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
-void
+streams_regparms void
 lis_safe_noenable(queue_t *q, char *f, int l)
 {
 	lis_flags_t psw;
@@ -99,7 +99,7 @@ lis_safe_noenable(queue_t *q, char *f, int l)
 	LIS_QISRUNLOCK(q, &psw);
 }
 
-void
+streams_regparms void
 lis_safe_enableok(queue_t *q, char *f, int l)
 {
 	lis_flags_t psw;
@@ -111,7 +111,7 @@ lis_safe_enableok(queue_t *q, char *f, int l)
 	LIS_QISRUNLOCK(q, &psw);
 }
 
-int
+streams_regparms int
 lis_safe_canenable(queue_t *q, char *f, int l)
 {
 	if (LIS_QMAGIC(q, f, l))
@@ -120,7 +120,7 @@ lis_safe_canenable(queue_t *q, char *f, int l)
 	return 0;
 }
 
-queue_t *
+streams_regparms queue_t *
 lis_safe_OTHERQ(queue_t *q, char *f, int l)
 {
 	queue_t *oq = NULL;
@@ -134,7 +134,7 @@ lis_safe_OTHERQ(queue_t *q, char *f, int l)
 	return NULL;
 }
 
-queue_t *
+streams_regparms queue_t *
 lis_safe_RD(queue_t *q, char *f, int l)
 {
 	queue_t *oq = NULL;
@@ -152,7 +152,7 @@ lis_safe_RD(queue_t *q, char *f, int l)
 	return NULL;
 }
 
-queue_t *
+streams_regparms queue_t *
 lis_safe_WR(queue_t *q, char *f, int l)
 {
 	queue_t *oq = NULL;
@@ -170,7 +170,7 @@ lis_safe_WR(queue_t *q, char *f, int l)
 	return NULL;
 }
 
-int
+streams_regparms int
 lis_safe_SAMESTR(queue_t *q, char *f, int l)
 {
 	if (LIS_QMAGIC(q, f, l)
@@ -230,13 +230,13 @@ lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry, char *f, int l
 	return (1);		/* msg consumed */
 }
 
-void
+streams_regparms void
 lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	lis_safe_do_putmsg(q, mp, (QDEFERRING | QOPENING), 0, f, l);
 }
 
-void
+streams_regparms void
 lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	queue_t *qnxt = NULL;
@@ -265,7 +265,7 @@ lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
 	lis_safe_putmsg(qnxt, mp, f, l);
 }
 
-void
+streams_regparms void
 lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	if (mp == NULL) {

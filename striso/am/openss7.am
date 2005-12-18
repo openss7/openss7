@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/12/13 12:38:10 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/12/18 05:41:22 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -47,7 +47,7 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/12/13 12:38:10 $ by $Author: brian $
+## Last Modified $Date: 2005/12/18 05:41:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -295,8 +295,10 @@ CTAGIDS			= -I __initdata \
 			  -I EXPORT_SYMBOL_GPL \
 			  -I FASTCALL \
 			  -I STREAMS_FASTCALL \
+			  -I STREAMS_REGPARMS \
 			  -I fastcall \
 			  -I streams_fastcall \
+			  -I streams_regparms \
 			  -I __attribute__+ \
 			  -I __BEGIN_DECLS \
 			  -I __END_DECLS \

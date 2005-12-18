@@ -142,7 +142,8 @@ extern volatile char lis_strbcflag;	/* the bufcall functions must be run */
 /* lis_bufcall - schedule recovery from alloc failure
  */
 #ifdef __KERNEL__
-extern int lis_bufcall(unsigned size, int priority, void (*function) (long), long arg);
+extern int
+ STREAMS_REGPARMS(lis_bufcall(unsigned size, int priority, void (*function) (long), long arg));
 #endif				/* __KERNEL__ */
 
 /* esbbcall - like bufcall, but for lis_esballoc. The function
@@ -150,13 +151,13 @@ extern int lis_bufcall(unsigned size, int priority, void (*function) (long), lon
  *	lis_esballoc will succeed.
  */
 #ifdef __KERNEL__
-extern int lis_esbbcall(int priority, void (*function) (long), long arg);
+extern int STREAMS_REGPARMS(lis_esbbcall(int priority, void (*function) (long), long arg));
 #endif				/* __KERNEL__ */
 
 /* unbufcall - cancels a bufcall/esbbcall
  */
 #ifdef __KERNEL__
-extern void lis_unbufcall(int bcid);
+extern void STREAMS_REGPARMS(lis_unbufcall(int bcid));
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */

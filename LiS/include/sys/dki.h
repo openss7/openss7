@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: dki.h,v 1.1.1.3.4.4 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -64,7 +64,7 @@
 #ifndef	DKI_H
 #define	DKI_H		1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/12/18 05:41:24 $"
 
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
@@ -101,9 +101,10 @@ typedef unsigned long timeout_id_t;	/* Solaris */
 #define	timeout(fcn,arg,ticks)	lis_timeout_fcn(fcn,arg,ticks,__FILE__, __LINE__)
 #define	untimeout		lis_untimeout
 
-extern toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name,
-			      int line_nr);
-extern toid_t lis_untimeout(toid_t id);
+extern toid_t
+ STREAMS_REGPARMS(lis_timeout_fcn
+		  (timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, int line_nr));
+extern toid_t STREAMS_REGPARMS(lis_untimeout(toid_t id));
 
 /*
  * The following are internal routines not exported
@@ -130,7 +131,7 @@ void lis_terminate_timers(void);	/* mdep rouitine */
  *
  * The routine is located in osif.c.
  */
-unsigned lis_usectohz(unsigned usec);
+unsigned STREAMS_REGPARMS(lis_usectohz(unsigned usec));
 
 /************************************************************************
 *                        Creating Nodes                                 *
@@ -150,8 +151,8 @@ unsigned lis_usectohz(unsigned usec);
 *									*
 ************************************************************************/
 
-extern int lis_mknod(char *name, int mode, dev_t dev);
-extern int lis_unlink(char *name);
+extern int STREAMS_REGPARMS(lis_mknod(char *name, int mode, dev_t dev));
+extern int STREAMS_REGPARMS(lis_unlink(char *name));
 
 #ifdef __LIS_INTERNAL__
 extern int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag,

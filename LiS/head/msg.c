@@ -370,7 +370,7 @@ initb(struct mdbblock *blk, char *buff, int size, struct free_rtn *frtn)
  *        To be completed later.
  */
 
-struct msgb *
+streams_regparms struct msgb *
 lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *file_name, int line_nr)
 {
 	return (lis_allocb(size, priority, file_name, line_nr));
@@ -383,7 +383,7 @@ lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *fil
  *	size. The priority is for compatibility only.
  */
 
-struct msgb *
+streams_regparms struct msgb *
 lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 {
 #if defined(CONFIG_DEV)
@@ -434,7 +434,7 @@ lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 /* testb: see if an allocation can actually be done.
  */
 
-int
+streams_regparms int
 lis_testb(int size, unsigned int priority)
 {
 #ifdef AVAIL
@@ -462,7 +462,7 @@ lis_testb(int size, unsigned int priority)
  * dblk to point to the user's buffer and to hold the freeinfo stuff.
  */
 
-mblk_t *
+streams_regparms mblk_t *
 lis_esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo, char *file_name,
 	     int line_nr)
 {
@@ -678,7 +678,7 @@ lis_freedb(mblk_t *bp, int free_hdr)
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  */
-void
+streams_regparms void
 lis_freeb(mblk_t *bp)
 {
 	lis_freedb(bp, 1);	/* free both hdr and data blk */
@@ -688,7 +688,7 @@ lis_freeb(mblk_t *bp)
 /*  -------------------------------------------------------------------  */
 /* freemsg - free a whole message
  */
-void
+streams_regparms void
 lis_freemsg(mblk_t *mp)
 {
 	while (mp) {
@@ -701,7 +701,7 @@ lis_freemsg(mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 /* extract values from a char pointer and advance the pointer */
-int
+streams_regparms int
 lis_getint(unsigned char **p)
 {
 	int result = *((int *) (*p));
@@ -710,7 +710,7 @@ lis_getint(unsigned char **p)
 }
 
 /*  -------------------------------------------------------------------  */
-void
+streams_regparms void
 lis_putbyte(unsigned char **p, unsigned char byte)
 {
 	**p = byte;

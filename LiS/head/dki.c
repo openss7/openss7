@@ -249,7 +249,7 @@ alloc_handle(void)
 /*
  * "timeout" is #defined to be this function in dki.h.
  */
-toid_t
+streams_regparms toid_t
 lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, int line_nr)
 {
 	tlist_t *tp;
@@ -280,7 +280,7 @@ lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, 
 
 }				/* lis_timeout_fcn */
 
-toid_t
+streams_regparms toid_t
 lis_untimeout(toid_t id)
 {
 	tlist_t *tp;

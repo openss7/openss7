@@ -120,7 +120,7 @@
 #define HAS_PCIBIOS	1
 #endif
 
-int
+streams_regparms int
 lis_pcibios_present(void)
 {
 #if defined(HAS_PCIBIOS)
@@ -134,12 +134,12 @@ lis_pcibios_present(void)
  * PCO BIOS init routine is not an exported symbol, but we define it
  * anyway in case some driver was calling it.
  */
-void
+streams_regparms void
 lis_pcibios_init(void)
 {
 }
 
-int
+streams_regparms int
 lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
 		       unsigned char *dev_fn)
 {
@@ -150,7 +150,7 @@ lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned c
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned short index,
 			unsigned char *bus, unsigned char *dev_fn)
 {
@@ -161,7 +161,7 @@ lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned s
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			     unsigned char *val)
 {
@@ -183,7 +183,7 @@ lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned c
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			     unsigned short *val)
 {
@@ -194,7 +194,7 @@ lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned c
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			      unsigned int *val)
 {
@@ -205,7 +205,7 @@ lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned 
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			      unsigned char val)
 {
@@ -216,7 +216,7 @@ lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned 
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			      unsigned short val)
 {
@@ -227,7 +227,7 @@ lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn, unsigned 
 #endif
 }
 
-int
+streams_regparms int
 lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			       unsigned int val)
 {
@@ -238,7 +238,7 @@ lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned
 #endif
 }
 
-const char *
+streams_regparms const char *
 lis_pcibios_strerror(int error)
 {
 #if defined(HAS_PCIBIOS)
@@ -274,69 +274,69 @@ lis_pcibios_strerror(int error)
  * End of old PCI BIOS routines
  */
 
-struct pci_dev *
+streams_regparms struct pci_dev *
 lis_osif_pci_find_device(unsigned int vendor, unsigned int device, struct pci_dev *from)
 {
 	return (pci_find_device(vendor, device, from));
 }
 
 #ifdef HAVE_KFUNC_PCI_FIND_CLASS
-struct pci_dev *
+streams_regparms struct pci_dev *
 lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
 {
 	return (pci_find_class(class, from));
 }
 #endif
 
-struct pci_dev *
+streams_regparms struct pci_dev *
 lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 {
 	return (pci_find_slot(bus, devfn));
 }
 
-int
+streams_regparms int
 lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 * val)
 {
 	return (pci_read_config_byte(dev, where, val));
 }
 
-int
+streams_regparms int
 lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 * val)
 {
 	return (pci_read_config_word(dev, where, val));
 }
 
-int
+streams_regparms int
 lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 * val)
 {
 	return (pci_read_config_dword(dev, where, val));
 }
 
-int
+streams_regparms int
 lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val)
 {
 	return (pci_write_config_byte(dev, where, val));
 }
 
-int
+streams_regparms int
 lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val)
 {
 	return (pci_write_config_word(dev, where, val));
 }
 
-int
+streams_regparms int
 lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val)
 {
 	return (pci_write_config_dword(dev, where, val));
 }
 
-void
+streams_regparms void
 lis_osif_pci_set_master(struct pci_dev *dev)
 {
 	pci_set_master(dev);
 }
 
-int
+streams_regparms int
 lis_osif_pci_enable_device(struct pci_dev *dev)
 {
 #if LINUX_VERSION_CODE < 0x020300	/* 2.0 or 2.2 kernel */
@@ -346,7 +346,7 @@ lis_osif_pci_enable_device(struct pci_dev *dev)
 #endif
 }
 
-void
+streams_regparms void
 lis_osif_pci_disable_device(struct pci_dev *dev)
 {
 #if LINUX_VERSION_CODE < 0x020300	/* 2.0 or 2.2 kernel */
@@ -357,24 +357,24 @@ lis_osif_pci_disable_device(struct pci_dev *dev)
 }
 
 #if LINUX_VERSION_CODE < 0x020300	/* 2.0 or 2.2 kernel */
-int
+streams_regparms int
 lis_osif_pci_module_init(void *p)
 {
 	return (0);
 }
 
-void
+streams_regparms void
 lis_osif_pci_unregister_driver(void *p)
 {
 }
 #else				/* 2.4 kernel */
-int
+streams_regparms int
 lis_osif_pci_module_init(struct pci_driver *p)
 {
 	return pci_module_init(p);
 }
 
-void
+streams_regparms void
 lis_osif_pci_unregister_driver(struct pci_driver *p)
 {
 	pci_unregister_driver(p);
@@ -388,7 +388,7 @@ lis_osif_pci_unregister_driver(struct pci_driver *p)
 	 *        PCI DMA Mapping Fcns		*
 	 ***************************************/
 
-void *
+streams_regparms void *
 lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size, dma_addr_t *dma_handle)
 {
 #ifdef CONFIG_PCI
@@ -398,7 +398,7 @@ lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size, dma_addr_t *dm
 #endif
 }
 
-void
+streams_regparms void
 lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size, void *vaddr, dma_addr_t dma_handle)
 {
 #ifdef CONFIG_PCI
@@ -408,32 +408,32 @@ lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size, void *vaddr, dm
 #endif
 }
 
-dma_addr_t
+streams_regparms dma_addr_t
 lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr, size_t size, int direction)
 {
 	return (pci_map_single(hwdev, ptr, size, direction));
 }
 
-void
+streams_regparms void
 lis_osif_pci_unmap_single(struct pci_dev *hwdev, dma_addr_t dma_addr, size_t size, int direction)
 {
 	pci_unmap_single(hwdev, dma_addr, size, direction);
 }
 
-int
+streams_regparms int
 lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, int direction)
 {
 	return (pci_map_sg(hwdev, sg, nents, direction));
 }
 
-void
+streams_regparms void
 lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nents, int direction)
 {
 	pci_unmap_sg(hwdev, sg, nents, direction);
 }
 
 #ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
-void
+streams_regparms void
 lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
 			     int direction)
 {
@@ -442,32 +442,32 @@ lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_
 #endif
 
 #ifdef HAVE_KFUNC_PCI_DMA_SYNC_SG
-void
+streams_regparms void
 lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems, int direction)
 {
 	pci_dma_sync_sg(hwdev, sg, nelems, direction);
 }
 #endif
 
-int
+streams_regparms int
 lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
 	return (pci_dma_supported(hwdev, mask));
 }
 
-int
+streams_regparms int
 lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
 	return (pci_set_dma_mask(hwdev, mask));
 }
 
-dma_addr_t
+streams_regparms dma_addr_t
 lis_osif_sg_dma_address(struct scatterlist *sg)
 {
 	return (sg_dma_address(sg));
 }
 
-size_t
+streams_regparms size_t
 lis_osif_sg_dma_len(struct scatterlist *sg)
 {
 	return (sg_dma_len(sg));
@@ -475,54 +475,54 @@ lis_osif_sg_dma_len(struct scatterlist *sg)
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
 
-void
+streams_regparms void
 lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address, size_t size, int direction)
 {
 	pci_unmap_page(hwdev, dma_address, size, direction);
 }
 
 #ifdef HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
-int
+streams_regparms int
 lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
 	return (pci_dac_set_dma_mask(hwdev, mask));
 }
 #endif
 
-dma_addr_t
+streams_regparms dma_addr_t
 lis_osif_pci_map_page(struct pci_dev *hwdev, struct page *page, unsigned long offset, size_t size,
 		      int direction)
 {
 	return (pci_map_page(hwdev, page, offset, size, direction));
 }
 
-int
+streams_regparms int
 lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
 	return (pci_dac_dma_supported(hwdev, mask));
 }
 
-dma64_addr_t
+streams_regparms dma64_addr_t
 lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page, unsigned long offset,
 			     int direction)
 {
 	return (pci_dac_page_to_dma(pdev, page, offset, direction));
 }
 
-struct page *
+streams_regparms struct page *
 lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
 	return (pci_dac_dma_to_page(pdev, dma_addr));
 }
 
-unsigned long
+streams_regparms unsigned long
 lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
 	return (pci_dac_dma_to_offset(pdev, dma_addr));
 }
 
 #ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
-void
+streams_regparms void
 lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 				 int direction)
 {
@@ -531,7 +531,7 @@ lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, si
 #endif
 
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
-void
+streams_regparms void
 lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 					 int direction)
 {
@@ -540,7 +540,7 @@ lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_
 #endif
 
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
-void
+streams_regparms void
 lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 					    int direction)
 {
@@ -633,7 +633,7 @@ int lis_irqreturn_not_handled = 0;
 
 #endif
 
-int
+streams_regparms int
 lis_request_irq(unsigned int irq, lis_int_handler handler, unsigned long flags, const char *device,
 		void *dev_id)
 {
@@ -670,7 +670,7 @@ lis_request_irq(unsigned int irq, lis_int_handler handler, unsigned long flags, 
 #endif
 }
 
-void
+streams_regparms void
 lis_free_irq(unsigned int irq, void *dev_id)
 {
 #if !defined(__s390__)
@@ -696,7 +696,7 @@ lis_free_irq(unsigned int irq, void *dev_id)
 #endif
 }
 
-void
+streams_regparms void
 lis_enable_irq(unsigned int irq)
 {
 #if !defined(__s390__)
@@ -704,7 +704,7 @@ lis_enable_irq(unsigned int irq)
 #endif
 }
 
-void
+streams_regparms void
 lis_disable_irq(unsigned int irq)
 {
 #if !defined(__s390__)
@@ -712,7 +712,7 @@ lis_disable_irq(unsigned int irq)
 #endif
 }
 
-void
+streams_regparms void
 lis_osif_cli(void)
 {
 #if defined(KERNEL_2_5)
@@ -723,7 +723,7 @@ lis_osif_cli(void)
 
 }
 
-void
+streams_regparms void
 lis_osif_sti(void)
 {
 #if defined(KERNEL_2_5)
@@ -746,7 +746,7 @@ lis_osif_sti(void)
 *									*
 ************************************************************************/
 
-void *
+streams_regparms void *
 lis_ioremap(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
@@ -758,7 +758,7 @@ lis_ioremap(unsigned long offset, unsigned long size)
 #endif
 }
 
-void *
+streams_regparms void *
 lis_ioremap_nocache(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
@@ -770,7 +770,7 @@ lis_ioremap_nocache(unsigned long offset, unsigned long size)
 #endif
 }
 
-void
+streams_regparms void
 lis_iounmap(void *ptr)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
@@ -780,7 +780,7 @@ lis_iounmap(void *ptr)
 #endif
 }
 
-void *
+streams_regparms void *
 lis_vremap(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
@@ -792,13 +792,13 @@ lis_vremap(unsigned long offset, unsigned long size)
 #endif
 }
 
-unsigned long
+streams_regparms unsigned long
 lis_virt_to_phys(volatile void *addr)
 {
 	return (virt_to_phys(addr));
 }
 
-void *
+streams_regparms void *
 lis_phys_to_virt(unsigned long addr)
 {
 	return (phys_to_virt(addr));
@@ -822,13 +822,13 @@ lis_check_region(unsigned int from, unsigned int extent)
 #endif
 }
 
-void
+streams_regparms void
 lis_request_region(unsigned int from, unsigned int extent, const char *name)
 {
 	request_region(from, extent, name);
 }
 
-void
+streams_regparms void
 lis_release_region(unsigned int from, unsigned int extent)
 {
 	release_region(from, extent);
@@ -856,25 +856,25 @@ lis_release_mem_region(unsigned int from, unsigned int extent)
 *                    Memory Allocation Routines                         *
 ************************************************************************/
 
-void *
+streams_regparms void *
 lis_kmalloc(size_t nbytes, int type)
 {
 	return (kmalloc(nbytes, type));
 }
 
-void
+streams_regparms void
 lis_kfree(const void *ptr)
 {
 	kfree((void *) ptr);
 }
 
-void *
+streams_regparms void *
 lis_vmalloc(unsigned long size)
 {
 	return (vmalloc(size));
 }
 
-void
+streams_regparms void
 lis_vfree(void *ptr)
 {
 	vfree(ptr);
@@ -884,7 +884,7 @@ lis_vfree(void *ptr)
 *                        DMA Routines                                   *
 ************************************************************************/
 
-int
+streams_regparms int
 lis_request_dma(unsigned int dma_nr, const char *device_id)
 {
 #if defined(MAX_DMA_CHANNELS)
@@ -894,7 +894,7 @@ lis_request_dma(unsigned int dma_nr, const char *device_id)
 #endif
 }
 
-void
+streams_regparms void
 lis_free_dma(unsigned int dma_nr)
 {
 #if defined(MAX_DMA_CHANNELS)
@@ -906,13 +906,13 @@ lis_free_dma(unsigned int dma_nr)
 *                         Delay Routines                                *
 ************************************************************************/
 
-void
+streams_regparms void
 lis_udelay(long micro_secs)
 {
 	udelay(micro_secs);
 }
 
-unsigned long
+streams_regparms unsigned long
 lis_jiffies(void)
 {
 	return (jiffies);
@@ -921,13 +921,13 @@ lis_jiffies(void)
 /************************************************************************
 *                         Time Routines                                 *
 ************************************************************************/
-void
+streams_regparms void
 lis_osif_do_gettimeofday(struct timeval *tp)
 {
 	do_gettimeofday(tp);
 }
 
-void
+streams_regparms void
 lis_osif_do_settimeofday(struct timeval *tp)
 {
 #if defined(KERNEL_2_5)		/* yes, of course we have to change a standard system routine
@@ -949,7 +949,7 @@ lis_osif_do_settimeofday(struct timeval *tp)
 *                         Printing Routines                             *
 ************************************************************************/
 __attribute__ ((format(printf, 1, 2)))
-	int lis_printk(const char *fmt, ...)
+	streams_regparms int lis_printk(const char *fmt, ...)
 {
 	extern char lis_cmn_err_buf[];
 	va_list args;
@@ -964,7 +964,7 @@ __attribute__ ((format(printf, 1, 2)))
 }
 
 __attribute__ ((format(printf, 2, 3)))
-	int lis_sprintf(char *bfr, const char *fmt, ...)
+	streams_regparms int lis_sprintf(char *bfr, const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -976,7 +976,7 @@ __attribute__ ((format(printf, 2, 3)))
 	return (ret);
 }
 
-int
+streams_regparms int
 lis_vsprintf(char *bfr, const char *fmt, va_list args)
 {
 	return (vsprintf(bfr, fmt, args));
@@ -986,7 +986,7 @@ lis_vsprintf(char *bfr, const char *fmt, va_list args)
 *                      Sleep/Wakeup Routines                            *
 ************************************************************************/
 #ifdef HAVE_KFUNC_SLEEP_ON
-void
+streams_regparms void
 lis_sleep_on(OSIF_WAIT_Q_ARG)
 {
 	sleep_on(wq);
@@ -994,7 +994,7 @@ lis_sleep_on(OSIF_WAIT_Q_ARG)
 #endif
 
 #ifdef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
-void
+streams_regparms void
 lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
 {
 	interruptible_sleep_on(wq);
@@ -1002,38 +1002,38 @@ lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
 #endif
 
 #ifdef HAVE_KFUNC_SLEEP_ON_TIMEOUT
-void
+streams_regparms void
 lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
 {
 	sleep_on_timeout(wq, timeout);
 }
 #endif
 
-void
+streams_regparms void
 lis_interruptible_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
 {
 	interruptible_sleep_on_timeout(wq, timeout);
 }
 
-void
+streams_regparms void
 lis_wait_event(OSIF_WAIT_E_ARG, int condition)
 {
 	wait_event(wq, condition);
 }
 
-void
+streams_regparms void
 lis_wait_event_interruptible(OSIF_WAIT_E_ARG, int condition)
 {
 	wait_event_interruptible(wq, condition);
 }
 
-void
+streams_regparms void
 lis_wake_up(OSIF_WAIT_Q_ARG)
 {
 	wake_up(wq);
 }
 
-void
+streams_regparms void
 lis_wake_up_interruptible(OSIF_WAIT_Q_ARG)
 {
 	wake_up_interruptible(wq);
@@ -1057,7 +1057,7 @@ lis_del_timer(struct timer_list *timer)
 /*
  * Prototype in dki.h (with other timer stuff), not osif.h
  */
-unsigned
+streams_regparms unsigned
 lis_usectohz(unsigned usec)
 {
 	if (((1000 / HZ) * HZ) == 1000)	/* ie: HZ == 100 */
@@ -1085,85 +1085,85 @@ lis_usectohz(unsigned usec)
 #define __real_memcpy	memcpy
 #define __real_memcmp	memcmp
 
-char *
+streams_regparms char *
 __wrap_strcpy(char *d, const char *s)
 {
 	return (__real_strcpy(d, s));
 }
 
-char *
+streams_regparms char *
 __wrap_strncpy(char *d, const char *s, __kernel_size_t l)
 {
 	return (__real_strncpy(d, s, l));
 }
 
-char *
+streams_regparms char *
 __wrap_strcat(char *d, const char *s)
 {
 	return (__real_strcat(d, s));
 }
 
-char *
+streams_regparms char *
 __wrap_strncat(char *d, const char *s, __kernel_size_t l)
 {
 	return (__real_strncat(d, s, l));
 }
 
-int
+streams_regparms int
 __wrap_strcmp(const char *a, const char *b)
 {
 	return (__real_strcmp(a, b));
 }
 
-int
+streams_regparms int
 __wrap_strncmp(const char *a, const char *b, __kernel_size_t l)
 {
 	return (__real_strncmp(a, b, l));
 }
 
-int
+streams_regparms int
 __wrap_strnicmp(const char *a, const char *b, __kernel_size_t l)
 {
 	return (__real_strnicmp(a, b, l));
 }
 
-char *
+streams_regparms char *
 __wrap_strchr(const char *s, int c)
 {
 	return (__real_strchr(s, c));
 }
 
-char *
+streams_regparms char *
 __wrap_strrchr(const char *s, int c)
 {
 	return (__real_strrchr(s, c));
 }
 
-char *
+streams_regparms char *
 __wrap_strstr(const char *a, const char *b)
 {
 	return (__real_strstr(a, b));
 }
 
-__kernel_size_t
+streams_regparms __kernel_size_t
 __wrap_strlen(const char *s)
 {
 	return (__real_strlen(s));
 }
 
-void *
+streams_regparms void *
 __wrap_memset(void *d, int v, __kernel_size_t l)
 {
 	return (__real_memset(d, v, l));
 }
 
-void *
+streams_regparms void *
 __wrap_memcpy(void *d, const void *s, __kernel_size_t l)
 {
 	return (__real_memcpy(d, s, l));
 }
 
-int
+streams_regparms int
 __wrap_memcmp(const void *a, const void *b, __kernel_size_t l)
 {
 	return (__real_memcmp(a, b, l));

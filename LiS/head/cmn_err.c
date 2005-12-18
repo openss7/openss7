@@ -128,7 +128,7 @@ lis_cmn_err_init(void)
 	lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock");
 }
 
-void
+streams_regparms void
 lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	lis_flags_t psw;
@@ -176,7 +176,7 @@ lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
 
 }				/* lis_cmn_err */
 
-void
+streams_regparms void
 lis_cmn_err(int err_lvl, const char *fmt, ...)
 {
 	va_list args;

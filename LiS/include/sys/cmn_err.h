@@ -77,8 +77,9 @@
 #ifdef __LIS_INTERNAL__
 void lis_cmn_err_init(void);		/* not exported */
 #endif
-void lis_vcmn_err(int err_lvl, const char *fmt, va_list args);
-void lis_cmn_err(int err_lvl, const char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+void STREAMS_REGPARMS(lis_vcmn_err(int err_lvl, const char *fmt, va_list args));
+void STREAMS_REGPARMS(lis_cmn_err(int err_lvl, const char *fmt, ...))
+    __attribute__ ((format(printf, 2, 3)));
 
 #define	cmn_err		lis_cmn_err
 #define vcmn_err	lis_vcmn_err

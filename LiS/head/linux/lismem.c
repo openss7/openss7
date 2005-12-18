@@ -230,7 +230,7 @@ find_entry(void *addr)
 	return (NULL);		/* could not find it */
 }
 
-void *
+streams_regparms void *
 lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 {
 	void *a;
@@ -282,19 +282,19 @@ lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 
 }				/* lis_get_free_pages_fcn */
 
-void *
+streams_regparms void *
 lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line)
 {
 	return (lis_get_free_pages_fcn(nbytes, GFP_ATOMIC, file, line));
 }
 
-void *
+streams_regparms void *
 lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line)
 {
 	return (lis_get_free_pages_fcn(nbytes, GFP_KERNEL, file, line));
 }
 
-void *
+streams_regparms void *
 lis_free_pages_fcn(void *ptr, char *file, int line)
 {
 	contig_memlink_t *mp;
@@ -461,25 +461,25 @@ lis__kfree(void *ptr)
 *									*
 ************************************************************************/
 
-void *
+streams_regparms void *
 lis_alloc_atomic_fcn(int nbytes, char *file, int line)
 {
 	return (lis_malloc(nbytes, GFP_ATOMIC, 0, file, line));
 }
 
-void *
+streams_regparms void *
 lis_alloc_kernel_fcn(int nbytes, char *file, int line)
 {
 	return (lis_malloc(nbytes, GFP_KERNEL, 0, file, line));
 }
 
-void *
+streams_regparms void *
 lis_alloc_dma_fcn(int nbytes, char *file, int line)
 {
 	return (lis_malloc(nbytes, GFP_DMA, 0, file, line));
 }
 
-void *
+streams_regparms void *
 lis_free_mem_fcn(void *mem_area, char *file, int line)
 {
 	lis_free(mem_area, file, line);
