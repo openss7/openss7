@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/13 12:01:14 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/07/18 11:51:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/07/18 11:51:23 $"
 
 /*
  *  fifo.c - FIFO pseudo-driver
@@ -152,8 +152,8 @@ static int fifo_initialized = 0;
 /*
  *  function prototypes
  */
-static int fifo_open(queue_t *, dev_t *, int, int, cred_t *);
-static int fifo_close(queue_t *, int, cred_t *);
+static int STREAMS_REGPARMS(fifo_open(queue_t *, dev_t *, int, int, cred_t *));
+static int STREAMS_REGPARMS(fifo_close(queue_t *, int, cred_t *));
 
 /*
  *  module structure
@@ -288,7 +288,7 @@ fifo_free(int idx)
 /*
  *  open
  */
-static int
+static streams_regparms int
 fifo_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	int m;
@@ -360,7 +360,7 @@ fifo_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
  *
  *  Pipe linkage is disassembled by lis_qdetach.
  */
-static int
+static streams_regparms int
 fifo_close(queue_t *q, int flag, cred_t *credp)
 {
 	fifo_dev_t *fdp = (fifo_dev_t *) q->q_ptr;

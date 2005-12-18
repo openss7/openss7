@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/18 06:37:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:26:27 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/18 06:37:52 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/18 06:37:52 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/12 12:26:27 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/18 06:37:52 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -146,7 +146,7 @@ STATIC struct module_info bufmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
-STATIC int
+STATIC streams_regparms int
 bufmod_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
@@ -171,7 +171,7 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_regparms int
 bufmod_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
@@ -195,7 +195,7 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streams_regparms int
 bufmod_srv(queue_t *q)
 {
 	mblk_t *mp;
@@ -218,7 +218,7 @@ bufmod_srv(queue_t *q)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streams_regparms int
 bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -237,7 +237,7 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-STATIC int
+STATIC streams_regparms int
 bufmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;

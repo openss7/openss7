@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:14 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/07/18 11:51:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/07/18 11:51:23 $"
 
 /*
  *  pipemod.c - "pipemod" module
@@ -95,9 +95,9 @@
 /*
  *  function prototypes
  */
-static int pipemod_open(queue_t *, dev_t *, int, int, cred_t *);
-static int pipemod_close(queue_t *, int, cred_t *);
-static int pipemod_put(queue_t *, mblk_t *);
+static int STREAMS_REGPARMS(pipemod_open(queue_t *, dev_t *, int, int, cred_t *));
+static int STREAMS_REGPARMS(pipemod_close(queue_t *, int, cred_t *));
+static int STREAMS_REGPARMS(pipemod_put(queue_t *, mblk_t *));
 
 static void flush_module(queue_t *, mblk_t *);
 
@@ -143,7 +143,7 @@ struct streamtab pipemod_info = {
 /*
  *  open
  */
-static int
+static streams_regparms int
 pipemod_open(q, devp, flag, sflag, credp)
 	queue_t *q;
 	dev_t *devp;
@@ -171,7 +171,7 @@ pipemod_open(q, devp, flag, sflag, credp)
 /*
  *  close
  */
-static int
+static streams_regparms int
 pipemod_close(q, flag, credp)
 	queue_t *q;
 	int flag;
@@ -227,7 +227,7 @@ flush_module(q, mp)
 /*
  *  put
  */
-static int
+static streams_regparms int
 pipemod_put(q, mp)
 	queue_t *q;
 	mblk_t *mp;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/13 12:01:15 $
+ @(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/07/18 11:51:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/13 12:01:15 $"
+#ident "@(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/07/18 11:51:24 $"
 
 /************************************************************************
 *                     Multi-Threaded Test Driver                        *
@@ -88,11 +88,11 @@ static struct module_info mtdrv_minfo = {
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int mtdrv_open(queue_t *, dev_t *, int, int, cred_t *);
-static int mtdrv_close(queue_t *, int, cred_t *);
-static int mtdrv_wput(queue_t *, mblk_t *);
-static int mtdrv_wsrv(queue_t *);
-static int mtdrv_rsrv(queue_t *);
+static int STREAMS_REGPARMS(mtdrv_open(queue_t *, dev_t *, int, int, cred_t *));
+static int STREAMS_REGPARMS(mtdrv_close(queue_t *, int, cred_t *));
+static int STREAMS_REGPARMS(mtdrv_wput(queue_t *, mblk_t *));
+static int STREAMS_REGPARMS(mtdrv_wsrv(queue_t *));
+static int STREAMS_REGPARMS(mtdrv_rsrv(queue_t *));
 
 /* qinit structures (rd and wr side) 
  */
@@ -200,7 +200,7 @@ mtdrv_term(void)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 mtdrv_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	int dev;
@@ -328,7 +328,7 @@ mtdrv_ioctl(queue_t *q, mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 mtdrv_wput(queue_t *q, mblk_t *mp)
 {
 
@@ -358,7 +358,7 @@ mtdrv_wput(queue_t *q, mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 mtdrv_wsrv(queue_t *q)
 {
 	return (0);
@@ -366,7 +366,7 @@ mtdrv_wsrv(queue_t *q)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 mtdrv_rsrv(queue_t *q)
 {
 	return (0);
@@ -374,7 +374,7 @@ mtdrv_rsrv(queue_t *q)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 mtdrv_close(queue_t *q, int dummy, cred_t *credp)
 {
 	char *devp = (char *) q->q_ptr;

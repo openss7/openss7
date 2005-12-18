@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $
+ @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/18 11:51:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/18 11:51:23 $"
 
 /*                               -*- Mode: C -*- 
  * relay.c --- A simple relay pushable module
  * Author          : Dave Grothe
  * Created On      : Dec 30, 1995
  * Last Modified By: Dave Grothe
- * RCS Id          : $Id: relay.c,v 1.1.1.3.4.3 2005/07/13 12:01:14 brian Exp $
+ * RCS Id          : $Id: relay.c,v 1.1.1.3.4.4 2005/07/18 11:51:23 brian Exp $
  * Purpose         : relay messages just to test pushable modules
  * ----------------______________________________________________
  *
@@ -109,10 +109,10 @@ static struct module_info relay3_minfo = {
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int relay_open(queue_t *, dev_t *, int, int, cred_t *);
-static int relay_close(queue_t *, int, cred_t *);
-static int relay_wput(queue_t *, mblk_t *);
-static int relay_rput(queue_t *, mblk_t *);
+static int STREAMS_REGPARMS(relay_open(queue_t *, dev_t *, int, int, cred_t *));
+static int STREAMS_REGPARMS(relay_close(queue_t *, int, cred_t *));
+static int STREAMS_REGPARMS(relay_wput(queue_t *, mblk_t *));
+static int STREAMS_REGPARMS(relay_rput(queue_t *, mblk_t *));
 
 #if 0
 static int relay_wsrv(queue_t *);
@@ -215,7 +215,7 @@ struct streamtab relay3_info = {
 /*  -------------------------------------------------------------------  */
 /*				relay_open				 */
 /*  -------------------------------------------------------------------  */
-static int
+static streams_regparms int
 relay_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	printk("relay_open(dev=0x%x, flag=0x%x, sflag=0x%x)\n", DEV_TO_INT(*devp), flag, sflag);
@@ -230,7 +230,7 @@ relay_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 /*				relay_wput				 */
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 relay_wput(queue_t *q, mblk_t *mp)
 {
 	lis_print_msg(mp, "relay_wput", PRINT_DATA_RDWR);
@@ -242,7 +242,7 @@ relay_wput(queue_t *q, mblk_t *mp)
 /*				relay_rput				 */
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 relay_rput(queue_t *q, mblk_t *mp)
 {
 	lis_print_msg(mp, "relay_rput", PRINT_DATA_RDWR);
@@ -280,7 +280,7 @@ relay_rsrv(queue_t *q)
 /*				relay_close				 */
 /*  -------------------------------------------------------------------  */
 
-static int
+static streams_regparms int
 relay_close(queue_t *q, int dummy, cred_t *credp)
 {
 	printk("relay_close\n");

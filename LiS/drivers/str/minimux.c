@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $
+ @(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/10/23 05:01:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
+ Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/10/23 05:01:26 $"
 
 /************************************************************************
 *                      Miniature Multiplexor                            *
@@ -146,16 +146,16 @@ static struct module_info mmux_minfo = {
 /*
  * Driver entry points -- upper
  */
-static int mmux_open(queue_t *, dev_t *, int, int, cred_t *);
-static int mmux_close(queue_t *, int, cred_t *);
-static int mmux_wput(queue_t *, mblk_t *);
-static int mmux_rsrv(queue_t *);
+static int STREAMS_REGPARMS(mmux_open(queue_t *, dev_t *, int, int, cred_t *));
+static int STREAMS_REGPARMS(mmux_close(queue_t *, int, cred_t *));
+static int STREAMS_REGPARMS(mmux_wput(queue_t *, mblk_t *));
+static int STREAMS_REGPARMS(mmux_rsrv(queue_t *));
 
 /*
  * Driver entry points -- lower
  */
-static int mmux_lrput(queue_t *, mblk_t *);
-static int mmux_lwsrv(queue_t *);
+static int STREAMS_REGPARMS(mmux_lrput(queue_t *, mblk_t *));
+static int STREAMS_REGPARMS(mmux_lwsrv(queue_t *));
 
 /*
  * qinit structures (rd and wr side, upper) 
@@ -252,7 +252,7 @@ new_mux(void)
 * Open routine for the multiplexor.					*
 *									*
 ************************************************************************/
-static int
+static streams_regparms int
 mmux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	mmux_tbl_t *muxp;
@@ -452,7 +452,7 @@ mmux_ioctl(mmux_tbl_t * muxp, mblk_t *mp)
 * Upper wput routine.							*
 *									*
 ************************************************************************/
-static int
+static streams_regparms int
 mmux_wput(queue_t *q, mblk_t *mp)
 {
 	queue_t *fwdq;
@@ -555,7 +555,7 @@ mmux_wsrv(queue_t *q)
 * Upper read service procedure.						*
 *									*
 ************************************************************************/
-static int
+static streams_regparms int
 mmux_rsrv(queue_t *q)
 {
 	mmux_messenger_service(q);
@@ -570,7 +570,7 @@ mmux_rsrv(queue_t *q)
 * Close routine.							*
 *									*
 ************************************************************************/
-static int
+static streams_regparms int
 mmux_close(queue_t *q, int dummy, cred_t *credp)
 {
 	mmux_tbl_t *muxp;
@@ -621,7 +621,7 @@ mmux_close(queue_t *q, int dummy, cred_t *credp)
 * Lower read put procedure.  Receives messages from driver below.	*
 *									*
 ************************************************************************/
-static int
+static streams_regparms int
 mmux_lrput(queue_t *q, mblk_t *mp)
 {
 	queue_t *fwdq;
@@ -685,7 +685,7 @@ mmux_lrput(queue_t *q, mblk_t *mp)
 * Lower write service routine.						*
 *									*
 ************************************************************************/
-static int
+static streams_regparms int
 mmux_lwsrv(queue_t *q)
 {
 	mmux_messenger_service(q);
