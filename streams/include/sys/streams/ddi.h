@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.31 2005/12/10 11:33:57 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.32 2005/12/19 03:23:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 11:33:57 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/10 11:33:57 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/19 03:23:36 $"
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -198,60 +198,8 @@ max(int a, int b)
 
 extern int sysctl_str_strmsgsz;
 
-__STRUTIL_EXTERN_INLINE int
-drv_getparm(const unsigned int parm, void *value_p)
-{
-	switch (parm) {
-	case LBOLT:
-		*(unsigned long *) value_p = jiffies;
-		return (0);
-	case PPGP:
-#if defined HAVE_KFUNC_PROCESS_GROUP
-		*(pid_t *) value_p = process_group(current);
-#else
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
-		*(pid_t *) value_p = current->pgrp;
-#else
-		*(pid_t *) value_p = current->signal->pgrp;
-#endif
-#endif
-		return (0);
-	case UPROCP:
-		*(ulong *) value_p = (ulong) current->files;
-		return (0);
-	case PPID:
-		*(pid_t *) value_p = current->pid;
-		return (0);
-	case PSID:
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
-		*(pid_t *) value_p = current->session;
-#else
-		*(pid_t *) value_p = current->signal->session;
-#endif
-		return (0);
-	case TIME:
-	{
-		struct timeval tv;
+extern int drv_getparm(const unsigned int parm, void *value_p);
 
-		do_gettimeofday(&tv);
-		*(time_t *) value_p = tv.tv_sec;
-		return (0);
-	}
-	case UCRED:
-		*(cred_t **) value_p = current_creds;
-		return (0);
-	case STRMSGSIZE:
-		*(int *) value_p = sysctl_str_strmsgsz;
-		return (0);
-	case HW_PROVIDER:
-		*(char **) value_p = "Linux " UTS_RELEASE " " UTS_VERSION;
-		return (0);
-	case DRV_MAXBIOSIZE:
-	case SYSCRED:
-		return (-1);
-	}
-	return (-1);
-}
 __STRUTIL_EXTERN_INLINE int
 drv_priv(cred_t *crp)
 {
@@ -268,7 +216,7 @@ drv_usecwait(unsigned long usec)
 __STRUTIL_EXTERN_INLINE void
 delay(unsigned long ticks)
 {
-	set_current_state(TASK_INTERRUPTIBLE);
+	set_current_state(TASK_UNINTERRUPTIBLE);
 	while ((ticks = schedule_timeout(ticks))) ;
 	set_current_state(TASK_RUNNING);
 }

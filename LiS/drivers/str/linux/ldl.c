@@ -350,6 +350,7 @@ STATIC int sap_n_alloc = 0;
 STATIC int ndev_n_alloc = 0;
 
 STATIC char *ldl_pkt_type(unsigned saptype);
+
 STATIC int _RP dl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int _RP dl_close(queue_t *, int, cred_t *);
 STATIC int _RP dl_rsrv(queue_t *);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: share.h,v 1.1.1.2.4.3 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -56,7 +56,7 @@
  * Last Modified By: Francisco J. Ballesteros
  * Last Modified On: Fri Sep 29 17:33:41 1995
  * Update Count    : 6
- * RCS Id          : $Id: share.h,v 1.6 1996/01/27 00:40:29 dave Exp $
+ * RCS Id          : $Id: share.h,v 1.1.1.2.4.3 2005/12/18 05:41:24 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) Unknown, Use with caution!
@@ -76,7 +76,7 @@
 #ifndef _SHARE_H
 #define _SHARE_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: share.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -116,9 +116,9 @@ enum { STR_ERR = 0, STR_OK = 1 };
 
 #ifdef __KERNEL__
 /* extract values from a char pointer and advance the pointer */
-int STREAMS_REGPARMS(lis_getint(unsigned char **p));	/* msg.c */
+int _RP lis_getint(unsigned char **p);	/* msg.c */
 
-void STREAMS_REGPARMS(lis_putbyte(unsigned char **p, unsigned char byte));	/* msg.c */
+void _RP lis_putbyte(unsigned char **p, unsigned char byte);	/* msg.c */
 
 #if 0
 void lis_bzero(void *ptr, int cnt);	/* head.c */

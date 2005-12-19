@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 1.1.2.4  2005/12/19 03:22:18  brian
+ - wend for simple _RP
+
  Revision 1.1.2.3  2005/12/18 06:37:53  brian
  - corrections for binary compatiblity
 
@@ -80,9 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $";
+static char const ident[] =
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -104,7 +108,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -177,7 +181,7 @@ static struct module_info testmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
-static streams_regparms int
+static int _RP
 testmod_rput(queue_t *q, mblk_t *mp)
 {
 	/* we don't queue so we don't need to worry about M_FLUSH */
@@ -221,7 +225,7 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 }
 #endif
 
-static streams_regparms int
+static int _RP
 testmod_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -502,7 +506,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static streams_regparms int
+static int _RP
 testmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -520,7 +524,7 @@ testmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-static streams_regparms int
+static int _RP
 testmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;

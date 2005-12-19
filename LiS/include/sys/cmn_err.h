@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/04/12 22:45:21 $
+ @(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 05:41:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -55,7 +55,7 @@
  * Author          : Francisco J. Ballesteros, David Grothe
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: cmn_err.h,v 1.1.1.2.4.3 2005/04/12 22:45:21 brian Exp $
+ * RCS Id          : $Id: cmn_err.h,v 1.1.1.2.4.7 2005/12/18 05:41:24 brian Exp $
  *
  * Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
@@ -63,7 +63,7 @@
 #ifndef _CMD_ERR_H
 #define _CMD_ERR_H 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/04/12 22:45:21 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 05:41:24 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -77,9 +77,9 @@
 #ifdef __LIS_INTERNAL__
 void lis_cmn_err_init(void);		/* not exported */
 #endif
-void STREAMS_REGPARMS(lis_vcmn_err(int err_lvl, const char *fmt, va_list args));
-void STREAMS_REGPARMS(lis_cmn_err(int err_lvl, const char *fmt, ...))
-    __attribute__ ((format(printf, 2, 3)));
+void _RP lis_vcmn_err(int err_lvl, const char *fmt, va_list args);
+void _RP lis_cmn_err(int err_lvl, const char *fmt, ...)
+    __attribute__ ((__format__(__printf__, 2, 3)));
 
 #define	cmn_err		lis_cmn_err
 #define vcmn_err	lis_vcmn_err

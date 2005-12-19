@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/18 06:37:53 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -247,7 +247,7 @@ testcase_10(struct iocblk *ioc, mblk_t *dp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_regparms int
+STATIC int _RP
 nullmod_wput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -310,7 +310,7 @@ nullmod_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_regparms int
+STATIC int _RP
 nullmod_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
@@ -324,7 +324,7 @@ nullmod_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC streams_regparms int
+STATIC int _RP
 nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -343,7 +343,7 @@ nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-STATIC streams_regparms int
+STATIC int _RP
 nullmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
@@ -378,7 +378,6 @@ STATIC struct streamtab nullmod_info = {
 	.st_rdinit = &nullmod_rinit,
 	.st_wrinit = &nullmod_winit,
 };
-
 
 #ifdef MODULE
 STATIC

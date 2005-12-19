@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/09/19 10:26:59 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -135,41 +135,41 @@ MODULE_ALIAS("streams-sdt_tpi");
 #endif				/* MODULE */
 
 STATIC struct module_info sdt_rinfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10,		/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
 STATIC struct module_info sdt_winfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC int sdt_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sdt_close(queue_t *, int, cred_t *);
+STATIC int streamscall sdt_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sdt_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit sdt_rinit = {
-	qi_putp:ss7_oput,		/* Read put (msg from below) */
-	qi_qopen:sdt_open,		/* Each open */
-	qi_qclose:sdt_close,		/* Last close */
-	qi_minfo:&sdt_rinfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Read put (msg from below) */
+	.qi_qopen = sdt_open,		/* Each open */
+	.qi_qclose = sdt_close,		/* Last close */
+	.qi_minfo = &sdt_rinfo,		/* Information */
 };
 
 STATIC struct qinit sdt_winit = {
-	qi_putp:ss7_iput,		/* Write put (msg from above) */
-	qi_minfo:&sdt_winfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Write put (msg from above) */
+	.qi_minfo = &sdt_winfo,		/* Information */
 };
 
 STATIC struct streamtab sdt_tpiinfo = {
-	st_rdinit:&sdt_rinit,		/* Upper read queue */
-	st_wrinit:&sdt_winit,		/* Upper write queue */
+	.st_rdinit = &sdt_rinit,	/* Upper read queue */
+	.st_wrinit = &sdt_winit,	/* Upper write queue */
 };
 
 /*
@@ -4288,7 +4288,7 @@ sdt_r_prim(queue_t *q, mblk_t *mp)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
-STATIC int
+STATIC streamscall int
 sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
@@ -4325,7 +4325,7 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	MOD_DEC_USE_COUNT;
 	return (EIO);
 }
-STATIC int
+STATIC streamscall int
 sdt_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

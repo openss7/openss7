@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/09 18:01:41 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -157,7 +157,7 @@ struct sad {
 	struct str_list sl;
 } sads[2];
 
-static streams_fastcall int
+static streamscall int
 sad_put(queue_t *q, mblk_t *mp)
 {
 	struct sad *sad = q->q_ptr;
@@ -380,7 +380,7 @@ sad_put(queue_t *q, mblk_t *mp)
  /* There are two minors 0 is the /dev/sad/admin driver and 1 is the /dev/sad/user driver.
     Permission for access to the /dev/sad/admin minor is performed by filesystem permission on the
     character device and a check on open. */
-static int
+static streamscall int
 sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	major_t major = getmajor(*devp);
@@ -406,7 +406,7 @@ sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (-ENXIO);
 }
-static int
+static streamscall int
 sad_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct sad *sad = q->q_ptr;
@@ -419,15 +419,15 @@ sad_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit sad_qinit = {
-      qi_putp:sad_put,
-      qi_qopen:sad_open,
-      qi_qclose:sad_close,
-      qi_minfo:&sad_minfo,
+	.qi_putp = sad_put,
+	.qi_qopen = sad_open,
+	.qi_qclose = sad_close,
+	.qi_minfo = &sad_minfo,
 };
 
 static struct streamtab sad_info = {
-      st_rdinit:&sad_qinit,
-      st_wrinit:&sad_qinit,
+	.st_rdinit = &sad_qinit,
+	.st_wrinit = &sad_qinit,
 };
 
 static struct cdevsw sad_cdev = {
@@ -440,15 +440,15 @@ static struct cdevsw sad_cdev = {
 };
 
 static struct devnode sad_node_admin = {
-      n_name:"admin",
-      n_flag:0,
-      n_mode:S_IFCHR | S_IRUSR | S_IWUSR,
+	.n_name = "admin",
+	.n_flag = 0,
+	.n_mode = S_IFCHR | S_IRUSR | S_IWUSR,
 };
 
 static struct devnode sad_node_user = {
-      n_name:"user",
-      n_flag:0,
-      n_mode:S_IFCHR | S_IRUGO | S_IWUGO,
+	.n_name = "user",
+	.n_flag = 0,
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 #ifdef CONFIG_STREAMS_SAD_MODULE

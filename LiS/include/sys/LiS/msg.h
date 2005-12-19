@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: msg.h,v 1.1.1.4.4.4 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msg.h,v 1.3 1996/01/27 00:40:27 dave Exp $
+ * RCS Id          : $Id: msg.h,v 1.1.1.4.4.4 2005/12/18 05:41:24 brian Exp $
  * Purpose         : provide streams message handling
  *                 : this is the main memory allocation related module.
  * ----------------______________________________________________
@@ -69,7 +69,7 @@
 #ifndef _MSG_H
 #define _MSG_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: msg.h,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -185,7 +185,7 @@ typedef msgb_t mblk_t;
  */
 
 typedef struct free_rtn {
-	void (*free_func) (char *);	/* the free() function */
+	void _RP(*free_func) (char *);	/* the free() function */
 	char *free_arg;			/* argument */
 } frtn_t;
 
@@ -263,32 +263,27 @@ extern void lis_terminate_msg(void);
  * allocb_physreq: allocate M_DATA in a memory block with specific
  *      physical characteristics.
  */
-struct msgb
-*STREAMS_REGPARMS(lis_allocb(int size, unsigned int priority, char *file_name, int line_nr));
-struct msgb
-*STREAMS_REGPARMS(lis_allocb_physreq
-		  (int size, unsigned int priority, void *physreq_ptr, char *file_name,
-		   int line_nr));
+struct msgb *_RP lis_allocb(int size, unsigned int priority, char *file_name, int line_nr);
+struct msgb *_RP lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr,
+				    char *file_name, int line_nr);
 
 /* testb: see if an allocation can actually be done.
  *
  */
-extern int STREAMS_REGPARMS(lis_testb(int size, unsigned int priority));
+extern int _RP lis_testb(int size, unsigned int priority);
 
 /*
  * esballoc: allocate a message block, using a user-provided data buffer
  *
  */
-extern mblk_t
-*STREAMS_REGPARMS(lis_esballoc
-		  (unsigned char *base, int size, int priority, frtn_t *freeinfo,
-		   char *file_name, int line_nr));
+extern mblk_t *_RP lis_esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo,
+				char *file_name, int line_nr);
 
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  *
  */
-extern void STREAMS_REGPARMS(lis_freeb(mblk_t *bp));
+extern void _RP lis_freeb(mblk_t *bp);
 
 #ifdef __LIS_INTERNAL__
 extern void lis_freedb(mblk_t *bp, int free_hdr);
@@ -297,7 +292,7 @@ extern void lis_freedb(mblk_t *bp, int free_hdr);
 /* freemsg - free a whole message
  *
  */
-void STREAMS_REGPARMS(lis_freemsg(mblk_t *mp));
+void _RP lis_freemsg(mblk_t *mp);
 
 #endif				/* __KERNEL__ */
 

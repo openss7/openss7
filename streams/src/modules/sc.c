@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/11 05:46:09 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/19 03:23:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 05:46:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/11 05:46:09 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/19 03:23:39 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/11 05:46:09 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/19 03:23:39 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/11 05:46:09 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/19 03:23:39 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -141,7 +141,7 @@ static struct module_info sc_minfo = {
  *  
  *  -------------------------------------------------------------------------
  */
-static streams_fastcall int
+static streamscall int
 sc_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc;
@@ -369,7 +369,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
-static streams_fastcall int
+static streamscall int
 sc_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
@@ -383,7 +383,7 @@ sc_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	if (q->q_ptr)
@@ -400,7 +400,7 @@ sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (-EIO);		/* can't be opened as driver */
 }
-static int
+static streamscall int
 sc_close(queue_t *q, int oflag, cred_t *crp)
 {
 	qprocsoff(q);

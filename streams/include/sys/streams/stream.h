@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.75 2005/12/14 11:43:21 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.76 2005/12/19 03:23:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 11:43:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/12/14 11:43:21 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/12/19 03:23:36 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -164,7 +164,7 @@ typedef unsigned long __streams_dev_t;
  */
 
 typedef struct free_rtn {
-	void (*free_func) (caddr_t);
+	void streamscall (*free_func) (caddr_t);
 	caddr_t free_arg;
 } frtn_t;
 
@@ -406,7 +406,8 @@ typedef struct queue {
 	/* Linux fast-STREAMS specific members */
 	ssize_t q_msgs;			/* messages on queue, Solaris counts mblks, we count msgs */
 	rwlock_t q_lock;		/* lock for this queue structure */
-	int (*q_ftmsg) (mblk_t *);	/* message filter ala AIX */
+	int streamscall (*q_ftmsg) (mblk_t *);	/* message filter ala AIX */
+	struct syncq *q_syncq;		/* synchronization queues */
 #if 0
 	/* these are just a waste of space */
 	struct queue *q_other;		/* LiS, OSF */
@@ -416,11 +417,7 @@ typedef struct queue {
 	/* Solaris has these specific fields following q_bandp */
 	kmutex_t q_lock;
 	struct stdata *q_stream;
-#endif
-#if defined CONFIG_STREAMS_SYNCQS
-	struct syncq *q_syncq;
-#endif
-#if 0
+	struct syncq *q_syncq;		/* synchronization queues */
 	unsigned char q_nband;
 	kcondvar_t q_wait;
 	kcondvar_t q_sync;
@@ -568,11 +565,11 @@ typedef struct module_stat {
 	uint ms_flags;			/* bool stats -- for future use */
 } module_stat_t;
 
-typedef int (*qi_putp_t) STREAMS_FASTCALL((queue_t *, mblk_t *));
-typedef int (*qi_srvp_t) STREAMS_FASTCALL((queue_t *));
-typedef int (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
-typedef int (*qi_qclose_t) (queue_t *, int, cred_t *);
-typedef int (*qi_qadmin_t) (void);
+typedef int streamscall (*qi_putp_t) (queue_t *, mblk_t *);
+typedef int streamscall (*qi_srvp_t) (queue_t *);
+typedef int streamscall (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
+typedef int streamscall (*qi_qclose_t) (queue_t *, int, cred_t *);
+typedef int streamscall (*qi_qadmin_t) (void);
 
 struct qinit {
 	qi_putp_t qi_putp;		/* put procedure */
@@ -872,15 +869,15 @@ struct strlp {
 };
 
 struct wantio {
-	unsigned int (*poll) (struct file *, struct poll_table_struct *);
-	ssize_t (*read) (struct file *, char *, size_t, loff_t *);
-	ssize_t (*write) (struct file *, const char *, size_t, loff_t *);
-	ssize_t (*readv) (struct file *, const struct iovec *, unsigned long, loff_t *);
-	ssize_t (*writev) (struct file *, const struct iovec *, unsigned long, loff_t *);
-	ssize_t (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
-	int (*getpmsg) (struct file *, struct strbuf *, struct strbuf *, int *, int *);
-	int (*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
-	int (*ioctl) (struct file *, unsigned int, unsigned long);
+	unsigned int streamscall (*poll) (struct file *, struct poll_table_struct *);
+	ssize_t streamscall (*read) (struct file *, char *, size_t, loff_t *);
+	ssize_t streamscall (*write) (struct file *, const char *, size_t, loff_t *);
+	ssize_t streamscall (*readv) (struct file *, const struct iovec *, unsigned long, loff_t *);
+	ssize_t streamscall (*writev) (struct file *, const struct iovec *, unsigned long, loff_t *);
+	ssize_t streamscall (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
+	int streamscall (*getpmsg) (struct file *, struct strbuf *, struct strbuf *, int *, int *);
+	int streamscall (*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
+	int streamscall (*ioctl) (struct file *, unsigned int, unsigned long);
 };
 
 /* If you use this structure, you might want to upcall to the stream head functions behind these.
@@ -898,7 +895,7 @@ typedef int bufcall_id_t;
 #define bufcall_id_t bufcall_id_t
 
 typedef void *weld_arg_t;
-typedef void (*weld_fcn_t) (weld_arg_t);
+typedef void streamscall (*weld_fcn_t) (weld_arg_t);
 
 #define ANYBAND (-1)
 
@@ -956,12 +953,12 @@ typedef enum qfields {
 
 /* Message utilities. */
 
-extern int STREAMS_FASTCALL(adjmsg(mblk_t *mp, ssize_t length));
+extern int STREAMS_FASTCALL(adjmsg(mblk_t *mp, register ssize_t length));
 extern mblk_t *STREAMS_FASTCALL(allocb(size_t size, unsigned int priority));
-extern mblk_t *STREAMS_FASTCALL(copyb(mblk_t *mp));
+extern mblk_t *STREAMS_FASTCALL(copyb(register mblk_t *mp));
 extern void STREAMS_FASTCALL(freeb(mblk_t *bp));
 __STRUTIL_EXTERN_INLINE void STREAMS_FASTCALL(freemsg(mblk_t *mp));
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(copymsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(copymsg(register mblk_t *mp));
 extern int STREAMS_FASTCALL(ctlmsg(unsigned char type));
 extern int STREAMS_FASTCALL(datamsg(unsigned char type));
 extern mblk_t *STREAMS_FASTCALL(dupb(mblk_t *mp));
@@ -969,60 +966,60 @@ __STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(dupmsg(mblk_t *mp));
 extern mblk_t *STREAMS_FASTCALL(esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo));
 __STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * db);
 __STRUTIL_EXTERN_INLINE int isdatamsg(mblk_t *mp);
-__STRUTIL_EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
+__STRUTIL_EXTERN_INLINE void linkb(register mblk_t *mp1, register mblk_t *mp2);
 __STRUTIL_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
-__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgdsize(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgdsize(register mblk_t *mp));
 extern mblk_t *STREAMS_FASTCALL(msgpullup(mblk_t *mp, ssize_t length));
 __STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgsize(mblk_t *mp));
 __STRUTIL_EXTERN_INLINE int pcmsg(unsigned char type);
-extern int STREAMS_FASTCALL(pullupmsg(mblk_t *mp, ssize_t len));
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(rmvb(mblk_t *mp, mblk_t *bp));
-extern int STREAMS_FASTCALL(testb(size_t size, unsigned int priority));
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(unlinkb(mblk_t *mp));
+extern int STREAMS_FASTCALL(pullupmsg(mblk_t *mp, register ssize_t len));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(rmvb(register mblk_t *mp, register mblk_t *bp));
+extern int STREAMS_FASTCALL(testb(register size_t size, unsigned int priority));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(unlinkb(register mblk_t *mp));
 extern size_t STREAMS_FASTCALL(xmsgsize(mblk_t *mp));
 
-extern bcid_t STREAMS_FASTCALL(bufcall(unsigned size, int priority, void (*function) (long), long arg));
+extern bcid_t STREAMS_FASTCALL(bufcall(unsigned size, int priority, void streamscall (*function) (long), long arg));
 
 extern int STREAMS_FASTCALL(appq(queue_t *q, mblk_t *mp1, mblk_t *mp2));
 extern int STREAMS_FASTCALL(bcanget(queue_t *q, unsigned char band));
 extern int STREAMS_FASTCALL(bcangetany(queue_t *q));
-extern int STREAMS_FASTCALL(bcanput(queue_t *q, unsigned char band));
-extern int STREAMS_FASTCALL(bcanputnext(queue_t *q, unsigned char band));
+extern int STREAMS_FASTCALL(bcanput(register queue_t *q, unsigned char band));
+extern int STREAMS_FASTCALL(bcanputnext(register queue_t *q, unsigned char band));
 extern int STREAMS_FASTCALL(bcanputany(queue_t *q));
 extern int STREAMS_FASTCALL(bcanputnextany(queue_t *q));
-extern int STREAMS_FASTCALL(insq(queue_t *q, mblk_t *emp, mblk_t *mp));
-extern int STREAMS_FASTCALL(putbq(queue_t *q, mblk_t *mp));
-extern int STREAMS_FASTCALL(putq(queue_t *q, mblk_t *mp));
+extern int STREAMS_FASTCALL(insq(register queue_t *q, register mblk_t *emp, register mblk_t *mp));
+extern int STREAMS_FASTCALL(putbq(register queue_t *q, register mblk_t *mp));
+extern int STREAMS_FASTCALL(putq(register queue_t *q, register mblk_t *mp));
 extern int STREAMS_FASTCALL(qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp));
 extern int STREAMS_FASTCALL(qdetach(queue_t *rq, int oflag, cred_t *crp));
 extern int qclose(queue_t *q, int oflag, cred_t *credp);
 extern int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp);
 extern int qready(void);
-extern int strqget(queue_t *q, qfields_t what, unsigned char band, long *val);
-extern int strqset(queue_t *q, qfields_t what, unsigned char band, long val);
+extern int strqget(register queue_t *q, qfields_t what, register unsigned char band, long *val);
+extern int strqset(register queue_t *q, qfields_t what, register unsigned char band, long val);
 extern int weldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
 extern int unweldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
 
-extern mblk_t *STREAMS_FASTCALL(getq(queue_t *q));
+extern mblk_t *STREAMS_FASTCALL(getq(register queue_t *q));
 
 extern modID_t getmid(const char *name);
 extern qi_qadmin_t getadmin(modID_t modid);
 extern queue_t *allocq(void);
 extern ssize_t STREAMS_FASTCALL(qcountstrm(queue_t *q));
 
-extern void STREAMS_FASTCALL(flushband(queue_t *q, int band, int flag));
-extern void STREAMS_FASTCALL(flushq(queue_t *q, int flag));
+extern void STREAMS_FASTCALL(flushband(register queue_t *q, int band, int flag));
+extern void STREAMS_FASTCALL(flushq(register queue_t *q, int flag));
 extern void freeq(queue_t *q);
 extern void STREAMS_FASTCALL(put(queue_t *q, mblk_t *mp));
 extern void STREAMS_FASTCALL(putnext(queue_t *q, mblk_t *mp));
 extern void STREAMS_FASTCALL(qbackenable(queue_t *q, const unsigned char band, const char bands[]));
 extern void qdelete(queue_t *rq);
-extern void STREAMS_FASTCALL(qenable(queue_t *q));
+extern void STREAMS_FASTCALL(qenable(register queue_t *q));
 extern void qinsert(struct stdata *sd, queue_t *rq);
 extern void qprocsoff(queue_t *q);
 extern void qprocson(queue_t *q);
-extern void STREAMS_FASTCALL(unbufcall(bcid_t bcid));
-extern void STREAMS_FASTCALL(rmvq(queue_t *q, mblk_t *mp));
+extern void STREAMS_FASTCALL(unbufcall(register bcid_t bcid));
+extern void STREAMS_FASTCALL(rmvq(register queue_t *q, register mblk_t *mp));
 extern void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 extern void setqsched(void);
 
@@ -1061,7 +1058,7 @@ freemsg(mblk_t *mp)
 }
 
 __STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
-copymsg(mblk_t *mp)
+copymsg(register mblk_t *mp)
 {
 	mblk_t *msg = NULL;
 	register mblk_t *b, **bp = &msg;
@@ -1103,11 +1100,12 @@ isdatamsg(mblk_t *mp)
 }
 
 __STRUTIL_EXTERN_INLINE void
-linkb(mblk_t *mp1, mblk_t *mp2)
+linkb(register mblk_t *mp1, register mblk_t *mp2)
 {
 	register mblk_t **bp;
+	mblk_t *mp = mp1;
 
-	for (bp = &mp1; *bp; bp = &(*bp)->b_cont) ;
+	for (bp = &mp; *bp; bp = &(*bp)->b_cont) ;
 	*bp = mp2;
 }
 
@@ -1122,7 +1120,7 @@ linkmsg(mblk_t *mp1, mblk_t *mp2)
 }
 
 __STRUTIL_EXTERN_INLINE streams_fastcall size_t
-msgdsize(mblk_t *mp)
+msgdsize(register mblk_t *mp)
 {
 	register mblk_t *b;
 	size_t size = 0;
@@ -1153,23 +1151,24 @@ pcmsg(unsigned char type)
 }
 
 __STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
-rmvb(mblk_t *mp, mblk_t *bp)
+rmvb(register mblk_t *mp, register mblk_t *bp)
 {
 	mblk_t **mpp;
+	mblk_t *b;
 
 	if (likely(bp != NULL)) {
-		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
+		for (mpp = &b; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
 		if (likely(*mpp != NULL)) {
 			*mpp = bp->b_cont;
 			bp->b_cont = NULL;
-			return (mp);
+			return (b);
 		}
 	}
 	return ((mblk_t *) (-1));
 }
 
 __STRUTIL_EXTERN_INLINE streams_fastcall mblk_t *
-unlinkb(mblk_t *mp)
+unlinkb(register mblk_t *mp)
 {
 	mblk_t *b;
 
@@ -1207,14 +1206,14 @@ canput(queue_t *q)
 }
 
 __STRUTIL_EXTERN_INLINE int
-canputnext(queue_t *q)
+canputnext(register queue_t *q)
 {
 	dassert(q);
 	return bcanputnext(q, 0);
 }
 
 __STRSCHD_EXTERN_INLINE bcid_t
-esbbcall(int priority, void (*function) (long), long arg)
+esbbcall(int priority, void streamscall (*function) (long), long arg)
 {
 	return bufcall(0, priority, function, arg);
 }
@@ -1277,7 +1276,7 @@ WR(queue_t *q)
 #endif
 
 __STRUTIL_EXTERN_INLINE queue_t *
-backq(queue_t *q)
+backq(register queue_t *q)
 {
 	queue_t *bq;
 
@@ -1286,7 +1285,7 @@ backq(queue_t *q)
 }
 
 __STRUTIL_EXTERN_INLINE ssize_t
-qsize(queue_t *q)
+qsize(register queue_t *q)
 {
 	dassert(q);
 	return (q->q_msgs);
@@ -1296,7 +1295,7 @@ extern void enableok(queue_t *q);
 extern void noenable(queue_t *q);
 
 __STRUTIL_EXTERN_INLINE void
-qreply(queue_t *q, mblk_t *mp)
+qreply(register queue_t *q, mblk_t *mp)
 {
 	queue_t *oq;
 
@@ -1312,7 +1311,7 @@ qreply(queue_t *q, mblk_t *mp)
 }
 
 #undef timo_fcn_t
-typedef void timo_fcn_t (caddr_t arg);
+typedef void streamscall timo_fcn_t (caddr_t arg);
 
 #define timo_fcn_t timo_fcn_t
 #undef toid_t

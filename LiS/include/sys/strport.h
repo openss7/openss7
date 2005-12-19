@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strport.h,v 1.1.1.3.4.3 2005/07/13 12:01:19 brian Exp $
+ @(#) $Id: strport.h,v 1.1.1.3.4.4 2005/12/18 06:38:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:38:14 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -53,7 +53,7 @@
  * <strport.h> --- Linux STREAMS portability declarations. 
  * Author          : gram & nemo
  * Created On      : Fri Mar 24 2:40:21 1995
- * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.3 2005/07/13 12:01:19 brian Exp $
+ * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.4 2005/12/18 06:38:14 brian Exp $
  * Last Modified By: David Grothe
  * Restrictions    : SHAREd items can be read/writen by usr
  *                 : EXPORTed items can only be read by usr
@@ -73,7 +73,7 @@
 #ifndef _STRPORT_H
 #define _STRPORT_H
 
-#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:19 $"
+#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/12/18 06:38:14 $"
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -180,8 +180,8 @@ typedef unsigned int uintptr_t;
 #ifdef __LIS_INTERNAL__
 extern char *lis_errmsg(int lvl);
 #endif
-extern void *STREAMS_REGPARMS(lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr));
-extern void STREAMS_REGPARMS(lis_free(void *ptr, char *file_name, int line_nr));
+extern void *_RP lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr);
+extern void _RP lis_free(void *ptr, char *file_name, int line_nr);
 #endif				/* __KERNEL__ */
 
 #endif				/* _STRPORT_H */

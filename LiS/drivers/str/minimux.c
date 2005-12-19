@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/10/23 05:01:26 $
+ @(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.8 $) $Date: 2005/12/18 06:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/23 05:01:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/10/23 05:01:26 $"
+#ident "@(#) $RCSfile: minimux.c,v $ $Name:  $($Revision: 1.1.1.2.4.8 $) $Date: 2005/12/18 06:37:53 $"
 
 /************************************************************************
 *                      Miniature Multiplexor                            *
@@ -125,7 +125,7 @@ typedef struct mmux_tbl {
 mmux_tbl_t *mmux_head;			/* head of mux tbl entry thread */
 
 #define	MAXMUX		100	/* max number of minors open */
-int mmux_minors[MAXMUX];			/* index by minor, in-use flags */
+int mmux_minors[MAXMUX];		/* index by minor, in-use flags */
 
 /************************************************************************
 *                         Streamtab Structure                           *
@@ -146,16 +146,16 @@ static struct module_info mmux_minfo = {
 /*
  * Driver entry points -- upper
  */
-static int STREAMS_REGPARMS(mmux_open(queue_t *, dev_t *, int, int, cred_t *));
-static int STREAMS_REGPARMS(mmux_close(queue_t *, int, cred_t *));
-static int STREAMS_REGPARMS(mmux_wput(queue_t *, mblk_t *));
-static int STREAMS_REGPARMS(mmux_rsrv(queue_t *));
+static int _RP mmux_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP mmux_close(queue_t *, int, cred_t *);
+static int _RP mmux_wput(queue_t *, mblk_t *);
+static int _RP mmux_rsrv(queue_t *);
 
 /*
  * Driver entry points -- lower
  */
-static int STREAMS_REGPARMS(mmux_lrput(queue_t *, mblk_t *));
-static int STREAMS_REGPARMS(mmux_lwsrv(queue_t *));
+static int _RP mmux_lrput(queue_t *, mblk_t *);
+static int _RP mmux_lwsrv(queue_t *);
 
 /*
  * qinit structures (rd and wr side, upper) 
@@ -252,7 +252,7 @@ new_mux(void)
 * Open routine for the multiplexor.					*
 *									*
 ************************************************************************/
-static streams_regparms int
+static int _RP
 mmux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	mmux_tbl_t *muxp;
@@ -452,7 +452,7 @@ mmux_ioctl(mmux_tbl_t * muxp, mblk_t *mp)
 * Upper wput routine.							*
 *									*
 ************************************************************************/
-static streams_regparms int
+static int _RP
 mmux_wput(queue_t *q, mblk_t *mp)
 {
 	queue_t *fwdq;
@@ -555,7 +555,7 @@ mmux_wsrv(queue_t *q)
 * Upper read service procedure.						*
 *									*
 ************************************************************************/
-static streams_regparms int
+static int _RP
 mmux_rsrv(queue_t *q)
 {
 	mmux_messenger_service(q);
@@ -570,7 +570,7 @@ mmux_rsrv(queue_t *q)
 * Close routine.							*
 *									*
 ************************************************************************/
-static streams_regparms int
+static int _RP
 mmux_close(queue_t *q, int dummy, cred_t *credp)
 {
 	mmux_tbl_t *muxp;
@@ -621,7 +621,7 @@ mmux_close(queue_t *q, int dummy, cred_t *credp)
 * Lower read put procedure.  Receives messages from driver below.	*
 *									*
 ************************************************************************/
-static streams_regparms int
+static int _RP
 mmux_lrput(queue_t *q, mblk_t *mp)
 {
 	queue_t *fwdq;
@@ -685,7 +685,7 @@ mmux_lrput(queue_t *q, mblk_t *mp)
 * Lower write service routine.						*
 *									*
 ************************************************************************/
-static streams_regparms int
+static int _RP
 mmux_lwsrv(queue_t *q)
 {
 	mmux_messenger_service(q);

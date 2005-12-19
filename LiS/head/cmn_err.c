@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cmn_err.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/04/12 22:44:59 $
+ @(#) $RCSfile: cmn_err.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/12/18 05:41:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:44:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cmn_err.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/04/12 22:44:59 $"
+#ident "@(#) $RCSfile: cmn_err.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/12/18 05:41:23 $"
 
 /************************************************************************
 *                           cmn_err                                     *
@@ -128,7 +128,7 @@ lis_cmn_err_init(void)
 	lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock");
 }
 
-streams_regparms void
+void _RP
 lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	lis_flags_t psw;
@@ -176,7 +176,7 @@ lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
 
 }				/* lis_cmn_err */
 
-streams_regparms void
+void _RP
 lis_cmn_err(int err_lvl, const char *fmt, ...)
 {
 	va_list args;

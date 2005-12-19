@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:27:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/09/19 10:27:00 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -142,8 +142,8 @@ STATIC struct module_info xp_minfo = {
 
 STATIC struct module_stat xp_mstat = { 0, };
 
-STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int xp_close(queue_t *, int, cred_t *);
+STATIC int streamscall xp_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
 	.qi_putp = ss7_oput,		/* Read put (message from below) */
@@ -9162,7 +9162,7 @@ STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
-STATIC int
+STATIC streamscall int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -9225,7 +9225,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
-STATIC int
+STATIC streamscall int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);

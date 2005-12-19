@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lispci.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:19 $
+ @(#) $RCSfile: lispci.h,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/18 05:41:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -65,7 +65,7 @@
 #ifndef SYS_LISPCI_H
 #define SYS_LISPCI_H	1
 
-#ident "@(#) $RCSfile: lispci.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:19 $"
+#ident "@(#) $RCSfile: lispci.h,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/18 05:41:24 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -129,34 +129,25 @@ typedef struct lis_pci_dev {
 *									*
 ************************************************************************/
 
-lis_pci_dev_t *STREAMS_REGPARMS(lis_pci_find_device(unsigned vendor, unsigned device,
-						    lis_pci_dev_t *previous_struct));
+lis_pci_dev_t *_RP lis_pci_find_device(unsigned vendor, unsigned device,
+				       lis_pci_dev_t *previous_struct);
 
 #ifdef HAVE_KFUNC_PCI_FIND_CLASS
 #ifdef __LIS_INTERNAL__
-lis_pci_dev_t *STREAMS_REGPARMS(lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct));
+lis_pci_dev_t *_RP lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct);
 #endif
 #endif
-lis_pci_dev_t *STREAMS_REGPARMS(lis_pci_find_slot(unsigned bus, unsigned dev_fcn));
+lis_pci_dev_t *_RP lis_pci_find_slot(unsigned bus, unsigned dev_fcn);
 
-int
- STREAMS_REGPARMS(lis_pci_read_config_byte
-		  (lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val));
-int
- STREAMS_REGPARMS(lis_pci_read_config_word
-		  (lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val));
-int
- STREAMS_REGPARMS(lis_pci_read_config_dword
-		  (lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val));
-int
- STREAMS_REGPARMS(lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val));
-int
- STREAMS_REGPARMS(lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val));
-int
- STREAMS_REGPARMS(lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val));
-void STREAMS_REGPARMS(lis_pci_set_master(lis_pci_dev_t *dev));
-int STREAMS_REGPARMS(lis_pci_enable_device(lis_pci_dev_t *dev));
-void STREAMS_REGPARMS(lis_pci_disable_device(lis_pci_dev_t *dev));
+int _RP lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val);
+int _RP lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val);
+int _RP lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val);
+int _RP lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val);
+int _RP lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val);
+int _RP lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val);
+void _RP lis_pci_set_master(lis_pci_dev_t *dev);
+int _RP lis_pci_enable_device(lis_pci_dev_t *dev);
+void _RP lis_pci_disable_device(lis_pci_dev_t *dev);
 
 /*
  * Internal routine, not to be called by user
@@ -190,31 +181,28 @@ typedef struct lis_dma_addr {
  * Allocate 'size' bytes and return the CPU pointer to it via return value.
  * Return the DMA address via 'dma_handle'.
  */
-void *STREAMS_REGPARMS(lis_pci_alloc_consistent
-		       (lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_handle));
+void *_RP lis_pci_alloc_consistent(lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_handle);
 
 /*
  * Deallocate memory allocated above.  'vaddr' is the address returned
  * by alloc_consistent.  'dma_handle' points to the DMA handle structure
  * returned by the allocate routine.
  */
-void *STREAMS_REGPARMS(lis_pci_free_consistent(lis_dma_addr_t * dma_handle));
+void *_RP lis_pci_free_consistent(lis_dma_addr_t * dma_handle);
 
-u32 STREAMS_REGPARMS(lis_pci_dma_handle_to_32(lis_dma_addr_t * dma_handle));
-u64 STREAMS_REGPARMS(lis_pci_dma_handle_to_64(lis_dma_addr_t * dma_handle));
+u32 _RP lis_pci_dma_handle_to_32(lis_dma_addr_t * dma_handle);
+u64 _RP lis_pci_dma_handle_to_64(lis_dma_addr_t * dma_handle);
 
-void
- STREAMS_REGPARMS(lis_pci_map_single
-		  (lis_pci_dev_t *dev, void *ptr, size_t size, lis_dma_addr_t * dma_handle,
-		   int direction));
+void _RP lis_pci_map_single(lis_pci_dev_t *dev, void *ptr, size_t size, lis_dma_addr_t * dma_handle,
+			    int direction);
 
-void *STREAMS_REGPARMS(lis_pci_unmap_single(lis_dma_addr_t * dma_handle));
+void *_RP lis_pci_unmap_single(lis_dma_addr_t * dma_handle);
 
 /*
  * Miscellaneous
  */
-int STREAMS_REGPARMS(lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask));
-int STREAMS_REGPARMS(lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask));
+int _RP lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
+int _RP lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
 
 /************************************************************************
 *                       DMA Synchronization                             *
@@ -230,8 +218,7 @@ int STREAMS_REGPARMS(lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask));
 
 #ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 #ifdef __LIS_INTERNAL__
-void
- STREAMS_REGPARMS(lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size, int direction));
+void _RP lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size, int direction);
 #endif
 #endif
 
@@ -244,6 +231,6 @@ void
 *									*
 ************************************************************************/
 
-void STREAMS_REGPARMS(lis_membar(void));
+void _RP lis_membar(void);
 
 #endif				/* SYS_LISPCI_H from top of file */

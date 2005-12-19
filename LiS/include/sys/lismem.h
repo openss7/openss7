@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: lismem.h,v 1.1.1.2.4.4 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -66,7 +66,7 @@
 #ifndef SYS_LISMEM_H
 #define SYS_LISMEM_H	1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lismem.h,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2005/12/18 05:41:24 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -79,14 +79,14 @@
  * value for the convenience of constructs such as ptr = lis_free_mem(ptr).
  * Also, the mem_area argument to lis_free_mem can be NULL.
  */
-void *STREAMS_REGPARMS(lis_alloc_atomic_fcn(int nbytes, char *file, int line));
-void *STREAMS_REGPARMS(lis_alloc_kernel_fcn(int nbytes, char *file, int line));
-void *STREAMS_REGPARMS(lis_alloc_dma_fcn(int nbytes, char *file, int line));
-void *STREAMS_REGPARMS(lis_free_mem_fcn(void *mem_area, char *file, int line));
-void *STREAMS_REGPARMS(lis_get_free_pages_fcn(int nbytes, int class, char *file, int line));
-void *STREAMS_REGPARMS(lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line));
-void *STREAMS_REGPARMS(lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line));
-void *STREAMS_REGPARMS(lis_free_pages_fcn(void *ptr, char *file, int line));
+void *_RP lis_alloc_atomic_fcn(int nbytes, char *file, int line);
+void *_RP lis_alloc_kernel_fcn(int nbytes, char *file, int line);
+void *_RP lis_alloc_dma_fcn(int nbytes, char *file, int line);
+void *_RP lis_free_mem_fcn(void *mem_area, char *file, int line);
+void *_RP lis_get_free_pages_fcn(int nbytes, int class, char *file, int line);
+void *_RP lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line);
+void *_RP lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line);
+void *_RP lis_free_pages_fcn(void *ptr, char *file, int line);
 
 #ifdef __LIS_INTERNAL__
 void lis_free_all_pages(void);		/* internal cleanup routine */

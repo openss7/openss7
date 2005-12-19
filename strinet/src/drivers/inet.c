@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:26:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -439,7 +439,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/17 08:39:21 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -584,11 +584,11 @@ STATIC struct module_info ss_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int ss_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int ss_close(queue_t *, int, cred_t *);
+STATIC streamscall int ss_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int ss_close(queue_t *, int, cred_t *);
 
-STATIC int STREAMS_FASTCALL(ss_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(ss_rsrv(queue_t *));
+STATIC streamscall int ss_rput(queue_t *, mblk_t *);
+STATIC streamscall int ss_rsrv(queue_t *);
 
 STATIC struct qinit ss_rinit = {
 	.qi_putp = ss_rput,		/* Read put (msg from below) */
@@ -598,8 +598,8 @@ STATIC struct qinit ss_rinit = {
 	.qi_minfo = &ss_minfo,		/* Information */
 };
 
-STATIC int STREAMS_FASTCALL(ss_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(ss_wsrv(queue_t *));
+STATIC streamscall int ss_wput(queue_t *, mblk_t *);
+STATIC streamscall int ss_wsrv(queue_t *);
 
 STATIC struct qinit ss_winit = {
 	.qi_putp = ss_wput,		/* Write put (msg from above) */
@@ -14944,7 +14944,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN
-			|| p->state == TCP_CLOSE || p->state == TCP_CLOSE_WAIT);
+	       || p->state == TCP_CLOSE || p->state == TCP_CLOSE_WAIT);
 	printd(("%s: %p: sk_data_ready [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
@@ -15356,25 +15356,25 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (rtn);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ss_rput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_r_prim);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ss_rsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_r_prim);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ss_wput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_w_prim);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ss_wsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_w_prim);
@@ -15574,7 +15574,7 @@ STATIC const ss_profile_t ss_profiles[] = {
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
 STATIC int ss_majors[SS__CMAJORS] = { SS__CMAJOR_0, };
-STATIC int
+STATIC streamscall int
 ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0, err;
@@ -15654,7 +15654,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 ss_close(queue_t *q, int flag, cred_t *crp)
 {
 	ss_t *ss = PRIV(q);
@@ -15732,86 +15732,86 @@ STATIC struct cdevsw ss_cdev = {
 
 STATIC struct devnode inet_node_ip = {
 	.n_name = "ip",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_icmp = {
 	.n_name = "icmp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_ggp = {
 	.n_name = "ggp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_ipip = {
 	.n_name = "ipip",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_tcp = {
 	.n_name = "tcp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_egp = {
 	.n_name = "egp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_pup = {
 	.n_name = "pup",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_udp = {
 	.n_name = "udp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_idp = {
 	.n_name = "idp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_rawip = {
 	.n_name = "rawip",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_ticots_ord = {
 	.n_name = "ticots_ord",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_ticots = {
 	.n_name = "ticots",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 STATIC struct devnode inet_node_ticlts = {
 	.n_name = "ticlts",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 #if defined HAVE_OPENSS7_SCTP
 STATIC struct devnode inet_node_sctp = {
 	.n_name = "sctp",
-	.n_flag = D_CLONE, /* clone minor */
+	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 #endif

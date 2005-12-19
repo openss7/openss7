@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/07/13 12:01:14 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/18 11:51:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/18 11:51:24 $"
 
 /*************************************************************************
  *
@@ -189,6 +189,7 @@ int _RP ip2xinetuwput(queue_t *q, mblk_t *mp);
 int _RP ip2xinetlrput(queue_t *q, mblk_t *mp);
 int _RP ip2xinetursrv(queue_t *q);
 int _RP ip2xinetlwsrv(queue_t *q);
+
 void ip2xinet_rx(struct net_device *dev, struct sk_buff *skb);
 int ip2xinet_send_down_bind(queue_t *q);
 int init_linuxip(void);

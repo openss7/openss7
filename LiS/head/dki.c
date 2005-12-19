@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: dki.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/12/18 05:41:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: dki.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/12/18 05:41:23 $"
 
 /************************************************************************
 *                      SVR4 Driver-Kernel Interface                     *
@@ -249,7 +249,7 @@ alloc_handle(void)
 /*
  * "timeout" is #defined to be this function in dki.h.
  */
-streams_regparms toid_t
+toid_t _RP
 lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, int line_nr)
 {
 	tlist_t *tp;
@@ -280,7 +280,7 @@ lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, 
 
 }				/* lis_timeout_fcn */
 
-streams_regparms toid_t
+toid_t _RP
 lis_untimeout(toid_t id)
 {
 	tlist_t *tp;

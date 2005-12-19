@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: buffcall.h,v 1.1.1.2.4.4 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Francisco J. Ballesteros & Graham Wheeler
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: buffcall.h,v 1.4 1996/01/27 00:40:24 dave Exp $
+ * RCS Id          : $Id: buffcall.h,v 1.1.1.2.4.4 2005/12/18 05:41:24 brian Exp $
  * ----------------______________________________________________
  *
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros,
@@ -68,7 +68,7 @@
 #ifndef _BUFFCALL_H
 #define _BUFFCALL_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: buffcall.h,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -92,7 +92,7 @@ typedef struct bcinfo {
 	unsigned size;			/* size for this node */
 	int id;				/* identifier for user */
 	volatile int state;		/* state of entry */
-	void (*usr_f) (long);		/* user callback */
+	void _RP(*usr_f) (long);	/* user callback */
 	long usr_arg;			/* arg for user callback */
 } bcinfo_t;
 
@@ -143,7 +143,7 @@ extern volatile char lis_strbcflag;	/* the bufcall functions must be run */
  */
 #ifdef __KERNEL__
 extern int
- STREAMS_REGPARMS(lis_bufcall(unsigned size, int priority, void (*function) (long), long arg));
+_RP lis_bufcall(unsigned size, int priority, void _RP(*function) (long), long arg);
 #endif				/* __KERNEL__ */
 
 /* esbbcall - like bufcall, but for lis_esballoc. The function
@@ -151,13 +151,14 @@ extern int
  *	lis_esballoc will succeed.
  */
 #ifdef __KERNEL__
-extern int STREAMS_REGPARMS(lis_esbbcall(int priority, void (*function) (long), long arg));
+extern int
+_RP lis_esbbcall(int priority, void _RP(*function) (long), long arg);
 #endif				/* __KERNEL__ */
 
 /* unbufcall - cancels a bufcall/esbbcall
  */
 #ifdef __KERNEL__
-extern void STREAMS_REGPARMS(lis_unbufcall(int bcid));
+extern void _RP lis_unbufcall(int bcid);
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */

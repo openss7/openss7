@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.9 $) $Date: 2005/12/18 06:38:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:38:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.9 $) $Date: 2005/12/18 06:38:07 $"
 
 /*                               -*- Mode: C -*- 
  * mod.c --- module mgmt
@@ -215,8 +215,8 @@ typedef struct driver_config {
 	int *cnf_major;
 	int cnf_n_majors;
 	int cnf_n_minors;
-	void (*cnf_init) STREAMS_REGPARMS((void));
-	void (*cnf_term) STREAMS_REGPARMS((void));
+	void _RP(*cnf_init) (void);
+	void _RP(*cnf_term) (void);
 	int cnf_qlock_option;
 
 } driver_config_t;
@@ -727,7 +727,7 @@ find_apush_entry(major_t major, minor_t minor)
 /*  -------------------------------------------------------------------  */
 /* register a new module
  */
-streams_regparms modID_t
+modID_t _RP
 lis_register_strmod(struct streamtab *strtab, const char *name)
 {
 	modID_t id = LIS_NULL_MID;
@@ -774,7 +774,7 @@ lis_register_strmod(struct streamtab *strtab, const char *name)
 	return id;
 }				/* lis_register_strmod */
 
-streams_regparms int
+int _RP
 lis_register_module_qlock_option(modID_t id, int qlock_option)
 {
 	int ret;
@@ -843,7 +843,7 @@ unregister_module(fmodsw_t * slot)
 	return 0;
 }
 
-streams_regparms int
+int _RP
 lis_unregister_strmod(struct streamtab *strtab)
 {
 	fmodsw_t *slot;
@@ -895,7 +895,7 @@ lis_findmod_strtab(struct streamtab *strtab)
 
 /* Find module by name in lis_fmod_sw[] 
  */
-streams_regparms modID_t
+modID_t _RP
 lis_findmod(const char *name)
 {
 	int id;
@@ -1066,7 +1066,7 @@ lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 /*  -------------------------------------------------------------------  */
 /* register a new streams device
  */
-streams_regparms int
+int _RP
 lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const char *name)
 {
 	int rslt;
@@ -1121,7 +1121,7 @@ lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const c
 
 }				/* lis_register_strdev */
 
-streams_regparms int
+int _RP
 lis_register_driver_qlock_option(major_t major, int qlock_option)
 {
 	int rslt;
@@ -1142,7 +1142,7 @@ lis_register_driver_qlock_option(major_t major, int qlock_option)
 /*  -------------------------------------------------------------------  */
 /* unregister a streams device
  */
-streams_regparms int
+int _RP
 lis_unregister_strdev(major_t major)
 {
 	int ret;
@@ -1301,7 +1301,7 @@ lis_apushm(dev_t dev, const char *mods[])
 	return a->push.npush;
 }				/* lis_apushm */
 
-streams_regparms int
+int _RP
 lis_apush_set(struct strapush *ap)
 {
 	int i, j, err;
@@ -1354,7 +1354,7 @@ lis_apush_set(struct strapush *ap)
 	return 0;
 }				/* lis_apush_set */
 
-streams_regparms int
+int _RP
 lis_apush_get(struct strapush *ap)
 {
 	autopush_t *a;
@@ -1393,7 +1393,7 @@ lis_apush_get(struct strapush *ap)
 	return 0;
 }				/* lis_apush_get */
 
-streams_regparms int
+int _RP
 lis_apush_vml(struct str_list *mlp)
 {
 	int i, j;

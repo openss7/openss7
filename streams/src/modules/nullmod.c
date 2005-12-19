@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/09 18:01:47 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:47 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.7  2005/12/19 03:23:39  brian
+ - wend for simple streamscall
+
  Revision 0.9.2.6  2005/12/09 18:01:47  brian
  - profiling copy
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/09 18:01:47 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/09 18:01:47 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -104,7 +107,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/09 18:01:47 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -269,7 +272,7 @@ testcase_10(union ioctypes *ioc, mblk_t *dp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_fastcall int
+STATIC streamscall int
 nullmod_wput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -332,7 +335,7 @@ nullmod_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 nullmod_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
@@ -346,7 +349,7 @@ nullmod_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -365,7 +368,7 @@ nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-STATIC int
+STATIC streamscall int
 nullmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;

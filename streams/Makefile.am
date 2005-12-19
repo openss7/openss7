@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2005/12/13 11:59:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2005/12/19 03:23:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/13 11:59:12 $ by $Author: brian $
+# Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -246,7 +246,11 @@ libLfS_specfs_a_SOURCES		+= \
 				src/kernel/specfs.c
 endif
 
-libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H) \
+				  src/kernel/strspecfs.c \
+				  src/kernel/strlookup.c \
+				  src/kernel/strattach.c \
+				  src/kernel/strpipe.c
 libLfS_specfs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=specfs $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libLfS_specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
@@ -334,7 +338,17 @@ if CONFIG_STREAMS_SPX
 libLfS_streams_a_SOURCES	+= src/drivers/spx.c
 endif
 
-libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H) \
+				  src/kernel/strmain.c \
+				  src/kernel/strreg.c \
+				  src/kernel/strprocfs.c \
+				  src/kernel/strsched.c \
+				  src/kernel/strsysctl.c \
+				  src/kernel/strsyms.c \
+				  src/kernel/strutil.c \
+				  src/kernel/strsad.c \
+				  src/modules/sth.c \
+				  src/drivers/clone.c
 libLfS_streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) -DKBUILD_BASENAME=streams $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libLfS_streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 

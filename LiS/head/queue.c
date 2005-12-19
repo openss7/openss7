@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.2 $) $Date: 2005/04/12 22:45:01 $
+ @(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/12/18 05:41:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:01 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.2 $) $Date: 2005/04/12 22:45:01 $"
+#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/12/18 05:41:23 $"
 
 /*                               -*- Mode: C -*- 
  * queue.c --- streams statistics
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.c,v 1.1.1.5.4.2 2005/04/12 22:45:01 brian Exp $
+ * RCS Id          : $Id: queue.c,v 1.1.1.5.4.5 2005/12/18 05:41:23 brian Exp $
  * Purpose         : provide some queue for LiS
  * ----------------______________________________________________
  *
@@ -807,7 +807,7 @@ lis_check_q_magic(queue_t *q, char *file, int line)
  * If q is a read queue then return the ptr to the downstream queue.
  * If q is a write queue then return the ptr to the upstream queue.
  */
-streams_regparms queue_t *
+queue_t *_RP
 lis_backq_fcn(queue_t *q, char *f, int l)
 {
 	queue_t *oq;
@@ -823,7 +823,7 @@ lis_backq_fcn(queue_t *q, char *f, int l)
 
 }				/* lis_backq_fcn */
 
-streams_regparms queue_t *
+queue_t *_RP
 lis_backq(queue_t *q)
 {
 	return (lis_backq_fcn(q, __FILE__, __LINE__));
@@ -842,7 +842,7 @@ lis_backq(queue_t *q)
  *
  *	Caller has NOT acquired the queue isr lock.
  */
-streams_regparms void
+void _RP
 lis_backenable(queue_t *q)
 {
 	lis_flags_t psw;
@@ -887,7 +887,7 @@ lis_backenable(queue_t *q)
 /* lis_getq - get message from head of queue
  */
 
-streams_regparms mblk_t *
+mblk_t *_RP
 lis_getq(queue_t *q)
 {
 	mblk_t *rtn;
@@ -912,7 +912,7 @@ lis_getq(queue_t *q)
 /*  -------------------------------------------------------------------  */
 /* putq- put a message into a queue
  */
-streams_regparms int
+int _RP
 lis_putq(queue_t *q, mblk_t *mp)
 {
 	lis_flags_t psw;
@@ -934,7 +934,7 @@ lis_putq(queue_t *q, mblk_t *mp)
 
 }				/* lis_putq */
 
-streams_regparms void
+void _RP
 lis_putqf(queue_t *q, mblk_t *mp)
 {
 	if (!lis_putq(q, mp))
@@ -944,7 +944,7 @@ lis_putqf(queue_t *q, mblk_t *mp)
 /*  -------------------------------------------------------------------  */
 /* putbq - return a message to a queue
  */
-streams_regparms int
+int _RP
 lis_putbq(queue_t *q, mblk_t *mp)
 {
 	lis_flags_t psw;
@@ -966,7 +966,7 @@ lis_putbq(queue_t *q, mblk_t *mp)
 
 }				/* lis_putbq */
 
-streams_regparms void
+void _RP
 lis_putbqf(queue_t *q, mblk_t *mp)
 {
 	if (!lis_putbq(q, mp))
@@ -978,7 +978,7 @@ lis_putbqf(queue_t *q, mblk_t *mp)
  *	of queue. If the insertion is out-of-order, the insert fails.
  *	Returns 1 on success; 0 otherwise.
  */
-streams_regparms int
+int _RP
 lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
 {
 	lis_flags_t psw;
@@ -1019,7 +1019,7 @@ lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
 /* rmvq - remove a message from a queue. If the message
  *		does not exist, panic.
  */
-streams_regparms void
+void _RP
 lis_rmvq(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp;
@@ -1230,7 +1230,7 @@ lis_retry_qenable(queue_t *q)
 	LIS_QISRUNLOCK(q, &pswq);
 }
 
-streams_regparms void
+void _RP
 lis_qenable(queue_t *q)
 {
 	lis_flags_t psw, pswq;
@@ -1300,7 +1300,7 @@ lis_qenable(queue_t *q)
 
 /* lis_setq - Set queue variables
  */
-streams_regparms void
+void _RP
 lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	if (rinit == NULL || winit == NULL) {
@@ -1486,7 +1486,7 @@ flush_worker(queue_t *q, int band, int flush_all)
  *	flag can be FLUSHDATA (flush only M_DATA, M_DELAY,
  *	M_PROTO, M_PCPROTO) or FLUSHALL.
  */
-streams_regparms void
+void _RP
 lis_flushband(queue_t *q, unsigned char band, int flag)
 {
 	flush_worker(q, (int) band, flag & FLUSHALL);
@@ -1498,7 +1498,7 @@ lis_flushband(queue_t *q, unsigned char band, int flag)
  *	service routines if applicable. The flag is the same as for
  *	lis_flushband.
  */
-streams_regparms void
+void _RP
 lis_flushq(queue_t *q, int flag)
 {
 	flush_worker(q, -1, flag & FLUSHALL);
@@ -1511,7 +1511,7 @@ lis_flushq(queue_t *q, int flag)
  *	0 if the allocation failed or type is one of
  *	M_DATA, M_PROTO or M_PCPROTO
  */
-streams_regparms int
+int _RP
 lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
 {
 	mblk_t *mp;
@@ -1526,7 +1526,7 @@ lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
 
 }				/* lis_putctl */
 
-streams_regparms int
+int _RP
 lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
 {
 	if (q == NULL || q->q_next == NULL)
@@ -1539,7 +1539,7 @@ lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
 /*  -------------------------------------------------------------------  */
 /* lis_putctl1 - as for lis_putctl, but with a one byte parameter
  */
-streams_regparms int
+int _RP
 lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 {
 	mblk_t *mp;
@@ -1555,7 +1555,7 @@ lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 
 }				/* lis_putctl1 */
 
-streams_regparms int
+int _RP
 lis_putnextctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 {
 	if (q == NULL || q->q_next == NULL)
@@ -1568,7 +1568,7 @@ lis_putnextctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 /*  -------------------------------------------------------------------  */
 /* lis_qsize - returns the number of messages on a queue
  */
-streams_regparms int
+int _RP
 lis_qsize(queue_t *q)
 {
 	mblk_t *mp;
@@ -1591,7 +1591,7 @@ lis_qsize(queue_t *q)
  *	QMINPSZ, QCOUNT, QFIRST, QLAST, QFLAG.
  *	Returns 0 on success.
  */
-streams_regparms int
+int _RP
 lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
 	struct qband *qp;
@@ -1679,7 +1679,7 @@ lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
  *	QMINPSZ.
  *	Returns 0 on success.
  */
-streams_regparms int
+int _RP
 lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
 	struct qband *qp;
@@ -1841,7 +1841,7 @@ lis_set_q_sync(queue_t *q, int qlock_option)
 /* Allocate a new NULL-initilized queue pair
  * return NULL on failure
  */
-streams_regparms queue_t *
+queue_t *_RP
 lis_allocq(const char *name)
 {
 	queue_t *q = (queue_t *) LIS_QUEUE_ALLOC(sizeof(queue_t) * 2, "Queue");
@@ -1874,7 +1874,7 @@ lis_allocq(const char *name)
 /* Deallocate a queue pair.  Presumably locking is not important
  * at this point.
  */
-streams_regparms void
+void _RP
 lis_freeq(queue_t *q)
 {
 	struct qband *qp;
@@ -1910,7 +1910,7 @@ lis_freeq(queue_t *q)
  * This is the same as inserting mp2 just in front of the next
  * message after mp1.
  */
-streams_regparms int
+int _RP
 lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 {
 	if (mp1 == NULL || mp2 == NULL)
@@ -1932,7 +1932,7 @@ lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
  *	For band==0 this is equivalent to canput. Returns 0 if
  *	flow controlled; 1 otherwise.
  */
-streams_regparms int
+int _RP
 lis_bcanput(queue_t *q, unsigned char band)
 {
 	lis_flags_t psw;
@@ -1996,7 +1996,7 @@ lis_bcanput(queue_t *q, unsigned char band)
  *
  *	This routine shows up in AT&T's MP spec for SVR4.
  */
-streams_regparms int
+int _RP
 lis_bcanputnext(queue_t *q, unsigned char band)
 {
 	if (!LIS_CHECK_Q_MAGIC(q) || !LIS_CHECK_Q_MAGIC(q->q_next))
@@ -2016,7 +2016,7 @@ lis_bcanputnext(queue_t *q, unsigned char band)
  *	the band with available space in it.  This actually sounds
  *	pretty useless to me.  -- DMG
  */
-streams_regparms int
+int _RP
 lis_bcanput_anyband(queue_t *q)
 {
 	lis_flags_t psw;
@@ -2057,7 +2057,7 @@ lis_bcanput_anyband(queue_t *q)
  *
  * Return the q_qcount field from the next queue.
  */
-streams_regparms int
+int _RP
 lis_qcountstrm(queue_t *q)
 {
 	lis_flags_t psw;
@@ -2088,7 +2088,7 @@ lis_qcountstrm(queue_t *q)
  *
  * Allow q put/svc procedures to be called.
  */
-streams_regparms void
+void _RP
 lis_qprocson(queue_t *rdq)
 {
 	lis_clr_q_flags((QPROCSOFF | QENAB), 1, rdq, NULL);
@@ -2103,7 +2103,7 @@ lis_qprocson(queue_t *rdq)
  *
  * Prevent q put/svc procedures from being called.
  */
-streams_regparms void
+void _RP
 lis_qprocsoff(queue_t *rdq)
 {
 	lis_set_q_flags(QPROCSOFF, 1, rdq, NULL);

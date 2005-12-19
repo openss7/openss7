@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.35 $) $Date: 2005/12/18 05:41:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.36 $) $Date: 2005/12/19 03:22:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/18 05:41:22 $ by $Author: brian $
+# Last Modified $Date: 2005/12/19 03:22:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1151,38 +1151,22 @@ AC_DEFUN([_LIS_REGPARMS], [dnl
 	[with_lis_regparms="$withval"],
 	[with_lis_regparms='0'])
     AH_TEMPLATE([STREAMS_REGPARM], [If you have a regparms kernel, define to the
-		 the number of register parameters passed to functions that LiS
-		 exports.  This is for binary compatibility.])
-    AH_TEMPLATE([streams_regparms], [Use this macro like fastcall.  It is set to
-		 an attribute with the number of parameters passed to exported
-		 LiS functions when there is a regparms kernel.  This is for
-		 binary compatibility.])
-    AH_TEMPLATE([STREAMS_REGPARMS], [Use this macro like FASTCALL().  It is set
-		 to postfix an attribute with the number of parameters passed to
-		 exported LiS functions when there is a regparms kernel.  This
-		 is for binary compatibility.])
-    AH_TEMPLATE([_RP], [This is the old LiS 2.18.0 version of streams_regparms
-		 and STREAMS_REGPARMS().])
+	the number of register parameters passed to functions that LiS exports.
+	This is for binary compatibility.])
+    AH_TEMPLATE([_RP], [Use this macro like fastcall.  It is set to an attribute
+	with the number of parameters passed to exported LiS functions when
+	there is a regparms kernel.  This is for binary compatibility.])
     AC_MSG_CHECKING([for lis regparms])
     LIS_STREAMS_REGPARM="${with_lis_regparms:-0}"
     if test :"${linux_cv_header_asm_linkage_h:-no}" = :no
     then
-	LIS_CCREGPARM=''
-	AC_DEFINE_UNQUOTED([streams_regparms], [])
-	AC_DEFINE_UNQUOTED([STREAMS_REGPARMS(__x)], [__x])
+	AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
 	AC_DEFINE_UNQUOTED([_RP], [])
     else
 	AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
-	LIS_CCREGPARM="${LIS_CCREGPARM:--mregparm=0}"
-	AC_DEFINE_UNQUOTED([streams_regparms], [__attribute__((regparm(STREAMS_REGPARM)))])
-	AC_DEFINE_UNQUOTED([STREAMS_REGPARMS(__x)], [__x streams_regparms])
-	AC_DEFINE_UNQUOTED([_RP], [streams_regparms])
+	AC_DEFINE_UNQUOTED([_RP], [__attribute__((__regparm__(STREAMS_REGPARM)))])
     fi
     AC_MSG_RESULT([$LIS_STREAMS_REGPARM])
-dnl
-dnl I don't know why these are for all architectures...  We don't need 'em.
-dnl
-dnl LIS_STREAMS_REGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=[[0-9]]*' | sed -r -e 's|.*-mregparm=([[0-9]]*).*|\1|'`
 ])# _LIS_REGPARMS
 # =============================================================================
 

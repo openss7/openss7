@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/17 08:39:21 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:26:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:26:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.5  2005/12/19 03:26:02  brian
+ - wend for simple streamscall
+
  Revision 0.9.2.4  2005/12/17 08:39:21  brian
  - modifications for master build
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/17 08:39:21 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:26:02 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/17 08:39:21 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:26:02 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -89,7 +92,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/17 08:39:21 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:26:02 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -555,7 +558,7 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 
 EXPORT_SYMBOL(ss7_srvq);
 
-int streams_fastcall
+int streamscall
 ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -572,7 +575,7 @@ ss7_oput(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL(ss7_oput);
 
-int streams_fastcall
+int streamscall
 ss7_osrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -593,7 +596,7 @@ ss7_osrv(queue_t *q)
 
 EXPORT_SYMBOL(ss7_osrv);
 
-int streams_fastcall
+int streamscall
 ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -610,7 +613,7 @@ ss7_iput(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL(ss7_iput);
 
-int streams_fastcall
+int streamscall
 ss7_isrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2005/12/18 05:41:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2005/12/18 05:41:24 $"
 
 /************************************************************************
 *                        LiS Memory Interface                           *
@@ -230,7 +230,7 @@ find_entry(void *addr)
 	return (NULL);		/* could not find it */
 }
 
-streams_regparms void *
+void *_RP
 lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 {
 	void *a;
@@ -282,19 +282,19 @@ lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 
 }				/* lis_get_free_pages_fcn */
 
-streams_regparms void *
+void *_RP
 lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line)
 {
 	return (lis_get_free_pages_fcn(nbytes, GFP_ATOMIC, file, line));
 }
 
-streams_regparms void *
+void *_RP
 lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line)
 {
 	return (lis_get_free_pages_fcn(nbytes, GFP_KERNEL, file, line));
 }
 
-streams_regparms void *
+void *_RP
 lis_free_pages_fcn(void *ptr, char *file, int line)
 {
 	contig_memlink_t *mp;
@@ -400,8 +400,7 @@ typedef struct {
 typedef struct {
 	mem_hdr_t mh;
 	char padding[LIS_CACHE_BYTES - (sizeof(mem_hdr_t) % LIS_CACHE_BYTES)];
-}
-mem_hdr_space_t;
+} mem_hdr_space_t;
 
 void *
 lis__kmalloc(int nbytes, int class, int use_cache)
@@ -461,25 +460,25 @@ lis__kfree(void *ptr)
 *									*
 ************************************************************************/
 
-streams_regparms void *
+void *_RP
 lis_alloc_atomic_fcn(int nbytes, char *file, int line)
 {
 	return (lis_malloc(nbytes, GFP_ATOMIC, 0, file, line));
 }
 
-streams_regparms void *
+void *_RP
 lis_alloc_kernel_fcn(int nbytes, char *file, int line)
 {
 	return (lis_malloc(nbytes, GFP_KERNEL, 0, file, line));
 }
 
-streams_regparms void *
+void *_RP
 lis_alloc_dma_fcn(int nbytes, char *file, int line)
 {
 	return (lis_malloc(nbytes, GFP_DMA, 0, file, line));
 }
 
-streams_regparms void *
+void *_RP
 lis_free_mem_fcn(void *mem_area, char *file, int line)
 {
 	lis_free(mem_area, file, line);

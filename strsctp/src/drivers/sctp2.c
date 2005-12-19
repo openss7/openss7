@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/17 08:39:22 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:22 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:26:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/17 08:39:22 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/17 08:39:22 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/17 08:39:22 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2207,7 +2207,8 @@ cksum(struct sctp *sp, void *buf, size_t len)
 #endif				/* defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C) */
 	}
 }
-#if 0 /* never used */
+
+#if 0				/* never used */
 STATIC INLINE uint32_t
 __add_cksum(struct sctp *sp, uint32_t csum1, uint32_t csum2, uint16_t l2)
 {
@@ -13753,12 +13754,12 @@ sctp_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (rtn);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 sctp_rput(queue_t *q, mblk_t *mp)
 {
 	return (int) sctp_putq(q, mp, &sctp_r_prim);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sctp_rsrv(queue_t *q)
 {
 	return (int) sctp_srvq(q, &sctp_r_prim);
@@ -13810,10 +13811,10 @@ STATIC struct module_info sctp_n_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int sctp_n_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sctp_n_close(queue_t *, int, cred_t *);
-STATIC int STREAMS_FASTCALL(sctp_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sctp_rsrv(queue_t *));
+STATIC streamscall int sctp_n_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int sctp_n_close(queue_t *, int, cred_t *);
+STATIC streamscall int sctp_rput(queue_t *, mblk_t *);
+STATIC streamscall int sctp_rsrv(queue_t *);
 STATIC struct qinit sctp_n_rinit = {
 	.qi_putp = sctp_rput,		/* Read put (msg from below) */
 	.qi_srvp = sctp_rsrv,		/* Read queue service */
@@ -13822,8 +13823,8 @@ STATIC struct qinit sctp_n_rinit = {
 	.qi_minfo = &sctp_n_minfo,	/* Information */
 };
 
-STATIC int STREAMS_FASTCALL(sctp_n_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sctp_n_wsrv(queue_t *));
+STATIC streamscall int sctp_n_wput(queue_t *, mblk_t *);
+STATIC streamscall int sctp_n_wsrv(queue_t *);
 
 STATIC struct qinit sctp_n_winit = {
 	.qi_putp = sctp_n_wput,		/* Write put (msg from above) */
@@ -15536,12 +15537,12 @@ sctp_n_w_prim(queue_t *q, mblk_t *mp)
 		return sctp_n_w_other(q, mp);
 	}
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sctp_n_wput(queue_t *q, mblk_t *mp)
 {
 	return (int) sctp_putq(q, mp, &sctp_n_w_prim);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sctp_n_wsrv(queue_t *q)
 {
 	return (int) sctp_srvq(q, &sctp_n_w_prim);
@@ -15554,7 +15555,7 @@ sctp_n_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-STATIC int
+STATIC streamscall int
 sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int cmajor = getmajor(*devp);
@@ -15603,7 +15604,7 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	err = ENOMEM;
 	goto unlock_exit;
 }
-STATIC int
+STATIC streamscall int
 sctp_n_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
@@ -15765,10 +15766,10 @@ STATIC struct module_info sctp_t_minfo = {
 	.mi_hiwat = 1 << 15,		/* Hi water mark */
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
-STATIC int sctp_t_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sctp_t_close(queue_t *, int, cred_t *);
-STATIC int STREAMS_FASTCALL(sctp_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sctp_rsrv(queue_t *));
+STATIC streamscall int sctp_t_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int sctp_t_close(queue_t *, int, cred_t *);
+STATIC streamscall int sctp_rput(queue_t *, mblk_t *);
+STATIC streamscall int sctp_rsrv(queue_t *);
 STATIC struct qinit sctp_t_rinit = {
 	.qi_putp = sctp_rput,		/* Read put (msg from below) */
 	.qi_srvp = sctp_rsrv,		/* Read queue service */
@@ -15776,8 +15777,8 @@ STATIC struct qinit sctp_t_rinit = {
 	.qi_qclose = sctp_t_close,	/* Last close */
 	.qi_minfo = &sctp_t_minfo,	/* Information */
 };
-STATIC int STREAMS_FASTCALL(sctp_t_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sctp_t_wsrv(queue_t *));
+STATIC streamscall int sctp_t_wput(queue_t *, mblk_t *);
+STATIC streamscall int sctp_t_wsrv(queue_t *);
 STATIC struct qinit sctp_t_winit = {
 	.qi_putp = sctp_t_wput,		/* Write put (msg from above) */
 	.qi_srvp = sctp_t_wsrv,		/* Write queue service */
@@ -26390,12 +26391,12 @@ sctp_t_w_prim(queue_t *q, mblk_t *mp)
 		return sctp_t_w_other(q, mp);
 	}
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sctp_t_wput(queue_t *q, mblk_t *mp)
 {
 	return (int) sctp_putq(q, mp, &sctp_t_w_prim);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sctp_t_wsrv(queue_t *q)
 {
 	return (int) sctp_srvq(q, &sctp_t_w_prim);
@@ -26408,7 +26409,7 @@ sctp_t_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-STATIC int
+STATIC streamscall int
 sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int cmajor = getmajor(*devp);
@@ -26455,7 +26456,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	err = ENOMEM;
 	goto unlock_exit;
 }
-STATIC int
+STATIC streamscall int
 sctp_t_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

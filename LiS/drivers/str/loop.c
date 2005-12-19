@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:23 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/18 06:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:23 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/18 06:37:53 $"
 
 /*                               -*- Mode: C -*- 
  * loop.c --- Streams loopback driver, as of Sun manual 
  * Author          : Graham Wheeler
  * Created On      : Sat Oct  7 05:01:31 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: loop.c,v 1.1.1.3.4.5 2005/07/18 11:51:23 brian Exp $
+ * RCS Id          : $Id: loop.c,v 1.1.1.3.4.6 2005/12/18 06:37:53 brian Exp $
  * Purpose         : provide loopback streams driver
  * ----------------______________________________________________
  *
@@ -97,11 +97,11 @@ static struct module_info loop_minfo = {
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int STREAMS_REGPARMS(loop_open(queue_t *, dev_t *, int, int, cred_t *));
-static int STREAMS_REGPARMS(loop_close(queue_t *, int, cred_t *));
-static int STREAMS_REGPARMS(loop_wput(queue_t *, mblk_t *));
-static int STREAMS_REGPARMS(loop_wsrv(queue_t *));
-static int STREAMS_REGPARMS(loop_rsrv(queue_t *));
+static int _RP loop_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP loop_close(queue_t *, int, cred_t *);
+static int _RP loop_wput(queue_t *, mblk_t *);
+static int _RP loop_wsrv(queue_t *);
+static int _RP loop_rsrv(queue_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -219,7 +219,7 @@ sloop_term(void)
 
 /*  -------------------------------------------------------------------  */
 
-static streams_regparms int
+static int _RP
 loop_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	static struct loop z;
@@ -258,7 +258,7 @@ loop_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 
 /*  -------------------------------------------------------------------  */
 
-static void
+static void _RP
 loop_timeout(caddr_t arg)
 {
 	struct loop *loop = (struct loop *) arg;
@@ -279,7 +279,7 @@ loop_timeout(caddr_t arg)
  *
  * The argument is a pointer to a queue to enable.
  */
-static void
+static void _RP
 loop_bufcall(long q_ptr)
 {
 	enableok((queue_t *) q_ptr);	/* allow qenable to work */
@@ -483,7 +483,7 @@ loop_iocdata(queue_t *wq, mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 
-static streams_regparms int
+static int _RP
 loop_wput(queue_t *q, mblk_t *mp)
 {
 	struct loop *loop;
@@ -788,7 +788,7 @@ loop_wput(queue_t *q, mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 
-static streams_regparms int
+static int _RP
 loop_wsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -830,7 +830,7 @@ loop_wsrv(queue_t *q)
 
 /*  -------------------------------------------------------------------  */
 
-static streams_regparms int
+static int _RP
 loop_rsrv(queue_t *q)
 {
 	struct loop *loop;
@@ -845,7 +845,7 @@ loop_rsrv(queue_t *q)
 
 /*  -------------------------------------------------------------------  */
 
-static streams_regparms int
+static int _RP
 loop_close(queue_t *q, int dummy, cred_t *credp)
 {
 	struct loop *loop;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 03:26:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:25 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:26:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 03:26:09 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 03:26:09 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/17 08:39:25 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 03:26:09 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -128,22 +128,22 @@ static struct module_info tirdwr_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
-static int tirdwr_close(queue_t *, int, cred_t *);
+static streamscall int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
+static streamscall int tirdwr_close(queue_t *, int, cred_t *);
 
-static int STREAMS_FASTCALL(tirdwr_rput(queue_t *q, mblk_t *mp));
-static int STREAMS_FASTCALL(tirdwr_wput(queue_t *q, mblk_t *mp));
+static streamscall int tirdwr_rput(queue_t *q, mblk_t *mp);
+static streamscall int tirdwr_wput(queue_t *q, mblk_t *mp);
 
 static struct qinit tirdwr_rinit = {
 	.qi_putp = tirdwr_rput,		/* Read put (message from below) */
-	.qi_qopen = tirdwr_open,		/* Each open */
-	.qi_qclose = tirdwr_close,		/* Last close */
-	.qi_minfo = &tirdwr_minfo,		/* Information */
+	.qi_qopen = tirdwr_open,	/* Each open */
+	.qi_qclose = tirdwr_close,	/* Last close */
+	.qi_minfo = &tirdwr_minfo,	/* Information */
 };
 
 static struct qinit tirdwr_winit = {
 	.qi_putp = tirdwr_wput,		/* Write put (message from above) */
-	.qi_minfo = &tirdwr_minfo,		/* Information */
+	.qi_minfo = &tirdwr_minfo,	/* Information */
 };
 
 static struct streamtab tirdwrinfo = {
@@ -373,7 +373,7 @@ tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 	return;
 }
 
-static streams_fastcall int
+static streamscall int
 tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
@@ -526,7 +526,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static streams_fastcall int
+static streamscall int
 tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
@@ -604,7 +604,7 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 		iocp->ioc_error = EPROTO;
 		iocp->ioc_rval = -1;
 		qreply(q, mp);
-		tirdwr_eproto(priv, NULL, NULL); /* XXX */
+		tirdwr_eproto(priv, NULL, NULL);	/* XXX */
 		break;
 	default:
 		tirdwr_eproto(priv, mp, NULL);
@@ -738,7 +738,7 @@ tirdwr_pop(queue_t *q)
 #   endif			/* defined M_UNHANGUP */
 }
 
-static int
+static streamscall int
 tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err = 0;
@@ -759,10 +759,11 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (err);
 }
 
-static int
+static streamscall int
 tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
 	queue_t *rq, *wq;
+
 	(void) oflag;
 	(void) crp;
 	(void) rq;

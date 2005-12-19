@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/17 08:39:20 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/17 08:39:20 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/17 08:39:20 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $";
 
 #include <sys/os7/compat.h>
 
@@ -70,7 +70,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/17 08:39:20 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:25:59 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -120,40 +120,40 @@ MODULE_ALIAS("streams-sdt_sctp");
 #endif				/* MODULE */
 
 STATIC struct module_info sdt_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted *//* FIXME */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted *//* FIXME */
-	mi_hiwat:1 << 15,		/* Hi water mark *//* FIXME */
-	mi_lowat:1 << 10,		/* Lo water mark *//* FIXME */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted *//* FIXME */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted *//* FIXME */
+	.mi_hiwat = 1 << 15,		/* Hi water mark *//* FIXME */
+	.mi_lowat = 1 << 10,		/* Lo water mark *//* FIXME */
 };
 
-STATIC int sdt_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sdt_close(queue_t *, int, cred_t *);
+STATIC int streamscall sdt_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sdt_close(queue_t *, int, cred_t *);
 
-STATIC int STREAMS_FASTCALL(sdt_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sdt_rsrv(queue_t *));
+STATIC int streamscall sdt_rput(queue_t *, mblk_t *);
+STATIC int streamscall sdt_rsrv(queue_t *);
 
 STATIC struct qinit sdt_rinit = {
-	qi_putp:sdt_rput,		/* Read put (msg from below) */
-	qi_srvp:sdt_rsrv,		/* Read queue service */
-	qi_qopen:sdt_open,		/* Each open */
-	qi_qclose:sdt_close,		/* Last close */
-	qi_minfo:&sdt_minfo,		/* Information */
+	.qi_putp = sdt_rput,		/* Read put (msg from below) */
+	.qi_srvp = sdt_rsrv,		/* Read queue service */
+	.qi_qopen = sdt_open,		/* Each open */
+	.qi_qclose = sdt_close,		/* Last close */
+	.qi_minfo = &sdt_minfo,		/* Information */
 };
 
-STATIC int STREAMS_FASTCALL(sdt_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sdt_wsrv(queue_t *));
+STATIC int streamscall sdt_wput(queue_t *, mblk_t *);
+STATIC int streamscall sdt_wsrv(queue_t *);
 
 STATIC struct qinit sdt_winit = {
-	qi_putp:sdt_wput,		/* Write put (msg from above) */
-	qi_srvp:sdt_wsrv,		/* Write queue service */
-	qi_minfo:&sdt_minfo,		/* Information */
+	.qi_putp = sdt_wput,		/* Write put (msg from above) */
+	.qi_srvp = sdt_wsrv,		/* Write queue service */
+	.qi_minfo = &sdt_minfo,		/* Information */
 };
 
 MODULE_STATIC struct streamtab sdt_sctpinfo = {
-	st_rdinit:&sdt_rinit,		/* Upper read queue */
-	st_wrinit:&sdt_winit,		/* Upper write queue */
+	.st_rdinit = &sdt_rinit,	/* Upper read queue */
+	.st_wrinit = &sdt_winit,	/* Upper write queue */
 };
 
 /*
@@ -1825,7 +1825,7 @@ sdt_m_other(queue_t *q, mblk_t *mp)
 /*
  *  SDT Write Put and Service
  */
-STATIC streams_fastcall int
+STATIC streamscall int
 sdt_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1890,7 +1890,7 @@ sdt_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 sdt_wsrv(queue_t *q)
 {
 	int rtn;
@@ -1963,7 +1963,7 @@ sdt_wsrv(queue_t *q)
 /*
  *  SCTP Read Put and Service
  */
-STATIC streams_fastcall int
+STATIC streamscall int
 sdt_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -2029,7 +2029,7 @@ sdt_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 sdt_rsrv(queue_t *q)
 {
 	int rtn;
@@ -2166,7 +2166,7 @@ sdt_free_priv(queue_t *q)
  *
  *  =========================================================================
  */
-STATIC int
+STATIC streamscall int
 sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;		/* for now */
@@ -2180,7 +2180,7 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	return EIO;
 }
-STATIC int
+STATIC streamscall int
 sdt_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

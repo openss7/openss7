@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -144,8 +144,8 @@ STATIC struct module_info dl_minfo = {
 	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int sdlm_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sdlm_close(queue_t *, int, cred_t *);
+STATIC int streamscall sdlm_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sdlm_close(queue_t *, int, cred_t *);
 
 STATIC struct module_stat dl_rmstat = {
 	.ms_pcnt = 0,			/* calls to qi_putp() */
@@ -256,12 +256,14 @@ STATIC struct streamtab sdlminfo = {
 typedef struct dl {
 	STR_DECLARATION (struct dl);	/* stream declaration */
 } dl_t;
+
 #define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
 
 typedef struct sd {
 	STR_DECLARATION (struct sd);	/* stream declaration */
 	ulong ppa;
 } sd_t;
+
 #define SD_PRIV(__q) ((struct sd *)((__q)->q_ptr))
 
 typedef struct df {
@@ -286,6 +288,7 @@ STATIC int
 sdlm_term_caches(void)
 {
 	int err = 0;
+
 	if (sdlm_sd_cachep) {
 		if (kmem_cache_destroy(sdlm_sd_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdlm_sd_cachep", __FUNCTION__);
@@ -347,6 +350,7 @@ STATIC struct dl *
 sdlm_alloc_dl(queue_t *q, struct dl **dpp, major_t cmajor, minor_t cminor, cred_t *crp)
 {
 	struct dl *dl;
+
 	printd(("%s: %s: create dl device = %hu:%hu\n", DRV_NAME, __FUNCTION__, cmajor, cminor));
 	if ((dl = kmem_cache_alloc(sdlm_dl_cachep, SLAB_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
@@ -382,6 +386,7 @@ sdlm_free_dl(queue_t *q)
 {
 	struct dl *dl = (struct dl *) q->q_ptr;
 	psw_t flags;
+
 	ensure(dl, return);
 	printd(("%s: %s: %p: free dl %hu:%hu\n", DRV_NAME, __FUNCTION__, dl, dl->u.dev.cmajor,
 		dl->u.dev.cminor));
@@ -440,6 +445,7 @@ STATIC struct sd *
 sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
 {
 	struct sd *sd;
+
 	printd(("%s: %s: create sd index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((sd = kmem_cache_alloc(sdlm_sd_cachep, SLAB_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
@@ -473,6 +479,7 @@ sdlm_free_sd(queue_t *q)
 {
 	struct sd *sd = (struct sd *) q->q_ptr;
 	psw_t flags;
+
 	ensure(sd, return);
 	printd(("%s: %s: %p: free sd %lu\n", DRV_NAME, __FUNCTION__, sd, sd->u.mux.index));
 	spin_lock_irqsave(&sd->lock, flags);
@@ -519,6 +526,7 @@ STATIC INLINE int
 lmi_ok_ack_reply(queue_t *q, mblk_t *mp, int prim, int state)
 {
 	lmi_ok_ack_t *p;
+
 	mp->b_wptr = mp->b_rptr;
 	p = (typeof(p)) mp->b_wptr;
 	mp->b_wptr += sizeof(*p);
@@ -532,6 +540,7 @@ STATIC INLINE int
 lmi_error_ack_reply(queue_t *q, mblk_t *mp, int prim, int state, int err)
 {
 	lmi_error_ack_t *p;
+
 	/* 
 	   return a negative acknowledgement */
 	mp->b_wptr = mp->b_rptr;
@@ -574,6 +583,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		struct dl *dl = DL_PRIV(q);
 		struct sd *sd;
 		ulong ppa = *((ulong *) &m->lmi_ppa);
+
 		for (sd = master.sd.list; sd && sd->ppa != ppa; sd = sd->next) ;
 		if (!sd || sd->iq->q_next)
 			goto lbadppa;
@@ -612,6 +622,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_detach_req_t *m = ((typeof(m)) mp->b_rptr);
+
 	if (mlen < sizeof(*m))
 		goto lprotoshort;
 	if (!q->q_next)
@@ -620,6 +631,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 		lmi_ok_ack_t *p;
 		struct dl *dl = DL_PRIV(q);
 		struct sd *sd = SD_PRIV(q->q_next);
+
 		/* disconnect them */
 #ifdef LFS
 		unweldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
@@ -666,6 +678,7 @@ STATIC int
 dl_w_proto(queue_t *q, mblk_t *mp)
 {
 	long prim = *((long *) mp->b_rptr);
+
 	switch (prim) {
 	case LMI_ATTACH_REQ:
 		return ((int) lmi_attach_req(q, mp));
@@ -711,6 +724,7 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	(void) dl;
 	(void) size;
 	(void) count;
@@ -720,6 +734,7 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		struct sd *sd, **spp;
 		struct linkblk *lb = (struct linkblk *) arg;
+
 		if (!lb) {
 			swerr();
 			ret = -EINVAL;
@@ -879,7 +894,7 @@ STATIC major_t sdlm_majors[SDLM_CMAJORS] = { SDLM_CMAJOR_0, };
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 sdlm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -887,6 +902,7 @@ sdlm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct dl *dl, **dpp;
+
 	MOD_INC_USE_COUNT;
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -906,10 +922,12 @@ sdlm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&master.lock, flags);
 	for (dpp = &master.dl.list; *dpp; dpp = &(*dpp)->next) {
 		major_t dmajor = (*dpp)->u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*dpp)->u.dev.cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -946,11 +964,12 @@ sdlm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 sdlm_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct dl *dl = DL_PRIV(q);
 	psw_t flags;
+
 	(void) dl;
 	printd(("%s: %p: closing character device %hu:%hu\n", DRV_NAME, dl, dl->u.dev.cmajor,
 		dl->u.dev.cminor));
@@ -977,6 +996,7 @@ sdlm_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -985,6 +1005,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for the SDL-MUX driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -1011,6 +1032,7 @@ STATIC int
 sdlm_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&sdlm_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -1020,6 +1042,7 @@ STATIC int
 sdlm_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&sdlm_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -1037,6 +1060,7 @@ STATIC int
 sdlm_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &sdlminfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	return (0);
@@ -1046,6 +1070,7 @@ STATIC int
 sdlm_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -1057,6 +1082,7 @@ MODULE_STATIC void __exit
 sdlmterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (sdlm_majors[mindex]) {
 			if ((err = sdlm_unregister_strdev(sdlm_majors[mindex])))
@@ -1075,6 +1101,7 @@ MODULE_STATIC int __init
 sdlminit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = sdlm_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/14 11:43:19 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/19 03:23:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 11:43:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/14 11:43:19 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/19 03:23:38 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/14 11:43:19 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/19 03:23:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1551,7 +1551,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 }
 #endif
 STATIC streams_fastcall long
-defer_bufcall_event(queue_t *q, unsigned size, int priority, void (*func) (long), long arg)
+defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long), long arg)
 {
 	long id = 0;
 	struct strevent *se;
@@ -1635,7 +1635,7 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
  *  caller exits or hits a pre-emption point.
  */
 bcid_t
-__bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg)
+__bufcall(queue_t *q, unsigned size, int priority, void streamscall (*function) (long), long arg)
 {
 	return defer_bufcall_event(q, size, priority, function, arg);
 }
@@ -1650,7 +1650,7 @@ EXPORT_SYMBOL(__bufcall);	/* include/sys/streams/strsubr.h */
  *  @arg:	a client argument to pass to the callback function
  */
 streams_fastcall bcid_t
-bufcall(unsigned size, int priority, void (*function) (long), long arg)
+bufcall(unsigned size, int priority, void streamscall streamscall (*function) (long), long arg)
 {
 	return __bufcall(NULL, size, priority, function, arg);
 }
@@ -1663,7 +1663,7 @@ EXPORT_SYMBOL(bufcall);		/* include/sys/streams/stream.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
+__STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long), long arg);
 
 EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
 
@@ -1673,7 +1673,7 @@ EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
  *  Notices:	Don't ever call this function with an expired bufcall id.
  */
 streams_fastcall void
-unbufcall(bcid_t bcid)
+unbufcall(register bcid_t bcid)
 {
 	struct strevent *se;
 
@@ -1875,7 +1875,7 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
  *  @func:	the function
  */
 STATIC void
-strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
+strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
 #if 0
 	queue_t *qold;
@@ -1915,7 +1915,7 @@ strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *))
  *  - strfunc() does not perform any synchronization
  */
 STATIC streams_fastcall void
-strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #if 0
 	queue_t *qold;
@@ -1942,7 +1942,7 @@ strfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 }
 
 STATIC void
-strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+strfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	strfunc_fast(func, q, mp, arg);
 }
@@ -2334,7 +2334,7 @@ enter_inner_syncq_asopen(struct syncq_cookie *sc)
 }
 
 STATIC int
-enter_syncq_writer(struct syncq_cookie *sc, void (*func) (queue_t *, mblk_t *), int perim)
+enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
@@ -2356,7 +2356,7 @@ enter_syncq_writer(struct syncq_cookie *sc, void (*func) (queue_t *, mblk_t *), 
 }
 
 STATIC int
-enter_inner_syncq_func(struct syncq_cookie *sc, void (*func) (void *, mblk_t *), void *arg)
+enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *, mblk_t *), void *arg)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
@@ -2465,7 +2465,7 @@ leave_syncq(struct syncq_cookie *sc)
  *
  */
 STATIC streams_fastcall void
-qstrwrit_fast(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+qstrwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
@@ -2482,7 +2482,7 @@ qstrwrit_fast(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int pe
 }
 
 STATIC void
-qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+qstrwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 	return qstrwrit_fast(q, mp, func, perim);
 }
@@ -2499,7 +2499,7 @@ qstrwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
  *  against which to synchronize.
  */
 STATIC streams_fastcall void
-qstrfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+qstrfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
@@ -2516,7 +2516,7 @@ qstrfunc_fast(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg
 }
 
 STATIC void
-qstrfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	return qstrfunc_fast(func, q, mp, arg);
 }
@@ -2804,7 +2804,7 @@ qsrvp(queue_t *q)
 __unlikely int
 qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	int (*q_open) (queue_t *, dev_t *, int, int, cred_t *);
+	qi_qopen_t q_open;
 
 	dassert(q);
 	dassert(q->q_qinfo);
@@ -2840,7 +2840,7 @@ EXPORT_SYMBOL(qopen);
 __unlikely int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
-	int (*q_close) (queue_t *, int, cred_t *);
+	qi_qclose_t q_close;
 
 	dassert(q);
 	dassert(q->q_qinfo);
@@ -2880,7 +2880,7 @@ EXPORT_SYMBOL(qclose);
  *  If this function is called from hardirq() it will be deferred to the STREAMS scheduler.
  */
 void
-__strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *), int perim)
+__strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 	if (!in_irq())
 		qstrwrit(q, mp, func, perim);
@@ -2915,7 +2915,7 @@ EXPORT_SYMBOL(__strwrit);
  *  If this function is called from hardirq() it will be deferred to the STREAMS scheduler.
  */
 void
-__strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+__strfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	if (!in_irq())
 		qstrfunc(func, q, mp, arg);
@@ -3000,7 +3000,7 @@ STATIC void
 do_bufcall_synced(struct strevent *se)
 {
 	queue_t *q;
-	void (*func) (long);
+	void streamscall (*func) (long);
 
 	q = se->x.b.queue;
 	if (likely((func = se->x.b.func) != NULL)) {
@@ -3059,7 +3059,7 @@ STATIC void
 do_timeout_synced(struct strevent *se)
 {
 	queue_t *q;
-	void (*func) (caddr_t);
+	void streamscall (*func) (caddr_t);
 
 	q = se->x.t.queue;
 	if (likely((func = se->x.t.func) != NULL)) {
@@ -3337,7 +3337,21 @@ do_unweldq_event(struct strevent *se)
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-__STRSCHD_EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
+void *
+kmem_alloc(size_t size, int flags)
+{
+	if (size == 0 || size > 131072)
+		return NULL;
+#if ((L1_CACHE_BYTES > 32) && (PAGE_SIZE == 4096)) || ((L1_CACHE_BYTES > 64) && (PAGE_SIZE != 4096))
+	/* all we have to do is pad to a cacheline to get cacheline aligment, as long as a
+	   cacheline is a power of 2 */
+	if (flags & KM_CACHEALIGN && size <= (L1_CACHE_BYTES >> 1))
+		size = L1_CACHE_BYTES;
+#endif
+	/* KM_PHYSCONTIG is ignored because kmalloc'ed memory is always physically contiguous. */
+	return kmalloc(size, ((flags & KM_NOSLEEP) ? GFP_ATOMIC : GFP_KERNEL)
+		       | ((flags & KM_DMA) ? GFP_DMA : 0));
+}
 
 EXPORT_SYMBOL(kmem_alloc);	/* include/sys/streams/kmem.h */
 
@@ -3346,7 +3360,20 @@ EXPORT_SYMBOL(kmem_alloc);	/* include/sys/streams/kmem.h */
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-__STRSCHD_EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
+void *
+kmem_zalloc(size_t size, int flags)
+{
+	void *mem;
+
+	if ((mem = kmem_alloc(size, flags)))
+#if defined HAVE_KFUNC_KSIZE
+		/* newer kernels can tell us how big a memory object truly is */
+		memset(mem, 0, ksize(mem));
+#else
+		memset(mem, 0, size);
+#endif
+	return (mem);
+}
 
 EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/streams/kmem.h */
 
@@ -3375,7 +3402,11 @@ EXPORT_SYMBOL(kmem_free);	/* include/sys/streams/kmem.h */
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  *  @node:
  */
-__STRSCHD_EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
+void *
+kmem_alloc_node(size_t size, int flags, cnodeid_t node)
+{
+	return kmalloc(size, GFP_KERNEL);
+}
 
 EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/streams/kmem.h */
 
@@ -3385,7 +3416,15 @@ EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/streams/kmem.h */
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  *  @node:
  */
-__STRSCHD_EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
+void *
+kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
+{
+	void *mem;
+
+	if ((mem = kmalloc(size, GFP_KERNEL)))
+		memset(mem, 0, size);
+	return (mem);
+}
 
 EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
 
@@ -3855,17 +3894,17 @@ freechain(mblk_t *mp, mblk_t **mpp)
 }
 
 /*
- *  _runqueues:	- run scheduled STRAMS events on the current processor
+ *  __runqueues:	- run scheduled STRAMS events on the current processor
  *  @unused:	unused
  *
  *  This is the internal softirq version of runqueues().
  */
 #if defined CONFIG_STREAMS_KTHREADS
 STATIC streams_fastcall __hot_in void
-_runqueues(void)
+__runqueues(void)
 #else
 STATIC __hot_in void
-_runqueues(struct softirq_action *unused)
+__runqueues(struct softirq_action *unused)
 #endif
 {				/* PROFILED */
 	struct strthread *t;
@@ -3941,9 +3980,9 @@ runqueues(void)
 #endif
 	enter_streams();	/* simulate STREAMS context */
 #if defined CONFIG_STREAMS_KTHREADS
-	_runqueues();
+	__runqueues();
 #else
-	_runqueues(NULL);
+	__runqueues(NULL);
 #endif
 	leave_streams();	/* go back to user context */
 #if defined HAVE_KINC_LINUX_KTHREAD_H
@@ -4253,7 +4292,7 @@ kstreamd(void *__bind_cpu)
 		preempt_disable();
 		if (cpu_is_offline((long) __bind_cpu))
 			goto wait_to_die;
-		_runqueues();
+		__runqueues();
 		preempt_enable();
 		cond_resched();
 		set_current_state(TASK_INTERRUPTIBLE);
@@ -4438,7 +4477,7 @@ kstreamd(void *__bind_cpu)
 				break;
 		}
 		__set_current_state(TASK_RUNNING);
-		_runqueues();
+		__runqueues();
 		if (current->need_resched)
 			schedule();
 		prefetchw(t);
@@ -4531,7 +4570,7 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 STATIC __unlikely void
 init_strsched(void)
 {
-	open_softirq(STREAMS_SOFTIRQ, _runqueues, NULL);
+	open_softirq(STREAMS_SOFTIRQ, __runqueues, NULL);
 	return;
 }
 

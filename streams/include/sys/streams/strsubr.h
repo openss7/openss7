@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.62 2005/12/12 12:28:29 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.63 2005/12/19 03:23:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:37 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/12 12:28:29 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/19 03:23:37 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -100,13 +100,13 @@ struct strevent {
 		} e;			/* stream event */
 		struct {
 			queue_t *queue;
-			void (*func) (long);
+			void streamscall (*func) (long);
 			long arg;
 			size_t size;
 		} b;			/* bufcall event */
 		struct {
 			queue_t *queue;
-			void (*func) (caddr_t);
+			void streamscall (*func) (caddr_t);
 			caddr_t arg;
 			int pl;
 			int cpu;
@@ -114,7 +114,7 @@ struct strevent {
 		} t;			/* timeout event */
 		struct {
 			queue_t *queue;
-			void (*func) (void *);
+			void streamscall (*func) (void *);
 			void *arg;
 			queue_t *q1, *q2, *q3, *q4;
 		} w;			/* weld request */
@@ -566,7 +566,7 @@ struct mdbblock {
 };
 
 /* from strsched.c */
-extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
+extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void streamscall (*function) (long), long arg);
 extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
 			int cpu);
 
@@ -686,11 +686,11 @@ extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 extern int strioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
 /* stream head read put and write service procedures, and open/close for use by replacement stream heads */
-extern int STREAMS_FASTCALL(strrput(queue_t *q, mblk_t *mp));
-extern int STREAMS_FASTCALL(strwput(queue_t *q, mblk_t *mp));
-extern int STREAMS_FASTCALL(strwsrv(queue_t *q));
-extern int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-extern int str_close(queue_t *q, int oflag, cred_t *crp);
+extern int streamscall strrput(queue_t *q, mblk_t *mp);
+extern int streamscall strwput(queue_t *q, mblk_t *mp);
+extern int streamscall strwsrv(queue_t *q);
+extern int streamscall str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+extern int streamscall str_close(queue_t *q, int oflag, cred_t *crp);
 
 extern struct file_operations strm_f_ops;
 

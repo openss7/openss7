@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/07/13 12:01:18 $
+ @(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 05:41:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/07/13 12:01:18 $"
+#ident "@(#) $RCSfile: lispci.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 05:41:24 $"
 
 /************************************************************************
 *                          LiS PCI Interface                            *
@@ -124,7 +124,7 @@ lis_map_pci_device(lis_pci_dev_t *p, struct pci_dev *kp)
 * to a lis_pci_dev_t structure for it.					*
 *									*
 ************************************************************************/
-streams_regparms lis_pci_dev_t *
+lis_pci_dev_t *_RP
 lis_pci_find_device(unsigned vendor, unsigned device, lis_pci_dev_t *previous_struct)
 {
 	lis_pci_dev_t *p;
@@ -180,7 +180,7 @@ lis_pci_find_device(unsigned vendor, unsigned device, lis_pci_dev_t *previous_st
 * Find a class in a manner similar to finding devices.			*
 *									*
 ************************************************************************/
-streams_regparms lis_pci_dev_t *
+lis_pci_dev_t *_RP
 lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct)
 {
 	lis_pci_dev_t *p;
@@ -222,7 +222,7 @@ lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct)
 * Find the structure by slot number.					*
 *									*
 ************************************************************************/
-streams_regparms lis_pci_dev_t *
+lis_pci_dev_t *_RP
 lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 {
 	lis_pci_dev_t *p;
@@ -261,7 +261,7 @@ lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 * Read a byte from config space for the device.				*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -277,7 +277,7 @@ lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_
 * Read a word from config space for the device.				*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -293,7 +293,7 @@ lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn
 * Read a dword from config space for the device.			*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -309,7 +309,7 @@ lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn
 * Write a byte from config space for the device.			*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -325,7 +325,7 @@ lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val)
 * Write a word from config space for the device.			*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -341,7 +341,7 @@ lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val
 * Write a dword from config space for the device.			*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -358,7 +358,7 @@ lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val
 * differences between different machines.				*
 *									*
 ************************************************************************/
-streams_regparms int
+int _RP
 lis_pci_enable_device(lis_pci_dev_t *dev)
 {
 	return (pci_enable_device(dev->kern_ptr));
@@ -371,7 +371,7 @@ lis_pci_enable_device(lis_pci_dev_t *dev)
 * Disable the device.  Undoes what lis_pci_enable_device does.		*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_pci_disable_device(lis_pci_dev_t *dev)
 {
 	pci_disable_device(dev->kern_ptr);
@@ -384,7 +384,7 @@ lis_pci_disable_device(lis_pci_dev_t *dev)
 * Set bus master capability for the device.				*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_pci_set_master(lis_pci_dev_t *dev)
 {
 	if (dev == NULL || dev->kern_ptr == NULL)
@@ -419,7 +419,7 @@ lis_pci_cleanup(void)
 *                         DMA Memory Allocation				*
 ************************************************************************/
 
-streams_regparms void *
+void *_RP
 lis_pci_alloc_consistent(lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_handle)
 {
 	dma_addr_t *dp = (dma_addr_t *) dma_handle->opaque;
@@ -433,7 +433,7 @@ lis_pci_alloc_consistent(lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_h
 	return (vaddr);
 }
 
-streams_regparms void *
+void *_RP
 lis_pci_free_consistent(lis_dma_addr_t * dma_handle)
 {
 	if (dma_handle->vaddr != NULL)
@@ -443,7 +443,7 @@ lis_pci_free_consistent(lis_dma_addr_t * dma_handle)
 	return (NULL);
 }
 
-streams_regparms u32
+u32 _RP
 lis_pci_dma_handle_to_32(lis_dma_addr_t * dma_handle)
 {
 	u32 *p = (u32 *) dma_handle->opaque;
@@ -451,7 +451,7 @@ lis_pci_dma_handle_to_32(lis_dma_addr_t * dma_handle)
 	return (*p);
 }
 
-streams_regparms u64
+u64 _RP
 lis_pci_dma_handle_to_64(lis_dma_addr_t * dma_handle)
 {
 	u64 *p = (u64 *) dma_handle->opaque;
@@ -459,7 +459,7 @@ lis_pci_dma_handle_to_64(lis_dma_addr_t * dma_handle)
 	return (*p);
 }
 
-streams_regparms void
+void _RP
 lis_pci_map_single(lis_pci_dev_t *dev, void *ptr, size_t size, lis_dma_addr_t * dma_handle,
 		   int direction)
 {
@@ -486,7 +486,7 @@ lis_pci_map_single(lis_pci_dev_t *dev, void *ptr, size_t size, lis_dma_addr_t * 
 	*dp = pci_map_single(dev->kern_ptr, ptr, size, direction);
 }
 
-streams_regparms void *
+void *_RP
 lis_pci_unmap_single(lis_dma_addr_t * dma_handle)
 {
 	if (dma_handle->vaddr != NULL)
@@ -505,7 +505,7 @@ lis_pci_unmap_single(lis_dma_addr_t * dma_handle)
 * Synchronize memory with DMA.						*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size, int direction)
 {
 	switch (direction) {
@@ -534,13 +534,13 @@ lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size, int direction)
 *                            Miscellaneous                              *
 ************************************************************************/
 
-streams_regparms int
+int _RP
 lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask)
 {
 	return (pci_dma_supported(dev->kern_ptr, mask));
 }
 
-streams_regparms int
+int _RP
 lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
 {
 	return (pci_set_dma_mask(dev->kern_ptr, mask));
@@ -553,7 +553,7 @@ lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
 * Our own routine.  Kernel versioning takes care of differences.	*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_membar(void)
 {
 	barrier();

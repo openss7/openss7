@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/12/18 05:41:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.3 $) $Date: 2005/12/18 05:41:23 $"
 
 /*                               -*- Mode: C -*- 
  * msg.c --- streams message handling
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msg.c,v 1.6 1996/01/17 18:57:05 dave Exp $
+ * RCS Id          : $Id: msg.c,v 1.1.1.4.4.3 2005/12/18 05:41:23 brian Exp $
  * Purpose         : provide streams message handling
  *                 : this is the main memory allocation related module.
  * ----------------______________________________________________
@@ -370,7 +370,7 @@ initb(struct mdbblock *blk, char *buff, int size, struct free_rtn *frtn)
  *        To be completed later.
  */
 
-streams_regparms struct msgb *
+struct msgb *_RP
 lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *file_name, int line_nr)
 {
 	return (lis_allocb(size, priority, file_name, line_nr));
@@ -383,7 +383,7 @@ lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *fil
  *	size. The priority is for compatibility only.
  */
 
-streams_regparms struct msgb *
+struct msgb *_RP
 lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 {
 #if defined(CONFIG_DEV)
@@ -434,7 +434,7 @@ lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 /* testb: see if an allocation can actually be done.
  */
 
-streams_regparms int
+int _RP
 lis_testb(int size, unsigned int priority)
 {
 #ifdef AVAIL
@@ -462,7 +462,7 @@ lis_testb(int size, unsigned int priority)
  * dblk to point to the user's buffer and to hold the freeinfo stuff.
  */
 
-streams_regparms mblk_t *
+mblk_t *_RP
 lis_esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo, char *file_name,
 	     int line_nr)
 {
@@ -678,7 +678,7 @@ lis_freedb(mblk_t *bp, int free_hdr)
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  */
-streams_regparms void
+void _RP
 lis_freeb(mblk_t *bp)
 {
 	lis_freedb(bp, 1);	/* free both hdr and data blk */
@@ -688,7 +688,7 @@ lis_freeb(mblk_t *bp)
 /*  -------------------------------------------------------------------  */
 /* freemsg - free a whole message
  */
-streams_regparms void
+void _RP
 lis_freemsg(mblk_t *mp)
 {
 	while (mp) {
@@ -701,7 +701,7 @@ lis_freemsg(mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 /* extract values from a char pointer and advance the pointer */
-streams_regparms int
+int _RP
 lis_getint(unsigned char **p)
 {
 	int result = *((int *) (*p));
@@ -710,7 +710,7 @@ lis_getint(unsigned char **p)
 }
 
 /*  -------------------------------------------------------------------  */
-streams_regparms void
+void _RP
 lis_putbyte(unsigned char **p, unsigned char byte)
 {
 	**p = byte;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $";
+static char const ident[] =
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +72,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/17 08:39:19 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -143,11 +144,11 @@ STATIC struct module_info spm_rinfo = {
 	0				/* Lo water mark */
 };
 
-STATIC int spm_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int spm_close(queue_t *, int, cred_t *);
+STATIC int streamscall spm_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall spm_close(queue_t *, int, cred_t *);
 
-STATIC int STREAMS_FASTCALL(spm_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(spm_wsrv(queue_t *));
+STATIC int streamscall spm_wput(queue_t *, mblk_t *);
+STATIC int streamscall spm_wsrv(queue_t *);
 
 STATIC struct qinit spm_winit = {
 	spm_wput,			/* Write put (message from above) */
@@ -159,8 +160,8 @@ STATIC struct qinit spm_winit = {
 	NULL				/* Statistics */
 };
 
-STATIC int STREAMS_FASTCALL(spm_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(spm_rsrv(queue_t *));
+STATIC int streamscall spm_rput(queue_t *, mblk_t *);
+STATIC int streamscall spm_rsrv(queue_t *);
 
 STATIC struct qinit spm_rinit = {
 	spm_rput,			/* Read put (message from below) */
@@ -217,6 +218,7 @@ typedef struct spm {
 	uint rno;			/* RD throttle count */
 	uint rtim;			/* WR throttle timer */
 } spm_t;
+
 #define PRIV(__q) ((spm_t *)(__q)->q_ptr)
 
 /*
@@ -227,6 +229,7 @@ typedef struct spm {
  *  ========================================================================
  */
 STATIC kmem_cache_t *spm_priv_cachep = NULL;
+
 /*
  *  Cache allocation
  *  ------------------------------------------------------------------------
@@ -264,6 +267,7 @@ STATIC spm_t *
 spm_alloc_priv(queue_t *q, spm_t ** sp, major_t cmajor, minor_t cminor)
 {
 	spm_t *s;
+
 	if ((s = kmem_cache_alloc(spm_priv_cachep, SLAB_ATOMIC))) {
 		printd(("spm: allocated module private structure\n"));
 		bzero(s, sizeof(*s));
@@ -284,19 +288,17 @@ spm_alloc_priv(queue_t *q, spm_t ** sp, major_t cmajor, minor_t cminor)
 		s->wno = 0;
 		s->rts = jiffies;
 		s->rno = 0;
-		/*
+		/* 
 		 *  Set some defaults:
 		 */
 		printd(("spm: setting module defaults\n"));
-		/*
-		   LMI configuration defaults 
-		 */
+		/* 
+		   LMI configuration defaults */
 		s->option.pvar = SS7_PVAR_ITUT_88;
 		s->option.popt = 0;
 #if 0
-		/*
-		   SDT configuration defaults 
-		 */
+		/* 
+		   SDT configuration defaults */
 		s->config.Tin = 4;	/* AERM normal proving threshold */
 		s->config.Tie = 1;	/* AERM emergency proving threshold */
 		s->config.T = 64;	/* SUERM error threshold */
@@ -314,6 +316,7 @@ spm_free_priv(queue_t *q)
 {
 	uint t;
 	spm_t *s = PRIV(q);
+
 	ensure(s, return);
 	if (s->rbid)
 		unbufcall(xchg(&s->rbid, 0));
@@ -352,6 +355,7 @@ STATIC int
 m_error(queue_t *q, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -371,6 +375,7 @@ STATIC INLINE int
 sdl_received_bits_ind(queue_t *q, mblk_t *mp)
 {
 	union SDL_primitives *p = (union SDL_primitives *) mp->b_rptr;
+
 	p->sdl_primitive = SDL_RECEIVED_BITS_IND;
 	putnext(q, mp);
 	return (QR_ABSORBED);
@@ -385,6 +390,7 @@ STATIC INLINE int
 sdl_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	union SDL_primitives *p = (union SDL_primitives *) mp->b_rptr;
+
 	p->sdl_primitive = SDL_DISCONNECT_IND;
 	putnext(q, mp);
 	return (QR_ABSORBED);
@@ -399,6 +405,7 @@ lmi_info_ack(queue_t *q, long state, caddr_t ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -428,6 +435,7 @@ lmi_ok_ack(queue_t *q, long state, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -451,6 +459,7 @@ lmi_error_ack(queue_t *q, long state, long prim, long err, long reason)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -475,6 +484,7 @@ lmi_enable_con(queue_t *q, long state)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -497,6 +507,7 @@ lmi_disable_con(queue_t *q, long state)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -520,6 +531,7 @@ lmi_optmgmt_ack(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -545,6 +557,7 @@ lmi_error_ind(queue_t *q, long state, long error, long reason)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -569,6 +582,7 @@ lmi_stats_ind(queue_t *q)
 {
 	mblk_t *mp;
 	lmi_stats_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -592,6 +606,7 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level, caddr_t inf_ptr, size_t inf_le
 {
 	mblk_t *mp;
 	lmi_event_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + inf_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -630,9 +645,8 @@ sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   strip to M_DATA 
-	 */
+	/* 
+	   strip to M_DATA */
 	return (QR_STRIP);
 }
 
@@ -645,9 +659,8 @@ sdl_connect_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   ignore 
-	 */
+	/* 
+	   ignore */
 	return (QR_DONE);
 }
 
@@ -658,9 +671,8 @@ sdl_connect_req(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sdl_disconnect_req(queue_t *q, mblk_t *mp)
 {
-	/*
-	   translated to indication 
-	 */
+	/* 
+	   translated to indication */
 	return sdl_disconnect_ind(q, mp);
 }
 
@@ -746,6 +758,7 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	*(lmi_option_t *) arg = s->option;
 	return (0);
 }
@@ -759,6 +772,7 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	s->option = *(lmi_option_t *) arg;
 	return (0);
 }
@@ -772,6 +786,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	*(sdl_config_t *) arg = s->config;
 	return (0);
 }
@@ -785,6 +800,7 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	s->config = *(sdl_config_t *) arg;
 	return (0);
 }
@@ -798,6 +814,7 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) s;
 	(void) arg;
 	fixme(("Test the configuration\n"));
@@ -813,6 +830,7 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) s;
 	(void) arg;
 	fixme(("Commit the configuration\n"));
@@ -828,6 +846,7 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	*(sdl_statem_t *) arg = s->statem;
 	return (0);
 }
@@ -841,6 +860,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) s;
 	(void) arg;
 	fixme(("Master reset\n"));
@@ -856,6 +876,7 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	*(sdl_stats_t *) arg = s->statsp;
 	return (0);
 }
@@ -869,6 +890,7 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	s->statsp = *(sdl_stats_t *) arg;
 	return (0);
 }
@@ -882,6 +904,7 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	*(sdl_stats_t *) arg = s->stats;
 	return (0);
 }
@@ -895,6 +918,7 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) arg;
 	bzero(&s->stats, sizeof(s->stats));
 	return (0);
@@ -909,6 +933,7 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	*(sdl_notify_t *) arg = s->notify;
 	return (0);
 }
@@ -922,6 +947,7 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	s->notify = *(sdl_notify_t *) arg;
 	return (0);
 }
@@ -935,6 +961,7 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	s->notify.events &= ~((sdl_notify_t *) arg)->events;
 	return (0);
 }
@@ -956,6 +983,7 @@ spm_m_ioctl(queue_t *q, mblk_t *mp)
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+
 	(void) nr;
 	switch (type) {
 	case __SID:
@@ -973,6 +1001,7 @@ spm_m_ioctl(queue_t *q, mblk_t *mp)
 		{
 			void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 			struct linkblk *lp = (struct linkblk *) arg;
+
 			rare();
 			(void) lp;
 			ret = -EINVAL;
@@ -1068,6 +1097,7 @@ spm_m_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	spm_t *s = PRIV(q);
 	ulong oldstate = s->state;
+
 	if ((prim = *(ulong *) mp->b_rptr) == SDL_BITS_FOR_TRANSMISSION_REQ)
 		rtn = sdl_bits_for_transmission_req(q, mp);
 	else
@@ -1100,9 +1130,8 @@ spm_m_proto(queue_t *q, mblk_t *mp)
 			rtn = lmi_optmgmt_req(q, mp);
 			break;
 		default:
-			/*
-			   pass along anything we don't recognize 
-			 */
+			/* 
+			   pass along anything we don't recognize */
 			rtn = QR_PASSFLOW;
 			break;
 		}
@@ -1122,6 +1151,7 @@ spm_w_timeout(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;
 	spm_t *s = PRIV(q);
+
 	if (!xchg(&s->wtim, 0))
 		return;
 	enableok(q);
@@ -1133,6 +1163,7 @@ spm_r_timeout(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;
 	spm_t *s = PRIV(q);
+
 	if (!xchg(&s->rtim, 0))
 		return;
 	enableok(q);
@@ -1143,11 +1174,11 @@ STATIC INLINE int
 spm_w_data(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
+
 	if (s->wts == jiffies) {
 		if (s->wno++ >= 10) {
-			/*
-			   come back in a tick 
-			 */
+			/* 
+			   come back in a tick */
 			s->wtim = timeout(&spm_w_timeout, (caddr_t) q, 1);
 			// printd(("spm: tx: blocking\n"));
 			return (QR_DISABLE);
@@ -1162,11 +1193,11 @@ STATIC INLINE int
 spm_r_data(queue_t *q, mblk_t *mp)
 {
 	spm_t *s = PRIV(q);
+
 	if (s->rts == jiffies) {
 		if (s->rno++ >= 10) {
-			/*
-			   come back in a tick 
-			 */
+			/* 
+			   come back in a tick */
 			s->rtim = timeout(&spm_r_timeout, (caddr_t) q, 1);
 			// printd(("spm: rx: blocking\n"));
 			return (QR_DISABLE);
@@ -1186,6 +1217,7 @@ STATIC int
 spm_m_pcrse(queue_t *q, mblk_t *mp)
 {
 	int rtn;
+
 	switch (*(ulong *) mp->b_rptr) {
 	default:
 		rtn = -EFAULT;
@@ -1230,9 +1262,8 @@ spm_r_flush(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 spm_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return spm_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -1254,9 +1285,8 @@ spm_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 spm_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return spm_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -1279,12 +1309,12 @@ STATIC void
 spm_rx_wakeup(queue_t *q)
 {
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 spm_rput(queue_t *q, mblk_t *mp)
 {
 	return (int) ss7_putq(q, mp, &spm_r_prim, &spm_rx_wakeup);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 spm_rsrv(queue_t *q)
 {
 	return (int) ss7_srvq(q, &spm_r_prim, &spm_rx_wakeup);
@@ -1293,12 +1323,12 @@ STATIC void
 spm_tx_wakeup(queue_t *q)
 {
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 spm_wput(queue_t *q, mblk_t *mp)
 {
 	return (int) ss7_putq(q, mp, &spm_w_prim, &spm_tx_wakeup);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 spm_wsrv(queue_t *q)
 {
 	return (int) ss7_srvq(q, &spm_w_prim, &spm_tx_wakeup);
@@ -1312,12 +1342,13 @@ spm_wsrv(queue_t *q)
  *  =======================================================================
  */
 STATIC spm_t *spm_list = NULL;
-STATIC int
+STATIC streamscall int
 spm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int cmajor = getmajor(*devp);
 	int cminor = getminor(*devp);
 	spm_t *s, **sp = &spm_list;
+
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
@@ -1344,14 +1375,16 @@ spm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	return (0);
 }
-STATIC int
+STATIC streamscall int
 spm_close(queue_t *q, int flag, cred_t *crp)
 {
 	spm_t *s = PRIV(q);
+
 	(void) flag;
 	(void) crp;
 	(void) s;
-	printd(("spm: Popped module for char device %hu:%hu\n", (ushort)s->cmajor, (ushort)s->cminor));
+	printd(("spm: Popped module for char device %hu:%hu\n", (ushort) s->cmajor,
+		(ushort) s->cminor));
 	spm_free_priv(q);
 	MOD_DEC_USE_COUNT;
 	return (0);
@@ -1371,6 +1404,7 @@ spm_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -1395,6 +1429,7 @@ STATIC int
 spm_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&spm_fmod)) < 0)
 		return (err);
 	return (0);
@@ -1404,6 +1439,7 @@ STATIC int
 spm_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&spm_fmod)) < 0)
 		return (err);
 	return (0);
@@ -1421,6 +1457,7 @@ STATIC int
 spm_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&spminfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	return (0);
@@ -1430,6 +1467,7 @@ STATIC int
 spm_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&spminfo)) < 0)
 		return (err);
 	return (0);
@@ -1441,6 +1479,7 @@ MODULE_STATIC int __init
 spminit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = spm_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -1460,6 +1499,7 @@ MODULE_STATIC void __exit
 spmterminate(void)
 {
 	int err;
+
 	if ((err = spm_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = spm_term_caches()))

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 03:23:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 03:23:38 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 03:23:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:41 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 03:23:38 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -156,7 +156,7 @@ typedef struct spx {
 static spinlock_t spx_lock = SPIN_LOCK_UNLOCKED;
 static struct spx *spx_list = NULL;
 
-static streams_fastcall int
+static streamscall int
 spx_rput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -173,7 +173,7 @@ spx_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static streams_fastcall int
+static streamscall int
 spx_wput(queue_t *q, mblk_t *mp)
 {
 	struct spx *p = q->q_ptr;
@@ -262,7 +262,7 @@ spx_wput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct spx *p, **pp = &spx_list;
@@ -325,7 +325,7 @@ spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int
+static streamscall int
 spx_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct spx *p;

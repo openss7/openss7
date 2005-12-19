@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.28 2005/12/10 20:21:39 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.29 2005/12/19 03:23:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/10 20:21:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/10 20:21:39 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/19 03:23:36 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -120,11 +120,11 @@
 #undef INLINE
 #define INLINE
 
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) __x
-
 #undef streams_fastcall
-#define streams_fastcall STREAMS_FASTCALL()
+#define streams_fastcall
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) __x streams_fastcall
 
 #undef streams_inline
 #define streams_inline
@@ -157,11 +157,11 @@
 #undef INLINE
 #define INLINE
 
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) FASTCALL(__x)
-
 #undef streams_fastcall
-#define streams_fastcall STREAMS_FASTCALL()
+#define streams_fastcall __attribute__((__regparm__(3)))
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) __x streams_fastcall
 
 #undef streams_inline
 #define streams_inline
@@ -194,11 +194,11 @@
 #undef INLINE
 #define INLINE inline
 
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) FASTCALL(__x)
-
 #undef streams_fastcall
-#define streams_fastcall STREAMS_FASTCALL()
+#define streams_fastcall __attribute__((__regparm__(3)))
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) __x streams_fastcall
 
 #undef streams_inline
 #define streams_inline inline
@@ -231,11 +231,11 @@
 #undef INLINE
 #define INLINE inline
 
-#undef STREAMS_FASTCALL
-#define STREAMS_FASTCALL(__x) FASTCALL(__x)
-
 #undef streams_fastcall
-#define streams_fastcall STREAMS_FASTCALL()
+#define streams_fastcall __attribute__((__regparm__(3)))
+
+#undef STREAMS_FASTCALL
+#define STREAMS_FASTCALL(__x) __x streams_fastcall
 
 #undef streams_inline
 #define streams_inline inline

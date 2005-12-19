@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/17 08:39:20 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/17 08:39:20 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/17 08:39:20 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $";
 
 #include <sys/os7/compat.h>
 
@@ -61,7 +61,7 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/17 08:39:20 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -116,11 +116,11 @@ STATIC struct module_info sm_minfo = {
 	512L				/* low water mark */
 };
 
-STATIC int sm_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sm_close(queue_t *, int, cred_t *);
+STATIC int streamscall sm_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sm_close(queue_t *, int, cred_t *);
 
-STATIC int STREAMS_FASTCALL(sm_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sm_rput(queue_t *, mblk_t *));
+STATIC int streamscall sm_wput(queue_t *, mblk_t *);
+STATIC int streamscall sm_rput(queue_t *, mblk_t *);
 
 STATIC struct qinit sm_rinit = {
 	sm_rput,			/* put */
@@ -167,7 +167,7 @@ sm_term_caches(void)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 sm_rput(queue_t *q, mblk_t *dp)
 {
 	/* 
@@ -220,7 +220,7 @@ sm_rput(queue_t *q, mblk_t *dp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 sm_wput(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -255,7 +255,7 @@ sm_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int
+STATIC streamscall int
 sm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	struct priv *p;
@@ -272,7 +272,7 @@ sm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
 }
 
-STATIC int
+STATIC streamscall int
 sm_close(queue_t *q, int sflag, cred_t *crp)
 {
 	struct priv *p = q->q_ptr;

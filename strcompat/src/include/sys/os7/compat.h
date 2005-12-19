@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.25 2005/12/17 08:39:21 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.26 2005/12/19 03:26:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:26:01 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -94,9 +94,15 @@ typedef void irqreturn_t;
 #define MOD_DEC_USE_COUNT
 #endif
 
-#ifndef LFS
-#define streams_fastcall
-#define STREAMS_FASTCALL(__X) __X
+#ifdef LIS
+#define STREAMSCALL(__X) __X _RP
+#define streamscall STREAMSCALL()
+#define STREAMS_FASTCALL(__X) __X __attribute__((__regparm__(3)))
+#define streams_fastcall STREAMS_FASTCALL()
+#endif
+
+#ifdef LFS
+#define _RP streamscall
 #endif
 
 #define _OS7_SOURCE

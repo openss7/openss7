@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: msgutl.h,v 1.1.1.2.4.3 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msgutl.h,v 1.6 1996/01/27 00:40:27 dave Exp $
+ * RCS Id          : $Id: msgutl.h,v 1.1.1.2.4.3 2005/12/18 05:41:24 brian Exp $
  * Purpose         : here you have utilites to handle str messages.
  *                 : 
  * ----------------______________________________________________
@@ -69,7 +69,7 @@
 #ifndef _MSGUTL_H
 #define _MSGUTL_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: msgutl.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -140,18 +140,18 @@
 /* msgsize - count sizes of blocks of message
  *
  */
-extern int STREAMS_REGPARMS(lis_msgsize(mblk_t *mp));
+extern int _RP lis_msgsize(mblk_t *mp);
 
 /* msgdsize - return number of data bytes in M_DATA blocks in message
  *
  */
-extern int STREAMS_REGPARMS(lis_msgdsize(mblk_t *mp));
+extern int _RP lis_msgdsize(mblk_t *mp);
 
 /* xmsgsize - count sizes of consecutive blocks of the same
  *	type as the first
  *
  */
-extern int STREAMS_REGPARMS(lis_xmsgsize(mblk_t *mp));
+extern int _RP lis_xmsgsize(mblk_t *mp);
 
 /* adjmsg - trim abs(len) bytes from a message. If len<0, trim
  *	from tail; else trim from head. If len is greater than
@@ -162,17 +162,17 @@ extern int STREAMS_REGPARMS(lis_xmsgsize(mblk_t *mp));
  *	Returns 1 on success; 0 otherwise.
  *
  */
-extern int STREAMS_REGPARMS(lis_adjmsg(mblk_t *mp, int length));
+extern int _RP lis_adjmsg(mblk_t *mp, int length);
 
 /* copyb - create and return a copy of a message block
  *
  */
-extern mblk_t *STREAMS_REGPARMS(lis_copyb(mblk_t *mp));
+extern mblk_t *_RP lis_copyb(mblk_t *mp);
 
 /* lis_copymsg - create and return a copy of a message
  *
  */
-extern mblk_t *STREAMS_REGPARMS(lis_copymsg(mblk_t *mp));
+extern mblk_t *_RP lis_copymsg(mblk_t *mp);
 
 #endif				/* __KERNEL__ */
 
@@ -185,25 +185,25 @@ extern mblk_t *STREAMS_REGPARMS(lis_copymsg(mblk_t *mp));
  *	The data block and data buffer are reused.
  *
  */
-extern mblk_t *STREAMS_REGPARMS(lis_dupb(mblk_t *mp));
+extern mblk_t *_RP lis_dupb(mblk_t *mp);
 
 /* lis_dupmsg - duplicate a message by duplicating the constituent
  *	data blocks.
  *
  */
-extern mblk_t *STREAMS_REGPARMS(lis_dupmsg(mblk_t *mp));
+extern mblk_t *_RP lis_dupmsg(mblk_t *mp);
 
 /*
  * lis_linkb - concatenate mp1 and mp2.
  *
  */
-extern void STREAMS_REGPARMS(lis_linkb(mblk_t *mp1, mblk_t *mp2));
+extern void _RP lis_linkb(mblk_t *mp1, mblk_t *mp2);
 
 /* unlinkb - remove first message block from a message. Return the
  *	next message block pointer, or NULL if no further blocks.
  *
  */
-extern mblk_t *STREAMS_REGPARMS(lis_unlinkb(mblk_t *mp));
+extern mblk_t *_RP lis_unlinkb(mblk_t *mp);
 
 /* lis_pullupmsg - attempt to merge the first len data bytes of a
  *	message into a single block. If len is -1, all leading
@@ -214,7 +214,7 @@ extern mblk_t *STREAMS_REGPARMS(lis_unlinkb(mblk_t *mp));
  *	Returns 1 on success; 0 otherwise.
  *
  */
-extern int STREAMS_REGPARMS(lis_pullupmsg(mblk_t *mp, int length));
+extern int _RP lis_pullupmsg(mblk_t *mp, int length);
 
 /*
  * lis_msgpullup
@@ -228,7 +228,7 @@ extern int STREAMS_REGPARMS(lis_pullupmsg(mblk_t *mp, int length));
  * Return of NULL means there were not 'length' bytes in the orignial
  * message or that something went wrong.
  */
-extern mblk_t *STREAMS_REGPARMS(lis_msgpullup(mblk_t *mp, int length));
+extern mblk_t *_RP lis_msgpullup(mblk_t *mp, int length);
 
 #endif				/* __KERNEL__ */
 
@@ -239,7 +239,7 @@ extern mblk_t *STREAMS_REGPARMS(lis_msgpullup(mblk_t *mp, int length));
  *	only block, or -1 if bp wasn't in the message
  *
  */
-extern mblk_t *STREAMS_REGPARMS(lis_rmvb(mblk_t *mp, mblk_t *bp));
+extern mblk_t *_RP lis_rmvb(mblk_t *mp, mblk_t *bp);
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:20 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:25:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:20 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:25:59 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:20 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:25:59 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -123,39 +123,39 @@ MODULE_ALIAS("streams-sl_tpi");
 #endif				/* MODULE */
 
 STATIC struct module_info sl_minfo = {
-	mi_idnum:SL_TPI_MOD_ID,		/* Module ID number */
-	mi_idname:SL_TPI_MOD_NAME,	/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10,		/* Lo water mark */
+	.mi_idnum = SL_TPI_MOD_ID,	/* Module ID number */
+	.mi_idname = SL_TPI_MOD_NAME,	/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int sl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sl_close(queue_t *, int, cred_t *);
+STATIC int streamscall sl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sl_close(queue_t *, int, cred_t *);
 
-STATIC int STREAMS_FASTCALL(sl_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sl_rsrv(queue_t *));
+STATIC int streamscall sl_rput(queue_t *, mblk_t *);
+STATIC int streamscall sl_rsrv(queue_t *);
 
 STATIC struct qinit sl_rinit = {
-	qi_putp:sl_rput,		/* Read put (msg from below) */
-	qi_srvp:sl_rsrv,		/* Read queue service */
-	qi_qopen:sl_open,		/* Each open */
-	qi_qclose:sl_close,		/* Last close */
-	qi_minfo:&sl_minfo,		/* Information */
+	.qi_putp = sl_rput,		/* Read put (msg from below) */
+	.qi_srvp = sl_rsrv,		/* Read queue service */
+	.qi_qopen = sl_open,		/* Each open */
+	.qi_qclose = sl_close,		/* Last close */
+	.qi_minfo = &sl_minfo,		/* Information */
 };
-STATIC int STREAMS_FASTCALL(sl_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(sl_wsrv(queue_t *));
+STATIC int streamscall sl_wput(queue_t *, mblk_t *);
+STATIC int streamscall sl_wsrv(queue_t *);
 
 STATIC struct qinit sl_winit = {
-	qi_putp:sl_wput,		/* Write put (msg from above) */
-	qi_srvp:sl_wsrv,		/* Write queue service */
-	qi_minfo:&sl_minfo,		/* Information */
+	.qi_putp = sl_wput,		/* Write put (msg from above) */
+	.qi_srvp = sl_wsrv,		/* Write queue service */
+	.qi_minfo = &sl_minfo,		/* Information */
 };
 
 STATIC struct streamtab sl_tpiinfo = {
-	st_rdinit:&sl_rinit,		/* Upper read queue */
-	st_wrinit:&sl_winit,		/* Upper write queue */
+	.st_rdinit = &sl_rinit,		/* Upper read queue */
+	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
 
 #define QR_DONE		0
@@ -8218,22 +8218,22 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 	return (rtn);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 sl_rput(queue_t *q, mblk_t *mp)
 {
 	return sl_putq(q, mp, &sl_r_prim, &sl_rx_wakeup);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sl_rsrv(queue_t *q)
 {
 	return sl_srvq(q, &sl_r_prim, &sl_rx_wakeup);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sl_wput(queue_t *q, mblk_t *mp)
 {
 	return sl_putq(q, mp, &sl_w_prim, &sl_tx_wakeup);
 }
-STATIC streams_fastcall int
+STATIC streamscall int
 sl_wsrv(queue_t *q)
 {
 	return sl_srvq(q, &sl_w_prim, &sl_tx_wakeup);
@@ -8444,7 +8444,7 @@ sl_free_priv(queue_t *q)
  *  head; close is called on the last close of the same device.
  */
 sl_t *sl_list = NULL;
-STATIC int
+STATIC streamscall int
 sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;		/* for now */
@@ -8466,7 +8466,7 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	MOD_DEC_USE_COUNT;
 	return EIO;
 }
-STATIC int
+STATIC streamscall int
 sl_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

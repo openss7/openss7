@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/12/14 11:43:19 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/19 03:23:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 11:43:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/12/14 11:43:19 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/19 03:23:38 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2005/12/14 11:43:19 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/19 03:23:38 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -163,7 +163,7 @@ mb_to_mdb(mblk_t *mb)
  *  Return Values: (1) - success; (0) - failure
  */
 streams_fastcall __unlikely int
-adjmsg(mblk_t *mp, ssize_t length)
+adjmsg(mblk_t *mp, register ssize_t length)
 {
 	mblk_t *b, *bp;
 	int type;
@@ -286,7 +286,7 @@ EXPORT_SYMBOL(allocb);
  *  Notices: Unlike LiS we do not align the copy.  The driver must me wary of alignment.
  */
 extern streams_fastcall __unlikely mblk_t *
-copyb(mblk_t *mp)
+copyb(register mblk_t *mp)
 {
 	mblk_t *b = NULL;
 
@@ -312,7 +312,7 @@ EXPORT_SYMBOL(copyb);		/* include/sys/streams/stream.h */
  *
  *  Copies all the message blocks in message @msg and returns a pointer to the copied message.
  */
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(copymsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(copymsg(register mblk_t *mp));
 
 EXPORT_SYMBOL(copymsg);		/* include/sys/streams/stream.h */
 
@@ -508,7 +508,7 @@ EXPORT_SYMBOL(pcmsg);
  *  @mp1:	message onto which to link
  *  @mp2:	message block to link
  */
-__STRUTIL_EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
+__STRUTIL_EXTERN_INLINE void linkb(register mblk_t *mp1, register mblk_t *mp2);
 
 EXPORT_SYMBOL(linkb);
 
@@ -525,7 +525,7 @@ EXPORT_SYMBOL(linkmsg);
  *  msgdsize:	- calculate size of data in message
  *  @mp:	message across which to calculate data bytes
  */
-__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgdsize(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgdsize(register mblk_t *mp));
 
 EXPORT_SYMBOL(msgdsize);
 
@@ -618,7 +618,7 @@ EXPORT_SYMBOL(msgsize);
  *  as a contiguous range of bytes.
  */
 streams_fastcall __unlikely int
-pullupmsg(mblk_t *mp, ssize_t len)
+pullupmsg(mblk_t *mp, register ssize_t len)
 {
 	dblk_t *db, *dp;
 	ssize_t size, blen, type;
@@ -734,7 +734,7 @@ EXPORT_SYMBOL(rmvb);
  *  @priority:	allocation priority to test
  */
 streams_fastcall __unlikely int
-testb(size_t size, uint priority)
+testb(register size_t size, uint priority)
 {
 	mblk_t *mp;
 
@@ -750,7 +750,7 @@ EXPORT_SYMBOL(testb);
  *  unlinkb:	- unlink first block of message
  *  @mp:	message to unlink
  */
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(unlinkb(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(unlinkb(register mblk_t *mp));
 
 EXPORT_SYMBOL(unlinkb);
 
@@ -798,7 +798,7 @@ EXPORT_SYMBOL(xmsgsize);
  *
  *  CONTEXT: STREAMS only.
  */
-__STRUTIL_EXTERN_INLINE queue_t *backq(queue_t *q);
+__STRUTIL_EXTERN_INLINE queue_t *backq(register queue_t *q);
 
 EXPORT_SYMBOL(backq);
 
@@ -947,7 +947,7 @@ bcanget(queue_t *q, unsigned char band)
 EXPORT_SYMBOL(bcanget);		/* include/sys/streams/stream.h */
 
 STATIC streams_inline streams_fastcall __hot_in int
-_bcanputany(queue_t *q)
+__bcanputany(queue_t *q)
 {
 	bool result;
 	unsigned long pl;
@@ -986,7 +986,7 @@ bcanputany(queue_t *q)
 	prlock(sd);
 #endif
 
-	result = _bcanputany(q);
+	result = __bcanputany(q);
 
 #ifdef CONFIG_SMP
 	prunlock(sd);
@@ -1025,7 +1025,7 @@ bcanputnextany(queue_t *q)
 	prlock(sd);
 #endif
 
-	result = _bcanputany(q->q_next);
+	result = __bcanputany(q->q_next);
 
 #ifdef CONFIG_SMP
 	prunlock(sd);
@@ -1092,7 +1092,7 @@ __get_qband(queue_t *q, unsigned char band)
 }
 
 /*
- *  _bcanput:
+ *  __bcanput:
  *
  *  A version without locks, called by bcanput() and bcanputnext() after locks taken.
  *
@@ -1103,7 +1103,7 @@ __get_qband(queue_t *q, unsigned char band)
  *  putq(9) then bcanput will always return 1.  SVR 4 SPG also says that any qi_putp(9) procedure
  *  that does putq(9) must have a qi_srvp(9) procedure.  
  *
- *  LOCKING: _bcanput() takes a queue read lock so that it can walk queue bands.
+ *  LOCKING: __bcanput() takes a queue read lock so that it can walk queue bands.
  *
  *  MP-STREAMS: Of course, because the locks are released before retuning, the result of the test
  *  can change before the result is used.  If the result is true (1) and the queue becomes full, we
@@ -1113,7 +1113,7 @@ __get_qband(queue_t *q, unsigned char band)
  *  procedure will go for another run anyway.
  */
 STATIC streams_inline streams_fastcall __hot_out int
-_bcanput(queue_t *q, unsigned char band)
+__bcanput(queue_t *q, unsigned char band)
 {
 	int result = 1;
 	unsigned long pl;
@@ -1187,12 +1187,12 @@ _bcanput(queue_t *q, unsigned char band)
  *  read queue or lower mux write queue (i.e., Stream ends).  The call on a Stream end is only
  *  really useful when the queue has a service procedure, a fact that the driver designer can know.
  *  Therefore we don't take a plumb read lock and expect a service procedure and not to have to walk
- *  the Stream in _bcanput().  Unfortunately _bcanput() is shared by bcanputnext() or I would have
- *  put checks in _bcanput().
+ *  the Stream in __bcanput().  Unfortunately __bcanput() is shared by bcanputnext() or I would have
+ *  put checks in __bcanput().
  *
  */
 streams_fastcall int
-bcanput(queue_t *q, unsigned char band)
+bcanput(register queue_t *q, unsigned char band)
 {
 	int result;
 
@@ -1206,7 +1206,7 @@ bcanput(queue_t *q, unsigned char band)
 	prlock(sd);
 #endif
 
-	result = _bcanput(q, band);
+	result = __bcanput(q, band);
 
 #ifdef CONFIG_SMP
 	prunlock(sd);
@@ -1251,7 +1251,7 @@ EXPORT_SYMBOL(bcanput);
  *  context by taking a plumb read lock.
  */
 streams_fastcall __hot_out int
-bcanputnext(queue_t *q, unsigned char band)
+bcanputnext(register queue_t *q, unsigned char band)
 {
 	int result;
 
@@ -1266,7 +1266,7 @@ bcanputnext(queue_t *q, unsigned char band)
 
 	dassert(q);
 	dassert(q->q_next);
-	result = _bcanput(q->q_next, band);
+	result = __bcanput(q->q_next, band);
 
 #ifdef CONFIG_SMP
 	prunlock(sd);
@@ -1320,7 +1320,7 @@ EXPORT_SYMBOL(canput);		/* include/sys/streams/stream.h */
  *
  *  LOCKING: Stream head read lock when called from !in_streams() context.
  */
-__STRUTIL_EXTERN_INLINE int canputnext(queue_t *q);
+__STRUTIL_EXTERN_INLINE int canputnext(register queue_t *q);
 
 EXPORT_SYMBOL(canputnext);
 
@@ -1483,7 +1483,7 @@ qschedule(queue_t *q)
  *  of the %QNOENB_BIT, but has to check for the existence of a service procedure.
  */
 streams_fastcall void
-qenable(queue_t *q)
+qenable(register queue_t *q)
 {
 	if (likely(q->q_qinfo->qi_srvp != NULL))
 		qschedule(q);
@@ -1640,7 +1640,7 @@ __putbq(queue_t *q, mblk_t *mp)
  *  @mp:	message to place back
  */
 streams_fastcall int
-putbq(queue_t *q, mblk_t *mp)
+putbq(register queue_t *q, register mblk_t *mp)
 {
 	int result;
 	unsigned long pl;
@@ -1924,7 +1924,7 @@ __putq(queue_t *q, mblk_t *mp)
  *  driver's lowest read queue.  Should not be frozen by the caller.
  */
 streams_fastcall int
-putq(queue_t *q, mblk_t *mp)
+putq(register queue_t *q, register mblk_t *mp)
 {
 	int result;
 	unsigned long pl;
@@ -2055,7 +2055,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
  *  LOCKING: The caller must lock the queue with MPSTR_QLOCK() or freezestr() across the call.
  */
 streams_fastcall int
-insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 {
 	int result;
 	unsigned long pl;
@@ -2549,7 +2549,7 @@ EXPORT_SYMBOL(qprocson);
  *  @q:		queue from which to reply
  *  @mp:	message reply
  */
-__STRUTIL_EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp);
+__STRUTIL_EXTERN_INLINE void qreply(register queue_t *q, mblk_t *mp);
 
 EXPORT_SYMBOL(qreply);
 
@@ -2557,7 +2557,7 @@ EXPORT_SYMBOL(qreply);
  *  qsize:	- calculate number of messages on a queue
  *  @q:		queue to count messages
  */
-__STRUTIL_EXTERN_INLINE ssize_t qsize(queue_t *q);
+__STRUTIL_EXTERN_INLINE ssize_t qsize(register queue_t *q);
 
 EXPORT_SYMBOL(qsize);
 
@@ -2709,7 +2709,7 @@ __rmvq(queue_t *q, mblk_t *mp)
  *  taken on the queue.  rmvq() panics if the message is not a queue, or not on the specified queue.
  */
 streams_fastcall __hot_in void
-rmvq(queue_t *q, mblk_t *mp)
+rmvq(register queue_t *q, register mblk_t *mp)
 { /* IRQ DISABLED */
 	bool backenable;
 	unsigned long pl;
@@ -2860,7 +2860,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
  *  This function is not supposed to be called on a Stream that is frozen by the calling thread.
  */
 streams_fastcall __unlikely void
-flushband(queue_t *q, int band, int flag)
+flushband(register queue_t *q, int band, int flag)
 {
 	bool backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
@@ -2980,7 +2980,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
 streams_fastcall __unlikely void
-flushq(queue_t *q, int flag)
+flushq(register queue_t *q, int flag)
 {
 	bool backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
@@ -3095,7 +3095,7 @@ __getq(queue_t *q, bool *be)
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
 streams_fastcall mblk_t *
-getq(queue_t *q)
+getq(register queue_t *q)
 {
 	mblk_t *mp;
 	bool backenable = false;
@@ -3372,7 +3372,7 @@ EXPORT_SYMBOL(setsq);		/* for stream head include/sys/streams/strsubr.h */
  *  @val:	location of return value
  */
 __unlikely int
-strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
+strqget(register queue_t *q, qfields_t what, register unsigned char band, long *val)
 {
 	int err = 0;
 	unsigned long pl;
@@ -3469,7 +3469,7 @@ EXPORT_SYMBOL(strqget);
  *  STREAMS context.
  */
 __unlikely int
-strqset(queue_t *q, qfields_t what, unsigned char band, long val)
+strqset(register queue_t *q, qfields_t what, register unsigned char band, long val)
 {
 	int err = 0;
 	unsigned long pl;
@@ -3779,7 +3779,60 @@ __STRUTIL_EXTERN_INLINE void delay(unsigned long ticks);
 
 EXPORT_SYMBOL(delay);
 
-__STRUTIL_EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p);
+int
+drv_getparm(const unsigned int parm, void *value_p)
+{
+	switch (parm) {
+	case LBOLT:
+		*(unsigned long *) value_p = jiffies;
+		return (0);
+	case PPGP:
+#if defined HAVE_KFUNC_PROCESS_GROUP
+		*(pid_t *) value_p = process_group(current);
+#else
+#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
+		*(pid_t *) value_p = current->pgrp;
+#else
+		*(pid_t *) value_p = current->signal->pgrp;
+#endif
+#endif
+		return (0);
+	case UPROCP:
+		*(ulong *) value_p = (ulong) current->files;
+		return (0);
+	case PPID:
+		*(pid_t *) value_p = current->pid;
+		return (0);
+	case PSID:
+#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+		*(pid_t *) value_p = current->session;
+#else
+		*(pid_t *) value_p = current->signal->session;
+#endif
+		return (0);
+	case TIME:
+	{
+		struct timeval tv;
+
+		do_gettimeofday(&tv);
+		*(time_t *) value_p = tv.tv_sec;
+		return (0);
+	}
+	case UCRED:
+		*(cred_t **) value_p = current_creds;
+		return (0);
+	case STRMSGSIZE:
+		*(int *) value_p = sysctl_str_strmsgsz;
+		return (0);
+	case HW_PROVIDER:
+		*(char **) value_p = "Linux " UTS_RELEASE " " UTS_VERSION;
+		return (0);
+	case DRV_MAXBIOSIZE:
+	case SYSCRED:
+		return (-1);
+	}
+	return (-1);
+}
 
 EXPORT_SYMBOL(drv_getparm);
 

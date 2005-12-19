@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/18 11:51:23 $
+ @(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 06:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/18 11:51:23 $"
+#ident "@(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 06:37:53 $"
 
 /************************************************************************
 *                          Printk Driver                                *
@@ -80,9 +80,9 @@ static struct module_info printk_minfo = {
 	40000				/* low water mark */
 };
 
-static int STREAMS_REGPARMS(printk_open(queue_t *, dev_t *, int, int, cred_t *));
-static int STREAMS_REGPARMS(printk_close(queue_t *, int, cred_t *));
-static int STREAMS_REGPARMS(printk_wput(queue_t *, mblk_t *));
+static int _RP printk_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP printk_close(queue_t *, int, cred_t *);
+static int _RP printk_wput(queue_t *, mblk_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -118,7 +118,7 @@ struct streamtab printk_info = {
 /*
  * Open routine grants all opens
  */
-static streams_regparms int
+static int _RP
 printk_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	(void) q;		/* compiler happiness */
@@ -131,7 +131,7 @@ printk_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 
 }				/* printk_open */
 
-static streams_regparms int
+static int _RP
 printk_close(queue_t *q, int dummy, cred_t *credp)
 {
 	(void) q;		/* compiler happiness */
@@ -141,7 +141,7 @@ printk_close(queue_t *q, int dummy, cred_t *credp)
 	return (0);
 }
 
-static streams_regparms int
+static int _RP
 printk_wput(queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;

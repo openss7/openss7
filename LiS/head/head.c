@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.9 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.10 $) $Date: 2005/12/18 06:38:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:38:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.9 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.10 $) $Date: 2005/12/18 06:38:05 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.9 2005/12/18 05:41:23 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.10 2005/12/18 06:38:05 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -314,7 +314,7 @@ C) Open vs Close
  *
  *  This timer is restricted to a cycle of approx. 64 seconds.
  */
-streams_regparms unsigned long
+unsigned long _RP
 lis_hitime(void)
 {
 	struct timeval tv;
@@ -332,7 +332,7 @@ lis_hitime(void)
  *  allows simpler comparison of times crossing a single cycle boundary
  *  because the full range of the underlying type is used.
  */
-streams_regparms unsigned long
+unsigned long _RP
 lis_usecs(void)
 {
 	struct timeval tv;
@@ -346,7 +346,7 @@ lis_usecs(void)
  *
  *  millisecond-resolution clock similar otherwise to lis_usecs().
  */
-streams_regparms unsigned long
+unsigned long _RP
 lis_msecs(void)
 {
 	struct timeval tv;
@@ -363,7 +363,7 @@ lis_msecs(void)
  *  this is included because some protocols (which might be implemented as
  *  STREAMS modules) specify timer events at this resolution...
  */
-streams_regparms unsigned long
+unsigned long _RP
 lis_dsecs(void)
 {
 	struct timeval tv;
@@ -377,7 +377,7 @@ lis_dsecs(void)
  *
  *  seconds-resolution clock similar otherwise to lis_usecs().
  */
-streams_regparms unsigned long
+unsigned long _RP
 lis_secs(void)
 {
 	struct timeval tv;
@@ -570,21 +570,21 @@ mblk_t *lis_queue_contention_msg(void);	/* queue.c */
  */
 
 struct module_info strmhd_rdminfo = {
-	0,			/* mi_idnum */
-	"str_rput",		/* mi_idname */
-	LIS_MINPSZ,		/* mi_minpsz */
-	LIS_MAXPSZ,		/* mi_maxpsz */
-	0xFFFF,			/* mi_hiwat */
-	0xF000			/* mi_lowat */
+	0,				/* mi_idnum */
+	"str_rput",			/* mi_idname */
+	LIS_MINPSZ,			/* mi_minpsz */
+	LIS_MAXPSZ,			/* mi_maxpsz */
+	0xFFFF,				/* mi_hiwat */
+	0xF000				/* mi_lowat */
 };
 
 struct module_info strmhd_wrminfo = {
-	0,			/* mi_idnum */
-	"str_wput",		/* mi_idname */
-	LIS_MINPSZ,		/* mi_minpsz */
-	LIS_MAXPSZ,		/* mi_maxpsz */
-	0xFFFF,			/* mi_hiwat */
-	0xF000			/* mi_lowat */
+	0,				/* mi_idnum */
+	"str_wput",			/* mi_idname */
+	LIS_MINPSZ,			/* mi_minpsz */
+	LIS_MAXPSZ,			/* mi_maxpsz */
+	0xFFFF,				/* mi_hiwat */
+	0xF000				/* mi_lowat */
 };
 
 struct module_stat strmhd_rdmstat = { };	/* all counters == 0 */
@@ -592,28 +592,28 @@ struct module_stat strmhd_rdmstat = { };	/* all counters == 0 */
 struct module_stat strmhd_wrmstat = { };	/* all counters == 0 */
 
 struct qinit strmhd_rdinit = {
-	lis_strrput,		/* qi_putp */
-	lis_strrsrv,		/* qi_srvp */
-	NULL,			/* qi_qopen */
-	NULL,			/* qi_qclose */
-	NULL,			/* qi_qadmin */
-	&strmhd_rdminfo,	/* qi_minfo */
-	&strmhd_rdmstat		/* qi_mstat */
+	lis_strrput,			/* qi_putp */
+	lis_strrsrv,			/* qi_srvp */
+	NULL,				/* qi_qopen */
+	NULL,				/* qi_qclose */
+	NULL,				/* qi_qadmin */
+	&strmhd_rdminfo,		/* qi_minfo */
+	&strmhd_rdmstat			/* qi_mstat */
 };
 
 struct qinit strmhd_wrinit = {
-	NULL,			/* qi_putp */
-	&lis_strwsrv,		/* qi_srvp */
-	NULL,			/* qi_qopen */
-	NULL,			/* qi_qclose */
-	NULL,			/* qi_qadmin */
-	&strmhd_wrminfo,	/* qi_minfo */
-	&strmhd_wrmstat		/* qi_mstat */
+	NULL,				/* qi_putp */
+	&lis_strwsrv,			/* qi_srvp */
+	NULL,				/* qi_qopen */
+	NULL,				/* qi_qclose */
+	NULL,				/* qi_qadmin */
+	&strmhd_wrminfo,		/* qi_minfo */
+	&strmhd_wrmstat			/* qi_mstat */
 };
 
 struct streamtab strmhd_info = {
-	&strmhd_rdinit,		/* read queue init */
-	&strmhd_wrinit,		/* write queue init */
+	&strmhd_rdinit,			/* read queue init */
+	&strmhd_wrinit,			/* write queue init */
 	NULL,
 	NULL
 };
@@ -625,7 +625,7 @@ struct streamtab strmhd_info = {
 
 extern int lis_await_qsched(stdata_t *hd, queue_t *q);
 extern void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds);
-extern void lis_wakeup_close(caddr_t arg);
+extern void _RP lis_wakeup_close (caddr_t arg);
 static void check_for_wantenable(stdata_t *hd);
 static int lis_strdoioctl(struct file *f, stdata_t *hd, strioctl_t * ioc, cred_t *creds,
 			  int do_copyin);
@@ -808,7 +808,7 @@ lis_down_nintr_head(stdata_t *hd, lis_semaphore_t *sem)
 
 /*  -------------------------------------------------------------------  */
 /*                            lis_clone_major				 */
-streams_regparms int
+int _RP
 lis_clone_major(void)
 {
 	return (LIS_CLONE);	/* rtn major of clone device */
@@ -1362,7 +1362,7 @@ set_readopt(int *flags, int rmode)
  * NOTE: STREAMS queues are run by waking up a process so that everything
  *       is orderly. -- DMG
  */
-static void
+static void _RP
 add_to_scanl(caddr_t arg)
 {
 	lis_flags_t psw, pswq;
@@ -3175,7 +3175,7 @@ lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
  * and the queue lock.  It needs to get the head lock first, which means
  * that we need to release the qeuue lock.  
  */
-streams_regparms int
+int _RP
 lis_strrsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -3224,7 +3224,7 @@ lis_strrsrv(queue_t *q)
  * when inserting the message into the list.  Because of the SPL we don't
  * need to lock the stream head.
  */
-streams_regparms int
+int _RP
 lis_strrput(queue_t *q, mblk_t *mp)
 {
 	stdata_t *hd;
@@ -3315,7 +3315,7 @@ lis_strrput(queue_t *q, mblk_t *mp)
  * queued for output so the stream can be closed.
  */
 
-streams_regparms int
+int _RP
 lis_strwsrv(queue_t *q)
 {
 	stdata_t *hd;
@@ -3960,7 +3960,7 @@ check_for_wantenable(stdata_t *hd)
  * take place for an LiS frozen stream, but standard semantics says not to
  * call these routines.
  */
-streams_regparms void
+void _RP
 lis_freezestr(queue_t *q)
 {
 	stdata_t *hd;
@@ -3994,7 +3994,7 @@ lis_freezestr(queue_t *q)
 	}
 }
 
-streams_regparms void
+void _RP
 lis_unfreezestr(queue_t *q)
 {
 	stdata_t *hd;
@@ -7062,7 +7062,7 @@ lis_strpoll(struct inode *i, struct file *f, void *ptr)
  * This routine is used as a timout routine and as a utility function.
  * The argument is really a pointer to a streamhead structure.
  */
-void
+void _RP
 lis_wakeup_close(caddr_t arg)
 {
 	stdata_t *hd = (stdata_t *) arg;
@@ -7083,7 +7083,7 @@ lis_wakeup_close(caddr_t arg)
  * Called if the M_FLUSH sent downstream at close time does not come back
  * to the stream head in a timely manner.
  */
-void
+void _RP
 lis_wakeup_flush(caddr_t arg)
 {
 	stdata_t *hd = (stdata_t *) arg;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/09 18:01:49 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:49 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.9  2005/12/19 03:23:40  brian
+ - wend for simple streamscall
+
  Revision 0.9.2.8  2005/12/09 18:01:49  brian
  - profiling copy
 
@@ -77,9 +80,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/09 18:01:49 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/09 18:01:49 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -104,7 +107,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/09 18:01:49 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -168,7 +171,7 @@ static struct module_info testmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
-static streams_fastcall int
+static streamscall int
 testmod_rput(queue_t *q, mblk_t *mp)
 {
 	/* we don't queue so we don't need to worry about M_FLUSH */
@@ -176,7 +179,7 @@ testmod_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static streams_fastcall int
+static streamscall int
 testmod_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -457,7 +460,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 testmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -476,7 +479,7 @@ testmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-static int
+static streamscall int
 testmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;

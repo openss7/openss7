@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/18 11:51:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.3 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/18 11:51:24 $"
 
 /************************************************************************
 *									*
@@ -199,12 +199,12 @@ extern int ip_strm_init(struct ism_dev *dev);
 ************************************************************************/
 
 extern int _RP ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
-
 extern int _RP ip_to_streams_close(queue_t *, int, cred_t *);
 extern int _RP ip_to_streams_wput(queue_t *, mblk_t *);
 extern int _RP ip_to_streams_wsrv(queue_t *);
 extern int _RP ip_to_streams_rput(queue_t *, mblk_t *);
 extern int _RP ip_to_streams_rsrv(queue_t *);
+
 extern int ip_to_streams_conn_req(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry);
 extern int ip_to_streams_proto(ip_to_streams_minor_t *, mblk_t *, int);
 

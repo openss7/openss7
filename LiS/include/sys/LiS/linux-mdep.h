@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: linux-mdep.h,v 1.1.1.7.4.4 2005/04/12 22:45:25 brian Exp $
+ @(#) $Id: linux-mdep.h,v 1.1.1.7.4.9 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:25 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.4 2005/04/12 22:45:25 brian Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.9 2005/12/18 05:41:24 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -71,7 +71,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.4 $) $Date: 2005/04/12 22:45:25 $"
+#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.9 $) $Date: 2005/12/18 05:41:24 $"
 
 #ifdef __KERNEL__
 #include <linux/config.h>
@@ -277,7 +277,7 @@ typedef unsigned int lis_dev_t;
 extern long lis_time_till(long target_time);
 extern long lis_target_time(long milli_sec);
 #endif
-extern long STREAMS_REGPARMS(lis_milli_to_ticks(long milli_sec));
+extern long _RP lis_milli_to_ticks(long milli_sec);
 
 extern char lis_kernel_version[];
 extern char lis_version[];
@@ -336,9 +336,8 @@ typedef struct cred {
 /*
  *  The ASSERT macro.
  */
-extern void
- STREAMS_REGPARMS(lis_assert_fail
-		  (const char *expr, const char *objname, const char *file, unsigned int line));
+extern void _RP lis_assert_fail(const char *expr, const char *objname, const char *file,
+				unsigned int line);
 
 #ifdef LIS_OBJNAME
 #define ___ASSERT_XSTR(s) ___ASSERT_STR(s)
@@ -389,13 +388,13 @@ typedef volatile long lis_atomic_t;
  */
 #define lis_atomic_t lis_atomic_t
 
-void STREAMS_REGPARMS(lis_atomic_set(lis_atomic_t *atomic_addr, int valu));
-int STREAMS_REGPARMS(lis_atomic_read(lis_atomic_t *atomic_addr));
-void STREAMS_REGPARMS(lis_atomic_add(lis_atomic_t *atomic_addr, int amt));
-void STREAMS_REGPARMS(lis_atomic_sub(lis_atomic_t *atomic_addr, int amt));
-void STREAMS_REGPARMS(lis_atomic_inc(lis_atomic_t *atomic_addr));
-void STREAMS_REGPARMS(lis_atomic_dec(lis_atomic_t *atomic_addr));
-int STREAMS_REGPARMS(lis_atomic_dec_and_test(lis_atomic_t *atomic_addr));
+void _RP lis_atomic_set(lis_atomic_t *atomic_addr, int valu);
+int _RP lis_atomic_read(lis_atomic_t *atomic_addr);
+void _RP lis_atomic_add(lis_atomic_t *atomic_addr, int amt);
+void _RP lis_atomic_sub(lis_atomic_t *atomic_addr, int amt);
+void _RP lis_atomic_inc(lis_atomic_t *atomic_addr);
+void _RP lis_atomic_dec(lis_atomic_t *atomic_addr);
+int _RP lis_atomic_dec_and_test(lis_atomic_t *atomic_addr);
 
 /*
  * Internally we can use these direct access macros for speed since LiS
@@ -411,7 +410,7 @@ int STREAMS_REGPARMS(lis_atomic_dec_and_test(lis_atomic_t *atomic_addr));
 #define	K_ATOMIC_SUB(lis_atomic_addr,v)		\
 				atomic_sub((v),(atomic_t *)(lis_atomic_addr))
 
-extern int STREAMS_REGPARMS(lis_in_interrupt(void));
+extern int _RP lis_in_interrupt(void);
 
 /*
  * Now include lislocks.h
@@ -421,15 +420,15 @@ extern int STREAMS_REGPARMS(lis_in_interrupt(void));
 /*
  *  lis_gettimeofday -  used by lis_hitime and similar functions
  */
-void STREAMS_REGPARMS(lis_gettimeofday(struct timeval *tv));
+void _RP lis_gettimeofday(struct timeval *tv);
 
 /* lock inodes...
  *
  * Must use kernel semaphore routine directly since the inode semaphore is a
  * kernel semaphore and not an LiS semaphore.
  */
-int STREAMS_REGPARMS(lis_kernel_down(struct semaphore *sem));
-void STREAMS_REGPARMS(lis_kernel_up(struct semaphore *sem));
+int _RP lis_kernel_down(struct semaphore *sem);
+void _RP lis_kernel_up(struct semaphore *sem);
 
 #if 0				/* don't need to hold inode semaphore for I/O oprns */
 #define	LOCK_INO(i)	lis_kernel_down(&((i)->i_sem))
@@ -507,8 +506,8 @@ extern int lis_strflush(struct file *);
 /*
  * Device node support
  */
-int STREAMS_REGPARMS(lis_mknod(char *name, int mode, dev_t dev));
-int STREAMS_REGPARMS(lis_unlink(char *name));
+int _RP lis_mknod(char *name, int mode, dev_t dev);
+int _RP lis_unlink(char *name);
 
 /*
  *  FIFO/pipe support
@@ -639,9 +638,9 @@ typedef unsigned lis_minor_t;
 #define	major_t		lis_major_t
 #define	minor_t		lis_minor_t
 
-extern major_t STREAMS_REGPARMS(lis_getmajor(dev_t dev));
-extern minor_t STREAMS_REGPARMS(lis_getminor(dev_t dev));
-extern dev_t STREAMS_REGPARMS(lis_makedevice(major_t majr, minor_t minr));
+extern major_t _RP lis_getmajor(dev_t dev);
+extern minor_t _RP lis_getminor(dev_t dev);
+extern dev_t _RP lis_makedevice(major_t majr, minor_t minr);
 
 #ifdef __LIS_INTERNAL__
 extern dev_t lis_kern_to_lis_dev(dev_t dev);
@@ -747,8 +746,8 @@ extern dev_t lis_i_rdev(struct inode *);
  * this returned value.  It particular, it is not visible to the thread that
  * started the new thread.
  */
-pid_t STREAMS_REGPARMS(lis_thread_start(int (*fcn) (void *), void *arg, const char *name));
-int STREAMS_REGPARMS(lis_thread_stop(pid_t pid));
+pid_t _RP lis_thread_start(int (*fcn) (void *), void *arg, const char *name);
+int _RP lis_thread_stop(pid_t pid);
 
 #else				/* __KERNEL__ */
 
@@ -907,8 +906,8 @@ extern void lis_memfree(void);
 #ifdef __LIS_INTERNAL__
 extern int lis_copyin_str(struct file *fp, const char *ustr, char **kstr, int max);
 #endif
-int STREAMS_REGPARMS(lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len));
-int STREAMS_REGPARMS(lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len));
+int _RP lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len);
+int _RP lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len);
 
 #ifdef __LIS_INTERNAL__
 int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth);

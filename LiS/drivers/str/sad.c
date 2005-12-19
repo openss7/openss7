@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2005/07/18 11:51:23 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2005/12/18 06:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2005/07/18 11:51:23 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2005/12/18 06:37:53 $"
 
 /*
  *  sad: STREAMS Administrative Driver
@@ -96,9 +96,9 @@
 #define INLINE inline
 #endif
 
-STATIC int STREAMS_REGPARMS(sad_open(queue_t *, dev_t *, int, int, cred_t *));
-STATIC int STREAMS_REGPARMS(sad_close(queue_t *, int, cred_t *));
-STATIC int STREAMS_REGPARMS(sad_wput(queue_t *, mblk_t *));
+STATIC int _RP sad_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int _RP sad_close(queue_t *, int, cred_t *);
+STATIC int _RP sad_wput(queue_t *, mblk_t *);
 
 STATIC struct module_info sad_minfo = {
 	0,				/* Module ID number */
@@ -360,7 +360,7 @@ sad_do_ioctl(struct priv *p, mblk_t *mp)
 /*                                                                          */
 /****************************************************************************/
 
-STATIC streams_regparms int
+STATIC int _RP
 sad_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	dev_t i;
@@ -386,7 +386,7 @@ sad_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return 0;
 }
 
-STATIC streams_regparms int
+STATIC int _RP
 sad_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct priv *p = q->q_ptr;
@@ -400,7 +400,7 @@ sad_close(queue_t *q, int flag, cred_t *crp)
 	return 0;
 }
 
-STATIC streams_regparms int
+STATIC int _RP
 sad_wput(queue_t *q, mblk_t *mp)
 {
 	struct priv *p;

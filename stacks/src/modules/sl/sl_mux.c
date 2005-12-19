@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/15 23:08:13 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:13 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/15 23:08:13 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/15 23:08:13 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $";
 
 #include <sys/os7/compat.h>
 
@@ -61,7 +61,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/15 23:08:13 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -122,8 +122,8 @@ STATIC struct module_info sl_minfo = {
 	.mi_lowat = 512L,		/* low water mark */
 };
 
-STATIC int sl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sl_close(queue_t *, int, cred_t *);
+STATIC int streamscall sl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sl_close(queue_t *, int, cred_t *);
 
 STATIC int sl_r_prim(queue_t *q, mblk_t *mp);
 
@@ -878,7 +878,7 @@ STATIC major_t slm_majors[CMAJORS] = { CMAJOR_0, };
  *  -------------------------------------------------------------------------
  */
 
-STATIC int
+STATIC streamscall int
 sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -946,7 +946,7 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC int
+STATIC streamscall int
 sl_close(queue_t *q, int sflag, cred_t *crp)
 {
 	struct sl *sl = SL_PRIV(q);

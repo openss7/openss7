@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/07/18 11:51:24 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/12/18 06:37:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:51:24 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/07/18 11:51:24 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/12/18 06:37:58 $"
 
 /*
  *  connld.c - unique pipe generator
@@ -101,10 +101,10 @@
 /*
  *  function prototypes
  */
-static int STREAMS_REGPARMS(connld_open(queue_t *, dev_t *, int, int, cred_t *));
-static int STREAMS_REGPARMS(connld_close(queue_t *, int, cred_t *));
-static int STREAMS_REGPARMS(connld_wput(queue_t *q, mblk_t *mp));
-static int STREAMS_REGPARMS(connld_rput(queue_t *q, mblk_t *mp));
+static int _RP connld_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP connld_close(queue_t *, int, cred_t *);
+static int _RP connld_wput(queue_t *q, mblk_t *mp);
+static int _RP connld_rput(queue_t *q, mblk_t *mp);
 
 /*
  *  module structure
@@ -148,7 +148,7 @@ struct streamtab connld_info = {
 /*
  *  open
  */
-static streams_regparms int
+static int _RP
 connld_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	stdata_t *head = q->q_str;
@@ -294,7 +294,7 @@ connld_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 /*
  *  close
  */
-static streams_regparms int
+static int _RP
 connld_close(queue_t *q, int flag, cred_t *credp)
 {
 	stdata_t *head = q->q_str;
@@ -321,7 +321,7 @@ connld_close(queue_t *q, int flag, cred_t *credp)
 /*
  *  wput
  */
-static streams_regparms int
+static int _RP
 connld_wput(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -355,7 +355,7 @@ connld_wput(queue_t *q, mblk_t *mp)
 /*
  *  rput
  */
-static streams_regparms int
+static int _RP
 connld_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);

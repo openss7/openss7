@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strmdbg.h,v 1.1.1.4.4.5 2005/12/18 05:41:24 brian Exp $
+ @(#) $Id: strmdbg.h,v 1.1.1.4.4.6 2005/12/18 06:38:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:38:20 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -73,7 +73,7 @@
 #ifndef	_STRMDBG_H
 #define	_STRMDBG_H		1
 
-#ident "@(#) $RCSfile: strmdbg.h,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: strmdbg.h,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/12/18 06:38:20 $"
 
 #ifndef _HEAD_H
 #include <sys/LiS/head.h>
@@ -247,24 +247,24 @@ extern unsigned long lis_debug_mask2;
  * Some routines to assist in debug printing
  */
 #ifdef __KERNEL__
-void STREAMS_REGPARMS(lis_print_block(void *ptr));
-void STREAMS_REGPARMS(lis_print_mem(void));
-void STREAMS_REGPARMS(lis_print_queue(queue_t *q));
+void _RP lis_print_block(void *ptr);
+void _RP lis_print_mem(void);
+void _RP lis_print_queue(queue_t *q);
 
 #ifdef __LIS_INTERNAL__
 void lis_print_queues(void);
 void lis_print_stream(stdata_t *head);
 #endif
-const char *STREAMS_REGPARMS(lis_strm_name(stdata_t *head));
-const char *STREAMS_REGPARMS(lis_strm_name_from_queue(queue_t *q));
-const char *STREAMS_REGPARMS(lis_queue_name(queue_t *q));
+const char *_RP lis_strm_name(stdata_t *head);
+const char *_RP lis_strm_name_from_queue(queue_t *q);
+const char *_RP lis_queue_name(queue_t *q);
 
 #ifdef __LIS_INTERNAL__
 const char *lis_maj_min_name(stdata_t *head);
 #endif
-const char *STREAMS_REGPARMS(lis_msg_type_name(mblk_t *mp));
-void STREAMS_REGPARMS(lis_print_data(mblk_t *mp, int opt, int cont));
-void STREAMS_REGPARMS(lis_print_msg(mblk_t *mp, const char *prefix, int opt));
+const char *_RP lis_msg_type_name(mblk_t *mp);
+void _RP lis_print_data(mblk_t *mp, int opt, int cont);
+void _RP lis_print_msg(mblk_t *mp, const char *prefix, int opt);
 
 #ifdef __LIS_INTERNAL__
 char *lis_poll_events(short events);
@@ -286,10 +286,10 @@ char *lis_poll_events(short events);
  * memory.
  */
 #ifdef __KERNEL__
-void *STREAMS_REGPARMS(lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr));
-void *STREAMS_REGPARMS(lis_zmalloc(int nbytes, int class, char *file_name, int line_nr));
-void STREAMS_REGPARMS(lis_free(void *ptr, char *file_name, int line_nr));
-void STREAMS_REGPARMS(lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr));
+void *_RP lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr);
+void *_RP lis_zmalloc(int nbytes, int class, char *file_name, int line_nr);
+void _RP lis_free(void *ptr, char *file_name, int line_nr);
+void _RP lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr);
 
 #if defined(CONFIG_DEV)
 #define	lis_mark_mem	lis_mark_mem_fcn

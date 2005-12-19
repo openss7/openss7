@@ -178,7 +178,7 @@
 #define  SAMESTR     LIS_SAMESTR
 #define	 strqset	lis_strqset
 #define	 strqget	lis_strqget
-extern void STREAMS_REGPARMS(lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l));
+extern void _RP lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l);
 
 #define put(q,m)	lis_safe_putmsg((q),(m),__FILE__,__LINE__)
 #endif				/* __KERNEL__ */

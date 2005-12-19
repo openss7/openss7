@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: lislocks.h,v 1.1.1.6.4.4 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -65,7 +65,7 @@
 #ifndef SYS_LISLOCKS_H
 #define SYS_LISLOCKS_H	1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lislocks.h,v $ $Name:  $($Revision: 1.1.1.6.4.4 $) $Date: 2005/12/18 05:41:24 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -150,18 +150,17 @@ typedef int lis_flags_t;
 typedef unsigned long lis_flags_t;
 #endif
 
-int STREAMS_REGPARMS(lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_spin_lock_fcn(lis_spin_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL));
-int STREAMS_REGPARMS(lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL));
-void
- STREAMS_REGPARMS(lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL));
-void STREAMS_REGPARMS(lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL));
-lis_spin_lock_t *STREAMS_REGPARMS(lis_spin_lock_alloc_fcn(const char *name, FL));
-lis_spin_lock_t *STREAMS_REGPARMS(lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL));
+int _RP lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL);
+void _RP lis_spin_lock_fcn(lis_spin_lock_t *lock, FL);
+void _RP lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL);
+int _RP lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL);
+void _RP lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL);
+void _RP lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL);
+void _RP lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL);
+void _RP lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL);
+void _RP lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL);
+lis_spin_lock_t *_RP lis_spin_lock_alloc_fcn(const char *name, FL);
+lis_spin_lock_t *_RP lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL);
 
 /************************************************************************
 *                           Read/Write Spin Locks			*
@@ -218,29 +217,27 @@ typedef volatile struct lis_rw_lock {
 /*
  * These are the real routines.  Not to be called directly.
  */
-void STREAMS_REGPARMS(lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL));
+void _RP lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL);
+void _RP lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL);
 
-void STREAMS_REGPARMS(lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL));
+void _RP lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL);
+void _RP lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL);
 
-void STREAMS_REGPARMS(lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL));
+void _RP lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL);
+void _RP lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL);
 
-void STREAMS_REGPARMS(lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL));
-void STREAMS_REGPARMS(lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL));
+void _RP lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL);
+void _RP lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL);
 
-void STREAMS_REGPARMS(lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL));
-void STREAMS_REGPARMS(lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL));
+void _RP lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
+void _RP lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
 
-void
- STREAMS_REGPARMS(lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL));
-void
- STREAMS_REGPARMS(lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL));
+void _RP lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
+void _RP lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
 
-void STREAMS_REGPARMS(lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL));
-lis_rw_lock_t *STREAMS_REGPARMS(lis_rw_lock_alloc_fcn(const char *name, FL));
-lis_rw_lock_t *STREAMS_REGPARMS(lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL));
+void _RP lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL);
+lis_rw_lock_t *_RP lis_rw_lock_alloc_fcn(const char *name, FL);
+lis_rw_lock_t *_RP lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL);
 
 /************************************************************************
 *                           SPL Routines                                *
@@ -255,14 +252,14 @@ lis_rw_lock_t *STREAMS_REGPARMS(lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL));
 #define	lis_splx(x)		lis_splx_fcn(x,__FILE__,__LINE__)
 #define	lis_spl0(x)		lis_spl0_fcn(__FILE__,__LINE__)
 
-lis_flags_t STREAMS_REGPARMS(lis_splstr_fcn(FL));
-void STREAMS_REGPARMS(lis_splx_fcn(lis_flags_t x, FL));
-void STREAMS_REGPARMS(lis_spl0_fcn(FL));
+lis_flags_t _RP lis_splstr_fcn(FL);
+void _RP lis_splx_fcn(lis_flags_t x, FL);
+void _RP lis_spl0_fcn(FL);
 
 #ifdef __LIS_INTERNAL__
 void lis_print_spl_track(void);
 #endif
-int STREAMS_REGPARMS(lis_own_spl(void));	/* do I own the global spl lock? */
+int _RP lis_own_spl(void);		/* do I own the global spl lock? */
 
 /************************************************************************
 *                           Semaphores                                  *
@@ -301,16 +298,16 @@ typedef struct lis_semaphore {
 #define	lis_up(s)	lis_up_fcn(s, __FILE__,__LINE__)
 #define	lis_down(s)	lis_down_fcn(s, __FILE__,__LINE__)
 #define	lis_down_nosig(s) lis_down_nosig_fcn(s, __FILE__,__LINE__)
-extern void STREAMS_REGPARMS(lis_sem_init(lis_semaphore_t *, int));
-extern lis_semaphore_t *STREAMS_REGPARMS(lis_sem_destroy(lis_semaphore_t *));
-extern lis_semaphore_t *STREAMS_REGPARMS(lis_sem_alloc(int));
+extern void _RP lis_sem_init(lis_semaphore_t *, int);
+extern lis_semaphore_t *_RP lis_sem_destroy(lis_semaphore_t *);
+extern lis_semaphore_t *_RP lis_sem_alloc(int);
 
 /*
  * Implementation routines, not to be used directly by drivers.
  */
-extern void STREAMS_REGPARMS(lis_up_fcn(lis_semaphore_t *sem, FL));
-extern int STREAMS_REGPARMS(lis_down_fcn(lis_semaphore_t *sem, FL));
-extern void STREAMS_REGPARMS(lis_down_nosig_fcn(lis_semaphore_t *lsem, FL));
+extern void _RP lis_up_fcn(lis_semaphore_t *sem, FL);
+extern int _RP lis_down_fcn(lis_semaphore_t *sem, FL);
+extern void _RP lis_down_nosig_fcn(lis_semaphore_t *lsem, FL);
 
 /*
  * Semaphore initialization is handled by lis_sem_init.  Semaphore destruction

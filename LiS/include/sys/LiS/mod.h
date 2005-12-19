@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mod.h,v 1.1.1.4.4.5 2005/07/13 12:01:20 brian Exp $
+ @(#) $Id: mod.h,v 1.1.1.4.4.7 2005/12/18 05:41:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -68,7 +68,7 @@
 #ifndef _MOD_H
 #define _MOD_H 1
 
-#ident "@(#) $RCSfile: mod.h,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:20 $"
+#ident "@(#) $RCSfile: mod.h,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/12/18 05:41:24 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -232,13 +232,13 @@ extern struct fmodsw lis_fmod_sw[MAX_STRMOD];	/* streams modules */
 #ifdef __KERNEL__
 
 /* Register and unregister streams modules and drivers */
-extern modID_t STREAMS_REGPARMS(lis_register_strmod(struct streamtab *strtab, const char *name));
-extern int STREAMS_REGPARMS(lis_unregister_strmod(struct streamtab *strtab));
-extern int STREAMS_REGPARMS(lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
-						const char *name));
-extern int STREAMS_REGPARMS(lis_unregister_strdev(major_t major));
-extern int STREAMS_REGPARMS(lis_register_driver_qlock_option(major_t major, int qlock_option));
-extern int STREAMS_REGPARMS(lis_register_module_qlock_option(modID_t id, int qlock_option));
+extern modID_t _RP lis_register_strmod(struct streamtab *strtab, const char *name);
+extern int _RP lis_unregister_strmod(struct streamtab *strtab);
+extern int _RP lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
+				   const char *name);
+extern int _RP lis_unregister_strdev(major_t major);
+extern int _RP lis_register_driver_qlock_option(major_t major, int qlock_option);
+extern int _RP lis_register_module_qlock_option(modID_t id, int qlock_option);
 
 /* Back compatible: Will go away when no longer used */
 #define	register_strdev		lis_register_strdev
@@ -249,7 +249,7 @@ extern streamtab_t *lis_find_strdev(major_t major);
 #endif
 
 /* Find/load a module id by name */
-extern modID_t STREAMS_REGPARMS(lis_findmod(const char *name));
+extern modID_t _RP lis_findmod(const char *name);
 
 #ifdef __LIS_INTERNAL__
 extern modID_t lis_loadmod(const char *name);
@@ -260,9 +260,9 @@ extern modID_t lis_findmod_strtab(struct streamtab *strtab);
 #ifdef __LIS_INTERNAL__
 extern int lis_apushm(dev_t dev, const char *mods[]);
 #endif
-extern int STREAMS_REGPARMS(lis_apush_set(struct strapush *ap));
-extern int STREAMS_REGPARMS(lis_apush_get(struct strapush *ap));
-extern int STREAMS_REGPARMS(lis_apush_vml(struct str_list *mlp));
+extern int _RP lis_apush_set(struct strapush *ap);
+extern int _RP lis_apush_get(struct strapush *ap);
+extern int _RP lis_apush_vml(struct str_list *mlp);
 
 /* mod.c initialization and cleanup functions */
 #ifdef __LIS_INTERNAL__

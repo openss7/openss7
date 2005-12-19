@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/19 10:26:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -71,7 +71,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/09/19 10:26:59 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -118,32 +118,32 @@ MODULE_ALIAS("streams-sl");
 #endif				/* MODULE */
 
 STATIC struct module_info sl_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10,		/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int sl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sl_close(queue_t *, int, cred_t *);
+STATIC int streamscall sl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall sl_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit sl_rinit = {
-	qi_putp:ss7_oput,		/* Read put (msg from below) */
-	qi_qopen:sl_open,		/* Each open */
-	qi_qclose:sl_close,		/* Last close */
-	qi_minfo:&sl_minfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Read put (msg from below) */
+	.qi_qopen = sl_open,		/* Each open */
+	.qi_qclose = sl_close,		/* Last close */
+	.qi_minfo = &sl_minfo,		/* Information */
 };
 
 STATIC struct qinit sl_winit = {
-	qi_putp:ss7_iput,		/* Write put (msg from above) */
-	qi_minfo:&sl_minfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Write put (msg from above) */
+	.qi_minfo = &sl_minfo,		/* Information */
 };
 
 STATIC struct streamtab slinfo = {
-	st_rdinit:&sl_rinit,		/* Upper read queue */
-	st_wrinit:&sl_winit,		/* Upper write queue */
+	.st_rdinit = &sl_rinit,		/* Upper read queue */
+	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
 
 /*
@@ -5732,7 +5732,7 @@ sl_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
@@ -5774,7 +5774,7 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 sl_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;

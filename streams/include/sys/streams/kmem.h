@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.13 2005/12/09 00:27:48 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.14 2005/12/19 03:23:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:48 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/09 00:27:48 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:23:36 $"
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
@@ -61,16 +61,6 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
-
-#include <linux/string.h>
-#include <linux/slab.h>
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
-#ifndef __STRSCHD_EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE __EXTERN_INLINE
-#endif				/* __STRSCHD_EXTERN_INLINE */
 
 #define KM_SLEEP	0
 #define KM_NOSLEEP	(1<<0)
@@ -81,57 +71,15 @@
 /* typedef unsigned short cnodeid_t; */
 typedef int cnodeid_t;
 
-__STRSCHD_EXTERN_INLINE void *
-kmem_alloc(size_t size, int flags)
-{
-	if (size == 0 || size > 131072)
-		return NULL;
-#if ((L1_CACHE_BYTES > 32) && (PAGE_SIZE == 4096)) || ((L1_CACHE_BYTES > 64) && (PAGE_SIZE != 4096))
-	/* all we have to do is pad to a cacheline to get cacheline aligment, as long as a
-	   cacheline is a power of 2 */
-	if (flags & KM_CACHEALIGN && size <= (L1_CACHE_BYTES >> 1))
-		size = L1_CACHE_BYTES;
-#endif
-	/* KM_PHYSCONTIG is ignored because kmalloc'ed memory is always physically contiguous. */
-	return kmalloc(size,
-		       ((flags & KM_NOSLEEP) ? GFP_ATOMIC : GFP_KERNEL) | ((flags & KM_DMA) ?
-									   GFP_DMA : 0));
-}
-
-__STRSCHD_EXTERN_INLINE void *
-kmem_zalloc(size_t size, int flags)
-{
-	void *mem;
-
-	if ((mem = kmem_alloc(size, flags)))
-#if defined HAVE_KFUNC_KSIZE
-		/* newer kernels can tell us how big a memory object truly is */
-		memset(mem, 0, ksize(mem));
-#else
-		memset(mem, 0, size);
-#endif
-	return (mem);
-}
-
+extern void *kmem_alloc(size_t size, int flags);
+extern void *kmem_zalloc(size_t size, int flags);
 extern void kmem_free(void *ptr, size_t size);
 
 #ifdef CONFIG_NUMA
 #warning kmem_alloc_node and kmem_zalloc_node are not supported on NUMA architectures
 #endif
 
-__STRSCHD_EXTERN_INLINE void *
-kmem_alloc_node(size_t size, int flags, cnodeid_t node)
-{
-	return kmalloc(size, GFP_KERNEL);
-}
-__STRSCHD_EXTERN_INLINE void *
-kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
-{
-	void *mem;
-
-	if ((mem = kmalloc(size, GFP_KERNEL)))
-		memset(mem, 0, size);
-	return (mem);
-}
+extern void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
+extern void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
 
 #endif				/* __SYS_STREAMS_KMEM_H__ */

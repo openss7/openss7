@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: safe.c,v $ $Name:  $($Revision: 1.1.1.5.4.3 $) $Date: 2005/12/18 05:41:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: safe.c,v $ $Name:  $($Revision: 1.1.1.5.4.3 $) $Date: 2005/12/18 05:41:23 $"
 
 /*                               -*- Mode: C -*- 
  * safe.c --- stream safe
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: safe.c,v 1.4 1996/01/20 17:02:56 dave Exp $
+ * RCS Id          : $Id: safe.c,v 1.1.1.5.4.3 2005/12/18 05:41:23 brian Exp $
  * Purpose         : stream safe processing stuff
  * ----------------______________________________________________
  *
@@ -87,7 +87,7 @@
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
-streams_regparms void
+void _RP
 lis_safe_noenable(queue_t *q, char *f, int l)
 {
 	lis_flags_t psw;
@@ -99,7 +99,7 @@ lis_safe_noenable(queue_t *q, char *f, int l)
 	LIS_QISRUNLOCK(q, &psw);
 }
 
-streams_regparms void
+void _RP
 lis_safe_enableok(queue_t *q, char *f, int l)
 {
 	lis_flags_t psw;
@@ -111,7 +111,7 @@ lis_safe_enableok(queue_t *q, char *f, int l)
 	LIS_QISRUNLOCK(q, &psw);
 }
 
-streams_regparms int
+int _RP
 lis_safe_canenable(queue_t *q, char *f, int l)
 {
 	if (LIS_QMAGIC(q, f, l))
@@ -120,7 +120,7 @@ lis_safe_canenable(queue_t *q, char *f, int l)
 	return 0;
 }
 
-streams_regparms queue_t *
+queue_t *_RP
 lis_safe_OTHERQ(queue_t *q, char *f, int l)
 {
 	queue_t *oq = NULL;
@@ -134,7 +134,7 @@ lis_safe_OTHERQ(queue_t *q, char *f, int l)
 	return NULL;
 }
 
-streams_regparms queue_t *
+queue_t *_RP
 lis_safe_RD(queue_t *q, char *f, int l)
 {
 	queue_t *oq = NULL;
@@ -152,7 +152,7 @@ lis_safe_RD(queue_t *q, char *f, int l)
 	return NULL;
 }
 
-streams_regparms queue_t *
+queue_t *_RP
 lis_safe_WR(queue_t *q, char *f, int l)
 {
 	queue_t *oq = NULL;
@@ -170,7 +170,7 @@ lis_safe_WR(queue_t *q, char *f, int l)
 	return NULL;
 }
 
-streams_regparms int
+int _RP
 lis_safe_SAMESTR(queue_t *q, char *f, int l)
 {
 	if (LIS_QMAGIC(q, f, l)
@@ -230,13 +230,13 @@ lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry, char *f, int l
 	return (1);		/* msg consumed */
 }
 
-streams_regparms void
+void _RP
 lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	lis_safe_do_putmsg(q, mp, (QDEFERRING | QOPENING), 0, f, l);
 }
 
-streams_regparms void
+void _RP
 lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	queue_t *qnxt = NULL;
@@ -265,7 +265,7 @@ lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
 	lis_safe_putmsg(qnxt, mp, f, l);
 }
 
-streams_regparms void
+void _RP
 lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	if (mp == NULL) {

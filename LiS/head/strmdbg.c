@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmdbg.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: strmdbg.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 06:38:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:38:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmdbg.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: strmdbg.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/12/18 06:38:08 $"
 
 /************************************************************************
 *                       STREAMS Debugging Aids                          *
@@ -143,11 +143,11 @@ char *lis_nxt_print_ptr = lis_print_buffer;
 static lis_spin_lock_t lis_print_buffer_lock;
 static int lock_initialized;
 
-__attribute__ ((format(printf, 1, 2)))
+__attribute__ ((__format__(__printf__, 1, 2)))
 	void lis_bprintf(char *fmt, ...)
 {
 	extern char lis_cmn_err_buf[];
-	extern int STREAMS_REGPARMS(vsprintf(char *, const char *, va_list));
+	extern int _RP vsprintf (char *, const char *, va_list);
 	va_list args;
 	int nbytes;
 
@@ -230,7 +230,7 @@ put_file_name(mem_link_t * p, const char *name)
 * Allocate nbytes of memory and return a pointer to it.			*
 *									*
 ************************************************************************/
-streams_regparms void *
+void *_RP
 lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr)
 {
 	mem_link_t *p;
@@ -307,7 +307,7 @@ lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr)
 * Like lis_malloc, only it zeros the memory before returning.		*
 *									*
 ************************************************************************/
-streams_regparms void *
+void *_RP
 lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 {
 	void *ptr = lis_malloc(nbytes, class, 0, file_name, line_nr);
@@ -362,7 +362,7 @@ lis_check_guard(void *ptr, char *msg)
 * Free a block of memory allocated by lis_malloc.			*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_free(void *ptr, char *file_name, int line_nr)
 {
 	mem_link_t *p;
@@ -493,7 +493,7 @@ lis_check_mem(void)
 * to track down memory leaks.						*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr)
 {
 #if defined(CONFIG_DEV)
@@ -522,7 +522,7 @@ lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr)
 * link field and print it out in decoded form.				*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_print_block(void *ptr)
 {
 	mem_link_t *p;
@@ -586,7 +586,7 @@ lis_print_block(void *ptr)
 * Walk the memory link list and print out each element.			*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_print_mem(void)
 {
 	mem_link_t *p;
@@ -645,7 +645,7 @@ lis_print_queues(void)
 *									*
 ************************************************************************/
 
-streams_regparms const char *
+const char *_RP
 lis_strm_name(stdata_t *head)
 {
 	const char *name;
@@ -679,7 +679,7 @@ lis_strm_name(stdata_t *head)
 * Find the stream name associated with the queue.			*
 *									*
 ************************************************************************/
-streams_regparms const char *
+const char *_RP
 lis_strm_name_from_queue(queue_t *q)
 {
 	if (q->q_str != NULL)
@@ -699,7 +699,7 @@ lis_strm_name_from_queue(queue_t *q)
 *									*
 ************************************************************************/
 
-streams_regparms const char *
+const char *_RP
 lis_queue_name(queue_t *q)
 {
 	const char *name;
@@ -723,7 +723,7 @@ lis_queue_name(queue_t *q)
 *									*
 ************************************************************************/
 
-streams_regparms const char *
+const char *_RP
 lis_msg_type_name(mblk_t *mp)
 {
 	if (mp == NULL)
@@ -829,7 +829,7 @@ lis_maj_min_name(stdata_t *head)
 * Print out some of the interesting features about a queue.		*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_print_queue(queue_t *q)
 {
 	const char *name;
@@ -976,7 +976,7 @@ lis_print_stream(stdata_t *hd)
 *									*
 ************************************************************************/
 
-streams_regparms void
+void _RP
 lis_print_data(mblk_t *mp, int opt, int cont)
 {
 	const unsigned char *p;
@@ -1038,7 +1038,7 @@ lis_print_data(mblk_t *mp, int opt, int cont)
 * 'opt' is the print format option, or zero for the short form.		*
 *									*
 ************************************************************************/
-streams_regparms void
+void _RP
 lis_print_msg(mblk_t *mp, const char *prefix, int opt)
 {
 	int nbytes;

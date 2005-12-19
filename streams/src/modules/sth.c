@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 16:31:27 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2005/12/14 16:31:27 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -168,10 +168,10 @@ struct module_info str_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-int str_close(queue_t *q, int oflag, cred_t *crp);
+int streamscall str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+int streamscall str_close(queue_t *q, int oflag, cred_t *crp);
 
-int STREAMS_FASTCALL(strrput(queue_t *q, mblk_t *mp));
+int streamscall strrput(queue_t *q, mblk_t *mp);
 
 static struct qinit str_rinit = {
 	.qi_putp = strrput,
@@ -180,8 +180,8 @@ static struct qinit str_rinit = {
 	.qi_minfo = &str_minfo,
 };
 
-int STREAMS_FASTCALL(strwput(queue_t *q, mblk_t *mp));
-int STREAMS_FASTCALL(strwsrv(queue_t *q));
+int streamscall strwput(queue_t *q, mblk_t *mp);
+int streamscall strwsrv(queue_t *q);
 
 static struct qinit str_winit = {
 	.qi_putp = strwput,
@@ -2566,7 +2566,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
  *  Intercpet M_IOCACK, M_IOCNAK messages on a multiplexed queue pair.  When sending the M_IOCTL for
  *  an I_UNLINK or I_PUNLINK operation, there is no stream head attached to process the response.
  */
-STATIC streams_fastcall int
+STATIC streamscall int
 strirput(queue_t *q, mblk_t *mp)
 {				/* PROFILED */
 	struct stdata *sd;
@@ -4404,7 +4404,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
  *  __strfreepage: - free routine function to free a esballoc'ed page
  *  @data: &struct page pointer passed as a caddr_t argument
  */
-STATIC __unlikely void
+STATIC __unlikely void streamscall
 __strfreepage(caddr_t data)
 {
 	struct page *page = (struct page *) data;
@@ -6760,7 +6760,7 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
  *  received by the other end or flushed.  Another option would be to refuse to flush them from the
  *  read queue, and leave them hanging around until the queue pair is closed (under user context).
  */
-STATIC void
+STATIC void streamscall
 freefd_func(caddr_t arg)
 {
 	struct file *file = (struct file *) arg;
@@ -7821,7 +7821,7 @@ EXPORT_SYMBOL(strm_f_ops);
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
  *  check a bunch of things here, before attempting a putnext().
  */
-int streams_fastcall
+int streamscall
 strwput(queue_t *q, mblk_t *mp)
 {				/* PROFILED -- never happens any more */
 	struct stdata *sd;
@@ -7887,7 +7887,7 @@ EXPORT_SYMBOL(strwput);
  *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
  *  for signalling streams events.
  */
-streams_fastcall __hot_in int
+streamscall __hot_in int
 strwsrv(queue_t *q)
 {
 	struct stdata *sd;
@@ -8355,7 +8355,7 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  In stead of putting everything in one big case statement (as is the practice for STREAMS), we
  *  do it with inlines so that we have a call stack in debug mode.
  */
-streams_fastcall __hot_out int
+streamscall __hot_out int
 strrput(queue_t *q, mblk_t *mp)
 {
 	struct stdata *sd;
@@ -8483,7 +8483,7 @@ EXPORT_SYMBOL(strrput);
  *  These could be separated into str_open, fifo_qopen and pipe_qopen but it is simpler to just
  *  leave them all in one.
  */
-__unlikely int
+__unlikely streamscall int
 str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct stdata *sd;
@@ -8557,7 +8557,7 @@ EXPORT_SYMBOL(str_open);
  *
  *  XXX: Should really move all of strlastclose() to here.
  */
-__unlikely int
+__unlikely streamscall int
 str_close(queue_t *q, int oflag, cred_t *crp)
 {
 	if (q->q_ptr == NULL)

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/12/12 08:33:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2005/12/19 03:23:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/12 08:33:54 $ by $Author: brian $
+# Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -851,6 +851,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_CHECK_KERNEL
     _LFS_SETUP_OPTIMIZE
     _LFS_SETUP_DEBUG
+    _LFS_SETUP_COMPAT
     _LFS_SETUP_MODULE
     _LFS_SETUP_SYNCQS
     _LFS_SETUP_KTHREADS
@@ -860,6 +861,40 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_SETUP_DRIVERS
     _LFS_SETUP_FIFOS
 ])# _LFS_SETUP
+# =============================================================================
+
+# =============================================================================
+# _LFS_SETUP_COMPAT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
+    AC_CACHE_CHECK([for STREAMS binary compatibilty mode], [lfs_cv_bcm], [dnl
+	AC_ARG_ENABLE([streams-bcm],
+	    AS_HELP_STRING([--disable-streams-bcm],
+		[disable STREAMS binary compatibility mode.
+		@<:@default=enabled@:>@]),
+		[enable_streams_bcm="$enableval"],
+		[enable_streams_bcm='yes'])
+	lfs_cv_bcm="${enable_streams_bcm:-yes}"])
+    AH_TEMPLATE([streamscall], [Use this macro like fastcall.  It is set to
+	an attribute with the number of parameters passed in registers to STREAMS
+	callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).  In binary
+	compatibility mode, this sets the number of parameters passed in
+	registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
+	setting for the kernel.])
+    AH_TEMPLATE([STREAMSCALL], [Use this macro like FASTCALL().  It is set to
+	an attribute with the number of parameters passed in registers to STREAMS
+	callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).  In binary
+	compatibility mode, this sets the number of parameters passed in
+	registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
+	setting for the kernel.])
+    if test :"${lfs_cv_bcm:-yes}" = :yes
+    then
+	AC_DEFINE_UNQUOTED([streamscall], [__attribute__((__regparm__(0)))])
+    else
+	AC_DEFINE_UNQUOTED([streamscall], [__attribute__((__regparm__(3)))])
+    fi
+    AC_DEFINE_UNQUOTED([STREAMSCALL(__x)], [__x streamscall])
+])# _LFS_SETUP_COMPAT
 # =============================================================================
 
 # =============================================================================

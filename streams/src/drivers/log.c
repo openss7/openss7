@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/09 18:01:40 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 03:23:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/09 18:01:40 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 03:23:37 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/09 18:01:40 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 03:23:37 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/09 18:01:40 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 03:23:37 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -238,7 +238,7 @@ log_trace_filter(queue_t *q, short mid, short sid, char level)
 	return (rval);
 }
 
-static streams_fastcall int
+static streamscall int
 log_rput(queue_t *q, mblk_t *mp)
 {
 	/* pass message along with flow control */
@@ -253,7 +253,7 @@ log_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static streams_fastcall int
+static streamscall int
 log_rsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -328,7 +328,7 @@ log_deliver_msg(queue_t *q, short mid, short sid, char level, int flags, int seq
 	return (0);
 }
 
-static streams_fastcall int
+static streamscall int
 log_wput(queue_t *q, mblk_t *mp)
 {
 	struct log *log = q->q_ptr;
@@ -477,7 +477,7 @@ log_wput(queue_t *q, mblk_t *mp)
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
 static struct log *log_list = NULL;
 
-static int
+static streamscall int
 log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct log *p, **pp = &log_list;
@@ -538,7 +538,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int
+static streamscall int
 log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;

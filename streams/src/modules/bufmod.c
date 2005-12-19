@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:47 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:47 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:23:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.5  2005/12/19 03:23:39  brian
+ - wend for simple streamscall
+
  Revision 0.9.2.4  2005/12/09 18:01:47  brian
  - profiling copy
 
@@ -66,10 +69,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:47 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:47 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -97,7 +100,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/09 18:01:47 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -161,7 +164,7 @@ STATIC struct module_info bufmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_fastcall int
+STATIC streamscall int
 bufmod_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
@@ -186,7 +189,7 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 bufmod_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
@@ -210,7 +213,7 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streams_fastcall int
+STATIC streamscall int
 bufmod_srv(queue_t *q)
 {
 	mblk_t *mp;
@@ -233,7 +236,7 @@ bufmod_srv(queue_t *q)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+STATIC streamscall int
 bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -252,7 +255,7 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-STATIC int
+STATIC streamscall int
 bufmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;

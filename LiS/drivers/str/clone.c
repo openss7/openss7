@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/18 11:51:23 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 06:37:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:51:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:37:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2005/07/18 11:51:23 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 06:37:52 $"
 
 /************************************************************************
 *                          Clone Driver                                 *
@@ -88,8 +88,8 @@ static struct module_info clone_minfo = {
 	0				/* low water mark */
 };
 
-static int STREAMS_REGPARMS(clone_open(queue_t *, dev_t *, int, int, cred_t *));
-static int STREAMS_REGPARMS(clone_close(queue_t *, int, cred_t *));
+static int _RP clone_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP clone_close(queue_t *, int, cred_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -122,7 +122,7 @@ struct streamtab clone_info = {
 	NULL				/* mux write queue */
 };
 
-static streams_regparms int
+static int _RP
 clone_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	int major_dev;
@@ -153,7 +153,7 @@ clone_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 
 }				/* clone_open */
 
-static streams_regparms int
+static int _RP
 clone_close(queue_t *q, int dummy, cred_t *credp)
 {
 	(void) q;		/* compiler happiness */

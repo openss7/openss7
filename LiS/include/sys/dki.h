@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 1.1.1.3.4.4 2005/12/18 05:41:24 brian Exp $
+ @(#) $Id: dki.h,v 1.1.1.3.4.5 2005/12/18 06:38:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
+ Last Modified $Date: 2005/12/18 06:38:14 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -64,7 +64,7 @@
 #ifndef	DKI_H
 #define	DKI_H		1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/12/18 06:38:14 $"
 
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
@@ -94,7 +94,7 @@
 
 #ifdef __KERNEL__
 
-typedef void timo_fcn_t (caddr_t arg);
+typedef void _RP timo_fcn_t (caddr_t arg);
 typedef unsigned long toid_t;		/* SVR4 */
 typedef unsigned long timeout_id_t;	/* Solaris */
 
@@ -102,9 +102,8 @@ typedef unsigned long timeout_id_t;	/* Solaris */
 #define	untimeout		lis_untimeout
 
 extern toid_t
- STREAMS_REGPARMS(lis_timeout_fcn
-		  (timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, int line_nr));
-extern toid_t STREAMS_REGPARMS(lis_untimeout(toid_t id));
+_RP lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, int line_nr);
+extern toid_t _RP lis_untimeout(toid_t id);
 
 /*
  * The following are internal routines not exported
@@ -131,7 +130,7 @@ void lis_terminate_timers(void);	/* mdep rouitine */
  *
  * The routine is located in osif.c.
  */
-unsigned STREAMS_REGPARMS(lis_usectohz(unsigned usec));
+unsigned _RP lis_usectohz(unsigned usec);
 
 /************************************************************************
 *                        Creating Nodes                                 *
@@ -151,8 +150,8 @@ unsigned STREAMS_REGPARMS(lis_usectohz(unsigned usec));
 *									*
 ************************************************************************/
 
-extern int STREAMS_REGPARMS(lis_mknod(char *name, int mode, dev_t dev));
-extern int STREAMS_REGPARMS(lis_unlink(char *name));
+extern int _RP lis_mknod(char *name, int mode, dev_t dev);
+extern int _RP lis_unlink(char *name);
 
 #ifdef __LIS_INTERNAL__
 extern int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag,
