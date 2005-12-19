@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/11 13:06:08 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 12:45:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 13:06:08 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 0.9.2.5  2005/12/19 12:45:16  brian
+ - locking down for release
+
  Revision 0.9.2.4  2005/12/11 13:06:08  brian
  - corrected normal build error
 
@@ -69,9 +72,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/11 13:06:08 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 12:45:16 $"
 
-static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/11 13:06:08 $";
+static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 12:45:16 $";
 
 /* can we just include these into one big compilation unit? */
 
@@ -82,21 +85,15 @@ static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.
 #ifdef CONFIG_STREAMS_STH
 #define BIG_STATIC_STH STATIC
 #define BIG_STATIC_INLINE_STH STATIC streams_inline
-#else
-#define BIG_STATIC_STH
-#define BIG_STATIC_INLINE_STH
 #endif
 
 #ifdef CONFIG_STREAMS_CLONE
 #define BIG_STATIC_CLONE STATIC
 #define BIG_STATIC_INLINE_CLONE STATIC streams_inline
-#else
-#define BIG_STATIC_CLONE
-#define BIG_STATIC_INLINE_CLONE
 #endif
 
-#define __STRSCHD_EXTERN_INLINE	inline
-#define __STRUTIL_EXTERN_INLINE inline
+#define __STRSCHD_EXTERN_INLINE	inline streams_fastcall
+#define __STRUTIL_EXTERN_INLINE inline streams_fastcall
 
 #undef ident
 #define ident ident_strreg

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/19 12:45:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:52 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/19 12:45:11 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/19 12:45:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/09 00:27:52 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/19 12:45:11 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -323,7 +323,7 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-int
+streams_fastcall int
 register_clone(struct cdevsw *cdev)
 {
 	int err;
@@ -363,7 +363,7 @@ register_clone(struct cdevsw *cdev)
 
 EXPORT_SYMBOL(register_clone);
 
-int
+streams_fastcall int
 unregister_clone(struct cdevsw *cdev)
 {
 	int err;
@@ -415,7 +415,7 @@ EXPORT_SYMBOL(unregister_clone);
  *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
  *  cb_ops.
  */
-int
+streams_fastcall int
 register_strdev(struct cdevsw *cdev, major_t major)
 {
 	int err;
@@ -463,7 +463,7 @@ EXPORT_SYMBOL(register_strdev);
  *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
  *		and permission is therefore denied.
  */
-int
+streams_fastcall int
 unregister_strdev(struct cdevsw *cdev, major_t major)
 {
 	unregister_clone(cdev);

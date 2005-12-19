@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:43 $
+ @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/19 12:45:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: specfs.c,v $
+ Revision 0.9.2.4  2005/12/19 12:45:16  brian
+ - locking down for release
+
  Revision 0.9.2.3  2005/12/09 18:01:43  brian
  - profiling copy
 
@@ -66,9 +69,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:43 $"
+#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/19 12:45:16 $"
 
-static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/09 18:01:43 $";
+static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/19 12:45:16 $";
 
 /* can we just include these into one big compilation unit? */
 
@@ -79,22 +82,16 @@ static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.3
 #ifdef CONFIG_STREAMS_STH
 #define BIG_STATIC_STH static
 #define BIG_STATIC_INLINE_STH static streams_inline
-#else
-#define BIG_STATIC_STH
-#define BIG_STATIC_INLINE_STH
 #endif
 
 #ifdef CONFIG_STREAMS_CLONE
 #define BIG_STATIC_CLONE static
 #define BIG_STATIC_INLINE_CLONE static streams_inline
-#else
-#define BIG_STATIC_CLONE
-#define BIG_STATIC_INLINE_CLONE
 #endif
 
 #define __EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE extern inline
-#define __STRUTIL_EXTERN_INLINE extern inline
+#define __STRSCHD_EXTERN_INLINE extern inline streams_fastcall
+#define __STRUTIL_EXTERN_INLINE extern inline streams_fastcall
 
 /* initialization for specfs */
 BIG_STATIC int strlookup_init(void);

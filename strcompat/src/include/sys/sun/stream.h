@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.4 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2005/12/19 12:44:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.5  2005/12/19 12:44:36  brian
+ - locking down for release
+
  Revision 0.9.2.4  2005/07/18 12:25:41  brian
  - standard indentation
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -118,9 +121,9 @@ extern int qwait_sig(queue_t *rq);
 #endif
 
 #if LFS
-extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *),
+extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *),
 			     void *arg);
-extern timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
+extern timeout_id_t qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks);
 #endif
 
 extern void qunbufcall(queue_t *q, bufcall_id_t bcid);
@@ -136,7 +139,7 @@ queclass(mblk_t *mp)
 #endif
 
 #if LFS
-extern void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+extern void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
 #endif
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))

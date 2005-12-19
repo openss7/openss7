@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:46:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/19 03:26:05 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2495,7 +2495,7 @@ sctp_dput(struct sctp_daddr *sd)
  */
 
 #if STREAMS
-STATIC void
+STATIC void streamscall
 sctp_bufsrv(long data)
 {
 	struct sctp *sp = (struct sctp *) data;
@@ -2760,9 +2760,9 @@ sctp_ostrm_find(sctp_t * sp, uint16_t sid, int *errp)
  *  Allocate a Destination Address
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC void sctp_heartbeat_timeout(caddr_t data);
-STATIC void sctp_retrans_timeout(caddr_t data);
-STATIC void sctp_idle_timeout(caddr_t data);
+STATIC void streamscall sctp_heartbeat_timeout(caddr_t data);
+STATIC void streamscall sctp_retrans_timeout(caddr_t data);
+STATIC void streamscall sctp_idle_timeout(caddr_t data);
 STATIC struct sctp_daddr *
 __sctp_daddr_alloc(sctp_t * sp, uint32_t daddr, int *errp)
 {
@@ -6793,7 +6793,7 @@ sctp_assoc_timedout(struct sctp *sp,	/* association */
  *  T1-init.  This means that we should attempt to retransmit the INIT until we have attempted
  *  Max.Init.Retrans times.
  */
-STATIC void
+STATIC void streamscall
 sctp_init_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -6843,7 +6843,7 @@ sctp_init_timeout(caddr_t data)
  *  T1-cookie.  This means that we should attempt to retransmit the COOKIE ECHO until we have
  *  attempted Path.Max.Retrans times.
  */
-STATIC void
+STATIC void streamscall
 sctp_cookie_timeout(caddr_t data)
 {
 	sctp_t *sp = (typeof(sp)) data;
@@ -6928,7 +6928,7 @@ sctp_send_forward_tsn(struct sctp *sp)
  *  that we should mark all outstanding DATA chunks for retransmission and start a retransmission
  *  cycle.
  */
-STATIC void
+STATIC void streamscall
 sctp_retrans_timeout(caddr_t data)
 {
 	mblk_t *mp;
@@ -7013,7 +7013,7 @@ sctp_retrans_timeout(caddr_t data)
  *  an unacknoweldged DATA chunk.  When an unacknowledged DATA chunks i receive and the timer is not
  *  running, the timer is set.  Whenever a DATA chunks(s) are acknowledged, the timer is stopped.
  */
-STATIC void
+STATIC void streamscall
 sctp_sack_timeout(caddr_t data)
 {
 	struct sctp *sp;
@@ -7055,7 +7055,7 @@ sctp_sack_timeout(caddr_t data)
  *  calculation is done.  While this timer is stopped, heartbeats will be sent until they are
  *  acknowledged.
  */
-STATIC void
+STATIC void streamscall
 sctp_idle_timeout(caddr_t data)
 {
 	struct sctp_daddr *sd = (typeof(sd)) data;
@@ -7099,7 +7099,7 @@ sctp_idle_timeout(caddr_t data)
  *  (Well!  That's not really true, is it?)
  */
 STATIC void sctp_reset_idle(struct sctp_daddr *sd);
-STATIC void
+STATIC void streamscall
 sctp_heartbeat_timeout(caddr_t data)
 {
 	struct sctp_daddr *sd = (typeof(sd)) data;
@@ -7149,7 +7149,7 @@ sctp_heartbeat_timeout(caddr_t data)
  *  This means that we have timedout on sending a SHUTDOWN or a SHUTDOWN ACK message.  We simply
  *  resend the message.
  */
-STATIC void
+STATIC void streamscall
 sctp_shutdown_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -7199,7 +7199,7 @@ sctp_shutdown_timeout(caddr_t data)
  *  per SCTP IG 2.12.
  */
 STATIC void sctp_send_abort(struct sctp *sp);
-STATIC void
+STATIC void streamscall
 sctp_guard_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -7242,7 +7242,7 @@ sctp_guard_timeout(caddr_t data)
  *  -------------------------------------------------------------------------
  *  This means that we have timedout on sending a ASCONF message.  We simply resend the message.
  */
-STATIC void
+STATIC void streamscall
 sctp_asconf_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -7300,7 +7300,7 @@ sctp_asconf_timeout(caddr_t data)
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 STATIC INLINE void sctp_send_forward_tsn(struct sctp *sp);
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
-STATIC void
+STATIC void streamscall
 sctp_life_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -27154,7 +27154,7 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
  *  checksum on the packet.  If the Adler-32 checksum fails then we should silently discard the
  *  packet per RFC 2960.
  */
-STATIC void
+STATIC void streamscall
 sctp_free(char *data)
 {
 	struct sk_buff *skb = (struct sk_buff *) data;

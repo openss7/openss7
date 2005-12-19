@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.11 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.12 2005/12/19 12:44:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_CMN_ERR_H__
 #define __SYS_STREAMS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 12:44:53 $"
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do no include sys/streams/cmn_err.h directly, include sys/cmn_err.h instead."
@@ -62,6 +62,15 @@
 #error "Do not include kernel header files in user space programs."
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+
+#include <stdarg.h>
+
 #define CE_CONT	    0
 #define CE_NOTE	    1
 #define CE_WARN	    2
@@ -69,7 +78,8 @@
 #define CE_DEBUG    4		/* IRIX 6.5 */
 #define CE_ALERT    5		/* IRIX 6.5 */
 
-extern void vcmn_err(int err_lvl, const char *fmt, va_list args);
-extern void cmn_err(int err_lvl, const char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+__STREAMS_EXTERN void vcmn_err(int err_lvl, const char *fmt, va_list args);
+__STREAMS_EXTERN void cmn_err(int err_lvl, const char *fmt, ...)
+    __attribute__ ((__format__(__printf__, 2, 3)));
 
 #endif				/* __SYS_STREAMS_CMN_ERR_H__ */

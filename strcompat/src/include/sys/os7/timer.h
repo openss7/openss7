@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.6 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.7 2005/12/19 12:44:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:31 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,10 +54,10 @@
 
 #define SS7_DECLARE_TIMER(__n,__o,__t,__c) \
 STATIC int __o ## _ ## __t ## _timeout(struct __o *); \
-STATIC void __o ## _ ## __t ## _expiry(caddr_t data) \
+STATIC void streamscall __o ## _ ## __t ## _expiry(caddr_t data) \
 { \
 	ss7_do_timeout(data, # __t, __n, &((struct __o *)data)->timers.__t, \
-			(int(*)(struct head *))&__o ## _ ## __t ## _timeout, \
+			(int (*)(struct head *))&__o ## _ ## __t ## _timeout, \
 			&__o ## _ ## __t ## _expiry); \
 } \
 STATIC void __o ## _stop_timer_ ## __t (struct __o * __o) \
@@ -71,7 +71,7 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
 
 __OS7_EXTERN_INLINE void
 ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
-	       int (*to_fnc) (struct head *), void (*exp_func) (caddr_t))
+	       int  (*to_fnc) (struct head *), void streamscall (*exp_func) (caddr_t))
 {
 	struct head *h = (struct head *) data;
 
@@ -117,7 +117,7 @@ ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 }
 __OS7_EXTERN_INLINE void
 ss7_start_timer(struct head *h, const char *timer, const char *mod, ulong *timeo,
-		void (*exp_func) (caddr_t), ulong val)
+		void streamscall (*exp_func) (caddr_t), ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", mod, h, timer, val * 1000 / HZ, jiffies));
 	if (h->priv_get)

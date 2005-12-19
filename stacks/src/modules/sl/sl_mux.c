@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:45 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:45 $";
 
 #include <sys/os7/compat.h>
 
@@ -61,7 +61,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:45 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -480,7 +480,7 @@ slm_free_ls(queue_t *q)
  *  =========================================================================
  */
 
-STATIC void
+STATIC void streamscall
 restart_link(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;
@@ -500,9 +500,9 @@ restart_link(caddr_t data)
 	ls->recovery_timer = timeout(&restart_link, (caddr_t) q, 12 * HZ);
 }
 
-STATIC void send_sltm(caddr_t data);
+STATIC void streamscall send_sltm(caddr_t data);
 
-STATIC void
+STATIC void streamscall
 failed_sltm(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;
@@ -524,7 +524,7 @@ failed_sltm(caddr_t data)
 	send_sltm(data);
 }
 
-STATIC void
+STATIC void streamscall
 send_sltm(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;

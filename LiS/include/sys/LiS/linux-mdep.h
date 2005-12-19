@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: linux-mdep.h,v 1.1.1.7.4.9 2005/12/18 05:41:24 brian Exp $
+ @(#) $Id: linux-mdep.h,v 1.1.1.7.4.10 2005/12/19 03:22:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:22 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.9 2005/12/18 05:41:24 brian Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.10 2005/12/19 03:22:22 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -71,7 +71,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.9 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.10 $) $Date: 2005/12/19 03:22:22 $"
 
 #ifdef __KERNEL__
 #include <linux/config.h>
@@ -295,7 +295,7 @@ typedef int o_uid_t;
 typedef int o_gid_t;
 typedef unsigned char uchar;
 
-#if 0
+#if 1
 typedef struct cred {
 	uid_t cr_uid;			/* effective user id */
 	gid_t cr_gid;			/* effective group id */

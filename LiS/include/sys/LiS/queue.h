@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 1.1.1.5.4.8 2005/12/18 06:38:20 brian Exp $
+ @(#) $Id: queue.h,v 1.1.1.5.4.9 2005/12/19 03:22:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:38:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:22 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.h,v 1.1.1.5.4.8 2005/12/18 06:38:20 brian Exp $
+ * RCS Id          : $Id: queue.h,v 1.1.1.5.4.9 2005/12/19 03:22:22 brian Exp $
  * Purpose         : here you have utilites to handle str queues.
  * ----------------______________________________________________
  *
@@ -68,7 +68,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 1
 
-#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/12/18 06:38:20 $"
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.9 $) $Date: 2005/12/19 03:22:22 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -278,23 +278,17 @@ extern void lis_clr_q_flags(ulong flags, int both_qs, ...);
  *  "int" form.  It seems that all the other Unix streams.h files use "int".
  *  Use "return(0)" in the functions.  The return value is ignored by LiS.
  */
-#if defined(USE_VOID_PUT_PROC)
-typedef void _RP(*qi_putp_t) (queue_t *, mblk_t *);
-typedef void _RP(*qi_srvp_t) (queue_t *);
-#else
-typedef int _RP(*qi_putp_t) (queue_t *, mblk_t *);
-typedef int _RP(*qi_srvp_t) (queue_t *);
-#endif
-typedef int _RP(*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
-typedef int _RP(*qi_qclose_t) (queue_t *, int, cred_t *);
-typedef int _RP(*qi_qadmin_t) (void);
-
 typedef struct qinit {
-	qi_putp_t qi_putp;		/* put procedure */
-	qi_srvp_t qi_srvp;		/* service procedure */
-	qi_qopen_t qi_qopen;
-	qi_qclose_t qi_qclose;		/* close procedure */
-	qi_qadmin_t qi_qadmin;		/* debugging */
+#if defined(USE_VOID_PUT_PROC)
+	void _RP(*qi_putp) (queue_t *, mblk_t *);	/* put procedure */
+	void _RP(*qi_srvp) (queue_t *);	/* service procedure */
+#else
+	int _RP(*qi_putp) (queue_t *, mblk_t *);	/* put procedure */
+	int _RP(*qi_srvp) (queue_t *);	/* service procedure */
+#endif
+	int _RP(*qi_qopen) (queue_t *, dev_t *, int, int, cred_t *);
+	int _RP(*qi_qclose) (queue_t *, int, cred_t *);	/* close procedure */
+	int _RP(*qi_qadmin) (void);	/* debugging */
 	struct lis_module_info *qi_minfo;	/* module information structure */
 	struct module_stat *qi_mstat;	/* module statistics structure */
 } qinit_t;

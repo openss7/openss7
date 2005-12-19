@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/11/07 10:54:54 $
+dnl @(#) $RCSfile: testsuite-sad.at,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/12/19 12:42:54 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/11/07 10:54:54 $ by $Author: brian $
+dnl Last Modified $Date: 2005/12/19 12:42:54 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-sad.at,v $
+dnl Revision 1.1.2.2  2005/12/19 12:42:54  brian
+dnl - locking down for release
+dnl
 dnl Revision 1.1.2.1  2005/11/07 10:54:54  brian
 dnl - added SAD testing
 dnl
@@ -113,7 +116,7 @@ function test_sad() {
     then
 	options='-vvv'
     else
-	options=
+	options='-v'
     fi
     if test-sad $options -e -o $1
     then

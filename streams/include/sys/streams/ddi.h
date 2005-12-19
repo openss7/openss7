@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.32 2005/12/19 03:23:36 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.33 2005/12/19 12:44:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/19 03:23:36 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/19 12:44:53 $"
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -62,18 +62,26 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
 #endif
 
 #ifndef __STREAMS_EXTERN_INLINE
-#define __STREAMS_EXTERN_INLINE __EXTERN_INLINE
+#define __STREAMS_EXTERN_INLINE __EXTERN_INLINE streams_fastcall
 #endif				/* __STREAMS_EXTERN_INLINE */
 #ifndef __STRSCHD_EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE __EXTERN_INLINE
+#define __STRSCHD_EXTERN_INLINE __EXTERN_INLINE streams_fastcall
 #endif				/* __STRSCHD_EXTERN_INLINE */
 #ifndef __STRUTIL_EXTERN_INLINE
-#define __STRUTIL_EXTERN_INLINE __EXTERN_INLINE
+#define __STRUTIL_EXTERN_INLINE __EXTERN_INLINE streams_fastcall
 #endif				/* __STRUTIL_EXTERN_INLINE */
 
 #include <asm/uaccess.h>	/* for copy_[to|from]_user */
@@ -198,7 +206,7 @@ max(int a, int b)
 
 extern int sysctl_str_strmsgsz;
 
-extern int drv_getparm(const unsigned int parm, void *value_p);
+__STREAMS_EXTERN int drv_getparm(const unsigned int parm, void *value_p);
 
 __STRUTIL_EXTERN_INLINE int
 drv_priv(cred_t *crp)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.5 2005/12/19 03:26:00 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.6 2005/12/19 12:44:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.6  2005/12/19 12:44:25  brian
+ - locking down for release
+
  Revision 0.9.2.5  2005/12/19 03:26:00  brian
  - wend for simple streamscall
 
@@ -70,7 +73,7 @@
 #ifndef __SYS_LIS_STREAM_H__
 #define __SYS_LIS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lis/stream.h directly, include sys/stream.h instead."
@@ -166,7 +169,7 @@ lis_bcanputnext_anyband(queue_t *q)
 }
 
 __LIS_EXTERN_INLINE _RP int
-lis_bufcall(unsigned size, int priority, void (*function) (long), long arg)
+lis_bufcall(unsigned size, int priority, void streamscall (*function) (long), long arg)
 {
 	return bufcall(size, priority, function, arg);
 }
@@ -203,7 +206,7 @@ lis_esballoc(unsigned char *base, int size, int priority,
 }
 
 __LIS_EXTERN_INLINE _RP int
-lis_esbbcall(int priority, void (*function) (long), long arg)
+lis_esbbcall(int priority, void streamscall (*function) (long), long arg)
 {
 	return esbbcall(priority, function, arg);
 }

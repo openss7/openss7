@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2005/07/21 20:47:17 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2005/12/19 12:44:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2005/12/19 12:44:20  brian
+ - locking down for release
+
  Revision 0.9.2.6  2005/07/21 20:47:17  brian
  - sync with notebook
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -126,11 +129,11 @@ enableq(queue_t *q)
 	return (0);
 }
 
-typedef int (*qi_putp_t) (queue_t *, mblk_t *);
-typedef int (*qi_srvp_t) (queue_t *);
-typedef int (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
-typedef int (*qi_qclose_t) (queue_t *, int, cred_t *);
-typedef int (*qi_qadmin_t) (void);
+typedef int streamscall (*qi_putp_t) (queue_t *, mblk_t *);
+typedef int streamscall (*qi_srvp_t) (queue_t *);
+typedef int streamscall (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
+typedef int streamscall (*qi_qclose_t) (queue_t *, int, cred_t *);
+typedef int streamscall (*qi_qadmin_t) (void);
 
 __LFS_EXTERN_INLINE qi_qadmin_t
 getadmin(modID_t modid)

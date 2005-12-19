@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.13 2005/11/29 05:46:39 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.14 2005/12/19 12:44:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/29 05:46:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/11/29 05:46:39 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 12:44:54 $"
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
 #endif
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN __attribute__((__regparm__(3)))
+#endif
+
+#include <stdarg.h>
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -75,12 +85,13 @@
 #define I_TRCLOG	(LOGCTL | 2)	/* trace logger */
 #define I_CONSLOG	(LOGCTL | 3)	/* console logger */
 
-extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
-    __attribute__ ((format(printf, 5, 6)));
-extern int vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args);
+__STREAMS_EXTERN int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
+    __attribute__ ((__format__(__printf__, 5, 6)));
+__STREAMS_EXTERN int vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt,
+			     va_list args);
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
-extern vstrlog_t register_strlog(vstrlog_t newlog);
+__STREAMS_EXTERN vstrlog_t register_strlog(vstrlog_t newlog);
 
 struct trace_ids {
 	short ti_mid;

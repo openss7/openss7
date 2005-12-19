@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.14 2005/12/19 03:23:36 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.15 2005/12/19 12:44:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:23:36 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:44:53 $"
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
@@ -61,6 +61,18 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN extern __attribute__((__regparm__(3)))
+#endif
+
+#include <linux/config.h>
+#include <linux/module.h>
+#include <linux/types.h>	/* for various types */
 
 #define KM_SLEEP	0
 #define KM_NOSLEEP	(1<<0)
@@ -71,15 +83,15 @@
 /* typedef unsigned short cnodeid_t; */
 typedef int cnodeid_t;
 
-extern void *kmem_alloc(size_t size, int flags);
-extern void *kmem_zalloc(size_t size, int flags);
-extern void kmem_free(void *ptr, size_t size);
+__STREAMS_EXTERN void *kmem_alloc(size_t size, int flags);
+__STREAMS_EXTERN void *kmem_zalloc(size_t size, int flags);
+__STREAMS_EXTERN void kmem_free(void *ptr, size_t size);
 
 #ifdef CONFIG_NUMA
 #warning kmem_alloc_node and kmem_zalloc_node are not supported on NUMA architectures
 #endif
 
-extern void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
-extern void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
+__STREAMS_EXTERN void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
+__STREAMS_EXTERN void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
 
 #endif				/* __SYS_STREAMS_KMEM_H__ */

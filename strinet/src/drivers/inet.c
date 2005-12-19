@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/12/19 12:45:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:02 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/12/19 12:45:53 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/12/19 12:45:53 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -439,7 +439,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/19 03:26:02 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/12/19 12:45:53 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1146,7 +1146,7 @@ ss_unlockq(queue_t *q)
  *  BUFSRV calls service routine
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC void streamscall
 ss_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
@@ -13458,7 +13458,7 @@ ss_sock_recvmsg(queue_t *q)
  *  -------------------------------------------------------------------------
  */
 STATIC void
-ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
+ss_putctl(ss_t * ss, queue_t *q, int type, void streamscall (*func) (long), struct sock *sk)
 {
 	mblk_t *mp;
 	ss_event_t *p;
@@ -13495,7 +13495,7 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
  *  We get state changes on sockets that we hold.  We also get state changes
  *  on accepting sockets.
  */
-STATIC void
+STATIC void streamscall
 _ss_sock_state_change(long data)
 {
 	struct sock *sk;
@@ -13524,7 +13524,7 @@ ss_state_change(struct sock *sk)
  *  WRITE Available
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC void streamscall
 _ss_sock_write_space(long data)
 {
 	struct sock *sk;
@@ -13553,7 +13553,7 @@ ss_write_space(struct sock *sk)
  *  ERROR Available
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC void streamscall
 _ss_sock_error_report(long data)
 {
 	struct sock *sk;
@@ -13585,7 +13585,7 @@ ss_error_report(struct sock *sk)
  *  READ Available
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC void streamscall
 _ss_sock_data_ready(long data)
 {
 	struct sock *sk;

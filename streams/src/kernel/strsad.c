@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:43 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/19 12:45:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:43 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/19 12:45:17 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/09 18:01:43 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/19 12:45:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -147,7 +147,7 @@ __autopush_del(struct cdevsw *cdev, struct strapush *sap)
 	return (err);
 }
 
-struct strapush *
+streams_fastcall struct strapush *
 autopush_find(dev_t dev)
 {
 	unsigned long flags;
@@ -173,7 +173,7 @@ autopush_find(dev_t dev)
 EXPORT_SYMBOL(autopush_find);
 #endif
 
-struct strapush *
+streams_fastcall struct strapush *
 autopush_search(const char *name, minor_t minor)
 {
 	char module[FMNAMESZ + 1] = { 0, };
@@ -205,7 +205,7 @@ autopush_search(const char *name, minor_t minor)
 EXPORT_SYMBOL(autopush_search);
 #endif
 
-int
+streams_fastcall int
 autopush_add(struct strapush *sap)
 {
 	unsigned long flags;
@@ -281,7 +281,7 @@ autopush_add(struct strapush *sap)
 EXPORT_SYMBOL(autopush_add);
 #endif
 
-int
+streams_fastcall int
 autopush_del(struct strapush *sap)
 {
 	unsigned long flags;
@@ -323,7 +323,7 @@ autopush_del(struct strapush *sap)
 EXPORT_SYMBOL(autopush_del);
 #endif
 
-int
+streams_fastcall int
 autopush_vml(struct str_mlist *smp, int nmods)
 {
 	int rtn = 0, k;
@@ -353,7 +353,7 @@ autopush_vml(struct str_mlist *smp, int nmods)
 EXPORT_SYMBOL(autopush_vml);
 #endif
 
-int
+streams_fastcall int
 apush_set(struct strapush *sap)
 {
 	if (sap != NULL) {
@@ -372,7 +372,7 @@ apush_set(struct strapush *sap)
 
 EXPORT_SYMBOL(apush_set);
 
-int
+streams_fastcall int
 apush_get(struct strapush *sap)
 {
 	if (sap != NULL) {
@@ -425,7 +425,7 @@ apush_get(struct strapush *sap)
 
 EXPORT_SYMBOL(apush_get);	/* strconf.h LiS specific */
 
-int
+streams_fastcall int
 apush_vml(struct str_list *slp)
 {
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
@@ -441,7 +441,7 @@ EXPORT_SYMBOL(apush_vml);
  *  @sflag: stream flag (%MODOPEN or %CLONEOPEN or %DRVOPEN)
  *  @crp: pointer to user credentials structure
  */
-BIG_STATIC_STH int
+BIG_STATIC_STH streams_fastcall int
 autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct apinfo *api;

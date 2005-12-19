@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/05 22:49:05 $
+ @(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 12:45:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,8 +54,8 @@
 #define __LOCAL_STRATTACH_H__
 
 #if HAVE_KERNEL_FATTACH_SUPPORT
-extern long do_fattach(const struct file *file, const char *file_name);
-long do_fdetach(const char *file_name);
+streams_fastcall long do_fattach(const struct file *file, const char *file_name);
+streams_fastcall long do_fdetach(const char *file_name);
 #endif
 
 #endif				/* __LOCAL_STRATTACH_H__ */

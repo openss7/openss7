@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/19 03:26:01 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/19 12:44:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:01 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/19 03:26:01 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/19 12:44:41 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/19 03:26:01 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/19 12:44:41 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/19 03:26:01 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/19 12:44:41 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -189,7 +189,7 @@ EXPORT_SYMBOL(lis_bcanputnext);
 __LIS_EXTERN_INLINE int _RP lis_bcanputnext_anyband(queue_t *q);
 
 EXPORT_SYMBOL(lis_bcanputnext_anyband);
-__LIS_EXTERN_INLINE int _RP lis_bufcall(unsigned size, int priority, void (*function) (long), long arg);
+__LIS_EXTERN_INLINE int _RP lis_bufcall(unsigned size, int priority, void streamscall (*function) (long), long arg);
 
 EXPORT_SYMBOL(lis_bufcall);
 __LIS_EXTERN_INLINE mblk_t *_RP lis_copyb(mblk_t *mp);
@@ -215,7 +215,7 @@ EXPORT_SYMBOL(lis_dupmsg);
 __LIS_EXTERN_INLINE mblk_t *_RP lis_esballoc(unsigned char *base, int size, int priority,
 					 frtn_t *freeinfo, char *file_name, int line_nr);
 EXPORT_SYMBOL(lis_esballoc);
-__LIS_EXTERN_INLINE int _RP lis_esbbcall(int priority, void (*function) (long), long arg);
+__LIS_EXTERN_INLINE int _RP lis_esbbcall(int priority, void streamscall (*function) (long), long arg);
 
 EXPORT_SYMBOL(lis_esbbcall);
 __LIS_EXTERN_INLINE void _RP lis_flushband(queue_t *q, unsigned char band, int flag);
@@ -810,7 +810,7 @@ EXPORT_SYMBOL(lis_bprintf);
 _RP void
 lis_cmn_err(int err_lvl, char *fmt, ...)
 {
-	extern void vcmn_err(int err_lvl, const char *fmt, va_list args);
+	extern void streams_fastcall vcmn_err(int err_lvl, const char *fmt, va_list args);
 	va_list args;
 
 	va_start(args, fmt);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/05 22:49:06 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/19 12:45:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:06 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCCAL_STRSPECFS_H__
 #define __LOCCAL_STRSPECFS_H__
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
 
 #define SPEC_SBI_MAGIC 0XFEEDDEAF
 struct spec_sb_info {
@@ -66,19 +74,19 @@ struct spec_sb_info {
 
 // extern struct file_operations spec_dev_f_ops;
 
-extern struct vfsmount *STREAMS_FASTCALL(specfs_mount(void));
-extern void STREAMS_FASTCALL(specfs_umount(void));
+__STREAMS_EXTERN struct vfsmount *specfs_mount(void);
+__STREAMS_EXTERN void specfs_umount(void);
 
-extern int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
-extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
+__STREAMS_EXTERN int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
+__STREAMS_EXTERN int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
 #ifndef BIG_COMPILE
-extern struct inode *spec_snode(dev_t dev, struct cdevsw *cdev);
+__STREAMS_EXTERN struct inode *spec_snode(dev_t dev, struct cdevsw *cdev);
 #endif
 
 #if 0
 /* initialization for main */
-extern int strspecfs_init(void);
-extern void strspecfs_exit(void);
+__STREAMS_EXTERN int strspecfs_init(void);
+__STREAMS_EXTERN void strspecfs_exit(void);
 #endif
 
 #endif				/* __LOCCAL_STRSPECFS_H__ */

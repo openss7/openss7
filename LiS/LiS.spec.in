@@ -1,7 +1,7 @@
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.41 $) $Date: 2005/12/16 12:13:49 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.42 $) $Date: 2005/12/19 12:42:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 12:13:49 $ by $Author: brian $
+# Last Modified $Date: 2005/12/19 12:42:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1606,9 +1606,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.41  2005/12/16 12:13:49  brian
-# - build does not require texinfo
+# Revision 1.1.6.42  2005/12/19 12:42:36  brian
+# - locking down for release
 #
+
+* Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.41  2005/12/16 12:13:49  brian
+- build does not require texinfo
 
 * Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.40  2005/12/16 09:23:59  brian

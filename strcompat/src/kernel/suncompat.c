@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/19 12:44:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 14:30:55 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/19 12:44:41 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/19 12:44:41 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/29 14:30:55 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/19 12:44:41 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -163,16 +163,16 @@ EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */
  *  @arg:	a client argument to pass to the callback function
  */
 bufcall_id_t
-qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg)
+qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *), void *arg)
 {
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
+	return __bufcall(q, size, priority, (void streamscall (*)(long)) function, (long) arg);
 }
 
 EXPORT_SYMBOL(qbufcall);	/* sun/ddi.h */
 timeout_id_t
-qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks)
+qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks)
 {
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
@@ -223,9 +223,9 @@ EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
  *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
  */
 __SUN_EXTERN_INLINE void
-qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter)
+qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter)
 {
-	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func)(queue_t *, mblk_t *), int perim);
+	extern void __strwrit(queue_t *q, mblk_t *mp, void streamscall (*func)(queue_t *, mblk_t *), int perim);
 	__strwrit(qp, mp, func, perimeter);
 }
 

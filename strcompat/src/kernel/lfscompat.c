@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:44:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/29 05:46:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.17  2005/12/19 12:44:41  brian
+ - locking down for release
+
  Revision 0.9.2.16  2005/11/29 05:46:39  brian
  - straightened out register_strlog
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:44:41 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:44:41 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -127,7 +130,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/11/29 05:46:39 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:44:41 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -275,7 +278,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		return (0);
 	}
 	case UCRED:
-		*(cred_t **) value_p = current_creds;
+		*(cred_t **) value_p = ((cred_t *)current->uid);
 		return (0);
 	case STRMSGSIZE:
 #if LFS

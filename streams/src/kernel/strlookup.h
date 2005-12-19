@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlookup.h,v 0.9.2.12 2005/12/05 22:49:05 brian Exp $
+ @(#) $Id: strlookup.h,v 0.9.2.13 2005/12/19 12:45:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/05 22:49:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRLOOKUP_H__
 #define __LOCAL_STRLOOKUP_H__
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
 
 extern rwlock_t cdevsw_lock;
 extern rwlock_t fmodsw_lock;
@@ -61,22 +69,22 @@ extern int fmod_count;
 extern struct list_head cdevsw_list;
 extern struct list_head fmodsw_list;
 
-extern void fmod_add(struct fmodsw *fmod, modID_t modid);
-extern void fmod_del(struct fmodsw *fmod);
-extern int sdev_add(struct cdevsw *cdev, modID_t modid);
-extern void sdev_del(struct cdevsw *cdev);
-extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
-extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
-extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
-extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
+__STREAMS_EXTERN void fmod_add(struct fmodsw *fmod, modID_t modid);
+__STREAMS_EXTERN void fmod_del(struct fmodsw *fmod);
+__STREAMS_EXTERN int sdev_add(struct cdevsw *cdev, modID_t modid);
+__STREAMS_EXTERN void sdev_del(struct cdevsw *cdev);
+__STREAMS_EXTERN void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
+__STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 
-extern struct fmodsw *STREAMS_FASTCALL(fmod_str(const struct streamtab *str));
-extern struct cdevsw *STREAMS_FASTCALL(cdev_str(const struct streamtab *str));
+__STREAMS_EXTERN struct fmodsw *fmod_str(const struct streamtab *str);
+__STREAMS_EXTERN struct cdevsw *cdev_str(const struct streamtab *str);
 
 #ifndef BIG_COMPILE
 /* initialization for specfs */
-extern int strlookup_init(void);
-extern void strlookup_exit(void);
+__STREAMS_EXTERN int strlookup_init(void);
+__STREAMS_EXTERN void strlookup_exit(void);
 #endif
 
 #endif				/* __LOCAL_STRLOOKUP_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:47:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2005/12/17 08:39:26 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -124,18 +124,13 @@ STATIC struct module_info ip_to_streams_minfo = {
 	.mi_lowat = 2000,		/* Lo water mark */
 };
 
-STATIC int ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int ip_to_streams_close(queue_t *, int, cred_t *);
+STATIC int streamscall ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall ip_to_streams_close(queue_t *, int, cred_t *);
 
-#ifndef LFS
-#define streams_fastcall
-#define STREAMS_FASTCALL(__x) __x
-#endif
-
-STATIC int STREAMS_FASTCALL(ip_to_streams_rput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(ip_to_streams_rsrv(queue_t *));
-STATIC int STREAMS_FASTCALL(ip_to_streams_wput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(ip_to_streams_wsrv(queue_t *));
+STATIC int streamscall ip_to_streams_rput(queue_t *, mblk_t *);
+STATIC int streamscall ip_to_streams_rsrv(queue_t *);
+STATIC int streamscall ip_to_streams_wput(queue_t *, mblk_t *);
+STATIC int streamscall ip_to_streams_wsrv(queue_t *);
 
 STATIC struct qinit ip_to_streams_rinit = {
 	.qi_putp = ip_to_streams_rput,	/* Read put (message from below) */
@@ -272,7 +267,7 @@ unsigned long ip_to_streams_debug_mask = 0;
  *  point is called when the IP_STRM module is first pushed onto the stack as
  *  well as each time that a module is pushed above it.
  */
-STATIC int
+STATIC int streamscall
 ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 {
 	int err;
@@ -338,7 +333,7 @@ ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
  *
  *  
  */
-STATIC int
+STATIC int streamscall
 ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -479,7 +474,7 @@ ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 *									*
 ************************************************************************/
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ip_to_streams_wput(queue_t *q, mblk_t *mp)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -845,7 +840,7 @@ ip_to_streams_ok_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long ok_prim
 *									*
 ************************************************************************/
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ip_to_streams_rsrv(queue_t *q)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -901,7 +896,7 @@ ip_to_streams_rsrv(queue_t *q)
 *									*
 ************************************************************************/
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ip_to_streams_wsrv(queue_t *q)
 {
 	ip_to_streams_minor_t *minor_ptr;
@@ -1017,7 +1012,7 @@ ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 * Handle a message from below.						*
 *									*
 ************************************************************************/
-STATIC streams_fastcall int
+STATIC streamscall int
 ip_to_streams_rput(queue_t *q, mblk_t *mp)
 {
 	ip_to_streams_minor_t *minor_ptr = q->q_ptr;

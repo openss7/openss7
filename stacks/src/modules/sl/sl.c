@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -71,7 +71,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:25:58 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 12:43:45 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1177,7 +1177,7 @@ SS7_DECLARE_TIMER(MOD_NAME, sl, t1, config);
 SS7_DECLARE_TIMER(MOD_NAME, sl, t2, config);
 SS7_DECLARE_TIMER(MOD_NAME, sl, t3, config);
 STATIC int sl_t4_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t4_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t4", "sl", &((struct sl *) data)->timers.t4,

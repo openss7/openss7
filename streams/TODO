@@ -1,14 +1,33 @@
 
 Things to do:
 
+- LiS Binary Compatibiility:-  Pretty much messed up right now.  I have the
+  regparm(0) stuff on the callout and callback functions, and the STREAMS
+  Compatibility Modules does regparm(0) on all the lis_ functions.  Primary
+  STREAMS data structures align on the first portion of the data structure.
+  Sizes vary, so don't do q+1.  Flags are a little different.  There are however
+  several problematic data structures: cred_t and the ioctypes: iocblk, copyreq,
+  copyresp, and the linkblk.  When you enable binary compatibility mode, it uses
+  the LiS versions of these.
+
+  DONE: Needs testing.
+
+- LfS Binary Compatibility:-  A little better.  Callouts and callbacks always
+  regparm(0).  STREAMS utility functions are always regparm(3).  Data structures
+  are stable for the most part.  cred_t, however, is variable depending on the
+  kernel.  Compile with the LiS binary compatibility and the cred_t will be
+  fixed size.
+
+  DONE: Needs testing.
+
 - Finish the documentation.
 
-  PART DONE: updated documentation alot.
+  MOSTLY DONE: updated documentation alot.
 
 - Finish the full STREAMS logger and proper implementation of the strlog()
   utility.
 
-  DONE: Added to strutil package.
+  DONE: Added to strutil package.  Needs testing.
 
 - Need to rework the specfs.  There are now several situations to consider:
 
@@ -57,9 +76,16 @@ Things to do:
   So, what we need now is to rework data structures and the specfs to be a
   little more stable.
 
+  DONE: Tested.
+
 - Kernel objects are another thing.  For 2.6 kernels, we need to hold our data
   structures in the kobject manner so that the /sys filesystem is usable.  This
   requires another adaptation layer because 2.4 kernels do this in a completely
   different way.  Much of our /proc filesystem stuff needs to move into /sys for
   2.6 kernels by stay the same for 2.4 kernels.
+
+  The /sys filesystem does not really do much for STREAMS.  The /dev/streams
+  specfs filesystem does more for us.
+
+  SKIPPED.
 

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-fifo.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/11/07 03:01:56 $
+dnl @(#) $RCSfile: testsuite-fifo.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 12:42:54 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/11/07 03:01:56 $ by $Author: brian $
+dnl Last Modified $Date: 2005/12/19 12:42:54 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-fifo.at,v $
+dnl Revision 1.1.2.4  2005/12/19 12:42:54  brian
+dnl - locking down for release
+dnl
 dnl Revision 1.1.2.3  2005/11/07 03:01:56  brian
 dnl - marked expected failures
 dnl
@@ -119,7 +122,7 @@ function test_fifo() {
     then
 	options='-vvv'
     else
-	options=
+	options='-v'
     fi
     if test-fifo $options -e -o $1
     then

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/09 04:49:37 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/19 12:42:54 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/12/09 04:49:37 $ by $Author: brian $
+dnl Last Modified $Date: 2005/12/19 12:42:54 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 1.1.2.5  2005/12/19 12:42:54  brian
+dnl - locking down for release
+dnl
 dnl Revision 1.1.2.4  2005/12/09 04:49:37  brian
 dnl - new test cases
 dnl
@@ -207,7 +210,7 @@ function test_streams() {
     then
 	options='-vvv'
     else
-	options=
+	options='-v'
     fi
     if test-streams $options -e -o $1
     then

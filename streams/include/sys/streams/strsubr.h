@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.63 2005/12/19 03:23:37 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.64 2005/12/19 12:44:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/19 03:23:37 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/12/19 12:44:54 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -61,6 +61,17 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+#ifndef __STREAMS_ENTRYP
+#define __STREAMS_ENTRYP __EXTERN streamscall
+#endif
 
 #include <linux/compiler.h>	/* for likely */
 #include <linux/slab.h>		/* for kmem_cache_t */
@@ -100,13 +111,13 @@ struct strevent {
 		} e;			/* stream event */
 		struct {
 			queue_t *queue;
-			void streamscall (*func) (long);
+			void streamscall(*func) (long);
 			long arg;
 			size_t size;
 		} b;			/* bufcall event */
 		struct {
 			queue_t *queue;
-			void streamscall (*func) (caddr_t);
+			void streamscall(*func) (caddr_t);
 			caddr_t arg;
 			int pl;
 			int cpu;
@@ -114,7 +125,7 @@ struct strevent {
 		} t;			/* timeout event */
 		struct {
 			queue_t *queue;
-			void streamscall (*func) (void *);
+			void streamscall(*func) (void *);
 			void *arg;
 			queue_t *q1, *q2, *q3, *q4;
 		} w;			/* weld request */
@@ -218,7 +229,7 @@ struct stdata {
 	ulong sd_closetime;		/* queue drain wait time on close */
 	ulong sd_rtime;			/* time to forward held message */
 	ulong sd_ioctime;		/* time to wait for ioctl() acknowledgement */
-//	klock_t sd_klock;		/* lock for queues under this stream */
+//      klock_t sd_klock;               /* lock for queues under this stream */
 	rwlock_t sd_lock;		/* structure lock for this stream */
 	rwlock_t sd_plumb;		/* plumbing and procedure lock for this stream */
 	rwlock_t sd_freeze;		/* lock for freezing streams */
@@ -399,7 +410,7 @@ struct strthread {
 extern struct strthread strthreads[];
 #endif
 
-extern void STREAMS_FASTCALL(__raise_streams(void));
+__STREAMS_EXTERN void __raise_streams(void);
 
 /* aligned so processors keep out of each other's way */
 
@@ -561,136 +572,142 @@ struct mdlinfo {
 struct mdbblock {
 	struct mbinfo msgblk;
 	struct dbinfo datablk;
-	unsigned char pad[BUFSZ-FASTBUF];
-	unsigned char databuf[FASTBUF]; /* should be nicely 32, 64 or 128 byte aligned */
+	unsigned char pad[BUFSZ - FASTBUF];
+	unsigned char databuf[FASTBUF];	/* should be nicely 32, 64 or 128 byte aligned */
 };
 
 /* from strsched.c */
-extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void streamscall (*function) (long), long arg);
-extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
-			int cpu);
+__STREAMS_EXTERN bcid_t __bufcall(queue_t *q, unsigned size, int priority,
+				  void streamscall(*function) (long), long arg);
+__STREAMS_EXTERN toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+				  unsigned long pl, int cpu);
 
-extern int setsq(queue_t *q, struct fmodsw *fmod);
-extern void qscan(queue_t *q);
+__STREAMS_EXTERN int setsq(queue_t *q, struct fmodsw *fmod);
+__STREAMS_EXTERN void qscan(queue_t *q);
 
 /* from strlookup.c */
 extern struct list_head cdevsw_list;	/* Drivers go here */
 extern struct list_head fmodsw_list;	/* Modules go here */
+
 #if 0
-extern struct list_head cminsw_list;	/* Minors go here */
+__STREAMS_EXTERN struct list_head cminsw_list;	/* Minors go here */
 #endif
-extern int cdev_count;			/* Driver count */
-extern int fmod_count;			/* Module count */
-extern int cmin_count;			/* Node count */
-extern struct devnode *STREAMS_FASTCALL(__cmaj_lookup(major_t major));
-extern struct cdevsw *STREAMS_FASTCALL(__cdev_lookup(major_t major));
-extern struct cdevsw *STREAMS_FASTCALL(__cdrv_lookup(modID_t modid));
-extern struct devnode *STREAMS_FASTCALL(__cmin_lookup(struct cdevsw *cdev, minor_t minor));
-extern struct fmodsw *STREAMS_FASTCALL(__fmod_lookup(modID_t modid));
-extern struct cdevsw *STREAMS_FASTCALL(__cdev_search(const char *name));
-extern struct fmodsw *STREAMS_FASTCALL(__fmod_search(const char *name));
-extern struct devnode *STREAMS_FASTCALL(__cmin_search(struct cdevsw *cdev, const char *name));
-extern void *STREAMS_FASTCALL(__smod_search(const char *name));
-extern struct fmodsw *STREAMS_FASTCALL(fmod_str(const struct streamtab *str));
-extern struct cdevsw *STREAMS_FASTCALL(cdev_str(const struct streamtab *str));
-extern struct cdevsw *STREAMS_FASTCALL(sdev_get(major_t major));
-extern void STREAMS_FASTCALL(sdev_put(struct cdevsw *cdev));
-extern struct cdevsw *STREAMS_FASTCALL(cdrv_get(modID_t modid));
-extern void STREAMS_FASTCALL(cdrv_put(struct cdevsw *cdev));
-extern struct fmodsw *STREAMS_FASTCALL(fmod_get(modID_t modid));
-extern void STREAMS_FASTCALL(fmod_put(struct fmodsw *fmod));
-extern struct cdevsw *STREAMS_FASTCALL(cdev_find(const char *name));
-extern struct cdevsw *STREAMS_FASTCALL(cdev_match(const char *name));
-extern struct fmodsw *STREAMS_FASTCALL(fmod_find(const char *name));
-extern struct devnode *STREAMS_FASTCALL(cmin_find(const struct cdevsw *cdev, const char *name));
-extern struct devnode *STREAMS_FASTCALL(cmin_get(const struct cdevsw *cdev, minor_t minor));
-extern struct devnode *STREAMS_FASTCALL(cmaj_get(const struct cdevsw *cdev, major_t major));
-extern minor_t STREAMS_FASTCALL(cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor));
+extern int cdev_count;	/* Driver count */
+extern int fmod_count;	/* Module count */
+extern int cmin_count;	/* Node count */
+__STREAMS_EXTERN struct devnode *__cmaj_lookup(major_t major);
+__STREAMS_EXTERN struct cdevsw *__cdev_lookup(major_t major);
+__STREAMS_EXTERN struct cdevsw *__cdrv_lookup(modID_t modid);
+__STREAMS_EXTERN struct devnode *__cmin_lookup(struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN struct fmodsw *__fmod_lookup(modID_t modid);
+__STREAMS_EXTERN struct cdevsw *__cdev_search(const char *name);
+__STREAMS_EXTERN struct fmodsw *__fmod_search(const char *name);
+__STREAMS_EXTERN struct devnode *__cmin_search(struct cdevsw *cdev, const char *name);
+__STREAMS_EXTERN void *__smod_search(const char *name);
+__STREAMS_EXTERN struct fmodsw *fmod_str(const struct streamtab *str);
+__STREAMS_EXTERN struct cdevsw *cdev_str(const struct streamtab *str);
+__STREAMS_EXTERN struct cdevsw *sdev_get(major_t major);
+__STREAMS_EXTERN void sdev_put(struct cdevsw *cdev);
+__STREAMS_EXTERN struct cdevsw *cdrv_get(modID_t modid);
+__STREAMS_EXTERN void cdrv_put(struct cdevsw *cdev);
+__STREAMS_EXTERN struct fmodsw *fmod_get(modID_t modid);
+__STREAMS_EXTERN void fmod_put(struct fmodsw *fmod);
+__STREAMS_EXTERN struct cdevsw *cdev_find(const char *name);
+__STREAMS_EXTERN struct cdevsw *cdev_match(const char *name);
+__STREAMS_EXTERN struct fmodsw *fmod_find(const char *name);
+__STREAMS_EXTERN struct devnode *cmin_find(const struct cdevsw *cdev, const char *name);
+__STREAMS_EXTERN struct devnode *cmin_get(const struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN struct devnode *cmaj_get(const struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor);
 
 /* from strreg.c */
-extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
-extern int unregister_cmajor(struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN int register_cmajor(struct cdevsw *cdev, major_t major,
+				     struct file_operations *fops);
+__STREAMS_EXTERN int unregister_cmajor(struct cdevsw *cdev, major_t major);
 
 /* other internals */
-extern int sdev_add(struct cdevsw *cdev, modID_t modid);
-extern void sdev_del(struct cdevsw *cdev);
+__STREAMS_EXTERN int sdev_add(struct cdevsw *cdev, modID_t modid);
+__STREAMS_EXTERN void sdev_del(struct cdevsw *cdev);
 extern rwlock_t cdevsw_lock;
-extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
-extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
-extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
-extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
+__STREAMS_EXTERN void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
+__STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
+
 #if 0
-extern rwlock_t cminsw_lock;
+__STREAMS_EXTERN rwlock_t cminsw_lock;
 #endif
 
-extern long do_fattach(const struct file *file, const char *file_name);
-extern long do_fdetach(const char *file_name);
-extern long do_spipe(int *fds);
+__STREAMS_EXTERN long do_fattach(const struct file *file, const char *file_name);
+__STREAMS_EXTERN long do_fdetach(const char *file_name);
+__STREAMS_EXTERN long do_spipe(int *fds);
 
-extern void fmod_add(struct fmodsw *fmod, modID_t modid);
-extern void fmod_del(struct fmodsw *fmod);
+__STREAMS_EXTERN void fmod_add(struct fmodsw *fmod, modID_t modid);
+__STREAMS_EXTERN void fmod_del(struct fmodsw *fmod);
 extern rwlock_t fmodsw_lock;
 
-extern int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
-extern int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
-extern struct vfsmount *STREAMS_FASTCALL(specfs_mount(void));
-extern void STREAMS_FASTCALL(specfs_umount(void));
+__STREAMS_EXTERN int spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev);
+__STREAMS_EXTERN int spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag);
+__STREAMS_EXTERN struct vfsmount *specfs_mount(void);
+__STREAMS_EXTERN void specfs_umount(void);
 
 #ifndef BIG_COMPILE
-extern struct linkblk *alloclk(void);
-extern void freelk(struct linkblk *l);
+__STREAMS_EXTERN struct linkblk *alloclk(void);
+__STREAMS_EXTERN void freelk(struct linkblk *l);
 #endif
 
-extern struct stdata *allocstr(void);
-extern void freestr(struct stdata *sd);
-#ifndef BIG_COMPILE
-extern struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
-extern void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
+__STREAMS_EXTERN struct stdata *allocstr(void);
+__STREAMS_EXTERN void freestr(struct stdata *sd);
 
-extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
-		    cred_t *crp);
+#ifndef BIG_COMPILE
+__STREAMS_EXTERN struct stdata *sd_get(struct stdata *sd);
+__STREAMS_EXTERN void sd_put(struct stdata **sdp);
+
+__STREAMS_EXTERN int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag,
+			      int sflag, cred_t *crp);
 #endif
 
 #if 0
-extern struct devinfo *di_alloc(struct cdevsw *cdev);
-extern void di_put(struct devinfo *di);
+__STREAMS_EXTERN struct devinfo *di_alloc(struct cdevsw *cdev);
+__STREAMS_EXTERN void di_put(struct devinfo *di);
 #endif
 
-extern struct strevent *STREAMS_FASTCALL(sealloc(void));
-extern int STREAMS_FASTCALL(sefree(struct strevent *se));
+__STREAMS_EXTERN struct strevent *sealloc(void);
+__STREAMS_EXTERN int sefree(struct strevent *se);
 
 #ifndef BIG_COMPILE
 extern int sysctl_str_nstrpush;
 extern int sysctl_str_strctlsz;
 #endif
 
-extern int register_clone(struct cdevsw *cdev);
-extern int unregister_clone(struct cdevsw *cdev);
+__STREAMS_EXTERN int register_clone(struct cdevsw *cdev);
+__STREAMS_EXTERN int unregister_clone(struct cdevsw *cdev);
 
-extern void runqueues(void);
+__STREAMS_EXTERN void runqueues(void);
 
 /* If you use this structure, you might want to upcall to the stream head functions behind these.
  * These are them.  Note that the functions above or below are called after acquiring a reference to
  * the STREAM head but before performing basic access checks.  Note also, that ioctl will be an
  * unlocked_ioctl on systems that support it.  Take your own big kernel locks if you need to. */
 
-extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
-extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
-extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
-extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
-			   loff_t *ppos, int more);
-extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
-		      int *flagsp);
-extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
-		      int flags);
-extern int strioctl(struct file *file, unsigned int cmd, unsigned long arg);
+__STREAMS_EXTERN unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
+__STREAMS_EXTERN ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
+__STREAMS_EXTERN ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
+__STREAMS_EXTERN ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
+				     loff_t *ppos, int more);
+__STREAMS_EXTERN int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp,
+				int *bandp, int *flagsp);
+__STREAMS_EXTERN int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp,
+				int band, int flags);
+__STREAMS_EXTERN int strioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
-/* stream head read put and write service procedures, and open/close for use by replacement stream heads */
-extern int streamscall strrput(queue_t *q, mblk_t *mp);
-extern int streamscall strwput(queue_t *q, mblk_t *mp);
-extern int streamscall strwsrv(queue_t *q);
-extern int streamscall str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-extern int streamscall str_close(queue_t *q, int oflag, cred_t *crp);
+/* stream head read put and write service procedures, and open/close for use by replacement stream
+ * heads */
+__STREAMS_ENTRYP int strrput(queue_t *q, mblk_t *mp);
+__STREAMS_ENTRYP int strwput(queue_t *q, mblk_t *mp);
+__STREAMS_ENTRYP int strwsrv(queue_t *q);
+__STREAMS_ENTRYP int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+__STREAMS_ENTRYP int str_close(queue_t *q, int oflag, cred_t *crp);
 
 extern struct file_operations strm_f_ops;
 

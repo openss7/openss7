@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/19 03:23:38 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/19 12:45:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/19 03:23:38 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/19 12:45:17 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2005/12/19 03:23:38 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/19 12:45:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -91,7 +91,7 @@ static char const ident[] =
 // #include <asm/atomic.h>
 
 #ifndef __STRSCHD_EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE inline
+#define __STRSCHD_EXTERN_INLINE inline streams_fastcall
 #endif
 
 #include "sys/strdebug.h"
@@ -204,7 +204,7 @@ qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-BIG_STATIC __unlikely struct qband *
+BIG_STATIC __unlikely streams_fastcall struct qband *
 allocqb(void)
 {
 	struct qband *qb;
@@ -228,7 +228,7 @@ allocqb(void)
 	return (qb);
 }
 
-BIG_STATIC __unlikely void
+BIG_STATIC __unlikely streams_fastcall void
 freeqb(struct qband *qb)
 {
 	struct strinfo *si = &Strinfo[DYN_QBAND];
@@ -269,7 +269,7 @@ __freebands(queue_t *rq)
 
 #if 0
 /* queue band gets and puts */
-BIG_STATIC streams_fastcall __unlikely qband_t *
+BIG_STATIC __unlikely streams_fastcall qband_t *
 bget(qband_t *qb)
 {
 	struct qbinfo *qbi;
@@ -282,7 +282,7 @@ bget(qband_t *qb)
 	}
 	return (qb);
 }
-BIG_STATIC streams_fastcall __unlikely void
+BIG_STATIC __unlikely streams_fastcall void
 bput(qband_t **bp)
 {
 	qband_t *qb;
@@ -323,7 +323,7 @@ apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-BIG_STATIC __unlikely struct apinfo *
+BIG_STATIC __unlikely streams_fastcall struct apinfo *
 ap_alloc(struct strapush *sap)
 {
 	struct apinfo *api;
@@ -365,7 +365,7 @@ ap_free(struct apinfo *api)
 #endif
 	kmem_cache_free(si->si_cache, api);
 }
-BIG_STATIC __unlikely struct apinfo *
+BIG_STATIC __unlikely streams_fastcall struct apinfo *
 ap_get(struct apinfo *api)
 {
 	if (api) {
@@ -375,7 +375,7 @@ ap_get(struct apinfo *api)
 	return (api);
 }
 
-BIG_STATIC __unlikely void
+BIG_STATIC __unlikely streams_fastcall void
 ap_put(struct apinfo *api)
 {
 	assert(api != NULL);
@@ -408,7 +408,7 @@ devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 }
 
 #if 0
-BIG_STATIC_STH struct __unlikely devinfo *
+BIG_STATIC_STH struct __unlikely streams_fastcall devinfo *
 di_alloc(struct cdevsw *cdev)
 {
 	struct devinfo *di;
@@ -461,7 +461,7 @@ di_free(struct devinfo *di)
 	kmem_cache_free(si->si_cache, di);
 }
 
-BIG_STATIC_STH __unlikely struct devinfo *
+BIG_STATIC_STH __unlikely streams_fastcall struct devinfo *
 di_get(struct devinfo *di)
 {
 	if (di) {
@@ -471,7 +471,7 @@ di_get(struct devinfo *di)
 	return (di);
 }
 
-BIG_STATIC __unlikely void
+BIG_STATIC __unlikely streams_fastcall void
 di_put(struct devinfo *di)
 {
 	assert(di != NULL);
@@ -508,7 +508,7 @@ mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 }
 
 #if 0
-BIG_STATIC __unlikely struct mdlinfo *
+BIG_STATIC __unlikely streams_fastcall struct mdlinfo *
 modi_alloc(struct fmodsw *fmod)
 {
 	struct mdlinfo *mi;
@@ -555,7 +555,7 @@ modi_free(struct mdlinfo *mi)
 #endif
 	kmem_cache_free(si->si_cache, mi);
 }
-BIG_STATIC __unlikely struct mdlinfo *
+BIG_STATIC __unlikely streams_fastcall struct mdlinfo *
 modi_get(struct mdlinfo *mi)
 {
 	if (mi) {
@@ -565,7 +565,7 @@ modi_get(struct mdlinfo *mi)
 	return (mi);
 }
 
-BIG_STATIC __unlikely void
+BIG_STATIC __unlikely streams_fastcall void
 modi_put(struct mdlinfo *mi)
 {
 	assert(mi != NULL);
@@ -606,7 +606,7 @@ queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
  *
  *  Can be called by the module writer to get a private queue pair.
  */
-queue_t *
+streams_fastcall queue_t *
 allocq(void)
 {
 	queue_t *rq;
@@ -637,7 +637,7 @@ allocq(void)
 
 EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
 
-BIG_STATIC_STH streams_fastcall void sd_put_slow(struct stdata **sdp);
+BIG_STATIC_STH void streams_fastcall sd_put_slow(struct stdata **sdp);
 
 /*
  *  __freeq:	- free a queue pair
@@ -698,7 +698,7 @@ freeq_fast(queue_t *rq)
 		freechain(mp, mpp);
 }
 
-void
+streams_fastcall void
 freeq(queue_t *rq)
 {
 	freeq_fast(rq);
@@ -1098,7 +1098,7 @@ linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		spin_unlock(&link_index_lock);
 	}
 }
-BIG_STATIC_STH struct __unlikely linkblk *
+BIG_STATIC_STH streams_fastcall __unlikely struct linkblk *
 alloclk(void)
 {
 	struct linkblk *l;
@@ -1127,7 +1127,7 @@ alloclk(void)
 EXPORT_SYMBOL(alloclk);		/* include/sys/streams/strsubr.h */
 #endif
 
-BIG_STATIC_STH __unlikely void
+BIG_STATIC_STH streams_fastcall __unlikely void
 freelk(struct linkblk *l)
 {
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
@@ -1175,7 +1175,7 @@ syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		INIT_LIST_HEAD((struct list_head *) &sq->sq_next);
 	}
 }
-BIG_STATIC __unlikely struct syncq *
+BIG_STATIC streams_fastcall __unlikely struct syncq *
 sq_alloc(void)
 {
 	struct syncq *sq;
@@ -1229,7 +1229,7 @@ sq_free(struct syncq *sq)
 	init_waitqueue_head(&sq->sq_waitq);
 	kmem_cache_free(si->si_cache, sq);
 }
-BIG_STATIC __unlikely struct syncq *
+BIG_STATIC streams_fastcall __unlikely struct syncq *
 sq_get(struct syncq *sq)
 {
 	if (sq) {
@@ -1240,7 +1240,7 @@ sq_get(struct syncq *sq)
 	}
 	return (sq);
 }
-BIG_STATIC __unlikely void
+BIG_STATIC streams_fastcall __unlikely void
 sq_put(struct syncq **sqp)
 {
 	struct syncq *sq;
@@ -1634,7 +1634,7 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
  *  invoked the buffer call.  This means that the callback function will not execute until after the
  *  caller exits or hits a pre-emption point.
  */
-bcid_t
+streams_fastcall bcid_t
 __bufcall(queue_t *q, unsigned size, int priority, void streamscall (*function) (long), long arg)
 {
 	return defer_bufcall_event(q, size, priority, function, arg);
@@ -1696,7 +1696,7 @@ EXPORT_SYMBOL(unbufcall);	/* include/sys/streams/stream.h */
  *  invoked the timeout callback.  This means that the callback function will not execute until
  *  after the caller exists the calling function or hits a pre-emption point.
  */
-toid_t
+streams_fastcall toid_t
 __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu)
 {
 	return defer_timeout_event(q, timo_fcn, arg, ticks, pl, cpu);
@@ -1712,7 +1712,7 @@ EXPORT_SYMBOL(__timeout);	/* include/sys/streams/strsubr.h */
  *  invoked the timeout.  This means that the callback function will not execute until after the
  *  caller hits a pre-emption point.
  */
-toid_t
+streams_fastcall toid_t
 timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 {
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
@@ -1724,7 +1724,7 @@ EXPORT_SYMBOL(timeout);		/* include/sys/streams/stream.h */
  *  untimeout:	- cancel a timeout callback
  *  @toid:	timeout identifier
  */
-clock_t
+streams_fastcall clock_t
 untimeout(toid_t toid)
 {
 	struct strevent *se;
@@ -1798,7 +1798,7 @@ __unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
  *
  *  Notices: The @func callback function will be called by the same CPU upon which weldq() was issued.
  */
-int
+streams_fastcall int
 weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
       queue_t *protq)
 {
@@ -1837,7 +1837,7 @@ EXPORT_SYMBOL(weldq);		/* include/sys/streams/stream.h */
  *  Notices: The @func callback function will be called by the same CPU upon which unweldq() was issued.
  *
  */
-int
+streams_fastcall int
 unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
 	queue_t *protq)
 {
@@ -2801,7 +2801,7 @@ qsrvp(queue_t *q)
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
-__unlikely int
+__unlikely streams_fastcall int
 qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	qi_qopen_t q_open;
@@ -2837,7 +2837,7 @@ EXPORT_SYMBOL(qopen);
  *
  *  CONTEXT: Must only be called from a blockable context.
  */
-__unlikely int
+__unlikely streams_fastcall int
 qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	qi_qclose_t q_close;
@@ -3337,7 +3337,7 @@ do_unweldq_event(struct strevent *se)
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-void *
+streams_fastcall void *
 kmem_alloc(size_t size, int flags)
 {
 	if (size == 0 || size > 131072)
@@ -3360,7 +3360,7 @@ EXPORT_SYMBOL(kmem_alloc);	/* include/sys/streams/kmem.h */
  *  @size:	amount of memory to allocate in bytes
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
-void *
+streams_fastcall void *
 kmem_zalloc(size_t size, int flags)
 {
 	void *mem;
@@ -3386,7 +3386,7 @@ EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/streams/kmem.h */
  *  memory, we also want to raise pending buffer callbacks on all STREAMS scheduler threads so that
  *  they can attempt to use the memory.
  */
-__hot_in void
+streams_fastcall __hot_in void
 kmem_free(void *addr, size_t size)
 {
 	kfree(addr);
@@ -3402,7 +3402,7 @@ EXPORT_SYMBOL(kmem_free);	/* include/sys/streams/kmem.h */
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  *  @node:
  */
-void *
+streams_fastcall void *
 kmem_alloc_node(size_t size, int flags, cnodeid_t node)
 {
 	return kmalloc(size, GFP_KERNEL);
@@ -3416,7 +3416,7 @@ EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/streams/kmem.h */
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  *  @node:
  */
-void *
+streams_fastcall void *
 kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
 {
 	void *mem;
@@ -3503,7 +3503,7 @@ scan_timeout_function(unsigned long arg)
 
 struct timer_list scan_timer;
 
-__unlikely void
+streams_fastcall __unlikely void
 qscan(queue_t *q)
 {
 	struct strthread *t = this_thread;
@@ -3828,7 +3828,7 @@ queuerun(struct strthread *t)
  *  concurrency and other exclusion measures are not necessary here.  This function must be called
  *  with the syncrhonization queue spin lock held and interrupts disabled.
  */
-BIG_STATIC void
+BIG_STATIC streams_fastcall void
 sqsched(syncq_t *sq)
 {
 	/* called with sq locked */
@@ -3969,7 +3969,7 @@ __runqueues(struct softirq_action *unused)
  *  system call.  All stream heads (regular stream head, fifo/pipe stream head, socket stream
  *  head) need this function exported so that they can be called at the end of a system call.
  */
-__hot_in void
+streams_fastcall __hot_in void
 runqueues(void)
 { /* PROFILED */
 #if 0
@@ -4033,7 +4033,7 @@ shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 		clear_shinfo(obj);
 }
-__unlikely struct stdata *
+streams_fastcall __unlikely struct stdata *
 allocstr(void)
 {
 	/* TODO: this function should take a queue pair (read queue) pointer as an argument.  We
@@ -4160,7 +4160,7 @@ sd_put_slow(struct stdata **sdp)
 }
 
 
-__unlikely void
+streams_fastcall __unlikely void
 freestr(struct stdata *sd)
 {
 	/* FIXME: need to deallocate anything attached to the stream head */

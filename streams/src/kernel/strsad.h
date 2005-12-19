@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/09 00:27:55 $
+ @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 12:45:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:55 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -66,7 +66,7 @@
 //extern int apush_get(struct strapush *sap);
 //extern int apush_vml(struct str_list *slp);
 
-BIG_STATIC_STH int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
+BIG_STATIC_STH int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
 #endif				/* __LOCAL_STRSAD_H__ */

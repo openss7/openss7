@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/19 03:23:38 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/19 12:45:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/19 03:23:38 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/19 12:45:20 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/19 03:23:38 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/19 12:45:20 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <stdbool.h>		/* for bool, true and false */
 
 #ifndef __STRUTIL_EXTERN_INLINE
-#define __STRUTIL_EXTERN_INLINE inline
+#define __STRUTIL_EXTERN_INLINE inline streams_fastcall
 #endif
 
 #include "sys/strdebug.h"
@@ -1338,7 +1338,7 @@ EXPORT_SYMBOL(canputnext);
  *  The purpose of this function is only to protect the queue members and block put and service
  *  procedures from manipulating the queue so that rmvq and insq functions can be called.
  */
-__unlikely unsigned long
+__unlikely streams_fastcall unsigned long
 freezestr(queue_t *q)
 {
 	struct stdata *sd;
@@ -1366,7 +1366,7 @@ EXPORT_SYMBOL(freezestr);
  *  the side-effect that the identified module may be loaded by module identifier.  The kernel
  *  module demand loaded will have the module name or alias "streams-modid-%u".
  */
-__unlikely qi_qadmin_t
+__unlikely streams_fastcall qi_qadmin_t
 getadmin(modID_t modid)
 {
 	qi_qadmin_t qadmin = NULL;
@@ -1398,7 +1398,7 @@ EXPORT_SYMBOL(getadmin);
  *  the side-effect that the named module may be loaded by module name.  The kernel module demand
  *  loaded will have the module name or alias "streams-%s".
  */
-__unlikely modID_t
+__unlikely streams_fastcall modID_t
 getmid(const char *name)
 {
 	struct fmodsw *fmod;
@@ -1432,7 +1432,7 @@ EXPORT_SYMBOL(OTHERQ);
 /**
  *  qready:	- test if queue procedures are scheduled
  */
-__unlikely int
+__unlikely streams_fastcall int
 qready(void)
 {
 	struct strthread *t = this_thread;
@@ -1445,7 +1445,7 @@ EXPORT_SYMBOL(qready);		/* include/sys/streams/stream.h */
 /**
  *  setqsched:	- schedule execution of queue procedures
  */
-streams_inline void
+streams_inline streams_fastcall void
 setqsched(void)
 {
 	struct strthread *t = this_thread;
@@ -1519,7 +1519,7 @@ EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
  *  That must be done with a separate call to enableq() or qenable().  It is not supposed to be
  *  called by a thread that froze the Stream with freezestr(9); but, it will still work.
  */
-__unlikely void
+__unlikely streams_fastcall void
 enableok(queue_t *q)
 {
 	struct stdata *sd;
@@ -1546,7 +1546,7 @@ EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
  *  This function simply sets the %QNOENB flag on the queue.  It is not supposed to be called by a
  *  thread that froze the Stream with freezestr(9); but, it will still work.
  */
-__unlikely void
+__unlikely streams_fastcall void
 noenable(queue_t *q)
 {
 	struct stdata *sd;
@@ -1687,7 +1687,7 @@ EXPORT_SYMBOL(putbq);
  *  @q:		the queue to put to
  *  @type:	the message type
  */
-int
+streams_fastcall int
 putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
@@ -1709,7 +1709,7 @@ EXPORT_SYMBOL(putctl);
  *  @type:	the message type
  *  @param:	the 1 byte parameter
  */
-int
+streams_fastcall int
 putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
@@ -1734,7 +1734,7 @@ EXPORT_SYMBOL(putctl1);
  *  @param1:	the first 1 byte parameter
  *  @param2:	the second 1 byte parameter
  */
-int
+streams_fastcall int
 putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
@@ -1759,7 +1759,7 @@ EXPORT_SYMBOL(putctl2);
  *  @q:		this queue
  *  @type:	the message type
  */
-int
+streams_fastcall int
 putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
@@ -1782,7 +1782,7 @@ EXPORT_SYMBOL(putnextctl);
  *  @type:	the message type
  *  @param:	the 1 byte parameter
  */
-int
+streams_fastcall int
 putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
@@ -1808,7 +1808,7 @@ EXPORT_SYMBOL(putnextctl1);
  *  @param1:	the first 1 byte parameter
  *  @param2:	the second 1 byte parameter
  */
-int
+streams_fastcall int
 putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
@@ -2175,8 +2175,8 @@ qalloc(struct stdata *sd, struct fmodsw *fmod)
 	return (q);
 }
 
-int setsq(queue_t *q, struct fmodsw *fmod);
-void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
+int streams_fastcall setsq(queue_t *q, struct fmodsw *fmod);
+void streams_fastcall setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 
 /**
  *  qattach: - attach a stream head, module or driver queue pair to a stream head
@@ -2269,7 +2269,7 @@ EXPORT_SYMBOL(qattach);
  *  because the Stream head reference count falling to zero is used to deallocate the Stream head
  *  queue pair.
  */
-__unlikely void
+__unlikely streams_fastcall void
 qdelete(queue_t *q)
 {
 	struct stdata *sd;
@@ -2364,7 +2364,7 @@ EXPORT_SYMBOL(qdetach);
  *  before qprocson() is called, from its qi_qclose() procedure after qprocsoff() is called, or
  *  using weldq() or unweldq().
  */
-__unlikely void
+__unlikely streams_fastcall void
 qinsert(struct stdata *sd, queue_t *irq)
 {
 	queue_t *iwq, *srq, *swq;
@@ -2410,7 +2410,7 @@ EXPORT_SYMBOL(qinsert);
  *  holding the STRCLOSE bit, so no other close can occur, and all other operations on the Stream
  *  will fail.
  */
-__unlikely void
+__unlikely streams_fastcall void
 qprocsoff(queue_t *q)
 {
 	queue_t *bq;
@@ -2500,7 +2500,7 @@ EXPORT_SYMBOL(qprocsoff);
  *  holding STWOPEN bit, so no other open can occur.  Because the Stream head has not yet been
  *  published to a file pointer or inode, no other operation can occur on the Stream.
  */
-__unlikely void
+__unlikely streams_fastcall void
 qprocson(queue_t *q)
 {
 	queue_t *bq;
@@ -3170,7 +3170,7 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
  *  is to allocate the syncrhonization queues with setsq() and the set the queues with setq().
  *  Syncrhonization queues from a multiplexed queue pair can be removed with setsq(q, NULL).
  */
-__unlikely void
+__unlikely streams_fastcall void
 setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	struct stdata *sd;
@@ -3342,7 +3342,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
  *  Locking: A stream head write lock should be maintained across the call to ensure that there are
  *  no STREAMS coroutines running while the queues are being manipulated.
  */
-__unlikely int
+__unlikely streams_fastcall int
 setsq(queue_t *q, struct fmodsw *fmod)
 {
 	int result;
@@ -3371,7 +3371,7 @@ EXPORT_SYMBOL(setsq);		/* for stream head include/sys/streams/strsubr.h */
  *  @band:	from which queue band
  *  @val:	location of return value
  */
-__unlikely int
+__unlikely streams_fastcall int
 strqget(register queue_t *q, qfields_t what, register unsigned char band, long *val)
 {
 	int err = 0;
@@ -3468,7 +3468,7 @@ EXPORT_SYMBOL(strqget);
  *  function.  On UP it is not necessary unless strqset(9) is to be called from outside of the
  *  STREAMS context.
  */
-__unlikely int
+__unlikely streams_fastcall int
 strqset(register queue_t *q, qfields_t what, register unsigned char band, long val)
 {
 	int err = 0;
@@ -3604,7 +3604,7 @@ STATIC vstrlog_t vstrlog_hook = &vstrlog_default;
  *  LOCKING: This function holds a write lock on strlog_reg_lock to keep others from calling a
  *  strlog() implementation function that is about to be unloaded for safe log driver unloading.
  */
-__unlikely vstrlog_t
+streams_fastcall __unlikely vstrlog_t
 register_strlog(vstrlog_t newlog)
 {
 	unsigned long flags;
@@ -3628,7 +3628,7 @@ EXPORT_SYMBOL(register_strlog);
  *  @fmt:	printf(3) format
  *  @args:	format specific arguments
  */
-int
+streams_fastcall int
 vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	int result = 0;
@@ -3658,7 +3658,7 @@ EXPORT_SYMBOL(vstrlog);
  *  LOCKING: This function holds a read lock on strlog_reg_lock to keep de-registrations from
  *  occurring while the function is being called for safe log driver unloading.
  */
-int
+streams_fastcall int
 strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	int result = 0;
@@ -3682,7 +3682,7 @@ EXPORT_SYMBOL(strlog);
  *  @q:			the queue in the stream to thaw
  *  @flags:		spl flags
  */
-__unlikely void
+__unlikely streams_fastcall void
 unfreezestr(queue_t *q, unsigned long flags)
 {
 	struct stdata *sd;
@@ -3708,7 +3708,7 @@ EXPORT_SYMBOL(WR);
 /*
  *  vcmn_err:
  */
-void
+streams_fastcall void
 vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	unsigned long flags;
@@ -3754,7 +3754,7 @@ EXPORT_SYMBOL(vcmn_err);
  *  @fmt:	printf(3) format
  *  @...:	format arguments
  */
-void
+streams_fastcall void
 cmn_err(int err_lvl, const char *fmt, ...)
 {
 	va_list args;
@@ -3779,7 +3779,7 @@ __STRUTIL_EXTERN_INLINE void delay(unsigned long ticks);
 
 EXPORT_SYMBOL(delay);
 
-int
+streams_fastcall int
 drv_getparm(const unsigned int parm, void *value_p)
 {
 	switch (parm) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/09 00:27:56 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/12/19 12:45:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,27 +46,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:19 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSCHED_H__
 #define __LOCAL_STRSCHED_H__
 
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+
+#ifndef __EXTERN_INLINE
+#define __EXTERN_INLINE extern __inline__
+#endif
+
+#ifndef __SCHED_EXTERN_INLINE
+#define __SCHED_EXTERN_INLINE __EXTERN_INLINE streams_fastcall
+#endif
+
 #ifndef BIG_STATIC
-#define BIG_STATIC
+#define BIG_STATIC __EXTERN
 #endif
 
 #ifndef BIG_STATIC_INLINE
-#define BIG_STATIC_INLINE
+#define BIG_STATIC_INLINE __EXTERN_INLINE
 #endif
 
 #ifndef BIG_STATIC_STH
-#define BIG_STATIC_STH
+#define BIG_STATIC_STH __EXTERN
 #endif
 
 #ifndef BIG_STATIC_INLINE_STH
-#define BIG_STATIC_INLINE_STH
+#define BIG_STATIC_INLINE_STH __EXTERN_INLINE
 #endif
 
 #undef STR
@@ -75,81 +91,79 @@
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 
-#ifndef __SCHED_EXTERN_INLINE
-#define __SCHED_EXTERN_INLINE extern __inline__
-#endif
-
 #ifndef STREAMS_SOFTIRQ
 #define STREAMS_SOFTIRQ (TASKLET_SOFTIRQ+1)
 #endif
 
 /* ctors and dtors for mdbblocks */
-BIG_STATIC mblk_t *STREAMS_FASTCALL(mdbblock_alloc(uint priority, void *func));
-BIG_STATIC void STREAMS_FASTCALL(mdbblock_free(mblk_t *mp));
+BIG_STATIC mblk_t *streams_fastcall mdbblock_alloc(uint priority, void *func);
+BIG_STATIC void streams_fastcall mdbblock_free(mblk_t *mp);
 
 /* queue gets and puts */
-BIG_STATIC queue_t *STREAMS_FASTCALL(qget(queue_t *q));
-BIG_STATIC void STREAMS_FASTCALL(qput(queue_t **qp));
+BIG_STATIC queue_t *streams_fastcall qget(queue_t *q);
+BIG_STATIC void streams_fastcall qput(queue_t **qp);
 
 /* ctors and dtors for queue bands */
-BIG_STATIC struct qband *allocqb(void);
-BIG_STATIC void freeqb(struct qband *qb);
+BIG_STATIC struct qband *streams_fastcall allocqb(void);
+BIG_STATIC void streams_fastcall freeqb(struct qband *qb);
+
 #if 0
 /* queue band gets and puts */
-BIG_STATIC qband_t *STREAMS_FASTCALL(bget(qband_t *qb));
-BIG_STATIC void STREAMS_FASTCALL(bput(qband_t **bp));
+BIG_STATIC qband_t *streams_fastcall bget(qband_t *qb);
+BIG_STATIC void streams_fastcall bput(qband_t **bp);
 #endif
 
 /* ctors and dtors for stream heads */
-extern struct stdata *allocstr(void);
-extern void freestr(struct stdata *sd);
-BIG_STATIC_STH struct stdata *STREAMS_FASTCALL(sd_get(struct stdata *sd));
-BIG_STATIC_STH void STREAMS_FASTCALL(sd_put(struct stdata **sdp));
+__STREAMS_EXTERN struct stdata *allocstr(void);
+__STREAMS_EXTERN void freestr(struct stdata *sd);
+BIG_STATIC_STH struct stdata *streams_fastcall sd_get(struct stdata *sd);
+BIG_STATIC_STH void streams_fastcall sd_put(struct stdata **sdp);
 
 /* ctors and dtors for autopush entries */
-BIG_STATIC struct apinfo *ap_alloc(struct strapush *sap);
-BIG_STATIC struct apinfo *ap_get(struct apinfo *api);
-BIG_STATIC void ap_put(struct apinfo *api);
+BIG_STATIC struct apinfo *streams_fastcall ap_alloc(struct strapush *sap);
+BIG_STATIC struct apinfo *streams_fastcall ap_get(struct apinfo *api);
+BIG_STATIC void streams_fastcall ap_put(struct apinfo *api);
+
 /* XXX: not even in strsched.c */
-BIG_STATIC_STH int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
-		    cred_t *crp);
+BIG_STATIC_STH int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag,
+			    int sflag, cred_t *crp);
 
 #if 0
 /* ctors and dtors for devinfo */
-BIG_STATIC struct devinfo *di_alloc(struct cdevsw *cdev);
-BIG_STATIC struct devinfo *di_get(struct devinfo *di);
-BIG_STATIC void di_put(struct devinfo *di);
+BIG_STATIC struct devinfo *streams_fastcall di_alloc(struct cdevsw *cdev);
+BIG_STATIC struct devinfo *streams_fastcall di_get(struct devinfo *di);
+BIG_STATIC void streams_fastcall di_put(struct devinfo *di);
 
 /* ctors and dtors for mdlinfo */
-BIG_STATIC struct mdlinfo *modi_alloc(struct fmodsw *fmod);
-BIG_STATIC struct mdlinfo *modi_get(struct mdlinfo *mi);
-BIG_STATIC void modi_put(struct mdlinfo *mi);
+BIG_STATIC struct mdlinfo *streams_fastcall modi_alloc(struct fmodsw *fmod);
+BIG_STATIC struct mdlinfo *streams_fastcall modi_get(struct mdlinfo *mi);
+BIG_STATIC void streams_fastcall modi_put(struct mdlinfo *mi);
 #endif
 
 /* ctors and dtors for linkblk */
-BIG_STATIC_STH struct linkblk *alloclk(void);
-BIG_STATIC_STH void freelk(struct linkblk *l);
+BIG_STATIC_STH struct linkblk *streams_fastcall alloclk(void);
+BIG_STATIC_STH void streams_fastcall freelk(struct linkblk *l);
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* ctors and dtors for syncq */
-BIG_STATIC struct syncq *sq_alloc(void);
-BIG_STATIC struct syncq *sq_get(struct syncq *sq);
-BIG_STATIC void sq_put(struct syncq **sqp);
+BIG_STATIC struct syncq *streams_fastcall sq_alloc(void);
+BIG_STATIC struct syncq *streams_fastcall sq_get(struct syncq *sq);
+BIG_STATIC void streams_fastcall sq_put(struct syncq **sqp);
 #endif
 
 /* freeing chains of message blocks */
-BIG_STATIC void STREAMS_FASTCALL(freechain(mblk_t *mp, mblk_t **mpp));
+BIG_STATIC void streams_fastcall freechain(mblk_t *mp, mblk_t **mpp);
 
 /* force scheduling queues */
-// extern void qschedule(queue_t *q);
+// __STREAMS_EXTERN void qschedule(queue_t *q);
 
 #if defined CONFIG_STREAMS_SYNCQS
-/* synq functions */ /* XXX: not even in strsched.c */
-extern void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
+							     /* synq functions *//* XXX: not even in strsched.c */
+__STREAMS_EXTERN void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
 #endif
 
 /* stuff for examining streams information lists */
-BIG_STATIC struct strinfo Strinfo[DYN_SIZE];
+BIG_STATIC struct streams_fastcall strinfo Strinfo[DYN_SIZE];
 BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 
 #define this_thread (&strthreads[smp_processor_id()])
@@ -161,7 +175,6 @@ typedef enum {
 	CTX_INT,			/* soft interrupt context */
 	CTX_ISR,			/* hard interrupt context */
 } context_t;
-
 
 #define in_streams() (!in_irq() && atomic_read(&this_thread->lock) != 0)
 
@@ -200,6 +213,7 @@ do { \
 } while (0)
 #endif				/* defined CONFIG_STREAMS_KTHREADS */
 
+#if 0
 __SCHED_EXTERN_INLINE streams_fastcall context_t
 current_context(void)
 {
@@ -215,11 +229,13 @@ current_context(void)
 #endif
 	return (CTX_PROC);
 }
+#endif
 
 /* for initialization */
 BIG_STATIC int strsched_init(void);
 BIG_STATIC void strsched_exit(void);
+
 #if defined CONFIG_STREAMS_SYNCQS
-BIG_STATIC void sqsched(syncq_t *sq);
+BIG_STATIC void streams_fastcall sqsched(syncq_t *sq);
 #endif
 #endif				/* __LOCAL_STRSCHED_H__ */

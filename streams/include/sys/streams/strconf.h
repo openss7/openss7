@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.21 2005/12/19 03:23:36 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.22 2005/12/19 12:44:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/19 03:23:36 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:44:53 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
@@ -61,6 +61,14 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
 
 #include <sys/sad.h>		/* for strapush */
 
@@ -86,23 +94,23 @@ typedef enum {
 	SQLVL_PERSTREAM = 7,		/* per-stream synchronization */
 } sqlvl_t;
 
-extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
-extern int register_strdev(struct cdevsw *cdev, major_t major);
-extern int register_strdrv(struct cdevsw *cdev);
-extern int register_strmod(struct fmodsw *fmod);
-extern int unregister_strnod(struct cdevsw *cdev, minor_t minor);
-extern int unregister_strdev(struct cdevsw *cdev, major_t major);
-extern int unregister_strdrv(struct cdevsw *cdev);
-extern int unregister_strmod(struct fmodsw *fmod);
+__STREAMS_EXTERN int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
+__STREAMS_EXTERN int register_strdev(struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN int register_strdrv(struct cdevsw *cdev);
+__STREAMS_EXTERN int register_strmod(struct fmodsw *fmod);
+__STREAMS_EXTERN int unregister_strnod(struct cdevsw *cdev, minor_t minor);
+__STREAMS_EXTERN int unregister_strdev(struct cdevsw *cdev, major_t major);
+__STREAMS_EXTERN int unregister_strdrv(struct cdevsw *cdev);
+__STREAMS_EXTERN int unregister_strmod(struct fmodsw *fmod);
 
-extern int autopush_add(struct strapush *sap);
-extern int autopush_del(struct strapush *sap);
-extern int autopush_vml(struct str_mlist *smp, int nmods);
-extern struct strapush *autopush_find(dev_t dev);
-extern struct strapush *autopush_search(const char *name, minor_t minor);
+__STREAMS_EXTERN int autopush_add(struct strapush *sap);
+__STREAMS_EXTERN int autopush_del(struct strapush *sap);
+__STREAMS_EXTERN int autopush_vml(struct str_mlist *smp, int nmods);
+__STREAMS_EXTERN struct strapush *autopush_find(dev_t dev);
+__STREAMS_EXTERN struct strapush *autopush_search(const char *name, minor_t minor);
 
-extern int apush_get(struct strapush *sap);
-extern int apush_set(struct strapush *sap);
-extern int apush_vml(struct str_list *slp);
+__STREAMS_EXTERN int apush_get(struct strapush *sap);
+__STREAMS_EXTERN int apush_set(struct strapush *sap);
+__STREAMS_EXTERN int apush_vml(struct str_list *slp);
 
 #endif				/* __SYS_STREAMS_STRCONF_H__ */

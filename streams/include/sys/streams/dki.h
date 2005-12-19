@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.14 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.15 2005/12/19 12:44:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DKI_H__
 #define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:44:53 $"
 
 #ifndef __SYS_DKI_H__
 #warning "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
@@ -69,8 +69,19 @@
 typedef __kernel_dev_t major_t;
 typedef __kernel_dev_t minor_t;
 
+#ifdef CONFIG_STREAMS_LIS_BCM
+
+/* for LiS binary compatibility */
+typedef struct cred {
+	uid_t cr_uid;			/* effective user id */
+	gid_t cr_gid;			/* effective group id */
+	uid_t cr_ruid;			/* real user id */
+	gid_t cr_rgid;			/* real group id */
+} cred_t;
+
+#else				/* CONFIG_STREAMS_LIS_BCM */
+
 /* same layout as in task_struct */
-#define current_creds ((cred_t *)(&current->uid))
 typedef struct cred {
 	uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
 	gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
@@ -83,15 +94,10 @@ typedef struct cred {
 #endif
 } cred_t;
 
-#if 0
-/* for LiS binary compatibility */
-typedef struct lis_cred {
-	uid_t cr_uid;			/* effective user id */
-	gid_t cr_gid;			/* effective group id */
-	uid_t cr_ruid;			/* real user id */
-	gid_t cr_rgid;			/* real group id */
-} lis_cred_t;
-#endif
+#endif				/* CONFIG_STREAMS_LIS_BCM */
+
+/* doesn't work for LIS BCM. */
+#define current_creds ((cred_t *)(&current->uid))
 
 /* make SVR4.2 oflag from file flags and mode */
 #define make_oflag(__f) \
@@ -100,7 +106,7 @@ typedef struct lis_cred {
 	 ((__f)->f_flags & FNDELAY ? (O_NONBLOCK | O_NDELAY) : 0))
 
 typedef struct klock {
-	unsigned long kl_isrflags; /* no longer required */
+	unsigned long kl_isrflags;	/* no longer required */
 	rwlock_t kl_lock;
 	struct task_struct *kl_owner;
 	uint kl_nest;

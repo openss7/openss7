@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/12/19 03:25:59 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1554,7 +1554,7 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 enum { tall, t1, t2, t3, t4, t5, t6, t7, t8, t9 };
 
 STATIC int xp_t1_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t1_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t1", DRV_NAME, &((struct xp *) data)->sl.timers.t1,
@@ -1573,7 +1573,7 @@ xp_start_timer_t1(struct xp *xp)
 };
 
 STATIC int xp_t2_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t2_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t2", DRV_NAME, &((struct xp *) data)->sl.timers.t2,
@@ -1592,7 +1592,7 @@ xp_start_timer_t2(struct xp *xp)
 };
 
 STATIC int xp_t3_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t3_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t3", DRV_NAME, &((struct xp *) data)->sl.timers.t3,
@@ -1611,7 +1611,7 @@ xp_start_timer_t3(struct xp *xp)
 };
 
 STATIC int xp_t4_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t4_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t4", "xp", &((struct xp *) data)->sl.timers.t4,
@@ -1630,7 +1630,7 @@ xp_start_timer_t4(struct xp *xp)
 };
 
 STATIC int xp_t5_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t5_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t5", DRV_NAME, &((struct xp *) data)->sl.timers.t5,
@@ -1649,7 +1649,7 @@ xp_start_timer_t5(struct xp *xp)
 };
 
 STATIC int xp_t6_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t6_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t6", DRV_NAME, &((struct xp *) data)->sl.timers.t6,
@@ -1668,7 +1668,7 @@ xp_start_timer_t6(struct xp *xp)
 };
 
 STATIC int xp_t7_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t7_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t7", DRV_NAME, &((struct xp *) data)->sl.timers.t7,
@@ -1687,7 +1687,7 @@ xp_start_timer_t7(struct xp *xp)
 };
 
 STATIC int xp_t8_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t8_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t8", DRV_NAME, &((struct xp *) data)->sdt.timers.t8,
@@ -1707,7 +1707,7 @@ xp_start_timer_t8(struct xp *xp)
 
 #if 0
 STATIC int xp_t9_timeout(struct xp *);
-STATIC void
+STATIC void streamscall
 xp_t9_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t9", "xp", &((struct xp *) data)->sdl.timers.t9,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:43:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:43:51 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:43:51 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 03:25:58 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:43:51 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -1248,7 +1248,7 @@ t_addr_req(queue_t *q, struct sdt *sdt)
 enum { tall, t8, t9 };
 
 STATIC int sdt_t8_timeout(struct sdt *);
-STATIC void
+STATIC void streamscall
 sdt_t8_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t8", "sdt-tpi", &((struct sdt *) data)->sdt.timers.t8,
@@ -1266,7 +1266,7 @@ sdt_start_timer_t8(struct sdt *sdt)
 			sdt->sdt.config.t8);
 };
 STATIC int sdt_t9_timeout(struct sdt *);
-STATIC void
+STATIC void streamscall
 sdt_t9_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t9", "sdt-tpi", &((struct sdt *) data)->sdl.timers.t9,

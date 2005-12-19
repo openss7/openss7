@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/19 03:23:40 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1905,9 +1905,16 @@ strwaitqueue(struct stdata *sd, queue_t *q)
 STATIC streams_fastcall __unlikely void
 strwaitclose(struct stdata *sd, int oflag)
 {
-	cred_t *crp;
 	queue_t *q;
 	bool wait;
+
+#ifdef CONFIG_STREAMS_LIS_BCM
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
+	cred_t *crp = current_creds;
+#endif
 
 	assert(sd);
 	q = sd->sd_wq;
@@ -1919,7 +1926,7 @@ strwaitclose(struct stdata *sd, int oflag)
 	/* STREAM head first */
 	if (wait && q->q_first)
 		ctrace(strwaitqueue(sd, q));
-	crp = current_creds;
+
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
 		if (wait && q->q_first)
 			ctrace(strwaitqueue(sd, q));
@@ -2233,6 +2240,14 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	long timeo;
 	int err = 0;
 
+#ifdef CONFIG_STREAMS_LIS_BCM
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
+	cred_t *crp = current_creds;
+#endif
+
 	if (ic->ic_len < 0 || ic->ic_len > sysctl_str_strmsgsz) {
 		/* POSIX less than zero or larger than maximum data part. */
 		ptrace(("Error path taken!\n"));
@@ -2251,7 +2266,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 
 	bzero(ioc, sizeof(*ioc));
 	ioc->iocblk.ioc_cmd = ic->ic_cmd;
-	ioc->iocblk.ioc_cr = current_creds;
+	ioc->iocblk.ioc_cr = crp;
 	ioc->iocblk.ioc_count = ic->ic_len;
 
 	/* implicit copyin for I_STR ioctl */
@@ -2365,6 +2380,14 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	long timeo;
 	int err = 0;
 
+#ifdef CONFIG_STREAMS_LIS_BCM
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
+	cred_t *crp = current_creds;
+#endif
+
 	while (!(mb = allocb(sizeof(*ioc), BPRI_WAITOK))) ;
 
 	mb->b_datap->db_type = M_IOCTL;
@@ -2374,7 +2397,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 
 	bzero(ioc, sizeof(*ioc));
 	ioc->iocblk.ioc_cmd = cmd;
-	ioc->iocblk.ioc_cr = current_creds;
+	ioc->iocblk.ioc_cr = crp;
 	ioc->iocblk.ioc_count = TRANSPARENT;
 
 	/* no implicit copyin for TRANPARENT ioctl */
@@ -2476,6 +2499,14 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	long timeo;
 	int err = 0;
 
+#ifdef CONFIG_STREAMS_LIS_BCM
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
+	cred_t *crp = current_creds;
+#endif
+
 	while (!(mb = allocb(sizeof(*ioc), BPRI_WAITOK))) ;
 
 	mb->b_datap->db_type = M_IOCTL;
@@ -2485,7 +2516,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 
 	bzero(ioc, sizeof(*ioc));
 	ioc->iocblk.ioc_cmd = cmd;
-	ioc->iocblk.ioc_cr = current_creds;
+	ioc->iocblk.ioc_cr = crp;
 	ioc->iocblk.ioc_count = sizeof(*l);
 
 	while (!(db = allocb(sizeof(*lbp), BPRI_WAITOK))) ;
@@ -2608,6 +2639,14 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	mblk_t *mb, *db;
 	struct qinit qi, *qi_old;
 
+#ifdef CONFIG_STREAMS_LIS_BCM
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
+	cred_t *crp = current_creds;
+#endif
+
 	/* wake everybody up before we block -- the STRCLOSE bit is set */
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_all(&sd->sd_waitq);
@@ -2622,7 +2661,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 
 	bzero(ioc, sizeof(*ioc));
 	ioc->iocblk.ioc_cmd = I_UNLINK;
-	ioc->iocblk.ioc_cr = current_creds;
+	ioc->iocblk.ioc_cr = crp;
 	ioc->iocblk.ioc_count = sizeof(*l);
 
 	while (!(db = allocb(sizeof(*lbp), BPRI_WAITOK))) ;
@@ -3244,13 +3283,13 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 	return (mask);
 }
 
-unsigned streams_fastcall int
+streams_fastcall unsigned int
 strpoll_slow(struct file *file, struct poll_table_struct *poll)
 {
 	return strpoll_fast(file, poll);
 }
 
-unsigned int
+streams_fastcall unsigned int
 strpoll(struct file *file, struct poll_table_struct *poll)
 {
 	return strpoll_slow(file, poll);
@@ -3389,7 +3428,14 @@ stropen(struct inode *inode, struct file *file)
 {
 	int err, oflag, sflag;
 	struct stdata *sd;
+
+#ifdef CONFIG_STREAMS_LIS_BCM
+	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+		    current->uid,.cr_rgid = current->gid,
+	}, *crp = &creds;
+#else
 	cred_t *crp = current_creds;
+#endif
 
 	ptrace(("opening a stream\n"));
 	oflag = make_oflag(file);
@@ -3998,7 +4044,8 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 					for (position = 0, b = mp; b; b = b->b_cont) {
 						if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 							continue;
-						if (unlikely(protdis && b->b_datap->db_type != M_DATA))
+						if (unlikely
+						    (protdis && b->b_datap->db_type != M_DATA))
 							continue;
 						if ((position += blen) >= nbytes) {
 							b->b_rptr += nbytes - (position - blen);
@@ -4085,7 +4132,7 @@ strread_slow(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	return strread_fast(file, buf, nbytes, ppos);
 }
 
-ssize_t
+streams_fastcall ssize_t
 strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strread_slow(file, buf, nbytes, ppos);
@@ -4335,7 +4382,7 @@ strwrite_slow(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	return strwrite_fast(file, buf, nbytes, ppos);
 }
 
-ssize_t
+streams_fastcall ssize_t
 strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	return strwrite_slow(file, buf, nbytes, ppos);
@@ -4492,7 +4539,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
  *  @ppos: seek position
  *  @more: more pages to send
  */
-__unlikely ssize_t
+streams_fastcall __unlikely ssize_t
 strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more)
 {
 	mblk_t *mp;
@@ -4651,7 +4698,7 @@ strputpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	return strputpmsg_fast(file, ctlp, datp, band, flags);
 }
 
-int
+streams_fastcall int
 strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
 	   int flags)
 {
@@ -4975,7 +5022,7 @@ strgetpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	return strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
 }
 
-int
+streams_fastcall int
 strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
 	   int __user *bandp, int __user *flagsp)
 {
@@ -6650,7 +6697,15 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 
 				dev_t dev = sd->sd_dev;
 				int oflag = make_oflag(file);
+
+#ifdef CONFIG_STREAMS_LIS_BCM
+				cred_t creds = {.cr_uid = current->euid,.cr_gid =
+					    current->egid,.cr_ruid = current->uid,.cr_rgid =
+					    current->gid,
+				}, *crp = &creds;
+#else
 				cred_t *crp = current_creds;
+#endif
 
 				sd->sd_file = file;	/* always before open */
 
@@ -6725,11 +6780,17 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 
 		/* protected by STWOPEN bit */
 		if (sd->sd_pushcnt > 0) {
+#ifdef CONFIG_STREAMS_LIS_BCM
+			cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
+				    current->uid,.cr_rgid = current->gid,
+			}, *crp = &creds;
+#else
+			cred_t *crp = current_creds;
+#endif
 
 			/* TODO: should use capabilities instead of UID */
-			if (sd->sd_pushcnt >= sd->sd_nanchor || current_creds->cr_uid == 0) {
+			if (sd->sd_pushcnt >= sd->sd_nanchor || crp->cr_uid == 0) {
 				int oflag = make_oflag(file);
-				cred_t *crp = current_creds;
 
 				sd->sd_pushcnt--;
 				qdetach(_RD(sd->sd_wq->q_next), oflag, crp);
@@ -7743,7 +7804,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 	return strioctl_fast(file, cmd, arg);
 }
 
-__hot int
+streams_fastcall __hot int
 strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	return strioctl_slow(file, cmd, arg);

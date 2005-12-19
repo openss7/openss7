@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:43 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 12:45:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:43 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 12:45:16 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/09 18:01:43 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 12:45:16 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -127,7 +127,7 @@ path_lookup(const char *path, unsigned flags, struct nameidata *nd)
 }
 #endif
 
-long
+streams_fastcall long
 do_fattach(const struct file *file, const char *file_name)
 {
 	/* very much like do_add_mount() but with different permissions and clone_mnt() of the file 
@@ -197,7 +197,7 @@ do_fattach(const struct file *file, const char *file_name)
 
 EXPORT_SYMBOL(do_fattach);
 
-long
+streams_fastcall long
 do_fdetach(const char *file_name)
 {
 	/* pretty much the same as sys_umount() with different permissions */

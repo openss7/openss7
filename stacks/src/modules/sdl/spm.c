@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:58 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:39 $"
 
 static char const ident[] =
-    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $";
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:39 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:58 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:39 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1146,7 +1146,7 @@ spm_m_proto(queue_t *q, mblk_t *mp)
  *  We need to throttle these to avoid locking up the processor.  The throttle
  *  is for 10 blocks every 10ms maximum which is precisely 64kbps.
  */
-STATIC void
+STATIC void streamscall
 spm_w_timeout(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;
@@ -1158,7 +1158,7 @@ spm_w_timeout(caddr_t data)
 	qenable(q);
 	return;
 }
-STATIC void
+STATIC void streamscall
 spm_r_timeout(caddr_t data)
 {
 	queue_t *q = (queue_t *) data;

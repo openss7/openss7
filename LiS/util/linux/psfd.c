@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $
+ @(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2005/07/13 12:01:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:35:16 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: psfd.c,v $
+ Revision 1.1.1.1.12.5  2005/07/13 12:01:24  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 1.1.1.1.12.3  2005/05/14 08:35:16  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
+#ident "@(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2005/07/13 12:01:24 $"
 
 static char const ident[] =
-    "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
+    "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2005/07/13 12:01:24 $";
 
 /* 
  *  psfd.c - pass a pipe end's FD to itself
@@ -73,7 +76,7 @@ static char const ident[] =
 #include <string.h>
 #include <memory.h>
 #include <fcntl.h>
-#include <poll.h>
+#include <sys/poll.h>
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif

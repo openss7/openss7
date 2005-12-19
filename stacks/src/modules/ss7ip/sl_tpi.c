@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:25:59 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:43:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:25:59 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:43:51 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:25:59 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/19 12:43:51 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -302,7 +302,7 @@ sl_unlockq(queue_t *q)
  *  BUFSRV calls service routine
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC void streamscall
 sl_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
@@ -1932,7 +1932,7 @@ sl_alloc_timeout(ulong timer)
 	}
 	return (mp);
 }
-STATIC void
+STATIC void streamscall
 sl_t1_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -1950,7 +1950,7 @@ sl_t1_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t2_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -1968,7 +1968,7 @@ sl_t2_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t3_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -1986,7 +1986,7 @@ sl_t3_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t4_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -2004,7 +2004,7 @@ sl_t4_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t5_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -2022,7 +2022,7 @@ sl_t5_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t6_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -2040,7 +2040,7 @@ sl_t6_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t7_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -2058,7 +2058,7 @@ sl_t7_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t8_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
@@ -2076,7 +2076,7 @@ sl_t8_timeout(caddr_t data)
 	}
 	return;
 }
-STATIC void
+STATIC void streamscall
 sl_t9_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;

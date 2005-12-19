@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.17 $) $Date: 2005/12/18 06:38:07 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.18 $) $Date: 2005/12/19 03:22:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:38:07 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.17 $) $Date: 2005/12/18 06:38:07 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.18 $) $Date: 2005/12/19 03:22:19 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.17 2005/12/18 06:38:07 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.18 2005/12/19 03:22:19 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -4268,9 +4268,7 @@ lis_start_qsched(void)
 		lis_sem_init(&lis_runq_kill_sems[cpu], 0);	/* initialize semaphore */
 
 		sprintf(name, "LiS-%s:%u", lis_version, cpu);
-		lis_runq_pids[cpu] = lis_thread_start(lis_thread_runqueues, (void *) (long) cpu,	/* __LP64__ 
-													 */
-						      name);
+		lis_runq_pids[cpu] = lis_thread_start(lis_thread_runqueues, (void *) (long) cpu, name);
 		if (lis_runq_pids[cpu] < 0) {	/* failed to fork */
 			printk("lis_start_qsched: %s: lis_thread_start error %d\n", name,
 			       lis_runq_pids[cpu]);

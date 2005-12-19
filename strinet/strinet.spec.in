@@ -1,7 +1,7 @@
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2005/12/16 12:13:51 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/12/19 12:45:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 12:13:51 $ by $Author: brian $
+# Last Modified $Date: 2005/12/19 12:45:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -168,7 +168,7 @@
 %if %{BUILD_lfs}
 %global _STREAMS LfS
 %global _streams streams
-%global _strvers @LFS_VERSION@
+%{expand: %%global _strvers @LFS_VERSION@}
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
@@ -176,7 +176,7 @@
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
-%global _strvers @LIS_VERSION@
+%{expand: %%global _strvers @LIS_VERSION@}
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
@@ -1589,9 +1589,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.95  2005/12/16 12:13:51  brian
-# - build does not require texinfo
+# Revision 0.9.2.96  2005/12/19 12:45:43  brian
+# - locking down for release
 #
+
+* Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.95  2005/12/16 12:13:51  brian
+- build does not require texinfo
 
 * Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.94  2005/12/16 09:24:01  brian

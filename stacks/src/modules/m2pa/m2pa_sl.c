@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:57 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:25:57 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:43:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:57 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:57 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $";
 
 #include <sys/os7/compat.h>
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 03:25:57 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:43:32 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1470,7 +1470,7 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 enum { tall, t1, t2, t3, t4, t5, t6, t7, t8, t9 };
 
 STATIC int sl_t1_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t1_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t1", MOD_NAME, &((struct sl *) data)->sl.timers.t1,
@@ -1489,7 +1489,7 @@ sl_start_timer_t1(struct sl *sl)
 };
 
 STATIC int sl_t2_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t2_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t2", MOD_NAME, &((struct sl *) data)->sl.timers.t2,
@@ -1508,7 +1508,7 @@ sl_start_timer_t2(struct sl *sl)
 };
 
 STATIC int sl_t3_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t3_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t3", MOD_NAME, &((struct sl *) data)->sl.timers.t3,
@@ -1527,7 +1527,7 @@ sl_start_timer_t3(struct sl *sl)
 };
 
 STATIC int sl_t4_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t4_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t4", MOD_NAME, &((struct sl *) data)->sl.timers.t4,
@@ -1549,7 +1549,7 @@ sl_start_timer_t4(struct sl *sl)
 
 #if 0
 STATIC int sl_t5_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t5_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t5", MOD_NAME, &((struct sl *) data)->sl.timers.t5,
@@ -1569,7 +1569,7 @@ sl_start_timer_t5(struct sl *sl)
 #endif
 
 STATIC int sl_t6_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t6_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t6", MOD_NAME, &((struct sl *) data)->sl.timers.t6,
@@ -1588,7 +1588,7 @@ sl_start_timer_t6(struct sl *sl)
 };
 
 STATIC int sl_t7_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t7_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t7", MOD_NAME, &((struct sl *) data)->sl.timers.t7,
@@ -1608,7 +1608,7 @@ sl_start_timer_t7(struct sl *sl)
 
 #if 0
 STATIC int sl_t8_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t8_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t8", MOD_NAME, &((struct sl *) data)->sdt.timers.t8,
@@ -1628,7 +1628,7 @@ sl_start_timer_t8(struct sl *sl)
 #endif
 
 STATIC int sl_t9_timeout(struct sl *);
-STATIC void
+STATIC void streamscall
 sl_t9_expiry(caddr_t data)
 {
 	ss7_do_timeout(data, "t9", MOD_NAME, &((struct sl *) data)->sdl.timers.t9,

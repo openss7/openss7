@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/17 08:39:25 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/17 08:39:25 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:47:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/17 08:39:25 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/17 08:39:25 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2005/12/17 08:39:25 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -124,11 +124,6 @@ MODULE_ALIAS("streams-ip_to_dlpi");
 #define UNITS 8
 #endif
 
-#ifndef LFS
-#define streams_fastcall
-#define STREAMS_FASTCALL(__x) __x
-#endif
-
 STATIC struct module_info ip2xinet_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
@@ -138,11 +133,11 @@ STATIC struct module_info ip2xinet_minfo = {
 	.mi_lowat = 1024,		/* Lo water mark */
 };
 
-STATIC int ip2xinet_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int ip2xinet_close(queue_t *, int, cred_t *);
+STATIC int streamscall ip2xinet_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall ip2xinet_close(queue_t *, int, cred_t *);
 
-STATIC int STREAMS_FASTCALL(ip2xinet_ursrv(queue_t *));
-STATIC int STREAMS_FASTCALL(ip2xinet_uwput(queue_t *, mblk_t *));
+STATIC int streamscall ip2xinet_ursrv(queue_t *);
+STATIC int streamscall ip2xinet_uwput(queue_t *, mblk_t *);
 
 STATIC struct qinit ip2xinet_urinit = {
 	.qi_srvp = ip2xinet_ursrv,	/* Read service */
@@ -156,8 +151,8 @@ STATIC struct qinit ip2xinet_uwinit = {
 	.qi_minfo = &ip2xinet_minfo,	/* Information */
 };
 
-STATIC int STREAMS_FASTCALL(ip2xinet_lrput(queue_t *, mblk_t *));
-STATIC int STREAMS_FASTCALL(ip2xinet_lwsrv(queue_t *));
+STATIC int streamscall ip2xinet_lrput(queue_t *, mblk_t *);
+STATIC int streamscall ip2xinet_lwsrv(queue_t *);
 
 STATIC struct qinit ip2xinet_lrinit = {
 	.qi_putp = ip2xinet_lrput,	/* Read put (message from below) */
@@ -300,7 +295,7 @@ ip2xinetinit(void)
  *
  ************************************************************************/
 
-int
+int streamscall
 ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	mblk_t *bp;
@@ -374,7 +369,7 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
  *
  ************************************************************************/
 
-int
+int streamscall
 ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
 {
 	(void) oflag;
@@ -421,7 +416,7 @@ ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
  *
  ************************************************************************/
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ip2xinet_uwput(queue_t *q, mblk_t *mp)
 {
 
@@ -584,7 +579,7 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
  *      instead.
  *
  ************************************************************************/
-STATIC streams_fastcall int
+STATIC streamscall int
 ip2xinet_ursrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -606,7 +601,7 @@ ip2xinet_ursrv(queue_t *q)
  *      devices from sending us stuff.
  *
  ************************************************************************/
-STATIC streams_fastcall int
+STATIC streamscall int
 ip2xinet_lwsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -672,7 +667,7 @@ ip2xinet_lwsrv(queue_t *q)
  *
  ************************************************************************/
 
-STATIC streams_fastcall int
+STATIC streamscall int
 ip2xinet_lrput(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp;

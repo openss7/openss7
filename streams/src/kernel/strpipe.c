@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/19 11:08:21 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 12:45:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/19 11:08:21 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 12:45:17 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/10/19 11:08:21 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 12:45:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -257,7 +257,7 @@ static typeof(&put_filp) _put_filp = (typeof(_put_filp)) HAVE_PUT_FILP_ADDR;
 #define put_filp(__f) _put_filp(__f)
 #endif
 
-long
+streams_fastcall long
 do_spipe(int *fds)
 {
 	dev_t dev;

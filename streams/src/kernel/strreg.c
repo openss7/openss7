@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/19 11:08:21 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/19 12:45:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:21 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/19 11:08:21 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/19 12:45:17 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/10/19 11:08:21 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/19 12:45:17 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -180,7 +180,7 @@ unregister_strsync(struct fmodsw *fmod)
  *  register_strmod: - register STREAMS module
  *  @fmod: STREAMS module structure to register
  */
-int
+streams_fastcall int
 register_strmod(struct fmodsw *fmod)
 {
 	struct module_info *mi;
@@ -269,7 +269,7 @@ EXPORT_SYMBOL(register_strmod);
  *  unregister_strmod:
  *  @fmod: STREAMS module structure to unregister
  */
-int
+streams_fastcall int
 unregister_strmod(struct fmodsw *fmod)
 {
 	int err = 0;
@@ -306,7 +306,7 @@ EXPORT_SYMBOL(unregister_strmod);
  *
  *  For full details, see register_strdrv(9).
  */
-int
+streams_fastcall int
 register_strdrv(struct cdevsw *cdev)
 {
 	struct module_info *mi;
@@ -406,7 +406,7 @@ EXPORT_SYMBOL(register_strdrv);
  *
  *  For full details, see unregister_strdrv(9).
  */
-int
+streams_fastcall int
 unregister_strdrv(struct cdevsw *cdev)
 {
 	int err = 0;
@@ -625,7 +625,7 @@ unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
  *  only one character major device number will be allocated.  If @major is zero on each call, a new
  *  available external major device number will be allocated on each call.
  */
-int
+streams_fastcall int
 register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 {
 	int err;
@@ -664,7 +664,7 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 
 EXPORT_SYMBOL(register_cmajor);
 
-int
+streams_fastcall int
 unregister_cmajor(struct cdevsw *cdev, major_t major)
 {
 	int err;
@@ -697,7 +697,7 @@ EXPORT_SYMBOL(unregister_cmajor);
  *  @cmin:	minor device node structure pointer
  *  @minor:	minor device number
  */
-int
+streams_fastcall int
 register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 {
 	int err = 0;
@@ -762,7 +762,7 @@ EXPORT_SYMBOL(register_strnod);
  *  @cmin: minor device node structure pointer
  *  @minor: minor device number
  */
-int
+streams_fastcall int
 unregister_strnod(struct cdevsw *cdev, minor_t minor)
 {
 	int err = 0;

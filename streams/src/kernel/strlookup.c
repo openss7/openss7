@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:54 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/19 12:45:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:54 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/19 12:45:16 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:54 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/19 12:45:16 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -1070,7 +1070,7 @@ cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 
 EXPORT_SYMBOL(cdev_minor);
 
-void
+streams_fastcall void
 fmod_add(struct fmodsw *fmod, modID_t modid)
 {
 	/* These are statically allocated and therefore need to be initialized, however, the module
@@ -1089,7 +1089,7 @@ fmod_add(struct fmodsw *fmod, modID_t modid)
 
 EXPORT_SYMBOL(fmod_add);
 
-void
+streams_fastcall void
 fmod_del(struct fmodsw *fmod)
 {
 	/* remove from list and hash */
@@ -1107,7 +1107,7 @@ EXPORT_SYMBOL(fmod_del);
  *  Notices: sdev_add() and sdev_del() had to be renamed from cdev_add() and cdev_put() because
  *  later 2.6 kernels use those names for character devices.
  */
-int
+streams_fastcall int
 sdev_add(struct cdevsw *cdev, modID_t modid)
 {
 	struct inode *inode;
@@ -1157,7 +1157,7 @@ EXPORT_SYMBOL(sdev_add);
  *  Notices: sdev_add() and sdev_del() had to be renamed from cdev_add() and cdev_put() because
  *  later 2.6 kernels use those names for character devices.
  */
-void
+streams_fastcall void
 sdev_del(struct cdevsw *cdev)
 {
 	struct inode *inode;
@@ -1177,7 +1177,7 @@ sdev_del(struct cdevsw *cdev)
 
 EXPORT_SYMBOL(sdev_del);
 
-void
+streams_fastcall void
 cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 {
 	cmaj->n_major = major;
@@ -1194,7 +1194,7 @@ cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 
 EXPORT_SYMBOL(cmaj_add);
 
-void
+streams_fastcall void
 cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
@@ -1207,7 +1207,7 @@ cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 
 EXPORT_SYMBOL(cmaj_del);
 
-int
+streams_fastcall int
 cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 {
 	struct inode *inode;
@@ -1242,7 +1242,7 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 
 EXPORT_SYMBOL(cmin_add);
 
-void
+streams_fastcall void
 cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
 	struct inode *inode;
