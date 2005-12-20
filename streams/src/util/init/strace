@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/16 09:26:08 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/20 10:19:45 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -46,12 +46,9 @@
 
 # Source init script functions library
 init_mode="standalone"
-if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
-if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig-lsb" ; fi
-if [ -r /etc/rc.status          ] ; then init_mode="insserv-lsb"   ; fi
-else
-if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
-if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 fi
 
 case "$init_mode" in
@@ -70,9 +67,7 @@ case "$init_mode" in
 	    return $RETVAL
 	}
 	;;
-    (chkconfig-lsb)
-	;;
-    (insserv|insserv-lsb)
+    (insserv)
 	action() {
 	    echo -en "$1"
 	    shift 1
@@ -279,7 +274,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/16 09:26:08 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/20 10:19:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -325,7 +320,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 09:26:08 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 10:19:45 $ by $Author: brian $
 #
 # =============================================================================
 

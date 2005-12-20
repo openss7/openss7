@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/16 09:26:07 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2005/12/20 10:19:31 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -43,12 +43,9 @@
 
 # Source init script functions library.
 init_mode="standalone"
-if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
-if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig" ; fi
-if [ -r /etc/rc.status          ] ; then init_mode="insserv"   ; fi
-else
-if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
-if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 fi
 
 case "$init_mode" in
@@ -93,7 +90,8 @@ config="/etc/sysconfig/$name"
 
 if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
-for STREAMS_MKNOD in /sbin/strmakenodes /usr/sbin/strmakenodes /bin/strmakenodes /usr/bin/strmakenodes ; do
+for STREAMS_MKNOD in \
+    ./strmakenodes /sbin/strmakenodes /usr/sbin/strmakenodes /bin/strmakenodes /usr/bin/strmakenodes ; do
     if [ -x $STREAMS_MKNOD ] ; then
 	break
     else
@@ -105,8 +103,8 @@ done
 
 #STREAMS_MODULES="streams streams-liskmod streams-mtdrv streams-pipemod"
 STREAMS_MODULES="streams"
-STREAMS_MAKEDEVICES="no"
-STREAMS_REMOVEDEVICES="no"
+STREAMS_MAKEDEVICES="yes"
+STREAMS_REMOVEDEVICES="yes"
 STREAMS_MOUNTSPECFS="yes"
 STREAMS_MOUNTPOINT="/dev/streams"
 
@@ -270,7 +268,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/16 09:26:07 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2005/12/20 10:19:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -316,7 +314,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 09:26:07 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 10:19:31 $ by $Author: brian $
 #
 # =============================================================================
 

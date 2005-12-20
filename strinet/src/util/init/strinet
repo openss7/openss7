@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/16 09:26:09 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/20 10:19:51 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -41,12 +41,9 @@
 
 # Source init script functions library.
 init_mode="standalone"
-if [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb" ;
-if [ -r /etc/init.d/functions   ] ; then init_mode="chkconfig" ; fi
-if [ -r /etc/rc.status          ] ; then init_mode="insserv"   ; fi
-else
-if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions ; init_mode="chkconfig" ; else
-if [ -r /etc/rc.status          ] ; then . /etc/rc.status        ; init_mode="insserv"   ; fi ; fi
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 fi
 
 case "$init_mode" in
@@ -91,7 +88,8 @@ config="/etc/sysconfig/$name"
 
 if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
-for STRINET_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
+for STRINET_MKNOD in \
+    ./${name}_mknod /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
     if [ -x $STRINET_MKNOD ] ; then
 	break
     else
@@ -118,8 +116,8 @@ done
 # Specify defaults
 
 STRINET_MODULES="streams-inet"
-STRINET_MAKEDEVICES="no"
-STRINET_REMOVEDEVICES="no"
+STRINET_MAKEDEVICES="yes"
+STRINET_REMOVEDEVICES="yes"
 
 # Source redhat and/or debian config file
 for file in $config ; do
@@ -299,7 +297,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/16 09:26:09 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/20 10:19:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -345,7 +343,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 09:26:09 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 10:19:51 $ by $Author: brian $
 #
 # =============================================================================
 
