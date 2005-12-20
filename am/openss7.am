@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/12/19 03:23:36 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/12/20 04:48:39 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -47,7 +47,7 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
+## Last Modified $Date: 2005/12/20 04:48:39 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -81,6 +81,8 @@ PRE_INSTALL_AM		=
 POST_INSTALL_AM		=
 PRE_UNINSTALL_AM	=
 POST_UNINSTALL_AM	=
+
+RETEST_AM		=
 
 ##
 # In case we only need the files version:
@@ -350,7 +352,7 @@ TAGS_FILES = $(DIST_SOURCES)
 ifnames:
 	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
 
-MY_PHONY	+= ifnames
+MY_PHONY		+= ifnames
 
 CLEANFILES		+= check_commands.log
 
@@ -415,6 +417,13 @@ check-local: $(CHECK_LOCAL)
 installcheck-local: $(INSTALLCHECK_LOCAL)
 
 distcheck-hook: $(DISTCHECK_HOOK)
+
+retest: retest-recursive
+
+retest-am: $(RETEST_AM)
+
+MY_RECURSIVE_TARGETS	+= retest-recursive
+MY_PHONY		+= retest retest-am
 
 #!
 #! Release Targets:

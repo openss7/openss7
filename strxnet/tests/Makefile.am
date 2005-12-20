@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/14 11:32:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/20 04:50:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/14 11:32:07 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 04:50:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2005/12/20 04:50:15  brian
+# - added autotest.am Makefile fragment
+#
 # Revision 0.9.2.11  2005/12/14 11:32:07  brian
 # - added way to pass options to testsuite from make installcheck
 #
@@ -90,114 +93,15 @@
 
 include ../am/openss7.am
 
-pkglibexecdir = $(libexecdir)/@PACKAGE@
+include ../am/autotest.am
 
-#
-# This automake file is used to specify the autotest definitions and targets
-# necessary for performing pre-install and post-install checks.  Pre-install
-# checks will work for libraries and application programs, however, it is
-# necessary to insert kernel modules into the running kernel to perform most
-# pre-install checks.
-#
-
-# my rule
-TESTSUITE		= testsuite
-
-# my rule
-package.m4: $(top_srcdir)/configure
-	@( \
-		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_RELEASE], [@PACKAGE_RELEASE@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
-	) > $@
-
-# my rule
 TESTSUITE_DEPS		= \
+			local.at \
 			kernel.at \
 			$(TESTSUITE)-timod.at \
 			$(TESTSUITE)-tirdwr.at \
 			$(TESTSUITE)-xnet.at \
 			$(TESTSUITE)-xnet_thr.at \
-			$(TESTSUITE).at \
-			local.at \
-			package.m4
-
-# my rule
-$(TESTSUITE): $(TESTSUITE_DEPS)
-	$(AUTOTEST) -I $(srcdir) $@.at -o $@
-
-# my rule
-atconfig: $(top_builddir)/config.status
-	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
-
-# automake does this one for us
-#
-#atlocal: $(srcdir)/atlocal.in $(top_builddir)/config.status
-#	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
-
-# my rule
-all-testsuite: $(TESTSUITE) atconfig atlocal
-
-if PERFORM_TESTING
-## PERFORM_TESTING
-
-INSTALLCHECK_TESTS =
-
-# my rule
-installcheck-test: $(TESTSUITE)
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
-
-INSTALLCHECK_TESTS += installcheck-test
-
-# my rule
-installcheck-testsuite: $(TESTSUITE) atconfig atlocal $(INSTALLCHECK_TESTS)
-
-## PERFORM_TESTING
-else
-## ! PERFORM_TESTING
-
-# my rule
-installcheck-testsuite: $(TESTSUITE) atconfig atlocal
-
-## ! PERFORM_TESTING
-endif
-
-# my rule
-clean-testsuite:
-	@for f in $(TESTSUITE) ; do \
-		if test -r "$$f" ; then \
-			$(ECHO) "$(SHELL) $$f --clean" ; \
-			$(SHELL) $$f --clean ; \
-			$(ECHO) "rm -f -- $$f" ; \
-			rm -f -- $$f ; \
-		fi ; \
-	done
-
-CLEANFILES		+= \
-			package.m4
-
-DISTCLEANFILES		+= \
-			atconfig \
-			atlocal
-
-ALL_LOCAL += all-testsuite
-
-INSTALLCHECK_LOCAL += installcheck-testsuite
-
-CLEAN_LOCAL += clean-testsuite
-
-if PKG_BUILD_INDEP
-## Test suites are actually architecture independent!
-pkglibexec_DATA		= atlocal
-pkglibexec_SCRIPTS	= $(TESTSUITE)
-endif
-
-# my rule
-EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
-
-.PHONY: all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK_TESTS)
+			$(TESTSUITE).at
 
 # vim: ft=automake
