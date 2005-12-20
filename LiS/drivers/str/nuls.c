@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:11:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -185,9 +185,12 @@ union ioctypes {
 	struct copyreq copyreq;
 	struct copyresp copyresp;
 };
+
+#define streamscall _RP
+
 #endif
 
-static int _RP
+static streamscall int
 nuls_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
@@ -259,7 +262,7 @@ static struct nuls *nuls_list = NULL;
  *
  *  -------------------------------------------------------------------------
  */
-static int _RP
+static streamscall int
 nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct nuls *p, **pp = &nuls_list;
@@ -327,6 +330,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&nuls_lock);
+		qprocson(q);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
@@ -335,7 +339,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int _RP
+static streamscall int
 nuls_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct nuls *p;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/20 15:12:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.10  2005/12/20 15:12:16  brian
+ - result of SMP kernel testing for LiS
+
  Revision 0.9.2.9  2005/12/19 03:23:40  brian
  - wend for simple streamscall
 
@@ -80,9 +83,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/20 15:12:16 $"
 
-static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $";
+static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/20 15:12:16 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -98,16 +101,20 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
+#ifdef LFS
 #include <sys/strsubr.h>
+#endif
 #include <sys/ddi.h>
 
 #include <sys/testmod.h>
 
+#ifdef LFS
 #include "sys/config.h"
+#endif
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/19 03:23:40 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/20 15:12:16 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -118,6 +125,10 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.
 				TESTMOD_CONTACT		"\n"
 #define TESTMOD_SPLASH		TESTMOD_DEVICE		" - " \
 				TESTMOD_REVISION	"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_TESTMOD_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
 MODULE_AUTHOR(TESTMOD_CONTACT);
@@ -130,12 +141,18 @@ MODULE_ALIAS("streams-testmod");
 #endif
 
 #ifndef CONFIG_STREAMS_TESTMOD_NAME
-//#define CONFIG_STREAMS_TESTMOD_NAME "testmod"
+#ifdef LIS
+#define CONFIG_STREAMS_TESTMOD_NAME TESTMOD__MOD_NAME
+#else
 #error "CONFIG_STREAMS_TESTMOD_NAME must be defined."
 #endif
+#endif
 #ifndef CONFIG_STREAMS_TESTMOD_MODID
-//#define CONFIG_STREAMS_TESTMOD_MODID 13
+#ifdef LIS
+#define CONFIG_STREAMS_TESTMOD_MODID TESTMOD__ID
+#else
 #error "CONFIG_STREAMS_TESTMOD_MODID must be defined."
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_TESTMOD_MODID;
@@ -148,10 +165,17 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for TESTMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TESTMOD_MODID));
 MODULE_ALIAS("streams-module-testmod");
 #endif
+#endif
+
+#ifdef LIS
+#define STRMINPSZ   0
+#define STRMAXPSZ   4096
+#define STRHIGH	    5120
+#define STRLOW	    1024
 #endif
 
 static struct module_info testmod_minfo = {
@@ -171,6 +195,10 @@ static struct module_info testmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
+#ifdef LIS
+#define streamscall _RP
+#endif
+
 static streamscall int
 testmod_rput(queue_t *q, mblk_t *mp)
 {
@@ -178,6 +206,42 @@ testmod_rput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+
+#ifdef LIS
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+
+#define printd(__x) while (0) { }
+#define ptrace(__x) while (0) { }
+
+int
+ctlmsg(unsigned char type)
+{
+	unsigned char mod = (type & ~QPCTL);
+
+	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
+}
+
+int
+putnextctl2(queue_t *q, int type, int param1, int param2)
+{
+	mblk_t *mp;
+
+	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
+		mp->b_datap->db_type = type;
+		mp->b_wptr[0] = (unsigned char) param1;
+		mp->b_wptr++;
+		mp->b_wptr[1] = (unsigned char) param2;
+		mp->b_wptr++;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
+#endif
 
 static streamscall int
 testmod_wput(queue_t *q, mblk_t *mp)
@@ -515,12 +579,14 @@ static struct streamtab testmod_info = {
 	.st_wrinit = &testmod_winit,
 };
 
+#ifdef LFS
 static struct fmodsw testmod_fmod = {
 	.f_name = CONFIG_STREAMS_TESTMOD_NAME,
 	.f_str = &testmod_info,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
+#endif
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
 static
@@ -536,8 +602,14 @@ testmod_init(void)
 	printk(KERN_INFO TESTMOD_SPLASH);
 #endif
 	testmod_minfo.mi_idnum = modid;
+#ifdef LFS
 	if ((err = register_strmod(&testmod_fmod)) < 0)
 		return (err);
+#endif
+#ifdef LIS
+	if ((err = lis_register_strmod(&testmod_info, CONFIG_STREAMS_TESTMOD_NAME)) < 0)
+		return (err);
+#endif
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
@@ -551,8 +623,14 @@ testmod_exit(void)
 {
 	int err;
 
+#ifdef LFS
 	if ((err = unregister_strmod(&testmod_fmod)) < 0)
 		return (void) (err);
+#endif
+#ifdef LIS
+	if ((err = lis_unregister_strmod(&testmod_info)) < 0)
+		return (void) (err);
+#endif
 	return (void) (0);
 };
 

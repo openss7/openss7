@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:11:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 1.1.2.5  2005/12/20 15:11:41  brian
+ - result of SMP kernel testing for LiS
+
  Revision 1.1.2.4  2005/12/19 03:22:18  brian
  - wend for simple _RP
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -102,13 +105,20 @@ static char const ident[] =
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
+#ifdef LFS
+#include <sys/strsubr.h>
+#endif
 #include <sys/ddi.h>
 
 #include <sys/testmod.h>
 
+#ifdef LFS
+#include "sys/config.h"
+#endif
+
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -135,12 +145,18 @@ MODULE_ALIAS("streams-testmod");
 #endif
 
 #ifndef CONFIG_STREAMS_TESTMOD_NAME
+#ifdef LIS
 #define CONFIG_STREAMS_TESTMOD_NAME TESTMOD__MOD_NAME
-//#error "CONFIG_STREAMS_TESTMOD_NAME must be defined."
+#else
+#error "CONFIG_STREAMS_TESTMOD_NAME must be defined."
+#endif
 #endif
 #ifndef CONFIG_STREAMS_TESTMOD_MODID
+#ifdef LIS
 #define CONFIG_STREAMS_TESTMOD_MODID TESTMOD__ID
-//#error "CONFIG_STREAMS_TESTMOD_MODID must be defined."
+#else
+#error "CONFIG_STREAMS_TESTMOD_MODID must be defined."
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_TESTMOD_MODID;
@@ -159,10 +175,12 @@ MODULE_ALIAS("streams-module-testmod");
 #endif
 #endif
 
+#ifdef LIS
 #define STRMINPSZ   0
 #define STRMAXPSZ   4096
 #define STRHIGH	    5120
 #define STRLOW	    1024
+#endif
 
 static struct module_info testmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_TESTMOD_MODID,
@@ -181,7 +199,11 @@ static struct module_info testmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
-static int _RP
+#ifdef LIS
+#define streamscall _RP
+#endif
+
+static streamscall int
 testmod_rput(queue_t *q, mblk_t *mp)
 {
 	/* we don't queue so we don't need to worry about M_FLUSH */
@@ -225,7 +247,7 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 }
 #endif
 
-static int _RP
+static streamscall int
 testmod_wput(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -506,7 +528,7 @@ testmod_wput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int _RP
+static streamscall int
 testmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -520,17 +542,19 @@ testmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		wq->q_minpsz = wq->q_next->q_minpsz;
 		wq->q_maxpsz = wq->q_next->q_maxpsz;
 		q->q_ptr = wq->q_ptr = q;	/* just set it to something */
+		qprocson(q);
 		return (0);
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-static int _RP
+static streamscall int
 testmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
 	if (!q->q_ptr)
 		return (ENXIO);
+	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }

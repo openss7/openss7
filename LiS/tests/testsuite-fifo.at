@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-fifo.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 12:42:54 $
+dnl @(#) $RCSfile: testsuite-fifo.at,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/12/19 12:42:54 $ by $Author: brian $
+dnl Last Modified $Date: 2005/12/20 15:11:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-fifo.at,v $
+dnl Revision 1.1.2.5  2005/12/20 15:11:46  brian
+dnl - result of SMP kernel testing for LiS
+dnl
 dnl Revision 1.1.2.4  2005/12/19 12:42:54  brian
 dnl - locking down for release
 dnl
@@ -120,9 +123,9 @@ m4_divert_push([DEFAULTS])
 function test_fifo() {
     if test $at_verbose = echo
     then
-	options='-vvv'
+	options='-vvvvv'
     else
-	options='-v'
+	options='-vvv'
     fi
     if test-fifo $options -e -o $1
     then
@@ -203,24 +206,64 @@ AT_CLEANUP
 AT_SETUP([posix fifo test 2.2.1])
 AT_KEYWORDS([fifo ioctl I_RECVFD ENXIO HUP])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.2.1], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.2.1
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.2.2])
 AT_KEYWORDS([fifo ioctl I_RECVFD EPROTO RDERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.2.2], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.2.2
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.2.3])
 AT_KEYWORDS([fifo ioctl I_RECVFD EAGAIN WRERR])
-AT_CHECK([test_fifo 2.2.3], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.2.3
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.2.4])
 AT_KEYWORDS([fifo ioctl I_RECVFD EPROTO RDERR WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.2.4], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.2.4
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.2.5])
@@ -243,67 +286,193 @@ AT_CLEANUP
 AT_SETUP([posix fifo test 2.3.1])
 AT_KEYWORDS([fifo ioctl I_SENDFD ENXIO HUP])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.3.1], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.3.1
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.3.2])
 AT_KEYWORDS([fifo ioctl I_SENDFD EPROTO RDERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.3.2], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.3.2
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.3.3])
 AT_KEYWORDS([fifo ioctl I_SENDFD EPROTO WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.3.3], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.3.3
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.3.4])
 AT_KEYWORDS([fifo ioctl I_SENDFD EPROTO RDERR WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.3.4], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.3.4
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.1])
 AT_KEYWORDS([fifo ioctl I_PUSH ENXIO HUP])
-AT_CHECK([test_fifo 2.4.1], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 2.4.1
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.2])
 AT_KEYWORDS([fifo ioctl I_POP ENXIO HUP])
-AT_CHECK([test_fifo 2.4.2], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 2.4.2
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.3])
 AT_KEYWORDS([fifo ioctl I_FLUSH ENXIO HUP])
-AT_CHECK([test_fifo 2.4.3], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 2.4.3
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.4])
 AT_KEYWORDS([fifo ioctl I_STR ENXIO HUP])
-AT_CHECK([test_fifo 2.4.4], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 2.4.4
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.5])
 AT_KEYWORDS([fifo ioctl I_FDINSERT ENXIO HUP])
-AT_CHECK([test_fifo 2.4.5], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 2.4.5
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.6])
 AT_KEYWORDS([fifo ioctl I_SWROPT ENXIO HUP])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.4.6], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.4.6
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.7])
 AT_KEYWORDS([fifo ioctl I_FLUSHBAND ENXIO HUP])
-AT_CHECK([test_fifo 2.4.7], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 2.4.7
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 2.4.8])
 AT_KEYWORDS([fifo ioctl I_CANPUT ENXIO HUP])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 2.4.8], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 2.4.8
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.1.1])
@@ -348,19 +517,50 @@ AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.1.8])
 AT_KEYWORDS([fifo write ENXIO HUP])
-AT_CHECK([test_fifo 3.1.8], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 3.1.8
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.1.9])
 AT_KEYWORDS([fifo write EPROTO SIGPIPE WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 3.1.9], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 3.1.9
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.1.10])
 AT_KEYWORDS([fifo write EPROTO RDERR WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 3.1.10], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 3.1.10
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.1.11])
@@ -411,19 +611,50 @@ AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.2.8])
 AT_KEYWORDS([fifo putmsg ENXIO HUP])
-AT_CHECK([test_fifo 3.2.8], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 3.2.8
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.2.9])
 AT_KEYWORDS([fifo putmsg EPROTO SIGPIPE WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 3.2.9], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 3.2.9
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.2.10])
 AT_KEYWORDS([fifo putmsg EPROTO RDERR WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 3.2.10], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 3.2.10
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.2.11])
@@ -474,19 +705,50 @@ AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.3.8])
 AT_KEYWORDS([fifo putpmsg ENXIO HUP])
-AT_CHECK([test_fifo 3.3.8], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	# Note that this is not an expected failure for UP.
+	#
+	exit 77
+    else
+	test_fifo 3.3.8
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.3.9])
 AT_KEYWORDS([fifo putpmsg EPROTO SIGPIPE WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 3.3.9], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 3.3.9
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.3.10])
 AT_KEYWORDS([fifo putpmsg EPROTO RDERR WRERR])
 AT_XFAIL_IF([test :${at_STRCONF_PACKAGE:-LiS} = :LiS])
-AT_CHECK([test_fifo 3.3.10], [], [ignore], [], [], [])
+AT_CHECK([
+    if test :${at_STRCONF_PACKAGE:-LiS} = :LiS
+    then
+	#
+	# LiS hangs the machine on this test (on SMP kernel)
+	#
+	exit 77
+    else
+	test_fifo 3.3.10
+    fi
+], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([posix fifo test 3.3.11])

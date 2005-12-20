@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.13 $) $Date: 2005/12/20 04:49:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.14 $) $Date: 2005/12/20 15:11:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/20 04:49:02 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 15:11:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.14  2005/12/20 15:11:46  brian
+# - result of SMP kernel testing for LiS
+#
 # Revision 1.1.4.13  2005/12/20 04:49:02  brian
 # - added autotest.am Makefile fragment
 #
@@ -98,7 +101,7 @@ include ../am/openss7.am
 
 include ../am/autotest.am
 
-TESTSUITE_DEPS		= \
+TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
 			$(TESTSUITE)-streams.at \

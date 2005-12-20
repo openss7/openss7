@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:23:37 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/20 15:12:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:23:37 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/20 15:12:08 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:23:37 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/20 15:12:08 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -71,14 +71,18 @@ static char const ident[] =
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
+#ifdef LFS
 #include <sys/strsubr.h>
+#endif
 #include <sys/ddi.h>
 
+#ifdef LFS
 #include "sys/config.h"
+#endif
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/19 03:23:37 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/20 15:12:08 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -89,6 +93,10 @@ static char const ident[] =
 			MUX_CONTACT	"\n"
 #define MUX_SPLASH	MUX_DEVICE	" - " \
 			MUX_REVISION	"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_MUX_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_MUX_MODULE
 MODULE_AUTHOR(MUX_CONTACT);
@@ -101,13 +109,28 @@ MODULE_ALIAS("streams-mux");
 #endif
 
 #ifndef CONFIG_STREAMS_MUX_NAME
+#ifdef LIS
+#define CONFIG_STREAMS_MUX_NAME MUX__DRV_NAME
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_MUX_NAME must be defined.
 #endif
+#endif
 #ifndef CONFIG_STREAMS_MUX_MAJOR
+#ifdef LIS
+#define CONFIG_STREAMS_MUX_MAJOR MUX__CMAJOR_0
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_MUX_MAJOR must be defined.
 #endif
+#endif
 #ifndef CONFIG_STREAMS_MUX_MODID
+#ifdef LIS
+#define CONFIG_STREAMS_MUX_MODID MUX__ID
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_MUX_MODID must be defined.
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_MUX_MODID;
@@ -136,11 +159,18 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-mux driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR) "-*");
 MODULE_ALIAS("/dev/mux");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mux");
 MODULE_ALIAS("/dev/streams/mux/*");
 #endif
+#endif
+
+#ifdef LIS
+#define STRMINPSZ   0
+#define STRMAXPSZ   4096
+#define STRHIGH	    5120
+#define STRLOW	    1024
 #endif
 
 STATIC struct module_info mux_minfo = {
@@ -151,6 +181,22 @@ STATIC struct module_info mux_minfo = {
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
+
+#ifdef LIS
+#define trace() while (0) { }
+#define ptrace(__x) while (0) { }
+#define printd(__x) while (0) { }
+#define pswerr(__x) while (0) { }
+#define ctrace(__x) __x
+
+#define QSVCBUSY QRUNNING
+
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+#endif
 
 /* private structures */
 struct mux {
@@ -178,6 +224,10 @@ STATIC struct mux *mux_links = NULL;
 
 #define MUX_UP 1
 #define MUX_DOWN 2
+
+#ifdef LIS
+#define streamscall _RP
+#endif
 
 STATIC streamscall int
 mux_uwput(queue_t *q, mblk_t *mp)
@@ -260,7 +310,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 				/* hang up all upper streams that feed this lower stream */
 				for (top = mux_opens; top; top = top->next) {
 					if (top->other == bot) {
-						putctl(top->rq, M_HANGUP);
+						putnextctl(top->rq, M_HANGUP);
 						top->other = NULL;
 					}
 				}
@@ -365,7 +415,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			queue_t *wq;
 
 			if ((wq = mux->other->wq)) {
-				put(wq, mp);
+				putnext(wq, mp);
 				read_unlock_bh(&mux_lock);
 				return (0);
 			}
@@ -401,37 +451,13 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		/* Check the QSVCBUSY flag in MP drivers to avoid missequencing of messages when
 		   service procedure is running concurrent with put procedure */
 		if (mp->b_datap->db_type < QPCTL
-		    && (q->q_first || (q->q_flag & QSVCBUSY) || !bcanput(wq, mp->b_band)))
+		    && (q->q_first || (q->q_flag & QSVCBUSY) || !bcanputnext(wq, mp->b_band)))
 			putq(q, mp);
 		else
-			put(wq, mp);
+			putnext(wq, mp);
 		break;
 	}
 	}
-	return (0);
-}
-
-STATIC streamscall int
-mux_urput(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_datap->db_type >= QPCTL ||
-	    (!q->q_first && !(q->q_flag & QSVCBUSY) && bcanputnext(q, mp->b_band))) {
-		putnext(q, mp);
-		return (0);
-	}
-	putq(q, mp);
-	return (0);
-}
-
-STATIC streamscall int
-mux_lwput(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_datap->db_type >= QPCTL ||
-	    (!q->q_first && !(q->q_flag & QSVCBUSY) && bcanputnext(q, mp->b_band))) {
-		putnext(q, mp);
-		return (0);
-	}
-	putq(q, mp);
 	return (0);
 }
 
@@ -455,7 +481,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
 			queue_t *rq;
 
 			if ((rq = mux->other->rq)) {
-				put(rq, mp);
+				putnext(rq, mp);
 				read_unlock_bh(&mux_lock);
 				return (0);
 			}
@@ -487,8 +513,9 @@ mux_lrput(queue_t *q, mblk_t *mp)
 				queue_t *rq;
 
 				if ((rq = mux->other->rq)
-				    && (mp->b_datap->db_type >= QPCTL || bcanput(rq, mp->b_band))) {
-					put(rq, mp);
+				    && (mp->b_datap->db_type >= QPCTL
+					|| bcanputnext(rq, mp->b_band))) {
+					putnext(rq, mp);
 					read_unlock_bh(&mux_lock);
 					return (0);
 				}
@@ -514,31 +541,16 @@ mux_lrput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 mux_lwsrv(queue_t *q)
 {
-	{
-		mblk_t *mp;
+	struct mux *mux = q->q_ptr;
+	struct mux *top;
 
-		/* first drain queue */
-		while ((mp = getq(q))) {
-			if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-				putnext(q, mp);
-				continue;
-			}
-			putbq(q, mp);
-			return (0);
-		}
-	}
-	{
-		struct mux *mux = q->q_ptr;
-		struct mux *top;
-
-		/* Find the upper queues feeding this one and enable them. */
-		read_lock_bh(&mux_lock);
-		for (top = mux_opens; top; top = top->next)
-			if (top->other == mux)
-				qenable(top->wq);
-		read_unlock_bh(&mux_lock);
-		return (0);
-	}
+	/* Find the upper queues feeding this one and enable them. */
+	read_lock_bh(&mux_lock);
+	for (top = mux_opens; top; top = top->next)
+		if (top->other == mux)
+			qenable(top->wq);
+	read_unlock_bh(&mux_lock);
+	return (0);
 }
 
 /*
@@ -561,18 +573,21 @@ mux_uwsrv(queue_t *q)
 	mblk_t *mp;
 
 	read_lock_bh(&mux_lock);
-	if ((mux->other && (wq = mux->other->wq)) || (wq = RD(q))) {
-		while ((mp = getq(q))) {
-			if (mp->b_datap->db_type >= QPCTL || bcanput(wq, mp->b_band)) {
-				put(wq, mp);
-				continue;
-			}
-			putbq(q, mp);
-			break;
-		}
-	} else
-		noenable(q);
+	if (mux->other)
+		wq = mux->other->wq;
 	read_unlock_bh(&mux_lock);
+
+	if (!wq)
+		wq = RD(q);
+
+	while ((mp = getq(q))) {
+		if (mp->b_datap->db_type >= QPCTL || bcanputnext(wq, mp->b_band)) {
+			putnext(wq, mp);
+			continue;
+		}
+		putbq(q, mp);
+		break;
+	}
 	return (0);
 }
 
@@ -588,39 +603,24 @@ mux_uwsrv(queue_t *q)
 STATIC streamscall int
 mux_ursrv(queue_t *q)
 {
-	{
-		mblk_t *mp;
+	struct mux *mux = q->q_ptr;
+	struct mux *bot;
+	bool found = false;
 
-		/* first drain the queue */
-		while ((mp = getq(q))) {
-			if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-				putnext(q, mp);
-				continue;
-			}
-			putbq(q, mp);
-			return (0);
+	/* Find the lower queues feeding this one and enable them. */
+	read_lock_bh(&mux_lock);
+	for (bot = mux_links; bot; bot = bot->next)
+		if (bot->other == mux) {
+			qenable(bot->rq);
+			found = true;
 		}
-	}
-	{
-		struct mux *mux = q->q_ptr;
-		struct mux *bot;
-		bool found = false;
+	read_unlock_bh(&mux_lock);
 
-		/* Find the lower queues feeding this one and enable them. */
-		read_lock_bh(&mux_lock);
-		for (bot = mux_links; bot; bot = bot->next)
-			if (bot->other == mux) {
-				qenable(bot->rq);
-				found = true;
-			}
-		read_unlock_bh(&mux_lock);
+	/* echo behaviour otherwise */
+	if (!found)
+		qenable(WR(q));
 
-		/* echo behaviour otherwise */
-		if (!found)
-			qenable(WR(q));
-
-		return (0);
-	}
+	return (0);
 }
 
 /*
@@ -641,10 +641,12 @@ mux_lrsrv(queue_t *q)
 	mblk_t *mp;
 
 	read_lock_bh(&mux_lock);
-	if (mux->other && (rq = mux->other->rq)) {
+	if (mux->other)
+		rq = mux->other->rq;
+	if (rq) {
 		while ((mp = getq(q))) {
-			if (mp->b_datap->db_type >= QPCTL || bcanput(rq, mp->b_band)) {
-				put(rq, mp);
+			if (mp->b_datap->db_type >= QPCTL || bcanputnext(rq, mp->b_band)) {
+				putnext(rq, mp);
 				continue;
 			}
 			putbq(q, mp);
@@ -739,7 +741,6 @@ mux_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 STATIC struct qinit mux_urqinit = {
-	.qi_putp = mux_urput,
 	.qi_srvp = mux_ursrv,
 	.qi_qopen = mux_open,
 	.qi_qclose = mux_close,
@@ -759,7 +760,6 @@ STATIC struct qinit mux_lrqinit = {
 };
 
 STATIC struct qinit mux_lwqinit = {
-	.qi_putp = mux_lwput,
 	.qi_srvp = mux_lwsrv,
 	.qi_minfo = &mux_minfo,
 };
@@ -771,6 +771,7 @@ STATIC struct streamtab mux_info = {
 	.st_muxwinit = &mux_lwqinit,
 };
 
+#ifdef LFS
 STATIC struct cdevsw mux_cdev = {
 	.d_name = CONFIG_STREAMS_MUX_NAME,
 	.d_str = &mux_info,
@@ -779,6 +780,7 @@ STATIC struct cdevsw mux_cdev = {
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
 };
+#endif
 
 #ifdef CONFIG_STREAMS_MUX_MODULE
 STATIC
@@ -794,8 +796,14 @@ mux_init(void)
 	printk(KERN_INFO MUX_SPLASH);
 #endif
 	mux_minfo.mi_idnum = modid;
+#ifdef LFS
 	if ((err = register_strdev(&mux_cdev, major)) < 0)
 		return (err);
+#endif
+#ifdef LIS
+	if ((err = register_strdev(major, &mux_info, 255, CONFIG_STREAMS_MUX_NAME)) < 0)
+		return (err);
+#endif
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
@@ -807,7 +815,12 @@ STATIC
 void __exit
 mux_exit(void)
 {
+#ifdef LFS
 	unregister_strdev(&mux_cdev, major);
+#endif
+#ifdef LIS
+	lis_unregister_strdev(major);
+#endif
 }
 
 #ifdef CONFIG_STREAMS_MUX_MODULE

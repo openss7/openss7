@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2005/12/20 15:12:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:27 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2005/12/20 15:12:14 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2005/12/20 15:12:14 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/19 12:45:27 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2005/12/20 15:12:14 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4140,10 +4140,8 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 EXPORT_SYMBOL(strread);
 
-STATIC int
- STREAMS_FASTCALL(_strgetpmsg
-		  (struct file *, struct strbuf __user *, struct strbuf __user *, int __user *,
-		   int __user *));
+STATIC int streams_fastcall _strgetpmsg(struct file *, struct strbuf __user *,
+					struct strbuf __user *, int __user *, int __user *);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -4253,9 +4251,8 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 	return (err);
 }
 
-STATIC int
- STREAMS_FASTCALL(_strputpmsg
-		  (struct file *, struct strbuf __user *, struct strbuf __user *, int, int));
+STATIC int streams_fastcall _strputpmsg(struct file *, struct strbuf __user *,
+					struct strbuf __user *, int, int);
 
 /**
  *  strwrite: - write file operation for a stream
@@ -4760,8 +4757,11 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	int retval = 0;
 	int err;
 
-	if (unlikely(!flagsp))
+	if (unlikely(flagsp == NULL))
 		goto einval;
+	/* Linux 2.4 does not check page 0 access */
+	if (unlikely(flagsp < (typeof(flagsp)) PAGE_SIZE))
+		goto efault;
 	if (unlikely(!access_ok(VERIFY_WRITE, flagsp, sizeof(*flagsp))))
 		goto efault;
 	if (unlikely((err = strcopyin(flagsp, &flags, sizeof(*flagsp)))))
@@ -5186,8 +5186,8 @@ tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
-STATIC int
- STREAMS_FASTCALL(str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg));
+STATIC int streams_fastcall str_i_atmark(const struct file *file, struct stdata *sd,
+					 unsigned long arg);
 
 /**
  *  sock_siocatmark:	- process %SIOCATMARK ioctl
@@ -6138,6 +6138,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 		ptrace(("Error path taken! err = %d\n", err));
 		setsq(sd->sd_rq, NULL);
 		strwakeopen(sd);
+		err = err < 0 ? err : -err; /* must be negative */
 	}
 	strwakeopen(mux);
 

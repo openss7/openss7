@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:11:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -66,23 +66,26 @@ static char const ident[] =
  *  verifying various internal STREAMS functions.
  */
 
-#include <sys/LiS/module.h>	/* should be first */
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
 
-#include <sys/LiS/config.h>
-
+#include <sys/kmem.h>
 #include <sys/stream.h>
-#include <sys/stropts.h>
-#ifdef LINUX
-#include <linux/errno.h>
-#else
-#include <sys/errno.h>
+#include <sys/strconf.h>
+#ifdef LFS
+#include <sys/strsubr.h>
 #endif
-#include <sys/cmn_err.h>
-#include <sys/osif.h>
+#include <sys/ddi.h>
+
+#ifdef LFS
+#include "sys/config.h"
+#endif
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:18 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -93,6 +96,10 @@ static char const ident[] =
 				NULLMOD_CONTACT		"\n"
 #define NULLMOD_SPLASH		NULLMOD_DEVICE		" - " \
 				NULLMOD_REVISION	"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_NULLMOD_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
 MODULE_AUTHOR(NULLMOD_CONTACT);
@@ -105,12 +112,18 @@ MODULE_ALIAS("streams-nullmod");
 #endif
 
 #ifndef CONFIG_STREAMS_NULLMOD_NAME
+#ifdef LIS
 #define CONFIG_STREAMS_NULLMOD_NAME NULLMOD__MOD_NAME
-//#error "CONFIG_STREAMS_NULLMOD_NAME must be defined."
+#else
+#error "CONFIG_STREAMS_NULLMOD_NAME must be defined."
+#endif
 #endif
 #ifndef CONFIG_STREAMS_NULLMOD_MODID
+#ifdef LIS
 #define CONFIG_STREAMS_NULLMOD_MODID NULLMOD__ID
-//#error "CONFIG_STREAMS_NULLMOD_MODID must be defined."
+#else
+#error "CONFIG_STREAMS_NULLMOD_MODID must be defined."
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_NULLMOD_MODID;
@@ -129,13 +142,20 @@ MODULE_ALIAS("streams-module-nullmod");
 #endif
 #endif
 
+#ifdef LIS
+#define STRMINPSZ	0
+#define STRMAXPSZ	4096
+#define STRHIGH		5120
+#define STRLOW		1024
+#endif
+
 STATIC struct module_info nullmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULLMOD_MODID,
 	.mi_idname = CONFIG_STREAMS_NULLMOD_NAME,
-	.mi_minpsz = 0,
-	.mi_maxpsz = 4096,
-	.mi_hiwat = 5120,
-	.mi_lowat = 1024,
+	.mi_minpsz = STRMINPSZ,
+	.mi_maxpsz = STRMAXPSZ,
+	.mi_hiwat = STRHIGH,
+	.mi_lowat = STRLOW,
 };
 
 /* 
@@ -146,96 +166,104 @@ STATIC struct module_info nullmod_minfo = {
  *  -------------------------------------------------------------------------
  */
 
+#ifdef LIS
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+#endif
+
 /*
  *  Test Case 1: allocb()  Test allocation and freeing of message blocks.
  */
 STATIC int
-testcase_1(struct iocblk *ioc, mblk_t *dp)
+testcase_1(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_2(struct iocblk *ioc, mblk_t *dp)
+testcase_2(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_3(struct iocblk *ioc, mblk_t *dp)
+testcase_3(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_4(struct iocblk *ioc, mblk_t *dp)
+testcase_4(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_5(struct iocblk *ioc, mblk_t *dp)
+testcase_5(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_6(struct iocblk *ioc, mblk_t *dp)
+testcase_6(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_7(struct iocblk *ioc, mblk_t *dp)
+testcase_7(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_8(struct iocblk *ioc, mblk_t *dp)
+testcase_8(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_9(struct iocblk *ioc, mblk_t *dp)
+testcase_9(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
 STATIC int
-testcase_10(struct iocblk *ioc, mblk_t *dp)
+testcase_10(union ioctypes *ioc, mblk_t *dp)
 {
-	ioc->ioc_rval = 0;
-	ioc->ioc_error = 0;
-	ioc->ioc_count = 0;
+	ioc->iocblk.ioc_rval = 0;
+	ioc->iocblk.ioc_error = 0;
+	ioc->iocblk.ioc_count = 0;
 	return (0);
 }
 
@@ -247,19 +275,23 @@ testcase_10(struct iocblk *ioc, mblk_t *dp)
  *  -------------------------------------------------------------------------
  */
 
-STATIC int _RP
+#ifdef LIS
+#define streamscall _RP
+#endif
+
+STATIC streamscall int
 nullmod_wput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
 		int err = 0;
-		struct iocblk *ioc;
+		union ioctypes *ioc;
 
 		ioc = (typeof(ioc)) mp->b_rptr;
-		if (_IOC_TYPE(ioc->ioc_cmd) != 'V')
+		if (_IOC_TYPE(ioc->iocblk.ioc_cmd) != 'V')
 			break;
-		switch (_IOC_NR(ioc->ioc_cmd)) {
+		switch (_IOC_NR(ioc->iocblk.ioc_cmd)) {
 		case 1:
 			err = testcase_1(ioc, mp->b_cont);
 			break;
@@ -296,9 +328,9 @@ nullmod_wput(queue_t *q, mblk_t *mp)
 		}
 		if (err) {
 			mp->b_datap->db_type = M_IOCNAK;
-			ioc->ioc_count = 0;
-			ioc->ioc_error = -err;
-			ioc->ioc_rval = -1;
+			ioc->iocblk.ioc_count = 0;
+			ioc->iocblk.ioc_error = -err;
+			ioc->iocblk.ioc_rval = -1;
 		} else {
 			mp->b_datap->db_type = M_IOCACK;
 		}
@@ -310,7 +342,7 @@ nullmod_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int _RP
+STATIC streamscall int
 nullmod_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
@@ -324,7 +356,7 @@ nullmod_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int _RP
+STATIC streamscall int
 nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
@@ -343,7 +375,7 @@ nullmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (EIO);		/* can't be opened as driver */
 }
-STATIC int _RP
+STATIC streamscall int
 nullmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
@@ -379,7 +411,16 @@ STATIC struct streamtab nullmod_info = {
 	.st_wrinit = &nullmod_winit,
 };
 
-#ifdef MODULE
+#ifdef LFS
+STATIC struct fmodsw nullmod_fmod = {
+	.f_name = CONFIG_STREAMS_NULLMOD_NAME,
+	.f_str = &nullmod_info,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
+};
+#endif
+
+#ifdef CONFIG_STREAMS_NULLMOD_MODULE
 STATIC
 #endif
 int __init
@@ -387,20 +428,26 @@ nullmod_init(void)
 {
 	int err;
 
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_NULLMOD_MODULE
 	printk(KERN_INFO NULLMOD_BANNER);
 #else
 	printk(KERN_INFO NULLMOD_SPLASH);
 #endif
 	nullmod_minfo.mi_idnum = modid;
+#ifdef LFS
+	if ((err = register_strmod(&nullmod_fmod)) < 0)
+		return (err);
+#endif
+#ifdef LIS
 	if ((err = lis_register_strmod(&nullmod_info, CONFIG_STREAMS_NULLMOD_NAME)) < 0)
 		return (err);
+#endif
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
 }
 
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_NULLMOD_MODULE
 STATIC
 #endif
 void __exit
@@ -408,12 +455,18 @@ nullmod_exit(void)
 {
 	int err;
 
+#ifdef LFS
+	if ((err = unregister_strmod(&nullmod_fmod)) < 0)
+		return (void) (err);
+#endif
+#ifdef LIS
 	if ((err = lis_unregister_strmod(&nullmod_info)) < 0)
 		return (void) (err);
+#endif
 	return (void) (0);
 }
 
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_NULLMOD_MODULE
 module_init(nullmod_init);
 module_exit(nullmod_exit);
 #endif

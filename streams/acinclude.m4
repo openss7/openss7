@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/12/19 12:44:47 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/20 15:11:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/19 12:44:47 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 15:11:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -877,18 +877,28 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	lfs_cv_bcm="${enable_streams_bcm:-yes}"])
     AH_TEMPLATE([CONFIG_STREAMS_LIS_BCM], [Defined when] AC_PACKAGE_TITLE [was
 	compiled for LiS Binary Compatibility.])
-    AH_TEMPLATE([streamscall], [Use this macro like fastcall.  It is set to
-	an attribute with the number of parameters passed in registers to STREAMS
-	callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).  In binary
-	compatibility mode, this sets the number of parameters passed in
-	registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
-	setting for the kernel.])
-    AH_TEMPLATE([STREAMSCALL], [Use this macro like FASTCALL().  It is set to
-	an attribute with the number of parameters passed in registers to STREAMS
-	callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).  In binary
-	compatibility mode, this sets the number of parameters passed in
-	registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
-	setting for the kernel.])
+    AH_VERBATIM([streamscall], m4_text_wrap([Use this macro like fastcall.  It
+	is set to an attribute with the number of parameters passed in registers
+	to STREAMS callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).
+	In binary compatibility mode, this sets the number of parameters passed
+	in registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
+	setting for the kernel. */], [   ], [/* ])[
+#ifdef __i386__
+#undef streamscall
+#else
+#define streamscall
+#endif])
+    AH_VERBATIM([STREAMSCALL], m4_text_wrap([Use this macro like FASTCALL().  It
+	is set to an attribute with the number of parameters passed in registers
+	to STREAMS callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).
+	In binary compatibility mode, this sets the number of parameters passed
+	in registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
+	setting for the kernel. */], [   ], [/* ])[
+#ifdef __i386__
+#undef STREAMSCALL
+#else
+#define STREAMSCALL(__x) __x
+#endif])
     if test :"${lfs_cv_bcm:-yes}" = :yes
     then
 	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LIS_BCM], [1])

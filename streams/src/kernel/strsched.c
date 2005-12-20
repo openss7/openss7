@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/19 12:45:17 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/20 15:12:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/19 12:45:17 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/20 15:12:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2005/12/19 12:45:17 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/20 15:12:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -758,9 +758,6 @@ mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct mdbblock *md = obj;
 
 		bzero(md, sizeof(*md));
-#if 0
-		atomic_set(&md->datablk.d_dblock.db_users, 0);
-#endif
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&md->msgblk.m_list);
 		INIT_LIST_HEAD(&md->datablk.db_list);
@@ -1877,10 +1874,6 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
 STATIC void
 strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
-#if 0
-	queue_t *qold;
-#endif
-
 #ifdef CONFIG_SMP
 	struct stdata *sd;
 
@@ -1917,10 +1910,6 @@ strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 STATIC streams_fastcall void
 strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
-#if 0
-	queue_t *qold;
-#endif
-
 #ifdef CONFIG_SMP
 	struct stdata *sd;
 
@@ -1993,10 +1982,6 @@ freezechk(queue_t *q)
 STATIC streams_inline streams_fastcall __hot_out void
 putp_fast(queue_t *q, mblk_t *mp)
 {
-#if 0
-	queue_t *qold;
-#endif
-
 	dassert(q);
 	dassert(q->q_qinfo);
 	dassert(q->q_qinfo->qi_putp);
@@ -2006,13 +1991,21 @@ putp_fast(queue_t *q, mblk_t *mp)
 	freeze_barrier(q);
 
 	/* procs can't be turned off */
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
 #endif
-		(void) q->q_qinfo->qi_putp(q, mp);
+	{
+		qi_putp_t qi_putp;
+
+		dassert(q->q_qinfo != NULL);
+		dassert(q->q_qinfo->qi_putp != NULL);
+		/* some weirdness in older compilers */
+		qi_putp = q->q_qinfo->qi_putp;
+		qi_putp(q, mp);
 		prefetchw(q);
 		qwakeup(q);
+	}
 #ifdef CONFIG_SMP
-	} else {
+	else {
 		freemsg(mp);
 		swerr();
 	}
@@ -2021,10 +2014,6 @@ putp_fast(queue_t *q, mblk_t *mp)
 STATIC void
 putp(queue_t *q, mblk_t *mp)
 {
-#if 0
-	struct strthread *t = this_thread;
-	prefetchw(t);
-#endif
 	putp_fast(q, mp);
 }
 
@@ -2078,16 +2067,21 @@ srvp_fast(queue_t *q)
 		dassert(sd);
 		prlock(sd);
 		/* check if procs are turned off */
-		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
 #endif
+		{
+			qi_srvp_t qi_srvp;
+
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
-			(void) q->q_qinfo->qi_srvp(q);
+			/* some weirdness in older compilers */
+			qi_srvp = q->q_qinfo->qi_srvp;
+			qi_srvp(q);
 			prefetchw(q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
-#ifdef CONFIG_SMP
 		}
+#ifdef CONFIG_SMP
 		prunlock(sd);
 #endif
 		qwakeup(q);
@@ -3972,9 +3966,6 @@ __runqueues(struct softirq_action *unused)
 streams_fastcall __hot_in void
 runqueues(void)
 { /* PROFILED */
-#if 0
-	return;
-#else
 #if defined HAVE_KINC_LINUX_KTHREAD_H
 	preempt_disable();
 #endif
@@ -3988,7 +3979,6 @@ runqueues(void)
 #if defined HAVE_KINC_LINUX_KTHREAD_H
 	preempt_enable();
 	cond_resched();
-#endif
 #endif
 }
 
@@ -4278,12 +4268,7 @@ str_init_caches(void)
 STATIC int
 kstreamd(void *__bind_cpu)
 {
-#if 0
-	current->policy = SCHED_FIFO;
-	current->rt_priority = 50;
-#else
 	set_user_nice(current, 19);
-#endif
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
 		if (!(this_thread->flags & (QRUNFLAGS)))
@@ -4451,12 +4436,7 @@ kstreamd(void *__bind_cpu)
 	struct strthread *t = &strthreads[cpu];
 
 	daemonize();
-#if 0
-	current->policy = SCHED_FIFO;
-	current->rt_priority = 50;
-#else
 	set_user_nice(current, 19);
-#endif
 	sigfillset(&current->blocked);
 	sigdelset(&current->blocked, SIGKILL);
 	set_cpus_allowed(current, 1UL << cpu);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: genconf.h.in,v 1.1.6.6 2005/12/19 03:22:22 brian Exp $
+ @(#) $Id: genconf.h.in,v 1.1.6.7 2005/12/20 15:11:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:22 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:11:44 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -62,7 +62,11 @@
 /* Use this macro like fastcall. It is set to an attribute with the number of
    parameters passed to exported LiS functions when there is a regparms
    kernel. This is for binary compatibility. */
+#ifdef __i386__
 #undef _RP
+#else
+#define _RP
+#endif
 
 /* following are foolishly referenced by headers */
 

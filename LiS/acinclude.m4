@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.36 $) $Date: 2005/12/19 03:22:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.37 $) $Date: 2005/12/20 15:11:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/19 03:22:17 $ by $Author: brian $
+# Last Modified $Date: 2005/12/20 15:11:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -430,7 +430,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h asm/linkage.h], [:], [:], [
+			  asm/uaccess.hh], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1153,19 +1153,19 @@ AC_DEFUN([_LIS_REGPARMS], [dnl
     AH_TEMPLATE([STREAMS_REGPARM], [If you have a regparms kernel, define to the
 	the number of register parameters passed to functions that LiS exports.
 	This is for binary compatibility.])
-    AH_TEMPLATE([_RP], [Use this macro like fastcall.  It is set to an attribute
-	with the number of parameters passed to exported LiS functions when
-	there is a regparms kernel.  This is for binary compatibility.])
+    AH_VERBATIM([_RP], m4_text_wrap([Use this macro like fastcall.  It is set to
+	an attribute with the number of parameters passed to exported LiS
+	functions when there is a regparms kernel.  This is for binary
+	compatibility. */], [   ], [/* ])[
+#ifdef __i386__
+#undef _RP
+#else
+#define _RP
+#endif])
     AC_MSG_CHECKING([for lis regparms])
     LIS_STREAMS_REGPARM="${with_lis_regparms:-0}"
-    if test :"${linux_cv_header_asm_linkage_h:-no}" = :no
-    then
-	AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
-	AC_DEFINE_UNQUOTED([_RP], [])
-    else
-	AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
-	AC_DEFINE_UNQUOTED([_RP], [__attribute__((__regparm__(STREAMS_REGPARM)))])
-    fi
+    AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
+    AC_DEFINE_UNQUOTED([_RP], [__attribute__((__regparm__(STREAMS_REGPARM)))])
     AC_MSG_RESULT([$LIS_STREAMS_REGPARM])
 ])# _LIS_REGPARMS
 # =============================================================================

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.8  2005/12/20 15:12:14  brian
+ - result of SMP kernel testing for LiS
+
  Revision 0.9.2.7  2005/12/19 03:23:39  brian
  - wend for simple streamscall
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -100,14 +103,18 @@ static char const ident[] =
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
+#ifdef LFS
 #include <sys/strsubr.h>
+#endif
 #include <sys/ddi.h>
 
+#ifdef LFS
 #include "sys/config.h"
+#endif
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/19 03:23:39 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/20 15:12:14 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -118,6 +125,10 @@ static char const ident[] =
 				NULLMOD_CONTACT		"\n"
 #define NULLMOD_SPLASH		NULLMOD_DEVICE		" - " \
 				NULLMOD_REVISION	"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_NULLMOD_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
 MODULE_AUTHOR(NULLMOD_CONTACT);
@@ -130,12 +141,18 @@ MODULE_ALIAS("streams-nullmod");
 #endif
 
 #ifndef CONFIG_STREAMS_NULLMOD_NAME
-//#define CONFIG_STREAMS_NULLMOD_NAME "nullmod"
+#ifdef LIS
+#define CONFIG_STREAMS_NULLMOD_NAME NULLMOD__MOD_NAME
+#else
 #error "CONFIG_STREAMS_NULLMOD_NAME must be defined."
 #endif
+#endif
 #ifndef CONFIG_STREAMS_NULLMOD_MODID
-//#define CONFIG_STREAMS_NULLMOD_MODID 13
+#ifdef LIS
+#define CONFIG_STREAMS_NULLMOD_MODID NULLMOD__ID
+#else
 #error "CONFIG_STREAMS_NULLMOD_MODID must be defined."
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_NULLMOD_MODID;
@@ -148,10 +165,17 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for NULLMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULLMOD_MODID));
 MODULE_ALIAS("streams-module-nullmod");
 #endif
+#endif
+
+#ifdef LIS
+#define STRMINPSZ	0
+#define STRMAXPSZ	4096
+#define STRHIGH		5120
+#define STRLOW		1024
 #endif
 
 STATIC struct module_info nullmod_minfo = {
@@ -170,6 +194,14 @@ STATIC struct module_info nullmod_minfo = {
  *
  *  -------------------------------------------------------------------------
  */
+
+#ifdef LIS
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+#endif
 
 /*
  *  Test Case 1: allocb()  Test allocation and freeing of message blocks.
@@ -271,6 +303,10 @@ testcase_10(union ioctypes *ioc, mblk_t *dp)
  *
  *  -------------------------------------------------------------------------
  */
+
+#ifdef LIS
+#define streamscall _RP
+#endif
 
 STATIC streamscall int
 nullmod_wput(queue_t *q, mblk_t *mp)
@@ -404,12 +440,14 @@ STATIC struct streamtab nullmod_info = {
 	.st_wrinit = &nullmod_winit,
 };
 
+#ifdef LFS
 STATIC struct fmodsw nullmod_fmod = {
 	.f_name = CONFIG_STREAMS_NULLMOD_NAME,
 	.f_str = &nullmod_info,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
+#endif
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
 STATIC
@@ -425,8 +463,14 @@ nullmod_init(void)
 	printk(KERN_INFO NULLMOD_SPLASH);
 #endif
 	nullmod_minfo.mi_idnum = modid;
+#ifdef LFS
 	if ((err = register_strmod(&nullmod_fmod)) < 0)
 		return (err);
+#endif
+#ifdef LIS
+	if ((err = lis_register_strmod(&nullmod_info, CONFIG_STREAMS_NULLMOD_NAME)) < 0)
+		return (err);
+#endif
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
@@ -440,8 +484,14 @@ nullmod_exit(void)
 {
 	int err;
 
+#ifdef LFS
 	if ((err = unregister_strmod(&nullmod_fmod)) < 0)
 		return (void) (err);
+#endif
+#ifdef LIS
+	if ((err = lis_unregister_strmod(&nullmod_info)) < 0)
+		return (void) (err);
+#endif
 	return (void) (0);
 }
 

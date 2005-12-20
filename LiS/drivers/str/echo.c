@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:17 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:11:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:17 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:17 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/19 03:22:17 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/20 15:11:41 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -190,21 +190,25 @@ union ioctypes {
 };
 #endif
 
-static int _RP
+#ifdef LIS
+#define streamscall _RP
+#endif
+
+static streamscall int
 echo_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
 	return (0);
 }
 
-static int _RP
+static streamscall int
 echo_rsrv(queue_t *q)
 {
 	qenable(OTHERQ(q));
 	return (0);
 }
 
-static int _RP
+static streamscall int
 echo_wput(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
@@ -276,7 +280,7 @@ echo_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int _RP
+static streamscall int
 echo_wsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -309,7 +313,7 @@ static struct echo *echo_list = NULL;
  *
  *  -------------------------------------------------------------------------
  */
-static int _RP
+static streamscall int
 echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct echo *p, **pp = &echo_list;
@@ -377,6 +381,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&echo_lock);
+		qprocson(q);
 		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
@@ -385,7 +390,7 @@ echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int _RP
+static streamscall int
 echo_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct echo *p;

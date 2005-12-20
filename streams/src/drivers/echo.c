@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/19 03:23:37 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/20 15:12:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/19 03:23:37 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/20 15:12:08 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/19 03:23:37 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/20 15:12:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -63,14 +63,18 @@ static char const ident[] =
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
+#ifdef LFS
 #include <sys/strsubr.h>
+#endif
 #include <sys/ddi.h>
 
+#ifdef LFS
 #include "sys/config.h"
+#endif
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/19 03:23:37 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/20 15:12:08 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -81,6 +85,10 @@ static char const ident[] =
 			ECHO_CONTACT	"\n"
 #define ECHO_SPLASH	ECHO_DEVICE	" - " \
 			ECHO_REVISION	"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_ECHO_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE
 MODULE_AUTHOR(ECHO_CONTACT);
@@ -93,13 +101,28 @@ MODULE_ALIAS("streams-echo");
 #endif
 
 #ifndef CONFIG_STREAMS_ECHO_NAME
+#ifdef LIS
+#define CONFIG_STREAMS_ECHO_NAME ECHO__DRV_NAME
+#endif
+#ifdef LFS
 #define CONFIG_STREAMS_ECHO_NAME "echo"
 #endif
+#endif
 #ifndef CONFIG_STREAMS_ECHO_MODID
+#ifdef LIS
+#define CONFIG_STREAMS_ECHO_MODID ECHO__ID
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_ECHO_MODID must be defined.
 #endif
+#endif
 #ifndef CONFIG_STREAMS_ECHO_MAJOR
+#ifdef LIS
+#define CONFIG_STREAMS_ECHO_MAJOR ECHO__CMAJOR_0
+#endif
+#ifdef LFS
 #error CONFIG_STREAMS_ECHO_MAJOR must be defined.
+#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_ECHO_MODID;
@@ -128,11 +151,18 @@ MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto alloca
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR) "-*");
 MODULE_ALIAS("/dev/echo");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/streams/echo");
 MODULE_ALIAS("/dev/streams/echo/*");
 #endif
+#endif
+
+#ifdef LIS
+#define STRMINPSZ   0
+#define STRMAXPSZ   4096
+#define STRHIGH	    5120
+#define STRLOW	    1024
 #endif
 
 static struct module_info echo_minfo = {
@@ -143,6 +173,26 @@ static struct module_info echo_minfo = {
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
+
+#ifdef LIS
+#define trace() while (0) { }
+#define ptrace(__x) while (0) { }
+#define printd(__x) while (0) { }
+#define pswerr(__x) while (0) { }
+#define ctrace(__x) __x
+
+#define QSVCBUSY QRUNNING
+
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+#endif
+
+#ifdef LiS
+#define streamscall _RP
+#endif
 
 static streamscall int
 echo_rput(queue_t *q, mblk_t *mp)
@@ -381,6 +431,7 @@ static struct streamtab echo_info = {
 	.st_wrinit = &echo_wqinit,
 };
 
+#ifdef LFS
 static struct cdevsw echo_cdev = {
 	.d_name = CONFIG_STREAMS_ECHO_NAME,
 	.d_str = &echo_info,
@@ -389,6 +440,7 @@ static struct cdevsw echo_cdev = {
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
 };
+#endif
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE
 static
@@ -404,8 +456,14 @@ echo_init(void)
 	printk(KERN_INFO ECHO_SPLASH);
 #endif
 	echo_minfo.mi_idnum = modid;
+#ifdef LFS
 	if ((err = register_strdev(&echo_cdev, major)) < 0)
 		return (err);
+#endif
+#ifdef LIS
+	if ((err = lis_register_strdev(major, &echo_info, 255, CONFIG_STREAMS_ECHO_NAME)) < 0)
+		return (err);
+#endif
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
@@ -417,7 +475,12 @@ static
 void __exit
 echo_exit(void)
 {
+#ifdef LFS
 	unregister_strdev(&echo_cdev, major);
+#endif
+#ifdef LIS
+	lis_unregister_strdev(major);
+#endif
 };
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE

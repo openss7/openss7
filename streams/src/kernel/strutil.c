@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/19 12:45:20 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/20 15:12:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/19 12:45:20 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/20 15:12:11 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/19 12:45:20 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2005/12/20 15:12:11 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -312,7 +312,7 @@ EXPORT_SYMBOL(copyb);		/* include/sys/streams/stream.h */
  *
  *  Copies all the message blocks in message @msg and returns a pointer to the copied message.
  */
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(copymsg(register mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *copymsg(register mblk_t *mp);
 
 EXPORT_SYMBOL(copymsg);		/* include/sys/streams/stream.h */
 
@@ -380,7 +380,7 @@ EXPORT_SYMBOL(dupb);
  *  Duplicates an entire message using dupb() to duplicate each of the message blocks in the
  *  message.  Returns a pointer to the duplicate message.
  */
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(dupmsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *dupmsg(mblk_t *mp);
 
 EXPORT_SYMBOL(dupmsg);		/* include/sys/streams/stream.h */
 
@@ -475,7 +475,7 @@ EXPORT_SYMBOL(freeb);
  *  freemsg:	- free a message
  *  @mp:	the message to free
  */
-__STRUTIL_EXTERN_INLINE void STREAMS_FASTCALL(freemsg(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE void freemsg(mblk_t *mp);
 
 EXPORT_SYMBOL(freemsg);
 
@@ -525,7 +525,7 @@ EXPORT_SYMBOL(linkmsg);
  *  msgdsize:	- calculate size of data in message
  *  @mp:	message across which to calculate data bytes
  */
-__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgdsize(register mblk_t *mp));
+__STRUTIL_EXTERN_INLINE size_t msgdsize(register mblk_t *mp);
 
 EXPORT_SYMBOL(msgdsize);
 
@@ -605,7 +605,7 @@ EXPORT_SYMBOL(msgpullup);
  *  msgsize:	- calculate size of a message
  *  @mp:	message for which to calculate size
  */
-__STRUTIL_EXTERN_INLINE size_t STREAMS_FASTCALL(msgsize(mblk_t *mp));
+__STRUTIL_EXTERN_INLINE size_t msgsize(mblk_t *mp);
 
 EXPORT_SYMBOL(msgsize);
 
@@ -724,7 +724,7 @@ EXPORT_SYMBOL(pullupmsg);
  *  @mp:    message from which to remove the block
  *  @bp:    the block to remove
  */
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(rmvb(mblk_t *mp, mblk_t *bp));
+__STRUTIL_EXTERN_INLINE mblk_t *rmvb(register mblk_t *mp, register mblk_t *bp);
 
 EXPORT_SYMBOL(rmvb);
 
@@ -750,11 +750,11 @@ EXPORT_SYMBOL(testb);
  *  unlinkb:	- unlink first block of message
  *  @mp:	message to unlink
  */
-__STRUTIL_EXTERN_INLINE mblk_t *STREAMS_FASTCALL(unlinkb(register mblk_t *mp));
+__STRUTIL_EXTERN_INLINE mblk_t *unlinkb(register mblk_t *mp);
 
 EXPORT_SYMBOL(unlinkb);
 
-__STRUTIL_EXTERN_INLINE mblk_t *unlinkmsg(mblk_t *mp, mblk_t *bp);
+__STRUTIL_EXTERN_INLINE mblk_t *unlinkmsg(register mblk_t *mp, register mblk_t *bp);
 
 EXPORT_SYMBOL(unlinkmsg);
 
@@ -820,15 +820,12 @@ streams_fastcall void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	queue_t *q_back;
-#ifdef CONFIG_SMP
 	struct stdata *sd;
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
-#endif
-	dassert(q);
 
 	for (q_back = backq(q); (q = q_back) && (q_back = backq(q)) && !q->q_qinfo->qi_srvp;) ;
 
@@ -861,9 +858,7 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		   control */
 		qenable(q);	/* always enable if a service procedure exists */
 	}
-#ifdef CONFIG_SMP
 	prunlock(sd);
-#endif
 }
 
 EXPORT_SYMBOL(qbackenable);
@@ -975,8 +970,6 @@ streams_fastcall int
 bcanputany(queue_t *q)
 {
 	bool result;
-
-#ifdef CONFIG_SMP
 	struct stdata *sd;
 
 	dassert(q);
@@ -984,13 +977,9 @@ bcanputany(queue_t *q)
 	dassert(sd);
 
 	prlock(sd);
-#endif
-
 	result = __bcanputany(q);
-
-#ifdef CONFIG_SMP
 	prunlock(sd);
-#endif
+
 	return (result);
 }
 
@@ -1015,21 +1004,16 @@ streams_inline streams_fastcall __hot_in int
 bcanputnextany(queue_t *q)
 {
 	int result;
-
-#ifdef CONFIG_SMP
 	struct stdata *sd;
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
+
 	prlock(sd);
-#endif
-
 	result = __bcanputany(q->q_next);
-
-#ifdef CONFIG_SMP
 	prunlock(sd);
-#endif
+
 	return (result);
 }
 
@@ -1195,8 +1179,6 @@ streams_fastcall int
 bcanput(register queue_t *q, unsigned char band)
 {
 	int result;
-
-#ifdef CONFIG_SMP
 	struct stdata *sd;
 
 	dassert(q);
@@ -1204,14 +1186,10 @@ bcanput(register queue_t *q, unsigned char band)
 
 	dassert(sd);
 	prlock(sd);
-#endif
 
 	result = __bcanput(q, band);
 
-#ifdef CONFIG_SMP
 	prunlock(sd);
-#endif
-
 	return (result);
 }
 
@@ -1254,23 +1232,19 @@ streams_fastcall __hot_out int
 bcanputnext(register queue_t *q, unsigned char band)
 {
 	int result;
-
-#ifdef CONFIG_SMP
 	struct stdata *sd;
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
-#endif
 
 	dassert(q);
 	dassert(q->q_next);
 	result = __bcanput(q->q_next, band);
 
-#ifdef CONFIG_SMP
 	prunlock(sd);
-#endif
+
 	return (result);
 }
 
@@ -2371,17 +2345,13 @@ qinsert(struct stdata *sd, queue_t *irq)
 
 	ptrace(("initial  half-insert of stream %p queue pair %p\n", sd, irq));
 
-#ifdef CONFIG_SMP
 	prlock(sd);
-#endif
 	srq = sd->sd_rq;
 	iwq = OTHERQ(irq);
 	swq = OTHERQ(srq);
 	irq->q_next = srq;
 	iwq->q_next = (swq->q_next != srq) ? swq->q_next : irq;
-#ifdef CONFIG_SMP
 	prunlock(sd);
-#endif
 }
 
 EXPORT_SYMBOL(qinsert);
@@ -2580,20 +2550,16 @@ qcountstrm(queue_t *q)
 	ssize_t count = 0;
 
 	if (q) {
-#ifdef CONFIG_SMP
 		struct stdata *sd;
 
 		sd = qstream(q);
 		assert(sd);
 		prlock(sd);
-#endif
 
 		for (; q && SAMESTR(q); q = q->q_next)
 			count += q->q_count;
 
-#ifdef CONFIG_SMP
 		prunlock(sd);
-#endif
 	}
 	return (count);
 }

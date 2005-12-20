@@ -91,3 +91,8 @@
 -T__kernel
 -Tbool
 -Tintptr_t
+-Tqi_putp_t
+-Tqi_srvp_t
+-Tqi_qopen_t
+-Tqi_qclose_t
+-Tqi_qadmin_t

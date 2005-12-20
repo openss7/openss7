@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.77 2005/12/19 12:44:53 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.78 2005/12/20 15:12:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/20 15:12:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/12/19 12:44:53 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/12/20 15:12:06 $"
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1197,7 +1197,7 @@ unlinkb(register mblk_t *mp)
 }
 
 __STRUTIL_EXTERN_INLINE mblk_t *
-unlinkmsg(mblk_t *mp, mblk_t *bp)
+unlinkmsg(register mblk_t *mp, register mblk_t *bp)
 {
 	if ((mp == bp))
 		mp = unlinkb(bp);
