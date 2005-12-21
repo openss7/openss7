@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/12 12:28:34 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/21 06:07:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/12 12:28:34 $ by $Author: brian $
+ Last Modified $Date: 2005/12/21 06:07:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/12 12:28:34 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/21 06:07:13 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/12/12 12:28:34 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/12/21 06:07:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1038,7 +1038,7 @@ get_streams_datab(char *page, ssize_t maxlen, struct datab *db)
 	len += snprintf(page + len, maxlen - len, ", db_type: %hhu", db->db_type);
 	len += snprintf(page + len, maxlen - len, ", db_class: %hhu", db->db_class);
 	len += snprintf(page + len, maxlen - len, ", db_size: %d:", db->db_size);
-	len += snprintf(page + len, maxlen - len, ", db_users: %d", atomic_read(&db->db_users));
+	// len += snprintf(page + len, maxlen - len, ", db_users: %d", atomic_read(&db->db_users));
       done:
 	return (len);
 }

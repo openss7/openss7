@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/19 12:47:07 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2005/12/21 11:25:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/19 12:47:07 $ by $Author: brian $
+# Last Modified $Date: 2005/12/21 11:25:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,7 +63,7 @@
 %global BUILD_test    1
 %global BUILD_devs    1
 %global MAKE_devs     0
-%global BUILD_lis     1
+%global BUILD_lis     0
 %global BUILD_lfs     0
 
 # there are three ways to pass kernel version to the build process:
@@ -162,24 +162,23 @@
 %global BUILD_source  0
 %endif
 
-%global _streams lis
-%global _ksubdir lis
-%global _kmodext lis
+%global _STREAMS SVR 4.2
+%global _streams STREAMS
+%global _ksubdir streams
+%global _kmodext streams
 %if %{BUILD_lfs}
 %global _STREAMS LfS
 %global _streams streams
-%{expand: %%global _strvers @LFS_VERSION@}
 %global _ksubdir streams
 %global _kmodext streams
-%global _conflict LiS
+%global _strvers @LFS_VERSION@%{?extrarelease}
 %endif
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
-%{expand: %%global _strvers @LIS_VERSION@}
 %global _ksubdir lis
 %global _kmodext lis
-%global _conflict streams
+%global _strvers @LIS_VERSION@%{?extrarelease}
 %endif
 
 %if %{BUILD_modules}
@@ -286,9 +285,10 @@
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
 
-# a macro to build require one package of the same version as another
-%define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+# a macro to [build] require one package of the same version as another (possibly virtual) package
+# use the arguments [Build]Requires: package1 [>]= package2
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
+%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux
 Name:           @PACKAGE@
@@ -316,10 +316,8 @@ BuildRequires:  kernel-source = %{kernel_source}
 %if %{BUILD_modules}
 BuildRequires:  modutils >= 2.4.12
 %endif
-BuildRequires:  %{_streams}-devel >= %{_strvers}
 %if %{without_ko_modules}
-BuildRequires:  %{_streams}-%{info_name} = %{_strvers}
-%buildreq_prov %{_streams}-devel %{_streams}-%{info_name}
+BuildRequires: strcompat-%{info_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease}
 %endif
 
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
@@ -342,7 +340,9 @@ BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
-BuildRequires:  strcompat-devel >= @STRCOMP_VERSION@
+BuildRequires: strcompat-devel >= @STRCOMP_VERSION@%{?extrarelease}
+BuildRequires:    strxns-devel >=     @XNS_VERSION@%{?extrarelease}
+
 # these are some needs of the configure script
 # to manipulate manual pages:
 BuildRequires:  /usr/bin/groff
@@ -541,14 +541,13 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
-Requires:       %{_streams}-%{core_name} = %{_strvers}
+Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_devs}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
 %endif
-Conflicts:      %{_conflict}-%{core_name}
 Prereq:         /sbin/depmod
 Prereq:         /sbin/lsmod
 Prereq:         /sbin/insmod
@@ -557,8 +556,9 @@ Prereq:         /usr/sbin/lsof
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -677,11 +677,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         # Running kernels do need init scripts run.
         list='%{initfiles}' ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
-                if [ -x /sbin/service ] ; then
-                    /sbin/service $i start || :
-                else
-                    %_initrddir/$i start || :
-                fi
+                /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
             fi
         done
 %endif
@@ -707,11 +703,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         done
         for i in $reverse ; do
             if [ -f %_initrddir/$i ] ; then
-                if [ -x /sbin/service ] ; then
-                    /sbin/service $i stop || :
-                else
-                    %_initrddir/$i stop || :
-                fi
+                /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
             fi
         done
 %endif
@@ -824,12 +816,15 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_datadir}/locale
-Requires:       %{_streams}-lib >= %{_strvers}
+%{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
+%{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
+#Requires:       strcompat-lib >= @STRCOMP_VERSION@%{?extrarelease}
 Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -928,13 +923,15 @@ Prefix:         %{_sysconfdir}
 %if %{have_libraries}
 Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 %endif
-Requires:       %{_streams}-lib >= %{_strvers}
+%{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
+%{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
+#Requires:       strcompat-lib >= @STRCOMP_VERSION@%{?extrarelease}
 Obsoletes:      %{name}-%{_streams}-utils
 Obsoletes:      %{name}-utils
-Conflicts:      %{_conflict}-util
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -975,7 +972,6 @@ fi
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
 Group:          System Environment/Base
-Conflicts:      %{_conflict}-dev
 Requires:       dev >= 3.3
 Obsoletes:      %{name}-devs
 Autoreq:        true
@@ -1025,7 +1021,7 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
-Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -1177,7 +1173,6 @@ Prefix:     %{_initrddir}
 Prefix:     %{_modutildir}
 %endif
 Obsoletes:  %{name}-inits
-Conflicts:  %{_conflict}-init
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1295,23 +1290,15 @@ if [ $arg = 1 ] ; then : # fresh install
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
         rm -f -- $prel_new
     fi
-    # Find the best init script removal tool
-    rminit=''
-    if [ -x /usr/lib/lsb/remove_initd ] ; then
-        rminit='/usr/lib/lsb/remove_initd'
-    elif [ -x /sbin/insserv ] ; then
-        rminit='/sbin/insserv -r'
-    elif [ -x /sbin/chkconfig ; then
-        rminit='/sbin/chkconfig --del'
-    fi
     # Fresh install, go looking for non-rpm initscripts and remove them.
-    if [ -n "$rminit" ] ; then
-        list='%{initfiles}' ; for i in $list ; do
-            if [ -f %_initrddir/$i ] ; then
-                $rminit $i 2>&1 || :
-            fi
-        done
-    fi
+    list='%{initfiles}' ; for i in $list strms_up strms_dn ; do
+        if [ -f %_initrddir/$i ] ; then
+            # Find the best working init script removal tool
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue
+        fi
+    done
     # remove conflicting and dependent modules
     if [ -n "$modl_mods" ] ; then
         rm -f -- $modl_mods
@@ -1409,21 +1396,13 @@ if [ $1 = 2 ] ; then : # upgrade
     fi
 %endif
 %if %{have_initscripts}
-    # Find the best init script installation tool
-    insinit=''
-    if [ -x /usr/lib/lsb/install_initd ] ; then
-        insinit='/usr/lib/lsb/install_initd'
-    elif [ -x /sbin/insserv ] ; then
-        insinit='/sbin/insserv'
-    elif [ -x /sbin/chkconfig ; then
-        insinit='/sbin/chkconfig --add'
-    fi
     # This is the end of a fresh install, add init scripts if we can
-    if [ -n "$insinit" ] ; then
-        list='%{initfiles}' ; for i in $list ; do
-            $insinit $i 2>&1 || :
-        done
-    fi
+    list='%{initfiles}' ; for i in $list ; do
+        # Find the best working init script installation tool
+        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
+        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
+        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
+    done
 %endif
 fi
 
@@ -1468,29 +1447,17 @@ if [ $1 = 0 ] ; then : # final removal
     fi
 %endif
 %if %{have_initscripts}
-    # Find the best init script removal tool
-    rminit=''
-    if [ -x /usr/lib/lsb/remove_initd ] ; then
-        rminit='/usr/lib/lsb/remove_initd'
-    elif [ -x /sbin/insserv ] ; then
-        rminit='/sbin/insserv -r'
-    elif [ -x /sbin/chkconfig ; then
-        rminit='/sbin/chkconfig --del'
-    fi
     # Uninstalling for good, remove init scripts if we can
-    if [ -n "$rminit" ] ; then
-        list='%{initfiles}' ; for i in $list ; do
-            if [ -f %_initrddir/$i ] ; then
-                # rpm is not too good about the order of removal
-                if [ -x /sbin/service ] ; then
-                    /sbin/service $i stop || :
-                else
-                    %_initrddir/$i stop || :
-                fi
-                $rminit $i 2>&1 || :
-            fi
-        done
-    fi
+    list='%{initfiles}' ; for i in $list ; do
+        if [ -f %_initrddir/$i ] ; then
+            # rpm is not too good about the order of removal
+            /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
+            # Find the best working init script removal tool
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue
+        fi
+    done
 %endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
@@ -1588,9 +1555,25 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.111  2005/12/19 12:47:07  brian
-# - locking down for release
+# Revision 0.9.2.115  2005/12/21 11:25:39  brian
+# - oops
 #
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.114  2005/12/21 10:31:25  brian
+- cleaning up dependencies and conflicts
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.113  2005/12/21 08:49:00  brian
+- add extraversion to dependencies
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.112  2005/12/21 06:07:14  brian
+- cleaned up versioning for RPM builds
+
+* Mon Dec 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.111  2005/12/19 12:47:07  brian
+- locking down for release
 
 * Fri Dec 16 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.110  2005/12/16 12:13:52  brian

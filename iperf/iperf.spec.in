@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.50 $) $Date: 2005/12/19 12:43:08 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.52 $) $Date: 2005/12/21 10:31:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/19 12:43:08 $ by $Author: brian $
+# Last Modified $Date: 2005/12/21 10:31:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -149,9 +149,10 @@
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
 
-# a macro to build require one package of the same version as another
-%define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+# a macro to [build] require one package of the same version as another (possibly virtual) package
+# use the arguments [Build]Requires: package1 [>]= package2
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
+%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 # doesn't work well with this spec file
 %define _unpackaged_files_terminate_build 0
@@ -490,7 +491,6 @@ Group:          Development/System
 Prefix:         %{_libexecdir}
 #Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-utils
-#Conflicts:      %{_conflict}-util
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -536,7 +536,6 @@ Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-tests
-#Conflicts:      %{_conflict}-test
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -564,8 +563,6 @@ Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
-#Conflicts:      %{_conflict}-doc
-#Conflicts:      %{_conflict}-docs
 Obsoletes:      %{name}-docs
 Prereq:         /sbin/install-info
 Autoreq:        true
@@ -682,9 +679,17 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.50  2005/12/19 12:43:08  brian
-# - locking down for release
+# Revision 1.1.2.52  2005/12/21 10:31:23  brian
+# - cleaning up dependencies and conflicts
 #
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.51  2005/12/21 06:07:11  brian
+- cleaned up versioning for RPM builds
+
+* Mon Dec 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.50  2005/12/19 12:43:08  brian
+- locking down for release
 
 * Sat Dec 17 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.49  2005/12/17 08:39:19  brian
