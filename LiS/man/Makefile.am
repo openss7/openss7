@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.16 $) $Date: 2005/11/07 10:54:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2005/12/21 07:59:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/07 10:54:50 $ by $Author: brian $
+# Last Modified $Date: 2005/12/21 07:59:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -194,7 +194,6 @@ man_MANS = \
 	man9/__wrap_strstr.9 \
 	man9/adjmsg.9 \
 	man9/allocb.9 \
-	man9/allocb_physreq.9 \
 	man9/allocq.9 \
 	man9/appq.9 \
 	man9/backq.9 \
@@ -725,9 +724,6 @@ man_MANS = \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/sparc_ioremap.9 \
-	man9/spl0.9 \
-	man9/splstr.9 \
-	man9/splx.9 \
 	man9/strqget.9 \
 	man9/strqset.9 \
 	man9/testb.9 \
@@ -877,7 +873,6 @@ dist_noinst_MANS = \
 	man9/__wrap_strstr.9.man \
 	man9/adjmsg.9.man \
 	man9/allocb.9.man \
-	man9/allocb_physreq.9.man \
 	man9/allocq.9.man \
 	man9/appq.9.man \
 	man9/backq.9.man \
@@ -1408,9 +1403,6 @@ dist_noinst_MANS = \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/sparc_ioremap.9.man \
-	man9/spl0.9.man \
-	man9/splstr.9.man \
-	man9/splx.9.man \
 	man9/strqget.9.man \
 	man9/strqset.9.man \
 	man9/testb.9.man \
