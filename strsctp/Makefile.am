@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/08/29 10:32:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/22 07:22:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:32:08 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,7 +78,7 @@ EXTRA_PROGRAMS			+= \
 				  test-sctp_ns \
 				  test-sctp_t
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
@@ -246,7 +246,7 @@ EXTRA_PROGRAMS			+= \
 				  test-sctp_ns \
 				  test-sctp_t
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \

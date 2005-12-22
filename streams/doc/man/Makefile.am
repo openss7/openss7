@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/12/08 02:16:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/12/22 07:27:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/08 02:16:47 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:27:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1990,211 +1990,59 @@ man_MANS = \
 ##dist_noinst_uxp_compat_pages = \
 ##	man9/uxpcompat.9.man
 ##
-dist_noinst_driver_pages =
-dist_noinst_module_pages =
-if CONFIG_STREAMS_CLONE
-dist_noinst_driver_pages += \
+
+dist_noinst_driver_pages = \
 	man4/clone.4.man \
-	man8/test-clone.8.man
-endif
-if CONFIG_STREAMS_CLONE_MODULE
-dist_noinst_driver_pages += \
-	man4/clone.4.man \
-	man8/test-clone.8.man
-endif
-if CONFIG_STREAMS_ECHO
-dist_noinst_driver_pages += \
+	man8/test-clone.8.man \
 	man4/echo.4.man \
-	man8/test-echo.8.man
-endif
-if CONFIG_STREAMS_ECHO_MODULE
-dist_noinst_driver_pages += \
-	man4/echo.4.man \
-	man8/test-echo.8.man
-endif
-if CONFIG_STREAMS_FIFO
-dist_noinst_driver_pages += \
+	man8/test-echo.8.man \
 	man4/s_fifo.4.man \
 	man4/fifo.4s.man \
-	man8/test-fifo.8.man
-endif
-if CONFIG_STREAMS_FIFO_MODULE
-dist_noinst_driver_pages += \
-	man4/s_fifo.4.man \
-	man4/fifo.4s.man \
-	man8/test-fifo.8.man
-endif
-if CONFIG_STREAMS_LOG
-dist_noinst_driver_pages += \
+	man8/test-fifo.8.man \
 	man4/conslog.4.man \
 	man4/log.4.man \
 	man4/strlog.4.man \
 	man8/test-log.8.man \
 	man8/strace.8.man \
 	man8/strerr.8.man \
-	man8/strclean.8.man
-endif
-if CONFIG_STREAMS_LOG_MODULE
-dist_noinst_driver_pages += \
-	man4/conslog.4.man \
-	man4/log.4.man \
-	man4/strlog.4.man \
-	man8/test-log.8.man \
-	man8/strace.8.man \
-	man8/strerr.8.man \
-	man8/strclean.8.man
-endif
-if CONFIG_STREAMS_LOOP
-dist_noinst_driver_pages += \
+	man8/strclean.8.man \
 	man4/loop.4.man \
 	man4/loop_clone.4.man \
 	man4/sloop.4.man \
-	man8/test-loop.8.man
-endif
-if CONFIG_STREAMS_LOOP_MODULE
-dist_noinst_driver_pages += \
-	man4/loop.4.man \
-	man4/loop_clone.4.man \
-	man4/sloop.4.man \
-	man8/test-loop.8.man
-endif
-if CONFIG_STREAMS_MUX
-dist_noinst_driver_pages += \
+	man8/test-loop.8.man \
 	man4/mux.4.man \
-	man8/test-mux.8.man
-endif
-if CONFIG_STREAMS_MUX_MODULE
-dist_noinst_driver_pages += \
-	man4/mux.4.man \
-	man8/test-mux.8.man
-endif
-if CONFIG_STREAMS_NSDEV
-dist_noinst_driver_pages += \
-	man4/nsdev.4.man
-man8/test-nsdev.8.man
-endif
-if CONFIG_STREAMS_NSDEV_MODULE
-dist_noinst_driver_pages += \
+	man8/test-mux.8.man \
+	man8/test-mux.8.man \
 	man4/nsdev.4.man \
-	man8/test-nsdev.8.man
-endif
-if CONFIG_STREAMS_NULS
-dist_noinst_driver_pages += \
+	man8/test-nsdev.8.man \
 	man4/nuls.4.man \
-	man8/test-nuls.8.man
-endif
-if CONFIG_STREAMS_NULS_MODULE
-dist_noinst_driver_pages += \
-	man4/nuls.4.man \
-	man8/test-nuls.8.man
-endif
-if CONFIG_STREAMS_PIPE
-dist_noinst_driver_pages += \
+	man8/test-nuls.8.man \
 	man4/pipe.4.man \
 	man8/test-pipe.8.man \
 	man8/fattach.8.man \
-	man8/fdetach.8.man
-endif
-if CONFIG_STREAMS_PIPE_MODULE
-dist_noinst_driver_pages += \
-	man4/pipe.4.man \
-	man8/test-pipe.8.man \
-	man8/fattach.8.man \
-	man8/fdetach.8.man
-endif
-if CONFIG_STREAMS_SAD
-dist_noinst_driver_pages += \
+	man8/fdetach.8.man \
 	man4/sad.4.man \
 	man8/test-sad.8.man \
 	man5/autopush.5.man \
 	man5/strapush.5.man \
-	man8/autopush.8.man
-endif
-if CONFIG_STREAMS_SAD_MODULE
-dist_noinst_driver_pages += \
-	man4/sad.4.man \
-	man8/test-sad.8.man \
-	man5/autopush.5.man \
-	man5/strapush.5.man \
-	man8/autopush.8.man
-endif
-if CONFIG_STREAMS_SFX
-dist_noinst_driver_pages += \
-	man4/sfx.4.man
-endif
-if CONFIG_STREAMS_SFX_MODULE
-dist_noinst_driver_pages += \
-	man4/sfx.4.man
-endif
-if CONFIG_STREAMS_SPX
-dist_noinst_driver_pages += \
+	man8/autopush.8.man \
+	man4/sfx.4.man \
 	man4/spx.4.man
-endif
-if CONFIG_STREAMS_SPX_MODULE
-dist_noinst_driver_pages += \
-	man4/spx.4.man
-endif
-if CONFIG_STREAMS_CONNLD
-dist_noinst_module_pages += \
+
+dist_noinst_module_pages = \
 	man4/connld.4.man \
-	man8/test-connld.8.man
-endif
-if CONFIG_STREAMS_CONNLD_MODULE
-dist_noinst_module_pages += \
-	man4/connld.4.man \
-	man8/test-connld.8.man
-endif
-if CONFIG_STREAMS_NULLMOD
-dist_noinst_module_pages += \
-	man4/nullmod.4.man
-endif
-if CONFIG_STREAMS_NULLMOD_MODULE
-dist_noinst_module_pages += \
-	man4/nullmod.4.man
-endif
-if CONFIG_STREAMS_BUFMOD
-dist_noinst_module_pages += \
-	man4/bufmod.4.man
-endif
-if CONFIG_STREAMS_BUFMOD_MODULE
-dist_noinst_module_pages += \
-	man4/bufmod.4.man
-endif
-if CONFIG_STREAMS_PIPEMOD
-dist_noinst_module_pages += \
+	man8/test-connld.8.man \
+	man4/nullmod.4.man \
+	man4/bufmod.4.man \
 	man4/pipemod.4.man \
-	man8/test-pipemod.8.man
-endif
-if CONFIG_STREAMS_PIPEMOD_MODULE
-dist_noinst_module_pages += \
-	man4/pipemod.4.man \
-	man8/test-pipemod.8.man
-endif
-if CONFIG_STREAMS_SC
-dist_noinst_module_pages += \
+	man8/test-pipemod.8.man \
 	man4/sc.4.man \
 	man8/test-sc.8.man \
 	man8/scls.8.man \
-	man8/strinfo.8.man
-endif
-if CONFIG_STREAMS_SC_MODULE
-dist_noinst_module_pages += \
-	man4/sc.4.man \
-	man8/test-sc.8.man \
-	man8/scls.8.man \
-	man8/strinfo.8.man
-endif
-if CONFIG_STREAMS_TESTMOD
-dist_noinst_module_pages += \
+	man8/strinfo.8.man \
 	man4/testmod.4.man
-endif
-if CONFIG_STREAMS_TESTMOD_MODULE
-dist_noinst_module_pages += \
-	man4/testmod.4.man
-endif
-dist_noinst_util_pages =
-if CONFIG_STREAMS_UTILS
-dist_noinst_util_pages += \
+
+dist_noinst_util_pages = \
 	man1/strchg.1.man \
 	man1/strconf.1.man \
 	man1/strreset.1.man \
@@ -2203,7 +2051,6 @@ dist_noinst_util_pages += \
 	man8/strload.8.man \
 	man8/strsetup.8.man \
 	man8/strvf.8.man
-endif
 
 dist_noinst_MANS = \
 	man2/fattach.2.man \

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/08/29 10:32:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/22 07:22:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:32:12 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,7 +71,7 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  test-clone \
 				  test-connld \
 				  test-echo \

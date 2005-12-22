@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.52 $) $Date: 2005/12/21 10:31:23 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.53 $) $Date: 2005/12/22 07:26:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/21 10:31:23 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:26:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -524,8 +524,8 @@ fi
 %defattr(-,root,root)
 #{_bindir}/*
 #{_sbindir}/*
-#{_libexecdir}/*test*
-#{_libexecdir}/*tst
+#{_libexecdir}/%{name}/*test*
+#{_libexecdir}/%{name}/*tst
 %endif
 
 # ===========================================================================
@@ -564,7 +564,7 @@ Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-Prereq:         /sbin/install-info
+#Prereq:         /sbin/install-info
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -679,9 +679,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.52  2005/12/21 10:31:23  brian
-# - cleaning up dependencies and conflicts
+# Revision 1.1.2.53  2005/12/22 07:26:42  brian
+# - make command location a little more portable
 #
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.52  2005/12/21 10:31:23  brian
+- cleaning up dependencies and conflicts
 
 * Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.51  2005/12/21 06:07:11  brian

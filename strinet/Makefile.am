@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/08/29 10:32:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/12/22 07:22:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:32:00 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,12 +76,12 @@ EXTRA_PROGRAMS			+= test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_sctp
 
-libexec_PROGRAMS		= test-inet_raw \
+pkglibexec_PROGRAMS		= test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp
 
 if WITH_OPENSS7_SCTP
-libexec_PROGRAMS		+= test-inet_sctp
+pkglibexec_PROGRAMS		+= test-inet_sctp
 endif
 
 sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
@@ -154,13 +154,13 @@ EXTRA_PROGRAMS			+= \
 				  test-inet_tcp \
 				  test-inet_sctp
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp
 
 if WITH_OPENSS7_SCTP
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-inet_sctp
 endif
 

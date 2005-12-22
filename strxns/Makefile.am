@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/08/29 10:32:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/22 07:22:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:32:19 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,7 +76,7 @@ EXTRA_PROGRAMS			+= \
 				  ldlconfig \
 				  @PACKAGE_TARNAME@_mknod
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  ldltest
 
 
@@ -154,7 +154,7 @@ EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  ldltest
 
 

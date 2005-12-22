@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/08/29 10:32:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/12/22 07:22:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:32:15 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,17 +77,17 @@ EXTRA_PROGRAMS			+= \
 				  test-xnet \
 				  test-xnet_thr
 
-libexec_PROGRAMS		= 
+pkglibexec_PROGRAMS		= 
 if WITH_TLI
 ## WITH_TLI
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-tirdwr \
 				  test-timod
 ## WITH_TLI
 endif
 if WITH_XNET
 ## WITH_XNET
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-xnet \
 				  test-xnet_thr
 ## WITH_XNET
@@ -181,17 +181,17 @@ EXTRA_PROGRAMS			+= \
 				  test-xnet \
 				  test-xnet_thr
 
-libexec_PROGRAMS		= 
+pkglibexec_PROGRAMS		= 
 if WITH_TLI
 ## WITH_TLI
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-tirdwr \
 				  test-timod
 ## WITH_TLI
 endif
 if WITH_XNET
 ## WITH_XNET
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-xnet \
 				  test-xnet_thr
 ## WITH_XNET

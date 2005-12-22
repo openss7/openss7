@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2005/12/19 03:23:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2005/12/22 07:22:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/19 03:23:36 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,90 +122,90 @@ dist_sbin_SCRIPTS		+= \
 				  src/util/strsetup
 endif
 
-libexec_PROGRAMS		=
+pkglibexec_PROGRAMS		=
 if CONFIG_STREAMS_STH
-libexec_PROGRAMS		+= test-streams
+pkglibexec_PROGRAMS		+= test-streams
 endif
 if CONFIG_STREAMS_STH_MODULE
-libexec_PROGRAMS		+= test-streams
+pkglibexec_PROGRAMS		+= test-streams
 endif
 if CONFIG_STREAMS_CLONE
-libexec_PROGRAMS		+= test-clone
+pkglibexec_PROGRAMS		+= test-clone
 endif
 if CONFIG_STREAMS_CLONE_MODULE
-libexec_PROGRAMS		+= test-clone
+pkglibexec_PROGRAMS		+= test-clone
 endif
 if CONFIG_STREAMS_CONNLD
-libexec_PROGRAMS		+= test-connld
+pkglibexec_PROGRAMS		+= test-connld
 endif
 if CONFIG_STREAMS_CONNLD_MODULE
-libexec_PROGRAMS		+= test-connld
+pkglibexec_PROGRAMS		+= test-connld
 endif
 if CONFIG_STREAMS_ECHO
-libexec_PROGRAMS		+= test-echo
+pkglibexec_PROGRAMS		+= test-echo
 endif
 if CONFIG_STREAMS_ECHO_MODULE
-libexec_PROGRAMS		+= test-echo
+pkglibexec_PROGRAMS		+= test-echo
 endif
 if CONFIG_STREAMS_FIFO
-libexec_PROGRAMS		+= test-fifo
+pkglibexec_PROGRAMS		+= test-fifo
 endif
 if CONFIG_STREAMS_FIFO_MODULE
-libexec_PROGRAMS		+= test-fifo
+pkglibexec_PROGRAMS		+= test-fifo
 endif
 if CONFIG_STREAMS_LOG
-libexec_PROGRAMS		+= test-log
+pkglibexec_PROGRAMS		+= test-log
 endif
 if CONFIG_STREAMS_LOG_MODULE
-libexec_PROGRAMS		+= test-log
+pkglibexec_PROGRAMS		+= test-log
 endif
 if CONFIG_STREAMS_LOOP
-libexec_PROGRAMS		+= test-loop
+pkglibexec_PROGRAMS		+= test-loop
 endif
 if CONFIG_STREAMS_LOOP_MODULE
-libexec_PROGRAMS		+= test-loop
+pkglibexec_PROGRAMS		+= test-loop
 endif
 if CONFIG_STREAMS_NSDEV
-libexec_PROGRAMS		+= test-nsdev
+pkglibexec_PROGRAMS		+= test-nsdev
 endif
 if CONFIG_STREAMS_NSDEV_MODULE
-libexec_PROGRAMS		+= test-nsdev
+pkglibexec_PROGRAMS		+= test-nsdev
 endif
 if CONFIG_STREAMS_MUX
-libexec_PROGRAMS		+= test-mux
+pkglibexec_PROGRAMS		+= test-mux
 endif
 if CONFIG_STREAMS_MUX_MODULE
-libexec_PROGRAMS		+= test-mux
+pkglibexec_PROGRAMS		+= test-mux
 endif
 if CONFIG_STREAMS_NULS
-libexec_PROGRAMS		+= test-nuls
+pkglibexec_PROGRAMS		+= test-nuls
 endif
 if CONFIG_STREAMS_NULS_MODULE
-libexec_PROGRAMS		+= test-nuls
+pkglibexec_PROGRAMS		+= test-nuls
 endif
 if CONFIG_STREAMS_PIPE
-libexec_PROGRAMS		+= test-pipe perftest perftestn
+pkglibexec_PROGRAMS		+= test-pipe perftest perftestn
 endif
 if CONFIG_STREAMS_PIPE_MODULE
-libexec_PROGRAMS		+= test-pipe perftest perftestn
+pkglibexec_PROGRAMS		+= test-pipe perftest perftestn
 endif
 if CONFIG_STREAMS_PIPEMOD
-libexec_PROGRAMS		+= test-pipemod
+pkglibexec_PROGRAMS		+= test-pipemod
 endif
 if CONFIG_STREAMS_PIPEMOD_MODULE
-libexec_PROGRAMS		+= test-pipemod
+pkglibexec_PROGRAMS		+= test-pipemod
 endif
 if CONFIG_STREAMS_SAD
-libexec_PROGRAMS		+= test-sad
+pkglibexec_PROGRAMS		+= test-sad
 endif
 if CONFIG_STREAMS_SAD_MODULE
-libexec_PROGRAMS		+= test-sad
+pkglibexec_PROGRAMS		+= test-sad
 endif
 if CONFIG_STREAMS_SC
-libexec_PROGRAMS		+= test-sc
+pkglibexec_PROGRAMS		+= test-sc
 endif
 if CONFIG_STREAMS_SC_MODULE
-libexec_PROGRAMS		+= test-sc
+pkglibexec_PROGRAMS		+= test-sc
 endif
 
 

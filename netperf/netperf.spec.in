@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.44 $) $Date: 2005/12/21 08:48:56 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.45 $) $Date: 2005/12/22 07:26:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/21 08:48:56 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:26:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -507,7 +507,7 @@ Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-Prereq:         /sbin/install-info
+#Prereq:         /sbin/install-info
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -622,9 +622,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.44  2005/12/21 08:48:56  brian
-# - add extraversion to dependencies
+# Revision 1.1.2.45  2005/12/22 07:26:43  brian
+# - make command location a little more portable
 #
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.44  2005/12/21 08:48:56  brian
+- add extraversion to dependencies
 
 * Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.43  2005/12/21 06:07:12  brian

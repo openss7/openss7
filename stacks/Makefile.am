@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/11/01 11:20:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/12/22 07:22:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/01 11:20:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,7 +69,7 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  test-m2pa \
 				  test-q781 \
 				  test-tcpc \
@@ -317,7 +317,7 @@ else
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-libexec_PROGRAMS		= \
+pkglibexec_PROGRAMS		= \
 				  perftest \
 				  test-m2pa \
 				  test-q781 \
@@ -767,7 +767,7 @@ test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
 ## WITH_TLI
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-timod \
 				  test-tirdwr
 ## WITH_TLI
@@ -800,7 +800,7 @@ test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_INET
 ## WITH_INET
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp
@@ -940,7 +940,7 @@ if RPM_BUILD_USER
 if WITH_XNET
 ## WITH_XNET
 lib_LTLIBRARIES			= libxnet.la
-libexec_PROGRAMS		+= \
+pkglibexec_PROGRAMS		+= \
 				  test-xnet \
 				  test-xnet_thr
 libxnet_la_SOURCES		= src/lib/libxnet/xnet.c gettext.h

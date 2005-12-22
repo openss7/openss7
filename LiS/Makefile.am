@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.28 $) $Date: 2005/11/07 10:54:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.29 $) $Date: 2005/12/22 07:22:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/07 10:54:46 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 07:22:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,7 +75,7 @@ libLiSuser_la_LDFLAGS		=
 libLiSuser_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiSuser_la_CFLAGS		= $(USER_CFLAGS)
 
-libexec_PROGRAMS		= timetst \
+pkglibexec_PROGRAMS		= timetst \
 				  strtst \
 				  polltst \
 				  perftest \
@@ -105,7 +105,7 @@ if PKG_BUILD_ARCH
 
 if RPM_BUILD_USER
 
-libexec_PROGRAMS		= timetst \
+pkglibexec_PROGRAMS		= timetst \
 				  strtst \
 				  perftest \
 				  thrtst \

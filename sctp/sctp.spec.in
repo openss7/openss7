@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/12/21 10:31:23 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/12/22 13:51:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/21 10:31:23 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 13:51:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -509,10 +509,10 @@ Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_versi
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
-Prereq:         /sbin/depmod
-Prereq:         /sbin/lsmod
-Prereq:         /sbin/insmod
-Prereq:         /sbin/modprobe
+#Prereq:         /sbin/depmod
+#Prereq:         /sbin/lsmod
+#Prereq:         /sbin/insmod
+#Prereq:         /sbin/modprobe
 Prereq:         /bin/netstat
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -594,12 +594,12 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
         # the running kernel, we have to worry about previous loaded modules for the old version or
         # a non-rpm version.
         mods="%{modules}" ; for m in $mods ; do
-            if ( /sbin/lsmod | grep -q "^$m" ) ; then
+            if ( lsmod | grep -q "^$m" ) ; then
                 # Module running, kick the stack.
-                /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( /sbin/lsmod | grep -q "^$m" ) ; then
-                    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( lsmod | grep -q "^$m" ) ; then
+                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( lsmod | grep -q "^$m" ) ; then
                         /bin/netstat -p 2>/dev/null | grep "^$m" | while read -a tokens ; do
                             case :"${tokens[6]}" in
                                 :[0-9]+)
@@ -609,8 +609,8 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
                             esac
                         done
                         /sbin/sleep 5 # wait for processes to die and close sockets
-                        /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                        if ( lsmod | grep -q "^$m" ) ; then
                             echo "Cannot install or upgrade with $m module running." >&2
                             exit 1
                         fi
@@ -625,9 +625,9 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # This is a running kernel, do a /sbin/depmod on the modules directory for the running
+        # This is a running kernel, do a depmod on the modules directory for the running
         # kernel.
-        /sbin/depmod -ae
+        depmod -ae || :
 %if %{have_initscripts}
         # Running kernels do need init scripts run.
         list='%{initfiles}' ; for i in $list ; do
@@ -637,10 +637,10 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         done
 %endif
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway, but
+        # Non-running kernels a depmod will be performed on boot by depmod anyway, but
         # try one now.
         UNAME_MACHINE=%{_target_cpu} \
-        /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} || :
         # Non-running kernels do not need init scripts run.
     fi
 fi
@@ -663,12 +663,12 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         done
 %endif
         mods="%{modules}" ; for m in $mods ; do
-            if ( /sbin/lsmod | grep -q "^$m" ) ; then
+            if ( lsmod | grep -q "^$m" ) ; then
                 # modules running, kick the stack
-                /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( /sbin/lsmod | grep -q "^$m" ) ; then
-                    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( lsmod | grep -q "^$m" ) ; then
+                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( lsmod | grep -q "^$m" ) ; then
                         /bin/netstat -p 2>/dev/null | grep "^$m" | while read -a tokens ; do
                             case :"${tokens[6]}" in
                                 :[0-9]+)
@@ -678,8 +678,8 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                             esac
                         done
                         /sbin/sleep 5 # wait for processes to die and close sockets
-                        /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                        if ( lsmod | grep -q "^$m" ) ; then
                             echo "Cannot uninstall with $m module running." >&2
                             exit 1
                         fi
@@ -711,25 +711,25 @@ if [ $1 = 0 ]; then : # final removal
 fi
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
-        # This is a running kernel, do a /sbin/depmod on the modules directory for.
-        /sbin/depmod -ae
+        # This is a running kernel, do a depmod on the modules directory for.
+        depmod -ae || :
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway.
+        # Non-running kernels a depmod will be performed on boot but depmod anyway.
         UNAME_MACHINE=%{_target_cpu} \
-        /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} || :
     fi
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
         # One more kick at killing any loaded modules on uninstall, last stage of the upgrade on a
         # running kernel for upgrade.
         reboot='no'
         mods="%{modules}" ; for m in $mods ; do
-            if ( /sbin/lsmod | grep -q "^$m" ) ; then
+            if ( lsmod | grep -q "^$m" ) ; then
                 # Modules running, kick the stack.
-                /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( /sbin/lsmod | grep -q "^$m" ) ; then
-                    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( /sbin/lsmod | grep -q "^$m" ) ; then
-                        /sbin/insmod -ar $m
+                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( lsmod | grep -q "^$m" ) ; then
+                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( lsmod | grep -q "^$m" ) ; then
+                        insmod -ar $m
                         /bin/netstat -p 2>/dev/null | grep "^$m" | while read -a tokens ; do
                             case :"${tokens[6]}" in
                                 :[0-9]+)
@@ -744,10 +744,10 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                             esac
                         done
                         /sbin/sleep 5 # wait for processes to die and close sockets
-                        /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                        if ( lsmod | grep -q "^$m" ) ; then
                             echo "Error: modules may be still loaded" >&2
-                            /sbin/lsmod | grep "^$m" >&2
+                            lsmod | grep "^$m" >&2
                             reboot='yes'
                         fi
                     fi
@@ -917,8 +917,8 @@ fi
 %defattr(-,root,root)
 #%{_bindir}/*
 #%{_sbindir}/*
-%{_libexecdir}/*test*
-#%{_libexecdir}/*tst
+%{_libexecdir}/%{name}/*test*
+#%{_libexecdir}/%{name}/*tst
 %endif
 
 # ===========================================================================
@@ -957,7 +957,7 @@ Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-Prereq:         /sbin/install-info
+#Prereq:         /sbin/install-info
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1069,11 +1069,11 @@ to create and distribute this rpm.
 # ===========================================================================
 %package init
 
-Summary:    %{title} init scripts and config files
-Group:      System Environment/Base
-Prefix:     %{_configdir}
-Prefix:     %{_initrddir}
-Obsoletes:  %{name}-inits
+Summary:        %{title} init scripts and config files
+Group:          System Environment/Base
+Prefix:         %{_configdir}
+Prefix:         %{_initrddir}
+Obsoletes:      %{name}-inits
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1349,9 +1349,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.74  2005/12/21 10:31:23  brian
-# - cleaning up dependencies and conflicts
+# Revision 0.9.2.76  2005/12/22 13:51:22  brian
+# - tough build for RH 7.3
 #
+
+* Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.75  2005/12/22 07:26:43  brian
+- make command location a little more portable
+
+* Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.74  2005/12/21 10:31:23  brian
+- cleaning up dependencies and conflicts
 
 * Wed Dec 21 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.73  2005/12/21 06:07:12  brian
