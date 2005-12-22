@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/19 12:45:17 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/22 10:28:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/19 12:45:17 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/22 10:28:42 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/12/19 12:45:17 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/22 10:28:42 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -263,7 +263,7 @@ register_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL(register_strmod);
+EXPORT_SYMBOL_NOVERS(register_strmod);
 
 /**
  *  unregister_strmod:
@@ -294,7 +294,7 @@ unregister_strmod(struct fmodsw *fmod)
 	goto unlock_exit;
 }
 
-EXPORT_SYMBOL(unregister_strmod);
+EXPORT_SYMBOL_NOVERS(unregister_strmod);
 
 /**
  *  register_strdrv:	- register STREAMS driver to specfs
@@ -393,7 +393,7 @@ register_strdrv(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL(register_strdrv);
+EXPORT_SYMBOL_NOVERS(register_strdrv);
 
 /**
  *  unregister_strdrv:	- unregister STREAMS driver from specfs
@@ -455,7 +455,7 @@ unregister_strdrv(struct cdevsw *cdev)
 	goto unlock_exit;
 }
 
-EXPORT_SYMBOL(unregister_strdrv);
+EXPORT_SYMBOL_NOVERS(unregister_strdrv);
 
 /*
  *  register_xinode:	- register a character device inode
@@ -662,7 +662,7 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 	return (err);
 }
 
-EXPORT_SYMBOL(register_cmajor);
+EXPORT_SYMBOL_NOVERS(register_cmajor);
 
 streams_fastcall int
 unregister_cmajor(struct cdevsw *cdev, major_t major)
@@ -689,7 +689,7 @@ unregister_cmajor(struct cdevsw *cdev, major_t major)
 	return (err);
 }
 
-EXPORT_SYMBOL(unregister_cmajor);
+EXPORT_SYMBOL_NOVERS(unregister_cmajor);
 
 /**
  *  register_strnod:	- register a minor device node
@@ -754,7 +754,7 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL(register_strnod);
+EXPORT_SYMBOL_NOVERS(register_strnod);
 
 /**
  *  unregister_strnod: - unregister a minor device node
@@ -799,5 +799,5 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL(unregister_strnod);
+EXPORT_SYMBOL_NOVERS(unregister_strnod);
 

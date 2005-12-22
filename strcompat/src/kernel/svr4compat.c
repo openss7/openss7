@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/29 10:36:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/08/29 10:36:54 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -129,7 +129,7 @@ MPSTR_QLOCK(queue_t *q)
 #endif
 }
 
-EXPORT_SYMBOL(MPSTR_QLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(MPSTR_QLOCK);	/* svr4/ddi.h */
 
 #undef MPSTR_QRELE
 void
@@ -164,7 +164,7 @@ MPSTR_QRELE(queue_t *q, long s)
 #endif
 }
 
-EXPORT_SYMBOL(MPSTR_QRELE);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(MPSTR_QRELE);	/* svr4/ddi.h */
 
 #undef MPSTR_STPLOCK
 long
@@ -198,7 +198,7 @@ MPSTR_STPLOCK(struct stdata *sd)
 #endif
 }
 
-EXPORT_SYMBOL(MPSTR_STPLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(MPSTR_STPLOCK);	/* svr4/ddi.h */
 
 #undef MPSTR_STPRELE
 void
@@ -231,7 +231,7 @@ MPSTR_STPRELE(struct stdata *sd, long s)
 #endif
 }
 
-EXPORT_SYMBOL(MPSTR_STPRELE);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(MPSTR_STPRELE);	/* svr4/ddi.h */
 
 static pl_t current_spl[NR_CPUS] __cacheline_aligned;
 
@@ -248,13 +248,13 @@ spl0(void)
 #if LFS
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl,
 				     processorid_t processor);
-EXPORT_SYMBOL(dtimeout);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(dtimeout);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
 
-EXPORT_SYMBOL(itimeout);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(itimeout);	/* svr4/ddi.h */
 #endif
 
-EXPORT_SYMBOL(spl0);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl0);		/* svr4/ddi.h */
 
 pl_t
 spl1(void)
@@ -266,7 +266,7 @@ spl1(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl1);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl1);		/* svr4/ddi.h */
 
 pl_t
 spl2(void)
@@ -278,7 +278,7 @@ spl2(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl2);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl2);		/* svr4/ddi.h */
 
 pl_t
 spl3(void)
@@ -290,7 +290,7 @@ spl3(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl3);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl3);		/* svr4/ddi.h */
 
 pl_t
 spl4(void)
@@ -302,7 +302,7 @@ spl4(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl4);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl4);		/* svr4/ddi.h */
 
 pl_t
 spl5(void)
@@ -314,7 +314,7 @@ spl5(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl5);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl5);		/* svr4/ddi.h */
 
 pl_t
 spl6(void)
@@ -326,7 +326,7 @@ spl6(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl6);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl6);		/* svr4/ddi.h */
 
 pl_t
 spl7(void)
@@ -338,7 +338,7 @@ spl7(void)
 	return (old_level);
 }
 
-EXPORT_SYMBOL(spl7);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl7);		/* svr4/ddi.h */
 
 pl_t
 spl(const pl_t level)
@@ -365,21 +365,21 @@ spl(const pl_t level)
 	return (invpl);
 }
 
-EXPORT_SYMBOL(spl);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(spl);		/* svr4/ddi.h */
 void
 splx(const pl_t level)
 {
 	return (void) spl(level);
 }
 
-EXPORT_SYMBOL(splx);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(splx);		/* svr4/ddi.h */
 
 __SVR4_EXTERN_INLINE major_t getemajor(dev_t dev);
 
-EXPORT_SYMBOL(getemajor);	/* uw7/ddi.h */
+EXPORT_SYMBOL_NOVERS(getemajor);	/* uw7/ddi.h */
 __SVR4_EXTERN_INLINE minor_t geteminor(dev_t dev);
 
-EXPORT_SYMBOL(geteminor);	/* uw7/ddi.h */
+EXPORT_SYMBOL_NOVERS(geteminor);	/* uw7/ddi.h */
 
 #ifndef NODEV
 #define NODEV 0
@@ -402,7 +402,7 @@ etoimajor(major_t emajor)
 	return (major);
 }
 
-EXPORT_SYMBOL(etoimajor);	/* uw7/ddi.h */
+EXPORT_SYMBOL_NOVERS(etoimajor);	/* uw7/ddi.h */
 
 int
 itoemajor(major_t imajor, int prevemaj)
@@ -428,34 +428,34 @@ itoemajor(major_t imajor, int prevemaj)
 	return (NODEV);
 }
 
-EXPORT_SYMBOL(itoemajor);	/* uw7/ddi.h */
+EXPORT_SYMBOL_NOVERS(itoemajor);	/* uw7/ddi.h */
 
 //__SVR4_EXTERN_INLINE pl_t LOCK(lock_t * lockp, pl_t pl);
-//EXPORT_SYMBOL(LOCK);          /* svr4/ddi.h */
+//EXPORT_SYMBOL_NOVERS(LOCK);          /* svr4/ddi.h */
 __SVR4_EXTERN_INLINE lock_t *LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
 					int flag);
-EXPORT_SYMBOL(LOCK_ALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(LOCK_ALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void LOCK_DEALLOC(lock_t * lockp);
 
-EXPORT_SYMBOL(LOCK_DEALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(LOCK_DEALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE pl_t TRYLOCK(lock_t * lockp, pl_t pl);
 
-EXPORT_SYMBOL(TRYLOCK);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(TRYLOCK);		/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl);
 
-EXPORT_SYMBOL(UNLOCK);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(UNLOCK);		/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp);
 
-EXPORT_SYMBOL(LOCK_OWNED);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(LOCK_OWNED);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
 					int flag);
-EXPORT_SYMBOL(RW_ALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_ALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp);
 
-EXPORT_SYMBOL(RW_DEALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_DEALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl);
 
-EXPORT_SYMBOL(RW_RDLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_RDLOCK);	/* svr4/ddi.h */
 pl_t
 RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
@@ -484,7 +484,7 @@ RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 	return (invpl);
 }
 
-EXPORT_SYMBOL(RW_TRYRDLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_TRYRDLOCK);	/* svr4/ddi.h */
 pl_t
 RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
@@ -508,48 +508,48 @@ RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 	return (invpl);
 }
 
-EXPORT_SYMBOL(RW_TRYWRLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_TRYWRLOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
 
-EXPORT_SYMBOL(RW_UNLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_UNLOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *, pl_t pl);
 
-EXPORT_SYMBOL(RW_WRLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(RW_WRLOCK);	/* svr4/ddi.h */
 
 __SVR4_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag);
 
-EXPORT_SYMBOL(SLEEP_ALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_ALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t * lockp);
 
-EXPORT_SYMBOL(SLEEP_DEALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_DEALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp);
 
-EXPORT_SYMBOL(SLEEP_LOCKAVAIL);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_LOCKAVAIL);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SLEEP_LOCK(sleep_t * lockp, int priority);
 
-EXPORT_SYMBOL(SLEEP_LOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_LOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t * lockp);
 
-EXPORT_SYMBOL(SLEEP_LOCKOWNED);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_LOCKOWNED);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t * lockp, int priority);
 
-EXPORT_SYMBOL(SLEEP_LOCK_SIG);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_LOCK_SIG);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t * lockp);
 
-EXPORT_SYMBOL(SLEEP_TRYLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_TRYLOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp);
 
-EXPORT_SYMBOL(SLEEP_UNLOCK);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SLEEP_UNLOCK);	/* svr4/ddi.h */
 
 __SVR4_EXTERN_INLINE sv_t *SV_ALLOC(int flag);
 
-EXPORT_SYMBOL(SV_ALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SV_ALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SV_BROADCAST(sv_t * svp, int flags);
 
-EXPORT_SYMBOL(SV_BROADCAST);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SV_BROADCAST);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
 
-EXPORT_SYMBOL(SV_DEALLOC);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SV_DEALLOC);	/* svr4/ddi.h */
 #if ! ( HAVE___WAKE_UP_SYNC_ADDR || HAVE___WAKE_UP_SYNC_EXPORT )
 #undef	__wake_up_sync
 #define __wake_up_sync __wake_up
@@ -567,13 +567,13 @@ SV_SIGNAL(sv_t * svp)
 	wake_up_interruptible_sync(&svp->sv_waitq);
 }
 
-EXPORT_SYMBOL(SV_SIGNAL);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SV_SIGNAL);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
 
-EXPORT_SYMBOL(SV_WAIT);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SV_WAIT);		/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
 
-EXPORT_SYMBOL(SV_WAIT_SIG);	/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(SV_WAIT_SIG);	/* svr4/ddi.h */
 
 int ts_kmdpris[] = {
 	60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
@@ -605,7 +605,7 @@ sleep(caddr_t event, pl_t pl)
 	return 1;
 }
 
-EXPORT_SYMBOL(sleep);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(sleep);		/* svr4/ddi.h */
 
 void
 wakeup(caddr_t event)
@@ -613,7 +613,7 @@ wakeup(caddr_t event)
 	return;
 }
 
-EXPORT_SYMBOL(wakeup);		/* svr4/ddi.h */
+EXPORT_SYMBOL_NOVERS(wakeup);		/* svr4/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 static

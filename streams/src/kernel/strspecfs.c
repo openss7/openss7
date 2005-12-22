@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/12/19 12:45:19 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/12/22 10:28:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/12/19 12:45:19 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/12/22 10:28:43 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/12/19 12:45:19 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/12/22 10:28:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -101,7 +101,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/12/19 12:45:19 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/12/22 10:28:43 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -392,7 +392,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
          || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
-EXPORT_SYMBOL(spec_reparent);
+EXPORT_SYMBOL_NOVERS(spec_reparent);
 #endif
 
 streams_fastcall int
@@ -429,7 +429,7 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
          || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
-EXPORT_SYMBOL(spec_open);
+EXPORT_SYMBOL_NOVERS(spec_open);
 #endif
 
 /* 
@@ -1304,7 +1304,7 @@ specfs_mount(void)
 	return (mntget(specfs_mnt));
 }
 
-EXPORT_SYMBOL(specfs_mount);
+EXPORT_SYMBOL_NOVERS(specfs_mount);
 
 #if ! defined HAVE_KFUNC_KERN_UMOUNT
 #undef kern_umount
@@ -1325,7 +1325,7 @@ specfs_umount(void)
 	}
 }
 
-EXPORT_SYMBOL(specfs_umount);
+EXPORT_SYMBOL_NOVERS(specfs_umount);
 
 /**
  *  strspecfs_init: - initialize the shadow special filesystem

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:44:41 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:44:41 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:44:41 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:44:41 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -123,7 +123,7 @@ wantio(queue_t *q, struct wantio *w)
 	return (0);
 }
 
-EXPORT_SYMBOL(wantio);		/* aix/ddi.h */
+EXPORT_SYMBOL_NOVERS(wantio);		/* aix/ddi.h */
 
 /* 
  *  WANTMSG
@@ -131,7 +131,7 @@ EXPORT_SYMBOL(wantio);		/* aix/ddi.h */
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int streamscall (*func) (mblk_t *));
 
-EXPORT_SYMBOL(wantmsg);		/* aix/ddi.h */
+EXPORT_SYMBOL_NOVERS(wantmsg);		/* aix/ddi.h */
 #endif
 
 /* 
@@ -337,7 +337,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 	return (EINVAL);
 }
 
-EXPORT_SYMBOL(str_install_AIX);	/* strconf.h */
+EXPORT_SYMBOL_NOVERS(str_install_AIX);	/* strconf.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 static

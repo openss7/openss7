@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.26 2005/12/19 03:26:01 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.27 2005/12/22 10:28:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:01 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:51 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -92,6 +92,10 @@ typedef void irqreturn_t;
 #ifndef __MOD_DEC_USE_COUNT
 #undef MOD_DEC_USE_COUNT
 #define MOD_DEC_USE_COUNT
+#endif
+
+#ifndef EXPORT_SYMBOL_NOVERS
+#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL(__sym)
 #endif
 
 #ifdef LIS

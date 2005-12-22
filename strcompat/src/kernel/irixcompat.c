@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:41 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/22 10:28:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/22 10:28:53 $"
 
 static char const ident[] =
-    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:41 $";
+    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/22 10:28:53 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/18 12:25:41 $"
+#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/22 10:28:53 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL"
@@ -121,7 +121,7 @@ irixcomp_exit(void)
 
 __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args);
 
-EXPORT_SYMBOL(icmn_err);	/* irix/ddi.h */
+EXPORT_SYMBOL_NOVERS(icmn_err);	/* irix/ddi.h */
 /* gcc 3.4.3 can't handle inlining with variable argument list */
 extern void
 cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
@@ -134,7 +134,7 @@ cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
 	return;
 }
 
-EXPORT_SYMBOL(cmn_err_tag);	/* irix/ddi.h */
+EXPORT_SYMBOL_NOVERS(cmn_err_tag);	/* irix/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
 module_init(irixcomp_init);

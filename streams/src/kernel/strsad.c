@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/19 12:45:17 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/22 10:28:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/19 12:45:17 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/22 10:28:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/19 12:45:17 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/12/22 10:28:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -170,7 +170,7 @@ autopush_find(dev_t dev)
 }
 
 #if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
-EXPORT_SYMBOL(autopush_find);
+EXPORT_SYMBOL_NOVERS(autopush_find);
 #endif
 
 streams_fastcall struct strapush *
@@ -202,7 +202,7 @@ autopush_search(const char *name, minor_t minor)
 }
 
 #if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
-EXPORT_SYMBOL(autopush_search);
+EXPORT_SYMBOL_NOVERS(autopush_search);
 #endif
 
 streams_fastcall int
@@ -278,7 +278,7 @@ autopush_add(struct strapush *sap)
 }
 
 #if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
-EXPORT_SYMBOL(autopush_add);
+EXPORT_SYMBOL_NOVERS(autopush_add);
 #endif
 
 streams_fastcall int
@@ -320,7 +320,7 @@ autopush_del(struct strapush *sap)
 }
 
 #if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
-EXPORT_SYMBOL(autopush_del);
+EXPORT_SYMBOL_NOVERS(autopush_del);
 #endif
 
 streams_fastcall int
@@ -350,7 +350,7 @@ autopush_vml(struct str_mlist *smp, int nmods)
 }
 
 #if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
-EXPORT_SYMBOL(autopush_vml);
+EXPORT_SYMBOL_NOVERS(autopush_vml);
 #endif
 
 streams_fastcall int
@@ -370,7 +370,7 @@ apush_set(struct strapush *sap)
 	return (-EINVAL);
 }
 
-EXPORT_SYMBOL(apush_set);
+EXPORT_SYMBOL_NOVERS(apush_set);
 
 streams_fastcall int
 apush_get(struct strapush *sap)
@@ -423,7 +423,7 @@ apush_get(struct strapush *sap)
 	return (-ENODEV);
 }
 
-EXPORT_SYMBOL(apush_get);	/* strconf.h LiS specific */
+EXPORT_SYMBOL_NOVERS(apush_get);	/* strconf.h LiS specific */
 
 streams_fastcall int
 apush_vml(struct str_list *slp)
@@ -431,7 +431,7 @@ apush_vml(struct str_list *slp)
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
 }
 
-EXPORT_SYMBOL(apush_vml);
+EXPORT_SYMBOL_NOVERS(apush_vml);
 
 /**
  *  autopush: - perform autopush operations on a newly opened stream
@@ -490,5 +490,5 @@ autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sfl
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(autopush);
+EXPORT_SYMBOL_NOVERS(autopush);
 #endif

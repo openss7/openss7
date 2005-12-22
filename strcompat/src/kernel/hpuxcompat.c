@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/29 07:37:51 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/29 07:37:51 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -115,11 +115,11 @@ streams_get_sleep_lock(caddr_t event)
 	return &sleep_lock;
 }
 
-EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
+EXPORT_SYMBOL_NOVERS(streams_get_sleep_lock);	/* hpux/ddi.h */
 
 lock_t *get_sleep_lock(caddr_t event) __attribute__ ((alias("streams_get_sleep_lock")));
 
-EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
+EXPORT_SYMBOL_NOVERS(get_sleep_lock);	/* hpux/ddi.h */
 
 #if LFS
 /**
@@ -149,7 +149,7 @@ streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 	__strfunc(func, q, mp, priv);
 }
 
-EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
+EXPORT_SYMBOL_NOVERS(streams_put);	/* hpux/ddi.h */
 #endif
 
 int
@@ -278,7 +278,7 @@ str_install_HPUX(struct stream_inst *inst)
 #endif
 }
 
-EXPORT_SYMBOL(str_install_HPUX);
+EXPORT_SYMBOL_NOVERS(str_install_HPUX);
 
 int
 str_uninstall(struct stream_inst *inst)
@@ -323,7 +323,7 @@ str_uninstall(struct stream_inst *inst)
 #endif
 }
 
-EXPORT_SYMBOL(str_uninstall);
+EXPORT_SYMBOL_NOVERS(str_uninstall);
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 static

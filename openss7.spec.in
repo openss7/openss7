@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/12/22 13:51:21 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/22 15:16:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 13:51:21 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 15:16:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -517,19 +517,19 @@ package_source
 %endif
 
 # stupid mandrake spec-helper will compress our macros files otherwise
-@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="sctp.refs sctp.macros
-@COOKED_MANPAGES_FALSE@                              iperf.refs iperf.macros
-@COOKED_MANPAGES_FALSE@                              lis.refs lis.macros
-@COOKED_MANPAGES_FALSE@                              streams.refs streams.macros
-@COOKED_MANPAGES_FALSE@                              strxns.refs strxns.macros
-@COOKED_MANPAGES_FALSE@                              strxnet.refs strxnet.macros
-@COOKED_MANPAGES_FALSE@                              strinet.refs strinet.macros
-@COOKED_MANPAGES_FALSE@                              strsctp.refs strsctp.macros
-@COOKED_MANPAGES_FALSE@                              netperf.refs netperf.macros
-@COOKED_MANPAGES_FALSE@                              strss7.refs strss7.macros"
+#@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="sctp.refs sctp.macros
+#@COOKED_MANPAGES_FALSE@                              iperf.refs iperf.macros
+#@COOKED_MANPAGES_FALSE@                              lis.refs lis.macros
+#@COOKED_MANPAGES_FALSE@                              streams.refs streams.macros
+#@COOKED_MANPAGES_FALSE@                              strxns.refs strxns.macros
+#@COOKED_MANPAGES_FALSE@                              strxnet.refs strxnet.macros
+#@COOKED_MANPAGES_FALSE@                              strinet.refs strinet.macros
+#@COOKED_MANPAGES_FALSE@                              strsctp.refs strsctp.macros
+#@COOKED_MANPAGES_FALSE@                              netperf.refs netperf.macros
+#@COOKED_MANPAGES_FALSE@                              strss7.refs strss7.macros"
 
 # stupid suse check compresses everything (including our macro files)
-%{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
+#{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
 
 %clean
 # ---------------------------------------------------------------------------
@@ -1120,7 +1120,7 @@ if [ $1 = 1 ] ; then : # fresh install
     # See if there are any libraries hanging around from a non-rpm install.  If there are, just
     # delete them.
     libs="%{libraries}" ; for lib in $libs ; do
-        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+        old_libs="`( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
         if [ -n "$old_libs" ] ; then
             # Old libraries hanging around, delete them.
             echo "warning: Deleting old non-rpm libraries $old_libs" >&2
@@ -1134,14 +1134,14 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # After a fresh install or upgrade, do a load config.
-    /sbin/ldconfig
+    ldconfig
 fi
 
 %postun lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then
     # Whether complete removal or upgrade, do a load config.
-    /sbin/ldconfig
+    ldconfig
 fi
 
 %if %{FILES_libs}
@@ -1372,6 +1372,10 @@ if [ $1 = 1 ] ; then : # fresh install
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
+@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.gz    ] && gunzip  %{_mandir}/%{base}.refs.gz
+@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.bz2   ] && bunzip2 %{_mandir}/%{base}.refs.bz2
+@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.gz  ] && gunzip  %{_mandir}/%{base}.macros.gz
+@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.bz2 ] && bunzip2 %{_mandir}/%{base}.macros.bz2
 fi
 
 %preun doc
@@ -1389,6 +1393,8 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             fi
         done
     fi
+@COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.refs
+@COOKED_MANPAGES_FALSE@    rm -f -- %{_mandir}/%{base}.macros
 fi
 
 %postun doc
@@ -1408,8 +1414,8 @@ fi
 %doc LSM %{name}-%{version}.lsm
 %doc README-make
 %{_infodir}/*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros*
 %{_mandir}/man*/*
 %endif
 
@@ -1420,8 +1426,8 @@ fi
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs*
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros*
 %{_mandir}/man*/*
 %endif
 
@@ -1844,9 +1850,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.52  2005/12/22 13:51:21  brian
-# - tough build for RH 7.3
+# Revision 0.9.2.53  2005/12/22 15:16:15  brian
+# - different approach to compressed marco files
 #
+
+* Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.52  2005/12/22 13:51:21  brian
+- tough build for RH 7.3
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.51  2005/12/22 10:26:02  brian

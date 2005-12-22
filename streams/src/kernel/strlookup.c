@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/19 12:45:16 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/22 10:28:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/19 12:45:16 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/22 10:28:42 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/19 12:45:16 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/22 10:28:42 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -143,17 +143,17 @@ struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
 #endif
 
 #if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
-EXPORT_SYMBOL(cdevsw_lock);
-EXPORT_SYMBOL(cdevsw_list);
+EXPORT_SYMBOL_NOVERS(cdevsw_lock);
+EXPORT_SYMBOL_NOVERS(cdevsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
-EXPORT_SYMBOL(fmodsw_lock);
-EXPORT_SYMBOL(fmodsw_list);
+EXPORT_SYMBOL_NOVERS(fmodsw_lock);
+EXPORT_SYMBOL_NOVERS(fmodsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 #if 0
-EXPORT_SYMBOL(cminsw_lock);
-EXPORT_SYMBOL(cminsw_list);
+EXPORT_SYMBOL_NOVERS(cminsw_lock);
+EXPORT_SYMBOL_NOVERS(cminsw_list);
 #endif
 #endif
 
@@ -166,9 +166,9 @@ int fmod_count = 0;
 int cmin_count = 0;
 
 #if defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
-EXPORT_SYMBOL(cdev_count);
-EXPORT_SYMBOL(fmod_count);
-EXPORT_SYMBOL(cmin_count);
+EXPORT_SYMBOL_NOVERS(cdev_count);
+EXPORT_SYMBOL_NOVERS(fmod_count);
+EXPORT_SYMBOL_NOVERS(cmin_count);
 #endif
 
 /*
@@ -240,7 +240,7 @@ __cmaj_lookup(major_t major)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__cmaj_lookup);
+EXPORT_SYMBOL_NOVERS(__cmaj_lookup);
 
 /**
  *  __cdev_lookup: - look up a cdev by major device number in cdev hashes
@@ -260,7 +260,7 @@ __cdev_lookup(major_t major)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__cdev_lookup);
+EXPORT_SYMBOL_NOVERS(__cdev_lookup);
 
 /**
  *  __cdrv_lookup: - look up a cdev by module identifier in fmod hashes
@@ -288,7 +288,7 @@ __cdrv_lookup(modID_t modid)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__cdrv_lookup);
+EXPORT_SYMBOL_NOVERS(__cdrv_lookup);
 
 /**
  *  __cmin_lookup: - look up a node by cdev and minor device number in node hashes
@@ -313,7 +313,7 @@ __cmin_lookup(struct cdevsw *cdev, minor_t minor)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__cmin_lookup);
+EXPORT_SYMBOL_NOVERS(__cmin_lookup);
 
 /**
  *  __fmod_lookup: - look up a fmod by module identifier in fmod hashes
@@ -341,7 +341,7 @@ __fmod_lookup(modID_t modid)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__fmod_lookup);
+EXPORT_SYMBOL_NOVERS(__fmod_lookup);
 
 streams_fastcall struct cdevsw *
 __cdev_search(const char *name)
@@ -361,7 +361,7 @@ __cdev_search(const char *name)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__cdev_search);
+EXPORT_SYMBOL_NOVERS(__cdev_search);
 
 streams_fastcall struct fmodsw *
 __fmod_search(const char *name)
@@ -381,7 +381,7 @@ __fmod_search(const char *name)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__fmod_search);
+EXPORT_SYMBOL_NOVERS(__fmod_search);
 
 streams_fastcall struct devnode *
 __cmin_search(struct cdevsw *cdev, const char *name)
@@ -403,7 +403,7 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(__cmin_search);
+EXPORT_SYMBOL_NOVERS(__cmin_search);
 
 streams_fastcall void *
 __smod_search(const char *name)
@@ -417,7 +417,7 @@ __smod_search(const char *name)
 	return (fmod);
 }
 
-EXPORT_SYMBOL(__smod_search);
+EXPORT_SYMBOL_NOVERS(__smod_search);
 
 STATIC struct cdevsw *
 cdev_grab(struct cdevsw *cdev)
@@ -811,7 +811,7 @@ fmod_str(const struct streamtab *str)
 	return (fmod);
 }
 
-EXPORT_SYMBOL(fmod_str);
+EXPORT_SYMBOL_NOVERS(fmod_str);
 
 /**
  *  cdev_str:	- look up a cdev by streamtab
@@ -835,7 +835,7 @@ cdev_str(const struct streamtab *str)
 	return (cdev);
 }
 
-EXPORT_SYMBOL(cdev_str);
+EXPORT_SYMBOL_NOVERS(cdev_str);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -861,7 +861,7 @@ sdev_get(major_t major)
 	return cdev_lookup(major, !in_interrupt());
 }
 
-EXPORT_SYMBOL(sdev_get);
+EXPORT_SYMBOL_NOVERS(sdev_get);
 
 /**
  *  sdev_put:	- put a reference to a STREAMS device
@@ -882,7 +882,7 @@ sdev_put(struct cdevsw *cdev)
 	}
 }
 
-EXPORT_SYMBOL(sdev_put);
+EXPORT_SYMBOL_NOVERS(sdev_put);
 
 /**
  *  cdrv_get:	- get a reference to a STREAMS driver
@@ -894,7 +894,7 @@ cdrv_get(modID_t modid)
 	return cdrv_lookup(modid, !in_interrupt());
 }
 
-EXPORT_SYMBOL(cdrv_get);
+EXPORT_SYMBOL_NOVERS(cdrv_get);
 
 /**
  *  cdrv_put:	- put a reference to a STREAMS driver
@@ -906,7 +906,7 @@ cdrv_put(struct cdevsw *cdev)
 	sdev_put(cdev);
 }
 
-EXPORT_SYMBOL(cdrv_put);
+EXPORT_SYMBOL_NOVERS(cdrv_put);
 
 /**
  *  fmod_get: - get a reference to a STREAMS module
@@ -921,7 +921,7 @@ fmod_get(modID_t modid)
 	return fmod_lookup(modid, !in_interrupt());
 }
 
-EXPORT_SYMBOL(fmod_get);
+EXPORT_SYMBOL_NOVERS(fmod_get);
 
 /**
  *  fmod_put: - put a reference to a STREAMS module
@@ -940,7 +940,7 @@ fmod_put(struct fmodsw *fmod)
 	}
 }
 
-EXPORT_SYMBOL(fmod_put);
+EXPORT_SYMBOL_NOVERS(fmod_put);
 
 /**
  *  cmaj_get: - get a reference to a major device node (devnode)
@@ -953,7 +953,7 @@ cmaj_get(const struct cdevsw *cdev, major_t major)
 	return cmaj_lookup(cdev, major);
 }
 
-EXPORT_SYMBOL(cmaj_get);
+EXPORT_SYMBOL_NOVERS(cmaj_get);
 
 /**
  *  cmin_get: - get a reference to a minor device node (devnode)
@@ -966,7 +966,7 @@ cmin_get(const struct cdevsw *cdev, minor_t minor)
 	return cmin_lookup(cdev, minor);
 }
 
-EXPORT_SYMBOL(cmin_get);
+EXPORT_SYMBOL_NOVERS(cmin_get);
 
 /**
  *  cdev_find: - find a STREAMS device by its name
@@ -986,7 +986,7 @@ cdev_find(const char *name)
 	return cdev_search(name, !in_interrupt());
 }
 
-EXPORT_SYMBOL(cdev_find);
+EXPORT_SYMBOL_NOVERS(cdev_find);
 
 /**
  *  cdev_match: - find a STREAMS device by extended name
@@ -1014,7 +1014,7 @@ cdev_match(const char *name)
 }
 
 #if defined CONFIG_STREAMS_NSDEV_MODULE || !defined CONFIG_STREAMS_NSDEV
-EXPORT_SYMBOL(cdev_match);
+EXPORT_SYMBOL_NOVERS(cdev_match);
 #endif
 
 /**
@@ -1035,7 +1035,7 @@ fmod_find(const char *name)
 	return fmod_search(name, !in_interrupt());
 }
 
-EXPORT_SYMBOL(fmod_find);
+EXPORT_SYMBOL_NOVERS(fmod_find);
 
 streams_fastcall struct devnode *
 cmin_find(const struct cdevsw *cdev, const char *name)
@@ -1043,7 +1043,7 @@ cmin_find(const struct cdevsw *cdev, const char *name)
 	return cmin_search(cdev, name);
 }
 
-EXPORT_SYMBOL(cmin_find);
+EXPORT_SYMBOL_NOVERS(cmin_find);
 
 /**
  *  cdev_minor: - get extended minor number from kernel device type
@@ -1068,7 +1068,7 @@ cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 	return (minor);
 }
 
-EXPORT_SYMBOL(cdev_minor);
+EXPORT_SYMBOL_NOVERS(cdev_minor);
 
 streams_fastcall void
 fmod_add(struct fmodsw *fmod, modID_t modid)
@@ -1087,7 +1087,7 @@ fmod_add(struct fmodsw *fmod, modID_t modid)
 	fmod_count++;
 }
 
-EXPORT_SYMBOL(fmod_add);
+EXPORT_SYMBOL_NOVERS(fmod_add);
 
 streams_fastcall void
 fmod_del(struct fmodsw *fmod)
@@ -1097,7 +1097,7 @@ fmod_del(struct fmodsw *fmod)
 	list_del_init(&fmod->f_hash);
 }
 
-EXPORT_SYMBOL(fmod_del);
+EXPORT_SYMBOL_NOVERS(fmod_del);
 
 /**
  *  sdev_add:	- add a STREAMS device to the registration list
@@ -1148,7 +1148,7 @@ sdev_add(struct cdevsw *cdev, modID_t modid)
 	return (0);
 }
 
-EXPORT_SYMBOL(sdev_add);
+EXPORT_SYMBOL_NOVERS(sdev_add);
 
 /**
  *  sdev_del:	- delete a streams device from the registration list
@@ -1175,7 +1175,7 @@ sdev_del(struct cdevsw *cdev)
 	cdev_count--;
 }
 
-EXPORT_SYMBOL(sdev_del);
+EXPORT_SYMBOL_NOVERS(sdev_del);
 
 streams_fastcall void
 cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
@@ -1192,7 +1192,7 @@ cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 	list_add_tail(&cmaj->n_hash, strdev_hash_slot(major));
 }
 
-EXPORT_SYMBOL(cmaj_add);
+EXPORT_SYMBOL_NOVERS(cmaj_add);
 
 streams_fastcall void
 cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
@@ -1205,7 +1205,7 @@ cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 		cdev->d_major = 0;
 }
 
-EXPORT_SYMBOL(cmaj_del);
+EXPORT_SYMBOL_NOVERS(cmaj_del);
 
 streams_fastcall int
 cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
@@ -1240,7 +1240,7 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	return (0);
 }
 
-EXPORT_SYMBOL(cmin_add);
+EXPORT_SYMBOL_NOVERS(cmin_add);
 
 streams_fastcall void
 cmin_del(struct devnode *cmin, struct cdevsw *cdev)
@@ -1265,7 +1265,7 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 	cmin_count--;
 }
 
-EXPORT_SYMBOL(cmin_del);
+EXPORT_SYMBOL_NOVERS(cmin_del);
 
 BIG_STATIC int
 strlookup_init(void)

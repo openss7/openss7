@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/20 10:19:51 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/22 10:27:17 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -53,7 +53,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    ${1+"$@"}
+	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
 	    rc_status -v
@@ -64,7 +64,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    ${1+"$@"}
+	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
 	    return $?
@@ -74,7 +74,7 @@ case "$init_mode" in
 	action() {
 	    echo -en "$1"
 	    shift 1
-	    ${1+"$@"}
+	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
 	    return $?
@@ -297,7 +297,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/20 10:19:51 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/22 10:27:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -343,7 +343,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/20 10:19:51 $ by $Author: brian $
+# Last Modified $Date: 2005/12/22 10:27:17 $ by $Author: brian $
 #
 # =============================================================================
 

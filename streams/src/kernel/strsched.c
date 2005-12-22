@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/20 15:12:10 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/22 10:28:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:12:10 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/20 15:12:10 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/22 10:28:42 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2005/12/20 15:12:10 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/22 10:28:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -113,7 +113,7 @@ BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 BIG_STATIC struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(strthreads);
+EXPORT_SYMBOL_NOVERS(strthreads);
 #endif
 
 #if defined CONFIG_STREAMS_KTHREADS
@@ -172,7 +172,7 @@ cpu_raise_streams(unsigned int cpu)
 
 #endif				/* defined CONFIG_STREAMS_KTHREADS */
 
-EXPORT_SYMBOL(__raise_streams);
+EXPORT_SYMBOL_NOVERS(__raise_streams);
 
 #if 0
 STATIC streams_fastcall void
@@ -435,7 +435,7 @@ di_alloc(struct cdevsw *cdev)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(di_alloc);	/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(di_alloc);	/* include/sys/streams/strsubr.h */
 #endif
 
 STATIC __unlikely void
@@ -481,7 +481,7 @@ di_put(struct devinfo *di)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(di_put);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(di_put);		/* include/sys/streams/strsubr.h */
 #endif
 #endif
 
@@ -635,7 +635,7 @@ allocq(void)
 	return (rq);
 }
 
-EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(allocq);		/* include/sys/streams/stream.h */
 
 BIG_STATIC_STH void streams_fastcall sd_put_slow(struct stdata **sdp);
 
@@ -704,7 +704,7 @@ freeq(queue_t *rq)
 	freeq_fast(rq);
 }
 
-EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(freeq);		/* include/sys/streams/stream.h */
 
 /* queue gets and puts */
 BIG_STATIC streams_fastcall __hot_out queue_t *
@@ -1121,7 +1121,7 @@ alloclk(void)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(alloclk);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(alloclk);		/* include/sys/streams/strsubr.h */
 #endif
 
 BIG_STATIC_STH streams_fastcall __unlikely void
@@ -1140,7 +1140,7 @@ freelk(struct linkblk *l)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(freelk);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(freelk);		/* include/sys/streams/strsubr.h */
 #endif
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -1361,7 +1361,7 @@ sealloc(void)
 	return ctrace(event_alloc(SE_STREAM, NULL));
 }
 
-EXPORT_SYMBOL(sealloc);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sealloc);		/* include/sys/streams/strsubr.h */
 
 /**
  *  sefree:	- deallocate a stream event structure
@@ -1374,7 +1374,7 @@ sefree(struct strevent *se)
 	return (0);
 }
 
-EXPORT_SYMBOL(sefree);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sefree);		/* include/sys/streams/strsubr.h */
 
 /*
  *  -------------------------------------------------------------------------
@@ -1637,7 +1637,7 @@ __bufcall(queue_t *q, unsigned size, int priority, void streamscall (*function) 
 	return defer_bufcall_event(q, size, priority, function, arg);
 }
 
-EXPORT_SYMBOL(__bufcall);	/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(__bufcall);	/* include/sys/streams/strsubr.h */
 
 /**
  *  bufcall:	- schedule a buffer callout
@@ -1652,7 +1652,7 @@ bufcall(unsigned size, int priority, void streamscall streamscall (*function) (l
 	return __bufcall(NULL, size, priority, function, arg);
 }
 
-EXPORT_SYMBOL(bufcall);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(bufcall);		/* include/sys/streams/stream.h */
 
 /**
  *  esbbcall:	- schedule a buffer callout
@@ -1662,7 +1662,7 @@ EXPORT_SYMBOL(bufcall);		/* include/sys/streams/stream.h */
  */
 __STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long), long arg);
 
-EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(esbbcall);	/* include/sys/streams/stream.h */
 
 /**
  *  unbufcall:	- cancel a buffer callout
@@ -1678,7 +1678,7 @@ unbufcall(register bcid_t bcid)
 		se->x.b.func = NULL;
 }
 
-EXPORT_SYMBOL(unbufcall);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(unbufcall);	/* include/sys/streams/stream.h */
 
 /*
  *  __timeout:	- generate a timeout callback
@@ -1699,7 +1699,7 @@ __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned lo
 	return defer_timeout_event(q, timo_fcn, arg, ticks, pl, cpu);
 }
 
-EXPORT_SYMBOL(__timeout);	/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(__timeout);	/* include/sys/streams/strsubr.h */
 
 /**
  *  timeout:	- issue a timeout callback
@@ -1715,7 +1715,7 @@ timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 
-EXPORT_SYMBOL(timeout);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(timeout);		/* include/sys/streams/stream.h */
 
 /**
  *  untimeout:	- cancel a timeout callback
@@ -1739,7 +1739,7 @@ untimeout(toid_t toid)
 	return (rem);
 }
 
-EXPORT_SYMBOL(untimeout);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(untimeout);	/* include/sys/streams/stream.h */
 
 /*
  *  __weldq:	- weld two queue pairs together
@@ -1815,7 +1815,7 @@ weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_
 	return __weldq(q1, q2, q3, q4, func, arg, protq);
 }
 
-EXPORT_SYMBOL(weldq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(weldq);		/* include/sys/streams/stream.h */
 
 /**
  *  unweldq:	- unweld two queue pairs from each other
@@ -1854,7 +1854,7 @@ unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
 	return __unweldq(q1, NULL, q3, NULL, func, arg, protq);
 }
 
-EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(unweldq);		/* include/sys/streams/stream.h */
 
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
@@ -2674,7 +2674,7 @@ put(queue_t *q, mblk_t *mp)
 	return;
 }
 
-EXPORT_SYMBOL(put);
+EXPORT_SYMBOL_NOVERS(put);
 
 /**
  *  putnext:	- put a message on the queue next to this one
@@ -2749,7 +2749,7 @@ putnext(queue_t *q, mblk_t *mp)
 	trace();
 }
 
-EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(putnext);		/* include/sys/streams/stream.h */
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /**
@@ -2821,7 +2821,7 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return q_open(q, devp, oflag, sflag, crp);
 }
 
-EXPORT_SYMBOL(qopen);
+EXPORT_SYMBOL_NOVERS(qopen);
 
 /**
  *  qclose:	- invoke a queue pair's qi_qclose entry point
@@ -2859,7 +2859,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 	return ctrace(q_close(q, oflag, crp));
 }
 
-EXPORT_SYMBOL(qclose);
+EXPORT_SYMBOL_NOVERS(qclose);
 
 /**
  *  __strwrit: - call a function after gaining exlusive access to the perimeter
@@ -2889,7 +2889,7 @@ __strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *)
 	}
 }
 
-EXPORT_SYMBOL(__strwrit);
+EXPORT_SYMBOL_NOVERS(__strwrit);
 
 /**
  *  __strfunc: - call a function like a queue's put procedure
@@ -2924,7 +2924,7 @@ __strfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, v
 	}
 }
 
-EXPORT_SYMBOL(__strfunc);
+EXPORT_SYMBOL_NOVERS(__strfunc);
 
 #ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
@@ -3347,7 +3347,7 @@ kmem_alloc(size_t size, int flags)
 		       | ((flags & KM_DMA) ? GFP_DMA : 0));
 }
 
-EXPORT_SYMBOL(kmem_alloc);	/* include/sys/streams/kmem.h */
+EXPORT_SYMBOL_NOVERS(kmem_alloc);	/* include/sys/streams/kmem.h */
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -3369,7 +3369,7 @@ kmem_zalloc(size_t size, int flags)
 	return (mem);
 }
 
-EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/streams/kmem.h */
+EXPORT_SYMBOL_NOVERS(kmem_zalloc);	/* include/sys/streams/kmem.h */
 
 /**
  *  kmem_free:	- free memory
@@ -3388,7 +3388,7 @@ kmem_free(void *addr, size_t size)
 		raise_bufcalls();
 }
 
-EXPORT_SYMBOL(kmem_free);	/* include/sys/streams/kmem.h */
+EXPORT_SYMBOL_NOVERS(kmem_free);	/* include/sys/streams/kmem.h */
 
 /**
  *  kmem_alloc_node: - allocate memory
@@ -3402,7 +3402,7 @@ kmem_alloc_node(size_t size, int flags, cnodeid_t node)
 	return kmalloc(size, GFP_KERNEL);
 }
 
-EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/streams/kmem.h */
+EXPORT_SYMBOL_NOVERS(kmem_alloc_node);	/* include/sys/streams/kmem.h */
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -3420,7 +3420,7 @@ kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
 	return (mem);
 }
 
-EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
+EXPORT_SYMBOL_NOVERS(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3513,7 +3513,7 @@ qscan(queue_t *q)
 		__raise_streams();
 }
 
-EXPORT_SYMBOL(qscan);		/* for stream head in include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(qscan);		/* for stream head in include/sys/streams/strsubr.h */
 
 
 
@@ -3982,7 +3982,7 @@ runqueues(void)
 #endif
 }
 
-EXPORT_SYMBOL(runqueues);	/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(runqueues);	/* include/sys/streams/strsubr.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -4062,7 +4062,7 @@ allocstr(void)
 	return (sd);
 }
 
-EXPORT_SYMBOL(allocstr);	/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(allocstr);	/* include/sys/streams/strsubr.h */
 
 STATIC __unlikely void
 __freestr(struct stdata *sd)
@@ -4081,7 +4081,7 @@ __freestr(struct stdata *sd)
 	kmem_cache_free(si->si_cache, sh);
 }
 
-EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(freestr);		/* include/sys/streams/strsubr.h */
 
 STATIC __unlikely void
 sd_free(struct stdata *sd)
@@ -4118,7 +4118,7 @@ sd_get(struct stdata *sd)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(sd_get);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sd_get);		/* include/sys/streams/strsubr.h */
 #endif
 BIG_STATIC_INLINE_STH streams_fastcall __hot void
 sd_put(struct stdata **sdp)
@@ -4140,7 +4140,7 @@ sd_put(struct stdata **sdp)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(sd_put);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sd_put);		/* include/sys/streams/strsubr.h */
 #endif
 
 BIG_STATIC_STH streams_fastcall void

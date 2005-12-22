@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 12:45:17 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/22 10:28:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 12:45:17 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/22 10:28:42 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/19 12:45:17 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/12/22 10:28:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -447,7 +447,7 @@ do_spipe(int *fds)
 #endif
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(do_spipe);
+EXPORT_SYMBOL_NOVERS(do_spipe);
 #endif
 
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */

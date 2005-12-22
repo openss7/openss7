@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 12:45:16 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/22 10:28:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 12:45:16 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/22 10:28:42 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/19 12:45:16 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/22 10:28:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -195,7 +195,7 @@ do_fattach(const struct file *file, const char *file_name)
 	return err;
 }
 
-EXPORT_SYMBOL(do_fattach);
+EXPORT_SYMBOL_NOVERS(do_fattach);
 
 streams_fastcall long
 do_fdetach(const char *file_name)
@@ -237,6 +237,6 @@ do_fdetach(const char *file_name)
 	return err;
 }
 
-EXPORT_SYMBOL(do_fdetach);
+EXPORT_SYMBOL_NOVERS(do_fdetach);
 
 #endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */

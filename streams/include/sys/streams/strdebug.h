@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.30 2005/12/20 15:11:56 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.31 2005/12/22 10:28:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:11:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/20 15:11:56 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/22 10:28:56 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -61,6 +61,13 @@
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
+
+/*
+ *  Kernel 2.4, 2.6 module compatibility.
+ */
+#ifndef EXPORT_SYMBOL_NOVERS
+#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL(__sym)
+#endif
 
 /*
  *  First optimizations, then assertions.

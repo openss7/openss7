@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/18 12:25:42 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -98,13 +98,13 @@ MODULE_ALIAS("streams-osfcompat");
 
 __OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp);
 
-EXPORT_SYMBOL(puthere);
+EXPORT_SYMBOL_NOVERS(puthere);
 __OSF_EXTERN_INLINE time_t lbolt(void);
 
-EXPORT_SYMBOL(lbolt);
+EXPORT_SYMBOL_NOVERS(lbolt);
 __OSF_EXTERN_INLINE time_t time(void);
 
-EXPORT_SYMBOL(time);
+EXPORT_SYMBOL_NOVERS(time);
 
 struct str_comm {
 	struct str_comm **prev;		/* must be first */
@@ -197,7 +197,7 @@ streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sfl
 	return (0);
 }
 
-EXPORT_SYMBOL(streams_open_comm);
+EXPORT_SYMBOL_NOVERS(streams_open_comm);
 
 /* 
  *  STREAMS_OPEN_OCOMM
@@ -217,7 +217,7 @@ streams_open_ocomm(dev_t dev, unsigned int size, queue_t *q, dev_t *devp, int of
 	return (0);
 }
 
-EXPORT_SYMBOL(streams_open_ocomm);
+EXPORT_SYMBOL_NOVERS(streams_open_ocomm);
 
 /* 
  *  STREAMS_CLOSE_COMM
@@ -246,7 +246,7 @@ streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-EXPORT_SYMBOL(streams_close_comm);
+EXPORT_SYMBOL_NOVERS(streams_close_comm);
 
 #ifndef NODEV
 #define NODEV (makedevice(0, 0))
@@ -387,7 +387,7 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 #endif
 }
 
-EXPORT_SYMBOL(strmod_add);
+EXPORT_SYMBOL_NOVERS(strmod_add);
 
 /*
  *  STRMOD_DEL
@@ -436,7 +436,7 @@ strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 #endif
 }
 
-EXPORT_SYMBOL(strmod_del);
+EXPORT_SYMBOL_NOVERS(strmod_del);
 
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 static

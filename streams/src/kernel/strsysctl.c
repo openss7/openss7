@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/11 05:46:08 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/22 10:28:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/11 05:46:08 $ by $Author: brian $
+ Last Modified $Date: 2005/12/22 10:28:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/11 05:46:08 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/22 10:28:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/11 05:46:08 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/22 10:28:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -96,10 +96,10 @@ BIG_STATIC int sysctl_str_max_strmod = MAX_STRMOD;/* max no streams modules */
 BIG_STATIC int sysctl_str_max_mblk = 10;	/* max no of headers on free list */
 BIG_STATIC int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
 
-EXPORT_SYMBOL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
+EXPORT_SYMBOL_NOVERS(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL(sysctl_str_strctlsz);
-EXPORT_SYMBOL(sysctl_str_nstrpush);
+EXPORT_SYMBOL_NOVERS(sysctl_str_strctlsz);
+EXPORT_SYMBOL_NOVERS(sysctl_str_nstrpush);
 #endif
 
 STATIC struct ctl_table_header *streams_sysctl_handle;
