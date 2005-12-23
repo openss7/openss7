@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.47 $) $Date: 2005/12/22 15:16:16 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.48 $) $Date: 2005/12/23 05:23:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 15:16:16 $ by $Author: brian $
+# Last Modified $Date: 2005/12/23 05:23:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -262,8 +262,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
+%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 Summary:        %{title} (SVR 4 %{virtual})
 Name:           @PACKAGE@
@@ -521,7 +521,7 @@ package_source
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
@@ -538,9 +538,9 @@ Prereq:         lsof
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -633,7 +633,7 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
                                 fi
                             fi
                         done
-                        sleep 5 # wait for processes to die and close streams
+                        /sbin/sleep 5 # wait for processes to die and close streams
                         modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                         if ( lsmod | grep -q "^$m" ) ; then
                             echo "Cannot install or upgrade with $m module running." >&2
@@ -657,7 +657,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         # Running kernels do need init scripts run.
         list='%{initfiles}' ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
-                service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
+                /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
             fi
         done
 %endif
@@ -683,7 +683,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         done
         for i in $reverse ; do
             if [ -f %_initrddir/$i ] ; then
-                service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
+                /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
             fi
         done
 %endif
@@ -703,7 +703,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                                 fi
                             fi
                         done
-                        sleep 5 # wait for processes to die and close streams
+                        /sbin/sleep 5 # wait for processes to die and close streams
                         modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                         if ( lsmod | grep -q "^$m" ) ; then
                             echo "Cannot uninstall with $m module running." >&2
@@ -754,7 +754,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                                 fi
                             fi
                         done
-                        sleep 5 # wait for processes to die and close streams
+                        /sbin/sleep 5 # wait for processes to die and close streams
                         modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                         if ( lsmod | grep -q "^$m" ) ; then
                             echo "Error: modules may be still loaded" >&2
@@ -864,14 +864,14 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # After a fresh install or upgrade, do a load config.
-    ldconfig
+    /sbin/ldconfig
 fi
 
 %postun lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then
     # Whether complete removal or upgrade, do a load config.
-    ldconfig
+    /sbin/ldconfig
 fi
 
 %if %{FILES_libs}
@@ -935,6 +935,7 @@ Prefix:         %{_libexecdir}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-utils
 Conflicts:      %{_conflict}-util
+Conflicts:      %{_conflict}-utils
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -995,6 +996,7 @@ fi
 Summary:        %{title} devices.
 Group:          System Environment/Base
 Conflicts:      %{_conflict}-dev
+Conflicts:      %{_conflict}-devs
 Requires:       dev >= 3.3
 %if %{MAKE_devs}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
@@ -1051,6 +1053,7 @@ Prefix:         %{_libexecdir}/%{name}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-tests
 Conflicts:      %{_conflict}-test
+Conflicts:      %{_conflict}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1112,10 +1115,10 @@ if [ $1 = 1 ] ; then : # fresh install
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.gz    ] && gunzip  %{_mandir}/%{base}.refs.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.bz2   ] && bunzip2 %{_mandir}/%{base}.refs.bz2
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.gz  ] && gunzip  %{_mandir}/%{base}.macros.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.bz2 ] && bunzip2 %{_mandir}/%{base}.macros.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
 fi
 
 %preun doc
@@ -1595,9 +1598,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.47  2005/12/22 15:16:16  brian
-# - different approach to compressed marco files
+# Revision 1.1.6.48  2005/12/23 05:23:27  brian
+# - corrections
 #
+
+* Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.47  2005/12/22 15:16:16  brian
+- different approach to compressed marco files
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.46  2005/12/22 13:51:22  brian

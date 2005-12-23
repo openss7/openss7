@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/12/22 15:16:17 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/12/23 05:23:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 15:16:17 $ by $Author: brian $
+# Last Modified $Date: 2005/12/23 05:23:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,6 +61,8 @@
 %global BUILD_arch    1
 %global BUILD_source  1
 %global BUILD_test    1
+#global BUILD_devs    1
+#global MAKE_devs     0
 
 # there are three ways to pass kernel version to the build process:
 #    global _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
@@ -78,10 +80,13 @@
 %global kernel_others %(echo %{_kversion} | sed -e 's|.*FC4.*$|0|;s|[^0].*$|1|')
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
+#global majbase     @STRCONF_MAJBASE@
+#global makedev     @STRCONF_MAKEDEV@
 %global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
 %global stitle      @PACKAGE_SHORTTITLE@
+#global virtual     STREAMS
 
 %global modules     %{name}
 %global preloads    %{name}
@@ -96,8 +101,12 @@
 %{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
 
 %if %{without_ko_modules}
+# assume devs for older kernels
+#global NEED_devs     1
 %global NEED_init     1
 %else
+# assume no devs for newer kernels
+#global NEED_devs     0
 %global NEED_init     0
 %endif
 
@@ -113,21 +122,39 @@
 %{?_without_indep:   %{expand: %%global BUILD_noarch  0}}
 %{?_without_arch:    %{expand: %%global BUILD_arch    0}}
 %{?_without_public:  %{expand: %%global BUILD_source  0}}
+#{?_with_devfs:      %{expand: %%global NEED_devs     0}}
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%global BUILD_tools   1}}
 %{?_with_indep:      %{expand: %%global BUILD_noarch  1}}
 %{?_with_arch:       %{expand: %%global BUILD_arch    1}}
 %{?_with_public:     %{expand: %%global BUILD_source  1}}
 
+#define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+#define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+
 %if %{BUILD_arch}
 %global BUILD_source  0
 %endif
 
+#if %{NEED_devs}
+#{expand: %%global BUILD_devs    %newrpm}
+#{expand: %%global MAKE_devs     %oldrpm}
+#else
+#global BUILD_devs    0
+#global MAKE_devs     0
+#endif
+
 %if %{BUILD_tools}
 %else
 %global BUILD_libs    0
+#global BUILD_devs    0
+#global MAKE_devs     0
 %global BUILD_source  0
 %endif
+
+#global _ksubdir streams
+#global _kmodext streams
+#global _conflict LiS
 
 %if %{BUILD_modules}
 %global FILES_modules       1
@@ -143,6 +170,8 @@
 %global FILES_libs          1
 %global FILES_nolibs        1
 %global FILES_tools         1
+#global FILES_makedev       1
+#global FILES_builddev      1
 %global FILES_test          %{BUILD_test}
 %global FILES_doc           1
 %global FILES_doclibs       1
@@ -155,6 +184,8 @@
 %global FILES_libs          0
 %global FILES_nolibs        0
 %global FILES_tools         0
+#global FILES_makedev       0
+#global FILES_builddev      0
 %global FILES_test          0
 %global FILES_doc           0
 %global FILES_doclibs       0
@@ -176,6 +207,8 @@
 
 %if %{BUILD_noarch}
 %else
+#global FILES_makedev       0
+#global FILES_builddev      0
 %global FILES_test          0
 %global FILES_doc           0
 %global FILES_doclibs       0
@@ -202,7 +235,15 @@
 %global FILES_modules       0
 %global FILES_init          0
 %global FILES_noinit        0
+#global FILES_makedev       0
+#global FILES_builddev      0
 %endif
+
+#if %{BUILD_devs}
+#global FILES_makedev       0
+#else
+#global FILES_builddev      0
+#endif
 
 %if %{have_initscripts}
 %global FILES_ko_noinit     0
@@ -221,8 +262,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
+%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 Summary:        %{title} for Linux
 Name:           @PACKAGE@
@@ -505,10 +546,14 @@ package_source
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}/kernel/net
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
+#if %{NEED_devs}
+#equires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
+#endif
+#onflicts:      %{_conflict}-%{core_name}
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
@@ -986,10 +1031,10 @@ if [ $1 = 1 ] ; then : # fresh install
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.gz    ] && gunzip  %{_mandir}/%{base}.refs.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.bz2   ] && bunzip2 %{_mandir}/%{base}.refs.bz2
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.gz  ] && gunzip  %{_mandir}/%{base}.macros.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.bz2 ] && bunzip2 %{_mandir}/%{base}.macros.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
 fi
 
 %preun doc
@@ -1079,6 +1124,8 @@ Summary:        %{title} init scripts and config files
 Group:          System Environment/Base
 Prefix:         %{_configdir}
 Prefix:         %{_initrddir}
+Prefix:         %{_sysconfdir}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-inits
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
@@ -1355,9 +1402,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.77  2005/12/22 15:16:17  brian
-# - different approach to compressed marco files
+# Revision 0.9.2.78  2005/12/23 05:23:28  brian
+# - corrections
 #
+
+* Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.77  2005/12/22 15:16:17  brian
+- different approach to compressed marco files
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.76  2005/12/22 13:51:22  brian

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2005/12/22 15:16:17 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2005/12/23 05:23:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 15:16:17 $ by $Author: brian $
+# Last Modified $Date: 2005/12/23 05:23:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -152,8 +152,8 @@
 %global BUILD_source  0
 %endif
 
-%global _ksubdir lis
-%global _kmodext lis
+%global _ksubdir streams
+%global _kmodext streams
 %global _conflict LiS
 
 %if %{BUILD_modules}
@@ -262,8 +262,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
+%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 Summary:        %{title} (SVR 4.2 MP %{virtual})
 Name:           @PACKAGE@
@@ -548,7 +548,7 @@ package_source
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
@@ -565,9 +565,9 @@ Prereq:         lsof
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1143,10 +1143,10 @@ if [ $1 = 1 ] ; then : # fresh install
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.gz    ] && gunzip  %{_mandir}/%{base}.refs.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.bz2   ] && bunzip2 %{_mandir}/%{base}.refs.bz2
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.gz  ] && gunzip  %{_mandir}/%{base}.macros.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.bz2 ] && bunzip2 %{_mandir}/%{base}.macros.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
 fi
 
 %preun doc
@@ -1594,7 +1594,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_sysconfdir}/streams.conf
+%{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/strload.conf
 %{_sysconfdir}/strsetup.conf
 %{_initrddir}/../*
@@ -1606,7 +1606,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_sysconfdir}/streams.conf
+%{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/strload.conf
 %{_sysconfdir}/strsetup.conf
 %{_initrddir}/../*
@@ -1630,9 +1630,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.130  2005/12/22 15:16:17  brian
-# - different approach to compressed marco files
+# Revision 0.9.2.131  2005/12/23 05:23:28  brian
+# - corrections
 #
+
+* Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.130  2005/12/22 15:16:17  brian
+- different approach to compressed marco files
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.129  2005/12/22 13:51:23  brian

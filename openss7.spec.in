@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/12/22 15:16:15 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/12/23 05:23:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 15:16:15 $ by $Author: brian $
+# Last Modified $Date: 2005/12/23 05:23:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -285,8 +285,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
+%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 Summary:        %{title} for Linux
 Name:           @PACKAGE@
@@ -542,7 +542,7 @@ package_source
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
@@ -804,7 +804,7 @@ fi
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
@@ -1372,10 +1372,10 @@ if [ $1 = 1 ] ; then : # fresh install
     if [ -x /usr/sbin/makewhatis ] ; then
         LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
     fi
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.gz    ] && gunzip  %{_mandir}/%{base}.refs.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.refs.bz2   ] && bunzip2 %{_mandir}/%{base}.refs.bz2
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.gz  ] && gunzip  %{_mandir}/%{base}.macros.gz
-@COOKED_MANPAGES_FALSE@    [ -f %{_mandir}/%{base}.macros.bz2 ] && bunzip2 %{_mandir}/%{base}.macros.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+@COOKED_MANPAGES_FALSE@    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
 fi
 
 %preun doc
@@ -1850,9 +1850,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.53  2005/12/22 15:16:15  brian
-# - different approach to compressed marco files
+# Revision 0.9.2.54  2005/12/23 05:23:27  brian
+# - corrections
 #
+
+* Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.53  2005/12/22 15:16:15  brian
+- different approach to compressed marco files
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.52  2005/12/22 13:51:21  brian
