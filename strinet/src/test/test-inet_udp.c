@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/18 12:47:59 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/23 20:21:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:47:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/23 20:21:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.37  2005/12/23 20:21:26  brian
+ - insert delay
+
  Revision 0.9.2.36  2005/07/18 12:47:59  brian
  - standard indentation
 
@@ -219,9 +222,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/18 12:47:59 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/23 20:21:26 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/18 12:47:59 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/23 20:21:26 $";
 
 /*
  *  Simple test program for INET streams.
@@ -17573,6 +17576,8 @@ test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
 	state++;
 	test_addr = addr;
 	test_alen = len;

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/29 10:19:02 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/23 20:21:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:19:02 $ by $Author: brian $
+# Last Modified $Date: 2005/12/23 20:21:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -250,7 +250,8 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 ])
     _LINUX_KERNEL_SYMBOLS([sock_alloc,
 			   tcp_current_mss,
-			   tcp_set_skb_tso_segs], [], [])
+			   tcp_set_skb_tso_segs,
+			   tcp_set_skb_tso_factor], [], [])
 ])# _INET_CONFIG_KERNEL
 # =============================================================================
 

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/12/23 05:23:29 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/12/23 20:28:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 05:23:29 $ by $Author: brian $
+# Last Modified $Date: 2005/12/23 20:28:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1359,9 +1359,9 @@ if [ $arg = 1 ] ; then : # fresh install
     list='%{initfiles}' ; for i in $list strms_up strms_dn ; do
         if [ -f %_initrddir/$i ] ; then
             # Find the best working init script removal tool
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
             [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
         fi
     done
     # remove conflicting and dependent modules
@@ -1464,9 +1464,9 @@ if [ $1 = 2 ] ; then : # upgrade
     # This is the end of a fresh install, add init scripts if we can
     list='%{initfiles}' ; for i in $list ; do
         # Find the best working init script installation tool
-        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
         [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
         [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
+        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
     done
 %endif
 fi
@@ -1517,9 +1517,9 @@ if [ $1 = 0 ] ; then : # final removal
             # rpm is not too good about the order of removal
             /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
             # Find the best working init script removal tool
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
             [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
         fi
     done
 %endif
@@ -1619,9 +1619,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
-# Revision 0.9.2.92  2005/12/23 05:23:29  brian
-# - corrections
+# Revision 0.9.2.93  2005/12/23 20:28:34  brian
+# - use lsb initd last
 #
+
+* Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.92  2005/12/23 05:23:29  brian
+- corrections
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.91  2005/12/22 15:16:19  brian
