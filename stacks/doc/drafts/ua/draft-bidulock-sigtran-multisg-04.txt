@@ -1,0 +1,473 @@
+
+
+
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+
+                                                        October 16, 2005
+Expires in April 2006
+
+
+
+                  Multiple Signalling Gateway Support
+                                  for
+                   Signalling User Adaptation Layers
+                <draft-bidulock-sigtran-multisg-04.txt>
+
+
+Status of this Memo
+
+    By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+    Internet-Drafts are working documents of the Internet Engineering
+  Task Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress".
+
+    The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire in April 2006.
+
+Copyright
+
+    Copyright (C) The Internet Society (2005).
+
+Abstract
+
+    This Internet-Draft describes Load Selection for Signalling User
+  Adaptation Protocols [M3UA-BIS, SUA..TUA], which permits an
+  Application Server Processes (ASP) to indicate its placement within an
+  Application Server and permits an Signalling Gateway (SG) to
+  distribute traffic over ASPs in Application Servers under Application
+  Server Process (ASP) control.
+
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 1
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+Contents
+
+    A complete table of contents, list of tables and illustrations, and
+  change history appears at the end of this document.
+
+1.  Introduction
+
+1.1.  Scope
+
+    This Internet-Draft provides parameters and procedures in extension
+  to the parameters and procedures of the Signalling User Adaptation
+  Layers (UAs) [M3UA-BIS, SUA..TUA], for the purpose of supporting
+  Application Servers interworking with multiple Signalling Gateways to
+  the SS7 Network.
+
+    UA implementations with Multiple SG Support are intended to be
+  compatible with UA implementations not supporting this configuration.
+
+    MULTI-SG is only applicable to Signalling Gateway (SG)-Application
+  Server Process (ASP) configurations in which ASP are supporting
+  Application Server (AS) connectivity to an SS7 network via multiple
+  SGs.[1] MULTI-SG is not applicable to configurations of IPSPs working
+  in a point-to-point network without relay points.[2]
+
+1.2.  Terminology
+
+    Multiple SG Support (MULTI-SG) supplements the terminology used in
+  the UA documents [M3UA-BIS, SUA..TUA] by adding the following terms:
+
+  Multiple SG Support (MULTI-SG) - the parameters and procedures
+      provided in this document.
+
+  Signalling User Adaptation Layer (UA) - one or more of the Stream
+      Control Transmission Protocol (SCTP) [RFC 2960] SS7 Signalling
+      User Adaptation Layers [M3UA-BIS, SUA..TUA] supporting the concept
+      of a Routing Context.
+
+1.3.  Overview
+
+    MULTI-SG provides procedures in addition to the UA procedures[3]
+  that provides for seamless interworking of SS7 Network Management with
+  Application Server Processes (ASPs) supporting Application Servers
+  (AS) to multiple Signalling Gateways (SGs).  MULTI-SG procedures
+  provide support for the following functions not provided for in the
+  existing UA documents:
+
+   + Support for fail-over of SCTP associations between Signalling
+     Gateways (SGs).
+   + Support for rerouting of traffic destined to Signalling Endpoints
+     (SEP) in SS7 Network between Signalling Gateways (SGs).
+   + Support for seamless interworking with SS7 Changeback [Q.704]
+     procedures towards the SS7 Network for rerouting of traffic between
+     SGs for elminating message mis-sequencing across the interworking
+     point between the SS7 and IP networks.
+
+B. Bidulock                    Version 0.4                        Page 2
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+    MUTLI-SG supplements the procedures for the diversion of traffic
+  during fail-over or restoration of ASPs, SGPs and IPSPs already
+  provided for in "Correlation Id and Heartbeat Procedures (CORID)
+  Supporting Lossless Fail-Over between SCTP Associations" [CORID].  The
+  benefits of MULTI-SG can, nevertheless, be supported indepedent from
+  CORID [CORID]
+
+1.3.1.  Multiple SGs
+
+    No procedures are described which provide for reduction of message
+  loss, duplication or mis-sequencing in multiple SG configurations in
+  the existing UA procedures.
+
+1.3.1.1.  Fail-over of routesets between SGs
+
+1.3.1.2.  Redirection of routesets between SGs
+
+1.4.  Sample Configurations
+
+                     |
+       SS7                          IP
+       Network       |              Network
+                 _______________                _______     ____
+                |    |   _______|        ______|       |   /    \
+                |       |       |_______|  ____|  ASP  |  |      |
+     B/D-Links  |    |  |  SGP  |________  |   |_______|  |      |
+     ___________| STP SG|_______|        | |    _______   |      |
+               /|    |  |       |__   +  | | __|       |  |  AS  |
+              / |       |  SGP  |__   +  | | __|  ASP  |  |      |
+       \     /  |    |  |_______|     +  | |   |_______|  |      |
+        \   /   |_______________|        | |    _______   |      |
+         \ / C-   |                   +  | | __|       |   \____/
+          X  Links|  |                +  | | __|  ASP  |    ____
+         / \     _|_____________      +  | |   |_______|   /    \
+        /   \   |    |   _______|        | |    _______   |      |
+       /     \  |       |       |__   +  | | __|       |  |      |
+              \ |    |  |  SGP  |__   +  | | __|  ASP  |  |      |
+     __________\| STP SG|_______|     +  | |   |_______|  |  AS  |
+                |    |  |       |________|_|    _______   |      |
+                |       |  SGP  |_______ |_____|       |  |      |
+                |    |  |_______|       |______|  ASP  |  |      |
+                |_______________| SCTP         |_______|   \___ /
+                     |            Associations
+
+                     |
+
+         Figure 1.  Example (A) Sample Multiple-SG Configuration
+
+
+    A typical Example (A) configuration multiple Signalling Gateways is
+  illustrated in Figure 1.  In this configuration a number of
+  Application Server Processes (ASPs) serving a number of Application
+  Servers (ASs) are connected to two Signalling Gateways (SGs).  The SGs
+  appear as mated SS7 Signalling Transfer Points (STPs) [Q.705] to the
+
+B. Bidulock                    Version 0.4                        Page 3
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+  SS7 Network.  Traffic originating at Signalling Endpoints (SEP) in the
+  SS7 network and directed toward SEP in the IP network (i.e.,
+  Application Servers) is loadshared over the STPs by the Signalling
+  Link Selection (SLS) [Q.704] value associated with each message.
+  Traffic originating at the SEP in the IP network (i.e, AS) is
+  loadshared over the SGs in the same fashion.
+
+Notes for Section 1
+
+  [1]  This is commonly referred to within the SIGTRAN WG as the
+       "backhaul" case.
+
+  [2]  This is commonly referred to within the SIGTRAN WG as the
+       "peer-to-peer" case.
+
+  [3]  See Section 4 of M3UA, SUA and TUA [M3UA-BIS, SUA..TUA].
+
+2.  Conventions
+
+    The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+  "OPTIONAL", when they appear in this document, are to be interpreted
+  as described in [RFC 2119].
+
+3.  Protocol Elements
+
+3.1.  Parameters
+
+3.2.  Messages
+
+4.  Procedures
+
+4.1.  AS and ASP State Maintenance
+
+4.1.1.  ASP State
+
+4.1.2.  AS State
+
+4.1.3.  ASP Up Procedures
+
+4.1.4.  ASP Down Procedures
+
+4.1.5.  ASP Active Procedures
+
+4.1.6.  ASP Inactive Procedures
+
+4.1.7.  Notify Procedures
+
+5.  Examples
+
+6.  Security
+
+    Load Selection does not introduce any new security risks or
+  considerations that are not already inherent in the UA [M3UA-BIS,
+
+B. Bidulock                    Version 0.4                        Page 4
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+  SUA..TUA] Please see the SIGTRAN Security document [SIGSEC] for
+  security considerations and recommendations that are applicable to
+  each of these UAs.
+
+7.  IANA Considerations
+
+
+0.  Change History
+
+  This section will be deleted once this memo is finalized.
+
+0.4.  Changes from Version 0.3 to Version 0.4
+
+0.3.  Changes from Version 0.2 to Version 0.3
+
+0.2.  Changes from Version 0.1 to Version 0.2
+
+0.1.  Changes from Version 0.0 to Version 0.1
+
+
+R.  References
+
+R.1.  Normative References
+
+  [RFC 2119]  Bradner, S., "Key words for use in RFCs to Indicate
+       Requirement Levels," RFC 2119 - BCP 14, The Internet Society
+       (March 1997).
+
+  [M3UA-BIS]  Pastor, J., Morneault, K., "Signaling System 7 (SS7)
+       Message Transfer Part 3 (MTP3)-User Adaptation Layer (M3UA),"
+       <draft-ietf-sigtran-rfc3332bis-05.txt>, Internet Engineering Task
+       Force - Signalling Transport Working Group (October 2005).  Work
+       In Progress
+
+  [RFC 2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
+       Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
+       and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
+       RFC 2960, The Internet Society (February 2000).
+
+  [SIGSEC]  Loughney, J., Tuexen, M. and Pastor-Balbas, J., "Security
+       Considerations for Signaling Transport (SIGTRAN) Protocols," RFC
+       3788, Internet Engineering Task Force - Signalling Transport
+       Working Group (June 2004).
+
+R.2.  Informative References
+
+  [SUA]  Loughney, J., Sidebottom, G., Coene, L., Verwimp, G., Keller,
+       J. and Bidulock, B., "Signalling Connection Control Part User
+       Adaptation Layer (SUA)," RFC 3868, Internet Engineering Task
+       Force - Signalling Transport Working Group (October, 2004).
+
+  [ISUA]  Bidulock, B., "SS7 ISUP-User Adaptation Layer (ISUA)," <draft-
+       bidulock-sigtran-isua-03.txt>, Internet Engineering Task Force -
+       Signalling Transport Working Group (October 16, 2005).  Work In
+
+B. Bidulock                    Version 0.4                        Page 5
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+       Progress.
+
+  [TUA]  Bidulock, B., "SS7 TCAP-User Adaptation Layer (TUA)," <draft-
+       bidulock-sigtran-tua-04.txt>, Internet Engineering Task Force -
+       Signalling Transport Working Group (October 16, 2005).  Work In
+       Progress.
+
+  [Q.704]  ITU, "Message Transfer Part - Signalling Network Functions
+       and Messages," ITU-T Recommendation Q.704, ITU-T
+       Telecommunication Standardization Sector of ITU, Geneva (March
+       1993).  (Previously "CCITT Recommendation")
+
+  [CORID]  Bidulock, B., "Correlation Id and Heartbeat Procedures
+       Supporting Lossless Fail-Over," <draft-bidulock-sigtran-
+       corid-04.txt>, Internet Engineering Task Force - Signalling
+       Transport Working Group (October 16, 2005).  Work In Progress.
+
+  [Q.705]  ITU, "Signalling System No. 7 - Signalling Network
+       Structure," ITU-T Recommendation Q.705, ITU-T Telecommunication
+       Standardization Sector of ITU, Geneva (March 1993).  (Previously
+       "CCITT Recommendation")
+
+
+Author's Addresses
+
+  Brian Bidulock
+  OpenSS7 Corporation
+  1469 Jeffreys Crescent
+  Edmonton, AB  T6L 6T1
+  Canada
+
+  Phone: +1-780-490-1141
+  Email: bidulock@openss7.org
+  URL: http//www.openss7.org/
+
+
+
+
+  This draft expires April 2006.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 6
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+
+                        List of Illustrations
+
+  Figure 1. Example (A) Sample Multiple-SG Configuration ..........    3
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  Contents ........................................................    2
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.2 Terminology .................................................    2
+  1.3 Overview ....................................................    2
+  1.3.1 Multiple SGs ..............................................    3
+  1.4 Sample Configurations .......................................    3
+  Notes for Section 1 .............................................    4
+  2 Conventions ...................................................    4
+  3 Protocol Elements .............................................    4
+  3.1 Parameters ..................................................    4
+  3.2 Messages ....................................................    4
+  4 Procedures ....................................................    4
+  4.1 AS and ASP State Maintenance ................................    4
+  4.1.1 ASP State .................................................    4
+  4.1.2 AS State ..................................................    4
+  4.1.3 ASP Up Procedures .........................................    4
+  4.1.4 ASP Down Procedures .......................................    4
+  4.1.5 ASP Active Procedures .....................................    4
+  4.1.6 ASP Inactive Procedures ...................................    4
+  4.1.7 Notify Procedures .........................................    4
+  5 Examples ......................................................    4
+  6 Security ......................................................    4
+  7 IANA Considerations ...........................................    5
+  0 Change History ................................................    5
+  0.4 Changes from Version 0.3 to Version 0.4 .....................    5
+  0.3 Changes from Version 0.2 to Version 0.3 .....................    5
+  0.2 Changes from Version 0.1 to Version 0.2 .....................    5
+  0.1 Changes from Version 0.0 to Version 0.1 .....................    5
+  R References ....................................................    5
+  R.1 Normative References ........................................    5
+  R.2 Informative References ......................................    5
+  Author's Addresses ..............................................    6
+  List of Illustrations ...........................................    7
+  Table of Contents ...............................................    7
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 7
+
+Internet Draft                 UA MULTI-SG              October 16, 2005
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at ietf-
+  ipr@ietf.org.
+
+Disclaimer of Validity
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+  ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+  INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Full Copyright Statement
+
+  Copyright (C) The Internet Society (2005).  This document is subject
+  to the rights, licenses and restrictions contained in BCP 78, and
+  except as set forth therein, the authors retain all their rights.
+
+Acknowledgement
+
+  Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.4                        Page 8
+
