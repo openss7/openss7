@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.35 $) $Date: 2005/07/10 02:42:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.36 $) $Date: 2005/12/28 11:09:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 02:42:14 $ by $Author: brian $
+# Last Modified $Date: 2005/12/28 11:09:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -225,6 +225,17 @@ netperf_hp.ps:
 CLEANFILES += netperf_hp.ps
 
 EXTRA_DIST			+= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes netperf_hp.ps
+
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi \
+				scripts/texi/testsuite.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX)
 
 ##
 ## Rules for lsms
