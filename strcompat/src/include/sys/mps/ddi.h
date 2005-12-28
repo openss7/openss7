@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.10  2005/12/28 09:51:48  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.9  2005/07/18 12:25:40  brian
  - standard indentation
 
@@ -85,7 +88,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -185,8 +188,10 @@ extern long mi_strtol(const caddr_t str, caddr_t *ptr, int base);
 extern void mps_intr_disable(pl_t * plp);
 extern void mps_intr_enable(pl_t pl);
 
-#elif defined(_MPS_SOURCE)
+#else
+#ifdef _MPS_SOURCE
 #warning "_MPS_SOURCE defined but not CONFIG_STREAMS_COMPAT_MPS"
+#endif
 #endif
 
 #endif				/* __SYS_MPS_DDI_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/07/13 12:01:22 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/12/28 09:53:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:22 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/07/13 12:01:22 $"
+#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/12/28 09:53:34 $"
 
 static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/07/13 12:01:22 $";
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/12/28 09:53:34 $";
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

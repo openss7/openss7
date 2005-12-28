@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:37 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:37 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:37 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:37 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:37 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -137,7 +137,7 @@ MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto alloca
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR) "-*");
 MODULE_ALIAS("/dev/loop");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
 MODULE_ALIAS("/dev/streams/loop");
 MODULE_ALIAS("/dev/streams/loop/*");

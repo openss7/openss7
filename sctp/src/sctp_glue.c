@@ -110,12 +110,14 @@ static char const ident[] = "sctp_glue.c,v LINUX-2-4-20-SCTP(1.1.6.3) 2004/02/09
 #include "sctp_debug.h"
 #include "netinet/sctp.h"
 
-#if	defined(CONFIG_SCTP_HMAC_MD5)
+#ifdef CONFIG_SCTP_HMAC_MD5
 #define SCTP_HMAC_DEFAULT SCTP_HMAC_MD5
-#elif	defined(CONFIG_SCTP_HMAC_SHA1)
+#else
+#ifdef CONFIG_SCTP_HMAC_SHA1
 #define SCTP_HMAC_DEFAULT SCTP_HMAC_SHA_1
 #else
 #define SCTP_HMAC_DEFAULT SCTP_HMAC_NONE
+#endif
 #endif
 
 /*

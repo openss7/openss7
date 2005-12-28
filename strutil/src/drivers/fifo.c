@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 
@@ -61,7 +61,7 @@ static char const ident[] =
 
 #include "fifo.h"		/* extern verification */
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_FIFO_MODID	FIFO_DRV_ID
 #define CONFIG_STREAMS_FIFO_NAME	FIFO_DRV_NAME
 #define CONFIG_STREAMS_FIFO_MAJOR	FIFO_CMAJOR_0
@@ -70,13 +70,13 @@ extern int strrput(queue_t *, mblk_t *);
 extern int strwsrv(queue_t *);
 extern struct file_operations strm_f_ops;
 #endif
-#if LFS
+#ifdef LFS
 #define LFSSTATIC static
 #endif
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/21 20:47:26 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/28 10:01:21 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -137,7 +137,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
 MODULE_ALIAS("/dev/fifo");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/streams/fifo");
 MODULE_ALIAS("/dev/streams/fifo/*");
@@ -193,7 +193,7 @@ LFSSTATIC struct streamtab fifo_info = {
 LFSSTATIC int
 fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	struct stdata *sd;
@@ -301,7 +301,7 @@ fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 LFSSTATIC int
 fifo_qclose(queue_t *q, int oflag, cred_t *crp)
 {
-#if LFS
+#ifdef LFS
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
 #endif
@@ -410,7 +410,7 @@ LFSSTATIC
 int __init
 fifo_init(void)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	int err;
@@ -438,7 +438,7 @@ LFSSTATIC
 void __exit
 fifo_exit(void)
 {
-#if LFS
+#ifdef LFS
 #ifdef CONFIG_STREAMS_FIFO_OVERRIDE
 	unregister_fifo();	/* This is not safe... */
 #endif

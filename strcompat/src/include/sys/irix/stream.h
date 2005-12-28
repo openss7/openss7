@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/15 23:08:34 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:34 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/12/28 09:51:47  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.2  2005/07/15 23:08:34  brian
  - checking in for sync
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_IRIX_STREAM_H__
 #define __SYS_IRIX_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."
@@ -83,8 +86,10 @@
 
 #if defined CONFIG_STREAMS_COMPAT_IRIX || defined CONFIG_STREAMS_COMPAT_IRIX_MODULE
 
-#elif defined _IRIX_SOURCE
+#else
+#ifdef _IRIX_SOURCE
 #warning "_IRIX_SOURCE defined by not CONFIG_STREAMS_COMPAT_IRIX"
+#endif
 #endif
 
 #endif				/* __SYS_IRIX_STREAM_H__ */

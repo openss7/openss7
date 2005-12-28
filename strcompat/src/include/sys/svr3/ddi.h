@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR3_DDI_H__
 #define __SYS_SVR3_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/28 09:51:49 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -113,8 +113,10 @@ eminor(dev_t dev)
 	return (MINOR(getminor(dev)));
 }
 
-#elif defined(_SVR3_SOURCE)
+#else
+#ifdef _SVR3_SOURCE
 #warning "_SVR3_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR3"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_SVR3 */
 
 #endif				/* __SYS_SVR3_DDI_H__ */

@@ -119,7 +119,7 @@ extern "C" {
 #endif
 
 
-#if   defined( HAVE_POSIX_THREAD )
+#ifdef HAVE_POSIX_THREAD
 
 /* Definitions for Posix Threads (pthreads) */
     #include <pthread.h>
@@ -128,7 +128,8 @@ typedef pthread_t nthread_t;
 
     #define HAVE_THREAD 1
 
-#elif defined( HAVE_WIN32_THREAD )
+#else
+#ifdef HAVE_WIN32_THREAD
 
 /* Definitions for Win32 NT Threads */
 typedef DWORD nthread_t;
@@ -142,6 +143,7 @@ typedef int nthread_t;
 
     #undef HAVE_THREAD
 
+#endif
 #endif
 
     // Forward declaration

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:31:36 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:33 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.7  2005/12/28 09:58:33  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.6  2005/05/14 08:31:36  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:31:36 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:33 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:31:36 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:33 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -130,10 +133,12 @@ static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -148,7 +153,7 @@ static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.
 #include <signal.h>
 #include <sys/uio.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

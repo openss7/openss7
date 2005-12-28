@@ -238,12 +238,14 @@ Report bugs to <dast@nlanr.net>\n";
 #endif
 
 // include a description of the threading in the version
-#if   defined( HAVE_POSIX_THREAD )
+#ifdef HAVE_POSIX_THREAD
     #define IPERF_THREADS "pthreads"
-#elif defined( HAVE_WIN32_THREAD )
+#else
+#ifdef HAVE_WIN32_THREAD
     #define IPERF_THREADS "win32 threads"
 #else
     #define IPERF_THREADS "single threaded"
+#endif
 #endif
 
 const char version[] =

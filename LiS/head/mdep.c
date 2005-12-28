@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,28 +46,40 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:17 $"
 
 /*
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
-#if defined(__MSDOS__)		/* DOS version */
-#include "dos-mdep.c"
-#elif defined(LINUX)		/* Linux version */
-#include "linux-mdep.c"
-#elif defined(USER)		/* user-level version */
-#include "user-mdep.c"
-#elif defined(SYS_SCO)		/* SCO user-level version */
-#include "user-mdep.c"
-#elif defined(SYS_54)		/* SCO user-level version */
-#include "user-mdep.c"
-#elif defined(QNX)		/* QNX driver version */
-#include "qnx-mdep.c"
-#elif defined(PORTABLE)		/* just the portable part */
-#include "port-mdep.c"
+#ifdef __MSDOS__		/* DOS version */
+# include "dos-mdep.c"
+#else
+# ifdef LINUX			/* Linux version */
+#  include "linux-mdep.c"
+# else
+#  ifdef USER			/* user-level version */
+#   include "user-mdep.c"
+#  else
+#   ifdef SYS_SCO		/* SCO user-level version */
+#    include "user-mdep.c"
+#   else
+#    ifdef SYS_54		/* SCO user-level version */
+#     include "user-mdep.c"
+#    else
+#     ifdef QNX			/* QNX driver version */
+#      include "qnx-mdep.c"
+#     else
+#      ifdef PORTABLE		/* just the portable part */
+#       include "port-mdep.c"
+#      endif
+#     endif
+#    endif
+#   endif
+#  endif
+# endif
 #endif

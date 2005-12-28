@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.9 2005/07/14 22:03:53 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.10 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_MPS_STRCONF_H__
 #define __SYS_MPS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/14 22:03:53 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 09:51:48 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -78,8 +78,10 @@
 #define dev_t __streams_dev_t
 #endif
 
-#elif defined(_MPS_SOURCE)
+#else
+#ifdef _MPS_SOURCE
 #warning "_MPS_SOURCE defined but not CONFIG_STREAMS_COMPAT_MPS"
+#endif
 #endif
 
 #endif				/* __SYS_MPS_STRCONF_H__ */

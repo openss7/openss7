@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/07/18 12:25:39 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_IRIX_DDI_H__
 #define __SYS_IRIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/18 12:25:39 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -83,8 +83,10 @@ icmn_err(int err_lvl, const char *fmt, va_list args)
 extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
     __attribute__ ((format(printf, 3, 4)));
 
-#elif defined(_IRIX_SOURCE)
+#else
+#ifdef _IRIX_SOURCE
 #warning "_IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_IRIX */
 
 #endif				/* __SYS_IRIX_DDI_H__ */

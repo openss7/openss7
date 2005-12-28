@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:38:50 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:01:24 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:38:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.19  2005/12/28 10:01:24  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.18  2005/07/18 12:38:50  brian
  - standard indentation
 
@@ -123,18 +126,20 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:38:50 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:01:24 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/18 12:38:50 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:01:24 $";
 
 #include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -149,7 +154,7 @@ static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0
 #include <signal.h>
 #include <sys/uio.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

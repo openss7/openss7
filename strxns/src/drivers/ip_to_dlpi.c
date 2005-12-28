@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/28 10:01:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:47:25 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/28 10:01:51 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/12/28 10:01:51 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2005/12/19 12:47:25 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2005/12/28 10:01:51 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -1361,7 +1361,7 @@ ip2xinet_devinit(struct net_device *dev)
 	if (dev->priv == NULL)
 		return -ENOMEM;
 	memset(dev->priv, 0, sizeof(struct ip2xinet_priv));
-#if HAVE_KFUNC_DEV_INIT_BUFFERS
+#ifdef HAVE_KFUNC_DEV_INIT_BUFFERS
 	dev_init_buffers(dev);
 #endif
 	ip2xinet_status.ip2x_dlstate = UNLINKED;
@@ -1469,7 +1469,8 @@ module_init(ip2xinet_init);
 module_exit(ip2xinet_exit);
 #endif
 
-#elif defined LIS
+#else
+#ifdef LIS
 
 STATIC int ip2xinet_initialized = 0;
 STATIC void
@@ -1556,4 +1557,5 @@ cleanup_module(void)
 	return ip2xinet_terminate();
 }
 
+#endif
 #endif

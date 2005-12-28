@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2005/12/22 10:28:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:47 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2005/12/22 10:28:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2005/12/22 10:28:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $";
 
 //#define __NO_VERSION__
 
@@ -102,7 +102,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2005/12/22 10:28:47 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -863,14 +863,15 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 	struct files_struct *files = procp->files;
 	int fd, max;
 
-#if defined HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET
+#ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET
 	read_lock(&files->file_lock);
 	max = files->max_fdset;
 	for (fd = 0; fd <= max && files->fd[fd] != file; fd++) ;
 	if (fd > max)
 		fd = ~0;
 	read_unlock(&files->file_lock);
-#elif defined HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB
+#else
+#ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB
 	spin_lock(&files->file_lock);
 	max = files->fdtab.max_fdset;
 	for (fd = 0; fd <= max && files->fdtab.fd[fd] != file; fd++) ;
@@ -879,6 +880,7 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 	spin_unlock(&files->file_lock);
 #else
 #error HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET or HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB must be defined
+#endif
 #endif
 	return (fd > max ? ~0 : fd);
 }

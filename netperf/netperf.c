@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2005/05/14 08:30:02 $
+ @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2005/12/28 09:55:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:02 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:55:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2005/05/14 08:30:02 $"
+#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2005/12/28 09:55:59 $"
 
-static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2005/05/14 08:30:02 $";
+static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2005/12/28 09:55:59 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -103,40 +103,40 @@ static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.
 char	netperf_id[]="@(#)netperf.c (c) Copyright 1993-2004 Hewlett-Packard Company. Version 2.3";
 
 #include <stdio.h>
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
-#if HAVE_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
 #if STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
-# if HAVE_STDLIB_H
+# ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H
+#ifdef HAVE_STRING_H
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #else
-# if HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
 #endif
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#if HAVE_MALLOC_H
+#ifdef HAVE_MALLOC_H
 # include <malloc.h>
 #endif
 

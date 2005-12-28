@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2005/07/22 06:06:50 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2005/12/28 09:51:48  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.6  2005/07/22 06:06:50  brian
  - working up streams/src/kernel/strsched.h
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -210,13 +213,13 @@ extern void mi_timer_free(mblk_t *mp);
 __MPS_EXTERN_INLINE void
 mi_bufcall(queue_t *q, int size, int priority)
 {
-#if LFS
+#ifdef LFS
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
 		qenable(q);
 #endif
-#if LIS
+#ifdef LIS
 	if (bufcall(size, priority, (void (*)) (long) qenable, (long) q) == 0)
 		qenable(q);
 #endif
@@ -271,8 +274,10 @@ extern uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len);
 typedef void (*proc_ptr_t) (queue_t *, mblk_t *);
 extern void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc);
 
-#elif defined _MPS_SOURCE
+#else
+#ifdef _MPS_SOURCE
 #warning "_MPS_SOURCE defined by not CONFIG_STREAMS_COMPAT_MPS"
+#endif
 #endif
 
 #endif				/* __SYS_MPS_STREAM_H__ */

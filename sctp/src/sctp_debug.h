@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_debug.h,v 0.9.2.3 2005/07/18 11:56:33 brian Exp $
+ @(#) $Id: sctp_debug.h,v 0.9.2.4 2005/12/28 09:57:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:56:33 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:57:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_SCTP_DEBUG_H__
 #define __LOCAL_SCTP_DEBUG_H__
 
-#ident "@(#) $RCSfile: sctp_debug.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_debug.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -116,7 +116,7 @@
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
-#if defined(SCTP_CONFIG_DEBUG)
+#ifdef SCTP_CONFIG_DEBUG
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -141,7 +141,8 @@
 #define STATIC
 #define INLINE
 
-#elif defined(SCTP_CONFIG_TEST)
+#else
+#ifdef SCTP_CONFIG_TEST
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -166,7 +167,8 @@
 #define STATIC static
 #define INLINE __inline__
 
-#elif defined(SCTP_CONFIG_SAFE)
+#else
+#ifdef SCTP_CONFIG_SAFE
 
 #define    never()		do { *(int *)0 = 0; } while(0)
 #define     rare()		_rare()
@@ -216,6 +218,8 @@
 #define STATIC static
 #define INLINE __inline__
 
+#endif
+#endif
 #endif
 
 #ifdef SCTP_CONFIG_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/18 12:53:10 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 10:01:04 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:53:10 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.13  2005/12/28 10:01:04  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.12  2005/07/18 12:53:10  brian
  - standard indentation
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/18 12:53:10 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 10:01:04 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/18 12:53:10 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 10:01:04 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -94,10 +97,12 @@ static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef defined HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -113,7 +118,7 @@ static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.
 #include <sys/uio.h>
 #include <time.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

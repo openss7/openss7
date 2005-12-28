@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:45 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.9 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4_STRCONF_H__
 #define __SYS_SVR4_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:49 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -74,8 +74,10 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 
-#elif defined(_SVR4_SOURCE)
+#else
+#ifdef _SVR4_SOURCE
 #warning "_SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_SVR4 */
 
 #endif				/* __SYS_SVR4_STRCONF_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.10 2005/07/14 22:03:57 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.11 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:57 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_STRCONF_H__
 #define __SYS_OSF_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 22:03:57 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/28 09:51:48 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -107,8 +107,10 @@ struct streamadm {
 extern dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa);
 extern int strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa);
 
-#elif defined(_OSF_SOURCE)
+#else
+#ifdef _OSF_SOURCE
 #warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
+#endif
 #endif
 
 #endif				/* __SYS_OSF_STRCONF_H__ */

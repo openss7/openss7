@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.5 2005/12/19 12:44:36 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.6 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:36 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.6  2005/12/28 09:51:49  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.5  2005/12/19 12:44:36  brian
  - locking down for release
 
@@ -70,7 +73,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -104,10 +107,10 @@ freezestr_SUN(queue_t *q)
 __SUN_EXTERN_INLINE void
 unfreezestr_SUN(queue_t *q)
 {
-#if LFS
+#ifdef LFS
 	unfreezestr(q, -1UL);
 #endif
-#if LIS
+#ifdef LIS
 	unfreezestr(q);
 #endif
 }
@@ -115,12 +118,12 @@ unfreezestr_SUN(queue_t *q)
 #undef unfreezestr
 #define unfreezestr unfreezestr_SUN
 
-#if LFS
+#ifdef LFS
 extern void qwait(queue_t *rq);
 extern int qwait_sig(queue_t *rq);
 #endif
 
-#if LFS
+#ifdef LFS
 extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *),
 			     void *arg);
 extern timeout_id_t qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks);
@@ -129,7 +132,7 @@ extern timeout_id_t qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), 
 extern void qunbufcall(queue_t *q, bufcall_id_t bcid);
 extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
 
-#if LFS
+#ifdef LFS
 /* LiS already defines this */
 __SUN_EXTERN_INLINE unsigned char
 queclass(mblk_t *mp)
@@ -138,7 +141,7 @@ queclass(mblk_t *mp)
 }
 #endif
 
-#if LFS
+#ifdef LFS
 extern void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
 #endif
 
@@ -181,8 +184,10 @@ extern void mi_timer_free(mblk_t *mp);
 #define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
 #define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)
 
-#elif defined _SUN_SOURCE
+#else
+#ifdef _SUN_SOURCE
 #warning "_SUN_SOURCE defined by not CONFIG_STREAMS_COMPAT_SUN"
+#endif
 #endif
 
 #endif				/* __SYS_SUN_STREAM_H__ */

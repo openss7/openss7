@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/23 20:21:59 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/23 20:21:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:00:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/23 20:21:59 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/23 20:21:59 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -118,7 +118,7 @@ static char const ident[] =
 
 /* Compatibility functions between 2.4 and 2.6. */
 
-#if HAVE_OLD_SOCK_STRUCTURE
+#ifdef HAVE_OLD_SOCK_STRUCTURE
 
 #define sk_callback_lock	callback_lock
 #define sk_user_data		user_data
@@ -186,7 +186,8 @@ static char const ident[] =
 
 #define tcp_user_mss(_tp)		((_tp)->user_mss)
 
-#elif HAVE_TRN_SOCK_STRUCTURE
+#else
+#ifdef HAVE_TRN_SOCK_STRUCTURE
 
 #define sock_tst_dead(_sk)		(sock_flag(_sk, SOCK_DEAD) ? 1 : 0)
 #define sock_tst_done(_sk)		(sock_flag(_sk, SOCK_DONE) ? 1 : 0)
@@ -225,7 +226,8 @@ static char const ident[] =
 
 #define tcp_user_mss(_tp)		((_tp)->user_mss)
 
-#elif HAVE_NEW_SOCK_STRUCTURE
+#else
+#ifdef HAVE_NEW_SOCK_STRUCTURE
 
 #define sock_tst_dead(_sk)		(sock_flag(_sk, SOCK_DEAD) ? 1 : 0)
 #define sock_tst_done(_sk)		(sock_flag(_sk, SOCK_DONE) ? 1 : 0)
@@ -234,12 +236,12 @@ static char const ident[] =
 #define sock_tst_linger(_sk)		(sock_flag(_sk, SOCK_LINGER) ? 1 : 0)
 #define sock_tst_destroy(_sk)		(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
 #define sock_tst_broadcast(_sk)		(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
-#if HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
+#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
 #define sock_tst_localroute(_sk)	(((struct sock *)_sk)->sk_localroute ? 1 : 0)
 #else
 #define sock_tst_localroute(_sk)	(sock_flag(_sk, SOCK_LOCALROUTE) ? 1 : 0)
 #endif
-#if HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
 #define sock_tst_debug(_sk)		(((struct sock *)_sk)->sk_debug ? 1 : 0)
 #else
 #define sock_tst_debug(_sk)		(sock_flag(_sk, SOCK_DBG) ? 1 : 0)
@@ -252,12 +254,12 @@ static char const ident[] =
 #define sock_set_linger(_sk)		(sock_set_flag(_sk, SOCK_LINGER))
 #define sock_set_destroy(_sk)		(sock_set_flag(_sk, SOCK_DESTROY))
 #define sock_set_broadcast(_sk)		(sock_set_flag(_sk, SOCK_BROADCAST))
-#if HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
+#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
 #define sock_set_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 1)
 #else
 #define sock_set_localroute(_sk)	(sock_set_flag(_sk, SOCK_LOCALROUTE))
 #endif
-#if HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
 #define sock_set_debug(_sk)		(((struct sock *)_sk)->sk_debug = 1)
 #else
 #define sock_set_debug(_sk)		(sock_set_flag(_sk, SOCK_DBG))
@@ -270,12 +272,12 @@ static char const ident[] =
 #define sock_clr_linger(_sk)		(sock_reset_flag(_sk, SOCK_LINGER))
 #define sock_clr_destroy(_sk)		(sock_reset_flag(_sk, SOCK_DESTROY))
 #define sock_clr_broadcast(_sk)		(sock_reset_flag(_sk, SOCK_BROADCAST))
-#if HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
+#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
 #define sock_clr_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 0)
 #else
 #define sock_clr_localroute(_sk)	(sock_reset_flag(_sk, SOCK_LOCALROUTE))
 #endif
-#if HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
 #define sock_clr_debug(_sk)		(((struct sock *)_sk)->sk_debug = 0)
 #else
 #define sock_clr_debug(_sk)		(sock_reset_flag(_sk, SOCK_DBG))
@@ -293,6 +295,8 @@ static char const ident[] =
 
 #else
 #error One of HAVE_OLD_SOCK_STRUCTURE, HAVE_TRN_SOCK_STRUCTURE or HAVE_NEW_SOCK_STRUCTURE must be defined.
+#endif
+#endif
 #endif
 
 #ifndef SK_WMEM_MAX
@@ -452,7 +456,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/23 20:21:59 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -911,12 +915,14 @@ typedef struct inet {
 #define sctp_default_istreams		33
 #define sctp_default_cookie_inc		1000	/* milliseconds */
 #define sctp_default_throttle_itvl	50	/* milliseconds */
-#if defined CONFIG_SCTP_HMAC_MD5
+#ifdef CONFIG_SCTP_HMAC_MD5
 #define sctp_default_mac_type		T_SCTP_HMAC_MD5
-#elif defined CONFIG_SCTP_HMAC_SHA1
+#else
+#ifdef CONFIG_SCTP_HMAC_SHA1
 #define sctp_default_mac_type		T_SCTP_HMAC_SHA1
 #else
 #define sctp_default_mac_type		T_SCTP_HMAC_NONE
+#endif
 #endif
 #if defined CONFIG_SCTP_CRC32C
 #define sctp_default_cksum_type		T_SCTP_CSUM_CRC32C
@@ -1675,18 +1681,20 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh->level = T_INET_IP;
 			oh->name = T_IP_TTL;
 			oh->status = T_SUCCESS;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			if (ss->options.ip.ttl != np->ttl) {
 				if (ss->options.ip.ttl > np->ttl)
 					oh->status = T_PARTSUCCESS;
 				ss->options.ip.ttl = np->ttl;
 			}
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			if (ss->options.ip.ttl != np->uc_ttl) {
 				if (ss->options.ip.ttl > np->uc_ttl)
 					oh->status = T_PARTSUCCESS;
 				ss->options.ip.ttl = np->uc_ttl;
 			}
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 			*((unsigned char *) T_OPT_DATA(oh)) = ss->options.ip.ttl;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -2426,10 +2434,12 @@ t_set_options(ss_t * ss)
 
 			if (*valp < 1)
 				*valp = 1;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		}
 		if (t_tst_bit(_T_BIT_IP_REUSEADDR, ss->options.flags)) {
@@ -3105,10 +3115,12 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 						continue;
 					if (*valp < 1)
 						*valp = 1;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 					np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 					np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 					continue;
 				}
@@ -4251,7 +4263,7 @@ ss_cmsg_build(const ss_t * ss, const unsigned char *ip, size_t ilen, struct msgh
 								    T_OPT_DATA(ih));
 						}
 						continue;
-#if defined HAVE_OPENSS7_SCTP
+#ifdef HAVE_OPENSS7_SCTP
 					case T_INET_SCTP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
 							ch->cmsg_len =
@@ -4274,12 +4286,14 @@ ss_cmsg_build(const ss_t * ss, const unsigned char *ip, size_t ilen, struct msgh
 					case T_INET_IP:
 					case T_INET_UDP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 							np->ttl = *((unsigned char *)
 								    T_OPT_DATA(ih));
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 							np->uc_ttl = *((unsigned char *)
 								       T_OPT_DATA(ih));
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 						}
 						continue;
@@ -10250,10 +10264,12 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
 #endif
 						}
 						t->options.ip.ttl = *valp;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 						np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 						np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 					}
 					if (ih->name != T_ALLOPT)
@@ -12099,7 +12115,7 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 {
 	struct socket *sock;
 
-#if HAVE_SOCK_ALLOC_ADDR
+#ifdef HAVE_SOCK_ALLOC_ADDR
 	struct socket *(*sock_alloc) (void) = (typeof(sock_alloc)) HAVE_SOCK_ALLOC_ADDR;
 #endif
 	ensure(newsock, return (-EFAULT));

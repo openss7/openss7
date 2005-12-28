@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.10 $) $Date: 2005/12/18 06:38:05 $
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.11 $) $Date: 2005/12/19 03:22:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:38:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.10 $) $Date: 2005/12/18 06:38:05 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.11 $) $Date: 2005/12/19 03:22:19 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.10 2005/12/18 06:38:05 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.11 2005/12/19 03:22:19 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -407,10 +407,12 @@ lis_secs(void)
  */
 #if defined(PORTABLE_POLL)
 #define	POLL_WAITING(hdp)	( (hdp)->sd_polllist.ph_list != NULL )
-#elif defined(LINUX_POLL)
+#else
+#if defined(LINUX_POLL)
 #define	POLL_WAITING(hdp)	( waitqueue_active(&(hdp)->sd_task_list) )
 #else
 #error "Either PORTABLE_POLL or LINUX_POLL must be defined"
+#endif
 #endif
 #define	POLL_NOT_WAITING(hdp)	( ! POLL_WAITING(hdp) )
 
@@ -2520,7 +2522,8 @@ lis_wake_up_poll(stdata_t *hd, int ev)
 
 	lis_select_wakeup(hd);	/* wake up selectors */
 
-#elif defined(LINUX_POLL)
+#else
+#if defined(LINUX_POLL)
 
 	if (LIS_DEBUG_POLL)
 		printk("lis_wake_up_poll: stream %s: revents:%s\n", hd->sd_name,
@@ -2530,6 +2533,7 @@ lis_wake_up_poll(stdata_t *hd, int ev)
 
 #else
 #error "Either PORTABLE_POLL or LINUX_POLL must be defined"
+#endif
 #endif
 
 }				/* lis_wake_up_poll */
@@ -2562,12 +2566,14 @@ lis_deallocate_polllist(stdata_t *hd)
 		pd->pd_headp = NULL;
 	}
 
-#elif defined(LINUX_POLL)
+#else
+#if defined(LINUX_POLL)
 
 	init_waitqueue_head(&hd->sd_task_list);
 
 #else
 #error "Either PORTABLE_POLL or LINUX_POLL must be defined"
+#endif
 #endif
 }				/* lis_deallocate_polllist */
 

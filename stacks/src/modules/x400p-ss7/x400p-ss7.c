@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:26:00 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:26:00 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:26:00 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -88,7 +88,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/12/19 03:26:00 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -380,12 +380,14 @@ STATIC int xp_e1_chan_map[] = {
 #define X400P_T1_CHAN_DESCRIPTOR 0xEEEEEEEE
 #define X400P_E1_CHAN_DESCRIPTOR 0xFFFFFFFE
 
-#if defined(__LITTLE_ENDIAN)
+#ifdef __LITTLE_ENDIAN
 #define span_to_byte(__span) (3-(__span))
-#elif defined(__BIG_ENDIAN)
+#else
+#ifdef __BIG_ENDIAN
 #define span_to_byte(__span) (__span)
 #else
 #error "Must know the endianess of processor\n"
+#endif
 #endif
 
 typedef enum {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:45 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/28 09:58:29 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:45 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:45 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/28 09:58:29 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:45 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/28 09:58:29 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -370,12 +370,14 @@ STATIC int xp_e1_chan_map[] = {
 #define X400P_T1_CHAN_DESCRIPTOR 0xEEEEEEEE
 #define X400P_E1_CHAN_DESCRIPTOR 0xFFFFFFFE
 
-#if defined(__LITTLE_ENDIAN)
+#ifdef __LITTLE_ENDIAN
 #define span_to_byte(__span) (3-(__span))
-#elif defined(__BIG_ENDIAN)
+#else
+#ifdef __BIG_ENDIAN
 #define span_to_byte(__span) (__span)
 #else
 #error "Must know the endianess of processor\n"
+#endif
 #endif
 
 typedef enum {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_SAD_MODID	SAD_DRV_ID
 #define CONFIG_STREAMS_SAD_NAME		SAD_DRV_NAME
 #define CONFIG_STREAMS_SAD_MAJOR	SAD_CMAJOR_0
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -126,7 +126,7 @@ MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR) "-*");
 MODULE_ALIAS("/dev/sad");
 MODULE_ALIAS("/dev/sad/admin");
 MODULE_ALIAS("/dev/sad/user");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR));
 MODULE_ALIAS("/dev/streams/sad");
 MODULE_ALIAS("/dev/streams/sad/admin");

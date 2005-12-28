@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_DDI_H__
 #define __SYS_OSF_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/18 12:25:40 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:48 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -83,8 +83,10 @@ time(void)
 	return tv.tv_sec;
 }
 
-#elif defined(_OSF_SOURCE)
+#else
+#ifdef _OSF_SOURCE
 #warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
+#endif
 #endif
 
 #endif				/* __SYS_OSF_DDI_H__ */

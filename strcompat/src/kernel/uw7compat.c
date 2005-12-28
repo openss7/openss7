@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:54 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:54 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:54 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:54 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:50 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -107,10 +107,10 @@ MODULE_ALIAS("streams-uw7compat");
 mblk_t *
 allocb_physreq(size_t size, uint priority, physreq_t * prp)
 {
-#if LIS
+#ifdef LIS
 	return lis_allocb_physreq(size, priority, prp, __FILE__, __LINE__);
 #endif
-#if LFS
+#ifdef LFS
 	if (prp->phys_align > 8)
 		return (NULL);
 	if (prp->phys_boundary != 0)

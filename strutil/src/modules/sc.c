@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:27 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -67,14 +67,14 @@ static char const ident[] =
 
 #include "sys/sc.h"
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_SC_MODID		SC_MOD_ID
 #define CONFIG_STREAMS_SC_NAME		SC_MOD_NAME
 #endif
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/21 20:47:27 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/28 10:01:22 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -113,7 +113,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SC_MODID));
 MODULE_ALIAS("streams-module-sc");
 #endif
@@ -211,12 +211,12 @@ sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_LIST:
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
-#if LIS
+#ifdef LIS
 				int i;
 				struct fmodsw *fmod;
 				struct fmodsw *cdev;
 #endif
-#if LFS
+#ifdef LFS
 				struct fmodsw *fmod;
 				struct cdevsw *cdev;
 				struct list_head *pos;
@@ -234,7 +234,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					if (!dp)
 						goto nak;
 					if (dp->b_wptr == dp->b_rptr) {
-#if LIS
+#ifdef LIS
 						int i, cdev_count = 0, fmod_count = 0;
 
 						for (i = 0; i < MAX_STRDEV; i++)
@@ -261,7 +261,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					count = sc->count;
 					list->sc_nmods = count;
 					mlist = (typeof(mlist)) dp->b_rptr;
-#if LFS
+#ifdef LFS
 					/* list all devices */
 					read_lock(&cdevsw_lock);
 					list_for_each(pos, &cdevsw_list) {
@@ -293,7 +293,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					}
 					read_unlock(&fmodsw_lock);
 #endif
-#if LIS
+#ifdef LIS
 					/* list all devices */
 					for (i = 0; i < MAX_STRDEV; i++) {
 						cdev = &lis_fstr_sw[i];
@@ -436,7 +436,7 @@ static struct streamtab sc_info = {
 	st_wrinit:&sc_wqinit,
 };
 
-#if LIS
+#ifdef LIS
 #define fmodsw _fmodsw
 #endif
 static struct fmodsw sc_fmod = {

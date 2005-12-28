@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.8 2005/12/19 12:44:31 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.9 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,25 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:31 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_DEBUG_H__
 #define __OS7_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/19 12:44:31 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:48 $"
 
 #if defined LFS
 
-#if	defined _DEBUG
+#ifdef _DEBUG
 #define CONFIG_STREAMS_DEBUG 1
-#elif	defined _TEST
+#else
+#ifdef _TEST
 #define CONFIG_STREAMS_TEST 1
-#elif	defined _SAFE
+#else
+#ifdef _SAFE
 #define CONFIG_STREAMS_SAFE 1
 #else
 #define CONFIG_STREAMS_NONE 1
+#endif
+#endif
 #endif
 
 #include <sys/strdebug.h>
@@ -227,12 +231,14 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #undef STATIC
 #define STATIC static
 #undef INLINE
-#if defined __inline
+#ifdef __inline
 #define INLINE inline
-#elif defined __inline__
+#else
+#ifdef __inline__
 #define INLINE __inline__
 #else
 #define INLINE inline
+#endif
 #endif
 
 #else				/* defined _TEST */
@@ -261,12 +267,14 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #undef STATIC
 #define STATIC static
 #undef INLINE
-#if defined __inline
+#ifdef __inline
 #define INLINE __inline
-#elif defined __inline__
+#else
+#ifdef __inline__
 #define INLINE __inline__
 #else
 #define INLINE inline
+#endif
 #endif
 
 #else				/* defined _SAFE */
@@ -294,12 +302,14 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #undef STATIC
 #define STATIC static
 #undef INLINE
-#if defined __inline
+#ifdef __inline
 #define INLINE __inline
-#elif defined __inline__
+#else
+#ifdef __inline__
 #define INLINE __inline__
 #else
 #define INLINE inline
+#endif
 #endif
 
 #endif				/* defined _SAFE */

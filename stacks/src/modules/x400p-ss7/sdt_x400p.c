@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:45 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/28 09:58:29 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:45 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:45 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/28 09:58:29 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:45 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/28 09:58:29 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:45 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2005/12/28 09:58:29 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -343,12 +343,14 @@ STATIC int xp_e1_chan_map[] = {
 #define X400P_T1_CHAN_DESCRIPTOR 0xEEEEEEEE
 #define X400P_E1_CHAN_DESCRIPTOR 0xFFFFFFFE
 
-#if defined(__LITTLE_ENDIAN)
+#ifdef __LITTLE_ENDIAN
 #define span_to_byte(__span) (3-(__span))
-#elif defined(__BIG_ENDIAN)
+#else
+#ifdef __BIG_ENDIAN
 #define span_to_byte(__span) (__span)
 #else
 #error "Must know the endianess of processor\n"
+#endif
 #endif
 
 typedef enum {

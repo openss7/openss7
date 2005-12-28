@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/14 16:30:40 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 09:53:34 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/14 16:30:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 1.1.2.4  2005/12/28 09:53:34  brian
+ - remove warnings on FC4 compile
+
  Revision 1.1.2.3  2005/12/14 16:30:40  brian
  - added delay before close to one test case
 
@@ -146,18 +149,20 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/14 16:30:40 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 09:53:34 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/12/14 16:30:40 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 09:53:34 $";
 
 #include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
+#else
+#ifdef HAVE_STDINT_H
 # include <stdint.h>
+#endif
 #endif
 
 #include <unistd.h>
@@ -173,7 +178,7 @@ static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.
 #include <sys/uio.h>
 #include <time.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/19 11:08:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
-#if ! HAVE_KFUNC_MODULE_PUT
+#ifndef HAVE_KFUNC_MODULE_PUT
 #define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
 #endif
 
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/10/19 11:08:19 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:01 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -140,7 +140,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
 MODULE_ALIAS("/dev/fifo");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/streams/fifo");
 MODULE_ALIAS("/dev/streams/fifo/*");

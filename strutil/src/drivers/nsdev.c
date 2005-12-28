@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/03 08:12:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
-#if LIS
+#ifdef LIS
 #define	CONFIG_STREAMS_NSDEV_MODID	NSDEV_DRV_ID
 #define	CONFIG_STREAMS_NSDEV_NAME	NSDEV_DRV_NAME
 #define	CONFIG_STREAMS_NSDEV_MAJOR	NSDEV_CMAJOR_0
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/03 08:12:23 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 10:01:21 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -132,7 +132,7 @@ MODULE_PARM_DESC(major, "Major device number for NSDEV driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR) "-*");
 MODULE_ALIAS("/dev/nsdev");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR));
 MODULE_ALIAS("/dev/streams/nsdev");
 MODULE_ALIAS("/dev/streams/nsdev/*");
@@ -181,7 +181,7 @@ LFSSTATIC struct streamtab nsdev_info = {
 LFSSTATIC int
 nsdevopen(struct inode *inode, struct file *file)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	struct cdevsw *cdev;
@@ -252,7 +252,7 @@ LFSSTATIC struct cdevsw nsdev_cdev = {
 STATIC int
 nsdev_open(struct inode *inode, struct file *file)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	int err;
@@ -262,7 +262,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 	dev_t dev;
 
-#if HAVE_KFUNC_TO_KDEV_T
+#ifdef HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else
@@ -309,7 +309,7 @@ LFSSTATIC
 int __init
 nsdev_init(void)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	int err;
@@ -334,7 +334,7 @@ LFSSTATIC
 void __exit
 nsdev_exit(void)
 {
-#if LFS
+#ifdef LFS
 	unregister_cmajor(&nsdev_cdev, major);
 #endif
 };

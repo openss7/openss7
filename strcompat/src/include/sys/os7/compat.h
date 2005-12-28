@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.27 2005/12/22 10:28:51 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.28 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:51 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -71,10 +71,10 @@
 #include <asm/system.h>
 #include <linux/interrupt.h>
 #include <linux/kdev_t.h>
-#if HAVE_KINC_LINUX_SECURITY_H
+#ifdef HAVE_KINC_LINUX_SECURITY_H
 #include <linux/security.h>
 #endif
-#if ! HAVE_KTYPE_IRQRETURN_T
+#ifndef HAVE_KTYPE_IRQRETURN_T
 typedef void irqreturn_t;
 #endif
 #undef IRQ_NONE
@@ -127,12 +127,14 @@ typedef void irqreturn_t;
 #endif
 
 /* minor device number range */
-#if defined LIS
+#ifdef LIS
 #define NMINORS		MINORMASK	/* really 255 for LiS */
-#elif defined LFS
+#else
+#ifdef LFS
 #define NMINORS		((1UL<<16)-1)	/* really big for LFS */
 #else
 #define NMINORS		((1UL<<8)-1)	/* be conservative for others */
+#endif
 #endif
 
 #ifdef LINUX

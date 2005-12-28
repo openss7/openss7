@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strport.h,v 1.1.1.3.4.4 2005/12/18 06:38:14 brian Exp $
+ @(#) $Id: strport.h,v 1.1.1.3.4.5 2005/12/19 03:22:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:38:14 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:21 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -53,7 +53,7 @@
  * <strport.h> --- Linux STREAMS portability declarations. 
  * Author          : gram & nemo
  * Created On      : Fri Mar 24 2:40:21 1995
- * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.4 2005/12/18 06:38:14 brian Exp $
+ * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.5 2005/12/19 03:22:21 brian Exp $
  * Last Modified By: David Grothe
  * Restrictions    : SHAREd items can be read/writen by usr
  *                 : EXPORTed items can only be read by usr
@@ -73,25 +73,37 @@
 #ifndef _STRPORT_H
 #define _STRPORT_H
 
-#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/12/18 06:38:14 $"
+#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/12/19 03:22:21 $"
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
 
 #if	defined( __MSDOS__)
 #include <sys/LiS/dos-mdep.h>
-#elif defined(LINUX)
+#else
+#ifdef LINUX
 #include <sys/LiS/linux-mdep.h>
-#elif defined(USER)
+#else
+#ifdef USER
 #include <sys/LiS/user-mdep.h>
-#elif defined (QNX)
+#else
+#ifdef QNX
 #include <sys/LiS/qnx-mdep.h>
-#elif defined(SYS_SCO)
+#else
+#ifdef SYS_SCO
 #include <sys/LiS/sco-mdep.h>
-#elif defined(SYS_54)
+#else
+#ifdef SYS_54
 #include <sys/LiS/sys54-mdep.h>
-#elif defined(PORTABLE)
+#else
+#ifdef PORTABLE
 #include <sys/LiS/port-mdep.h>
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
 #endif				/* !__MSDOS__ */
 
 /*
@@ -158,14 +170,16 @@ typedef unsigned int uintptr_t;
  * for such things as poll.
  */
 #if !defined(KERNEL_2_0) && !defined(KERNEL_2_1)
-#define PORTABLE_POLL   1
-#else
-# if defined(KERNEL_2_0)
 # define PORTABLE_POLL   1
-# elif defined(KERNEL_2_1)
-# define LINUX_POLL      2
+#else
+# ifdef KERNEL_2_0
+#  define PORTABLE_POLL   1
 # else
-# error "ifdef logic error involving KERNEL_2_0 and KERNEL_2_1"
+#  ifdef KERNEL_2_1
+#   define LINUX_POLL      2
+#  else
+#   error "ifdef logic error involving KERNEL_2_0 and KERNEL_2_1"
+#  endif
 # endif
 #endif
 

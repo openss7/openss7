@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:51:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/22 10:28:54 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:51:50 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -258,7 +258,7 @@ EXPORT_SYMBOL_NOVERS(streams_close_comm);
 dev_t
 strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
-#if LIS
+#ifdef LIS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
@@ -291,7 +291,7 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 		return (NODEV);
 	}
 #endif
-#if LFS
+#ifdef LFS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
@@ -396,7 +396,7 @@ EXPORT_SYMBOL_NOVERS(strmod_add);
 int
 strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
-#if LIS
+#ifdef LIS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 		return lis_unregister_strdev(getmajor(dev));
@@ -406,7 +406,7 @@ strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 		return (EINVAL);
 	}
 #endif
-#if LFS
+#ifdef LFS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.20 2005/12/19 03:26:00 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.21 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/19 03:26:00 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -83,7 +83,7 @@
 
 #include <linux/poll.h>
 #include <linux/interrupt.h>
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 
@@ -280,7 +280,7 @@ extern const char *_RP lis_queue_name(queue_t *q);
 extern void _RP lis_release_region(unsigned int from, unsigned int extent);
 extern int _RP lis_request_dma(unsigned int dma_nr, const char *device_id);
 
-#if HAVE_KTYPE_IRQRETURN_T
+#ifdef HAVE_KTYPE_IRQRETURN_T
 extern int _RP lis_request_irq(unsigned int irq,
 			       irqreturn_t(*handler) (int, void *, struct pt_regs *),
 			       unsigned long flags, const char *device, void *dev_id);
@@ -361,7 +361,7 @@ extern void *_RP lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t siz
 					       dma_addr_t *dma_handle);
 extern int _RP lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
 
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 extern void _RP lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
 						 size_t len, int direction);
 #endif

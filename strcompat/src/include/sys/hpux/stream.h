@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.4 2005/07/18 12:25:39 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.5  2005/12/28 09:51:47  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.4  2005/07/18 12:25:39  brian
  - standard indentation
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_HPUX_STREAM_H__
 #define __SYS_HPUX_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/hpux/stream.h directly, include sys/stream.h instead."
@@ -97,13 +100,15 @@ typedef spinlock_t lock_t;
 
 extern lock_t *streams_get_sleep_lock(caddr_t event);
 
-#if LFS
+#ifdef LFS
 typedef void (*streams_put_t) (void *, mblk_t *);
 extern void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
 #endif
 
-#elif defined _HPUX_SOURCE
+#else
+#ifdef _HPUX_SOURCE
 #warning "_HPUX_SOURCE defined by not CONFIG_STREAMS_COMPAT_HPUX"
+#endif
 #endif
 
 #endif				/* __SYS_HPUX_STREAM_H__ */

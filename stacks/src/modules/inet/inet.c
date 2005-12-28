@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:27 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:27 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:27 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:27 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -211,7 +211,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/13 12:01:27 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -609,12 +609,14 @@ typedef struct inet {
 #define sctp_default_istreams		33
 #define sctp_default_cookie_inc		1000	/* milliseconds */
 #define sctp_default_throttle_itvl	50	/* milliseconds */
-#if defined CONFIG_SCTP_HMAC_MD5
+#ifdef CONFIG_SCTP_HMAC_MD5
 #define sctp_default_mac_type		T_SCTP_HMAC_MD5
-#elif defined CONFIG_SCTP_HMAC_SHA1
+#else
+#ifdef CONFIG_SCTP_HMAC_SHA1
 #define sctp_default_mac_type		T_SCTP_HMAC_SHA1
 #else
 #define sctp_default_mac_type		T_SCTP_HMAC_NONE
+#endif
 #endif
 #if defined CONFIG_SCTP_CRC32C
 #define sctp_default_cksum_type		T_SCTP_CSUM_CRC32C
@@ -1349,18 +1351,20 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh->name = T_IP_TTL;
 			oh->len = _T_LENGTH_SIZEOF(ss->options.ip.ttl);
 			oh->status = T_SUCCESS;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			if (ss->options.ip.ttl != np->ttl) {
 				if (ss->options.ip.ttl > np->ttl)
 					oh->status = T_PARTSUCCESS;
 				ss->options.ip.ttl = np->ttl;
 			}
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			if (ss->options.ip.ttl != np->uc_ttl) {
 				if (ss->options.ip.ttl > np->uc_ttl)
 					oh->status = T_PARTSUCCESS;
 				ss->options.ip.ttl = np->uc_ttl;
 			}
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 			*((unsigned char *) T_OPT_DATA(oh)) = ss->options.ip.ttl;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -2077,10 +2081,12 @@ ss_set_options(ss_t * ss)
 			unsigned char *valp = &ss->options.ip.ttl;
 			if (*valp < 1)
 				*valp = 1;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		}
 		if (ss_tst_bit(_T_BIT_IP_REUSEADDR, ss->options.flags)) {
@@ -2694,10 +2700,12 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 						continue;
 					if (*valp < 1)
 						*valp = 1;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 					np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 					np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 					continue;
 				}
@@ -3805,12 +3813,14 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 					case T_INET_IP:
 					case T_INET_UDP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 							np->ttl =
 							    *((unsigned char *) T_OPT_DATA(ih));
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 							np->uc_ttl =
 							    *((unsigned char *) T_OPT_DATA(ih));
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 						}
 						continue;
@@ -9337,10 +9347,12 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 #endif
 					}
 					ss->options.ip.ttl = *valp;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 					np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 					np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 					if (ih->name != T_ALLOPT)
 						continue;

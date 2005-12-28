@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 08:00:34 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/28 10:01:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/13 08:00:34 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 08:00:34 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/28 10:01:39 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 08:00:34 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/28 10:01:39 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -93,7 +93,7 @@ static char const ident[] =
 #include "gettext.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#if HAVE_SYS_IOCTL_H
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
 #include <sys/stropts.h>
@@ -108,10 +108,12 @@ static char const ident[] =
 #pragma weak isastream
 #endif
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #ifndef __EXCEPTIONS
@@ -6150,10 +6152,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.15 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.16 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.15 $)
- * @date \$Date: 2005/11/13 08:00:34 $
+ * @version \$Name:  $(\$Revision: 0.9.2.16 $)
+ * @date \$Date: 2005/12/28 10:01:39 $
  *
  * @}
  */

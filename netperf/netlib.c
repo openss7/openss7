@@ -53,54 +53,54 @@ char    netlib_id[]="\
 /****************************************************************/
 
 #include <stdio.h>
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
-#if HAVE_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
 #if STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
-# if HAVE_STDLIB_H
+# ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H
-# if !STDC_HEADERS && HAVE_MEMORY_H
+#ifdef HAVE_STRING_H
+# if !defined STDC_HEADERS && defined HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #else
-# if HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
 #endif
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#if HAVE_MALLOC_H
+#ifdef HAVE_MALLOC_H
 # include <malloc.h>
 #endif
  /* It would seem that most of the includes being done here from */
  /* "sys/" actually have higher-level wrappers at just /usr/include. */
  /* This is based on a spot-check of a couple systems at my disposal. */
  /* If you have trouble compiling you may want to add "sys/" raj 10/95 */
-#if HAVE_LIMITS_H
+#ifdef HAVE_LIMITS_H
 # include <limits.h>
 #endif
 #include <signal.h>
 #ifdef MPE
 #  define NSIG _NSIG
 #endif /* MPE */
-#if HAVE_FCNTL_H
+#ifdef HAVE_FCNTL_H
 # include <fcntl.h>
 #endif
 #include <math.h>
@@ -117,28 +117,28 @@ char    netlib_id[]="\
 # include <sys/time.h>
 # include <time.h>
 #else
-# if HAVE_SYS_TIME_H
+# ifdef HAVE_SYS_TIME_H
 #  include <sys/time.h>
 # else
 #  include <time.h>
 # endif
 #endif
-#if HAVE_SYS_SOCKET_H
+#ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
 #endif
-#if HAVE_NETINET_IN_H
+#ifdef HAVE_NETINET_IN_H
 # include <netinet/in.h>
 #endif
-#if HAVE_ARPA_INET_H
+#ifdef HAVE_ARPA_INET_H
 # include <arpa/inet.h>
 #endif
-#if HAVE_NETDB_H
+#ifdef HAVE_NETDB_H
 # include <netdb.h>
 #endif
 #include <errno.h>
 #include <sys/utsname.h>
 #if !defined(MPE) && !defined(__VMS)
-#if HAVE_SYS_PARAM_H
+#ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
 #endif /* MPE */
@@ -163,7 +163,7 @@ char    netlib_id[]="\
 #endif /* WIN32 */
 
 #ifdef _AIX
-#if HAVE_SYS_SELECT_H
+#ifdef HAVE_SYS_SELECT_H
 # include <sys/select.h>
 #endif
 #include <sys/sched.h>
@@ -3389,7 +3389,7 @@ cpu_stop(int measure_cpu, float *elapsed)
 
 {
 #ifndef WIN32
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 #endif /* WIN32 */
@@ -4004,7 +4004,7 @@ sit_and_spin(int child_index)
       SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
 #else /* WIN32 */
 #if defined(__sun) && defined(__SVR4)
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
 #include <sys/priocntl.h>

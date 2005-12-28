@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/07/18 12:25:39 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.9  2005/12/28 09:51:47  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.8  2005/07/18 12:25:39  brian
  - standard indentation
 
@@ -79,7 +82,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -189,8 +192,10 @@ delay(unsigned long ticks)
 	set_current_state(TASK_RUNNING);
 }
 
-#elif defined(_LFS_SOURCE)
+#else
+#ifdef _LFS_SOURCE
 #warning "_LFS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LFS"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_LFS */
 
 #endif				/* __SYS_LFS_DDI_H__ */

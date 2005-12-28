@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.14 2005/07/18 12:25:39 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.15 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LFS_STRCONF_H__
 #define __SYS_LFS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:25:39 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -260,8 +260,10 @@ autopush_find(dev_t dev)
 	return (sap);
 }
 
-#elif defined(_LFS_SOURCE)
+#else
+#ifdef _LFS_SOURCE
 #warning "_LFS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LFS"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_LFS */
 
 #endif				/* __SYS_LFS_STRCONF_H__ */

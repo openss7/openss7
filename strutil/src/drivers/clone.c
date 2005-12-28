@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/09 20:28:03 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 
@@ -61,19 +61,19 @@ static char const ident[] =
 
 #include "clone.h"		/* extern verification */
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_CLONE_MODID	CLONE_DRV_ID
 #define CONFIG_STREAMS_CLONE_NAME	CLONE_DRV_NAME
 #define CONFIG_STREAMS_CLONE_MAJOR	CLONE_CMAJOR_0
 #define LFSSTATIC
 #endif
-#if LFS
+#ifdef LFS
 #define LFSSTATIC static
 #endif
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/09/09 20:28:03 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 10:01:21 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -136,7 +136,7 @@ MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-*");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-0");
 MODULE_ALIAS("/dev/clone");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("/dev/streams/clone");
 MODULE_ALIAS("/dev/streams/clone/*");
@@ -181,7 +181,7 @@ LFSSTATIC struct streamtab clone_info = {
 LFSSTATIC int
 cloneopen(struct inode *inode, struct file *file)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	struct cdevsw *cdev;
@@ -208,7 +208,7 @@ cloneopen(struct inode *inode, struct file *file)
 #endif
 }
 
-#if LFS
+#ifdef LFS
 struct file_operations clone_ops ____cacheline_aligned = {
 	.owner = THIS_MODULE,
 	.open = cloneopen,
@@ -223,7 +223,7 @@ struct file_operations clone_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-#if LFS
+#ifdef LFS
 static struct cdevsw clone_cdev = {
 	.d_name = "clone",
 	.d_str = &clone_info,
@@ -242,7 +242,7 @@ static struct cdevsw clone_cdev = {
  *  -------------------------------------------------------------------------
  */
 
-#if LFS
+#ifdef LFS
 int
 register_clone(struct cdevsw *cdev)
 {
@@ -332,7 +332,7 @@ EXPORT_SYMBOL(unregister_clone);
 LFSSTATIC int
 clone_open(struct inode *inode, struct file *file)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	int err;
@@ -344,7 +344,7 @@ clone_open(struct inode *inode, struct file *file)
 	ptrace(("%s: opening clone device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
-#if HAVE_KFUNC_TO_KDEV_T
+#ifdef HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else
@@ -395,7 +395,7 @@ LFSSTATIC
 int __init
 clone_init(void)
 {
-#if LFS
+#ifdef LFS
 	int err;
 
 #ifdef CONFIG_STREAMS_CLONE_MODULE
@@ -418,7 +418,7 @@ LFSSTATIC
 void __exit
 clone_exit(void)
 {
-#if LFS
+#ifdef LFS
 	if (unregister_cmajor(&clone_cdev, major) != 0)
 		swerr();
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.7 2005/07/15 23:09:00 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.8 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_MAC_DDI_H__
 #define __SYS_MAC_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -70,8 +70,10 @@
 
 extern int mi_sprintf(caddr_t buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 
-#elif defined(_MAC_SOURCE)
+#else
+#ifdef _MAC_SOURCE
 #warning "_MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC"
+#endif
 #endif
 
 #endif				/* __SYS_MAC_DDI_H__ */

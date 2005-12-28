@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 00:27:52 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/28 09:48:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/09 00:27:52 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/28 09:48:02 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -135,7 +135,7 @@ MODULE_PARM_DESC(major, "Major device number for NSDEV driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR) "-*");
 MODULE_ALIAS("/dev/nsdev");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR));
 MODULE_ALIAS("/dev/streams/nsdev");
 MODULE_ALIAS("/dev/streams/nsdev/*");

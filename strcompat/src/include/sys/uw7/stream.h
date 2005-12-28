@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:04:07 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:07 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/12/28 09:51:49  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.2  2005/07/14 22:04:07  brian
  - updates for check pass and header splitting
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_UW7_STREAM_H__
 #define __SYS_UW7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/uw7/stream.h directly, include sys/stream.h instead."
@@ -121,7 +124,7 @@ typedef struct {
 	unsigned char sg_format;
 } scgth_t;
 
-#if LFS
+#ifdef LFS
 /* already defined by LiS */
 extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
 #endif
@@ -134,8 +137,10 @@ extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
 int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
 #endif
 
-#elif defined _UW7_SOURCE
+#else
+#ifdef _UW7_SOURCE
 #warning "_UW7_SOURCE defined by not CONFIG_STREAMS_COMPAT_UW7"
+#endif
 #endif
 
 #endif				/* __SYS_UW7_STREAM_H__ */

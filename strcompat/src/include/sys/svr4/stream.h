@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.4 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.4  2005/12/28 09:51:49  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.3  2005/07/18 12:25:41  brian
  - standard indentation
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_SVR4_STREAM_H__
 #define __SYS_SVR4_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/svr4/stream.h directly, include sys/stream.h instead."
@@ -108,8 +111,10 @@ extern void MPSTR_STPRELE(struct stdata *stp, long s);
 #define MPSTR_STPRELE(__s,__f) MPSTR_STPRELE(__s,__f)
 #endif
 
-#elif defined _SVR4_SOURCE
+#else
+#ifdef _SVR4_SOURCE
 #warning "_SVR4_SOURCE defined by not CONFIG_STREAMS_COMPAT_SVR4"
+#endif
 #endif
 
 #endif				/* __SYS_SVR4_STREAM_H__ */

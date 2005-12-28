@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: module.h,v 1.1.1.1.4.2 2005/07/13 12:01:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/07/13 12:01:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef LIS_MODULE_H
 #define LIS_MODULE_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: module.h,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2005/07/13 12:01:20 $"
 
 /************************************************************************
 *                        LiS Module Header File                         *
@@ -87,24 +87,26 @@
 #endif
 
 #ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
+# if defined(LINUX) && defined(__KERNEL__)
+#  ifdef MODVERSIONS
+#   ifdef LISMODVERS
+#    include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
+#   else
+#    include <linux/modversions.h>
+#   endif
 #  endif
+#  include <linux/module.h>
+# else
+#  error This can only be a module in the Linux kernel environment
+# endif
 #endif
 
-#elif defined(USER)		/* defined(LINUX) && defined(__KERNEL__) */
+#else				/* defined(LINUX) && defined(__KERNEL__) */
+#ifdef USER
 
 #include <sys/LiS/user-mdep.h>
 
+#endif
 #endif				/* defined(LINUX) && defined(__KERNEL__) */
 
 #include <sys/LiS/modcnt.h>	/* MODGET(), MODPUT() */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strpipe.h,v 0.9.2.8 2005/12/19 12:45:17 brian Exp $
+ @(#) $Id: strpipe.h,v 0.9.2.9 2005/12/28 09:48:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRPIPE_H__
 #define __LOCAL_STRPIPE_H__
 
-#if HAVE_KERNEL_PIPE_SUPPORT
+#ifdef HAVE_KERNEL_PIPE_SUPPORT
 streams_fastcall long do_spipe(int *fds);
 #endif
 

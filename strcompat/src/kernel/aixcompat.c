@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:49 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/22 10:28:53 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:51:49 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -102,7 +102,7 @@ MODULE_ALIAS("streams-aixcompat");
  *  implemented in mspcompat.c
  */
 
-#if LFS
+#ifdef LFS
 /* 
  *  WANTIO
  *  -------------------------------------------------------------------------
@@ -145,7 +145,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 		return (EINVAL);
 	switch (cmd) {
 	case STR_LOAD_DEV:
-#if LIS
+#ifdef LIS
 	{
 		int err;
 
@@ -154,7 +154,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 		return (err < 0 ? -err : 0);
 	}
 #endif
-#if LFS
+#ifdef LFS
 		{
 			struct cdevsw *cdev;
 			int err;
@@ -219,12 +219,12 @@ str_install_AIX(int cmd, strconf_t * sc)
 		}
 #endif
 	case STR_UNLOAD_DEV:
-#if LIS
+#ifdef LIS
 	{
 		return lis_unregister_strdev(sc->sc_major);
 	}
 #endif
-#if LFS
+#ifdef LFS
 		{
 			struct cdevsw *cdev;
 			int err;
@@ -242,7 +242,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 		}
 #endif
 	case STR_LOAD_MOD:
-#if LIS
+#ifdef LIS
 	{
 		int err;
 
@@ -251,7 +251,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 		return (err < 0 ? -err : 0);
 	}
 #endif
-#if LFS
+#ifdef LFS
 		{
 			struct fmodsw *fmod;
 			int err;
@@ -316,12 +316,12 @@ str_install_AIX(int cmd, strconf_t * sc)
 		}
 #endif
 	case STR_UNLOAD_MOD:
-#if LIS
+#ifdef LIS
 	{
 		return lis_unregister_strmod(sc->sc_str);
 	}
 #endif
-#if LFS
+#ifdef LFS
 		{
 			struct fmodsw *fmod;
 			int err;

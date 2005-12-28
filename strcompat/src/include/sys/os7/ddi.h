@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.2 2005/07/15 23:09:19 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.3 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_DDI_H__
 #define __SYS_OS7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/15 23:09:19 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/28 09:51:48 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -68,8 +68,10 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_OS7) || defined(CONFIG_STREAMS_COMPAT_OS7_MODULE)
 
-#elif defined(_OS7_SOURCE)
+#else
+#ifdef _OS7_SOURCE
 #warning "_OS7_SOURCE defined but not CONFIG_STREAMS_COMPAT_OS7"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_OS7 */
 
 #endif				/* __SYS_OS7_DDI_H__ */

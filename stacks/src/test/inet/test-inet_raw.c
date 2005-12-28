@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:25 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 09:58:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:25 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.8  2005/12/28 09:58:31  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.7  2005/05/14 08:31:25  brian
  - copyright header correction
 
@@ -99,10 +102,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:25 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 09:58:31 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:25 $";
+    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 09:58:31 $";
 
 /*
  *  Simple test program for INET streams.
@@ -120,7 +123,7 @@ static char const ident[] =
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.6  2005/12/28 09:48:02  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.5  2005/12/19 03:23:39  brian
  - wend for simple streamscall
 
@@ -69,10 +72,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -100,7 +103,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/19 03:23:39 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -141,7 +144,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for BUFMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_BUFMOD_MODID));
 MODULE_ALIAS("streams-module-bufmod");
 #endif

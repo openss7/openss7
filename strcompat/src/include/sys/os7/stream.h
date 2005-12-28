@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:40 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.4 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:40 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.4  2005/12/28 09:51:48  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.3  2005/07/18 12:25:40  brian
  - standard indentation
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_OS7_STREAM_H__
 #define __SYS_OS7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."
@@ -95,8 +98,10 @@
 #include <sys/os7/timer.h>	/* generic timer handling */
 #include <sys/os7/bufpool.h>	/* generic buffer pools */
 
-#elif defined _OS7_SOURCE
+#else
+#ifdef _OS7_SOURCE
 #warning "_OS7_SOURCE defined by not CONFIG_STREAMS_COMPAT_OS7"
+#endif
 #endif
 
 #endif				/* __SYS_OS7_STREAM_H__ */

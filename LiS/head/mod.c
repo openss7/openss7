@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.9 $) $Date: 2005/12/18 06:38:07 $
+ @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/12/19 03:22:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:38:07 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.9 $) $Date: 2005/12/18 06:38:07 $"
+#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/12/19 03:22:19 $"
 
 /*                               -*- Mode: C -*- 
  * mod.c --- module mgmt
@@ -1240,7 +1240,7 @@ lis_find_strdev(major_t major)
 		if (initname != NULL) {	/* call initialization */
 			void (*init) (void);
 
-#if HAVE_KFUNC___SYMBOL_GET && HAVE_KFUNC___SYMBOL_PUT
+#if defined HAVE_KFUNC___SYMBOL_GET && defined HAVE_KFUNC___SYMBOL_PUT
 			char symbolname[64];
 
 			snprintf(symbolname, 64, "%s%s", MODULE_SYMBOL_PREFIX, initname);
@@ -1253,7 +1253,7 @@ lis_find_strdev(major_t major)
 				       "in module %s for major %u\n", initname, objname, major);
 			else {
 				(*init) ();
-#if HAVE_KFUNC___SYMBOL_GET && HAVE_KFUNC___SYMBOL_PUT
+#if defined HAVE_KFUNC___SYMBOL_GET && defined HAVE_KFUNC___SYMBOL_PUT
 				__symbol_put(symbolname);
 #else
 				inter_module_put(initname);

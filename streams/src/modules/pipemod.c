@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/19 03:23:39 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/19 03:23:39 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/19 03:23:39 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/19 03:23:39 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 09:48:03 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -119,7 +119,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for PIPEMOD.");
 
 #ifdef MODULE_ALIAS
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PIPEMOD_MODID));
 MODULE_ALIAS("streams-module-pipemod");
 #endif

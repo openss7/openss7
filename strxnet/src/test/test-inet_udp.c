@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:45:05 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 10:01:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:05 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.7  2005/12/28 10:01:40  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.6  2005/07/18 12:45:05  brian
  - standard indentation
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:45:05 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 10:01:40 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 12:45:05 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 10:01:40 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -137,10 +140,12 @@ static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>

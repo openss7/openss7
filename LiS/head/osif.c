@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.9 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.10 $) $Date: 2005/12/19 03:22:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.9 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.10 $) $Date: 2005/12/19 03:22:19 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -530,7 +530,7 @@ lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, si
 }
 #endif
 
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
 void _RP
 lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 					 int direction)
@@ -539,7 +539,7 @@ lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_
 }
 #endif
 
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
 void _RP
 lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 					    int direction)
@@ -751,10 +751,12 @@ lis_ioremap(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
 	return (vremap(offset, size));
-#elif !defined(__s390__)
+#else
+#ifndef __s390__
 	return (ioremap(offset, size));
 #else
 	return (NULL);
+#endif
 #endif
 }
 
@@ -763,10 +765,12 @@ lis_ioremap_nocache(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
 	return (vremap(offset, size));
-#elif !defined(__s390__)
+#else
+#ifndef __s390__
 	return (ioremap_nocache(offset, size));
 #else
 	return (NULL);
+#endif
 #endif
 }
 
@@ -775,8 +779,10 @@ lis_iounmap(void *ptr)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
 	vfree(ptr);
-#elif !defined(__s390__)
+#else
+#ifndef __s390__
 	iounmap(ptr);
+#endif
 #endif
 }
 
@@ -785,10 +791,12 @@ lis_vremap(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100	/* 2.0 kernel */
 	return (vremap(offset, size));
-#elif !defined(__s390__)
+#else
+#ifndef __s390__
 	return (ioremap_nocache(offset, size));
 #else
 	return (NULL);
+#endif
 #endif
 }
 
@@ -938,10 +946,12 @@ lis_osif_do_settimeofday(struct timeval *tp)
 	ts.tv_nsec = tp->tv_usec * 1000;
 	do_settimeofday(&ts);
 
-#elif LINUX_VERSION_CODE >= 0x020300	/* 2.4 kernel */
+#else
+#if LINUX_VERSION_CODE >= 0x020300	/* 2.4 kernel */
 
 	do_settimeofday(tp);
 
+#endif				/* not in earlier kernels */
 #endif				/* not in earlier kernels */
 }
 

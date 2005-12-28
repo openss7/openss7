@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:45 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:29 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -757,12 +757,14 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			span_allocated = 1;
 		}
 	}
-#if defined(__LITTLE_ENDIAN)
+#ifdef __LITTLE_ENDIAN
 	byte = 3 - span;
-#elif defined(__BIG_ENDIAN)
+#else
+#ifdef __BIG_ENDIAN
 	byte = span;
 #else
 #error "__LITTLE_ENDIAN or __BIG_ENDIAN must be defined\n"
+#endif
 #endif
 	if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1) {
 		swerr();

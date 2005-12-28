@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2005/12/19 12:44:25 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:25 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2005/12/28 09:51:47  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.6  2005/12/19 12:44:25  brian
  - locking down for release
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_LIS_STREAM_H__
 #define __SYS_LIS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lis/stream.h directly, include sys/stream.h instead."
@@ -522,8 +525,10 @@ lis_xmsgsize(mblk_t *mp)
 #define OTHER(__q) lis_OTHERQ(__q)
 #endif
 
-#elif defined _LIS_SOURCE
+#else
+#ifdef _LIS_SOURCE
 #warning "_LIS_SOURCE defined by not CONFIG_STREAMS_COMPAT_LIS"
+#endif
 #endif
 
 #endif				/* __SYS_LIS_STREAM_H__ */

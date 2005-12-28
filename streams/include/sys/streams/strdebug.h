@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.31 2005/12/22 10:28:56 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.32 2005/12/28 09:48:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/22 10:28:56 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 09:48:01 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -148,7 +148,8 @@
 #define __EXTERN_INLINE
 #endif
 
-#elif defined(CONFIG_STREAMS_OPTIMIZE_SIZE)
+#else
+#ifdef CONFIG_STREAMS_OPTIMIZE_SIZE
 
 #undef prefetchw
 #define prefetchw(__a) __builtin_prefetch((__a),1,3)
@@ -179,7 +180,8 @@
 #define __EXTERN_INLINE extern
 #endif
 
-#elif defined(CONFIG_STREAMS_OPTIMIZE_SPEED)
+#else
+#ifdef CONFIG_STREAMS_OPTIMIZE_SPEED
 
 #undef prefetchw
 #define prefetchw(__a) __builtin_prefetch((__a),1,3)
@@ -241,6 +243,8 @@
 #define __EXTERN_INLINE extern inline
 #endif
 
+#endif
+#endif
 #endif
 
 #undef  __never
@@ -331,7 +335,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
-#if defined(CONFIG_STREAMS_DEBUG)
+#ifdef CONFIG_STREAMS_DEBUG
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -354,7 +358,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#elif defined(CONFIG_STREAMS_TEST)
+#else
+#ifdef CONFIG_STREAMS_TEST
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -377,7 +382,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#elif defined(CONFIG_STREAMS_SAFE)
+#else
+#ifdef CONFIG_STREAMS_SAFE
 
 #define    never()		do { *(int *)0 = 0; } while(0)
 #define     rare()		_rare()
@@ -423,6 +429,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		_swerr()
 #define   pswerr(__pks)		_pswerr(__pks)
 
+#endif
+#endif
 #endif
 
 #endif				/* __SYS_STREAMS_STRDEBUG_H__ */

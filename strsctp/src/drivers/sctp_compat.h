@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_compat.h,v 0.9.2.5 2005/07/13 12:01:51 brian Exp $
+ @(#) $Id: sctp_compat.h,v 0.9.2.6 2005/12/28 10:01:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:51 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:03 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_SCTP_COMPAT_H__
 #define __LOCAL_SCTP_COMPAT_H__
 
-#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <sys/os7/compat.h>
 
@@ -80,11 +80,11 @@
 
 #ifdef LINUX
 #include <linux/interrupt.h>	/* for local_irq functions */
-#if HAVE_KINC_ASM_SOFTIRQ_H
+#ifdef HAVE_KINC_ASM_SOFTIRQ_H
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
 #endif
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
-#if HAVE_KINC_LINUX_RCUPDATE_H
+#ifdef HAVE_KINC_LINUX_RCUPDATE_H
 #include <linux/rcupdate.h>
 #endif
 #endif				/* LINUX */

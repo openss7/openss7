@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:23:38 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/28 09:48:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/12/19 03:23:38 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/12/28 09:48:02 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -132,7 +132,7 @@ MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR) "-*");
 MODULE_ALIAS("/dev/sad");
 MODULE_ALIAS("/dev/sad/admin");
 MODULE_ALIAS("/dev/sad/user");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR));
 MODULE_ALIAS("/dev/streams/sad");
 MODULE_ALIAS("/dev/streams/sad/admin");

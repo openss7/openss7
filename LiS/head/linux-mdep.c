@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.18 $) $Date: 2005/12/19 03:22:19 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.19 $) $Date: 2005/12/19 12:42:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:42:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.18 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.19 $) $Date: 2005/12/19 12:42:42 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.18 2005/12/19 03:22:19 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.19 2005/12/19 12:42:42 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -134,10 +134,12 @@
  */
 #if ( defined(__s390__) || defined(__s390x__) ) && defined(KERNEL_2_4)
 #define NUM_CPUS		smp_num_cpus
-#elif defined(KERNEL_2_5)
+#else
+#if defined(KERNEL_2_5)
 #define NUM_CPUS		num_online_cpus()
 #else
 #define NUM_CPUS		smp_num_cpus
+#endif
 #endif
 
 /*  -------------------------------------------------------------------  */
@@ -151,18 +153,26 @@ extern char lis_date[];
 extern void lis_start_qsched(void);
 
 char *lis_stropts_file =
-#if   defined(_LIS_STROPTS_H)
+#if defined(_LIS_STROPTS_H)
     "<LiS/include/stropts.h>"
-#elif defined(_LIS_SYS_STROPTS_H)
+#else
+#if defined(_LIS_SYS_STROPTS_H)
     "<LiS/include/sys/stropts.h>"
-#elif defined(_STROPTS_H)
+#else
+#if defined(_STROPTS_H)
     "<usr/include/stropts.h>"
-#elif defined(_SYS_STROPTS_H)
+#else
+#if defined(_SYS_STROPTS_H)
     "<usr/include/sys/stropts.h>"
-#elif defined(_BITS_STROPTS_H)
+#else
+#if defined(_BITS_STROPTS_H)
     "<usr/include/bits/stropts.h>"
 #else
     "<unknown/stropts.h>"
+#endif
+#endif
+#endif
+#endif
 #endif
 ;
 
@@ -214,36 +224,43 @@ static int lis_errnos[LIS_NR_CPUS];
 #ifdef HAVE_SYS_MKNOD_ADDR
 static asmlinkage long (*syscall_mknod) (const char *filename, int mode, dev_t dev)
 = (typeof(syscall_mknod)) HAVE_SYS_MKNOD_ADDR;
-#elif defined _HPPA_LIS_
+#else
+#ifdef _HPPA_LIS_
 #define syscall_mknod(name,mode,dev) (-ENOSYS)
 #else
 #define __NR_syscall_mknod	__NR_mknod
 static _NI _syscall3(long, syscall_mknod, const char *, file, int, mode, int, dev);
 #endif
+#endif
 #ifdef HAVE_SYS_UNLINK_ADDR
 static asmlinkage long (*syscall_unlink) (const char *pathname)
 = (typeof(syscall_unlink)) HAVE_SYS_UNLINK_ADDR;
-#elif defined _HPPA_LIS_
+#else
+#ifdef _HPPA_LIS_
 #define syscall_unlink(name) (-ENOSYS)
 #else
 #define __NR_syscall_unlink	__NR_unlink
 static _NI _syscall1(long, syscall_unlink, const char *, file);
 #endif
+#endif
 #ifdef HAVE_SYS_MOUNT_ADDR
 static asmlinkage long (*syscall_mount) (char *dev_name, char *dir_name, char *type,
 					 unsigned long flags, void *data)
 = (typeof(syscall_mount)) HAVE_SYS_MOUNT_ADDR;
-#elif defined _HPPA_LIS_
+#else
+#ifdef _HPPA_LIS_
 #define syscall_mount(dev_name,dir_name,type,flags,data) (-ENOSYS)
 #else
 #define __NR_syscall_mount	__NR_mount
 static _NI _syscall5(long, syscall_mount, char *, dev, char *, dir, char *, type, unsigned long,
 		     flg, void *, data);
 #endif
+#endif
 #ifdef HAVE_SYS_UMOUNT_ADDR
 asmlinkage long (*syscall_umount2) (char *name, int flags)
 = (typeof(syscall_umount2)) HAVE_SYS_UMOUNT_ADDR;
-#elif defined _HPPA_LIS_
+#else
+#ifdef _HPPA_LIS_
 #define syscall_umount2(name,flags) (-ENOSYS)
 #else
 #if defined(_ASM_IA64_UNISTD_H)
@@ -252,6 +269,7 @@ asmlinkage long (*syscall_umount2) (char *name, int flags)
 #define __NR_syscall_umount2	__NR_umount2
 #endif
 static _NI _syscall2(long, syscall_umount2, char *, file, int, flags);
+#endif
 #endif
 #undef _NI
 /************************************************************************
@@ -1098,7 +1116,7 @@ lis_cdev_put(struct dentry *d)
 	struct cdev *cp;
 	static spinlock_t lock = SPIN_LOCK_UNLOCKED;
 
-#if HAVE_CDEV_PUT_ADDR
+#ifdef HAVE_CDEV_PUT_ADDR
 	static void (*cdev_put) (struct cdev *) = (typeof(cdev_put)) HAVE_CDEV_PUT_ADDR;
 #endif
 
@@ -1107,7 +1125,7 @@ lis_cdev_put(struct dentry *d)
 		       inode, inode ? I_COUNT(inode) : 0);
 		if (inode && inode->i_cdev)
 			printk(">> i->i_cdev: c@0x%p/%d/%x \"%s\"\n", inode->i_cdev,
-#if HAVE_KMEMB_STRUCT_KOBJECT_KREF
+#ifdef HAVE_KMEMB_STRUCT_KOBJECT_KREF
 			       K_ATOMIC_READ(&inode->i_cdev->kobj.kref.refcount),
 #else
 			       K_ATOMIC_READ(&inode->i_cdev->kobj.refcount),
@@ -3622,7 +3640,7 @@ lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len)
 int
 lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth)
 {
-#if HAVE_KMACRO_ACCESS_OK
+#ifdef HAVE_KMACRO_ACCESS_OK
 	return (access_ok(rd_wr_fcn, usr_addr, lgth) ? 0 : -EFAULT);
 #else
 	return (verify_area(rd_wr_fcn, usr_addr, lgth));
@@ -4077,10 +4095,12 @@ lis_thread_func(void *argp)
 
 #if defined(KERNEL_2_5)
 	daemonize("%s", arg->name);	/* make me a daemon */
-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,16)
+#else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,16)
 	reparent_to_init();	/* disown all parentage */
 #else
 	daemonize();		/* make me a daemon */
+#endif
 #endif
 
 	current->uid = 0;	/* become root */

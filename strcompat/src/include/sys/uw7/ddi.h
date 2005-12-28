@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.14 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.15 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7_DDI_H__
 #define __SYS_UW7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/28 09:51:49 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -127,8 +127,10 @@ ATOMIC_INT_WRITE(atomic_int_t * counter, int value)
 	atomic_set(counter, value);
 }
 
-#elif defined(_UW7_SOURCE)
+#else
+#ifdef _UW7_SOURCE
 #warning "_UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_UW7 */
 
 #endif				/* __SYS_UW7_DDI_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/05/14 08:35:14 $
+ @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:35:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timetst.c,v $
+ Revision 1.1.1.2.4.5  2005/07/13 12:01:23  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 1.1.1.2.4.3  2005/05/14 08:35:14  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/05/14 08:35:14 $"
+#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:23 $"
 
 static char const ident[] =
-    "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/05/14 08:35:14 $";
+    "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2005/07/13 12:01:23 $";
 
 /*
  * Copyright 1997 David Grothe, Gcom, Inc <dave@gcom.com>
@@ -88,12 +91,14 @@ static char const ident[] =
 
 #include <sys/stropts.h>
 
-#if	defined(LINUX)
+#ifdef LINUX
 #include <sys/LiS/linuxio.h>
-#elif	defined(SYS_QNX)
+#else
+#ifdef SYS_QNX
 #include <sys/LiS/qnxio.h>
 #else
 #include <sys/LiS/usrio.h>
+#endif
 #endif
 
 #include <sys/LiS/loop.h>	/* an odd place for this file */
@@ -101,11 +106,12 @@ static char const ident[] =
 /************************************************************************
 *                      File Names                                       *
 ************************************************************************/
-#if	defined(LINUX)
+#ifdef LINUX
 #define	LOOP_1		"/dev/loop.1"
 #define	LOOP_2		"/dev/loop.2"
 #define LOOP_CLONE	"/dev/loop_clone"
-#elif	defined(QNX)
+#else
+#ifdef QNX
 #define	LOOP_1		"/dev/gcom/loop.1"
 #define	LOOP_2		"/dev/gcom/loop.2"
 #define LOOP_CLONE	"/dev/gcom/loop_clone"
@@ -113,6 +119,7 @@ static char const ident[] =
 #define	LOOP_1		"loop.1"
 #define	LOOP_2		"loop.2"
 #define LOOP_CLONE	"loop_clone"
+#endif
 #endif
 
 #define	ALL_DEBUG_BITS	( ~ ((unsigned long long) 0) )

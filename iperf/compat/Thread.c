@@ -188,7 +188,7 @@ void thread_start( struct thread_Settings* thread ) {
         thread_sNum++;
         Condition_Unlock( thread_sNum_cond );
 
-#if   defined( HAVE_POSIX_THREAD )
+#ifdef HAVE_POSIX_THREAD
 
         // pthreads -- spawn new thread
         if ( pthread_create( &thread->mTID, NULL, thread_run_wrapper, thread ) != 0 ) {
@@ -200,7 +200,8 @@ void thread_start( struct thread_Settings* thread ) {
             Condition_Unlock( thread_sNum_cond );
         }
 
-#elif defined( HAVE_WIN32_THREAD )
+#else
+#ifdef  HAVE_WIN32_THREAD
 
         // Win32 threads -- spawn new thread
         // Win32 has a thread handle in addition to the thread ID
@@ -218,6 +219,7 @@ void thread_start( struct thread_Settings* thread ) {
 
         // single-threaded -- call Run_Wrapper in this thread
         thread_run_wrapper( thread );
+#endif
 #endif
     }
 } // end thread_start

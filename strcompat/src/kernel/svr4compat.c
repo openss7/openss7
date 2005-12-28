@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -100,13 +100,13 @@ MODULE_ALIAS("streams-svr4compat");
 long
 MPSTR_QLOCK(queue_t *q)
 {
-#if LIS
+#ifdef LIS
 	lis_flags_t flags;
 
 	lis_rw_write_lock_irqsave(&q->q_isr_lock, &flags);
 	return (flags);
 #endif
-#if LFS
+#ifdef LFS
 #if 0
 	if (q->q_klock.kl_owner == current)
 		q->q_klock.kl_nest++;
@@ -135,13 +135,13 @@ EXPORT_SYMBOL_NOVERS(MPSTR_QLOCK);	/* svr4/ddi.h */
 void
 MPSTR_QRELE(queue_t *q, long s)
 {
-#if LIS
+#ifdef LIS
 	lis_flags_t flags = s;
 
 	lis_rw_write_unlock_irqrestore(&q->q_isr_lock, &flags);
 	return;
 #endif
-#if LFS
+#ifdef LFS
 #if 0
 	if (q->q_klock.kl_nest > 0)
 		q->q_klock.kl_nest--;
@@ -170,13 +170,13 @@ EXPORT_SYMBOL_NOVERS(MPSTR_QRELE);	/* svr4/ddi.h */
 long
 MPSTR_STPLOCK(struct stdata *sd)
 {
-#if LIS
+#ifdef LIS
 	lis_flags_t flags;
 
 	lis_spin_lock_irqsave(&sd->sd_lock, &flags);
 	return (flags);
 #endif
-#if LFS
+#ifdef LFS
 #if 0
 	if (sd->sd_klock.kl_owner == current)
 		sd->sd_klock.kl_nest++;
@@ -204,13 +204,13 @@ EXPORT_SYMBOL_NOVERS(MPSTR_STPLOCK);	/* svr4/ddi.h */
 void
 MPSTR_STPRELE(struct stdata *sd, long s)
 {
-#if LIS
+#ifdef LIS
 	lis_flags_t flags = s;
 
 	lis_spin_unlock_irqrestore(&sd->sd_lock, &flags);
 	return;
 #endif
-#if LFS
+#ifdef LFS
 #if 0
 	if (sd->sd_klock.kl_nest > 0)
 		sd->sd_klock.kl_nest--;
@@ -245,7 +245,7 @@ spl0(void)
 	return (old_level);
 }
 
-#if LFS
+#ifdef LFS
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl,
 				     processorid_t processor);
 EXPORT_SYMBOL_NOVERS(dtimeout);	/* svr4/ddi.h */
@@ -389,7 +389,7 @@ etoimajor(major_t emajor)
 {
 	major_t major = NODEV;
 
-#if LFS
+#ifdef LFS
 	struct cdevsw *cdev;
 
 	if ((cdev = sdev_get(emajor))) {
@@ -407,7 +407,7 @@ EXPORT_SYMBOL_NOVERS(etoimajor);	/* uw7/ddi.h */
 int
 itoemajor(major_t imajor, int prevemaj)
 {
-#if LFS
+#ifdef LFS
 	struct cdevsw *cdev;
 
 	if ((cdev = cdrv_get(imajor)) && cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
@@ -461,21 +461,21 @@ RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
 
-#if CONFIG_SMP && HAVE_READ_TRYLOCK
+#if defined CONFIG_SMP && defined HAVE_READ_TRYLOCK
 	if (read_trylock(lockp))
 		return (old_pl);
 #else
-#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
+#if defined CONFIG_SMP && defined HAVE_WRITE_TRYLOCK
 	if (write_trylock(lockp))
 		return (old_pl);
 #else
-#if CONFIG_SMP
+#if defined CONFIG_SMP
 	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
 #endif
 		read_lock(lockp);
 		return (old_pl);
-#if CONFIG_SMP
+#if defined CONFIG_SMP
 	}
 #endif
 #endif
@@ -490,17 +490,17 @@ RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
 
-#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
+#if defined CONFIG_SMP && defined HAVE_WRITE_TRYLOCK
 	if (write_trylock(lockp))
 		return (old_pl);
 #else
-#if CONFIG_SMP
+#if defined CONFIG_SMP
 	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
 #endif
 		write_lock(lockp);
 		return (old_pl);
-#if CONFIG_SMP
+#if defined CONFIG_SMP
 	}
 #endif
 #endif
@@ -550,7 +550,7 @@ EXPORT_SYMBOL_NOVERS(SV_BROADCAST);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
 
 EXPORT_SYMBOL_NOVERS(SV_DEALLOC);	/* svr4/ddi.h */
-#if ! ( HAVE___WAKE_UP_SYNC_ADDR || HAVE___WAKE_UP_SYNC_EXPORT )
+#if ! ( defined HAVE___WAKE_UP_SYNC_ADDR || defined HAVE___WAKE_UP_SYNC_EXPORT )
 #undef	__wake_up_sync
 #define __wake_up_sync __wake_up
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.20 2005/07/22 06:06:51 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.21 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/22 06:06:51 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/22 06:06:51 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:49 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -119,7 +119,7 @@ extern pl_t spl7(void);
 
 typedef int processorid_t;
 
-#if LFS
+#ifdef LFS
 __SVR4_EXTERN_INLINE toid_t
 dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
 {

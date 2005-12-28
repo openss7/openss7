@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:38 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:38 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:28 $"
 
-static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:38 $";
+static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 09:58:28 $";
 
 #define __NO_VERSION__
 
@@ -261,7 +261,7 @@ sctp_update_routes(sp, force_reselect)
 		if (!rt) {
 			if (sd->dif)
 				sd->saddr = 0;
-#if defined HAVE_OLD_STYLE_INET_PROTOCOL
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 			if ((err =
 			     ip_route_connect(&rt, sd->daddr, sd->saddr,
 					      RT_TOS(sp->ip_tos) | RTO_CONN | sp->ip_dontroute,
@@ -269,7 +269,8 @@ sctp_update_routes(sp, force_reselect)
 				rare();
 				continue;
 			}
-#elif defined HAVE_NEW_STYLE_INET_PROTOCOL
+#else
+#ifdef HAVE_NEW_STYLE_INET_PROTOCOL
 			if ((err =
 			     ip_route_connect(&rt, sd->daddr, sd->saddr,
 					      RT_TOS(sp->ip_tos) | RTO_CONN | sp->ip_dontroute,
@@ -280,6 +281,7 @@ sctp_update_routes(sp, force_reselect)
 			}
 #else
 #error One of HAVE_OLD_STYLE_INET_PROTOCOL or HAVE_NEW_STYLE_INET_PROTOCOL must be defined.
+#endif
 #endif
 			if (rt->rt_flags & (RTCF_MULTICAST | RTCF_BROADCAST) && !sp->ip_broadcast) {
 				rare();
@@ -320,15 +322,17 @@ sctp_update_routes(sp, force_reselect)
 			   see if route changed on primary as result of INIT that was discarded 
 			 */
 			struct rtable *rt2 = NULL;
-#if defined HAVE_OLD_STYLE_INET_PROTOCOL
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif))
-#elif defined HAVE_NEW_STYLE_INET_PROTOCOL
+#else
+#ifdef HAVE_NEW_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif,
 			     IPPROTO_SCTP, sp->sport, sp->dport, NULL))
 #else
 #error One of HAVE_OLD_STYLE_INET_PROTOCOL or HAVE_NEW_STYLE_INET_PROTOCOL must be defined.
+#endif
 #endif
 			{
 				if (rt2->rt_src != rt->rt_src) {

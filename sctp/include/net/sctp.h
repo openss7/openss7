@@ -100,7 +100,7 @@
 #define __swerr() \
 	do { printk(KERN_INFO "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
-#if defined(CONFIG_SCTP_DEBUG)
+#ifdef CONFIG_SCTP_DEBUG
 
 #define   never()		__never()
 #define    rare()		__rare()
@@ -123,7 +123,8 @@
 #define STATIC
 #define INLINE __inline__
 
-#elif defined(CONFIG_SCTP_SAFE)
+#else
+#ifdef CONFIG_SCTP_SAFE
 
 #define   never()		do { *(int *)0 = 0; } while(0)
 #define    rare()		do { } while(0)
@@ -169,6 +170,7 @@
 #define STATIC static
 #define INLINE __inline__
 
+#endif
 #endif
 
 #ifdef CONFIG_SCTP_MODULE

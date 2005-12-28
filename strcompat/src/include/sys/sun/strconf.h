@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.10 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.11 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRCONF_H__
 #define __SYS_SUN_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/12/28 09:51:49 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -239,8 +239,10 @@ extern int mod_install(struct modlinkage *ml);
 extern int mod_remove(struct modlinkage *ml);
 extern int mod_info(struct modlinkage *ml, struct modinfo *mi);
 
-#elif defined(_SUN_SOURCE)
+#else
+#ifdef _SUN_SOURCE
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_SUN */
 
 #endif				/* __SYS_SUN_STRCONF_H__ */

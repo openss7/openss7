@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: linux-mdep.h,v 1.1.1.7.4.10 2005/12/19 03:22:22 brian Exp $
+ @(#) $Id: linux-mdep.h,v 1.1.1.7.4.11 2005/12/19 12:42:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:22 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 12:42:48 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.10 2005/12/19 03:22:22 brian Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.11 2005/12/19 12:42:48 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -71,7 +71,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.10 $) $Date: 2005/12/19 03:22:22 $"
+#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.11 $) $Date: 2005/12/19 12:42:48 $"
 
 #ifdef __KERNEL__
 #include <linux/config.h>
@@ -968,7 +968,8 @@ extern int lis_select(struct inode *inode, struct file *file, int sel_type, sele
 extern void lis_select_wakeup(struct stdata *hd);
 #endif
 
-#elif defined(KERNEL_2_1)
+#else
+#ifdef KERNEL_2_1
 
 #ifdef __LIS_INTERNAL__
 extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
@@ -976,6 +977,7 @@ extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
 
 #else
 #error "Either KERNEL_2_0 or KERNEL_2_1 needs to be defined"
+#endif
 #endif
 
 /*

@@ -176,7 +176,8 @@ typedef struct {
 #define LDLPRI_LO	TC_PRIO_BULK
 #define LDLPRI_MED	TC_PRIO_BESTEFFORT
 #define LDLPRI_HI	TC_PRIO_INTERACTIVE
-#elif defined(SOPRI_BACKGROUND)
+#else
+#if defined(SOPRI_BACKGROUND)
 #define LDLPRI_LO	SOPRI_BACKGROUND
 #define LDLPRI_MED	SOPRI_NORMAL
 #define LDLPRI_HI	SOPRI_INTERACTIVE
@@ -184,6 +185,7 @@ typedef struct {
 #define LDLPRI_LO       0
 #define LDLPRI_MED      0
 #define LDLPRI_HI       0
+#endif
 #endif
 
 /*
@@ -1223,7 +1225,8 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	return DONE;
 }
 
-#elif defined(too_complicated_KERNEL_2_1)
+#else
+#if defined(too_complicated_KERNEL_2_1)
 
 STATIC int
 ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
@@ -1289,6 +1292,7 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
 	dev_queue_xmit(skb, ndev->dev, pri);
 	return DONE;
 }
+#endif
 #endif
 
 /****************************************************************************/

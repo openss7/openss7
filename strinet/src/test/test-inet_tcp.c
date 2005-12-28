@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/11/06 11:01:12 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:41 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/06 11:01:12 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:00:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.38  2005/12/28 10:00:41  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.37  2005/11/06 11:01:12  brian
  - changes from testing
 
@@ -207,9 +210,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/11/06 11:01:12 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:41 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/11/06 11:01:12 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:41 $";
 
 /*
  *  Simple test program for INET streams.
@@ -219,10 +222,12 @@ static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -238,7 +243,7 @@ static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 
 #include <sys/uio.h>
 #include <time.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

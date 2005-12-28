@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: poll.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/07/13 12:01:18 $
+ @(#) $RCSfile: poll.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/18 11:51:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:18 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: poll.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/07/13 12:01:18 $"
+#ident "@(#) $RCSfile: poll.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/18 11:51:26 $"
 
 /************************************************************************
 *                      poll() System Call				*
@@ -77,12 +77,14 @@
 #include <sys/osif.h>
 
 char *lis_poll_file =
-#if defined(USED_LINUX_POLL_H)
+#ifdef USED_LINUX_POLL_H
     "<linux/poll.h>"
-#elif defined(USED_LIS_POLL_H)
+#else
+#ifdef USED_LIS_POLL_H
     "<LiS/include/sys/poll.h>"
 #else
     "<unknown/poll.h>"
+#endif
 #endif
 ;
 

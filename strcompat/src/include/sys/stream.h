@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/07/18 12:25:38 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.4 2005/12/28 09:51:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:38 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.4  2005/12/28 09:51:46  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.3  2005/07/18 12:25:38  brian
  - standard indentation
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifdef LIS
 #include <sys/LiS/stream.h>
@@ -74,7 +77,7 @@
 #include <sys/strsubr.h>
 #endif
 
-#if LIS
+#ifdef LIS
 #undef db_frtnp
 #define db_frtnp frtnp
 union ioctypes {

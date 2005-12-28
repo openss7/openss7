@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:40:29 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 10:01:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.5  2005/12/28 10:01:50  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.4  2005/07/18 12:40:29  brian
  - standard indentation
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:40:29 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 10:01:50 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:40:29 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 10:01:50 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -99,7 +102,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:40:29 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 10:01:50 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -336,7 +339,7 @@ ip_get_state(struct ip *ip)
  *
  *  =========================================================================
  */
-#if HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE in
 ip_queue_xmit(struct sk_buff * skb)
 {
@@ -349,7 +352,7 @@ ip_queue_xmit(struct sk_buff * skb)
 	ip_select_ident(iph, &rt->u.dst, NULL);
 #endif
 	ip_send_check(iph);
-#if HAVE_KFUNC_IP_DST_OUTPUT
+#ifdef HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
 #else
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
@@ -414,13 +417,15 @@ ip_xmit_msg(uint32_t daddr, uint32_t saddr, uint8_t protoid, mblk_t *mp, struct 
 			iph->protocol = protoid;
 			iph->tot_len = htons(len);
 			skb->nh.iph = iph;
-#if ! HAVE_KFUNC_DST_OUTPUT
-#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
-#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 			__ip_select_ident(iph, &rt->u.dat, 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 #endif
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possible a message buffer chain 
@@ -434,7 +439,7 @@ ip_xmit_msg(uint32_t daddr, uint32_t saddr, uint8_t protoid, mblk_t *mp, struct 
 				} else
 					rare();
 			}
-#if HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, ip_queue_xmit);
 #else
 			ip_queue_xmit(skb);

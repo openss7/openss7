@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #include "log.h"
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_LOG_MODID	LOG_DRV_ID
 #define CONFIG_STREAMS_LOG_NAME		LOG_DRV_NAME
 #define CONFIG_STREAMS_LOG_MAJOR	LOG_CMAJOR_0
@@ -87,7 +87,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/21 20:47:26 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/12/28 10:01:21 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -147,7 +147,7 @@ MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR) "-*");
 MODULE_ALIAS("/dev/log");
 MODULE_ALIAS("/dev/strlog");
 MODULE_ALIAS("/dev/conslog");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");

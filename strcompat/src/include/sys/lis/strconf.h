@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.12 2005/12/19 03:26:00 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.13 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:26:00 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/19 03:26:00 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -134,7 +134,7 @@ extern int _RP lis_check_q_magic(queue_t *q, char *file, int line);
 extern int _RP lis_clone_major(void);
 
 #if 0
-#if HAVE_KERNEL_FATTACH_SUPPORT
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 extern int _RP lis_fattach(struct file *f, const char *path);
 extern int _RP lis_fdetach(const char *path);
 #endif
@@ -160,7 +160,7 @@ extern int _RP lis_ioc_pipe(unsigned int *fildes);
 extern struct inode *_RP lis_old_inode(struct file *f, struct inode *i);
 extern lis_atomic_t lis_open_cnt __depr;
 
-#if HAVE_KERNEL_PIPE_SUPPORT
+#ifdef HAVE_KERNEL_PIPE_SUPPORT
 extern int _RP lis_pipe(unsigned int *fd);
 #endif
 extern unsigned _RP lis_poll_2_1(struct file *fp, poll_table * wait);
@@ -194,8 +194,10 @@ extern ssize_t _RP lis_strwrite(struct file *fp, const char *ubuff, size_t ulen,
 extern int _RP lis_valid_mod_list(struct str_list ml);
 #endif
 
-#elif defined(_LIS_SOURCE)
+#else
+#ifdef _LIS_SOURCE
 #warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
 #endif				/* __SYS_LIS_STRCONF_H__ */

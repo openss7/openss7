@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_NULS_MODID	NULS_DRV_ID
 #define CONFIG_STREAMS_NULS_NAME	NULS_DRV_NAME
 #define CONFIG_STREAMS_NULS_MAJOR	NULS_CMAJOR_0
@@ -67,7 +67,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/21 20:47:26 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/12/28 10:01:21 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -125,7 +125,7 @@ MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto alloca
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NULS_MAJOR) "-*");
 MODULE_ALIAS("/dev/nuls");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NULS_MAJOR));
 MODULE_ALIAS("/dev/streams/nuls");
 MODULE_ALIAS("/dev/streams/nuls/*");

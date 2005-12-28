@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: liskmod.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/13 12:01:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/07/13 12:01:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: liskmod.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/13 12:01:15 $"
 
 /************************************************************************
 *                      LiS Kernel Module                                *
@@ -87,12 +87,14 @@
 #include <linux/module.h>
 #include <linux/init.h>
 
-#if   LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
 #define KERNEL_2_0
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(2,3,0)
+#else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,3,0)
 #define KERNEL_2_2
 #else
 #define	KERNEL_2_4
+#endif
 #endif
 
 #include <linux/kernel.h>	/* for printk */
@@ -156,7 +158,8 @@ put_unused_fd(unsigned int fd)
 	FD_CLR(fd, &current->files->open_fds);
 }
 
-# elif LINUX_VERSION_CODE < KERNEL_VERSION(2,2,18)
+# else
+#  if LINUX_VERSION_CODE < KERNEL_VERSION(2,2,18)
 
 void
 put_unused_fd(unsigned int fd)
@@ -166,11 +169,13 @@ put_unused_fd(unsigned int fd)
 		current->files->next_fd = fd;
 }
 
-# else
+#  else
 	/* kernel version 2.2.17 should have this visible */
+#  endif
 # endif
 
-#elif defined(KERNEL_2_4)
+#else
+#if defined(KERNEL_2_4)
 
 # if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,1)
 
@@ -196,6 +201,7 @@ put_unused_fd(unsigned int fd)
 	/* kernel version 2.4.1 should have this visible */
 # endif
 
+#endif
 #endif
 
 /************************************************************************

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:22 $
+ @(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/07/18 11:51:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 11:51:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:22 $"
+#ident "@(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/07/18 11:51:27 $"
 
 static char const ident[] =
-    "$RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:22 $";
+    "$RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/07/18 11:51:27 $";
 
 #define	inline			/* make disappear */
 
@@ -63,29 +63,33 @@ static char const ident[] =
 
 #include <unistd.h>
 #include <time.h>
-#if 	defined(LINUX)
+#ifdef LINUX
 #include <stdio.h>
 #include <fcntl.h>
 #include "linuxio.h"
-#elif	defined(SYS_QNX)
+#else
+#ifdef SYS_QNX
 #include "qnxio.h"
 #include <ioctl.h>
 #else
 #include "usrio.h"
 #endif
+#endif
 
 /************************************************************************
 *                      File Names                                       *
 ************************************************************************/
-#if	defined(LINUX)
+#ifdef LINUX
 #define NULL_CLONE	"/dev/null_clone"
 #define	LOOP_1		"/dev/loop.1"
-#elif	defined(QNX)
+#else
+#ifdef QNX
 #define NULL_CLONE	"/dev/gcom/null_clone"
 #define	LOOP_1		"/dev/gcom/loop.1"
 #else
 #define NULL_CLONE	"null_clone"
 #define	LOOP_1		"loop.1"
+#endif
 #endif
 
 /************************************************************************

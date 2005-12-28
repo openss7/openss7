@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:46:18 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:00:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/19 12:46:18 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -230,12 +230,14 @@ STATIC int min_sctp_max_burst = 1;
 #define sctp_default_istreams		33
 #define sctp_default_cookie_inc		1000	/* milliseconds */
 #define sctp_default_throttle_itvl	50	/* milliseconds */
-#if defined SCTP_CONFIG_HMAC_MD5
+#ifdef SCTP_CONFIG_HMAC_MD5
 #define sctp_default_mac_type		T_SCTP_HMAC_MD5
-#elif defined SCTP_CONFIG_HMAC_SHA1
+#else
+#ifdef SCTP_CONFIG_HMAC_SHA1
 #define sctp_default_mac_type		T_SCTP_HMAC_SHA1
 #else
 #define sctp_default_mac_type		T_SCTP_HMAC_NONE
+#endif
 #endif
 #if defined SCTP_CONFIG_CRC32C
 #define sctp_default_cksum_type		T_SCTP_CSUM_CRC32C
@@ -982,7 +984,7 @@ DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 #define SCTP_INC_STATS_USER(field)	SNMP_INC_STATS(sctp_statistics, field)
 #endif				/* SOCKETS */
 
-#if HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_KINC_LINUX_SNMP_H
 #define SctpRtoAlgorithm	SCTP_MIB_RTOALGORITHM
 #define SctpRtoMin		SCTP_MIB_RTOMIN
 #define SctpRtoMax		SCTP_MIB_RTOMAX
@@ -2295,8 +2297,10 @@ cksum_generate(void *buf, size_t len)
 
 #if defined(SCTP_CONFIG_CRC_32C)||!defined(SCTP_CONFIG_ADLER_32)
 	csum = crc32c(~0UL, buf, len);
-#elif defined(SCTP_CONFIG_ADLER_32)
+#else
+#ifdef SCTP_CONFIG_ADLER_32
 	csum = adler32(1UL, buf, len);
+#endif
 #endif				/* defined(SCTP_CONFIG_ADLER_32) */
 	return (csum);
 }
@@ -4702,7 +4706,7 @@ sp_dst_reset(struct sctp *sp)
 			dst_release(xchg(&sd->dst_cache, NULL));
 }
 
-#if HAVE_KFUNC_DST_MTU
+#ifdef HAVE_KFUNC_DST_MTU
 /* Why do stupid people rename things like this? */
 #undef dst_pmtu
 #define dst_pmtu dst_mtu
@@ -4912,7 +4916,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
  *  -------------------------------------------------------------------------
  *  We need this broken out so that we can use the netfilter hooks.
  */
-#if HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
 sctp_queue_xmit(struct sk_buff *skb)
 {
@@ -4925,7 +4929,7 @@ sctp_queue_xmit(struct sk_buff *skb)
 	ip_select_ident(iph, &rt->u.dst, NULL);
 #endif
 	ip_send_check(iph);
-#if HAVE_KFUNC_IP_DST_OUTPUT
+#ifdef HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
 #else
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
@@ -4999,13 +5003,15 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
-#if ! HAVE_KFUNC_DST_OUTPUT
-#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
-#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 			__ip_select_ident(iph, &rt->u.dst, 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 #endif
 #endif
 			/* For sockets the passed in sk_buff represents a single packet.  For
@@ -5026,7 +5032,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum_generate(sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
-#if HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC_DST_OUTPUT
 			sctp_queue_xmit(skb);
 #else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
@@ -5097,8 +5103,10 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 #if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
-#elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			iph->ttl = ip->uc_ttl;
+#endif
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 #else
 			iph->ttl = ip->uc_ttl;
@@ -5108,13 +5116,15 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->protocol = sp->protocol;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
-#if ! HAVE_KFUNC_DST_OUTPUT
-#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
-#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 			__ip_select_ident(iph, &rt->u.dst, 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 #endif
 #endif
 			/* For sockets the passed in sk_buff represents a single packet.  For
@@ -5135,7 +5145,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum(sp, sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
-#if HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 			sctp_queue_xmit(skb);
@@ -5244,8 +5254,10 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 #if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
-#elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		iph->ttl = ip->uc_ttl;
+#endif
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 #else
 		iph->ttl = ip->uc_ttl;
@@ -5255,13 +5267,15 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->protocol = sp->protocol;
 		iph->tot_len = htons(tlen);
 		skb->nh.iph = iph;
-#if ! HAVE_KFUNC_DST_OUTPUT
-#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 		__ip_select_ident(iph, sd->dst_cache);
-#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#else
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 		__ip_select_ident(iph, sd->dst_cache, 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 #endif
 #endif
 		/* For sockets, socket buffers representing chunks are chained together by control
@@ -5319,7 +5333,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 			sh->check = htonl(cksum(sp, sh, plen));
 		SCTP_INC_STATS(SctpOutSCTPPacks);
-#if HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC_DST_OUTPUT
 		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 		sctp_queue_xmit(skb);
@@ -10994,7 +11008,7 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 		sctp_send_abort_error_ootb(iph->saddr, iph->daddr, sh,
 					   SCTP_CAUSE_NO_RESOURCE, NULL, 0);
 		if (err == -ERESTART)
-#if HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_KINC_LINUX_SNMP_H
 			NET_INC_STATS_BH(LINUX_MIB_LISTENOVERFLOWS);
 #else
 			NET_INC_STATS_BH(ListenOverflows);
@@ -12896,7 +12910,7 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
 STATIC int sctp_port_rover = 0;
 
 /* FIXME: the following should be done in the hooks file. */
-#if HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
 extern int sysctl_local_port_range[2];
 #else				/* sysctl_local_port_range */
 STATIC int sysctl_local_port_range[2] = { 1024, 4999 };
@@ -13209,8 +13223,10 @@ sctp_init_struct(struct sctp *sp)
 #if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 	sp->inet.ttl = sysctl_ip_default_ttl;
-#elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 	sp->inet.uc_ttl = sysctl_ip_default_ttl;
+#endif
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 #else
 	sp->inet.uc_ttl = sysctl_ip_default_ttl;
@@ -16042,10 +16058,12 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 				if (*valp < 1)
 					*valp = 1;
 #if 0
-#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 				np->ttl = *valp;
-#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 				np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 #else
 				np->uc_ttl = *valp;
@@ -18982,18 +19000,20 @@ t_build_conn_opts(struct sctp *sp, unsigned char *op, size_t olen)
 		oh->len = _T_LENGTH_SIZEOF(sp->options.ip.ttl);
 		oh->status = T_SUCCESS;
 #if 0
-#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		if (sp->options.ip.ttl != np->ttl) {
 			if (sp->options.ip.ttl > np->ttl)
 				oh->status = T_PARTSUCCESS;
 			sp->options.ip.ttl = np->ttl;
 		}
-#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		if (sp->options.ip.ttl != np->uc_ttl) {
 			if (sp->options.ip.ttl > np->uc_ttl)
 				oh->status = T_PARTSUCCESS;
 			sp->options.ip.ttl = np->uc_ttl;
 		}
+#endif
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 #else
 		if (sp->options.ip.ttl != np->uc_ttl) {
@@ -22843,10 +22863,12 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 					}
 					t->options.ip.ttl = *valp;
 #if 0
-#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 					np->ttl = *valp;
-#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 					np->uc_ttl = *valp;
+#endif
 #endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 #else
 					np->uc_ttl = *valp;
@@ -27135,7 +27157,7 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	goto drop;
       drop:
-#if HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_KINC_LINUX_SNMP_H
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
@@ -27665,7 +27687,7 @@ sctp_get_info(char *buffer, char **start, off_t offset, int length)
 }
 #endif				/* SOCKETS */
 
-#if HAVE_KINC_LINUX_PERCPU_H
+#ifdef HAVE_KINC_LINUX_PERCPU_H
 STATIC void
 sctp_init_stats(void)
 {
@@ -28064,7 +28086,7 @@ sctp_init(void)
 #ifdef CONFIG_PROC_FS
 	sctp_init_procfs();
 #endif				/* CONFIG_PROC_FS */
-#if HAVE_KINC_LINUX_PERCPU_H
+#ifdef HAVE_KINC_LINUX_PERCPU_H
 	sctp_init_stats();
 #endif				/* HAVE_KINC_LINUX_PERCPU_H */
 	return;
@@ -28073,7 +28095,7 @@ sctp_init(void)
 STATIC void
 sctp_terminate(void)
 {
-#if HAVE_KINC_LINUX_PERCPU_H
+#ifdef HAVE_KINC_LINUX_PERCPU_H
 	sctp_term_stats();
 #endif				/* HAVE_KINC_LINUX_PERCPU_H */
 #ifdef CONFIG_PROC_FS

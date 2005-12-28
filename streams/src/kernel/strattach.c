@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/22 10:28:42 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/22 10:28:42 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/12/22 10:28:42 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/12/28 09:48:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,11 +72,11 @@ static char const ident[] =
 #include <asm/uaccess.h>
 
 #include <linux/seq_file.h>
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 #include <linux/file.h>
-#if HAVE_KINC_LINUX_NAMEI_H
+#ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
 
@@ -114,8 +114,7 @@ STATIC int (*do_umount) (struct vfsmount * mnt, int flags)
 = (typeof(do_umount)) HAVE_DO_UMOUNT_ADDR;
 #endif
 
-#if HAVE_PATH_LOOKUP_EXPORT
-#else
+#ifndef HAVE_PATH_LOOKUP_EXPORT
 int
 path_lookup(const char *path, unsigned flags, struct nameidata *nd)
 {

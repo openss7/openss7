@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:49 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 09:58:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:49 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:49 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 09:58:25 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:49 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/12/28 09:58:25 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -104,10 +104,12 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $
 #pragma weak isastream
 #endif
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef defined HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -5890,10 +5892,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.4 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.5 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.4 $)
- * @date \$Date: 2005/05/14 08:30:49 $
+ * @version \$Name:  $(\$Revision: 0.9.2.5 $)
+ * @date \$Date: 2005/12/28 09:58:25 $
  *
  * @}
  */

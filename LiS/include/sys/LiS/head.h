@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: head.h,v 1.1.1.4.4.6 2005/12/18 06:38:20 brian Exp $
+ @(#) $Id: head.h,v 1.1.1.4.4.7 2005/12/19 03:22:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:38:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/19 03:22:22 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: head.h,v 1.1.1.4.4.6 2005/12/18 06:38:20 brian Exp $
+ * RCS Id          : $Id: head.h,v 1.1.1.4.4.7 2005/12/19 03:22:22 brian Exp $
  * Purpose         : here you have utilites to handle str heads.
  * ----------------______________________________________________
  *
@@ -70,7 +70,7 @@
 #ifndef _HEAD_H
 #define _HEAD_H 1
 
-#ident "@(#) $RCSfile: head.h,v $ $Name:  $($Revision: 1.1.1.4.4.6 $) $Date: 2005/12/18 06:38:20 $"
+#ident "@(#) $RCSfile: head.h,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2005/12/19 03:22:22 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -297,12 +297,14 @@ typedef struct stdata {
 	int sd_maxpushcnt;		/* currently there's no limit in # of pushed mods, but
 					   let's set up an artificial one to aid debugging */
 	struct strevent *sd_siglist;	/* processes to be sent SIGPOLL */
-#if defined(PORTABLE_POLL)
+#ifdef PORTABLE_POLL
 	struct pollhead sd_polllist;	/* polling processes */
-#elif defined(LINUX_POLL)
+#else
+#ifdef LINUX_POLL
 	wait_queue_head_t sd_task_list;	/* tasks waiting on poll */
 #else
 #error "Either PORTABLE_POLL or LINUX_POLL must be defined"
+#endif
 #endif
 	lis_semaphore_t sd_opening;	/* stream is opening */
 	lis_semaphore_t sd_close_wt;	/* Waiting for close to complete */

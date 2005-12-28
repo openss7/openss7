@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/07/15 23:08:28 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:28 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUX_DDI_H__
 #define __SYS_HPUX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/15 23:08:28 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -75,8 +75,10 @@
 
 extern lock_t *get_sleep_lock(caddr_t event);
 
-#elif defined(_HPUX_SOURCE)
+#else
+#ifdef _HPUX_SOURCE
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_HPUX */
 
 #endif				/* __SYS_HPUX_DDI_H__ */

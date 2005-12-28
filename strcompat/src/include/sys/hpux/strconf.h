@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:42 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.9 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUX_STRCONF_H__
 #define __SYS_HPUX_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:42 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -90,8 +90,10 @@ extern int str_uninstall(struct stream_inst *inst);
 #define str_install(__inst) str_install_HPUX(__inst)
 #endif
 
-#elif defined(_HPUX_SOURCE)
+#else
+#ifdef _HPUX_SOURCE
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_HPUX */
 
 #endif				/* __SYS_HPUX_STRCONF_H__ */

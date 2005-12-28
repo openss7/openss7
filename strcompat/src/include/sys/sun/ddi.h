@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.17 2005/07/18 12:25:41 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.18 2005/12/28 09:51:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:25:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 12:25:41 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/28 09:51:49 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -75,7 +75,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
-#if LFS
+#ifdef LFS
 __SUN_EXTERN_INLINE cred_t *
 ddi_get_cred(void)
 {
@@ -104,7 +104,7 @@ ddi_get_time(void)
 __SUN_EXTERN_INLINE unsigned short
 ddi_getiminor(dev_t dev)
 {
-#if HAVE_KFUNC_TO_KDEV_T
+#ifdef HAVE_KFUNC_TO_KDEV_T
 	kdev_t kdev;
 
 	kdev = to_kdev_t(dev);
@@ -422,8 +422,10 @@ extern int ddi_umem_unlock(void);
 extern int ddi_unmap_regs(void);
 #endif
 
-#elif defined(_SUN_SOURCE)
+#else
+#ifdef _SUN_SOURCE
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
+#endif
 #endif				/* CONFIG_STREAMS_COMPAT_SUN */
 
 #endif				/* __SYS_SUN_DDI_H__ */

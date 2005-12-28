@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/12/19 12:47:26 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/12/19 12:47:26 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/12/19 12:47:26 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.27 $) $Date: 2005/12/19 12:47:26 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -286,11 +286,12 @@ typedef struct {
 /*
  *  Transmission priorities
  */
-#if defined(TC_PRIO_BULK)
+#ifdef TC_PRIO_BULK
 #define LDLPRI_LO	TC_PRIO_BULK
 #define LDLPRI_MED	TC_PRIO_BESTEFFORT
 #define LDLPRI_HI	TC_PRIO_INTERACTIVE
-#elif defined(SOPRI_BACKGROUND)
+#else
+#ifdef SOPRI_BACKGROUND
 #define LDLPRI_LO	SOPRI_BACKGROUND
 #define LDLPRI_MED	SOPRI_NORMAL
 #define LDLPRI_HI	SOPRI_INTERACTIVE
@@ -298,6 +299,7 @@ typedef struct {
 #define LDLPRI_LO       0
 #define LDLPRI_MED      0
 #define LDLPRI_HI       0
+#endif
 #endif
 
 /*
@@ -722,19 +724,23 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		pt->pt.type = saptype;
 		pt->pt.dev = dl->ndev->dev;
 		pt->pt.func = rcv_func;
-#if HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV
 		pt->pt.af_packet_priv = (void *) 1;	/* indicate "new style" packet handler */
-#elif HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA
+#else
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA
 		pt->pt.data = (void *) 1;	/* indicate "new style" packet handler */
 #else
 #error Must have HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA or HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV defined.
 #endif
-#if HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT
+#endif
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT
 		pt->pt.next = NULL;
-#elif HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST
+#else
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST
 		pt->pt.list = (struct list_head) LIST_HEAD_INIT(pt->pt.list);
 #else
 #error Must have HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT or HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST defined.
+#endif
 #endif
 		spin_unlock(&first_pt_lock);
 		dev_add_pack(&pt->pt);
@@ -1263,7 +1269,7 @@ ndev_skb_destruct(struct sk_buff *skb)
 	}
 }
 
-#if defined(KERNEL_2_1)
+#ifdef KERNEL_2_1
 
 STATIC int
 ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
@@ -1308,7 +1314,8 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	return ret;
 }
 
-#elif defined(too_complicated_KERNEL_2_1)
+#else
+#ifdef too_complicated_KERNEL_2_1
 
 STATIC int
 ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
@@ -1374,6 +1381,7 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
 	dev_queue_xmit(skb, ndev->dev, pri);
 	return DONE;
 }
+#endif
 #endif
 
 /****************************************************************************/
@@ -4630,7 +4638,8 @@ module_init(ldl_init);
 module_exit(ldl_exit);
 #endif
 
-#elif defined LIS
+#else
+#ifdef LIS
 
 STATIC int ldl_initialized = 0;
 STATIC void
@@ -4685,4 +4694,5 @@ cleanup_module(void)
 	return ldl_terminate();
 }
 
+#endif
 #endif

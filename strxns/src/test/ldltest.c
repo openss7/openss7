@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:40:29 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 10:01:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:40:29 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.8  2005/12/28 10:01:51  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.7  2005/07/18 12:40:29  brian
  - standard indentation
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:40:29 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 10:01:51 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 12:40:29 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/28 10:01:51 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -241,12 +244,14 @@ typedef struct tr_llc_frm_hdr {
  *  IP header structure, snipped from <linux/ip.h>
  */
 struct iphdr {
-#if defined(__LITTLE_ENDIAN_BITFIELD)
+#ifdef __LITTLE_ENDIAN_BITFIELD
 	__u8 ihl:4, version:4;
-#elif defined (__BIG_ENDIAN_BITFIELD)
+#else
+#ifdef __BIG_ENDIAN_BITFIELD
 	__u8 version:4, ihl:4;
 #else
 #error  "Please fix byteorder"
+#endif
 #endif
 	__u8 tos;
 	__u16 tot_len;

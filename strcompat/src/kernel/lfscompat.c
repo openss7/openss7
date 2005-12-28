@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/22 10:28:53 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.19  2005/12/28 09:51:50  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.18  2005/12/22 10:28:53  brian
  - no symbol mangling for 2.4 kernels
 
@@ -107,10 +110,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/22 10:28:53 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/22 10:28:53 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:51:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -133,7 +136,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/22 10:28:53 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:51:50 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -249,10 +252,10 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(unsigned long *) value_p = jiffies;
 		return (0);
 	case PPGP:
-#if HAVE_KFUNC_PROCESS_GROUP
+#ifdef HAVE_KFUNC_PROCESS_GROUP
 		*(pid_t *) value_p = process_group(current);
 #else				/* HAVE_KFUNC_PROCESS_GROUP */
-#if HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
+#ifdef HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 		*(pid_t *) value_p = current->pgrp;
 #else				/* HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP */
 		*(pid_t *) value_p = current->signal->pgrp;
@@ -266,7 +269,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->pid;
 		return (0);
 	case PSID:
-#if HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+#ifdef HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 		*(pid_t *) value_p = current->session;
 #else				/* HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION */
 		*(pid_t *) value_p = current->signal->session;
@@ -284,7 +287,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(cred_t **) value_p = ((cred_t *)current->uid);
 		return (0);
 	case STRMSGSIZE:
-#if LFS
+#ifdef LFS
 		*(int *) value_p = sysctl_str_strmsgsz;
 		return (0);
 #else

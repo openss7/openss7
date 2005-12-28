@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/05/14 08:30:03 $
+ @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:03 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:55:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netsh.c,v $
+ Revision 1.1.1.12  2005/12/28 09:55:59  brian
+ - remove warnings on FC4 compile
+
  Revision 1.1.1.11  2005/05/14 08:30:03  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/05/14 08:30:03 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $"
 
-static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/05/14 08:30:03 $";
+static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -74,40 +77,40 @@ char	netsh_id[]="\
 /****************************************************************/
 
 #include <stdio.h>
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
-#if HAVE_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
 #if STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
-# if HAVE_STDLIB_H
+# ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H
+#ifdef HAVE_STRING_H
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #else
-# if HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
 #endif
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#if HAVE_MALLOC_H
+#ifdef HAVE_MALLOC_H
 # include <malloc.h>
 #endif
 
@@ -117,7 +120,7 @@ char	netsh_id[]="\
 # endif /* __VMS */
 #endif /* WIN32 */
 
-#if HAVE_FCNTL_H
+#ifdef HAVE_FCNTL_H
 # include <fcntl.h>
 #endif
 
@@ -134,19 +137,19 @@ char	netsh_id[]="\
 #  include <sys/time.h>
 #  include <time.h>
 # else
-#  if HAVE_SYS_TIME_H
+#  ifdef HAVE_SYS_TIME_H
 #   include <sys/time.h>
 #  else
 #   include <time.h>
 #  endif
 # endif
-# if HAVE_SYS_SOCKET_H
+# ifdef HAVE_SYS_SOCKET_H
 #  include <sys/socket.h>
 # endif
-# if HAVE_NETINET_IN_H
+# ifdef HAVE_NETINET_IN_H
 #  include <netinet/in.h>
 # endif
-# if HAVE_NETDB_H
+# ifdef HAVE_NETDB_H
 #  include <netdb.h>
 # endif
 #else
@@ -177,7 +180,7 @@ double atof(const char *);
 #ifdef DO_UNIX
 #include "nettest_unix.h"
 #ifndef WIN32
-#if HAVE_SYS_SOCKET_H
+#ifdef HAVE_SYS_SOCKET_H
 # include "sys/socket.h"
 #endif
 #endif  // !WIN32

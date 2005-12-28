@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 09:57:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/09/24 01:19:44 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:57:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 09:57:08 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 09:57:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -158,9 +158,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.31 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.32 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/09/24 01:19:44 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/28 09:57:08 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1993,8 +1993,10 @@ cksum_generate(void *buf, size_t len)
 
 #if defined(SCTP_CONFIG_CRC_32C)||!defined(SCTP_CONFIG_ADLER_32)
 	csum = crc32c(~0UL, buf, len);
-#elif defined(SCTP_CONFIG_ADLER_32)
+#else
+#ifdef SCTP_CONFIG_ADLER_32
 	csum = adler32(1UL, buf, len);
+#endif
 #endif				/* defined(SCTP_CONFIG_ADLER_32) */
 	return (csum);
 }
@@ -4306,14 +4308,16 @@ sctp_update_routes(struct sock *sk, int force_reselect)
 			sd->saddr = 0;
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
-#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0);
-#elif defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+#else
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 			err =
 			    ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0, IPPROTO_SCTP,
 					     sk->sport, sk->dport, NULL);
 #else				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 #error One of HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+#endif
 #endif				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 			if (err < 0 || !rt || rt->u.dst.obsolete) {
 				rare();
@@ -4377,14 +4381,16 @@ sctp_update_routes(struct sock *sk, int force_reselect)
 			/* see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
 
-#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif))
-#elif defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+#else
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif, IPPROTO_SCTP,
 			     sk->sport, sk->dport, NULL))
 #else				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 #error One of HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+#endif
 #endif				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 			{
 				if (rt2->rt_src != rt->rt_src) {
@@ -4614,10 +4620,12 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
-#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
-#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			iph->ttl = ip->uc_ttl;
+#endif
 #endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
@@ -4739,10 +4747,12 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
-#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
-#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#else
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		iph->ttl = ip->uc_ttl;
+#endif
 #endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		iph->daddr = sd->daddr;	/* XXX */
 		iph->saddr = sd->saddr;
@@ -15922,12 +15932,14 @@ STATIC int
 sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 {
 #ifdef CONFIG_FILTER
-#if defined HAVE_SK_FILTER_2_ARGS
+#ifdef HAVE_SK_FILTER_2_ARGS
 	if (sk->filter && sk_filter(skb, sk->filter))
-#elif defined HAVE_SK_FILTER_3_ARGS
+#else
+#ifdef HAVE_SK_FILTER_3_ARGS
 	if (sk->filter && sk_filter(sk, skb, 1))
 #else
 #error HAVE_SK_FILTER_2_ARGS or HAVE_SK_FILTER_3_ARGS must be defined.
+#endif
 #endif
 	goto discard;
 #endif				/* CONFIG_FILTER */

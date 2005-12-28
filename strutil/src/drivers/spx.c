@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_SPX_MODID	SPX_DRV_ID
 #define CONFIG_STREAMS_SPX_NAME		SPX_DRV_NAME
 #define CONFIG_STREAMS_SPX_MAJOR	SPX_CMAJOR_0
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/21 20:47:26 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:21 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -124,7 +124,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR) "-*");
 MODULE_ALIAS("/dev/spx");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
 MODULE_ALIAS("/dev/streams/spx");
 MODULE_ALIAS("/dev/streams/spx/*");
@@ -206,7 +206,7 @@ spx_wput(queue_t *q, mblk_t *mp)
 			spin_lock(&spx_lock);
 			for (x = spx_list; x && x->q != oq; x = x->next) ;
 			if (x && x->q == oq) {
-#if LIS
+#ifdef LIS
 #else
 				weldq(WR(q), oq, WR(oq), q, NULL, NULL, NULL);
 #endif

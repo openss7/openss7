@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
 #include "fifo.h"		/* for fifo stuff */
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_SFX_MODID	SFX_DRV_ID
 #define CONFIG_STREAMS_SFX_NAME		SFX_DRV_NAME
 #define CONFIG_STREAMS_SFX_MAJOR	SFX_CMAJOR_0
@@ -70,7 +70,7 @@ extern struct file_operations strm_f_ops;
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/21 20:47:26 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/28 10:01:21 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -131,7 +131,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs (0 for allo
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR) "-*");
 MODULE_ALIAS("/dev/sfx");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/streams/sfx");
 MODULE_ALIAS("/dev/streams/sfx/*");
@@ -179,7 +179,7 @@ static struct streamtab sfx_info = {
 static int
 sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-#if LIS
+#ifdef LIS
 	return (ENXIO);
 #else
 	int err;

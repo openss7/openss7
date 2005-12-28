@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:41 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.9 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AIX_STRCONF_H__
 #define __SYS_AIX_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:41 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:47 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -108,8 +108,10 @@ extern int str_install_AIX(int cmd, strconf_t * conf);
 #define str_install(__cmd, __conf) str_install_AIX(__cmd, __conf)
 #endif
 
-#elif defined(_AIX_SOURCE)
+#else
+#ifdef _AIX_SOURCE
 #warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
+#endif
 #endif
 
 #endif				/* __SYS_AIX_STRCONF_H__ */

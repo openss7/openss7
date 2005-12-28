@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:47:33 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/12/19 12:47:33 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/12/28 10:01:51 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -1528,7 +1528,7 @@ module_param(modid, ushort, 0);
 MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
 #endif				/* LINUX */
 
-#if defined LFS
+#ifdef LFS
 STATIC struct fmodsw ip_to_streams_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &ip_to_streams_info,
@@ -1552,7 +1552,8 @@ ip_to_streams_unregister_module(void)
 {
 	return (void) unregister_strmod(&ip_to_streams_fmod);
 }
-#elif defined LIS
+#else
+#ifdef LIS
 STATIC int
 ip_to_streams_register_module(void)
 {
@@ -1572,6 +1573,7 @@ ip_to_streams_unregister_module(void)
 	/* LiS provides detailed error here when they are discarded. */
 	return (void) lis_unregister_strmod(&ip_to_streams_info);
 }
+#endif
 #endif
 
 STATIC int __init

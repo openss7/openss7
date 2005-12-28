@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/23 22:09:55 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:32 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:09:55 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.13  2005/12/28 09:58:32  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.12  2005/06/23 22:09:55  brian
  - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/23 22:09:55 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:32 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/23 22:09:55 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:32 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -121,11 +124,13 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #   define __constant_ntohs(x)	(x)
 #   define __constant_htonl(x)	(x)
 #   define __constant_htons(x)	(x)
-#elif __BYTE_ORDER == __LITTLE_ENDIAN
+#else
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 #   define __constant_ntohl(x)	__bswap_constant_32(x)
 #   define __constant_ntohs(x)	__bswap_constant_16(x)
 #   define __constant_htonl(x)	__bswap_constant_32(x)
 #   define __constant_htons(x)	__bswap_constant_16(x)
+#endif
 #endif
 
 #define SUCCESS		 0
@@ -954,7 +959,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+#else
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 		data.len = 4 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -972,7 +978,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
+#else
+#if defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 		data.len = 5 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -990,7 +997,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+#else
+#if defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
 		data.len = 3 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -1008,6 +1016,8 @@ send(int msg)
 		return SUCCESS;
 #else
 		return FAILURE;
+#endif
+#endif
 #endif
 	case MSU_TOO_SHORT:
 		msu_len = 1;
@@ -1042,7 +1052,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+#else
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 		pt_fsn++;
 		pt_fsn &= 0xffffff;
 		if (!cntmsg) {
@@ -1067,7 +1078,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
+#else
+#if defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 		pt_fsn++;
 		pt_fsn &= 0xffffff;
 		if (!cntmsg) {
@@ -1095,6 +1107,8 @@ send(int msg)
 #else
 		return FAILURE;
 #endif
+#endif
+#endif
 	case BAD_ACK:
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 		return INCONCLUSIVE;
@@ -1120,7 +1134,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4_1)
+#else
+#if defined(M2PA_VERSION_DRAFT4_1)
 	      pt_ack_putmsg:
 		pt_printf("IN-SERVICE", "");
 		ptconf.qos_data.sid = 0;
@@ -1140,7 +1155,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4_9)
+#else
+#if defined(M2PA_VERSION_DRAFT4_9)
 	      pt_ack_putmsg:
 		pt_printf("IN-SERVICE", "");
 		ptconf.qos_data.sid = 0;
@@ -1160,7 +1176,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
+#else
+#if defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
 	      pt_ack_putmsg:
 		pt_printf("IN-SERVICE", "");
 		ptconf.qos_data.sid = 0;
@@ -1180,7 +1197,8 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
+#else
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 	      pt_ack_putmsg:
 		printf("               DATA-ACK  --%06X, %06X->                         \n", pt_fsn & 0xffffff, pt_bsn & 0xffffff);
 		FFLUSH(stdout);
@@ -1203,6 +1221,10 @@ send(int msg)
 		return SUCCESS;
 #else
 		return INCONCLUSIVE;
+#endif
+#endif
+#endif
+#endif
 #endif
 	case STOP:
 		printf("                  :stop                                             \n");
@@ -1683,12 +1705,16 @@ pt_decode_data(void)
 	{
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
 		uint mystatus = ((uint32_t *) pt_buf)[2];
-#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+#else
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 		uint mystatus = ((uint32_t *) pt_buf)[3];
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
+#else
+#if defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 		uint mystatus = ((uint32_t *) pt_buf)[4];
 #else
 #error "Draft poorly defined."
+#endif
+#endif
 #endif
 		switch (mystatus) {
 		case M2PA_STATUS_OUT_OF_SERVICE:
@@ -1839,12 +1865,16 @@ pt_decode_data(void)
 		case INVALID_STATUS:
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
 			printf("                         <-----------------  [INVALID STATUS %5u] \n", ntohl(((uint32_t *) pt_buf)[2]));
-#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+#else
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 			printf("                         <-%06X, %06X--  [INVALID STATUS %5u] \n", iut_bsn & 0xffffff, iut_fsn & 0xffffff, ntohl(((uint32_t *) pt_buf)[3]));
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
+#else
+#if defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 			printf("                         <-%06X, %06X--  [INVALID STATUS %5u] \n", iut_bsn & 0xffffff, iut_fsn & 0xffffff, ntohl(((uint32_t *) pt_buf)[4]));
 #else
 #error "Poorly defined version."
+#endif
+#endif
 #endif
 			FFLUSH(stdout);
 			return ret;
@@ -1862,16 +1892,20 @@ pt_decode_data(void)
 		case ACK:
 			iut_printf_sn("", "IN-SERVICE");
 			return ret;
-#elif defined(M2PA_VERSION_DRAFT3_1)
+#else
+#if defined(M2PA_VERSION_DRAFT3_1)
 		case ACK:
 			printf("                         <-----------------  ACK [%5u msgs]       \n", ntohl(((uint32_t *) pt_buf)[2]));
 			FFLUSH(stdout);
 			return ret;
-#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
+#else
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
 		case ACK:
 			printf("                         <-%06X, %06X--  DATA-ACK               \n", iut_bsn & 0xffffff, iut_fsn & 0xffffff);
 			FFLUSH(stdout);
 			return ret;
+#endif
+#endif
 #endif
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 		case PROVING:

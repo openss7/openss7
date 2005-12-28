@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/23 22:05:33 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:05:33 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:55:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/23 22:05:33 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/23 22:05:33 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -108,44 +108,44 @@ char	nettest_id[]="\
 /****************************************************************/
      
 #include <stdio.h>
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
-#if HAVE_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
 #if STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
-# if HAVE_STDLIB_H
+# ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H
+#ifdef HAVE_STRING_H
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #else
-# if HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
 #endif
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-#if HAVE_MALLOC_H
+#ifdef HAVE_MALLOC_H
 # include <malloc.h>
 #endif
 
-#if HAVE_FCNTL_H
+#ifdef HAVE_FCNTL_H
 # include <fcntl.h>
 #endif
 #ifndef WIN32
@@ -158,7 +158,7 @@ char	nettest_id[]="\
 #  include <sys/time.h>
 #  include <time.h>
 # else
-#  if HAVE_SYS_TIME_H
+#  ifdef HAVE_SYS_TIME_H
 #   include <sys/time.h>
 #  else
 #   include <time.h>
@@ -170,20 +170,20 @@ char	nettest_id[]="\
 # ifdef _GNU_SOURCE
 #  include <getopt.h>
 # endif /* _GNU_SOURCE */
-# if HAVE_SYS_SOCKET_H
+# ifdef HAVE_SYS_SOCKET_H
 #  include <sys/socket.h>
 # endif
-# if HAVE_NETINET_IN_H
+# ifdef HAVE_NETINET_IN_H
 #  include <netinet/in.h>
 # endif
 # include <netinet/tcp.h>
 # ifdef DO_SCTP
 #  include <netinet/sctp.h>
 # endif
-# if HAVE_ARPA_INET_H
+# ifdef HAVE_ARPA_INET_H
 #  include <arpa/inet.h>
 # endif
-# if HAVE_NETDB_H
+# ifdef HAVE_NETDB_H
 #  include <netdb.h>
 # endif
 #else /* WIN32 */
@@ -3659,7 +3659,7 @@ Size (bytes)\n\
     * which is defined & implemented in the kernel
     * but which has no libc stub.
     */
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
 #include <sys/scall_define.h>
@@ -4132,13 +4132,15 @@ if (send_width == 0) {
 			send_ring->length,
 			send_ring->hdtrl,
 			send_ring->flags)) != send_size)
-#elif defined(__linux)  || defined(__SunOS_5_9)
+#else
+#if defined(__linux)  || defined(__SunOS_5_9)
 	scratch_offset = send_ring->offset;
 	if ((len=sendfile(send_socket, 
 			  send_ring->fildes, 
 			  &scratch_offset,   /* modified after the call! */
 			  send_ring->length)) != send_size)
-#elif defined(__FreeBSD__)
+#else
+#if defined(__FreeBSD__)
       /* so close to HP-UX and yet so far away... :) */
       if ((sendfile(send_ring->fildes, 
 		    send_socket, 
@@ -4155,6 +4157,8 @@ if (send_width == 0) {
 			send_ring->length,
 			send_ring->hdtrl,
 			send_ring->flags)) != send_size)
+#endif
+#endif
 #endif /* QUICK_SENDPATH */
 	  {
 	    /* the test was interrupted, must be the end of test. the
@@ -4978,13 +4982,15 @@ if (send_width == 0) {
 			send_ring->length,
 			send_ring->hdtrl,
 			send_ring->flags)) != send_size)
-#elif defined(__linux)  || defined(__SunOS_5_9)
+#else
+#if defined(__linux)  || defined(__SunOS_5_9)
 	scratch_offset = send_ring->offset;
 	if ((len=sendfile(send_socket, 
 			  send_ring->fildes, 
 			  &scratch_offset,   /* modified after the call! */
 			  send_ring->length)) != send_size)
-#elif defined(__FreeBSD__)
+#else
+#if defined(__FreeBSD__)
       /* so close to HP-UX and yet so far away... :) */
       if ((sendfile(send_ring->fildes, 
 		    send_socket, 
@@ -5001,6 +5007,8 @@ if (send_width == 0) {
 			send_ring->length,
 			send_ring->hdtrl,
 			send_ring->flags)) != send_size)
+#endif
+#endif
 #endif /* QUICK_SENDPATH */
 	  {
 	    /* the test was interrupted, must be the end of test. the

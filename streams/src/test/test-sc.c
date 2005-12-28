@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/14 12:26:54 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:48:06 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/14 12:26:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sc.c,v $
+ Revision 0.9.2.20  2005/12/28 09:48:06  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.19  2005/10/14 12:26:54  brian
  - SC module and scls utility tested
 
@@ -131,18 +134,20 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/14 12:26:54 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:48:06 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/10/14 12:26:54 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/12/28 09:48:06 $";
 
 #include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -157,7 +162,7 @@ static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.
 #include <signal.h>
 #include <sys/uio.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

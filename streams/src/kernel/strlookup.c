@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/22 10:28:42 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/22 10:28:42 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/12/22 10:28:42 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:02 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 #include <linux/poll.h>
 #include <linux/fs.h>
 #include <linux/mount.h>	/* for vfsmount stuff */
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
 #include <asm/hardirq.h>
@@ -83,10 +83,10 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
-#if ! HAVE_KFUNC_TRY_MODULE_GET
+#ifndef HAVE_KFUNC_TRY_MODULE_GET
 #define try_module_get try_inc_mod_count
 #endif
-#if ! HAVE_KFUNC_MODULE_PUT
+#ifndef HAVE_KFUNC_MODULE_PUT
 #define module_put(__m) __MOD_DEC_USE_COUNT((__m))
 #define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
 #endif

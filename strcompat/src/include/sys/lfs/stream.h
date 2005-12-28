@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2005/12/19 12:44:20 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2005/12/28 09:51:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:20 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.8  2005/12/28 09:51:47  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.7  2005/12/19 12:44:20  brian
  - locking down for release
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -309,8 +312,10 @@ __LFS_EXTERN_INLINE void setq(queue_t *q, struct qinit *rinit, struct qinit *wri
 }
 
 
-#elif defined _LFS_SOURCE
+#else
+#ifdef _LFS_SOURCE
 #warning "_LFS_SOURCE defined by not CONFIG_STREAMS_COMPAT_LFS"
+#endif
 #endif
 
 #define STRHIGH		5120	/* default hi water mark */

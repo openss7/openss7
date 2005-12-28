@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/15 23:07:56 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:07:56 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:58:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/15 23:07:56 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/15 23:07:56 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $";
 
 #include <sys/os7/compat.h>
 
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #ifdef LINUX
 #include <linux/interrupt.h>	/* for local_irq functions */
-#if HAVE_KINC_ASM_SOFTIRQ_H
+#ifdef HAVE_KINC_ASM_SOFTIRQ_H
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
 #endif
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
@@ -122,7 +122,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/15 23:07:56 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:27 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1811,8 +1811,10 @@ cksum_generate(void *buf, size_t len)
 	uint32_t csum = 0;
 #if defined(SCTP_CONFIG_ADLER_32)||!defined(SCTP_CONFIG_CRC_32C)
 	csum = adler32(1UL, buf, len);
-#elif defined(SCTP_CONFIG_CRC_32C)
+#else
+#ifdef SCTP_CONFIG_CRC_32C
 	csum = crc32c(~0UL, buf, len);
+#endif
 #endif
 	return (csum);
 }
@@ -4100,7 +4102,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		if (!rt) {
 			if (sd->dif)
 				sd->saddr = 0;
-#if defined HAVE_OLD_STYLE_INET_PROTOCOL
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 			if ((err =
 			     ip_route_connect(&rt, sd->daddr, sd->saddr,
 					      RT_TOS(sp->ip_tos) | RTO_CONN | sp->ip_dontroute,
@@ -4108,7 +4110,8 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 				rare();
 				continue;
 			}
-#elif defined HAVE_NEW_STYLE_INET_PROTOCOL
+#else
+#ifdef HAVE_NEW_STYLE_INET_PROTOCOL
 			if ((err =
 			     ip_route_connect(&rt, sd->daddr, sd->saddr,
 					      RT_TOS(sp->ip_tos) | RTO_CONN | sp->ip_dontroute,
@@ -4119,6 +4122,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			}
 #else
 #error One of HAVE_OLD_STYLE_INET_PROTOCOL or HAVE_NEW_STYLE_INET_PROTOCOL must be defined.
+#endif
 #endif
 			if (rt->rt_flags & (RTCF_MULTICAST | RTCF_BROADCAST)
 			    && !sp->ip_broadcast) {
@@ -4171,15 +4175,17 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		if (sysctl_ip_dynaddr && sp->s_state == SCTP_COOKIE_WAIT && sd == sp->daddr) {
 			/* see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
-#if defined HAVE_OLD_STYLE_INET_PROTOCOL
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif))
-#elif defined HAVE_NEW_STYLE_INET_PROTOCOL
+#else
+#ifdef HAVE_NEW_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif,
 			     IPPROTO_SCTP, sp->sport, sp->dport, NULL))
 #else
 #error One of HAVE_OLD_STYLE_INET_PROTOCOL or HAVE_NEW_STYLE_INET_PROTOCOL must be defined.
+#endif
 #endif
 			{
 				if (rt2->rt_src != rt->rt_src) {

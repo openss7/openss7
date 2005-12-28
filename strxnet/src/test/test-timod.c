@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:39 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/28 10:01:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/04 07:36:39 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.22  2005/12/28 10:01:40  brian
+ - remove warnings on FC4 compile
+
  Revision 0.9.2.21  2005/11/04 07:36:39  brian
  - all test cases pass on Linux Fast-STREAMS
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:39 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/28 10:01:40 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/11/04 07:36:39 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/28 10:01:40 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -175,10 +178,12 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
 #include <stropts.h>
 #include <stdlib.h>
 
-#if HAVE_INTTYPES_H
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
-#elif HAVE_STDINT_H
-# include <stdint.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #include <unistd.h>
@@ -194,7 +199,7 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
 #include <sys/uio.h>
 #include <time.h>
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 

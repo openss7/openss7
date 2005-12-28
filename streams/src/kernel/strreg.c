@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/22 10:28:42 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/28 09:48:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/22 10:28:42 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/28 09:48:02 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/12/22 10:28:42 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/12/28 09:48:02 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -81,7 +81,7 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
-#if ! HAVE_KFUNC_MODULE_PUT
+#ifndef HAVE_KFUNC_MODULE_PUT
 #define module_refcount(__m) atomic_read(&(__m)->uc.usecount)
 #endif
 

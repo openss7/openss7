@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.9 2005/12/28 09:51:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_MAC_STRCONF_H__
 #define __SYS_MAC_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:43 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/28 09:51:48 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -74,8 +74,10 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_MAC) || defined(CONFIG_STREAMS_COMPAT_MAC_MODULE)
 
-#elif defined(_MAC_SOURCE)
+#else
+#ifdef _MAC_SOURCE
 #warning "_MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC"
+#endif
 #endif
 
 #endif				/* __SYS_MAC_STRCONF_H__ */

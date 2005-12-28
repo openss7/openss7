@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/12/22 10:28:54 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/12/28 09:51:50 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -103,7 +103,7 @@ __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
 
 EXPORT_SYMBOL_NOVERS(unfreezestr_SUN);
 
-#if LFS
+#ifdef LFS
 /**
  *  qwait:  - wait for a procedure to be called on a queue pair
  *  @rq:    a pointer to the read queue of the queue pair
@@ -126,7 +126,7 @@ qwait(queue_t *rq)
 EXPORT_SYMBOL_NOVERS(qwait);		/* sun/ddi.h */
 #endif
 
-#if LFS
+#ifdef LFS
 /**
  *  qwait_sig: - wait for a procedure on a queue pair or signal
  *  @rq:    a pointer to the read queue of the queue pair
@@ -153,7 +153,7 @@ qwait_sig(queue_t *rq)
 EXPORT_SYMBOL_NOVERS(qwait_sig);	/* sun/ddi.h */
 #endif
 
-#if LFS
+#ifdef LFS
 /**
  *  qbufcall:	- schedule a buffer callout
  *  @q:		queue used for synchronization
@@ -201,13 +201,13 @@ quntimeout(queue_t *q, timeout_id_t toid)
 }
 
 EXPORT_SYMBOL_NOVERS(quntimeout);	/* sun/ddi.h */
-#if LFS
+#ifdef LFS
 /* LIS already has queclass defined */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(queclass);	/* sun/ddi.h */
 #endif
-#if LFS
+#ifdef LFS
 /**
  *  qwriter:	- deferred call to a callback function.
  *  @qp:	a pointer to the RD() queue of a queue pair
@@ -623,7 +623,7 @@ mod_install(struct modlinkage *ml)
 		struct modlstrmod *mod = ml->ml_linkage[0];
 		int err;
 
-#if LIS
+#ifdef LIS
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
 
 		if ((err = lis_register_strmod(st, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
@@ -633,7 +633,7 @@ mod_install(struct modlinkage *ml)
 		}
 		return (-err);
 #endif
-#if LFS
+#ifdef LFS
 		/* registering a module */
 		struct fmodsw *fmod;
 
@@ -659,7 +659,7 @@ mod_install(struct modlinkage *ml)
 		struct modldrv *drv = ml->ml_linkage[0];
 		int err;
 
-#if LIS
+#ifdef LIS
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
 
 		if ((err =
@@ -670,7 +670,7 @@ mod_install(struct modlinkage *ml)
 		}
 		return (-err);
 #endif
-#if LFS
+#ifdef LFS
 		/* registering a driver */
 		struct cdevsw *cdev;
 
@@ -715,14 +715,14 @@ mod_remove(struct modlinkage *ml)
 		struct modlstrmod *mod = ml->ml_linkage[0];
 		int err;
 
-#if LIS
+#ifdef LIS
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
 
 		if ((err = lis_unregister_strmod(st)) >= 0)
 			return (DDI_SUCCESS);
 		return (-err);
 #endif
-#if LFS
+#ifdef LFS
 		struct fmodsw *fmod;
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
 
@@ -741,14 +741,14 @@ mod_remove(struct modlinkage *ml)
 		struct modldrv *drv = ml->ml_linkage[0];
 		int err;
 
-#if LIS
+#ifdef LIS
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
 
 		if ((err = lis_unregister_strdev(st->st_rdinit->qi_minfo->mi_idnum)) >= 0)
 			return (DDI_SUCCESS);
 		return (-err);
 #endif
-#if LFS
+#ifdef LFS
 		struct cdevsw *cdev;
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
 

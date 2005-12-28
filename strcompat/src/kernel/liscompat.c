@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/22 10:28:53 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/22 10:28:53 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/22 10:28:53 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/12/22 10:28:53 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -118,7 +118,7 @@ dont_use_this_function(void)
 }
 
 #ifdef CONFIG_STREAMS_DEBUG
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 static void
 warn_kern_violation(char *func, char *file, int line)
 {
@@ -166,7 +166,7 @@ __LIS_EXTERN_INLINE struct msgb *_RP lis_allocb_physreq(int size, unsigned int p
 						    void *physreq_ptr, char *file_name,
 						    int line_nr);
 EXPORT_SYMBOL_NOVERS(lis_allocb_physreq);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE queue_t *_RP lis_allocq(const char *name);
 
 EXPORT_SYMBOL_NOVERS(lis_allocq);
@@ -198,7 +198,7 @@ EXPORT_SYMBOL_NOVERS(lis_copyb);
 __LIS_EXTERN_INLINE mblk_t *_RP lis_copymsg(mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(lis_copymsg);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE int _RP lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len);
 
 EXPORT_SYMBOL_NOVERS(lis_copyin);
@@ -236,7 +236,7 @@ EXPORT_SYMBOL_NOVERS(lis_freezestr);
 __LIS_EXTERN_INLINE mblk_t *_RP lis_getq(queue_t *q);
 
 EXPORT_SYMBOL_NOVERS(lis_getq);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void _RP lis_freeq(queue_t *q);
 
 EXPORT_SYMBOL_NOVERS(lis_freeq);
@@ -286,7 +286,7 @@ EXPORT_SYMBOL_NOVERS(lis_putq);
 __LIS_EXTERN_INLINE int _RP lis_qcountstrm(queue_t *q);
 
 EXPORT_SYMBOL_NOVERS(lis_qcountstrm);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void _RP lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds);
 
 EXPORT_SYMBOL_NOVERS(lis_qdetach);
@@ -370,7 +370,7 @@ __LIS_EXTERN_INLINE int _RP lis_xmsgsize(mblk_t *mp);
 
 EXPORT_SYMBOL_NOVERS(lis_xmsgsize);
 
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 char *lis_poll_file = "<linux/poll.h>";
 
 EXPORT_SYMBOL_NOVERS(lis_poll_file);
@@ -387,7 +387,7 @@ EXPORT_SYMBOL_NOVERS(lis_kernel_version);
 char lis_version[] = "1.1.2.17";
 
 EXPORT_SYMBOL_NOVERS(lis_version);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 char *
 lis_poll_events(short events)
 {
@@ -485,7 +485,7 @@ lis_apush_vml(struct str_list *slp)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_apush_vml);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP int
 lis_apushm(dev_t dev, const char *mods[])
 {
@@ -530,7 +530,7 @@ lis_clone_major(void)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_clone_major);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP int
 lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds)
 {
@@ -573,7 +573,7 @@ EXPORT_SYMBOL_NOVERS(lis_get_pipe);
 _RP int
 lis_ioc_fattach(struct file *f, char *path)
 {
-#if HAVE_KERNEL_FATTACH_SUPPORT
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 	return lis_fattach(f, path);
 #else
 	return (-ENOSYS);
@@ -584,7 +584,7 @@ EXPORT_SYMBOL_NOVERS(lis_ioc_fattach);
 _RP int
 lis_ioc_fdetach(char *path)
 {
-#if HAVE_KERNEL_FATTACH_SUPPORT
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 	return lis_fdetach(path);
 #else
 	return (-ENOSYS);
@@ -595,7 +595,7 @@ EXPORT_SYMBOL_NOVERS(lis_ioc_fdetach);
 _RP int
 lis_ioc_pipe(unsigned int *fildes)
 {
-#if HAVE_KERNEL_PIPE_SUPPORT
+#ifdef HAVE_KERNEL_PIPE_SUPPORT
 	return lis_pipe(fildes);
 #else
 	return (-ENOSYS);
@@ -634,7 +634,7 @@ lis_printk(const char *fmt, ...)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_printk);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP int
 lis_strclose(struct inode *i, struct file *f)
 {
@@ -697,7 +697,7 @@ lis_thread_start(int (*fcn) (void *), void *arg, const char *name)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_thread_start);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP ssize_t
 lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 {
@@ -797,7 +797,7 @@ lis_vmalloc(unsigned long size)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_vmalloc);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_bprintf(char *fmt, ...)
 {
@@ -819,7 +819,7 @@ lis_cmn_err(int err_lvl, char *fmt, ...)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_cmn_err);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_dobufcall(int cpu_id)
 {
@@ -862,7 +862,7 @@ lis_free(void *ptr, char *file_name, int line_nr)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_free);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_freedb(mblk_t *bp, int free_hdr)
 {
@@ -926,7 +926,7 @@ lis_print_queue(queue_t *q)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_print_queue);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_print_queues(void)
 {
@@ -974,7 +974,7 @@ lis_spl0_fcn(char *file, int line)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_spl0_fcn);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 volatile unsigned long lis_queuerun_cnts[NR_CPUS] = { 0, };
 
 EXPORT_SYMBOL_NOVERS(lis_queuerun_cnts);
@@ -989,7 +989,7 @@ volatile unsigned long lis_setqsched_isr_cnts[NR_CPUS] = { 0, };
 EXPORT_SYMBOL_NOVERS(lis_setqsched_isr_cnts);
 #endif
 
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP mblk_t *
 lis_get_passfp(void)
 {
@@ -1057,7 +1057,7 @@ lis_osif_sg_dma_address(struct scatterlist *sg)
 
 EXPORT_SYMBOL_NOVERS(lis_osif_sg_dma_address);
 #endif
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP int
 lis_can_unload(void)
 {
@@ -1065,7 +1065,7 @@ lis_can_unload(void)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_can_unload);
-#if HAVE_KFUNC_CHECK_REGION
+#ifdef HAVE_KFUNC_CHECK_REGION
 _RP int
 lis_check_region(unsigned int from, unsigned int extent)
 {
@@ -1107,7 +1107,7 @@ lis_kernel_down(struct semaphore *sem)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_kernel_down);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP int
 lis_kill_pg(int pgrp, int sig, int priv)
 {
@@ -1142,7 +1142,7 @@ lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_supported);
-#if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
+#ifdef HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 _RP int
 lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
@@ -1238,7 +1238,7 @@ lis_pcibios_strerror(int error)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_strerror);
-#if HAVE_KFUNC_PCIBIOS_INIT
+#ifdef HAVE_KFUNC_PCIBIOS_INIT
 _RP void
 lis_pcibios_init(void)
 {
@@ -1252,7 +1252,7 @@ lis_pcibios_init(void)
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_init);
 #endif
-#if HAVE_KFUNC_PCIBIOS_FIND_CLASS
+#ifdef HAVE_KFUNC_PCIBIOS_FIND_CLASS
 _RP int
 lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
 		       unsigned char *dev_fn)
@@ -1262,7 +1262,7 @@ lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned c
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_find_class);
 #endif
-#if HAVE_KFUNC_PCIBIOS_FIND_DEVICE
+#ifdef HAVE_KFUNC_PCIBIOS_FIND_DEVICE
 _RP int
 lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned short index,
 			unsigned char *bus, unsigned char *dev_fn)
@@ -1272,7 +1272,7 @@ lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned s
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_find_device);
 #endif
-#if HAVE_KFUNC_PCIBIOS_PRESENT
+#ifdef HAVE_KFUNC_PCIBIOS_PRESENT
 _RP int
 lis_pcibios_present(void)
 {
@@ -1281,7 +1281,7 @@ lis_pcibios_present(void)
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_present);
 #endif
-#if HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
+#ifdef HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
 _RP int
 lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			     unsigned char *val)
@@ -1291,7 +1291,7 @@ lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned c
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_read_config_byte);
 #endif
-#if HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
+#ifdef HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
 _RP int
 lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			      unsigned int *val)
@@ -1301,7 +1301,7 @@ lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned 
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_read_config_dword);
 #endif
-#if HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
+#ifdef HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
 _RP int
 lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			     unsigned short *val)
@@ -1311,7 +1311,7 @@ lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned c
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_read_config_word);
 #endif
-#if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_BYTE
+#ifdef HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_BYTE
 _RP int
 lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			      unsigned char val)
@@ -1321,7 +1321,7 @@ lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned 
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_write_config_byte);
 #endif
-#if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_DWORD
+#ifdef HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_DWORD
 _RP int
 lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			       unsigned int val)
@@ -1331,7 +1331,7 @@ lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned
 
 EXPORT_SYMBOL_NOVERS(lis_pcibios_write_config_dword);
 #endif
-#if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_WORD
+#ifdef HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_WORD
 _RP int
 lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
 			      unsigned short val)
@@ -1350,7 +1350,7 @@ lis_request_dma(unsigned int dma_nr, const char *device_id)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_request_dma);
-#if HAVE_KTYPE_IRQRETURN_T
+#ifdef HAVE_KTYPE_IRQRETURN_T
 _RP int
 lis_request_irq(unsigned int irq, irqreturn_t(*handler) (int, void *, struct pt_regs *),
 		unsigned long flags, const char *device, void *dev_id)
@@ -1404,7 +1404,7 @@ lis_osif_sg_dma_len(struct scatterlist *sg)
 
 EXPORT_SYMBOL_NOVERS(lis_osif_sg_dma_len);
 #endif
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP struct inode *
 lis_file_inode(struct file *f)
 {
@@ -1422,7 +1422,7 @@ lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_to_page);
-#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef HAVE_KFUNC_PCI_FIND_CLASS
 _RP struct pci_dev *
 lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
 {
@@ -1446,7 +1446,7 @@ lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_find_slot);
 #endif
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP struct stdata *
 lis_file_str(struct file *f)
 {
@@ -1594,7 +1594,7 @@ lis_ioremap_nocache(unsigned long offset, unsigned long size)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_ioremap_nocache);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void *
 lis_kmalloc(size_t nbytes, int type)
 {
@@ -1641,7 +1641,7 @@ lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_zmalloc);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_add_timer(struct timer_list *timer)
 {
@@ -1658,8 +1658,8 @@ lis_assert_fail(const char *expr, const char *objname, const char *file, unsigne
 }
 
 EXPORT_SYMBOL_NOVERS(lis_assert_fail);
-#if LIS_DEPRECARTED_FUNCTIONS
-#if HAVE_KFUNC_MOD_DEC_USE_COUNT
+#ifdef LIS_DEPRECARTED_FUNCTIONS
+#ifdef HAVE_KFUNC_MOD_DEC_USE_COUNT
 _RP void
 lis_dec_mod_cnt_fcn(const char *file, int line)
 {
@@ -1705,8 +1705,8 @@ lis_gettimeofday(struct timeval *tv)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_gettimeofday);
-#if LIS_DEPRECARTED_FUNCTIONS
-#if HAVE_KFUNC_MOD_INC_USE_COUNT
+#ifdef LIS_DEPRECARTED_FUNCTIONS
+#ifdef HAVE_KFUNC_MOD_INC_USE_COUNT
 _RP void
 lis_inc_mod_cnt_fcn(const char *file, int line)
 {
@@ -1717,7 +1717,7 @@ lis_inc_mod_cnt_fcn(const char *file, int line)
 EXPORT_SYMBOL_NOVERS(lis_inc_mod_cnt_fcn);
 #endif
 #endif
-#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#ifdef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 _RP void
 lis_interruptible_sleep_on(wait_queue_head_t *wq)
 {
@@ -1733,7 +1733,7 @@ lis_kernel_up(struct semaphore *sem)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_kernel_up);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_kfree(const void *ptr)
 {
@@ -1785,7 +1785,7 @@ lis_osif_do_settimeofday(struct timeval *tp)
 EXPORT_SYMBOL_NOVERS(lis_osif_do_settimeofday);
 
 #ifdef CONFIG_PCI
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 _RP void
 lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 				 int direction)
@@ -1796,7 +1796,7 @@ lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, si
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_sync_single);
 #endif
 
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
 _RP void
 lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					 size_t len, int direction)
@@ -1807,7 +1807,7 @@ lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_sync_single_for_cpu);
 #endif
 
-#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
 _RP void
 lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					    size_t len, int direction)
@@ -1825,7 +1825,7 @@ lis_osif_pci_disable_device(struct pci_dev *dev)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_disable_device);
-#if HAVE_KFUNC_PCI_DMA_SYNC_SG
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SG
 _RP void
 lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems, int direction)
 {
@@ -1834,7 +1834,7 @@ lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nele
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dma_sync_sg);
 #endif
-#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#ifdef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 _RP void
 lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
 			     int direction)
@@ -1890,7 +1890,7 @@ EXPORT_SYMBOL_NOVERS(lis_osif_pci_unregister_driver);
 _RP void
 lis_osif_sti(void)
 {
-#if HAVE_KFUNC_STI
+#ifdef HAVE_KFUNC_STI
 	WARN(sti());
 #else
 	WARN(local_irq_enable());
@@ -1921,7 +1921,7 @@ lis_request_region(unsigned int from, unsigned int extent, const char *name)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_request_region);
-#if HAVE_KFUNC_SLEEP_ON
+#ifdef HAVE_KFUNC_SLEEP_ON
 _RP void
 lis_sleep_on(wait_queue_head_t *wq)
 {
@@ -2008,7 +2008,7 @@ lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_pci_find_slot);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_pci_cleanup(void)
 {
@@ -2314,7 +2314,7 @@ EXPORT_SYMBOL_NOVERS(lis_rw_write_unlock_irqrestore_fcn);
  *  LiS weighty atomic wrappers.  We just use the normal kernel atomic types
  *  inside the LiS type.
  */
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 lis_atomic_t lis_in_syscall = 0;
 
 EXPORT_SYMBOL_NOVERS(lis_in_syscall);
@@ -2542,7 +2542,7 @@ lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag, vo
 }
 
 EXPORT_SYMBOL_NOVERS(lis_mount);
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP int
 lis_umount2(char *path, int flags)
 {
@@ -2565,8 +2565,8 @@ lis_umount2(char *path, int flags)
 
 EXPORT_SYMBOL_NOVERS(lis_umount2);
 #endif
-#if LIS_DEPRECARTED_FUNCTIONS
-#if HAVE_KERNEL_FATTACH_SUPPORT
+#ifdef LIS_DEPRECARTED_FUNCTIONS
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 _RP int
 lis_fattach(struct file *f, const char *path)
 {
@@ -2587,8 +2587,8 @@ lis_fdetach(const char *path)
 EXPORT_SYMBOL_NOVERS(lis_fdetach);
 #endif				/* HAVE_KERNEL_FATTACH_SUPPORT */
 #endif
-#if LIS_DEPRECARTED_FUNCTIONS
-#if HAVE_KERNEL_PIPE_SUPPORT
+#ifdef LIS_DEPRECARTED_FUNCTIONS
+#ifdef HAVE_KERNEL_PIPE_SUPPORT
 _RP int
 lis_pipe(unsigned int *fd)
 {
@@ -2601,7 +2601,7 @@ EXPORT_SYMBOL_NOVERS(lis_pipe);
 #endif				/* HAVE_KERNEL_PIPE_SUPPORT */
 #endif
 
-#if LIS_DEPRECARTED_FUNCTIONS
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_fdetach_all(void)
 {

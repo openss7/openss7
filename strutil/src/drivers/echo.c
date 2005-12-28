@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/21 20:47:26 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 10:01:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $";
 
 #define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
-#if LIS
+#ifdef LIS
 #define CONFIG_STREAMS_ECHO_MODID	ECHO_DRV_ID
 #define CONFIG_STREAMS_ECHO_NAME	ECHO_DRV_NAME
 #define CONFIG_STREAMS_ECHO_MAJOR	ECHO_CMAJOR_0
@@ -67,7 +67,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/21 20:47:26 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/28 10:01:21 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -125,7 +125,7 @@ MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto alloca
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR) "-*");
 MODULE_ALIAS("/dev/echo");
-#if LFS
+#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/streams/echo");
 MODULE_ALIAS("/dev/streams/echo/*");
