@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/23 20:37:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/28 11:44:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 20:37:37 $ by $Author: brian $
+# Last Modified $Date: 2005/12/28 11:44:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,14 +56,15 @@ info_TEXINFOS		= STREAMS.texi porting.texi STREAMS_FAQ.texi SPG2.texi # SPG.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
+			  install.texi \
 			  releases.texi \
 			  rpm.texi \
-			  tree.texi \
-			  install.texi \
 			  testsuite.texi \
+			  tree.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
+			  texi/install.texi \
 			  texi/lesser.texi \
 			  texi/testsuite.texi \
 			  $(top_builddir)/scripts/texi/funding.texi

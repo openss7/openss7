@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/07/08 13:15:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 11:44:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 13:15:37 $ by $Author: brian $
+# Last Modified $Date: 2005/12/28 11:44:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,8 +56,10 @@ info_TEXINFOS		= netperf.texi
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
+			  install.texi \
 			  releases.texi \
 			  rpm.texi \
+			  testsuite.texi \
 			  tree.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
