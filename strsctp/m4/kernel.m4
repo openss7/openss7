@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/12 08:33:55 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/28 23:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/12 08:33:55 $ by $Author: brian $
+# Last Modified $Date: 2005/12/28 23:51:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -997,13 +997,17 @@ dnl	    could be 2.4.18-13.1, another could be 2.4.18-12 and they do not necessa
 dnl	    running kernel.  In fact, on debian, there is no way to tell which exact version of the
 dnl	    kernel is running.
 dnl
+dnl	    Added some special search paths for newer and older NexusWare.
+dnl
 	    eval "k_sysmap_search_path=\"
 		${kbuilddir}/System.map-${kversion}
 		${kbuilddir}/System.map
 		${DESTDIR}${rootdir}/boot/System.map-${kversion}
 		${DESTDIR}${rootdir}/boot/System.map
 		${DESTDIR}/boot/System.map-${kversion}
-		${DESTDIR}/boot/System.map\""
+		${DESTDIR}/boot/System.map
+		${DESTDIR}/kernel/${kversion}/System.map
+		${DESTDIR}/kernels/generic/System.map\""
 	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    linux_cv_k_sysmap=
 	    for linux_file in $k_sysmap_search_path ; do
@@ -1571,8 +1575,14 @@ dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
     AC_CACHE_CHECK([for kernel CFLAGS], [linux_cv_k_cflags], [dnl
+	if test :"${cross_compiling:-no}" = :no
+	then
+	    linux_tmp="CROSS_COMPILING=\"`dirname $CC`\" ARCH=\"${linux_cv_k_mach}\""
+	else
+	    linux_tmp=""
+	fi
 	cp -f "$kconfig" .config
-	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check`"
+	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check`"
 	rm -f .config
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -1695,7 +1705,17 @@ dnl
 	cp -f "$kconfig" .config
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check`"
 	rm -f .config
-	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
+	if test :"${cross_compiling:-no}" = :no
+	then
+	    linux_tmp=
+	else
+dnl
+dnl	    Old NexusWare cross compilers do not set up iprefix correctly.
+dnl
+	    linux_tmp=`$CC -print-libgcc-file-name`
+	    linux_tmp="-iprefix `dirname $linux_tmp`/"
+	fi
+	linux_cv_k_cppflags="-nostdinc ${linux_tmp:+$linux_tmp }-iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
 dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
 dnl	location of the source directory.  include2 on the otherhand is properly
