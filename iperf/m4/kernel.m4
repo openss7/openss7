@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2005/12/28 23:51:31 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/29 10:42:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/28 23:51:31 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 10:42:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1006,7 +1006,6 @@ dnl
 		${DESTDIR}${rootdir}/boot/System.map
 		${DESTDIR}/boot/System.map-${kversion}
 		${DESTDIR}/boot/System.map
-		${DESTDIR}/kernel/${kversion}/System.map
 		${DESTDIR}/kernels/generic/System.map\""
 	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    linux_cv_k_sysmap=
@@ -1577,9 +1576,9 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
     AC_CACHE_CHECK([for kernel CFLAGS], [linux_cv_k_cflags], [dnl
 	if test :"${cross_compiling:-no}" = :no
 	then
-	    linux_tmp="CROSS_COMPILING=\"`dirname $CC`\" ARCH=\"${linux_cv_k_mach}\""
-	else
 	    linux_tmp=""
+	else
+	    linux_tmp="CROSS_COMPILING=`dirname $CC` ARCH=${linux_cv_k_mach}"
 	fi
 	cp -f "$kconfig" .config
 	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check`"
@@ -1658,7 +1657,12 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	eval "linux_dir=\"${kbuilddir}/include2\"" ; if test -d "$linux_dir" ; then
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude2 | -I${kbuilddir}/include2 |g"`
 	fi
+dnl
+dnl	Only ppc and um currently include architecture directories.  The rest include asm
+dnl	directories.
+dnl
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iarch/| -I${ksrcdir}/arch/|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9s]]* | $linux_cflags |"`
 dnl
 dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
@@ -1726,7 +1730,12 @@ dnl
 	eval "linux_dir=\"${kbuilddir}/include2\"" ; if test -d "$linux_dir" ; then
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude2 | -I${kbuilddir}/include2 |g"`
 	fi
+dnl
+dnl	Only ppc and um currently include architecture directories.  The rest include asm
+dnl	directories.
+dnl
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
+	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iarch/| -I${ksrcdir}/arch/|g"`
 dnl
 dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
 dnl	build directory.
