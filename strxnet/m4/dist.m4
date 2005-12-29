@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/29 06:05:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 06:05:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -581,7 +581,9 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 **** ])
     fi
     if test ":$build_vendor" != ":$host_vendor" -o ":$build_vendor" != ":$target_vendor" ; then
-	AC_MSG_WARN([
+	if test :"${cross_compiling:-no}" = :no
+	then
+	    AC_MSG_WARN([
 **** 
 **** The build distribution ($build_vendor) is not the same
 **** as the host or target distribution ($host_vendor or
@@ -591,6 +593,7 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 **** later, build on the same distribution as the host and
 **** target.
 **** ])
+	fi
     fi
 ])# _DISTRO_CHECK_VENDOR
 # =============================================================================
