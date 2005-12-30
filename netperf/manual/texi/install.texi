@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.23 2005/11/18 08:47:58 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.24 2005/12/30 04:38:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/11/18 08:47:58 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 04:38:45 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1892,6 +1892,20 @@ steps describe the process:
 @end example
 @end cartouche
 
+For more recent @cite{Nex@-us@-Ware} releases, the method for rebuilding a
+kernel is a little different as follows:
+
+@cartouche
+@example
+% pushd /u5/@-Nex@-us@-Ware@-80
+% ./nexus 2.4
+% ./nexus 8260
+% ./nexus quick
+% . SETUP.sh
+% popd
+@end example
+@end cartouche
+
 @item Next download, unpack
 (@pxref{Downloading the Tar Ball}) and configure (@pxref{Configuring the Tar
 Ball}) using the provided @file{configure.nexusware} wrapper for
@@ -1908,6 +1922,11 @@ Ball}) can be used on the same line as @samp{./configure.nexusware}.  One of
 particular interest to embedded targets is @samp{--with-k-optimize=size} to
 attempt to reduce the size of the kernel modules.
 
+You must specify the kernel version of the kernel for which you are configuring.
+Add the --with-k-release=2.4.18 option for older @cite{Nex@-us@-Ware} releases,
+--with-k-release=2.4.25 or --with-k-release=2.6.12 for more current
+@cite{Nex@-us@-Ware} releases.
+
 @item Install as normal (@pxref{Installing the Tar Ball}), however, for embedded
 targets the @command{install-strip} target should be used instead of the
 @command{install} target.  The @command{install-strip} target will strip
@@ -1921,16 +1940,18 @@ tree is rooted at @file{/u5/@-Nex@-us@-Ware}.)
 
 @cartouche
 @example
-% pushd /u5/@-Nex@-us@-Ware@-24
-% source SETUP.sh
-% make
+% pushd /u5/@-Nex@-us@-Ware@-80
+% ./nexus 2.4
+% ./nexus 8260
+% ./nexus quick
+% . SETUP.sh
 % popd
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd @value{PACKAGE}-@value{VERSION}
-% ./configure.nexusware --with-k-optimize=size
+% ./configure.nexusware --with-k-release=2.4.25 --with-k-optimize=size
 % make
-% make install-strip
+% make DESTDIR="$NEXUSWARE_PREFIX" install-strip
 % popd
 @end example
 @end cartouche
@@ -1956,6 +1977,12 @@ In addition, because @cite{Nex@-us@-Ware} does not include an
 @file{/etc/@-modules.conf} file by default, it will be necessary to add one or
 edit your @file{rc.4} file to @command{insmod} the necessary
 @file{@value{PACKAGE_NAME}} modules at boot time.
+
+Also, @cite{Nex@-us@-Ware} does not configure its kernels for @var{CONFIG_KMOD},
+so any kernel modules must be loaded by the @file{rc.4} init script at boot.
+On more recent @cite{Nex@-us@-Ware} releases, the init scripts will be installed
+in @file{@var{$NEX@-US@-WARE@-_PRE@-FIX}/etc/rc.d/init.d/} but you must manually
+edit your @file{rc.4} script to invoke these scripts.
 
 Once you have completed the necessary @file{.spec} and @file{rc.4} file entries,
 you need to rebuild the @samp{generic} kernel flash image once more for these
@@ -2010,6 +2037,8 @@ build the @cite{Nex@-us@-Ware} flash image as normal:
 % popd
 @end example
 @end cartouche
+
+The situation is a little more complex for recent @cite{Nex@-us@-Ware} releases.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

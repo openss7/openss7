@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.4.8 2005/05/30 07:26:18 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.4.10 2005/12/30 04:38:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/30 07:26:18 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 04:38:45 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -568,42 +568,42 @@ DPKG architectures.
 
 The tar ball may be downloaded easily with @command{wget} as follows:
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 or
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
-@end cartouche
 @end example
+@end cartouche
 
 @subsubheading  Unpacking the Archive
 
 After downloading one of the tar balls, unpack the archive using one of the
 following commands:
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
 % tar -xzvf @value{PACKAGE}-@value{VERSION}.tar.gz
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 or
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 Either will create a subdirectory name
@@ -634,15 +634,15 @@ subdirectory of @file{/var/cvs}.  For release tag information, see
 To access the archive from the project CVS pserver, use the following commands
 to check out a version from the archive:
 
-@example
 @cartouche
+@example
 % export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
 % cvs login
 Password: *********
 % cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE}
 % cvs logout
-@end cartouche
 @end example
+@end cartouche
 
 It is, of course, possible to check out by date or by other criteria.  For more
 information, see @ref{cvs(1), cvs(1), cvs(1), *manpages*, The Manual Pages}.
@@ -677,11 +677,11 @@ target host, including kernel tools such as @command{genksyms} and others.
 To generate a configuration script and the necessary scriptlets required by the
 GNU autoconf system, execute the following commands on the working directory:
 
-@example
 @cartouche
+@example
 % autoreconf -fiv @value{PACKAGE}
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 where, @file{@value{PACKAGE}} is the name of the directory to where the working
@@ -692,12 +692,12 @@ distributed with the release Tar Balls, SRPMs and DSCs.
 Make sure that @samp{autoreconf --version} returns @samp{2.59}.  Otherwise, you
 may need to perform something like the following:
 
-@example
 @cartouche
+@example
 % PATH="/usr/local/bin:$PATH"
 % autoreconf -fiv @value{PACKAGE}
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 After reconfiguring the directory, the package can then be configured and built
@@ -854,8 +854,8 @@ as described in @ref{rpm(8), rpm(8), rpm(8), *manpages*, The Manual Pages}.
 Following is an example of the @file{~/.rpmmacros} file that I use for
 rebuilding RPMS:
 
-@smallexample
 @cartouche
+@smallexample
 #
 # RPM macros for building rpms
 #
@@ -901,8 +901,8 @@ package or when debugging this package.\
 %endif\
 %@{nil@}
 
-@end cartouche
 @end smallexample
+@end cartouche
 
 
 When building from the source RPM (@pxref{Building from the Source RPM}), it is
@@ -1769,25 +1769,25 @@ above (@pxref{Installing the Binary RPM}).
 @noindent
 The source RPM is rebuilt to binary RPMs as follows:
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
 % rpmbuild --rebuild -vv @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 The rebuild process can also recognize a number of options that can be used to
 tweak the resulting binaries, @xref{Configuring the Source RPM}.  These options
 are provided on the @command{rpm} command line.  For example:
 
-@example
 @cartouche
+@example
 % rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
   --define "_kversion @value{_kversion}" \ 
   -- @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 will rebuild binary RPM for the @samp{@value{_kversion}} kernel for the
@@ -1813,13 +1813,13 @@ above (@pxref{Installing the Debian DEB}).
 @noindent
 The Debian DSC is rebuilt to binary DEBs as follows:
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc
 % wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz
 % dpkg-buildpackage -v @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 The rebuild process can also recognize a number of options that can be used to
@@ -1828,15 +1828,15 @@ are provided in the environment variable @var{BUILD_DPKGOPTIONS} and have the
 same form as the options to @command{configure}, @xref{Configuring the Tar Ball}.
 For example:
 
-@example
 @cartouche
+@example
 % BUILD_DEBOPTIONS='
         --with-k-release=@value{_kversion}
         --host=athlon-debian-linux-gnu'
   dpkg-buildpackage -v \
   @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 will rebuild binary DEB for the @samp{@value{_kversion}} kernel for the
@@ -1862,16 +1862,16 @@ build process does not required @command{root} privilege.)
 
 Folowing is an example of a native build against the running kernel:
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
 % make
 % popd
-@end cartouche
 @end example
+@end cartouche
 
 @subsubsection Cross-Build
 
@@ -1883,12 +1883,12 @@ cross-building, specify the root for the build with environment variable
 @var{DESTDIR}.  The cross-compile host must also be specified if different from
 the build host.  Either the compiler and other tools must be in the usual places
 where GNU @command{autoconf} can find them, or they must be specified with
-declarations such as @samp{CC=/u5/@-Nexus@-Ware@-24/@-ppc@--linux/@-gcc} on the
+declarations such as @samp{CC=/u5/@-Nex@-us@-Ware@-24/@-ppc@--linux/@-gcc} on the
 @command{configure} command line.  Look in the file @file{configure.nexusware}
 in the release package for an example.
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % pushd @value{PACKAGE}@--@value{VERSION}
@@ -1896,8 +1896,8 @@ in the release package for an example.
 	--with-k-release=2.4.18 --host sparc-linux
 % make
 % popd
-@end cartouche
 @end example
+@end cartouche
 
 @subsubsection NexusWare Build
 
@@ -1912,14 +1912,28 @@ steps describe the process:
 @file{generic} kernel and flash image as follows:  (Note that I keep my
 @cite{Nex@-us@-Ware} build in @file{/u5/@-Nex@-us@-Ware@-24}.)
 
-@example
 @cartouche
+@example
 % pushd /u5/@-Nex@-us@-Ware@-24
 % source SETUP.sh
 % make
 % popd
-@end cartouche
 @end example
+@end cartouche
+
+For more recent @cite{Nex@-us@-Ware} releases, the method for rebuilding a
+kernel is a little different as follows:
+
+@cartouche
+@example
+% pushd /u5/@-Nex@-us@-Ware@-80
+% ./nexus 2.4
+% ./nexus 8260
+% ./nexus quick
+% . SETUP.sh
+% popd
+@end example
+@end cartouche
 
 @item Next download, unpack
 (@pxref{Downloading the Tar Ball}) and configure (@pxref{Configuring the Tar
@@ -1937,6 +1951,11 @@ Ball}) can be used on the same line as @samp{./configure.nexusware}.  One of
 particular interest to embedded targets is @samp{--with-k-optimize=size} to
 attempt to reduce the size of the kernel modules.
 
+You must specify the kernel version of the kernel for which you are configuring.
+Add the --with-k-release=2.4.18 option for older @cite{Nex@-us@-Ware} releases,
+--with-k-release=2.4.25 or --with-k-release=2.6.12 for more current
+@cite{Nex@-us@-Ware} releases.
+
 @item Install as normal (@pxref{Installing the Tar Ball}), however, for embedded
 targets the @command{install-strip} target should be used instead of the
 @command{install} target.  The @command{install-strip} target will strip
@@ -1948,21 +1967,23 @@ file system flash image.
 Following is what I use for configuration and installation: (My @cite{Nex@-us@-Ware}
 tree is rooted at @file{/u5/@-Nex@-us@-Ware}.)
 
-@example
 @cartouche
-% pushd /u5/@-Nex@-us@-Ware@-24
-% source SETUP.sh
-% make
+@example
+% pushd /u5/@-Nex@-us@-Ware@-80
+% ./nexus 2.4
+% ./nexus 8260
+% ./nexus quick
+% . SETUP.sh
 % popd
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd @value{PACKAGE}-@value{VERSION}
-% ./configure.nexusware --with-k-optimize=size
+% ./configure.nexusware --with-k-release=2.4.25 --with-k-optimize=size
 % make
-% make install-strip
+% make DESTDIR="$NEXUSWARE_PREFIX" install-strip
 % popd
-@end cartouche
 @end example
+@end cartouche
 
 Once built and installed in the @cite{Nex@-us@-Ware} directory, you will have to
 (currently) hand edit a @file{.spec} file to include the components you want in
@@ -1986,6 +2007,12 @@ In addition, because @cite{Nex@-us@-Ware} does not include an
 edit your @file{rc.4} file to @command{insmod} the necessary
 @file{@value{PACKAGE_NAME}} modules at boot time.
 
+Also, @cite{Nex@-us@-Ware} does not configure its kernels for @var{CONFIG_KMOD},
+so any kernel modules must be loaded by the @file{rc.4} init script at boot.
+On more recent @cite{Nex@-us@-Ware} releases, the init scripts will be installed
+in @file{@var{$NEX@-US@-WARE@-_PRE@-FIX}/etc/rc.d/init.d/} but you must manually
+edit your @file{rc.4} script to invoke these scripts.
+
 Once you have completed the necessary @file{.spec} and @file{rc.4} file entries,
 you need to rebuild the @samp{generic} kernel flash image once more for these
 objects to be included in the flash file system.  It is important that this
@@ -1999,8 +2026,8 @@ place the unpacked tarball in
 the top-level @cite{Nex@-us@-Ware} @file{Makefile} to make the build process a
 single step process instead of dual pass:
 
-@smallexample
 @cartouche
+@smallexample
 all:
 ...
         (cd kernels/generic; $(MAKE) depend)
@@ -2014,16 +2041,16 @@ all:
 #       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
         (cd build/generic; $(MAKE))
 ...
-@end cartouche
 @end smallexample
+@end cartouche
 
 Another, perhaps simpler approach, is to make the necessary edits to the
 @cite{Nex@-us@-Ware} top-level @file{Makefile} and @file{.spec} and @file{rc.4}
 files, download and unpack the tar ball into the @cite{Nex@-us@-Ware} directory, and
 build the @cite{Nex@-us@-Ware} flash image as normal:
 
-@example
 @cartouche
+@example
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % pushd /u5/@-Nex@-us@-Ware@-24
 % source SETUP.sh
@@ -2033,8 +2060,10 @@ build the @cite{Nex@-us@-Ware} flash image as normal:
 % popd
 % make
 % popd
-@end cartouche
 @end example
+@end cartouche
+
+The situation is a little more complex for recent @cite{Nex@-us@-Ware} releases.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -2062,12 +2091,12 @@ the Source RPM}), then the following instructions will install the RPMs on your
 system. For additional information on @command{rpm}, see @ref{rpm(8), rpm(8),
 rpm(8), *manpages*, The Manual Pages}.
 
-@example
 @cartouche
+@example
 % pushd RPMS/i686
 % rpm -ihv @value{PACKAGE}-*-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 You must have the correct binary RPMs downloaded or built for this to be
@@ -2078,15 +2107,15 @@ altered with the @samp{--relocate} option to @command{rpm}, see @ref{rpm, rpm(8)
 rpm(8), rpm(8), *manpages*, The Manual Pages}.  For example, the following
 will relocate the documentation and info directories:
 
-@example
 @cartouche
+@example
 % pushd RPMS/i686
 % rpm -ihv \ 
         --relocate '/usr/share/doc=/usr/local/share/doc' \ 
         --relocate '/usr/share/info=/usr/local/share/info' \ 
         -- @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 The previous example will install the @file{@value{PACKAGE}-doc} package by will
@@ -2106,12 +2135,12 @@ the Debian DSC}), then the following instructions will install the DEBs on your
 system.  For additional information on @command{dpkg}, see @ref{dpkg(8),
 dpkg(8), dpkg(8), *manpages*, The Manual Pages}.
 
-@example
 @cartouche
+@example
 % pushd debian
 % dpkg -iv @value{PACKAGE}-*_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_*.deb
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 You must have the correct @file{.deb} files downloaded or build for this to be
@@ -2165,11 +2194,11 @@ To remove an installed version of the binary RPMs (whether obtained from the
 OpenSS7 binary RPM releases, or whether created by the source RPM), execute the
 following command:
 
-@example
 @cartouche
+@example
 % rpm -evv `rpm -qa | grep '^@value{PACKAGE}-'`
-@end cartouche
 @end example
+@end cartouche
 
 For more information on @command{rpm}, see @ref{rpm(8), rpm(8), rpm(8),
 *manpages*, The Manual Pages}.
@@ -2185,11 +2214,11 @@ To remove and installed version of the debian DEB (whether obtained from the
 OpenSS7 binary DEB releases, or whether created by the Debian DSC), execute the
 following command:
 
-@example
 @cartouche
+@example
 % dpkg -ev `dpkg -l | grep '^@value{PACKAGE}-'`
-@end cartouche
 @end example
+@end cartouche
 
 For more information on @command{dpkg}, see @ref{dpkg(8), dpkg(8), dpkg(8),
 *manpages*, The Manual Pages}.
@@ -2205,11 +2234,11 @@ To remove all the installed binary RPM build from the source RPM, see
 @ref{Removing the Binary RPM}.  Then simply remove the binary RPM package
 files and source RPM file.  A command such as:
 
-@example
 @cartouche
+@example
 % find / -name '@value{PACKAGE}-*.rpm' -type f -print0 | xargs --null rm -f
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.
@@ -2225,14 +2254,14 @@ To remove all the installed binary DEB build from the Debian DSC, see
 @ref{Removing the Debian DEB}.  Then simply remove the binary DEB package
 files and Debian DSC file.  A command such as:
 
-@example
 @cartouche
+@example
 % find / \( -name '@value{PACKAGE}-*.deb' \
          -o -name '@value{PACKAGE}-*.dsc' \
          -o -name '@value{PACKAGE}-*.tar.* \
          \) -type f -print0 | xargs --null rm -f
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 should remove all @file{@value{PACKAGE_NAME}} DEBs, DSCs and TARs from your
@@ -2249,16 +2278,16 @@ To remove a version installed from tar ball, change to the build directory where
 the package was built and use the @samp{uninstall} @command{make} target as
 follows:
 
-@example
 @cartouche
+@example
 % cd /usr/src/@value{PACKAGE}
 % make uninstall
 % cd ..
 % rm -fr @value{PACKAGE}-@value{VERSION}
 % rm -f @value{PACKAGE}-@value{VERSION}.tar.gz
 % rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
-@end cartouche
 @end example
+@end cartouche
 
 If you have inadvertently removed the build directory and, therefore, no longer
 have a configured directory from which to execute @samp{make uninstall}, then
@@ -2310,26 +2339,26 @@ process makes the necessary changes to the
 lines like the following added to your @file{@value{_rootdir}/@-etc/@-modules.conf}
 file:
 
-@example
 @cartouche
+@example
 prune modules.@value{PACKAGE_LCNAME}
 if -f /lib/modules/`uname -r`/modules.@value{PACKAGE_LCNAME}
 include /lib/modules/`uname -r`/modules.@value{PACKAGE_LCNAME}
 endif
-@end cartouche
 @end example
+@end cartouche
 
 @noindent
 which will provide for demand loading of the modules if they have been built and
 installed for the running kernel.  The @file{/lib/@-modules/@-@command{`uname
 -r`}/@-modules.@value{PACKAGE_LCNAME}} file looks like this:
 
-@smallexample
 @cartouche
+@smallexample
 alias char-major-245  streams-@var{some_driver}
 alias char-major-246  streams-@var{other_driver}
-@end cartouche
 @end smallexample
+@end cartouche
 
 Note that STREAMS modules are not listed in this file, but will be loaded by
 name using @file{kerneld} if available.
