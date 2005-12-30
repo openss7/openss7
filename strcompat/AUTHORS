@@ -1,22 +1,22 @@
-strcompat, the OpenSS7 STREAMS Compatibility modules were written as part
-of the OpenSS7 Project (http://www.openss7.org/) by:
+OpenSS7 STREAMS Compatibility -- authors and acknowledgements.  2005-12-29
+Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions.
+
+strcompat, the OpenSS7 STREAMS Compatibility modules were written as
+part of the OpenSS7 Project (http://www.openss7.org/) by:
 
-Brian Bidulock			bidulock@openss7.org
+  Brian Bidulock		bidulock@openss7.org
 
 The current maintainer of the package is:
 
-Brian Bidulock			bidulock@openss7.org
+  Brian Bidulock		bidulock@openss7.org
 
-Packaging would not be what it is today without the invaluable help of these
-people:
+Packaging would not be what it is today without the invaluable help of
+these people:
 
-Christian Hildner		christian.hildner@hob.de
-Gurol Akman			gurol.akman@ss8.com
-John A. Boyd Jr.		jaboydjr@netwalk.com
-William Waites			openss7@lists.styx.org
-
-Additional people not named here that I missed putting on the list.  We thank
-them too!
+Additional people not named here that I missed putting on the list.  We
+thank them too!
 
 -----
 

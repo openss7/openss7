@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.47 $) $Date: 2005/12/23 05:23:28 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.48 $) $Date: 2005/12/30 12:21:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 05:23:28 $ by $Author: brian $
+# Last Modified $Date: 2005/12/30 12:21:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -345,28 +345,76 @@ fi
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
-    %{?_with_arch:               '%enable %_with_arch'} \
-    %{?_without_arch:            '%disable %_without_arch'} \
-    %{?_with_indep:              '%enable %_with_indep'} \
-    %{?_without_indep:           '%disable %_without_indep'} \
-    %{?_with_checks:             '%enable %_with_checks'} \
-    %{?_without_checks:          '%disable %_without_checks'} \
-    %{?_with_autotest:           '%enable %_with_autotest'} \
-    %{?_without_autotest:        '%disable %_without_autotest'} \
-    %{?_with_cooked_manpages:    '%_with_cooked_manpages'} \
-    %{?_without_cooked_manpages: '%_without_cooked_manpages'} \
-    %{?_with_public:             '%enable %_with_public'} \
-    %{?_without_public:          '%disable %_without_public'} \
-    %{?_with_lis:                '%_with_lis'} \
-    %{?_with_lfs:                '%_with_lfs'} \
-    %{?_with_xns:                '%_with_xns'} \
-    %{?_without_xns:             '%_without_xns'} \
-    %{?_with_xti:                '%_with_xti'} \
-    %{?_without_xti:             '%_without_xti'} \
-    %{?_with_inet:               '%_with_inet'} \
-    %{?_without_inet:            '%_without_inet'} \
-    %{?_with_sctp:               '%_with_sctp'} \
-    %{?_without_sctp:            '%_without_sctp'} \
+    %{?_with_arch:                      '%enable %_with_arch'} \
+    %{?_without_arch:                   '%disable %_without_arch'} \
+    %{?_with_indep:                     '%enable %_with_indep'} \
+    %{?_without_indep:                  '%disable %_without_indep'} \
+    %{?_with_checks:                    '%enable %_with_checks'} \
+    %{?_without_checks:                 '%disable %_without_checks'} \
+    %{?_with_autotest:                  '%enable %_with_autotest'} \
+    %{?_without_autotest:               '%disable %_without_autotest'} \
+    %{?_with_cooked_manpages:           '%_with_cooked_manpages'} \
+    %{?_without_cooked_manpages:        '%_without_cooked_manpages'} \
+    %{?_with_public:                    '%enable %_with_public'} \
+    %{?_without_public:                 '%disable %_without_public'} \
+    %{?_with_lis:                       '%_with_lis'} \
+    %{?_with_lfs:                       '%_with_lfs'} \
+    %{?_with_xns:                       '%_with_xns'} \
+    %{?_without_xns:                    '%_without_xns'} \
+    %{?_with_xti:                       '%_with_xti'} \
+    %{?_without_xti:                    '%_without_xti'} \
+    %{?_with_inet:                      '%_with_inet'} \
+    %{?_without_inet:                   '%_without_inet'} \
+    %{?_with_sctp:                      '%_with_sctp'} \
+    %{?_without_sctp:                   '%_without_sctp'} \
+    %{?_with_netperf_debug_log_file:    '%_with_netperf_debug_log_file'} \
+    %{?_without_netperf_debug_log_file: '%_without_netperf_debug_log_file'} \
+    %{?_with_netperf_dirty:             '%enable %_with_netperf_dirty'} \
+    %{?_without_netperf_dirty:          '%disable %_without_netperf_dirty'} \
+    %{?_with_netperf_histogram:         '%enable %_with_netperf_histogram'} \
+    %{?_without_netperf_histogram:      '%disable %_without_netperf_histogram'} \
+    %{?_with_netperf_old_histogram:     '%enable %_with_netperf_old_histogram'} \
+    %{?_without_netperf_old_histogram:  '%disable %_without_netperf_old_histogram'} \
+    %{?_with_netperf_intervals:         '%enable %_with_netperf_intervals'} \
+    %{?_without_netperf_intervals:      '%disable %_without_netperf_intervals'} \
+    %{?_with_netperf_do_dlpi:           '%enable %_with_netperf_do_dlpi'} \
+    %{?_without_netperf_do_dlpi:        '%disable %_without_netperf_do_dlpi'} \
+    %{?_with_netperf_do_sctp:           '%enable %_with_netperf_do_sctp'} \
+    %{?_without_netperf_do_sctp:        '%disable %_without_netperf_do_sctp'} \
+    %{?_with_netperf_do_select:         '%enable %_with_netperf_do_select'} \
+    %{?_without_netperf_do_select:      '%disable %_without_netperf_do_select'} \
+    %{?_with_netperf_do_lwp:            '%enable %_with_netperf_do_lwp'} \
+    %{?_without_netperf_do_lwp:         '%disable %_without_netperf_do_lwp'} \
+    %{?_with_netperf_do_nbrr:           '%enable %_with_netperf_do_nbrr'} \
+    %{?_without_netperf_do_nbrr:        '%disable %_without_netperf_do_nbrr'} \
+    %{?_with_netperf_do_xti:            '%enable %_with_netperf_do_xti'} \
+    %{?_without_netperf_do_xti:         '%disable %_without_netperf_do_xti'} \
+    %{?_with_netperf_xti_sctp:          '%enable %_with_netperf_xti_sctp'} \
+    %{?_without_netperf_xti_sctp:       '%disable %_without_netperf_xti_sctp'} \
+    %{?_with_netperf_do_unix:           '%enable %_with_netperf_do_unix'} \
+    %{?_without_netperf_do_unix:        '%disable %_without_netperf_do_unix'} \
+    %{?_with_netperf_do_1644:           '%enable %_with_netperf_do_1644'} \
+    %{?_without_netperf_do_1644:        '%disable %_without_netperf_do_1644'} \
+    %{?_with_netperf_do_first_burst:    '%enable %_with_netperf_do_first_burst'} \
+    %{?_without_netperf_do_first_burst: '%disable %_without_netperf_do_first_burst'} \
+    %{?_with_netperf_use_use_looper:    '%enable %_with_netperf_use_use_looper'} \
+    %{?_without_netperf_use_use_looper: '%disable %_without_netperf_use_use_looper'} \
+    %{?_with_netperf_use_pstat:         '%enable %_with_netperf_use_pstat'} \
+    %{?_without_netperf_use_pstat:      '%disable %_without_netperf_use_pstat'} \
+    %{?_with_netperf_use_kstat:         '%enable %_with_netperf_use_kstat'} \
+    %{?_without_netperf_use_kstat:      '%disable %_without_netperf_use_kstat'} \
+    %{?_with_netperf_use_proc_stat:     '%enable %_with_netperf_use_proc_stat'} \
+    %{?_without_netperf_use_proc_stat:  '%disable %_without_netperf_use_proc_stat'} \
+    %{?_with_netperf_do_ipv6:           '%enable %_with_netperf_do_ipv6'} \
+    %{?_without_netperf_do_ipv6:        '%disable %_without_netperf_do_ipv6'} \
+    %{?_with_netperf_do_dns:            '%enable %_with_netperf_do_dns'} \
+    %{?_without_netperf_do_dns:         '%disable %_without_netperf_do_dns'} \
+    %{?_with_netperf_use_sysctl:        '%enable %_with_netperf_use_sysctl'} \
+    %{?_without_netperf_use_sysctl:     '%disable %_without_netperf_use_sysctl'} \
+    %{?_with_netperf_use_perfstat:      '%enable %_with_netperf_use_perfstat'} \
+    %{?_without_netperf_use_perfstat:   '%disable %_without_netperf_use_perfstat'} \
+    %{?_with_netperf_dont_wait:         '%enable %_with_netperf_dont_wait'} \
+    %{?_without_netperf_dont_wait:      '%disable %_without_netperf_dont_wait'} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -628,9 +676,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.47  2005/12/23 05:23:28  brian
-# - corrections
+# Revision 1.1.2.48  2005/12/30 12:21:28  brian
+# - updating release notes
 #
+
+* Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.47  2005/12/23 05:23:28  brian
+- corrections
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.46  2005/12/22 15:16:17  brian

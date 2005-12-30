@@ -1,54 +1,70 @@
-OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2005-06-13
+OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2005-12-29
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Major changes in LiS-2.18.2
 
-  The major change for 2.18.2 is the port-back of POSIX/SUSv3 XSR/XSI
-  conformance test suites and performance programs from Linux Fast-STREAMS.  The
-  purpose of porting back theses tests suites and supporting modules and drivers
-  is to provide the ability to do comparison tests between LiS and Linux
-  Fast-STREAMS.
+  Cross-build support for newer `NexusWare' releases.  Build support for
+  (recent FC4) 2.6.14 kernel.  Corrected installation support (init
+  scripts) for SuSE 9.2.
 
-  Another change is a module unloading safe vstrlog hook register and unregister
-  functions register_strlog() and unregister_strlog().
+  Binary compatibility backwards compatible to GCOM 2.18.0 included.
+  This includes exported symbols changed to not generate versioned
+  symbols on 2.4 kernels.  Also, exported symbols are always compiled
+  `attribute((regparm(0)))' on regparm capable architectures, regardless
+  of the kernel version or compile options.(1).  For actual binary
+  compatibilty packaging, see the `strcompat' package.
 
-  Some bug corrections and fixes for glaring SMP errors reported by Kutluck.
+  A major change for 2.18.2 is the port-back of POSIX/SUSv3 XSR/XSI
+  conformance test suites and performance programs from Linux
+  Fast-STREAMS.  The purpose of porting back theses tests suites and
+  supporting modules and drivers is to provide the ability to do
+  comparison tests between LiS and Linux Fast-STREAMS.
 
-  This might be the last OpenSS7 release of Linux STREAMS.  You should seriously
-  consider using the Linux Fast-STREAMS package (streams-0.7a.4) instead.  If
-  you need comptibility to LiS (or other STREAMS implementation), investigate
-  the strcompat package.
+  Another change is a module unloading safe vstrlog hook register and
+  unregister functions register_strlog() and unregister_strlog().
+
+  Some bug corrections and fixes for glaring SMP errors reported by
+  Kutluck.
+
+  This might be the last OpenSS7 release of Linux STREAMS.  You should
+  seriously consider using the Linux Fast-STREAMS package
+  (streams-0.7a.4 or later) instead.  If you need comptibility to LiS
+  (or other STREAMS implementation), investigate the strcompat package,
+  which provides some binary compatibility to LiS under Linux Fast
+  STREAMS.
 
 * Major changes in LiS-2.18.1
 
-  This is a port forward of most of the build and patches from 2.16.19 forward
-  and applied over 2.18.0.  This is our first LiS-2.18 release.  All further
-  development on 2.16.19 will now cease.  2.18.1 is maintained on both 2.4 and
-  2.6 kernels.  No active development will be performed on 2.18.1, only
-  maintenance.  For an active development release, see the Linux Fast-STREAMS
-  releases.
+  This is a port forward of most of the build and patches from 2.16.19
+  forward and applied over 2.18.0.  This is our first LiS-2.18 release.
+  All further development on 2.16.19 will now cease.  2.18.1 is
+  maintained on both 2.4 and 2.6 kernels.  No active development will be
+  performed on 2.18.1, only maintenance.  For an active development
+  release, see the Linux Fast-STREAMS releases.
 
-  Major changes from LiS-2.18.0 include all of the autoconf build system, manual
-  pages and texi/pdf manual for LiS that were applied on the 2.16.19 release.
-  This includes a number of 64 bit, HPPA, PARISC, printf, atomic stats, HZ
-  calculations for 64bit machines, DMA patch for mblk buffer alignment, flush
-  handling patch, panic patch, smp patch, parisc syscall patch, appq patch, and
-  multithreaded test program patches, POSIX threads compilant library functions.
+  Major changes from LiS-2.18.0 include all of the autoconf build
+  system, manual pages and texi/pdf manual for LiS that were applied on
+  the 2.16.19 release.  This includes a number of 64 bit, HPPA, PARISC,
+  printf, atomic stats, HZ calculations for 64bit machines, DMA patch
+  for mblk buffer alignment, flush handling patch, panic patch, smp
+  patch, parisc syscall patch, appq patch, and multithreaded test
+  program patches, POSIX threads compilant library functions.
 
-  Additional changes made to support later 2.6 kernels and distributions.
-  Switched putpmsg()/getpmsg() to use ioctl for system call emulation instead of
-  read()/write(), primarily because 2.6.11 kernels check for a valid count
-  before calling the driver's read()/write() file operations.  Updates to the
-  build system to support a wider range of kernels and distributions.  See the
-  installation and reference manual for a complete list of supported kernels and
-  distributions.
+  Additional changes made to support later 2.6 kernels and
+  distributions.  Switched putpmsg()/getpmsg() to use ioctl for system
+  call emulation instead of read()/write(), primarily because 2.6.11
+  kernels check for a valid count before calling the driver's
+  read()/write() file operations.  Updates to the build system to
+  support a wider range of kernels and distributions.  See the
+  installation and reference manual for a complete list of supported
+  kernels and distributions.
 
   Please note that the entire package is released under GPL.
 
-  For the next release I will make an attempt to collect all of the 2.18.0
-  patches that were reported to the LiS mailing list.
+  For the next release I will make an attempt to collect all of the
+  2.18.0 patches that were reported to the LiS mailing list.
 
 * Major changes in LiS-2.16.19-1
 
@@ -56,73 +72,74 @@ See the end for copying conditions.
 
 * Major changes in LiS-2.16.18-22
 
-  Replaced m4 and automake files with common equivalents.  This allows the
-  same set of m4 macros and automake fragments to be used with all of the
-  OpenSS7 release packages.  Maintenance is easier as one correction will
-  propagate across all items.  Performed similar function with texinfo
-  documentation pieces.
+  Replaced m4 and automake files with common equivalents.  This allows
+  the same set of m4 macros and automake fragments to be used with all
+  of the OpenSS7 release packages.  Maintenance is easier as one
+  correction will propagate across all items.  Performed similar
+  function with texinfo documentation pieces.
 
   Not publicly released.
 
 * Major changes in LiS-2.16.18-21
 
-  Removed all XTI/TLI and Linux networking code, headers and documentation
-  from LiS distribution and bumped epoch to 2.  Linux networking code has
-  been migrated to the strxns, strxnet, strinet and strsctp packages.  The
-  purpose for doing this was to allow the Linux networking to build against
-  Linux Fast-STREAMS as well as Linux STREAMS and is a preparation for phasing
-  out LiS and phasing in LfS.  Updated texinfo documentation to reflect.
+  Removed all XTI/TLI and Linux networking code, headers and
+  documentation from LiS distribution and bumped epoch to 2.  Linux
+  networking code has been migrated to the strxns, strxnet, strinet and
+  strsctp packages.  The purpose for doing this was to allow the Linux
+  networking to build against Linux Fast-STREAMS as well as Linux
+  STREAMS and is a preparation for phasing out LiS and phasing in LfS.
+  Updated texinfo documentation to reflect.
 
-  Made a number of spec file improvements.  Improved passing of options from
-  configure script to rpmbuild.
+  Made a number of spec file improvements.  Improved passing of options
+  from configure script to rpmbuild.
 
-  Corrected generations of versioned module symbols to generate symbols both
-  for SMP and non-SMP architectures.  This allows a single installed module
-  versions header file to provide for both SMP and non-SMP kernels on the same
-  machine based on the presence or absence of CONFIG_SMP.  Provided the same
-  mechanism for SuSE CONFIG_REGPARM.
+  Corrected generations of versioned module symbols to generate symbols
+  both for SMP and non-SMP architectures.  This allows a single
+  installed module versions header file to provide for both SMP and
+  non-SMP kernels on the same machine based on the presence or absence
+  of CONFIG_SMP.  Provided the same mechanism for SuSE CONFIG_REGPARM.
 
-  Added missing configure.nexusware to distribution.  LiS cache options now
-  default to 'no' because of instabilities with timers.
+  Added missing configure.nexusware to distribution.  LiS cache options
+  now default to 'no' because of instabilities with timers.
 
   Not publicly released.
 
 * Major changes in LiS-2.16.18-20
 
-  Minor corrections: made conflicting manpage xti_sctp.3 dependent on OpenSS7
-  SCTP kernel.
+  Minor corrections: made conflicting manpage xti_sctp.3 dependent on
+  OpenSS7 SCTP kernel.
 
   Not publicly released.
 
 * Major changes in LiS-2.16.18-19
 
-  Changes to ompile, install and builds rpms for Fedora Core 1 (FC1), Whitebox
-  Enterprise Linux (WBEL) and RedHat Enterprise Linux 3 (EL3).  Included
-  explicit epoch in internal dependencies in spec file for RPM versions 4.2.1,
-  4.2.2 and higher.  Added hugemem kernel detection and moved getpmsg and
-  putpmsg manual pages.
+  Changes to ompile, install and builds rpms for Fedora Core 1 (FC1),
+  Whitebox Enterprise Linux (WBEL) and RedHat Enterprise Linux 3 (EL3).
+  Included explicit epoch in internal dependencies in spec file for RPM
+  versions 4.2.1, 4.2.2 and higher.  Added hugemem kernel detection and
+  moved getpmsg and putpmsg manual pages.
 
-  Correction to symbolic linking and system map file location during non-rpm
-  autoconf installation.
+  Correction to symbolic linking and system map file location during
+  non-rpm autoconf installation.
 
   Correction to zero maxlen behavior in t_rcvconnect().
 
 * Major changes in LiS-2.16.18-18
 
-  Added check for CONFIG_REGPARM, addition of -mregparm=3 CFLAGS, addition
-  of regparm_ prefix for exported ksyms.
+  Added check for CONFIG_REGPARM, addition of -mregparm=3 CFLAGS,
+  addition of regparm_ prefix for exported ksyms.
 
-  Minor corretions to separate build directory install of devices and caching
-  of detected ksyms.
+  Minor corretions to separate build directory install of devices and
+  caching of detected ksyms.
 
 * Major changes in LiS-2.16.18-17
 
-  Added option --disable-k-modversions to supress versioning of LiS exported
-  symbols.
+  Added option --disable-k-modversions to supress versioning of LiS
+  exported symbols.
 
-  A couple of corrections to the build process reported by Gurol.  Changed
-  order of build in `make rebuild' target to build tools last so that the rpm
-  debug package is built correctly on RH9.
+  A couple of corrections to the build process reported by Gurol.
+  Changed order of build in `make rebuild' target to build tools last so
+  that the rpm debug package is built correctly on RH9.
 
   Change MODULE_PARM to static so that make install-strip does not strip
   module parameter symbols.
@@ -130,66 +147,71 @@ See the end for copying conditions.
   Added lis_check_mem_region(), lis_release_mem_region() and
   lis_request_mem_region() for memory mapped io instead of just io.
 
-  Added printk patches discussed on linux-stream mailling list.  Added gcc
-  printf checking and corrected errors in LiS debugging printk statements.
+  Added printk patches discussed on linux-stream mailling list.  Added
+  gcc printf checking and corrected errors in LiS debugging printk
+  statements.
 
-  Added HP patches.  There are a couple of questionable components in the HP
-  patches that I reversed.  They include;
+  Added HP patches.  There are a couple of questionable components in
+  the HP patches that I reversed.  They include;
 
   - modification of lis_msgsize to lis_msgdsize.  This would change the
-    calculation of queue counts.  Queue counts aren't M_DATA counts, they
-    are "data" message counts.  LiS probably doesn't have this the right
-    way, but lis_msgdsize is not correct either.
+    calculation of queue counts.  Queue counts aren't M_DATA counts,
+    they are "data" message counts.  LiS probably doesn't have this the
+    right way, but lis_msgdsize is not correct either.
 
-  - addition of qi_mstat->ms_pcnt increment on lis_safe_putmsg.  Same for
-    ms_scnt, ms_ocnt, ms_ccnt.  STREAMS is not supposed to increment counts.
-    It is the module writer's responsibility to increment counts in their own
-    queue procedures.
+  - addition of qi_mstat->ms_pcnt increment on lis_safe_putmsg.  Same
+    for ms_scnt, ms_ocnt, ms_ccnt.  STREAMS is not supposed to increment
+    counts.  It is the module writer's responsibility to increment
+    counts in their own queue procedures.
 
   Added HP ldl patches.
 
   Made modifications to putq(), putbq(), insq() and appq() discussed on
   linux-streams mailing list.  These do not free messages on failure.
-  Modified all ocurrences internal to LiS to free the message on error to
-  ensure old behavior.
+  Modified all ocurrences internal to LiS to free the message on error
+  to ensure old behavior.
 
-  Added HP dejagnu patches to strtst and added dejagnu testsuite directory and
-  file.  Added the make check target.  Use DEJATOOLS on the make command line
-  to invoke the tests, such as  `make DEJATOOLS=strtst check' to invoke the
-  tests.  Because a patched netperf is not commonly available and netperf will
-  not be distributed with the package, gnu autotest might be a better choice.
-  But that's for a later release.
+  Added HP dejagnu patches to strtst and added dejagnu testsuite
+  directory and file.  Added the make check target.  Use DEJATOOLS on
+  the make command line to invoke the tests, such as  `make
+  DEJATOOLS=strtst check' to invoke the tests.  Because a patched
+  netperf is not commonly available and netperf will not be distributed
+  with the package, gnu autotest might be a better choice.  But that's
+  for a later release.
 
 * Major changes in LiS-2.16.18-16
 
-  General updates to the build process, optimization options, build options.
-  Corrected library linkage.  Synced TLI modules and INET driver to Linux
-  Fast-STREAMS.  Removed deadlock from INET driver and loosened locking.
-  Unfortunately suitable libraries must be installed before distcheck will
-  clear.
+  General updates to the build process, optimization options, build
+  options.  Corrected library linkage.  Synced TLI modules and INET
+  driver to Linux Fast-STREAMS.  Removed deadlock from INET driver and
+  loosened locking.  Unfortunately suitable libraries must be installed
+  before distcheck will clear.
 
   Smoother and more reliable stripping of kernel symbols, starts with
-  /proc/ksyms if applicable then System.map then modversions.h to attempt to
-  choose symbols most closely synced with an installed or running kernel.
+  /proc/ksyms if applicable then System.map then modversions.h to
+  attempt to choose symbols most closely synced with an installed or
+  running kernel.
 
-  Improvements to autoconf installation of manpages (autocompressed now) and
-  info and pdf manuals are distributed.  install-strip target will actually
-  properly strip kernel modules.
+  Improvements to autoconf installation of manpages (autocompressed now)
+  and info and pdf manuals are distributed.  install-strip target will
+  actually properly strip kernel modules.
 
-  Included an option to build and install only kernel or user parts of package
-  to speed rpm rebuild process for multiple kernel.  Added `rebuild' target to
-  rebuild the rpms from srpm for multiple kernel and architectures.  Added a
-  `sign' and `resign' target to sign srpm and rebuilt rpms respectively.
+  Included an option to build and install only kernel or user parts of
+  package to speed rpm rebuild process for multiple kernel.  Added
+  `rebuild' target to rebuild the rpms from srpm for multiple kernel and
+  architectures.  Added a `sign' and `resign' target to sign srpm and
+  rebuilt rpms respectively.
 
-  Greatly enhanced cross-build and cross-compile support, primarily in support
-  of the NexusWare embedded target.  Added NexusWare helper script and
-  documentation.  DESTDIR is now a blessed environment variable used by
-  configure to set the cross-build root as well as the install root.  Try
-  adding --with-k-optimize='size' to configure to optimize for size for
-  embedded targets.  Builds clean against NexusWare24 (810p0674.10-rc4).
+  Greatly enhanced cross-build and cross-compile support, primarily in
+  support of the NexusWare embedded target.  Added NexusWare helper
+  script and documentation.  DESTDIR is now a blessed environment
+  variable used by configure to set the cross-build root as well as the
+  install root.  Try adding --with-k-optimize='size' to configure to
+  optimize for size for embedded targets.  Builds clean against
+  NexusWare24 (810p0674.10-rc4).
 
-  Added start of an option to build as linkable object for embedded targets
-  rather than loadable kernel module.
+  Added start of an option to build as linkable object for embedded
+  targets rather than loadable kernel module.
 
 * Major changes in LiS-2.16.18-15
 
@@ -198,12 +220,13 @@ See the end for copying conditions.
 
 * Major changes in LiS-2.16.18-14
 
-  A few more enhancements to the build process to work with autoconf 2.59.
+  A few more enhancements to the build process to work with autoconf
+  2.59.
 
 * Major changes in LiS-2.16.18-13
 
-  Enhanced build process for autoconf-2.59, automake-1.8.3, gettext-0.14.1,
-  and libtool-1.5.6.
+  Enhanced build process for autoconf-2.59, automake-1.8.3,
+  gettext-0.14.1, and libtool-1.5.6.
 
 * Major changes in LiS-2.16.18-12
 
@@ -213,10 +236,10 @@ See the end for copying conditions.
   Enhanced build process.
   
   All kernel symbols exported by LiS are versioned on kernels that have
-  versioned symbols.  This makes it safer to compile kernel modules against
-  kernel/LiS combinations.  This is in preparation for splitting off the
-  strxnet package, and the technique was imported from the Linux Fast-STREAMS
-  build.
+  versioned symbols.  This makes it safer to compile kernel modules
+  against kernel/LiS combinations.  This is in preparation for splitting
+  off the strxnet package, and the technique was imported from the Linux
+  Fast-STREAMS build.
 
 * Major changes in LiS-2.16.18-11
 
@@ -226,78 +249,81 @@ See the end for copying conditions.
 * Major changes in LiS-2.16.18-10
 
   Added support for cooked manpages both for non-rpm systems and for rpm
-  systems.  It is still better to leave manpages uncooked for rpm releases
-  because they are much smaller that way.  Give the --with-cooked-manpages
-  flag to configure if you want cooked manpages.  You still need grefer on
-  the build system.
+  systems.  It is still better to leave manpages uncooked for rpm
+  releases because they are much smaller that way.  Give the
+  --with-cooked-manpages flag to configure if you want cooked manpages.
+  You still need grefer on the build system.
 
-  Updates to all manual pages in man7, and some others (xti) in man3.  Removed
-  unused .macros and .refs files.
+  Updates to all manual pages in man7, and some others (xti) in man3.
+  Removed unused .macros and .refs files.
 
   Moved automake fragments into separate directory.  Cleaned up automake
   fragments.
 
-  Rearranged header files in the xti subdirectory to install in LiS package
-  include directory instead.  Reworked xti, tihdr and tiuser file groups to
-  include properly from kernel or user space independent of order.  tiuser
-  and xti still cannot be included together.  Added older TLI interface
-  <tiuser.h> that is still consistent with newer XTI interface.  Changed
-  references in man pages to XTI/TLI instead of just XTI.
+  Rearranged header files in the xti subdirectory to install in LiS
+  package include directory instead.  Reworked xti, tihdr and tiuser
+  file groups to include properly from kernel or user space independent
+  of order.  tiuser and xti still cannot be included together.  Added
+  older TLI interface <tiuser.h> that is still consistent with newer XTI
+  interface.  Changed references in man pages to XTI/TLI instead of just
+  XTI.
 
-  Added ticlts.h, ticots.h and ticotsord.h header files.  Updated dlpi.h and
-  npi.h header files.  Removed sys/LiS/tpicommon.h because it is largely
-  replaced by sys/tli.h and sys/tpi.h.  Removed the, now redundant, xti header
-  file subdirectory.
+  Added ticlts.h, ticots.h and ticotsord.h header files.  Updated dlpi.h
+  and npi.h header files.  Removed sys/LiS/tpicommon.h because it is
+  largely replaced by sys/tli.h and sys/tpi.h.  Removed the, now
+  redundant, xti header file subdirectory.
 
-  A series of bug fixes to xnet.c (libxnet) that resulted from discussions
-  with Gurol Akman on openss7-develop mailing list.  Mostly surrounding
-  t_alloc and t_getinfo behaviour and the behavior when NULL pointers are
-  passed to various XTI/TLI library calls.  Updated xti documentation as well.
+  A series of bug fixes to xnet.c (libxnet) that resulted from
+  discussions with Gurol Akman on openss7-develop mailing list.  Mostly
+  surrounding t_alloc and t_getinfo behaviour and the behavior when NULL
+  pointers are passed to various XTI/TLI library calls.  Updated xti
+  documentation as well.
 
-  Many changes to the inet.c INET driver.  Wildcard IP addresses can now be
-  bound and wildcard addresses will be assigned with no address is passed to
-  most providers.  (/dev/rawip still requires an address or TNOADDR is
-  returned.)  Option management has been extensively rewritten to be more
-  conformant to XNS documentation.  Test programs test-inet_raw,
-  test-inet_udp, test-inet_tcp have been upgraded and converted to multiple
-  child processes.  A number of fixes to SMP lock behavior and M_FLUSH have
-  beend added as reported by Dave Grothe.  Corrected all level and TBADOPT
-  behavior on negotiation.
+  Many changes to the inet.c INET driver.  Wildcard IP addresses can now
+  be bound and wildcard addresses will be assigned with no address is
+  passed to most providers.  (/dev/rawip still requires an address or
+  TNOADDR is returned.)  Option management has been extensively
+  rewritten to be more conformant to XNS documentation.  Test programs
+  test-inet_raw, test-inet_udp, test-inet_tcp have been upgraded and
+  converted to multiple child processes.  A number of fixes to SMP lock
+  behavior and M_FLUSH have beend added as reported by Dave Grothe.
+  Corrected all level and TBADOPT behavior on negotiation.
 
-  Although this driver is now closer to expected behavior, it has not been
-  tested for XNS 5.2 compliance, nor will it be until someone has the time to
-  extend the test programs to handle all test cases in a similar manner as was
-  done for the library.  Your mileage many vary.  Remember, there is no
-  warranty.
+  Although this driver is now closer to expected behavior, it has not
+  been tested for XNS 5.2 compliance, nor will it be until someone has
+  the time to extend the test programs to handle all test cases in a
+  similar manner as was done for the library.  Your mileage many vary.
+  Remember, there is no warranty.
 
 * Major changes in LiS-2.16.18-9
 
-  Changes primarily in support of builds on HPPA (PARISC) architectures.  LiS
-  doesn't build too well on PARISC so some modifications where used from the
-  Linux Fast-STREAMS package to correct deficiencies.  Better building on
-  recent 2.4 kernels (2.4.23, 2.4.24, 2.4.25) is also provided.
+  Changes primarily in support of builds on HPPA (PARISC) architectures.
+  LiS doesn't build too well on PARISC so some modifications where used
+  from the Linux Fast-STREAMS package to correct deficiencies.  Better
+  building on recent 2.4 kernels (2.4.23, 2.4.24, 2.4.25) is also
+  provided.
 
 * Major changes in LiS-2.16.18-8
 
-  Changes to permit better builds on recent RedHat kernels, and especially
-  kernel-2.4.20-30.9.
+  Changes to permit better builds on recent RedHat kernels, and
+  especially kernel-2.4.20-30.9.
 
 * Major changes in LiS-2.16.18-7
 
-  Fixed a module loading bug in LiS.  Previously modules would not demand
-  load.
+  Fixed a module loading bug in LiS.  Previously modules would not
+  demand load.
 
 * Major changes in LiS-2.16.18-6
 
-  Fixed a possible null pointer dereference in libxnet.  Corrected t_bind to
-  return TNOADDR instead of TBADADDR on wildcard bind attempt.  Module loading
-  bug patched.
+  Fixed a possible null pointer dereference in libxnet.  Corrected
+  t_bind to return TNOADDR instead of TBADADDR on wildcard bind attempt.
+  Module loading bug patched.
 
 * Major changes in LiS-2.16.18-5
 
   Fixes a t_open and t_bind problem in libxnet.  Fixes alignemnt of data
-  portion of mblks.  Adds (untested) ticots_ord, ticots and ticlts devices
-  over UNIX domain sockets.
+  portion of mblks.  Adds (untested) ticots_ord, ticots and ticlts
+  devices over UNIX domain sockets.
 
 * Major changes in LiS-2.16.18-4
 
@@ -320,14 +346,14 @@ See the end for copying conditions.
 
   Initial autoconf/rpm packaging of LiS.
 
-  We got tired of trying to stablize LiS loads, so we autoconf'ed it, rpm'ed
-  it, added an XTI/TLI library that works, a tirdwr module that works, fixed
-  tihdr and timod header files, pulled strinet into the build, added in manual
-  pages, added --help and --version options to all the utilities to pass
-  distcheck targets.
+  We got tired of trying to stablize LiS loads, so we autoconf'ed it,
+  rpm'ed it, added an XTI/TLI library that works, a tirdwr module that
+  works, fixed tihdr and timod header files, pulled strinet into the
+  build, added in manual pages, added --help and --version options to
+  all the utilities to pass distcheck targets.
 
-  This release will greatly simplify loading LiS for those that don't want to
-  recompile kernels (or recompile anything for that matter).
+  This release will greatly simplify loading LiS for those that don't
+  want to recompile kernels (or recompile anything for that matter).
 
 
 =========================================================================

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.38 $) $Date: 2005/12/29 21:31:29 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.39 $) $Date: 2005/12/30 12:21:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/29 21:31:29 $ by $Author: brian $
+# Last Modified $Date: 2005/12/30 12:21:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1166,7 +1166,11 @@ AC_DEFUN([_LIS_REGPARMS], [dnl
     AC_MSG_CHECKING([for lis regparms])
     LIS_STREAMS_REGPARM="${with_lis_regparms:-0}"
     AC_DEFINE_UNQUOTED([STREAMS_REGPARM], [$LIS_STREAMS_REGPARM])
-    AC_DEFINE_UNQUOTED([_RP], [__attribute__((__regparm__(STREAMS_REGPARM)))])
+    if test :$LIS_STREAMS_REGPARM = :no ; then
+	AC_DEFINE_UNQUOTED([_RP], [])
+    else
+	AC_DEFINE_UNQUOTED([_RP], [__attribute__((__regparm__(STREAMS_REGPARM)))])
+    fi
     AC_MSG_RESULT([$LIS_STREAMS_REGPARM])
 ])# _LIS_REGPARMS
 # =============================================================================

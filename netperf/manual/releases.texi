@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.2.4 2005/09/14 23:41:07 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.2.5 2005/12/30 12:21:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/09/14 23:41:07 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:21:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -152,9 +152,11 @@ This section discusses compatibility with major prerequisites.
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @item Fedora Core 4 (FC4)
-@item Debian 3.1r0a Sarge
 @item Lineox 4.026 (LEL4)
 @item Mandriva Linux LE2005 (MDK102)
+@item Performance Technologies NexusWare 8.0
+@item Debian 3.1r0a Sarge (untested)
+@item OpenSuSE 10.0 (untested)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
@@ -253,8 +255,16 @@ Hewlett-Packard Company releases.
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a bug fixes release.  What remains to be done is to merge in the latest upstream
-release of netperf into this package.
+Many corrections (but not enough) are included to use the package for XTI INET testing.  UDP works
+now, but TCP is not completely corrected yet (and, therefore, neither is SCTP).  These capabilities
+could not have possibly worked in the original @cite{netperf-2.3} release.  The next release should
+have TCP and SCTP corrected for XTI.
+
+Corrections included to make the package cross-build for @cite{Nex@-us@-Ware} as well as recent
+2.6.14 (FC4) kernels.
+
+What remains to be done is to merge in the latest upstream release of netperf into this package and
+contribute XTI corrections back upstream.
 
 @node Release netperf-2.3.1
 @subsection Release netperf-2.3.1

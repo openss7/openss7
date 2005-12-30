@@ -1,57 +1,72 @@
-OpenSS7 Linux Fast STREAMS -- history of user-visible changes.  2005-03-15
+OpenSS7 Linux Fast STREAMS -- history of user-visible changes.  2005-12-29
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Major changes for streams-0.7a.4
 
-  This is primarily a bug fix release.
+  This is primarily a bug fixes release and corrections resulting from
+  testing.
 
 * Major changes for streams-0.7a.3
 
-  With this release version numbers were changed to reflect an upstream version
-  only to be consistent with other OpenSS7 package releases.  All RPM release
-  numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian release numbers will be
-  _0.  If you wish to apply patches and relelease the package, please bump up
-  the release number and apply a suitable release suffix for your organization.
-  We leave Debian release number _1 reserved for your use, so you can still
-  bundle the source in the .dsc file.
+  With this release version numbers were changed to reflect an upstream
+  version only to be consistent with other OpenSS7 package releases.
+  All `RPM' release numbers will be `-1$(PACKAGE_RPMEXTRA)' and all
+  `Debian' release numbers will be `_0'.  If you wish to apply patches
+  and relelease the package, please bump up the release number and apply
+  a suitable release suffix for your organization.  We leave `Debian'
+  release number `_1' reserved for your use, so you can still bundle the
+  source in the `.dsc' file.
 
-  Major changes for this release include build against Linux 2.6 kernels and
-  popular distributions based on the 2.6 kernel as well as wider distribution
-  support.
+  Major changes for this release include build against Linux 2.6 kernels
+  and popular distributions based on the 2.6 kernel as well as wider
+  distribution support.
+
+  This was an internal beta test release and was not released publicly.
 
 * Major changes for streams-0.7a-3
 
-  Updated to common build process.  Documentation updates.
+  Updates to common build process.  Documentation updates.
+
+  This was an internal alpha test release and was not released publicly.
 
 * Major changes for streams-0.7a-2
 
-  Removed all XTI/TLI and Linux networking code, headers and documentation
-  from streams distribution and set epoch at 0.  Linux networking code has
-  been migrated to the strxnet, strinet and strsctp packages.  The purpose for
-  doing this was to allow the Linux networking to build against Linux
-  Fast-STREAMS as well as Linux STREAMS and is a preparation for phasing out
-  LiS and phasing in LfS.
+  Removed all XTI/TLI and Linux networking code, headers and
+  documentation from streams distribution and set epoch at 0.  Linux
+  networking code has been migrated to the strxnet, strinet and strsctp
+  packages.  The purpose for doing this was to allow the Linux
+  networking to build against `Linux Fast-STREAMS' as well as `Linux
+  STREAMS' and is a preparation for phasing out LiS and phasing in LfS.
+
+  This was an internal alpha test release and was not released publicly.
 
 * Major changes for streams-0.7a-1
 
-  This is the initial release of the Linux Fast-STREAMS package for Linux.
-  This is intended as a high-performance, production replacement for Linux
-  STREAMS (LiS).  Linux Fast-STREAMS has the following features:
+  This is the initial release of the Linux Fast-STREAMS package for
+  Linux.  This is intended as a high-performance, production replacement
+  for `Linux STREAMS (LiS)'.  Linux Fast-STREAMS has the following
+  features:
 
-  - optimized for Linux kernels.
-  - prepared for mainstream Linux kernel adoption.
-  - lindented and follows kernel coding practices.
-  - compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2 and LiS.
-  - supports all major SVR4.2 variants.
-  - licensed under GPL with commercial licensing available.
-  - supports full SVR 4.2 MP synchronization models.
-  - runs at SoftIRQ.
-  - provides common SVR 4.2 system tunable parameters and sysctls.
-  - provides /proc filesystem access for debugging and performance tuning.
-  - provides a full set of common STREAMS modules and drivers.
-  - provides full name-streams device and shadow special filesystem support.
+   - optimized for Linux kernels.
+   - prepared for mainstream Linux kernel adoption.
+   - lindented and follows kernel coding practices.
+   - compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2
+     and LiS.
+   - supports all major SVR4.2 variants.
+   - licensed under GPL with commercial licensing available.
+   - supports full SVR 4.2 MP synchronization models.
+   - runs at SoftIRQ.
+   - provides common SVR 4.2 system tunable parameters and sysctls.
+   - provides /proc filesystem access for debugging and performance
+     tuning.
+   - provides a full set of common STREAMS modules and drivers.
+   - provides full name-streams device and shadow special filesystem
+     support.
+
+  This was an internal alpha test release and was not released publicly.
+
 
 =========================================================================
 

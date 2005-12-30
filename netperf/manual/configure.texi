@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 1.1.2.1 2005/05/30 08:44:01 brian Exp $
+@c @(#) $Id: configure.texi,v 1.1.2.2 2005/12/30 12:21:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/30 08:44:01 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:21:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -63,172 +63,124 @@
 In addition, the following @command{configure} options, specific to the
 @value{PACKAGE_TITLE} package are available:
 
-@ignore
 @table @command
-@item --enable-sctp-slow-verification
-@opindex sctp-slow-verification
-Enable slow verification of addresses and tags.
 
-When a message comes from an SCTP enpoint with the correct verification tag, it is not necessary to check whether it is
-from a correct source address to identify the SCTP association to which it belongs.  When you disable this feature
-(@command{--disable-sctp-slow-verification}), source addresses are not checked and it is up to firewall implementations
-to thwart attackers of the verification tag.  When you enable this feature (@command{--enablesctp-slow-verification}),
-you get RFC 2960 compliant operation, but at great cost to SCTP performance.
+@item --disable-netperf-dirty
+@opindex netperf-dirty
+Disable code that dirties buffers before calls to send.  This option defaults to @samp{enabled}.
 
-This option defaults to disabled.
+@item --disable-netperf-histogram
+@opindex netperf-histogram
+Disable code to keep a histogram of request-response times or time spend in @command{send()}.  This
+option defaults to @samp{enabled}.
 
-@item --enable-sctp-throttle-heartbeats
-@opindex sctp-throttle-heartbeats
-Enable heartbeat throttling.
+@item --enable-netperf-old-histogram
+@opindex netperf-old-histogram
+Enable old pre-2.2pl6 formatted histogram.  This option defaults to @samp{disabled}.
 
-Special feature of @value{PACKAGE_TITLE} that is not mentioned in RFC 2960.  When you enable this feature
-(@command{--enable-sctp-throttle-heartbeats}), @value{PACKAGE_TITLE} will throttle the rate at which it responds to
-heartbeats to the system control @var{heartbeat_interval}.  This makes SCTP more resilient to implementations which
-flood heartbeat messages.  For RFC 2960 compliant operation, disable this feature (@command{--disable-sctp-throttle-heartbeats}).
+@item --disable-netperf-intervals
+@opindex netperf-intervals
+Disable code to allow pacing of sends in UDP, TCP or SCTP tests.  This may have unexpected results
+on non-HPUX systems.  This option defaults to @samp{enabled}.
 
-This option defaults to disabled.
+@item --disable-netperf-do-dlpi
+@opindex netperf-do-dlpi
+Disable code to test to the DLPI implementation.  This option defaults to @samp{enabled}.
 
-@item --enable-sctp-discard-ootb
-@opindex sctp-discard-ootb
-Enable discard of out-of-the-blue packets.
+@item --disable-netperf-do-sctp
+@opindex netperf-do-sctp
+Disable code to test the SCTP implementation.  This option defaults to @samp{enabled}.
 
-RFC 2960 requires the implementation to send @code{ABORT} to some OOTB packets (packets for which no SCTP association
-exists).  Sending @code{ABORT} chunks to unverified source addresses with the T bit set opens SCTP to blind masquerade
-attacks.  Not sending them may lead to delays at the peer endpoint aborting associations where our @code{ABORT} has been
-lost and the socket is already closed or if we have restarted and the peer still has open associations to us.  If you
-enable this feature (@command{--enable-sctp-discard-ootb}), SCTP will discard all OOTB packets.  This is necessary if
-another SCTP stack is being run on the same machine.  Therefore, if the @value{PACKAGE_TITLE} package is included on an
-OpenSS7 SCTP kernel, this feature is automagically enabled.  For RFC 2960 compliant operation, disable this feature
-(@command{--disable-sctp-discard-ootb}).
+@item --disable-netperf-do-select
+@opindex netperf-do-select
+Disable code to do @command{select()} on receive.  This option defaults to @samp{enabled}.
 
-This option defaults to disabled for non-OpenSS7 SCTP kernels, and enable for OpenSS7 SCTP kernels.
+@item --enable-netperf-do-lwp
+@opindex netperf-do-lwp
+This option defaults to @samp{disabled}.
 
-@item --enable-sctp-extended-ip-support
-@opindex sctp-extended-ip-support
-Enable extended IP support for SCTP.
+@item --disable-netperf-do-nbrr
+@opindex netperf-do-nbrr
+Disable code to do non-blocking request-response.  This option defaults to @samp{enabled}.
 
-This provides extended IP support for SCTP for things like IP Transparent Proxy and IP Masquerading.  This is
-experimental stuff.  If in doubt, disable this feature (@command{--disable-sctp-expended-ip-support}).
+@item --disable-netperf-do-xti
+@opindex netperf-do-xti
+Disable code to test the XTI implementation.  This option defaults to @samp{enabled}.
 
-This option defaults to disabled.
+@item --disable-netperf-do-xti-sctp
+@opindex netperf-do-xti-sctp
+Disable code to test the XTI SCTP implementation.  This option defaults to @samp{enabled}.
 
-@item --disable-sctp-hmac-sha1
-@opindex sctp-hmac-sha1
-Disable SHA-1 HMAC.
+@item --disable-netperf-do-unix
+@opindex netperf-do-unix
+Disable code to test the UNIX domain implementation.  This option defaults to @samp{enabled}.
 
-This provides the ability to use the FIPS 180-1 (SHA-1) message authentication code in SCTP cookies.  If you enable this
-feature (@command{--enable-sctp-hmac-sha1}), when the appropriate sysctl is set, SCTP will use the SHA-1 HMAC when signing
-cookies in the @code{INIT-ACK} chunk.  If disable this feature (@command{--disable-sctp-hmac-sha1}), the SHA-1 HMAC will
-be unavailable for use with SCTP.
+@item --disable-netperf-do-1644
+@opindex netperf-do-1644
+Disable code to test T/TCP vs TCP trasnactions.  This option defaults to @samp{enabled}.
 
-This option defaults to enabled.
+@item --disable-netperf-do-first-burst
+@opindex netperf-do-first-burst
+Disable code to create an initial burst.  This option defaults to @samp{enabled}.
 
-@item --disable-sctp-hmac-md5
-@opindex sctp-hmac-md5
-Disable MD5 HMAC.
+@item --enable-netperf-use-looper
+@opindex netperf-use-looper
+Enable looper or soaker processes.  When enabled, use looper or soaker processes to measure CPU
+utilization.  These will be forked-off at the beginning.  If you are running this way, it is
+important to see how much impact these have on the measurement.  A loopback test on uniprocessor
+should be able to consume approximately 100% of the CPU, and the difference between throughput with
+@var{USE_LOOPER_CPU} and without should be small for a real network.  If it is not, then some work
+probably needs to be done on reducing the priority of the looper processes.  This option defaults to
+@samp{disabled}.  Do not enable this option for @cite{Linux}.
 
-This provides the ability to use the MD5 (RFC 1321) message authentication code in SCTP cookies.  If you enable this
-feature (@command{--enable-sctp-hmac-md5}), when the appropriate sysctl is set, SCTP will use the MD5 HMAC when signing
-cookies in the INIT ACK chunk.  If you disable this feature (@command{--disable-sctp-hmac-md5}), the MD5 HMAC will be
-unavailable for use with SCTP.
+@item --enable-netperf-use-pstat
+@opindex netperf-use-pstat
+Enable code to perform HPUX CPU utilization.  If use on @cite{HP-UX 10.0} and later, this will make
+CPU utilitzation measurements with some information returns by the @cite{10.X} @command{pstat()}
+call.  This is very accurate, and should have no impact on the measurement.  Astute observers will
+notices that the @var{LOC_CPU} and @var{REM_CPU} reates with this method look remarkably close to
+the clockrate of the machine.  This option defaults to @samp{disabled}.  Do not enable this option
+for @cite{Linux}.
 
-This option defaults to enabled.
+@item --enable-netperf-use-kstat
+@opindex netperf-use-kstat
+Enable code to Solaris CPU utilitization.  If used on @cite{Solaris 2}, this will make CPU
+utilization meansurements using the @command{kstat()} insterface.  This option defaults to
+@samp{disabled}.  Do not enable this option for @cite{Linux}.
 
-@item --enable-sctp-adler32
-@opindex sctp-adler32
-Enable Adler32 checksum.
+@item --disable-netperf-use-proc-stat
+@opindex netperf-use-proc-stat
+Disable use of @file{/proc/stat} interface.  Enabled for @cite{Linux} systems with CPU utilization
+info in @file{/proc/stat}.  Provides a fairly accurate CPU load measurement without affecting
+measurement.  This option defaults to @samp{enabled}.
 
-This provides the ability to use the older RFC 2960 Adler32 checksum.  If CONFIG_SCTP_CRC_32 below is not selected, the
-Adler32 checksum is always provided.
+@item --enable-netperf-do-ipv6
+@opindex netperf-do-ipv6
+Enables IPv6 testing.  This option defaults to @samp{disabled}.
 
-This option defaults to disabled.
+@item --disable-netperf-do-dns
+@opindex netperf-do-dns
+Disables DNS testing.  This option defaults to @samp{enabled}.
 
-@item --disable-sctp-crc32c
-@opindex sctp-crc32c
-Disable CRC-32C checksum.
+@item --enable-netperf-use-sysctl
+@opindex netperf-use-sysctl
+Enables use of sysctl on BSD.  When enabled, use the @command{sysctl()} call on FreeBSD (perhaps
+other BSDs) to calculate CPU utilization.  This option defaults to @samp{disabled}.  Do not enable
+this option for @cite{Linux}.
 
-This provides the ability to use the newer CRC-32c checksum as described in RFC 3309.  When this is selected and
-CONFIG_SCTP_ADLER_32 is not selected above, then the only checksum that will be used is the CRC-32c checksum.
+@item --enable-netperf-use-perfstat
+@opindex netperf-use-perfstat
+Enable use of perfstat on AIX.  When enabled, use the @command{perfstat()} call on AIX to calculate
+CPU utilization.  This option defaults to @samp{disabled}.  Do not enable this option for
+@cite{Linux}.
 
-This option defaults to enabled.
+@item --enable-netperf-dont-wait
+@opindex netperf-dont-wait
+Enable MSG_DONTWAIT on sends.  This option defaults to @samp{disabled}.
 
-@item --enable-sctp-throttle-passiveopens
-@opindex sctp-throttle-passiveopens
-Enable throttling of passive opens.
-
-Special feature of Linux SCTP not mentioned in RFC 2960.  When secure algorithms are used for signing cookies, the
-implementation becomes vulnerable to INIT and @code{COOKIE-ECHO} flooding.  If you enable this feature
-(@command{--enable-sctp-throttle-passiveopens}), SCTP will only allow one INIT and one @code{COOKIE-ECHO} to be
-processed in each interval corresponding to the sysctl sctp_throttle_itvl.  Setting sctp_throttle_itvl to 0 defeats this
-function.  If you disable this feature (@command{--disable-sctp-throttle-passiveopens}), each INIT and
-@code{COOKIE-ECHO} will be processed.
-
-This option defaults to disabled.
-
-@item --enable-sctp-ecn
-@opindex sctp-ecn
-Enable explicit congestion notification.
-
-This enables support for Explicit Congestion Notification (ECN) chunks in SCTP messages as defined in RFC 2960 and RFC
-3168.  It also adds syctl (/proc/net/ipv4/sctp_ecn) which allows ECN for SCTP to be disabled at runtime.
-
-This option defaults to disabled.
-
-@item --enable-sctp-lifetimes
-@opindex sctp-lifetimes
-Enable SCTP message lifetimes.
-
-This enables support for message lifetimes as described in RFC 2960.  When enabled, message lifetimes can be set on
-messages.  See sctp(7).  This feature is always enabled when Partial Reliability Support is set.
-
-This option defaults to disabled.
-
-@item --enable-sctp-add-ip
-@opindex sctp-add-ip
-Enable ADD-IP.
-
-This enables support for ADD-IP as described in draft-ietf-tsvwg-addip-sctp-07.txt.  This allows the addition and
-removal of IP addresses from existing connections.  This is experimental stuff.
-
-This option defaults to disabled.
-
-@item --enable-sctp-adaptation-layer-info
-@opindex sctp-adaptation-layer-info
-Enable ALI.
-
-This enables support for the Adaptation Layer Information parameter described in draft-ietf-tsvwg-addip-sctp-07.txt for
-communicating application layer information bits at initialization.  This is experimental stuff.
-
-This option defaults to disabled.
-
-@item --enable-sctp-partial-reliability
-@opindex sctp-partial-reliability
-Enable SCTP Partial Reliability (PR-SCTP).
-
-This enables support for PR-SCTP as described in draft-stewart-tsvwg-prsctp-03.txt.  This allows for partial reliability
-of message delivery on a "timed reliability" basis.  This is experimental stuff.
-
-This option defaults to disabled.
-
-@item --disable-sctp-error-generator
-@opindex sctp-error-generator
-Disable the SCTP error generator.
-
-This provides an internal error generator that can be accessed with socket options for testing SCTP operation under
-packet loss.  You will need this option to run some of the test programs distributed with the SCTP module.
-
-This option defaults to enabled.
-
-@item --with-sctp
-@opindex sctp
-Enable the version 1 driver in the build.
-This option defaults to disabled.
-
-@item --with-sctp2
-@opindex sctp2
-Enable the version 2 driver in the build.
-This option defaults to enabled.
+@item --with-netperf-logfile=@var{LOGFILE}
+@opindex netperf-logfile
+Specify a debug log file.  This option defaults to @file{/tmp/netperf.debug}.
 
 @end table
-@end ignore
 

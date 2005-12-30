@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.36 $) $Date: 2005/12/28 11:09:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.37 $) $Date: 2005/12/30 12:21:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/28 11:09:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/30 12:21:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -260,8 +260,10 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  README-cvs \
+				  README-nexusware \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

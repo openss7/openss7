@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.13 2005/09/14 23:41:14 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.14 2005/12/30 12:21:39 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/09/14 23:41:14 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:21:39 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -142,9 +142,11 @@ This section discusses compatibility with major prerequisites.
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @item Fedora Core 4 (FC4)
-@item Debian 3.1r0a Sarge
 @item Lineox 4.026 (LEL4)
 @item Mandriva Linux LE2005 (MDK102)
+@item Performance Technologies NexusWare 8.0
+@item Debian 3.1r0a Sarge (untested)
+@item OpenSuSE 10.0 (untested)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
@@ -183,8 +185,8 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::			Release @value{PACKAGE_RELEASE}
-* Release sctp-0.2.21::		Release 21
-* Release sctp-0.2.20::		Release 20
+* Release @value{PACKAGE}-0.2.21::		Release 21
+* Release @value{PACKAGE}-0.2.20-1::		Release 20
 @end menu
 @end ifnothtml
 @end ifnotplaintext
@@ -195,23 +197,37 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a bug fix release.
+This is primarily a bug fixes release and corrections resulting from testing.  This is a major bug
+fix release.  The previous release was largely untested.
 
 @c ----------------------------------------------------------------------------
 
-@node Release sctp-0.2.21
-@subsection Release sctp-0.2.21
-@cindex release sctp-0.2.21
+@node Release @value{PACKAGE}-0.2.21
+@subsection Release @value{PACKAGE}-0.2.21
+@cindex release @value{PACKAGE}-0.2.21
 
-Updated version numbering.  Improved build process.
+With this release version numbers were changed to reflect an upstream version only to be consistent
+with other OpenSS7 package releases.  All @cite{RPM} release numbers will be
+@samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian} release numbers will be @samp{_0}.  If you wish
+to apply patches and relelease the package, please bump up the release number and apply a suitable
+release suffix for your organization.  We leave @cite{Debian} release number @samp{_1} reserved for
+your use, so you can still bundle the source in the @file{.dsc} file.
+
+Improved build process.
+
+Not publicly released.
 
 @c ----------------------------------------------------------------------------
 
-@node sctp-0.2.20
-@subsection sctp-0.2.20
-@cindex sctp-0.2.20
+@node @value{PACKAGE}-0.2.20-1
+@subsection @value{PACKAGE}-0.2.20-1
+@cindex @value{PACKAGE}-0.2.20-1
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
+
+The @cite{OpenSS7 Linux Native SCTP} existed before as a kernel patch for the Linux kernel.  This is
+an @command{autoconf/rpm} packaging release of @cite{Linux Native SCTP} that builds and installs
+separate from the Linux kernel tree.
 
 Not publicly released.
 

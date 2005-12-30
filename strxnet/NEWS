@@ -1,73 +1,101 @@
-OpenSS7 STREAMS INET -- history of user-visible changes.  2005-03-15
+OpenSS7 STREAMS INET -- history of user-visible changes.  2005-12-29
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Major changes in strxnet-0.9.2.7
 
-  This release has been verified (conformance test suite passes) for operation
-  with Linux Fast-STREAMS (streams-0.7a.4).  Some test cases were updated
-  because LiS was not operating correctly on pipes (does not send SIGPIPE on
-  write error contrary to POSIX).
+  This is primarily a bug fixes release.  This release has been verified
+  (conformance test suite passes) for operation with Linux Fast-STREAMS
+  (streams-0.7a.4).  Some test cases were updated because LiS was not
+  operating correctly on pipes (does not send SIGPIPE on write error
+  contrary to POSIX).
 
 * Major changes in strxnet-0.9.2.6
 
-  With this release version numbers were changed to reflect an upstream version
-  only to be consistent with other OpenSS7 package releases.  All RPM release
-  numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian release numbers will be
-  _0.  If you wish to apply patches and relelease the package, please bump up
-  the release number and apply a suitable release suffix for your organization.
-  We leave Debian release number _1 reserved for your use, so you can still
-  bundle the source in the .dsc file.
+  With this release version numbers were changed to reflect an upstream
+  version only to be consistent with other OpenSS7 package releases.
+  All `RPM' release numbers will be `-1$(PACKAGE_RPMEXTRA)' and all
+  `Debian' release numbers will be `_0'.  If you wish to apply patches
+  and relelease the package, please bump up the release number and apply
+  a suitable release suffix for your organization.  We leave `Debian'
+  release number `_1' reserved for your use, so you can still bundle the
+  source in the `.dsc' file.
 
-  Major changes for this release include build against Linux 2.6 kernels and
-  popular distributions based on the 2.6 kernel as well as wider distribution
-  support.  The package also supports both LiS 2.18.1 as well as streams-0.7a
-  on both kernels.
+  Major changes for this release include build against Linux 2.6 kernels
+  and popular distributions based on the 2.6 kernel as well as wider
+  distribution support.  The package also supports both `LiS-2.18.1' as
+  well as `streams-0.7a' on both kernels.
 
-  Removed XNS kernel modules, header files and documentation to a separate
-  strxns-0.9.2-1 package and INET kernel modules, header files and documentation
-  to a separate strinet-0.9.2-1 package.
+  Removed `XNS' kernel modules, header files and documentation to a
+  separate `strxns-0.9.2-1' package and `INET' kernel modules, header
+  files and documentation to a separate `strinet-0.9.2-1' package.
 
 * Major changes in strxnet-0.9.2-5
 
-  Minor corrections: made SCTP manpages conditional on OpenSS7 SCTP kernel.
+  Dropped RPM epoch to 0 from 1 in preparation for RPM release.  Bumped
+  RPM release to 5.
+
+  Minor corrections: made `SCTP' manpages conditional on `OpenSS7 SCTP'
+  kernel.
+
+  Updated documentation and provided improvements to build process
+  applied to other packages.  This includes improvements to creation of
+  `info' and `pdf' manuals.  Update `tirdwr' and `timod' manpage.
+
+  Removed INET package from `strxnet-0.9.2-5' release.  This has now
+  been moved to the `strxns-0.9.2'(1) package.  Removed XNS header files
+  and manual pages for CDI, DLPI and NPI to that package.  Also removed
+  `test-inet_raw', `test-inet_udp' and `test-inet_tcp' test programs to
+  that package.  Removed `/dev/inet' driver to that package.  Stripped
+  out the -dev- RPM subpackage as there are no devices left in the
+  package.  Adjusted the virtual package provides naming to a more
+  rational approach.  Adjusted kernel module installation process to
+  accomodate.
+
+  Genksyms now generates kernels symbols for all combinations of SMP and
+  CONFIG_REGPARM kernels allowing a single modversions header file.
+  Improved manpages `automake' file fragment (`am/man.am') to accomodate
+  top-level manual pages (this was really for the `netperf' release).
 
 * Major changes in strxnet-0.9.2-4
 
-  Changes to ompile, install and builds rpms for Fedora Core 1 (FC1), Whitebox
-  Enterprise Linux (WBEL) and RedHat Enterprise Linux 3 (EL3).  Included
-  explicit epoch in internal dependencies in spec file for RPM versions 4.2.1,
-  4.2.2 and higher.  Added hugemem kernel detection and moved getpmsg and
-  putpmsg manual pages.
+  Changes to compile, install.  Now builds rpms for `Fedora Core 1
+  (FC1)', `Whitebox Enterprise Linux (WBEL)' and `RedHat Enterprise
+  Linux (EL3)'.
 
-  Correction to symbolic linking and system map file location during non-rpm
-  autoconf installation.
+  Included explicit epoch in internal dependencies in `.spec' file for
+  RPM versions 4.2.1, 4.2.2 and higher.  Added hugemem kernel detection
+  and moved `getpmsg' and `putpmsg' manual pages.
 
-  Correction to zero maxlen behavior in t_rcvconnect().
+  Correction to symbolic linking and system map file location during
+  non-rpm `autoconf' installation.
+
+  Correction to zero maxlen behavior in `t_rcvconnect()'.
 
 * Major changes in strxnet-0.9.2-3
 
-  Added check for CONFIG_REGPARM, addition of -mregparm=3 CFLAGS, addition
-  of regparm_ prefix for exported ksyms.
+  Added check for CONFIG_REGPARM, addition of `-mregparm=3' CFLAGS,
+  addition of `regparm_' prefix for exported kernel symbols.
 
-  Minor corretions to separate build directory install of devices and caching
-  of detected ksyms.
+  Minor corrections to separate build directory install of devices and
+  caching of detected kernel symbols.
 
-  Added option for suppression of exported symbol versioning.
+  Added an option for suppression of exported symbol versioning
+  (`--without-modversions').
 
 * Major changes in strxnet-0.9.2-2
 
-  A couple of corrections to the build process reported by Gurol.  Changed
-  order of build in `make rebuild' target to build tools last so that the rpm
-  debug package is built correctly on RH9.
-  
-  Change MODULE_PARM to static so that make install-strip does not strip
-  module parameter symbols.
+  A couple of corrections to the build process reported by Gurol.
+  Changed order of build in `make rebuild' target to build tools last so
+  that the rpm debug package is build correctly on `RedHat 9'.
+
+  Changed MODULE_PARM to static so that `make install-strip' does not
+  strip module parameter symbols.
 
 * Initial release strxnet-0.9.2-1
 
-  Initial autoconf/RPM packaging of the OpenSS7 strxnet release.
+  Initial autoconf/RPM packaging of the `strxnet' release.
 
 =========================================================================
 

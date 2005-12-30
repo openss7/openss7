@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 0.9.2.4 2005/05/14 08:34:35 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.5 2005/12/30 12:22:17 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/14 08:34:35 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:22:17 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -62,165 +62,165 @@ In addition, the following @command{rpm} options, specific to the
 
 @table @command
 
-@item --without compat-svr4
-@opindex compat-svr4
+@item --with streams-syncqs
+@opindex streams-syncqs
+When enabled, MP syncrhonization queues are enabled for SMP kernels.
+This option defaults to @samp{disabled}.
+This option is not tested for early releases.
 
-Disable source compatibility with SVR 4.2 MP variants.  This option disables the
-SVR 4.2 MP compatibility functions that are included in the separate kernel
-module @file{streams-svr4compat.o}.  This option defaults to enabled.
+@item --without streams-kthreads
+@opindex streams-kthreads
+When enabled, the STREAMS scheduler runs as a kernel thread.  When disabled, the STREAMS scheduler
+runs as a software interrupt (bottom half).
+Running the STREAMS scheduler at bottom half instead of a kernel thread breaks the @file{strinet}
+driver, which must be able to invoke kernel functions that might sleep (but don't).
+This option defaults to @samp{enabled}.
 
-@item --without compat-sol8
-@opindex compat-sol8
+@item --without streams-utils
+@opindex streams-utils
+I have experimented with putting the STREAMS utilities into their own package, @file{strutil},
+however, this is not complete yet.
+This option defaults to @samp{enabled}.
+Do not disable this option.
 
-Disable source compatibility with Solaris 8 variants.  This option disables the
-Solaris 8 compatibility functions that are included in the separate kernel
-module @file{streams-suncompat.o}.  This option defaults to enabled.
-
-@item --without compat-uw7
-@opindex compat-uw7
-
-Disable source compatibility with UnixWare 7 variants.  This option disables the
-UnixWare 7 compatibility functions that are included in the separate kernel
-module @file{streams-uw7compat.o}.  This option defaults to enabled.
-
-@item --without compat-osf
-@opindex compat-osf
-
-Disable source compatibility with OSF/1.2 variants.  This option disables the
-OSF/1.2 compatibility functions that are included in the separate kernel module
-@file{streams-osfcompat.o}.  This option defaults to enabled.
-
-@item --without compat-aix
-@opindex compat-aix
-
-Disable source compatibility with AIX 4 variants.  This option disables the AIX
-4 compatibility functions that are included in the separate kernel module
-@file{streams-aixcompat.o}.  This option defaults to enabled.
-
-@item --without compat-hpux
-@opindex compat-hpux
-
-Disable source compatibility with HPUX variants.  This option disables the HPUX
-compatibility functions that are included in the separate kernel module
-@file{streams-hpuxcompat.o}.  This option defaults to enabled.
-
-@item --without compat-lis
-@opindex compat-lis
-
-Disable source compatibility with LiS variants.  This option disables the LiS
-compatibility functions that are included in the separate kernel module
-@file{streams-liscompat.o}.  This option defaults to enabled.
+@item --without big-compile
+@opindex big-compile
+When enabled, the STREAMS, the Stream head, and the clone driver are all compiled together in one
+big compilation unit.  This allows the compiler greater opportunity to optimize.
+This option defaults to @samp{enabled}.
+Do not disable this option.
 
 @item --with module-sth
-@itemx --without module-sth
 @opindex module-sth
+Enable @file{sth} (stream head) module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module,
+unless option @samp{big-compile} is specified.
+This option defaults to @samp{disabled}.
+This option defaults to @samp{enabled} if @samp{big-compile} is enabled.
 
-Enable building @file{sth} (stream head) module linked into @file{streams}
-object instead built as a separate loadable kernel module.  The default is to
-create the module as a separate loadable kernel module.
+@item --with module-bufmod
+@opindex module-bufmod
+Enable @file{bufmod} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with module-nullmod
+@opindex module-nullmod
+Enable @file{nullmod} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
 @item --with module-pipemod
-@itemx --without module-pipemod
 @opindex module-pipemod
-
-Enable building @file{pipemod} module linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the module
-as a separate loadable kernel module.
+Enable @file{pipemod} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
 @item --with module-connld
-@itemx --without module-connld
 @opindex module-connld
-
-Enable building @file{connld} module linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the module
-as a separate loadable kernel module.
+Enable @file{connld} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
 @item --with module-sc
-@itemx --without module-sc
 @opindex module-sc
+Enable @file{sc} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
-Enable building @file{sc} module linked into @file{streams} object instead built
-as a separate loadable kernel module.  The default is to create the module as a
-separate loadable kernel module.
+@item --with module-testmod
+@opindex module-testmod
+Enable @file{testmod} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
 @item --with driver-clone
-@itemx --without driver-clone
 @opindex driver-clone
-
-Enable building @file{clone} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
-
-@item --with driver-fifo
-@itemx --without driver-fifo
-@opindex driver-fifo
-
-Enable building @file{fifo} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
-
-@item --with driver-loop
-@itemx --without driver-loop
-@opindex driver-loop
-
-Enable building @file{loop} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
-
-@item --with driver-sad
-@itemx --without driver-sad
-@opindex driver-sad
-
-Enable building @file{sad} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
-
-@item --with driver-nsdev
-@itemx --without driver-nsdev
-@opindex driver-nsdev
-
-Enable building @file{nsdev} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
+Enable @file{clone} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module,
+unless option @samp{big-compile} is specified.
+This option defaults to @samp{disabled}.
+This option defaults to @samp{enabled} if @samp{big-compile} is enabled.
 
 @item --with driver-echo
-@itemx --without driver-echo
 @opindex driver-echo
+Enable @file{echo} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
-Enable building @file{echo} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
-
-@item --with driver-nuls
-@itemx --without driver-nuls
-@opindex driver-nuls
-
-Enable building @file{nuls} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
-
-@item --with driver-pipe
-@itemx --without driver-pipe
-@opindex driver-pipe
-
-Enable building @file{pipe} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
+@item --with driver-fifo
+@opindex driver-fifo
+Enable @file{fifo} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
 @item --with driver-log
-@itemx --without driver-log
 @opindex driver-log
+Enable @file{log} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
-Enable building @file{log} driver linked into @file{streams} object instead
-built as a separate loadable kernel module.  The default is to create the driver
-as a separate loadable kernel module.
+@item --with driver-loop
+@opindex driver-loop
+Enable @file{loop} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-nsdev
+@opindex driver-nsdev
+Enable @file{nsdev} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-mux
+@opindex driver-mux
+Enable @file{mux} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-nuls
+@opindex driver-nuls
+Enable @file{nuls} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-pipe
+@opindex driver-pipe
+Enable @file{pipe} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-sad
+@opindex driver-sad
+Enable @file{sad} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-sfx
+@opindex driver-sfx
+Enable @file{sfx} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
+
+@item --with driver-spx
+@opindex driver-spx
+Enable @file{spx} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+This option defaults to @samp{disabled}.
 
 @item --with streams-fifos
-@itemx --without streams-fifos
 @opindex streams-fifos
-
 Enable override of system fifos with STREAMS-based fifos.
-The default for this feature is disabled.
+This option defaults to @samp{disabled}.
+This option is not tested.  Do not enable this option yet.
+
+@item --without streams-bcm
+@opindex streams-bcm
+Disable STREAMS binary compatibility mode.
+When enabled, exported functions (and callouts) will always pass three arguments in registers on
+architectures supporting @code{regparm} (i.e. @var{__i386__}) regardless of how the kernel was
+compiled.
+This option defaults to @samp{enabled}.
 
 @end table
 

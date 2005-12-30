@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.49 $) $Date: 2005/12/23 20:28:22 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.50 $) $Date: 2005/12/30 12:21:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 20:28:22 $ by $Author: brian $
+# Last Modified $Date: 2005/12/30 12:21:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -450,7 +450,9 @@ fi
     %{?_with_solaris_cmn_err:    '%{_with_solaris_cmn_err}'} \
     %{?_without_solaris_cmn_err: '%{_without_solaris_cmn_err}'} \
     %{?_with_solaris_consts:     '%{_with_solaris_consts}'} \
-    %{?_without_solaris_consts:  '%{_without_solaris_conts}'} \
+    %{?_without_solaris_consts:  '%{_without_solaris_consts}'} \
+    %{?_with_lis_regparms:       '%{_with_lis_regparms}'} \
+    %{?_without_lis_regparms:    '%{_without_lis_regparms}'} \
     %{?_with_k_modversions:      '%enable %_with_k_modversions'} \
     %{?_without_k_modversions:   '%disable %_without_k_modversions'} \
     %{?_with_k_cache:            '%enable %_with_k_cache'} \
@@ -461,6 +463,8 @@ fi
     %{?_without_broken_cpu_flags:'%disable %_without_broken_cpu_flags'} \
     %{?_with_atomic_stats:       '%enable %_with_atomic_stats'} \
     %{?_without_atomic_stats:    '%disable %_without_atomic_stats'} \
+    %{?_with_lis_development:    '%enable %_with_lis_development'} \
+    %{?_without_lis_development: '%disable %_without_lis_development'} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -1598,9 +1602,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.49  2005/12/23 20:28:22  brian
-# - use lsb initd last
+# Revision 1.1.6.50  2005/12/30 12:21:10  brian
+# - updating release notes
 #
+
+* Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.49  2005/12/23 20:28:22  brian
+- use lsb initd last
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.48  2005/12/23 05:23:27  brian

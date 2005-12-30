@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 1.1.4.4 2005/05/14 08:35:11 brian Exp $
+@c @(#) $Id: configure.texi,v 1.1.4.5 2005/12/30 12:21:15 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,101 +53,79 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/14 08:35:11 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:21:15 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @c This file is include from install.texi and contains the descriptions for
 @c package-specific enable/disable and with/without options
 
-In addition, the following @command{configure} options, specific to the
-@value{PACKAGE_TITLE} package are available:
+In addition, the following @command{configure} options, specific to the @value{PACKAGE_TITLE}
+package are available:
 
 @table @command
 @item --enable-user-mode
-@itemx --disable-user-mode
-Enable user mode build.  The default is no.  Don't use this option, it hasn't
+@opindex user-mode
+Enable user mode build.  The option defaults to @samp{disabled}.  Don't use this option, it hasn't
 been tested.
 
 @item --enable-broken-cpu-flags
-@itemx --disable-broken-cpu-flags
-Specify @code{int} instead of @code{long} interrupt flags.  Linux uses
-@code{long} interrupt flags exclusively.  The default is to use @code{long}
-interrupt flags.
+@opindex broken-cpu-flags
+Specify @code{int} instead of @code{long} interrupt flags.  Linux uses @code{long} interrupt flags
+exclusively.  The default is to use @code{long} interrupt flags.
+This option defaults to @samp{disabled}.
+
+@item --disable-lis-development
+@opindex lis-development
+This option is new to @cite{LiS-2.18.2}.
+Disable reporting of source code path traces in debug logs.  @value{PACKAGE_TITLE} passes file name
+and line number arguments to many of the exported functions.  This is exhaustive of stack resources
+and requires the passing of more than three arguments on the stack in many circumnstances.  Note
+that disabling code path traces breaks binary compatibility.  The default is perform source code
+path traces, unless optimized for size or speed, in which case, the default is to not perform source
+code path traces.  This option defaults to @samp{enabled}.
 
 @item --enable-k-timers
-@itemx --disable-k-timers
-Invoke Linux kernel cahcing on timer structures.  This increases speed and
-efficiency but is unsafe on SMP architectures and for buggy or high-speed
-drivers.  The default is to @strong{not} perform kernel caching on timer
-structures.
+@opindex k-timers
+Invoke Linux kernel cahcing on timer structures.  This increases speed and efficiency but is unsafe
+on SMP architectures and for buggy or high-speed drivers.  The default is to @strong{not} perform
+kernel caching on timer structures.  This option defaults to @samp{disabled}.
 
 @item --enable-k-cache
-@itemx --disable-k-cache
-Invoke Linux kernel caching on primary structures.  This incresase speed and
-efficiency.  The default is to @strong{not} perform kernel caching on primary
-structures.
+@opindex k-cache
+Invoke Linux kernel caching on primary structures.  This incresase speed and efficiency.  The
+default is to @strong{not} perform kernel caching on primary structures.  This option defaults to
+@samp{disabled}.
 
 @item --enable-atomic-stats
-@itemx --disable-atomic-stats
-Enable atomic statistics elements for STREAMS statistics.  The changes STREAMS
-statistics elements from the standard @code{int} to @code{atomic_t} to permit
-atomic increment of statistics structures.  This is not recommended and the
-default is to @strong{not} use @code{atomic_t} for statistics structures.
+@opindex atomic-stats
+Enable atomic statistics elements for STREAMS statistics.  The changes STREAMS statistics elements
+from the standard @code{int} to @code{atomic_t} to permit atomic increment of statistics structures.
+This is not recommended and the default is to @strong{not} use @code{atomic_t} for statistics
+structures.  This option defaults to @samp{disabled}.
 
-@ignore
-@item --with-sctp
-@itemx --without-sctp
-Include xopen sctp driver in build.  [default=yes]  Unused.
+@item --with-lis-regparms=NUMBER
+@itemx --without-lis-regparms
+@opindex lis-regparms
+This option is new to @cite{LiS-2.18.2}.
+Specifies the number of parameters to pass in registers to @value{PACKAGE_TITLE} exported functions.
+Specifying other than @samp{0} here may break binary compatibility.  Specifying
+@samp{--without-lis-regparms} will default to the number used for kernel exported functions.
+Specifying greater than @samp{3} will cause the build to fail.  The default is to pass no arguments
+in registers.  This option defaults to @samp{0}.
 
-@item --with-sctp2
-@itemx --without-sctp2
-Include xopen sctp version 2 driver in build.  [default=no]  Unused.
-
-@item --with-xns
-@itemx --without-xns
-Include xopen xns headers in install.  [default=yes]
-
-@item --with-tli
-@itemx --without-tli
-Include xopen tli modules in build.  [default=yes] Build and package the TLI
-modules (@file{streams-timod.o} and @file{streams-tirdwr.o}).  These are needed
-by the XTI/XNS Unix98 libraries.  The default is to build and package TLI
-modules.
-@pgindex streams-timod.o
-@pgindex streams-tirdwr.o
-
-@item --with-inet
-@itemx --without-inet
-Include xopen inet driver in build.  [default=yes] Build and package the INET
-driver (@file{streams-inet.o}).  This driver is needed for XTI/XNS Unix98
-compatibility.  The default is to build and package the INET driver.
-@pgindex streams-inet.o
-
-@item --with-xnet
-@itemx --without-xnet
-Include xopen xnet library in build.  [default=yes] Build and package the
-XTI/XNS library (@file{libxnet}).  This library is needed for XTI/XNS Unix98
-compatiblity.  The default is to build and package the XNET library.
-@pgindex libxnet.a
-@pgindex libxnet.so
-
-@item --with-sock
-@itemx --without-sock
-Include xopen sock library in build.  [default=yes]
-@end ignore
-
-@item --with-solaris-consts
-@itemx --without-solaris-consts
-Attempt to be compatible with Solaris constants.  The default is to attempt to
-be compatible with SVR 4.2/Unixware constants.
+@item --without-solaris-consts
+@opindex solaris-consts
+Attempt to be compatible with Solaris constants.  The default is to attempt to be compatible with
+Solaris constants.
+This option defaults to @samp{enabled}.
 
 @item --without-solaris-cmn_err
-@itemx --with-solaris-cmn_err
-Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style
-prints a newline at the end of each statement.  The SVR 4.2 style prints a
-newline at the beginning of each statement unless @code{CE_CONT} is specified.
-Linux kernel logs use the former, so this defaults to Solaris-style.
+@opindex solaris-cmn_err
+Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style prints a newline at the
+end of each statement.  The SVR 4.2 style prints a newline at the beginning of each statement unless
+@code{CE_CONT} is specified.  Linux kernel logs use the former, so this defaults to Solaris-style.
+This option defaults to @samp{enabled}.
 
 @end table
 

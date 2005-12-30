@@ -9,11 +9,11 @@ Keywords:		STREAMS, SVR 4.2 MP, LfS
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
-			4.0MB @PACKAGE@-@VERSION@.tar.bz2
-			4.8MB @PACKAGE@-@VERSION@.tar.gz
+			3.3MB @PACKAGE@-@VERSION@.tar.bz2
+			4.1MB @PACKAGE@-@VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			4.0MB @PACKAGE@-@VERSION@.tar.bz2
-			4.8MB @PACKAGE@-@VERSION@.tar.gz
+			3.3MB @PACKAGE@-@VERSION@.tar.bz2
+			4.1MB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		Linux
 Requires:		Linux kernel 2.4 or 2.6
 Copying-policy:		GPL

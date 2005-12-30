@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/22 07:22:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/30 12:21:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/22 07:22:01 $ by $Author: brian $
+# Last Modified $Date: 2005/12/30 12:21:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -354,23 +354,25 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  README-cvs \
+				  README-nexusware \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
-MAINTAINERCLEANFILES	+= \
-			$(top_srcdir)/aclocal.m4 \
-			$(top_srcdir)/config.h.in \
-			$(top_srcdir)/configure \
-			$(top_srcdir)/COPYING \
-			$(top_srcdir)/INSTALL \
-			$(top_srcdir)/scripts/compile \
-			$(top_srcdir)/scripts/config.guess \
-			$(top_srcdir)/scripts/config.sub \
-			$(top_srcdir)/scripts/depcomp \
-			$(top_srcdir)/scripts/install-sh \
-			$(top_srcdir)/scripts/ltmain.sh \
-			$(top_srcdir)/scripts/missing \
-			$(top_srcdir)/scripts/texinfo.tex
+MAINTAINERCLEANFILES		+= \
+				  $(top_srcdir)/aclocal.m4 \
+				  $(top_srcdir)/config.h.in \
+				  $(top_srcdir)/configure \
+				  $(top_srcdir)/COPYING \
+				  $(top_srcdir)/INSTALL \
+				  $(top_srcdir)/scripts/compile \
+				  $(top_srcdir)/scripts/config.guess \
+				  $(top_srcdir)/scripts/config.sub \
+				  $(top_srcdir)/scripts/depcomp \
+				  $(top_srcdir)/scripts/install-sh \
+				  $(top_srcdir)/scripts/ltmain.sh \
+				  $(top_srcdir)/scripts/missing \
+				  $(top_srcdir)/scripts/texinfo.tex
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

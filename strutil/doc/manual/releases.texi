@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.2 2005/09/14 23:41:52 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.3 2005/12/30 12:22:41 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/09/14 23:41:52 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:22:41 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -149,9 +149,11 @@ This section discusses compatibility with major prerequisites.
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @item Fedora Core 4 (FC4)
-@item Debian 3.1r0a Sarge
 @item Lineox 4.026 (LEL4)
 @item Mandriva Linux LE2005 (MDK102)
+@item Performance Technologies NexusWare 8.0
+@item Debian 3.1r0a Sarge (untested)
+@item OpenSuSE 10.0 (untested)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
@@ -222,7 +224,9 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a bug fixes release.
+The previous release was experimental and was an Alpha release.  This package represent a stripping
+off of utilities from @cite{Linux Fast-STREAMS} that could also be used for @cite{Linux STREAMS
+(LiS)}.  This release is the result of further development and testing on this utilities package.
 
 @c ----------------------------------------------------------------------------
 
@@ -231,6 +235,13 @@ This is primarily a bug fixes release.
 @cindex release @value{PACKAGE}-0.9.2.1
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
+
+This is the initial release of the @cite{OpenSS7 STREAMS Utilities} package for @cite{Linux
+Fast-STREAMS} (and LiS).  These STREAMS utilities were formerly part of the @cite{Linux
+Fast-STREAMS} package (@file{streams-0.7a.3}), however, as they were also applicable to LiS, they
+have been removed into a separate package.  Once @cite{Linux Fast-STREAMS} is production grade,
+these compatibility modules will be rolled back into the streams package as @cite{LiS} becomes
+deprecated.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

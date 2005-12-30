@@ -18,10 +18,10 @@ Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
 			1.3MB @PACKAGE@-@VERSION@.tar.bz2
-			1.5MB @PACKAGE@-@VERSION@.tar.gz
+			1.6MB @PACKAGE@-@VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
 			1.3MB @PACKAGE@-@VERSION@.tar.bz2
-			1.5MB @PACKAGE@-@VERSION@.tar.gz
+			1.6MB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		Linux
 Requires:		Linux kernel 2.4 or 2.6,
 			LiS-2.18.2 or streams-0.7a.4 SVR 4.2 STREAMS

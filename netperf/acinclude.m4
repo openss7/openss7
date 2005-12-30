@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2005/07/04 20:07:21 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2005/12/30 12:21:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:07:21 $ by $Author: brian $
+# Last Modified $Date: 2005/12/30 12:21:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -155,87 +155,87 @@ AC_DEFUN([AC_NETPERF], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_NETPERF_OPTIONS], [dnl
     AC_ARG_ENABLE([netperf-dirty],
-	AS_HELP_STRING([--enable-netperf-dirty],
-	    [enable code to dirty buffers before calls to send
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-dirty],
+	    [disable code to dirty buffers before calls to send
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_dirty="$enableval"],
 	[netperf_cv_dirty='yes'])
     AC_ARG_ENABLE([netperf-histogram],
-	AS_HELP_STRING([--enable-netperf-histogram],
-	    [enable code to to keep a histogram of r/r times or time spent in
-	     send() @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-histogram],
+	    [disable code to to keep a histogram of r/r times or time spent in
+	     send() @<:@default=enabled@:>@]),
 	[netperf_cv_histogram="$enableval"],
 	[netperf_cv_histogram='yes'])
     AC_ARG_ENABLE([netperf-old-histogram],
 	AS_HELP_STRING([--enable-netperf-old-histogram],
 	    [enable old pre-2.2pl6 formatted histogram
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_old_histogram="$enableval"],
 	[netperf_cv_old_histogram='no'])
     AC_ARG_ENABLE([netperf-intervals],
-	AS_HELP_STRING([--enable-netperf-intervals],
-	    [enable code to allow pacing of sends in a UDP, TCP or SCTP test.
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-intervals],
+	    [disable code to allow pacing of sends in a UDP, TCP or SCTP test.
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_intervals="$enableval"],
 	[netperf_cv_intervals='yes'])
     AC_ARG_ENABLE([netperf-do-dlpi],
-	AS_HELP_STRING([--enable-netperf-do-dlpi],
-	    [enable code to test the DLPI implementation
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-dlpi],
+	    [disable code to test the DLPI implementation
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_dlpi="$enableval"],
 	[netperf_cv_do_dlpi='yes'])
     AC_ARG_ENABLE([netperf-do-sctp],
-	AS_HELP_STRING([--enable-netperf-do-sctp],
-	    [enable code to test the SCTP implementation
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-sctp],
+	    [disable code to test the SCTP implementation
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_sctp="$enableval"],
 	[netperf_cv_do_sctp='yes'])
     AC_ARG_ENABLE([netperf-do-select],
-	AS_HELP_STRING([--enable-netperf-select],
-	    [enable code to perform select() on receive
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-select],
+	    [disable code to perform select() on receive
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_select="$enableval"],
 	[netperf_cv_do_select='yes'])
     AC_ARG_ENABLE([netperf-do-lwp],
-	AS_HELP_STRING([--enable-netperf-lwp],
+	AS_HELP_STRING([--enable-netperf-do-lwp],
 	    [enable code for light weight processes
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_do_lwp="$enableval"],
 	[netperf_cv_do_lwp='no'])
     AC_ARG_ENABLE([netperf-do-nbrr],
-	AS_HELP_STRING([--enable-netperf-nbrr],
-	    [enable code for non-blocking request/response
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-nbrr],
+	    [disable code for non-blocking request/response
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_nbrr="$enableval"],
 	[netperf_cv_do_nbrr='yes'])
     AC_ARG_ENABLE([netperf-do-xti],
-	AS_HELP_STRING([--enable-netperf-do-xti],
-	    [enable code to test the XTI implementation
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-xti],
+	    [disable code to test the XTI implementation
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_xti="$enableval"],
 	[netperf_cv_do_xti='yes'])
     AC_ARG_ENABLE([netperf-do-xti-sctp],
-	AS_HELP_STRING([--enable-netperf-do-xti-sctp],
-	    [enable code to test the XTI SCTP implementation
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-xti-sctp],
+	    [disable code to test the XTI SCTP implementation
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_xti_sctp="$enableval"],
 	[netperf_cv_do_xti_sctp='yes'])
     AC_ARG_ENABLE([netperf-do-unix],
-	AS_HELP_STRING([--enable-netperf-do-unix],
-	    [enable code to test the Unix domain implementation
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-unix],
+	    [disable code to test the Unix domain implementation
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_unix="$enableval"],
 	[netperf_cv_do_unix='yes'])
     AC_ARG_ENABLE([netperf-do-1644],
-	AS_HELP_STRING([--enable-netperf-do-1644],
-	    [enable code to test the transactions
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-1644],
+	    [disable code to test the transactions
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_1644="$enableval"],
 	[netperf_cv_do_1644='yes'])
     AC_ARG_ENABLE([netperf-do-first-burst],
-	AS_HELP_STRING([--enable-netperf-do-first-burst],
-	    [enable first burst code
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-first-burst],
+	    [disable first burst code
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_first_burst="$enableval"],
 	[netperf_cv_do_first_burst='yes'])
     AC_ARG_WITH([netperf-debug-log-file],
@@ -245,57 +245,57 @@ AC_DEFUN([_NETPERF_OPTIONS], [dnl
 	[netperf_cv_debug_log_file="$enableval"],
 	[netperf_cv_debug_log_file='/tmp/netperf.debug'])
     AC_ARG_ENABLE([netperf-use-looper],
-	AS_HELP_STRING([--enable-netperf-looper],
+	AS_HELP_STRING([--enable-netperf-use-looper],
 	    [enable looper or soaker processes to measure CPU utilitization
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_use_looper="$enableval"],
 	[netperf_cv_use_looper='no'])
     AC_ARG_ENABLE([netperf-use-pstat],
 	AS_HELP_STRING([--enable-netperf-use-pstat],
 	    [enable CPU utilization measurements with pstat()
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_use_pstat="$enableval"],
 	[netperf_cv_use_pstat="${ac_cv_func_pstat:-no}"])
     AC_ARG_ENABLE([netperf-use-kstat],
 	AS_HELP_STRING([--enable-netperf-use-kstat],
 	    [enable CPU utilization measurements with kstat()
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_use_kstat="$enableval"],
 	[netperf_cv_use_kstat="${ac_cv_func_kstat:-no}"])
     AC_ARG_ENABLE([netperf-use-proc-stat],
-	AS_HELP_STRING([--enable-netperf-use-proc-stat],
-	    [enable CPU utilization measurements with /proc/stat()
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-use-proc-stat],
+	    [disable CPU utilization measurements with /proc/stat()
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_use_proc_stat="$enableval"],
 	[netperf_cv_use_proc_stat='yes'])
     AC_ARG_ENABLE([netperf-do-ipv6],
-	AS_HELP_STRING([--enable-netperf-ipv6],
+	AS_HELP_STRING([--enable-netperf-do-ipv6],
 	    [enable tests using socket interface to IPV6
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_do_ipv6="$enableval"],
 	[netperf_cv_do_ipv6='no'])
     AC_ARG_ENABLE([netperf-do-dns],
-	AS_HELP_STRING([--enable-netperf-dns],
-	    [enable tests that measure the performance of a DNS server
-	     @<:@default=yes@:>@]),
+	AS_HELP_STRING([--disable-netperf-do-dns],
+	    [disable tests that measure the performance of a DNS server
+	     @<:@default=enabled@:>@]),
 	[netperf_cv_do_dns="$enableval"],
 	[netperf_cv_do_dns='yes'])
     AC_ARG_ENABLE([netperf-use-sysctl],
 	AS_HELP_STRING([--enable-netperf-use-sysctl],
 	    [enable CPU utilization measurements with sysctl()
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_use_sysctl="$enableval"],
 	[netperf_cv_use_sysctl='no'])
     AC_ARG_ENABLE([netperf-use-perfstat],
 	AS_HELP_STRING([--enable-netperf-use-perfstat],
 	    [enable CPU utilization measurements with perfstat()
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_use_perfstat="$enableval"],
 	[netperf_cv_use_perfstat="${ac_cv_func_perfstat:-no}"])
     AC_ARG_ENABLE([netperf-dont-wait],
 	AS_HELP_STRING([--enable-netperf-dont-wait],
 	    [enable to not wait for children to exit
-	     @<:@default=no@:>@]),
+	     @<:@default=disabled@:>@]),
 	[netperf_cv_dont_wait="$enableval"],
 	[netperf_cv_dont_wait='no'])
 ])# _NETPERF_OPTIONS
@@ -323,6 +323,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_CHECKING([for netperf old histogram])
     if test :"${netperf_cv_old_histogram:-no}" = :yes ; then
 	AC_DEFINE([OLD_HISTOGRAM], [1], [
+	    Define to enable old pre-2.2pl6 formatted histogram.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_old_histogram:-no}])
@@ -434,13 +435,13 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     if test :"${netperf_cv_use_looper:-no}" = :yes ; then
 	AC_DEFINE([USE_LOOPER], [1], [
 	    Define to use looper or soaker processes to measure CPU
-	    utilitization.  There will be forked-off at the beginning.  If you
+	    utilitization.  These will be forked-off at the beginning.  If you
 	    are running this way, it is important to see how much impact these
 	    have on the measurement.  A loopback test on uniprocessor should
 	    be able to consume approximately 100% of the CPU, and the
 	    difference between throughput with USE_LOOPER CPU and without
 	    should be small for a real network.  If it is not, then some work
-	    probably need to be done o reducing the priority of the looper
+	    probably needs to be done on reducing the priority of the looper
 	    processes.
 	])dnl
     fi
@@ -449,7 +450,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     if test :"${netperf_cv_use_pstat:-no}" = :yes ; then
 	AC_DEFINE([USE_PSTAT], [1], [
 	    If used on HP-UX 10.0 and later, this will make CPU utilization
-	    measurements with some information returned byt he 10.X pstat()
+	    measurements with some information returned by the 10.X pstat()
 	    call. This is very accurate, and should have no impact on the
 	    measurement. Astute observers will notice that the LOC_CPU and
 	    REM_CPU rates with this method look remarkably close to the
@@ -492,18 +493,21 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_CHECKING([for netperf do ipv6])
     if test :"${netperf_cv_do_ipv6:-no}" = :yes ; then
 	AC_DEFINE([DO_IPV6], [1], [
+	    Define to enable IPv6 testing.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_ipv6:-no}])
     AC_MSG_CHECKING([for netperf do dns])
     if test :"${netperf_cv_do_dns:-no}" = :yes ; then
 	AC_DEFINE([DO_DNS], [1], [
+	    Define to enable DNS testing.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_dns:-no}])
     AC_MSG_CHECKING([for netperf dont wait])
     if test :"${netperf_cv_dont_wait:-no}" = :yes ; then
 	AC_DEFINE([DONT_WAIT], [1], [
+	    Define to enable MSG_DONTWAIT on sends.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_dont_wait:-no}])

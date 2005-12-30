@@ -1,36 +1,46 @@
-LiS was originally written by:
+OpenSS7 STREAMS XNS -- authors and acknowledgements.  2005-12-29
+Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions.
+
+ip_to_dlpi.c was originally written and distributed under LGPL by:
 
-Christian Herkt			macbett@cs.tu-berlin.de
-David Grothe			dave@gcom.com
-Denis Froschauer		100741.1151@compuserve.com
-Dennis Henriksen		duke@diku.dk
-Ed Pendzik			edp@eznet.net
-Francisco J. Ballesteros	nemo@gsyc.escet.urjc.es
-Gautham Ghantasala		unknown@jove.acs.unt.edu
-Graham Wheeler			gram@aztec.co.za
-ISOLA Jean-Marc			root@devnet.fr
-John A. Boyd Jr.		jaboydjr@netwalk.com
-Lars Dahl-Hansen		ldh@imada.ou.dk
-Ole Husgaard			sparre@login.dknet.dk
-Rodney Thayer			rodney@sabletech.com
-Roland Dunkerley		rolandd@swn.com
-Shyan Katru			shyam@jove.acs.unt.edu
-Tim G. Boerresen		tgrube@diku.dk
+  The Software Group Limited.
 
-Autoconf/RPM ackaging was performed by:
+ldl.c, ldltest.c, ldlconfig.c, were originally written and distributed
+under GPL by:
 
-Brian Bidulock			bidulock@openss7.org
+  Ole Husgaard			sparre@login.dknet.dk
+  Dave Grothe			dave@gcom.com
 
-Packaging would not be what it is today without the invaluable help of these
-people:
+ip_strm_mod.c was originally written and distributed under LGPL by:
 
-Christian Hildner		christian.hildner@hob.de
-Gurol Akman			gurol.akman@ss8.com
-John A. Boyd Jr.		jaboydjr@netwalk.com
-William Waites			openss7@lists.styx.org
+  Mikel Matthews		mikel@gcom.com
+  Dave Grothe			dave@gcom.com
 
-Additional people not named here that I missed putting on the list.  We thank
-them too!
+Autoconf/RPM packaging was performed by:
+
+  Brian Bidulock		bidulock@openss7.org
+
+The current maintainer of the package is:
+
+  Brian Bidulock		bidulock@openss7.org
+
+Packaging would not be what it is today without the invaluable help of
+these people:
+
+  Christian Hildner		christian.hildner@hob.de
+  Gurol Akman			gurol.akman@ss8.com
+  John A. Boyd Jr.		jaboydjr@netwalk.com
+  William Waites		openss7@lists.styx.org
+
+Additional people not named here that I missed putting on the list.  We
+thank them too!
+
+------
+
+Although the original package is distributed under LGPL, this package is
+distributed by OpenSS7 Corporation under the GNU Public License.
 
 -----
 

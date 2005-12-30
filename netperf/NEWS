@@ -1,32 +1,43 @@
-OpenSS7 Netperf -- history of user-visible changes.  2005-03-15
+OpenSS7 Netperf -- history of user-visible changes.  2005-12-29
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Major changes in netperf-2.3.2
 
-  This is simply a bug fix release.  What remains to be done is to merge in the
-  latest upstream release of netperf.
+  Many corrections (but not enough) are included to use the package for
+  XTI INET testing.  UDP works now, but TCP is not completely corrected
+  yet (and, therefore, neither is SCTP).  These capabilities could not
+  have possibly worked in the original `netperf-2.3' release.  The next
+  release should have TCP and SCTP corrected for XTI.
+
+  Corrections included to make the package cross-build for `NexusWare'
+  as well as recent 2.6.14 (FC4) kernels.
+
+  What remains to be done is to merge in the latest upstream release of
+  netperf into this package and contribute XTI corrections back
+  upstream.
 
 * Initial release netperf-2.3.1
 
-  With this release version numbers were changed to reflect an upstream version
-  only to be consistent with other OpenSS7 package releases.  All RPM release
-  numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian release numbers will be
-  _0.  If you wish to apply patches and relelease the package, please bump up
-  the release number and apply a suitable release suffix for your organization.
-  We leave Debian release number _1 reserved for your use, so you can still
-  bundle the source in the .dsc file.
+  With this release version numbers were changed to reflect an upstream
+  version only to be consistent with other OpenSS7 package releases.
+  All RPM release numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian
+  release numbers will be _0.  If you wish to apply patches and
+  relelease the package, please bump up the release number and apply a
+  suitable release suffix for your organization.  We leave Debian
+  release number _1 reserved for your use, so you can still bundle the
+  source in the .dsc file.
 
 * Initial release netperf-2.3-1
 
   Initial autoconf/rpm packaging release of Netperf.
 
-  This is an autoconf/rpm release of Netperf suitable for use with OpenSS7
-  STREAMS SCTP (Stream Control Transmission Protocol), STREAMS/LiS INET and
-  STREAMS/LiS DLPI.  It is usable for performance testing STREAMS SCTP/INET/DLPI
-  as well as sockets versions of OpenSS7 Linux Native SCTP as well as sockets
-  versions of INET.
+  This is an autoconf/rpm release of Netperf suitable for use with
+  OpenSS7 STREAMS SCTP (Stream Control Transmission Protocol),
+  STREAMS/LiS INET and STREAMS/LiS DLPI.  It is usable for performance
+  testing STREAMS SCTP/INET/DLPI as well as sockets versions of OpenSS7
+  Linux Native SCTP as well as sockets versions of INET.
 
   Not publicly released.
 

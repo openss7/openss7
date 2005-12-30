@@ -15,11 +15,11 @@ Keywords:		SS7 SIGTRAN ISDN H323 VoIP
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
-			11MB @PACKAGE@-@VERSION@.tar.bz2
-			12MB @PACKAGE@-@VERSION@.tar.gz
+			16MB @PACKAGE@-@VERSION@.tar.bz2
+			18MB @PACKAGE@-@VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			11MB @PACKAGE@-@VERSION@.tar.bz2
-			12MB @PACKAGE@-@VERSION@.tar.gz
+			16MB @PACKAGE@-@VERSION@.tar.bz2
+			18MB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		Linux
 Requires:		Linux kernel 2.4 or 2.6,
 			LiS-2.18.1 or streams-0.7a.3 SVR 4.2 STREAMS

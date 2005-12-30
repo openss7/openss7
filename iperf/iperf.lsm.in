@@ -12,8 +12,8 @@ Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
 			150kB iperf-@PACKAGE_VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			292kB @PACKAGE@-@VERSION@.tar.bz2
-			376kB @PACKAGE@-@VERSION@.tar.gz
+			353kB @PACKAGE@-@VERSION@.tar.bz2
+			449kB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		UNIX, Windows
 Requires:		sctp-0.2.20-1
 Copying-policy:		GPL

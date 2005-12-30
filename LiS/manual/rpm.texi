@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 1.1.4.4 2005/05/14 08:35:11 brian Exp $
+@c @(#) $Id: rpm.texi,v 1.1.4.5 2005/12/30 12:21:17 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/14 08:35:11 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:21:17 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,65 +61,61 @@ In addition, the following @command{rpm} options, specific to the
 @value{PACKAGE_TITLE} package are available:
 
 @table @command
-@item --with solaris-cmn_err
-@itemx --without solaris-cmn_err
-Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style
-prints a newline at the end of each statement.  The SVR 4.2 style prints a
-newline at the beginning of each statement unless @code{CE_CONT} is specified.
-Linux kernel logs use the former, so this defaults to Solaris-style.
+@item --with broken-cpu-flags
+@opindex broken-cpu-flags
+Specify @code{int} instead of @code{long} interrupt flags.  Linux uses @code{long} interrupt flags
+exclusively.  The default is to use @code{long} interrupt flags.  This option defaults to
+@samp{disabled}.
 
-@item --with solaris-consts
-@itemx --without solaris-consts
-Attempt to be compatible with Solaris constants.  The default is to attempt to
-be compatible with SVR 4.2/Unixware constants.
-
-@item --with k-cache
-@itemx --without k-cache
-Invoke Linux kernel caching on primary structures.  This incresase speed and
-efficiency.  The default is to perform kernel caching on primary structures.
+@item --without lis-development
+@opindex lis-development
+This option is new to @cite{LiS-2.18.2}.
+Disable reporting of source code path traces in debug logs.  @value{PACKAGE_TITLE} passes file name
+and line number arguments to many of the exported functions.  This is exhaustive of stack resources
+and requires the passing of more than three arguments on the stack in many circumnstances.  Note
+that disabling code path traces breaks binary compatibility.  The default is perform source code
+path traces, unless optimized for size or speed, in which case, the default is to not perform source
+code path traces.  This option defaults to @samp{enabled}.
 
 @item --with k-timers
-@itemx --without k-timers
-Invoke Linux kernel cahcing on timer structures.  This increases speed and
-efficiency but is unsafe on SMP architectures and for buggy drivers.  The
-default is to perform kernel caching on timer structures.
+@opindex k-timers
+Invoke Linux kernel cahcing on timer structures.  This increases speed and efficiency but is unsafe
+on SMP architectures and for buggy drivers.  The default is to perform kernel caching on timer
+structures.  This option defaults to @samp{disabled}.
 
-@item --with broken-cpu-flags
-@itemx --without broken-cpu-flags
-Specify @code{int} instead of @code{long} interrupt flags.  Linux uses
-@code{long} interrupt flags exclusively.  The default is to use @code{long}
-interrupt flags.
+@item --with k-cache
+@opindex k-cache
+Invoke Linux kernel caching on primary structures.  This incresase speed and efficiency.  The
+default is to perform kernel caching on primary structures.  This option defaults to
+@samp{disabled}.
 
 @item --with atomic-stats
-@itemx --without atomic-stats
-Specify @code{atomic_t} element types for elements of the @code{module_stat}
-structure instead of @code{int} element types.  The default is to use @code{int}
-elements types for the @code{module_stat} structure.
+@opindex atomic-stats
+Specify @code{atomic_t} element types for elements of the @code{module_stat} structure instead of
+@code{int} element types.  The default is to use @code{int} elements types for the
+@code{module_stat} structure.  This option defaults to @samp{disabled}.
 
-@ignore
-@item --with tli
-@itemx --without tli
-Build and package the TLI modules (@file{streams-timod.o} and
-@file{streams-tirdwr.o}).  These are needed by the XTI/XNS Unix98 libraries.
-The default is to build and package TLI modules.
-@pgindex streams-timod.o
-@pgindex streams-tirdwr.o
+@item --with lis-regparms=NUMBER
+@itemx --without lis-regparms
+@opindex lis-regparms
+This option is new to @cite{LiS-2.18.2}.
+Specifies the number of parameters to pass in registers to @value{PACKAGE_TITLE} exported functions.
+Specifying other than @samp{0} here may break binary compatibility.  Specifying
+@samp{--without lis-regparms} will default to the number used for kernel exported functions.
+Specifying greater than @samp{3} will cause the build to fail.  The default is to pass no arguments
+in registers.  This option defaults to @samp{0}.
 
-@item --with inet
-@itemx --without inet
-Build and package the INET driver (@file{streams-inet.o}).  This driver is
-needed for XTI/XNS Unix98 compatibility.  The default is to build and package
-the INET driver.
-@pgindex streams-inet.o
+@item --without solaris-consts
+@opindex solaris-consts
+Attempt to be compatible with Solaris constants.  The default is to attempt to be compatible with
+Solaris constants.  This option defaults to @samp{enabled}.
 
-@item --with xnet
-@itemx --without xnet
-Build and package the XTI/XNS library (@file{libxnet}).  This library is needed for
-XTI/XNS Unix98 compatiblity.  The default is to build and package the XNET
-library.
-@pgindex libxnet.a
-@pgindex libxnet.so
-@end ignore
+@item --without solaris-cmn_err
+@opindex solaris-cmn_err
+Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style prints a newline at the
+end of each statement.  The SVR 4.2 style prints a newline at the beginning of each statement unless
+@code{CE_CONT} is specified.  Linux kernel logs use the former, so this defaults to Solaris-style.
+This option defaults to @samp{enabled}.
 
 @end table
 

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.13 2005/09/14 23:42:11 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.14 2005/12/30 12:23:00 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/09/14 23:42:11 $ by $Author: brian $
+@c Last Modified $Date: 2005/12/30 12:23:00 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -149,9 +149,11 @@ This section discusses compatibility with major prerequisites.
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @item Fedora Core 4 (FC4)
-@item Debian 3.1r0a Sarge
 @item Lineox 4.026 (LEL4)
 @item Mandriva Linux LE2005 (MDK102)
+@item Performance Technologies NexusWare 8.0
+@item Debian 3.1r0a Sarge (untested)
+@item OpenSuSE 10.0 (untested)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
@@ -212,6 +214,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
 * Release @value{PACKAGE}-0.9.2.1::		Release 1
+* Release @value{PACKAGE}-0.9.2-1::		Release 1
 @end menu
 @end ifnothtml
 @end ifnotplaintext
@@ -222,7 +225,11 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @subsection Release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is primarily a bug fixes release.
+This is primarily a bug fixes release.  This release has been tested to build and install against
+both @file{LiS-2.18.2} and @file{streams-0.7a.4} on both 2.4 and 2.6 kernels as well as the
+@cite{Nex@-us@-Ware} cross-build environment.
+
+This package is still largely untested and does not yet have a testsuite.
 
 @c ----------------------------------------------------------------------------
 
@@ -230,7 +237,26 @@ This is primarily a bug fixes release.
 @subsection Release @value{PACKAGE}-0.9.2.1
 @cindex release @value{PACKAGE}-0.9.2.1
 
+With this release version numbers were changed to reflect an upstream version only to be consistent
+with other @cite{OpenSS7} package releases.  All @cite{RPM} release numbers will be
+@samp{-1$(PACKAGE_RPMEXTRA)} and all @cite{Debian} release numbers will be @samp{_0}.  If you wish
+to apply patches and relelease the package, please bump up the release number and apply a suitable
+release suffix for your organization.  We leave @cite{Debian} release number @samp{_1} reserved for
+your use, so you can still bundle the source in the @file{.dsc} file.
+
+Major changes for this release include build against Linux 2.6 kernels and popular distributions
+based on the 2.6 kernel as well as wider distribution support.  The package also supports both
+@file{LiS-2.18.1} as well as @file{streams-0.7a} on both kernels.
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2-1
+@subsection Release @value{PACKAGE}-0.9.2-1
+@cindex release @value{PACKAGE}-0.9.2-1
+
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
+
+This was an internal alpha test release and was not released publicly.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
