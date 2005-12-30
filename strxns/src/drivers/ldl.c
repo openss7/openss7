@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:51 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.28 $) $Date: 2005/12/28 10:01:51 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.29 $) $Date: 2005/12/29 21:36:49 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -472,7 +472,11 @@ STATIC int ndev_n_alloc = 0;
 
 STATIC char *ldl_pkt_type(unsigned saptype);
 
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
+STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt, struct ldldev *dev2);
+#else
 STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt);
+#endif
 STATIC int tx_func_raw(struct dl *dl, mblk_t *mp);
 
 STATIC void
@@ -2548,7 +2552,11 @@ mblk_destructor(char *arg)
  *  M_PCPROTO messages queued on our read queue.
  */
 STATIC int
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
+rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt, struct ldldev *dev2)
+#else
 rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
+#endif
 {
 	mblk_t *dp;
 	struct dl *dl, *last = NULL;

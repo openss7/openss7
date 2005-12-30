@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.14 2005/12/19 12:44:54 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.15 2005/12/29 21:33:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:54 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:33:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/19 12:44:54 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/29 21:33:57 $"
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
+#endif
+
+#ifndef streams_fastcall
+#ifdef __i386__
+#define streams_fastcall __attribute__((__regparm__(3)))
+#else
+#define streams_fastcall
+#endif
 #endif
 
 #ifndef __EXTERN
@@ -63,7 +71,7 @@
 #endif
 
 #ifndef __STREAMS_EXTERN
-#define __STREAMS_EXTERN __EXTERN __attribute__((__regparm__(3)))
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
 #endif
 
 #include <stdarg.h>

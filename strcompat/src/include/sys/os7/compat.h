@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.28 2005/12/28 09:51:48 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.29 2005/12/29 21:33:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:48 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:33:54 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -69,6 +69,7 @@
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <asm/system.h>
+#include <linux/irq.h>
 #include <linux/interrupt.h>
 #include <linux/kdev_t.h>
 #ifdef HAVE_KINC_LINUX_SECURITY_H
@@ -99,10 +100,10 @@ typedef void irqreturn_t;
 #endif
 
 #ifdef LIS
-#define STREAMSCALL(__X) __X _RP
-#define streamscall STREAMSCALL()
-#define STREAMS_FASTCALL(__X) __X __attribute__((__regparm__(3)))
-#define streams_fastcall STREAMS_FASTCALL()
+#define streamscall _RP
+#define STREAMSCALL(__X) __X streamscall
+#define streams_fastcall __attribute__((__regparm__(3)))
+#define STREAMS_FASTCALL(__X) __X streams_fastcall
 #endif
 
 #ifdef LFS

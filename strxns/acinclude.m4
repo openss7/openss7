@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/08/29 10:19:18 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/29 21:31:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:19:18 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:31:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -270,6 +270,28 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/netdevice.h>
 ])
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel member struct packet_type.func takes 4 args],
+	    [linux_cv_kmem_struct_packet_type_func_4_args], [
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/netdevice.h>]],
+[[int (*my_autoconf_function_pointer)(struct sk_buff *, struct net_device *, struct packet_type *, struct net_device *) = (void *)0;
+struct packet_type *my_autoconf_structure_pointer = (void *)0;
+my_autoconf_structure_pointer->func = my_autoconf_function_pointer;]]) ],
+		[linux_cv_kmem_struct_packet_type_func_4_args='yes'],
+		[linux_cv_kmem_struct_packet_type_func_4_args='no'])
+	    ])
+	])
+    if test :$linux_cv_kmem_struct_packet_type_func_4_args = :yes ; then
+	AC_DEFINE([HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS], [1], [Define to 1
+	    if the func member of the packet_type structure passes four
+	    arguments instead of three.])
+    fi
 ])# _XNS_CONFIG_KERNEL
 # =============================================================================
 

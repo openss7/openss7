@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -66,6 +66,7 @@ static char const ident[] =
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/sched.h>
 #include <linux/interrupt.h>
 
 #include <sys/kmem.h>
@@ -79,7 +80,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/12/28 09:48:02 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/29 21:36:18 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"

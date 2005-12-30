@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.15 2005/12/19 12:44:53 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.16 2005/12/29 21:33:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:33:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/19 12:44:53 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/29 21:33:57 $"
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
@@ -62,12 +62,20 @@
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
+#ifndef streams_fastcall
+# ifdef __i386__
+#  define streams_fastcall __attribute__((__regparm__(3)))
+# else
+#  define streams_fastcall
+# endif
+#endif
+
 #ifndef __EXTERN
 #define __EXTERN extern
 #endif
 
 #ifndef __STREAMS_EXTERN
-#define __STREAMS_EXTERN extern __attribute__((__regparm__(3)))
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
 #endif
 
 #include <linux/config.h>

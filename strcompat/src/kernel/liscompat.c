@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/29 21:36:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/29 21:36:14 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/29 21:36:14 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/12/28 09:51:50 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/12/29 21:36:14 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -790,6 +790,7 @@ EXPORT_SYMBOL_NOVERS(lis_debug_mask2);
 unsigned long lis_debug_mask = 0;
 
 EXPORT_SYMBOL_NOVERS(lis_debug_mask);
+#ifdef HAVE_KFUNC_VMALLOC
 _RP void *
 lis_vmalloc(unsigned long size)
 {
@@ -797,6 +798,7 @@ lis_vmalloc(unsigned long size)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_vmalloc);
+#endif
 #ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP void
 lis_bprintf(char *fmt, ...)
@@ -1026,6 +1028,7 @@ EXPORT_SYMBOL_NOVERS(lis_sendfd);
  *  know when a module is using one and can change it.
  */
 #ifdef CONFIG_PCI
+#ifdef HAVE_KFUNC_PCI_DAC_PAGE_TO_DMA
 _RP dma64_addr_t
 lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page,
 			     unsigned long offset, int direction)
@@ -1034,6 +1037,7 @@ lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page,
 }
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_page_to_dma);
+#endif				/* HAVE_KFUNC_PCI_DAC_PAGE_TO_DMA */
 _RP dma_addr_t
 lis_osif_pci_map_page(struct pci_dev *hwdev, struct page *page, unsigned long offset,
 		      size_t size, int direction)
@@ -1415,6 +1419,7 @@ EXPORT_SYMBOL_NOVERS(lis_file_inode);
 #endif
 
 #ifdef CONFIG_PCI
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_TO_PAGE
 _RP struct page *
 lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
@@ -1422,6 +1427,7 @@ lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_to_page);
+#endif
 #ifdef HAVE_KFUNC_PCI_FIND_CLASS
 _RP struct pci_dev *
 lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
@@ -1501,6 +1507,7 @@ lis_msecs(void)
 EXPORT_SYMBOL_NOVERS(lis_msecs);
 
 #ifdef CONFIG_PCI
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_TO_OFFSET
 _RP unsigned long
 lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
@@ -1508,6 +1515,7 @@ lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_to_offset);
+#endif
 #endif
 _RP unsigned long
 lis_secs(void)
@@ -1937,6 +1945,7 @@ lis_udelay(long micro_secs)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_udelay);
+#ifdef HAVE_KFUNC_VFREE
 _RP void
 lis_vfree(void *ptr)
 {
@@ -1944,6 +1953,7 @@ lis_vfree(void *ptr)
 }
 
 EXPORT_SYMBOL_NOVERS(lis_vfree);
+#endif
 _RP void
 lis_wake_up(wait_queue_head_t *wq)
 {

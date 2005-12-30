@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.nexusware,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/12/29 21:27:39 $
+# @(#) $RCSfile: configure.nexusware,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/12/29 21:27:01 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/29 21:27:39 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:27:01 $ by $Author: brian $
 #
 # =============================================================================
 

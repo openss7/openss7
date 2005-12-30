@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:00:32 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -416,6 +416,15 @@ tcp_current_mss(struct sock *sk, int large)
 
 #ifndef tcp_set_skb_tso_segs
 #ifdef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
+#ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
+void
+tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb)
+{
+	static void (*func) (struct sock *, struct sk_buff *) =
+	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
+	return func(sk, skb);
+}
+#else
 void
 tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 {
@@ -423,6 +432,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
 	return func(skb, mss_std);
 }
+#endif
 #endif
 #endif
 
@@ -456,7 +466,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/12/28 10:00:32 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2005/12/29 21:36:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:55:59 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2005/12/29 21:36:01 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.12 $) $Date: 2005/12/28 09:55:59 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.13 $) $Date: 2005/12/29 21:36:01 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -204,9 +204,9 @@ char	nettest_id[]="\
 int first_burst_size=0;
 #endif /* DO_FIRST_BURST */
 
-#if defined(HAVE_SENDFILE) && (defined(__linux) || defined(__SunOS_5_9))
+#if defined(HAVE_SENDFILE) && (defined(__linux__) || defined(__SunOS_5_9))
 #include <sys/sendfile.h>
-#endif /* HAVE_SENDFILE && (__linux || __SunOS_5_9 */
+#endif /* HAVE_SENDFILE && (__linux__ || __SunOS_5_9 */
 
 
 
@@ -3764,13 +3764,13 @@ Size (bytes)\n\
   
   struct	sockaddr_in	server;
 
-#if defined(__linux) || defined(__SunOS_5_9)
+#if defined(__linux__) || defined(__SunOS_5_9)
   off_t     scratch_offset;   /* the linux sendfile() call will update
 				 the offset variable, which is
 				 something we do _not_ want to happen
 				 to the value in the send_ring! so, we
 				 have to use a scratch variable. */
-#endif /* __linux  || defined(__SunOS_5_9) */
+#endif /* __linux__  || defined(__SunOS_5_9) */
   
   struct	sctp_stream_request_struct	*sctp_stream_request;
   struct	sctp_stream_response_struct	*sctp_stream_response;
@@ -4133,7 +4133,7 @@ if (send_width == 0) {
 			send_ring->hdtrl,
 			send_ring->flags)) != send_size)
 #else
-#if defined(__linux)  || defined(__SunOS_5_9)
+#if defined(__linux__)  || defined(__SunOS_5_9)
 	scratch_offset = send_ring->offset;
 	if ((len=sendfile(send_socket, 
 			  send_ring->fildes, 
@@ -4614,13 +4614,13 @@ Size (bytes)\n\
   
   struct	sockaddr_in	server;
 
-#if defined(__linux) || defined(__SunOS_5_9)
+#if defined(__linux__) || defined(__SunOS_5_9)
   off_t     scratch_offset;   /* the linux sendfile() call will update
 				 the offset variable, which is
 				 something we do _not_ want to happen
 				 to the value in the send_ring! so, we
 				 have to use a scratch variable. */
-#endif /* __linux  || defined(__SunOS_5_9) */
+#endif /* __linux__  || defined(__SunOS_5_9) */
   
   struct	tcp_stream_request_struct	*tcp_stream_request;
   struct	tcp_stream_response_struct	*tcp_stream_response;
@@ -4983,7 +4983,7 @@ if (send_width == 0) {
 			send_ring->hdtrl,
 			send_ring->flags)) != send_size)
 #else
-#if defined(__linux)  || defined(__SunOS_5_9)
+#if defined(__linux__)  || defined(__SunOS_5_9)
 	scratch_offset = send_ring->offset;
 	if ((len=sendfile(send_socket, 
 			  send_ring->fildes, 
@@ -5372,8 +5372,8 @@ if (send_width == 0) {
 #endif /* HISTOGRAM */
   }
 }
+#endif
 
-#endif /* HAVE_SENDFILE */
 
 #ifdef DO_SCTP
 

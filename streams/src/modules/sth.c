@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:03 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $";
 
 //#define __NO_VERSION__
 
@@ -76,6 +76,11 @@ static char const ident[] =
 #include <asm/ioctls.h>		/* for TGETS, etc. */
 #include <linux/termios.h>	/* for struct termios, etc. */
 #include <linux/sockios.h>	/* for FIOCGETOWN, etc. */
+
+/* another ppc architecture stupidity */
+#ifdef __powerpc__
+#include <linux/socket.h>	/* for FIOCGETOWN, etc. */
+#endif
 
 #ifndef __user
 #define __user
@@ -102,7 +107,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2005/12/28 09:48:03 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -817,6 +822,9 @@ alloc_proto(ssize_t psize, ssize_t dsize, size_t wroff, int type, uint bpri)
  *  -------------------------------------------------------------------------
  */
 
+#ifndef thread_group_leader
+#define thread_group_leader(p) (p->pid == p->tgid)
+#endif
 /**
  *  str_find_thread_group_leader: - given a thread find the thread group leader
  *  @procp:	the process
@@ -7518,10 +7526,10 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(I_ISASTREAM):
 			printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
 			return str_i_isastream(file, sd, arg);
-#if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCGETS))
+#if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCSBRK))
 		}
 		break;
-	case _IOC_TYPE(TCGETS):
+	case _IOC_TYPE(TCSBRK):
 		switch (_IOC_NR(cmd)) {
 #endif
 #if 0				/* let these go tranparent */
@@ -7572,7 +7580,10 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			access |= FEXCL;
 			length = 0;	/* no argument - simple return */
 			break;
+#if 0
+		/* conflicts with TCSBRK on ppc */
 		case _IOC_NR(TIOCCONS):	/* void *//* BSD *//* XXX */
+#endif
 		case _IOC_NR(TIOCNOTTY):	/* void *//* XXX */
 		case _IOC_NR(TIOCSERCONFIG):	/* void *//* XXX */
 			length = 0;	/* no argument - simple return */
@@ -7596,11 +7607,15 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			break;
 #endif
 		case _IOC_NR(TIOCOUTQ):	/* int * *//* BSD *//* XXX */
-#if (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(TCGETS))
+#if 0
+#if (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(TCSBRK))
 		case _IOC_NR(TIOCINQ):	/* int * *//* also FIONREAD *//* XXX */
 #endif
-#if ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(TCGETS)) && (FIONREAD != TIOCINQ))
+#endif
+#if 0
+#if ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(TCSBRK)) && (FIONREAD != TIOCINQ))
 		case _IOC_NR(FIONREAD):	/* int * *//* XXX */
+#endif
 #endif
 			length = sizeof(int);
 			break;
@@ -7630,24 +7645,36 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			access |= FEXCL;
 			length = sizeof(char);
 			break;
+#if 0
+			/* conflict with TCSETAF on ppc */
 		case _IOC_NR(TIOCLINUX):	/* const char * and more *//* XXX */
 			/* hmmm */
 			break;
+#endif
 		case _IOC_NR(TIOCSWINSZ):	/* const struct winsize * *//* XXX */
 			access |= FEXCL;
 		case _IOC_NR(TIOCGWINSZ):	/* struct winsize * *//* BSD *//* XXX */
 			length = sizeof(struct winsize);
 			break;
+#if 0
+			/* conflicts with TCSETA on ppc */
 		case _IOC_NR(TIOCMSET):	/* const int * *//* SVID *//* XXX */
+			/* conflicts with TCSETSF on ppc */
 		case _IOC_NR(TIOCMBIS):	/* const int * *//* SVID *//* XXX */
+			/* conflicts with TCGETA on ppc */
 		case _IOC_NR(TIOCMBIC):	/* const int * *//* SVID *//* XXX */
+#endif
 		case _IOC_NR(TIOCSSOFTCAR):	/* const int * *//* XXX */
 		case _IOC_NR(TIOCPKT):	/* const int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCSETD):	/* const int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCSERSWILD):	/* const int * *//* XXX */
 			access |= FEXCL;
+#if 0
+			/* conflicts with TCSETSW on ppc */
 		case _IOC_NR(TIOCMGET):	/* int * *//* SVID *//* XXX */
+			/* conflicts with TCSETAW on ppc */
 		case _IOC_NR(TIOCGSOFTCAR):	/* int * *//* XXX */
+#endif
 		case _IOC_NR(TIOCGETD):	/* int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCGPTN):	/* unsigned int * *//* Get Pty Number (of pty-mux device) *//* XXX */
 		case _IOC_NR(TIOCSERGWILD):	/* int * *//* XXX */
@@ -7725,7 +7752,7 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			access |= FEXCL;
 			break;
 #endif
-#if (_IOC_TYPE(TCGETS) != _IOC_TYPE(FIOGETOWN))
+#if (_IOC_TYPE(TCSBRK) != _IOC_TYPE(FIOGETOWN))
 		}
 		break;
 	case _IOC_TYPE(FIOGETOWN):
@@ -7756,12 +7783,12 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			length = sizeof(loff_t);
 			break;
 #endif
-#if (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(FIOGETOWN))
+#if 1 /* (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(FIOGETOWN)) */
 		case _IOC_NR(TIOCINQ):
 			length = sizeof(int);
 			break;
 #endif
-#if ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(FIOGETOWN)) && (FIONREAD != TIOCINQ))
+#if 0 /* ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(FIOGETOWN)) && (FIONREAD != TIOCINQ)) */
 		case _IOC_NR(FIONREAD):	/* int * *//* XXX */
 			length = sizeof(int);
 			break;

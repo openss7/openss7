@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:50 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:51:50 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.22  2005/12/29 21:36:14  brian
+ - a few idiosynchrasies for PPC, old 2.95 compiler, and 2.6.14 builds
+
  Revision 0.9.2.21  2005/12/28 09:51:50  brian
  - remove warnings on FC4 compile
 
@@ -117,10 +120,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:50 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:50 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -148,7 +151,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/28 09:51:50 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/29 21:36:14 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -1363,7 +1366,7 @@ mi_putc(char c, mblk_t **mpp)
 }
 
 static int
-mi_number(mblk_t **mpp, long long num, int base, int width, int decimal, int flags)
+mi_number(mblk_t **mpp, unsigned long long num, int base, int width, int decimal, int flags)
 {
 	char sign;
 	int i, count = 0, rval = 0;
@@ -1375,9 +1378,9 @@ mi_number(mblk_t **mpp, long long num, int base, int width, int decimal, int fla
 		return (count);
 	sign = '\0';
 	if (flags & _MI_FLAG_SIGN) {
-		if (num < 0) {
+		if ((signed long long) num < 0) {
 			sign = '-';
-			num = -num;
+			num = - (signed long long) num;
 			width--;
 		} else if (flags & _MI_FLAG_PLUS) {
 			sign = '+';
@@ -1403,7 +1406,7 @@ mi_number(mblk_t **mpp, long long num, int base, int width, int decimal, int fla
 	else {
 		const char *hexdig =
 		    (flags & _MI_FLAG_LARGE) ? "0123456789ABCDEF" : "0123456789abcdef";
-		for (; num != 0; tmp[i++] = hexdig[do_div(num, base)]) ;
+		for (; num != 0; tmp[i++] = hexdig[do_div(num,base)]) ;
 	}
 	if (i > decimal)
 		decimal = i;

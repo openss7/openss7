@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/11/13 07:55:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/29 21:31:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/11/13 07:55:57 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:31:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -671,6 +671,8 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
+			pci_dac_page_to_dma pci_dac_dma_to_page \
+			pci_dac_dma_to_offset vmalloc vfree \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			read_trylock write_trylock \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [
@@ -682,7 +684,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_osif_${lk_func}"
 				;;
-			    *sleep_on*)
+			    *sleep_on*|vmalloc|vfree)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
 				;;
 			esac ], [

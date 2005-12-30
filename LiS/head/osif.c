@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.10 $) $Date: 2005/12/19 03:22:19 $
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.11 $) $Date: 2005/12/28 09:53:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.10 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.11 $) $Date: 2005/12/28 09:53:31 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -502,24 +502,30 @@ lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
 	return (pci_dac_dma_supported(hwdev, mask));
 }
 
+#ifdef HAVE_KFUNC_PCI_DAC_PAGE_TO_DMA
 dma64_addr_t _RP
 lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev, struct page *page, unsigned long offset,
 			     int direction)
 {
 	return (pci_dac_page_to_dma(pdev, page, offset, direction));
 }
+#endif
 
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_TO_PAGE
 struct page *_RP
 lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
 	return (pci_dac_dma_to_page(pdev, dma_addr));
 }
+#endif
 
+#ifdef HAVE_KFUNC_PCI_DMA_TO_OFFSET
 unsigned long _RP
 lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {
 	return (pci_dac_dma_to_offset(pdev, dma_addr));
 }
+#endif
 
 #ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 void _RP

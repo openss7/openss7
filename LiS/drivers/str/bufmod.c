@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/19 03:22:17 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/29 21:35:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:17 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:35:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/19 03:22:17 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/29 21:35:53 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/19 03:22:17 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/29 21:35:53 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/12/19 03:22:17 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/29 21:35:53 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -137,6 +137,13 @@ STATIC struct module_info bufmod_minfo = {
 	.mi_hiwat = 5120,
 	.mi_lowat = 1024,
 };
+
+#ifndef unlikely
+#define unlikely(__x) (__x)
+#endif
+#ifndef likely
+#define likely(__x) (__x)
+#endif
 
 /* 
  *  -------------------------------------------------------------------------

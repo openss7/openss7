@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/23 20:21:58 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:31:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 20:21:58 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:31:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -252,6 +252,35 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			   tcp_current_mss,
 			   tcp_set_skb_tso_segs,
 			   tcp_set_skb_tso_factor], [], [])
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel function tcp_set_skb_tso_segs with sock argument], [linux_cv_tcp_set_skb_tso_segs_sock], [
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>
+#include <linux/tcp.h>]],
+		[[void (*my_autoconf_function_pointer)(struct sock *, struct sk_buff *) = &tcp_set_skb_tso_segs;]]) ],
+		[linux_cv_tcp_set_skb_tso_segs_sock='yes'],
+		[linux_cv_tcp_set_skb_tso_segs_sock='no'])
+	    ])
+	])
+    if test :$linux_cv_tcp_set_skb_tso_segs_sock = :yes ; then
+	AC_DEFINE([HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK], [1], [[Define to 1 if function
+	tcp_set_skb_tso_segs takes a (struct sock *, struct sk_buff *) argument list.]])
+    fi
 ])# _INET_CONFIG_KERNEL
 # =============================================================================
 

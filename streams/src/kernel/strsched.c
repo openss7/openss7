@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/22 10:28:42 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/29 21:36:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/22 10:28:42 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/29 21:36:21 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2005/12/22 10:28:42 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/29 21:36:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -4428,6 +4428,9 @@ STATIC asmlinkage NORET_TYPE void (*do_exit_) (long error_code) ATTRIB_NORET
 #undef do_exit
 #define do_exit do_exit_
 #endif
+#ifndef cpu
+#define cpu() smp_processor_id()
+#endif
 STATIC int
 kstreamd(void *__bind_cpu)
 {
@@ -4440,6 +4443,8 @@ kstreamd(void *__bind_cpu)
 	sigfillset(&current->blocked);
 	sigdelset(&current->blocked, SIGKILL);
 	set_cpus_allowed(current, 1UL << cpu);
+	if (cpu() != cpu)
+		schedule();
 	if (cpu() != cpu)
 		swerr();
 	sprintf(current->comm, "kstreamd_CPU%d", bind_cpu);
@@ -4473,6 +4478,9 @@ kstreamd(void *__bind_cpu)
 
 #ifndef CLONE_KERNEL
 #define CLONE_KERNEL (CLONE_FS|CLONE_FILES|CLONE_SIGNAL)
+#endif
+#ifndef HAVE_KFUNC_YIELD
+#define yield() do { current->policy |= SCHED_YEILD; schedule(); } while (0)
 #endif
 STATIC __unlikely int
 spawn_kstreamd(void)

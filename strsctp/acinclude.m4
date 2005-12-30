@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/21 10:31:24 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:31:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/21 10:31:24 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:31:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -518,8 +518,8 @@ dnl 	])
 #include <net/inet_ecn.h>
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
-#include <linux/netfilter_ipv4.h>]],
-#include <linux/ip.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
 		[[void (*my_autoconf_function_pointer)(struct iphdr *, struct dst_entry *) = &__ip_select_ident;]]) ],
 		[linux_cv_have___ip_select_ident_2_args='yes'],
 		[linux_cv_have___ip_select_ident_2_args='no'])

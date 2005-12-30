@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/12/20 15:11:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/29 21:31:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/20 15:11:54 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:31:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -976,7 +976,8 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			cpumask_scnprintf __symbol_get __symbol_put \
 			read_trylock write_trylock atomic_add_return path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
-			num_online_cpus generic_delete_inode set_user_nice set_cpus_allowed], [:], [
+			num_online_cpus generic_delete_inode set_user_nice \
+			set_cpus_allowed yield], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"

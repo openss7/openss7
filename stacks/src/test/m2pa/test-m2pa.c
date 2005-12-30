@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:32 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/29 21:36:09 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:32 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.14  2005/12/29 21:36:09  brian
+ - a few idiosynchrasies for PPC, old 2.95 compiler, and 2.6.14 builds
+
  Revision 0.9.2.13  2005/12/28 09:58:32  brian
  - remove warnings on FC4 compile
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:32 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/29 21:36:09 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/12/28 09:58:32 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/12/29 21:36:09 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -1016,6 +1019,7 @@ send(int msg)
 		return SUCCESS;
 #else
 		return FAILURE;
+#endif
 #endif
 #endif
 #endif

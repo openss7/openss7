@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 09:48:01 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/29 21:36:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:01 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 09:48:01 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/29 21:36:18 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 09:48:01 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/29 21:36:18 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -71,11 +71,13 @@ static char const ident[] =
  *  is present in the system would information be passed upstream.  This is far preferrable to
  *  cmn_err(9) which generates each and every message to the kernel log.
  */
+#include <stdarg.h>
 
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/sched.h>
 #include <linux/interrupt.h>	/* for local_bh_disable */
 #include <linux/ctype.h>	/* for isdigit */
 
@@ -91,7 +93,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 09:48:01 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/12/29 21:36:18 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -589,6 +591,9 @@ static struct cdevsw log_cdev = {
 
 static vstrlog_t oldlog = NULL;
 
+#ifndef va_copy
+#define va_copy(__x,__y) __va_copy((__x),(__y))
+#endif
 /*
  *  Allocate a data block and fill it in with the format string and an argument
  *  list beginning with the integer aligned following the format string.  We

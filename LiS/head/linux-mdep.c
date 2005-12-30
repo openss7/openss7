@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.19 $) $Date: 2005/12/19 12:42:42 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.20 $) $Date: 2005/12/28 09:53:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:42:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.19 $) $Date: 2005/12/19 12:42:42 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.20 $) $Date: 2005/12/28 09:53:31 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.19 2005/12/19 12:42:42 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.20 2005/12/28 09:53:31 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -3640,7 +3640,7 @@ lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len)
 int
 lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth)
 {
-#ifdef HAVE_KMACRO_ACCESS_OK
+#if defined HAVE_KMACRO_ACCESS_OK || defined HAVE_KFUNC_ACCESS_OK
 	return (access_ok(rd_wr_fcn, usr_addr, lgth) ? 0 : -EFAULT);
 #else
 	return (verify_area(rd_wr_fcn, usr_addr, lgth));

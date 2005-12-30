@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/20 15:11:41 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/29 21:35:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:11:41 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:35:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/20 15:11:41 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/29 21:35:53 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/20 15:11:41 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/29 21:35:53 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -65,6 +65,7 @@ static char const ident[] =
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/sched.h>
 #include <linux/interrupt.h>	/* for local_bh_disable */
 #include <linux/ctype.h>	/* for isdigit */
 
@@ -82,7 +83,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/12/20 15:11:41 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/12/29 21:35:53 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"

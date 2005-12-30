@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.37 $) $Date: 2005/12/20 15:11:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.38 $) $Date: 2005/12/29 21:31:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/20 15:11:38 $ by $Author: brian $
+# Last Modified $Date: 2005/12/29 21:31:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -430,7 +430,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.hh], [:], [:], [
+			  asm/uaccess.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -455,11 +455,12 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
+			pci_dac_page_to_dma pci_dac_dma_to_page pci_dac_dma_to_offset \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
 			read_trylock write_trylock path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
-			num_online_cpus generic_delete_inode], [:], [
+			num_online_cpus generic_delete_inode access_ok], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"

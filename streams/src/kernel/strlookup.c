@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:02 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:36:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:02 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:36:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:02 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:36:21 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:02 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/12/29 21:36:21 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -419,6 +419,7 @@ __smod_search(const char *name)
 
 EXPORT_SYMBOL_NOVERS(__smod_search);
 
+#ifdef CONFIG_KMOD
 STATIC struct cdevsw *
 cdev_grab(struct cdevsw *cdev)
 {
@@ -437,7 +438,9 @@ cdev_grab(struct cdevsw *cdev)
 	}
 	return (cdev);
 }
+#endif
 
+#ifdef CONFIG_KMOD
 STATIC struct fmodsw *
 fmod_grab(struct fmodsw *fmod)
 {
@@ -456,6 +459,7 @@ fmod_grab(struct fmodsw *fmod)
 	}
 	return (fmod);
 }
+#endif
 
 /*
  *  cdev_lookup: - look up a cdev by major device number in cdev hashes
