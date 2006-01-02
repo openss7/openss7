@@ -13,7 +13,7 @@
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com/} @*
+Copyright @copyright{} 2001-2005  OpenSS7 Corporation @url{http://www.openss7.com/} @*
 All Rights Reserved. @*
 
 @noindent

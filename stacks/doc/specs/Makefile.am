@@ -1,4 +1,4 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = tri tci mapi
+SUBDIRS = cci tri tci mapi

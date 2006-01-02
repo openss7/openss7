@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/01/02 11:33:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:33 $ by $Author: brian $
+ Last Modified $Date: 2006/01/02 11:33:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/01/02 11:33:43 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/01/02 11:33:43 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -174,6 +174,8 @@ static char const ident[] =
 
 #undef inet_sk
 #define inet_sk(_sk)			(&(((struct sock *)_sk)->protinfo.af_inet))
+#undef inet_csk
+#define inet_csk(_sk)			(&(((struct sock *)_sk)->protinfo.af_inet))
 #undef tcp_sk
 #define tcp_sk(_sk)			(&(((struct sock *)_sk)->tp_pinfo.af_tcp))
 #undef sctp_sk
@@ -185,6 +187,13 @@ static char const ident[] =
 #define sock_dport(_sk)			(((struct sock *)_sk)->dport)
 
 #define tcp_user_mss(_tp)		((_tp)->user_mss)
+
+#define sock_syn_retries(_sk)		(tcp_sk(_sk)->syn_retries)
+#define sock_defer_accept(_sk)		(tcp_sk(_sk)->defer_accept)
+#define sock_accept_queue_head(_sk)	(tcp_sk(_sk)->accept_queue)
+#define sock_accept_queue_tail(_sk)	(tcp_sk(_sk)->accept_queue_tail)
+#define sock_accept_queue_lock(_sk)
+#define sock_accept_queue_unlock(_sk)
 
 #else
 #ifdef HAVE_TRN_SOCK_STRUCTURE
@@ -225,6 +234,13 @@ static char const ident[] =
 #define sock_dport(_sk)			(inet_sk(_sk)->dport)
 
 #define tcp_user_mss(_tp)		((_tp)->user_mss)
+
+#define sock_syn_retries(_sk)		(tcp_sk(_sk)->syn_retries)
+#define sock_defer_accept(_sk)		(tcp_sk(_sk)->defer_accept)
+#define sock_accept_queue_head(_sk)	(tcp_sk(_sk)->accept_queue)
+#define sock_accept_queue_tail(_sk)	(tcp_sk(_sk)->accept_queue_tail)
+#define sock_accept_queue_lock(_sk)
+#define sock_accept_queue_unlock(_sk)
 
 #else
 #ifdef HAVE_NEW_SOCK_STRUCTURE
@@ -292,6 +308,24 @@ static char const ident[] =
 #define tcp_opt		tcp_sock
 
 #define tcp_user_mss(_tp)		((_tp)->rx_opt.user_mss)
+
+#ifndef HAVE_KFUNC_INET_CSK
+#define sock_syn_retries(_sk)		(tcp_sk(_sk)->syn_retries)
+#define sock_defer_accept(_sk)		(tcp_sk(_sk)->defer_accept)
+#define sock_accept_queue_head(_sk)	(tcp_sk(_sk)->accept_queue)
+#define sock_accept_queue_tail(_sk)	(tcp_sk(_sk)->accept_queue_tail)
+#define sock_accept_queue_lock(_sk)
+#define sock_accept_queue_unlock(_sk)
+#else
+#define sock_syn_retries(_sk)		(inet_csk(_sk)->icsk_syn_retries)
+#define sock_defer_accept(_sk)		(inet_csk(_sk)->icsk_accept_queue.rskq_defer_accept)
+#define sock_accept_queue_head(_sk)	(inet_csk(_sk)->icsk_accept_queue.rskq_accept_head)
+#define sock_accept_queue_tail(_sk)	(inet_csk(_sk)->icsk_accept_queue.rskq_accept_tail)
+#define sock_accept_queue_lock(_sk)	write_lock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
+#define sock_accept_queue_unlock(_sk)	write_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
+#define open_request request_sock
+#define tcp_openreq_fastfree(__req)	__reqsk_free(__req)
+#endif
 
 #else
 #error One of HAVE_OLD_SOCK_STRUCTURE, HAVE_TRN_SOCK_STRUCTURE or HAVE_NEW_SOCK_STRUCTURE must be defined.
@@ -466,7 +500,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/29 21:36:33 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/01/02 11:33:43 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1873,10 +1907,10 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_TCP_SYNCNT;
 				oh->status = T_SUCCESS;
 				if (ss->options.tcp.syncnt == T_UNSPEC)
-					ss->options.tcp.syncnt = tp->syn_retries;
-				else if (ss->options.tcp.syncnt != tp->syn_retries) {
+					ss->options.tcp.syncnt = sock_syn_retries(sk);
+				else if (ss->options.tcp.syncnt != sock_syn_retries(sk)) {
 					oh->status = T_FAILURE;
-					ss->options.tcp.syncnt = tp->syn_retries;
+					ss->options.tcp.syncnt = sock_syn_retries(sk);
 				}
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.syncnt;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1902,12 +1936,12 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->status = T_SUCCESS;
 				if (ss->options.tcp.defer_accept == T_UNSPEC)
 					ss->options.tcp.defer_accept =
-					    (TCP_TIMEOUT_INIT / HZ) << tp->defer_accept;
+					    (TCP_TIMEOUT_INIT / HZ) << sock_defer_accept(sk);
 				else if (ss->options.tcp.defer_accept !=
-					 ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept)) {
+					 ((TCP_TIMEOUT_INIT / HZ) << sock_defer_accept(sk))) {
 					oh->status = T_PARTSUCCESS;
 					ss->options.tcp.defer_accept =
-					    ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept);
+					    ((TCP_TIMEOUT_INIT / HZ) << sock_defer_accept(sk));
 				}
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.defer_accept;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -3383,7 +3417,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 						*valp = 1;
 					if (*valp > MAX_TCP_SYNCNT)
 						*valp = MAX_TCP_SYNCNT;
-					tp->syn_retries = *valp;
+					sock_syn_retries(sk) = *valp;
 					continue;
 				}
 				case T_TCP_LINGER2:
@@ -3415,14 +3449,15 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 					if (!request)
 						continue;
 					if (*valp == 0)
-						tp->defer_accept = 0;
+						sock_defer_accept(sk) = 0;
 					else {
-						for (tp->defer_accept = 0;
-						     tp->defer_accept < 32
+						for (sock_defer_accept(sk) = 0;
+						     sock_defer_accept(sk) < 32
 						     && *valp >
-						     ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept);
-						     tp->defer_accept++) ;
-						tp->defer_accept++;
+						     ((TCP_TIMEOUT_INIT / HZ) <<
+						      sock_defer_accept(sk));
+						     sock_defer_accept(sk)++) ;
+						sock_defer_accept(sk)++;
 					}
 					continue;
 				}
@@ -12138,23 +12173,24 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 	printd(("%s: %p: SS_ACCEPT\n", DRV_NAME, ss));
 	if ((sock = sock_alloc())) {
 		struct sock *sk = ss->sock->sk;
-		struct tcp_opt *tp = tcp_sk(sk);
 		struct open_request *req, *req_prev, **reqp;
 		struct sock *ask = ((ss_event_t *) cp->b_rptr)->sk;
 
 		sock->type = ss->sock->type;
 		sock->ops = ss->sock->ops;
 		lock_sock(sk);
-		if (tp->accept_queue) {
+		if (sock_accept_queue_head(sk)) {
+			sock_accept_queue_lock(sk);
 			/* find connection in queue */
-			for (reqp = &tp->accept_queue, req_prev = NULL; *reqp && (*reqp)->sk != ask;
+			for (reqp = &sock_accept_queue_head(sk), req_prev = NULL; *reqp && (*reqp)->sk != ask;
 			     req_prev = (*reqp), reqp = &(*reqp)->dl_next) ;
 			if ((req = *reqp)) {
 				if (!((*reqp) = (*reqp)->dl_next))
-					tp->accept_queue_tail = req_prev;
+					sock_accept_queue_tail(sk) = req_prev;
 				sk->sk_ack_backlog--;
 				tcp_openreq_fastfree(req);
 			}
+			sock_accept_queue_unlock(sk);
 			release_sock(sk);
 			lock_sock(ask);
 			sock_graft(ask, sock);

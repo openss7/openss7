@@ -1,0 +1,93 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+center box tab(:);
+l|l.
+\fI\)CCI Primitive\fR:\fI\)Q.764 Primitive\fR
+=
+.TH
+CC_INFO_REQ:\-
+CC_INFO_ACK:\-
+CC_BIND_REQ:\-
+CC_BIND_ACK:\-
+CC_UNBIND_REQ:\-
+CC_ADDR_REQ:\-
+CC_ADDR_ACK:\-
+CC_OK_ACK:\-
+CC_ERROR_ACK:\-
+_
+CC_SETUP_REQ:Setup Request
+CC_SETUP_IND:Setup Indication
+CC_MORE_INFO_REQ:\-
+CC_MORE_INFO_IND:\-
+CC_INFORMATION_REQ:Information Request
+CC_INFORMATION_IND:Information Indication
+CC_INFO_TIMEOUT_IND:\-
+CC_SETUP_RES:Proceeding, Alerting, Progress Request; Setup Response
+CC_SETUP_CON:Proceeding, Alerting, Progress Indication; Setup Confirm
+_
+CC_PROCEEDING_REQ:Proceeding Request
+CC_PROCEEDING_IND:Proceeding Indication
+CC_ALERTING_REQ:Alerting Request
+CC_ALERTING_IND:Alerting Indication
+CC_PROGRESS_REQ:Progress Request
+CC_PROGRESS_IND:Progress Indication
+CC_CONNECT_REQ:Setup Response
+CC_CONNECT_IND:Setup Confirm
+_
+CC_SUSPEND_REQ:Suspend Request
+CC_SUSPEND_IND:Suspend Indication
+CC_RESUME_REQ:Resume Request
+CC_RESUME_IND:Resume Indication
+_
+CC_CALL_REATTEMPT_IND:Reattempt Indication
+CC_CALL_FAILURE_IND:Failure Indication
+CC_REJECT_REQ:Release Request
+CC_REJECT_IND:Release Indication
+CC_RELEASE_REQ:Release Request
+CC_RELEASE_IND:Release Indication
+CC_RELEASE_RES:Release Response
+CC_RELEASE_CON:Release Confirm
+_
+CC_RESET_REQ:Reset Request
+CC_RESET_IND:Reset Indication
+CC_RESET_RES:Reset Response
+CC_RESET_CON:Reset Confirm
+CC_BLOCKING_REQ:Blocking Request
+CC_BLOCKING_IND:Blocking Indication
+CC_BLOCKING_RES:Blocking Response
+CC_BLOCKING_CON:Blocking Confirm
+CC_UNBLOCKING_REQ:Unblocking Request
+CC_UNBLOCKING_IND:Unblocking Indication
+CC_UNBLOCKING_RES:Unblocking Response
+CC_UNBLOCKING_CON:Unblocking Confirm
+_
+CC_QUERY_REQ:\-
+CC_QUERY_IND:\-
+CC_QUERY_RES:\-
+CC_QUERY_CON:\-
+.TE
