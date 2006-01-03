@@ -1,6 +1,6 @@
-# OpenSS7 Netperf -- NexusWare procedures.  2005-12-29
-# $Id: README-nexusware,v 0.9.2.1 2005/12/30 12:21:25 brian Exp $
-# Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+# OpenSS7 Netperf -- NexusWare procedures.  2006-01-03
+# $Id: README-nexusware,v 0.9.2.2 2006/01/03 16:21:34 brian Exp $
+# Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 # See the end for copying conditions.
 
@@ -63,6 +63,16 @@ steps describe the process:
           % make
           % popd
 
+     For more recent `NexusWare' releases, the method for rebuilding a kernel
+     is a little different as follows:
+
+          % pushd /u5/NexusWare80
+          % ./nexus 2.4
+          % ./nexus 8260
+          % ./nexus quick
+          % . SETUP.sh
+          % popd
+
   2. Next download, unpack (*note Downloading the Tar Ball::) and configure
      (*note Configuring the Tar Ball::) using the provided
      `configure.nexusware' wrapper for `configure'.  This wrapper simply tells
@@ -74,6 +84,11 @@ steps describe the process:
      particular interest to embedded targets is `--with-k-optimize=size' to
      attempt to reduce the size of the kernel modules.
 
+     You must specify the kernel version of the kernel for which you are
+     configuring.  Add the -with-k-release=2.4.18 option for older `NexusWare'
+     releases, -with-k-release=2.4.25 or -with-k-release=2.6.12 for more current
+     `NexusWare' releases.
+
   3. Install as normal (*note Installing the Tar Ball::), however, for embedded
      targets the `install-strip' target should be used instead of the `install'
      target.  The `install-strip' target will strip unnecessary symbols from
@@ -84,16 +99,18 @@ steps describe the process:
 Following is what I use for configuration and installation: (My `NexusWare'
 tree is rooted at `/u5/NexusWare'.)
 
-     % pushd /u5/NexusWare24
-     % source SETUP.sh
-     % make
+     % pushd /u5/NexusWare80
+     % ./nexus 2.4
+     % ./nexus 8260
+     % ./nexus quick
+     % . SETUP.sh
      % popd
      % wget http://www.openss7.org/netperf-2.3.2.tar.bz2
      % tar -xjvf netperf-2.3.2.tar.bz2
      % pushd netperf-2.3.2
-     % ./configure.nexusware --with-k-optimize=size
+     % ./configure.nexusware --with-k-release=2.4.25 --with-k-optimize=size
      % make
-     % make install-strip
+     % make DESTDIR="$NEXUSWARE_PREFIX" install-strip
      % popd
 
 Once built and installed in the `NexusWare' directory, you will have to
@@ -113,6 +130,12 @@ to remote mount the `/usr' directory after boot), then specify the
 In addition, because `NexusWare' does not include an `/etc/modules.conf' file
 by default, it will be necessary to add one or edit your `rc.4' file to
 `insmod' the necessary `netperf' modules at boot time.
+
+Also, `NexusWare' does not configure its kernels for CONFIG_KMOD, so any kernel
+modules must be loaded by the `rc.4' init script at boot.  On more recent
+`NexusWare' releases, the init scripts will be installed in
+`$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you must manually edit your `rc.4'
+script to invoke these scripts.
 
 Once you have completed the necessary `.spec' and `rc.4' file entries, you need
 to rebuild the `generic' kernel flash image once more for these objects to be
@@ -159,6 +182,8 @@ flash image as normal:
      % make
      % popd
 
+The situation is a little more complex for recent `NexusWare' releases.
+
 ---------- Footnotes ----------
 
 (1) Because it _is_ a cross-build, the kernel version on the build machine is
@@ -169,11 +194,10 @@ configuration, these instructions should work equally well for the Solaris
 `NexusWare' cross-building environment as it does for the Linux `NexusWare'
 cross-building environment.
 
-
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.

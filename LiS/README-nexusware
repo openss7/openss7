@@ -1,5 +1,5 @@
-# OpenSS7 Linux Fast STREAMS -- NexusWare procedures.  2006-01-03
-# $Id: README-nexusware,v 0.9.2.2 2006/01/03 16:21:41 brian Exp $
+# OpenSS7 Linux STREAMS (LiS) -- NexusWare procedures.  2006-01-03
+# $Id: README-nexusware,v 0.9.2.1 2006/01/03 16:21:31 brian Exp $
 # Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 # See the end for copying conditions.
@@ -18,9 +18,9 @@ build process does not required `root' privilege.)
 
 Folowing is an example of a native build against the running kernel:
 
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
-     % tar -xjvf streams-0.7a.4.tar.bz2
-     % pushd streams-0.7a.4
+     % wget http://www.openss7.org/LiS-2.18.2.tar.bz2
+     % tar -xjvf LiS-2.18.2.tar.bz2
+     % pushd LiS-2.18.2
      % ./configure
      % make
      % popd
@@ -37,9 +37,9 @@ find them, or they must be specified with declarations such as
 `CC=/u5/NexusWare24/ppc-linux/gcc' on the `configure' command line.  Look in
 the file `configure.nexusware' in the release package for an example.
 
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
-     % tar -xjvf streams-0.7a.4.tar.bz2
-     % pushd streams-0.7a.4
+     % wget http://www.openss7.org/LiS-2.18.2.tar.bz2
+     % tar -xjvf LiS-2.18.2.tar.bz2
+     % pushd LiS-2.18.2
      % ./configure DESTDIR="/some/other/root" \
      	--with-k-release=2.4.18 --host sparc-linux
      % make
@@ -105,9 +105,9 @@ tree is rooted at `/u5/NexusWare'.)
      % ./nexus quick
      % . SETUP.sh
      % popd
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
-     % tar -xjvf streams-0.7a.4.tar.bz2
-     % pushd streams-0.7a.4
+     % wget http://www.openss7.org/LiS-2.18.2.tar.bz2
+     % tar -xjvf LiS-2.18.2.tar.bz2
+     % pushd LiS-2.18.2
      % ./configure.nexusware --with-k-release=2.4.25 --with-k-optimize=size
      % make
      % make DESTDIR="$NEXUSWARE_PREFIX" install-strip
@@ -118,7 +118,7 @@ Once built and installed in the `NexusWare' directory, you will have to
 `NexusWare' root file system.  If you are cross-building for `NexusWare' you
 should already know what that means.  Objects that you might be interested in
 copying to the root file system are kernel modules that were installed in
-`$NEXUSWARE_PREFIX/lib/modules/2.4.18/streams', libraries installed in
+`$NEXUSWARE_PREFIX/lib/modules/2.4.18/lis', libraries installed in
 `$NEXUSWARE_PREFIX/usr/lib' and utility functions installed in
 `$NEXUSWARE_PREFIX/usr/bin' and `$NEXUSWARE_PREFIX/usr/sbin' and test programs
 in `$NEXUSWARE_PREFIX/usr/libexec'.  If you would prefer that these programs be
@@ -129,11 +129,13 @@ to remote mount the `/usr' directory after boot), then specify the
 
 In addition, because `NexusWare' does not include an `/etc/modules.conf' file
 by default, it will be necessary to add one or edit your `rc.4' file to
-`insmod' the necessary `streams' modules at boot time.  Also, `NexusWare' does
-not configure its kernels for CONFIG_KMOD, so any kernel modules must be loaded
-by the `rc.4' init script at boot.  On more recent `NexusWare' releases, the
-init scripts will be installed in `$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you
-must manually edit your `rc.4' script to invoke these scripts.
+`insmod' the necessary `LiS' modules at boot time.
+
+Also, `NexusWare' does not configure its kernels for CONFIG_KMOD, so any kernel
+modules must be loaded by the `rc.4' init script at boot.  On more recent
+`NexusWare' releases, the init scripts will be installed in
+`$NEXUSWARE_PREFIX/etc/rc.d/init.d/' but you must manually edit your `rc.4'
+script to invoke these scripts.
 
 Once you have completed the necessary `.spec' and `rc.4' file entries, you need
 to rebuild the `generic' kernel flash image once more for these objects to be
@@ -141,9 +143,9 @@ included in the flash file system.  It is important that this second build of
 the kernel image be the same as the first.
 
 When modifying and rebuilding a `NexusWare' kernel, it will be necessary to
-rebuild and install `streams'.  Simply perform the last `make install-strip'
-stage or start again with `./configure.nexusware'.  You can place the unpacked
-tarball in `$NEXUSWARE_PREFIX/usr/src/streams', and add the following to the
+rebuild and install `LiS'.  Simply perform the last `make install-strip' stage
+or start again with `./configure.nexusware'.  You can place the unpacked
+tarball in `$NEXUSWARE_PREFIX/usr/src/LiS', and add the following to the
 top-level `NexusWare' `Makefile' to make the build process a single step
 process instead of dual pass:
 
@@ -156,8 +158,8 @@ process instead of dual pass:
              (cd usr/src/pti; $(MAKE))
              (cd drivers; $(MAKE))
              (cd utility; $(MAKE))
-     #       uncomment for streams build
-     #       (cd usr/src/streams; ./configure.nexusware; $(MAKE) install-strip)
+     #       uncomment for LiS build
+     #       (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
              (cd build/generic; $(MAKE))
      ...
 
@@ -166,12 +168,12 @@ Another, perhaps simpler approach, is to make the necessary edits to the
 unpack the tar ball into the `NexusWare' directory, and build the `NexusWare'
 flash image as normal:
 
-     % wget http://www.openss7.org/streams-0.7a.4.tar.bz2
+     % wget http://www.openss7.org/LiS-2.18.2.tar.bz2
      % pushd /u5/NexusWare24
      % source SETUP.sh
      % pushd usr/src
-     % tar -xjvf ${DIRSTACK[2]}/streams-0.7a.4.tar.bz2
-     % ln -sf streams-0.7a.4 streams
+     % tar -xjvf ${DIRSTACK[2]}/LiS-2.18.2.tar.bz2
+     % ln -sf LiS-2.18.2 LiS
      % popd
      % make
      % popd
@@ -187,7 +189,6 @@ unlikely to be the kernel version of the target machine, except by coincidence.
 configuration, these instructions should work equally well for the Solaris
 `NexusWare' cross-building environment as it does for the Linux `NexusWare'
 cross-building environment.
-
 
 
 =========================================================================

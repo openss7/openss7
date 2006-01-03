@@ -102,8 +102,10 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  README-cvs \
+				  README-nexusware \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

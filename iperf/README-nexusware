@@ -1,11 +1,10 @@
-# OpenSS7 STREAMS Utilities -- CVS procedures.  2006-01-03
-# $Id: README-cvs,v 0.9.2.2 2006/01/03 16:21:46 brian Exp $
+# OpenSS7 Iperf -- NexusWare procedures.  2006-01-03
+# $Id: README-nexusware,v 0.9.2.1 2006/01/03 16:21:33 brian Exp $
 # Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 # See the end for copying conditions.
 
-The following is an extract from the manual to assist CVS developers:
-
+The following is an extract from the manual to assist NexusWare developers:
 
 
 
