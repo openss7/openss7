@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/08/29 10:18:51 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/01/03 14:37:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/08/29 10:18:51 $ by $Author: brian $
+# Last Modified $Date: 2006/01/03 14:37:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -209,6 +209,20 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #include <linux/time.h>		/* for struct timespec */
 ])
+    AC_SUBST([EXPOSED_SYMBOLS])
+    EXPOSED_SYMBOLS="\
+	mtp_n_uderror_ind \
+	mtp_n_unitdata_ind \
+	mtp_n_unitdata_req \
+	sccp_n_uderror_ind \
+	sccp_n_unitdata_ind \
+	sccp_n_unitdata_req \
+	sctp_data_ind \
+	sctp_data_req \
+	sctp_datack_ind \
+	sctp_datack_req \
+	sctp_exdata_ind \
+	sctp_exdata_req"
 ])# _SS7_CONFIG_KERNEL
 # =============================================================================
 

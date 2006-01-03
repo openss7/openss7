@@ -9,7 +9,9 @@ SUBDIRS = . man manual specs projects
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
-TESTS_ENVIRONMENT	+= PKG_MANPATH='$(PKG_MANPATH)' \
+TESTS_ENVIRONMENT	+= EXPOSED_SYMBOLS='$(EXPOSED_SYMBOLS) $(AM_EXPOSED_SYMBOLS)' \
+			   WARN_EXCESS=yes \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= $(top_builddir)/check_decls.log
 DISTCLEANFILES		+= *.err *.out

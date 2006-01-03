@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/29 08:07:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/01/03 14:45:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/29 08:07:10 $ by $Author: brian $
+# Last Modified $Date: 2006/01/03 14:45:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,6 +79,17 @@ ss7_man_MANS = \
 	man4/cpc388.4 \
 	man4/dass.4 \
 	man4/dl.4 \
+	man4/dl_dua.4 \
+	man4/dl_gr303.4 \
+	man4/dl_gr303ua.4 \
+	man4/dl_gsma.4 \
+	man4/dl_h225.4 \
+	man4/dl_ioctl.4 \
+	man4/dl_iua.4 \
+	man4/dl_lapb.4 \
+	man4/dl_lapf.4 \
+	man4/dl_v52.4 \
+	man4/dl_v5ua.4 \
 	man4/dlb.4 \
 	man4/dl_ioctl.4 \
 	man4/dpnss.4 \
@@ -989,7 +1000,20 @@ ss7_man_MANS = \
 	man8/tua.8 \
 	man8/uaconfd.8 \
 	man8/undoc.8 \
-	man8/voipconfd.8
+	man8/voipconfd.8 \
+	man9/mtp_n_uderror_ind.9 \
+	man9/mtp_n_unitdata_ind.9 \
+	man9/mtp_n_unitdata_req.9 \
+	man9/sccp_n_uderror_ind.9 \
+	man9/sccp_n_unitdata_ind.9 \
+	man9/sccp_n_unitdata_req.9 \
+	man9/sctp_datack_ind.9 \
+	man9/sctp_datack_req.9 \
+	man9/sctp_data_ind.9 \
+	man9/sctp_data_req.9 \
+	man9/sctp_exdata_ind.9 \
+	man9/sctp_exdata_req.9 \
+	man9/ss7undoc.9
 
 xnet_man_MANS = \
 	man3/t_accept.3 \
@@ -1406,6 +1430,17 @@ ss7_dist_noinst_MANS = \
 	man4/cpc388.4.man \
 	man4/dass.4.man \
 	man4/dl.4.man \
+	man4/dl_dua.4.man \
+	man4/dl_gr303.4.man \
+	man4/dl_gr303ua.4.man \
+	man4/dl_gsma.4.man \
+	man4/dl_h225.4.man \
+	man4/dl_ioctl.4.man \
+	man4/dl_iua.4.man \
+	man4/dl_lapb.4.man \
+	man4/dl_lapf.4.man \
+	man4/dl_v52.4.man \
+	man4/dl_v5ua.4.man \
 	man4/dlb.4.man \
 	man4/dl_ioctl.4.man \
 	man4/dpnss.4.man \
@@ -2316,7 +2351,20 @@ ss7_dist_noinst_MANS = \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
 	man8/undoc.8.man \
-	man8/voipconfd.8.man
+	man8/voipconfd.8.man \
+	man9/mtp_n_uderror_ind.9.man \
+	man9/mtp_n_unitdata_ind.9.man \
+	man9/mtp_n_unitdata_req.9.man \
+	man9/sccp_n_uderror_ind.9.man \
+	man9/sccp_n_unitdata_ind.9.man \
+	man9/sccp_n_unitdata_req.9.man \
+	man9/sctp_datack_ind.9.man \
+	man9/sctp_datack_req.9.man \
+	man9/sctp_data_ind.9.man \
+	man9/sctp_data_req.9.man \
+	man9/sctp_exdata_ind.9.man \
+	man9/sctp_exdata_req.9.man \
+	man9/ss7undoc.9.man
 
 
 xnet_dist_noinst_MANS = \
