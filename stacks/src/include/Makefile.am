@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/14 22:03:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/01/03 12:00:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:37 $ by $Author: brian $
+# Last Modified $Date: 2006/01/03 12:00:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -131,13 +131,11 @@ nobase_pkginclude_HEADERS = \
 	ss7/v52_ioctl.h \
 	ss7/v5ua_ioctl.h \
 	sys/cdi_daed.h \
-	sys/cdi.h \
 	sys/cdi_hdlc.h \
 	sys/dlpi_dua.h \
 	sys/dlpi_gr303.h \
 	sys/dlpi_gr303ua.h \
 	sys/dlpi_gsma.h \
-	sys/dlpi.h \
 	sys/dlpi_h225.h \
 	sys/dlpi_isdn.h \
 	sys/dlpi_iua.h \
@@ -148,27 +146,11 @@ nobase_pkginclude_HEADERS = \
 	sys/dlpi_mtp2.h \
 	sys/dlpi_v52.h \
 	sys/dlpi_v5ua.h \
-	sys/npi.h \
-	sys/npi_ip.h \
 	sys/npi_mtp.h \
 	sys/npi_sccp.h \
 	sys/npi_sctp.h \
 	sys/npi_ss7.h \
 	sys/npi_sscop.h \
-	sys/npi_tcp.h \
-	sys/npi_udp.h \
-	sys/sockmod.h \
-	sys/ticlts.h \
-	sys/ticots.h \
-	sys/ticotsord.h \
-	sys/tihdr.h \
-	sys/timod.h \
-	sys/tirdwr.h \
-	sys/tiuser.h \
-	sys/tli.h \
-	sys/tpi.h \
-	sys/tpi_inet.h \
-	sys/tpi_ip.h \
 	sys/tpi_mtp.h \
 	sys/tpi_sccp.h \
 	sys/tpi_sctp.h \
@@ -176,12 +158,7 @@ nobase_pkginclude_HEADERS = \
 	sys/tpi_ss7.h \
 	sys/tpi_sscop.h \
 	sys/tpi_tcap.h \
-	sys/tpi_tcp.h \
-	sys/tpi_udp.h \
 	sys/xti_atm.h \
-	sys/xti.h \
-	sys/xti_inet.h \
-	sys/xti_ip.h \
 	sys/xti_local.h \
 	sys/xti_mosi.h \
 	sys/xti_mtp.h \
@@ -192,18 +169,42 @@ nobase_pkginclude_HEADERS = \
 	sys/xti_ss7.h \
 	sys/xti_sscop.h \
 	sys/xti_tcap.h \
-	sys/xti_tcp.h \
-	sys/xti_udp.h \
-	sys/xti_xti.h \
-	ticlts.h \
-	ticots.h \
-	ticotsord.h \
-	tihdr.h \
-	timod.h \
-	tirdwr.h \
-	tiuser.h \
-	xti.h \
-	xti_inet.h
+	sys/xti_xti.h
+
+#	sys/sockmod.h \
+#	sys/ticlts.h \
+#	sys/ticots.h \
+#	sys/ticotsord.h \
+#	sys/tihdr.h \
+#	sys/timod.h \
+#	sys/tirdwr.h \
+#	sys/tiuser.h \
+#	sys/cdi.h \
+#	sys/dlpi.h \
+#	sys/npi.h \
+#	sys/tpi.h \
+#	sys/tli.h \
+#	sys/xti.h \
+#	sys/tpi_inet.h \
+#	sys/xti_inet.h \
+#	sys/npi_tcp.h \
+#	sys/tpi_tcp.h \
+#	sys/xti_tcp.h \
+#	sys/npi_udp.h \
+#	sys/tpi_udp.h \
+#	sys/xti_udp.h \
+#	sys/npi_ip.h \
+#	sys/tpi_ip.h \
+#	sys/xti_ip.h \
+#	ticlts.h \
+#	ticots.h \
+#	ticotsord.h \
+#	tihdr.h \
+#	timod.h \
+#	tirdwr.h \
+#	tiuser.h \
+#	xti.h \
+#	xti_inet.h
 
 #	os7/allocb.h
 #	os7/bufpool.h
