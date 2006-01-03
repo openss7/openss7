@@ -1,1 +1,1 @@
-.so man9/spl0.9.man
+.so man9/SPL0.9.man

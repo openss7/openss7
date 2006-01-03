@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.11 $) $Date: 2005/12/28 09:53:31 $
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.12 $) $Date: 2005/12/29 21:35:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:53:31 $ by $Author: brian $
+ Last Modified $Date: 2005/12/29 21:35:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.11 $) $Date: 2005/12/28 09:53:31 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.12 $) $Date: 2005/12/29 21:35:57 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -519,7 +519,7 @@ lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr)
 }
 #endif
 
-#ifdef HAVE_KFUNC_PCI_DMA_TO_OFFSET
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_TO_OFFSET
 unsigned long _RP
 lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr)
 {

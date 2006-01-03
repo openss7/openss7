@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: genconf.h.in,v 1.1.6.7 2005/12/20 15:11:44 brian Exp $
+ @(#) $Id: genconf.h.in,v 1.1.6.8 2006/01/03 13:05:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:11:44 $ by $Author: brian $
+ Last Modified $Date: 2006/01/03 13:05:24 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -92,14 +92,65 @@
 
 /* following are for osif */
 
-/* Define to 1 if kernel function pci_find_class() exists. */
-#undef HAVE_KFUNC_PCI_FIND_CLASS
+/* Define to 1 if kernel function pcibios_find_class() exists. */
+#undef HAVE_KFUNC_PCIBIOS_FIND_CLASS
+
+/* Define to 1 if kernel function pcibios_find_device() exists. */
+#undef HAVE_KFUNC_PCIBIOS_FIND_DEVICE
+
+/* Define to 1 if kernel function pcibios_init() exists. */
+#undef HAVE_KFUNC_PCIBIOS_INIT
+
+/* Define to 1 if kernel function pcibios_present() exists. */
+#undef HAVE_KFUNC_PCIBIOS_PRESENT
+
+/* Define to 1 if kernel function pcibios_read_config_byte() exists. */
+#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
+
+/* Define to 1 if kernel function pcibios_read_config_dword() exists. */
+#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
+
+/* Define to 1 if kernel function pcibios_read_config_word() exists. */
+#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
+
+/* Define to 1 if kernel function pcibios_write_config_byte() exists. */
+#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_BYTE
+
+/* Define to 1 if kernel function pcibios_write_config_dword() exists. */
+#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_DWORD
+
+/* Define to 1 if kernel function pcibios_write_config_word() exists. */
+#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_WORD
+
+/* Define to 1 if kernel function pci_dac_dma_sync_single() exists. */
+#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
+
+/* Define to 1 if kernel function pci_dac_dma_sync_single_for_cpu() exists. */
+#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+
+/* Define to 1 if kernel function pci_dac_dma_sync_single_for_device() exists. */
+#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+
+/* Define to 1 if kernel function pci_dac_dma_to_offset() exists. */
+#undef HAVE_KFUNC_PCI_DAC_DMA_TO_OFFSET
+
+/* Define to 1 if kernel function pci_dac_dma_to_page() exists. */
+#undef HAVE_KFUNC_PCI_DAC_DMA_TO_PAGE
+
+/* Define to 1 if kernel function pci_dac_page_to_dma() exists. */
+#undef HAVE_KFUNC_PCI_DAC_PAGE_TO_DMA
+
+/* Define to 1 if kernel function pci_dac_set_dma_mask() exists. */
+#undef HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
+
+/* Define to 1 if kernel function pci_dma_sync_sg() exists. */
+#undef HAVE_KFUNC_PCI_DMA_SYNC_SG
 
 /* Define to 1 if kernel function pci_dma_sync_single() exists. */
 #undef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 
-/* Define to 1 if kernel function pci_dma_sync_sg() exists. */
-#undef HAVE_KFUNC_PCI_DMA_SYNC_SG
+/* Define to 1 if kernel function pci_find_class() exists. */
+#undef HAVE_KFUNC_PCI_FIND_CLASS
 
 /* Define to 1 if kernel function sleep_on() exists. */
 #undef HAVE_KFUNC_SLEEP_ON

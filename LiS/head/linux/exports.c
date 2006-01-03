@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.16 $) $Date: 2005/12/20 15:11:42 $
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.17 $) $Date: 2005/12/28 09:53:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:11:42 $ by $Author: brian $
+ Last Modified $Date: 2005/12/28 09:53:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.16 $) $Date: 2005/12/20 15:11:42 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.17 $) $Date: 2005/12/28 09:53:32 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -428,9 +428,15 @@ EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_sync_single_for_cpu);
 #ifdef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_sync_single_for_device);
 #endif
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_TO_OFFSET
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_to_offset);
+#endif
+#ifdef HAVE_KFUNC_PCI_DAC_DMA_TO_PAGE
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_to_page);
+#endif
+#ifdef HAVE_KFUNC_PCI_DAC_PAGE_TO_DMA
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_page_to_dma);
+#endif
 #endif				/* 2.4.13 */
 
 /*
