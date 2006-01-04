@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/06 11:21:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/01/03 18:28:49 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 11:21:39 $ by $Author: brian $
+## Last Modified $Date: 2006/01/03 18:28:49 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -61,6 +61,9 @@ export RPMXOPTS="--nodeps"
 export DEBXOPTS="-d"
 
 SUBDIRS	= @subdirs@
+
+dist_noinst_SCRIPTS		+= scripts/cflagcheck $(top_srcdir)/scripts/modpost.sh
+EXTRA_SCRIPTS			+= scripts/cflagcheck
 
 ##
 ## Rules for lsms
@@ -85,8 +88,8 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
