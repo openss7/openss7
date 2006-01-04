@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/12/30 12:21:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/01/03 21:39:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/30 12:21:42 $ by $Author: brian $
+# Last Modified $Date: 2006/01/03 21:39:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -967,13 +967,13 @@ if WITH_INET
 ## WITH_INET
 
 install-inet-devices: $(INET_MKDEV)
-	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
 		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)' ; \
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV) ; \
 	fi
 
 uninstall-inet-devices:
-	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
 		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)' ; \
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
 	fi

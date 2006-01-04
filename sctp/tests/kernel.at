@@ -3,7 +3,7 @@ dnl vim: ft=config sw=4
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.at,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:08:44 $
+# @(#) $RCSfile: kernel.at,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/01/03 21:39:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,11 +62,14 @@ dnl vim: ft=config sw=4
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:08:44 $ by $Author: brian $
+# Last Modified $Date: 2006/01/03 21:39:05 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: kernel.at,v $
+# Revision 0.9.2.7  2006/01/03 21:39:05  brian
+# - rootdir not krootdir
+#
 # Revision 0.9.2.6  2005/07/04 20:08:44  brian
 # - fixed spelling of CVS keyword
 #
@@ -93,8 +96,8 @@ AT_CHECK([
     fi
     UNAME_MACHINE=${at_target_cpu} \
 	${at_DEPMOD:-depmod} -ae \
-	-b  ${at_DESTDIR}${at_krootdir}/ \
-	-C ${at_DESTDIR}${at_krootdir}/etc/modules.conf \
+	-b  ${at_DESTDIR}${at_rootdir}/ \
+	-C ${at_DESTDIR}${at_rootdir}/etc/modules.conf \
 	${at_ksysmap:+-F ${at_DESTDIR}${at_ksysmap}} \
 	${at_kversion}
     ], [], [ignore], [], [], [])
