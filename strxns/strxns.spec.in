@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/12/23 20:28:40 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2006/01/04 08:03:19 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 20:28:40 $ by $Author: brian $
+# Last Modified $Date: 2006/01/04 08:03:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -821,6 +821,37 @@ fi
 %endif
 
 # ===========================================================================
+%package %{_streams}-%{info_name}
+
+Summary:        %{title} core kernel module symbol versions.
+Group:          System Environment/Kernel
+Prefix:         %{_includedir}/%{name}/%{kernel_version}
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_streams}-%{info_name}
+The %{name}-%{_streams}-%{info_name} package contains the kernel modules symbol
+information for development of kernel modules against the core kernel modules
+included in the %{name}-core package.  This package is tied to the core kernel
+modules and kernel for which they were compiled.  This package applies to core
+kernel modules %{name}-%{_streams}-%{core_name} for kernel version %{_kversion}.
+
+%if %{FILES_modules}
+%files %{_streams}-%{info_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_includedir}/%{name}/%{kernel_version}
+%{_includedir}/%{name}/%{kernel_version}/*
+%endif
+
+# don't include package for FILES_ko_modules
+
+# ===========================================================================
 %package %{_streams}-lib
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} run-time libraries.
@@ -829,7 +860,6 @@ Prefix:         %{_libdir}
 Prefix:         %{_datadir}/locale
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
-#Requires:       strcompat-lib >= @STRCOMP_VERSION@%{?extrarelease}
 Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
@@ -911,16 +941,18 @@ STREAMS %{stitle} application programs.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_libdir}/*.a
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
+%dir %{_includedir}/%{name}/sys
+#{_includedir}/%{name}/*.h
+%{_includedir}/%{name}/sys/*
 %endif
 
 %if %{FILES_nolibs}
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
+%dir %{_includedir}/%{name}/sys
+#{_includedir}/%{name}/*.h
+%{_includedir}/%{name}/sys/*
 %endif
 
 # ===========================================================================
@@ -937,7 +969,6 @@ Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 %endif
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
-#Requires:       strcompat-lib >= @STRCOMP_VERSION@%{?extrarelease}
 Obsoletes:      %{name}-%{_streams}-utils
 Obsoletes:      %{name}-utils
 %{?_conflict:Conflicts:      %{name}-%{_conflict}-util}
@@ -1581,9 +1612,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.102  2005/12/23 20:28:40  brian
-# - use lsb initd last
+# Revision 0.9.2.103  2006/01/04 08:03:19  brian
+# - added info package to spec files
 #
+
+* Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.102  2005/12/23 20:28:40  brian
+- use lsb initd last
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.101  2005/12/23 05:23:31  brian

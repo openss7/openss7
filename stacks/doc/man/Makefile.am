@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/01/03 14:45:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/01/04 08:04:48 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/01/03 14:45:05 $ by $Author: brian $
+# Last Modified $Date: 2006/01/04 08:04:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,7 +84,6 @@ ss7_man_MANS = \
 	man4/dl_gr303ua.4 \
 	man4/dl_gsma.4 \
 	man4/dl_h225.4 \
-	man4/dl_ioctl.4 \
 	man4/dl_iua.4 \
 	man4/dl_lapb.4 \
 	man4/dl_lapf.4 \
@@ -1435,7 +1434,6 @@ ss7_dist_noinst_MANS = \
 	man4/dl_gr303ua.4.man \
 	man4/dl_gsma.4.man \
 	man4/dl_h225.4.man \
-	man4/dl_ioctl.4.man \
 	man4/dl_iua.4.man \
 	man4/dl_lapb.4.man \
 	man4/dl_lapf.4.man \

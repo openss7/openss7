@@ -2,11 +2,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/01/03 14:37:32 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/01/04 08:04:47 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/01/03 14:37:32 $ by $Author: brian $
+# Last Modified $Date: 2006/01/04 08:04:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,6 +68,10 @@ m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
 m4_include([m4/xopen.m4])
+m4_include([m4/xns.m4])
+m4_include([m4/xti.m4])
+m4_include([m4/inet.m4])
+m4_include([m4/sctp.m4])
 
 # =============================================================================
 # AC_SS7
@@ -161,11 +165,15 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
 AC_DEFUN([_SS7_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
-    _SS7_CONFIG_KERNEL
     _GENKSYMS
+    _SS7_CONFIG_KERNEL
     _LINUX_STREAMS
     _STRCOMP
     _XOPEN
+    _XNS
+    _XTI
+    _INET
+    _SCTP
 ])# _SS7_SETUP
 # =============================================================================
 
@@ -186,7 +194,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, pm_message_t], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -208,6 +216,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #include <linux/time.h>		/* for struct timespec */
+#include <linux/pm.h>
 ])
     AC_SUBST([EXPOSED_SYMBOLS])
     EXPOSED_SYMBOLS="\
@@ -265,7 +274,7 @@ AC_DEFUN([_SS7_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

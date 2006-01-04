@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/01/04 08:04:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:43:58 $ by $Author: brian $
+ Last Modified $Date: 2006/01/04 08:04:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/01/04 08:04:51 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/01/04 08:04:51 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -78,8 +78,8 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2005/12/19 12:43:58 $"
-#define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2006/01/04 08:04:51 $"
+#define X100P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define X100P_LICENSE		"GPL"
@@ -439,7 +439,11 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
 #ifdef CONFIG_PM
+#ifdef HAVE_KTYPE_PM_MESSAGE_T
+STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
+#else
 STATIC int xp_suspend(struct pci_dev *pdev, u32 state);
+#endif
 STATIC int xp_resume(struct pci_dev *pdev);
 #endif
 
@@ -9816,12 +9820,21 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
  *  X100P-SS7 Suspend
  *  -----------------------------------
  */
+#ifdef HAVE_KTYPE_PM_MESSAGE_T
+STATIC int
+xp_suspend(struct pci_dev *pdev, pm_message_t state)
+{
+	fixme(("Write a suspend routine.\n"));
+	return 0;
+}
+#else
 STATIC int
 xp_suspend(struct pci_dev *pdev, u32 state)
 {
 	fixme(("Write a suspend routine.\n"));
 	return 0;
 }
+#endif
 
 /*
  *  X100P-SS7 Resume

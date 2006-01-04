@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: cci.texi,v 0.9.2.2 2006/01/03 12:00:35 brian Exp $
+% @(#) $Id: cci.texi,v 0.9.2.3 2006/01/04 08:04:11 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/01/03 12:00:35 $ by $Author: brian $
+% Last Modified $Date: 2006/01/04 08:04:11 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -384,23 +384,24 @@ providing a basis for call control for other call control signalling protocols.
 
 @section Purpose
 
-The purpose of this document is to provide technical documentation of the Call Control Interface (CCI).  This document
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.  This document
 is intended to be included with the OpenSS7 @cite{STREAMS}
 @cpindex STREAMS
 software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and
-users of the Call Control Interface (CCI) with understanding the software architecture and technical interfaces that are
+users of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces that are
 made available in the software package.
 
 @section Intent
 
-It is the intent of this document that it act as the primary source of information concerning the Call Control Interface
-(CCI).  This document is intended to provide information for writers of OpenSS7 Call Control Interface (CCI)
-applications as well as writers of OpenSS7 Call Control Interface (CCI) Users.
+It is the intent of this document that it act as the primary source of information concerning the @value{MANUAL_TITLE}.
+This document is intended to provide information for writers of OpenSS7 Call Control Interface (CCI) applications as
+well as writers of OpenSS7 Call Control Interface (CCI) Users.
 
 @section Audience
 
-The audience for this document is software developers, maintainers and users and integrators of the Call Control
-Interface (CCI).  The target audience is developers and users of the OpenSS7 SS7 and ISDN stack.
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.
+The target audience is developers and users of the OpenSS7 SS7 and ISDN stack.
 
 @section Disclaimer
 
@@ -418,6 +419,9 @@ A printed (or postscript) version of this document is an UNCONTROLLED version.
 @smallexample
 
 $Log: cci.texi,v $
+Revision 0.9.2.3  2006/01/04 08:04:11  brian
+- corrected documentation
+
 Revision 0.9.2.2  2006/01/03 12:00:35  brian
 - documentation updates
 
@@ -11986,7 +11990,7 @@ Indicates the offset of the address from the start of the block.
 @smallexample
 /*****************************************************************************
 
- @@(#) $Id: cci.texi,v 0.9.2.2 2006/01/03 12:00:35 brian Exp $
+ @@(#) $Id: cci.texi,v 0.9.2.3 2006/01/04 08:04:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -12032,14 +12036,14 @@ Indicates the offset of the address from the start of the block.
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/01/03 12:00:35 $ by $Author: brian $
+ Last Modified $Date: 2006/01/04 08:04:11 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_ISUPI_H__
 #define __SS7_ISUPI_H__
 
-#ident "@@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2006 OpenSS7 Corporation."
+#ident "@@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2006 OpenSS7 Corporation."
 
 /*
  *  ISUP addresss

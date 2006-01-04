@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:58:30 $ by $Author: brian $
+ Last Modified $Date: 2006/01/04 08:04:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -88,8 +88,8 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/12/28 09:58:30 $"
-#define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2006/01/04 08:04:52 $"
+#define X400P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define X400P_LICENSE		"GPL"
@@ -422,18 +422,26 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
 #ifdef CONFIG_PM
+#ifdef HAVE_KTYPE_PM_MESSAGE_T
+STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
+#else
 STATIC int xp_suspend(struct pci_dev *pdev, u32 state);
+#endif
 STATIC int xp_resume(struct pci_dev *pdev);
 #endif
 
 STATIC struct pci_driver xp_driver = {
 	name:DRV_NAME,
+	id_table:xp_pci_tbl,
 	probe:xp_probe,
 	remove:__devexit_p(xp_remove),
-	id_table:xp_pci_tbl,
 #ifdef CONFIG_PM
 	suspend:xp_suspend,
 	resume:xp_resume,
+#endif
+#if 0
+	enable_wake:xp_wake,
+	shutdown:xp_shutdown,
 #endif
 };
 
@@ -4569,12 +4577,21 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
  *  X400P-SS7 Suspend
  *  -----------------------------------
  */
+#ifdef HAVE_KTYPE_PM_MESSAGE_T
+STATIC int
+xp_suspend(struct pci_dev *pdev, pm_message_t state)
+{
+	fixme(("Write a suspend routine.\n"));
+	return 0;
+}
+#else
 STATIC int
 xp_suspend(struct pci_dev *pdev, u32 state)
 {
 	fixme(("Write a suspend routine.\n"));
 	return 0;
 }
+#endif
 
 /*
  *  X400P-SS7 Resume

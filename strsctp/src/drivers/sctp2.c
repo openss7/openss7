@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/01/04 08:04:56 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:00:58 $ by $Author: brian $
+ Last Modified $Date: 2006/01/04 08:04:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/01/04 08:04:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/01/04 08:04:56 $";
 
 #include "sctp_compat.h"
 
@@ -65,8 +65,8 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:58 $"
-#define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/01/04 08:04:56 $"
+#define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -3781,23 +3781,27 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 	struct net_device *dev;
 
 	read_lock(&dev_base_lock);
-#if ! ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	read_lock(&inetdev_lock);
 #endif
 	for (dev = dev_base; dev; dev = dev->next) {
 		struct in_device *in_dev;
 		struct in_ifaddr *ifa;
 
-#if ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 		rcu_read_lock();
 #endif
+#ifdef HAVE_KFUNC___IN_DEV_GET_RCU
+		if (!(in_dev = __in_dev_get_rcu(dev))) {
+#else
 		if (!(in_dev = __in_dev_get(dev))) {
-#if ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#endif
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 			rcu_read_unlock();
 #endif
 			continue;
 		}
-#if !( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 		read_lock(&in_dev->lock);
 #endif
 		/* get primary or secondary addresses for each interface */
@@ -3813,13 +3817,13 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 			if (sctp_saddr_include(sp, ifa->ifa_local, &err))
 				allocated++;
 		}
-#if ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 		rcu_read_unlock();
 #else
 		read_unlock(&in_dev->lock);
 #endif
 	}
-#if ! ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	read_unlock(&inetdev_lock);
 #endif
 	read_unlock(&dev_base_lock);
@@ -27359,11 +27363,16 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 	struct net_device *dev = (struct net_device *) data;
 	struct in_device *in_dev;
 
-#if ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	rcu_read_lock();
 #endif
+#ifdef HAVE_KFUNC___IN_DEV_GET_RCU
+	if (!(in_dev = __in_dev_get_rcu(dev)))
+		goto done;
+#else
 	if (!(in_dev = __in_dev_get(dev)))
 		goto done;
+#endif
 	switch (msg) {
 	case NETDEV_UP:
 	case NETDEV_REBOOT:
@@ -27384,7 +27393,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 			/* stream must be wildcard bound */
 			if (sp->userlocks & SCTP_BINDADDR_LOCK)
 				continue;
-#if !( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 			read_lock(&in_dev->lock);
 #endif
 			for (ifa = in_dev->ifa_list; ifa; ifa = ifa->ifa_next) {
@@ -27403,7 +27412,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 					ss->flags &= ~SCTP_SRCEF_DEL_REQUEST;
 				/* should we clear del pending too? */
 			}
-#if ! ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 			read_unlock(&in_dev->lock);
 #endif
 			sctp_transmit_wakeup(sp);
@@ -27431,7 +27440,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 			/* socket must be wildcard bound */
 			if (sp->userlocks & SCTP_BINDADDR_LOCK)
 				continue;
-#if !( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 			read_lock(&in_dev->lock);
 #endif
 			for (ifa = in_dev->ifa_list; ifa; ifa = ifa->ifa_next) {
@@ -27447,7 +27456,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 					/* should we clear add pending too? */
 				}
 			}
-#if !( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 			read_unlock(&in_dev->lock);
 #endif
 			sctp_transmit_wakeup(sp);
@@ -27468,7 +27477,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 		break;
 	}
       done:
-#if ( HAVE_KFUNC_RCU_READ_LOCK || HAVE_KMACRO_RCU_READ_LOCK )
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	rcu_read_unlock();
 #endif
 	return NOTIFY_DONE;
