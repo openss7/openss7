@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2005/12/30 12:21:27 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2006/01/04 11:57:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/30 12:21:27 $ by $Author: brian $
+# Last Modified $Date: 2006/01/04 11:57:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,7 @@ m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
 m4_include([m4/public.m4])
 m4_include([m4/streams.m4])
+m4_include([m4/strcomp.m4])
 m4_include([m4/xti.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/inet.m4])
@@ -89,6 +90,7 @@ AC_DEFUN([AC_NETPERF], [dnl
 	    ])
 	fi
     else
+	_STRCOMP
 	_XNS
 	if test :"${xns_cv_includes:-no}" = :no ; then
 	    if test  :"${with_xns:-no}" != :no ; then
@@ -143,7 +145,7 @@ AC_DEFUN([AC_NETPERF], [dnl
 	    ])
 	fi
     fi
-    CPPFLAGS="-I- -include ./config.h${SCTP_CPPFLAGS:+ }${SCTP_CPPFLAGS}${INET_CPPFLAGS:+ }${INET_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    CPPFLAGS="-I- -include ./config.h${SCTP_CPPFLAGS:+ }${SCTP_CPPFLAGS}${INET_CPPFLAGS:+ }${INET_CPPFLAGS}${STRCOMP_CPPFLAGS:+ }${STRCOMP_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     NETPERF_LDADD="$STREAMS_LDADD $XTI_LDADD"
     AC_SUBST([NETPERF_LDADD])
     _NETPERF_OUTPUT
