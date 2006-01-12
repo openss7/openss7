@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.5 2005/11/20 22:26:16 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.6 2006/01/11 22:03:15 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/11/20 22:26:16 $ by $Author: brian $
+% Last Modified $Date: 2006/01/11 22:03:15 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -1039,8 +1039,8 @@ Provider indicates success with a
 DL_@-OK_@-ACK;
 @prindex DL_OK_ACK
 failure with a
-DL_@-ERROR_@-ACK.
 @prindex DL_ERROR_ACK
+DL_@-ERROR_@-ACK.
 
 @figuresized{dlpi_fig7,7,Message Flow: Unbinding a Stream from a DLSAP,4in}
 
@@ -1051,8 +1051,8 @@ basis.  The Provider indicates success with a
 DL_@-OK_@-ACK;
 @prindex DL_OK_ACK
 failure with a
-DL_@-ERROR_@-ACK.
 @prindex DL_ERROR_ACK
+DL_@-ERROR_@-ACK.
 
 @figuresized{dlpi_fig8,8,Message Flow: Enabling a specific multicast address on a Stream,4in}
 
@@ -1063,8 +1063,8 @@ Stream basis.  The Provider indicates success with a
 DL_@-OK_@-ACK;
 @prindex DL_OK_ACK
 failure with a
-DL_@-ERROR_@-ACK.
 @prindex DL_ERROR_ACK
+DL_@-ERROR_@-ACK.
 
 @figuresized{dlpi_fig9,9,Message Flow: Disabling a specific multicast address on a Stream,4in}
 
@@ -1076,8 +1076,8 @@ success with a
 DL_@-OK_@-ACK;
 @prindex DL_OK_ACK
 failure with a
-DL_@-ERROR_@-ACK.
 @prindex DL_ERROR_ACK
+DL_@-ERROR_@-ACK.
 
 @figuresized{dlpi_fi10,10,Message Flow: Enabling promiscuous mode on a Stream,4in}
 
@@ -1089,8 +1089,8 @@ indicates success with a
 DL_@-OK_@-ACK;
 @prindex DL_OK_ACK
 failure with a
-DL_@-ERROR_@-ACK.
 @prindex DL_ERROR_ACK
+DL_@-ERROR_@-ACK.
 
 @figuresized{dlpi_fi11,11,Message Flow: Disabling promiscuous mode on a Stream,4in}
 
@@ -1141,9 +1141,9 @@ DL_@-CON@-NECT_@-CON
 @prindex DL_CONNECT_CON
 informs the calling DLS user that the connection has been established.
 
+@cpindex Connection establishment
 The normal sequence of messages is illustrated in the following figure.
 
-@cpindex Connection establishment
 @figuresized{dlpi_fi12,12,Message Flow: Successful Connection Establishment,4in}
 
 Once the connection is established, the DLS users may exchange user data using
@@ -1198,10 +1198,10 @@ to reject the connect request by issuing
 DL_@-DIS@-CON@-NECT_@-REQ
 @prindex DL_DISCONNECT_REQ
 instead of
-DL_@-CON@-NECT_@-RES.
 @prindex DL_CONNECT_RES
-
 @cpindex Connection establishment
+DL_@-CON@-NECT_@-RES.
+
 @figuresized{dlpi_fi14,14,Message Flow: Called DLS User Rejection of Connection Establishment Attempt,4in}
 
 The following figure illustrates the situation where the DLS provider rejects a
@@ -1209,10 +1209,10 @@ connect request for lack of resources or other reason.  The DLS provider sends
 DL_@-DIS@-CON@-NECT_@-IND
 @prindex DL_DISCONNECT_IND
 in response to
-DL_@-CON@-NECT_@-REQ.
 @prindex DL_CONNECT_REQ
-
 @cpindex Connection establishment
+DL_@-CON@-NECT_@-REQ.
+
 @figuresized{dlpi_fi15,15,Message Flow: DLS Provider Rejection of a Connection Establishment Attempt,4in}
 
 @cpindex Calling DLS user
@@ -1277,23 +1277,23 @@ following figure.
 
 The next figure illustrates that when two DLS users independently invoke the
 connection release service, neither receives a
-DL_@-DIS@-CON@-NECT_@-IND.
 @prindex DL_DISCONNECT_IND
+DL_@-DIS@-CON@-NECT_@-IND.
 
 @figuresized{dlpi_fi21,21,Message Flow: Simultaneous DLS User Invoked Connection Release,4in}
 
 The next figure illustrates that when the DLS provider initiates the connection
 release service, each DLS user receives a
-DL_@-DIS@-CON@-NECT_@-IND.
 @prindex DL_DISCONNECT_IND
+DL_@-DIS@-CON@-NECT_@-IND.
 
 @figuresized{dlpi_fi22,22,Message Flow: DLS Provider Invoked Connection Release,4in}
 
 The next figure illustrates that when the DLS provider and the local DLS user
 simultaneously invoke the connection release service, the remote DLS user
 receives a
-DL_@-DIS@-CON@-NECT_@-IND.
 @prindex DL_DISCONNECT_IND
+DL_@-DIS@-CON@-NECT_@-IND.
 
 @figuresized{dlpi_fi23,23,Message Flow: Simultaneous DLS User & DLS Provider Invoked Connection Release,4in}
 
@@ -1434,9 +1434,9 @@ conveys one DLSDU to the DLS provider.
 DL_@-UNITDATA_@-IND
 @prindex DL_UNITDATA_IND
 conveys one DLSDU to the DLS user.  The normal flow of messages is illustrated
+@cpindex Connectionless mode
 in the figure below.
 
-@cpindex Connectionless mode
 @figuresized{dlpi_fi28,28,Message Flow: Connectionless Data Transfer,4in}
 
 @node QOS Management Service (1)
@@ -1448,9 +1448,9 @@ data transfer service.  The
 DL_@-UD@-QOS_@-REQ
 @prindex DL_UDQOS_REQ
 directs the DLS provider to set the QOS parameters to the specified values.  The
+@cpindex Connectionless mode
 normal flow of messages is illustrated in the figure below.
 
-@cpindex Connectionless mode
 @figuresized{dlpi_fi29,29,Message Flow: Connectionless Data Transfer,4in}
 
 @node Error Reporting Service (1)
@@ -1513,20 +1513,20 @@ which the DLS User scan exchange DLSDUs which are acknowledged at the LLC
 sublayer, without the establishment of a Data Link connection.  The services
 provide a means by which a local DLS User can send a data unit to the peer DLS
 User, request a previously prepared data unit, or exchange data units with the
+@cpindex Connectionless mode
 peer DLS User.
 
-@cpindex Connectionless mode
 @figuresized{dlpi_fi32,32,Message Flow: Acknowledged Connectionless-Mode Data Unit Transmission service,4in}
 
 The next figure illustrates the acknowledged connectionless-mode data unit
+@cpindex Connectionless mode
 exchange service.
 
-@cpindex Connectionless mode
 @figuresized{dlpi_fi33,33,Message Flow: Acknowledged Connectionless-Mode Data Unit Exchange service,4in}
 
+@cpindex Connectionless mode
 The next figure illustrates the Reply Data Unit Preparation service.
 
-@cpindex Connectionless mode
 @figuresized{dlpi_fi34,34,Message Flow: Acknowledged Connectionless-Mode Reply Data Unit Preparation Service,4in}
 
 @node QOS Management Service (2)
@@ -1553,9 +1553,9 @@ flow, refer to @ref{Error Reporting Service (1)}.
 To bring it all together, the following example illustrates the primitives that
 @cpindex Connection mode
 flow during a complete, connection-mode sequence between stream open and stream
+@cpindex Connection mode
 close.
 
-@cpindex Connection mode
 @figuresized{dlpi_fi35,35,Message Flow: A Connection-mode Example,3.75in}
 
 @node DLPI Primitives

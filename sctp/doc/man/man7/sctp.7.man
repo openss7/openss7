@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sctp.7.man,v 0.9.2.3 2005/05/12 20:57:43 brian Exp $
+.\" @(#) $Id: sctp.7.man,v 0.9.2.4 2006/01/11 22:03:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/12 20:57:43 $ by $Author: brian $
+.\" Last Modified $Date: 2006/01/11 22:03:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so sctp.macros
@@ -973,7 +973,8 @@ sockets.  For \fBsetsockopt\fR(2) and \fBgetsockopt\fR(2), the argument is a fla
 the socket whether the \fI\fCIP_PKTINFO\fR message should be passed or not.  The message itself
 can only be sent or retrieved as a control message with a packet using \fBrecvmsg\fR(2) or
 \fBsendmsg\fR(2).
-.IP
+.RS
+.PP
 .nf
 .ps -2
 \fC\
@@ -984,8 +985,7 @@ struct in_pktinfo {
 };
 .ps +2
 .fi
-.IP
-.RS
+.PP
 .TP
 .I ipi_ifindex
 is the unique index of the interface the packet was received on, or the index of the interface
@@ -1180,8 +1180,8 @@ before a passive connection indication is received on a listening socket.
 Set or get the heartbeat activation and interval associated with the specified destination
 address. The expected value is a \fBsctp_hbitvl\fR structure.  This option will return an error
 if it is attempted on a socket in the unconnected state.
-.IP
 .RS
+.PP
 .nf
 .ps -2
 \fC\
@@ -1252,8 +1252,8 @@ destinations can be controlled with the \fI\fCSCTP_RTO\fR socket option.
 Set or get the retransmission timeout parameters associated with the specified destination
 address.  The expected value is a \fBsctp_rtoval\fR structure.  This option will return an
 error if it is attempted on a socket in the unconnected state.
-.IP
 .RS
+.PP
 .nf
 .ps -2
 \fC\
@@ -1605,8 +1605,8 @@ Gets the association status and the status associated with each of the destinati
 addresses forming the association.  The returned value is a \fBsctp_astat\fR structure
 following by \fIassoc_nrep\fR \fBsctp_dstat\fR structures (one for each destination transport
 address as returned by \fBgetpeername\fR(2)).
-.IP
 .RS
+.PP
 .nf
 .ps -2
 \fC\
