@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/16 09:26:09 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/01/17 02:53:55 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -126,7 +126,7 @@ start() {
     fi
     if [ -n "$STRINET_MKNOD" -o -n "$INET_MKDEV" ] ; then
 	if [ :"$STRINET_MAKEDEVICES" = ":yes" ] ; then
-	    if [ -n "$INET_MKDEV" ] then
+	    if [ -n "$INET_MKDEV" ] ; then
 		echo -n "Making STREAMS iBCS devices: "
 		$INET_MKDEV
 		RETVAL=$?
@@ -136,7 +136,7 @@ start() {
 		    echo "(failed.)"
 		fi
 	    fi
-	    if [ -n "$STRINET_MKNOD" ] then
+	    if [ -n "$STRINET_MKNOD" ] ; then
 		echo -n "Making STREAMS INET devices: "
 		$STRINET_MKNOD
 		RETVAL=$?
@@ -214,7 +214,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/12/16 09:26:09 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/01/17 02:53:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -260,7 +260,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/16 09:26:09 $ by $Author: brian $
+# Last Modified $Date: 2006/01/17 02:53:55 $ by $Author: brian $
 #
 # =============================================================================
 
