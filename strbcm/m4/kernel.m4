@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/29 10:42:14 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2006/02/13 22:48:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/29 10:42:14 $ by $Author: brian $
+# Last Modified $Date: 2006/02/13 22:48:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1736,6 +1736,12 @@ dnl	directories.
 dnl
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iarch/| -I${ksrcdir}/arch/|g"`
+dnl
+dnl	Recent 2.6.15+ kernels include autoconf.h from the build directory instead of the source
+dnl	directory.  I suppose the idea is to allow you to configure in a separate directory as
+dnl	well as build.  Given 100 years, kbuild might catch up to autoconf.
+dnl
+	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -include include/linux/autoconf.h| -include ${kbuilddir}/include/linux/autoconf.h|"`
 dnl
 dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
 dnl	build directory.
