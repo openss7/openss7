@@ -2,19 +2,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.39 $) $Date: 2005/12/30 12:21:14 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.40 $) $Date: 2006/02/20 11:41:09 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/30 12:21:14 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 11:41:09 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: acinclude.m4,v $
+# Revision 1.1.6.40  2006/02/20 11:41:09  brian
+# - added checks for 64 bit architectures
 #
 # =============================================================================
 
@@ -430,7 +435,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h], [:], [:], [
+			  asm/uaccess.h linux/compat.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -711,6 +716,24 @@ retval = do_settimeofday(&ts);]]) ],
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
     AC_REQUIRE([AC_CANONICAL_HOST])dnl
+    AH_TEMPLATE([_X86_64_LIS_], [Define when compiling for X86_64.  This define is
+	only used for linux kernel target.  This is really the wrong way to go
+	about doing this: the function should be checked for by autoconf instead
+	of placing the architectural dependencies in the LiS source.  The define
+	is used in "head/linux-mdep.c" to determine whether lis_pci_cleanup
+	exists; "head/linux/exports.c" to determine whether a bunch of functions
+	are available; "head/osif.c" to determine whether a bunch of PCI DMA
+	mapping functions are available; "include/sys/osif.h" to determine
+	whether a bunch of PCI MDA mapping functions are available.])
+    AH_TEMPLATE([_PPC64_LIS_], [Define when compiling for PPC64.  This define is
+	only used for linux kernel target.  This is really the wrong way to go
+	about doing this: the function should be checked for by autoconf instead
+	of placing the architectural dependencies in the LiS source.  The define
+	is used in "head/linux-mdep.c" to determine whether lis_pci_cleanup
+	exists; "head/linux/exports.c" to determine whether a bunch of functions
+	are available; "head/osif.c" to determine whether a bunch of PCI DMA
+	mapping functions are available; "include/sys/osif.h" to determine
+	whether a bunch of PCI MDA mapping functions are available.])
     AH_TEMPLATE([_HPPA_LIS_], [Define when compiling for HPPA.  This define is
 	only used for linux kernel target.  This is really the wrong way to go
 	about doing this: the function should be checked for by autoconf instead
@@ -757,22 +780,27 @@ AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
 	<LiS/include/osif.h>, when PCI BIOS is not present (head/osif.c), and
 	when <linux/poll.h> is missing POLLMSG <LiS/include/sys/poll.h>])
     case "$linux_cv_march" in
-	alpha*)			: ;;
-	arm*)			: ;;
-	cris*)			: ;;
-	i?86* | k6* | athlon*)	: ;;
-	ia64)			: ;;
-	m68*)			: ;;
-	mips64*)		: ;;
-	mips*)			: ;;
-	hppa*)			AC_DEFINE([_HPPA_LIS_],    [1]) ;;
-	ppc* | powerpc*)	AC_DEFINE([_PPC_LIS_],     [1]) ;;
-	s390x*)			AC_DEFINE([_S390X_LIS_],   [1]) ;;
-	s390*)			AC_DEFINE([_S390_LIS_],    [1]) ;;
-	sh*)			: ;;
-	sparc64*)		AC_DEFINE([_SPARC64_LIS_], [1]) ;;
-	sparc*)			AC_DEFINE([_SPARC_LIS_],   [1]) ;;
-	*)			: ;;
+	alpha*)			:					;;
+	arm*)			:					;;
+	cris*)			:					;;
+	i?86* | k6* | athlon*)	:					;;
+	ia64)			:					;;
+	m68*)			:					;;
+	mips64*)		:					;;
+	mips*)			:					;;
+	hppa*)			AC_DEFINE([_HPPA_LIS_],		[1])	;;
+	ppc64* | powerpc64*)	AC_DEFINE([_PPC64_LIS_],	[1])
+				AC_DEFINE([_PPC_LIS_],		[1])	;;
+	ppc* | powerpc*)	AC_DEFINE([_PPC_LIS_],		[1])	;;
+	s390x*)			AC_DEFINE([_S390X_LIS_],	[1])
+				AC_DEFINE([_S390_LIS_],		[1])	;;
+	s390*)			AC_DEFINE([_S390_LIS_],		[1])	;;
+	sh*)			:					;;
+	sparc64*)		AC_DEFINE([_SPARC64_LIS_],	[1])
+				AC_DEFINE([_SPARC_LIS_],	[1])	;;
+	sparc*)			AC_DEFINE([_SPARC_LIS_],	[1])	;;
+	x86_64*)		AC_DEFINE([_X86_64_LIS_],	[1])	;;
+	*)			:					;;
     esac
 dnl AH_TEMPLATE([__powerpc__], [Define when compiling for PPC.  This define is
 dnl	only used for the linux target.  This is an error, this value is defined
@@ -1521,7 +1549,7 @@ AC_DEFUN([_LIS_STRCONF], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

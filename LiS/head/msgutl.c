@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.3 $) $Date: 2005/12/18 05:41:23 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:23 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.3 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.4 $) $Date: 2005/12/19 03:22:19 $"
 
 /*                               -*- Mode: C -*- 
  * msgutl.c --- streams message utilities.
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msgutl.c,v 1.1.1.5.4.3 2005/12/18 05:41:23 brian Exp $
+ * RCS Id          : $Id: msgutl.c,v 1.1.1.5.4.4 2005/12/19 03:22:19 brian Exp $
  * Purpose         : here you have utilites to handle str messages.
  * ----------------______________________________________________
  *
@@ -427,7 +429,7 @@ lis_pullupmsg(mblk_t *mp, int length)
 		return 0;
 
 	if (length <= (n = mp->b_wptr - mp->b_rptr)) {
-		if ((((uintptr_t) mp->b_rptr) & ALIGN_MOD) == 0)	/* aligned? */
+		if ((((uintptr_t) (long) mp->b_rptr) & ALIGN_MOD) == 0)	/* aligned? */
 			return 1;	/* already pulled up */
 		length = n;	/* don't make 1st bfr any smaller */
 	}

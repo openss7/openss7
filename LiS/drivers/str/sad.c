@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2005/12/18 06:37:53 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2005/12/18 06:37:53 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2005/12/19 03:22:18 $"
 
 /*
  *  sad: STREAMS Administrative Driver
@@ -197,7 +199,7 @@ sad_iocdata(struct priv *p, mblk_t *mp)
 	int err = 0, ret = 0;
 
 	if (res->cp_rval != 0) {
-		err = (int) (-(intptr_t) res->cp_rval);
+		err = (int) (-(intptr_t) (long) res->cp_rval);
 		ret = -1;
 		goto ioctl_done;
 	}

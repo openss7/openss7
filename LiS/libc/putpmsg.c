@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; either version 2.1 of the License, or (at your option)
- any later version.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:21 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:27 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:21 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:27 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -81,16 +83,31 @@ pthread_testcancel(void)
 }
 
 #ifdef BLD32OVER64
+/* 2006-02-20 bidulock@openss7.org : This is really, really, the wrong way to do this.  I cannot
+ * stress how wrong this is.  This does not provide 32/64 bit compatibility at all.  It simply
+ * attempts to turn a 32 bit call into a 64 bit call an passes it to the kernel.  A big problem is
+ * the pointer conversion (32->64), which is architecture specific.  (Some need (void
+ * *)(long)(int32_t), some need (void *)(ulong)(uint32_t), others might need to supply an offset.)
+ * For example of how wrong this is: applications built on s390 using static libraries will not run
+ * on s390x.  The proper way to do this is as it is done under Linux Fast-STREAMS: leave the library
+ * alone and handle the conversion in the kernel.  When performed by syscall, the syscall32
+ * interface must perform the conversion.  When performed by read/write call, the "magic length"
+ * must indicate whether conversion is necessary.  When performed by ioctl, the 32/64 bit ioctl
+ * conversion functions must do the job.  I really have no desire to "fix" LiS in this regard.  It
+ * is deprecated: don't use it.  Use Linux Fast-STREAMS instead. */
+#endif
+
+#ifdef BLD32OVER64
 typedef struct strbuf6 {
 	int maxlen;
 	int len;
-	long long buf;
+	unsigned long long buf;
 } strbuf6_t;
 
 typedef struct putpmsg_args6 {
 	int fd;
-	long long ctl;
-	long long dat;
+	unsigned long long ctl;
+	unsigned long long dat;
 	int band;
 	int flags;
 } putpmsg_args6_t;
@@ -109,21 +126,21 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 	if (ctlptr) {
 		ctl6.maxlen = ctlptr->maxlen;
 		ctl6.len = ctlptr->len;
-		ctl6.buf = (long long) ctlptr->buf;
+		ctl6.buf = (unsigned long long) (unsigned long) ctlptr->buf;
 		ptrc6 = &ctl6;
 	}
 
 	if (dataptr) {
 		dat6.maxlen = dataptr->maxlen;
 		dat6.len = dataptr->len;
-		dat6.buf = (long long) dataptr->buf;
+		dat6.buf = (unsigned long long) (unsigned long) dataptr->buf;
 		ptrd6 = &dat6;
 	}
 
 	memset((void *) &args, 0, sizeof(putpmsg_args6_t));
 	args.fd = fd;
-	args.ctl = (long long) ptrc6;
-	args.dat = (long long) ptrd6;
+	args.ctl = (unsigned long long) (unsigned long) ptrc6;
+	args.dat = (unsigned long long) (unsigned long) ptrd6;
 	args.band = band;
 	args.flags = flags;
 

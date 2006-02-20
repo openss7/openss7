@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.17 $) $Date: 2005/12/28 09:53:32 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:53:32 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.17 $) $Date: 2005/12/28 09:53:32 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.18 $) $Date: 2006/01/03 13:05:22 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -207,9 +209,9 @@ EXPORT_SYMBOL_NOVERS(lis_makedevice);
 EXPORT_SYMBOL_NOVERS(lis_major);
 EXPORT_SYMBOL_NOVERS(lis_malloc);
 EXPORT_SYMBOL_NOVERS(lis_mark_mem_fcn);
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 EXPORT_SYMBOL_NOVERS(lis_membar);
-#endif				/* S390 or S390X or HPPA */
+#endif				/* S390 or S390X or HPPA or PPC64 */
 EXPORT_SYMBOL_NOVERS(lis_milli_to_ticks);
 EXPORT_SYMBOL_NOVERS(lis_mknod);
 EXPORT_SYMBOL_NOVERS(lis_msecs);
@@ -239,7 +241,7 @@ EXPORT_SYMBOL_NOVERS(lis_osif_pci_write_config_dword);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_write_config_word);
 EXPORT_SYMBOL_NOVERS(lis_osif_sti);
 EXPORT_SYMBOL_NOVERS(lis_own_spl);
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 EXPORT_SYMBOL_NOVERS(lis_pcibios_find_class);
 EXPORT_SYMBOL_NOVERS(lis_pcibios_find_device);
 EXPORT_SYMBOL_NOVERS(lis_pcibios_init);
@@ -276,7 +278,7 @@ EXPORT_SYMBOL_NOVERS(lis_pci_unmap_single);
 EXPORT_SYMBOL_NOVERS(lis_pci_write_config_byte);
 EXPORT_SYMBOL_NOVERS(lis_pci_write_config_dword);
 EXPORT_SYMBOL_NOVERS(lis_pci_write_config_word);
-#endif				/* S390 or S390X or HPPA */
+#endif				/* S390 or S390X or HPPA or PPC64 */
 EXPORT_SYMBOL_NOVERS(lis_phys_to_virt);
 EXPORT_SYMBOL_NOVERS(lis_print_block);
 EXPORT_SYMBOL_NOVERS(lis_print_data);
@@ -394,7 +396,7 @@ EXPORT_SYMBOL_NOVERS(lis_wake_up_interruptible);
 EXPORT_SYMBOL_NOVERS(lis_xmsgsize);
 EXPORT_SYMBOL_NOVERS(lis_zmalloc);
 
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_alloc_consistent);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dma_supported);
@@ -457,4 +459,4 @@ EXPORT_SYMBOL_NOVERS(__wrap_memset);
 EXPORT_SYMBOL_NOVERS(__wrap_memcpy);
 EXPORT_SYMBOL_NOVERS(__wrap_memcmp);
 
-#endif				/* S390 or S390X */
+#endif				/* S390 or S390X or HPPA or PPC64 */

@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: osif.h,v 1.1.1.4.4.9 2005/12/18 05:41:24 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,8 +44,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 05:41:24 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
 /************************************************************************
@@ -67,7 +69,7 @@
 #if defined(LINUX) && !defined(OSIF_H)
 #define OSIF_H			/* file included */
 
-#ident "@(#) $RCSfile: osif.h,v $ $Name:  $($Revision: 1.1.1.4.4.9 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/LiS/genconf.h>
 
@@ -226,7 +228,7 @@
 
 #if LINUX_VERSION_CODE >= 0x020400	/* 2.4 kernel */
 
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 #ifdef pci_alloc_consistent
 #undef pci_alloc_consistent
 #endif
@@ -320,7 +322,7 @@
 #endif
 #define sg_dma_len lis_osif_sg_dma_len
 
-#endif				/* S390 or S390X */
+#endif				/* S390 or S390X or HPPA or PPC64 */
 #endif
 
 #ifdef request_irq
@@ -601,12 +603,14 @@ extern int _RP lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask);
 extern dma_addr_t _RP lis_osif_sg_dma_address(struct scatterlist *sg);
 extern size_t _RP lis_osif_sg_dma_len(struct scatterlist *sg);
 
+#if 0
 #if  BITS_PER_LONG == 64
 typedef u64 dma64_addr_t;
 #endif
+#endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 extern void _RP lis_osif_pci_unmap_page(struct pci_dev *hwdev, dma_addr_t dma_address, size_t size,
 					int direction);
 extern int _RP lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask);
@@ -629,7 +633,7 @@ extern void _RP lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev,
 extern void _RP lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev,
 							    dma64_addr_t dma_addr, size_t len,
 							    int direction);
-#endif				/* S390 or S390X */
+#endif				/* S390 or S390X or HPPA or PPC64 */
 #endif				/* 2.4.13 */
 
 #endif				/* LINUX_VERSION_CODE >= 0x020400 */

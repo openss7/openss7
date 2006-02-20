@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/18 06:37:53 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/18 06:37:53 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/18 06:37:53 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2005/12/19 03:22:18 $"
 
 /*                               -*- Mode: C -*- 
  * loop.c --- Streams loopback driver, as of Sun manual 
  * Author          : Graham Wheeler
  * Created On      : Sat Oct  7 05:01:31 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: loop.c,v 1.1.1.3.4.6 2005/12/18 06:37:53 brian Exp $
+ * RCS Id          : $Id: loop.c,v 1.1.1.3.4.7 2005/12/19 03:22:18 brian Exp $
  * Purpose         : provide loopback streams driver
  * ----------------______________________________________________
  *
@@ -367,8 +369,8 @@ loop_iocdata(queue_t *wq, mblk_t *mp)
 		}
 
 		if (msgdsize(dp) != sizeof(loop_xparent_t)) {
-			printk("loop_iocdata: expected %d bytes, got %d\n", sizeof(loop_xparent_t),
-			       msgdsize(dp));
+			printk("loop_iocdata: expected %ld bytes, got %ld\n", (long) sizeof(loop_xparent_t),
+			       (long) msgdsize(dp));
 			return (-EINVAL);
 		}
 
@@ -505,8 +507,8 @@ loop_wput(queue_t *q, mblk_t *mp)
 			int to;
 
 			if (iocb->ioc_count != sizeof(int)) {
-				printk("Expected ioctl len %d, got %d\n", sizeof(int),
-				       iocb->ioc_count);
+				printk("Expected ioctl len %ld, got %ld\n", (long) sizeof(int),
+				       (long) iocb->ioc_count);
 
 				error = EINVAL;
 				goto iocnak;
@@ -569,8 +571,8 @@ loop_wput(queue_t *q, mblk_t *mp)
 			int *devp;
 
 			if (iocb->ioc_count != sizeof(int)) {
-				printk("Expected ioctl len %d, got %d\n", sizeof(int),
-				       iocb->ioc_count);
+				printk("Expected ioctl len %ld, got %ld\n", (long) sizeof(int),
+				       (long) iocb->ioc_count);
 
 				error = EINVAL;
 				goto iocnak;

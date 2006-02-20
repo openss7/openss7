@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.11 $) $Date: 2005/12/19 03:22:19 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 03:22:19 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.11 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.12 $) $Date: 2005/12/28 09:53:31 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.11 2005/12/19 03:22:19 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.12 2005/12/28 09:53:31 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -4686,8 +4688,8 @@ lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
 
 	if (ulen < hd->sd_minpsz) {
 		if (LIS_DEBUG_WRITE)
-			printk("strwrite: stream %s: write length %d less than min size of %ld\n",
-			       hd->sd_name, ulen, hd->sd_minpsz);
+			printk("strwrite: stream %s: write length %lu less than min size of %lu\n",
+			       hd->sd_name, (ulong) ulen, (ulong) hd->sd_minpsz);
 
 		RTN(-EINVAL);
 	}
@@ -5149,8 +5151,8 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 					lis_requeue(hd, mp);	/* save rest of msg */
 			}
 			if (LIS_DEBUG_READ)
-				printk("strread: stream %s: RDOPT=0x%x user buffer %d bytes, "
-				       "read %d error %d\n", hd->sd_name, hd->sd_rdopt, ulen, count,
+				printk("strread: stream %s: RDOPT=0x%x user buffer %ld bytes, "
+				       "read %ld error %d\n", hd->sd_name, hd->sd_rdopt, (long) ulen, (long) count,
 				       err);
 			if (ulen == count	/* filled user buffer */
 			    || (hd->sd_rdopt & RMODEMASK) != RNORM || msg_lgth == 0	/* 0-lgth

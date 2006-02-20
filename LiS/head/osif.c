@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.12 $) $Date: 2005/12/29 21:35:57 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:35:57 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.12 $) $Date: 2005/12/29 21:35:57 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2006/01/03 13:05:20 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -382,7 +384,7 @@ lis_osif_pci_unregister_driver(struct pci_driver *p)
 #endif
 
 #if LINUX_VERSION_CODE >= 0x020400	/* 2.4 kernel */
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 
 	 /***************************************
 	 *        PCI DMA Mapping Fcns		*
@@ -556,7 +558,7 @@ lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t d
 
 #endif				/* 2.4.13 */
 
-#endif				/* S390 or S390X */
+#endif				/* S390 or S390X or HPPA or PPC64 */
 
 #endif				/* LINUX_VERSION_CODE >= 0x020400 */
 
@@ -618,7 +620,9 @@ lis_free_devid_list(void)
 		nxt = dv->link;
 		if (dv->handler && dv->dev_id && dv->irq) {
 			printk("LiS freeing IRQ%u\n", dv->irq);
+#if !defined(__s390__)
 			free_irq(dv->irq, dv);
+#endif
 		}
 		FREE(dv);
 		dv = nxt;

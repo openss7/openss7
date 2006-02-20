@@ -1,8 +1,15 @@
-OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2005-12-29
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2006-02-20
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes in LiS-2.18.3
+
+  Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+  mailing list.  Builds on FC4 2.6.15 kernel and with gcc 4.0.2.
+
+  Added in many of Paul's 64-bit corrections.
+
 * Major changes in LiS-2.18.2
 
   Cross-build support for newer `NexusWare' releases.  Build support for
@@ -358,7 +365,7 @@ See the end for copying conditions.
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.

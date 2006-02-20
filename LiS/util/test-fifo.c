@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 09:53:34 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/02/20 11:05:58 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:53:34 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 11:05:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 1.1.2.5  2006/02/20 11:05:58  brian
+ - gcc 4.0.2 does not like (-1UL) on 64 bit
+
  Revision 1.1.2.4  2005/12/28 09:53:34  brian
  - remove warnings on FC4 compile
 
@@ -149,9 +152,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 09:53:34 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/02/20 11:05:58 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/12/28 09:53:34 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2006/02/20 11:05:58 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -231,7 +234,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 200	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1UL
+#define INFINITE_WAIT	-1
 #define TEST_DURATION	20000
 
 char cbuf[BUFSIZE];
@@ -3022,7 +3025,7 @@ returned when I_STR is attempted on a hung up FIFO."
 int
 test_case_2_4_4(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5538,7 +5541,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -5564,9 +5567,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -5594,7 +5596,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

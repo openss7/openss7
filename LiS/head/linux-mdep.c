@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.20 $) $Date: 2005/12/28 09:53:31 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:53:31 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.20 $) $Date: 2005/12/28 09:53:31 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.21 $) $Date: 2005/12/29 21:35:56 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.20 2005/12/28 09:53:31 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.21 2005/12/29 21:35:56 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -126,6 +128,12 @@
 #include <linux/capability.h>
 #endif
 #include <linux/time.h>
+
+#if defined __s390x__ || defined __powerpc64__ || defined __x86_64__
+#if defined HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
+#endif
+#endif
 
 /*  -------------------------------------------------------------------  */
 /*
@@ -216,7 +224,7 @@ static int lis_errnos[LIS_NR_CPUS];
 #define	_NI	__attribute__((noinline))
 #endif
 
-/* PARISC cannot handle in-kernel system calls in the same way as external
+/* PARISC (and X86_64) cannot handle in-kernel system calls in the same way as external
  * calls.  Therefore we rip the necessary symbols in the configuration script
  * and perform a dynamic linkage.  This is done for all architectures when the
  * addresses are available. */
@@ -225,7 +233,7 @@ static int lis_errnos[LIS_NR_CPUS];
 static asmlinkage long (*syscall_mknod) (const char *filename, int mode, dev_t dev)
 = (typeof(syscall_mknod)) HAVE_SYS_MKNOD_ADDR;
 #else
-#ifdef _HPPA_LIS_
+#if defined(_HPPA_LIS_) || defined(_X86_64_LIS_)
 #define syscall_mknod(name,mode,dev) (-ENOSYS)
 #else
 #define __NR_syscall_mknod	__NR_mknod
@@ -236,7 +244,7 @@ static _NI _syscall3(long, syscall_mknod, const char *, file, int, mode, int, de
 static asmlinkage long (*syscall_unlink) (const char *pathname)
 = (typeof(syscall_unlink)) HAVE_SYS_UNLINK_ADDR;
 #else
-#ifdef _HPPA_LIS_
+#if defined(_HPPA_LIS_) || defined(_X86_64_LIS_)
 #define syscall_unlink(name) (-ENOSYS)
 #else
 #define __NR_syscall_unlink	__NR_unlink
@@ -248,7 +256,7 @@ static asmlinkage long (*syscall_mount) (char *dev_name, char *dir_name, char *t
 					 unsigned long flags, void *data)
 = (typeof(syscall_mount)) HAVE_SYS_MOUNT_ADDR;
 #else
-#ifdef _HPPA_LIS_
+#if defined(_HPPA_LIS_) || defined(_X86_64_LIS_)
 #define syscall_mount(dev_name,dir_name,type,flags,data) (-ENOSYS)
 #else
 #define __NR_syscall_mount	__NR_mount
@@ -260,7 +268,7 @@ static _NI _syscall5(long, syscall_mount, char *, dev, char *, dir, char *, type
 asmlinkage long (*syscall_umount2) (char *name, int flags)
 = (typeof(syscall_umount2)) HAVE_SYS_UMOUNT_ADDR;
 #else
-#ifdef _HPPA_LIS_
+#if defined(_HPPA_LIS_) || defined(_X86_64_LIS_)
 #define syscall_umount2(name,flags) (-ENOSYS)
 #else
 #if defined(_ASM_IA64_UNISTD_H)
@@ -324,7 +332,7 @@ extern int lis_new_file_name_dev(struct file *f, const char *name, dev_t dev);
 static struct inode *lis_get_inode(mode_t mode, dev_t dev);
 void lis_print_dentry(struct dentry *d, char *comment);
 
-#ifdef _S390X_LIS_
+#if defined(_S390X_LIS_) || defined (_PPC64_LIS_) || defined(_X86_64_LIS_)
 extern long sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
 extern int register_ioctl32_conversion(unsigned int fd,
 				       int (*handler) (unsigned int fd, unsigned int cmd,
@@ -3682,7 +3690,7 @@ lis_loadable_load(const char *name)
 #endif
 }
 
-#ifdef _S390X_LIS_
+#if defined(_S390X_LIS_) || defined(_PPC64_LIS_) || defined(_X86_64_LIS_)
 int
 lis_ioctl32_str(unsigned int fd, unsigned int cmd, unsigned long arg)
 {
@@ -3696,15 +3704,15 @@ lis_ioctl32_str(unsigned int fd, unsigned int cmd, unsigned long arg)
 
 	ptr32 = (strioctl32_t *) arg;
 	if (copy_from_user((void *) &par32, (void *) ptr32, sizeof(strioctl32_t))) {
-		printk("Unable to get parameter block for 32 bit ioctl I_STR (length %d)\n",
-		       sizeof(strioctl32_t));
+		printk("Unable to get parameter block for 32 bit ioctl I_STR (length %ld)\n",
+		       (long) sizeof(strioctl32_t));
 		rc = -EFAULT;
 		goto ioctl32_end;
 	}
 	par64.ic_cmd = par32.ic_cmd;
 	par64.ic_timout = par32.ic_timout;
 	par64.ic_len = par32.ic_len;
-	data32p = (char *) par32.ic_dp;
+	data32p = (char *) compat_ptr(par32.ic_dp);
 	if (par64.ic_len > 0) {
 		datap = ALLOCF(par64.ic_len, "ioctl32 ");
 		if (datap == NULL) {
@@ -3759,6 +3767,18 @@ lis_ioctl32_str(unsigned int fd, unsigned int cmd, unsigned long arg)
 
 	return (rc);
 }
+
+int
+lis_ioctl32(unsigned int fd, unsigned int cmd, unsigned long arg)
+{
+	switch (cmd) {
+	case I_STR:
+		return lis_ioctl32_str(fd, cmd, arg);
+	default:
+		return sys_ioctl(fd, cmd, arg);
+	}
+}
+
 #endif
 
 #ifdef LIS_ATOMIC_STATS
@@ -3821,6 +3841,81 @@ lis_proc_read(char *page, char **start, off_t off, int count, int *eof, void *da
 }
 
 #endif				/* LIS_ATOMIC_STATS */
+
+#if 0
+static struct ioctl_trans *streams_trans_map[256];
+
+/*
+ *  Override ioctl 32 conversion function for 2.4 kernels.
+ */
+int
+override_ioctl32_conversion(unsigned int cmd, ioctl_trans_handler_t handler)
+{
+	struct ioctl_trans *t;
+	unsigned long hash = ioctl32_hash(cmd);
+
+	if ((t = kmalloc(sizeof(struct ioctl_trans), GFP_KERNEL)) == NULL)
+		return (-ENOMEM);
+
+	t->next = NULL;
+	t->cmd = cmd;
+	t->handler = handler;
+
+	lock_kernel();
+	t->next = ioctl32_hash_table[hash];
+	ioctl32_hash_table[hash] = t;
+	unlock_kernel();
+
+	return (0);
+}
+
+/*
+ *  Override ioctl 32 conversion function for 2.6 kernels.
+ */
+int
+override_ioctl32_conversion(unsigned int cmd, ioctl_trans_handler_t hander)
+{
+	struct ioctl_trans *t;
+	unsigned long hash = ioctl32_hash(cmd);
+
+	if ((t = kmalloc(sizeof(struct ioctl_trans), GFP_KERNEL)) == NULL)
+		return (-ENOMEM);
+
+	t->next = NULL;
+	t->cmd = cmd;
+	t->handler = handler;
+	streams_trans_map[cmd] = t;
+
+	down_write(&ioctl32_sem);
+	t->next = ioctl32_hash_table[hash];
+	ioctl32_hash_table[hash] = t;
+	up_write(&ioctl32_sem);
+
+	return (0);
+}
+
+/*
+ *  Chain to next conversion function, both kernels.
+ */
+int
+ioctl32_convert_next(unsigned int fd, unsigned int cmd, unsigned long arg, struct file *file)
+{
+	struct ioctl_trans *t;
+
+	for (t = streams_trans_map[cmd]; t && t->cmd != cmd; t = t->next) ;
+	return (t != NULL) ? (t->handler(fd, cmd, arg, file)) : (-EINVAL);
+}
+
+int
+streams_compat_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg, struct file *file)
+{
+	if (file && file->f_dentry && file->f_dentry->d_inode &&
+			(file->f_dentry->d_inode->i_mode & S_IFMT) == S_IFBLK)
+		return ioctl32_convert_next(fd, cmd, arg, file);
+	return sys_ioctl(fd, cmd, arg);
+}
+#endif
+
 
 int
 lis_init_module(void)
@@ -3886,14 +3981,14 @@ lis_init_module(void)
 
 	lis_start_qsched();	/* ensure q running process going */
 
-#ifdef _S390X_LIS_
-	register_ioctl32_conversion(I_SETSIG, sys_ioctl);
-	register_ioctl32_conversion(I_SRDOPT, sys_ioctl);
-	register_ioctl32_conversion(I_PUSH, sys_ioctl);
-	register_ioctl32_conversion(I_LINK, sys_ioctl);
-	register_ioctl32_conversion(I_UNLINK, sys_ioctl);
+#if defined(_S390X_LIS_) || defined(_PPC64_LIS_) || defined(_X86_64_LIS_)
+	register_ioctl32_conversion(I_SETSIG, lis_ioctl32);
+	register_ioctl32_conversion(I_SRDOPT, lis_ioctl32);
+	register_ioctl32_conversion(I_PUSH, lis_ioctl32);
+	register_ioctl32_conversion(I_LINK, lis_ioctl32);
+	register_ioctl32_conversion(I_UNLINK, lis_ioctl32);
 
-	register_ioctl32_conversion(I_STR, lis_ioctl32_str);
+	register_ioctl32_conversion(I_STR, lis_ioctl32);
 #endif
 #ifdef LIS_ATOMIC_STATS
 	lis_proc_file = create_proc_read_entry("LiS", 0444, NULL, lis_proc_read, NULL);
@@ -3917,7 +4012,7 @@ lis_init_module(void)
  * Magic named routine called by kernel module support code.
  */
 #ifdef KERNEL_2_5
-int
+static int __init
 _lis_init_module(void)
 #else
 int
@@ -3931,7 +4026,7 @@ init_module(void)
  * Magic named routine called by kernel module support code.
  */
 #ifdef KERNEL_2_5
-void
+static void __exit
 _lis_cleanup_module(void)
 #else
 void
@@ -3972,13 +4067,13 @@ cleanup_module(void)
 	lis_kill_qsched();	/* drivers/str/runq.c */
 	lis_terminate_head();
 
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_) && !defined(_PPC64_LIS_))
 	{
 		extern void lis_pci_cleanup(void);
 
 		lis_pci_cleanup();
 	}
-#endif				/* S390 or S390X */
+#endif				/* S390 or S390X or HPPA or PPC64 */
 
 	unregister_chrdev(lis_major, "streams");
 	MNTSYNC();
@@ -4008,7 +4103,7 @@ cleanup_module(void)
 	lis_terminate_final();	/* LiS internal memory */
 	lis_mem_terminate();	/* LiS use of slab allocator */
 
-#ifdef _S390X_LIS_
+#if defined(_S390X_LIS_) || defined(_PPC64_LIS_) || defined(_X86_64_LIS_)
 	unregister_ioctl32_conversion(I_SETSIG);
 	unregister_ioctl32_conversion(I_SRDOPT);
 	unregister_ioctl32_conversion(I_PUSH);
@@ -4174,7 +4269,7 @@ lis_thread_stop(pid_t pid)
 int
 lis_thread_runqueues(void *p)
 {
-	intptr_t cpu_id = (intptr_t) p;
+	intptr_t cpu_id = (intptr_t) (long) p;
 	int sig_cnt = 0;
 	unsigned long seconds = 0;
 	lis_semaphore_t *semp = &lis_runq_sems[cpu_id];
@@ -4288,7 +4383,8 @@ lis_start_qsched(void)
 		lis_sem_init(&lis_runq_kill_sems[cpu], 0);	/* initialize semaphore */
 
 		sprintf(name, "LiS-%s:%u", lis_version, cpu);
-		lis_runq_pids[cpu] = lis_thread_start(lis_thread_runqueues, (void *) (long) cpu, name);
+		lis_runq_pids[cpu] =
+		    lis_thread_start(lis_thread_runqueues, (void *) (long) cpu, name);
 		if (lis_runq_pids[cpu] < 0) {	/* failed to fork */
 			printk("lis_start_qsched: %s: lis_thread_start error %d\n", name,
 			       lis_runq_pids[cpu]);

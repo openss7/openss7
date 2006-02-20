@@ -1,3 +1,38 @@
+2006-02-20 brian <bidulock@openss7.org>
+	* Changes from OpenSS7 2.18.2 release:
+	* (util/test-fifo.c): modified
+	* (util/test-pipe.c): modified
+	* (util/test-streams.c): modified
+	- gcc 4.0.2 does not like (-1UL) on 64 bit
+	* (util/strtst.c): modified
+	- printf changes for 64 bit
+	* (util/streams.c): modified
+	- stats corrections for 64 bit
+	* (libc/getpmsg.c): modified
+	* (libc/putpmsg.c): modified
+	- Paul's patches for s390x
+	* (include/sys/osif.h): modified
+	- Paul's 64 bit patches
+	* (drivers/str/loop.c): modified
+	* (drivers/str/sad.c): modified
+	* (drivers/str/linux/mtdrv.c): modified
+	- 64bit corrections, mostly printf
+	* (head/head.c): modified
+	* (head/linux-mdep.c): modified
+	* (head/msgutl.c): modified
+	* (head/osif.c): modified
+	* (head/linux/exports.c): modified
+	- corrections for some 64bit architectures, from patches
+	* (acinclude.m4): modified
+	- added checks for 64bit architectures
+	* (NEWS): modified
+	* (ChangeLog): modified
+	- updated for next release
+
+2006-02-13 brian <bidulock@openss7.org>
+	* Changes from OpenSS7 2.18.2 release:
+	* (m4/kernel.m4): changes for Gentoo and 2.6.15 kernels
+
 2005-11-13  brian  <bidulock@openss7.org>
 	* Changes from OpenSS7 2.18.1 release:
 	* (.indent.pro): added a few types
@@ -2452,15 +2487,14 @@
 
 -----
 
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

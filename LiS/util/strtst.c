@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/06/23 22:05:24 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:05:24 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
  $Log: strtst.c,v $
+ Revision 1.1.1.5.4.10  2005/07/13 12:01:22  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 1.1.1.5.4.8  2005/06/23 22:05:24  brian
  - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
 
@@ -75,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/06/23 22:05:24 $"
+#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/07/13 12:01:22 $"
 
 static char const ident[] =
-    "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/06/23 22:05:24 $";
+    "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/07/13 12:01:22 $";
 
 /*
  * Copyright (C)  1997-2000  David Grothe, Gcom, Inc <dave@gcom.com>
@@ -4892,7 +4894,7 @@ band_test(struct test_context *ctx)
 
 	tprint("band_test: band 2 full (%d msgs), write band 1\n", n_sent);
 	send_band(ctx, fd1, 1, 21, _M_DATA);
-	sleep(1);		/* allow messages to flow */
+	sleep(2);		/* allow messages to flow */
 	tprint("   %d messages available to read\n", nread_wait_msgs(fd2, 1));
 	for (i = 0; i < n_sent; i++) {
 		receive_band(ctx, fd2, 2, send_seq + i, _M_DATA);
@@ -5266,20 +5268,20 @@ mt_thread(void *arg)
 	int ctl_fd;
 	char buf[300];
 
-	print("%s: Thread%d: Starting up\n", now(), thrno);
-	sprintf(buf, "/dev/mtdrv.%d", thrno);
+	print("%s: Thread%d: Starting up\n", now(), (int) thrno);
+	sprintf(buf, "/dev/mtdrv.%d", (int) thrno);
 	ctl_fd = open(buf, O_RDWR, 0);
 	if (ctl_fd < 0) {
 		perror(buf);
 		mt_set_state(-1);
 	}
 
-	print("%s: Thread%d: opened %s\n", now(), thrno, buf);
+	print("%s: Thread%d: opened %s\n", now(), (int) thrno, buf);
 
 	do {
 		prev_state = state;
 		state = mt_get_state();
-		print("%s: Thread%d: state %d\n", now(), thrno, state);
+		print("%s: Thread%d: state %d\n", now(), (int) thrno, state);
 		switch (state) {
 		case 0:	/* initial idle state */
 			mt_await_state(1);
@@ -5309,7 +5311,7 @@ mt_thread(void *arg)
 
 			mt_set_state(2);
 
-			print("%s: Thread%d: opening mtdrv.3\n", now(), thrno);
+			print("%s: Thread%d: opening mtdrv.3\n", now(), (int) thrno);
 			fd = open("/dev/mtdrv.3", O_RDWR, 0);
 			if (fd < 0) {
 				perror("mtdrv.3");
@@ -5317,7 +5319,7 @@ mt_thread(void *arg)
 				break;
 			}
 
-			print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd);
+			print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), (int) thrno, fd);
 			break;
 
 		case 2:
@@ -5338,7 +5340,7 @@ mt_thread(void *arg)
 			}
 
 			sleep(1);
-			print("%s: Thread%d: opening mtdrv.3\n", now(), thrno);
+			print("%s: Thread%d: opening mtdrv.3\n", now(), (int) thrno);
 			fd = open("/dev/mtdrv.3", O_RDWR, 0);
 			if (fd < 0) {
 				perror("mtdrv.3");
@@ -5346,7 +5348,7 @@ mt_thread(void *arg)
 				break;
 			}
 
-			print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd);
+			print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), (int) thrno, fd);
 			mt_set_state(3);
 			break;
 
@@ -5363,7 +5365,7 @@ mt_thread(void *arg)
 
 			if (thrno == 1) {
 				sleep(2);
-				print("%s: Thread%d: close fd=%d\n", now(), thrno, fd);
+				print("%s: Thread%d: close fd=%d\n", now(), (int) thrno, fd);
 				close(fd);
 				fd = -1;
 				break;
@@ -5375,27 +5377,27 @@ mt_thread(void *arg)
 				break;
 			}
 
-			print("%s: Thread%d: opening mtdrv_clone\n", now(), thrno);
+			print("%s: Thread%d: opening mtdrv_clone\n", now(), (int) thrno);
 			fdc = open("/dev/mtdrv_clone", O_RDWR, 0);
 			if (fdc >= 0) {
 				print("%s: Thread%d: "
 				      "mtdrv_clone opened dev 3 but should have failed\n", now(),
-				      thrno);
+				      (int) thrno);
 				mt_set_state(-1);
 				break;
 			}
 
 			if (errno != EBUSY) {
 				print("%s: Thread%d: " "mtdrv_clone failed opening dev 3 "
-				      "but with wrong errno %d\n", now(), thrno, errno);
+				      "but with wrong errno %d\n", now(), (int) thrno, errno);
 				mt_set_state(-1);
 				break;
 			}
 
 			print("%s: Thread%d: mtdrv_clone "
-			      "got expected EBUSY return opening dev 3\n", now(), thrno);
+			      "got expected EBUSY return opening dev 3\n", now(), (int) thrno);
 			sleep(1);
-			print("%s: Thread%d: close fd=%d\n", now(), thrno, fd);
+			print("%s: Thread%d: close fd=%d\n", now(), (int) thrno, fd);
 			close(fd);
 			fd = -1;
 			fdc = -1;
@@ -5426,7 +5428,7 @@ mt_thread(void *arg)
 
 			mt_set_state(5);
 
-			print("%s: Thread%d: opening mtdrv.3\n", now(), thrno);
+			print("%s: Thread%d: opening mtdrv.3\n", now(), (int) thrno);
 			fd = open("/dev/mtdrv.3", O_RDWR, 0);	/* open will sleep */
 			if (fd < 0) {
 				perror("mtdrv.3");
@@ -5434,7 +5436,7 @@ mt_thread(void *arg)
 				break;
 			}
 
-			print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd);
+			print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), (int) thrno, fd);
 			break;
 
 		case 5:
@@ -5461,27 +5463,27 @@ mt_thread(void *arg)
 				break;
 			}
 
-			print("%s: Thread%d: opening mtdrv_clone\n", now(), thrno);
+			print("%s: Thread%d: opening mtdrv_clone\n", now(), (int) thrno);
 			fdc = open("/dev/mtdrv_clone", O_RDWR, 0);
 			if (fdc >= 0) {
 				print("%s: Thread%d: "
 				      "mtdrv_clone opened dev 3 but should have failed\n", now(),
-				      thrno);
+				      (int) thrno);
 				mt_set_state(-1);
 				break;
 			}
 
 			if (errno != EBUSY) {
 				print("%s: Thread%d: " "mtdrv_clone failed opening dev 3 "
-				      "but with wrong errno %d\n", now(), thrno, errno);
+				      "but with wrong errno %d\n", now(), (int) thrno, errno);
 				mt_set_state(-1);
 				break;
 			}
 
 			print("%s: Thread%d: mtdrv_clone "
-			      "got expected EBUSY return opening dev 3\n", now(), thrno);
+			      "got expected EBUSY return opening dev 3\n", now(), (int) thrno);
 
-			print("%s: Thread%d: close fd=%d\n", now(), thrno, fdc);
+			print("%s: Thread%d: close fd=%d\n", now(), (int) thrno, fdc);
 			close(fdc);
 			fdc = -1;
 			sleep(1);	/* give thread 1 some time */
@@ -5496,11 +5498,11 @@ mt_thread(void *arg)
 
 	} while (state >= 0);
 
-	print("%s: Thread%d: close fd=%d\n", now(), thrno, fd);
+	print("%s: Thread%d: close fd=%d\n", now(), (int) thrno, fd);
 	close(fd);
 	fd = -1;
 	close(ctl_fd);
-	print("%s: Thread%d: Exiting\n", now(), thrno);
+	print("%s: Thread%d: Exiting\n", now(), (int) thrno);
 	pthread_mutex_unlock(&mt_quit);	/* awaken parent */
 
 	return ((void *) 0);
@@ -5898,7 +5900,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
 Copyright (c) 1997-2000  David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
@@ -5906,8 +5908,7 @@ All Rights Reserved.\n\
 \n\
 This program is free software;  you can  redistribute  it and/or modify it under\n\
 the terms of the GNU General  Public License as  published by the  Free Software\n\
-Foundation; either  version 2 of  the  License, or  (at  your option) any  later\n\
-version.\n\
+Foundation; version 2 of  the  License.\n\
 \n\
 This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
 WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -5942,7 +5943,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
     Copyright (c) 1997-2000  David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
