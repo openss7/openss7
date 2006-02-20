@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.11 2005/08/30 03:37:09 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.13 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/08/30 03:37:09 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sad.h,v $
+ Revision 0.9.2.13  2006/02/20 10:59:20  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_SAD_H__
 #define __SYS_STREAMS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/08/30 03:37:09 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SAD_H__
 #warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
@@ -73,6 +78,20 @@
 
 #define MAXAPUSH MAX_APUSH
 
+#ifdef __LP64__
+struct strapush {
+	int32_t sap_cmd;
+	int32_t sap_major;
+	int32_t sap_minor;
+	int32_t sap_lastminor;
+	u_int32_t sap_npush;
+	char sap_list[MAXAPUSH][FMNAMESZ + 1];
+	/* Solaris adds sap_anchor which is the integer anchor position */
+	int32_t sap_anchor;
+	/* This one is Linux Fast-STREAMS specific */
+	char sap_module[FMNAMESZ + 1];	/* This is mine. */
+};
+#else				/* __LP64__ */
 struct strapush {
 	int sap_cmd;
 	long sap_major;
@@ -85,6 +104,7 @@ struct strapush {
 	/* This one is Linux Fast-STREAMS specific */
 	char sap_module[FMNAMESZ + 1];	/* This is mine. */
 };
+#endif				/* __LP64__ */
 
 #define SAP_CLEAR	0x00	/* clear entry */
 #define SAP_ONE		0x01	/* add entry for one minor */

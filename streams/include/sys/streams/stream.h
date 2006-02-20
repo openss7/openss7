@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.78 2005/12/20 15:12:06 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.80 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:12:06 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stream.h,v $
+ Revision 0.9.2.80  2006/02/20 10:59:20  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/12/20 15:12:06 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.80 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -307,7 +312,7 @@ typedef struct msgb {
 #define MSGNOTIFY	(1<<9)	/* OSF: notify when message consumed */
 
 #define NOERROR		(-1)	/* UnixWare, OSF, HP-UX */
-#define TRANSPARENT	(-1UL)
+#define TRANSPARENT	(-1)
 #define MAXIOCBSZ	1024	/* Solaris */
 
 #define STRCTLSZ	256	/* Mac OT */	/* variable strctlsz under OSF/HP-UX */

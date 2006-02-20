@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/01/04 08:03:04 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2006/02/20 10:07:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/01/04 08:03:04 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 10:07:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -117,7 +117,7 @@
 
 %{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/modutils}}
-%{!?_kmoduledir:     %{expand: %%global _kmoduledir   %%{_lib}/modules/%%{kernel_version}}}
+%{!?_kmoduledir:     %{expand: %%global _kmoduledir   /lib/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -464,7 +464,7 @@ fi
     --disable-dependency-tracking \
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
-    --with-k-modules=/%{_lib}/modules/%{kernel_version} \
+    --with-k-modules=%{_kmoduledir} \
     --with-base-major=%{majbase} \
     %{?_with_arch:               '%enable %_with_arch'} \
     %{?_without_arch:            '%disable %_without_arch'} \
@@ -600,8 +600,8 @@ package_source
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
-Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+Prefix:         %{_kmoduledir}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
@@ -859,17 +859,17 @@ fi
 %files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+%dir %{_kmoduledir}/%{base}
+%attr(644,root,root) %{_kmoduledir}/modules.%{base}
+%{_kmoduledir}/%{base}/*
 %endif
 
 %if %{FILES_ko_modules}
 %files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+%dir %{_kmoduledir}/%{base}
+%{_kmoduledir}/%{base}/*
 %endif
 
 # ===========================================================================
@@ -1667,9 +1667,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.68  2006/01/04 08:03:04  brian
-# - added info package to spec files
+# Revision 0.9.2.69  2006/02/20 10:07:02  brian
+# - changes for 64 bit distributions
 #
+
+* Wed Jan  4 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.68  2006/01/04 08:03:04  brian
+- added info package to spec files
 
 * Mon Jan  2 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.67  2006/01/02 11:51:28  brian

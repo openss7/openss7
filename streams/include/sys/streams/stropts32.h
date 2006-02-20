@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.18 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: stropts32.h,v 0.9.2.2 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -48,65 +48,77 @@
 
  -----------------------------------------------------------------------------
 
- $Log: kmem.h,v $
- Revision 0.9.2.18  2006/02/20 10:59:20  brian
+ $Log: stropts32.h,v $
+ Revision 0.9.2.2  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
+
+ Revision 0.9.2.1  2006/02/20 09:36:14  brian
+ - added 32 bit compatibility headers
 
  *****************************************************************************/
 
-#ifndef __SYS_STREAMS_KMEM_H__
-#define __SYS_STREAMS_KMEM_H__ 1
+#ifndef __SYS_STREAMS_STROPTS32_H__
+#define __SYS_STREAMS_STROPTS32_H__
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
-#ifndef __SYS_KMEM_H__
-#warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
-#endif
+struct bandinfo32 {
+	unsigned char bi_pri;
+	int32_t bi_flag;
+};
 
-#ifndef __KERNEL__
-#error "Do not use kernel headers for user space programs"
-#endif				/* __KERNEL__ */
+struct strbuf32 {
+	int maxlen;
+	int len;
+	uint32_t buf;
+};
 
-#ifndef streams_fastcall
-# ifdef __i386__
-#  define streams_fastcall __attribute__((__regparm__(3)))
-# else
-#  define streams_fastcall
-# endif
-#endif
+struct strpeek32 {
+	struct strbuf32 ctlbuf;
+	struct strbuf32 databuf;
+	uint32_t flags;
+};
 
-#ifndef __EXTERN
-#define __EXTERN extern
-#endif
+struct strfdinsert32 {
+	struct strbuf32 ctlbuf;
+	struct strbuf32 databuf;
+	uint32_t flags;
+	int32_t fildes;
+};
 
-#ifndef __STREAMS_EXTERN
-#define __STREAMS_EXTERN __EXTERN streams_fastcall
-#endif
+struct strioctl32 {
+	int32_t ic_cmd;
+	int32_t ic_timout;
+	int32_t ic_len;
+	uint32_t ic_dp;
+};
 
-#include <linux/config.h>
-#include <linux/module.h>
-#include <linux/types.h>	/* for various types */
+struct strrecvfd32 {
+	int32_t fd;
+	uid_t uid;
+	gid_t gid;
+	char fill[8];			/* UnixWare/Solaris compatibility */
+};
 
-#define KM_SLEEP	0
-#define KM_NOSLEEP	(1<<0)
-#define KM_PHYSCONTIG	(1<<1)	/* IRIX 6.5 */
-#define KM_CACHEALIGN	(1<<2)	/* IRIX 6.5 */
-#define KM_DMA		(1<<3)	/* Linux Fast-STREAMS specific */
+struct str_mlist32 {
+	char l_name[FMNAMESZ + 1];
+};
 
-/* typedef unsigned short cnodeid_t; */
-typedef int cnodeid_t;
+struct str_list32 {
+	int32_t sl_nmods;
+	uint32_t sl_modlist;
+};
 
-__STREAMS_EXTERN void *kmem_alloc(size_t size, int flags);
-__STREAMS_EXTERN void *kmem_zalloc(size_t size, int flags);
-__STREAMS_EXTERN void kmem_free(void *ptr, size_t size);
+struct strsigset32 {
+	pid_t ss_pid;			/* XXX */
+	int32_t ss_events;
+};
 
-#if 0
-#ifdef CONFIG_NUMA
-#warning kmem_alloc_node and kmem_zalloc_node are not supported on NUMA architectures
-#endif
-#endif
+struct strpmsg32 {
+	struct strbuf32 ctlbuf;
+	struct strbuf32 databuf;
+	int32_t band;
+	int32_t flags;
+};
 
-__STREAMS_EXTERN void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
-__STREAMS_EXTERN void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
-
-#endif				/* __SYS_STREAMS_KMEM_H__ */
+#endif				/* __SYS_STREAMS_STROPTS32_H__ */

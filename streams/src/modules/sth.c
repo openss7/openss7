@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:26 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:24 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sth.c,v $
+ Revision 0.9.2.137  2006/02/20 10:59:24  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $";
 
 //#define __NO_VERSION__
 
@@ -86,6 +91,12 @@ static char const ident[] =
 #define __user
 #endif
 
+#ifdef WITH_32BIT_CONVERSION
+#ifdef HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
+#endif
+#endif
+
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strsubr.h>
@@ -106,8 +117,8 @@ static char const ident[] =
 #include "src/drivers/clone.h"	/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2005/12/29 21:36:26 $"
+#define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -499,7 +510,7 @@ strput(struct stdata *sd, mblk_t *mp)
 }
 
 STATIC streams_inline streams_fastcall __hot_in int
-strcopyout(const void *from, void *to, size_t len)
+strcopyout(const void __user *from, void *to, size_t len)
 {
 	/* before every system call return or sleep -- saves a context switch */
 	if (likely((this_thread->flags & (QRUNFLAGS)) != 0))
@@ -509,7 +520,7 @@ strcopyout(const void *from, void *to, size_t len)
 }
 
 STATIC streams_inline streams_fastcall __hot_out int
-strcopyin(const void *from, void *to, size_t len)
+strcopyin(const void __user *from, void *to, size_t len)
 {
 	/* before every system call return or sleep -- saves a context switch */
 	if (unlikely((this_thread->flags & (QRUNFLAGS)) != 0))
@@ -872,12 +883,20 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 	int fd, max;
 
 #ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET
+#ifdef WITH_KO_MODULES
+	spin_lock(&files->file_lock);
+#else
 	read_lock(&files->file_lock);
+#endif
 	max = files->max_fdset;
 	for (fd = 0; fd <= max && files->fd[fd] != file; fd++) ;
 	if (fd > max)
 		fd = ~0;
+#ifdef WITH_KO_MODULES
+	spin_unlock(&files->file_lock);
+#else
 	read_unlock(&files->file_lock);
+#endif
 #else
 #ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB
 	spin_lock(&files->file_lock);
@@ -1367,7 +1386,7 @@ strsendmread(struct stdata *sd, const unsigned long len)
 		if ((b = allocb(len, BPRI_WAITOK))) {
 			b->b_datap->db_type = M_READ;
 			*((unsigned long *) b->b_rptr) = len;
-			b->b_wptr = b->b_rptr + sizeof(&len);
+			b->b_wptr = b->b_rptr + sizeof(len);
 			if (!(err = straccess(sd, FREAD))) {
 				ctrace(strput(sd, b));
 				trace();
@@ -4178,7 +4197,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* FIXME: we really need to do these as an (unlocked) ioctl now */
-	if (unlikely(len == LFS_GETMSG_PUTMSG_ULEN)) {
+	if (unlikely((uint32_t) len == (uint32_t) LFS_GETMSG_PUTMSG_ULEN)) {
 		err = _strread_getpmsg(file, buf, len, ppos);
 		goto exit;
 	}
@@ -4409,9 +4428,9 @@ _strwrite_putpmsg(struct file *file, const char __user *buf, size_t len, loff_t 
 	/* write emulation of the putpmsg system call: the problem with this approach is that it
 	   almost completely destroys the ability to have a 64-bit application running against a
 	   32-bit kernel because the pointers cannot be properly converted. */
-	if ((err = strcopyin(&sp->band, &band, sizeof(&sp->band))))
+	if ((err = strcopyin(&sp->band, &band, sizeof(sp->band))))
 		return (err);
-	if ((err = strcopyin(&sp->flags, &flags, sizeof(&sp->flags))))
+	if ((err = strcopyin(&sp->flags, &flags, sizeof(sp->flags))))
 		return (err);
 	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
 }
@@ -4427,7 +4446,7 @@ _strwrite(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
 	/* FIXME: we really need to do these as an (unlocked) ioctl now */
-	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+	if ((uint32_t) len == (uint32_t) LFS_GETMSG_PUTMSG_ULEN) {
 		err = _strwrite_putpmsg(file, buf, len, ppos);
 		goto exit;
 	}
@@ -4687,8 +4706,9 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 			/* use put instead of putnext because of STRHOLD feature */
 			ctrace(strput(sd, mp));
 			trace();
-		} else
+		} else {
 			err = PTR_ERR(mp);
+		}
 	}
       error:
       done:
@@ -5137,7 +5157,7 @@ tty_tiocgsid(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-ENOTTY);
 	if (sd->sd_session <= 0)
 		return (-ENOTTY);
-	return put_user(sd->sd_session, (pid_t *) arg);
+	return put_user(sd->sd_session, (pid_t *) (long) arg);
 }
 
 /*
@@ -5216,7 +5236,7 @@ sock_siocatmark(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if ((err = str_i_atmark(file, sd, ANYMARK)) < 0)
 		return (err);
-	return put_user(&err, (int *) arg);
+	return put_user(err, (int *) arg);
 }
 
 STATIC streams_fastcall __unlikely int
@@ -5376,14 +5396,15 @@ str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	queue_t *q = sd->sd_rq;
 	mblk_t *b;
+	uint32_t flags = arg;
 	int err = -EINVAL;
 
-	if (!(arg & ~(ANYMARK | LASTMARK)) && (arg & (ANYMARK | LASTMARK))) {
+	if (!(flags & ~(ANYMARK | LASTMARK)) && (flags & (ANYMARK | LASTMARK))) {
 		if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
 			unsigned long pl;
 
 			pl = qrlock(q);
-			if (arg == LASTMARK) {
+			if (flags == LASTMARK) {
 				if ((b = q->q_first) && b->b_flag & MSGMARK) {
 					if ((b = b->b_next) && b->b_flag & MSGMARK)
 						err = 0;
@@ -5440,13 +5461,14 @@ STATIC int
 str_i_canput(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = -EINVAL;
+	int32_t band = arg;
 
-	if (arg < 256 || arg == ANYBAND) {
+	if (band < 256 || band == ANYBAND) {
 		if (!(err = straccess_rlock(sd, (FWRITE | FNDELAY)))) {
 			queue_t *q = sd->sd_wq;
 
-			if (arg != ANYBAND)
-				err = bcanputnext(q, arg) ? 1 : 0;
+			if (band != ANYBAND)
+				err = bcanputnext(q, band) ? 1 : 0;
 			else
 				err = bcanputnextany(q) ? 1 : 0;
 			srunlock(sd);
@@ -5467,13 +5489,14 @@ STATIC int
 str_i_ckband(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = -EINVAL;
+	int32_t band = arg;
 
-	if (arg < 256 || arg == ANYBAND) {
+	if (band < 256 || band == ANYBAND) {
 		if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
 			queue_t *q = sd->sd_rq;
 
-			if (arg != ANYBAND)
-				err = bcanget(q, arg) ? 1 : 0;
+			if (band != ANYBAND)
+				err = bcanget(q, band) ? 1 : 0;
 			else
 				err = bcangetany(q) ? 1 : 0;
 			srunlock(sd);
@@ -5511,7 +5534,8 @@ str_i_ckband(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	struct strfdinsert fdi, *valp = (typeof(valp)) arg;
+	void __user *where = (typeof(where)) arg;
+	struct strfdinsert fdi, *valp = (typeof(valp)) where;
 	t_uscalar_t token = 0;
 	int err;
 
@@ -5558,7 +5582,7 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 					   know that from experience. */
 					for (qbot = sd2->sd_wq; SAMESTR(qbot);
 					     qbot = qbot->q_next) ;
-					token = (typeof(token)) _RD(qbot);
+					token = (typeof(token)) (ulong) _RD(qbot);
 					srunlock(sd2);
 				}
 				ctrace(sd_put(&sd2));
@@ -5586,6 +5610,15 @@ str_i_fdinsert(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_fdinsert32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	fixme(("Write this conversion function."));
+	return (-ENOSYS);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_find: - perform streamio(7) %I_FIND ioctl
  *  @file: user file pointer
@@ -5602,9 +5635,10 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 	char name[FMNAMESZ + 1];
 	queue_t *wq = sd->sd_wq;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
 	printd(("%s: copying string from user\n", __FUNCTION__));
-	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0) {
+	if ((err = strncpy_from_user(name, (const char *) where, FMNAMESZ + 1)) < 0) {
 		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
@@ -5622,6 +5656,16 @@ str_i_find(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_find32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_find(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_flushband: - perform streamio(7) %I_FLUSHBAND ioctl
  *  @file: user file pointer
@@ -5634,8 +5678,9 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	struct bandinfo bi;
 	mblk_t *mp;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if ((err = strcopyin((typeof(&bi)) arg, &bi, sizeof(bi)))) {
+	if ((err = strcopyin((typeof(&bi)) where, &bi, sizeof(bi)))) {
 		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
@@ -5668,6 +5713,16 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_fastcall int
+str_i_flushband32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_flushband(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_flush: - perform streamio(7) %I_FLUSH ioctl
  *  @file: user file pointer
@@ -5688,8 +5743,9 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	mblk_t *mp;
 	int err = 0;
+	uint32_t flags = arg;
 
-	if (((arg & ~(FLUSHR | FLUSHW | FLUSHRW))) || !((arg & (FLUSHR | FLUSHW | FLUSHRW)))) {
+	if (((flags & ~(FLUSHR | FLUSHW | FLUSHRW))) || !((flags & (FLUSHR | FLUSHW | FLUSHRW)))) {
 		ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	}
@@ -5701,7 +5757,7 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	ptrace(("message block %p allocated\n", mp));
 
 	mp->b_datap->db_type = M_FLUSH;
-	*mp->b_wptr++ = arg;
+	*mp->b_wptr++ = flags;
 
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
@@ -5728,8 +5784,9 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 	queue_t *q = sd->sd_rq;
 	int band = -1;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if (!access_ok(VERIFY_WRITE, arg, sizeof(band))) {
+	if (!access_ok(VERIFY_WRITE, where, sizeof(band))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
@@ -5749,10 +5806,20 @@ str_i_getband(const struct file *file, struct stdata *sd, unsigned long arg)
 		srunlock(sd);
 	}
 	if (!err)
-		err = strcopyout(&band, (int *) arg, sizeof(band));
+		err = strcopyout(&band, (typeof(&band)) where, sizeof(band));
 
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_fastcall int
+str_i_getband32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_getband(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_getcltime: - perform streamio(7) %I_GETCLTIME ioctl
@@ -5774,6 +5841,16 @@ str_i_getcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_getcltime32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_getcltime(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_setcltime: - perform streamio(7) %I_SETCLTIME ioctl
  *  @file: user file pointer
@@ -5785,8 +5862,9 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int closetime;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if (!(err = strcopyin((int *) arg, &closetime, sizeof(closetime)))) {
+	if (!(err = strcopyin((typeof(&closetime)) where, &closetime, sizeof(closetime)))) {
 		if (0 > closetime || closetime >= 300000) {
 			ptrace(("Error path taken!\n"));
 			return (-EINVAL);
@@ -5796,6 +5874,16 @@ str_i_setcltime(const struct file *file, struct stdata *sd, unsigned long arg)
 	}
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_setcltime32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_setcltime(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_getsig: - perform streamio(7) %I_GETSIG ioctl
@@ -5812,8 +5900,9 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int flags;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if (!access_ok(VERIFY_WRITE, arg, sizeof(int))) {
+	if (!access_ok(VERIFY_WRITE, (typeof(&flags)) where, sizeof(flags))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
@@ -5830,9 +5919,19 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 		srunlock(sd);
 	}
 	if (!err)
-		err = strcopyout(&flags, (typeof(&flags)) arg, sizeof(flags));
+		err = strcopyout(&flags, (typeof(&flags)) where, sizeof(flags));
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_getsig32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_getsig(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_setsig: - perform streamio(7) %I_SETSIG ioctl
@@ -5849,15 +5948,16 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
+	uint32_t flags = arg;
 	int err;
 
-	if ((arg & ~S_ALL))
+	if ((flags & ~S_ALL))
 		return (-EINVAL);
 
 	if (!(err = straccess_wlock(sd, FAPPEND))) {
 		/* quick check */
-		if (arg || (sd->sd_sigflags & S_ALL))
-			err = __strevent_register(file, sd, arg);
+		if (flags || (sd->sd_sigflags & S_ALL))
+			err = __strevent_register(file, sd, flags);
 		else {
 			ptrace(("Error path taken!\n"));
 			err = -EINVAL;
@@ -5877,20 +5977,31 @@ str_i_setsig(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_grdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int rdopt;
+	int32_t rdopt;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if (!access_ok(VERIFY_WRITE, arg, sizeof(rdopt))) {
+	if (!access_ok(VERIFY_WRITE, (typeof(&rdopt)) where, sizeof(rdopt))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		rdopt = sd->sd_rdopt & (RMODEMASK | RPROTMASK);
 		srunlock(sd);
-		err = strcopyout(&rdopt, (typeof(&rdopt)) arg, sizeof(rdopt));
+		err = strcopyout(&rdopt, (typeof(&rdopt)) where, sizeof(rdopt));
 	}
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_grdopt32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_grdopt(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_srdopt: - perform streamio(7) %I_SRDOPT ioctl
@@ -5928,13 +6039,13 @@ str_i_grdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_srdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int rdopt;
+	uint32_t rdopt = arg;
 	int err;
 
-	if ((arg & ~(RMODEMASK | RPROTMASK)))
+	if ((rdopt & ~(RMODEMASK | RPROTMASK)))
 		return (-EINVAL);
 
-	rdopt = arg & (RMODEMASK | RPROTMASK);
+	rdopt &= (RMODEMASK | RPROTMASK);
 
 	switch (rdopt & RMODEMASK) {
 	case RNORM:
@@ -5974,17 +6085,18 @@ str_i_srdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int wropt;
+	int32_t wropt;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if (!access_ok(VERIFY_WRITE, arg, sizeof(wropt))) {
+	if (!access_ok(VERIFY_WRITE, (typeof(&wropt)) where, sizeof(wropt))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD);
 		srunlock(sd);
-		err = strcopyout(&wropt, (typeof(&wropt)) arg, sizeof(wropt));
+		err = strcopyout(&wropt, (typeof(&wropt)) where, sizeof(wropt));
 	}
 	return (err);
 }
@@ -6002,11 +6114,13 @@ str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC int
 str_i_swropt(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int wropt = arg & (SNDZERO | SNDPIPE | SNDHOLD);
+	int32_t wropt = arg;
 	int err;
 
-	if (arg & ~(SNDZERO | SNDPIPE | SNDHOLD))
+	if (wropt & ~(SNDZERO | SNDPIPE | SNDHOLD))
 		return (-EINVAL);
+
+	wropt &= (SNDZERO | SNDPIPE | SNDHOLD);
 
 	if (!(err = straccess_wlock(sd, (FWRITE | FNDELAY | FEXCL)))) {
 		sd->sd_wropt = (sd->sd_wropt & ~(SNDZERO | SNDPIPE | SNDHOLD)) | wropt;
@@ -6061,6 +6175,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	struct stdata *sd;
 	struct streamtab *st;
 	int err;
+	int fd = (int) arg;
 
 	err = -EINVAL;
 	if (mux->sd_flag & (STRISFIFO | STRISPIPE)) {
@@ -6089,7 +6204,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	}
 
 	err = -EBADF;
-	if (!(f = fget(arg))) {
+	if (!(f = fget(fd))) {
 		ptrace(("Error path taken!\n"));
 		goto unlock_error;
 	}
@@ -6148,7 +6263,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 		ptrace(("Error path taken! err = %d\n", err));
 		setsq(sd->sd_rq, NULL);
 		strwakeopen(sd);
-		err = err < 0 ? err : -err; /* must be negative */
+		err = err < 0 ? err : -err;	/* must be negative */
 	}
 	strwakeopen(mux);
 
@@ -6434,8 +6549,9 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 	struct str_mlist smlist[STR_MLIST_FAST], *sm = smlist;
 	size_t smlist_size = sizeof(sl);
 	int err;
+	void __user *where = (typeof(where)) arg;
 
-	if (arg == 0) {
+	if (where == NULL) {
 		/* return number of modules and drivers */
 		if (!(err = straccess_rlock(sd, FAPPEND))) {
 			int drivers;
@@ -6447,7 +6563,7 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (err);
 	}
 
-	if ((err = strcopyin((typeof(&sl)) arg, &sl, sizeof(sl))))
+	if ((err = strcopyin((typeof(&sl)) where, &sl, sizeof(sl))))
 		return (err);
 
 	if (sl.sl_nmods < 0 || sl.sl_modlist == NULL)
@@ -6483,7 +6599,7 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 		if ((sl.sl_nmods = i) && (err = strcopyout(sm, sl.sl_modlist, size)))
 			goto error;
 
-		err = strcopyout(&sl.sl_nmods, (typeof(&sl.sl_nmods)) arg, sizeof(sl.sl_nmods));
+		err = strcopyout(&sl.sl_nmods, (typeof(&sl.sl_nmods)) where, sizeof(sl.sl_nmods));
 	}
       error:
 
@@ -6493,6 +6609,16 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (err);
 #undef STR_MLIST_FAST
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_list32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_list(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_look: - perform streamio(7) %I_LOOK ioctl
@@ -6506,6 +6632,7 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 	char fmname[FMNAMESZ + 1];
 	queue_t *q = sd->sd_wq;
 	int err;
+	void __user *where = (typeof(where)) arg;
 
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		if (SAMESTR(q) && (q = q->q_next))
@@ -6515,9 +6642,19 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 		srunlock(sd);
 	}
 	if (!err)
-		err = strcopyout(fmname, (char *) arg, FMNAMESZ + 1);
+		err = strcopyout(fmname, (char *) where, FMNAMESZ + 1);
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_look32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_look(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_nread: - perform streamio(7) %I_NREAD ioctl
@@ -6528,7 +6665,9 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC streams_fastcall int
 str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err, msgs, bytes;
+	int err, msgs;
+	int bytes;
+	void __user *where = (typeof(where)) arg;
 
 	if (!(err = straccess_rlock(sd, (FREAD | FNDELAY)))) {
 		queue_t *q = sd->sd_rq;
@@ -6541,11 +6680,21 @@ str_i_nread(const struct file *file, struct stdata *sd, unsigned long arg)
 			bytes = 0;
 		qrunlock(q, pl);
 		srunlock(sd);
-		if (!(err = strcopyout(&bytes, (typeof(&bytes)) arg, sizeof(bytes))))
+		if (!(err = strcopyout(&bytes, (typeof(&bytes)) where, sizeof(bytes))))
 			err = msgs;
 	}
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_fastcall int
+str_i_nread32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	void __user *ptr = compat_ptr(arg);
+
+	return str_i_nread(file, sd, (unsigned long) ptr);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_peek: - perform streamio(7) %I_PEEK ioctl
@@ -6660,6 +6809,13 @@ str_i_peek(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (rtn);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_fastcall int
+str_i_peek32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_push: - perform streamio(7) %I_PUSH ioctl
  *  @file: user file pointer
@@ -6686,7 +6842,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	printd(("%s: copying string from user\n", __FUNCTION__));
-	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0) {
+	if ((err = strncpy_from_user(name, (const char *) (long) arg, FMNAMESZ + 1)) < 0) {
 		ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
@@ -6858,6 +7014,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	struct file *f2;
 	int err;
 	bool fifo, pipe;
+	int fd = arg;
 
 	if ((err = straccess_rlock(sd, (FWRITE | FEXCL | FNDELAY))))
 		goto exit;
@@ -6877,7 +7034,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		goto unlock_exit;
 
 	err = -EBADF;
-	if (!(f2 = fget(arg)))
+	if (!(f2 = fget(fd)))
 		goto unlock2_exit;
 
 	printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2)));
@@ -6945,10 +7102,10 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 STATIC streams_fastcall __unlikely int
 str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	struct strrecvfd *srp = (typeof(srp)) arg;
+	struct strrecvfd __user *srp = (typeof(srp)) arg;
 	int fd, err;
 
-	if (!arg)
+	if (srp == NULL)
 		return (-EINVAL);
 
 	if (!access_ok(VERIFY_WRITE, srp, sizeof(*srp)))
@@ -6974,7 +7131,7 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 			sr.fd = fd;
 			sr.uid = f2->f_uid;
 			sr.gid = f2->f_gid;
-			if (!(err = strcopyout(&sr, (typeof(&sr)) arg, sizeof(sr)))) {
+			if (!(err = strcopyout(&sr, srp, sizeof(sr)))) {
 				fd_install(fd, f2);
 				printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2,
 					file_count(f2)));
@@ -7000,6 +7157,13 @@ str_i_recvfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	}
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_fastcall __unlikely int
+str_i_recvfd32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_str: - perform streamio(7) %I_STR ioctl
@@ -7075,6 +7239,13 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 	return (rval);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC int
+str_i_str32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_gerropt: - get error options streamio(7) %I_GERROPT ioctl
  *  @file: user file pointer for the open stream
@@ -7087,14 +7258,14 @@ str_i_gerropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int eropt;
 	int err;
 
-	if (!access_ok(VERIFY_WRITE, arg, sizeof(eropt))) {
+	if (!access_ok(VERIFY_WRITE, (void *) (long) arg, sizeof(eropt))) {
 		ptrace(("Error path taken!\n"));
 		return (-EFAULT);
 	}
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		eropt = sd->sd_eropt & (RERRNONPERSIST | WERRNONPERSIST);
 		srunlock(sd);
-		err = strcopyout(&eropt, (typeof(&eropt)) arg, sizeof(eropt));
+		err = strcopyout(&eropt, (typeof(&eropt)) (long) arg, sizeof(eropt));
 	}
 	return (err);
 }
@@ -7164,6 +7335,15 @@ str_i_getpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 	return _strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
 }
 
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_inline streams_fastcall __hot_get int
+str_i_getpmsg32(struct file *file, struct stdata *sd, unsigned long arg)
+{
+	fixme(("Write this conversion."));
+	return (-ENOSYS);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
 /**
  *  str_i_putpmsg: - perform putpmsg(2) system call emulation as streamio(7) ioctl
  *  @file: file pointer for the stream
@@ -7173,19 +7353,28 @@ str_i_getpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 STATIC streams_inline streams_fastcall __hot_put int
 str_i_putpmsg(struct file *file, struct stdata *sd, unsigned long arg)
 {
-	struct strpmsg *sp = (struct strpmsg *) arg;
+	struct strpmsg __user *sp = (struct strpmsg *) arg;
 	int band, flags;
 	int err;
 
-	if (unlikely((err = strcopyin(&sp->band, &band, sizeof(&sp->band))) != 0))	/* PROFILED 
-											 */
+	if (unlikely((err = strcopyin(&sp->band, &band, sizeof(sp->band))) != 0))
+		/* PROFILED */
 		goto error;
-	if (unlikely((err = strcopyin(&sp->flags, &flags, sizeof(&sp->flags))) != 0))
+	if (unlikely((err = strcopyin(&sp->flags, &flags, sizeof(sp->flags))) != 0))
 		goto error;
 	return _strputpmsg(file, &sp->ctlbuf, &sp->databuf, band, flags);
       error:
 	return (err);
 }
+
+#ifdef WITH_32BIT_CONVERSION
+STATIC streams_inline streams_fastcall __hot_put int
+str_i_putpmsg32(struct file *file, struct stdata *sd, unsigned long arg)
+{
+	fixme(("Write this conversion."));
+	return (-ENOSYS);
+}
+#endif				/* WITH_32BIT_CONVERSION */
 
 /**
  *  str_i_fattach: - perform fattach(2) system call emulation as streamio(7) ioctl
@@ -7199,7 +7388,7 @@ str_i_fattach(struct file *file, struct stdata *sd, unsigned long arg)
 	char path[256];
 	int err;
 
-	if (unlikely((err = strncpy_from_user(path, (const char *) arg, 256)) < 0))
+	if (unlikely((err = strncpy_from_user(path, (const char *) (long) arg, 256)) < 0))
 		goto error;
 
 	if ((err = straccess_wlock(sd, FEXCL))) {
@@ -7221,10 +7410,10 @@ str_i_fattach(struct file *file, struct stdata *sd, unsigned long arg)
 STATIC __unlikely int
 str_i_fdetach(struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err;
 	char path[256];
+	int err;
 
-	if ((err = strncpy_from_user(path, (const char *) arg, 256)) < 0)
+	if ((err = strncpy_from_user(path, (const char *) (long) arg, 256)) < 0)
 		return (err);
 
 	return strfdetach(path);
@@ -7279,6 +7468,7 @@ STATIC __unlikely int
 str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err;
+	int fd = arg;
 
 	if (!(err = straccess_rlock(sd, FCREAT))) {
 
@@ -7288,7 +7478,7 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 			struct file *f2;
 
 			err = -EBADF;
-			if ((f2 = fget(arg)) && f2->f_op && f2->f_op->release == &strclose) {
+			if ((f2 = fget(fd)) && f2->f_op && f2->f_op->release == &strclose) {
 				struct stdata *sd2;
 
 				err = -EIO;
@@ -7581,7 +7771,7 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			length = 0;	/* no argument - simple return */
 			break;
 #if 0
-		/* conflicts with TCSBRK on ppc */
+			/* conflicts with TCSBRK on ppc */
 		case _IOC_NR(TIOCCONS):	/* void *//* BSD *//* XXX */
 #endif
 		case _IOC_NR(TIOCNOTTY):	/* void *//* XXX */
@@ -7783,12 +7973,13 @@ strioctl_fast(struct file *file, unsigned int cmd, unsigned long arg)
 			length = sizeof(loff_t);
 			break;
 #endif
-#if 1 /* (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(FIOGETOWN)) */
+#if 1				/* (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(FIOGETOWN)) */
 		case _IOC_NR(TIOCINQ):
 			length = sizeof(int);
 			break;
 #endif
-#if 0 /* ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(FIOGETOWN)) && (FIONREAD != TIOCINQ)) */
+#if 0				/* ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(FIOGETOWN)) && (FIONREAD !=
+				   TIOCINQ)) */
 		case _IOC_NR(FIONREAD):	/* int * *//* XXX */
 			length = sizeof(int);
 			break;
@@ -7866,6 +8057,470 @@ _strioctl_locked(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	return _strioctl(file, cmd, arg);
 }
 
+#if defined HAVE_COMPAT_IOCTL && defined WITH_32BIT_CONVERSION
+STATIC streams_inline streams_fastcall __hot int
+strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
+{
+	struct stdata *sd = stri_lookup(file);
+	int access = FNDELAY;		/* default access check is for io */
+	int locking = FREAD;		/* default locking is head read lock */
+	int length = TRANSPARENT;	/* default size */
+	int err;
+
+	if (unlikely(!sd))
+		return (-EIO);
+
+	/* Fast path for data -- PROFILED */
+	if (likely(cmd == I_GETPMSG)) {	/* getpmsg syscall emulation */
+		printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+		return str_i_getpmsg32(file, sd, arg);	/* not compatible */
+	}
+	if (likely(cmd == I_PUTPMSG)) {	/* putpmsg syscall emulation */
+		printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+		return str_i_putpmsg32(file, sd, arg);	/* not compatible */
+	}
+
+	switch (_IOC_TYPE(cmd)) {
+	case _IOC_TYPE(I_STR):
+		switch (_IOC_NR(cmd)) {
+		case _IOC_NR(I_ATMARK):
+			printd(("%s: got I_ATMARK\n", __FUNCTION__));
+			return str_i_atmark(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_CANPUT):
+			printd(("%s: got I_CANPUT\n", __FUNCTION__));
+			return str_i_canput(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_CKBAND):
+			printd(("%s: got I_CKBAND\n", __FUNCTION__));
+			return str_i_ckband(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_FDINSERT):
+			printd(("%s: got I_FDINSERT\n", __FUNCTION__));
+			return str_i_fdinsert32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_FIND):
+			printd(("%s: got I_FIND\n", __FUNCTION__));
+			return str_i_find32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_FLUSHBAND):
+			printd(("%s: got I_FLUSHBAND\n", __FUNCTION__));
+			return str_i_flushband32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_FLUSH):
+			printd(("%s: got I_FLUSH\n", __FUNCTION__));
+			return str_i_flush(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_GETBAND):
+			printd(("%s: got I_GETBAND\n", __FUNCTION__));
+			return str_i_getband32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_GETCLTIME):
+			printd(("%s: got I_GETCLTIME\n", __FUNCTION__));
+			return str_i_getcltime32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_GETSIG):
+			printd(("%s: got I_GETSIG\n", __FUNCTION__));
+			return str_i_getsig32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_GRDOPT):
+			printd(("%s: got I_GRDOPT\n", __FUNCTION__));
+			return str_i_grdopt32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_GWROPT):
+			printd(("%s: got I_GWROPT\n", __FUNCTION__));
+			return str_i_gwropt(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_LINK):
+			printd(("%s: got I_LINK\n", __FUNCTION__));
+			return str_i_link(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_LIST):
+			printd(("%s: got I_LIST\n", __FUNCTION__));
+			return str_i_list32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_LOOK):
+			printd(("%s: got I_LOOK\n", __FUNCTION__));
+			return str_i_look32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_NREAD):
+			printd(("%s: got I_NREAD\n", __FUNCTION__));
+			return str_i_nread32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_PEEK):
+			printd(("%s: got I_PEEK\n", __FUNCTION__));
+			return str_i_peek32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_PLINK):
+			printd(("%s: got I_PLINK\n", __FUNCTION__));
+			return str_i_plink(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_POP):
+			printd(("%s: got I_POP\n", __FUNCTION__));
+			return str_i_pop(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_PUNLINK):
+			printd(("%s: got I_PUNLINK\n", __FUNCTION__));
+			return str_i_punlink(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_PUSH):
+			printd(("%s: got I_PUSH\n", __FUNCTION__));
+			return str_i_push(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_RECVFD):
+			printd(("%s: got I_RECVFD\n", __FUNCTION__));
+			return str_i_recvfd32(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_SENDFD):
+			printd(("%s: got I_SENDFD\n", __FUNCTION__));
+			return str_i_sendfd(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_SETCLTIME):
+			printd(("%s: got I_SETCLTIME\n", __FUNCTION__));
+			return str_i_setcltime(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_SETSIG):
+			printd(("%s: got I_SETSIG\n", __FUNCTION__));
+			return str_i_setsig(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_SRDOPT):
+			printd(("%s: got I_SRDOPT\n", __FUNCTION__));
+			return str_i_srdopt(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_STR):
+			printd(("%s: got I_STR\n", __FUNCTION__));
+			return str_i_str32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_SWROPT):
+			printd(("%s: got I_SWROPT\n", __FUNCTION__));
+			return str_i_swropt(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_UNLINK):
+			printd(("%s: got I_UNLINK\n", __FUNCTION__));
+			return str_i_unlink(file, sd, arg);	/* compatible */
+			/* are these Solaris specific? */
+		case _IOC_NR(I_SERROPT):
+			printd(("%s: got I_SERROPT\n", __FUNCTION__));
+			return str_i_serropt(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_GERROPT):
+			printd(("%s: got I_GERROPT\n", __FUNCTION__));
+			return str_i_gerropt(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_ANCHOR):
+			printd(("%s: got I_ANCHOR\n", __FUNCTION__));
+			return str_i_anchor(file, sd, arg);	/* compatible */
+			/* Linux Fast-STREAMS special ioctls */
+		case _IOC_NR(I_GETPMSG):	/* getpmsg syscall emulation */
+			printd(("%s: got I_GETPMSG\n", __FUNCTION__));
+			return str_i_getpmsg32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_PUTPMSG):	/* putpmsg syscall emulation */
+			printd(("%s: got I_PUTPMSG\n", __FUNCTION__));
+			return str_i_putpmsg32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_PIPE):	/* pipe syscall emulation */
+			printd(("%s: got I_PIPE\n", __FUNCTION__));
+			return str_i_pipe(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_FATTACH):	/* fattach syscall emulation */
+			printd(("%s: got I_FATTACH\n", __FUNCTION__));
+			return str_i_fattach(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_FDETACH):	/* fdetach syscall emulation */
+			printd(("%s: got I_FDETACH\n", __FUNCTION__));
+			return str_i_fdetach(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_ISASTREAM):
+			printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
+			return str_i_isastream(file, sd, arg);	/* compatible */
+#if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCSBRK))
+		}
+		break;
+	case _IOC_TYPE(TCSBRK):
+		switch (_IOC_NR(cmd)) {
+#endif
+#if 0				/* let these go tranparent */
+		case _IOC_NR(TCGETX):	/* SVID */
+		case _IOC_NR(TCSETX):	/* SVID */
+		case _IOC_NR(TCSETXF):	/* SVID */
+		case _IOC_NR(TCSETXW):	/* SVID */
+			/* unknown, leave them transparent */
+			break;
+#endif
+		case _IOC_NR(TCSETS):	/* const struct termios * *//* SVID *//* XXX */
+		case _IOC_NR(TCSETSW):	/* const struct termios * *//* SVID *//* XXX */
+		case _IOC_NR(TCSETSF):	/* const struct termios * *//* SVID *//* XXX */
+		case _IOC_NR(TIOCSLCKTRMIOS):	/* const struct termios * *//* XXX */
+			access |= FEXCL;
+		case _IOC_NR(TCGETS):	/* struct termios * *//* SVID *//* XXX */
+		case _IOC_NR(TIOCGLCKTRMIOS):	/* struct termios * *//* XXX */
+			length = sizeof(struct termios);
+			break;
+		case _IOC_NR(TCSETA):	/* const struct termio * *//* SVID *//* XXX */
+		case _IOC_NR(TCSETAW):	/* const struct termio * *//* SVID *//* XXX */
+		case _IOC_NR(TCSETAF):	/* const struct termio * *//* SVID *//* XXX */
+			access |= FEXCL;
+		case _IOC_NR(TCGETA):	/* struct termio * *//* SVID *//* XXX */
+			length = sizeof(struct termio);
+			break;
+		case _IOC_NR(TCSBRK):	/* int *//* SVID *//* XXX */
+		case _IOC_NR(TCXONC):	/* int *//* SVID *//* XXX */
+		case _IOC_NR(TCFLSH):	/* int *//* SVID *//* XXX */
+#ifdef TCDSET
+		case _IOC_NR(TCDSET):
+#endif
+			access |= FEXCL;
+			break;
+#if 0				/* let these go tranparent */
+		case _IOC_NR(TIOCFLUSH):	/* int *//* BSD */
+			access |= FEXCL;
+			/* just use arg, make them transparent */
+			break;
+		case _IOC_NR(TIOCSCTTY):	/* int *//* XXX */
+		case _IOC_NR(TCSBRKP):	/* int *//* used by tcsendbreak *//* XXX */
+		case _IOC_NR(TIOCSPTLCK):	/* int *//* Lock/unlock Pty *//* XXX */
+			/* just use arg, make them transparent */
+			break;
+#endif
+		case _IOC_NR(TIOCNXCL):	/* void *//* BSD *//* XXX */
+		case _IOC_NR(TIOCEXCL):	/* void *//* BSD *//* XXX */
+			access |= FEXCL;
+			length = 0;	/* no argument - simple return */
+			break;
+#if 0
+			/* conflicts with TCSBRK on ppc */
+		case _IOC_NR(TIOCCONS):	/* void *//* BSD *//* XXX */
+#endif
+		case _IOC_NR(TIOCNOTTY):	/* void *//* XXX */
+		case _IOC_NR(TIOCSERCONFIG):	/* void *//* XXX */
+			length = 0;	/* no argument - simple return */
+			break;
+#if 0
+		case _IOC_NR(FIOCLEX):	/* void *//* XXX */
+		case _IOC_NR(FIONCLEX):	/* void *//* XXX */
+			/* Note: FIOCLEX and FIONCLEX (close_on_exec) and handled by sys_ioctl() */
+			length = 0;	/* no argument - simple return */
+			break;
+		case _IOC_NR(FIOASYNC):	/* const int * *//* XXX */
+			/* Note: FIOASYNC is handled by sys_ioctl() and strfasync() and FASYNC. */
+		case _IOC_NR(FIONBIO):	/* const int * *//* XXX */
+			/* Note: FIONBIO (nonblocking io) is handled by sys_ioctl() and FNDELAY. */
+			access |= FEXCL;
+			length = sizeof(int);
+			break;
+		case _IOC_NR(FIOQSIZE):
+			/* Note: FIOQSIZE is intercepted by sys_ioctl() */
+			length = sizeof(loff_t);
+			break;
+#endif
+		case _IOC_NR(TIOCOUTQ):	/* int * *//* BSD *//* XXX */
+#if 0
+#if (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(TCSBRK))
+		case _IOC_NR(TIOCINQ):	/* int * *//* also FIONREAD *//* XXX */
+#endif
+#endif
+#if 0
+#if ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(TCSBRK)) && (FIONREAD != TIOCINQ))
+		case _IOC_NR(FIONREAD):	/* int * *//* XXX */
+#endif
+#endif
+			length = sizeof(int);
+			break;
+#if 0
+		case _IOC_NR(TIOCHPCL):	/* void *//* BSD */
+		case _IOC_NR(TIOCSTOP):	/* void *//* BSD */
+		case _IOC_NR(TIOCSTART):	/* void *//* BSD */
+			access |= FEXCL;
+			length = 0;	/* no argument - simple return */
+			break;
+#endif
+		case _IOC_NR(TIOCSBRK):	/* void *//* BSD *//* XXX */
+		case _IOC_NR(TIOCCBRK):	/* void *//* BSD *//* XXX */
+			access |= FEXCL;
+			length = 0;	/* no argument - simple return */
+			break;
+		case _IOC_NR(TIOCGSID):	/* pid_t * *//* SVID *//* XXX */
+			printd(("%s: got TIOCGSID\n", __FUNCTION__));
+			return tty_tiocgsid(file, sd, arg);	/* compatible */
+		case _IOC_NR(TIOCGPGRP):	/* pid_t * *//* SVID *//* XXX */
+			printd(("%s: got TIOCGPGRP\n", __FUNCTION__));
+			return tty_tiocgpgrp(file, sd, arg);
+		case _IOC_NR(TIOCSPGRP):	/* const pid_t * *//* SVID *//* XXX */
+			printd(("%s: got TIOCSPGRP\n", __FUNCTION__));
+			return tty_tiocspgrp(file, sd, arg);
+		case _IOC_NR(TIOCSTI):	/* const char * *//* BSD *//* XXX */
+			access |= FEXCL;
+			length = sizeof(char);
+			break;
+#if 0
+			/* conflict with TCSETAF on ppc */
+		case _IOC_NR(TIOCLINUX):	/* const char * and more *//* XXX */
+			/* hmmm */
+			break;
+#endif
+		case _IOC_NR(TIOCSWINSZ):	/* const struct winsize * *//* XXX */
+			access |= FEXCL;
+		case _IOC_NR(TIOCGWINSZ):	/* struct winsize * *//* BSD *//* XXX */
+			length = sizeof(struct winsize);
+			break;
+#if 0
+			/* conflicts with TCSETA on ppc */
+		case _IOC_NR(TIOCMSET):	/* const int * *//* SVID *//* XXX */
+			/* conflicts with TCSETSF on ppc */
+		case _IOC_NR(TIOCMBIS):	/* const int * *//* SVID *//* XXX */
+			/* conflicts with TCGETA on ppc */
+		case _IOC_NR(TIOCMBIC):	/* const int * *//* SVID *//* XXX */
+#endif
+		case _IOC_NR(TIOCSSOFTCAR):	/* const int * *//* XXX */
+		case _IOC_NR(TIOCPKT):	/* const int * *//* BSD *//* XXX */
+		case _IOC_NR(TIOCSETD):	/* const int * *//* BSD *//* XXX */
+		case _IOC_NR(TIOCSERSWILD):	/* const int * *//* XXX */
+			access |= FEXCL;
+#if 0
+			/* conflicts with TCSETSW on ppc */
+		case _IOC_NR(TIOCMGET):	/* int * *//* SVID *//* XXX */
+			/* conflicts with TCSETAW on ppc */
+		case _IOC_NR(TIOCGSOFTCAR):	/* int * *//* XXX */
+#endif
+		case _IOC_NR(TIOCGETD):	/* int * *//* BSD *//* XXX */
+		case _IOC_NR(TIOCGPTN):	/* unsigned int * *//* Get Pty Number (of pty-mux device) *//* XXX */
+		case _IOC_NR(TIOCSERGWILD):	/* int * *//* XXX */
+		case _IOC_NR(TIOCSERGETLSR):	/* int * *//* Get line status register *//* XXX */
+			length = sizeof(int);
+			break;
+#if 0
+		case _IOC_NR(TIOCSSERIAL):	/* const struct serial_struct * *//* XXX */
+			access |= FEXCL;
+		case _IOC_NR(TIOCGSERIAL):	/* struct serial_struct * *//* XXX */
+			length = sizeof(struct serial_struct);
+			break;
+#endif
+#ifdef TIOCTTYGSTRUCT
+		case _IOC_NR(TIOCTTYGSTRUCT):	/* struct tty_struct * *//* debuggin only */
+			length = sizeof(struct tty_struct);
+			break;
+#endif
+#if 0
+		case _IOC_NR(TIOCSERGSTRUCT):	/* struct async_struct * *//* debugging only *//* XXX */
+			length = sizeof(struct async_struct);
+			break;
+		case _IOC_NR(TIOCSERSETMULTI):	/* const struct serial_multiport_struct * *//* Set multiport config *//* XXX */
+			access |= FEXCL;
+		case _IOC_NR(TIOCSERGETMULTI):	/* struct serial_multiport_struct * *//* Get multiport config *//* XXX */
+			length = sizeof(struct serial_multiport_struct);
+			break;
+#endif
+#if 0
+		case _IOC_NR(TIOCSETP):	/* const struct sgttyb * *//* BSD */
+		case _IOC_NR(TIOCSETN):	/* const struct sgttyb * *//* BSD */
+			access |= FEXCL;
+		case _IOC_NR(TIOCGETP):	/* struct sgttyb * *//* BSD */
+			length = sizeof(struct sgttyb);
+			break;
+		case _IOC_NR(TIOCSETC):	/* const struct tchars * *//* BSD */
+			access |= FEXCL;
+		case _IOC_NR(TIOCGETC):	/* struct tchars * *//* BSD */
+			length = sizeof(struct tchars);
+			break;
+		case _IOC_NR(TIOCSLTC):	/* const struct ltchars * *//* BSD */
+			access |= FEXCL;
+		case _IOC_NR(TIOCGLTC):	/* struct ltchars * *//* BSD */
+			length = sizeof(struct ltchars);
+			break;
+		case _IOC_NR(TIOCLBIC):	/* const int * *//* BSD */
+		case _IOC_NR(TIOCLBIS):	/* const int * *//* BSD */
+		case _IOC_NR(TIOCLSET):	/* const int * *//* BSD */
+			access |= FEXCL;
+			length = sizeof(int);
+			break;
+		case _IOC_NR(TIOCLGET):	/* void *//* BSD */
+			length = 0;
+			break;
+#endif
+#if 0				/* let these go tranparent */
+		case _IOC_NR(TIOCMIWAIT):	/* wait for change on serial input lines *//* XXX */
+		case _IOC_NR(TIOCGICOUNT):	/* read serial port inline interrupt counts *//* XXX */
+		case _IOC_NR(TIOCGHAYESESP):	/* Get Hayes ESP config *//* XXX */
+		case _IOC_NR(TIOCSHAYESESP):	/* Set Hayes ESP config *//* XXX */
+		case _IOC_NR(FIOQSIZE):	/* XXX */
+			break;
+#endif
+#if 0				/* let these go tranparent */
+		case _IOC_NR(TIOCWINSZ):	/* BSD */
+		case _IOC_NR(TIOCUCNTL):	/* BSD */
+			break;
+		case _IOC_NR(TIOCSDTR):	/* BSD */
+		case _IOC_NR(TIOCCDTR):	/* BSD */
+		case _IOC_NR(TIOCREMOTE):	/* AT&T */
+		case _IOC_NR(TIOCSIGNAL):
+		case _IOC_NR(LDSETT):
+		case _IOC_NR(LDSMAP):
+		case _IOC_NR(DIOCSETP):
+			access |= FEXCL;
+			break;
+#endif
+#if (_IOC_TYPE(TCSBRK) != _IOC_TYPE(FIOGETOWN))
+		}
+		break;
+	case _IOC_TYPE(FIOGETOWN):
+		switch (_IOC_NR(cmd)) {
+#endif
+		case _IOC_NR(FIOGETOWN):	/* pid_t * */
+			printd(("%s: got FIOGETOWN\n", __FUNCTION__));
+			return file_fiogetown(file, sd, arg);
+			break;
+		case _IOC_NR(FIOSETOWN):	/* const pid_t * */
+			printd(("%s: got FIOSETOWN\n", __FUNCTION__));
+			return file_fiosetown(file, sd, arg);
+#if 0
+		case _IOC_NR(FIOCLEX):	/* void *//* XXX */
+		case _IOC_NR(FIONCLEX):	/* void *//* XXX */
+			/* Note: FIOCLEX and FIONCLEX (close_on_exec) and handled by sys_ioctl() */
+			length = 0;	/* no argument - simple return */
+			break;
+		case _IOC_NR(FIOASYNC):	/* const int * *//* XXX */
+			/* Note: FIOASYNC is handled by sys_ioctl() and strfasync() and FASYNC. */
+		case _IOC_NR(FIONBIO):	/* const int * *//* XXX */
+			/* Note: FIONBIO (nonblocking io) is handled by sys_ioctl() and FNDELAY. */
+			access |= FEXCL;
+			length = sizeof(int);
+			break;
+		case _IOC_NR(FIOQSIZE):
+			/* Note: FIOQSIZE is intercepted by sys_ioctl() */
+			length = sizeof(loff_t);
+			break;
+#endif
+#if 1				/* (_IOC_TYPE(TIOCINQ) == _IOC_TYPE(FIOGETOWN)) */
+		case _IOC_NR(TIOCINQ):
+			length = sizeof(int);
+			break;
+#endif
+#if 0				/* ((_IOC_TYPE(FIONREAD) == _IOC_TYPE(FIOGETOWN)) && (FIONREAD !=
+				   TIOCINQ)) */
+		case _IOC_NR(FIONREAD):	/* int * *//* XXX */
+			length = sizeof(int);
+			break;
+#endif
+#if (_IOC_TYPE(FIOGETOWN) != _IOC_TYPE(SIOCATMARK))
+		}
+		break;
+	case _IOC_TYPE(SIOCATMARK):
+		switch (_IOC_NR(cmd)) {
+#endif
+		case _IOC_NR(SIOCATMARK):	/* int * */
+			printd(("%s: got SIOCATMARK\n", __FUNCTION__));
+			access |= FREAD;
+			return sock_siocatmark(file, sd, arg);
+		case _IOC_NR(SIOCSPGRP):	/* const pid_t * */
+			printd(("%s: got SIOCSPGRP\n", __FUNCTION__));
+			access |= FEXCL;
+			length = sizeof(pid_t);
+			return sock_siocspgrp(file, sd, arg);
+		case _IOC_NR(SIOCGPGRP):	/* pid_t * */
+			printd(("%s: got SIOCGPGRP\n", __FUNCTION__));
+			length = sizeof(pid_t);
+			return sock_siocgpgrp(file, sd, arg);
+		}
+		break;
+	}
+	if (locking & FWRITE)
+		swlock(sd);
+	else if (locking & FREAD)
+		srlock(sd);
+	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_slow(sd, access)) != 0))
+		err = str_i_default(file, sd, cmd, arg, length, access);
+	if (locking & FWRITE)
+		swunlock(sd);
+	else if (locking & FREAD)
+		srunlock(sd);
+	return (err);
+}
+
+/* Just about every 64-bit architecture has a 32-bit compatibility mode */
+STATIC __hot int
+_strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
+{
+	struct stdata *sd;
+	int err = -ENOSTR;
+
+	if (likely((sd = stri_acquire(file)) != NULL)) {
+		if (likely(!sd->sd_directio || !sd->sd_directio->compat_ioctl))
+			err = strioctl_compat(file, cmd, arg);
+		else
+			err = sd->sd_directio->compat_ioctl(file, cmd, arg);
+		ctrace(sd_put(&sd));
+	}
+	strsyscall();
+	return (err);
+}
+#endif				/* defined HAVE_COMPAT_IOCTL && defined WITH_32BIT_CONVERSION */
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -7881,6 +8536,11 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 	.poll = _strpoll,
 #if defined HAVE_UNLOCKED_IOCTL
 	.unlocked_ioctl = _strioctl,
+#endif
+#if 0
+#if defined HAVE_COMPAT_IOCTL
+	.compat_ioctl = _strioctl_compat,
+#endif
 #endif
 	.ioctl = _strioctl_locked,
 	.mmap = strmmap,

@@ -96,3 +96,4 @@
 -Tqi_qopen_t
 -Tqi_qclose_t
 -Tqi_qadmin_t
+-Tstreamscall

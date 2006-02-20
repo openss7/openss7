@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.33 2005/12/19 12:44:53 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.35 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:44:53 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: ddi.h,v $
+ Revision 0.9.2.35  2006/02/20 10:59:20  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/19 12:44:53 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.35 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_DDI_H__
 #warning "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -204,7 +209,7 @@ max(int a, int b)
 #define	HW_PROVIDER	0x0a
 #define SYSCRED		0x0b
 
-extern int sysctl_str_strmsgsz;
+extern ulong sysctl_str_strmsgsz;
 
 __STREAMS_EXTERN int drv_getparm(const unsigned int parm, void *value_p);
 

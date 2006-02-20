@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2005/12/29 21:31:37 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2006/02/20 09:34:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/29 21:31:37 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 09:34:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -947,7 +947,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
-			  asm/uaccess.h linux/kthread.h], [:], [:], [
+			  asm/uaccess.h linux/kthread.h linux/compat.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

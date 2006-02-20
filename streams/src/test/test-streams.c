@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/28 09:48:06 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/02/20 10:59:27 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:06 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.59  2006/02/20 10:59:27  brian
+ - updated copyright headers on changed files
+
+ Revision 0.9.2.58  2006/02/20 09:47:04  brian
+ - gcc 4.0.2 does not like (-1UL) on 64 bit
+
  Revision 0.9.2.57  2005/12/28 09:48:06  brian
  - remove warnings on FC4 compile
 
@@ -245,9 +251,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/28 09:48:06 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/02/20 10:59:27 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/12/28 09:48:06 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/02/20 10:59:27 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -333,7 +339,7 @@ pid_t test_pid[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 200	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1UL
+#define INFINITE_WAIT	-1
 #define TEST_DURATION	20000
 
 char cbuf[BUFSIZE];
@@ -2848,7 +2854,7 @@ space."
 int
 test_case_2_1_2(int child)
 {
-	if (test_ioctl(child, I_NREAD, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_NREAD, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -3025,7 +3031,7 @@ UnixWare."
 int
 test_case_2_2_3(int child)
 {
-	if (test_ioctl(child, I_PUSH, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_PUSH, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -3702,7 +3708,7 @@ Checks that I_FLUSH with an invalid argument returns EINVAL."
 int
 test_case_2_5_2(int child)
 {
-	if (test_ioctl(child, I_FLUSH, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_FLUSH, -1) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4119,12 +4125,12 @@ struct test_stream test_2_6_10 = { &preamble_0, &test_case_2_6_10, &postamble_0 
 #define sref_case_2_6_11 sref_case_2_6
 #define desc_case_2_6_11 "\
 Checks that EINVAL is returned when I_SRDOPT is called with an invalid\n\
-argument (-1UL)."
+argument (-1)."
 
 int
 test_case_2_6_11(int child)
 {
-	if (test_ioctl(child, I_SRDOPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_SRDOPT, -1) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4536,7 +4542,7 @@ space."
 int
 test_case_2_7_11(int child)
 {
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4699,7 +4705,7 @@ space."
 int
 test_case_2_8_1(int child)
 {
-	if (test_ioctl(child, I_STR, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_STR, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4721,7 +4727,7 @@ ic_len less than zero, which should return EINVAL."
 int
 test_case_2_8_2(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = -1, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = -1, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4744,7 +4750,7 @@ ic_len greater than streams.strmsgsz, which should return EINVAL."
 int
 test_case_2_8_3(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 262145, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 262145, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4767,7 +4773,7 @@ ic_timout less than minus one (-1), which should return EINVAL."
 int
 test_case_2_8_4(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = -2, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = -2, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4789,7 +4795,7 @@ Checks that I_STR can be performed on a Stream."
 int
 test_case_2_8_5(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4812,7 +4818,7 @@ returned when I_STR is attempted on a Stream that has hung up."
 int
 test_case_2_8_6(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != ENXIO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4835,7 +4841,7 @@ returned when I_STR is attempted on a Stream that has a read error."
 int
 test_case_2_8_7(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4858,7 +4864,7 @@ returned when I_STR is attempted on a Stream that has a write error."
 int
 test_case_2_8_8(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4881,7 +4887,7 @@ returned when I_STR is attempted on a Stream that has an error."
 int
 test_case_2_8_9(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4905,7 +4911,7 @@ Multiplexing Driver."
 int
 test_case_2_8_10(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5UL, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -5767,7 +5773,7 @@ space."
 int
 test_case_2_10_2(int child)
 {
-	if (test_ioctl(child, I_GETSIG, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8163,7 +8169,7 @@ value, resulting in the return of EINVAL."
 int
 test_case_2_19_9(int child)
 {
-	if (test_ioctl(child, I_SWROPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_SWROPT, -1) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8584,7 +8590,7 @@ space."
 int
 test_case_2_20_10(int child)
 {
-	if (test_ioctl(child, I_GWROPT, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9244,7 +9250,7 @@ Checks that I_FLUSHBAND with an invalid argument returns EINVAL."
 int
 test_case_2_24_2(int child)
 {
-	struct bandinfo bi = { 0, -1UL };
+	struct bandinfo bi = { 0, -1};
 
 	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
@@ -9268,7 +9274,7 @@ space."
 int
 test_case_2_24_3(int child)
 {
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10352,7 +10358,7 @@ space."
 int
 test_case_2_28_2(int child)
 {
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10760,7 +10766,7 @@ space."
 int
 test_case_2_29_2(int child)
 {
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10973,7 +10979,7 @@ newly opened Stream), the return value should be zero (0)."
 int
 test_case_2_30_4(int child)
 {
-	if (test_ioctl(child, I_CANPUT, (-1UL)) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_ioctl(child, I_CANPUT, (-1)) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -11196,7 +11202,7 @@ preamble_test_case_2_30_12(int child)
 int
 test_case_2_30_12(int child)
 {
-	if (test_ioctl(child, I_CANPUT, (-1UL)) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_CANPUT, (-1)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval != 0)
@@ -11227,7 +11233,7 @@ preamble_test_case_2_30_13(int child)
 int
 test_case_2_30_13(int child)
 {
-	if (test_ioctl(child, I_CANPUT, (-1UL)) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_CANPUT, (-1)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval == 0)
@@ -11355,7 +11361,7 @@ value, resulting in the return of EINVAL."
 int
 test_case_2_31_5(int child)
 {
-	if (test_ioctl(child, I_SERROPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_SERROPT, -1) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -11743,7 +11749,7 @@ space."
 int
 test_case_2_32_6(int child)
 {
-	if (test_ioctl(child, I_GERROPT, (intptr_t) -1UL) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) -1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -21777,7 +21783,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -21803,9 +21809,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -21833,7 +21838,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

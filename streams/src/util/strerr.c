@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/16 05:31:43 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:59:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/16 05:31:43 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:30 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strerr.c,v $
+ Revision 0.9.2.20  2006/02/20 10:59:30  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/16 05:31:43 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:59:30 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/10/16 05:31:43 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/20 10:59:30 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -578,7 +583,7 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -650,15 +655,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version  2  of  the  License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -1225,9 +1229,10 @@ main(int argc, char *argv[])
 				if (dat.len <= 0)
 					continue;
 				if (nomead && outfile[0] != '\0') {
+					time_t ltime = lc->ltime;
 					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 					fprintf(stdout, "%d", lc->seq_no);
-					fprintf(stdout, " %s", ctime(&lc->ltime));
+					fprintf(stdout, " %s", ctime(&ltime));
 					fprintf(stdout, "%lu", (unsigned long) lc->ttime);
 					fprintf(stdout, "%3d", lc->level);
 					if (lc->flags & SL_TRACE)

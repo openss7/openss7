@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.55 $) $Date: 2005/12/23 05:23:28 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.56 $) $Date: 2006/02/20 10:06:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 05:23:28 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 10:06:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -685,9 +685,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.55  2005/12/23 05:23:28  brian
-# - corrections
+# Revision 1.1.2.56  2006/02/20 10:06:58  brian
+# - changes for 64 bit distributions
 #
+
+* Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.55  2005/12/23 05:23:28  brian
+- corrections
 
 * Thu Dec 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.54  2005/12/22 15:16:17  brian

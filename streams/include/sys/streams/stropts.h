@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.21 2005/12/20 15:12:06 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.23 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/20 15:12:06 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stropts.h,v $
+ Revision 0.9.2.23  2006/02/20 10:59:20  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/12/20 15:12:06 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STROPTS_H__
 //#warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
@@ -70,7 +75,11 @@
 #endif
 
 #ifndef t_uscalar_t
+#ifdef __LP64__
+typedef u_int32_t t_uscalar_t;
+#else				/* __LP64__ */
 typedef unsigned long int t_uscalar_t;
+#endif				/* __LP64__ */
 #define t_uscalar_t t_uscalar_t
 #endif
 
@@ -295,6 +304,6 @@ struct strputpmsg {
 
 /* 2.6.8 thinks this stupid number is legitimate, but doesn't have unlocked_ioctl */
 /* upgrade your kernel please! */
-#define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678)
+#define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678UL)
 
 #endif				/* __SYS_STREAMS_STROPTS_H__ */

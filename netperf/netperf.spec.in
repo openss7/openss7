@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.48 $) $Date: 2005/12/30 12:21:28 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.49 $) $Date: 2006/02/20 10:07:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/30 12:21:28 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 10:07:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -676,9 +676,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.48  2005/12/30 12:21:28  brian
-# - updating release notes
+# Revision 1.1.2.49  2006/02/20 10:07:00  brian
+# - changes for 64 bit distributions
 #
+
+* Fri Dec 30 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.48  2005/12/30 12:21:28  brian
+- updating release notes
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.47  2005/12/23 05:23:28  brian

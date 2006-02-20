@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/12/23 20:28:20 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/02/20 10:06:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/23 20:28:20 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 10:06:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,7 +113,7 @@
 
 %{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/modutils}}
-%{!?_kmoduledir:     %{expand: %%global _kmoduledir   %%{_lib}/modules/%%{kernel_version}}}
+%{!?_kmoduledir:     %{expand: %%global _kmoduledir   /lib/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -442,7 +442,7 @@ fi
     --disable-dependency-tracking \
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
-    --with-k-modules=/%{_lib}/modules/%{kernel_version} \
+    --with-k-modules=%{_kmoduledir} \
     --with-base-major=%{majbase} \
     %{?_with_arch:               '%enable %_with_arch'} \
     %{?_without_arch:            '%disable %_without_arch'} \
@@ -541,8 +541,8 @@ package_source
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
-Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+Prefix:         %{_kmoduledir}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
@@ -778,24 +778,24 @@ fi
 %files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{_ksubdir}
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{_ksubdir}
-/%{_lib}/modules/%{kernel_version}/%{_ksubdir}/*
-%dir /%{_lib}/modules/%{kernel_version}/strxns
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strxns
-/%{_lib}/modules/%{kernel_version}/strxns/*
-%dir /%{_lib}/modules/%{kernel_version}/strxnet
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strxnet
-/%{_lib}/modules/%{kernel_version}/strxnet/*
-%dir /%{_lib}/modules/%{kernel_version}/strinet
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strinet
-/%{_lib}/modules/%{kernel_version}/strinet/*
-%dir /%{_lib}/modules/%{kernel_version}/strsctp
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strsctp
-/%{_lib}/modules/%{kernel_version}/strsctp/*
-%dir /%{_lib}/modules/%{kernel_version}/strss7
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strss7
-/%{_lib}/modules/%{kernel_version}/strss7/*
+%dir %{_kmoduledir}/%{_ksubdir}
+%attr(644,root,root) %{_kmoduledir}/modules.%{_ksubdir}
+%{_kmoduledir}/%{_ksubdir}/*
+%dir %{_kmoduledir}/strxns
+%attr(644,root,root) %{_kmoduledir}/modules.strxns
+%{_kmoduledir}/strxns/*
+%dir %{_kmoduledir}/strxnet
+%attr(644,root,root) %{_kmoduledir}/modules.strxnet
+%{_kmoduledir}/strxnet/*
+%dir %{_kmoduledir}/strinet
+%attr(644,root,root) %{_kmoduledir}/modules.strinet
+%{_kmoduledir}/strinet/*
+%dir %{_kmoduledir}/strsctp
+%attr(644,root,root) %{_kmoduledir}/modules.strsctp
+%{_kmoduledir}/strsctp/*
+%dir %{_kmoduledir}/strss7
+%attr(644,root,root) %{_kmoduledir}/modules.strss7
+%{_kmoduledir}/strss7/*
 %endif
 
 # ===========================================================================
@@ -803,8 +803,8 @@ fi
 
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
-Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+Prefix:         %{_kmoduledir}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
@@ -1049,17 +1049,17 @@ fi
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+%dir %{_kmoduledir}/%{base}
+%attr(644,root,root) %{_kmoduledir}/modules.%{base}
+%{_kmoduledir}/%{base}/*
 %endif
 
 %if %{FILES_ko_modules}
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+%dir %{_kmoduledir}/%{base}
+%{_kmoduledir}/%{base}/*
 %endif
 
 # ===========================================================================
@@ -1850,9 +1850,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.55  2005/12/23 20:28:20  brian
-# - use lsb initd last
+# Revision 0.9.2.56  2006/02/20 10:06:57  brian
+# - changes for 64 bit distributions
 #
+
+* Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.55  2005/12/23 20:28:20  brian
+- use lsb initd last
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.54  2005/12/23 05:23:27  brian

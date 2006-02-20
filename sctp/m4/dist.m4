@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/12/29 06:05:58 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/02/20 09:43:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/29 06:05:58 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 09:43:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,6 +61,7 @@ dnl _DISTRO_OPTIONS
     _DISTRO_SETUP
     _DISTRO_OUTPUT
     _DISTRO_CHECK_VENDOR
+    _DISTRO_ADJUST_64BIT_LIBDIR
 ])# _DISTRO
 # =============================================================================
 
@@ -596,6 +597,21 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 	fi
     fi
 ])# _DISTRO_CHECK_VENDOR
+# =============================================================================
+#
+# =============================================================================
+# _DISTRO_ADJUST_64BIT_LIBDIR
+# -----------------------------------------------------------------------------
+# adjust default lib directory for 64 bit
+AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
+    if test ":$libdir" = ':${exec_prefix}/lib' ; then 
+	case $host_cpu in
+	    (*64)
+		libdir='${exec_prefix}/lib64'
+		;;
+	esac
+    fi
+])# _DISTRO_ADJUST_64BIT_LIBDIR
 # =============================================================================
 
 # =============================================================================

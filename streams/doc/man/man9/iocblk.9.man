@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.9 2005/12/06 09:39:14 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.10 2006/02/20 09:35:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/12/06 09:39:14 $ by $Author: brian $
+.\" Last Modified $Date: 2006/02/20 09:35:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -467,7 +467,7 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR Solaris \(rg
 documents the
-.I ioc_flags
+.I ioc_flag
 member.
 .[
 soldoc
@@ -478,7 +478,7 @@ soldoc
 and
 .IR UXP/V \(rg
 do not document the
-.I ioc_flags
+.I ioc_flag
 member.
 .[
 suxspg
@@ -493,7 +493,7 @@ uxpspg
 Portable
 .I STREAMS
 drivers and modules will not access the
-.I ioc_flags
+.I ioc_flag
 member.
 .IP \(em
 .IR UnixWare \(rg
@@ -544,7 +544,7 @@ implementation as closely as possible.
 Portable
 .I STREAMS
 drivers and modules will not rely upon a specific overall size of the
-.BR ioclk (9)
+.BR iocblk (9)
 structure, or the offset or alignment of any of its members.
 .IP \(em
 Lining up these input-output control block data structures is tedious and uninteresting.  See

@@ -1,8 +1,24 @@
-OpenSS7 Linux Fast STREAMS -- history of user-visible changes.  2005-12-29
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 Linux Fast STREAMS -- history of user-visible changes.  2006-02-20
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Major changes for streams-0.7a.5
+
+  Changes to satisfy gcc 4.0.2 compiler.
+
+  Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+  mailing list.  Build and run tested on FC4 i686 and x86_64 kernels
+  based on 2.6.15.
+
+  Corrections for and testing of 64-bit clean compile and test runs on
+  x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
+  compiler warnings.
+
+  Initial corrections for and testing of SMP operation on Intel 630
+  Hyper-Threaded SMP on x86_64.  This stuff should run well on N-way
+  Xeons even with Hyper-Threading enabled.
+
 * Major changes for streams-0.7a.4
 
   This is primarily a bug fixes release and corrections resulting from
@@ -70,7 +86,7 @@ See the end for copying conditions.
 
 =========================================================================
 
-Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.

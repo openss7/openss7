@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/22 10:28:44 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/02/20 10:59:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/22 10:28:44 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:22 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strutil.c,v $
+ Revision 0.9.2.119  2006/02/20 10:59:22  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/22 10:28:44 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/02/20 10:59:22 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2005/12/22 10:28:44 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2006/02/20 10:59:22 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -3788,7 +3793,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(cred_t **) value_p = current_creds;
 		return (0);
 	case STRMSGSIZE:
-		*(int *) value_p = sysctl_str_strmsgsz;
+		*(int *) value_p = (int) sysctl_str_strmsgsz;
 		return (0);
 	case HW_PROVIDER:
 		*(char **) value_p = "Linux " UTS_RELEASE " " UTS_VERSION;

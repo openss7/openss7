@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.10 2005/10/13 10:58:34 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.12 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/13 10:58:34 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sc.h,v $
+ Revision 0.9.2.12  2006/02/20 10:59:20  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_SC_H__
 #define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/10/13 10:58:34 $"
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SC_H__
 #warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."
@@ -72,7 +77,13 @@ struct bar {
 	int bar;
 };
 
-#ifndef __KERNEL__
+/*
+ *  This was a really bad idea for 32-bit compatibility exposing this internal kernel structure.
+ *  What we really need to do is to define a new sc_module_info and sc_module_stat that is the same
+ *  across 32-bit and 64-bit architectures.
+ */
+
+#if 0
 #undef  module_info
 #define module_info smodule_info
 struct module_info {
@@ -96,11 +107,30 @@ typedef struct module_stat {
 } module_stat_t;
 #endif
 
+struct sc_module_info {
+	int16_t mi_idnum;		/* module id number */
+	char mi_idname[FMNAMESZ+1];	/* module name */
+	int32_t mi_minpsz;		/* min packet size accepted */
+	int32_t mi_maxpsz;		/* max packet size accepted */
+	u_int32_t mi_hiwat;		/* hi water mark */
+	u_int32_t mi_lowat;		/* lo water mark */
+};
+
+typedef struct sc_module_stat {
+	int32_t ms_pcnt;		/* calls to qi_putp() */
+	int32_t ms_scnt;		/* calls to qi_srvp() */
+	int32_t ms_ocnt;		/* calls to qi_qopen() */
+	int32_t ms_ccnt;		/* calls to qi_qclose() */
+	int32_t ms_acnt;		/* calls to qi_qadmin() */
+	u_int32_t ms_flags;		/* bool stats -- for future use */
+	int16_t ms_xsize;		/* len of private stats */
+} sc_module_stat_t;
+
 struct sc_mlist {
 	int major;
 	char name[FMNAMESZ + 1];
-	struct module_info mi;
-	struct module_stat ms;
+	struct sc_module_info mi;
+	struct sc_module_stat ms;
 };
 
 struct sc_list {

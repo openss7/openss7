@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/19 12:45:16 $
+ @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/02/20 10:59:21 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/19 12:45:16 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: specfs.c,v $
+ Revision 0.9.2.6  2006/02/20 10:59:21  brian
+ - updated copyright headers on changed files
+
+ Revision 0.9.2.5  2006/02/20 09:44:07  brian
+ - gcc 4.0.2 does not like declared but unused static functions
+
  Revision 0.9.2.4  2005/12/19 12:45:16  brian
  - locking down for release
 
@@ -69,15 +74,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/19 12:45:16 $"
+#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/02/20 10:59:21 $"
 
-static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/12/19 12:45:16 $";
+static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/02/20 10:59:21 $";
 
 /* can we just include these into one big compilation unit? */
 
 #define BIG_COMPILE 1
 #define BIG_STATIC static
 #define BIG_STATIC_INLINE static streams_inline
+
+#define BIG_COMPILE_SPECFS 1
 
 #ifdef CONFIG_STREAMS_STH
 #define BIG_STATIC_STH static

@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:03 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:03 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:24 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sc.c,v $
+ Revision 0.9.2.43  2006/02/20 10:59:24  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:03 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:03 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -79,8 +84,8 @@ static char const ident[] =
 #include "src/kernel/strlookup.h"
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/12/28 09:48:03 $"
+#define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/02/20 10:59:24 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -284,13 +289,37 @@ sc_wput(queue_t *q, mblk_t *mp)
 
 							qinit = cdev->d_str->st_wrinit;
 							mlist->major = cdev->d_major;
-							mlist->mi = *qinit->qi_minfo;
-							strncpy(mlist->name, mlist->mi.mi_idname,
-								FMNAMESZ + 1);
-							mlist->mi.mi_idname = NULL;
+							strncpy(mlist->name,
+									qinit->qi_minfo->mi_idname,
+									FMNAMESZ + 1);
+							// mlist->mi = *qinit->qi_minfo;
+							mlist->mi.mi_idnum = qinit->qi_minfo->mi_idnum;
+							strncpy(mlist->mi.mi_idname,
+									qinit->qi_minfo->mi_idname,
+									FMNAMESZ + 1);
+							mlist->mi.mi_minpsz =
+								qinit->qi_minfo->mi_minpsz;
+							mlist->mi.mi_maxpsz =
+								qinit->qi_minfo->mi_maxpsz;
+							mlist->mi.mi_hiwat =
+								qinit->qi_minfo->mi_hiwat;
+							mlist->mi.mi_lowat =
+								qinit->qi_minfo->mi_lowat;
 							if (qinit->qi_mstat) {
-								mlist->ms = *qinit->qi_mstat;
-								mlist->ms.ms_xptr = NULL;
+								mlist->ms.ms_pcnt =
+									qinit->qi_mstat->ms_pcnt;
+								mlist->ms.ms_scnt =
+									qinit->qi_mstat->ms_scnt;
+								mlist->ms.ms_ocnt =
+									qinit->qi_mstat->ms_ocnt;
+								mlist->ms.ms_ccnt =
+									qinit->qi_mstat->ms_ccnt;
+								mlist->ms.ms_acnt =
+									qinit->qi_mstat->ms_acnt;
+								mlist->ms.ms_flags =
+									qinit->qi_mstat->ms_flags;
+								mlist->ms.ms_xsize =
+									qinit->qi_mstat->ms_xsize;
 							}
 							n++;
 							mlist++;
@@ -313,13 +342,37 @@ sc_wput(queue_t *q, mblk_t *mp)
 
 							qinit = fmod->f_str->st_wrinit;
 							mlist->major = 0;
-							mlist->mi = *qinit->qi_minfo;
-							strncpy(mlist->name, mlist->mi.mi_idname,
-								FMNAMESZ + 1);
-							mlist->mi.mi_idname = NULL;
+							strncpy(mlist->name,
+									qinit->qi_minfo->mi_idname,
+									FMNAMESZ + 1);
+							mlist->mi.mi_idnum =
+								qinit->qi_minfo->mi_idnum;
+							strncpy(mlist->mi.mi_idname,
+									qinit->qi_minfo->mi_idname,
+									FMNAMESZ + 1);
+							mlist->mi.mi_minpsz =
+								qinit->qi_minfo->mi_minpsz;
+							mlist->mi.mi_maxpsz =
+								qinit->qi_minfo->mi_maxpsz;
+							mlist->mi.mi_hiwat =
+								qinit->qi_minfo->mi_hiwat;
+							mlist->mi.mi_lowat =
+								qinit->qi_minfo->mi_lowat;
 							if (qinit->qi_mstat) {
-								mlist->ms = *qinit->qi_mstat;
-								mlist->ms.ms_xptr = NULL;
+								mlist->ms.ms_pcnt =
+									qinit->qi_mstat->ms_pcnt;
+								mlist->ms.ms_scnt =
+									qinit->qi_mstat->ms_scnt;
+								mlist->ms.ms_ocnt =
+									qinit->qi_mstat->ms_ocnt;
+								mlist->ms.ms_ccnt =
+									qinit->qi_mstat->ms_ccnt;
+								mlist->ms.ms_acnt =
+									qinit->qi_mstat->ms_acnt;
+								mlist->ms.ms_flags =
+									qinit->qi_mstat->ms_flags;
+								mlist->ms.ms_xsize =
+									qinit->qi_mstat->ms_xsize;
 							}
 							n++;
 							mlist++;
@@ -337,13 +390,13 @@ sc_wput(queue_t *q, mblk_t *mp)
 				ioc->copyreq.cq_addr = uaddr;
 				ioc->copyreq.cq_size = size;
 				ioc->copyreq.cq_flag = 0;
-				ioc->copyreq.cq_private = (mblk_t *) count;
+				ioc->copyreq.cq_private = (mblk_t *) (long) count;
 				qreply(q, mp);
 				return (0);
 			} else {
 				trace();
 				/* done */
-				rval = (int) ioc->copyresp.cp_private;
+				rval = (int) (long) ioc->copyresp.cp_private;
 				goto ack;
 			}
 		}

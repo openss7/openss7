@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/29 21:36:21 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/02/20 10:59:21 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:36:21 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:21 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strsched.c,v $
+ Revision 0.9.2.124  2006/02/20 10:59:21  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/29 21:36:21 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/02/20 10:59:21 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2005/12/29 21:36:21 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/02/20 10:59:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -291,6 +296,7 @@ bput(qband_t **bp)
 	prefetchw(bp);
 	if (qb != NULL) {
 		struct qbinfo *qbi = (typeof(qbi)) qb;
+
 		bp = NULL;
 
 		if (atomic_read(&qbi->qbi_refs) >= 1) {
@@ -481,7 +487,7 @@ di_put(struct devinfo *di)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(di_put);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(di_put);	/* include/sys/streams/strsubr.h */
 #endif
 #endif
 
@@ -635,7 +641,7 @@ allocq(void)
 	return (rq);
 }
 
-EXPORT_SYMBOL_NOVERS(allocq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(allocq);	/* include/sys/streams/stream.h */
 
 BIG_STATIC_STH void streams_fastcall sd_put_slow(struct stdata **sdp);
 
@@ -704,7 +710,7 @@ freeq(queue_t *rq)
 	freeq_fast(rq);
 }
 
-EXPORT_SYMBOL_NOVERS(freeq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(freeq);	/* include/sys/streams/stream.h */
 
 /* queue gets and puts */
 BIG_STATIC streams_fastcall __hot_out queue_t *
@@ -753,7 +759,7 @@ qput(queue_t **qp)
  */
 STATIC __hot_out void
 mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
-{ /* IRQ DISABLED? */
+{				/* IRQ DISABLED? */
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct mdbblock *md = obj;
 
@@ -826,7 +832,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 
 #if 0
 		md->msgblk.m_func = func;
-		ctrace(md->msgblk.m_queue = NULL;
+		ctrace(md->msgblk.m_queue = NULL);
 #endif
 #if defined CONFIG_STREAMS_DEBUG
 		write_lock_irqsave(&smi->si_rwlock, flags);
@@ -1087,7 +1093,7 @@ linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 		spin_lock(&link_index_lock);
 		/* must be non-zero */
-		if ((l->l_index = (int) l) == 0)
+		if ((l->l_index = (int) (unsigned long) l) == 0)
 			l->l_index++;	/* bite me */
 		/* must be positive */
 		if (l->l_index < 0)
@@ -1121,7 +1127,7 @@ alloclk(void)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(alloclk);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(alloclk);	/* include/sys/streams/strsubr.h */
 #endif
 
 BIG_STATIC_STH streams_fastcall __unlikely void
@@ -1140,7 +1146,7 @@ freelk(struct linkblk *l)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(freelk);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(freelk);	/* include/sys/streams/strsubr.h */
 #endif
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -1361,7 +1367,7 @@ sealloc(void)
 	return ctrace(event_alloc(SE_STREAM, NULL));
 }
 
-EXPORT_SYMBOL_NOVERS(sealloc);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sealloc);	/* include/sys/streams/strsubr.h */
 
 /**
  *  sefree:	- deallocate a stream event structure
@@ -1374,7 +1380,7 @@ sefree(struct strevent *se)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(sefree);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sefree);	/* include/sys/streams/strsubr.h */
 
 /*
  *  -------------------------------------------------------------------------
@@ -1563,8 +1569,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	return (id);
 }
 STATIC streams_fastcall long
-defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl,
-		    int cpu)
+defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsigned long pl, int cpu)
 {
 	long id = 0;
 	struct strevent *se;
@@ -1652,7 +1657,7 @@ bufcall(unsigned size, int priority, void streamscall streamscall (*function) (l
 	return __bufcall(NULL, size, priority, function, arg);
 }
 
-EXPORT_SYMBOL_NOVERS(bufcall);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(bufcall);	/* include/sys/streams/stream.h */
 
 /**
  *  esbbcall:	- schedule a buffer callout
@@ -1715,7 +1720,7 @@ timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 
-EXPORT_SYMBOL_NOVERS(timeout);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(timeout);	/* include/sys/streams/stream.h */
 
 /**
  *  untimeout:	- cancel a timeout callback
@@ -1815,7 +1820,7 @@ weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_
 	return __weldq(q1, q2, q3, q4, func, arg, protq);
 }
 
-EXPORT_SYMBOL_NOVERS(weldq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(weldq);	/* include/sys/streams/stream.h */
 
 /**
  *  unweldq:	- unweld two queue pairs from each other
@@ -1854,7 +1859,7 @@ unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
 	return __unweldq(q1, NULL, q3, NULL, func, arg, protq);
 }
 
-EXPORT_SYMBOL_NOVERS(unweldq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(unweldq);	/* include/sys/streams/stream.h */
 
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
@@ -2597,7 +2602,7 @@ qputp_slow(queue_t *q, mblk_t *mp)
  */
 streams_fastcall void
 put(queue_t *q, mblk_t *mp)
-{ /* PROFILED */
+{				/* PROFILED */
 	struct strthread *t = this_thread;
 
 	dassert(mp);
@@ -2749,7 +2754,7 @@ putnext(queue_t *q, mblk_t *mp)
 	trace();
 }
 
-EXPORT_SYMBOL_NOVERS(putnext);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_NOVERS(putnext);	/* include/sys/streams/stream.h */
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /**
@@ -3513,10 +3518,7 @@ qscan(queue_t *q)
 		__raise_streams();
 }
 
-EXPORT_SYMBOL_NOVERS(qscan);		/* for stream head in include/sys/streams/strsubr.h */
-
-
-
+EXPORT_SYMBOL_NOVERS(qscan);	/* for stream head in include/sys/streams/strsubr.h */
 
 /*
  *  scanqueues:	- scan held queues
@@ -3945,8 +3947,7 @@ __runqueues(struct softirq_action *unused)
 			if (unlikely(test_bit(strevents, &t->flags) != 0))
 				ctrace(doevents(t));
 			/* do buffer calls if necessary */
-			if (unlikely
-			    (test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
+			if (unlikely(test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
 				ctrace(bufcalls(t));
 		}
 		clear_bit(qwantrun, &t->flags);
@@ -3965,7 +3966,7 @@ __runqueues(struct softirq_action *unused)
  */
 streams_fastcall __hot_in void
 runqueues(void)
-{ /* PROFILED */
+{				/* PROFILED */
 #if defined HAVE_KINC_LINUX_KTHREAD_H
 	preempt_disable();
 #endif
@@ -4081,7 +4082,7 @@ __freestr(struct stdata *sd)
 	kmem_cache_free(si->si_cache, sh);
 }
 
-EXPORT_SYMBOL_NOVERS(freestr);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(freestr);	/* include/sys/streams/strsubr.h */
 
 STATIC __unlikely void
 sd_free(struct stdata *sd)
@@ -4118,7 +4119,7 @@ sd_get(struct stdata *sd)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(sd_get);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sd_get);	/* include/sys/streams/strsubr.h */
 #endif
 BIG_STATIC_INLINE_STH streams_fastcall __hot void
 sd_put(struct stdata **sdp)
@@ -4140,7 +4141,7 @@ sd_put(struct stdata **sdp)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(sd_put);		/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_NOVERS(sd_put);	/* include/sys/streams/strsubr.h */
 #endif
 
 BIG_STATIC_STH streams_fastcall void
@@ -4148,7 +4149,6 @@ sd_put_slow(struct stdata **sdp)
 {
 	sd_put(sdp);
 }
-
 
 streams_fastcall __unlikely void
 freestr(struct stdata *sd)
@@ -4252,8 +4252,7 @@ str_init_caches(void)
 		if (ci->size == 0)
 			continue;
 		si->si_cache =
-		    kmem_cache_create(ci->name, ci->size, ci->offset, ci->flags, ci->ctor,
-				      ci->dtor);
+		    kmem_cache_create(ci->name, ci->size, ci->offset, ci->flags, ci->ctor, ci->dtor);
 		if (si->si_cache != NULL)
 			continue;
 		printk(KERN_ERR "%s: could not allocate %s cache\n", __FUNCTION__, ci->name);
@@ -4355,29 +4354,29 @@ takeover_strsched(unsigned int cpu)
 STATIC int __devinit
 str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 {
-	int hotcpu = (unsigned long) hcpu;
-	struct strthread *t = &strthreads[hotcpu];
+	int cpu = (long) hcpu;
+	struct strthread *t = &strthreads[cpu];
 	struct task_struct *p = t->proc;
 
 	switch (action) {
 	case CPU_UP_PREPARE:
-		if (IS_ERR(p = kthread_create(kstreamd, hcpu, "kstreamd/%d", hotcpu))) {
-			pswerr(("kstreamd for %i failed\n", hotcpu));
+		if (IS_ERR(p = kthread_create(kstreamd, hcpu, "kstreamd/%d", cpu))) {
+			__pswerr(("kstreamd for cpu %d failed\n", cpu));
 			return (NOTIFY_BAD);
 		}
-		kthread_bind(p, hotcpu);
 		t->proc = p;
+		kthread_bind(p, cpu);
 		break;
 	case CPU_ONLINE:
 		wake_up_process(p);
 		break;
 #if defined CONFIG_HOTPLUG_CPU
-	case CPU_UP_CANCELLED:
+	case CPU_UP_CANCELED:
 		kthread_bind(p, smp_processor_id());
 	case CPU_DEAD:
-		t->proc = NULL;
 		kthread_stop(p);
-		takeover_strsched(hotcpu);
+		takeover_strsched(cpu);
+		t->proc = NULL;
 		break;
 #endif				/* defined CONFIG_HOTPLUG_CPU */
 	}
@@ -4386,13 +4385,25 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 STATIC struct notifier_block __devinitdata str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
+
+/* This was OK for boot, but not for starting threads after all the processors have come online.  So
+ * we check which processors are online and start their threads.  Note that this will also still
+ * work for boot. */
 STATIC __unlikely int
 spawn_kstreamd(void)
 {
-	void *cpu = (void *) (long) smp_processor_id();
+	int cpu;
 
-	str_cpu_callback(&str_cpu_nfb, CPU_UP_PREPARE, cpu);
-	str_cpu_callback(&str_cpu_nfb, CPU_ONLINE, cpu);
+	for (cpu = 0; cpu < NR_CPUS; cpu++) {
+
+		if (likely((cpu_present(cpu) && cpu_online(cpu)))) {
+			void *hcpu = (void *) (long) cpu;
+
+			if (str_cpu_callback(&str_cpu_nfb, CPU_UP_PREPARE, hcpu) == NOTIFY_OK)
+				str_cpu_callback(&str_cpu_nfb, CPU_ONLINE, hcpu);
+		}
+	}
+	/* FIXME: Some race between turning processes up and registering the notifier. */
 	register_cpu_notifier(&str_cpu_nfb);
 	return (0);
 }
@@ -4408,8 +4419,8 @@ kill_kstreamd(void)
 		if (p) {
 			/* make it runnable on this processor */
 			kthread_bind(p, smp_processor_id());
-			t->proc = NULL;
 			kthread_stop(p);
+			t->proc = NULL;
 		}
 	}
 	/* FIXME: need to clean out outstanding events now that everything is stopped */

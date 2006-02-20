@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.50 $) $Date: 2005/12/30 12:21:10 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.51 $) $Date: 2006/02/20 10:06:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/12/30 12:21:10 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 10:06:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -112,7 +112,7 @@
 
 %{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/modutils}}
-%{!?_kmoduledir:     %{expand: %%global _kmoduledir   %%{_lib}/modules/%%{kernel_version}}}
+%{!?_kmoduledir:     %{expand: %%global _kmoduledir   /lib/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -418,7 +418,7 @@ fi
     --disable-dependency-tracking \
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
-    --with-k-modules=/%{_lib}/modules/%{kernel_version} \
+    --with-k-modules=%{_kmoduledir} \
     --with-base-major=%{majbase} \
     %{?_with_arch:               '%enable %_with_arch'} \
     %{?_without_arch:            '%disable %_without_arch'} \
@@ -524,8 +524,8 @@ package_source
 
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
-Prefix:         /%{_lib}/modules/%{kernel_version}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+Prefix:         %{_kmoduledir}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
@@ -780,17 +780,17 @@ fi
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+%dir %{_kmoduledir}/%{base}
+%attr(644,root,root) %{_kmoduledir}/modules.%{base}
+%{_kmoduledir}/%{base}/*
 %endif
 
 %if %{FILES_ko_modules}
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+%dir %{_kmoduledir}/%{base}
+%{_kmoduledir}/%{base}/*
 %endif
 
 # ===========================================================================
@@ -1602,9 +1602,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.50  2005/12/30 12:21:10  brian
-# - updating release notes
+# Revision 1.1.6.51  2006/02/20 10:06:59  brian
+# - changes for 64 bit distributions
 #
+
+* Fri Dec 30 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.50  2005/12/30 12:21:10  brian
+- updating release notes
 
 * Fri Dec 23 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.49  2005/12/23 20:28:22  brian

@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.15 2005/12/29 21:33:57 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.17 2006/02/20 10:59:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,33 +44,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:33:57 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strlog.h,v $
+ Revision 0.9.2.17  2006/02/20 10:59:20  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/12/29 21:33:57 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
-#endif
-
-#ifndef streams_fastcall
-#ifdef __i386__
-#define streams_fastcall __attribute__((__regparm__(3)))
-#else
-#define streams_fastcall
-#endif
-#endif
-
-#ifndef __EXTERN
-#define __EXTERN extern
-#endif
-
-#ifndef __STREAMS_EXTERN
-#define __STREAMS_EXTERN __EXTERN streams_fastcall
 #endif
 
 #include <stdarg.h>
@@ -93,6 +82,24 @@
 #define I_TRCLOG	(LOGCTL | 2)	/* trace logger */
 #define I_CONSLOG	(LOGCTL | 3)	/* console logger */
 
+#ifdef __KERNEL__
+
+#ifndef streams_fastcall
+#ifdef __i386__
+#define streams_fastcall __attribute__((__regparm__(3)))
+#else
+#define streams_fastcall
+#endif
+#endif
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+
 __STREAMS_EXTERN int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
     __attribute__ ((__format__(__printf__, 5, 6)));
 __STREAMS_EXTERN int vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt,
@@ -100,6 +107,30 @@ __STREAMS_EXTERN int vstrlog(short mid, short sid, char level, unsigned short fl
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 __STREAMS_EXTERN vstrlog_t register_strlog(vstrlog_t newlog);
+
+#endif				/* __KERNEL__ */
+
+#ifdef __LP64__
+
+struct trace_ids {
+	int16_t ti_mid;
+	int16_t ti_sid;
+	char ti_level;
+	int16_t ti_flags;		/* not for Solaris */
+};
+
+struct log_ctl {
+	int16_t mid;
+	int16_t sid;
+	char level;
+	int16_t flags;
+	int32_t ltime;			/* clock32_t or clock_t under Solaris */
+	int32_t ttime;			/* time32_t or time_t under Solaris */
+	int32_t seq_no;
+	int32_t pri;			/* priority = (facility|level) except HPUX */
+};
+
+#else				/* __LP64__ */
 
 struct trace_ids {
 	short ti_mid;
@@ -113,10 +144,12 @@ struct log_ctl {
 	short sid;
 	char level;
 	short flags;
-	long ltime;			/* clock32_t or clock_t under Solaris */
-	long ttime;			/* time32_t or time_t under Solaris */
+	clock_t ltime;			/* clock32_t or clock_t under Solaris */
+	clock_t ttime;			/* time32_t or time_t under Solaris */
 	int seq_no;
 	int pri;			/* priority = (facility|level) except HPUX */
 };
+
+#endif				/* __LP64__ */
 
 #endif				/* __SYS_STREAMS_STRLOG_H__ */

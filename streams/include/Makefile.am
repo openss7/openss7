@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/09/25 22:52:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2006/02/20 09:36:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/09/25 22:52:09 $ by $Author: brian $
+# Last Modified $Date: 2006/02/20 09:36:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,6 +68,7 @@ nobase_pkginclude_HEADERS = \
 	sys/stream.h \
 	sys/strlog.h \
 	sys/stropts.h \
+	sys/stropts32.h \
 	sys/strsubr.h \
 	sys/streams/cmn_err.h \
 	sys/streams/ddi.h \
@@ -79,6 +80,7 @@ nobase_pkginclude_HEADERS = \
 	sys/streams/stream.h \
 	sys/streams/strlog.h \
 	sys/streams/stropts.h \
+	sys/streams/stropts32.h \
 	sys/streams/strsubr.h
 
 if CONFIG_STREAMS_LOG

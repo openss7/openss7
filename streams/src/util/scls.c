@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/16 05:31:43 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/02/20 10:59:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/10/16 05:31:43 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:30 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: scls.c,v $
+ Revision 0.9.2.19  2006/02/20 10:59:30  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/16 05:31:43 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/02/20 10:59:30 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/10/16 05:31:43 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/02/20 10:59:30 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -88,7 +93,7 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -152,15 +157,14 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version  2  of  the  License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
@@ -213,10 +217,10 @@ printit(struct sc_mlist *l, int cmd)
 		fprintf(stdout, "\t%d", l->mi.mi_hiwat);
 		fprintf(stdout, "\t%d", l->mi.mi_lowat);
 	case CMN_COUNT:
-		fprintf(stdout, "\t%lu", l->ms.ms_pcnt);
-		fprintf(stdout, "\t%lu", l->ms.ms_scnt);
-		fprintf(stdout, "\t%lu", l->ms.ms_ocnt);
-		fprintf(stdout, "\t%lu", l->ms.ms_acnt);
+		fprintf(stdout, "\t%u", l->ms.ms_pcnt);
+		fprintf(stdout, "\t%u", l->ms.ms_scnt);
+		fprintf(stdout, "\t%u", l->ms.ms_ocnt);
+		fprintf(stdout, "\t%u", l->ms.ms_acnt);
 		fprintf(stdout, "\t%x", l->ms.ms_flags);
 	}
 	fprintf(stdout, "\n");

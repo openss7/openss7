@@ -1,18 +1,16 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/12/09 18:01:44 $
+ @(#) $Id: strsysctl.h,v 0.9.2.14 2006/02/20 10:59:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,12 +44,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/09 18:01:44 $ by $Author: brian $
+ Last Modified $Date: 2006/02/20 10:59:22 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strsysctl.h,v $
+ Revision 0.9.2.14  2006/02/20 10:59:22  brian
+ - updated copyright headers on changed files
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSYSCTL_H__
 #define __LOCAL_STRSYSCTL_H__
+
+#ident "@(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef BIG_STATIC
 #define BIG_STATIC
@@ -95,26 +101,26 @@ enum {
 	STREAMS_MSG_PRIORITY = 21,
 };
 
-BIG_STATIC int sysctl_str_maxpsz;	/* stream head default max packet size */
-BIG_STATIC int sysctl_str_minpsz;	/* stream head default min packet size */
-BIG_STATIC int sysctl_str_hiwat;	/* stream head default hi water mark */
-BIG_STATIC int sysctl_str_lowat;	/* stream head default lo water mark */
-BIG_STATIC int sysctl_str_cltime;	/* close wait time in msec (save in ticks) */
-BIG_STATIC int sysctl_str_rtime;	/* msec to wait to forward held msg (save in ticks) */
-BIG_STATIC int sysctl_str_ioctime;	/* msec to wait for ioctl() acknowledgement (save in ticks) */
-BIG_STATIC_STH int sysctl_str_nstrpush;		/* max pushed modules */
-BIG_STATIC int sysctl_str_strthresh;	/* memory limit */
-BIG_STATIC int sysctl_str_strhold;	/* active stream hold feature */
-BIG_STATIC_STH int sysctl_str_strctlsz;		/* maximum stream control size */
-extern int sysctl_str_strmsgsz;		/* maximum stream message size */
-BIG_STATIC int sysctl_str_nstrmsgs;	/* maximum number of streams messages */
-BIG_STATIC int sysctl_str_nband;	/* number of queue bands */
+BIG_STATIC ulong sysctl_str_maxpsz;	/* stream head default max packet size */
+BIG_STATIC ulong sysctl_str_minpsz;	/* stream head default min packet size */
+BIG_STATIC ulong sysctl_str_hiwat;	/* stream head default hi water mark */
+BIG_STATIC ulong sysctl_str_lowat;	/* stream head default lo water mark */
+BIG_STATIC ulong sysctl_str_cltime;	/* close wait time in msec (save in ticks) */
+BIG_STATIC ulong sysctl_str_rtime;	/* msec to wait to forward held msg (save in ticks) */
+BIG_STATIC ulong sysctl_str_ioctime;	/* msec to wait for ioctl() acknowledgement (save in ticks) */
+BIG_STATIC_STH ulong sysctl_str_nstrpush;		/* max pushed modules */
+BIG_STATIC ulong sysctl_str_strthresh;	/* memory limit */
+BIG_STATIC ulong sysctl_str_strhold;	/* active stream hold feature */
+BIG_STATIC_STH ulong sysctl_str_strctlsz;		/* maximum stream control size */
+extern ulong sysctl_str_strmsgsz;		/* maximum stream message size */
+BIG_STATIC ulong sysctl_str_nstrmsgs;	/* maximum number of streams messages */
+BIG_STATIC ulong sysctl_str_nband;	/* number of queue bands */
 BIG_STATIC int sysctl_str_reuse_fmodsw;	/* reuse fmodsw entries */
-BIG_STATIC int sysctl_str_max_apush;	/* max autopushed mods per str */
-BIG_STATIC int sysctl_str_max_stramod;	/* max autopushed modules */
-BIG_STATIC int sysctl_str_max_strdev;	/* max streams devices */
-BIG_STATIC int sysctl_str_max_strmod;	/* max streams modules */
-BIG_STATIC int sysctl_str_max_mblk;	/* max of headers on free list */
+BIG_STATIC ulong sysctl_str_max_apush;	/* max autopushed mods per str */
+BIG_STATIC ulong sysctl_str_max_stramod;	/* max autopushed modules */
+BIG_STATIC ulong sysctl_str_max_strdev;	/* max streams devices */
+BIG_STATIC ulong sysctl_str_max_strmod;	/* max streams modules */
+BIG_STATIC ulong sysctl_str_max_mblk;	/* max of headers on free list */
 BIG_STATIC int sysctl_str_msg_priority;	/* observer message allocation priority */
 
 /* initialization for main */
