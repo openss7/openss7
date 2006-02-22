@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.18 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.19 2006/02/22 11:35:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 11:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: kmem.h,v $
+ Revision 0.9.2.19  2006/02/22 11:35:46  brian
+ - added __x86_64__ and __k8__ to regparms
+
  Revision 0.9.2.18  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
@@ -68,7 +71,7 @@
 #endif				/* __KERNEL__ */
 
 #ifndef streams_fastcall
-# ifdef __i386__
+# if defined __i386__ || defined __x86_64__ || defined __k8__
 #  define streams_fastcall __attribute__((__regparm__(3)))
 # else
 #  define streams_fastcall

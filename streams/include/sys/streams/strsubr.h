@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.66 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.67 2006/02/22 11:37:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 11:37:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.67  2006/02/22 11:37:18  brian
+ - split giant wait queue into 4 independent queues
+
  Revision 0.9.2.66  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.66 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.67 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -229,7 +232,11 @@ struct stdata {
 	struct fasync_struct *sd_fasync;	/* list of procs for SIGIO */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
 	wait_queue_head_t sd_polllist;	/* waiters on poll */
-	wait_queue_head_t sd_waitq;	/* waiters */
+//	wait_queue_head_t sd_waitq;	/* waiters */
+	wait_queue_head_t sd_rwaitq;	/* waiters on read/getmsg/getpmsg/I_RECVFD */
+	wait_queue_head_t sd_wwaitq;	/* waiters on write/putmsg/putpmsg/I_SENDFD */
+	wait_queue_head_t sd_iwaitq;	/* waiters on ioctl */
+	wait_queue_head_t sd_owaitq;	/* waiters on open bit */
 //      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
 	ulong sd_rtime;			/* time to forward held message */
@@ -383,7 +390,7 @@ enum {
 };
 
 struct strthread {
-	volatile unsigned long flags;	/* flags */
+	unsigned long flags;		/* flags */
 	struct task_struct *proc;	/* task */
 	atomic_t lock;			/* thread lock */
 	mblk_t *freemblk_head;		/* head of free mdbblocks cached */

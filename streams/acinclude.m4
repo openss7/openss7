@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2006/02/20 09:34:49 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.113 $) $Date: 2006/02/22 11:36:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/02/20 09:34:49 $ by $Author: brian $
+# Last Modified $Date: 2006/02/22 11:36:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -883,7 +883,7 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	In binary compatibility mode, this sets the number of parameters passed
 	in registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
 	setting for the kernel. */], [   ], [/* ])[
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__ || defined __k8__
 #undef streamscall
 #else
 #define streamscall
@@ -894,7 +894,7 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	In binary compatibility mode, this sets the number of parameters passed
 	in registers to zero.  Otherwise, it defaults to the CONFIG_REPARM
 	setting for the kernel. */], [   ], [/* ])[
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__ || defined __k8__
 #undef STREAMSCALL
 #else
 #define STREAMSCALL(__x) __x
@@ -977,7 +977,8 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			read_trylock write_trylock atomic_add_return path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode set_user_nice \
-			set_cpus_allowed yield], [:], [
+			set_cpus_allowed yield \
+			prepare_to_wait prepare_to_wait_exclusive finish_wait], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"

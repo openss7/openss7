@@ -1,7 +1,42 @@
 # $Log: ChangeLog,v $
-# Revision 0.9.2.11  2006/02/20 09:34:31  brian
-# - updates for next release
+# Revision 0.9.2.12  2006/02/22 11:40:22  brian
+# - updates
 #
+
+2006-02-22 brian <bidulock@openss7.org>
+	* (ChangeLog): modified - updated
+	* (NEWS): modified - updated
+	* (acinclude.m4): modified
+	- check for new style wait queue elements
+	- added __x86_64__ and __k8__ to regparms
+	* (doc/manual/configure.texi): modified
+	* (doc/manual/rpm.texi): modified
+	* (include/sys/streams/config.h.in): modified
+	* (include/sys/streams/kmem.h): modified
+	* (include/sys/streams/strdebug.h): modified
+	* (include/sys/streams/strlog.h): modified
+	- added __x86_64__ and __k8__ to regparms
+	* (include/sys/streams/strsubr.h): modified
+	* (src/kernel/strsched.c): modified
+	- split giant wait queue into 4 independent wait queues
+	* (src/modules/sth.c): modified
+	- split giant wait queue into 4 independent wait queues
+	- adapt new and old style wait queue approach
+	* (tests/testsuite-clone.at): modified
+	* (tests/testsuite-connld.at): modified
+	* (tests/testsuite-echo.at): modified
+	* (tests/testsuite-fifo.at): modified
+	* (tests/testsuite-log.at): modified
+	* (tests/testsuite-loop.at): modified
+	* (tests/testsuite-mux.at): modified
+	* (tests/testsuite-nsdev.at): modified
+	* (tests/testsuite-nuls.at): modified
+	* (tests/testsuite-pipe.at): modified
+	* (tests/testsuite-pipemod.at): modified
+	* (tests/testsuite-sad.at): modified
+	* (tests/testsuite-sc.at): modified
+	* (tests/testsuite-streams.at): modified
+	- check for --quiet when running testsuites
 
 2006-02-20 brian <bidulock@openss7.org>
 	* (ChangeLog): modified - updated

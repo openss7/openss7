@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/02/22 11:39:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:24 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 11:39:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.138  2006/02/22 11:39:58  brian
+ - split giant wait queue into 4 independent queues
+ - adapt new and old style wait queue approach
+
  Revision 0.9.2.137  2006/02/20 10:59:24  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/02/22 11:39:58 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/02/22 11:39:58 $";
 
 //#define __NO_VERSION__
 
@@ -118,7 +122,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/02/20 10:59:24 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2006/02/22 11:39:58 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -391,28 +395,6 @@ strremove(struct stdata *sd)
 	}
 }
 
-/**
- *  strinccounts:   - increment open counts
- *  @sd:	STREAM head
- *  @oflag:	open flags
- *
- *  Increments the sd_opens, sd_readers, sd_writers counts as appropriate.  The reverse is performed
- *  by strdeccounts().
- *
- *  LOCKING: Caller must hold a stream head write lock (or have a private stream head).
- */
-STATIC streams_fastcall __unlikely dev_t
-strinccounts(struct file *file, struct stdata *sd, int oflag)
-{
-	sd->sd_opens++;
-	if (oflag & FREAD)
-		sd->sd_readers++;
-	if (oflag & FWRITE)
-		sd->sd_writers++;
-	sd->sd_file = file;
-	return (sd->sd_dev);
-}
-
 STATIC streams_fastcall __unlikely bool
 strdetached(struct stdata *sd)
 {
@@ -421,54 +403,6 @@ strdetached(struct stdata *sd)
 	    && !test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag))
 		return (true);
 	return (false);
-}
-
-/**
- *  strdeccounts:   - decrement STREAM counts and possibly wake other
- *  @sd:	STREAM head
- *  @oflag:	open() flags
- *
- *  Decrement the sd_opens, sd_readers and sd_writers counts as appropriate and possibly wake the
- *  other end of a STREAMS-based pipe.  Reverses the steps taken by strinccounts().
- *
- *  Return Value: Returns false (0) when this is not the last close.  Returns true (1) when this is
- *  the last close (and we are not linked under a multiplexing driver).
- *
- *  Notes: When the STREAM head is multiplexed (or is in the process of being multiplexed), or is
- *  mounted (or is in the process of being mounted) do not pop modules or perform any other STREAM
- *  head actions because the STREAM head queue pair is owned by the link or mount point.  We will
- *  have to perform close actions when the STREAM is unlinked or when a pending link operation
- *  fails, or unmounted or when a pending fattach operation fails. Leave the open count at zero so
- *  that the link/unlink code knows what is going on. Another open in the meantime might boost the
- *  count.
- */
-STATIC streams_fastcall __unlikely bool
-strdeccounts(struct stdata *sd, int oflag)
-{
-	bool last = false;
-	bool wake = false;
-
-	swlock(sd);
-
-	if ((oflag & FREAD) && --sd->sd_readers <= 0) {
-		sd->sd_readers = 0;
-		wake = true;
-	}
-	if ((oflag & FWRITE) && --sd->sd_writers <= 0) {
-		sd->sd_writers = 0;
-		wake = true;
-	}
-	if (--sd->sd_opens <= 0) {
-		sd->sd_opens = 0;
-		last = strdetached(sd);
-	}
-	if (wake && (sd->sd_flag & STRISPIPE) && sd->sd_other
-	    && waitqueue_active(&sd->sd_other->sd_waitq))
-		wake_up_interruptible(&sd->sd_other->sd_waitq);
-
-	swunlock(sd);
-
-	return (last);
 }
 
 /*
@@ -1231,6 +1165,10 @@ strsignal_locked(struct stdata *sd, mblk_t *mp, const int access)
  *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
  *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
  *
+ *  strgetq() is almost identical to sgtgetfp().  The only difference is that strgetq() will
+ *  retrieve an M_PROTO, M_PCPROTO or M_DATA message and return EBADMSG on M_PASSFP, and for
+ *  strgetfp() the situation is reversed.  Both procedures handle M_SIG messages the same.
+ *
  *  NOTICES: Note that M_PCPROTO is the only priority message that we place on the stream head read
  *  queue, so if the STRPRI bit is set, there is one (and only one) there.  We leave the STRPRI bit
  *  set because we need to release locks between taking the message off and putting it back.
@@ -1324,26 +1262,44 @@ strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
 
 /**
  *  strwaitgetq: - wait to get a message from a stream ala getpmsg
- *  @sd: STREAM head
+ *  @sd: Stream head
+ *  @q: queue from which to retrieve
  *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
  *  @band: priority band from which to get message
  *
- *  LOCKING: This function must be called with the Stream head read locked and the Stream frozen.
+ *  This function is almost identical to strwaitgetfp().
+ *
+ *  LOCKING: This function must be called with the Stream head read locked.
  *
  *  NOTICES: The call to this function can be pig slow: we are going to block anyway.
  *
+ *  Unfortunately now there are two different approaches to wait queue handling, one for 2.4 and one
+ *  for 2.6, and the 2.4 approach will not work for 2.6.  Also, there is no generic macro that does
+ *  what we need to do here, so we have to expose the internals of the wait queue implementation
+ *  here.
  */
 STATIC mblk_t *
 strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	mblk_t *mp;
 	int err;
 
 	srunlock(sd);
-	add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	add_wait_queue(&sd->sd_rwaitq, &wait);
+#endif
 	for (;;) {
 		strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
+#else
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 		srlock(sd);
 		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
 			mp = ERR_PTR(err);
@@ -1353,15 +1309,19 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 			mp = ERR_PTR(-EINTR);
 			break;
 		}
-		set_current_state(TASK_INTERRUPTIBLE);
-		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetq_slow(sd, q, flags, band)) != NULL))
 			break;
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
+
 		schedule();
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_rwaitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(&sd->sd_rwaitq, &wait);
+#endif
 	return (mp);
 }
 
@@ -1506,6 +1466,10 @@ strtestgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
  *  we should not even use the STRPRI bit, because we could always check
  *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
  *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
+ *
+ *  strgetfp() is almost identical to strgetq().   The only difference is that strgetfp() will
+ *  retreive an M_PASSFP message and return EBADMSG on M_PROTO, M_PCPROTO or M_DATA, and for
+ *  strgetq() the situation is reversed.  Both procedures handle M_SIG messages the same.
  */
 STATIC __unlikely mblk_t *
 strgetfp(struct stdata *sd, queue_t *q)
@@ -1563,35 +1527,66 @@ strgetfp_slow(struct stdata *sd, queue_t *q)
 	return strgetfp(sd, q);
 }
 
+/**
+ *  strwaitgetfp: - wait to get a file pointer from a stream ala I_RECVFD
+ *  @sd: Stream head
+ *  @q: queue from which to retrieve
+ *
+ *  This function is almost identical to strwaitgetq().
+ *
+ *  LOCKING: This function must be called with the Stream head read locked.
+ *
+ *  NOTICES: The call to this function can be pig slow: we are going to block anyway.
+ *
+ *  Unfortunately now there are two different approaches to wait queue handling, one for 2.4 and one
+ *  for 2.6, and the 2.4 approach will not work for 2.6.  Also, there is no generic macro that does
+ *  what we need to do here, so we have to expose the internals of the wait queue implementation
+ *  here.
+ */
 STATIC __unlikely mblk_t *
 strwaitgetfp(struct stdata *sd, queue_t *q)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	mblk_t *mp;
 	int err;
 
 	srunlock(sd);
-	add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	add_wait_queue(&sd->sd_rwaitq, &wait);
+#endif
 	for (;;) {
 		strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
+#else
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 		srlock(sd);
-		if ((err = straccess(sd, FREAD))) {
+		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
 			mp = ERR_PTR(err);
 			break;
 		}
-		if (signal_pending(current)) {
+		if (unlikely(signal_pending(current) != 0)) {
 			mp = ERR_PTR(-EINTR);
 			break;
 		}
-		set_current_state(TASK_INTERRUPTIBLE);
-		set_bit(RSLEEP_BIT, &sd->sd_flag);
-		if ((mp = strgetfp_slow(sd, q)))
+		if (likely((mp = strgetfp_slow(sd, q)) != NULL))
 			break;
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
+
 		schedule();
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_rwaitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(&sd->sd_rwaitq, &wait);
+#endif
 	return (mp);
 }
 
@@ -1636,13 +1631,24 @@ STATIC streams_fastcall int
 __strwaitband(struct stdata *sd, int band)
 {
 	/* wait for band to become available */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	int err = 0;
 
 	srunlock(sd);
-	add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	add_wait_queue(&sd->sd_wwaitq, &wait); /* exclusive? */
+#endif
 	for (;;) {
 		strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+		prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE); /* exclusive? */
+#else
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 		srlock(sd);
 		if (unlikely((err = straccess(sd, FWRITE)) != 0))
 			break;
@@ -1650,16 +1656,20 @@ __strwaitband(struct stdata *sd, int band)
 			err = -EINTR;
 			break;
 		}
-		set_current_state(TASK_INTERRUPTIBLE);
-		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		/* have read lock and access is ok */
 		if (likely(bcanputnext(sd->sd_wq, band)))
 			break;
+		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
+
 		schedule();
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_wwaitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(&sd->sd_wwaitq, &wait);
+#endif
 	return (err);
 }
 
@@ -1719,15 +1729,27 @@ strwaitband(struct stdata *sd, const int f_flags, const int band, const int flag
 STATIC streams_fastcall __unlikely int
 __strwaitopen(struct stdata *sd, const int access)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	int err;
 
 	swunlock(sd);
-	add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+	add_wait_queue_exclusive(&sd->sd_owaitq, &wait);
+#endif
+
 	/* Wait for the STWOPEN bit.  Only one open can be performed on a stream at a time. See
 	   Magic Garden. */
 	for (;;) {
 		strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+		prepare_to_wait_exclusive(&sd->sd_owaitq, &wait, TASK_INTERRUPTIBLE);
+#else
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 		swlock(sd);
 		if ((err = straccess_slow(sd, access)))
 			break;
@@ -1735,14 +1757,18 @@ __strwaitopen(struct stdata *sd, const int access)
 			err = -EINTR;
 			break;
 		}
-		set_current_state(TASK_INTERRUPTIBLE);
 		if (!test_and_set_bit(STWOPEN_BIT, &sd->sd_flag))
 			break;
 		swunlock(sd);
+
 		schedule();
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_rwaitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(&sd->sd_owaitq, &wait);
+#endif
 	return (err);
 }
 
@@ -1778,8 +1804,8 @@ strwakeopen_swunlock(struct stdata *sd)
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	if (!(detached = strdetached(sd))
-	    && waitqueue_active(&sd->sd_waitq))
-		wake_up_interruptible(&sd->sd_waitq);
+	    && waitqueue_active(&sd->sd_owaitq))
+		wake_up_interruptible(&sd->sd_owaitq);
 	swunlock(sd);
 	if (detached) {
 		strremove(sd);
@@ -1809,19 +1835,21 @@ strwakepoll(struct stdata *sd)
 
 STATIC streams_inline streams_fastcall __hot_out void
 strwakeread(struct stdata *sd)
-{				/* PROFILED */
-	if (unlikely(test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag)))	/* PROFILED */
-		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
-			wake_up_interruptible(&sd->sd_waitq);
+{
+	if (unlikely(waitqueue_active(&sd->sd_rwaitq) != 0)) {	/* PROFILED */
+		clear_bit(RSLEEP_BIT, &sd->sd_flag);
+		wake_up_interruptible(&sd->sd_rwaitq);
+	}
 	strwakepoll(sd);
 }
 
 STATIC streams_inline streams_fastcall __hot_in void
 strwakewrite(struct stdata *sd)
-{				/* PROFILED */
-	if (unlikely(test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag)))	/* PROFILED */
-		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
-			wake_up_interruptible(&sd->sd_waitq);
+{
+	if (unlikely(waitqueue_active(&sd->sd_wwaitq) != 0)) {	/* PROFILED */
+		clear_bit(WSLEEP_BIT, &sd->sd_flag);
+		wake_up_interruptible(&sd->sd_wwaitq);
+	}
 	strwakepoll(sd);
 }
 
@@ -1829,19 +1857,27 @@ STATIC streams_fastcall void
 strwakeiocwait(struct stdata *sd)
 {
 	if (likely(test_bit(IOCWAIT_BIT, &sd->sd_flag)))
-		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
-			wake_up_interruptible(&sd->sd_waitq);
+		if (likely(waitqueue_active(&sd->sd_iwaitq) != 0))
+			wake_up_interruptible_all(&sd->sd_iwaitq);
 }
 
 STATIC streams_fastcall void
 strwakeall(struct stdata *sd)
 {
-	if (unlikely(test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag) ||
-		     test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag) ||
-		     test_bit(IOCWAIT_BIT, &sd->sd_flag)))
-		if (likely(waitqueue_active(&sd->sd_waitq) != 0))
-			wake_up_interruptible(&sd->sd_waitq);
-	strwakepoll(sd);
+	if (unlikely(waitqueue_active(&sd->sd_rwaitq) != 0)) {
+		clear_bit(RSLEEP_BIT, &sd->sd_flag);
+		wake_up_interruptible_all(&sd->sd_rwaitq);
+	}
+	if (unlikely(waitqueue_active(&sd->sd_wwaitq) != 0)) {
+		clear_bit(WSLEEP_BIT, &sd->sd_flag);
+		wake_up_interruptible_all(&sd->sd_wwaitq);
+	}
+	if (unlikely(waitqueue_active(&sd->sd_iwaitq) != 0))
+		wake_up_interruptible_all(&sd->sd_iwaitq);
+	if (unlikely(waitqueue_active(&sd->sd_polllist) != 0))
+		wake_up_interruptible_all(&sd->sd_polllist);
+	if (unlikely(waitqueue_active(&sd->sd_owaitq) != 0))
+		wake_up_interruptible_all(&sd->sd_owaitq);
 }
 
 /**
@@ -1856,25 +1892,47 @@ strwakeall(struct stdata *sd)
 STATIC __unlikely int
 __strwaitfifo(struct stdata *sd, const int oflag)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	int err = 0;
+	wait_queue_head_t *waitq;
 
-	add_wait_queue(&sd->sd_waitq, &wait);
+	waitq = (oflag & FREAD) ? &sd->sd_rwaitq : &sd->sd_wwaitq;
+
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	add_wait_queue(waitq, &wait);
+#endif
 	for (;;) {
 		strschedule();	/* save context switch */
-		if ((err = straccess(sd, FCREAT)))
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+		prepare_to_wait(waitq, &wait, TASK_INTERRUPTIBLE);
+#else
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		if (unlikely((err = straccess_rlock(sd, FCREAT)) != 0))
 			break;
 		if (signal_pending(current)) {
 			err = -EINTR;
+			srunlock(sd);
 			break;
 		}
-		set_current_state(TASK_INTERRUPTIBLE);
-		if (sd->sd_readers >= 1 && sd->sd_writers >= 1)
+		if (likely(sd->sd_readers >= 1 && sd->sd_writers >= 1)) {
+			srunlock(sd);
 			break;
+		}
+		srunlock(sd);
+
 		schedule();
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(waitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(waitq, &wait);
+#endif
 	return (err);
 }
 
@@ -1900,25 +1958,39 @@ strwaitfifo(struct stdata *sd, const int oflag)
 STATIC streams_fastcall __unlikely void
 strwaitqueue(struct stdata *sd, queue_t *q)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	long timeo = sd->sd_closetime;
 	struct queinfo *qu = ((struct queinfo *) _RD(q));
 
 	set_bit(QWCLOSE_BIT, &q->q_flag);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	add_wait_queue(&qu->qu_qwait, &wait);
+#endif
 	for (;;) {
 		strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+		prepare_to_wait(&qu->qu_qwait, &wait, TASK_INTERRUPTIBLE);
+#else
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 		if (timeo == 0)
 			break;
 		if (signal_pending(current))
 			break;
 		if (!q->q_first)
 			break;
-		set_current_state(TASK_INTERRUPTIBLE);
 		timeo = schedule_timeout(timeo);
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&qu->qu_qwait, &wait);
+#else
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&qu->qu_qwait, &wait);
+#endif
 	clear_bit(QWCLOSE_BIT, &q->q_flag);
 }
 
@@ -1980,39 +2052,59 @@ strwaitclose(struct stdata *sd, int oflag)
 STATIC streams_fastcall int
 __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	int err = 0;
 
 	srunlock(sd);
-	add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	add_wait_queue(&sd->sd_iwaitq, &wait);
+#endif
 	/* Wait for the IOCWAIT bit.  Only one ioctl can be performed on a stream at a time. See
 	   Magic Garden.  However, only wait as long as we would have waited for a response to our
 	   input output control. */
 	if (timeo) {
 		for (;;) {
 			strschedule();	/* save context switch */
-			srlock(sd);
-			if ((err = straccess_wakeup(sd, 0, timeo, access)))
-				break;
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+			prepare_to_wait(&sd->sd_iwaitq, &wait, TASK_INTERRUPTIBLE);
+#else
 			set_current_state(TASK_INTERRUPTIBLE);
+#endif
+			srlock(sd);
+			if (unlikely((err = straccess_wakeup(sd, 0, timeo, access)) != 0))
+				break;
 			if (!test_and_set_bit(IOCWAIT_BIT, &sd->sd_flag))
 				break;
 			srunlock(sd);
+
 			*timeo = schedule_timeout(*timeo);
 		}
 	} else {
 		for (;;) {
 			strschedule();	/* save context switch */
-			srlock(sd);
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+			prepare_to_wait(&sd->sd_iwaitq, &wait, TASK_UNINTERRUPTIBLE);
+#else
 			set_current_state(TASK_UNINTERRUPTIBLE);
+#endif
+			srlock(sd);
 			if (!test_and_set_bit(IOCWAIT_BIT, &sd->sd_flag))
 				break;
 			srunlock(sd);
+
 			schedule();
 		}
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_iwaitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(&sd->sd_iwaitq, &wait);
+#endif
 	return (err);
 }
 
@@ -2046,31 +2138,41 @@ strwakeioctl(struct stdata *sd)
 		ctrace(freemsg(mp));
 	}
 	clear_bit(IOCWAIT_BIT, &sd->sd_flag);
-	if (waitqueue_active(&sd->sd_waitq))
-		wake_up_all(&sd->sd_waitq);
+	if (waitqueue_active(&sd->sd_iwaitq))
+		wake_up(&sd->sd_iwaitq);
 	srunlock(sd);		/* to balance strwaitioctl */
 }
 
 STATIC streams_fastcall mblk_t *
 __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+	DEFINE_WAIT(wait);
+#else
 	DECLARE_WAITQUEUE(wait, current);
+#endif
 	mblk_t *mp;
 	int err;
 
 	srunlock(sd);
 	/* We are waiting for a response to our downwards ioctl message.  Wait until the message
 	   arrives or the io check fails. */
-	add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+	add_wait_queue_exclusive(&sd->sd_iwaitq, &wait);
+#endif
 	if (timeo) {
 		do {
 			strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+			prepare_to_wait_exclusive(&sd->sd_iwaitq, &wait, TASK_INTERRUPTIBLE);
+#else
+			set_current_state(TASK_INTERRUPTIBLE);
+#endif
 			srlock(sd);
-			if ((err = straccess_wakeup(sd, 0, timeo, access))) {
+			if (unlikely((err = straccess_wakeup(sd, 0, timeo, access)) != 0)) {
 				mp = ERR_PTR(err);
 				break;
 			}
-			set_current_state(TASK_INTERRUPTIBLE);
 			mp = sd->sd_iocblk;
 			prefetchw(mp);
 			if (likely(mp != NULL)) {
@@ -2079,6 +2181,7 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 				break;
 			}
 			srunlock(sd);
+
 			*timeo = schedule_timeout(*timeo);
 			prefetchw(sd);
 		} while (1);
@@ -2086,8 +2189,12 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 		/* timeo is NULL for no timeout no signals */
 		do {
 			strschedule();	/* save context switch */
-			srlock(sd);
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+			prepare_to_wait_exclusive(&sd->sd_iwaitq, &wait, TASK_UNINTERRUPTIBLE);
+#else
 			set_current_state(TASK_UNINTERRUPTIBLE);
+#endif
+			srlock(sd);
 			mp = sd->sd_iocblk;
 			prefetchw(mp);
 			if (likely(mp != NULL)) {
@@ -2096,12 +2203,17 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 				break;
 			}
 			srunlock(sd);
+
 			schedule();
 			prefetchw(sd);
 		} while (1);
 	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_iwaitq, &wait);
+#else
 	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_waitq, &wait);
+	remove_wait_queue(&sd->sd_iwaitq, &wait);
+#endif
 	return (mp);
 }
 
@@ -2140,8 +2252,8 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
 				ctrace(freemsg(db));
 			}
 			/* might not be sleeping yet */
-			if (waitqueue_active(&sd->sd_waitq))
-				wake_up_all(&sd->sd_waitq);
+			if (waitqueue_active(&sd->sd_iwaitq))
+				wake_up(&sd->sd_iwaitq);
 			return (true);
 		} else
 			ptrace(("%s: ioctl response has wrong iocid\n", __FUNCTION__));
@@ -2677,8 +2789,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 #endif
 
 	/* wake everybody up before we block -- the STRCLOSE bit is set */
-	if (waitqueue_active(&sd->sd_waitq))
-		wake_up_all(&sd->sd_waitq);
+	strwakeall(sd);
 
 	/* block here till we get gosh darn buffers */
 	while (!(mb = allocb(sizeof(*ioc), BPRI_WAITOK))) ;
@@ -3137,6 +3248,76 @@ kill_sl(pid_t sess, int sig, int priv)
 #endif
 #endif
 
+/**
+ *  strinccounts:   - increment open counts
+ *  @sd:	STREAM head
+ *  @oflag:	open flags
+ *
+ *  Increments the sd_opens, sd_readers, sd_writers counts as appropriate.  The reverse is performed
+ *  by strdeccounts().
+ *
+ *  LOCKING: Caller must hold a stream head write lock (or have a private stream head).
+ */
+STATIC streams_fastcall __unlikely dev_t
+strinccounts(struct file *file, struct stdata *sd, int oflag)
+{
+	sd->sd_opens++;
+	if (oflag & FREAD)
+		sd->sd_readers++;
+	if (oflag & FWRITE)
+		sd->sd_writers++;
+
+	if ((sd->sd_flag & STRISFIFO))
+		strwakeall(sd);
+
+	sd->sd_file = file;
+	return (sd->sd_dev);
+}
+
+/**
+ *  strdeccounts:   - decrement STREAM counts and possibly wake other
+ *  @sd:	STREAM head
+ *  @oflag:	open() flags
+ *
+ *  Decrement the sd_opens, sd_readers and sd_writers counts as appropriate and possibly wake the
+ *  other end of a STREAMS-based pipe.  Reverses the steps taken by strinccounts().
+ *
+ *  Return Value: Returns false (0) when this is not the last close.  Returns true (1) when this is
+ *  the last close (and we are not linked under a multiplexing driver).
+ *
+ *  Notes: When the STREAM head is multiplexed (or is in the process of being multiplexed), or is
+ *  mounted (or is in the process of being mounted) do not pop modules or perform any other STREAM
+ *  head actions because the STREAM head queue pair is owned by the link or mount point.  We will
+ *  have to perform close actions when the STREAM is unlinked or when a pending link operation
+ *  fails, or unmounted or when a pending fattach operation fails. Leave the open count at zero so
+ *  that the link/unlink code knows what is going on. Another open in the meantime might boost the
+ *  count.
+ */
+STATIC streams_fastcall __unlikely bool
+strdeccounts(struct stdata *sd, int oflag)
+{
+	bool last = false;
+
+	swlock(sd);
+
+	if ((oflag & FREAD) && --sd->sd_readers <= 0)
+		sd->sd_readers = 0;
+	if ((oflag & FWRITE) && --sd->sd_writers <= 0)
+		sd->sd_writers = 0;
+	if (--sd->sd_opens <= 0) {
+		sd->sd_opens = 0;
+		last = strdetached(sd);
+	}
+	if ((sd->sd_flag & STRISFIFO))
+		strwakeall(sd);
+	if ((sd->sd_flag & STRISPIPE) && sd->sd_other != NULL)
+		strwakeall(sd->sd_other);
+
+	swunlock(sd);
+
+	return (last);
+}
+
 STATIC streams_fastcall __unlikely void
 strhangup(struct stdata *sd)
 {
@@ -3219,8 +3400,7 @@ strlastclose(struct stdata *sd, int oflag)
 	   by this point and when the waiters wake up, straccess() will kick them out with an
 	   appropriate error. */
 
-	if (waitqueue_active(&sd->sd_waitq))
-		wake_up_all(&sd->sd_waitq);
+	strwakeall(sd);
 
 	trace();
 	if ((sd_other = sd->sd_other)) {
@@ -4519,14 +4699,25 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 
 		if ((band != -1 && !bcanputnext(sd->sd_wq, band))) {
 			/* wait for band to become available */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+			DEFINE_WAIT(wait);
+#else
 			DECLARE_WAITQUEUE(wait, current);
+#endif
 
 			srunlock(sd);
-			add_wait_queue(&sd->sd_waitq, &wait);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+			add_wait_queue(&sd->sd_wwaitq, &wait); /* exclusive? */
+#endif
 			for (;;) {
 				strschedule();	/* save context switch */
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+				prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE); /* exclusive? */
+#else
+				set_current_state(TASK_INTERRUPTIBLE);
+#endif
 				srlock(sd);
-				if ((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)))
+				if (unlikely((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)) != 0))
 					break;
 				if (type == M_DATA
 				    && (sd->sd_minpsz > size
@@ -4534,16 +4725,19 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 					err = -ERANGE;
 					break;
 				}
-				set_current_state(TASK_INTERRUPTIBLE);
-				set_bit(WSLEEP_BIT, &sd->sd_flag);
-				if (bcanputnext(sd->sd_wq, band)) {
+				if (likely(bcanputnext(sd->sd_wq, band) != 0))
 					break;
-				}
+				set_bit(WSLEEP_BIT, &sd->sd_flag);
 				srunlock(sd);
+
 				*timeo = schedule_timeout(*timeo);
 			}
+#if defined HAVE_KFUNC_FINISH_WAIT
+			finish_wait(&sd->sd_wwaitq, &wait);
+#else
 			set_current_state(TASK_RUNNING);
-			remove_wait_queue(&sd->sd_waitq, &wait);
+			remove_wait_queue(&sd->sd_wwaitq, &wait);
+#endif
 		}
 	srunlock(sd);
 	if (err)
@@ -8663,6 +8857,7 @@ strwsrv(queue_t *q)
 
 	if (likely(be[0]))	/* PROFILED */
 		strevent(sd, S_WRNORM, 0);
+
 	for (band = q->q_nband; unlikely(band > 0); band--) {	/* PROFILED */
 		if (likely(be[band] == 0))
 			continue;
@@ -8682,7 +8877,7 @@ STATIC streams_fastcall int
 str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* MG 7.9.6:- "M_DATA, M_PROTO, M_PCPROTO, M_PASSFP -- after checking the message type, the 
-	   messae is placed on the stream head read queue.  If the message is an M_PCPROTO the
+	   message is placed on the stream head read queue.  If the message is an M_PCPROTO the
 	   STRPRI flag is set in the stream head, indicating the presence of an M_PCPROTO message.
 	   If this bit is already set, indicating than an M_PCPROTO message is already present, the 
 	   new message is discarded.  The relevant processes are then woken up or signalled. */

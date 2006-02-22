@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.17 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.18 2006/02/22 11:35:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 11:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.18  2006/02/22 11:35:46  brian
+ - added __x86_64__ and __k8__ to regparms
+
  Revision 0.9.2.17  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +60,7 @@
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRLOG_H__
 #warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
@@ -85,7 +88,7 @@
 #ifdef __KERNEL__
 
 #ifndef streams_fastcall
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__ || defined __k8__
 #define streams_fastcall __attribute__((__regparm__(3)))
 #else
 #define streams_fastcall

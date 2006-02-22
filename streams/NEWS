@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Major changes for streams-0.7a.5
 
+  Changes to wait queues.  Split single wait queue into four independent
+  wait queues.  Reworked wait queues for both old style (2.4) and new
+  style (2.6) semantics.
+
   Changes to satisfy gcc 4.0.2 compiler.
 
   Corrected build flags for Gentoo and 2.6.15 kernels as reported on

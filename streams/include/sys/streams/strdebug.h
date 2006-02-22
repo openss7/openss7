@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.33 2005/12/29 21:33:57 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.34 2006/02/22 11:35:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/29 21:33:57 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 11:35:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/12/29 21:33:57 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2006/02/22 11:35:46 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -84,7 +84,7 @@
 #endif
 
 #if !defined FASTCALL
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__ || defined __k8__
 #define FASTCALL(__x) __x __attribute__((__regparm__(3)))
 #else
 #define FASTCALL(__x) __x
@@ -97,7 +97,7 @@
 #endif
 
 #undef streams_fastcall
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__ || defined __k8__
 #define streams_fastcall __attribute__((__regparm__(3)))
 #else
 #define streams_fastcall

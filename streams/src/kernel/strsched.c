@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/02/20 10:59:21 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/02/22 11:37:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:21 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 11:37:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.125  2006/02/22 11:37:19  brian
+ - split giant wait queue into 4 independent queues
+
  Revision 0.9.2.124  2006/02/20 10:59:21  brian
  - updated copyright headers on changed files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/02/20 10:59:21 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/02/22 11:37:19 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2006/02/20 10:59:21 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2006/02/22 11:37:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -4010,8 +4013,12 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
-	init_waitqueue_head(&sd->sd_waitq);
-	init_waitqueue_head(&sd->sd_polllist);
+//	init_waitqueue_head(&sd->sd_waitq);	/* waiters */
+	init_waitqueue_head(&sd->sd_rwaitq);	/* waiters on read */
+	init_waitqueue_head(&sd->sd_wwaitq);	/* waiters on write */
+	init_waitqueue_head(&sd->sd_iwaitq);	/* waiters on ioctl */
+	init_waitqueue_head(&sd->sd_owaitq);	/* waiters on open */
+	init_waitqueue_head(&sd->sd_polllist);	/* waiters on poll */
 	slockinit(sd);		/* stream head read/write lock */
 	plockinit(sd);		/* stream plumbing read/write lock */
 	zlockinit(sd);		/* stream freeze read/write lock */
@@ -4424,6 +4431,7 @@ kill_kstreamd(void)
 		}
 	}
 	/* FIXME: need to clean out outstanding events now that everything is stopped */
+	unregister_cpu_notifier(&str_cpu_nfb);
 	return;
 }
 #else				/* defined HAVE_KINC_LINUX_KTHREAD_H */
