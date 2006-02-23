@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/28 10:01:39 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/23 12:11:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This library is free software; you can redistribute it and/or modify it under
  the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; either version 2.1 of the License, or (at your option)
- any later version.
+ Software Foundation; version 2.1 of the License.
 
  This library is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:39 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 12:11:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/28 10:01:39 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/23 12:11:10 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/12/28 10:01:39 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/02/23 12:11:10 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -2451,7 +2450,7 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 		} buf;
 
 		buf.req.PRIM_type = T_INFO_REQ;
-		if (__xnet_t_strioctl(fd, TI_GETINFO, &buf, sizeof(&buf)) != 0)
+		if (__xnet_t_strioctl(fd, TI_GETINFO, &buf, sizeof(buf)) != 0)
 			goto error;
 		user->info.addr = buf.ack.ADDR_size;
 		user->info.options = buf.ack.OPT_size;
@@ -6152,10 +6151,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.16 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.17 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.16 $)
- * @date \$Date: 2005/12/28 10:01:39 $
+ * @version \$Name:  $(\$Revision: 0.9.2.17 $)
+ * @date \$Date: 2006/02/23 12:11:10 $
  *
  * @}
  */

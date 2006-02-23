@@ -1,17 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.4 2005/11/04 07:36:33 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.5 2006/02/23 12:00:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,9 +44,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/11/04 07:36:33 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 12:00:10 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: timod.h,v $
+ Revision 0.9.2.5  2006/02/23 12:00:10  brian
+ - corrections for 64bit and 32/64bit compatibility
+ - updated headers
+
  Revision 0.9.2.4  2005/11/04 07:36:33  brian
  - all test cases pass on Linux Fast-STREAMS
 
@@ -65,7 +70,7 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define TIMOD			('T'<<8)
 #define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */
@@ -89,7 +94,11 @@ struct _o_ti_user {
 	int ti_lookdsize;		/* look data buffer size */
 	int ti_lookcsize;		/* look ctrl buffer size */
 	int ti_maxpsz;			/* TIDU size */
+#ifdef __LP64__
+	u_int32_t ti_servtype;		/* service type */
+#else					/* __LP64__ */
 	long ti_servtype;		/* service type */
+#endif					/* __LP64__ */
 	int ti_lookflg;			/* buffered look flag */
 };
 

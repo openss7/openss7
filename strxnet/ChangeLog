@@ -1,12 +1,56 @@
 # $Log: ChangeLog,v $
-# Revision 0.9.2.6  2005/09/14 23:41:55  brian
-# - bumped release numbers and change logs
+# Revision 0.9.2.7  2006/02/23 12:17:38  brian
+# - updated for new release
 #
 
-* Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
-- Revision 0.9.2.5  2004/06/27 04:24:23  brian
-- Updated.
+2006-02-23 brian <bidulock@openss7.org>
+	* (src/test/test-inet_raw.c): modified
+	* (src/test/test-inet_tcp.c): modified
+	* (src/test/test-inet_udp.c): modified
+	* (src/test/test-timod.c): modified
+	* (src/test/test-tirdwr.c): modified
+	* (src/test/test-xnet.c): modified
+	- updates for 64bit
+	- disabled lockf (doesn't work well on SMP)
+	- updated headers
 
+	* (tests/testsuite-timod.at): modified
+	* (tests/testsuite-tirdwr.at): modified
+	* (tests/testsuite-xnet.at): modified
+	* (tests/testsuite-xnet_thr.at): modified
+	- changed verbosity level for bug reports
+	- updated headers
+
+	* (src/include/sys/timod.h): modified
+	* (src/include/sys/tpi.h): modified
+	* (src/include/sys/xti.h): modified
+	- corrections for 64bit and 32/64bit compatibility
+	- updated headers
+
+	* (TODO): added - added TODO file for this package
+	* (Makefile.am): modified -- added TODO file to distribution
+
+	* (ChangeLog): modified -- updated for new release
+	* (NEWS): modified -- updated for new release
+	* (README): modified -- updated for new release
+
+2006-02-20 brian <bidulock@openss7.org>
+	* (.indent.pro): modified -- added types
+	* (strxnet.spec.in): modified -- corrected for 64bit distribution
+	* (m4/dist.m4): modified -- corrected for 64bit distribution
+	* (src/.indent.pro): modified -- added types
+
+2006-02-13 brian <bidulock@openss7.org>
+	* (.pkgrelease): modified -- updated for new release
+	* (m4/kernel.m4): changes for Gentoo and 2.6.15 kernels
+
+2005-09-14 Brian Bidulock <bidulock@openss7.org>
+	- Revision 0.9.2.6  2005/09/14 23:41:55  brian
+	- bumped release numbers and change logs
+
+2004-07-27 Brian Bidulock <bidulock@openss7.org>
+	- Revision 0.9.2.5  2004/06/27 04:24:23  brian
+	- Updated.
 
 2004-06-22 brian <bidulock@openss7.org>
 	* (.rpmrelease):
@@ -58,15 +102,14 @@
 
 -----
 
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

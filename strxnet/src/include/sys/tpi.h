@@ -1,18 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9.2.4 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.5 2006/02/23 12:00:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +44,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 12:00:10 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tpi.h,v $
+ Revision 0.9.2.5  2006/02/23 12:00:10  brian
+ - corrections for 64bit and 32/64bit compatibility
+ - updated headers
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #if 0
 #if !defined _XTI_H && !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
@@ -201,11 +206,11 @@ struct t_opthdr {
 #define _T_ALIGN_SIZE sizeof(t_uscalar_t)
 
 #define _T_ALIGN_OFS(p, o)							\
-	((char *)(((t_uscalar_t)(p) - (o) + _T_ALIGN_SIZE - 1)			\
+	((char *)(((unsigned long)(p) - (o) + _T_ALIGN_SIZE - 1)		\
 		    & ~(_T_ALIGN_SIZE - 1)) + (o))
 
 #define _T_ALIGN_OFFSET(p)							\
-	((t_uscalar_t)(p) & (_T_ALIGN_SIZE - 1))
+	((unsigned long)(p) & (_T_ALIGN_SIZE - 1))
 
 #define _T_ALIGN_OFS_OFS(p, l, o) _T_ALIGN_OFS((char *)(p) + l, (o))
 

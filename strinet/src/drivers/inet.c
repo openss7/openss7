@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/01/11 22:03:07 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/01/11 22:03:07 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 11:08:51 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: inet.c,v $
+ Revision 0.9.2.60  2006/02/23 11:08:51  brian
+ - a couple of bug corrections reported by sponsors
+ - 64bit changes
+ - validated on x86_64 SMP kernel
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/01/11 22:03:07 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/01/11 22:03:07 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -349,6 +356,7 @@ static char const ident[] =
 #include <linux/slab.h>
 static kmem_cache_t **const _tcp_openreq_cachep_location =
     (typeof(_tcp_openreq_cachep_location)) (HAVE_TCP_OPENREQ_CACHEP_ADDR);
+
 #define tcp_openreq_cachep (*_tcp_openreq_cachep_location)
 #endif
 #endif
@@ -410,6 +418,7 @@ __u8 ip_tos2prio[16] = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
 #ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
 static __u32 *const _sysctl_rmem_default_location =
     (typeof(_sysctl_rmem_default_location)) (HAVE_SYSCTL_RMEM_DEFAULT_ADDR);
+
 #define sysctl_rmem_default (*_sysctl_rmem_default_location)
 #else
 #define sysctl_rmem_default SK_RMEM_MAX
@@ -420,6 +429,7 @@ static __u32 *const _sysctl_rmem_default_location =
 #ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
 static __u32 *const _sysctl_wmem_default_location =
     (typeof(_sysctl_wmem_default_location)) (HAVE_SYSCTL_WMEM_DEFAULT_ADDR);
+
 #define sysctl_wmem_default (*_sysctl_wmem_default_location)
 #else
 #define sysctl_wmem_default SK_WMEM_MAX
@@ -430,6 +440,7 @@ static __u32 *const _sysctl_wmem_default_location =
 #ifdef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
 static __u32 *const _sysctl_tcp_fin_timeout_location =
     (typeof(_sysctl_tcp_fin_timeout_location)) (HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR);
+
 #define sysctl_tcp_fin_timeout (*_sysctl_tcp_fin_timeout_location)
 #else
 #define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
@@ -456,6 +467,7 @@ tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb)
 {
 	static void (*func) (struct sock *, struct sk_buff *) =
 	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
+
 	return func(sk, skb);
 }
 #else
@@ -464,6 +476,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 {
 	static void (*func) (struct sk_buff *, unsigned int) =
 	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
+
 	return func(skb, mss_std);
 }
 #endif
@@ -478,6 +491,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 {
 	static void (*func) (struct sk_buff *, unsigned int) =
 	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR;
+
 	return func(skb, mss_std);
 }
 #endif
@@ -493,14 +507,14 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #include <sys/xti_inet.h>
 #include <sys/xti_sctp.h>
 
-#define T_ALLLEVELS -1UL
+#define T_ALLLEVELS -1
 
 #define LINUX_2_4 1
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/01/11 22:03:07 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2006/02/23 11:08:51 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -867,10 +881,10 @@ typedef struct ss_protocol {
 	spinlock_t lock;		/* structure lock */
 	void (*put) (struct ss_protocol *);	/* release function */
 	struct ss_protocol *(*get) (struct ss_protocol *);	/* acquire function */
-	ulong type;			/* structure type */
-	ulong id;			/* structure id */
-	ulong state;			/* state */
-	ulong flags;			/* flags */
+	uint type;			/* structure type */
+	uint id;			/* structure id */
+	uint state;			/* state */
+	uint flags;			/* flags */
 	int ps_family;
 	int ps_type;
 	int ps_protocol;
@@ -1609,6 +1623,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		goto eproto;
 	oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0);
 	if (t_tst_bit(_T_BIT_XTI_DEBUG, ss->options.flags)) {
+		if (oh == NULL)
+			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.debug);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_DEBUG;
@@ -1617,6 +1633,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_LINGER, ss->options.flags)) {
+		if (oh == NULL)
+			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.linger);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_LINGER;
@@ -1637,6 +1655,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_RCVBUF, ss->options.flags)) {
+		if (oh == NULL)
+			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvbuf);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_RCVBUF;
@@ -1651,6 +1671,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, ss->options.flags)) {
+		if (oh == NULL)
+			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvlowat);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_RCVLOWAT;
@@ -1665,6 +1687,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_SNDBUF, ss->options.flags)) {
+		if (oh == NULL)
+			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndbuf);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_SNDBUF;
@@ -1679,6 +1703,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, ss->options.flags)) {
+		if (oh == NULL)
+			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndlowat);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_SNDLOWAT;
@@ -1698,6 +1724,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		if (t_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
 #endif
 		{
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(ss->options.ip.options);
 			oh->level = T_INET_IP;
 			oh->name = T_IP_OPTIONS;
@@ -1708,6 +1736,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		if (t_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
 #endif
 		{
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(ss->options.ip.tos);
 			oh->level = T_INET_IP;
 			oh->name = T_IP_TOS;
@@ -1721,6 +1751,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_TTL, ss->options.flags)) {
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(ss->options.ip.ttl);
 			oh->level = T_INET_IP;
 			oh->name = T_IP_TTL;
@@ -1744,6 +1776,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_REUSEADDR, ss->options.flags)) {
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(unsigned int);
 
 			oh->level = T_INET_IP;
@@ -1757,6 +1791,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_DONTROUTE, ss->options.flags)) {
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(unsigned int);
 
 			oh->level = T_INET_IP;
@@ -1770,6 +1806,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_BROADCAST, ss->options.flags)) {
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(unsigned int);
 
 			oh->level = T_INET_IP;
@@ -1783,6 +1821,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_ADDR, ss->options.flags)) {
+			if (oh == NULL)
+				goto efault;
 			oh->len = _T_LENGTH_SIZEOF(uint32_t);
 
 			oh->level = T_INET_IP;
@@ -1797,6 +1837,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			struct tcp_opt *tp = tcp_sk(sk);
 
 			if (t_tst_bit(_T_BIT_TCP_NODELAY, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_NODELAY;
@@ -1809,6 +1851,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_MAXSEG, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_MAXSEG;
@@ -1822,6 +1866,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_KEEPALIVE, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(struct t_kpalive);
 
 				oh->level = T_INET_TCP;
@@ -1848,6 +1894,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_CORK, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_CORK;
@@ -1860,6 +1908,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_KEEPIDLE, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPIDLE;
@@ -1874,6 +1924,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_KEEPINTVL, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPINTVL;
@@ -1888,6 +1940,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_KEEPCNT, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPCNT;
@@ -1902,6 +1956,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_SYNCNT, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_SYNCNT;
@@ -1916,6 +1972,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_LINGER2, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_LINGER2;
@@ -1930,6 +1988,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_DEFER_ACCEPT, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_DEFER_ACCEPT;
@@ -1947,6 +2007,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_TCP_WINDOW_CLAMP, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_WINDOW_CLAMP;
@@ -1964,6 +2026,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				/* read-only */
 			}
 			if (t_tst_bit(_T_BIT_TCP_QUICKACK, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_QUICKACK;
@@ -1979,6 +2043,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			struct sctp_opt *sp = sctp_sk(sk);
 
 			if (t_tst_bit(_T_BIT_SCTP_NODELAY, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_NODELAY;
@@ -1991,6 +2057,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_MAXSEG, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAXSEG;
@@ -2004,6 +2072,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_CORK, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_CORK;
@@ -2012,6 +2082,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_PPI, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PPI;
@@ -2021,6 +2093,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_SID, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SID;
@@ -2036,6 +2110,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				/* only per-packet */
 			}
 			if (t_tst_bit(_T_BIT_SCTP_RECVOPT, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RECVOPT;
@@ -2045,6 +2121,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_COOKIE_LIFE, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_COOKIE_LIFE;
@@ -2058,6 +2136,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_SACK_DELAY, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SACK_DELAY;
@@ -2071,6 +2151,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_PATH_MAX_RETRANS, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PATH_MAX_RETRANS;
@@ -2081,6 +2163,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_ASSOC_MAX_RETRANS, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ASSOC_MAX_RETRANS;
@@ -2091,6 +2175,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_MAX_INIT_RETRIES, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAX_INIT_RETRIES;
@@ -2101,6 +2187,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_HEARTBEAT_ITVL, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_HEARTBEAT_ITVL;
@@ -2115,6 +2203,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_RTO_INITIAL, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RTO_INITIAL;
@@ -2128,6 +2218,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_RTO_MIN, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RTO_MIN;
@@ -2141,6 +2233,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_RTO_MAX, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RTO_MAX;
@@ -2157,6 +2251,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			if (t_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
 #endif
 			{
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_OSTREAMS;
@@ -2173,6 +2269,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			if (t_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
 #endif
 			{
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ISTREAMS;
@@ -2186,6 +2284,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_COOKIE_INC, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_COOKIE_INC;
@@ -2199,6 +2299,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_THROTTLE_ITVL, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_THROTTLE_ITVL;
@@ -2213,6 +2315,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_MAC_TYPE, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAC_TYPE;
@@ -2221,6 +2325,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_CKSUM_TYPE, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_CKSUM_TYPE;
@@ -2229,6 +2335,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_HB, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(struct t_sctp_hb);
 
 				oh->level = T_INET_SCTP;
@@ -2237,6 +2345,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_RTO, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(struct t_sctp_rto);
 
 				oh->level = T_INET_SCTP;
@@ -2245,6 +2355,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_STATUS, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len =
 				    T_SPACE(sizeof(struct t_sctp_status) +
 					    sizeof(struct t_sctp_dest_status));
@@ -2254,6 +2366,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_DEBUG, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DEBUG;
@@ -2263,6 +2377,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			}
 #if defined CONFIG_SCTP_ECN
 			if (t_tst_bit(_T_BIT_SCTP_ECN, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ECN;
@@ -2273,6 +2389,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 			if (t_tst_bit(_T_BIT_SCTP_ALI, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ALI;
@@ -2284,6 +2402,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
 			if (t_tst_bit(_T_BIT_SCTP_ADD, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ADD;
@@ -2293,6 +2413,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_SET, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SET;
@@ -2302,6 +2424,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_ADD_IP, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ADD_IP;
@@ -2311,6 +2435,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_DEL_IP, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DEL_IP;
@@ -2320,6 +2446,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_SET_IP, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SET_IP;
@@ -2331,6 +2459,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 			if (t_tst_bit(_T_BIT_SCTP_PR, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PR;
@@ -2342,6 +2472,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 			if (t_tst_bit(_T_BIT_SCTP_LIFETIME, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_LIFETIME;
@@ -2357,6 +2489,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 			if (t_tst_bit(_T_BIT_SCTP_DISPOSITION, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				/* FIXME: this should probably be read-only */
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
@@ -2367,6 +2501,8 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_MAX_BURST, ss->options.flags)) {
+				if (oh == NULL)
+					goto efault;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_MAX_BURST;
@@ -2380,11 +2516,22 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	return ((unsigned char *) oh - op);	/* return actual length */
+	/* expect oh to be NULL (filled buffer) */
+	assure(oh == NULL);
+	return (olen);
+	// return ((unsigned char *) oh - op); /* return actual length */
       eproto:
 	swerr();
 	return (-EPROTO);
+      efault:
+	swerr();
+	return (-EFAULT);
 }
+
+#ifdef __LP64__
+#undef MAX_SCHEDULE_TIMEOUT
+#define MAX_SCHEDULE_TIMEOUT INT_MAX
+#endif
 
 /*
  *  Set options on new socket.
@@ -3298,6 +3445,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 				{
 					struct t_kpalive *valp =
 					    (struct t_kpalive *) T_OPT_DATA(ih);
+
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->kp_onoff != T_YES && valp->kp_onoff != T_NO)
@@ -3454,8 +3602,8 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 						for (sock_defer_accept(sk) = 0;
 						     sock_defer_accept(sk) < 32
 						     && *valp >
-						     ((TCP_TIMEOUT_INIT / HZ) <<
-						      sock_defer_accept(sk));
+						     ((TCP_TIMEOUT_INIT /
+						       HZ) << sock_defer_accept(sk));
 						     sock_defer_accept(sk)++) ;
 						sock_defer_accept(sk)++;
 					}
@@ -3869,6 +4017,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 				{
 					struct t_sctp_hb *valp =
 					    (struct t_sctp_hb *) T_OPT_DATA(ih);
+
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->hb_onoff != T_YES && valp->hb_onoff != T_NO)
@@ -3895,6 +4044,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 				{
 					struct t_sctp_rto *valp =
 					    (struct t_sctp_rto *) T_OPT_DATA(ih);
+
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->rto_initial != T_INFINITE
@@ -4040,6 +4190,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 				{
 					struct sockaddr_in *valp =
 					    (struct sockaddr_in *) T_OPT_DATA(ih);
+
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->sin_family != AF_INET)
@@ -4057,6 +4208,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 				{
 					struct sockaddr_in *valp =
 					    (struct sockaddr_in *) T_OPT_DATA(ih);
+
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->sin_family != AF_INET)
@@ -4074,6 +4226,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 				{
 					struct sockaddr_in *valp =
 					    (struct sockaddr_in *) T_OPT_DATA(ih);
+
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->sin_family != AF_INET)
@@ -4290,6 +4443,7 @@ ss_cmsg_build(const ss_t * ss, const unsigned char *ip, size_t ilen, struct msgh
 				{
 					size_t len =
 					    ih->len - sizeof(*ih) < 40 ? ih->len - sizeof(*ih) : 40;
+
 					ch->cmsg_len = CMSG_LEN(len);
 					ch->cmsg_level = SOL_IP;
 					ch->cmsg_type = IP_OPTIONS;
@@ -4546,7 +4700,11 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 				switch (cmsg->cmsg_type) {
 				case IP_RECVOPTS:
 				{
-					size_t len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
+					size_t len;
+
+					if (oh == NULL)
+						goto efault;
+					len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
 
 					printd(("%s: %p: processing option IP_RECVOPTS\n", DRV_NAME,
 						ss));
@@ -4561,6 +4719,8 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 					continue;
 				}
 				case IP_TOS:
+					if (oh == NULL)
+						goto efault;
 					printd(("%s: %p: processing option IP_TOS\n", DRV_NAME,
 						ss));
 					printd(("%s: %p: building option T_IP_TOS\n", DRV_NAME,
@@ -4575,6 +4735,8 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_TTL:
+					if (oh == NULL)
+						goto efault;
 					printd(("%s: %p: processing option IP_TTL\n", DRV_NAME,
 						ss));
 					printd(("%s: %p: building option T_IP_TTL\n", DRV_NAME,
@@ -4589,6 +4751,8 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_PKTINFO:
+					if (oh == NULL)
+						goto efault;
 					printd(("%s: %p: processing option IP_PKTINFO\n", DRV_NAME,
 						ss));
 					printd(("%s: %p: building option T_IP_ADDR\n", DRV_NAME,
@@ -4617,6 +4781,8 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 		case SOL_SCTP:
 			switch (cmsg->cmsg_type) {
 			case SCTP_PPI:
+				if (oh == NULL)
+					goto efault;
 				printd(("%s: %p: processing option SCTP_PPI\n", DRV_NAME, ss));
 				printd(("%s: %p: building option T_SCTP_PPI\n", DRV_NAME, ss));
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
@@ -4628,6 +4794,8 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 				continue;
 			case SCTP_DISPOSITION:
+				if (oh == NULL)
+					goto efault;
 				printd(("%s: %p: processing option SCTP_DISPOSITION\n", DRV_NAME,
 					ss));
 				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", DRV_NAME,
@@ -4645,7 +4813,12 @@ ss_opts_build(const ss_t * ss, struct msghdr *msg, unsigned char *op, size_t ole
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	return ((unsigned char *) oh - op);
+	assure(oh == NULL);
+	return (olen);
+	// return ((unsigned char *) oh - op);
+      efault:
+	swerr();
+	return (-EFAULT);
 }
 
 /*
@@ -6500,8 +6673,8 @@ t_size_negotiate_options(const ss_t * t, const unsigned char *ip, size_t ilen)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
-STATIC ulong
-t_overall_result(ulong *overall, ulong result)
+STATIC uint
+t_overall_result(uint * overall, uint result)
 {
 	switch (result) {
 	case T_NOTSUPPORT:
@@ -6535,11 +6708,11 @@ t_overall_result(ulong *overall, ulong result)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Perform the actions required of T_DEFAULT placing the output in the provided buffer.
  */
-STATIC long
+STATIC t_scalar_t
 t_build_default_options(const ss_t * ss, const unsigned char *ip, size_t ilen, unsigned char *op,
 			size_t *olen)
 {
-	long overall = T_SUCCESS;
+	t_scalar_t overall = T_SUCCESS;
 	const struct t_opthdr *ih;
 	struct t_opthdr *oh, all;
 	struct sock *sk = (ss && ss->sock) ? ss->sock->sk : NULL;
@@ -7370,11 +7543,11 @@ t_build_default_options(const ss_t * ss, const unsigned char *ip, size_t ilen, u
  *  Perform the actions required of T_CURRENT placing the output in the
  *  provided buffer.
  */
-STATIC long
+STATIC t_scalar_t
 t_build_current_options(const ss_t * t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			size_t *olen)
 {
-	long overall = T_SUCCESS;
+	t_scalar_t overall = T_SUCCESS;
 	const struct t_opthdr *ih;
 	struct t_opthdr *oh, all;
 	struct sock *sk = (t && t->sock) ? t->sock->sk : NULL;
@@ -8273,11 +8446,11 @@ t_build_current_options(const ss_t * t, const unsigned char *ip, size_t ilen, un
  *  Perform the actions required of T_CHECK placing the output in the provided
  *  buffer.
  */
-STATIC long
+STATIC t_scalar_t
 t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
-	long overall = T_SUCCESS;
+	t_scalar_t overall = T_SUCCESS;
 	const struct t_opthdr *ih;
 	struct t_opthdr *oh, all;
 	struct sock *sk = (ss && ss->sock) ? ss->sock->sk : NULL;
@@ -8748,6 +8921,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
 					if (optlen) {
 						struct t_kpalive *valp =
 						    (typeof(valp)) T_OPT_DATA(oh);
+
 						bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 						if (optlen != sizeof(*valp))
 							goto einval;
@@ -9577,6 +9751,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
 					if (optlen) {
 						struct t_sctp_hb *valp =
 						    (typeof(valp)) T_OPT_DATA(oh);
+
 						bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 						if (optlen != sizeof(*valp))
 							goto einval;
@@ -9614,6 +9789,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
 					if (optlen) {
 						struct t_sctp_rto *valp =
 						    (typeof(valp)) T_OPT_DATA(oh);
+
 						bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 						if (optlen != sizeof(*valp))
 							goto einval;
@@ -9773,6 +9949,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
 					if (optlen) {
 						struct sockaddr_in *valp =
 						    (typeof(valp)) T_OPT_DATA(oh);
+
 						bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 						if (optlen != sizeof(*valp))
 							goto einval;
@@ -9789,6 +9966,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
 					if (optlen) {
 						struct sockaddr_in *valp =
 						    (typeof(valp)) T_OPT_DATA(oh);
+
 						bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 						if (optlen != sizeof(*valp))
 							goto einval;
@@ -9805,6 +9983,7 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
 					if (optlen) {
 						struct sockaddr_in *valp =
 						    (typeof(valp)) T_OPT_DATA(oh);
+
 						bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 						if (optlen != sizeof(*valp))
 							goto einval;
@@ -9918,11 +10097,11 @@ t_build_check_options(const ss_t * ss, const unsigned char *ip, size_t ilen, uns
  *  Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and
  *  T_NEGOTIARE, placing the output in the provided buffer.
  */
-STATIC long
+STATIC t_scalar_t
 t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
-	long overall = T_SUCCESS;
+	t_scalar_t overall = T_SUCCESS;
 	const struct t_opthdr *ih;
 	struct t_opthdr *oh, all;
 	struct sock *sk = (t && t->sock) ? t->sock->sk : NULL;
@@ -10247,6 +10426,7 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
 								unsigned char type =
 								    *valp & (T_LDELAY | T_HITHRPT |
 									     T_HIREL | T_LOCOST);
+
 								if (*valp != SET_TOS(prec, type))
 									goto einval;
 								if (prec >= T_CRITIC_ECP
@@ -11852,9 +12032,9 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
  *  Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and
  *  T_NEGOTIARE, placing the output in the provided buffer.
  */
-STATIC long
+STATIC t_scalar_t
 t_build_options(ss_t * t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
-		long flag)
+		t_scalar_t flag)
 {
 	switch (flag) {
 	case T_DEFAULT:
@@ -11903,7 +12083,7 @@ ss_addr_size(ss_t * ss, struct sockaddr *add)
  */
 #ifdef _DEBUG
 STATIC const char *
-state_name(long state)
+state_name(t_scalar_t state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -11948,13 +12128,14 @@ state_name(long state)
 }
 #endif
 STATIC void
-ss_set_state(ss_t * ss, long state)
+ss_set_state(ss_t * ss, t_scalar_t state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, ss, state_name(state),
 		state_name(ss->p.info.CURRENT_state)));
 	ss->p.info.CURRENT_state = state;
 }
-STATIC long
+
+STATIC t_scalar_t
 ss_get_state(ss_t * ss)
 {
 	return (ss->p.info.CURRENT_state);
@@ -12014,7 +12195,7 @@ ss_socket(ss_t * ss)
 	int family, type, protocol;
 
 	ensure(ss, return (-EFAULT));
-	__ensure(!ss->sock, return (-EPROTO));
+	ensure(!ss->sock, return (-EPROTO));
 	family = ss->p.prot.family;
 	type = ss->p.prot.type;
 	protocol = (ss->p.prot.protocol == IPPROTO_RAW) ? ss->port : ss->p.prot.protocol;
@@ -12114,7 +12295,7 @@ ss_listen(ss_t * ss, uint cons)
 	int type;
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->listen, return (-EFAULT));
@@ -12166,7 +12347,7 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 	ensure(newsock, return (-EFAULT));
 	ensure(cp, return (-EFAULT));
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->accept, return (-EFAULT));
@@ -12182,7 +12363,8 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 		if (sock_accept_queue_head(sk)) {
 			sock_accept_queue_lock(sk);
 			/* find connection in queue */
-			for (reqp = &sock_accept_queue_head(sk), req_prev = NULL; *reqp && (*reqp)->sk != ask;
+			for (reqp = &sock_accept_queue_head(sk), req_prev = NULL;
+			     *reqp && (*reqp)->sk != ask;
 			     req_prev = (*reqp), reqp = &(*reqp)->dl_next) ;
 			if ((req = *reqp)) {
 				if (!((*reqp) = (*reqp)->dl_next))
@@ -12247,7 +12429,7 @@ ss_connect(ss_t * ss, struct sockaddr *dst)
 	int err;
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->connect, return (-EFAULT));
@@ -12269,7 +12451,7 @@ ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 	int res;
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->sendmsg, return (-EFAULT));
 	ensure(ss->sock->sk, return (-EFAULT));
@@ -12298,7 +12480,7 @@ ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
 	int sflags = MSG_DONTWAIT | MSG_NOSIGNAL;
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->recvmsg, return (-EFAULT));
 	ensure(ss->sock->sk, return (-EFAULT));
@@ -12330,7 +12512,7 @@ ss_disconnect(ss_t * ss)
 	int err;
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->connect, return (-EFAULT));
 	ensure(ss->sock->sk, return (-EFAULT));
@@ -12356,7 +12538,7 @@ ss_getsockname(ss_t * ss)
 	int err, len = sizeof(ss->src);
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->getname, return (-EFAULT));
 	if ((err = ss->sock->ops->getname(ss->sock, &ss->src, &len, 0)))
@@ -12369,7 +12551,7 @@ ss_getpeername(ss_t * ss)
 	int err, len = sizeof(ss->dst);
 
 	ensure(ss, return (-EFAULT));
-	__ensure(ss->sock, return (-EPROTO));
+	ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->getname, return (-EFAULT));
 	if ((err = ss->sock->ops->getname(ss->sock, &ss->dst, &len, 1)))
@@ -12482,7 +12664,7 @@ t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
 				p->SRC_offset = src_len ? sizeof(*p) : 0;
 				p->OPT_length = opt_len;
 				p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
-				p->SEQ_number = (ulong) cp;
+				p->SEQ_number = (t_uscalar_t) (long) cp;
 				mp->b_wptr += sizeof(*p);
 				if (src_len) {
 					bcopy(src, mp->b_wptr, src_len);
@@ -12586,7 +12768,8 @@ t_seq_find(ss_t * ss, mblk_t *rp)
 	}
 	return (mp);
 }
-STATIC ulong
+
+STATIC t_uscalar_t
 t_seq_delete(ss_t * ss, mblk_t *rp)
 {
 	mblk_t *mp;
@@ -12596,7 +12779,7 @@ t_seq_delete(ss_t * ss, mblk_t *rp)
 
 		if (!ss_accept(ss, &sock, rp) && sock)
 			sock_release(sock);
-		return ((ulong) mp);
+		return ((t_uscalar_t) (long) mp);
 	}
 	return (0);
 }
@@ -12606,7 +12789,7 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
 	struct T_discon_ind *p;
-	ulong seq = 0;
+	t_uscalar_t seq = 0;
 
 	(void) res;
 	/* TPI spec says that if the interface is in the TS_DATA_XFER, TS_WIND_ORDREL or
@@ -12731,7 +12914,7 @@ t_info_ack(queue_t *q)
  *  ---------------------------------------------------------------
  */
 STATIC int
-t_bind_ack(queue_t *q, struct sockaddr *add, ulong conind)
+t_bind_ack(queue_t *q, struct sockaddr *add, t_uscalar_t conind)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -12764,7 +12947,7 @@ t_bind_ack(queue_t *q, struct sockaddr *add, ulong conind)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-t_error_ack(queue_t *q, ulong prim, long error)
+t_error_ack(queue_t *q, t_scalar_t prim, t_scalar_t error)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -12848,7 +13031,7 @@ t_error_ack(queue_t *q, ulong prim, long error)
  */
 STATIC int ss_sock_recvmsg(queue_t *q);
 STATIC int
-t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
+t_ok_ack(queue_t *q, t_scalar_t prim, mblk_t *cp, ss_t * as)
 {
 	int err = -EFAULT;
 	ss_t *ss = PRIV(q);
@@ -13051,7 +13234,7 @@ t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  options.  This will be adjusted when the option buffer is built.
  */
 STATIC int
-t_optmgmt_ack(queue_t *q, long flags, unsigned char *req, size_t req_len, size_t opt_len)
+t_optmgmt_ack(queue_t *q, t_scalar_t flags, unsigned char *req, size_t req_len, size_t opt_len)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -13211,7 +13394,7 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
  *  T_CAPABILITY_ACK must also be sent as a M_PROTO.
  */
 STATIC int
-t_capability_ack(queue_t *q, ulong caps, int type)
+t_capability_ack(queue_t *q, t_uscalar_t caps, int type)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -13222,7 +13405,7 @@ t_capability_ack(queue_t *q, ulong caps, int type)
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps & (TC1_INFO | TC1_ACCEPTOR_ID);
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) ss->rq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (t_uscalar_t) (long) ss->rq : 0;
 		mp->b_wptr += sizeof(*p);
 		if (caps & TC1_INFO)
 			p->INFO_ack = ss->p.info;
@@ -13295,11 +13478,11 @@ ss_conn_ind(queue_t *q, mblk_t *cp)
 	}
 	return t_conn_ind(q, &dst, cp);
       einval:
-	swerr();
-	ptrace(("%s: SWERR: invalid primitive format\n", DRV_NAME));
+	pswerr(("%s: SWERR: invalid primitive format\n", DRV_NAME));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: ERROR: connect indication in wrong state %ld\n", DRV_NAME, ss_get_state(ss)));
+	ptrace(("%s: ERROR: connect indication in wrong state %ld\n", DRV_NAME,
+		(long) ss_get_state(ss)));
 	return (-EPROTO);
       nolisten:
 	ptrace(("%s: ERROR: connect indication received while not listening\n", DRV_NAME));
@@ -13342,7 +13525,7 @@ ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
 	if ((sdu = (int) ss->p.info.TSDU_size) > 0 && (!n || len > sdu))
 		goto out;
 	err = -EFAULT;
-	__ensure(ss->sock, goto out);
+	ensure(ss->sock, goto out);
 	err = -EBUSY;
 	if (len > sock_wspace(ss->sock->sk))
 		goto out;
@@ -13432,12 +13615,12 @@ ss_sock_recvmsg(queue_t *q)
 		case SOCK_RDM:
 		case SOCK_STREAM:
 		{
-			__ensure(ss->sock, return (-EFAULT));
+			ensure(ss->sock, return (QR_DONE));	/* spurious, ignore it */
 			size = (skb = skb_peek(&ss->sock->sk->sk_receive_queue)) ? skb->len : 0;
 			break;
 		}
 		case SOCK_SEQPACKET:
-			__ensure(ss->sock, return (-EFAULT));
+			ensure(ss->sock, return (QR_DONE));	/* spurious, ignore it */
 			size = atomic_read(&ss->sock->sk->sk_rmem_alloc);
 			break;
 		}
@@ -13802,24 +13985,24 @@ t_conn_req(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------
  */
 STATIC mblk_t *
-t_seq_check(ss_t * ss, ulong seq)
+t_seq_check(ss_t * ss, t_uscalar_t seq)
 {
 	mblk_t *mp;
 
 	spin_lock_bh(&ss->conq.q_lock); {
-		for (mp = bufq_head(&ss->conq); mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
+		for (mp = bufq_head(&ss->conq); mp && (t_uscalar_t) (long) mp != seq;
+		     mp = mp->b_next) ;
 	}
 	spin_unlock_bh(&ss->conq.q_lock);
 	usual(mp);
 	return (mp);
 }
 STATIC ss_t *
-t_tok_check(ulong acceptor)
+t_tok_check(t_uscalar_t tok)
 {
 	ss_t *as;
-	queue_t *aq = (queue_t *) acceptor;
 
-	for (as = ss_opens; as && as->rq != aq; as = as->next) ;
+	for (as = ss_opens; as && (t_uscalar_t) (long) as->rq != tok; as = as->next) ;
 	usual(as);
 	return (as);
 }
@@ -14683,7 +14866,7 @@ t_capability_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_other_req(queue_t *q, mblk_t *mp)
 {
-	ulong prim = *((ulong *) mp->b_rptr);
+	t_scalar_t prim = *((t_scalar_t *) mp->b_rptr);
 
 	return t_error_ack(q, prim, TNOTSUPPORT);
 }
@@ -14707,12 +14890,13 @@ STATIC int
 ss_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-	ulong prim;
+	t_scalar_t prim;
 	ss_t *ss = PRIV(q);
-	ulong oldstate = ss_get_state(ss);
-	if (mp->b_wptr < mp->b_rptr + sizeof(ulong))
+	t_uscalar_t oldstate = ss_get_state(ss);
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(t_scalar_t))
 		goto eproto;
-	switch ((prim = *((ulong *) mp->b_rptr))) {
+	switch ((prim = *((t_scalar_t *) mp->b_rptr))) {
 	case T_CONN_REQ:
 		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, ss));
 		rtn = t_conn_req(q, mp);
@@ -15023,8 +15207,9 @@ ss_r_read(queue_t *q, mblk_t *mp)
 
 	if (!ss->sock)
 		goto discard;
-	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN
-	       || p->state == TCP_CLOSE || p->state == TCP_CLOSE_WAIT);
+	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN || p->state == TCP_CLOSE
+	       || p->state == TCP_CLOSE_WAIT || p->state == TCP_FIN_WAIT1
+	       || p->state == TCP_FIN_WAIT2);
 	printd(("%s: %p: sk_data_ready [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
@@ -15445,7 +15630,8 @@ ss_rput(queue_t *q, mblk_t *mp)
 STATIC streamscall int
 ss_rsrv(queue_t *q)
 {
-	ss_sock_recvmsg(q);
+	if (((ss_t *) PRIV(q))->sock != NULL)
+		ss_sock_recvmsg(q);
 	return ss_srvq(q, &ss_r_prim);
 }
 

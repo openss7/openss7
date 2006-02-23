@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 10:01:40 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/23 11:51:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,8 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +58,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:40 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 11:51:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.9  2006/02/23 11:51:05  brian
+ - updated headers
+
+ Revision 0.9.2.8  2006/02/23 11:43:16  brian
+ - updates for 64 bit
+ - disabled lockf because it doesn't work too well on SMP
+
  Revision 0.9.2.7  2005/12/28 10:01:40  brian
  - remove warnings on FC4 compile
 
@@ -114,9 +120,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 10:01:40 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/23 11:51:05 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/12/28 10:01:40 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/23 11:51:05 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -282,6 +288,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 static int
 time_event(int event)
@@ -4941,7 +4952,7 @@ copying(int argc, char *argv[])
 \n\
 XNS 5.2/TPI Rev 2 - OpenSS7 INET Driver - TCP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -4967,9 +4978,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -4997,7 +5007,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

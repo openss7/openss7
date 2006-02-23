@@ -1,40 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:45 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/02/23 11:10:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written authorization
- of the copyright holder, and licensors, if any.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
- The recipient of this document, by its retention and use, warrants that the
- recipient will protect this information and keep it confidential, and will
- not disclose the information contained in this document without the written
- permission of its owner.
-
- The author reserves the right to revise this software and documentation for
- any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of the
- technical arts, or the reflection of changes in the design of any techniques,
- or procedures embodied, described, or referred to herein.  The author is
- under no obligation to provide any feature listed herein.
-
- -----------------------------------------------------------------------------
-
- As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:00:45 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 11:10:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.39  2006/02/23 11:10:43  brian
+ - 64bit changes for x86_64
+ - suppress lockf because it doesn't work too well on SMP
+
  Revision 0.9.2.38  2005/12/28 10:00:45  brian
  - remove warnings on FC4 compile
 
@@ -225,9 +215,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:45 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/02/23 11:10:43 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/12/28 10:00:45 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2006/02/23 11:10:43 $";
 
 /*
  *  Simple test program for INET streams.
@@ -331,7 +321,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1UL
+#define INFINITE_WAIT	-1
+#define TEST_DURATION	20000
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -452,6 +443,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*
@@ -955,7 +951,7 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
  */
 
 char *
-errno_string(long err)
+errno_string(t_scalar_t err)
 {
 	switch (err) {
 	case 0:
@@ -1208,14 +1204,14 @@ errno_string(long err)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
 }
 
 char *
-terrno_string(ulong terr, long uerr)
+terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 {
 	switch (terr) {
 	case TBADADDR:
@@ -1280,7 +1276,7 @@ terrno_string(ulong terr, long uerr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%lu]", terr);
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
 		return buf;
 	}
 	}
@@ -1539,7 +1535,7 @@ ioctl_string(int cmd, intptr_t arg)
 }
 
 const char *
-service_type(ulong type)
+service_type(t_uscalar_t type)
 {
 	switch (type) {
 	case T_CLTS:
@@ -1554,7 +1550,7 @@ service_type(ulong type)
 }
 
 const char *
-state_string(ulong state)
+state_string(t_uscalar_t state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -1657,7 +1653,7 @@ print_addr(char *add_ptr, size_t add_len)
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		if (add_len != sizeof(*a))
-			fprintf(stdout, "Aaarrg! add_len = %d, ", add_len);
+			fprintf(stdout, "Aaarrg! add_len = %lu, ", (ulong) add_len);
 		fprintf(stdout, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		fprintf(stdout, "(no address)");
@@ -1675,7 +1671,7 @@ addr_string(char *add_ptr, size_t add_len)
 
 	if (add_len) {
 		if (add_len != sizeof(*a))
-			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, ", (ulong) add_len);
 		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
@@ -1734,7 +1730,7 @@ status_string(struct t_opthdr *oh)
 }
 
 #ifndef T_ALLLEVELS
-#define T_ALLLEVELS -1UL
+#define T_ALLLEVELS -1
 #endif
 
 char *
@@ -2163,7 +2159,7 @@ mgmtflag_string(t_uscalar_t flag)
 }
 
 char *
-size_string(ulong size)
+size_string(t_uscalar_t size)
 {
 	static char buf[128];
 
@@ -2175,12 +2171,12 @@ size_string(ulong size)
 	case T_UNSPEC:
 		return ("T_UNSPEC");
 	}
-	snprintf(buf, sizeof(buf), "%lu", size);
+	snprintf(buf, sizeof(buf), "%lu", (ulong) size);
 	return buf;
 }
 
 const char *
-prim_string(ulong prim)
+prim_string(t_uscalar_t prim)
 {
 	switch (prim) {
 	case T_CONN_REQ:
@@ -2249,7 +2245,7 @@ prim_string(ulong prim)
 }
 
 char *
-t_errno_string(long err, long syserr)
+t_errno_string(t_scalar_t err, t_scalar_t syserr)
 {
 	switch (err) {
 	case 0:
@@ -2316,7 +2312,7 @@ t_errno_string(long err, long syserr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
@@ -3000,9 +2996,9 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
-	snprintf(buf, sizeof(buf), "opt len = %d", opt_len);
+	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "opt ofs = %d", opt_ofs);
+	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
 	print_string(child, buf);
 	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
 	if (oh) {
@@ -4483,9 +4479,9 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 }
 
 #if 0
-#define IUT 0x00000001UL
-#define PT  0x00000002UL
-#define ANY 0x00000003UL
+#define IUT 0x00000001
+#define PT  0x00000002
+#define ANY 0x00000003
 
 int
 any_wait_event(int source, int wait)
@@ -4758,7 +4754,7 @@ test_msleep(int child, unsigned long m)
 static int
 preamble_0(int child)
 {
-	if (start_tt(20000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
@@ -17590,7 +17586,7 @@ test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(20000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	for (;;) {
 		state++;
@@ -26157,7 +26153,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -26190,7 +26186,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -26223,7 +26219,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -27149,7 +27145,7 @@ for a UNKNOWN primitive sent in the wrong direction."
 int
 test_case_11_2_17(int child)
 {
-	return test_case_11_1(child, -1UL);
+	return test_case_11_1(child, -1);
 }
 
 #define preamble_11_2_17_conn	preamble_0
@@ -27248,7 +27244,7 @@ test_case_11_3(int child, long prim)
 			break;
 		case T_UNITDATA_REQ:
 			break;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -27295,7 +27291,7 @@ test_case_11_3(int child, long prim)
 				goto failure;
 			state++;
 			goto expect_error;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -27338,7 +27334,7 @@ test_case_11_3(int child, long prim)
 				goto failure;
 			state++;
 			goto expect_error;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -27684,7 +27680,7 @@ verifies that behavior."
 int
 test_case_11_3_14(int child)
 {
-	return test_case_11_3(child, -1UL);
+	return test_case_11_3(child, -1);
 }
 
 struct test_stream test_11_3_14_conn = { &preamble_0, &test_case_11_3_14, &postamble_0 };
@@ -34635,7 +34631,7 @@ TS_UNBND.  The TPI specification indicates the allowable states in which primiti
 can be issued.  This test case tests the T_INFO_REQ primitive in the TS_UNBND state."
 
 int
-test_case_14_9(int child, ulong CURRENT_state)
+test_case_14_9(int child, t_uscalar_t CURRENT_state)
 {
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -35639,7 +35635,7 @@ test_run(struct test_stream *stream[])
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	if (start_tt(10000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
@@ -37332,7 +37328,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -37358,9 +37354,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -37388,7 +37383,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/28 10:01:40 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/02/23 11:51:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,8 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +58,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:01:40 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 11:51:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.24  2006/02/23 11:51:06  brian
+ - updated headers
+
+ Revision 0.9.2.23  2006/02/23 11:43:16  brian
+ - updates for 64 bit
+ - disabled lockf because it doesn't work too well on SMP
+
  Revision 0.9.2.22  2005/12/28 10:01:40  brian
  - remove warnings on FC4 compile
 
@@ -117,9 +123,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/28 10:01:40 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/02/23 11:51:06 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/12/28 10:01:40 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/02/23 11:51:06 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -269,7 +275,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1UL
+#define INFINITE_WAIT	-1
 #define TEST_DURATION	20000
 
 char cbuf[BUFSIZE];
@@ -399,6 +405,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*
@@ -1360,7 +1371,7 @@ print_addr(char *add_ptr, size_t add_len)
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		if (add_len != sizeof(*a))
-			fprintf(stdout, "Aaarrg! add_len = %d, ", add_len);
+			fprintf(stdout, "Aaarrg! add_len = %lu, ", (ulong) add_len);
 		fprintf(stdout, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		fprintf(stdout, "(no address)");
@@ -1378,7 +1389,7 @@ addr_string(char *add_ptr, size_t add_len)
 
 	if (add_len) {
 		if (add_len != sizeof(*a))
-			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, ", (ulong) add_len);
 		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
@@ -1437,7 +1448,7 @@ status_string(struct t_opthdr *oh)
 }
 
 #ifndef T_ALLLEVELS
-#define T_ALLLEVELS -1UL
+#define T_ALLLEVELS -1
 #endif
 
 char *
@@ -2758,9 +2769,9 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
-	snprintf(buf, sizeof(buf), "opt len = %d", opt_len);
+	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "opt ofs = %d", opt_ofs);
+	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
 	print_string(child, buf);
 	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
 	if (oh) {
@@ -4245,9 +4256,9 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 }
 
 #if 0
-#define IUT 0x00000001UL
-#define PT  0x00000002UL
-#define ANY 0x00000003UL
+#define IUT 0x00000001
+#define PT  0x00000002
+#define ANY 0x00000003
 
 int
 any_wait_event(int source, int wait)
@@ -7685,7 +7696,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -7711,9 +7722,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -7741,7 +7751,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

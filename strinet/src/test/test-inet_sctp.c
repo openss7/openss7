@@ -1,40 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:00:37 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/23 11:10:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written authorization
- of the copyright holder, and licensors, if any.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
- The recipient of this document, by its retention and use, warrants that the
- recipient will protect this information and keep it confidential, and will
- not disclose the information contained in this document without the written
- permission of its owner.
-
- The author reserves the right to revise this software and documentation for
- any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of the
- technical arts, or the reflection of changes in the design of any techniques,
- or procedures embodied, described, or referred to herein.  The author is
- under no obligation to provide any feature listed herein.
-
- -----------------------------------------------------------------------------
-
- As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 10:00:37 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 11:10:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.20  2006/02/23 11:10:11  brian
+ - 64bit changes for x86_64
+ - suppress lockf because it doesn't work too well on SMP
+
  Revision 0.9.2.19  2005/12/28 10:00:37  brian
  - remove warnings on FC4 compile
 
@@ -183,9 +173,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:00:37 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/23 11:10:11 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 10:00:37 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/23 11:10:11 $";
 
 /*
  *  Simple test program for INET streams.
@@ -289,6 +279,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
+#define TEST_DURATION	20000
+#define INFINITE_WAIT	-1
 
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
@@ -417,6 +409,11 @@ enum {
 long test_start = 0;
 
 static int state;
+
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 #if 0
 /*
@@ -548,6 +545,7 @@ timer_sethandler(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -915,7 +913,7 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
  */
 
 char *
-errno_string(long err)
+errno_string(t_scalar_t err)
 {
 	switch (err) {
 	case 0:
@@ -1168,14 +1166,14 @@ errno_string(long err)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
 }
 
 char *
-terrno_string(ulong terr, long uerr)
+terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 {
 	switch (terr) {
 	case TBADADDR:
@@ -1240,7 +1238,7 @@ terrno_string(ulong terr, long uerr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%lu]", terr);
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
 		return buf;
 	}
 	}
@@ -1499,7 +1497,7 @@ ioctl_string(int cmd, intptr_t arg)
 }
 
 const char *
-service_type(ulong type)
+service_type(t_uscalar_t type)
 {
 	switch (type) {
 	case T_CLTS:
@@ -1514,7 +1512,7 @@ service_type(ulong type)
 }
 
 const char *
-state_string(ulong state)
+state_string(t_uscalar_t state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -1710,7 +1708,7 @@ status_string(struct t_opthdr *oh)
 }
 
 #ifndef T_ALLLEVELS
-#define T_ALLLEVELS -1UL
+#define T_ALLLEVELS -1
 #endif
 
 char *
@@ -2137,7 +2135,7 @@ mgmtflag_string(t_uscalar_t flag)
 }
 
 char *
-size_string(ulong size)
+size_string(t_uscalar_t size)
 {
 	static char buf[128];
 
@@ -2149,12 +2147,12 @@ size_string(ulong size)
 	case T_UNSPEC:
 		return ("T_UNSPEC");
 	}
-	snprintf(buf, sizeof(buf), "%lu", size);
+	snprintf(buf, sizeof(buf), "%lu", (ulong) size);
 	return buf;
 }
 
 const char *
-prim_string(ulong prim)
+prim_string(t_uscalar_t prim)
 {
 	switch (prim) {
 	case T_CONN_REQ:
@@ -2223,7 +2221,7 @@ prim_string(ulong prim)
 }
 
 char *
-t_errno_string(long err, long syserr)
+t_errno_string(t_scalar_t err, t_scalar_t syserr)
 {
 	switch (err) {
 	case 0:
@@ -2290,7 +2288,7 @@ t_errno_string(long err, long syserr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
@@ -2974,9 +2972,9 @@ print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 
 	if (verbose < 4)
 		return;
-	snprintf(buf, sizeof(buf), "opt len = %d", opt_len);
+	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "opt ofs = %d", opt_ofs);
+	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
 	print_string(child, buf);
 	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
 	if (oh) {
@@ -4435,9 +4433,9 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 }
 
 #if 0
-#define IUT 0x00000001UL
-#define PT  0x00000002UL
-#define ANY 0x00000003UL
+#define IUT 0x00000001
+#define PT  0x00000002
+#define ANY 0x00000003
 
 int
 any_wait_event(int source, int wait)
@@ -4710,8 +4708,11 @@ test_msleep(int child, unsigned long m)
 static int
 preamble_0(int child)
 {
-	start_tt(20000);
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int
@@ -4735,7 +4736,8 @@ postamble_0(int child)
 		break;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4819,7 +4821,8 @@ postamble_1(int child)
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4856,7 +4859,8 @@ postamble_1e(int child)
 		failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4969,7 +4973,8 @@ postamble_2_conn(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5010,7 +5015,8 @@ postamble_2_resp(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5045,7 +5051,8 @@ postamble_2_list(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5162,7 +5169,8 @@ postamble_3_conn(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5216,7 +5224,8 @@ postamble_3_resp(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5393,6 +5402,31 @@ struct test_stream {
 	int (*testcase) (int);		/* test case */
 	int (*postamble) (int);		/* test postamble */
 };
+
+/*
+ *  Check test case guard timer.
+ */
+#define test_group_0 "Sanity checks"
+#define tgrp_case_0_1 test_group_0
+#define numb_case_0_1 "0.1"
+#define name_case_0_1 "Check test case guard timer."
+#define sref_case_0_1 "(none)"
+#define desc_case_0_1 "\
+Checks that the test case guard timer will fire and bring down the children."
+
+int
+test_case_0_1(int child)
+{
+	test_sleep(child, 40);
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_0_1		preamble_0
+#define postamble_0_1		postamble_0
+
+struct test_stream test_0_1_conn = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+struct test_stream test_0_1_resp = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+struct test_stream test_0_1_list = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
 
 /*
  *  Open and Close 3 streams.
@@ -17498,12 +17532,16 @@ test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
 	test_addr = addr;
 	test_alen = len;
 	test_data = msg;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	start_tt(20000);
+	state++;
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+		goto failure;
 	for (;;) {
 		state++;
 		switch (wait_event(child, NORMAL_WAIT)) {
@@ -17553,9 +17591,9 @@ int
 postamble_2_2(int child)
 {
 	if (last_info.SERV_type == T_CLTS)
-		return postamble_1(child);
-	else
 		return postamble_0(child);
+	else
+		return postamble_1(child);
 }
 
 #define preamble_2_2_conn	preamble_1s
@@ -22868,11 +22906,18 @@ test_case_4_1_3_list(int child)
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	expect(child, LONG_WAIT, __EVENT_NO_MSG);
+	switch (last_event) {
+	case __EVENT_NO_MSG:
+		state++;
+		if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case __TEST_DISCON_IND:
+		break;
+	default:
 		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		goto failure;
+	}
 	state++;
 	expect(child, LONG_WAIT, __EVENT_NO_MSG);
 	switch (last_event) {
@@ -23471,7 +23516,7 @@ test_case_4_1_7_conn_part(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT << 1, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -23486,7 +23531,7 @@ test_case_4_1_7_resp_part(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, LONGER_WAIT << 3, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, SHORT_WAIT);
@@ -30109,7 +30154,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -30142,7 +30187,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -30175,7 +30220,7 @@ test_case_11_1(int child, int prim)
 			goto expect_error;
 		case T_UNITDATA_REQ:
 			goto expect_error;
-		case -1UL:
+		case -1:
 			goto expect_nosupport_ack;
 		default:
 			goto expect_error;
@@ -31101,7 +31146,7 @@ for a UNKNOWN primitive sent in the wrong direction."
 int
 test_case_11_2_17(int child)
 {
-	return test_case_11_1(child, -1UL);
+	return test_case_11_1(child, -1);
 }
 
 #define preamble_11_2_17_conn	preamble_0
@@ -31200,7 +31245,7 @@ test_case_11_3(int child, long prim)
 			break;
 		case T_UNITDATA_REQ:
 			break;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -31247,7 +31292,7 @@ test_case_11_3(int child, long prim)
 				goto failure;
 			state++;
 			goto expect_error;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -31290,7 +31335,7 @@ test_case_11_3(int child, long prim)
 				goto failure;
 			state++;
 			goto expect_error;
-		case -1UL:
+		case -1:
 		default:
 			last_prim = prim;
 			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
@@ -31636,7 +31681,7 @@ verifies that behavior."
 int
 test_case_11_3_14(int child)
 {
-	return test_case_11_3(child, -1UL);
+	return test_case_11_3(child, -1);
 }
 
 struct test_stream test_11_3_14_conn = { &preamble_0, &test_case_11_3_14, &postamble_0 };
@@ -32543,7 +32588,8 @@ postamble_ts_wcon_creq_conn(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -32650,6 +32696,8 @@ preamble_ts_wind_ordrel_conn(int child)
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -35338,9 +35386,19 @@ test_case_13_6_2_conn(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -35357,9 +35415,19 @@ test_case_13_6_2_resp(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -35983,9 +36051,19 @@ test_case_13_8_2_conn(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -36002,9 +36080,19 @@ test_case_13_8_2_resp(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -38544,7 +38632,7 @@ TS_UNBND.  The TPI specification indicates the allowable states in which primiti
 can be issued.  This test case tests the T_INFO_REQ primitive in the TS_UNBND state."
 
 int
-test_case_14_9(int child, ulong CURRENT_state)
+test_case_14_9(int child, t_uscalar_t CURRENT_state)
 {
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -39548,7 +39636,8 @@ test_run(struct test_stream *stream[])
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	start_tt(20000);
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -39592,6 +39681,7 @@ test_run(struct test_stream *stream[])
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
+	      waitagain:
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
 				if (this_child == child[0]) {
@@ -39692,27 +39782,18 @@ test_run(struct test_stream *stream[])
 			if (timer_timeout) {
 				timer_timeout = 0;
 				print_timeout(3);
-				last_event = __EVENT_TIMEOUT;
 			}
-			if (child[0]) {
+			if (child[0])
 				kill(child[0], SIGKILL);
-				status[0] = __RESULT_INCONCLUSIVE;
-				child[0] = 0;
-			}
-			if (child[1]) {
+			if (child[1])
 				kill(child[1], SIGKILL);
-				status[1] = __RESULT_INCONCLUSIVE;
-				child[1] = 0;
-			}
-			if (child[2]) {
+			if (child[2])
 				kill(child[2], SIGKILL);
-				status[2] = __RESULT_INCONCLUSIVE;
-				child[2] = 0;
-			}
-			break;
+			goto waitagain;
 		}
 	}
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
 		return (__RESULT_NOTAPPL);
 	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
@@ -39721,6 +39802,7 @@ test_run(struct test_stream *stream[])
 		return (__RESULT_FAILURE);
 	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
+      inconclusive:
 	return (__RESULT_INCONCLUSIVE);
 }
 
@@ -39745,6 +39827,8 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
+		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, {
+	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
 	&test_1_1_conn, &test_1_1_resp, &test_1_1_list}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
@@ -41337,9 +41421,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -41367,7 +41450,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

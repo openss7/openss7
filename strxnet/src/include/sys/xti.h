@@ -1,18 +1,16 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.6 2005/07/18 12:45:04 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.7 2006/02/23 12:00:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +44,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:45:04 $ by $Author: brian $
+ Last Modified $Date: 2006/02/23 12:00:10 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: xti.h,v $
+ Revision 0.9.2.7  2006/02/23 12:00:10  brian
+ - corrections for 64bit and 32/64bit compatibility
+ - updated headers
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_H
 #define _SYS_XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef t_scalar_t
 /**
@@ -86,7 +91,7 @@ typedef u_int32_t t_uscalar_t;
 #include <sys/tpi.h>		/* common TLI, XTI, TI definitions */
 #include <sys/xti_xti.h>	/* for XTI_GENERIC level options */
 
-#define T_ALIGN(p)	(((uintptr_t)(p) + sizeof(long)-1) & ~(sizeof(long)-1))
+#define T_ALIGN(p)	(((uintptr_t)(p) + sizeof(t_uscalar_t)-1) & ~(sizeof(t_uscalar_t)-1))
 
 #if 0
 #if !defined _SYS_TIHDR_H
