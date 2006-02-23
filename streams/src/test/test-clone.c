@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:48:03 $
+ @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/22 19:57:33 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/28 09:48:03 $ by $Author: brian $
+ Last Modified $Date: 2006/02/22 19:57:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-clone.c,v $
+ Revision 0.9.2.20  2006/02/22 19:57:33  brian
+ - strap out lockf() that was blocking some test case
+   processes on SMP and even on UP
+
  Revision 0.9.2.19  2005/12/28 09:48:03  brian
  - remove warnings on FC4 compile
 
@@ -131,9 +135,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:48:03 $"
+#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/22 19:57:33 $"
 
-static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/12/28 09:48:03 $";
+static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/02/22 19:57:33 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -285,6 +289,12 @@ enum {
 long test_start = 0;
 
 static int state;
+
+/* lockf does not work well on SMP for some reason */
+#if 1
+#undef lockf
+#define lockf(x,y,z) 0
+#endif
 
 /*
  *  Return the current time in milliseconds.

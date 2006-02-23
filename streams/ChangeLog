@@ -1,6 +1,7 @@
 # $Log: ChangeLog,v $
-# Revision 0.9.2.12  2006/02/22 11:40:22  brian
-# - updates
+# Revision 0.9.2.13  2006/02/22 19:57:26  brian
+# - strap out lockf() that was blocking some test case
+#   processes on SMP and even on UP
 #
 
 2006-02-22 brian <bidulock@openss7.org>
@@ -37,6 +38,22 @@
 	* (tests/testsuite-sc.at): modified
 	* (tests/testsuite-streams.at): modified
 	- check for --quiet when running testsuites
+	* (src/test/test-clone.c): modified
+	* (src/test/test-connld.c): modified
+	* (src/test/test-echo.c): modified
+	* (src/test/test-fifo.c): modified
+	* (src/test/test-log.c): modified
+	* (src/test/test-loop.c): modified
+	* (src/test/test-mux.c): modified
+	* (src/test/test-nsdev.c): modified
+	* (src/test/test-nuls.c): modified
+	* (src/test/test-pipe.c): modified
+	* (src/test/test-pipemod.c): modified
+	* (src/test/test-sad.c): modified
+	* (src/test/test-sc.c): modified
+	* (src/test/test-streams.c): modified
+	- strap out lockf() that was blocking some test case
+	  processes on SMP and even on UP
 
 2006-02-20 brian <bidulock@openss7.org>
 	* (ChangeLog): modified - updated
