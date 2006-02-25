@@ -5,28 +5,15 @@ See the end cor copying conditions.
 
 Things to do:
 
-- Per cpu data:- I am still using the older approach of using cacheline
-  aligned arrays for per-cpu data.  This, of course, does not fully
-  utilize NUMA architectures.  For NUMA architectures we need to use the
-  per-cpu utilities provided by the 2.6 kernel.  I haven't touched
-  converting this yet.
+- More performance testing and profiling on SMP.  On the same kernel
+  running non-SMP we get pipe performance of about 80-90% of a Linux
+  native pipe.  Just running an SMP kernel drops this to 60%
+  comparative.  Running both CPUs in an SMP kernel does not improve
+  matters.  Need to profile this up 80-90% on SMP too.  Also, so many
+  changes were made for 64bit and 32bit compatibility that the old
+  profiling information is out of date and needs to be updated.
 
-  Also, there are several NUMA supporting STREAMS utility functions
-  (allocb_node, etc.) that need to be supported yet.
-
-  TODO: Convert cacheline aligned arrays to NUMA per-cpu data on 2.6
-        kernels.  Complete NUMA supporting STREAMS facilities.
-
-- SMP:- Finally got at least a Hyper-Threaded Intel 630 for testing.
-  There are some issues discovered when running the test suites.
-  Initial debugging is done (everything runs and doesn't crash) it is
-  just that some multiple writers and readers are getting stuck in wait
-  queues.  What we need to do is to split the wait queues into open,
-  close, read, write and ioctl from the big wait queue that it is, and
-  largely get rid of the RSLEEP, WSLEEP, IOCWAIT type bits (we could
-  still set them for compatibilty with SVR4 but not examine them).
-
-  TODO: Rework of wait queues.
+  TODO: Profile and performance test on SMP.
 
 - 32bit compatibility:- Not done yet, but a plan in place.  Override
   stupid CDROM ioctl conversions on kernels before 2.6.11, use
@@ -40,9 +27,41 @@ Things to do:
 
   TODO: Some code roughed in.
 
+- Per cpu data:- I am still using the older approach of using cacheline
+  aligned arrays for per-cpu data.  This, of course, does not fully
+  utilize NUMA architectures.  For NUMA architectures we need to use the
+  per-cpu utilities provided by the 2.6 kernel.  I haven't touched
+  converting this yet.
+
+  Also, there are several NUMA supporting STREAMS utility functions
+  (allocb_node, etc.) that need to be supported yet.
+
+  TODO: Convert cacheline aligned arrays to NUMA per-cpu data on 2.6
+        kernels.  Complete NUMA supporting STREAMS facilities.
+
+- I am interested to convert the perftest program to use a FIFO instead
+  of a pipe.  This is because a FIFO is more closely related to a Linux
+  Native pipe (i.e it has a read side and a write side, is really only
+  one file pointer, and only supports unidirectional flow).  Comparative
+  tests as opposed to STREAMS-based pipes should be interesting.
+
+  DONE: Tested.  Results were unimpressive.  STREAMS FIFOs perform about
+        1% better than STREAMS-based pipes.
+
 - Timers and Buffer callbacks:- Still haven't tested these.
 
   TODO: Test.
+
+- SMP:- Finally got at least a Hyper-Threaded Intel 630 for testing.
+  There are some issues discovered when running the test suites.
+  Initial debugging is done (everything runs and doesn't crash) it is
+  just that some multiple writers and readers are getting stuck in wait
+  queues.  What we need to do is to split the wait queues into open,
+  close, read, write and ioctl from the big wait queue that it is, and
+  largely get rid of the RSLEEP, WSLEEP, IOCWAIT type bits (we could
+  still set them for compatibilty with SVR4 but not examine them).
+
+  DONE: Tested on X86_64 SMP.
 
 - 64bit clean:- Pretty good now.  I have clean compiles and test suite
   runs on 2.6.9-22.EL x86_64 kernels.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.10 2006/02/20 09:35:36 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.11 2006/02/25 01:30:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/02/20 09:35:36 $ by $Author: brian $
+.\" Last Modified $Date: 2006/02/25 01:30:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -489,6 +489,17 @@ uw7spg
 .[
 uxpspg
 .]
+.IR Solaris \(rg
+uses the
+.I ioc_flag
+member to indicate whether the input output control that invoked the operation was native to the
+kernel
+.RB ( FNATIVE )
+or was a 32-bit operation invoked on a kernel with 64-bit longs and pointers
+.RB ( DATAMODEL_ILP32 ).
+.B @PACKAGE_TITLE@
+supports this flag for compatibility with modules or drivers written for
+.IR Solaris \(rg.
 .IP ""
 Portable
 .I STREAMS

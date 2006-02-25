@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/07 11:14:12 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/25 01:30:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,8 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +58,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/12/07 11:14:12 $ by $Author: brian $
+ Last Modified $Date: 2006/02/25 01:30:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.9  2006/02/25 01:30:46  brian
+ - more roughing in of 32bit compatibilty support
+ - updated perftest program to be able to use FIFOs as well as pipes
+ - added README-LiS file to capture LiS binary compatibility issues
+
  Revision 0.9.2.8  2005/12/07 11:14:12  brian
  - fixed bug keeping getmsg/putmsg from working.
 
@@ -93,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/07 11:14:12 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/25 01:30:46 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/12/07 11:14:12 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/02/25 01:30:46 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -137,6 +141,7 @@ int readwrite = 1;
 int native = 0;
 int readwrite = 0;
 #endif
+int fifo = 0;
 int push = 0;
 int blocking = 0;
 int asynchronous = 0;
@@ -572,17 +577,37 @@ do_tests(void)
 {
 	int fds[2] = { 0, 0 };
 
-	if (verbose > 1) {
-		fprintf(stderr, "Opening pipe\n");
-		fflush(stderr);
-	}
-	if (pipe(fds) != 0) {
-		if (verbose)
-			perror("pipe()");
-		goto dead;
-	}
-	if (verbose > 1) {
-		fprintf(stderr, "--> Pipe opened.\n");
+	if (!fifo) {
+		if (verbose > 1) {
+			fprintf(stderr, "Opening pipe\n");
+			fflush(stderr);
+		}
+		if (pipe(fds) != 0) {
+			if (verbose)
+				perror("pipe()");
+			goto dead;
+		}
+		if (verbose > 1) {
+			fprintf(stderr, "--> Pipe opened.\n");
+		}
+	} else {
+		if (verbose > 1) {
+			fprintf(stderr, "Opening fifo\n");
+			fflush(stderr);
+		}
+		if ((fds[0] = open("/dev/fifo", O_RDONLY | O_NONBLOCK)) < 0) {
+			if (verbose)
+				perror("open()");
+			goto dead;
+		}
+		if ((fds[1] = open("/dev/fifo", O_WRONLY | O_NONBLOCK)) < 0) {
+			if (verbose)
+				perror("open()");
+			goto dead;
+		}
+		if (verbose > 1) {
+			fprintf(stderr, "--> FIFO opened.\n");
+		}
 	}
 #if 0
 	if (!native) {
@@ -596,12 +621,10 @@ do_tests(void)
 		}
 	}
 #endif
-	if (!blocking) {
-		if (fcntl(fds[0], F_SETFL, O_NONBLOCK) < 0) {
-			if (verbose)
-				perror("fcntl(O_NONBLOCK)");
-			goto dead;
-		}
+	if (fcntl(fds[0], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
+		if (verbose)
+			perror("fcntl");
+		goto dead;
 	}
 	if (verbose > 1) {
 		fprintf(stderr, "--> Options set.\n");
@@ -618,12 +641,10 @@ do_tests(void)
 		}
 	}
 #endif
-	if (!blocking) {
-		if (fcntl(fds[1], F_SETFL, O_NONBLOCK) < 0) {
-			if (verbose)
-				perror("fcntl(O_NONBLOCK)");
-			goto dead;
-		}
+	if (fcntl(fds[1], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
+		if (verbose)
+			perror("fcntl");
+		goto dead;
 	}
 	if (verbose > 1) {
 		fprintf(stderr, "--> Options set.\n");
@@ -632,7 +653,8 @@ do_tests(void)
 		int i;
 
 		if (verbose > 1) {
-			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname, fds[0]);
+			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname,
+				fds[0]);
 		}
 		for (i = 0; i < push; i++) {
 			if (ioctl(fds[0], I_PUSH, modname) < 0) {
@@ -675,7 +697,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -701,9 +723,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -732,7 +753,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -772,6 +793,8 @@ Arguments:\n\
 Options:\n\
     -a, --async\n\
         Perform asynchronous testing\n\
+    -f, --fifo\n\
+        Use a STREAMS FIFO instead of a STREAMS-based pipe\n\
     -m, --module=MODNAME\n\
         Module name to push [default: %6$s]\n\
     -p, --push=[COUNT]\n\
@@ -810,6 +833,7 @@ main(int argc, char *argv[])
 		static struct option long_options[] = {
 			{"module",	required_argument,	NULL, 'm'},
 			{"async",	no_argument,		NULL, 'a'},
+			{"fifo",	no_argument,		NULL, 'f'},
 			{"push",	required_argument,	NULL, 'p'},
 			{"blocking",	no_argument,		NULL, 'b'},
 			{"size",	required_argument,	NULL, 's'},
@@ -825,9 +849,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "m:ap:bs:rt:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "m:afp:bs:rt:qvhV?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "m:ap:bs:rt:qvhV?");
+		c = getopt(argc, argv, "m:afp:bs:rt:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -843,6 +867,10 @@ main(int argc, char *argv[])
 			break;
 		case 'a':
 			asynchronous = 1;
+			break;
+		case 'f':
+			if (!native)
+				fifo = 1;
 			break;
 		case 'p':
 			if (optarg == NULL) {

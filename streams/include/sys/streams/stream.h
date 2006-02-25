@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.80 2006/02/20 10:59:20 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.81 2006/02/25 01:30:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 10:59:20 $ by $Author: brian $
+ Last Modified $Date: 2006/02/25 01:30:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.81  2006/02/25 01:30:43  brian
+ - more roughing in of 32bit compatibilty support
+ - updated perftest program to be able to use FIFOs as well as pipes
+ - added README-LiS file to capture LiS binary compatibility issues
+
  Revision 0.9.2.80  2006/02/20 10:59:20  brian
  - updated copyright headers on changed files
 
@@ -57,7 +62,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.80 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.81 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -168,6 +173,13 @@ typedef unsigned long __streams_dev_t;
 #ifndef FAPPEND
 #define FAPPEND O_APPEND
 #endif
+#ifndef FILP32
+#define FILP32 IOC_ILP32
+#endif
+#ifndef FNATIVE
+#define FNATIVE IOC_NATIVE
+#endif
+
 
 /* 
  *  strdata - qinit structure stream head read
@@ -175,7 +187,7 @@ typedef unsigned long __streams_dev_t;
  */
 
 typedef struct free_rtn {
-	void streamscall(*free_func) (caddr_t);
+	void streamscall (*free_func) (caddr_t);
 	caddr_t free_arg;
 } frtn_t;
 
@@ -418,7 +430,7 @@ typedef struct queue {
 	/* Linux fast-STREAMS specific members */
 	ssize_t q_msgs;			/* messages on queue, Solaris counts mblks, we count msgs */
 	rwlock_t q_lock;		/* lock for this queue structure */
-	int streamscall(*q_ftmsg) (mblk_t *);	/* message filter ala AIX */
+	int streamscall (*q_ftmsg) (mblk_t *);	/* message filter ala AIX */
 	struct syncq *q_syncq;		/* synchronization queues */
 #if 0
 	/* these are just a waste of space */
@@ -577,11 +589,11 @@ typedef struct module_stat {
 	uint ms_flags;			/* bool stats -- for future use */
 } module_stat_t;
 
-typedef int streamscall(*qi_putp_t) (queue_t *, mblk_t *);
-typedef int streamscall(*qi_srvp_t) (queue_t *);
-typedef int streamscall(*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
-typedef int streamscall(*qi_qclose_t) (queue_t *, int, cred_t *);
-typedef int streamscall(*qi_qadmin_t) (void);
+typedef int streamscall (*qi_putp_t) (queue_t *, mblk_t *);
+typedef int streamscall (*qi_srvp_t) (queue_t *);
+typedef int streamscall (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
+typedef int streamscall (*qi_qclose_t) (queue_t *, int, cred_t *);
+typedef int streamscall (*qi_qadmin_t) (void);
 
 struct qinit {
 	qi_putp_t qi_putp;		/* put procedure */
@@ -765,73 +777,60 @@ struct linkblk {
 };
 #endif
 
-/*
- *  LiS actually has some problems where, it does not align using the union below, meaning that the
- *  remaining fields overlap on 64-bit architectures.  Therefore, this LiS compatibility is only
- *  really for 32-bit architectures.  I you have problems with IOCTLs, this is it.
- */
-#ifdef CONFIG_STREAMS_LIS_BCM
+/* LiS actually has some problems where, it does not align using the union below, meaning that the
+   remaining fields overlap on 64-bit architectures.  Therefore, this LiS compatibility is only
+   really for 32-bit architectures.  I you have problems with IOCTLs, this is it.  Setting
+   CONFIG_STREAMS_LIS_BCM uses LiS 2.18.0 compatible definitions for iocblk on __LP64__.  Note
+   that without CONFIG_STREAMS_LIS_BCM, or on 32-bit native architectures, Linux Fast-STREAMS is
+   always binary compatible with OSF/HPUX/AIX/SUX/IRIX/UW7.  It is only binary compatible with
+   Solaris on 32bit architectures.  Solaris 64bit deviates from this so much that binary
+   compatibilty with Solaris 64 bit is not possible without breaking everything else. */
+
 typedef union {
 	long l;				/* long value */
 	ulong ul;			/* unsigned long value */
 	caddr_t cp;			/* char address pointer */
 	mblk_t *mp;			/* msgb pointer */
 } ioc_pad;
-#endif
 
-#ifdef CONFIG_STREAMS_LIS_BCM
 struct iocblk {
 	int ioc_cmd;			/* command to perform */
 	cred_t *ioc_cr;			/* credentials */
 	uint ioc_id;			/* id of this ioctl */
+#if defined __LP64__ && defined CONFIG_STREAMS_LIS_BCM
+	uint ioc_count;			/* size of the data field */
+#else
 	ioc_pad ioc_cnt;
 #define ioc_count       ioc_cnt.ul	/* size of the data field */
+#endif
 	int ioc_error;			/* ioctl error code (for errno) */
 	int ioc_rval;			/* system call return value */
 	long ioc_filler[4];
+#define ioc_flag	ioc_filler[1]	/* data model, IOC_NATIVE or IOC_ILP32 */
 };
-#else
-struct iocblk {
-	int ioc_cmd;			/* command to perform */
-	cred_t *ioc_cr;			/* credentials */
-	uint ioc_id;			/* id of this ioctl */
-	caddr_t __pad1;
-	size_t ioc_count;		/* size of the data field */
-	int ioc_error;			/* ioctl error code (for errno) */
-	int ioc_rval;			/* system call return value */
-	uint ioc_flag;
-	mblk_t *__pad2;
-};
-#endif
 
 #define ioc_uid		ioc_cr->cr_uid
 #define ioc_gid		ioc_cr->cr_gid
 
-#ifdef CONFIG_STREAMS_LIS_BCM
-struct copyreq {
-	int cq_cmd;
-	cred_t *cq_cr;
-	uint cq_id;
-	ioc_pad cq_ad;
-#define cq_addr cq_ad.cp
-	uint cq_size;
-	int cq_flag;
-	mblk_t *cq_private;
-	long cq_filler[4];
-};
-#else
+/* This is a Solaris compatible approach for signalling to the driver that the ioctl that generated 
+   the M_IOCTL or M_IOCDATA was 32bit or native 64 bit. */
+
+#define IOC_MASK	0xff000000	/* mask of model bits */
+#define IOC_NONE	0x00000000	/* no indication */
+#define IOC_NATIVE	0x01000000	/* native ioctl request */
+#define IOC_IPL32	0x02000000	/* 32bit ioctl request */
+
 struct copyreq {
 	int cq_cmd;			/* command being performed */
 	cred_t *cq_cr;			/* credentials */
 	uint cq_id;			/* id of this ioctl */
-	caddr_t cq_addr;		/* data address */
-	size_t cq_size;			/* size of data */
-	int __pad1;
-	int __pad2;
-	uint cq_flag;			/* request flags (must be zero) */
+	ioc_pad cq_ad;
+#define cq_addr cq_ad.cp		/* data address */
+	uint cq_size;			/* size of data */
+	int cq_flag;			/* STRCANON or RECOPY */
 	mblk_t *cq_private;		/* private state information */
+	long cq_filler[4];		/* SVR4 compatibility */
 };
-#endif
 
 #define cq_uid		cq_cr->cr_uid
 #define cq_gid		cq_cr->cr_gid
@@ -840,31 +839,18 @@ struct copyreq {
 #define RECOPY		0x02	/* perform I_STR copyin again, this time using canonical format
 				   specifier */
 
-#ifdef CONFIG_STREAMS_LIS_BCM
-struct copyresp {
-	int cp_cmd;
-	cred_t *cp_cr;
-	uint cp_id;
-	ioc_pad cp_rv;
-#define cp_rval cp_rv.cp
-	uint cp_pad1;
-	int cp_pad2;
-	mblk_t *cp_private;
-	long cp_filler[4];
-};
-#else
 struct copyresp {
 	int cp_cmd;			/* command being performed */
 	cred_t *cp_cr;			/* credentials */
 	uint cp_id;			/* id of this ioctl */
-	caddr_t cp_rval;		/* data address */
-	size_t __pad1;			/* alignment with copyreq */
-	int __pad2;
-	int __pad3;
-	uint cp_flag;			/* response flags */
+	ioc_pad cp_rv;
+#define cp_rval cp_rv.cp		/* result 0 - success, 1 - failure */
+	uint cp_pad1;			/* reserved */
+	int cp_pad2;			/* reserved */
 	mblk_t *cp_private;		/* private state information */
+	long cp_filler[4];		/* SVR4 compatibility */
+#define cp_flag		cp_filler[0]	/* data model, IOC_NATIVE or IOC_ILP32 */
 };
-#endif
 
 #define cp_uid		cp_cr->cr_uid
 #define cp_gid		cp_cr->cr_gid
@@ -878,25 +864,27 @@ union ioctypes {
 /* AIX wantio structures (not binary compatible, or source compatible either).  I cannot find
    structure descriptions for either the contents of the M_LETSPLAY message (whether the count is
    an int), nor the wantio structure (which has the read/write/select(?) points. */
+
 struct strlp {
 	int lp_count;			/* count of supporting modules */
 	queue_t *lp_queue;		/* pointer to queue write pointer (for reply) */
 };
 
 struct wantio {
-	unsigned int streamscall(*poll) (struct file *, struct poll_table_struct *);
-	ssize_t streamscall(*read) (struct file *, char *, size_t, loff_t *);
-	ssize_t streamscall(*write) (struct file *, const char *, size_t, loff_t *);
-	ssize_t streamscall(*readv) (struct file *, const struct iovec *, unsigned long, loff_t *);
-	ssize_t streamscall(*writev) (struct file *, const struct iovec *, unsigned long, loff_t *);
-	ssize_t streamscall(*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
-	int streamscall(*getpmsg) (struct file *, struct strbuf *, struct strbuf *, int *, int *);
-	int streamscall(*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
-	int streamscall(*ioctl) (struct file *, unsigned int, unsigned long);
+	unsigned int streamscall (*poll) (struct file *, struct poll_table_struct *);
+	ssize_t streamscall (*read) (struct file *, char *, size_t, loff_t *);
+	ssize_t streamscall (*write) (struct file *, const char *, size_t, loff_t *);
+	ssize_t streamscall (*readv) (struct file *, const struct iovec *, unsigned long, loff_t *);
+	ssize_t streamscall (*writev) (struct file *, const struct iovec *, unsigned long,
+				       loff_t *);
+	ssize_t streamscall (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
+	int streamscall (*getpmsg) (struct file *, struct strbuf *, struct strbuf *, int *, int *);
+	int streamscall (*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
+	int streamscall (*ioctl) (struct file *, unsigned int, unsigned long);
 };
 
 /* If you use this structure, you might want to upcall to the stream head functions behind these.
- * You will find them in sys/strsubr.h.  You can find the stream from the file pointer like this: */
+   You will find them in sys/strsubr.h.  You can find the stream from the file pointer like this: */
 
 #define fstream(__f) ((struct stdata *)((__f)->private_data))
 
@@ -910,7 +898,7 @@ typedef int bufcall_id_t;
 #define bufcall_id_t bufcall_id_t
 
 typedef void *weld_arg_t;
-typedef void streamscall(*weld_fcn_t) (weld_arg_t);
+typedef void streamscall (*weld_fcn_t) (weld_arg_t);
 
 #define ANYBAND (-1)
 
@@ -994,7 +982,7 @@ __STREAMS_EXTERN int testb(register size_t size, unsigned int priority);
 __STRUTIL_EXTERN_INLINE mblk_t *unlinkb(register mblk_t *mp);
 __STREAMS_EXTERN size_t xmsgsize(mblk_t *mp);
 
-__STREAMS_EXTERN bcid_t bufcall(unsigned size, int priority, void streamscall(*function) (long),
+__STREAMS_EXTERN bcid_t bufcall(unsigned size, int priority, void streamscall (*function) (long),
 				long arg);
 
 __STREAMS_EXTERN int appq(queue_t *q, mblk_t *mp1, mblk_t *mp2);
@@ -1235,7 +1223,7 @@ canputnext(register queue_t *q)
 }
 
 __STRSCHD_EXTERN_INLINE bcid_t
-esbbcall(int priority, void streamscall(*function) (long), long arg)
+esbbcall(int priority, void streamscall (*function) (long), long arg)
 {
 	return bufcall(0, priority, function, arg);
 }
